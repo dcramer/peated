@@ -1,3 +1,4 @@
+import { getUserActor } from "@peated/server/lib/actors";
 import {
   DuplicateBottleAliasError,
   FailedToSaveBottleAliasError,
@@ -70,7 +71,7 @@ export default procedure
         input: input.bottle,
         releaseInput: input.release,
         user: context.user,
-        actorType: "user",
+        actor: await getUserActor(context.user),
       });
 
       return {

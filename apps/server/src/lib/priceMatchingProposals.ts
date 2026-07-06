@@ -17,6 +17,7 @@ import {
 import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
+  actors,
   bottleObservations,
   bottleReleases,
   bottleSeries,
@@ -31,11 +32,7 @@ import {
   type StorePriceMatchProposal,
   type User,
 } from "@peated/server/db/schema";
-import {
-  getPeatedSystemActorForDatabase,
-  getUserActorByIdForDatabase,
-  getUserActorForDatabase,
-} from "@peated/server/lib/actors";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
@@ -116,7 +113,39 @@ type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
-type IncomingBottleDecisionActorType = IncomingBottleDecisionActor["type"];
+
+async function getPriceMatchWriteActorForDatabase(
+  tx: AnyDatabase,
+  actor: IncomingBottleDecisionActor,
+  {
+    userId,
+    allowSystemActor = false,
+  }: {
+    userId: number;
+    allowSystemActor?: boolean;
+  },
+): Promise<IncomingBottleDecisionActor> {
+  const storedActor = await tx.query.actors.findFirst({
+    where: eq(actors.id, actor.id),
+  });
+
+  if (!storedActor || storedActor.type !== actor.type) {
+    throw new Error(`Invalid price match actor ${actor.id}.`);
+  }
+
+  if (storedActor.type === "system") {
+    if (!allowSystemActor) {
+      throw new Error(`System actor ${actor.id} is not allowed here.`);
+    }
+    return storedActor;
+  }
+
+  if (storedActor.userId !== userId) {
+    throw new Error(`User actor ${actor.id} does not match user ${userId}.`);
+  }
+
+  return storedActor;
+}
 
 function withStoreCaskBottleDefaults(
   proposedBottle: BottleClassificationDecision["proposedBottle"],
@@ -1058,13 +1087,18 @@ async function applyBottleRepairDraftInTransaction(
     bottleId,
     proposedBottle,
     user,
+    actor,
   }: {
     bottleId: number;
     proposedBottle: ProposedBottle;
     user: User;
+    actor: IncomingBottleDecisionActor;
   },
 ) {
-  const actorId = (await getUserActorForDatabase(tx, user)).id;
+  const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
+    userId: user.id,
+  });
+  const actorId = writeActor.id;
   const bottle = await getBottleForStorePriceRepairInTransaction(tx, bottleId);
   const currentDistillers = bottle.bottlesToDistillers.map(
     (row) => row.distiller,
@@ -1676,8 +1710,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     releaseInput,
     user,
     creationSource,
-    actorType,
-    actor: actorInput,
+    actor,
     expectedProcessingToken,
   }: {
     proposalId: number;
@@ -1685,8 +1718,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
     user: User;
     creationSource: CatalogVerificationCreationSource;
-    actorType: IncomingBottleDecisionActorType;
-    actor?: IncomingBottleDecisionActor;
+    actor: IncomingBottleDecisionActor;
     expectedProcessingToken?: string;
   },
 ) {
@@ -1708,11 +1740,10 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     );
   }
 
-  const actor =
-    actorInput ??
-    (actorType === "system"
-      ? await getPeatedSystemActorForDatabase(tx)
-      : await getUserActorForDatabase(tx, user));
+  const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
+    userId: user.id,
+    allowSystemActor: creationSource === "price_match_automation",
+  });
 
   let createResult: Awaited<
     ReturnType<typeof createBottleInTransaction>
@@ -1736,7 +1767,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     try {
       createResult = await createBottleInTransaction(tx, {
         creationSource,
-        createdByActorId: actor.id,
+        createdByActorId: writeActor.id,
         input,
         context: {
           user,
@@ -1771,7 +1802,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     try {
       createReleaseResult = await createBottleReleaseInTransaction(tx, {
         bottleId: releaseBottleId,
-        createdByActorId: actor.id,
+        createdByActorId: writeActor.id,
         input: releaseInput,
         user,
       });
@@ -1808,8 +1839,9 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
       bottleId: resolvedBottleId,
       releaseId: resolvedReleaseId,
       reviewedById: user.id,
+      allowSystemActor: creationSource === "price_match_automation",
       decisionLog: {
-        actor,
+        actor: writeActor,
         decision: getIncomingBottleDecisionFromCreationTarget(creationTarget),
         createdBottle: !!createResult,
         createdRelease: !!createReleaseResult,
@@ -1838,7 +1870,7 @@ export async function createBottleFromStorePriceMatchProposal({
   releaseInput,
   user,
   creationSource = "price_match_review",
-  actorType,
+  actor,
   expectedProcessingToken,
 }: {
   proposalId: number;
@@ -1846,7 +1878,7 @@ export async function createBottleFromStorePriceMatchProposal({
   releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
   user: User;
   creationSource?: CatalogVerificationCreationSource;
-  actorType: IncomingBottleDecisionActorType;
+  actor: IncomingBottleDecisionActor;
   expectedProcessingToken?: string;
 }) {
   const result = await db.transaction(async (tx) =>
@@ -1856,7 +1888,7 @@ export async function createBottleFromStorePriceMatchProposal({
       releaseInput,
       user,
       creationSource,
-      actorType,
+      actor,
       expectedProcessingToken,
     }),
   );
@@ -2100,7 +2132,8 @@ export async function resolveStorePriceMatchProposal(
           bottleId: proposal.suggestedBottleId,
           releaseId: proposal.suggestedReleaseId ?? null,
           reviewedById: automationUser.id,
-          actorType: "system",
+          actor: await getPeatedSystemActor(),
+          allowSystemActor: true,
           expectedProcessingToken: processingToken,
         });
 
@@ -2119,7 +2152,7 @@ export async function resolveStorePriceMatchProposal(
         ...createInputs,
         user: automationUser,
         creationSource: "price_match_automation",
-        actorType: "system",
+        actor: await getPeatedSystemActor(),
         expectedProcessingToken: processingToken,
       });
 
@@ -2352,16 +2385,16 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     bottleId,
     releaseId = null,
     reviewedById,
-    decisionLog = {
-      decision: "match_existing",
-    },
+    allowSystemActor = false,
+    decisionLog,
   }: {
     proposal: StorePriceMatchProposalForReview;
     bottleId: number;
     releaseId?: number | null;
     reviewedById: number;
-    decisionLog?: {
-      actor?: IncomingBottleDecisionActor;
+    allowSystemActor?: boolean;
+    decisionLog: {
+      actor: IncomingBottleDecisionActor;
       decision: IncomingBottleDecisionType;
       createdBottle?: boolean;
       createdRelease?: boolean;
@@ -2369,6 +2402,15 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     };
   },
 ) {
+  const actor = await getPriceMatchWriteActorForDatabase(
+    tx,
+    decisionLog.actor,
+    {
+      userId: reviewedById,
+      allowSystemActor,
+    },
+  );
+
   if (releaseId !== null) {
     const release = await tx.query.bottleReleases.findFirst({
       where: eq(bottleReleases.id, releaseId),
@@ -2380,9 +2422,6 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
       );
     }
   }
-
-  const actor =
-    decisionLog.actor ?? (await getUserActorByIdForDatabase(tx, reviewedById));
 
   const aliasKey = normalizeBottleAliasKey(proposal.price.name);
   // Store listing keys stay bottle-level unless an existing canonical release
@@ -2460,14 +2499,16 @@ export async function applyApprovedStorePriceMatchInTransaction(
     bottleId,
     releaseId,
     reviewedById,
-    actorType,
+    actor,
+    allowSystemActor = false,
     expectedProcessingToken,
   }: {
     proposalId: number;
     bottleId: number;
     releaseId?: number | null;
     reviewedById: number;
-    actorType: IncomingBottleDecisionActorType;
+    actor: IncomingBottleDecisionActor;
+    allowSystemActor?: boolean;
     expectedProcessingToken?: string;
   },
 ) {
@@ -2476,16 +2517,12 @@ export async function applyApprovedStorePriceMatchInTransaction(
     expectedProcessingToken,
   });
 
-  const actor =
-    actorType === "system"
-      ? await getPeatedSystemActorForDatabase(tx)
-      : await getUserActorByIdForDatabase(tx, reviewedById);
-
   return await applyApprovedStorePriceMatchProposalInTransaction(tx, {
     proposal,
     bottleId,
     releaseId,
     reviewedById,
+    allowSystemActor,
     decisionLog: {
       actor,
       decision: "match_existing",
@@ -2498,14 +2535,16 @@ export async function applyApprovedStorePriceMatch({
   bottleId,
   releaseId,
   reviewedById,
-  actorType,
+  actor,
+  allowSystemActor = false,
   expectedProcessingToken,
 }: {
   proposalId: number;
   bottleId: number;
   releaseId?: number | null;
   reviewedById: number;
-  actorType: IncomingBottleDecisionActorType;
+  actor: IncomingBottleDecisionActor;
+  allowSystemActor?: boolean;
   expectedProcessingToken?: string;
 }) {
   const aliasResult = await db.transaction(async (tx) =>
@@ -2514,7 +2553,8 @@ export async function applyApprovedStorePriceMatch({
       bottleId,
       releaseId,
       reviewedById,
-      actorType,
+      actor,
+      allowSystemActor,
       expectedProcessingToken,
     }),
   );
@@ -2535,10 +2575,12 @@ export async function applyApprovedStorePriceMatch({
 export async function applyStorePriceBottleRepairFromProposal({
   proposalId,
   user,
+  actor,
   expectedProcessingToken,
 }: {
   proposalId: number;
   user: User;
+  actor: IncomingBottleDecisionActor;
   expectedProcessingToken?: string;
 }) {
   const { repairResult, aliasResult } = await db.transaction(async (tx) => {
@@ -2555,6 +2597,7 @@ export async function applyStorePriceBottleRepairFromProposal({
       bottleId: proposal.currentBottleId!,
       proposedBottle,
       user,
+      actor,
     });
     const approvedAliasResult =
       await applyApprovedStorePriceMatchProposalInTransaction(tx, {
@@ -2562,6 +2605,10 @@ export async function applyStorePriceBottleRepairFromProposal({
         bottleId: repairedBottle.bottle.id,
         releaseId: null,
         reviewedById: user.id,
+        decisionLog: {
+          actor,
+          decision: "match_existing",
+        },
       });
 
     return {
@@ -2583,13 +2630,19 @@ export async function applyStorePriceBottleRepairFromProposal({
 export async function ignoreStorePriceMatchProposal({
   proposalId,
   reviewedById,
+  actor,
 }: {
   proposalId: number;
   reviewedById: number;
+  actor: IncomingBottleDecisionActor;
 }) {
   await db.transaction(async (tx) => {
     await getStorePriceMatchProposalForReviewInTransaction(tx, {
       proposalId,
+    });
+
+    await getPriceMatchWriteActorForDatabase(tx, actor, {
+      userId: reviewedById,
     });
 
     await tx

@@ -6,17 +6,20 @@ import {
   bottleSeries,
   bottles,
   bottlesToDistillers,
+  changes,
+  incomingBottleDecisionLogs,
   reviews,
   storePriceMatchProposals,
   storePriceMatchRetryRunItems,
   storePriceMatchRetryRuns,
   storePrices,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -711,6 +714,15 @@ describe("price match queue", () => {
     expect(updatedSourceSeries?.numReleases).toEqual(0);
     expect(updatedTargetSeries?.numReleases).toEqual(1);
 
+    const repairChange = await db.query.changes.findFirst({
+      where: and(
+        eq(changes.objectType, "bottle"),
+        eq(changes.objectId, currentBottle.id),
+        eq(changes.type, "update"),
+      ),
+    });
+    expect(repairChange?.actorId).toBe((await getUserActor(user)).id);
+
     const observation = await db.query.bottleObservations.findFirst({
       where: (bottleObservations, { eq }) =>
         eq(bottleObservations.sourceKey, `store_price:${price.id}`),
@@ -1209,8 +1221,18 @@ describe("price match queue", () => {
     const updatedBottle = await db.query.bottles.findFirst({
       where: (table, { eq }) => eq(table.id, bottle.id),
     });
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+
+    const userActor = await getUserActor(user);
 
     expect(alias?.bottleId).toBe(bottle.id);
+    expect(alias?.assignedByActorId).toBe(userActor.id);
+    expect(decisionLog?.actorId).toBe(userActor.id);
     expect(updatedPrice?.bottleId).toBe(bottle.id);
     expect(updatedSiblingPrice?.bottleId).toBeNull();
     expect(updatedReview?.bottleId).toBe(bottle.id);
@@ -1285,8 +1307,17 @@ describe("price match queue", () => {
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "Queue Create Candidate"),
     });
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+        eq(incomingBottleDecisionLogs.sourceId, price.id),
+      ),
+    });
+
+    const userActor = await getUserActor(user);
 
     expect(result.bottle.fullName).toBe("Queue Brand Single Cask");
+    expect(decisionLog?.actorId).toBe(userActor.id);
     expect(updatedPrice?.bottleId).toBe(result.bottle.id);
     expect(updatedProposal).toMatchObject({
       status: "approved",
@@ -1295,6 +1326,7 @@ describe("price match queue", () => {
       reviewedById: user.id,
     });
     expect(listingAlias?.bottleId).toBe(result.bottle.id);
+    expect(listingAlias?.assignedByActorId).toBe(userActor.id);
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
       bottleId: result.bottle.id,
       creationSource: "price_match_review",

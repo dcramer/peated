@@ -5,11 +5,13 @@ import {
   bottleReleases,
   bottles,
   bottlesToDistillers,
+  changes,
   incomingBottleDecisionLogs,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import {
   findBottleReferenceCandidates,
   searchBottleCandidates,
@@ -538,7 +540,7 @@ describe("priceMatching", () => {
         flavorProfile: null,
       },
       user: reviewer,
-      actorType: "user",
+      actor: await getUserActor(reviewer),
     });
 
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
@@ -1168,6 +1170,7 @@ describe("priceMatching", () => {
       sourceKind: "store_price",
       sourceId: price.id,
       proposalId: proposal.id,
+      actorId: (await getPeatedSystemActor()).id,
       decision: "match_existing",
       bottleId: bottle.id,
       releaseId: null,
@@ -3098,7 +3101,6 @@ describe("priceMatching", () => {
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
-
     expect(extractFromText).not.toHaveBeenCalled();
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal).toMatchObject({
@@ -3809,6 +3811,7 @@ describe("priceMatching", () => {
       }),
     );
 
+    const systemActor = await getPeatedSystemActor();
     const proposal = await resolveStorePriceMatchProposal(price.id);
     const updatedPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, price.id),
@@ -3818,6 +3821,13 @@ describe("priceMatching", () => {
     });
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+    const creationChange = await db.query.changes.findFirst({
+      where: and(
+        eq(changes.objectType, "bottle"),
+        eq(changes.objectId, proposal.suggestedBottleId!),
+        eq(changes.type, "add"),
+      ),
     });
     const [attempt] = await db
       .select()
@@ -3835,8 +3845,11 @@ describe("priceMatching", () => {
     expect(createdBottle).toMatchObject({
       name: "Web Reserve",
       fullName: "Auto Brand Web Reserve",
+      createdByActorId: systemActor.id,
     });
     expect(listingAlias?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(listingAlias?.assignedByActorId).toBe(systemActor.id);
+    expect(creationChange?.actorId).toBe(systemActor.id);
     expect(attempt).toMatchObject({
       automationEligible: true,
       finalStatus: "approved",
@@ -3853,6 +3866,7 @@ describe("priceMatching", () => {
       sourceKind: "store_price",
       sourceId: price.id,
       proposalId: proposal.id,
+      actorId: systemActor.id,
       decision: "create_bottle",
       bottleId: proposal.suggestedBottleId,
       releaseId: null,
@@ -5111,6 +5125,7 @@ describe("priceMatching", () => {
     await ignoreStorePriceMatchProposal({
       proposalId: proposal.id,
       reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
     });
 
     const [reviewedAttempt] = await db
@@ -5121,6 +5136,42 @@ describe("priceMatching", () => {
     expect(reviewedAttempt).toMatchObject({
       finalStatus: "ignored",
       reviewedById: reviewer.id,
+    });
+  });
+
+  test("rejects ignoring a proposal with an actor from another user", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const otherUser = await fixtures.User();
+    const price = await fixtures.StorePrice({
+      name: "Ignore Mismatch Candidate",
+    });
+
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+      })
+      .returning();
+
+    await expect(
+      ignoreStorePriceMatchProposal({
+        proposalId: proposal.id,
+        reviewedById: reviewer.id,
+        actor: await getUserActor(otherUser),
+      }),
+    ).rejects.toThrow(`does not match user ${reviewer.id}`);
+
+    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
+      where: eq(storePriceMatchProposals.id, proposal.id),
+    });
+
+    expect(updatedProposal).toMatchObject({
+      status: "pending_review",
+      reviewedById: null,
     });
   });
 
@@ -5868,7 +5919,7 @@ describe("priceMatching", () => {
       proposalId: reviewableProposal.id,
       bottleId: bottle.id,
       reviewedById: user.id,
-      actorType: "user",
+      actor: await getUserActor(user),
     });
 
     const updatedReviewableProposal =
@@ -5986,7 +6037,7 @@ describe("priceMatching", () => {
       bottleId: bottle.id,
       releaseId: release.id,
       reviewedById: reviewer.id,
-      actorType: "user",
+      actor: await getUserActor(reviewer),
     });
 
     const observation = await db.query.bottleObservations.findFirst({
