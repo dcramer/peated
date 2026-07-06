@@ -7,6 +7,39 @@ class ORPCUnauthorizedRedirectError extends Error {
   name = "ORPCUnauthorizedRedirectError";
 }
 
+export type ORPCResponseTraceContext = {
+  sentryTraceId: string | null;
+};
+
+const SENTRY_TRACE_ID_PATTERN = /^[0-9a-f]{32}$/;
+
+/** Creates caller-owned response trace state populated from `x-sentry-trace-id`. */
+export function createORPCResponseTraceContext(): ORPCResponseTraceContext {
+  return { sentryTraceId: null };
+}
+
+function isORPCResponseTraceContext(
+  value: unknown,
+): value is ORPCResponseTraceContext {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+
+  if (!("sentryTraceId" in value)) {
+    return false;
+  }
+
+  const traceContext = value as { sentryTraceId: unknown };
+  return (
+    traceContext.sentryTraceId === null ||
+    typeof traceContext.sentryTraceId === "string"
+  );
+}
+
+function parseSentryTraceId(traceId: string | null): string | null {
+  return traceId && SENTRY_TRACE_ID_PATTERN.test(traceId) ? traceId : null;
+}
+
 export function isORPCUnauthorizedRedirectError(
   error: unknown,
 ): error is ORPCUnauthorizedRedirectError {
@@ -52,6 +85,18 @@ export function getLink({
       };
     },
     url: `${apiServer}/rpc`,
+    adapterInterceptors: [
+      async ({ next, ...options }) => {
+        const response = await next(options);
+        const responseTraceContext = options.context.responseTraceContext;
+        if (isORPCResponseTraceContext(responseTraceContext)) {
+          responseTraceContext.sentryTraceId = parseSentryTraceId(
+            response.headers.get("x-sentry-trace-id"),
+          );
+        }
+        return response;
+      },
+    ],
     interceptors: [
       async ({ next, ...options }) => {
         try {

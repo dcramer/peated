@@ -27,6 +27,9 @@ catalogs:
     '@sentry/core':
       specifier: 10.53.0
       version: 10.53.0
+    '@sentry/hono':
+      specifier: 10.53.0
+      version: 10.53.0
     '@sentry/nextjs':
       specifier: 10.53.0
       version: 10.53.0
@@ -279,6 +282,9 @@ importers:
       '@sentry/core':
         specifier: 'catalog:'
         version: 10.53.0
+      '@sentry/hono':
+        specifier: 'catalog:'
+        version: 10.53.0(@sentry/node@10.53.0)(hono@4.12.25)
       '@sentry/node':
         specifier: 'catalog:'
         version: 10.53.0
@@ -4394,6 +4400,25 @@ packages:
   '@sentry/core@10.53.0':
     resolution: {integrity: sha512-clFNN45Ry4QYn32yzdp7ZqwUrn1HWpd3URsD73L2hk1WS6KDNB2TtBaLNau+Z5hwTU61Kxezkn5FyoRb68/5Yw==}
     engines: {node: '>=18'}
+
+  '@sentry/hono@10.53.0':
+    resolution: {integrity: sha512-2at8q0Dgqseo5oQcgJHEdTxe0xOwC5/5pn/rd5HLj0lmJabEU6t4iLuKDH4sTIhXObAy3b1vcXeLDJc0fMkDKA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@cloudflare/workers-types': ^4.x
+      '@sentry/bun': 10.53.0
+      '@sentry/cloudflare': 10.53.0
+      '@sentry/node': 10.53.0
+      hono: ^4.x
+    peerDependenciesMeta:
+      '@cloudflare/workers-types':
+        optional: true
+      '@sentry/bun':
+        optional: true
+      '@sentry/cloudflare':
+        optional: true
+      '@sentry/node':
+        optional: true
 
   '@sentry/nextjs@10.53.0':
     resolution: {integrity: sha512-TutlfGoZOVvSibmij6dGuEobjg3/m5qaHQzeAV4mSVl61woSzMJU99531t1MCVe4wYY9rI2GEHbIeTe1vQxjHA==}
@@ -13675,6 +13700,14 @@ snapshots:
       - supports-color
 
   '@sentry/core@10.53.0': {}
+
+  '@sentry/hono@10.53.0(@sentry/node@10.53.0)(hono@4.12.25)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@sentry/core': 10.53.0
+      hono: 4.12.25
+    optionalDependencies:
+      '@sentry/node': 10.53.0
 
   '@sentry/nextjs@10.53.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(next@16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(webpack@5.93.0(esbuild@0.27.7)(postcss@8.5.16))':
     dependencies:

@@ -86,16 +86,21 @@ test.describe("log tasting", () => {
 
     await uploadLabel(page);
 
-    await expect(page.getByText("Match found")).toBeVisible();
-    await expect(page.getByText("Lagavulin")).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByText("Matched to existing bottle in Peated"),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Lagavulin", { exact: true }).first(),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Show all details" }).click();
     await expect(page.getByText("16 years")).toBeVisible();
     await expect(
       page
         .locator("main section")
-        .filter({ hasText: "Match found" })
-        .getByRole("button")
-        .first(),
-    ).toHaveText("Log Tasting");
+        .filter({ hasText: existingBottle.fullName })
+        .getByRole("button", { name: "Log Tasting" }),
+    ).toBeVisible();
 
     await page.getByRole("button", { name: "Log Tasting" }).click();
 
@@ -127,7 +132,7 @@ test.describe("log tasting", () => {
 
     await uploadLabel(page);
 
-    await expect(page.getByText("Match found")).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Log Tasting" }).click();
 
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();

@@ -10,6 +10,7 @@ import {
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
+import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { procedure } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import {
@@ -22,22 +23,13 @@ import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import bottleReleasesDetails from "../bottleReleases/details";
 import bottlesDetails from "../bottles/details";
-import {
-  identifyPendingImage,
-  isPhotoIdentificationCreateDecisionAutoCreatable,
-} from "./photo-identification";
+import { isPhotoIdentificationCreateDecisionAutoCreatable } from "./photo-identification";
 
 type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
 };
 
-const CatalogImageApprovalTargetSchema = z.enum(["bottle", "release"]);
-type CatalogImageApprovalTarget = z.infer<
-  typeof CatalogImageApprovalTargetSchema
->;
-const CatalogImageApprovalSchema = z.object({
-  target: CatalogImageApprovalTargetSchema,
-});
+type CatalogImageApprovalTarget = "bottle" | "release";
 const CatalogImageWarningSchema = z.object({
   code: z.literal("CATALOG_IMAGE_COPY_FAILED"),
   message: z.string(),
@@ -50,9 +42,9 @@ type CreateDecisionResult = Awaited<
 type CreateDecision = Parameters<
   typeof applyClassifierCreateDecision
 >[0]["decision"];
-type ImageEvidence = Awaited<
-  ReturnType<typeof identifyPendingImage>
->["imageEvidence"];
+type PhotoSuitability = Awaited<
+  ReturnType<typeof verifyPhotoIdentificationCreateToken>
+>["photoSuitability"];
 
 const catalogImageWarningMessage: Record<CatalogImageApprovalTarget, string> = {
   bottle: "The bottle was created, but the public image was not saved.",
@@ -68,7 +60,7 @@ function buildCatalogImageWarning(
   };
 }
 
-/** Catalog image approval is the only image promotion path for scan-created releases. */
+/** Scan-created releases only promote suitable source photos, never classifier-proposed images. */
 function stripUnapprovedCatalogImages(
   decision: CreateDecision,
 ): CreateDecision {
@@ -99,22 +91,18 @@ function getCatalogImageApprovalDestination({
   approvalTarget,
   decision,
   result,
-  imageEvidence,
+  photoSuitability,
   pendingPurpose,
 }: {
-  approvalTarget: CatalogImageApprovalTarget | null | undefined;
+  approvalTarget: CatalogImageApprovalTarget;
   decision: CreateDecision;
   result: CreateDecisionResult;
-  imageEvidence: ImageEvidence;
+  photoSuitability: PhotoSuitability;
   pendingPurpose: string;
 }): { target: CatalogImageApprovalTarget; id: number } | null {
-  if (!approvalTarget) {
-    return null;
-  }
-
   if (
     pendingPurpose !== "photo_tasting_entry" ||
-    imageEvidence.photoSuitability.suitableAsBottleImage !== true
+    photoSuitability.suitableAsBottleImage !== true
   ) {
     return null;
   }
@@ -140,6 +128,12 @@ function getCatalogImageApprovalDestination({
   return null;
 }
 
+function getDefaultCatalogImageApprovalTarget(
+  decision: CreateDecision,
+): CatalogImageApprovalTarget {
+  return decision.action === "create_bottle" ? "bottle" : "release";
+}
+
 function logCatalogImageApprovalError(
   err: unknown,
   {
@@ -157,7 +151,7 @@ function logCatalogImageApprovalError(
   },
 ) {
   logError(err, {
-    catalogImageApproval: {
+    catalogImagePromotion: {
       target: destination.target,
       targetId: destination.id,
       pendingImageId,
@@ -291,15 +285,12 @@ export default procedure
     path: "/tastings/photo-identification-create",
     summary: "Create bottle target from photo identification",
     description:
-      "Create the bottle or release target from a reviewed photo identification result, with optional approved public catalog image promotion.",
+      "Create the bottle or release target from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
     operationId: "createTastingBottleTargetFromPhotoIdentification",
   })
   .input(
     z.object({
-      pendingImageId: z.string().trim().min(1),
-      catalogImageApproval: CatalogImageApprovalSchema.nullish().describe(
-        "Approved public catalog image destination for the pending scan",
-      ),
+      createToken: z.string().trim().min(1),
     }),
   )
   .output(
@@ -318,10 +309,30 @@ export default procedure
       throw errors.UNAUTHORIZED();
     }
 
+    let createTokenPayload: Awaited<
+      ReturnType<typeof verifyPhotoIdentificationCreateToken>
+    >;
+    try {
+      createTokenPayload = await verifyPhotoIdentificationCreateToken(
+        input.createToken,
+      );
+    } catch (err) {
+      throw errors.BAD_REQUEST({
+        message: "Photo identification create proposal is no longer valid.",
+        cause: err,
+      });
+    }
+
+    if (createTokenPayload.userId !== user.id) {
+      throw errors.BAD_REQUEST({
+        message: "Photo identification create proposal is no longer valid.",
+      });
+    }
+
     let pendingImage;
     try {
       pendingImage = await getUsablePendingUpload({
-        id: input.pendingImageId,
+        id: createTokenPayload.pendingImageId,
         userId: user.id,
       });
     } catch (err) {
@@ -332,17 +343,12 @@ export default procedure
       }
       throw err;
     }
-    const { imageEvidence, classification } = await identifyPendingImage({
-      pendingImage,
-    });
-
-    if (classification.status !== "classified") {
-      throw errors.BAD_REQUEST({
-        message: "Photo identification result is not a create proposal.",
-      });
-    }
-
-    let decision = classification.decision;
+    const {
+      candidateBottleIds,
+      decision: createDecision,
+      photoSuitability,
+    } = createTokenPayload;
+    let decision = createDecision;
     if (
       decision.action !== "create_bottle" &&
       decision.action !== "create_release" &&
@@ -356,6 +362,14 @@ export default procedure
       throw errors.BAD_REQUEST({
         message:
           "Photo identification result needs review before creating a bottle.",
+      });
+    }
+    if (
+      decision.action === "create_release" &&
+      !candidateBottleIds.includes(decision.parentBottleId)
+    ) {
+      throw errors.BAD_REQUEST({
+        message: "Photo identification result is not a valid create proposal.",
       });
     }
     decision = stripUnapprovedCatalogImages(decision);
@@ -374,10 +388,10 @@ export default procedure
 
     const warning = await applyCatalogImageApproval({
       destination: getCatalogImageApprovalDestination({
-        approvalTarget: input.catalogImageApproval?.target,
+        approvalTarget: getDefaultCatalogImageApprovalTarget(decision),
         decision,
         result,
-        imageEvidence,
+        photoSuitability,
         pendingPurpose: pendingImage.purpose,
       }),
       pendingImageId: pendingImage.id,

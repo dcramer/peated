@@ -68,10 +68,11 @@ const sentryInterceptor = (
     try {
       return await Sentry.startSpan(
         {
+          op: "rpc.client",
           name: `orpc.${path.join("/")}`,
           attributes: {
-            "span.kind": "CLIENT",
             "rpc.system": "orpc",
+            "rpc.service": "peated.orpc",
             "rpc.method": path.join("."),
             ...(options.captureInputs && {
               "rpc.arguments": input ? safeJsonStringify(input) : undefined,

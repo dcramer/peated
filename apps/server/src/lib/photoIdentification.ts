@@ -34,11 +34,16 @@ export async function getPhotoExtractionImageInput({
   return `data:image/webp;base64,${image.toString("base64")}`;
 }
 
-function maybeField<T extends string | number>(
+function maybeField<T extends boolean | number | string | string[]>(
   value: T | null | undefined,
   confidence = 0.75,
 ) {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
     return undefined;
   }
 
@@ -64,6 +69,8 @@ export function buildPhotoEvidenceFromExtractedIdentity({
     extractedIdentity?.brand,
     extractedIdentity?.expression,
     extractedIdentity?.series,
+    ...(extractedIdentity?.distillery ?? []),
+    extractedIdentity?.bottler,
     extractedIdentity?.edition,
     extractedIdentity?.stated_age
       ? `${extractedIdentity.stated_age} year old`
@@ -100,11 +107,17 @@ export function buildPhotoEvidenceFromExtractedIdentity({
     fieldCandidates: {
       brand: maybeField(extractedIdentity?.brand),
       expression: maybeField(extractedIdentity?.expression),
+      series: maybeField(extractedIdentity?.series),
+      distillery: maybeField(extractedIdentity?.distillery),
+      bottler: maybeField(extractedIdentity?.bottler),
+      category: maybeField(extractedIdentity?.category),
       statedAge: maybeField(extractedIdentity?.stated_age),
       abv: maybeField(extractedIdentity?.abv),
       vintageYear: maybeField(extractedIdentity?.vintage_year),
       releaseYear: maybeField(extractedIdentity?.release_year),
       edition: maybeField(extractedIdentity?.edition),
+      caskStrength: maybeField(extractedIdentity?.cask_strength),
+      singleCask: maybeField(extractedIdentity?.single_cask),
     },
     photoSuitability: {
       isSingleBottlePhoto: Boolean(extractedIdentity),

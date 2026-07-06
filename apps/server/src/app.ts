@@ -9,15 +9,13 @@ import {
   ZodToJsonSchemaConverter,
 } from "@orpc/zod/zod4";
 import {
-  captureException,
   continueTrace,
   flush,
-  getHttpSpanDetailsFromUrlObject,
-  parseStringToURLObject,
-  setHttpStatus,
+  getActiveSpan,
+  getCurrentScope,
+  sentry,
   setUser,
-  startSpan,
-} from "@sentry/core";
+} from "@sentry/hono/node";
 import { open } from "fs/promises";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
@@ -147,23 +145,30 @@ const rpcHandler = new RPCHandler(router, {
   ],
 });
 
-// File upload handler constants
 const ONE_DAY = 60 * 60 * 24;
+const honoApp = new Hono();
 
-export const app = new Hono()
+export const app = honoApp
+  .use(sentry(honoApp))
   .use("*", async (c, next) => {
-    try {
-      await next();
-    } catch (err) {
-      captureException(err, {
-        mechanism: { handled: false, type: "hono" },
-      });
-      throw err;
-    } finally {
-      await flush(2000);
-    }
+    return await continueTrace(
+      {
+        sentryTrace: c.req.header("sentry-trace"),
+        baggage: c.req.header("baggage"),
+      },
+      async () => {
+        try {
+          await next();
+        } finally {
+          const traceId =
+            getActiveSpan()?.spanContext().traceId ??
+            getCurrentScope().getPropagationContext().traceId;
+          c.header("x-sentry-trace-id", traceId);
+          await flush(2000);
+        }
+      },
+    );
   })
-  // TODO: Sentry needs Hono support
   .onError((err, c) => {
     logError(err);
     return c.json({ error: "Internal Server Error" }, 500);
@@ -174,6 +179,7 @@ export const app = new Hono()
     cors({
       credentials: true,
       origin: config.CORS_HOST.split(","),
+      exposeHeaders: ["x-sentry-trace-id"],
       maxAge: 600,
     }),
   )

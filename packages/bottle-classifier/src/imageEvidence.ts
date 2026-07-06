@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CategoryEnum } from "./classifierTypes";
 
 const ConfidenceSchema = z.number().min(0).max(1);
 
@@ -60,6 +61,10 @@ const createEvidenceFieldSchema = <T extends z.ZodTypeAny>(valueSchema: T) =>
 const EvidenceStringFieldSchema = createEvidenceFieldSchema(
   z.string().trim().min(1),
 );
+const EvidenceStringArrayFieldSchema = createEvidenceFieldSchema(
+  z.array(z.string().trim().min(1)).min(1),
+);
+const EvidenceBooleanFieldSchema = createEvidenceFieldSchema(z.boolean());
 const EvidenceAgeFieldSchema = createEvidenceFieldSchema(
   z.number().int().min(0).max(100),
 );
@@ -90,12 +95,18 @@ export const ImageBottleFieldCandidatesSchema = z
   .object({
     brand: EvidenceStringFieldSchema.optional(),
     expression: EvidenceStringFieldSchema.optional(),
+    series: EvidenceStringFieldSchema.optional(),
+    distillery: EvidenceStringArrayFieldSchema.optional(),
+    bottler: EvidenceStringFieldSchema.optional(),
+    category: createEvidenceFieldSchema(CategoryEnum).optional(),
     statedAge: EvidenceAgeFieldSchema.optional(),
     abv: EvidenceAbvFieldSchema.optional(),
     vintageYear: EvidenceYearFieldSchema.optional(),
     releaseYear: EvidenceYearFieldSchema.optional(),
     edition: EvidenceStringFieldSchema.optional(),
     caskNumber: EvidenceStringFieldSchema.optional(),
+    caskStrength: EvidenceBooleanFieldSchema.optional(),
+    singleCask: EvidenceBooleanFieldSchema.optional(),
   })
   .strict();
 

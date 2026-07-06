@@ -31,10 +31,11 @@ const sentryMiddleware = (options: Options = {}) =>
   os.middleware(async ({ next, path }, input) => {
     return await Sentry.startSpan(
       {
+        op: "rpc.server",
         name: `orpc.${path.join("/")}`,
         attributes: {
-          "span.kind": "SERVER",
           "rpc.system": "orpc",
+          "rpc.service": "peated.orpc",
           "rpc.method": path.join("."),
           ...(options.captureInputs && {
             "rpc.arguments": input ? JSON.stringify(input) : undefined,

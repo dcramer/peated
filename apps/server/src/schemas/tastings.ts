@@ -236,4 +236,8 @@ export const PhotoIdentificationSchema = z.object({
   classification: PhotoIdentificationClassificationSchema,
   suggestedNextStep: PhotoIdentificationSuggestedNextStepEnum,
   diagnostics: PhotoIdentificationDiagnosticsSchema,
+  createToken: z
+    .string()
+    .nullable()
+    .describe("Signed token for creating an auto-approved photo proposal"),
 });
