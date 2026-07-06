@@ -275,7 +275,7 @@ export function PhotoIdentificationTraceFootnote({
   }
 
   return (
-    <div className="text-muted mt-4 flex items-center gap-1.5 px-1 text-xs">
+    <div className="text-muted mx-auto mt-4 flex max-w-full items-center justify-center gap-1.5 px-1 text-center text-xs">
       <span className="min-w-0 truncate">Trace ID: {traceId}</span>
       <button
         type="button"
