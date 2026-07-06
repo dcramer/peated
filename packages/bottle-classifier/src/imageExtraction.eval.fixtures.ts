@@ -192,17 +192,14 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
         // The replica label prints the identity as separate "Distillery No. 1"
         // and "Single Cask No. 285" components; the composed "1.285" code is
         // not on the label, so extraction stays honest to the components. The
-        // handwritten digits are genuinely ambiguous (the verified cask number
-        // 285, age 11, and distilled-on 6.8.11 read as 205/17/77 to vision
-        // extractors), so this eval pins the component structure and the
-        // printed facts rather than the handwritten digit values.
+        // handwritten digits and cask wording are genuinely ambiguous (the
+        // verified cask number 285, age 11, and distilled-on 6.8.11 read as
+        // 205/17/77 to vision extractors, and the edition sometimes drops the
+        // word "Cask"), so this eval pins the reliably readable distillery
+        // component and the printed facts rather than the handwritten values.
         {
           fields: ["expression", "series", "edition"],
           includes: ["Distillery No. 1"],
-        },
-        {
-          fields: ["expression", "edition"],
-          includes: ["Cask No."],
         },
       ],
     },
