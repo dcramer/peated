@@ -451,6 +451,41 @@ describe("POST /tastings/photo-identification", () => {
       "photo_identification.suggested_next_step",
       "confirm_match",
     );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.field.brand",
+      "Ardbeg",
+    );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.field.expression",
+      "Uigeadail",
+    );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.local.action",
+      "no_match",
+    );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.local.candidate_bottle_ids",
+      [],
+    );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.final.candidate_bottle_ids",
+      [matchedBottleId],
+    );
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.final.candidate_names",
+      ["Ardbeg Uigeadail"],
+    );
+    const candidateIdentityCall = sentrySpanSetAttributeMock.mock.calls.find(
+      ([key]) => key === "photo_identification.final.candidate_identity",
+    );
+    expect(candidateIdentityCall?.[1]).toEqual([expect.any(String)]);
+    expect(JSON.parse(candidateIdentityCall?.[1][0])).toEqual(
+      expect.objectContaining({
+        bottleId: matchedBottleId,
+        fullName: "Ardbeg Uigeadail",
+        abv: null,
+      }),
+    );
   });
 
   test("reuses pending upload for idempotent retries", async ({

@@ -292,6 +292,284 @@ describe("priceMatchingAutomation", () => {
     ).toBe(true);
   });
 
+  test("auto-approves high-confidence unassigned correction assignments without applying unsafe repair fields", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "correction",
+      modelConfidence: 97,
+      price: {
+        bottleId: null,
+        name: "Example Heritage Table Whiskey",
+        url: "https://example.com/table-whiskey",
+      },
+      suggestedBottleId: 77,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Heritage",
+        expression: "Table Whiskey",
+        distillery: [],
+        category: null,
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: {
+        name: "Table Whiskey",
+        brand: {
+          id: null,
+          name: "Example Heritage",
+        },
+        series: null,
+        category: null,
+        distillers: [
+          {
+            id: null,
+            name: "Example Heritage",
+          },
+        ],
+        bottler: null,
+        edition: null,
+        statedAge: 7,
+        abv: 50,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 77,
+          fullName: "Example Heritage Table Whiskey",
+          bottleFullName: "Example Heritage Table Whiskey",
+          alias: "Example Heritage Table Whiskey",
+          brand: "Example Heritage",
+          distillery: [],
+          category: "spirit",
+          statedAge: null,
+          abv: null,
+          caskType: null,
+          source: ["exact"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationScore).toBe(97);
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(assessment.decisiveMatchAttributes).toEqual(
+      expect.arrayContaining(["brand", "name"]),
+    );
+    expect(assessment.automationEligible).toBe(false);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "correction",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 77,
+        suggestedReleaseId: null,
+        modelConfidence: 97,
+        automationBlockers: assessment.automationBlockers,
+      }),
+    ).toBe(true);
+  });
+
+  test("keeps lower-confidence unassigned correction assignments in review", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "correction",
+      modelConfidence: 88,
+      price: {
+        bottleId: null,
+        name: "Example Heritage Table Whiskey",
+        url: "https://example.com/table-whiskey",
+      },
+      suggestedBottleId: 77,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Heritage",
+        expression: "Table Whiskey",
+        distillery: [],
+        category: null,
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: {
+        name: "Table Whiskey",
+        brand: {
+          id: null,
+          name: "Example Heritage",
+        },
+        series: null,
+        category: null,
+        distillers: [
+          {
+            id: null,
+            name: "Example Heritage",
+          },
+        ],
+        bottler: null,
+        edition: null,
+        statedAge: 7,
+        abv: 50,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 77,
+          fullName: "Example Heritage Table Whiskey",
+          bottleFullName: "Example Heritage Table Whiskey",
+          alias: "Example Heritage Table Whiskey",
+          brand: "Example Heritage",
+          distillery: [],
+          category: "spirit",
+          statedAge: null,
+          abv: null,
+          caskType: null,
+          source: ["exact"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toEqual([]);
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "correction",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 77,
+        suggestedReleaseId: null,
+        modelConfidence: 88,
+        automationBlockers: assessment.automationBlockers,
+        plainAgeBottleAutoVerifyEligible: true,
+      }),
+    ).toBe(false);
+  });
+
+  test("keeps current-assignment repair corrections review-only", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "correction",
+      modelConfidence: 100,
+      price: {
+        bottleId: 77,
+        name: "Example Heritage Table Whiskey",
+        url: "https://example.com/table-whiskey",
+      },
+      suggestedBottleId: 77,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Heritage",
+        expression: "Table Whiskey",
+        distillery: [],
+        category: null,
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: {
+        name: "Table Whiskey",
+        brand: {
+          id: null,
+          name: "Example Heritage",
+        },
+        series: null,
+        category: null,
+        distillers: [],
+        bottler: null,
+        edition: null,
+        statedAge: 7,
+        abv: 50,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          bottleId: 77,
+          fullName: "Example Heritage Table Whiskey",
+          bottleFullName: "Example Heritage Table Whiskey",
+          alias: "Example Heritage Table Whiskey",
+          brand: "Example Heritage",
+          distillery: [],
+          category: "spirit",
+          statedAge: null,
+          abv: null,
+          caskType: null,
+          source: ["exact"],
+        }),
+      ],
+    });
+
+    expect(assessment.automationBlockers).toContain(
+      "auto-create requires a concrete whisky category",
+    );
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "correction",
+        currentBottleId: 77,
+        currentReleaseId: null,
+        suggestedBottleId: 77,
+        suggestedReleaseId: null,
+        modelConfidence: 100,
+        automationBlockers: [],
+      }),
+    ).toBe(false);
+  });
+
+  test("blocks correction assignment verification when the suggested candidate is missing", () => {
+    const assessment = getStorePriceMatchAutomationAssessment({
+      action: "correction",
+      modelConfidence: 100,
+      price: {
+        bottleId: null,
+        name: "Example Heritage Table Whiskey",
+        url: "https://example.com/table-whiskey",
+      },
+      suggestedBottleId: 77,
+      suggestedReleaseId: null,
+      extractedLabel: buildExtractedLabel({
+        brand: "Example Heritage",
+        expression: "Table Whiskey",
+        distillery: [],
+        category: null,
+        stated_age: null,
+        abv: null,
+        cask_type: null,
+      }),
+      proposedBottle: null,
+      searchEvidence: [],
+      candidateBottles: [],
+    });
+
+    expect(assessment.automationBlockers).toContain(
+      "suggested match candidate was not found",
+    );
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "correction",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 77,
+        suggestedReleaseId: null,
+        modelConfidence: 100,
+        automationBlockers: assessment.automationBlockers,
+      }),
+    ).toBe(false);
+  });
+
   test("records agent-supported external evidence for high-confidence bottle matches", () => {
     const extractedLabel = buildExtractedLabel({
       brand: "The Glenlivet",

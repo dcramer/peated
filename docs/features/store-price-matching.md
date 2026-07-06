@@ -226,6 +226,9 @@ For existing-match proposals, that policy should stay thin:
 - the classifier confidence must clear the shared verification threshold
 - reaffirming the current bottle/release assignment uses a lower threshold because the risk is lower; today that threshold is `80`
 - new unmatched matches only verify at the higher bottle-only threshold; today that threshold is `96`
+- an unassigned `correction` that only assigns an existing bottle may verify at
+  the same high bottle-only threshold, but any proposed bottle repair fields
+  remain review-only and must not be applied by that assignment
 - the classifier should be the layer that decides when listing-title
   reaffirmation, official confirmation, or agent-reviewed corroborating web
   evidence justifies the `96+` confidence band
