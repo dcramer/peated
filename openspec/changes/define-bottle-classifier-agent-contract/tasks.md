@@ -28,8 +28,8 @@
 
 ## 4. Confidence Removal And Gating
 
-- [ ] 4.1 Implement the code-derived automation tier for automated consumers from action risk, `unresolvedRisks`, `webEvidence`, exact-alias/current-assignment anchors, and deterministic anchors; `confidenceBasis.band` may only downgrade.
-- [ ] 4.2 Migrate `priceMatchingEvidence.ts` numeric thresholds and `priceMatchingProposals.ts` consumers to the derived tier while numeric `confidence` is emitted but ignored.
+- [x] 4.1 Implement the code-derived automation tier for automated consumers from action risk, `unresolvedRisks`, `webEvidence`, exact-alias/current-assignment anchors, and deterministic anchors; `confidenceBasis.band` may only downgrade.
+- [x] 4.2 Migrate `priceMatchingEvidence.ts` numeric thresholds and `priceMatchingProposals.ts` consumers to the derived tier while numeric `confidence` is emitted but ignored.
 - [ ] 4.3 Remove numeric `confidence` and `confidenceBasis.band` from the agent output schema, prompt, eval scorers, and fixtures in one revision; express the review veto as a typed unresolved risk, move current-assignment reaffirmation to positive evidence, and retire the review-policy caps that existed only to reconcile numeric confidence with the structured basis, and migrate deterministic band producers (`apps/server/src/agents/bottleClassifier/service.ts`, `smwsPolicy.ts`) to the derived tier.
 - [ ] 4.4 Update `docs/architecture/bottle-classifier.md` eval guidance from confidence calibration to deterministic tier-derivation correctness.
 - [x] 4.5 Implement the `aliasScope` write-time gate: alias-creating code paths read the asserted scope and refuse global aliases unless `global_alias` was asserted. (2026-07-06: scope persisted on proposals via migration 0191; gate at proposal approval marks non-`global_alias` listing aliases `ignored`; gate applies only to new/claimed alias rows and never mutates an existing assigned alias.)

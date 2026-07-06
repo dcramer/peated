@@ -9,10 +9,11 @@ import {
   textsOverlap,
 } from "@peated/bottle-classifier/identityEvidenceCore";
 import {
+  type AutomationConfidenceBand,
+  deriveAutomationTier,
   evaluateExistingMatchWebEvidence,
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch as hasSupportiveBottleEvidence,
-  isExistingMatchConfidenceEligibleForVerification,
   isPlainAgeBottleMatchEligibleForVerification,
   type WebEvidenceJudgment,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
@@ -1152,8 +1153,12 @@ function getSuggestedMatchCandidate({
 
 /**
  * Gates whether an existing bottle assignment can be verified immediately.
- * Unassigned correction proposals may assign an existing bottle, but only via
- * the normal confidence gate; repair fields remain review-only.
+ * Unassigned correction proposals may assign an existing bottle, but only when
+ * the code-derived automation tier is `auto`; repair fields remain review-only.
+ *
+ * Tier is derived from structured evidence (`deriveAutomationTier`) rather than
+ * a numeric confidence score. The numeric `confidence` is still stored as
+ * telemetry but no longer gates this decision.
  */
 export function shouldVerifyStorePriceMatch(params: {
   action: MatchAction;
@@ -1162,7 +1167,9 @@ export function shouldVerifyStorePriceMatch(params: {
   identityScope?: MatchIdentityScope | null;
   suggestedBottleId: number | null;
   suggestedReleaseId: number | null;
-  modelConfidence: number | null;
+  band: AutomationConfidenceBand;
+  hasUnresolvedRisks: boolean;
+  webEvidence?: WebEvidenceJudgment;
   automationBlockers: string[];
   plainAgeBottleAutoVerifyEligible?: boolean;
 }) {
@@ -1174,7 +1181,9 @@ export function shouldVerifyStorePriceMatch(params: {
     identityScope,
     suggestedBottleId,
     suggestedReleaseId,
-    modelConfidence,
+    band,
+    hasUnresolvedRisks,
+    webEvidence,
     plainAgeBottleAutoVerifyEligible = false,
   } = params;
 
@@ -1190,6 +1199,9 @@ export function shouldVerifyStorePriceMatch(params: {
     return false;
   }
 
+  // Deterministic plain-age structured-identity lane. This is a closed-form
+  // anchor that does not depend on the band or evidence tier, so it short
+  // circuits before the derived tier just as it did before the numeric gate.
   if (
     action === "match_existing" &&
     currentBottleId === null &&
@@ -1200,16 +1212,31 @@ export function shouldVerifyStorePriceMatch(params: {
     return true;
   }
 
-  if (modelConfidence === null) {
-    return false;
-  }
+  const reaffirmsCurrentAssignment =
+    currentBottleId != null &&
+    suggestedBottleId === currentBottleId &&
+    (suggestedReleaseId ?? null) === (currentReleaseId ?? null);
 
-  return isExistingMatchConfidenceEligibleForVerification({
-    confidence: modelConfidence,
-    currentBottleId,
-    currentReleaseId: currentReleaseId ?? null,
-    identityScope,
-    matchedBottleId: suggestedBottleId,
-    matchedReleaseId: suggestedReleaseId ?? null,
-  });
+  return (
+    deriveAutomationTier({
+      actionRiskClass: "match",
+      hasUnresolvedRisks,
+      band,
+      webEvidence: webEvidence ?? null,
+      hasMatchTarget: true,
+      reaffirmsCurrentAssignment,
+      // A different current assignment means this is a correction, not a verify.
+      replacesCurrentAssignment:
+        currentBottleId != null && !reaffirmsCurrentAssignment,
+      matchesFreshReleaseTarget:
+        !reaffirmsCurrentAssignment && (suggestedReleaseId ?? null) !== null,
+      hasExactAliasAnchor: false,
+      // The exact-cask scope is the price-match deterministic anchor here; SMWS
+      // exact-cask and the plain-age lane are handled above/upstream.
+      hasDeterministicAnchor: identityScope === "exact_cask",
+      // Price matching has no primary image and treats retailer titles as
+      // evidence to interpret, not primary label evidence.
+      hasPrimaryLabelOrImageEvidence: false,
+    }) === "auto"
+  );
 }

@@ -98,6 +98,17 @@ const supportiveWebEvidenceConfidenceBasis = {
   webEvidence: "supportive",
 };
 
+// The code-derived automation tier reads structured evidence, not the numeric
+// confidence score. A surviving `band: "auto_verification"` (with no unresolved
+// risks) is the interim evidence-equivalent of a passing verification gate.
+const autoVerificationConfidenceBasis = {
+  band: "auto_verification",
+  positiveEvidence: ["The candidate covers the observed bottle identity."],
+  unresolvedRisks: [],
+  toolsUsed: ["initial_local_candidates"],
+  webEvidence: "not_needed",
+};
+
 function buildMockBottleReferenceClassification(
   overrides: Record<string, unknown>,
 ) {
@@ -1219,6 +1230,7 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 97,
           rationale: "The listing exactly matches a canonical alias.",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1319,6 +1331,7 @@ describe("priceMatching", () => {
           confidence: 98,
           rationale:
             "The raw title directly reaffirms the existing Jameson Cold Brew bottle.",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1678,6 +1691,7 @@ describe("priceMatching", () => {
           confidence: 96,
           rationale:
             "Official Glenlivet sources confirm Caribbean Reserve as the rum-cask-finished single malt release.",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1823,6 +1837,7 @@ describe("priceMatching", () => {
           confidence: 97,
           rationale:
             "The existing bottle is the marketed identity, but the proposed canonical fields need review.",
+          confidenceBasis: autoVerificationConfidenceBasis,
           matchedBottleId: bottle.id,
           matchedReleaseId: null,
           candidateBottleIds: [bottle.id],
@@ -3331,6 +3346,8 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
+          identityScope: "exact_cask",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -3450,6 +3467,8 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
+          identityScope: "exact_cask",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -3747,6 +3766,8 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
+          identityScope: "exact_cask",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,

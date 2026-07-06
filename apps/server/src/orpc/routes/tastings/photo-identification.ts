@@ -1,6 +1,10 @@
 // This route owns the photo lookup boundary for add-tasting. It may create or
 // reuse a pending upload, but it must not create tastings, bottles, releases, or
 // durable classifier trace rows.
+import {
+  agentActionRiskClass,
+  deriveAutomationTier,
+} from "@peated/bottle-classifier/priceMatchingEvidence";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
 import config from "@peated/server/config";
@@ -48,7 +52,6 @@ type SentrySpanLike = {
   setAttribute: (key: string, value: PhotoIdentificationAttributeValue) => void;
 };
 
-export const PHOTO_IDENTIFICATION_CREATE_CONFIDENCE_THRESHOLD = 70;
 const PHOTO_IDENTIFICATION_LOG_MESSAGE =
   "Bottle photo identification completed";
 
@@ -58,19 +61,41 @@ const photoIdentificationRateLimit = createRateLimit<AuthenticatedContext>({
   keyPrefix: "photo-identification",
 });
 
-export function isPhotoIdentificationCreateDecisionAutoCreatable(
-  decision: Extract<
-    PhotoIdentificationClassification,
-    { status: "classified" }
-  >["decision"],
-) {
-  const confidenceBasisBand = decision.confidenceBasis?.band;
+type PhotoIdentificationDecision = Extract<
+  PhotoIdentificationClassification,
+  { status: "classified" }
+>["decision"];
 
-  return (
-    decision.confidence >= PHOTO_IDENTIFICATION_CREATE_CONFIDENCE_THRESHOLD &&
-    (confidenceBasisBand === undefined ||
-      confidenceBasisBand === "auto_verification")
-  );
+// Derives the automation tier for a photo-identification decision. Photo
+// identification always carries the uploaded bottle photo as primary image
+// evidence and never resolves against a current bottle assignment. The user
+// still confirms the suggested next step, so this tier only chooses between the
+// confirm and manual-search suggestions rather than acting silently. The
+// numeric `confidence` is no longer read for this gate.
+function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
+  const confidenceBasis = decision.confidenceBasis;
+
+  return deriveAutomationTier({
+    actionRiskClass: agentActionRiskClass(decision.action),
+    hasUnresolvedRisks: (confidenceBasis?.unresolvedRisks.length ?? 0) > 0,
+    band: confidenceBasis?.band ?? null,
+    webEvidence: confidenceBasis?.webEvidence ?? null,
+    hasMatchTarget:
+      decision.action === "match" && decision.matchedBottleId !== null,
+    reaffirmsCurrentAssignment: false,
+    replacesCurrentAssignment: false,
+    matchesFreshReleaseTarget:
+      decision.action === "match" && decision.matchedReleaseId !== null,
+    hasExactAliasAnchor: false,
+    hasDeterministicAnchor: decision.identityScope === "exact_cask",
+    hasPrimaryLabelOrImageEvidence: true,
+  });
+}
+
+export function isPhotoIdentificationCreateDecisionAutoCreatable(
+  decision: PhotoIdentificationDecision,
+) {
+  return derivePhotoIdentificationTier(decision) === "auto";
 }
 
 function getSuggestedNextStep(
@@ -82,7 +107,7 @@ function getSuggestedNextStep(
 
   switch (classification.decision.action) {
     case "match":
-      return classification.decision.confidence >= 70
+      return derivePhotoIdentificationTier(classification.decision) === "auto"
         ? "confirm_match"
         : "manual_search";
     case "create_bottle":

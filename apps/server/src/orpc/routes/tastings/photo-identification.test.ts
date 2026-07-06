@@ -847,18 +847,24 @@ describe("POST /tastings/photo-identification", () => {
     });
   });
 
-  test("routes low-confidence create proposals to manual review", async ({
+  test("routes low-band create proposals to manual review", async ({
     defaults,
     fixtures,
   }) => {
     const identification = await identifyCreateProposal({
       fixtures,
       user: defaults.user,
-      idempotencyKey: "photo-identification-low-confidence-create",
+      idempotencyKey: "photo-identification-low-band-create",
       decision: buildCreateBottleDecision({
         brandName: "Low Confidence Photo Brand",
         bottleName: "Review Bottle",
-        confidence: 55,
+        confidenceBasis: {
+          band: "low",
+          positiveEvidence: [],
+          unresolvedRisks: [],
+          toolsUsed: [],
+          webEvidence: "not_used",
+        },
       }),
     });
 

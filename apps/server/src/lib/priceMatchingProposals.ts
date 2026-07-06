@@ -3,6 +3,10 @@ import type {
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import type {
+  AutomationConfidenceBand,
+  WebEvidenceJudgment,
+} from "@peated/bottle-classifier/priceMatchingEvidence";
 import {
   getReleaseObservationFacts,
   isAddingBottleLevelReleaseTraits,
@@ -804,10 +808,20 @@ function getProposalType(
   return decision.action;
 }
 
+// Structured evidence the code-derived automation tier reads. Carried
+// alongside the translated price-match decision because the derived tier no
+// longer reads the numeric `confidence` score.
+type StorePriceMatchDecisionEvidence = {
+  band: AutomationConfidenceBand;
+  hasUnresolvedRisks: boolean;
+  webEvidence: WebEvidenceJudgment;
+};
+
 function getProposalStatus(
   price: StorePrice,
   decision: StorePriceMatchDecision,
   automationAssessment: StorePriceMatchAutomationAssessment | null,
+  decisionEvidence: StorePriceMatchDecisionEvidence | null,
 ): StorePriceMatchProposal["status"] {
   if (
     automationAssessment &&
@@ -818,7 +832,9 @@ function getProposalStatus(
       identityScope: decision.identityScope,
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
-      modelConfidence: decision.confidence,
+      band: decisionEvidence?.band ?? null,
+      hasUnresolvedRisks: decisionEvidence?.hasUnresolvedRisks ?? false,
+      webEvidence: decisionEvidence?.webEvidence ?? null,
       automationBlockers: automationAssessment.automationBlockers,
       plainAgeBottleAutoVerifyEligible:
         automationAssessment.plainAgeBottleAutoVerifyEligible,
@@ -1574,6 +1590,7 @@ export async function upsertStorePriceMatchProposal({
   extractedLabel,
   candidates,
   decision,
+  decisionEvidence,
   automationAssessment,
   searchEvidence,
   error,
@@ -1585,6 +1602,7 @@ export async function upsertStorePriceMatchProposal({
   extractedLabel: ExtractedBottleDetails | null;
   candidates: PriceMatchCandidate[];
   decision?: StorePriceMatchDecision | null;
+  decisionEvidence?: StorePriceMatchDecisionEvidence | null;
   automationAssessment?: StorePriceMatchAutomationAssessment | null;
   searchEvidence?: SearchEvidence[];
   error?: string | null;
@@ -1601,7 +1619,12 @@ export async function upsertStorePriceMatchProposal({
   const status =
     statusOverride ??
     (parsedDecision
-      ? getProposalStatus(price, parsedDecision, automationAssessment ?? null)
+      ? getProposalStatus(
+          price,
+          parsedDecision,
+          automationAssessment ?? null,
+          decisionEvidence ?? null,
+        )
       : "errored");
   const creationTarget =
     parsedDecision?.action === "create_new"
@@ -2100,6 +2123,14 @@ export async function resolveStorePriceMatchProposal(
       extractedLabel,
       candidates,
       decision,
+      decisionEvidence: {
+        band: classification.decision.confidenceBasis?.band ?? null,
+        hasUnresolvedRisks:
+          (classification.decision.confidenceBasis?.unresolvedRisks.length ??
+            0) > 0,
+        webEvidence:
+          classification.decision.confidenceBasis?.webEvidence ?? null,
+      },
       automationAssessment,
       searchEvidence,
       expectedProcessingToken: processingToken,

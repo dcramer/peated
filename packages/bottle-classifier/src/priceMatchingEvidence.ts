@@ -137,6 +137,202 @@ export function isExistingMatchConfidenceEligibleForVerification({
   return confidence >= UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
 }
 
+// Code-derived automation tier. Automated consumers (price scraping, ingestion)
+// derive whether a classifier decision may act automatically from the action's
+// risk class and the structured evidence the agent asserts, instead of reading
+// the numeric `confidence` score. See
+// `docs/architecture/bottle-classifier.md` (Determinism) and
+// `openspec/changes/define-bottle-classifier-agent-contract/design.md`
+// ("Remove numeric confidence; consumers derive gating from evidence"). User
+// driven flows (Add Bottle) need no tier because the user confirms the outcome.
+export type AutomationTier = "auto" | "review";
+
+export const AUTOMATION_ACTION_RISK_CLASSES = [
+  "match",
+  "create",
+  "repair",
+  "none",
+] as const;
+export type AutomationActionRiskClass =
+  (typeof AUTOMATION_ACTION_RISK_CLASSES)[number];
+
+// Interim `confidenceBasis.band`. The agent still emits a band while the numeric
+// score is being retired; a later pass (tasks.md 4.3) removes the read entirely
+// and expresses the veto as a typed unresolved risk.
+export type AutomationConfidenceBand =
+  | "low"
+  | "review"
+  | "auto_verification"
+  | "current_assignment"
+  | null
+  | undefined;
+
+export type AutomationTierInput = {
+  // Risk class of the classifier action. Callers map their own action
+  // vocabulary (agent enum or price-match enum) onto this shared class.
+  actionRiskClass: AutomationActionRiskClass;
+  // Model veto: any asserted unresolved risk forces review (design.md model
+  // veto scenario). Callers pass whether the risk list is non-empty.
+  hasUnresolvedRisks: boolean;
+  // Downgrade-only band veto (interim). See `bandForcesReview`.
+  band: AutomationConfidenceBand;
+  // How web/source evidence affected the decision.
+  webEvidence: WebEvidenceJudgment;
+  // Match anchors ----------------------------------------------------------
+  // Whether a concrete existing bottle/release target was selected.
+  hasMatchTarget: boolean;
+  // The match reaffirms the reference's current bottle/release assignment.
+  reaffirmsCurrentAssignment: boolean;
+  // The match replaces a *different* current assignment (a correction, not a
+  // verification candidate).
+  replacesCurrentAssignment: boolean;
+  // A fresh (non-reaffirming) release-level match; never auto-verified.
+  matchesFreshReleaseTarget: boolean;
+  // An exact accepted local alias resolved the reference.
+  hasExactAliasAnchor: boolean;
+  // A closed-form deterministic identity anchor (SMWS exact cask, exact_cask
+  // scope, or a unique plain-age structured match).
+  hasDeterministicAnchor: boolean;
+  // Create/repair anchors --------------------------------------------------
+  // Reviewed label or image evidence is the primary support (e.g. a photo
+  // scan), independent of web search.
+  hasPrimaryLabelOrImageEvidence: boolean;
+};
+
+// The band is downgrade-only: it can force review but can never upgrade a
+// decision that carries a model veto or fails a structural review rule. Only
+// the explicit downgrade bands (`low`, `review`) force review. `auto_verification`
+// and `current_assignment` do not downgrade — `current_assignment` reaffirms
+// the existing assignment and design.md treats it as positive evidence — and an
+// absent band carries no signal (this preserves the historical photo behavior
+// of not blocking when the agent omitted a band). This band read is removed
+// entirely in the confidence-removal pass (tasks.md 4.3), where the typed
+// positive-evidence anchors replace it.
+function bandForcesReview(band: AutomationConfidenceBand): boolean {
+  return band === "low" || band === "review";
+}
+
+// Interim evidence-equivalent of the retired numeric thresholds. reviewPolicy
+// caps band to "review" whenever `isExistingMatchConfidenceEligibleForVerification`
+// (the numeric gate) fails and whenever a creation lacks supporting evidence, so
+// a surviving `band === "auto_verification"` is a code-produced assertion that
+// the retiring threshold for this risk class was met. Reading the band here
+// (never the number) preserves behavioral intent during the interim; it is
+// dropped from the anchor set in tasks.md 4.3 once typed positive evidence
+// lands. The band never overrides the model veto or the structural review rules
+// checked before it, so it can only ever permit auto, never force one past a
+// risk or a correction.
+function bandAssertsAutoVerification(band: AutomationConfidenceBand): boolean {
+  return band === "auto_verification";
+}
+
+function deriveMatchTier(input: AutomationTierInput): AutomationTier {
+  if (!input.hasMatchTarget) {
+    return "review";
+  }
+
+  // Replacing a different current assignment is a downstream correction, not an
+  // existing-match verification (mirrors the currentBottleId guard in
+  // `isExistingMatchConfidenceEligibleForVerification`).
+  if (input.replacesCurrentAssignment) {
+    return "review";
+  }
+
+  // Fresh release-level matches are never auto-verified from evidence alone.
+  if (input.matchesFreshReleaseTarget) {
+    return "review";
+  }
+
+  // Evidence-condition mapping of the retired numeric thresholds:
+  //   reaffirmed (80)  -> current-assignment reaffirmation anchor
+  //   exact_cask (95)  -> deterministic anchor
+  //   unmatched (96)   -> supportive web evidence, an exact alias, primary
+  //                       label/image evidence, or (interim) the band
+  //                       auto_verification assertion that encodes the numeric
+  //                       gate having passed.
+  const hasMatchAnchor =
+    input.reaffirmsCurrentAssignment ||
+    input.hasDeterministicAnchor ||
+    input.hasExactAliasAnchor ||
+    input.hasPrimaryLabelOrImageEvidence ||
+    input.webEvidence === "supportive" ||
+    bandAssertsAutoVerification(input.band);
+
+  return hasMatchAnchor ? "auto" : "review";
+}
+
+function deriveCreateOrRepairTier(input: AutomationTierInput): AutomationTier {
+  // Creates and repairs require corroborating evidence: supportive web
+  // evidence, a closed-form deterministic anchor, or reviewed label/image
+  // primary evidence. This matches the existing creation-automation contract
+  // (reviewPolicy `capUnverifiedCreationAutomation`, which is exactly what caps
+  // band to "review" when that evidence is missing).
+  const hasCreationEvidence =
+    input.webEvidence === "supportive" ||
+    input.hasDeterministicAnchor ||
+    input.hasPrimaryLabelOrImageEvidence ||
+    bandAssertsAutoVerification(input.band);
+
+  return hasCreationEvidence ? "auto" : "review";
+}
+
+/**
+ * Derives whether an automated flow may act on a classifier decision without
+ * human review. Pure and deterministic: identical inputs always yield the same
+ * tier. Never reads a numeric confidence score.
+ */
+export function deriveAutomationTier(
+  input: AutomationTierInput,
+): AutomationTier {
+  // Model veto (design.md "Model veto forces review"): any unresolved risk,
+  // including an uncategorizable holistic concern, forces review regardless of
+  // anchors.
+  if (input.hasUnresolvedRisks) {
+    return "review";
+  }
+
+  // Downgrade-only band veto (interim; removed in tasks.md 4.3).
+  if (bandForcesReview(input.band)) {
+    return "review";
+  }
+
+  switch (input.actionRiskClass) {
+    case "match":
+      return deriveMatchTier(input);
+    case "create":
+    case "repair":
+      return deriveCreateOrRepairTier(input);
+    default:
+      return "review";
+  }
+}
+
+// Maps the agent decision action enum onto the shared automation risk class.
+export function agentActionRiskClass(
+  action:
+    | "match"
+    | "create_bottle"
+    | "create_release"
+    | "create_bottle_and_release"
+    | "repair_parent_and_create_release"
+    | "repair_bottle"
+    | "no_match",
+): AutomationActionRiskClass {
+  switch (action) {
+    case "match":
+      return "match";
+    case "create_bottle":
+    case "create_release":
+    case "create_bottle_and_release":
+      return "create";
+    case "repair_bottle":
+    case "repair_parent_and_create_release":
+      return "repair";
+    default:
+      return "none";
+  }
+}
+
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(
