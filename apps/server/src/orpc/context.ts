@@ -4,4 +4,6 @@ export type Context = {
   user: User | null;
   ip?: string;
   userAgent?: string;
+  resHeaders?: Headers;
+  sentryTraceId?: string;
 };

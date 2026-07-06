@@ -227,6 +227,11 @@ export const PhotoIdentificationClassificationSchema = z.discriminatedUnion(
 );
 
 export const PhotoIdentificationSchema = z.object({
+  traceId: z
+    .string()
+    .trim()
+    .regex(/^[a-f0-9]{32}$/)
+    .describe("Sentry trace id for photo identification logs and eval triage"),
   pendingImage: PendingUploadSchema.pick({
     id: true,
     imageUrl: true,

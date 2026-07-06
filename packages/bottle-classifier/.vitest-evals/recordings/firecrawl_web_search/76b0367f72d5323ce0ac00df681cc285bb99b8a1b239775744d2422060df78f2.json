@@ -1,0 +1,61 @@
+{
+  "writtenAt": "2026-07-05T18:57:35.860Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition double matured 2001 bottled"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Talisker Distillers Edition double matured 2001 bottled",
+    "summary": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine. - [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&product",
+    "results": [
+      {
+        "title": "Talisker 1988, The Distillers Edition 2001 Bottling",
+        "url": "https://www.thewhiskyvault.com/talisker-1988-the-distillers-edition-2001-bottling-25536-p.asp",
+        "domain": "thewhiskyvault.com",
+        "description": "Bottles from this series are double matured, a process where the whisky gets a second maturation period in casks that have previously held fortified wine.",
+        "extraSnippets": [
+          "- [mail@thewhiskyvault.com](mailto:mail@thewhiskyvault.com) GBP£ [AUD$](https://www.thewhiskyvault.com/index.asp?function=CART&mode=CURRENCY&code=AUD&catid=0&productid=25536) [CHFS"
+        ]
+      },
+      {
+        "title": "Talisker Distillers Edition 2012",
+        "url": "https://www.musthavemalts.com/product/talisker-distillers-edition-2012/",
+        "domain": "musthavemalts.com",
+        "description": "This richly flavoured maritime malt, distilled in 2001, has been double matured in Amoroso cask wood. Its luscious, fruity sweetness perfectly complements ...",
+        "extraSnippets": [
+          "Search ``` ``` Search [![](https://www.musthavemalts.com/wp-content/uploads/2026/04/MHM-Logo.png)](https://www.musthavemalts.com/) No products in the cart. [€ 0.00€ 0.000Cart](http"
+        ]
+      },
+      {
+        "title": "Talisker 2001 - Ratings and reviews",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": "Soft, oily, sweet-woody, pepper wave, berry jam, creamy notes, caramel, light shades of burnt crackers and kvass, dry medicinal herbs, peat in ...",
+        "extraSnippets": [
+          "**Whiskybase** Open in app for a better experience [Download](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001?__cf_chl_f_tk=ZJBJI1rtyNvi2bEzTDQf_1g60krBjF83CYAEUJVv1"
+        ]
+      },
+      {
+        "title": "Review #2: Talisker Distillers Edition Double Matured in ...",
+        "url": "https://www.reddit.com/r/Scotch/comments/16dgqiu/review_2_talisker_distillers_edition_double/",
+        "domain": "reddit.com",
+        "description": "Finish: Woody. Peppery. Peat. Salt. Effervescence. Mineral-y. Sweet. Medium in length. Towards the end of the bottle the finish is a bit more ...",
+        "extraSnippets": []
+      },
+      {
+        "title": "Talisker Distiller's Edition - A Bona Fide Beast",
+        "url": "http://smokybeast.blogspot.com/2012/12/smokybeast-review-talisker-distillers.html",
+        "domain": "smokybeast.blogspot.com",
+        "description": "... 2001 and bottled in 2012, an 11-year variety that's been double matured in Amoroso sherry casks. Here's how it's described on the box ...",
+        "extraSnippets": [
+          "[![SmokyBeast](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj_VU2bzTeHKjkaB1TSLvj_HuvjFB4duSaeAfQuNWlV3uTiugjWM1LA6yUIPbNzu5Xwi0tk8meQCNyfSerggx5hkI6FLX0eotOhBk_Vr_R5"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "76b0367f72d5323ce0ac00df681cc285bb99b8a1b239775744d2422060df78f2",
+    "mode": "auto"
+  }
+}

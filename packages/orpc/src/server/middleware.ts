@@ -28,13 +28,14 @@ type Options = {
  * ```
  */
 const sentryMiddleware = (options: Options = {}) =>
-  os.middleware(async ({ next, path }, input) => {
+  os.middleware(async ({ context, next, path }, input) => {
     return await Sentry.startSpan(
       {
+        op: "rpc.server",
         name: `orpc.${path.join("/")}`,
         attributes: {
-          "span.kind": "SERVER",
           "rpc.system": "orpc",
+          "rpc.service": "peated.orpc",
           "rpc.method": path.join("."),
           ...(options.captureInputs && {
             "rpc.arguments": input ? JSON.stringify(input) : undefined,
@@ -42,8 +43,20 @@ const sentryMiddleware = (options: Options = {}) =>
         },
       },
       async (span) => {
+        const traceId = span.spanContext().traceId;
+        const contextWithHeaders = context as typeof context & {
+          resHeaders?: Headers;
+          sentryTraceId?: string;
+        };
+        contextWithHeaders.resHeaders?.set("x-sentry-trace-id", traceId);
+
         try {
-          return await next();
+          return await next({
+            context: {
+              ...context,
+              sentryTraceId: traceId,
+            },
+          });
         } catch (error) {
           span.setStatus({
             code: 2,

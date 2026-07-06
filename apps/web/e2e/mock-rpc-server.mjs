@@ -287,6 +287,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       sendRpcResponse(response, {
+        traceId: "11111111111111111111111111111111",
         pendingImage: {
           id: "playwright-photo-upload",
           imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
@@ -739,6 +740,12 @@ function buildCreateProposalPhotoIdentification({
           };
 
   return {
+    traceId:
+      action === "create_bottle_and_release"
+        ? "22222222222222222222222222222222"
+        : action === "create_release"
+          ? "33333333333333333333333333333333"
+          : "44444444444444444444444444444444",
     pendingImage: {
       id: "playwright-photo-upload",
       imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
@@ -915,6 +922,7 @@ function createPhotoIdentificationTarget(request, input) {
  */
 function buildNoMatchPhotoIdentification() {
   return {
+    traceId: "55555555555555555555555555555555",
     pendingImage: {
       id: "playwright-photo-upload",
       imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
@@ -946,6 +954,26 @@ function buildNoMatchPhotoIdentification() {
         expression: {
           value: createdBottleName,
           confidence: 0.8,
+          sourceExtractorIndexes: [0],
+        },
+        edition: {
+          value: "Single Cask",
+          confidence: 0.78,
+          sourceExtractorIndexes: [0],
+        },
+        vintageYear: {
+          value: 2007,
+          confidence: 0.78,
+          sourceExtractorIndexes: [0],
+        },
+        releaseYear: {
+          value: 2016,
+          confidence: 0.78,
+          sourceExtractorIndexes: [0],
+        },
+        caskNumber: {
+          value: "1661",
+          confidence: 0.76,
           sourceExtractorIndexes: [0],
         },
       },
@@ -988,6 +1016,7 @@ function buildNoMatchPhotoIdentification() {
 
 function buildNeedsReviewPhotoIdentification() {
   return {
+    traceId: "66666666666666666666666666666666",
     pendingImage: {
       id: "playwright-photo-upload",
       imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",

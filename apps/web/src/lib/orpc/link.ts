@@ -7,6 +7,16 @@ class ORPCUnauthorizedRedirectError extends Error {
   name = "ORPCUnauthorizedRedirectError";
 }
 
+let lastResponseSentryTraceId: string | null = null;
+
+export function getLastORPCResponseSentryTraceId() {
+  return lastResponseSentryTraceId;
+}
+
+export function clearLastORPCResponseSentryTraceId() {
+  lastResponseSentryTraceId = null;
+}
+
 export function isORPCUnauthorizedRedirectError(
   error: unknown,
 ): error is ORPCUnauthorizedRedirectError {
@@ -52,6 +62,13 @@ export function getLink({
       };
     },
     url: `${apiServer}/rpc`,
+    adapterInterceptors: [
+      async ({ next, ...options }) => {
+        const response = await next(options);
+        lastResponseSentryTraceId = response.headers.get("x-sentry-trace-id");
+        return response;
+      },
+    ],
     interceptors: [
       async ({ next, ...options }) => {
         try {

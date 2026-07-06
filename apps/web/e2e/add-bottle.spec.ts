@@ -673,6 +673,41 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(page.getByText(testBrand.name)).toBeVisible();
     await expect(page.getByText(createdBottleName)).toBeVisible();
+    await expect(page.getByText("Single Cask")).toBeVisible();
+    await expect(page.getByText("2007")).toBeVisible();
+    await expect(page.getByText("2016")).toBeVisible();
+    await expect(page.getByText("1661")).toBeVisible();
+    await expect(
+      page.getByText("Trace ID: 55555555555555555555555555555555"),
+    ).toBeVisible();
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async (value: string) => {
+            (window as typeof window & { __copiedText?: string }).__copiedText =
+              value;
+          },
+        },
+      });
+    });
+    await page
+      .getByRole("button", { name: "Copy photo identification payload" })
+      .click();
+    const copiedPayload = await page.evaluate(
+      () => (window as typeof window & { __copiedText?: string }).__copiedText,
+    );
+    expect(copiedPayload).toBeDefined();
+    const copied = JSON.parse(copiedPayload!);
+    expect(copied.traceId).toBe("55555555555555555555555555555555");
+    expect(copied.suggestedNextStep).toBe("manual_search");
+    expect(copied.imageEvidence.fieldCandidates).toMatchObject({
+      edition: { value: "Single Cask" },
+      vintageYear: { value: 2007 },
+      releaseYear: { value: 2016 },
+      caskNumber: { value: "1661" },
+    });
+    expect(copied.classification.decision.action).toBe("no_match");
     const createBottleLink = page.getByRole("link", {
       name: "Create Bottle",
     });
