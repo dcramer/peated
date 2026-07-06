@@ -1,11 +1,9 @@
 "use client";
 
 import type { Bottle, BottleRelease } from "@peated/server/types";
-import Button from "@peated/web/components/button";
 import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
-import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -14,22 +12,9 @@ import {
   type ORPCResponseTraceContext,
 } from "@peated/web/lib/orpc/link";
 import { useMutation } from "@tanstack/react-query";
-import {
-  Camera,
-  Check,
-  ChevronLeft,
-  ImageIcon,
-  Plus,
-  Search,
-} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  type ChangeEvent,
-  type ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
 import {
   createIdempotencyKey,
@@ -46,59 +31,24 @@ import {
   getSearchSeed,
   type PhotoIdentification,
   type PhotoIdentificationCreateInput,
-} from "./bottleResolver.helpers";
+} from "./helpers";
+import type { PhotoFailureTrace } from "./panels";
 import {
-  EvidencePills,
-  FallbackActions,
-  getPhotoFailureCopyPayload,
-  getPhotoIdentificationCopyPayload,
-  PhotoFailurePanel,
-  type PhotoFailureTrace,
-  PhotoIdentificationTraceFootnote,
-  ResultHeader,
-  SearchBottleCallout,
-} from "./bottleResolverPanels";
+  PhotoLoadingState,
+  PhotoMatchCreateState,
+  PhotoMatchedFallbackActions,
+  PhotoNoMatchState,
+  PhotoReadFailureState,
+  PhotoUploadState,
+} from "./states";
+import type { BottleResolverMatchedAction, BottleResolverProps } from "./types";
 
-export type BottleResolverTarget = {
-  bottle: Bottle;
-  release: BottleRelease | null;
-  hasExactLibraryEntry: boolean;
-  pendingImage: PhotoIdentification["pendingImage"] | null;
-  /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
-  previewUrl: string | null;
-  warnings?: string[];
-};
-
-export type BottleResolverMatchedAction = "library" | "tasting";
-
-export type BottleResolverMatchedActionsProps = {
-  bottleId: number;
-  releaseId: number | null;
-  hasExactLibraryEntry: boolean;
-  loadingExactLibraryStatus: boolean;
-  resolvingAction: BottleResolverMatchedAction | null;
-  onResolve: (action: BottleResolverMatchedAction) => void;
-};
-
-type Props = {
-  onResolve: (
-    target: BottleResolverTarget,
-    action?: BottleResolverMatchedAction,
-  ) => Promise<void> | void;
-  searchHrefForQuery: (query?: string) => string;
-  createBottleHrefForResult?: (
-    query: string,
-    prefill?: CreateBottlePrefill,
-  ) => string;
-  title: string;
-  matchedResultDescription?: string;
-  renderMatchedResultActions?: (
-    props: BottleResolverMatchedActionsProps,
-  ) => ReactNode;
-  createProposalActionLabel?: string;
-  searchActionLabel?: string;
-  enableCatalogImageApproval?: boolean;
-};
+export type {
+  BottleResolverMatchedAction,
+  BottleResolverMatchedActionsProps,
+  BottleResolverProps,
+  BottleResolverTarget,
+} from "./types";
 
 const loadingMessages = [
   "Holding it up to the light",
@@ -118,7 +68,7 @@ export default function BottleResolver({
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
   enableCatalogImageApproval = false,
-}: Props) {
+}: BottleResolverProps) {
   const router = useRouter();
   const orpc = useORPC();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -496,256 +446,83 @@ export default function BottleResolver({
 
       <div className="mx-auto mt-5 max-w-3xl space-y-5">
         {!previewUrl && !photoResult && !isIdentifying && (
-          <>
-            <section className="px-3 sm:px-0">
-              <div className="space-y-5">
-                <div className="text-center">
-                  <div className="text-muted text-sm">
-                    Start with a bottle photo
-                  </div>
-                  <h2 className="mt-1 text-2xl font-semibold text-white">
-                    Capture the label, then confirm the match.
-                  </h2>
-                </div>
-
-                <button
-                  type="button"
-                  className="flex min-h-72 w-full flex-col items-center justify-center gap-4 rounded border border-slate-800 bg-black p-6 text-center transition hover:border-slate-700 hover:bg-slate-950"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <div className="rounded-full border border-slate-700 bg-slate-950 p-5">
-                    <Camera className="text-highlight h-10 w-10" />
-                  </div>
-                  <div>
-                    <div className="text-lg font-semibold text-white">
-                      Take or upload a photo
-                    </div>
-                    <div className="text-muted mt-1 text-sm">
-                      Use a clear bottle label for the fastest match.
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </section>
-            <SearchBottleCallout searchHref={defaultSearchHref} />
-          </>
+          <PhotoUploadState
+            searchHref={defaultSearchHref}
+            onSelectPhoto={() => fileInputRef.current?.click()}
+          />
         )}
 
         {!isIdentifying && previewUrl && !photoResult && photoError && (
-          <>
-            <PhotoFailurePanel
-              previewUrl={previewUrl}
-              title="We couldn't read that photo"
-              description={photoError}
-              searchHref={defaultSearchHref}
-              searchLabel={searchActionLabel}
-              createBottleHref={createBottleHrefForResult?.("") ?? null}
-              onStartOver={startOver}
-              variant="error"
-            />
-            {photoFailureTrace && (
-              <PhotoIdentificationTraceFootnote
-                traceId={photoFailureTrace.traceId}
-                copyPayload={getPhotoFailureCopyPayload(photoFailureTrace)}
-              />
-            )}
-          </>
+          <PhotoReadFailureState
+            previewUrl={previewUrl}
+            photoError={photoError}
+            searchHref={defaultSearchHref}
+            searchLabel={searchActionLabel}
+            createBottleHref={createBottleHrefForResult?.("") ?? null}
+            trace={photoFailureTrace}
+            onStartOver={startOver}
+          />
         )}
 
         {isIdentifying && (
-          <section className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-3 py-8 text-center sm:min-h-0 sm:items-start sm:justify-start sm:py-10 sm:text-left">
-            <div className="mx-auto max-w-md space-y-5 sm:flex sm:max-w-3xl sm:items-center sm:gap-8 sm:space-y-0">
-              {previewUrl && (
-                <img
-                  src={previewUrl}
-                  alt="Selected bottle label"
-                  className="mx-auto h-28 w-28 rounded object-cover sm:mx-0 sm:h-56 sm:w-56"
-                />
-              )}
-              <div>
-                <h2 className="bottle-resolver-loading-shimmer via-highlight inline-block bg-gradient-to-r from-white to-white bg-[length:200%_100%] bg-clip-text text-xl font-semibold text-transparent">
-                  {loadingMessages[loadingMessageIndex]}
-                </h2>
-                <p className="text-muted mt-2 text-sm">
-                  Reading the label and checking Peated for a match.
-                </p>
-                <p className="text-muted mt-1 text-sm">
-                  This can take up to 30 seconds.
-                </p>
-                <div className="mt-5">
-                  <Button
-                    href={defaultSearchHref}
-                    icon={<Search className="h-4 w-4" />}
-                  >
-                    Search Bottles
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </section>
+          <PhotoLoadingState
+            previewUrl={previewUrl}
+            loadingMessage={loadingMessages[loadingMessageIndex]}
+            searchHref={defaultSearchHref}
+          />
         )}
 
         {!isIdentifying && photoResult && (
           <>
             {matchedBottleId || createDecision ? (
-              <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
-                <div className="space-y-5">
-                  <div className="space-y-4">
-                    {matchedBottleId ? (
-                      <ResultHeader
-                        previewUrl={previewUrl}
-                        icon={
-                          <div className="bg-highlight rounded-full p-2 text-black">
-                            <Check className="h-5 w-5" />
-                          </div>
-                        }
-                        title="Match found"
-                        description={matchedResultDescription}
-                      >
-                        <EvidencePills result={photoResult} />
-                      </ResultHeader>
-                    ) : (
-                      <ResultHeader
-                        previewUrl={previewUrl}
-                        icon={
-                          <div className="bg-highlight rounded-full p-2 text-black">
-                            <Plus className="h-5 w-5" />
-                          </div>
-                        }
-                        title={createProposalLabel?.title ?? "New bottle found"}
-                        description={
-                          createProposalLabel?.description ??
-                          "Create the bottle from this label."
-                        }
-                      >
-                        <EvidencePills result={photoResult} />
-                      </ResultHeader>
-                    )}
-
-                    {createDecision && proposedName && (
-                      <div className="rounded border border-slate-800 bg-slate-950 p-3">
-                        <div className="text-muted text-xs uppercase tracking-wide">
-                          Proposed
-                        </div>
-                        <div className="mt-1 font-semibold text-white">
-                          {proposedName}
-                        </div>
-                        <div className="text-muted mt-2 text-sm">
-                          {createProposalLabel?.description ??
-                            "Create a new bottle from this label."}
-                        </div>
-                      </div>
-                    )}
-                    {createDecision && catalogImageApprovalCopy && (
-                      <label className="flex items-start gap-3 rounded border border-slate-800 bg-slate-950 p-3">
-                        <input
-                          type="checkbox"
-                          className="mt-1 h-4 w-4"
-                          checked={catalogImageApproved}
-                          disabled={photoIdentificationCreateMutation.isPending}
-                          onChange={(event) =>
-                            setCatalogImageApproved(event.target.checked)
-                          }
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="flex items-center gap-2 font-semibold text-white">
-                            <ImageIcon className="h-4 w-4" />
-                            {catalogImageApprovalCopy.label}
-                          </span>
-                          <span className="text-muted mt-1 block text-sm">
-                            {catalogImageApprovalCopy.help}
-                          </span>
-                        </span>
-                      </label>
-                    )}
-                  </div>
-                  <div
-                    className={`mx-auto grid w-full gap-2 ${
-                      matchedBottleId && renderMatchedResultActions
-                        ? ""
-                        : "sm:w-1/2"
-                    }`}
-                  >
-                    {matchedBottleId &&
-                      (renderMatchedResultActions ? (
-                        renderMatchedResultActions({
-                          bottleId: matchedBottleId,
-                          releaseId: matchedReleaseId,
-                          hasExactLibraryEntry:
-                            matchedBottleHasExactLibraryEntry,
-                          loadingExactLibraryStatus:
-                            matchedBottleExactLibraryStatusLoading,
-                          resolvingAction,
-                          onResolve: (action) => {
-                            void loadTarget(
-                              matchedBottleId,
-                              matchedReleaseId,
-                              action,
-                            );
-                          },
-                        })
-                      ) : (
-                        <Button
-                          color="highlight"
-                          fullWidth
-                          disabled={Boolean(resolvingAction)}
-                          onClick={() =>
-                            void loadTarget(matchedBottleId, matchedReleaseId)
-                          }
-                        >
-                          Continue
-                        </Button>
-                      ))}
-                    {createDecision && (
-                      <Button
-                        color="highlight"
-                        fullWidth
-                        icon={<Plus className="h-4 w-4" />}
-                        onClick={() => void acceptCreateProposal(photoResult)}
-                        disabled={photoIdentificationCreateMutation.isPending}
-                      >
-                        {photoIdentificationCreateMutation.isPending
-                          ? "Creating..."
-                          : createProposalActionLabel}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </section>
+              <PhotoMatchCreateState
+                result={photoResult}
+                previewUrl={previewUrl}
+                matchedBottleId={matchedBottleId}
+                matchedReleaseId={matchedReleaseId}
+                matchedResultDescription={matchedResultDescription}
+                renderMatchedResultActions={renderMatchedResultActions}
+                createProposalLabel={createProposalLabel}
+                hasCreateDecision={Boolean(createDecision)}
+                proposedName={proposedName}
+                catalogImageApprovalCopy={catalogImageApprovalCopy}
+                catalogImageApproved={catalogImageApproved}
+                createPending={photoIdentificationCreateMutation.isPending}
+                createActionLabel={createProposalActionLabel}
+                resolvingAction={resolvingAction}
+                hasExactLibraryEntry={matchedBottleHasExactLibraryEntry}
+                loadingExactLibraryStatus={
+                  matchedBottleExactLibraryStatusLoading
+                }
+                onCatalogImageApprovedChange={setCatalogImageApproved}
+                onLoadTarget={(bottleId, releaseId, action) => {
+                  void loadTarget(bottleId, releaseId, action);
+                }}
+                onAcceptCreateProposal={(result) => {
+                  void acceptCreateProposal(result);
+                }}
+              />
             ) : (
-              <>
-                <PhotoFailurePanel
-                  previewUrl={previewUrl}
-                  title={manualResultCopy.title}
-                  description={manualResultCopy.description}
-                  searchHref={searchHref}
-                  searchLabel={searchActionLabel}
-                  createBottleHref={
-                    manualResultCopy.createLabel ? createBottleHref : null
-                  }
-                  createBottleLabel={manualResultCopy.createLabel}
-                  primaryAction={manualResultCopy.primaryAction}
-                  onStartOver={startOver}
-                  variant="no-match"
-                >
-                  <EvidencePills result={photoResult} />
-                </PhotoFailurePanel>
-                {photoIdentificationTraceId && (
-                  <PhotoIdentificationTraceFootnote
-                    traceId={photoIdentificationTraceId}
-                    copyPayload={getPhotoIdentificationCopyPayload(
-                      photoResult,
-                      photoIdentificationTraceId,
-                    )}
-                  />
-                )}
-              </>
-            )}
-            {(matchedBottleId || createDecision) && (
-              <FallbackActions
+              <PhotoNoMatchState
+                result={photoResult}
+                previewUrl={previewUrl}
+                title={manualResultCopy.title}
+                description={manualResultCopy.description}
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
-                showStartOver
+                createBottleHref={
+                  manualResultCopy.createLabel ? createBottleHref : null
+                }
+                createBottleLabel={manualResultCopy.createLabel}
+                primaryAction={manualResultCopy.primaryAction}
+                traceId={photoIdentificationTraceId}
+                onStartOver={startOver}
+              />
+            )}
+            {(matchedBottleId || createDecision) && (
+              <PhotoMatchedFallbackActions
+                searchHref={searchHref}
+                searchLabel={searchActionLabel}
                 onStartOver={startOver}
               />
             )}

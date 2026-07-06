@@ -11,10 +11,7 @@ import {
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
-import {
-  getFieldValue,
-  type PhotoIdentification,
-} from "./bottleResolver.helpers";
+import { getFieldValue, type PhotoIdentification } from "./helpers";
 
 export type PhotoFailureTrace = {
   traceId: string;
