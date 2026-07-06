@@ -344,6 +344,15 @@ function evaluateDecisionShape(
   }
 
   if (
+    expected.aliasScope !== undefined &&
+    result.decision.aliasScope !== expected.aliasScope
+  ) {
+    failures.push(
+      `aliasScope expected ${expected.aliasScope} but got ${result.decision.aliasScope}`,
+    );
+  }
+
+  if (
     expected.matchedBottleId !== undefined &&
     result.decision.matchedBottleId !== expected.matchedBottleId
   ) {

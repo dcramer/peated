@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { z } from "zod";
 import {
+  AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
   CategoryEnum,
@@ -72,6 +73,7 @@ export const classifierEvalExpectationSchema = z.object({
     ])
     .optional(),
   identityScope: z.enum(["product", "exact_cask"]).optional(),
+  aliasScope: AliasScopeEnum.optional(),
   matchedBottleId: z.number().int().nullable().optional(),
   matchedReleaseId: z.number().int().nullable().optional(),
   parentBottleId: z.number().int().nullable().optional(),

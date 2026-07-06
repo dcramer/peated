@@ -259,6 +259,72 @@ function classifyAgeCreationWithoutSiblingConflict(
 }
 
 describe("finalizeBottleReferenceClassification", () => {
+  test("defaults missing alias metadata to no alias", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Example Private Cask",
+      },
+      decision: {
+        action: "match",
+        confidence: 91,
+        rationale: "The existing candidate matches.",
+        candidateBottleIds: [existingPrivateCask.bottleId],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: existingPrivateCask.bottleId,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [existingPrivateCask],
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "match",
+      aliasScope: "none",
+    });
+  });
+
+  test("preserves alias metadata from the reviewed agent decision", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Example Known Bottle",
+        url: "https://shop.example.test/product/abc123",
+      },
+      decision: {
+        action: "match",
+        confidence: 97,
+        rationale: "The listing title is safe as a reusable alias.",
+        candidateBottleIds: [existingPrivateCask.bottleId],
+        identityScope: "product",
+        aliasScope: "global_alias",
+        observation: null,
+        matchedBottleId: existingPrivateCask.bottleId,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [existingPrivateCask],
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "match",
+      aliasScope: "global_alias",
+    });
+  });
+
   test("restores bottle-level age when same-family conflict proves it belongs in the display name", () => {
     const result = classifyShieldaigAgeCreation(
       buildShieldaigAgeCreationDecision("Speyside"),

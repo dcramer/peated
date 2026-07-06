@@ -731,6 +731,14 @@ const BOTTLE_CLASSIFIER_INSTRUCTIONS = [
     "Judge web results by specificity, independence, and corroboration, not domain familiarity alone.",
   ]),
   "",
+  "Source And Alias Scope:",
+  renderBulletLines([
+    "Always fill `aliasScope`.",
+    "`aliasScope = global_alias` only when the listing title itself is safe as a reusable bottle alias.",
+    "`aliasScope = none` when no reusable global alias should be created; use it for generic, underspecified, source-specific, or otherwise unsafe listing titles.",
+    "Do not infer alias safety from brand prefixes, retailer domain names, title shape, `single barrel` wording, search rank, or sibling family snippets. Use the reviewed evidence in this run.",
+  ]),
+  "",
   "Bottle, Bottling, Exact Cask:",
   renderBulletLines([
     "A parent bottle is the stable marketed product family.",
