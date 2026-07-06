@@ -1620,6 +1620,7 @@ export async function upsertStorePriceMatchProposal({
     suggestedReleaseId: parsedDecision?.suggestedReleaseId ?? null,
     parentBottleId: parsedDecision?.parentBottleId ?? null,
     creationTarget,
+    aliasScope: parsedDecision?.aliasScope ?? null,
     candidateBottles: candidates,
     extractedLabel,
     proposedBottle: parsedDecision?.proposedBottle ?? null,
@@ -2436,6 +2437,13 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
   }
 
   const aliasKey = normalizeBottleAliasKey(proposal.price.name);
+  // Alias-safety gate: a newly assigned listing title only becomes a reusable
+  // global alias when the decision asserted `aliasScope = global_alias`. For
+  // "none"/null/missing scope the exact listing is still assigned (backfilled)
+  // and retained for provenance, but the new alias is marked ignored so a
+  // generic retailer title cannot be reused for future listings. Aliases that
+  // are already assigned to this target keep their existing ignored state.
+  const reusableGlobalAlias = proposal.aliasScope === "global_alias";
   // Store listing keys stay bottle-level unless an existing canonical release
   // alias already owns the same text, which assignBottleAliasInTransaction preserves.
   const aliasResult = await assignBottleAliasInTransaction(tx, {
@@ -2446,6 +2454,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     name: aliasKey,
     backfillNames: [proposal.price.name],
     volume: proposal.price.volume,
+    ignored: !reusableGlobalAlias,
     assignmentSource: "source_approved",
     assignedByActorId: actor.id,
   });

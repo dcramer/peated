@@ -1338,6 +1338,13 @@
       "when": 1783291208003,
       "tag": "0190_rich_silverclaw",
       "breakpoints": false
+    },
+    {
+      "idx": 191,
+      "version": "7",
+      "when": 1783353724393,
+      "tag": "0191_known_freak",
+      "breakpoints": false
     }
   ]
 }

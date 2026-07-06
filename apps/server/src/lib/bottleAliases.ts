@@ -75,6 +75,7 @@ export async function assignBottleAliasInTransaction(
     name,
     backfillNames = [],
     volume,
+    ignored,
     assignmentSource,
     assignedByActorId,
   }: {
@@ -85,6 +86,11 @@ export async function assignBottleAliasInTransaction(
     name: string;
     backfillNames?: string[];
     volume?: number;
+    // Initial ignored state when this call creates the assignment (new row or
+    // claiming an unbound row). `true` keeps the row for provenance without
+    // making it a reusable exact-match alias (e.g. a source-scoped store
+    // listing title). Never mutates an alias already assigned to the target.
+    ignored?: boolean;
   } & BottleAliasAssignmentOptions,
 ): Promise<{ alias: BottleAlias; isNew: boolean }> {
   if (!name.trim()) {
@@ -111,6 +117,12 @@ export async function assignBottleAliasInTransaction(
     existingAlias?.releaseId === aliasReleaseId ||
     existingAlias?.releaseId === null ||
     aliasReleaseId === null;
+
+  // `ignored` only applies when this call establishes a new assignment (fresh
+  // insert or claiming an unbound row). An alias already assigned to the same
+  // target keeps its stored ignored state: a classifier-scoped write must not
+  // resurrect a moderator-ignored alias or deactivate an accepted active one.
+  const ignoredSet = ignored !== undefined ? { ignored } : {};
 
   if (hasMatchingBottle && hasMatchingRelease) {
     const assignmentUpdateValues = getAssignmentUpdateValues(assignmentOptions);
@@ -139,6 +151,7 @@ export async function assignBottleAliasInTransaction(
         name,
         bottleId,
         releaseId: aliasReleaseId,
+        ...ignoredSet,
         ...getAssignmentInsertValues(assignmentOptions),
       })
       .returning();
@@ -149,6 +162,7 @@ export async function assignBottleAliasInTransaction(
       .set({
         bottleId,
         releaseId: aliasReleaseId,
+        ...ignoredSet,
         ...getAssignmentInsertValues(assignmentOptions),
       })
       .where(eq(bottleAliases.name, existingAlias.name))
