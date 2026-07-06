@@ -194,13 +194,30 @@ test.describe("profile library", () => {
       savedBottleRow.getByText("Only for this Library entry."),
     ).toHaveCount(0);
 
-    await uploadLibraryImage(page, savedBottleRow);
+    const addImageButton = savedBottleRow.getByRole("button", {
+      name: `Add image for ${savedBottleName}`,
+    });
+    await expect(addImageButton).toBeVisible();
+    await uploadLibraryImage(page, addImageButton);
 
     await expect(
       savedBottleRow.getByRole("img", {
         name: `Photo of ${savedBottleName}`,
       }),
     ).toHaveAttribute("src", /library-replaced-\d+\.webp$/);
+
+    const viewImageButton = savedBottleRow.getByRole("button", {
+      name: `View image for ${savedBottleName}`,
+    });
+    await expect(viewImageButton).toBeVisible();
+    await viewImageButton.click();
+    await expect(
+      page.getByRole("heading", { name: `Photo of ${savedBottleName}` }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Replace Photo" }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
 
     await signIn(context, {
       accessToken,
@@ -246,10 +263,9 @@ test.describe("profile library", () => {
   });
 });
 
-async function uploadLibraryImage(page: Page, row: Locator) {
+async function uploadLibraryImage(page: Page, trigger: Locator) {
   const fileChooserPromise = page.waitForEvent("filechooser");
-  await row.getByRole("button", { name: "Bottle options" }).click();
-  await page.getByRole("menuitem", { name: "Edit Image" }).click();
+  await trigger.click();
   const fileChooser = await fileChooserPromise;
   await fileChooser.setFiles({
     name: "library-label.png",

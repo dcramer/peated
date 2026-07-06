@@ -4,6 +4,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { CollectionBottle, PagingRel } from "@peated/server/types";
 import Button from "@peated/web/components/button";
+import { ImageModal } from "@peated/web/components/imageModal";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -158,12 +159,28 @@ function useLibraryEntryMutations({
 }
 
 export function LibraryEntryThumbnail({ entry }: { entry: CollectionBottle }) {
+  const [imageOpen, setImageOpen] = useState(false);
+
   return entry.imageUrl ? (
-    <div className="h-12 w-12 shrink-0 overflow-hidden rounded border border-slate-800 bg-slate-900">
-      <img
-        src={entry.imageUrl}
+    <div className="h-12 w-12 shrink-0">
+      <button
+        type="button"
+        className="h-12 w-12 overflow-hidden rounded border border-slate-800 bg-slate-900"
+        aria-label={`View image for ${entry.bottle.fullName}`}
+        onClick={() => setImageOpen(true)}
+      >
+        <img
+          src={entry.imageUrl}
+          alt={`Photo of ${entry.bottle.fullName}`}
+          className="h-full w-full object-cover"
+        />
+      </button>
+      <ImageModal
+        image={entry.imageUrl}
         alt={`Photo of ${entry.bottle.fullName}`}
-        className="h-full w-full object-cover"
+        title={`Photo of ${entry.bottle.fullName}`}
+        open={imageOpen}
+        setOpen={setImageOpen}
       />
     </div>
   ) : null;
@@ -181,26 +198,53 @@ export function LibraryEntryImage({
       entry,
       username,
     });
+  const [imageOpen, setImageOpen] = useState(false);
+  const imageAlt = `Photo of ${entry.bottle.fullName}`;
 
   return (
     <div className="min-w-0 shrink-0">
       <button
         type="button"
         className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900 disabled:opacity-60"
-        aria-label={`Edit image for ${entry.bottle.fullName}`}
+        aria-label={
+          entry.imageUrl
+            ? `View image for ${entry.bottle.fullName}`
+            : `Add image for ${entry.bottle.fullName}`
+        }
         disabled={isBusy}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => {
+          if (entry.imageUrl) {
+            setImageOpen(true);
+          } else {
+            fileInputRef.current?.click();
+          }
+        }}
       >
         {entry.imageUrl ? (
           <img
             src={entry.imageUrl}
-            alt={`Photo of ${entry.bottle.fullName}`}
+            alt={imageAlt}
             className="h-full w-full object-cover"
           />
         ) : (
           <ImagePlus className="text-muted h-6 w-6" aria-hidden="true" />
         )}
       </button>
+      {entry.imageUrl && (
+        <ImageModal
+          image={entry.imageUrl}
+          alt={imageAlt}
+          title={imageAlt}
+          open={imageOpen}
+          setOpen={setImageOpen}
+          action={{
+            label: "Replace Photo",
+            icon: <ImagePlus className="h-4 w-4" />,
+            disabled: isBusy,
+            onClick: () => fileInputRef.current?.click(),
+          }}
+        />
+      )}
       {error && (
         <div className="mt-1 text-xs font-medium text-red-300" role="alert">
           {error}
@@ -214,7 +258,10 @@ export function LibraryEntryImage({
         aria-label={`Edit image for ${entry.bottle.fullName}`}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
-          if (file) void replaceImage(file);
+          if (file) {
+            setImageOpen(false);
+            void replaceImage(file);
+          }
         }}
       />
     </div>
