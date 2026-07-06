@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T04:59:20.607Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 Creative Whisky Company cask 1661"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 Creative Whisky Company cask 1661",
+    "summary": "I found **good evidence for the bottle family**, but **not a confirmed match for cask #1661** specifically.\n\n**Confirmed traits for this bottling style**\n- **Bottler:** Creative Whisky Company (CWC). ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc))\n- **Series:** **The Exclusive Malts",
+    "results": [
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "url": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "domain": "firstclassspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "url": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/68066/islay-2007-cwc",
+        "url": "https://www.whiskybase.com/whiskies/whisky/68066/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "url": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "domain": "maltrunners.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "url": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2f79888ebb7d5e29d15ee446507b36a658804acacf2e59233bb718a1223d33c0",
+    "mode": "auto"
+  }
+}

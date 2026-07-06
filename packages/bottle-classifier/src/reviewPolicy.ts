@@ -37,6 +37,7 @@ import {
 import { normalizeObservation } from "./observation";
 import { isExistingMatchConfidenceEligibleForVerification } from "./priceMatchingEvidence";
 import {
+  candidateLooksSmws,
   getSmwsCodeAnchor,
   maybeResolveSmwsExactCaskCodeDecision,
   normalizeSmwsExactCaskProposedBottleDraft,
@@ -1745,6 +1746,69 @@ function hasSmwsCodeAnchoredCreationEvidence({
   );
 }
 
+function hasImageLabelAnchoredExactCaskCreationEvidence({
+  decision,
+  artifacts,
+}: {
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  if (
+    decision.action !== "create_bottle" ||
+    decision.identityScope !== "exact_cask" ||
+    !decision.proposedBottle ||
+    !artifacts.imageEvidence?.photoSuitability.isSingleBottlePhoto ||
+    !artifacts.imageEvidence.photoSuitability.labelReadable ||
+    artifacts.imageEvidence.conflicts.length > 0
+  ) {
+    return false;
+  }
+
+  if (
+    !hasExactCaskSignals({
+      reference: { name: decision.proposedBottle.name },
+      proposedBottle: decision.proposedBottle,
+      extractedIdentity: artifacts.extractedIdentity,
+      observation: decision.observation,
+    })
+  ) {
+    return false;
+  }
+
+  const fieldCandidates = artifacts.imageEvidence.fieldCandidates;
+  const brandCandidate = String(fieldCandidates.brand?.value ?? "");
+  const expressionCandidate = String(
+    fieldCandidates.expression?.value ??
+      artifacts.extractedIdentity?.expression ??
+      "",
+  );
+  const caskCandidate = String(
+    fieldCandidates.caskNumber?.value ??
+      decision.observation?.caskNumber ??
+      decision.observation?.barrelNumber ??
+      artifacts.extractedIdentity?.edition ??
+      "",
+  );
+
+  const proposedName = decision.proposedBottle.name;
+  const proposedBrand = decision.proposedBottle.brand.name;
+  const proposedCask =
+    decision.observation?.caskNumber ??
+    decision.observation?.barrelNumber ??
+    decision.proposedBottle.edition ??
+    proposedName;
+
+  return Boolean(
+    proposedBrand &&
+    brandCandidate &&
+    textsOverlap(brandCandidate, proposedBrand) &&
+    expressionCandidate &&
+    textsOverlap(expressionCandidate, proposedName) &&
+    caskCandidate &&
+    textsOverlap(caskCandidate, proposedCask),
+  );
+}
+
 function hasCreationEvidence({
   reference,
   decision,
@@ -1757,6 +1821,10 @@ function hasCreationEvidence({
   return (
     hasSmwsCodeAnchoredCreationEvidence({
       reference,
+      decision,
+      artifacts,
+    }) ||
+    hasImageLabelAnchoredExactCaskCreationEvidence({
       decision,
       artifacts,
     }) ||
@@ -2460,13 +2528,21 @@ function rejectInvalidExistingMatch({
     targetCandidate: target,
     extractedLabel: artifacts.extractedIdentity,
   });
-  if (!identityConflicts.length) {
+  const smwsCode = getSmwsCodeAnchor({ reference, decision, artifacts });
+  const materialIdentityConflicts =
+    smwsCode &&
+    candidateLooksSmws(target) &&
+    candidateHasExactCaskCodeAnchor(target, smwsCode)
+      ? identityConflicts.filter((field) => field !== "brand")
+      : identityConflicts;
+
+  if (!materialIdentityConflicts.length) {
     return decision;
   }
 
   const downgradedRationale = appendRationale(
     decision.rationale,
-    `Server downgraded the existing-match recommendation because the candidate conflicts with extracted reference details (${identityConflicts.join(
+    `Server downgraded the existing-match recommendation because the candidate conflicts with extracted reference details (${materialIdentityConflicts.join(
       "; ",
     )}).`,
   );
@@ -2505,6 +2581,10 @@ function capUnverifiedCreationAutomation({
     }) ||
     hasSmwsCodeAnchoredCreationEvidence({
       reference,
+      decision,
+      artifacts,
+    }) ||
+    hasImageLabelAnchoredExactCaskCreationEvidence({
       decision,
       artifacts,
     }) ||

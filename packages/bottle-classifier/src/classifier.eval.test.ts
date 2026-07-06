@@ -42,6 +42,10 @@ type ClassifiedBottleClassificationResult = Extract<
 >;
 
 function getScenarioEvalName(testCase: ClassifierScenarioEvalCase): string {
+  if (testCase.kind === "decision") {
+    return testCase.testCase.name;
+  }
+
   return testCase.testCase.input.reference.name;
 }
 
@@ -97,6 +101,35 @@ function getDerivedVerifyEligibility(
     matchedBottleId: result.decision.matchedBottleId,
     matchedReleaseId: result.decision.matchedReleaseId,
   });
+}
+
+function getDerivedSuggestedNextStep(
+  result: BottleClassificationResult,
+): "confirm_match" | "confirm_create" | "manual_search" | "needs_review" {
+  if (result.status === "ignored") {
+    return "manual_search";
+  }
+
+  const decision = result.decision;
+  switch (decision.action) {
+    case "match":
+      return decision.confidence >= 70 ? "confirm_match" : "manual_search";
+    case "create_bottle":
+    case "create_release":
+    case "create_bottle_and_release": {
+      const confidenceBasisBand = decision.confidenceBasis?.band;
+      return decision.confidence >= 70 &&
+        (confidenceBasisBand === undefined ||
+          confidenceBasisBand === "auto_verification")
+        ? "confirm_create"
+        : "manual_search";
+    }
+    case "repair_parent_and_create_release":
+    case "repair_bottle":
+      return "needs_review";
+    case "no_match":
+      return "manual_search";
+  }
 }
 
 function deepContainsSubset(actual: unknown, expected: unknown): boolean {
@@ -393,6 +426,15 @@ function evaluateDecisionShape(
     getDerivedVerifyEligibility(testCase, result) !== expected.verifyEligible
   ) {
     failures.push(`verifyEligible expected ${expected.verifyEligible}`);
+  }
+
+  if (
+    expected.suggestedNextStep !== undefined &&
+    getDerivedSuggestedNextStep(result) !== expected.suggestedNextStep
+  ) {
+    failures.push(
+      `suggestedNextStep expected ${expected.suggestedNextStep} but got ${getDerivedSuggestedNextStep(result)}`,
+    );
   }
 
   if (

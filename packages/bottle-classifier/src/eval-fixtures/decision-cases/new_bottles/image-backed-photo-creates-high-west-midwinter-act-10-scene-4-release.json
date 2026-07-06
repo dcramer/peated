@@ -1,0 +1,158 @@
+{
+  "id": "image-backed-photo-creates-high-west-midwinter-act-10-scene-4-release",
+  "name": "image-backed photo: creates High West A Midwinter Night's Dram Act 10 Scene 4 release",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-10-scene-4.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-10-scene-4.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "High West",
+      "bottler": null,
+      "expression": "A Midwinter Night's Dram",
+      "series": "A Midwinter Night's Dram",
+      "distillery": ["High West"],
+      "category": "rye",
+      "stated_age": null,
+      "abv": 49.3,
+      "release_year": 2022,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Act 10 Scene 4"
+    },
+    "imageEvidence": {
+      "sourceImageId": "high-west-midwinter-act-10-scene-4",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.98,
+          "textSpans": [
+            {
+              "text": "High West Distillery A Midwinter Night's Dram. A blend of straight rye whiskeys finished in Port barrels. Limited Engagement. Bottled by High West Distillery, Park City, Utah. 49.3% Alc/Vol. Act 10 Scene 4.",
+              "confidence": 0.98
+            }
+          ],
+          "observations": [
+            "The front label identifies High West A Midwinter Night's Dram, 49.3% ABV, Act 10 Scene 4."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "High West",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "A Midwinter Night's Dram",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 49.3,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "Act 10 Scene 4",
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://highwest.com/",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-10-scene-4.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-10-scene-4.jpg",
+    "dbOutcome": {
+      "bottleId": 43397,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": true,
+      "summary": "Production DB outcome: create a new release under bottle 43397. Nearby broad release row: release 3, Act 10."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_release",
+        "releaseId": 3,
+        "field": "edition",
+        "productionValue": "Act 10",
+        "evidenceValue": "Act 10 Scene 4",
+        "source": "image_evidence",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The observed label uses the fuller release edition Act 10 Scene 4; the existing production release is the broader Act 10 row."
+      }
+    ],
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label explicitly reads A Midwinter Night's Dram, Act 10 Scene 4, 49.3% ABV. High West names these releases by act and scene, so Act 10 Scene 4 is the bottling edition rather than incidental label text."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_release",
+    "identityScope": "product",
+    "parentBottleId": 43397,
+    "proposedRelease": {
+      "edition": "Act 10 Scene 4",
+      "abv": 49.3,
+      "releaseYear": 2022
+    },
+    "confidenceBand": "auto_verification",
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create release Act 10 Scene 4 under bottle 43397."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1750,
+        "name": "High West",
+        "type": ["brand", "bottler", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 43397,
+        "name": "A Midwinter Night's Dram",
+        "fullName": "High West A Midwinter Night's Dram",
+        "brandId": 1750,
+        "series": "A Midwinter Night's Dram",
+        "distillerIds": [1750],
+        "category": "rye"
+      }
+    ],
+    "releases": [
+      {
+        "id": 3,
+        "bottleId": 43397,
+        "fullName": "High West A Midwinter Night's Dram - Act 10 - 2022 Release - 49.3% ABV",
+        "edition": "Act 10",
+        "abv": 49.3,
+        "releaseYear": 2022
+      }
+    ],
+    "aliases": [
+      {
+        "name": "High West A Midwinter Night's Dram Act 10",
+        "bottleId": 43397,
+        "releaseId": 3
+      },
+      {
+        "name": "High West Midwinter Nights Dram Act 10",
+        "bottleId": 43397,
+        "releaseId": 3
+      }
+    ]
+  }
+}

@@ -126,6 +126,12 @@ Normal user input should focus on:
 
 ## Matching Rule
 
+- Resolve the source bottle family and exact release/bottling details first.
+- Use Peated DB search as prior-art evidence for whether that exact target
+  already exists and how nearby items are modeled.
 - Match bottle-first when bottle identity is clear and release identity is weak.
-- Match or create a release only when the differentiating traits are explicit enough to survive canonicalization.
+- Match or create a release only when the differentiating traits are explicit
+  enough to survive canonicalization.
 - Preserve the rest as observations so precision is not lost.
+- Do not route a clear identity to manual search merely because the matched
+  catalog row is missing optional attributes or exposes repair/enrichment work.

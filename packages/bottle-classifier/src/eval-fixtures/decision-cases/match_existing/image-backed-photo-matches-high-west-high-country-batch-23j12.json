@@ -1,0 +1,161 @@
+{
+  "id": "image-backed-photo-matches-high-west-high-country-batch-23j12",
+  "name": "image-backed photo: matches High West High Country Batch No. 23J12",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "High West",
+      "bottler": null,
+      "expression": "High Country",
+      "series": null,
+      "distillery": ["High West"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 44,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Batch No. 23J12"
+    },
+    "imageEvidence": {
+      "sourceImageId": "high-west-high-country-batch-23j12",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.98,
+          "textSpans": [
+            {
+              "text": "High West High Country American Single Malt Whiskey. 44% Alc/Vol. Batch No. 23J12. Park City, Utah.",
+              "confidence": 0.98
+            }
+          ],
+          "observations": [
+            "The label identifies High West High Country American Single Malt Whiskey at 44% ABV with batch no. 23J12."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "High West",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "High Country",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 44,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "Batch No. 23J12",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://highwest.com/",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-high-country-batch-23j12.jpg",
+    "dbOutcome": {
+      "bottleId": 44284,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Production DB outcome: match existing bottle 44284, High West High Country - Batch No. 23J12. Nearby broad parent row: bottle 12825, High West High Country."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 12825,
+        "field": "abv",
+        "productionValue": null,
+        "evidenceValue": 44,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "The parent production bottle lacks ABV, but the observed 44% belongs to the Batch No. 23J12 bottling/release."
+      }
+    ],
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads High West High Country American Single Malt Whiskey, 44% ABV, batch no. 23J12. Production bottle 44284 already represents this exact batch as a legacy standalone bottle row; production bottle 12825 is the broader parent."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 44284,
+    "matchedReleaseId": null,
+    "suggestedNextStep": "confirm_match",
+    "summary": "Match existing bottle 44284, High West High Country - Batch No. 23J12."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1750,
+        "name": "High West",
+        "type": ["brand", "bottler", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 12825,
+        "name": "High Country",
+        "fullName": "High West High Country",
+        "brandId": 1750,
+        "category": "single_malt"
+      },
+      {
+        "id": 44284,
+        "name": "High Country",
+        "fullName": "High West High Country - Batch No. 23J12",
+        "brandId": 1750,
+        "category": "single_malt",
+        "edition": "Batch No. 23J12",
+        "abv": 44
+      },
+      {
+        "id": 43397,
+        "name": "A Midwinter Night's Dram",
+        "fullName": "High West A Midwinter Night's Dram",
+        "brandId": 1750,
+        "series": "A Midwinter Night's Dram",
+        "category": "rye"
+      }
+    ],
+    "releases": [],
+    "aliases": [
+      {
+        "name": "High West High Country",
+        "bottleId": 12825
+      },
+      {
+        "name": "High West High Country American Single Malt",
+        "bottleId": 12825
+      },
+      {
+        "name": "High West High Country Batch No. 23J12",
+        "bottleId": 44284
+      }
+    ]
+  }
+}

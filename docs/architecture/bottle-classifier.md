@@ -45,22 +45,30 @@ policy.
 
 ## Correctness Bar
 
-The classifier should choose the safest Peated DB outcome for the observed
-reference.
+The classifier should first identify the observed bottle family and exact
+release/bottling details, then choose the safest Peated DB outcome for that
+target.
 
-- Match an existing candidate only when it covers the marketed identity without
-  unsupported extra traits.
+- Treat local Peated search as prior-art evidence: it answers whether the exact
+  target already exists and shows nearby modeling patterns. Nearby local rows
+  must not erase clear source identity.
+- Match an existing candidate only when it covers the identified bottle and
+  release/bottling identity without unsupported extra identity traits.
 - Create a bottle or release only when reviewed source, label, image,
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a
   closed-form deterministic anchor.
-- Repair only when the existing bottle identity is right but stored canonical
-  fields conflict with evidence.
+- Repair and enrichment are secondary to identity routing. Missing optional
+  fields, questionable catalog metadata, or non-target-defining repair
+  opportunities should be recorded as observations or downstream repair work;
+  they should not block a clear match or create outcome.
+- Use repair actions only when a stored field conflict makes the selected target
+  identity unsafe.
 - Use `repair_parent_and_create_release` when a supported child release cannot
   safely be created until an existing parent bottle is repaired into a clean
   reusable parent.
-- Return `no_match` when evidence is missing, weak, contradictory, or not yet
-  mappable to the local database.
+- Return `no_match` only when the bottle/release identity is unresolved or when
+  creating would invent an ambiguous hybrid.
 
 False positive existing-bottle matches are worse than `no_match` or reviewed
 creation.
@@ -77,6 +85,9 @@ evidence bars:
   corroborate missing canonical identity, but creation and release outcomes may
   also be supported by reviewed label/image evidence, closed-form deterministic
   anchors, or explicit local parent/sibling evidence where policy allows them.
+- Manual-search consumers should treat `no_match` as unresolved identity, not as
+  a generic fallback for clear identities that happen to expose catalog repair
+  or enrichment work.
 
 ## Execution
 
@@ -154,6 +165,28 @@ ambiguity, or any required whisky interpretation, fall through to the agent.
 If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
 review policy.
+
+### Review Policy Audit
+
+`reviewPolicy.ts` is a final safety gate, not a second classifier. Audit changes
+there against this boundary:
+
+- Keep schema normalization, unknown-id rejection, impossible-state rejection,
+  non-whisky rejection, and confidence caps that enforce explicit automation
+  contracts.
+- Keep checks that validate the selected target exists in the reviewed candidate
+  set.
+- Keep direct extracted-field conflict rejection only for explicit conflicts on
+  populated fields.
+- Remove or narrow checks that re-score names, infer family modeling, require
+  local text-rank proof, or turn a clear agent match/create into `no_match`
+  because the catalog row is incomplete or has non-target-defining cleanup work.
+- Remove or narrow caps that treat lack of web corroboration as a blocker when
+  the source label, image evidence, local candidates, or a closed-form anchor
+  already supports the exact target.
+- Prefer adding an eval that proves the agent decision is right before relaxing
+  a review-policy gate. Only relax the gate when the remaining failure is the
+  gate itself.
 
 ## Agent Judgment
 

@@ -50,7 +50,7 @@ export async function extractFromImage({
           {
             type: "input_image",
             image_url: imageUrlOrBase64,
-            detail: "auto",
+            detail: "high",
           },
         ],
       },

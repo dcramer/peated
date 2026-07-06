@@ -1,0 +1,139 @@
+{
+  "id": "image-backed-photo-matches-trestle-spirit-of-eclipse",
+  "name": "image-backed photo: matches Trestle Spirit of Eclipse",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/trestle-spirit-of-eclipse.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/trestle-spirit-of-eclipse.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "Trestle",
+      "bottler": "Old Trestle",
+      "expression": "Spirit of Eclipse",
+      "series": null,
+      "distillery": ["Old Trestle"],
+      "category": "blend",
+      "stated_age": null,
+      "abv": 50,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "trestle-spirit-of-eclipse",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.97,
+          "textSpans": [
+            {
+              "text": "Old Trestle Distillery. Trestle Spirit of Eclipse. Spirits distilled from grain and hops. 50% Alc. by Vol. 100 proof. 750 ml.",
+              "confidence": 0.97
+            }
+          ],
+          "observations": [
+            "The label identifies Trestle Spirit of Eclipse from Old Trestle Distillery at 50% ABV."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Trestle",
+          "confidence": 0.96,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Spirit of Eclipse",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 50,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.oldtrestle.com/",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/trestle-spirit-of-eclipse.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/trestle-spirit-of-eclipse.jpg",
+    "dbOutcome": {
+      "bottleId": 38004,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Production DB outcome: match bottle 38004 with releaseId null."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "matched_bottle",
+        "bottleId": 38004,
+        "field": "abv",
+        "productionValue": null,
+        "evidenceValue": 50,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": true,
+        "notes": "The matched production bottle lacks ABV, and the bottle photo clearly reads 50% Alc. by Vol. / 100 proof."
+      }
+    ],
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads Trestle Spirit of Eclipse, spirits distilled from grain and hops, 50% ABV / 100 proof. Production bottle 38004 has the right name, Old Trestle entity, category blend, and release year 2011, but is missing the observed 50% ABV."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 38004,
+    "matchedReleaseId": null,
+    "suggestedNextStep": "confirm_match",
+    "summary": "Match existing bottle 38004 with no release."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 70736,
+        "name": "Old Trestle",
+        "shortName": "Trestle",
+        "type": ["brand", "bottler", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 38004,
+        "name": "Spirit of Eclipse",
+        "fullName": "Trestle Spirit of Eclipse",
+        "brandId": 70736,
+        "bottlerId": 70736,
+        "distillerIds": [70736],
+        "category": "blend",
+        "releaseYear": 2011
+      }
+    ],
+    "releases": [],
+    "aliases": [
+      {
+        "name": "Trestle Spirit of Eclipse",
+        "bottleId": 38004
+      },
+      {
+        "name": "Old Trestle Spirit of Eclipse",
+        "bottleId": 38004
+      }
+    ]
+  }
+}

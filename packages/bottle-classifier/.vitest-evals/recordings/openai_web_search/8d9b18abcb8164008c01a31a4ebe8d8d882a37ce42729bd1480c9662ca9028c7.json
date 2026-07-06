@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T04:15:25.160Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 1661"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 1661",
+    "summary": "I found a strong bottle match for **The Exclusive Malts Islay 2007 8 year old 57.1**.\n\n**Most likely confirmed identity**\n- **Bottler:** Creative Whisky Company (CWC), under **The Exclusive Malts** series. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc?utm_source=openai))\n- **Region/",
+    "results": [
+      {
+        "title": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "url": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "domain": "firstclassspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "url": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://boozedancing.com/2015/09/04/whisky-review-the-exclusive-malts-batch-8-part-2/",
+        "url": "https://boozedancing.com/2015/09/04/whisky-review-the-exclusive-malts-batch-8-part-2/",
+        "domain": "boozedancing.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskybarrel.com/products/mystery-malt-isle-of-islay-10-year-old-2007-exclusive-malts-200703",
+        "url": "https://www.thewhiskybarrel.com/products/mystery-malt-isle-of-islay-10-year-old-2007-exclusive-malts-200703",
+        "domain": "thewhiskybarrel.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year",
+        "url": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year",
+        "domain": "fineliquors.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8d9b18abcb8164008c01a31a4ebe8d8d882a37ce42729bd1480c9662ca9028c7",
+    "mode": "auto"
+  }
+}

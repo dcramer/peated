@@ -66,3 +66,12 @@
 - [x] 9.2 Run targeted web checks for Add Bottle, Create Bottle, search intent, and Log Tasting copy changes.
 - [x] 9.3 Use local UI verification at mobile and desktop widths for scan to Library, search to Library, create bottle, Add Another Bottle, View Library, and Log Tasting paths.
 - [x] 9.4 Run relevant package typechecks and lint for touched server and web surfaces.
+
+## 10. Scan-Backed Classifier Outcomes
+
+- [x] 10.1 Add image extraction eval fixtures for the observed `photo_` Add Bottle misses, preserving the original image inputs.
+- [x] 10.2 Add final classifier eval fixtures that encode the verified Peated DB outcome, provenance, and expected Add Bottle UI next step.
+- [x] 10.3 Update classifier and extractor instructions so visible bottle/release details are preserved before deciding match versus create.
+- [x] 10.4 Run focused image extraction evals and final classifier evals for the five scan-backed cases.
+- [x] 10.5 Audit review policy downgrades surfaced by those evals and remove or narrow gates only after the classifier result is proven correct.
+- [x] 10.6 Run targeted classifier tests, eval fixture validation, typecheck, and commit intentional eval replay recordings.

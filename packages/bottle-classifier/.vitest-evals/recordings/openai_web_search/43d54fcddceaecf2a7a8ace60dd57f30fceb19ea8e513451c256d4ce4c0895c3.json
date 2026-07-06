@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T05:17:22.809Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 312"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 312",
+    "summary": "I found **strong evidence for a very similar bottle family**, but **not enough to confirm your exact bottle as written**.\n\n**What is confirmed about this line:**\n- **Bottler:** **Creative Whisky Company (CWC)**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc))\n- **Series:** **The Excl",
+    "results": [
+      {
+        "title": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "url": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "domain": "firstclassspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "2007 An Islay (Lagavulin) 8 Year Old \"Exclusive Malts\" Single Barrel Cask Strength Single Malt Scotch Whisky (750ml) - SKU 1255139",
+        "url": "https://shop.klwines.com/products/details/1255139",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.gasparsliquorshoppe.com/exclusive-malts-8-year.html",
+        "url": "https://www.gasparsliquorshoppe.com/exclusive-malts-8-year.html",
+        "domain": "gasparsliquorshoppe.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/islay-2008-9-year-cask-20084-the-exclusive-malts",
+        "url": "https://distiller.com/spirits/islay-2008-9-year-cask-20084-the-exclusive-malts",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "url": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "43d54fcddceaecf2a7a8ace60dd57f30fceb19ea8e513451c256d4ce4c0895c3",
+    "mode": "auto"
+  }
+}

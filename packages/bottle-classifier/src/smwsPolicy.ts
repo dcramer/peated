@@ -55,7 +55,7 @@ function textLooksSmws(value: string | null | undefined): boolean {
   return SMWS_REFERENCE_PATTERN.test(value ?? "");
 }
 
-function candidateLooksSmws(candidate: BottleCandidate): boolean {
+export function candidateLooksSmws(candidate: BottleCandidate): boolean {
   return (
     isSmwsIdentityAnchor(candidate.brand) ||
     isSmwsIdentityAnchor(candidate.bottler) ||
