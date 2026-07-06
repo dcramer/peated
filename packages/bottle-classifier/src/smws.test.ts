@@ -1,11 +1,16 @@
 import { describe, expect, test } from "vitest";
 import {
+  composeExactCaskCodeFromComponents,
   getCategoryFromCask,
   parseCaskType,
   parseDetailsFromName,
   parseFlavorProfile,
   parseReferenceName,
 } from "./smws";
+
+const REPLICA_LABEL_TEXT =
+  "THE SCOTCH MALT WHISKY SOCIETY Society Distillery No. 1 Single Cask No. 285 " +
+  "11 years Aged Distilled on 6.8.11 SINGLE MALT SCOTCH WHISKY 63.4% ALC/VOL 700ml";
 
 describe("smws", () => {
   test("parses cask-number details from an SMWS bottle name", () => {
@@ -82,5 +87,98 @@ describe("smws", () => {
     });
     expect(parseReferenceName("RW6.5 Sauna Smoke")).toBeNull();
     expect(parseReferenceName("SMWS single cask 54.2% ABV")).toBeNull();
+  });
+
+  describe("composeExactCaskCodeFromComponents", () => {
+    test("composes the code from the replica label's separate components", () => {
+      expect(composeExactCaskCodeFromComponents(REPLICA_LABEL_TEXT)).toBe(
+        "1.285",
+      );
+    });
+
+    test("composes without the Society/Single prefixes", () => {
+      expect(
+        composeExactCaskCodeFromComponents(
+          "SMWS Distillery No. 1 Cask No. 285",
+        ),
+      ).toBe("1.285");
+    });
+
+    test("composes lettered distillery-number prefixes", () => {
+      expect(
+        composeExactCaskCodeFromComponents(
+          "The Scotch Malt Whisky Society Distillery No. G15 Single Cask No. 3",
+        ),
+      ).toBe("G15.3");
+    });
+
+    test("refuses to compose without an SMWS identity anchor", () => {
+      expect(
+        composeExactCaskCodeFromComponents(
+          "Distillery No. 1 Single Cask No. 285 63.4% ALC/VOL",
+        ),
+      ).toBeNull();
+      expect(
+        composeExactCaskCodeFromComponents(
+          "Glenfarclas Distillery No. 1 Single Cask No. 285",
+        ),
+      ).toBeNull();
+    });
+
+    test("refuses to compose from a single component", () => {
+      expect(
+        composeExactCaskCodeFromComponents(
+          "THE SCOTCH MALT WHISKY SOCIETY Society Distillery No. 1 11 years",
+        ),
+      ).toBeNull();
+      expect(
+        composeExactCaskCodeFromComponents(
+          "THE SCOTCH MALT WHISKY SOCIETY Single Cask No. 285 11 years",
+        ),
+      ).toBeNull();
+    });
+
+    test("does not mis-compose when a printed code follows Cask No.", () => {
+      // "Society Cask No. 95.71" already carries a full code; the digits before
+      // the dot must not be treated as a cask-number component.
+      expect(
+        composeExactCaskCodeFromComponents(
+          "SMWS Distillery No. 1 Society Cask No. 95.71",
+        ),
+      ).toBeNull();
+    });
+
+    test("returns null for empty or non-SMWS input", () => {
+      expect(composeExactCaskCodeFromComponents(null)).toBeNull();
+      expect(composeExactCaskCodeFromComponents("")).toBeNull();
+      expect(
+        composeExactCaskCodeFromComponents("Willett Distillery No. 1"),
+      ).toBeNull();
+    });
+  });
+
+  test("parseReferenceName composes a code from labeled components", () => {
+    expect(
+      parseReferenceName(
+        "The Scotch Malt Whisky Society Society Distillery No. 1 Single Cask No. 285",
+      ),
+    ).toEqual({
+      category: "single_malt",
+      code: "1.285",
+      distiller: "Glenfarclas",
+      name: "1.285",
+      selector: null,
+    });
+  });
+
+  test("parseReferenceName still prefers a printed code over composition", () => {
+    // A printed code wins, and its printed subtitle is preserved as the selector
+    // even when component-style wording is also present.
+    expect(
+      parseReferenceName("SMWS 95.71 Prepare for Winter Single Cask No. 71"),
+    ).toMatchObject({
+      code: "95.71",
+      selector: "Prepare for Winter Single Cask No. 71",
+    });
   });
 });

@@ -1,0 +1,149 @@
+{
+  "id": "image-backed-photo-composes-smws-1-285-from-label-components",
+  "name": "image-backed photo: composes SMWS 1.285 from separate label components",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-1.285.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-1.285.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "The Scotch Malt Whisky Society",
+      "bottler": "The Scotch Malt Whisky Society",
+      "expression": null,
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": 11,
+      "abv": 63.4,
+      "release_year": null,
+      "vintage_year": 2011,
+      "cask_strength": true,
+      "single_cask": true,
+      "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "smws-1.285",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.95,
+          "textSpans": [
+            {
+              "text": "THE SCOTCH MALT WHISKY SOCIETY. Society Distillery No. 1. Single Cask No. 285. 11 years Aged. Distilled on 6.8.11. SINGLE MALT SCOTCH WHISKY 63.4% ALC/VOL 700ml.",
+              "confidence": 0.95
+            }
+          ],
+          "observations": [
+            "The label prints the identity as two separate parts, 'Society Distillery No. 1' and 'Single Cask No. 285'; the composed code '1.285' does not appear anywhere on the label.",
+            "Handwritten replica-1983 presentation signed by founder Pip Hills, part of the SMWS 40th-anniversary 'Maverick's 40' series.",
+            "The distillation date reads '6.8.11'; whiskybase records the same cask as distilled 08.06.2011, so this is a date-format variant of 8 June 2011, not a different vintage."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "The Scotch Malt Whisky Society",
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 11,
+          "confidence": 0.96,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 63.4,
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "vintageYear": {
+          "value": 2011,
+          "confidence": 0.9,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskNumber": {
+          "value": "285",
+          "confidence": 0.95,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://smwsa.com/products/cask-no-1-285",
+      "https://www.whiskybase.com/whiskies/whisky/236164/glenfarclas-2011-smws-1285",
+      "https://www.spiritradar.com/whisky-db/glenfarclas-2011-smws-1.285-afternoon-tea-party-1st-fill-ex-oloroso-sherry-hogshead-finish-63.4-percent-700ml/",
+      "https://smws.co.za/collections/vendors?q=CASK+NO.+1.285",
+      "https://www.youtube.com/watch?v=p4Yc0lPhdgA",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-1.285.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-1.285.jpg",
+    "dbOutcome": {
+      "bottleId": 11940,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Production DB outcome: match bottle 11940, SMWS 1.285 (name '1.285 Party in the afternoon'), releaseId null, identityScope exact_cask. The bottle already carries statedAge 11, abv 63.4, vintageYear 2011, caskStrength true, singleCask true, so nothing is missing to backfill."
+    },
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The classifier extracted the cask number '285' but never composed the SMWS code because '1.285' is printed nowhere on the label; the label instead prints the identity as separate 'Society Distillery No. 1' and 'Single Cask No. 285' components. Documented Society practice composes 'Distillery No. X' + 'Cask No. Y' into code 'X.Y', so deterministic composition yields '1.285' and matches existing bottle 11940. This is the SMWS 40th-anniversary 'Maverick's 40' replica-1983 handwritten presentation signed by founder Pip Hills (Glenfarclas, distillery code 1). The label's distillation date '6.8.11' is a format variant of whiskybase's 08.06.2011 (8 June 2011), so vintageYear stays 2011."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 11940,
+    "matchedReleaseId": null,
+    "expectedTier": "auto",
+    "suggestedNextStep": "confirm_match",
+    "summary": "Compose the SMWS code 1.285 from the label's 'Distillery No. 1' + 'Single Cask No. 285' components and match existing exact-cask bottle 11940 with no release."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 976,
+        "name": "Glenfarclas",
+        "type": ["brand", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 11940,
+        "name": "1.285 Party in the afternoon",
+        "fullName": "SMWS 1.285 Party in the afternoon",
+        "brandId": 4263,
+        "bottlerId": 4263,
+        "distillerIds": [976],
+        "category": "single_malt",
+        "statedAge": 11,
+        "caskStrength": true,
+        "singleCask": true,
+        "abv": 63.4,
+        "vintageYear": 2011,
+        "releaseYear": 2023
+      }
+    ],
+    "releases": [],
+    "aliases": [
+      {
+        "name": "SMWS 1.285 Party in the afternoon",
+        "bottleId": 11940
+      }
+    ]
+  }
+}

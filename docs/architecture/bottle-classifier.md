@@ -177,6 +177,14 @@ Deterministic SMWS code may:
 - recognize SMWS identity anchors such as `SMWS` and `The Scotch Malt Whisky
 Society`
 - parse exact-cask codes such as `95.71`, `RW6.5`, or `G15.1`
+- compose the exact-cask code from separately labeled components when the SMWS
+  identity is anchored and BOTH a distillery-number component (`Society
+Distillery No. 1` / `Distillery No. 1`) and a cask-number component (`Single
+Cask No. 285` / `Cask No. 285`) are present, for example composing `1.285`
+  from a replica/anniversary label that never prints the composed code. This is
+  a closed identifier operation in the same spirit as parsing `95.71`; the
+  composed code is then treated exactly like a parsed code. Never compose from a
+  single component and never invent the missing component.
 - treat that exact code as the bottle identity anchor for matching existing
   SMWS rows
 - derive the rough distillery/category from the curated SMWS code table when the

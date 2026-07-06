@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T21:09:10.623Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig 18 year old single barrel bourbon 45%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig 18 year old single barrel bourbon 45%",
+    "summary": "**Elijah Craig 18 Year Old Single Barrel Bourbon (45% ABV / 90 proof)**\n\nConfirmed bottle traits:\n\n- **Brand / expression:** Elijah Craig **18 Year Old Single Barrel**\n- **Type:** **Kentucky Straight Bourbon Whiskey** ([whiskymarketplace.com](https://www.whiskymarketplace.com/whiskey/elijah-craig-single-barrel-18-year-",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/elijah-craig-single-barrel.html",
+        "url": "https://www.whisky.com/whisky-database/details/elijah-craig-single-barrel.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyshelf.com/elijah-craig-18-year-single-barrel-bourbon-review/",
+        "url": "https://www.thewhiskeyshelf.com/elijah-craig-18-year-single-barrel-bourbon-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyshop.com/elijah-craig-single-barrel-18-year-old",
+        "url": "https://www.whiskyshop.com/elijah-craig-single-barrel-18-year-old",
+        "domain": "whiskyshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavenhill.com/press-detail.php?postid=heaven-hill-brings-back-critically-acclaimed-elijah-craig-18-year-old-single-barrel-bourbon-after-three-year-",
+        "url": "https://www.heavenhill.com/press-detail.php?postid=heaven-hill-brings-back-critically-acclaimed-elijah-craig-18-year-old-single-barrel-bourbon-after-three-year-hiatus",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.walmart.com/ip/154360031",
+        "url": "https://www.walmart.com/ip/154360031",
+        "domain": "walmart.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskymarketplace.com/whiskey/elijah-craig-single-barrel-18-year-old-bourbon-whiskey",
+        "url": "https://www.whiskymarketplace.com/whiskey/elijah-craig-single-barrel-18-year-old-bourbon-whiskey",
+        "domain": "whiskymarketplace.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6ef281216734823de163e1e5152b2c2b25b722f3d5fcf3f669acd586f9f91422",
+    "mode": "auto"
+  }
+}

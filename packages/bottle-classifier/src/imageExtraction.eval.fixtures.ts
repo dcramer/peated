@@ -173,4 +173,38 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
       ],
     },
   },
+  {
+    id: "image-extraction-smws-1-285-replica-components",
+    name: "SMWS 1.285 replica label (composed from components)",
+    imagePath: assetPath("smws-1.285.jpg"),
+    expected: {
+      fields: {
+        category: "single_malt",
+        abv: 63.4,
+        cask_strength: true,
+        single_cask: true,
+      },
+      anyText: [
+        {
+          fields: ["brand", "bottler"],
+          includes: ["Scotch Malt Whisky Society"],
+        },
+        // The replica label prints the identity as separate "Distillery No. 1"
+        // and "Single Cask No. 285" components; the composed "1.285" code is
+        // not on the label, so extraction stays honest to the components. The
+        // handwritten digits are genuinely ambiguous (the verified cask number
+        // 285, age 11, and distilled-on 6.8.11 read as 205/17/77 to vision
+        // extractors), so this eval pins the component structure and the
+        // printed facts rather than the handwritten digit values.
+        {
+          fields: ["expression", "series", "edition"],
+          includes: ["Distillery No. 1"],
+        },
+        {
+          fields: ["expression", "edition"],
+          includes: ["Cask No."],
+        },
+      ],
+    },
+  },
 ];

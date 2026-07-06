@@ -18,7 +18,10 @@ import {
 } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
-import { parseDetailsFromName as parseSmwsDetailsFromName } from "./smws";
+import {
+  composeExactCaskCodeFromComponents,
+  parseDetailsFromName as parseSmwsDetailsFromName,
+} from "./smws";
 
 const BARE_SMWS_CODE_REFERENCE_PATTERN = /^SMWS\s+([A-Z]*\d+\.\d+)$/i;
 const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
@@ -72,6 +75,46 @@ export function candidateLooksSmws(candidate: BottleCandidate): boolean {
   );
 }
 
+// Collects every SMWS-relevant text fragment (extracted identity, decision
+// draft, reference name, and image OCR spans/observations) into one string so
+// deterministic code composition can see both the society anchor and the
+// separately labeled distillery/cask components even when they originate from
+// different fields.
+function getSmwsCompositionText({
+  reference,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReference;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): string {
+  const fragments: Array<string | null | undefined> = [
+    reference.name,
+    artifacts.extractedIdentity?.brand,
+    artifacts.extractedIdentity?.bottler,
+    artifacts.extractedIdentity?.expression,
+    artifacts.extractedIdentity?.edition,
+    decision.proposedBottle?.brand.name,
+    decision.proposedBottle?.bottler?.name,
+    decision.proposedBottle?.name,
+    decision.proposedBottle?.edition,
+  ];
+
+  for (const extractor of artifacts.imageEvidence?.extractors ?? []) {
+    for (const span of extractor.textSpans) {
+      fragments.push(span.text);
+    }
+    for (const observation of extractor.observations) {
+      fragments.push(observation);
+    }
+  }
+
+  return fragments
+    .filter((fragment): fragment is string => Boolean(fragment))
+    .join(" \n ");
+}
+
 export function getSmwsCodeAnchor({
   reference,
   decision,
@@ -107,7 +150,11 @@ export function getSmwsCodeAnchor({
     }
   }
 
-  return null;
+  // No printed code found: fall back to composing it from the separately
+  // labeled distillery-number and cask-number components on the label.
+  return composeExactCaskCodeFromComponents(
+    getSmwsCompositionText({ reference, decision, artifacts }),
+  );
 }
 
 function getSmwsReferenceCodeAnchor({
@@ -119,7 +166,10 @@ function getSmwsReferenceCodeAnchor({
     return null;
   }
 
-  return getExactCaskCodeAnchor(reference.name);
+  return (
+    getExactCaskCodeAnchor(reference.name) ??
+    composeExactCaskCodeFromComponents(reference.name)
+  );
 }
 
 function getSmwsCodeTargetCandidate({

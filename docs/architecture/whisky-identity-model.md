@@ -128,6 +128,11 @@ Normal user input should focus on:
   source-backed title to preserve in the bottle display/create proposal when it
   is visible or extracted. The code may roughly derive the distillery from the
   SMWS code table, but it must not invent or correct the title.
+- `SMWS 1.285` on a replica/anniversary label that prints only `Distillery No.
+1` and `Single Cask No. 285`: the code `1.285` may be composed
+  deterministically from those two labeled components and then anchors matching
+  exactly like a printed code. Composition requires the SMWS anchor plus both
+  components; it never fabricates a missing component or a subtitle.
 
 ## Matching Rule
 
