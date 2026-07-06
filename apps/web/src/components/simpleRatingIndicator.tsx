@@ -25,19 +25,26 @@ export default function SimpleRatingIndicator({ avgRating, className }: Props) {
     rating === "pass" ? "Pass" : rating === "sip" ? "Sip" : "Savor"
   }`;
 
-  if (rating === "savor") {
-    return (
-      <div
-        className={classNames("inline-flex gap-0.5", className)}
-        title={title}
-      >
-        <HandThumbUpIcon className="h-4 w-4" />
-        <HandThumbUpIcon className="h-4 w-4" />
-      </div>
-    );
-  }
-
   const Icon = rating === "pass" ? HandThumbDownIcon : HandThumbUpIcon;
+  const icons =
+    rating === "savor" ? (
+      <>
+        <HandThumbUpIcon className="h-4 w-4" />
+        <HandThumbUpIcon className="h-4 w-4" />
+      </>
+    ) : (
+      <Icon className="h-4 w-4" />
+    );
 
-  return <Icon className={classNames("h-4 w-4", className)} title={title} />;
+  return (
+    <span
+      className={classNames(
+        "inline-flex items-center justify-center gap-0.5",
+        className,
+      )}
+      title={title}
+    >
+      {icons}
+    </span>
+  );
 }

@@ -64,7 +64,7 @@ export default function BottleTable({
           title: "Bottle",
           sort: "name",
           sortDefaultOrder: "asc",
-          className: "min-w-full sm:w-1/2",
+          className: showBottleStats ? "min-w-full sm:w-1/2" : "w-full",
           value: (item) => {
             const collectionImage =
               item.collectionBottle &&
