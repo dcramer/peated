@@ -920,6 +920,87 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
+  test("does not append SMWS age and vintage to agent exact-cask proposal names", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Bottle photo upload",
+      },
+      decision: {
+        action: "create_bottle",
+        confidence: 89,
+        rationale: "The readable SMWS label identifies an exact-cask bottle.",
+        candidateBottleIds: [],
+        identityScope: "exact_cask",
+        observation: {
+          selector: null,
+          caskNumber: "95.71",
+          barrelNumber: null,
+          bottleNumber: null,
+          outturn: null,
+          market: null,
+          exclusive: null,
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: {
+          name: "95.71 Prepare for Winter",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 14,
+          caskStrength: true,
+          singleCask: true,
+          abv: 57,
+          vintageYear: 2007,
+          releaseYear: null,
+          brand: {
+            id: null,
+            name: "SMWS",
+          },
+          distillers: [],
+          bottler: {
+            id: null,
+            name: "The Scotch Malt Whisky Society",
+          },
+        },
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [],
+        extractedIdentity: {
+          brand: "SMWS",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "Prepare for Winter",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 14,
+          abv: 57,
+          release_year: null,
+          vintage_year: 2007,
+          cask_strength: true,
+          single_cask: true,
+          edition: "95.71",
+        },
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "95.71 Prepare for Winter",
+        statedAge: 14,
+        abv: 57,
+        vintageYear: 2007,
+      },
+    });
+  });
+
   test("downgrades release creation when the parent has conflicting bottle-level release traits", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_release",

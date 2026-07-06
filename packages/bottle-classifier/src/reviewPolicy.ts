@@ -3014,7 +3014,29 @@ function sanitizeClassifierDecision({
     }
 
     let proposedBottleDraft = normalizedDrafts.proposedBottle;
-    if ((decision.identityScope ?? "product") === "exact_cask") {
+    const smwsAnchorDecision: BottleClassificationDecision = {
+      ...decision,
+      action: "create_bottle",
+      identityScope: decision.identityScope ?? "product",
+      aliasScope: decision.aliasScope ?? undefined,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: proposedBottleDraft,
+      proposedRelease: null,
+    };
+    const hasSmwsCodeAnchor = Boolean(
+      getSmwsCodeAnchor({
+        reference,
+        decision: smwsAnchorDecision,
+        artifacts,
+      }),
+    );
+
+    if (
+      (decision.identityScope ?? "product") === "exact_cask" &&
+      !hasSmwsCodeAnchor
+    ) {
       proposedBottleDraft = restoreExactCaskBottleDisplayName({
         reference,
         extractedIdentity: artifacts.extractedIdentity,
