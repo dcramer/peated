@@ -5,6 +5,7 @@ import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/
 import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
+import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
   buildPhotoReferenceName,
@@ -518,17 +519,29 @@ function logPhotoIdentificationFailure({
   err: unknown;
 }) {
   const error = err instanceof Error ? err : null;
+  const failureContext = {
+    userId: context.user.id,
+    pendingImageId: pendingImage.id,
+    pendingImageUrl: pendingImage.imageUrl,
+    idempotencyKey,
+    outcome: "failed",
+    fileSize: file.size,
+    fileType: file.type || "unknown",
+  };
 
   logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
-    "photo_identification.user_id": context.user.id,
-    "photo_identification.pending_image_id": pendingImage.id,
-    "photo_identification.idempotency_key": idempotencyKey,
+    "photo_identification.user_id": failureContext.userId,
+    "photo_identification.pending_image_id": failureContext.pendingImageId,
+    "photo_identification.idempotency_key": failureContext.idempotencyKey,
     "photo_identification.outcome": "failed",
-    "photo_identification.file_size": file.size,
-    "photo_identification.file_type": file.type || "unknown",
+    "photo_identification.file_size": failureContext.fileSize,
+    "photo_identification.file_type": failureContext.fileType,
     "photo_identification.error_name": error?.name ?? typeof err,
     "photo_identification.error_message":
       error?.message ?? "Unknown photo identification failure.",
+  });
+  logError(err, {
+    photoIdentification: failureContext,
   });
 }
 
