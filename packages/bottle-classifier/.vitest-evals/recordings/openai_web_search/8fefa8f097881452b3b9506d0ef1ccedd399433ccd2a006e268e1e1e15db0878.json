@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:03:39.976Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof C923 batch bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof C923 batch bourbon",
+    "summary": "**Elijah Craig Barrel Proof C923** is the **September 2023** batch of Elijah Craig Barrel Proof, produced by **Heaven Hill**. Officially, the batch is listed at **133.0 proof (66.5% ABV)** and carries an age statement of **13 years, 7 months**. The batch code follows Elijah Craig’s standard format: **C** = third releas",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bourbon-whiskey-and-rye.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "url": "https://bourbon-whiskey-and-rye.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "bourbon-whiskey-and-rye.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://secretwhiskeysociety.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "url": "https://secretwhiskeysociety.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "secretwhiskeysociety.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "url": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.peoplesbourbonreview.com/reviews/elijah-craig-barrel-proof-batch-c923-review",
+        "url": "https://www.peoplesbourbonreview.com/reviews/elijah-craig-barrel-proof-batch-c923-review",
+        "domain": "peoplesbourbonreview.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.memywifeandwhisky.com/reviews/review-238-elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.memywifeandwhisky.com/reviews/review-238-elijah-craig-barrel-proof-batch-c923",
+        "domain": "memywifeandwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8fefa8f097881452b3b9506d0ef1ccedd399433ccd2a006e268e1e1e15db0878",
+    "mode": "auto"
+  }
+}
