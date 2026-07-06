@@ -22,6 +22,13 @@ import { parseDetailsFromName as parseSmwsDetailsFromName } from "./smws";
 
 const BARE_SMWS_CODE_REFERENCE_PATTERN = /^SMWS\s+([A-Z]*\d+\.\d+)$/i;
 const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
+const SMWS_TITLE_NOISE = new Set([
+  "single malt",
+  "single malt scotch whisky",
+  "scotch whisky",
+  "whisky",
+  "cask strength",
+]);
 
 function appendRationale(
   rationale: string | null,
@@ -154,12 +161,88 @@ function getSmwsSelectorFromReference({
   return selector || null;
 }
 
+function cleanSmwsTitleCandidate(value: string): string | null {
+  const cleaned = value
+    .replace(/^[\s.,:;/-]+|[\s.,:;/-]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!cleaned || SMWS_TITLE_NOISE.has(normalizeComparableText(cleaned))) {
+    return null;
+  }
+
+  return cleaned;
+}
+
+function extractSmwsTitleCandidate({
+  value,
+  code,
+  allowCodeLess,
+}: {
+  value: string | null | undefined;
+  code: string;
+  allowCodeLess: boolean;
+}): string | null {
+  const normalizedValue = normalizeString(value ?? "").trim();
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const containsCode =
+    getExactCaskCodeAnchor(normalizedValue) === code ||
+    new RegExp(`\\b${escapeRegExp(code)}\\b`, "i").test(normalizedValue);
+  if (!containsCode && !allowCodeLess) {
+    return null;
+  }
+
+  const withoutIdentityMarkers = normalizedValue
+    .replace(SMWS_REFERENCE_PATTERN, " ")
+    .replace(/\b(?:the\s+)?society\s+cask\s+no\.?\b/gi, " ")
+    .replace(/\bcask\s+no\.?\b/gi, " ")
+    .replace(new RegExp(`\\b${escapeRegExp(code)}\\b\\.?`, "i"), " ");
+
+  return cleanSmwsTitleCandidate(withoutIdentityMarkers);
+}
+
+function getSmwsExactCaskDisplayName({
+  code,
+  extractedIdentity,
+  proposedBottleName,
+  reference,
+}: {
+  code: string;
+  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
+  proposedBottleName?: string | null;
+  reference: BottleReference;
+}): string {
+  const title =
+    extractSmwsTitleCandidate({
+      value: extractedIdentity?.expression,
+      code,
+      allowCodeLess: true,
+    }) ??
+    extractSmwsTitleCandidate({
+      value: proposedBottleName,
+      code,
+      allowCodeLess: true,
+    }) ??
+    extractSmwsTitleCandidate({
+      value: reference.name,
+      code,
+      allowCodeLess: false,
+    });
+
+  return title ? `${code} ${title}` : code;
+}
+
 function buildSmwsExactCaskBottleDraft({
   artifacts,
   code,
+  reference,
 }: {
   artifacts: BottleClassificationArtifacts;
   code: string;
+  reference: BottleReference;
 }): NonNullable<BottleClassificationDecision["proposedBottle"]> {
   const extractedIdentity = artifacts.extractedIdentity;
   const smwsDetails = parseSmwsDetailsFromName(code);
@@ -186,7 +269,11 @@ function buildSmwsExactCaskBottleDraft({
     }));
 
   return {
-    name: code,
+    name: getSmwsExactCaskDisplayName({
+      code,
+      extractedIdentity,
+      reference,
+    }),
     series: null,
     category: extractedIdentity?.category ?? smwsDetails?.category ?? null,
     edition: null,
@@ -237,7 +324,12 @@ export function normalizeSmwsExactCaskProposedBottleDraft({
   if (smwsCode) {
     return {
       ...proposedBottle,
-      name: smwsCode,
+      name: getSmwsExactCaskDisplayName({
+        code: smwsCode,
+        extractedIdentity,
+        proposedBottleName: proposedBottle.name,
+        reference,
+      }),
       edition: null,
     };
   }
@@ -320,6 +412,7 @@ export function maybeResolveSmwsExactCaskCodeDecision({
   const proposedBottle = buildSmwsExactCaskBottleDraft({
     artifacts,
     code: smwsCode,
+    reference,
   });
 
   return {
@@ -433,6 +526,7 @@ export function resolveSmwsExactCaskReference({
     proposedBottle: buildSmwsExactCaskBottleDraft({
       artifacts,
       code: smwsCode,
+      reference,
     }),
     proposedRelease: null,
   });

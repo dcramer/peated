@@ -61,6 +61,29 @@ When a scan-backed eval fails, diagnose the layer in this order:
 
 Only the third case should relax review policy, and the relaxation should remove or narrow the deterministic gate that caused the downgrade rather than adding family-specific matching rules.
 
+### Deterministic whisky rules stay closed-form
+
+The Add Bottle resolver follows the classifier's deterministic boundary.
+Deterministic code may parse closed-form identifiers and preserve source-backed
+facts, but it should not decide whisky-family semantics from string similarity
+or brand-specific heuristics.
+
+The explicit whisky-domain exception is SMWS exact-cask identity:
+
+- SMWS cask-code syntax such as `95.71`, `RW6.5`, or `G15.1` may
+  deterministically anchor the bottle identity.
+- The curated SMWS code table may roughly derive distillery/category from the
+  first code segment.
+- A visible or extracted SMWS subtitle may be preserved in the create proposal
+  display name, for example `95.71 Prepare for Winter`.
+- The subtitle itself is not deterministic: code must not invent, correct, or
+  choose between ambiguous titles.
+
+Other single-cask, barrel, batch, private-selection, brand-prefix, and
+retailer-title patterns remain classifier/evidence decisions. They can inform
+extraction and observations, but they cannot bypass the agent or review
+contract.
+
 ### Collection entry images are user-owned images
 
 Add `image_url` to `collection_bottle`. This represents a user's photo for their saved bottle or release. It does not replace `bottles.image_url` or `bottle_releases.image_url`, and it should be serialized with collection bottle list/detail responses.

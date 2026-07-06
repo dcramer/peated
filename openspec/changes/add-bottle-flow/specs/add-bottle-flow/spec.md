@@ -59,6 +59,14 @@ The system SHALL resolve scan, search, and manual creation paths into a bottle t
 - **THEN** the review policy gate is audited for removal or narrowing
 - **AND** the system keeps only invalid-state, unknown-target, direct-field-conflict, non-whisky, and explicit automation-cap checks
 
+#### Scenario: Deterministic SMWS code handling
+
+- **WHEN** photo identification reads an SMWS exact-cask code such as `95.71`
+- **THEN** the classifier may use that code as a deterministic bottle identity anchor
+- **AND** the classifier may derive rough distillery/category from the curated SMWS code table when available
+- **AND** the resolver preserves any visible or extracted SMWS title in the create proposal display name
+- **AND** the system does not generalize this deterministic rule to non-SMWS single-cask, barrel, batch, private-selection, brand-prefix, or retailer-title patterns
+
 ### Requirement: Intent-aware actions
 
 The system SHALL support intent parameters that prioritize a follow-up action without removing other valid actions.

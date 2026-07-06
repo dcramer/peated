@@ -166,6 +166,39 @@ If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
 review policy.
 
+### SMWS Deterministic Exception
+
+SMWS is the narrow whisky-domain exception because its cask-code syntax is a
+closed identifier scheme, not a fuzzy product-name heuristic.
+
+Deterministic SMWS code may:
+
+- recognize SMWS identity anchors such as `SMWS` and `The Scotch Malt Whisky
+Society`
+- parse exact-cask codes such as `95.71`, `RW6.5`, or `G15.1`
+- treat that exact code as the bottle identity anchor for matching existing
+  SMWS rows
+- derive the rough distillery/category from the curated SMWS code table when the
+  code prefix is present
+- carry a visible or extracted subtitle into the create proposal display name,
+  for example `95.71 Prepare for Winter`, while keeping the code as the match
+  anchor
+
+Deterministic SMWS code must not:
+
+- invent or correct the subtitle/title
+- decide between competing subtitles when source evidence is ambiguous
+- generalize SMWS cask-code behavior to non-SMWS single-cask, barrel, batch, or
+  private-selection labels
+- use brand-prefix, retailer-title, or fuzzy-name similarity to prove a match
+- create a release split solely because a cask code, subtitle, age, ABV, or year
+  appears on the label
+
+Outside this exception, single-cask and bottling identity remains model-led and
+evidence-reviewed. Code may preserve exact observations and block impossible
+states, but it must not decide canonical whisky-family semantics from string
+patterns alone.
+
 ### Review Policy Audit
 
 `reviewPolicy.ts` is a final safety gate, not a second classifier. Audit changes

@@ -4935,7 +4935,7 @@ describe("createBottleClassifier", () => {
       identityScope: "exact_cask",
       proposedRelease: null,
       proposedBottle: {
-        name: "RW6.5",
+        name: "RW6.5 Sauna Smoke",
         category: "rye",
         singleCask: true,
         distillers: [

@@ -865,6 +865,61 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
+  test("keeps the extracted SMWS title in exact-cask create proposals", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Bottle photo upload",
+      },
+      decision: {
+        action: "no_match",
+        confidence: 89,
+        rationale: "No local bottle matched the readable SMWS label.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [],
+        extractedIdentity: {
+          brand: "SMWS",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "Prepare for Winter",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 14,
+          abv: 57,
+          release_year: null,
+          vintage_year: 2007,
+          cask_strength: true,
+          single_cask: true,
+          edition: "95.71",
+        },
+      }),
+      options: {
+        enforceCreateWebEvidence: false,
+      },
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "95.71 Prepare for Winter",
+        edition: null,
+        statedAge: 14,
+        abv: 57,
+        vintageYear: 2007,
+      },
+      proposedRelease: null,
+    });
+  });
+
   test("downgrades release creation when the parent has conflicting bottle-level release traits", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_release",
