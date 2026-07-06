@@ -252,7 +252,9 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      if (getAccessToken(request).includes("photo-create-release-approval")) {
+      if (
+        getAccessToken(request).includes("photo-create-release-default-image")
+      ) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({
@@ -263,16 +265,9 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      if (getAccessToken(request).includes("photo-create-bottle-unchecked")) {
-        sendRpcResponse(
-          response,
-          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
-          "44444444444444444444444444444444",
-        );
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-create-bottle-approval")) {
+      if (
+        getAccessToken(request).includes("photo-create-bottle-default-image")
+      ) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
@@ -789,6 +784,21 @@ function buildCreateProposalPhotoIdentification({
           confidence: 0.9,
           sourceExtractorIndexes: [0],
         },
+        series: {
+          value: "Playwright Series",
+          confidence: 0.88,
+          sourceExtractorIndexes: [0],
+        },
+        distillery: {
+          value: [testBrand.name],
+          confidence: 0.89,
+          sourceExtractorIndexes: [0],
+        },
+        category: {
+          value: "single_malt",
+          confidence: 0.87,
+          sourceExtractorIndexes: [0],
+        },
         edition:
           action === "create_bottle"
             ? undefined
@@ -839,16 +849,17 @@ function buildCreateProposalPhotoIdentification({
         reason: "Create proposal fixture.",
       },
     },
+    createToken: `playwright-create-token:${action}:${suitableAsBottleImage ? "suitable" : "unsuitable"}`,
   };
 }
 
 function createPhotoIdentificationTarget(request, input) {
-  if (input?.pendingImageId !== "playwright-photo-upload") {
-    throw new Error("Unexpected photo identification create pending image");
+  const expectedCreateToken = getExpectedPhotoCreateToken(request);
+  if (input?.createToken !== expectedCreateToken) {
+    throw new Error("Unexpected photo identification create token");
   }
 
   const token = getAccessToken(request);
-  const approvalTarget = input?.catalogImageApproval?.target;
   const bottle = buildBottle({
     id: createdBottleId,
     name: createdBottleName,
@@ -856,10 +867,6 @@ function createPhotoIdentificationTarget(request, input) {
   });
 
   if (token.includes("photo-create-warning")) {
-    if (approvalTarget !== "bottle") {
-      throw new Error("Expected bottle catalog image approval");
-    }
-
     return {
       bottle,
       release: null,
@@ -874,21 +881,13 @@ function createPhotoIdentificationTarget(request, input) {
   }
 
   if (token.includes("photo-create-unsuitable")) {
-    if (input?.catalogImageApproval !== undefined) {
-      throw new Error("Unexpected catalog image approval for unsuitable photo");
-    }
-
     return {
       bottle,
       release: null,
     };
   }
 
-  if (token.includes("photo-create-release-approval")) {
-    if (approvalTarget !== "release") {
-      throw new Error("Expected release catalog image approval");
-    }
-
+  if (token.includes("photo-create-release-default-image")) {
     return {
       bottle,
       release: buildBottleRelease({
@@ -902,22 +901,7 @@ function createPhotoIdentificationTarget(request, input) {
     };
   }
 
-  if (token.includes("photo-create-bottle-unchecked")) {
-    if (input?.catalogImageApproval !== undefined) {
-      throw new Error("Unexpected catalog image approval");
-    }
-
-    return {
-      bottle,
-      release: null,
-    };
-  }
-
-  if (token.includes("photo-create-bottle-approval")) {
-    if (approvalTarget !== "bottle") {
-      throw new Error("Expected bottle catalog image approval");
-    }
-
+  if (token.includes("photo-create-bottle-default-image")) {
     return {
       bottle,
       release: null,
@@ -925,6 +909,26 @@ function createPhotoIdentificationTarget(request, input) {
   }
 
   throw new Error("Unexpected photo identification create scenario");
+}
+
+function getExpectedPhotoCreateToken(request) {
+  const token = getAccessToken(request);
+  if (token.includes("photo-create-unsuitable")) {
+    return "playwright-create-token:create_bottle:unsuitable";
+  }
+
+  if (token.includes("photo-create-release-default-image")) {
+    return "playwright-create-token:create_bottle_and_release:suitable";
+  }
+
+  if (
+    token.includes("photo-create-bottle-default-image") ||
+    token.includes("photo-create-warning")
+  ) {
+    return "playwright-create-token:create_bottle:suitable";
+  }
+
+  return null;
 }
 
 /**
@@ -963,6 +967,11 @@ function buildNoMatchPhotoIdentification() {
         expression: {
           value: createdBottleName,
           confidence: 0.8,
+          sourceExtractorIndexes: [0],
+        },
+        distillery: {
+          value: [testBrand.name],
+          confidence: 0.79,
           sourceExtractorIndexes: [0],
         },
         edition: {

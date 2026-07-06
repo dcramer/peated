@@ -1,5 +1,6 @@
 import {
   expect,
+  type Locator,
   type Page,
   type Request,
   test,
@@ -399,10 +400,17 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(page.getByText("Match found")).toBeVisible();
     await expect(
-      page.getByText("Trace ID: 11111111111111111111111111111111"),
+      page.getByRole("heading", { name: "Bottle found" }),
+    ).toBeHidden();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByText("Matched to existing bottle in Peated"),
     ).toBeVisible();
+    const traceFooter = page.getByText(
+      "Trace ID: 11111111111111111111111111111111",
+    );
+    await expect(traceFooter).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Copy photo identification payload" }),
     ).toBeVisible();
@@ -413,11 +421,11 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
+    await expectFooterBelowAction(
+      page.getByRole("link", { name: "View Bottle" }),
+      traceFooter,
+    );
     await page.getByRole("button", { name: "Add to Library" }).click();
-    await expect(page.getByText("Match found")).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Bottle found" }),
-    ).toBeHidden();
 
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
@@ -442,7 +450,10 @@ test.describe("add bottle flow", () => {
 
     await page.goto("/addBottle");
     await uploadLabel(page);
-    await expect(page.getByText("Match found")).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByText("Matched to existing bottle in Peated"),
+    ).toBeVisible();
     const inLibraryButton = page.getByRole("button", { name: "In Library" });
     await expect(inLibraryButton).toBeVisible();
     await expect(inLibraryButton).toBeDisabled();
@@ -481,126 +492,76 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
   });
 
-  test("creates a bottle from a scan with explicit bottle image approval", async ({
+  test("creates a bottle from a scan with the photo as the default image", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "photo-create-bottle-approval"),
-    });
-
-    await page.goto("/addBottle");
-    await uploadLabel(page);
-
-    const imageApproval = page.getByRole("checkbox", {
-      name: /Set as Bottle Image/,
-    });
-    await expect(imageApproval).toBeVisible();
-    await expect(imageApproval).not.toBeChecked();
-    await expect(
-      page.getByText(
-        "This photo will be shown as the public image for the new bottle.",
+      accessToken: uniqueAccessToken(
+        testInfo,
+        "photo-create-bottle-default-image",
       ),
-    ).toBeVisible();
-
-    await imageApproval.check();
-    const requestPromise = waitForPhotoIdentificationCreate(page);
-    await page.getByRole("button", { name: "Create Bottle" }).click();
-    const input = getRpcInput(await requestPromise);
-
-    expect(input).toMatchObject({
-      pendingImageId: "playwright-photo-upload",
-      catalogImageApproval: {
-        target: "bottle",
-      },
-    });
-    await expect(
-      page.getByText(`${testBrand.name} ${createdBottleName}`),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Add to Library" }),
-    ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
-  });
-
-  test("creates a bottle from a scan without catalog image approval when unchecked", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "photo-create-bottle-unchecked"),
     });
 
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    const imageApproval = page.getByRole("checkbox", {
-      name: /Set as Bottle Image/,
-    });
-    await expect(imageApproval).toBeVisible();
-    await expect(imageApproval).not.toBeChecked();
-
     const requestPromise = waitForPhotoIdentificationCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
     const input = getRpcInput(await requestPromise);
 
-    expect(input).toMatchObject({
-      pendingImageId: "playwright-photo-upload",
-    });
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:suitable",
+    );
     expect(input).not.toHaveProperty("catalogImageApproval");
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
     ).toBeVisible();
     await expect(
+      page.getByRole("heading", { name: "Bottle created" }),
+    ).toBeVisible();
+    await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
-  test("creates a release from a scan with explicit release image approval", async ({
+  test("creates a release from a scan with the photo as the default release image", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "photo-create-release-approval"),
+      accessToken: uniqueAccessToken(
+        testInfo,
+        "photo-create-release-default-image",
+      ),
     });
 
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    const imageApproval = page.getByRole("checkbox", {
-      name: /Set as Release Image/,
-    });
-    await expect(imageApproval).toBeVisible();
-    await expect(imageApproval).not.toBeChecked();
-    await expect(
-      page.getByText(
-        "This photo will be shown as the public image for the new release.",
-      ),
-    ).toBeVisible();
-
-    await imageApproval.check();
     const requestPromise = waitForPhotoIdentificationCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
     const input = getRpcInput(await requestPromise);
 
-    expect(input).toMatchObject({
-      pendingImageId: "playwright-photo-upload",
-      catalogImageApproval: {
-        target: "release",
-      },
-    });
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle_and_release:suitable",
+    );
+    expect(input).not.toHaveProperty("catalogImageApproval");
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
     ).toBeVisible();
     await expect(page.getByText("First Fill Oloroso")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Bottle created" }),
+    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
-  test("hides catalog image approval for unsuitable scan create proposals", async ({
+  test("creates from an unsuitable scan without requesting image approval", async ({
     context,
     page,
   }, testInfo) => {
@@ -611,20 +572,13 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(
-      page.getByRole("checkbox", { name: /Set as Bottle Image/ }),
-    ).toBeHidden();
-    await expect(
-      page.getByRole("checkbox", { name: /Set as Release Image/ }),
-    ).toBeHidden();
-
     const requestPromise = waitForPhotoIdentificationCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
     const input = getRpcInput(await requestPromise);
 
-    expect(input).toMatchObject({
-      pendingImageId: "playwright-photo-upload",
-    });
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:unsuitable",
+    );
     expect(input).not.toHaveProperty("catalogImageApproval");
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
@@ -643,7 +597,6 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await page.getByRole("checkbox", { name: /Set as Bottle Image/ }).check();
     await page.getByRole("button", { name: "Create Bottle" }).click();
 
     await expect(
@@ -677,15 +630,27 @@ test.describe("add bottle flow", () => {
         "We found label details, but not enough to choose an existing bottle automatically.",
       ),
     ).toBeVisible();
-    await expect(page.getByText(testBrand.name)).toBeVisible();
-    await expect(page.getByText(createdBottleName)).toBeVisible();
-    await expect(page.getByText("Single Cask")).toBeVisible();
-    await expect(page.getByText("2007")).toBeVisible();
-    await expect(page.getByText("2016")).toBeVisible();
-    await expect(page.getByText("1661")).toBeVisible();
+    const result = page.getByRole("main");
     await expect(
-      page.getByText("Trace ID: 55555555555555555555555555555555"),
+      result.getByText(testBrand.name, { exact: true }).first(),
     ).toBeVisible();
+    await result.getByRole("button", { name: "Show all details" }).click();
+    await expect(
+      result.getByText(createdBottleName, { exact: true }),
+    ).toBeVisible();
+    await expect(
+      result.getByText(testBrand.name, { exact: true }).first(),
+    ).toBeVisible();
+    await expect(
+      result.getByText("Single Cask", { exact: true }),
+    ).toBeVisible();
+    await expect(result.getByText("2007", { exact: true })).toBeVisible();
+    await expect(result.getByText("2016", { exact: true })).toBeVisible();
+    await expect(result.getByText("1661", { exact: true })).toBeVisible();
+    const traceFooter = page.getByText(
+      "Trace ID: 55555555555555555555555555555555",
+    );
+    await expect(traceFooter).toBeVisible();
     await page.evaluate(() => {
       Object.defineProperty(navigator, "clipboard", {
         configurable: true,
@@ -718,6 +683,7 @@ test.describe("add bottle flow", () => {
       name: "Create Bottle",
     });
     await expect(createBottleLink).toBeVisible();
+    await expectFooterBelowAction(createBottleLink, traceFooter);
     const href = await createBottleLink.getAttribute("href");
     expect(href).not.toBeNull();
 
@@ -829,6 +795,17 @@ function getRpcInput(request: Request) {
   expect(postData).toBeTruthy();
 
   return JSON.parse(postData!).json;
+}
+
+async function expectFooterBelowAction(action: Locator, footer: Locator) {
+  const [actionBox, footerBox] = await Promise.all([
+    action.boundingBox(),
+    footer.boundingBox(),
+  ]);
+
+  expect(actionBox).not.toBeNull();
+  expect(footerBox).not.toBeNull();
+  expect(footerBox!.y).toBeGreaterThanOrEqual(actionBox!.y + actionBox!.height);
 }
 
 async function submitCreateBottle(page: Page) {

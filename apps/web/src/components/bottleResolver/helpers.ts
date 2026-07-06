@@ -5,7 +5,6 @@ export type PhotoIdentification = Outputs["tastings"]["photoIdentification"];
 export type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
 
-type CatalogImageApprovalTarget = "bottle" | "release";
 type ManualResultCopy = {
   title: string;
   description: string;
@@ -26,8 +25,17 @@ export function getFieldValue(
 ) {
   const value = result?.imageEvidence.fieldCandidates[field]?.value;
   if (value === undefined || value === null) return null;
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "boolean") return value ? "Yes" : "No";
   if (field === "statedAge") return `${value} years`;
   if (field === "abv") return `${value}% ABV`;
+  if (field === "category") {
+    return String(value)
+      .split("_")
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  }
   return String(value);
 }
 
@@ -126,6 +134,32 @@ export function getMatchedReleaseId(result: PhotoIdentification | null) {
     return result.classification.decision.matchedReleaseId;
   }
   return null;
+}
+
+/**
+ * Returns the classifier candidate for the matched release, falling back to the
+ * matched bottle candidate when the decision did not target a specific release.
+ */
+export function getMatchedCandidate(result: PhotoIdentification | null) {
+  if (
+    result?.classification.status !== "classified" ||
+    result.classification.decision.action !== "match"
+  ) {
+    return null;
+  }
+
+  const { matchedBottleId, matchedReleaseId } = result.classification.decision;
+  return (
+    result.classification.artifacts.candidates.find(
+      (candidate) =>
+        candidate.bottleId === matchedBottleId &&
+        (candidate.releaseId ?? null) === (matchedReleaseId ?? null),
+    ) ??
+    result.classification.artifacts.candidates.find(
+      (candidate) => candidate.bottleId === matchedBottleId,
+    ) ??
+    null
+  );
 }
 
 export function getCreateDecision(result: PhotoIdentification | null) {
@@ -237,44 +271,6 @@ export function getCreateProposalLabel(result: PhotoIdentification | null) {
   return {
     title: "Bottle not in Peated",
     description: "Create a new bottle from this label.",
-  };
-}
-
-function getCatalogImageApprovalTarget(
-  action: "create_bottle" | "create_release" | "create_bottle_and_release",
-): CatalogImageApprovalTarget {
-  return action === "create_bottle" ? "bottle" : "release";
-}
-
-export function getAllowedCatalogImageApprovalTarget(
-  result: PhotoIdentification,
-  enabled: boolean,
-) {
-  const decision = getCreateDecision(result);
-  if (
-    !enabled ||
-    !decision ||
-    result.imageEvidence.photoSuitability.suitableAsBottleImage !== true
-  ) {
-    return null;
-  }
-
-  return getCatalogImageApprovalTarget(decision.action);
-}
-
-export function getCatalogImageApprovalCopy(
-  target: CatalogImageApprovalTarget,
-) {
-  if (target === "bottle") {
-    return {
-      label: "Set as Bottle Image",
-      help: "This photo will be shown as the public image for the new bottle.",
-    };
-  }
-
-  return {
-    label: "Set as Release Image",
-    help: "This photo will be shown as the public image for the new release.",
   };
 }
 

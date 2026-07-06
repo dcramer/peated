@@ -1,25 +1,37 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { createServer, type Server, type ServerResponse } from "node:http";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { createORPCResponseTraceContext, getLink } from "./link";
 
 describe("oRPC response trace context", () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
+  let server: Server | null = null;
+
+  afterEach(async () => {
+    if (!server) {
+      return;
+    }
+
+    await new Promise<void>((resolve, reject) => {
+      server?.close((err) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+    });
+    server = null;
   });
 
   it("captures response Sentry trace IDs per request context", async () => {
-    const pendingFetches: Array<{
-      resolve: (response: Response) => void;
-    }> = [];
-    vi.spyOn(globalThis, "fetch").mockImplementation(
-      () =>
-        new Promise<Response>((resolve) => {
-          pendingFetches.push({ resolve });
-        }),
-    );
+    const pendingResponses: ServerResponse[] = [];
+    server = createServer((_req, res) => {
+      pendingResponses.push(res);
+    });
+    const apiServer = await listen(server);
 
     const link = getLink({
-      apiServer: "https://api.example.test",
+      apiServer,
       userAgent: "@peated/web (test)",
     });
     const firstTraceContext = createORPCResponseTraceContext();
@@ -36,31 +48,65 @@ describe("oRPC response trace context", () => {
       { context: { responseTraceContext: secondTraceContext } },
     );
 
-    await vi.waitFor(() => {
-      expect(pendingFetches).toHaveLength(2);
-    });
+    await expect.poll(() => pendingResponses.length).toBe(2);
 
-    pendingFetches[1]!.resolve(rpcResponse("22222222222222222222222222222222"));
+    writeRpcResponse(pendingResponses[1]!, "22222222222222222222222222222222");
     await expect(secondCall).resolves.toEqual({ ok: true });
     expect(secondTraceContext.sentryTraceId).toBe(
       "22222222222222222222222222222222",
     );
     expect(firstTraceContext.sentryTraceId).toBeNull();
 
-    pendingFetches[0]!.resolve(rpcResponse("11111111111111111111111111111111"));
+    writeRpcResponse(pendingResponses[0]!, "11111111111111111111111111111111");
     await expect(firstCall).resolves.toEqual({ ok: true });
     expect(firstTraceContext.sentryTraceId).toBe(
       "11111111111111111111111111111111",
     );
   });
+
+  it("ignores malformed response Sentry trace IDs", async () => {
+    server = createServer((_req, res) => {
+      writeRpcResponse(res, "not-a-trace-id");
+    });
+    const apiServer = await listen(server);
+
+    const traceContext = createORPCResponseTraceContext();
+    const link = getLink({
+      apiServer,
+      userAgent: "@peated/web (test)",
+    });
+
+    await expect(
+      link.call(
+        ["trace"],
+        {},
+        { context: { responseTraceContext: traceContext } },
+      ),
+    ).resolves.toEqual({ ok: true });
+    expect(traceContext.sentryTraceId).toBeNull();
+  });
 });
 
-function rpcResponse(traceId: string) {
-  return new Response(JSON.stringify({ json: { ok: true } }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-      "x-sentry-trace-id": traceId,
-    },
+async function listen(server: Server) {
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      server.off("error", reject);
+      resolve();
+    });
   });
+
+  const address = server.address();
+  if (!address || typeof address === "string") {
+    throw new Error("Unable to bind test server");
+  }
+  return `http://127.0.0.1:${address.port}`;
+}
+
+function writeRpcResponse(response: ServerResponse, traceId: string) {
+  response.writeHead(200, {
+    "Content-Type": "application/json",
+    "x-sentry-trace-id": traceId,
+  });
+  response.end(JSON.stringify({ json: { ok: true } }));
 }

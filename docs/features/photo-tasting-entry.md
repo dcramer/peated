@@ -432,13 +432,15 @@ type PhotoIdentificationDecision =
     | "manual_search"
     | "needs_review";
   diagnostics: PhotoIdentificationDiagnostics;
+  createToken: string | null;
 }
 ```
 
 This route intentionally has no permanent side effects beyond creating the
 pending upload record. The public response should return bounded
-photo-identification data; full classifier artifacts remain server-owned
-diagnostics instead of browser payload.
+photo-identification data. Auto-approved create proposals also return a signed
+create token that carries the reviewed classifier decision needed to create the
+target without rerunning photo extraction or classification.
 
 The route should support idempotency for client retries. If the same user retries
 with the same `idempotencyKey`, return the existing pending upload and current
@@ -447,6 +449,27 @@ identification state instead of creating duplicate pending objects.
 If extraction or classification fails or times out, the route should fail the
 photo-identification request. The client keeps the local preview visible and
 lets the user continue by manually searching for the bottle.
+
+### Create Bottle Target From Photo Identification
+
+`POST /tastings/photo-identification-create`
+
+Input:
+
+```ts
+{
+  createToken: string;
+}
+```
+
+The identify response returns `createToken` only for auto-approved create
+proposals. The token signs the pending upload id, create decision, reviewed
+candidate bottle ids, and photo suitability so creation can persist the reviewed
+result without rerunning photo extraction or classification.
+
+When the pending scan is suitable as a catalog image, creation promotes it by
+default to the created bottle or release target. Unsuitable photos still create
+the bottle target, but do not write a public catalog image.
 
 ### Create Tasting With Selected Picture
 
@@ -508,6 +531,10 @@ type ImageBottleEvidence = {
   fieldCandidates: {
     brand?: EvidenceField<string>;
     expression?: EvidenceField<string>;
+    series?: EvidenceField<string>;
+    distillery?: EvidenceField<string>;
+    bottler?: EvidenceField<string>;
+    category?: EvidenceField<Category>;
     statedAge?: EvidenceField<number>;
     abv?: EvidenceField<number>;
     vintageYear?: EvidenceField<number>;
@@ -515,6 +542,8 @@ type ImageBottleEvidence = {
     edition?: EvidenceField<string>;
     caskType?: EvidenceField<string>;
     caskNumber?: EvidenceField<string>;
+    caskStrength?: EvidenceField<boolean>;
+    singleCask?: EvidenceField<boolean>;
   };
   photoSuitability: {
     isSingleBottlePhoto: boolean;
@@ -609,7 +638,9 @@ Attach to tasting:
 Promote to bottle or release:
 
 - never overwrite an existing bottle or release image
-- only promote when `promoteImageToBottle = "if_empty"`
+- for photo-identification create, promote suitable scans by default when the
+  target image slot is empty
+- for tasting create, only promote when `promoteImageToBottle = "if_empty"`
 - only promote when `photoSuitability.suitableAsBottleImage = true`
 - if the confirmed target is a release and the release has an image field, prefer
   release image over parent bottle image

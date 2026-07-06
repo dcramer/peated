@@ -1,17 +1,16 @@
 import Button from "@peated/web/components/button";
-import { Camera, Check, ImageIcon, Plus, Search } from "lucide-react";
+import { Camera, Check, Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
-import type { PhotoIdentification } from "./helpers";
+import { getMatchedCandidate, type PhotoIdentification } from "./helpers";
 import {
   EvidencePills,
   FallbackActions,
   getPhotoFailureCopyPayload,
-  getPhotoIdentificationCopyPayload,
   PhotoFailurePanel,
   type PhotoFailureTrace,
   PhotoIdentificationTraceFootnote,
-  ResultHeader,
+  PhotoResultCard,
   SearchBottleCallout,
 } from "./panels";
 import type {
@@ -150,7 +149,6 @@ export function PhotoNoMatchState({
   createBottleHref,
   createBottleLabel,
   primaryAction,
-  traceId,
   onStartOver,
 }: {
   result: PhotoIdentification;
@@ -162,32 +160,23 @@ export function PhotoNoMatchState({
   createBottleHref: string | null;
   createBottleLabel?: string;
   primaryAction?: "search" | "create";
-  traceId: string | null;
   onStartOver: () => void;
 }) {
   return (
-    <>
-      <PhotoFailurePanel
-        previewUrl={previewUrl}
-        title={title}
-        description={description}
-        searchHref={searchHref}
-        searchLabel={searchLabel}
-        createBottleHref={createBottleHref}
-        createBottleLabel={createBottleLabel}
-        primaryAction={primaryAction}
-        onStartOver={onStartOver}
-        variant="no-match"
-      >
-        <EvidencePills result={result} />
-      </PhotoFailurePanel>
-      {traceId && (
-        <PhotoIdentificationTraceFootnote
-          traceId={traceId}
-          copyPayload={getPhotoIdentificationCopyPayload(result, traceId)}
-        />
-      )}
-    </>
+    <PhotoFailurePanel
+      previewUrl={previewUrl}
+      title={title}
+      description={description}
+      searchHref={searchHref}
+      searchLabel={searchLabel}
+      createBottleHref={createBottleHref}
+      createBottleLabel={createBottleLabel}
+      primaryAction={primaryAction}
+      onStartOver={onStartOver}
+      variant="no-match"
+    >
+      <EvidencePills result={result} compact />
+    </PhotoFailurePanel>
   );
 }
 
@@ -196,20 +185,15 @@ export function PhotoMatchCreateState({
   previewUrl,
   matchedBottleId,
   matchedReleaseId,
-  matchedResultDescription,
   renderMatchedResultActions,
   createProposalLabel,
   hasCreateDecision,
   proposedName,
-  catalogImageApprovalCopy,
-  catalogImageApproved,
   createPending,
   createActionLabel,
-  traceId,
   resolvingAction,
   hasExactLibraryEntry,
   loadingExactLibraryStatus,
-  onCatalogImageApprovedChange,
   onLoadTarget,
   onAcceptCreateProposal,
 }: {
@@ -217,22 +201,17 @@ export function PhotoMatchCreateState({
   previewUrl: string | null;
   matchedBottleId: number | null;
   matchedReleaseId: number | null;
-  matchedResultDescription: string;
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
   createProposalLabel: { title: string; description: string } | null;
   hasCreateDecision: boolean;
   proposedName: string | null;
-  catalogImageApprovalCopy: { label: string; help: string } | null;
-  catalogImageApproved: boolean;
   createPending: boolean;
   createActionLabel: string;
-  traceId: string | null;
   resolvingAction: BottleResolverMatchedAction | null;
   hasExactLibraryEntry: boolean;
   loadingExactLibraryStatus: boolean;
-  onCatalogImageApprovedChange: (checked: boolean) => void;
   onLoadTarget: (
     bottleId: number,
     releaseId: number | null,
@@ -240,147 +219,83 @@ export function PhotoMatchCreateState({
   ) => void;
   onAcceptCreateProposal: (result: PhotoIdentification) => void;
 }) {
-  return (
-    <>
+  const matchedCandidate = getMatchedCandidate(result);
+
+  if (matchedBottleId) {
+    const matchedName =
+      matchedCandidate?.fullName ??
+      matchedCandidate?.bottleFullName ??
+      "Matched bottle";
+
+    return (
       <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
         <div className="space-y-5">
-          <div className="space-y-4">
-            {matchedBottleId ? (
-              <ResultHeader
-                previewUrl={previewUrl}
-                icon={
-                  <div className="bg-highlight rounded-full p-2 text-black">
-                    <Check className="h-5 w-5" />
-                  </div>
-                }
-                title="Match found"
-                description={matchedResultDescription}
-              >
-                <EvidencePills result={result} />
-              </ResultHeader>
-            ) : (
-              <ResultHeader
-                previewUrl={previewUrl}
-                icon={
-                  <div className="bg-highlight rounded-full p-2 text-black">
-                    <Plus className="h-5 w-5" />
-                  </div>
-                }
-                title={createProposalLabel?.title ?? "New bottle found"}
-                description={
-                  createProposalLabel?.description ??
-                  "Create the bottle from this label."
-                }
-              >
-                <EvidencePills result={result} />
-              </ResultHeader>
-            )}
-
-            {hasCreateDecision && proposedName && (
-              <div className="rounded border border-slate-800 bg-slate-950 p-3">
-                <div className="text-muted text-xs uppercase tracking-wide">
-                  Proposed
-                </div>
-                <div className="mt-1 font-semibold text-white">
-                  {proposedName}
-                </div>
-                <div className="text-muted mt-2 text-sm">
-                  {createProposalLabel?.description ??
-                    "Create a new bottle from this label."}
-                </div>
-              </div>
-            )}
-            {hasCreateDecision && catalogImageApprovalCopy && (
-              <label className="flex items-start gap-3 rounded border border-slate-800 bg-slate-950 p-3">
-                <input
-                  type="checkbox"
-                  className="mt-1 h-4 w-4"
-                  checked={catalogImageApproved}
-                  disabled={createPending}
-                  onChange={(event) =>
-                    onCatalogImageApprovedChange(event.target.checked)
-                  }
-                />
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 font-semibold text-white">
-                    <ImageIcon className="h-4 w-4" />
-                    {catalogImageApprovalCopy.label}
-                  </span>
-                  <span className="text-muted mt-1 block text-sm">
-                    {catalogImageApprovalCopy.help}
-                  </span>
-                </span>
-              </label>
-            )}
-          </div>
-          <div
-            className={`mx-auto grid w-full gap-2 ${
-              matchedBottleId && renderMatchedResultActions ? "" : "sm:w-1/2"
-            }`}
+          <PhotoResultCard
+            previewUrl={previewUrl}
+            title={matchedName}
+            subtitle="Matched to existing bottle in Peated"
+            fallbackIcon={<Check className="text-highlight h-6 w-6" />}
           >
-            {matchedBottleId &&
-              (renderMatchedResultActions ? (
-                renderMatchedResultActions({
-                  bottleId: matchedBottleId,
-                  releaseId: matchedReleaseId,
-                  hasExactLibraryEntry,
-                  loadingExactLibraryStatus,
-                  resolvingAction,
-                  onResolve: (action) => {
-                    onLoadTarget(matchedBottleId, matchedReleaseId, action);
-                  },
-                })
-              ) : (
-                <Button
-                  color="highlight"
-                  fullWidth
-                  disabled={Boolean(resolvingAction)}
-                  onClick={() =>
-                    onLoadTarget(matchedBottleId, matchedReleaseId)
-                  }
-                >
-                  Continue
-                </Button>
-              ))}
-            {hasCreateDecision && (
+            <EvidencePills result={result} compact />
+          </PhotoResultCard>
+          {renderMatchedResultActions ? (
+            renderMatchedResultActions({
+              bottleId: matchedBottleId,
+              releaseId: matchedReleaseId,
+              hasExactLibraryEntry,
+              loadingExactLibraryStatus,
+              resolvingAction,
+              onResolve: (action) => {
+                onLoadTarget(matchedBottleId, matchedReleaseId, action);
+              },
+            })
+          ) : (
+            <div className="mx-auto grid w-full gap-2 sm:w-1/2">
               <Button
                 color="highlight"
                 fullWidth
-                icon={<Plus className="h-4 w-4" />}
-                onClick={() => onAcceptCreateProposal(result)}
-                disabled={createPending}
+                disabled={Boolean(resolvingAction)}
+                onClick={() => onLoadTarget(matchedBottleId, matchedReleaseId)}
               >
-                {createPending ? "Creating..." : createActionLabel}
+                Continue
               </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </section>
-      {traceId && (
-        <PhotoIdentificationTraceFootnote
-          traceId={traceId}
-          copyPayload={getPhotoIdentificationCopyPayload(result, traceId)}
-        />
-      )}
-    </>
-  );
-}
+    );
+  }
 
-export function PhotoMatchedFallbackActions({
-  searchHref,
-  searchLabel,
-  onStartOver,
-}: {
-  searchHref: string;
-  searchLabel: string;
-  onStartOver: () => void;
-}) {
   return (
-    <FallbackActions
-      searchHref={searchHref}
-      searchLabel={searchLabel}
-      showStartOver
-      onStartOver={onStartOver}
-    />
+    <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
+      <div className="space-y-5">
+        <PhotoResultCard
+          previewUrl={previewUrl}
+          title={
+            proposedName ?? createProposalLabel?.title ?? "New bottle found"
+          }
+          subtitle={
+            createProposalLabel?.description ??
+            "Create a new bottle from this label."
+          }
+          fallbackIcon={<Plus className="text-highlight h-6 w-6" />}
+        >
+          <EvidencePills result={result} compact />
+        </PhotoResultCard>
+        <div className="mx-auto grid w-full gap-2 sm:w-1/2">
+          {hasCreateDecision && (
+            <Button
+              color="highlight"
+              fullWidth
+              icon={<Plus className="h-4 w-4" />}
+              onClick={() => onAcceptCreateProposal(result)}
+              disabled={createPending}
+            >
+              {createPending ? "Creating..." : createActionLabel}
+            </Button>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

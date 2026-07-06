@@ -28,7 +28,7 @@ type Options = {
  * ```
  */
 const sentryMiddleware = (options: Options = {}) =>
-  os.middleware(async ({ context, next, path }, input) => {
+  os.middleware(async ({ next, path }, input) => {
     return await Sentry.startSpan(
       {
         op: "rpc.server",
@@ -43,12 +43,6 @@ const sentryMiddleware = (options: Options = {}) =>
         },
       },
       async (span) => {
-        const traceId = span.spanContext().traceId;
-        const contextWithHeaders = context as typeof context & {
-          resHeaders?: Headers;
-        };
-        contextWithHeaders.resHeaders?.set("x-sentry-trace-id", traceId);
-
         try {
           return await next();
         } catch (error) {

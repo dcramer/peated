@@ -3,10 +3,7 @@ import { OpenAPIGenerator } from "@orpc/openapi";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { onError, ORPCError, ValidationError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
-import {
-  BatchHandlerPlugin,
-  ResponseHeadersPlugin,
-} from "@orpc/server/plugins";
+import { BatchHandlerPlugin } from "@orpc/server/plugins";
 import {
   experimental_ZodSmartCoercionPlugin as ZodSmartCoercionPlugin,
   ZodToJsonSchemaConverter,
@@ -35,7 +32,6 @@ import { userToActorContext, withActorContext } from "./lib/actorContext";
 import { getUserFromHeader } from "./lib/auth";
 import { getStorage } from "./lib/gcs";
 import { httpLogger, logError, logInfo, logWarn } from "./lib/log";
-import type { Context } from "./orpc/context";
 import router from "./orpc/router";
 import {
   AuthSchema,
@@ -103,7 +99,7 @@ const openAPIGenerator = new OpenAPIGenerator({
 });
 
 const rpcHandler = new RPCHandler(router, {
-  plugins: [new BatchHandlerPlugin(), new ResponseHeadersPlugin<Context>()],
+  plugins: [new BatchHandlerPlugin()],
 
   clientInterceptors: [
     onError((error) => {

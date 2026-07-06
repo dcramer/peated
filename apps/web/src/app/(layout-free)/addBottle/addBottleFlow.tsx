@@ -7,6 +7,7 @@ import BottleResolver, {
   type BottleResolverMatchedActionsProps,
   type BottleResolverTarget,
 } from "@peated/web/components/bottleResolver";
+import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
 import FormError from "@peated/web/components/formError";
@@ -300,6 +301,11 @@ function OutcomeSelection({
   loggingTasting: boolean;
   error?: string;
 }) {
+  const wasCreated = target.resultSource === "created";
+  const title = wasCreated ? "Bottle created" : "Bottle found";
+  const description = wasCreated
+    ? "Choose what you want to do next."
+    : "Choose what you want to do with this bottle.";
   const libraryButton = (
     <OutcomeButton
       key="library"
@@ -360,10 +366,8 @@ function OutcomeSelection({
         <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
           <div className="space-y-4">
             <div>
-              <h2 className="font-semibold text-white">Bottle found</h2>
-              <p className="text-muted mt-1 text-sm">
-                Choose what you want to do with this bottle.
-              </p>
+              <h2 className="font-semibold text-white">{title}</h2>
+              <p className="text-muted mt-1 text-sm">{description}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
           </div>
@@ -384,6 +388,12 @@ function OutcomeSelection({
             Start Over
           </Button>
         </div>
+        {target.photoTrace && (
+          <PhotoIdentificationTraceFootnote
+            traceId={target.photoTrace.traceId}
+            copyPayload={target.photoTrace.copyPayload}
+          />
+        )}
       </div>
     </Layout>
   );
@@ -392,10 +402,12 @@ function OutcomeSelection({
 function AddedToLibrary({
   entry,
   userLibraryHref,
+  photoTrace,
   onAddAnother,
 }: {
   entry: CollectionBottle;
   userLibraryHref: string;
+  photoTrace?: BottleResolverTarget["photoTrace"] | null;
   onAddAnother: () => void;
 }) {
   return (
@@ -437,6 +449,12 @@ function AddedToLibrary({
             View Library
           </Button>
         </div>
+        {photoTrace && (
+          <PhotoIdentificationTraceFootnote
+            traceId={photoTrace.traceId}
+            copyPayload={photoTrace.copyPayload}
+          />
+        )}
       </div>
     </Layout>
   );
@@ -465,6 +483,9 @@ function AddBottleFlowContent() {
     useState<BottleResolverTarget | null>(null);
   const [libraryError, setLibraryError] = useState<string | undefined>();
   const [addedEntry, setAddedEntry] = useState<CollectionBottle | null>(null);
+  const [addedEntryPhotoTrace, setAddedEntryPhotoTrace] = useState<
+    BottleResolverTarget["photoTrace"] | null
+  >(null);
   const [tastingDraft, setTastingDraft] = useState<TastingDraft | null>(null);
   const [tastingLoadError, setTastingLoadError] = useState<
     string | undefined
@@ -502,6 +523,7 @@ function AddBottleFlowContent() {
       setLoadingTarget(true);
       setTargetLoadError(null);
       setAddedEntry(null);
+      setAddedEntryPhotoTrace(null);
       setTastingDraft(null);
       setTastingLoadError(undefined);
 
@@ -571,6 +593,7 @@ function AddBottleFlowContent() {
     setSelectedTarget(null);
     setLibraryError(undefined);
     setAddedEntry(null);
+    setAddedEntryPhotoTrace(null);
     setTastingDraft(null);
     setTastingLoadError(undefined);
     setTargetLoadError(null);
@@ -609,6 +632,7 @@ function AddBottleFlowContent() {
   ) {
     setLibraryError(undefined);
     setAddedEntry(null);
+    setAddedEntryPhotoTrace(null);
     setTastingDraft(null);
     setTastingLoadError(undefined);
 
@@ -647,6 +671,7 @@ function AddBottleFlowContent() {
         pendingImageId: target.pendingImage?.id,
       });
       setAddedEntry(entry);
+      setAddedEntryPhotoTrace(target.photoTrace ?? null);
       setSelectedTarget(null);
       revokeBlobPreviewUrl(target);
     } catch (err) {
@@ -742,6 +767,7 @@ function AddBottleFlowContent() {
       <AddedToLibrary
         entry={addedEntry}
         userLibraryHref="/library"
+        photoTrace={addedEntryPhotoTrace}
         onAddAnother={startOver}
       />
     );
@@ -797,10 +823,8 @@ function AddBottleFlowContent() {
           prefill,
         })
       }
-      matchedResultDescription="We identified this bottle in Peated."
       createProposalActionLabel="Create Bottle"
       searchActionLabel="Search Bottles"
-      enableCatalogImageApproval
       renderMatchedResultActions={(props) => (
         <MatchedOutcomeActions {...props} intent={intent} />
       )}

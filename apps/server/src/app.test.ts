@@ -4,6 +4,22 @@ import { join } from "path";
 import { describe, expect, test } from "vitest";
 import { app } from "./app";
 
+describe("app trace headers", () => {
+  test("returns the Sentry trace id header and exposes it to browsers", async () => {
+    const response = await app.request("/_health", {
+      headers: {
+        Origin: config.CORS_HOST,
+      },
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x-sentry-trace-id")).toMatch(/^[0-9a-f]{32}$/);
+    expect(response.headers.get("access-control-expose-headers")).toContain(
+      "x-sentry-trace-id",
+    );
+  });
+});
+
 describe("GET /uploads/:filename", () => {
   test("serves uploaded image files with image headers", async () => {
     const filename = "test-upload.webp";

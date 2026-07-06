@@ -1,6 +1,5 @@
 "use client";
 
-import type { Bottle, BottleRelease } from "@peated/server/types";
 import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
@@ -14,12 +13,10 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import {
   createIdempotencyKey,
-  getAllowedCatalogImageApprovalTarget,
-  getCatalogImageApprovalCopy,
   getCreateBottlePrefill,
   getCreateDecision,
   getCreateNameSeed,
@@ -32,16 +29,24 @@ import {
   type PhotoIdentification,
   type PhotoIdentificationCreateInput,
 } from "./helpers";
-import type { PhotoFailureTrace } from "./panels";
+import {
+  FallbackActions,
+  getPhotoIdentificationCopyPayload,
+  PhotoIdentificationTraceFootnote,
+  type PhotoFailureTrace,
+} from "./panels";
 import {
   PhotoLoadingState,
   PhotoMatchCreateState,
-  PhotoMatchedFallbackActions,
   PhotoNoMatchState,
   PhotoReadFailureState,
   PhotoUploadState,
 } from "./states";
-import type { BottleResolverMatchedAction, BottleResolverProps } from "./types";
+import type {
+  BottleResolverMatchedAction,
+  BottleResolverProps,
+  BottleResolverTarget,
+} from "./types";
 
 export type {
   BottleResolverMatchedAction,
@@ -63,11 +68,9 @@ export default function BottleResolver({
   searchHrefForQuery,
   createBottleHrefForResult,
   title,
-  matchedResultDescription = "We identified this bottle in Peated.",
   renderMatchedResultActions,
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
-  enableCatalogImageApproval = false,
 }: BottleResolverProps) {
   const router = useRouter();
   const orpc = useORPC();
@@ -87,7 +90,6 @@ export default function BottleResolver({
   const [photoFailureTrace, setPhotoFailureTrace] =
     useState<PhotoFailureTrace | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  const [catalogImageApproved, setCatalogImageApproved] = useState(false);
   const [resolvingAction, setResolvingAction] =
     useState<BottleResolverMatchedAction | null>(null);
   const [matchedBottleStatus, setMatchedBottleStatus] = useState<{
@@ -156,20 +158,26 @@ export default function BottleResolver({
   }
 
   async function resolveTarget(
-    target: {
-      bottle: Bottle;
-      release: BottleRelease | null;
-      hasExactLibraryEntry: boolean;
-      warnings?: string[];
-    },
+    target: Omit<BottleResolverTarget, "pendingImage" | "previewUrl">,
     action?: BottleResolverMatchedAction,
   ) {
     const currentPreviewUrl = previewUrl;
+    const photoTrace =
+      photoResult && photoIdentificationTraceId
+        ? {
+            traceId: photoIdentificationTraceId,
+            copyPayload: getPhotoIdentificationCopyPayload(
+              photoResult,
+              photoIdentificationTraceId,
+            ),
+          }
+        : undefined;
     await onResolve(
       {
         ...target,
         pendingImage: photoResult?.pendingImage ?? null,
         previewUrl: currentPreviewUrl,
+        photoTrace,
       },
       action,
     );
@@ -222,15 +230,15 @@ export default function BottleResolver({
     }
 
     try {
-      const catalogImageApprovalTarget = getAllowedCatalogImageApprovalTarget(
-        result,
-        enableCatalogImageApproval,
-      );
+      if (!result.createToken) {
+        setError(
+          "We couldn't create that bottle from the photo. Search for the bottle to keep going.",
+        );
+        return;
+      }
+
       const payload: PhotoIdentificationCreateInput = {
-        pendingImageId: result.pendingImage.id,
-        ...(catalogImageApproved && catalogImageApprovalTarget
-          ? { catalogImageApproval: { target: catalogImageApprovalTarget } }
-          : {}),
+        createToken: result.createToken,
       };
       const created =
         await photoIdentificationCreateMutation.mutateAsync(payload);
@@ -238,6 +246,7 @@ export default function BottleResolver({
         bottle: created.bottle,
         release: created.release,
         hasExactLibraryEntry: false,
+        resultSource: "created",
         warnings: (created.warnings ?? []).map(
           (warning) =>
             warning.message ||
@@ -260,7 +269,6 @@ export default function BottleResolver({
     setPhotoResult(null);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
-    setCatalogImageApproved(false);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
@@ -321,7 +329,6 @@ export default function BottleResolver({
     setPhotoResult(null);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
-    setCatalogImageApproved(false);
     setMatchedBottleStatus(null);
     replacePreviewUrl(null);
   }
@@ -331,15 +338,6 @@ export default function BottleResolver({
   const createDecision = getCreateDecision(photoResult);
   const proposedName = getProposedName(photoResult);
   const createProposalLabel = getCreateProposalLabel(photoResult);
-  const catalogImageApprovalTarget = photoResult
-    ? getAllowedCatalogImageApprovalTarget(
-        photoResult,
-        enableCatalogImageApproval,
-      )
-    : null;
-  const catalogImageApprovalCopy = catalogImageApprovalTarget
-    ? getCatalogImageApprovalCopy(catalogImageApprovalTarget)
-    : null;
   const defaultSearchHref = searchHrefForQuery();
   const searchSeed = getSearchSeed(photoResult);
   const searchHref = searchHrefForQuery(searchSeed);
@@ -480,22 +478,17 @@ export default function BottleResolver({
                 previewUrl={previewUrl}
                 matchedBottleId={matchedBottleId}
                 matchedReleaseId={matchedReleaseId}
-                matchedResultDescription={matchedResultDescription}
                 renderMatchedResultActions={renderMatchedResultActions}
                 createProposalLabel={createProposalLabel}
                 hasCreateDecision={Boolean(createDecision)}
                 proposedName={proposedName}
-                catalogImageApprovalCopy={catalogImageApprovalCopy}
-                catalogImageApproved={catalogImageApproved}
                 createPending={photoIdentificationCreateMutation.isPending}
                 createActionLabel={createProposalActionLabel}
-                traceId={photoIdentificationTraceId}
                 resolvingAction={resolvingAction}
                 hasExactLibraryEntry={matchedBottleHasExactLibraryEntry}
                 loadingExactLibraryStatus={
                   matchedBottleExactLibraryStatusLoading
                 }
-                onCatalogImageApprovedChange={setCatalogImageApproved}
                 onLoadTarget={(bottleId, releaseId, action) => {
                   void loadTarget(bottleId, releaseId, action);
                 }}
@@ -516,15 +509,24 @@ export default function BottleResolver({
                 }
                 createBottleLabel={manualResultCopy.createLabel}
                 primaryAction={manualResultCopy.primaryAction}
-                traceId={photoIdentificationTraceId}
                 onStartOver={startOver}
               />
             )}
             {(matchedBottleId || createDecision) && (
-              <PhotoMatchedFallbackActions
+              <FallbackActions
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
+                showStartOver
                 onStartOver={startOver}
+              />
+            )}
+            {photoIdentificationTraceId && (
+              <PhotoIdentificationTraceFootnote
+                traceId={photoIdentificationTraceId}
+                copyPayload={getPhotoIdentificationCopyPayload(
+                  photoResult,
+                  photoIdentificationTraceId,
+                )}
               />
             )}
           </>

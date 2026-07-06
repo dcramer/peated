@@ -11,6 +11,7 @@ import {
   buildPhotoReferenceName,
   extractPhotoBottleEvidence,
 } from "@peated/server/lib/photoIdentification";
+import { signPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { logInfo } from "@peated/server/lib/structuredLog";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
@@ -734,6 +735,22 @@ export default procedure
       diagnostics,
       suggestedNextStep,
     });
+    const createToken =
+      classification.status === "classified" &&
+      suggestedNextStep === "confirm_create" &&
+      isPhotoIdentificationCreateDecisionAutoCreatable(classification.decision)
+        ? await signPhotoIdentificationCreateToken({
+            type: "photo_identification_create",
+            userId: context.user.id,
+            pendingImageId: pendingImage.id,
+            decision: classification.decision,
+            photoSuitability: imageEvidence.photoSuitability,
+            candidateBottleIds: classification.artifacts.candidates.map(
+              (candidate) => candidate.bottleId,
+            ),
+          })
+        : null;
+
     return {
       pendingImage: {
         id: pendingImage.id,
@@ -745,5 +762,6 @@ export default procedure
         serializePhotoIdentificationClassification(classification),
       suggestedNextStep,
       diagnostics,
+      createToken,
     };
   });

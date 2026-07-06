@@ -236,17 +236,51 @@ function buildCreateBottleAndReleaseDecision({
   };
 }
 
+function buildCreateReleaseDecision({
+  parentBottleId,
+  releaseEdition,
+  releaseImageUrl = null,
+}: {
+  parentBottleId: number;
+  releaseEdition: string;
+  releaseImageUrl?: string | null;
+}) {
+  return {
+    action: "create_release",
+    confidence: 91,
+    rationale: "Reliable photo evidence supports the release identity.",
+    parentBottleId,
+    proposedRelease: {
+      edition: releaseEdition,
+      statedAge: null,
+      abv: 43,
+      caskStrength: null,
+      singleCask: null,
+      vintageYear: null,
+      releaseYear: null,
+      imageUrl: releaseImageUrl,
+    },
+  };
+}
+
 async function identifyCreateProposal({
   fixtures,
   user,
   idempotencyKey,
   decision,
+  candidates = [],
   suitableAsBottleImage = true,
 }: {
   fixtures: { SampleSquareImage: () => Promise<Blob> };
   user: NonNullable<Context["user"]>;
   idempotencyKey: string;
   decision: Record<string, unknown>;
+  candidates?: Array<{
+    bottleId: number;
+    releaseId?: number | null;
+    bottleFullName?: string;
+    fullName?: string;
+  }>;
   suitableAsBottleImage?: boolean;
 }) {
   extractPhotoBottleEvidenceMock.mockImplementation(
@@ -271,7 +305,9 @@ async function identifyCreateProposal({
       }),
     }),
   );
-  classifyBottleReferenceMock.mockResolvedValue(buildClassification(decision));
+  classifyBottleReferenceMock.mockResolvedValue(
+    buildClassification(decision, { candidates }),
+  );
 
   return await routerClient.tastings.photoIdentification(
     {
@@ -796,7 +832,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -827,6 +863,7 @@ describe("POST /tastings/photo-identification", () => {
     });
 
     expect(identification.suggestedNextStep).toBe("manual_search");
+    expect(identification.createToken).toBeNull();
     expect(identification.classification).toMatchObject({
       status: "classified",
       decision: {
@@ -864,28 +901,18 @@ describe("POST /tastings/photo-identification", () => {
     });
 
     expect(identification.suggestedNextStep).toBe("manual_search");
+    expect(identification.createToken).toBeNull();
   });
 
-  test("rejects low-confidence create proposals before persistence", async ({
+  test("requires a signed create proposal token before persistence", async ({
     defaults,
-    fixtures,
   }) => {
-    const identification = await identifyCreateProposal({
-      fixtures,
-      user: defaults.user,
-      idempotencyKey: "photo-identification-create-low-confidence-reject",
-      decision: buildCreateBottleDecision({
-        brandName: "Rejected Low Confidence Brand",
-        bottleName: "Review Before Save",
-        confidence: 55,
-      }),
-    });
     const before = await countRows();
 
     const err = await waitError(
       routerClient.tastings.photoIdentificationCreate(
         {
-          pendingImageId: identification.pendingImage.id,
+          createToken: "invalid-token",
         },
         {
           context: { user: defaults.user },
@@ -894,52 +921,12 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Photo identification result needs review before creating a bottle.]`,
+      `[Error: Photo identification create proposal is no longer valid.]`,
     );
     await expect(countRows()).resolves.toEqual(before);
   });
 
-  test("rejects review-band create proposals before persistence", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const identification = await identifyCreateProposal({
-      fixtures,
-      user: defaults.user,
-      idempotencyKey: "photo-identification-create-review-band-reject",
-      decision: buildCreateBottleDecision({
-        brandName: "Rejected Review Band Brand",
-        bottleName: "Review Band Before Save",
-        confidence: 90,
-        confidenceBasis: {
-          band: "review",
-          positiveEvidence: ["The label text matches a plausible bottle."],
-          unresolvedRisks: ["The bottle versus bottling model is uncertain."],
-          toolsUsed: ["initial_local_candidates"],
-          webEvidence: "not_used",
-        },
-      }),
-    });
-    const before = await countRows();
-
-    const err = await waitError(
-      routerClient.tastings.photoIdentificationCreate(
-        {
-          pendingImageId: identification.pendingImage.id,
-        },
-        {
-          context: { user: defaults.user },
-        },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Photo identification result needs review before creating a bottle.]`,
-    );
-    await expect(countRows()).resolves.toEqual(before);
-  });
-
-  test("approved bottle image on a create bottle proposal writes the canonical bottle image", async ({
+  test("default bottle image promotion writes the canonical bottle image", async ({
     defaults,
     fixtures,
   }) => {
@@ -955,8 +942,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "bottle" },
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -979,7 +965,7 @@ describe("POST /tastings/photo-identification", () => {
     );
   });
 
-  test("approved release image on a create bottle and release proposal writes the canonical release image", async ({
+  test("default release image promotion writes the canonical release image", async ({
     defaults,
     fixtures,
   }) => {
@@ -996,8 +982,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "release" },
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -1020,23 +1005,35 @@ describe("POST /tastings/photo-identification", () => {
     );
   });
 
-  test("unchecked catalog image approval creates without writing a canonical image", async ({
+  test("default existing bottle release image promotion writes the canonical release image", async ({
     defaults,
     fixtures,
   }) => {
+    const existingBottle = await fixtures.Bottle({
+      name: "Existing Release Image Parent",
+    });
     const identification = await identifyCreateProposal({
       fixtures,
       user: defaults.user,
-      idempotencyKey: "photo-identification-create-unchecked-image",
-      decision: buildCreateBottleDecision({
-        brandName: "Photo Unchecked Brand",
-        bottleName: "Unchecked Public Image",
+      idempotencyKey:
+        "photo-identification-create-approved-existing-release-image",
+      decision: buildCreateReleaseDecision({
+        parentBottleId: existingBottle.id,
+        releaseEdition: "Existing Parent Release Image Edition",
       }),
+      candidates: [
+        {
+          bottleId: existingBottle.id,
+          releaseId: null,
+          bottleFullName: existingBottle.fullName,
+          fullName: existingBottle.fullName,
+        },
+      ],
     });
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -1044,33 +1041,110 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.bottle.imageUrl).toBeNull();
+    expect(response.bottle.id).toBe(existingBottle.id);
+    expect(response.release?.imageUrl).toContain(
+      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
+    );
 
-    const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.bottle.id),
+    const release = await db.query.bottleReleases.findFirst({
+      where: eq(bottleReleases.id, response.release!.id),
     });
-    expect(bottle?.imageUrl).toBeNull();
+    expect(release?.imageUrl).toMatch(
+      new RegExp(
+        `^/uploads/bottle-releases/bottle_release-${response.release!.id}-pending-upload-.+\\.webp$`,
+      ),
+    );
   });
 
-  test("unchecked release catalog image approval strips classifier release image URLs", async ({
+  test("create release rejects parent bottles outside the reviewed candidates", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const existingBottle = await fixtures.Bottle({
+      name: "Unreviewed Release Parent",
+    });
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-create-unreviewed-release-parent",
+      decision: buildCreateReleaseDecision({
+        parentBottleId: existingBottle.id,
+        releaseEdition: "Unreviewed Parent Release",
+      }),
+      candidates: [],
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          createToken: identification.createToken!,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Photo identification result is not a valid create proposal.",
+    });
+  });
+
+  test("create proposal does not rerun photo extraction or classification", async ({
     defaults,
     fixtures,
   }) => {
     const identification = await identifyCreateProposal({
       fixtures,
       user: defaults.user,
-      idempotencyKey: "photo-identification-create-unchecked-release-image",
+      idempotencyKey: "photo-identification-create-no-rerun",
+      decision: buildCreateBottleDecision({
+        brandName: "Photo No Rerun Brand",
+        bottleName: "No Rerun Public Image",
+      }),
+    });
+    extractPhotoBottleEvidenceMock.mockRejectedValue(
+      new Error("photo extraction should not rerun"),
+    );
+    classifyBottleReferenceMock.mockRejectedValue(
+      new Error("classification should not rerun"),
+    );
+
+    const response = await routerClient.tastings.photoIdentificationCreate(
+      {
+        createToken: identification.createToken!,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(response.warnings).toBeUndefined();
+    expect(response.bottle.fullName).toBe(
+      "Photo No Rerun Brand No Rerun Public Image",
+    );
+  });
+
+  test("release create strips classifier release image URLs and uses pending upload image", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-create-default-release-image",
       decision: buildCreateBottleAndReleaseDecision({
-        brandName: "Photo Unchecked Release Brand",
-        bottleName: "Unchecked Release Public Image",
-        releaseEdition: "Unchecked Release Edition",
+        brandName: "Photo Default Release Brand",
+        bottleName: "Default Release Public Image",
+        releaseEdition: "Default Release Edition",
         releaseImageUrl: "https://example.com/classifier-release.webp",
       }),
     });
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -1079,15 +1153,21 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(response.warnings).toBeUndefined();
     expect(response.bottle.imageUrl).toBeNull();
-    expect(response.release?.imageUrl).toBeNull();
+    expect(response.release?.imageUrl).toContain(
+      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
+    );
 
     const release = await db.query.bottleReleases.findFirst({
       where: eq(bottleReleases.id, response.release!.id),
     });
-    expect(release?.imageUrl).toBeNull();
+    expect(release?.imageUrl).toMatch(
+      new RegExp(
+        `^/uploads/bottle-releases/bottle_release-${response.release!.id}-pending-upload-.+\\.webp$`,
+      ),
+    );
   });
 
-  test("unsuitable approved photo creates without writing a canonical image", async ({
+  test("unsuitable photo creates without writing a canonical image", async ({
     defaults,
     fixtures,
   }) => {
@@ -1104,8 +1184,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "bottle" },
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -1119,48 +1198,6 @@ describe("POST /tastings/photo-identification", () => {
       where: eq(bottles.id, response.bottle.id),
     });
     expect(bottle?.imageUrl).toBeNull();
-  });
-
-  test("mismatched catalog image approval target creates without writing a canonical image", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const identification = await identifyCreateProposal({
-      fixtures,
-      user: defaults.user,
-      idempotencyKey: "photo-identification-create-mismatched-image-target",
-      decision: buildCreateBottleAndReleaseDecision({
-        brandName: "Photo Mismatched Target Brand",
-        bottleName: "Mismatched Public Image",
-        releaseEdition: "Mismatched Target Edition",
-        releaseImageUrl: "https://example.com/classifier-release.webp",
-      }),
-    });
-
-    const response = await routerClient.tastings.photoIdentificationCreate(
-      {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "bottle" },
-      },
-      {
-        context: { user: defaults.user },
-      },
-    );
-
-    expect(response.warnings).toBeUndefined();
-    expect(response.bottle.imageUrl).toBeNull();
-    expect(response.release?.imageUrl).toBeNull();
-
-    const [bottle, release] = await Promise.all([
-      db.query.bottles.findFirst({
-        where: eq(bottles.id, response.bottle.id),
-      }),
-      db.query.bottleReleases.findFirst({
-        where: eq(bottleReleases.id, response.release!.id),
-      }),
-    ]);
-    expect(bottle?.imageUrl).toBeNull();
-    expect(release?.imageUrl).toBeNull();
   });
 
   test("copy failure after creation returns warning and keeps the created bottle", async ({
@@ -1182,8 +1219,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "bottle" },
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -1226,8 +1262,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "release" },
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },
@@ -1282,8 +1317,7 @@ describe("POST /tastings/photo-identification", () => {
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
-        pendingImageId: identification.pendingImage.id,
-        catalogImageApproval: { target: "bottle" },
+        createToken: identification.createToken!,
       },
       {
         context: { user: defaults.user },

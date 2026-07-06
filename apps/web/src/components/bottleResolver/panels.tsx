@@ -3,13 +3,16 @@ import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { logError } from "@peated/web/lib/log";
 import {
   AlertTriangle,
+  Check,
+  ChevronDown,
+  ChevronUp,
   Copy,
   Plus,
   RotateCcw,
   Search,
   SearchX,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { getFieldValue, type PhotoIdentification } from "./helpers";
 
@@ -26,68 +29,126 @@ export type PhotoFailureTrace = {
 
 export function EvidencePills({
   result,
+  compact = false,
 }: {
   result: PhotoIdentification | null;
+  compact?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const fields = [
     ["Brand", getFieldValue(result, "brand")],
     ["Expression", getFieldValue(result, "expression")],
+    ["Series", getFieldValue(result, "series")],
+    ["Distillers", getFieldValue(result, "distillery")],
+    ["Bottler", getFieldValue(result, "bottler")],
+    ["Category", getFieldValue(result, "category")],
     ["Age", getFieldValue(result, "statedAge")],
     ["ABV", getFieldValue(result, "abv")],
     ["Edition", getFieldValue(result, "edition")],
     ["Vintage", getFieldValue(result, "vintageYear")],
     ["Release", getFieldValue(result, "releaseYear")],
     ["Cask", getFieldValue(result, "caskNumber")],
+    ["Cask Strength", getFieldValue(result, "caskStrength")],
+    ["Single Cask", getFieldValue(result, "singleCask")],
   ].filter(([, value]) => value);
 
   if (!fields.length) return null;
 
-  return (
-    <div className="flex flex-wrap gap-2">
-      {fields.map(([label, value]) => (
+  if (compact) {
+    return (
+      <div className="flex min-w-0 items-start gap-2">
         <div
-          key={label}
-          className="rounded border border-slate-800 bg-slate-950 px-3 py-2 text-sm"
+          className={`relative min-w-0 flex-1 text-sm leading-6 ${
+            expanded
+              ? "flex flex-wrap gap-x-4 gap-y-1"
+              : "overflow-hidden whitespace-nowrap pr-6 after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-8 after:bg-gradient-to-r after:from-transparent after:to-slate-950"
+          }`}
         >
-          <span className="text-muted">{label}</span>{" "}
-          <span className="font-medium text-white">{value}</span>
+          {fields.map(([label, value]) => (
+            <span
+              key={label}
+              className={
+                expanded ? "inline-flex gap-1" : "mr-4 inline-flex gap-1"
+              }
+            >
+              <span className="text-muted font-medium">{label}:</span>
+              <span className="text-white">{value}</span>
+            </span>
+          ))}
         </div>
+        {fields.length > 1 ? (
+          <button
+            type="button"
+            className="text-muted hover:text-highlight flex h-6 w-6 shrink-0 items-center justify-center rounded border border-slate-800 bg-slate-950"
+            aria-label={expanded ? "Show fewer details" : "Show all details"}
+            onClick={() => setExpanded((value) => !value)}
+          >
+            {expanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm leading-6">
+      {fields.map(([label, value]) => (
+        <span key={label} className="inline-flex gap-1">
+          <span className="text-muted font-medium">{label}:</span>
+          <span className="text-white">{value}</span>
+        </span>
       ))}
     </div>
   );
 }
 
-export function ResultHeader({
+export function PhotoResultCard({
   previewUrl,
-  icon,
   title,
-  description,
+  subtitle,
+  fallbackIcon,
   children,
 }: {
   previewUrl: string | null;
-  icon: ReactNode;
   title: string;
-  description: string;
+  subtitle: string;
+  fallbackIcon?: ReactNode;
   children?: ReactNode;
 }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [previewUrl]);
+
+  const showImage = Boolean(previewUrl) && !imageFailed;
+
   return (
-    <div className="flex items-start gap-4">
-      {previewUrl && (
-        <img
-          src={previewUrl}
-          alt=""
-          className="h-16 w-16 shrink-0 rounded object-cover sm:h-[96px] sm:w-[96px]"
-        />
-      )}
-      <div className="min-w-0 flex-1 space-y-3">
-        <div className="flex items-start gap-3">
-          {icon}
-          <div>
-            <div className="font-semibold text-white">{title}</div>
-            <div className="text-muted mt-1 text-sm">{description}</div>
+    <div className="rounded border border-slate-800 bg-slate-950 p-3">
+      <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-4 gap-y-2 sm:grid-cols-[96px_minmax(0,1fr)]">
+        {showImage ? (
+          <img
+            src={previewUrl ?? undefined}
+            alt=""
+            className="row-span-3 h-[72px] w-[72px] rounded object-cover sm:h-[96px] sm:w-[96px]"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <div className="row-span-3 flex h-[72px] w-[72px] items-center justify-center rounded bg-slate-900 sm:h-[96px] sm:w-[96px]">
+            {fallbackIcon ?? <Check className="text-highlight h-6 w-6" />}
+          </div>
+        )}
+        <div className="min-w-0 self-end">
+          <div className="break-words text-base font-semibold leading-snug text-white sm:text-lg">
+            {title}
           </div>
         </div>
-        {children}
+        <div className="text-muted min-w-0 self-start text-sm">{subtitle}</div>
+        {children && <div className="min-w-0">{children}</div>}
       </div>
     </div>
   );
@@ -229,6 +290,7 @@ export function PhotoFailurePanel({
   );
 }
 
+/** Builds the trace footer payload used to reproduce or evaluate a photo identification. */
 export function getPhotoIdentificationCopyPayload(
   result: PhotoIdentification,
   traceId: string,
@@ -294,6 +356,7 @@ export function PhotoIdentificationTraceFootnote({
   );
 }
 
+/** Builds the trace footer payload for failures before the server returns a result. */
 export function getPhotoFailureCopyPayload(trace: PhotoFailureTrace) {
   return JSON.stringify(
     {

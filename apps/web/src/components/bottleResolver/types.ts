@@ -11,6 +11,11 @@ export type BottleResolverTarget = {
   pendingImage: PhotoIdentification["pendingImage"] | null;
   /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
   previewUrl: string | null;
+  resultSource?: "created" | "found";
+  photoTrace?: {
+    traceId: string;
+    copyPayload: string;
+  };
   warnings?: string[];
 };
 
@@ -36,11 +41,9 @@ export type BottleResolverProps = {
     prefill?: CreateBottlePrefill,
   ) => string;
   title: string;
-  matchedResultDescription?: string;
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
   createProposalActionLabel?: string;
   searchActionLabel?: string;
-  enableCatalogImageApproval?: boolean;
 };
