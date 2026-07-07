@@ -20,7 +20,7 @@ import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatReleaseName } from "@peated/server/lib/format";
 import { logError, logInfo } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { eq, inArray, or, sql } from "drizzle-orm";
+import { asc, eq, inArray, or, sql } from "drizzle-orm";
 
 // TODO: this should happen async
 export default async function mergeBottle({
@@ -68,7 +68,8 @@ export default async function mergeBottle({
       tx
         .select()
         .from(collectionBottles)
-        .where(inArray(collectionBottles.bottleId, fromBottleIds)),
+        .where(inArray(collectionBottles.bottleId, fromBottleIds))
+        .orderBy(asc(collectionBottles.createdAt), asc(collectionBottles.id)),
       tx
         .select()
         .from(flightBottles)
@@ -124,17 +125,45 @@ export default async function mergeBottle({
     }
 
     if (sourceCollectionRows.length > 0) {
+      // Collapse source rows before upsert; existing target images win unless blank.
+      const mergedSourceCollectionRows = Array.from(
+        sourceCollectionRows
+          .reduce((rows, row) => {
+            const key = `${row.collectionId}:${row.releaseId ?? "null"}`;
+            const existingRow = rows.get(key);
+            if (!existingRow) {
+              rows.set(key, row);
+            } else if (!existingRow.imageUrl && row.imageUrl) {
+              rows.set(key, { ...existingRow, imageUrl: row.imageUrl });
+            }
+            return rows;
+          }, new Map<string, (typeof sourceCollectionRows)[number]>())
+          .values(),
+      );
+
       await tx
         .insert(collectionBottles)
         .values(
-          sourceCollectionRows.map((row) => ({
+          mergedSourceCollectionRows.map((row) => ({
             collectionId: row.collectionId,
             bottleId: toBottleId,
             releaseId: row.releaseId,
+            imageUrl: row.imageUrl,
             createdAt: row.createdAt,
           })),
         )
-        .onConflictDoNothing();
+        .onConflictDoUpdate({
+          target: [
+            collectionBottles.collectionId,
+            collectionBottles.bottleId,
+            collectionBottles.releaseId,
+          ],
+          set: {
+            imageUrl: sql<
+              string | null
+            >`COALESCE(${collectionBottles.imageUrl}, excluded.image_url)`,
+          },
+        });
     }
 
     if (sourceFlightRows.length > 0) {
