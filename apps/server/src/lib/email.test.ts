@@ -3,7 +3,7 @@ import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
 import type SMTPTransport from "nodemailer/lib/smtp-transport";
-import { notifyComment } from "./email";
+import { notifyComment, sendMagicLinkEmail } from "./email";
 
 let transport: Transporter<SMTPTransport.SentMessageInfo>;
 let outbox: Mail.Options[];
@@ -49,6 +49,7 @@ const createEmailTestHarness = () => {
 
 beforeEach(async () => {
   config.API_SERVER = "http://localhost";
+  config.SMTP_HOST = "localhost";
   config.SMTP_FROM = "example@example.com";
 
   const harness = createEmailTestHarness();
@@ -121,5 +122,29 @@ describe("notifyComment", () => {
     const msg = outbox[0];
     expect(msg.to).toBe(author.email);
     expect(msg.subject).toBe("New Comment on Tasting");
+  });
+});
+
+describe("sendMagicLinkEmail", () => {
+  test("requires SendGrid SMTP credentials", async ({ fixtures }) => {
+    const user = await fixtures.User({ active: true });
+    const originalHost = config.SMTP_HOST;
+    const originalUser = config.SMTP_USER;
+    const originalPass = config.SMTP_PASS;
+
+    config.SMTP_HOST = "smtp.sendgrid.net";
+    config.SMTP_USER = undefined;
+    config.SMTP_PASS = undefined;
+
+    try {
+      await expect(sendMagicLinkEmail({ user, transport })).rejects.toThrow(
+        "SMTP credentials are not configured",
+      );
+      expect(outbox.length).toBe(0);
+    } finally {
+      config.SMTP_HOST = originalHost;
+      config.SMTP_USER = originalUser;
+      config.SMTP_PASS = originalPass;
+    }
   });
 });

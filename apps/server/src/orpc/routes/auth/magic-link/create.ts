@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendMagicLinkEmail } from "@peated/server/lib/email";
+import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import { eq, sql } from "drizzle-orm";
@@ -43,7 +44,19 @@ export default procedure
       });
     }
 
-    await sendMagicLinkEmail({ user });
+    try {
+      await sendMagicLinkEmail({ user });
+    } catch (error) {
+      logError(error, {
+        context: {
+          name: "auth/magic-link/create",
+          userId: user.id,
+        },
+      });
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Unable to send magic link email.",
+      });
+    }
 
     return {};
   });
