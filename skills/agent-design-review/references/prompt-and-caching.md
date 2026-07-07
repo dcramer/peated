@@ -104,6 +104,6 @@ Benchmark explicit reasoning scaffolds on the target model instead of treating t
 
 - OpenAI, "Prompt caching": https://developers.openai.com/api/docs/guides/prompt-caching
 - OpenAI, "Prompt engineering": https://developers.openai.com/api/docs/guides/prompt-engineering
-- Anthropic, "Prompting best practices": https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview
-- Anthropic, "Use XML tags": https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags
+- Anthropic, "Prompting best practices": https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview
+- Anthropic, "Use XML tags": https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/use-xml-tags
 - Google, "Context caching": https://ai.google.dev/gemini-api/docs/caching

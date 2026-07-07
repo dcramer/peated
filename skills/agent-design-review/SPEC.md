@@ -79,8 +79,9 @@ Data that must not be stored:
 
 ## Validation
 
-- Lightweight validation: run the local skill validator against
-  `skills/agent-design-review` from the repository root.
+- Lightweight validation: confirm every file routed by `SKILL.md` exists under
+  `references/`, and every repo path named in `references/classifier-agents.md`
+  and `SOURCES.md` still exists.
 - Discovery validation: confirm `.agents/skills/agent-design-review/SKILL.md`
   resolves when this repo uses the symlinked skill registration.
 - Deeper validation: test realistic prompts manually or through a future
@@ -90,9 +91,8 @@ Data that must not be stored:
 
 ## Known Limitations
 
-- Computer-use and browser-operating agents are lightly covered.
-- MCP-specific tool discovery patterns are not deeply covered.
-- The skill does not include an executable eval harness yet.
+Open gaps are tracked in `SOURCES.md` under "Open gaps" so they live in one
+place with their next actions.
 
 ## Maintenance Notes
 

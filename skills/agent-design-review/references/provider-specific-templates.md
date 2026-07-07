@@ -91,7 +91,7 @@ Use this pattern when the agent is built around `messages.create`.
 
 ```json
 {
-  "model": "claude-sonnet-4-5",
+  "model": "claude-sonnet-5",
   "max_tokens": 1024,
   "tools": [
     {
@@ -141,14 +141,14 @@ Use this pattern when the agent is built around `messages.create`.
 
 ## Provider-Specific Differences That Matter
 
-| Concern | OpenAI Responses | Anthropic Messages |
-| --- | --- | --- |
-| Stable policy channel | `instructions` | `system` |
-| Dynamic request content | `input` | `messages` |
-| Structured final output | `text.format` with JSON schema | Usually prompt + post-parse or tool/result structure |
-| Tool definitions | `tools` with function schemas and `strict` | `tools` with `description` and `input_schema` |
-| Tool-call control | `tool_choice`, `parallel_tool_calls` | `tool_choice`, `disable_parallel_tool_use` |
-| Caching | automatic exact-prefix matching | explicit `cache_control` breakpoints |
+| Concern                 | OpenAI Responses                           | Anthropic Messages                                   |
+| ----------------------- | ------------------------------------------ | ---------------------------------------------------- |
+| Stable policy channel   | `instructions`                             | `system`                                             |
+| Dynamic request content | `input`                                    | `messages`                                           |
+| Structured final output | `text.format` with JSON schema             | Usually prompt + post-parse or tool/result structure |
+| Tool definitions        | `tools` with function schemas and `strict` | `tools` with `description` and `input_schema`        |
+| Tool-call control       | `tool_choice`, `parallel_tool_calls`       | `tool_choice`, `disable_parallel_tool_use`           |
+| Caching                 | automatic exact-prefix matching            | explicit `cache_control` breakpoints                 |
 
 ## Sources
 
