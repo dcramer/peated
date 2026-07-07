@@ -533,4 +533,175 @@ describe("mergeBottle", () => {
     expect(mergedCollectionRows).toHaveLength(1);
     expect(mergedFlightRows).toHaveLength(1);
   });
+
+  it("preserves collection bottle images while merging bottles", async ({
+    fixtures,
+  }) => {
+    const sourceBottle = await fixtures.Bottle({
+      name: "Source Image Bottle",
+      category: "single_malt",
+    });
+    const targetBottle = await fixtures.Bottle({
+      name: "Target Image Bottle",
+      category: "single_malt",
+    });
+    const collection = await fixtures.Collection();
+
+    await db.insert(collectionBottles).values({
+      collectionId: collection.id,
+      bottleId: sourceBottle.id,
+      releaseId: null,
+      imageUrl: "/uploads/collection-bottles/source-entry.webp",
+    });
+
+    await mergeBottle({
+      fromBottleIds: [sourceBottle.id],
+      toBottleId: targetBottle.id,
+    });
+
+    const mergedCollectionRows = await db
+      .select()
+      .from(collectionBottles)
+      .where(
+        and(
+          eq(collectionBottles.collectionId, collection.id),
+          eq(collectionBottles.bottleId, targetBottle.id),
+        ),
+      );
+
+    expect(mergedCollectionRows).toHaveLength(1);
+    expect(mergedCollectionRows[0]?.imageUrl).toBe(
+      "/uploads/collection-bottles/source-entry.webp",
+    );
+  });
+
+  it("reconciles duplicate collection bottle images while merging bottles", async ({
+    fixtures,
+  }) => {
+    const sourceBottle = await fixtures.Bottle({
+      name: "Source Duplicate Image Bottle",
+      category: "single_malt",
+    });
+    const targetBottle = await fixtures.Bottle({
+      name: "Target Duplicate Image Bottle",
+      category: "single_malt",
+    });
+    const fillImageCollection = await fixtures.Collection();
+    const keepImageCollection = await fixtures.Collection();
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: fillImageCollection.id,
+        bottleId: sourceBottle.id,
+        releaseId: null,
+        imageUrl: "/uploads/collection-bottles/source-fill.webp",
+      },
+      {
+        collectionId: fillImageCollection.id,
+        bottleId: targetBottle.id,
+        releaseId: null,
+        imageUrl: null,
+      },
+      {
+        collectionId: keepImageCollection.id,
+        bottleId: sourceBottle.id,
+        releaseId: null,
+        imageUrl: "/uploads/collection-bottles/source-keep.webp",
+      },
+      {
+        collectionId: keepImageCollection.id,
+        bottleId: targetBottle.id,
+        releaseId: null,
+        imageUrl: "/uploads/collection-bottles/target-existing.webp",
+      },
+    ]);
+
+    await mergeBottle({
+      fromBottleIds: [sourceBottle.id],
+      toBottleId: targetBottle.id,
+    });
+
+    const fillImageRows = await db
+      .select()
+      .from(collectionBottles)
+      .where(
+        and(
+          eq(collectionBottles.collectionId, fillImageCollection.id),
+          eq(collectionBottles.bottleId, targetBottle.id),
+        ),
+      );
+    const keepImageRows = await db
+      .select()
+      .from(collectionBottles)
+      .where(
+        and(
+          eq(collectionBottles.collectionId, keepImageCollection.id),
+          eq(collectionBottles.bottleId, targetBottle.id),
+        ),
+      );
+
+    expect(fillImageRows).toHaveLength(1);
+    expect(fillImageRows[0]?.imageUrl).toBe(
+      "/uploads/collection-bottles/source-fill.webp",
+    );
+    expect(keepImageRows).toHaveLength(1);
+    expect(keepImageRows[0]?.imageUrl).toBe(
+      "/uploads/collection-bottles/target-existing.webp",
+    );
+  });
+
+  it("dedupes multiple source collection rows while preserving an image", async ({
+    fixtures,
+  }) => {
+    const sourceBottleA = await fixtures.Bottle({
+      name: "Source Multi Image Bottle A",
+      category: "single_malt",
+    });
+    const sourceBottleB = await fixtures.Bottle({
+      name: "Source Multi Image Bottle B",
+      category: "single_malt",
+    });
+    const targetBottle = await fixtures.Bottle({
+      name: "Target Multi Image Bottle",
+      category: "single_malt",
+    });
+    const collection = await fixtures.Collection();
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: collection.id,
+        bottleId: sourceBottleA.id,
+        releaseId: null,
+        imageUrl: null,
+        createdAt: new Date("2024-01-01T00:00:00.000Z"),
+      },
+      {
+        collectionId: collection.id,
+        bottleId: sourceBottleB.id,
+        releaseId: null,
+        imageUrl: "/uploads/collection-bottles/source-multi.webp",
+        createdAt: new Date("2024-01-02T00:00:00.000Z"),
+      },
+    ]);
+
+    await mergeBottle({
+      fromBottleIds: [sourceBottleA.id, sourceBottleB.id],
+      toBottleId: targetBottle.id,
+    });
+
+    const mergedCollectionRows = await db
+      .select()
+      .from(collectionBottles)
+      .where(
+        and(
+          eq(collectionBottles.collectionId, collection.id),
+          eq(collectionBottles.bottleId, targetBottle.id),
+        ),
+      );
+
+    expect(mergedCollectionRows).toHaveLength(1);
+    expect(mergedCollectionRows[0]?.imageUrl).toBe(
+      "/uploads/collection-bottles/source-multi.webp",
+    );
+  });
 });
