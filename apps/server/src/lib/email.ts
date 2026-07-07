@@ -35,18 +35,33 @@ type CommentWithRelations = Comment & {
 };
 
 const hasEmailSupport = () => {
-  if (!config.URL_PREFIX) {
-    logError("URL_PREFIX is not configured");
-    return false;
-  }
+  const error = getEmailSupportError({ requireSmtpCredentials: false });
+  if (error) logError(error);
 
-  if (!config.SMTP_FROM) {
-    logError("SMTP_FROM is not configured");
-    return false;
-  }
-
-  return true;
+  return !error;
 };
+
+function getEmailSupportError({
+  requireSmtpCredentials,
+}: {
+  requireSmtpCredentials: boolean;
+}) {
+  if (!config.URL_PREFIX) return "URL_PREFIX is not configured";
+  if (!config.SMTP_FROM) return "SMTP_FROM is not configured";
+  if (
+    requireSmtpCredentials &&
+    config.SMTP_HOST === "smtp.sendgrid.net" &&
+    (!config.SMTP_USER || !config.SMTP_PASS)
+  ) {
+    return "SMTP credentials are not configured";
+  }
+  return null;
+}
+
+function assertEmailSupport() {
+  const error = getEmailSupportError({ requireSmtpCredentials: true });
+  if (error) throw new Error(error);
+}
 
 const createMailTransport = () => {
   const user = config.SMTP_USER;
@@ -233,8 +248,7 @@ export async function sendMagicLinkEmail({
   user: User;
   transport?: Transporter<SMTPTransport.SentMessageInfo>;
 }) {
-  // TODO: error out
-  if (!hasEmailSupport()) return;
+  assertEmailSupport();
 
   if (!transport) {
     if (!mailTransport) mailTransport = createMailTransport();

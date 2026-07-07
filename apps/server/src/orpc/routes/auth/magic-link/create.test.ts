@@ -27,6 +27,28 @@ describe("POST /auth/magic-link", () => {
     expect(sendMagicLinkEmail).toHaveBeenCalledWith({ user });
   });
 
+  test("throws error when magic link email delivery fails", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ active: true });
+    vi.mocked(sendMagicLinkEmail).mockRejectedValueOnce(
+      new Error("SMTP credentials are not configured"),
+    );
+
+    const error = await waitError(
+      routerClient.auth.magicLink.create(
+        {
+          email: user.email,
+        },
+        { context: { ip: "127.0.0.1" } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Unable to send magic link email.]`,
+    );
+  });
+
   test("throws error when user is not found", async ({ fixtures }) => {
     const error = await waitError(
       routerClient.auth.magicLink.create(
