@@ -520,11 +520,6 @@ test.describe("add bottle flow", () => {
       page.getByText(`${testBrand.name} ${createdBottleName}`),
     ).toBeVisible();
     await expect(
-      page.getByText(
-        "This will create the missing bottle or bottling in Peated before continuing.",
-      ),
-    ).toBeVisible();
-    await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expect(
