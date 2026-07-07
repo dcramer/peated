@@ -98,7 +98,7 @@ export default procedure
 
       // Log unexpected errors with minimal context
       logError(error as Error, {
-        context: {
+        extra: {
           name: "auth/login",
         },
       });

@@ -48,7 +48,7 @@ export default procedure
       await sendMagicLinkEmail({ user });
     } catch (error) {
       logError(error, {
-        context: {
+        extra: {
           name: "auth/magic-link/create",
           userId: user.id,
         },

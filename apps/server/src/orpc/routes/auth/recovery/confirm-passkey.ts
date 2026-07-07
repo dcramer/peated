@@ -182,7 +182,7 @@ export default procedure
       }
 
       logError(error as Error, {
-        context: {
+        extra: {
           name: "auth/recovery/confirm-passkey",
         },
       });
