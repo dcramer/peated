@@ -19,6 +19,7 @@ export * from "./magicLink";
 export * from "./notifications";
 export * from "./pendingUploads";
 export * from "./priceMatches";
+export * from "./profileActivity";
 export * from "./regions";
 export * from "./reviews";
 export * from "./shared";

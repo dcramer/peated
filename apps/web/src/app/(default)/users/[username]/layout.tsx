@@ -60,9 +60,8 @@ export default async function Layout(props: {
 
   const isPrivate =
     user.private &&
-    currentUser &&
-    user.id !== currentUser.id &&
-    user.friendStatus !== "friends";
+    (!currentUser ||
+      (user.id !== currentUser.id && user.friendStatus !== "friends"));
 
   const jsonLd: WithContext<ProfilePage> = {
     "@context": "https://schema.org",
