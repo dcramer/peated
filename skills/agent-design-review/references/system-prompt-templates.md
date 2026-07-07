@@ -94,8 +94,8 @@ Allowed actions:
 <output_contract>
 Return a JSON object with:
 - action
-- confidence
 - rationale
+- evidence or basis fields that justify the action
 - [other typed fields]
 </output_contract>
 
@@ -103,6 +103,10 @@ Return a JSON object with:
 {STRUCTURED_CONTEXT}
 </request_context>
 ```
+
+Add a numeric confidence field only when code consumes it for thresholds or
+downstream policy. Prefer structured evidence fields and code-derived gating;
+decorative confidence fields create noise.
 
 ## Copy-Paste Template: Evaluator Agent
 
@@ -193,5 +197,5 @@ Return JSON with:
 
 - OpenAI, "Prompt caching": https://developers.openai.com/api/docs/guides/prompt-caching
 - OpenAI, "Prompt engineering": https://developers.openai.com/api/docs/guides/prompt-engineering
-- Anthropic, "Prompting best practices": https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview
-- Anthropic, "Use XML tags": https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags
+- Anthropic, "Prompting best practices": https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview
+- Anthropic, "Use XML tags": https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/use-xml-tags

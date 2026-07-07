@@ -167,11 +167,6 @@ Use a strict schema for final decisions when downstream code depends on the resu
       "type": "string",
       "enum": ["match_existing", "create_new", "no_match", "escalate"]
     },
-    "confidence": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
-    },
     "rationale": {
       "type": ["string", "null"]
     },
@@ -182,14 +177,18 @@ Use a strict schema for final decisions when downstream code depends on the resu
       }
     }
   },
-  "required": ["action", "confidence", "rationale", "candidate_ids"],
+  "required": ["action", "rationale", "candidate_ids"],
   "additionalProperties": false
 }
 ```
 
+Add a numeric confidence field only when downstream code consumes it for
+thresholds or policy. Prefer typed evidence fields plus code-derived gating;
+a confidence number nothing reads is decorative noise.
+
 ## Sources
 
-- Anthropic, "Implement tool use": https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use
+- Anthropic, "Implement tool use": https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use
 - OpenAI, "Function calling": https://developers.openai.com/api/docs/guides/function-calling
 - OpenAI, "Structured Outputs": https://openai.com/index/introducing-structured-outputs-in-the-api/
 - Google, "Function calling": https://ai.google.dev/gemini-api/docs/function-calling

@@ -24,14 +24,14 @@ If a simpler step can plausibly solve the problem, recommend proving it first on
 
 ## Pattern Guide
 
-| Pattern | Good fit | Failure sign |
-| --- | --- | --- |
-| Prompted workflow | Stable procedure, low ambiguity, little exploration | The workflow keeps branching or needing environment feedback |
-| Routing | Request types split cleanly into a few categories | Routes are unstable or too overlapping |
-| Prompt chaining | One step produces structured input for the next | Intermediate outputs are fuzzy or not validated |
-| Single agent with tools | The model must decide what evidence to gather next | The tool set becomes overloaded or tool choice gets unreliable |
-| Evaluator-optimizer | Quality can be judged with a clear rubric | The evaluator is subjective or inconsistent |
-| Multi-agent | Different prompts, tools, or trust boundaries must stay isolated | More agents are added without a measured improvement |
+| Pattern                 | Good fit                                                         | Failure sign                                                   |
+| ----------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------- |
+| Prompted workflow       | Stable procedure, low ambiguity, little exploration              | The workflow keeps branching or needing environment feedback   |
+| Routing                 | Request types split cleanly into a few categories                | Routes are unstable or too overlapping                         |
+| Prompt chaining         | One step produces structured input for the next                  | Intermediate outputs are fuzzy or not validated                |
+| Single agent with tools | The model must decide what evidence to gather next               | The tool set becomes overloaded or tool choice gets unreliable |
+| Evaluator-optimizer     | Quality can be judged with a clear rubric                        | The evaluator is subjective or inconsistent                    |
+| Multi-agent             | Different prompts, tools, or trust boundaries must stay isolated | More agents are added without a measured improvement           |
 
 ## Review Questions
 

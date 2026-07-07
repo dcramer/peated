@@ -58,8 +58,8 @@ Do not rely on prompt instructions alone to keep risky tool calls safe.
 ## Sources
 
 - Anthropic, "Building effective agents": https://www.anthropic.com/research/building-effective-agents/
-- Anthropic, "Tool use overview": https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/overview
-- Anthropic, "Implement tool use": https://docs.anthropic.com/en/docs/agents-and-tools/tool-use/implement-tool-use
+- Anthropic, "Tool use overview": https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview
+- Anthropic, "Implement tool use": https://platform.claude.com/docs/en/agents-and-tools/tool-use/implement-tool-use
 - OpenAI, "Function calling": https://developers.openai.com/api/docs/guides/function-calling
 - OpenAI, "Structured Outputs": https://openai.com/index/introducing-structured-outputs-in-the-api/
 - Google, "Function calling": https://ai.google.dev/gemini-api/docs/function-calling

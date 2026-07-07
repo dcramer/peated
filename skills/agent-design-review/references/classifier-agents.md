@@ -67,9 +67,11 @@ Then check:
 - extraction conservatism: prefer `null` or `[]` over guessing
 - decisive identity fields: producer, distillery, expression, series, edition, age, cask flags, ABV, and years
 - candidate generation before web search
-- reviewed action boundaries: `match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `no_match`
+- reviewed action boundaries: `match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `repair_parent_and_create_release`, `no_match`
 - `identityScope` boundaries: `product` versus `exact_cask`
-- deterministic downgrade, validation, and automation thresholds
+- deterministic downgrade and validation; automation gating is code-derived
+  from action risk plus structured evidence, and `confidenceBasis.band` only
+  downgrades, never upgrades
 - post-model policy that sanitizes, rejects, or downgrades unsafe output without
   turning eval cases into semantic action rewrites
 - server-side sanitization of ids and proposed entities
