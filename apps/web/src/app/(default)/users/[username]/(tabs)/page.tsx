@@ -2,7 +2,7 @@
 import { use } from "react";
 
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import TastingList from "@peated/web/components/tastingList";
+import ProfileActivityList from "@peated/web/components/profileActivityList";
 import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
 import UserLocationChart from "@peated/web/components/userLocationChart";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -21,26 +21,28 @@ export default function UserProfilePage(props: {
   const userId = useProfileUserId();
 
   const orpc = useORPC();
-  const { data: tastings } = useSuspenseQuery(
-    orpc.tastings.list.queryOptions({
+  const { data: activity } = useSuspenseQuery(
+    orpc.users.activity.list.queryOptions({
       input: { user: username, limit: 10 },
     }),
   );
 
   return (
     <div>
-      {tastings.results.length ? (
-        <TastingList values={tastings.results} />
-      ) : (
-        <EmptyActivity />
-      )}
-
-      <div className="mt-8 space-y-6 px-3 lg:px-0">
+      <div className="mt-1 space-y-6 px-3 lg:px-0">
         <UserBadgeList userId={userId} />
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <UserLocationChart userId={userId} />
           <UserFlavorDistributionChart userId={userId} />
         </div>
+      </div>
+
+      <div className="mt-8">
+        {activity.results.length ? (
+          <ProfileActivityList values={activity.results} />
+        ) : (
+          <EmptyActivity />
+        )}
       </div>
     </div>
   );

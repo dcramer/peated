@@ -33,6 +33,9 @@ import type {
   NotificationSchema,
   ObjectTypeEnum,
   PointSchema,
+  ProfileActivityEntrySchema,
+  ProfileCollectionAddActivitySchema,
+  ProfileTastingActivitySchema,
   RegionSchema,
   ReviewSchema,
   ServingStyleEnum,
@@ -61,6 +64,13 @@ export type ObjectType = z.infer<typeof ObjectTypeEnum>;
 export type FollowStatus = z.infer<typeof FollowStatusEnum>;
 export type FriendStatus = z.infer<typeof FriendStatusEnum>;
 export type Point = z.infer<typeof PointSchema>;
+export type ProfileActivityEntry = z.infer<typeof ProfileActivityEntrySchema>;
+export type ProfileCollectionAddActivity = z.infer<
+  typeof ProfileCollectionAddActivitySchema
+>;
+export type ProfileTastingActivity = z.infer<
+  typeof ProfileTastingActivitySchema
+>;
 
 export type Badge = z.infer<typeof BadgeSchema>;
 export type BadgeAward = z.infer<typeof BadgeAwardSchema>;
