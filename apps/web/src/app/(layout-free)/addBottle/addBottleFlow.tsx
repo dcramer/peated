@@ -4,6 +4,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import BadgeImage from "@peated/web/components/badgeImage";
 import BottleCard from "@peated/web/components/bottleCard";
 import BottleResolver, {
+  type BottleResolverAction,
+  type BottleResolverCreateProposalActionsProps,
   type BottleResolverMatchedActionsProps,
   type BottleResolverTarget,
 } from "@peated/web/components/bottleResolver";
@@ -280,6 +282,66 @@ function MatchedOutcomeActions({
       : [libraryButton, tastingButton, viewButton];
 
   return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
+}
+
+function CreateProposalOutcomeActions({
+  createPending,
+  resolvingAction,
+  intent,
+  onResolve,
+}: BottleResolverCreateProposalActionsProps & { intent: AddBottleIntent }) {
+  const creating = createPending || Boolean(resolvingAction);
+  const libraryButton = (
+    <OutcomeButton
+      key="library"
+      onClick={() => onResolve("library")}
+      icon={<BookOpen className="h-4 w-4" />}
+      emphasized
+      disabled={creating}
+      loading={resolvingAction === "library"}
+    >
+      Add to Library
+    </OutcomeButton>
+  );
+  const tastingButton = (
+    <OutcomeButton
+      key="tasting"
+      onClick={() => onResolve("tasting")}
+      icon={<Wine className="h-4 w-4" />}
+      emphasized
+      disabled={creating}
+      loading={resolvingAction === "tasting"}
+    >
+      Log Tasting
+    </OutcomeButton>
+  );
+  const createButton = (
+    <OutcomeButton
+      key="create"
+      onClick={() => onResolve("create")}
+      icon={<Plus className="h-4 w-4" />}
+      disabled={creating}
+      loading={resolvingAction === "create"}
+    >
+      Create Bottle
+    </OutcomeButton>
+  );
+  const actionButtons =
+    intent === "tasting"
+      ? [tastingButton, libraryButton, createButton]
+      : intent === "view"
+        ? [createButton, libraryButton, tastingButton]
+        : [libraryButton, tastingButton, createButton];
+
+  return (
+    <div className="space-y-3">
+      <p className="text-muted text-sm">
+        This will create the missing bottle or bottling in Peated before
+        continuing.
+      </p>
+      <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
+    </div>
+  );
 }
 
 function OutcomeSelection({
@@ -628,7 +690,7 @@ function AddBottleFlowContent() {
 
   async function handleResolvedTarget(
     target: BottleResolverTarget,
-    action?: "library" | "tasting",
+    action?: BottleResolverAction,
   ) {
     setLibraryError(undefined);
     setAddedEntry(null);
@@ -636,10 +698,17 @@ function AddBottleFlowContent() {
     setTastingDraft(null);
     setTastingLoadError(undefined);
 
+    if (action) {
+      target.warnings?.forEach((warning) => flash(warning, "error"));
+    }
+
     if (action === "library") {
       await addToLibrary(target, { showOutcomeWhileSaving: false });
     } else if (action === "tasting") {
       await startLogTasting(target);
+    } else if (action === "create") {
+      router.push(getViewBottleHref(target));
+      revokeBlobPreviewUrl(target);
     } else {
       setSelectedTarget(target);
     }
@@ -827,6 +896,9 @@ function AddBottleFlowContent() {
       searchActionLabel="Search Bottles"
       renderMatchedResultActions={(props) => (
         <MatchedOutcomeActions {...props} intent={intent} />
+      )}
+      renderCreateProposalActions={(props) => (
+        <CreateProposalOutcomeActions {...props} intent={intent} />
       )}
       onResolve={handleResolvedTarget}
     />

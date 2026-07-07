@@ -12,9 +12,12 @@ import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdBottleId,
   createdBottleName,
+  createdReleaseId,
+  createdTastingId,
   existingBottle,
   existingRelease,
   existingReleaseId,
+  photoTastingNotes,
   testAccessToken,
   testBrand,
   testUser,
@@ -492,7 +495,7 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
   });
 
-  test("creates a bottle from a scan with the photo as the default image", async ({
+  test("defers scan bottle creation until Create Bottle is clicked", async ({
     context,
     page,
   }, testInfo) => {
@@ -503,8 +506,31 @@ test.describe("add bottle flow", () => {
       ),
     });
 
+    const createRequests: Request[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/rpc/tastings/photoIdentificationCreate")) {
+        createRequests.push(request);
+      }
+    });
+
     await page.goto("/addBottle");
     await uploadLabel(page);
+
+    await expect(
+      page.getByText(`${testBrand.name} ${createdBottleName}`),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "This will create the missing bottle or bottling in Peated before continuing.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Log Tasting" }),
+    ).toBeVisible();
+    await expect(createRequests).toHaveLength(0);
 
     const requestPromise = waitForPhotoIdentificationCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
@@ -514,19 +540,16 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
+    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
     await expect(
-      page.getByText(`${testBrand.name} ${createdBottleName}`),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Bottle created" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Add to Library" }),
+      page.getByRole("heading", {
+        name: `${testBrand.name} ${createdBottleName}`,
+      }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
-  test("creates a release from a scan with the photo as the default release image", async ({
+  test("creates a release from a scan when Create Bottle is clicked", async ({
     context,
     page,
   }, testInfo) => {
@@ -548,15 +571,11 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle_and_release:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
+    await expect(page).toHaveURL(
+      new RegExp(`/bottles/${createdBottleId}/bottlings/${createdReleaseId}$`),
+    );
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
-    ).toBeVisible();
-    await expect(page.getByText("First Fill Oloroso")).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Bottle created" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
@@ -580,8 +599,11 @@ test.describe("add bottle flow", () => {
       "playwright-create-token:create_bottle:unsuitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
+    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
     await expect(
-      page.getByText(`${testBrand.name} ${createdBottleName}`),
+      page.getByRole("heading", {
+        name: `${testBrand.name} ${createdBottleName}`,
+      }),
     ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
@@ -604,12 +626,161 @@ test.describe("add bottle flow", () => {
         "The bottle was created, but the public image was not saved.",
       ),
     ).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(
+      page.getByRole("heading", {
+        name: `${testBrand.name} ${createdBottleName}`,
+      }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("creates a scan proposal as part of Add to Library", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(
+        testInfo,
+        "photo-create-bottle-default-image-library",
+      ),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    const input = getRpcInput(await requestPromise);
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:suitable",
+    );
+    expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
     ).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "Add to Library" }),
+      page.getByRole("heading", { name: "Bottle created" }),
+    ).toBeHidden();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("creates a scan proposal as part of Log Tasting", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(
+        testInfo,
+        "photo-create-bottle-default-image-tasting",
+      ),
+    });
+
+    await page.goto("/addBottle?intent=tasting");
+    await uploadLabel(page);
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    await page.getByRole("button", { name: "Log Tasting" }).click();
+    const input = getRpcInput(await requestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:suitable",
+    );
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
+    await expect(
+      page.getByText(`${testBrand.name} ${createdBottleName}`),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByLabel("Comments").fill(photoTastingNotes);
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
+    await expect(
+      page.getByRole("heading", { name: "Bottle created" }),
+    ).toBeHidden();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("routes to an existing bottle when action-time create reuses a target", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-create-existing-view"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+    const input = getRpcInput(await requestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:suitable",
+    );
+    await expect(page).toHaveURL(new RegExp(`/bottles/${existingBottle.id}$`));
+    await expect(
+      page.getByRole("heading", { name: existingBottle.fullName }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("adds an existing reused create proposal to Library", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-create-existing-library"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    const input = getRpcInput(await requestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:suitable",
+    );
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("opens Log Tasting for an existing reused create proposal", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-create-existing-tasting"),
+    });
+
+    await page.goto("/addBottle?intent=tasting");
+    await uploadLabel(page);
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    await page.getByRole("button", { name: "Log Tasting" }).click();
+    const input = getRpcInput(await requestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle:suitable",
+    );
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
+    ).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
@@ -774,7 +945,13 @@ function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
 }
 
 async function uploadLabel(page: Page) {
-  await page.locator('input[type="file"]').setInputFiles({
+  await expect(
+    page.getByRole("button", { name: /Take or upload a photo/ }),
+  ).toBeVisible();
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: /Take or upload a photo/ }).click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
     name: "label.png",
     mimeType: "image/png",
     buffer: Buffer.from(
@@ -787,6 +964,12 @@ async function uploadLabel(page: Page) {
 function waitForPhotoIdentificationCreate(page: Page) {
   return page.waitForRequest((request) =>
     request.url().includes("/rpc/tastings/photoIdentificationCreate"),
+  );
+}
+
+function waitForCollectionBottleCreate(page: Page) {
+  return page.waitForRequest((request) =>
+    request.url().includes("/rpc/collections/bottles/create"),
   );
 }
 

@@ -37,7 +37,9 @@ The system SHALL resolve scan, search, and manual creation paths into a bottle t
 #### Scenario: Create proposal resolved
 
 - **WHEN** photo identification proposes creating a bottle or release
-- **THEN** the system shows proposed bottle or release fields before the user can create the target
+- **THEN** the system shows proposed bottle or release fields
+- **AND** the system offers Add to Library, Log Tasting, and Create Bottle actions
+- **AND** each selected action creates or reuses the proposed target before continuing
 
 #### Scenario: Scan resolves source identity before catalog action
 

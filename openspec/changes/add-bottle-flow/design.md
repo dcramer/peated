@@ -45,7 +45,7 @@ Extract the scan/search/review logic from `/addTasting` into a reusable Bottle R
 - `intent=tasting`: Log Tasting is primary.
 - no intent or `intent=choose`: show all applicable outcomes.
 
-Existing bottle matches show Add to Library, Log Tasting, and View Bottle. Missing or uncertain bottles show Search Again, Start Over, and Create Bottle when user creation is available.
+Existing bottle matches show Add to Library, Log Tasting, and View Bottle. Clear missing-target create proposals show Add to Library, Log Tasting, and Create Bottle; unresolved or ambiguous bottles show Search Again, Start Over, and Create Bottle when user creation is available.
 
 For scan-backed results, the classifier should preserve release and bottling traits visible on the label, including edition, batch, barrel/cask number, stated age, ABV, and expression name. If the exact identity exists in Peated, the resolver should confirm the match. If it does not exist and the identity is otherwise clear, the resolver should confirm a create proposal. Search Again should mean "the system could not identify the bottle/release," not "the target row is missing enrichment."
 

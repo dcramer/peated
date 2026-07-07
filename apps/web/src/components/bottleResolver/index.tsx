@@ -43,12 +43,15 @@ import {
   PhotoUploadState,
 } from "./states";
 import type {
+  BottleResolverAction,
   BottleResolverMatchedAction,
   BottleResolverProps,
   BottleResolverTarget,
 } from "./types";
 
 export type {
+  BottleResolverAction,
+  BottleResolverCreateProposalActionsProps,
   BottleResolverMatchedAction,
   BottleResolverMatchedActionsProps,
   BottleResolverProps,
@@ -69,6 +72,7 @@ export default function BottleResolver({
   createBottleHrefForResult,
   title,
   renderMatchedResultActions,
+  renderCreateProposalActions,
   createProposalActionLabel = "Continue",
   searchActionLabel = "Search Bottles",
 }: BottleResolverProps) {
@@ -91,7 +95,7 @@ export default function BottleResolver({
     useState<PhotoFailureTrace | null>(null);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [resolvingAction, setResolvingAction] =
-    useState<BottleResolverMatchedAction | null>(null);
+    useState<BottleResolverAction | null>(null);
   const [matchedBottleStatus, setMatchedBottleStatus] = useState<{
     bottleId: number;
     releaseId: number | null;
@@ -159,7 +163,7 @@ export default function BottleResolver({
 
   async function resolveTarget(
     target: Omit<BottleResolverTarget, "pendingImage" | "previewUrl">,
-    action?: BottleResolverMatchedAction,
+    action?: BottleResolverAction,
   ) {
     const currentPreviewUrl = previewUrl;
     const photoTrace =
@@ -221,7 +225,10 @@ export default function BottleResolver({
     }
   }
 
-  async function acceptCreateProposal(result: PhotoIdentification) {
+  async function acceptCreateProposal(
+    result: PhotoIdentification,
+    action: BottleResolverAction,
+  ) {
     if (
       result.classification.status !== "classified" ||
       !getCreateDecision(result)
@@ -229,6 +236,8 @@ export default function BottleResolver({
       return;
     }
 
+    setError(null);
+    setResolvingAction(action);
     try {
       if (!result.createToken) {
         setError(
@@ -242,17 +251,20 @@ export default function BottleResolver({
       };
       const created =
         await photoIdentificationCreateMutation.mutateAsync(payload);
-      await resolveTarget({
-        bottle: created.bottle,
-        release: created.release,
-        hasExactLibraryEntry: false,
-        resultSource: "created",
-        warnings: (created.warnings ?? []).map(
-          (warning) =>
-            warning.message ||
-            "The bottle was created, but the public image was not saved.",
-        ),
-      });
+      await resolveTarget(
+        {
+          bottle: created.bottle,
+          release: created.release,
+          hasExactLibraryEntry: false,
+          resultSource: "created",
+          warnings: (created.warnings ?? []).map(
+            (warning) =>
+              warning.message ||
+              "The bottle was created, but the public image was not saved.",
+          ),
+        },
+        action,
+      );
     } catch (err) {
       if (isORPCUnauthorizedRedirectError(err)) return;
 
@@ -260,6 +272,8 @@ export default function BottleResolver({
       setError(
         "We couldn't create that bottle from the photo. Search for the bottle to keep going.",
       );
+    } finally {
+      setResolvingAction(null);
     }
   }
 
@@ -479,6 +493,7 @@ export default function BottleResolver({
                 matchedBottleId={matchedBottleId}
                 matchedReleaseId={matchedReleaseId}
                 renderMatchedResultActions={renderMatchedResultActions}
+                renderCreateProposalActions={renderCreateProposalActions}
                 createProposalLabel={createProposalLabel}
                 hasCreateDecision={Boolean(createDecision)}
                 proposedName={proposedName}
@@ -492,8 +507,8 @@ export default function BottleResolver({
                 onLoadTarget={(bottleId, releaseId, action) => {
                   void loadTarget(bottleId, releaseId, action);
                 }}
-                onAcceptCreateProposal={(result) => {
-                  void acceptCreateProposal(result);
+                onAcceptCreateProposal={(result, action) => {
+                  void acceptCreateProposal(result, action);
                 }}
               />
             ) : (
