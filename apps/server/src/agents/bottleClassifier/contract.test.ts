@@ -42,7 +42,6 @@ describe("bottleClassifier contract", () => {
     const classified = createDecidedBottleClassification({
       decision: {
         action: "no_match",
-        confidence: 72,
         rationale: "Not enough identity evidence.",
         candidateBottleIds: [],
         identityScope: "product",

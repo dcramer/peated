@@ -74,7 +74,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 630,
-    "confidenceBand": "auto_verification",
+    "expectedTier": "auto",
     "verifyEligible": true,
     "summary": "Use the uploaded bottle photo, not the generic reference name, to extract Ardbeg Uigeadail and match the existing Ardbeg Uigeadail bottle."
   }

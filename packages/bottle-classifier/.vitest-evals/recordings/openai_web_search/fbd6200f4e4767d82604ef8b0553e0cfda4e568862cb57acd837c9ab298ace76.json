@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T15:59:58.717Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 21 year old single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside 21 year old single malt",
+    "summary": "Here’s the most defensible bottle-level summary I could confirm for **Shieldaig Speyside 21 Year Old Single Malt**:\n\n- **Brand / range:** Shieldaig Speyside Single Malt Scotch Whisky, **21 years old**. ([corktreewineandliquors.com](https://corktreewineandliquors.com/products/shieldaig-speyside-21-year?utm_source=openai",
+    "results": [
+      {
+        "title": "https://corktreewineandliquors.com/products/shieldaig-speyside-21-year",
+        "url": "https://corktreewineandliquors.com/products/shieldaig-speyside-21-year",
+        "domain": "corktreewineandliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+        "url": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+        "domain": "shipt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/",
+        "url": "https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/",
+        "domain": "thedailypour.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/137892/shieldaig-21-year-old-im",
+        "url": "https://www.whiskybase.com/whiskies/whisky/137892/shieldaig-21-year-old-im",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.iwsc.net/results/detail/107041/shieldaig-speyside-single-21-yo-scotch-whisky",
+        "url": "https://www.iwsc.net/results/detail/107041/shieldaig-speyside-single-21-yo-scotch-whisky",
+        "domain": "iwsc.net",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/aultmore/aultmore-21-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/aultmore/aultmore-21-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fbd6200f4e4767d82604ef8b0553e0cfda4e568862cb57acd837c9ab298ace76",
+    "mode": "auto"
+  }
+}

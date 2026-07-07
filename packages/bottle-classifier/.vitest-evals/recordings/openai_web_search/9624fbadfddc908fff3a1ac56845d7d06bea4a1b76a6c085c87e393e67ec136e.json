@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T04:51:42.418Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 bottled 2016 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 bottled 2016 Creative Whisky Company",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **The Exclusive Malts Islay 8 year old 2007, 57.1%, 1661 bottles, bottled 2016, Creative Whisky Company**:\n\n- **Bottler:** **Creative Whisky Company (CWC)**. Whiskybase lists this bottling under CWC and the **The Exclusive Malts** series. ([whiskybase.com](https:/",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc",
+        "url": "https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/68066/islay-2007-cwc",
+        "url": "https://www.whiskybase.com/whiskies/whisky/68066/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "url": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year",
+        "url": "https://fineliquors.com/products/exclusice-malts-2007-an-islay-7-year",
+        "domain": "fineliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "url": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/40236/caol-ila-2006-11-year-old-the-exclusive-malts",
+        "url": "https://www.thewhiskyexchange.com/p/40236/caol-ila-2006-11-year-old-the-exclusive-malts",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9624fbadfddc908fff3a1ac56845d7d06bea4a1b76a6c085c87e393e67ec136e",
+    "mode": "auto"
+  }
+}

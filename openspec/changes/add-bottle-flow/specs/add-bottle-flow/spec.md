@@ -39,6 +39,34 @@ The system SHALL resolve scan, search, and manual creation paths into a bottle t
 - **WHEN** photo identification proposes creating a bottle or release
 - **THEN** the system shows proposed bottle or release fields before the user can create the target
 
+#### Scenario: Scan resolves source identity before catalog action
+
+- **WHEN** photo identification can read enough label detail to identify the bottle and release or bottling
+- **THEN** the resolver treats that bottle and release identity as the primary result
+- **AND** the system uses Peated catalog data to decide whether the target already exists or needs to be created
+- **AND** the system does not route to manual search merely because an existing catalog row is missing non-target-defining attributes
+
+#### Scenario: One-click scan outcome
+
+- **WHEN** photo identification identifies a bottle and release or bottling with enough confidence for an existing match or create proposal
+- **THEN** the resolver offers the corresponding one-click confirmation path for Add to Library or creation
+- **AND** manual search is reserved for cases where the bottle and release or bottling identity remains unresolved or ambiguous
+
+#### Scenario: Review policy audit for scan outcome
+
+- **WHEN** classifier evals prove the agent selected the correct scan outcome
+- **AND** deterministic review policy still downgrades the result away from one-click confirmation
+- **THEN** the review policy gate is audited for removal or narrowing
+- **AND** the system keeps only invalid-state, unknown-target, direct-field-conflict, non-whisky, and explicit automation-cap checks
+
+#### Scenario: Deterministic SMWS code handling
+
+- **WHEN** photo identification reads an SMWS exact-cask code such as `95.71`
+- **THEN** the classifier may use that code as a deterministic bottle identity anchor
+- **AND** the classifier may derive rough distillery/category from the curated SMWS code table when available
+- **AND** the resolver preserves any visible or extracted SMWS title in the create proposal display name
+- **AND** the system does not generalize this deterministic rule to non-SMWS single-cask, barrel, batch, private-selection, brand-prefix, or retailer-title patterns
+
 ### Requirement: Intent-aware actions
 
 The system SHALL support intent parameters that prioritize a follow-up action without removing other valid actions.

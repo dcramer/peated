@@ -1,0 +1,215 @@
+{
+  "id": "image-backed-photo-matches-smws-95-71-prepare-for-winter",
+  "name": "image-backed photo: matches SMWS 95.71 Prepare for Winter instead of tasting notes",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-95-71-prepare-for-winter.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-95-71-prepare-for-winter.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "The Scotch Malt Whisky Society",
+      "bottler": "The Scotch Malt Whisky Society",
+      "expression": "95.71 Prepare for Winter",
+      "series": null,
+      "distillery": [],
+      "category": "single_malt",
+      "stated_age": 14,
+      "abv": 57,
+      "release_year": null,
+      "vintage_year": 2007,
+      "cask_strength": true,
+      "single_cask": true,
+      "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "smws-95-71-prepare-for-winter",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.96,
+          "textSpans": [
+            {
+              "text": "Society Cask No. 95.71. Prepare for Winter. 14 years. Single Malt Scotch Whisky. Distilled 31 October 2007. Region: Speyside. Initial cask: ex-bourbon hogshead. Final cask: 1st fill Spanish oak oloroso hogshead. 57.0% alc/vol. Tasting notes include serrano-wrapped plums.",
+              "confidence": 0.96
+            }
+          ],
+          "observations": [
+            "The large product title is Prepare for Winter; serrano-wrapped plums appears in tasting-note copy, not as the bottle expression."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "The Scotch Malt Whisky Society",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "95.71 Prepare for Winter",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 14,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 57,
+          "confidence": 0.95,
+          "sourceExtractorIndexes": [0]
+        },
+        "vintageYear": {
+          "value": 2007,
+          "confidence": 0.96,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskNumber": {
+          "value": "95.71",
+          "confidence": 0.99,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.smws.com/",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-95-71-prepare-for-winter.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/smws-95-71-prepare-for-winter.jpg",
+    "dbOutcome": {
+      "bottleId": 11939,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Production DB outcome: match bottle 11939 with releaseId null. Nearby non-target row: bottle 38409, SMWS 95.71 Serrano-wrapped plums."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "matched_bottle",
+        "bottleId": 11939,
+        "field": "abv",
+        "productionValue": null,
+        "evidenceValue": 57,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": true,
+        "notes": "The matched production bottle lacks ABV, and the bottle photo clearly reads 57.0% alc/vol."
+      },
+      {
+        "target": "matched_bottle",
+        "bottleId": 11939,
+        "field": "vintageYear",
+        "productionValue": null,
+        "evidenceValue": 2007,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": true,
+        "notes": "The bottle photo states distilled 31 October 2007."
+      },
+      {
+        "target": "matched_bottle",
+        "bottleId": 11939,
+        "field": "caskStrength",
+        "productionValue": null,
+        "evidenceValue": true,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": true,
+        "notes": "SMWS 95.71 is an exact-cask cask-strength bottling at 57.0% alc/vol."
+      },
+      {
+        "target": "matched_bottle",
+        "bottleId": 11939,
+        "field": "singleCask",
+        "productionValue": null,
+        "evidenceValue": true,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": true,
+        "notes": "The Society Cask No. 95.71 label identifies a single-cask SMWS bottling."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 38409,
+        "field": "name",
+        "productionValue": "95.71 Serrano-wrapped plums",
+        "evidenceValue": "95.71 Prepare for Winter",
+        "source": "image_evidence",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The photo uses Prepare for Winter as the product title; serrano-wrapped plums appears in tasting-note copy."
+      }
+    ],
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The photo shows Society Cask No. 95.71, title Prepare for Winter, age 14 years, distilled 31 October 2007, Speyside, and tasting notes containing serrano-wrapped plums. Production bottle 11939 has the right title and age but is missing observed ABV 57%, vintage year 2007, cask-strength, and single-cask attributes."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 11939,
+    "matchedReleaseId": null,
+    "suggestedNextStep": "confirm_match",
+    "summary": "Match existing bottle 11939 with no release."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 27,
+        "name": "Auchroisk",
+        "type": ["brand", "bottler", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 11939,
+        "name": "95.71 Prepare for Winter",
+        "fullName": "SMWS 95.71 Prepare for Winter",
+        "brandId": 4263,
+        "bottlerId": 4263,
+        "distillerIds": [27],
+        "category": "single_malt",
+        "statedAge": 14
+      },
+      {
+        "id": 38409,
+        "name": "95.71 Serrano-wrapped plums",
+        "fullName": "SMWS 95.71 Serrano-wrapped plums",
+        "brandId": 4263,
+        "bottlerId": 4263,
+        "distillerIds": [27],
+        "category": "single_malt",
+        "statedAge": 14,
+        "singleCask": true,
+        "releaseYear": 2024
+      }
+    ],
+    "releases": [],
+    "aliases": [
+      {
+        "name": "SMWS 95.71 Prepare for Winter",
+        "bottleId": 11939
+      },
+      {
+        "name": "SMWS 95.71 Serrano-wrapped plums",
+        "bottleId": 38409
+      }
+    ]
+  }
+}

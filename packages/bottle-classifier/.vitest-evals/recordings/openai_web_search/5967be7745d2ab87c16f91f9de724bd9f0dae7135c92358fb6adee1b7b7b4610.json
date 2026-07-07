@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T20:32:59.120Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Single Barrel Barrel Strength bourbon product"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Single Barrel Barrel Strength bourbon product",
+    "summary": "**Four Roses Single Barrel Barrel Strength bourbon** is best understood as **Four Roses Private Selection / single-barrel store-pick bourbon bottled at barrel strength**, rather than one fixed nationwide SKU. The exact bottle varies by barrel. ([thewhiskystudy.com](https://thewhiskystudy.com/reviews-1/four-roses-barrel",
+    "results": [
+      {
+        "title": "https://lostcargo.com/whiskey/four-roses-single-barrel-barrel-strength/",
+        "url": "https://lostcargo.com/whiskey/four-roses-single-barrel-barrel-strength/",
+        "domain": "lostcargo.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://canawineco.com/products/four-roses-oeso-barrel-strength-single-barrel-select-bourbon",
+        "url": "https://canawineco.com/products/four-roses-oeso-barrel-strength-single-barrel-select-bourbon",
+        "domain": "canawineco.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://debonairgentlemen.com/2023/03/04/how-to-read-a-four-roses-label/",
+        "url": "https://debonairgentlemen.com/2023/03/04/how-to-read-a-four-roses-label/",
+        "domain": "debonairgentlemen.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskystudy.com/reviews-1/four-roses-barrel-strength-single-barrel-oesv-shelf-review",
+        "url": "https://thewhiskystudy.com/reviews-1/four-roses-barrel-strength-single-barrel-oesv-shelf-review",
+        "domain": "thewhiskystudy.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "url": "https://www.breakingbourbon.com/review/four-roses-single-barrel",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "url": "https://www.liquor.com/four-roses-single-barrel-bourbon-review-5219181",
+        "domain": "liquor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5967be7745d2ab87c16f91f9de724bd9f0dae7135c92358fb6adee1b7b7b4610",
+    "mode": "auto"
+  }
+}

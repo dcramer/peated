@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T21:07:54.669Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 1661 Creative Whisky Company",
+    "summary": "Here’s the best bottle-specific match I could confirm for **“The Exclusive Malts Islay 8 year old 2007 Creative Whisky Company”**:\n\n- **Bottler:** Creative Whisky Company (CWC)  \n- **Series:** **The Exclusive Malts**  \n- **Region / label name:** **Islay** / “An Islay” / “Islay Distillery” style unnamed Islay release  \n",
+    "results": [
+      {
+        "title": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "url": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "domain": "firstclassspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "url": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "2007 An Islay (Lagavulin) 8 Year Old \"Exclusive Malts\" Single Barrel Cask Strength Single Malt Scotch Whisky (750ml) - SKU 1255139",
+        "url": "https://shop.klwines.com/products/details/1255139",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "url": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "domain": "maltrunners.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "url": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "824ef054e8941925517c6c7cbfd6fa71fb530c0217821af5902c491f5796b6cc",
+    "mode": "auto"
+  }
+}

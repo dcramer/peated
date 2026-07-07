@@ -123,9 +123,25 @@ Normal user input should focus on:
 - `Mystery Distillery 1990 Release`: if `1990` is the only known marketed form and no reusable parent expression is established yet, one bottle is acceptable. If a `1991 Release` later appears under the same parent expression, split into one bottle plus `1990` and `1991` releases.
 - `Octomore 13.1` vs `Octomore 13.3`: separate bottles under a shared range because drinkers generally treat them as different expressions.
 - `SMWS 6.53`: the SMWS code is the exact-cask bottle identity; different subtitles or retailer names can still be the same bottle/code, and additional wording stays in observations.
+- `SMWS 95.71 Prepare for Winter`: the exact-cask code `95.71`
+  deterministically anchors matching, while `Prepare for Winter` is a
+  source-backed title to preserve in the bottle display/create proposal when it
+  is visible or extracted. The code may roughly derive the distillery from the
+  SMWS code table, but it must not invent or correct the title.
+- `SMWS 1.285` on a replica/anniversary label that prints only `Distillery No.
+1` and `Single Cask No. 285`: the code `1.285` may be composed
+  deterministically from those two labeled components and then anchors matching
+  exactly like a printed code. Composition requires the SMWS anchor plus both
+  components; it never fabricates a missing component or a subtitle.
 
 ## Matching Rule
 
+- Resolve the source bottle family and exact release/bottling details first.
+- Use Peated DB search as prior-art evidence for whether that exact target
+  already exists and how nearby items are modeled.
 - Match bottle-first when bottle identity is clear and release identity is weak.
-- Match or create a release only when the differentiating traits are explicit enough to survive canonicalization.
+- Match or create a release only when the differentiating traits are explicit
+  enough to survive canonicalization.
 - Preserve the rest as observations so precision is not lost.
+- Do not route a clear identity to manual search merely because the matched
+  catalog row is missing optional attributes or exposes repair/enrichment work.

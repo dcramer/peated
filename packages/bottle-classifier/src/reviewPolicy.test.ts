@@ -150,7 +150,6 @@ function buildShieldaigAgeCreationDecision(
 ): BottleClassifierAgentDecisionInput {
   return {
     action: "create_bottle",
-    confidence: 87,
     rationale:
       "The source supports a new Shieldaig Speyside 30-year-old bottle distinct from existing age-stated siblings.",
     candidateBottleIds: [ageBearingParentCandidate.bottleId],
@@ -163,9 +162,13 @@ function buildShieldaigAgeCreationDecision(
       siblingEvidence: "dirty_sibling_candidates",
     },
     confidenceBasis: {
-      band: "review",
       positiveEvidence: ["source title states 30-year-old"],
-      unresolvedRisks: ["same-family aged bottle siblings exist"],
+      unresolvedRisks: [
+        {
+          category: "sibling_ambiguity",
+          note: "same-family aged bottle siblings exist",
+        },
+      ],
       toolsUsed: ["initial_local_candidates"],
       webEvidence: "not_used",
     },
@@ -220,9 +223,6 @@ function classifyShieldaigAgeCreation(
         edition: null,
       },
     }),
-    options: {
-      enforceCreateWebEvidence: false,
-    },
   });
 }
 
@@ -252,9 +252,6 @@ function classifyAgeCreationWithoutSiblingConflict(
         edition: null,
       },
     }),
-    options: {
-      enforceCreateWebEvidence: false,
-    },
   });
 }
 
@@ -266,7 +263,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "match",
-        confidence: 91,
         rationale: "The existing candidate matches.",
         candidateBottleIds: [existingPrivateCask.bottleId],
         identityScope: "product",
@@ -280,9 +276,6 @@ describe("finalizeBottleReferenceClassification", () => {
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -299,7 +292,6 @@ describe("finalizeBottleReferenceClassification", () => {
       },
       decision: {
         action: "match",
-        confidence: 97,
         rationale: "The listing title is safe as a reusable alias.",
         candidateBottleIds: [existingPrivateCask.bottleId],
         identityScope: "product",
@@ -314,9 +306,6 @@ describe("finalizeBottleReferenceClassification", () => {
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -404,9 +393,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -450,7 +436,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("does not let generic cask details bypass duplicate product creation checks", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
-      confidence: 88,
       rationale:
         "The source appears to describe a private cask product, but not a separate exact-cask bottle identity.",
       candidateBottleIds: [existingPrivateCask.bottleId],
@@ -496,9 +481,6 @@ describe("finalizeBottleReferenceClassification", () => {
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
       }),
-      options: {
-        enforceCreateWebEvidence: true,
-      },
     });
 
     expect(result).toMatchObject({
@@ -516,7 +498,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("does not resolve exact-cask creation to a wrong-family code match", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
-      confidence: 91,
       rationale:
         "The source and web evidence support an exact-cask bottle for Example.",
       candidateBottleIds: [wrongFamilyExactCodeCandidate.bottleId],
@@ -577,9 +558,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -595,7 +573,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("lets reviewed repair parents anchor child release creation", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_release",
-      confidence: 92,
       rationale:
         "The local repair parent is the reusable product and S2B13 is release identity.",
       candidateBottleIds: [repairParentCandidate.bottleId],
@@ -654,10 +631,341 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
+  test("lets readable image evidence anchor exact-cask bottle creation automation", () => {
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "create_bottle",
+      rationale:
+        "The readable label identifies an exact single-cask bottle with no safe local match.",
+      candidateBottleIds: [],
+      identityScope: "exact_cask",
+      aliasScope: "none",
+      observation: {
+        selector: null,
+        caskNumber: "4779",
+        barrelNumber: "4779",
+        bottleNumber: null,
+        outturn: null,
+        market: null,
+        exclusive: null,
+      },
+      identityBasis: null,
+      confidenceBasis: {
+        positiveEvidence: ["Readable bottle label states barrel 4779."],
+        unresolvedRisks: [],
+        toolsUsed: ["initial_local_candidates"],
+        webEvidence: "not_needed",
+      },
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: {
+        name: "Single Barrel Barrel No. 4779 5-year-old",
+        brand: {
+          name: "Example",
+        },
+        bottler: null,
+        distillers: [
+          {
+            name: "Example",
+          },
+        ],
+        series: null,
+        category: "bourbon",
+        statedAge: 5,
+        abv: 64.2,
+        caskStrength: true,
+        singleCask: true,
+        vintageYear: null,
+        releaseYear: null,
+        edition: "Barrel No. 4779",
+      },
+      proposedRelease: null,
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Example Single Barrel Barrel No. 4779",
+      },
+      decision,
+      artifacts: buildBottleClassificationArtifacts({
+        extractedIdentity: {
+          brand: "Example",
+          bottler: null,
+          expression: "Single Barrel",
+          series: null,
+          distillery: ["Example"],
+          category: "bourbon",
+          stated_age: 5,
+          abv: 64.2,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: true,
+          single_cask: true,
+          edition: "Barrel No. 4779",
+        },
+        imageEvidence: {
+          sourceImageId: "example-barrel-4779",
+          extractors: [
+            {
+              kind: "ocr",
+              confidence: 0.98,
+              textSpans: [
+                {
+                  text: "Example Single Barrel. Barrel No. 4779. 64.2% ABV.",
+                  confidence: 0.98,
+                },
+              ],
+              observations: [
+                "The label identifies barrel no. 4779 as the bottle identity.",
+              ],
+            },
+          ],
+          fieldCandidates: {
+            brand: {
+              value: "Example",
+              confidence: 0.98,
+              sourceExtractorIndexes: [0],
+            },
+            expression: {
+              value: "Single Barrel",
+              confidence: 0.98,
+              sourceExtractorIndexes: [0],
+            },
+            caskNumber: {
+              value: "4779",
+              confidence: 0.98,
+              sourceExtractorIndexes: [0],
+            },
+          },
+          photoSuitability: {
+            isSingleBottlePhoto: true,
+            labelReadable: true,
+            suitableAsTastingImage: true,
+            suitableAsBottleImage: true,
+          },
+          conflicts: [],
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+    });
+  });
+
+  test("does not suppress brand conflicts for non-SMWS targets with an SMWS-style code", () => {
+    const targetCandidate: BottleCandidate = {
+      bottleId: 11940,
+      releaseId: null,
+      kind: "bottle",
+      alias: "Other Bottler 95.71 Winter Release",
+      fullName: "Other Bottler 95.71 Winter Release",
+      bottleFullName: "Other Bottler 95.71 Winter Release",
+      brand: "Other Bottler",
+      bottler: "Other Bottler",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      statedAge: 14,
+      edition: null,
+      caskStrength: null,
+      singleCask: true,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      score: 0.9,
+      source: ["text"],
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "SMWS 95.71 Prepare for Winter",
+      },
+      decision: {
+        action: "match",
+        rationale: "The source appears to match the coded candidate.",
+        candidateBottleIds: [targetCandidate.bottleId],
+        identityScope: "exact_cask",
+        aliasScope: "none",
+        observation: {
+          selector: null,
+          caskNumber: "95.71",
+          barrelNumber: null,
+          bottleNumber: null,
+          outturn: null,
+          market: null,
+          exclusive: null,
+        },
+        identityBasis: null,
+        confidenceBasis: {
+          positiveEvidence: ["The source uses cask code 95.71."],
+          unresolvedRisks: [],
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_needed",
+        },
+        matchedBottleId: targetCandidate.bottleId,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [targetCandidate],
+        extractedIdentity: {
+          brand: "SMWS",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "95.71 Prepare for Winter",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 14,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+    });
+  });
+
+  test("keeps the extracted SMWS title in exact-cask create proposals", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Bottle photo upload",
+      },
+      decision: {
+        action: "no_match",
+        rationale: "No local bottle matched the readable SMWS label.",
+        candidateBottleIds: [],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: null,
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [],
+        extractedIdentity: {
+          brand: "SMWS",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "Prepare for Winter",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 14,
+          abv: 57,
+          release_year: null,
+          vintage_year: 2007,
+          cask_strength: true,
+          single_cask: true,
+          edition: "95.71",
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "95.71 Prepare for Winter",
+        edition: null,
+        statedAge: 14,
+        abv: 57,
+        vintageYear: 2007,
+      },
+      proposedRelease: null,
+    });
+  });
+
+  test("does not append SMWS age and vintage to agent exact-cask proposal names", () => {
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Bottle photo upload",
+      },
+      decision: {
+        action: "create_bottle",
+        rationale: "The readable SMWS label identifies an exact-cask bottle.",
+        candidateBottleIds: [],
+        identityScope: "exact_cask",
+        observation: {
+          selector: null,
+          caskNumber: "95.71",
+          barrelNumber: null,
+          bottleNumber: null,
+          outturn: null,
+          market: null,
+          exclusive: null,
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        parentBottleId: null,
+        proposedBottle: {
+          name: "95.71 Prepare for Winter",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: 14,
+          caskStrength: true,
+          singleCask: true,
+          abv: 57,
+          vintageYear: 2007,
+          releaseYear: null,
+          brand: {
+            id: null,
+            name: "SMWS",
+          },
+          distillers: [],
+          bottler: {
+            id: null,
+            name: "The Scotch Malt Whisky Society",
+          },
+        },
+        proposedRelease: null,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [],
+        extractedIdentity: {
+          brand: "SMWS",
+          bottler: "The Scotch Malt Whisky Society",
+          expression: "Prepare for Winter",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 14,
+          abv: 57,
+          release_year: null,
+          vintage_year: 2007,
+          cask_strength: true,
+          single_cask: true,
+          edition: "95.71",
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "95.71 Prepare for Winter",
+        statedAge: 14,
+        abv: 57,
+        vintageYear: 2007,
+      },
+    });
+  });
+
   test("downgrades release creation when the parent has conflicting bottle-level release traits", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_release",
-      confidence: 90,
       rationale:
         "The local parent matches the family, but the source age differs.",
       candidateBottleIds: [ageBearingParentCandidate.bottleId],
@@ -701,9 +1009,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({
@@ -718,7 +1023,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("keeps parent repair plus release creation decisions", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "repair_parent_and_create_release",
-      confidence: 90,
       rationale:
         "The existing parent should be repaired into a clean reusable Shieldaig Speyside bottle before creating the supported 21-year-old child release.",
       candidateBottleIds: [ageBearingParentCandidate.bottleId],
@@ -778,9 +1082,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: null,
         },
       }),
-      options: {
-        enforceCreateWebEvidence: true,
-      },
     });
 
     expect(result).toMatchObject({
@@ -804,7 +1105,6 @@ describe("finalizeBottleReferenceClassification", () => {
   test("keeps parent repair on the classifier-selected dirty parent", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "repair_parent_and_create_release",
-      confidence: 91,
       rationale:
         "The selected candidate is a dirty same-family bottling row, so repair it before creating the Batch 2 bottling.",
       candidateBottleIds: [
@@ -868,9 +1168,6 @@ describe("finalizeBottleReferenceClassification", () => {
           edition: "Batch 2",
         },
       }),
-      options: {
-        enforceCreateWebEvidence: false,
-      },
     });
 
     expect(result).toMatchObject({

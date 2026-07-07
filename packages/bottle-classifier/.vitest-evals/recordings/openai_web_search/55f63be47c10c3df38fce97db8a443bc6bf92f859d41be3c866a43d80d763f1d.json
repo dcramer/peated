@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T18:10:13.035Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Four Roses Limited Edition Small Batch 2017"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Four Roses Limited Edition Small Batch 2017",
+    "summary": "**Four Roses Limited Edition Small Batch 2017** is an annual limited-release bourbon from **Four Roses Distillery**. For the standard 2017 release, Four Roses says it was composed of **three low-rye recipe components**: **15-year-old OESK, 13-year-old OESK, and 12-year-old OESV**, making it the **first Limited Edition ",
+    "results": [
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-2017-limited-edition-small-batch-with-us",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/limited-edition-drawing-and-conditions",
+        "url": "https://www.fourrosesbourbon.com/limited-edition-drawing-and-conditions",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+        "url": "https://www.fourrosesbourbon.com/blog/celebrate-our-130th-anniversary-limited-edition-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "url": "https://whiskyadvocate.com/Four-Roses-Limited-Edition-Small-Batch-2017-Release-53-95",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.fourrosesbourbon.com/blog/the-story-of-small-batch",
+        "url": "https://www.fourrosesbourbon.com/blog/the-story-of-small-batch",
+        "domain": "fourrosesbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "55f63be47c10c3df38fce97db8a443bc6bf92f859d41be3c866a43d80d763f1d",
+    "mode": "auto"
+  }
+}

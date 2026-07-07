@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:21:53.202Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 21 year old single malt Scotch whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside 21 year old single malt Scotch whisky",
+    "summary": "Here’s the most solid bottle-specific evidence I could confirm for **Shieldaig Speyside 21 Year Old Single Malt Scotch Whisky**:\n\n- **Brand/label:** Shieldaig. ([whiskybase.com](https://www.whiskybase.com/whiskies/brand/85214/whiskies))\n- **Region/style:** **Speyside single malt Scotch whisky**. ([iwsc.net](https://www",
+    "results": [
+      {
+        "title": "https://corktreewineandliquors.com/products/shieldaig-speyside-21-year",
+        "url": "https://corktreewineandliquors.com/products/shieldaig-speyside-21-year",
+        "domain": "corktreewineandliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.aberfeldy.com/us/en/our-whiskies/21-year-old-whisky/",
+        "url": "https://www.aberfeldy.com/us/en/our-whiskies/21-year-old-whisky/",
+        "domain": "aberfeldy.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.caskmalt.com/product/single-cask-nation-bowmore-2004-21-year-old-161212-70cl-56-2-abv/",
+        "url": "https://www.caskmalt.com/product/single-cask-nation-bowmore-2004-21-year-old-161212-70cl-56-2-abv/",
+        "domain": "caskmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/age/21-year-old-whisky/",
+        "url": "https://www.masterofmalt.com/age/21-year-old-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+        "url": "https://www.shipt.com/shop/products/38a315b4-d949-11ef-ad6c-0ff3b48cac1a",
+        "domain": "shipt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/",
+        "url": "https://thedailypour.com/spirit/shieldaig-speyside-single-malt-scotch-whisky-21-year/",
+        "domain": "thedailypour.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5bfb79d956bf6c3e3797e4a1dfe4458d013cdbe3e24234b2dd795ff7807c9fde",
+    "mode": "auto"
+  }
+}

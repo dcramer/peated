@@ -60,10 +60,6 @@ function formatDate(value: string): string {
   });
 }
 
-function formatConfidence(value: number | null): string {
-  return value === null ? "n/a" : `${value}`;
-}
-
 function getSourceLabel(item: DecisionLogItem): string {
   return item.sourceKind === "store_price" ? "Store Price" : "Review";
 }
@@ -118,9 +114,6 @@ function DecisionRow({ item }: { item: DecisionLogItem }) {
             </Link>
           </div>
         ) : null}
-      </td>
-      <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-300">
-        {formatConfidence(item.confidence)}
       </td>
       <td className="px-4 py-3 text-sm text-slate-300">
         {item.url ? (
@@ -223,9 +216,6 @@ export default function Page() {
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
                     Target
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Confidence
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
                     URL

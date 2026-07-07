@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:55:32.336Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye rye whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye rye whiskey",
+    "summary": "**Wild Turkey Rare Breed Rye** is a **Kentucky straight rye whiskey** from **Wild Turkey Distillery**, released as a **permanent** Rare Breed line extension in **July 2020**. It’s bottled **barrel proof / uncut** and **non-chill filtered** at **112.2 proof (56.1% ABV)**. Wild Turkey’s official product page also describ",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyful.com/reviews/wild-turkey-rare-breed-rye",
+        "url": "https://whiskeyful.com/reviews/wild-turkey-rare-breed-rye",
+        "domain": "whiskeyful.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/162441/wild-turkey-rare-breed",
+        "url": "https://www.whiskybase.com/whiskies/whisky/162441/wild-turkey-rare-breed",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyrant.com/wild-turkey-rare-breed-barrel-proof/",
+        "url": "https://www.whiskyrant.com/wild-turkey-rare-breed-barrel-proof/",
+        "domain": "whiskyrant.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+        "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+        "domain": "whiskeyinmyweddingring.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "dc12159c8b156594649aed64cefba12259b52522d5f41647dff5edc3eef88974",
+    "mode": "auto"
+  }
+}

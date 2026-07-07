@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T20:19:11.133Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Vol 3 whiskey Bootleg Series"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Vol 3 whiskey Bootleg Series",
+    "summary": "**Heaven’s Door Bootleg Series Vol. III** is the **third annual Bootleg Series release** from Heaven’s Door, Bob Dylan’s whiskey brand. The bottle-specific details that are consistently corroborated are: it’s a **13-year-old Kentucky bourbon**, **finished in Vino de Naranja casks** from southern Spain, and bottled at *",
+    "results": [
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iv-11-year-old-wheated-bourbon/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iv-11-year-old-wheated-bourbon/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/bourbon-whiskey-press-releases/heavens-door-unveils-bootleg-series-volume-v",
+        "url": "https://breakingbourbon.com/bourbon-whiskey-press-releases/heavens-door-unveils-bootleg-series-volume-v",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whisky-review-heavens-door-bootleg-series-volume-1/",
+        "url": "https://thewhiskeywash.com/reviews/whisky-review-heavens-door-bootleg-series-volume-1/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "86ad9fdef90cdd2e90c2dabdd0376470a13ab89d9d6b387191de2addb4e222b1",
+    "mode": "auto"
+  }
+}

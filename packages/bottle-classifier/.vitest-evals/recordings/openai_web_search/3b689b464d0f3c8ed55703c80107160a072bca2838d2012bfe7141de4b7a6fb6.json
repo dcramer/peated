@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T05:12:51.799Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon Barrel No. 4769 64.2 5 years"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon Barrel No. 4769 64.2 5 years",
+    "summary": "I found bottle-specific matches for this one.\n\n**Confirmed ID**\n- **Willett Family Estate Bottled Single Barrel Bourbon**\n- **Barrel No. 4769**\n- **Age:** **5 years**\n- **ABV:** **64.2%** (**128.4 proof**)\n- **Bottle count:** **189 bottles**\n- **Cask type:** **White Oak Barrel**\n- **Bottled for / selection:** **Healthy",
+    "results": [
+      {
+        "title": "https://shop.klwines.com/auctions/bidding/1900372",
+        "url": "https://shop.klwines.com/auctions/bidding/1900372",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.klwines.com/auctions/bidding/1910598?searchId=7a1214e0-38d1-466b-ba11-a3f5c4c96686&searchRank=508&searchServiceName=klwines-prod-productsearch",
+        "url": "https://shop.klwines.com/auctions/bidding/1910598?searchId=7a1214e0-38d1-466b-ba11-a3f5c4c96686&searchRank=508&searchServiceName=klwines-prod-productsearch",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.klwines.com/products/details/1050796",
+        "url": "https://shop.klwines.com/products/details/1050796",
+        "domain": "shop.klwines.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/ko/whiskies/distillery/364/whiskies",
+        "url": "https://www.whiskybase.com/ko/whiskies/distillery/364/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/81549/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/brand/81549/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.klwines.com/Auction/Bidding/AuctionBidDetail.aspx?sku=1885346",
+        "url": "https://www.klwines.com/Auction/Bidding/AuctionBidDetail.aspx?sku=1885346",
+        "domain": "klwines.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3b689b464d0f3c8ed55703c80107160a072bca2838d2012bfe7141de4b7a6fb6",
+    "mode": "auto"
+  }
+}

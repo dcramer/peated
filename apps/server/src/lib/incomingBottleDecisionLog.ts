@@ -10,17 +10,6 @@ export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
-export function normalizeIncomingBottleDecisionConfidence(
-  confidence: number | null | undefined,
-): number | null {
-  if (confidence === null || confidence === undefined) {
-    return null;
-  }
-
-  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
-  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
-}
-
 export function getIncomingBottleDecisionFromResolutionSource(
   source: string,
 ): IncomingBottleDecisionType | null {

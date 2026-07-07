@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:55:31.370Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Double Oaked bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Double Double Oaked bourbon",
+    "summary": "**Woodford Reserve Double Double Oaked** is a **Woodford Reserve / Brown-Forman** bourbon expression that extends the brand’s Double Oaked concept. Woodford describes it as a **double-barreled bourbon** that spends extra time in a **second, custom-crafted barrel** that is **deeply toasted and lightly charred**. The off",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/woodford-reserve-double-oaked-bourbon",
+        "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-oaked-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+        "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oaked",
+        "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oaked",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/whiskey-reviews/bourbon-review-woodford-reserve-double-oaked/",
+        "url": "https://thewhiskeywash.com/whiskey-reviews/bourbon-review-woodford-reserve-double-oaked/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/ja/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/ja/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7b529fb225156414b82968c79aad1b750178ab16e369ea09ae6f827b6d8dea70",
+    "mode": "auto"
+  }
+}

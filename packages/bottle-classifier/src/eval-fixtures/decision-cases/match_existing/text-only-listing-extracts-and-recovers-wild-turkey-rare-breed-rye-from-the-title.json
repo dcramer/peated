@@ -119,7 +119,7 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 501,
-    "confidenceBand": "auto_verification",
+    "expectedTier": "auto",
     "summary": "Extract the product identity from the raw title, then use the web plus local follow-up search to recover the canonical Wild Turkey Rare Breed Rye Barrel Proof bottle safely."
   }
 }

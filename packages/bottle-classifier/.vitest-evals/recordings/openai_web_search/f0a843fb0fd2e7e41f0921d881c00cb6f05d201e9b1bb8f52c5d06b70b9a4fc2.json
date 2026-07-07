@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:18:09.665Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Elijah Craig Cask Strength bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Elijah Craig Cask Strength bourbon",
+    "summary": "**Elijah Craig Barrel Proof** and **Elijah Craig Cask Strength** are generally referring to the same core bourbon style: Elijah Craig’s **uncut, non-chill-filtered barrel-strength release** from Heaven Hill. The official current branding is **Elijah Craig Barrel Proof**. ([elijahcraig.com](https://elijahcraig.com/barre",
+    "results": [
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "url": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-a123",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-a123",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c922",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c922",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f0a843fb0fd2e7e41f0921d881c00cb6f05d201e9b1bb8f52c5d06b70b9a4fc2",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:01:49.796Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club Reserve 9 year old Triple Aged Canadian whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club Reserve 9 year old Triple Aged Canadian whisky",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Canadian Club Reserve 9 Year Old Triple Aged Canadian Whisky**:\n\n- **Brand / producer:** Canadian Club, a Canadian whisky brand now under **Suntory Global Spirits** in current trade listings. ([strathliquor.com](https://www.strathliquor.com/product/canadian-club",
+    "results": [
+      {
+        "title": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "url": "https://www.connosr.com/canadian-club-reserve-aged-9-years-whisky-review-5602",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://therumhowlerblog.com/2014/01/27/review-canadian-club-reserve-9-year-old/",
+        "url": "https://therumhowlerblog.com/2014/01/27/review-canadian-club-reserve-9-year-old/",
+        "domain": "therumhowlerblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "url": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.luekensliquors.com/product/canadian-club-reserve-9yr-1-75l/",
+        "url": "https://www.luekensliquors.com/product/canadian-club-reserve-9yr-1-75l/",
+        "domain": "luekensliquors.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://woodencork.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-yr",
+        "url": "https://woodencork.com/products/canadian-club-canadian-whisky-reserve-triple-aged-9-yr",
+        "domain": "woodencork.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c392af6c591211a17627e93d46cb312f36d040aa4a09125cdcc231be2d8de7c7",
+    "mode": "auto"
+  }
+}

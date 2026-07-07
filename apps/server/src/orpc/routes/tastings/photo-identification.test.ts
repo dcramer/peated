@@ -101,7 +101,6 @@ function buildClassification(
   return BottleClassificationResultSchema.parse({
     status: "classified" as const,
     decision: {
-      confidence: 90,
       rationale: "test fixture",
       candidateBottleIds: [],
       ...decision,
@@ -120,16 +119,23 @@ function buildClassification(
 function buildCreateBottleDecision({
   brandName,
   bottleName,
-  confidence = 91,
   confidenceBasis,
 }: {
   brandName: string;
   bottleName: string;
-  confidence?: number;
   confidenceBasis?: {
-    band: "low" | "review" | "auto_verification" | "current_assignment";
     positiveEvidence?: string[];
-    unresolvedRisks?: string[];
+    unresolvedRisks?: {
+      category:
+        | "trait_conflict"
+        | "sibling_ambiguity"
+        | "release_ambiguity"
+        | "web_evidence_conflict"
+        | "insufficient_evidence"
+        | "identity_ambiguity"
+        | "other";
+      note: string;
+    }[];
     toolsUsed?: (
       | "initial_local_candidates"
       | "search_bottles"
@@ -148,7 +154,6 @@ function buildCreateBottleDecision({
 }) {
   return {
     action: "create_bottle",
-    confidence,
     rationale: "Reliable photo evidence supports creating the bottle.",
     confidenceBasis: confidenceBasis
       ? {
@@ -198,7 +203,6 @@ function buildCreateBottleAndReleaseDecision({
 }) {
   return {
     action: "create_bottle_and_release",
-    confidence: 91,
     rationale: "Reliable photo evidence supports the product identity.",
     proposedBottle: {
       name: bottleName,
@@ -247,7 +251,6 @@ function buildCreateReleaseDecision({
 }) {
   return {
     action: "create_release",
-    confidence: 91,
     rationale: "Reliable photo evidence supports the release identity.",
     parentBottleId,
     proposedRelease: {
@@ -780,7 +783,6 @@ describe("POST /tastings/photo-identification", () => {
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({
         action: "create_bottle_and_release",
-        confidence: 91,
         rationale: "Reliable web evidence supports the product identity.",
         proposedBottle: {
           name: "Totara Cask",
@@ -847,18 +849,28 @@ describe("POST /tastings/photo-identification", () => {
     });
   });
 
-  test("routes low-confidence create proposals to manual review", async ({
+  test("routes low-band create proposals to manual review", async ({
     defaults,
     fixtures,
   }) => {
     const identification = await identifyCreateProposal({
       fixtures,
       user: defaults.user,
-      idempotencyKey: "photo-identification-low-confidence-create",
+      idempotencyKey: "photo-identification-low-band-create",
       decision: buildCreateBottleDecision({
         brandName: "Low Confidence Photo Brand",
         bottleName: "Review Bottle",
-        confidence: 55,
+        confidenceBasis: {
+          positiveEvidence: [],
+          unresolvedRisks: [
+            {
+              category: "insufficient_evidence",
+              note: "Evidence is too weak to auto-create this bottle.",
+            },
+          ],
+          toolsUsed: [],
+          webEvidence: "not_used",
+        },
       }),
     });
 
@@ -889,11 +901,14 @@ describe("POST /tastings/photo-identification", () => {
       decision: buildCreateBottleDecision({
         brandName: "Review Band Photo Brand",
         bottleName: "Review Band Bottle",
-        confidence: 90,
         confidenceBasis: {
-          band: "review",
           positiveEvidence: ["The label text matches a plausible bottle."],
-          unresolvedRisks: ["The bottle versus bottling model is uncertain."],
+          unresolvedRisks: [
+            {
+              category: "identity_ambiguity",
+              note: "The bottle versus bottling model is uncertain.",
+            },
+          ],
           toolsUsed: ["initial_local_candidates"],
           webEvidence: "not_used",
         },

@@ -6,9 +6,11 @@ import type {
 } from "./classifierTypes";
 import { classifySearchResultSource } from "./identityEvidenceCore";
 import {
+  agentActionRiskClass,
+  type AutomationTierInput,
+  deriveAutomationTier,
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
-  isExistingMatchConfidenceEligibleForVerification,
 } from "./priceMatchingEvidence";
 
 function buildExtractedLabel(
@@ -274,93 +276,274 @@ describe("priceMatchingEvidence", () => {
       }),
     ).not.toContain("candidate category conflicts with extracted label");
   });
+});
 
-  test("allows a lower confidence threshold when the classifier reaffirms the current assignment", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 80,
-        currentBottleId: 3,
-        currentReleaseId: null,
-        matchedBottleId: 3,
-        matchedReleaseId: null,
-      }),
-    ).toBe(true);
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 79,
-        currentBottleId: 3,
-        currentReleaseId: null,
-        matchedBottleId: 3,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
+function buildTierInput(
+  overrides: Partial<AutomationTierInput> = {},
+): AutomationTierInput {
+  return {
+    actionRiskClass: "match",
+    hasUnresolvedRisks: false,
+    webEvidence: "not_used",
+    hasMatchTarget: true,
+    reaffirmsCurrentAssignment: false,
+    replacesCurrentAssignment: false,
+    matchesFreshReleaseTarget: false,
+    hasExactAliasAnchor: false,
+    hasDeterministicAnchor: false,
+    hasPrimaryLabelOrImageEvidence: false,
+    ...overrides,
+  };
+}
+
+describe("agentActionRiskClass", () => {
+  test.each([
+    ["match", "match"],
+    ["create_bottle", "create"],
+    ["create_release", "create"],
+    ["create_bottle_and_release", "create"],
+    ["repair_bottle", "repair"],
+    ["repair_parent_and_create_release", "repair"],
+    ["no_match", "none"],
+  ] as const)("maps %s to %s", (action, expected) => {
+    expect(agentActionRiskClass(action)).toBe(expected);
+  });
+});
+
+describe("deriveAutomationTier", () => {
+  describe("model veto", () => {
+    test("any unresolved risk forces review regardless of anchors", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            hasUnresolvedRisks: true,
+            reaffirmsCurrentAssignment: true,
+            hasDeterministicAnchor: true,
+            hasExactAliasAnchor: true,
+            hasPrimaryLabelOrImageEvidence: true,
+            webEvidence: "supportive",
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test("unresolved risk forces review for creates too", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "create",
+            hasUnresolvedRisks: true,
+            webEvidence: "supportive",
+            hasPrimaryLabelOrImageEvidence: true,
+          }),
+        ),
+      ).toBe("review");
+    });
   });
 
-  test("requires a higher confidence threshold for unmatched bottle-only matches", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 96,
-        currentBottleId: null,
-        currentReleaseId: null,
-        matchedBottleId: 4,
-        matchedReleaseId: null,
-      }),
-    ).toBe(true);
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 95,
-        currentBottleId: null,
-        currentReleaseId: null,
-        matchedBottleId: 4,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
+  describe("match risk class", () => {
+    test("no match target routes to review", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            hasMatchTarget: false,
+            reaffirmsCurrentAssignment: true,
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test("replacing a different current assignment is a correction, not a verify", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            replacesCurrentAssignment: true,
+            hasDeterministicAnchor: true,
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test("fresh release-level match routes to review", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            matchesFreshReleaseTarget: true,
+            hasDeterministicAnchor: true,
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test("current-assignment reaffirmation anchors an auto match", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({ reaffirmsCurrentAssignment: true }),
+        ),
+      ).toBe("auto");
+    });
+
+    test("deterministic anchor (exact_cask / SMWS / plain-age) autos", () => {
+      expect(
+        deriveAutomationTier(buildTierInput({ hasDeterministicAnchor: true })),
+      ).toBe("auto");
+    });
+
+    test("exact alias anchor autos", () => {
+      expect(
+        deriveAutomationTier(buildTierInput({ hasExactAliasAnchor: true })),
+      ).toBe("auto");
+    });
+
+    test("primary label/image evidence anchors an auto match", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({ hasPrimaryLabelOrImageEvidence: true }),
+        ),
+      ).toBe("auto");
+    });
+
+    test("supportive web evidence anchors an auto match", () => {
+      expect(
+        deriveAutomationTier(buildTierInput({ webEvidence: "supportive" })),
+      ).toBe("auto");
+    });
+
+    test("webEvidence=not_needed anchors an auto match (clear local match, no risks)", () => {
+      expect(
+        deriveAutomationTier(buildTierInput({ webEvidence: "not_needed" })),
+      ).toBe("auto");
+    });
+
+    test("webEvidence=not_needed does not override the model veto", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            webEvidence: "not_needed",
+            hasUnresolvedRisks: true,
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test.each(["not_used", "weak", "conflicting"] as const)(
+      "unanchored match with webEvidence=%s routes to review",
+      (webEvidence) => {
+        expect(deriveAutomationTier(buildTierInput({ webEvidence }))).toBe(
+          "review",
+        );
+      },
+    );
   });
 
-  test("allows exact-cask code matches at the exact-cask confidence threshold", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 95,
-        currentBottleId: null,
-        currentReleaseId: null,
-        identityScope: "exact_cask",
-        matchedBottleId: 41,
-        matchedReleaseId: null,
-      }),
-    ).toBe(true);
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 94,
-        currentBottleId: null,
-        currentReleaseId: null,
-        identityScope: "exact_cask",
-        matchedBottleId: 41,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
+  describe("create risk class", () => {
+    test("supportive web evidence autos a create", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "create",
+            webEvidence: "supportive",
+          }),
+        ),
+      ).toBe("auto");
+    });
+
+    test("deterministic anchor autos a create", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "create",
+            hasDeterministicAnchor: true,
+          }),
+        ),
+      ).toBe("auto");
+    });
+
+    test("primary label/image evidence autos a create", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "create",
+            hasPrimaryLabelOrImageEvidence: true,
+          }),
+        ),
+      ).toBe("auto");
+    });
+
+    // `not_needed` anchors a match but must NOT rescue a create: writing new
+    // canonical identity needs concrete support, not the absence of a search.
+    test.each(["not_needed", "not_used", "weak", "conflicting"] as const)(
+      "unsupported create with webEvidence=%s routes to review",
+      (webEvidence) => {
+        expect(
+          deriveAutomationTier(
+            buildTierInput({ actionRiskClass: "create", webEvidence }),
+          ),
+        ).toBe("review");
+      },
+    );
+
+    test("match anchors do not rescue an unsupported create", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "create",
+            reaffirmsCurrentAssignment: true,
+            hasExactAliasAnchor: true,
+            webEvidence: "weak",
+          }),
+        ),
+      ).toBe("review");
+    });
   });
 
-  test("does not allow corrections from confidence alone", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 100,
-        currentBottleId: 4,
-        currentReleaseId: null,
-        matchedBottleId: 5,
-        matchedReleaseId: null,
-      }),
-    ).toBe(false);
+  describe("repair risk class", () => {
+    test("repair follows the create evidence rules", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "repair",
+            webEvidence: "supportive",
+          }),
+        ),
+      ).toBe("auto");
+    });
+
+    test("unsupported repair routes to review", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "repair",
+            webEvidence: "not_used",
+          }),
+        ),
+      ).toBe("review");
+    });
+
+    test("webEvidence=not_needed does not rescue a repair", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "repair",
+            webEvidence: "not_needed",
+          }),
+        ),
+      ).toBe("review");
+    });
   });
 
-  test("does not allow unmatched release-level matches from confidence alone", () => {
-    expect(
-      isExistingMatchConfidenceEligibleForVerification({
-        confidence: 100,
-        currentBottleId: null,
-        currentReleaseId: null,
-        matchedBottleId: 5,
-        matchedReleaseId: 12,
-      }),
-    ).toBe(false);
+  describe("none risk class", () => {
+    test("no_match / unclassified always routes to review", () => {
+      expect(
+        deriveAutomationTier(
+          buildTierInput({
+            actionRiskClass: "none",
+            hasDeterministicAnchor: true,
+            hasPrimaryLabelOrImageEvidence: true,
+            webEvidence: "supportive",
+          }),
+        ),
+      ).toBe("review");
+    });
   });
 });

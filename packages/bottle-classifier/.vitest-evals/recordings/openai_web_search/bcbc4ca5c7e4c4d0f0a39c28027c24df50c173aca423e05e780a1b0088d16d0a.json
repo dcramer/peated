@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:53:21.115Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon",
+    "summary": "**Elijah Craig Barrel Proof** is the current official name for what many people still casually call **Elijah Craig Cask Strength / barrel proof bourbon**. It’s a **Kentucky Straight Bourbon Whiskey** produced by **Heaven Hill Distillery**. ([heavenhilldistillery.com](https://heavenhilldistillery.com/elijah-craig-barrel",
+    "results": [
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/larceny-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/larceny-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/introducing-elijah-craig-barrel-proof-rye",
+        "url": "https://elijahcraig.com/introducing-elijah-craig-barrel-proof-rye",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof-rye.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof-rye.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/our-whiskey",
+        "url": "https://elijahcraig.com/our-whiskey",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bcbc4ca5c7e4c4d0f0a39c28027c24df50c173aca423e05e780a1b0088d16d0a",
+    "mode": "auto"
+  }
+}

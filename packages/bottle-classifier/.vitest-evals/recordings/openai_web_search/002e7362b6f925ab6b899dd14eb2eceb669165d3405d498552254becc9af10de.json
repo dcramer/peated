@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:55:53.734Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Oaked bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Double Oaked bourbon",
+    "summary": "**Woodford Reserve Double Oaked** is a **Kentucky straight bourbon whiskey** from **Woodford Reserve Distillery / Brown-Forman**. Its defining trait is **double maturation**: it’s first aged in the brand’s standard new charred oak barrel, then moved into a **second new oak barrel that is deeply toasted and lightly char",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/de/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/de/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/fr/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/ja/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/ja/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-au/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/en-au/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fall-in-love-double-oaked/",
+        "url": "https://www.woodfordreserve.com/fall-in-love-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "002e7362b6f925ab6b899dd14eb2eceb669165d3405d498552254becc9af10de",
+    "mode": "auto"
+  }
+}

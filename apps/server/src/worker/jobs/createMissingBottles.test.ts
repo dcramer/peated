@@ -155,7 +155,7 @@ describe("createMissingBottles", () => {
       releaseId: null,
       createdBottle: true,
       createdRelease: false,
-      confidence: 90,
+      confidence: null,
       model: expect.any(String),
       rationale: "test fixture",
     });

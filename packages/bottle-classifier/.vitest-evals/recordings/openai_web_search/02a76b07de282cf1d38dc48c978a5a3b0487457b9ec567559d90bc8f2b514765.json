@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T20:22:11.339Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10-year-old"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10-year-old",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Masterson’s Straight Rye Whiskey French Oak Barrel Finished 10-Year-Old**:\n\n- **Brand / bottler:** Masterson’s, part of **3 Badge Beverage Corporation**. A contemporaneous trade/article source quotes 3 Badge president August Sebastiani discussing the barrel-fini",
+    "results": [
+      {
+        "title": "Masterson's 10 Year French Oak Finish Straight Rye Whiskey | Wine.com",
+        "url": "https://www.wine.com/product/mastersons-10-year-french-oak-finish-straight-rye-whiskey/532092",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/masterson-s-straight-rye-whiskey-10-year",
+        "url": "https://distiller.com/spirits/masterson-s-straight-rye-whiskey-10-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+        "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+        "domain": "woodencork.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.caskers.com/masterson-s-10-year-old-rye-whiskey-barrel-finished-in-french-oak/",
+        "url": "https://www.caskers.com/masterson-s-10-year-old-rye-whiskey-barrel-finished-in-french-oak/",
+        "domain": "caskers.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/masterson-s-straight-barley-whiskey-10-year",
+        "url": "https://distiller.com/spirits/masterson-s-straight-barley-whiskey-10-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.connosr.com/mastersons-10-year-old-rye-whiskey-whisky-review-4695",
+        "url": "https://www.connosr.com/mastersons-10-year-old-rye-whiskey-whisky-review-4695",
+        "domain": "connosr.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "02a76b07de282cf1d38dc48c978a5a3b0487457b9ec567559d90bc8f2b514765",
+    "mode": "auto"
+  }
+}

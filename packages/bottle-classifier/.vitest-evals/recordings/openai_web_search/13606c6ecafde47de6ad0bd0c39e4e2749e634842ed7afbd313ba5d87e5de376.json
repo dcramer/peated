@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:59:14.845Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength No. 5 whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Highland Park Cask Strength No. 5 whisky",
+    "summary": "**Highland Park Cask Strength Release No. 5** is a **Highland Park distillery bottling** from Orkney, released as part of the brand’s ongoing **Cask Strength Series**. It is a **NAS single malt Scotch whisky**, bottled at **64.7% ABV** in a **700 ml** format. Highland Park’s official product page describes it as bottle",
+    "results": [
+      {
+        "title": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/56/highland-park.",
+        "url": "https://www.whiskybase.com/whiskies/distillery/56/highland-park.",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/highland-park-cask-strength-release-no5",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/highland-park-cask-strength-release-no5",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.mensjournal.com/drink/highland-park-number-five-scotch",
+        "url": "https://www.mensjournal.com/drink/highland-park-number-five-scotch",
+        "domain": "mensjournal.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyexperts.net/neu-highland-park-cask-strength-release-no-5/",
+        "url": "https://whiskyexperts.net/neu-highland-park-cask-strength-release-no-5/",
+        "domain": "whiskyexperts.net",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "url": "https://www.drinkhacker.com/2024/10/18/review-highland-park-cask-strength-release-no-5/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "13606c6ecafde47de6ad0bd0c39e4e2749e634842ed7afbd313ba5d87e5de376",
+    "mode": "auto"
+  }
+}

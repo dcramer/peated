@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:53:34.263Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof Batch C923"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof Batch C923",
+    "summary": "**Elijah Craig Barrel Proof Batch C923**  \n- **Producer/distillery:** Elijah Craig / Heaven Hill Distillery. ([heavenhilldistillery.com](https://heavenhilldistillery.com/elijah-craig-barrel-proof.php?utm_source=openai))  \n- **Batch code:** **C923**, which denotes the **September 2023** release in Elijah Craig Barrel Pr",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://bevinfogroup.com/2023/09/13/elijah-craig-barrel-proof-c923-heaven-hill/",
+        "url": "https://bevinfogroup.com/2023/09/13/elijah-craig-barrel-proof-c923-heaven-hill/",
+        "domain": "bevinfogroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon-batch-c923",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "url": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7561e09904a26e940b7f671d1df6f34635612fd85f61fa76e697b474037e189d",
+    "mode": "auto"
+  }
+}

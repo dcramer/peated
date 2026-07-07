@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:58:20.113Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon Heaven Hill"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon Heaven Hill",
+    "summary": "**Elijah Craig Barrel Proof** is a **Heaven Hill** product, officially named **Elijah Craig Barrel Proof Kentucky Straight Bourbon Whiskey**. It is **uncut**, **bottled straight from the barrel**, and **not chill filtered**. Heaven Hill states that both **proof and age vary by release**, and each bottle is hand-labeled",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/our-whiskey.php",
+        "url": "https://elijahcraig.com/our-whiskey.php",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof-rye",
+        "url": "https://elijahcraig.com/barrel-proof-rye",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/pga-2026-championship-commemorative-bottle",
+        "url": "https://elijahcraig.com/pga-2026-championship-commemorative-bottle",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-toasted-barrel.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-toasted-barrel.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e9523094e807dd8a66ac02749fa7b12f2e4993af8110160509e6bdfc1af6b154",
+    "mode": "auto"
+  }
+}

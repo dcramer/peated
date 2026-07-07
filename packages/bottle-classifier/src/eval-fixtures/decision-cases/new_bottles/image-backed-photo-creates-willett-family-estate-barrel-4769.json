@@ -1,0 +1,228 @@
+{
+  "id": "image-backed-photo-creates-willett-family-estate-barrel-4769",
+  "name": "image-backed photo: creates Willett Family Estate barrel 4769 as an exact-cask bottle",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "Willett",
+      "bottler": null,
+      "expression": "Family Estate Bottled Single Barrel Bourbon Barrel No. 4769",
+      "series": "Family Estate Bottled",
+      "distillery": ["Willett"],
+      "category": "bourbon",
+      "stated_age": 5,
+      "abv": 64.2,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": true,
+      "single_cask": true,
+      "edition": "Barrel No. 4769"
+    },
+    "imageEvidence": {
+      "sourceImageId": "willett-family-estate-barrel-4769",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.98,
+          "textSpans": [
+            {
+              "text": "Family Estate Bottled Single Barrel Bourbon. Aged in hand selected white oak barrels for 5 years. Hand bottled from Barrel No. 4769. Alc. 64.2% by Vol. 128.4 proof. Willett Straight Kentucky Bourbon Whiskey. Rare Release. Handcrafted in Kentucky.",
+              "confidence": 0.98
+            }
+          ],
+          "observations": [
+            "The label identifies an exact single-barrel Willett Family Estate bourbon from barrel no. 4769, 5 years old, 64.2% ABV."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Willett",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Family Estate Bottled Single Barrel Bourbon",
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 5,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 64.2,
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "Barrel No. 4769",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskNumber": {
+          "value": "4769",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.kentuckybourbonwhiskey.com/",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/willett-family-estate-barrel-4769.jpg",
+    "dbOutcome": {
+      "bottleId": null,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Production DB outcome: no bottle found for barrel no. 4769; create a new exact-cask bottle. Nearby rows: bottle 2, bottle 43924, and bottle 17073."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 2,
+        "field": "category",
+        "productionValue": "single_malt",
+        "evidenceValue": "bourbon",
+        "source": "image_evidence",
+        "issue": "conflicts_with_evidence",
+        "safeToAutoFill": false,
+        "notes": "The nearby production row is generic and has the wrong category for the observed bourbon label."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 2,
+        "field": "edition",
+        "productionValue": null,
+        "evidenceValue": "Barrel No. 4769",
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "The observed barrel number is exact-cask identity and should not be filled onto the generic production row."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 17073,
+        "field": "name",
+        "productionValue": "Single Barrel Cask No. 2504 9-year-old",
+        "evidenceValue": "Family Estate Bottled Single Barrel Bourbon Barrel No. 4769",
+        "source": "image_evidence",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The existing exact-cask production row is for cask no. 2504, not the observed barrel no. 4769."
+      }
+    ],
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads Willett Family Estate Bottled Single Barrel Bourbon, aged 5 years, hand bottled from barrel no. 4769, 64.2% ABV / 128.4 proof. Willett Family Estate bourbons are individually barrel-numbered barrel-proof single-barrel releases; this photo should not collapse to the generic Single Barrel Family Estate row, the generic Small Batch row, or the different cask no. 2504 row."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "proposedBottle": {
+      "brand": {
+        "name": "Willett"
+      },
+      "category": "bourbon",
+      "statedAge": 5,
+      "abv": 64.2,
+      "caskStrength": true,
+      "singleCask": true
+    },
+    "proposedBottleNameIncludes": ["Family Estate", "Single Barrel", "4769"],
+    "proposedBottleNameExcludes": ["2504", "Small Batch"],
+    "proposedRelease": null,
+    "verifyEligible": false,
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create a new exact-cask Willett Family Estate barrel 4769 bottle."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 502,
+        "name": "Willett",
+        "shortName": "Willett",
+        "type": ["brand", "bottler", "distiller"]
+      },
+      {
+        "id": 1779,
+        "name": "Kentucky Bourbon Distillers",
+        "type": ["brand", "bottler", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 2,
+        "name": "Single Barrel Family Estate",
+        "fullName": "Willett Single Barrel Family Estate",
+        "brandId": 502,
+        "distillerIds": [502],
+        "category": "single_malt",
+        "singleCask": true
+      },
+      {
+        "id": 43924,
+        "name": "Family Estate Small Batch 4-year-old Cask Strength",
+        "fullName": "Willett Family Estate Small Batch 4-year-old Cask Strength",
+        "brandId": 502,
+        "distillerIds": [502],
+        "category": "bourbon",
+        "statedAge": 4,
+        "caskStrength": true
+      },
+      {
+        "id": 44139,
+        "name": "Pot Still Reserve",
+        "fullName": "Willett Pot Still Reserve",
+        "brandId": 502,
+        "distillerIds": [502],
+        "category": "bourbon",
+        "abv": 47
+      },
+      {
+        "id": 17073,
+        "name": "Single Barrel Cask No. 2504 9-year-old",
+        "fullName": "Willett Single Barrel Cask No. 2504 9-year-old",
+        "brandId": 502,
+        "category": "bourbon",
+        "statedAge": 9,
+        "singleCask": true
+      }
+    ],
+    "releases": [],
+    "aliases": [
+      {
+        "name": "Willett Single Barrel Family Estate",
+        "bottleId": 2
+      },
+      {
+        "name": "Willett Family Estate Small Batch 4-year-old Cask Strength",
+        "bottleId": 43924
+      },
+      {
+        "name": "Willett Single Barrel Cask No. 2504 9-year-old",
+        "bottleId": 17073
+      },
+      {
+        "name": "Willett Pot Still Reserve",
+        "bottleId": 44139
+      }
+    ]
+  }
+}

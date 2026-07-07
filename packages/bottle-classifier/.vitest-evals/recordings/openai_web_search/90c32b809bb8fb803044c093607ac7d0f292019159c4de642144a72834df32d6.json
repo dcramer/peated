@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T06:54:38.400Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Octomore 13.1 Bruichladdich"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Octomore 13.1 Bruichladdich",
+    "summary": "**Octomore 13.1** is a **Bruichladdich Distillery** bottling from Islay in the **Octomore 13 Series**. The bottle is generally identified as **Octomore 13.1 / 137.3 PPM**. Reliable bottle-level sources agree it was **distilled in 2016**, made from **100% Scottish barley**, and **matured for 5 years in first-fill Americ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/229738?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/octomore-13-1",
+        "url": "https://distiller.com/spirits/octomore-13-1",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/68019/octomore-edition-131-5-year-old-scottish-barley-bourbon-cask",
+        "url": "https://www.thewhiskyexchange.com/p/68019/octomore-edition-131-5-year-old-scottish-barley-bourbon-cask",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.finedrams.com/octomore-13-1-whisky.html",
+        "url": "https://www.finedrams.com/octomore-13-1-whisky.html",
+        "domain": "finedrams.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/nl/whiskies/whisky/218659",
+        "url": "https://www.whiskybase.com/nl/whiskies/whisky/218659",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "90c32b809bb8fb803044c093607ac7d0f292019159c4de642144a72834df32d6",
+    "mode": "auto"
+  }
+}

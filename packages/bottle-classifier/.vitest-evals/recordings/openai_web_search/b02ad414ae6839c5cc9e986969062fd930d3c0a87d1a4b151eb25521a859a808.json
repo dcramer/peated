@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:43:05.655Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old official batch release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old official batch release",
+    "summary": "**Ardbeg Traigh Bhan 19 Year Old** is an **official distillery bottling** from Ardbeg’s core/small-batch annual series, first announced in **2019** as the distillery’s first permanent age-stated release in nearly 20 years. Ardbeg stated it would be released in **limited annual batches**, with the recipe varying subtly ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/market/whisky/363983",
+        "url": "https://www.whiskybase.com/market/whisky/363983",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/407282",
+        "url": "https://www.whiskybase.com/market/whisky/407282",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg reveals 19 Year Old Traigh Bhan | Scotch Whisky",
+        "url": "https://scotchwhisky.com/magazine/latest-news/27070/ardbeg-reveals-19-year-old-traigh-bhan/",
+        "domain": "scotchwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Ardbeg Traigh Bhan Batches | Whisky Auctioneer",
+        "url": "https://whiskyauctioneer.com/learn/explore-whisky/series/ardbeg-traigh-bhan-batches",
+        "domain": "whiskyauctioneer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/131177?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/131177?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b02ad414ae6839c5cc9e986969062fd930d3c0a87d1a4b151eb25521a859a808",
+    "mode": "auto"
+  }
+}

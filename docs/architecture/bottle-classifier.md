@@ -45,22 +45,30 @@ policy.
 
 ## Correctness Bar
 
-The classifier should choose the safest Peated DB outcome for the observed
-reference.
+The classifier should first identify the observed bottle family and exact
+release/bottling details, then choose the safest Peated DB outcome for that
+target.
 
-- Match an existing candidate only when it covers the marketed identity without
-  unsupported extra traits.
+- Treat local Peated search as prior-art evidence: it answers whether the exact
+  target already exists and shows nearby modeling patterns. Nearby local rows
+  must not erase clear source identity.
+- Match an existing candidate only when it covers the identified bottle and
+  release/bottling identity without unsupported extra identity traits.
 - Create a bottle or release only when reviewed source, label, image,
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a
   closed-form deterministic anchor.
-- Repair only when the existing bottle identity is right but stored canonical
-  fields conflict with evidence.
+- Repair and enrichment are secondary to identity routing. Missing optional
+  fields, questionable catalog metadata, or non-target-defining repair
+  opportunities should be recorded as observations or downstream repair work;
+  they should not block a clear match or create outcome.
+- Use repair actions only when a stored field conflict makes the selected target
+  identity unsafe.
 - Use `repair_parent_and_create_release` when a supported child release cannot
   safely be created until an existing parent bottle is repaired into a clean
   reusable parent.
-- Return `no_match` when evidence is missing, weak, contradictory, or not yet
-  mappable to the local database.
+- Return `no_match` only when the bottle/release identity is unresolved or when
+  creating would invent an ambiguous hybrid.
 
 False positive existing-bottle matches are worse than `no_match` or reviewed
 creation.
@@ -77,6 +85,9 @@ evidence bars:
   corroborate missing canonical identity, but creation and release outcomes may
   also be supported by reviewed label/image evidence, closed-form deterministic
   anchors, or explicit local parent/sibling evidence where policy allows them.
+- Manual-search consumers should treat `no_match` as unresolved identity, not as
+  a generic fallback for clear identities that happen to expose catalog repair
+  or enrichment work.
 
 ## Execution
 
@@ -126,7 +137,8 @@ Deterministic code is allowed for closed-form behavior:
 - normalization
 - known-id validation
 - impossible-state blocking
-- confidence caps and automation gates
+- the code-derived automation tier (`deriveAutomationTier`), which routes an
+  automated decision to review or auto from action risk plus structured evidence
 - exact identity anchors such as SMWS bottle codes
 - unambiguous literal stored alias lookup for match-only local identification
 - direct field contradictions, such as an extracted brand, category, distillery,
@@ -142,9 +154,9 @@ create canonical identity, or bypass agent judgment.
 Post-agent deterministic review must not turn a classifier `match` into
 `no_match` merely because code cannot prove the match from local text, fuzzy
 name comparison, search rank, or structured-support heuristics. Missing
-deterministic support can cap automation confidence or require review, but only
-binary invalid state or direct extracted-field conflict may erase the agent's
-semantic match.
+deterministic support can route the decision to review through the derived
+automation tier, but only binary invalid state or direct extracted-field
+conflict may erase the agent's semantic match.
 
 A literal stored alias shortcut is allowed only when the normalized input
 matches a non-ignored stored alias attached to exactly one bottle or release. If
@@ -154,6 +166,74 @@ ambiguity, or any required whisky interpretation, fall through to the agent.
 If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
 review policy.
+
+### SMWS Deterministic Exception
+
+SMWS is the narrow whisky-domain exception because its cask-code syntax is a
+closed identifier scheme, not a fuzzy product-name heuristic.
+
+Deterministic SMWS code may:
+
+- recognize SMWS identity anchors such as `SMWS` and `The Scotch Malt Whisky
+Society`
+- parse exact-cask codes such as `95.71`, `RW6.5`, or `G15.1`
+- compose the exact-cask code from separately labeled components when the SMWS
+  identity is anchored and BOTH a distillery-number component (`Society
+Distillery No. 1` / `Distillery No. 1`) and a cask-number component (`Single
+Cask No. 285` / `Cask No. 285`) are present, for example composing `1.285`
+  from a replica/anniversary label that never prints the composed code. This is
+  a closed identifier operation in the same spirit as parsing `95.71`; the
+  composed code is then treated exactly like a parsed code. Never compose from a
+  single component and never invent the missing component.
+- treat that exact code as the bottle identity anchor for matching existing
+  SMWS rows
+- derive the rough distillery/category from the curated SMWS code table when the
+  code prefix is present
+- carry a visible or extracted subtitle into the create proposal display name,
+  for example `95.71 Prepare for Winter`, while keeping the code as the match
+  anchor
+
+Deterministic SMWS code must not:
+
+- invent or correct the subtitle/title
+- decide between competing subtitles when source evidence is ambiguous
+- generalize SMWS cask-code behavior to non-SMWS single-cask, barrel, batch, or
+  private-selection labels
+- use brand-prefix, retailer-title, or fuzzy-name similarity to prove a match
+- create a release split solely because a cask code, subtitle, age, ABV, or year
+  appears on the label
+
+Outside this exception, single-cask and bottling identity remains model-led and
+evidence-reviewed. Code may preserve exact observations and block impossible
+states, but it must not decide canonical whisky-family semantics from string
+patterns alone.
+
+### Review Policy Audit
+
+`reviewPolicy.ts` is a final safety gate, not a second classifier. Audit changes
+there against this boundary:
+
+- Keep schema normalization, unknown-id rejection, impossible-state rejection,
+  and non-whisky rejection.
+- Keep checks that validate the selected target exists in the reviewed candidate
+  set.
+- Keep direct extracted-field conflict rejection only for explicit conflicts on
+  populated fields.
+- Do not reintroduce numeric-confidence or confidence-band reconciliation caps.
+  The classifier contract carries no numeric `confidence` and no
+  `confidenceBasis.band`; automated flows derive review routing in code from the
+  structured evidence via `deriveAutomationTier`, and the model's veto is a typed
+  `unresolvedRisks` entry (category plus note) that only forces review.
+- Remove or narrow checks that re-score names, infer family modeling, require
+  local text-rank proof, or turn a clear agent match/create into `no_match`
+  because the catalog row is incomplete or has non-target-defining cleanup work.
+- Keep review routing that treats lack of web corroboration as a downgrade in the
+  derived tier only, never as an erasure of the agent's match; the source label,
+  image evidence, local candidates, or a closed-form anchor can each be the
+  auto-tier anchor instead of web evidence.
+- Prefer adding an eval that proves the agent decision is right before relaxing
+  a review-policy gate. Only relax the gate when the remaining failure is the
+  gate itself.
 
 ## Agent Judgment
 
@@ -167,8 +247,13 @@ Use the agent for:
 - match decisions that are not closed-form local id assertions
 
 The full classifier agent must fill `identityBasis` and `confidenceBasis` for
-reviewed decisions. `confidenceBasis.webEvidence = supportive` is required
-before automation can treat web-backed create evidence as validated.
+reviewed decisions. The contract has no numeric confidence score and no
+confidence band; the agent expresses certainty only through positive evidence,
+typed `unresolvedRisks` (category plus note), `webEvidence`, and the action
+itself. Any asserted unresolved risk forces automated review and no field can
+upgrade a decision the derived tier routes to review.
+`confidenceBasis.webEvidence = supportive` is required before automation can
+treat web-backed create evidence as validated.
 
 ## Evidence And Tools
 
@@ -218,9 +303,12 @@ Exact-cask identity does not create child releases.
 ## Evals
 
 Classifier evals should score final action, ids, create drafts, release scope,
-required fields, incorrect fields, and confidence calibration. Encoded expected
-fields are required. Missing unencoded optional enrichment can be tolerated;
-wrong required identity fields should fail.
+required fields, and incorrect fields. There is no numeric confidence to
+calibrate; instead evals assert the code-derived automation tier
+(`expectedTier: auto | review`) computed deterministically from the decision by
+`deriveAutomationTier`, and that derivation is covered by unit tests rather than
+model-scored confidence. Encoded expected fields are required. Missing unencoded
+optional enrichment can be tolerated; wrong required identity fields should fail.
 
 Local-identification evals should be scored separately from full
 classification evals. They should cover exact alias matches, safe non-exact
@@ -244,11 +332,11 @@ Keep responsibilities narrow:
 
 - `classifierRuntime.ts`: extraction, retrieval, tools, agent loop
 - `runtime/deterministic.ts`: pre-agent deterministic resolver registry
-- `reviewPolicy.ts`: validation, normalization, invalid-state rejection, and
-  confidence caps
+- `reviewPolicy.ts`: validation, normalization, and invalid-state rejection
 - `exactCaskPolicy.ts`: generic exact-cask signal validation for reviewed scope
 - `instructions.ts`: stable classifier and extractor prompts
-- `priceMatchingEvidence.ts`: pure evidence checks shared with price matching
+- `priceMatchingEvidence.ts`: pure evidence checks and the code-derived
+  automation tier (`deriveAutomationTier`) shared with price matching
 - `smws.ts`: SMWS parsing and exact-code behavior
 - `apps/server/src/agents/bottleClassifier/service.ts`: server adapter wiring
 

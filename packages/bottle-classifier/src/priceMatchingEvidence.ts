@@ -35,10 +35,6 @@ type ExistingMatchWebEvidenceEvaluation = {
   hasSupportiveWebEvidence: boolean;
 };
 
-export const REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 80;
-export const UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 96;
-export const EXACT_CASK_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD = 95;
-type BottleIdentityScope = "product" | "exact_cask";
 const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "bottler",
   "name",
@@ -87,54 +83,158 @@ const TITLE_IGNORABLE_NAME_TOKENS = new Set([
   "world",
 ]);
 
-export function isExistingMatchConfidenceEligibleForVerification({
-  confidence,
-  currentBottleId,
-  currentReleaseId,
-  identityScope = "product",
-  matchedBottleId,
-  matchedReleaseId,
-}: {
-  confidence: number;
-  currentBottleId?: null | number;
-  currentReleaseId?: null | number;
-  identityScope?: BottleIdentityScope | null;
-  matchedBottleId: null | number;
-  matchedReleaseId?: null | number;
-}): boolean {
-  // Downstream existing-match verification should be a thin confidence gate.
-  // Exact/title/web evidence should affect classifier confidence upstream rather
-  // than being re-implemented as separate approval heuristics.
-  if (matchedBottleId === null) {
-    return false;
+// Code-derived automation tier. Automated consumers (price scraping, ingestion)
+// derive whether a classifier decision may act automatically from the action's
+// risk class and the structured evidence the agent asserts, instead of reading
+// the numeric `confidence` score. See
+// `docs/architecture/bottle-classifier.md` (Determinism) and
+// `openspec/changes/define-bottle-classifier-agent-contract/design.md`
+// ("Remove numeric confidence; consumers derive gating from evidence"). User
+// driven flows (Add Bottle) need no tier because the user confirms the outcome.
+export type AutomationTier = "auto" | "review";
+
+export const AUTOMATION_ACTION_RISK_CLASSES = [
+  "match",
+  "create",
+  "repair",
+  "none",
+] as const;
+export type AutomationActionRiskClass =
+  (typeof AUTOMATION_ACTION_RISK_CLASSES)[number];
+
+export type AutomationTierInput = {
+  // Risk class of the classifier action. Callers map their own action
+  // vocabulary (agent enum or price-match enum) onto this shared class.
+  actionRiskClass: AutomationActionRiskClass;
+  // Model veto: any asserted unresolved risk forces review (design.md model
+  // veto scenario). Callers pass whether the risk list is non-empty.
+  hasUnresolvedRisks: boolean;
+  // How web/source evidence affected the decision.
+  webEvidence: WebEvidenceJudgment;
+  // Match anchors ----------------------------------------------------------
+  // Whether a concrete existing bottle/release target was selected.
+  hasMatchTarget: boolean;
+  // The match reaffirms the reference's current bottle/release assignment.
+  reaffirmsCurrentAssignment: boolean;
+  // The match replaces a *different* current assignment (a correction, not a
+  // verification candidate).
+  replacesCurrentAssignment: boolean;
+  // A fresh (non-reaffirming) release-level match; never auto-verified.
+  matchesFreshReleaseTarget: boolean;
+  // An exact accepted local alias resolved the reference.
+  hasExactAliasAnchor: boolean;
+  // A closed-form deterministic identity anchor (SMWS exact cask, exact_cask
+  // scope, or a unique plain-age structured match).
+  hasDeterministicAnchor: boolean;
+  // Create/repair anchors --------------------------------------------------
+  // Reviewed label or image evidence is the primary support (e.g. a photo
+  // scan), independent of web search.
+  hasPrimaryLabelOrImageEvidence: boolean;
+};
+
+function deriveMatchTier(input: AutomationTierInput): AutomationTier {
+  if (!input.hasMatchTarget) {
+    return "review";
   }
 
-  const reaffirmsCurrentAssignment =
-    currentBottleId != null &&
-    matchedBottleId === currentBottleId &&
-    (matchedReleaseId ?? null) === (currentReleaseId ?? null);
-
-  if (reaffirmsCurrentAssignment) {
-    return (
-      confidence >= REAFFIRMED_EXISTING_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD
-    );
+  // Replacing a different current assignment is a downstream correction, not an
+  // existing-match verification.
+  if (input.replacesCurrentAssignment) {
+    return "review";
   }
 
-  // Replacing an existing assignment is a downstream correction, not an
-  // existing-match verification candidate.
-  if (currentBottleId != null) {
-    return false;
+  // Fresh release-level matches are never auto-verified from evidence alone.
+  if (input.matchesFreshReleaseTarget) {
+    return "review";
   }
 
-  if (matchedReleaseId !== null && matchedReleaseId !== undefined) {
-    return false;
+  // An unmatched existing match auto-verifies only with an explicit typed
+  // anchor: a reaffirmed current assignment, a closed-form deterministic anchor
+  // (exact_cask/SMWS), an exact accepted alias, primary label/image evidence,
+  // agent-reviewed supportive web evidence, or the agent's affirmative
+  // `webEvidence = not_needed` judgment. `not_needed` anchors a match because
+  // the spec's evidence requirement explicitly allows a clear existing match to
+  // skip web search when local/label evidence suffices, and the deterministic
+  // conflict gates (unknown-id rejection, extracted-field contradiction checks)
+  // still run before the tier as the safety net. `not_used` must NOT anchor:
+  // it only says the web was not consulted and makes no claim of clarity,
+  // whereas `not_needed` is the agent's judgment that the local evidence
+  // settles the match. Absent all anchors, the match goes to review.
+  const hasMatchAnchor =
+    input.reaffirmsCurrentAssignment ||
+    input.hasDeterministicAnchor ||
+    input.hasExactAliasAnchor ||
+    input.hasPrimaryLabelOrImageEvidence ||
+    input.webEvidence === "supportive" ||
+    input.webEvidence === "not_needed";
+
+  return hasMatchAnchor ? "auto" : "review";
+}
+
+function deriveCreateOrRepairTier(input: AutomationTierInput): AutomationTier {
+  // Creates and repairs require corroborating evidence: supportive web
+  // evidence, a closed-form deterministic anchor, or reviewed label/image
+  // primary evidence. `webEvidence = not_needed` does NOT anchor here — writing
+  // new canonical identity needs concrete support, not just the absence of a
+  // search.
+  const hasCreationEvidence =
+    input.webEvidence === "supportive" ||
+    input.hasDeterministicAnchor ||
+    input.hasPrimaryLabelOrImageEvidence;
+
+  return hasCreationEvidence ? "auto" : "review";
+}
+
+/**
+ * Derives whether an automated flow may act on a classifier decision without
+ * human review. Pure and deterministic: identical inputs always yield the same
+ * tier. Never reads a numeric confidence score.
+ */
+export function deriveAutomationTier(
+  input: AutomationTierInput,
+): AutomationTier {
+  // Model veto (design.md "Model veto forces review"): any unresolved risk,
+  // including an uncategorizable holistic concern, forces review regardless of
+  // anchors.
+  if (input.hasUnresolvedRisks) {
+    return "review";
   }
 
-  if (identityScope === "exact_cask") {
-    return confidence >= EXACT_CASK_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
+  switch (input.actionRiskClass) {
+    case "match":
+      return deriveMatchTier(input);
+    case "create":
+    case "repair":
+      return deriveCreateOrRepairTier(input);
+    default:
+      return "review";
   }
+}
 
-  return confidence >= UNMATCHED_BOTTLE_MATCH_VERIFICATION_CONFIDENCE_THRESHOLD;
+// Maps the agent decision action enum onto the shared automation risk class.
+export function agentActionRiskClass(
+  action:
+    | "match"
+    | "create_bottle"
+    | "create_release"
+    | "create_bottle_and_release"
+    | "repair_parent_and_create_release"
+    | "repair_bottle"
+    | "no_match",
+): AutomationActionRiskClass {
+  switch (action) {
+    case "match":
+      return "match";
+    case "create_bottle":
+    case "create_release":
+    case "create_bottle_and_release":
+      return "create";
+    case "repair_bottle":
+    case "repair_parent_and_create_release":
+      return "repair";
+    default:
+      return "none";
+  }
 }
 
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {

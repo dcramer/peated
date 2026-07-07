@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T18:15:35.965Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished in Peated Scotch Barrels"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished in Peated Scotch Barrels",
+    "summary": "Confirmed bottle details for **Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished in Peated Scotch Barrels**:\n\n- **Producer / brand:** Hudson Whiskey NY. ([hudsonwhiskey.com](https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/?utm_source=openai))\n- **Whiskey type:** **New York Straight",
+    "results": [
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+        "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+        "url": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+        "domain": "shop.hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/",
+        "url": "https://www.hudsonwhiskey.com/en-US/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hudsonwhiskey.com/en-US/our-range/",
+        "url": "https://www.hudsonwhiskey.com/en-US/our-range/",
+        "domain": "hudsonwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/hudson-whiskey-back-room-deal",
+        "url": "https://distiller.com/spirits/hudson-whiskey-back-room-deal",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.kroger.com/p/hudson-whiskey-back-room-deal-ny-straight-rye-whiskey-finished-in-peated-scotch-barrels/0008366487453",
+        "url": "https://www.kroger.com/p/hudson-whiskey-back-room-deal-ny-straight-rye-whiskey-finished-in-peated-scotch-barrels/0008366487453",
+        "domain": "kroger.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b20e7904d546a7160f4916ae4335993e127e65bc412d018afff7131212fc9ff0",
+    "mode": "auto"
+  }
+}

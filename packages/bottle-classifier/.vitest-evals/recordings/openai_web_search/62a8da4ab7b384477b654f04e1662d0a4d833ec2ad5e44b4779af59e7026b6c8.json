@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:00:19.370Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 30 year old single malt scotch whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside 30 year old single malt scotch whisky",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Shieldaig Speyside 30 Year Old Single Malt Scotch Whisky**:\n\n- **Brand/label:** Shieldaig 30-year-old. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old))\n- **Category:** **Single Malt Scotch Whisky**. ([whiskybase.com](ht",
+    "results": [
+      {
+        "title": "https://www.masterofmalt.com/whiskies/speyside/speyside-30-year-old-1991-cask-15455-xtra-old-particular-douglas-laing-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/speyside/speyside-30-year-old-1991-cask-15455-xtra-old-particular-douglas-laing-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/speyside/speyside-30-year-old-1992-cask-17240-xtra-old-particular-douglas-laing-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/speyside/speyside-30-year-old-1992-cask-17240-xtra-old-particular-douglas-laing-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/speyside/speyside-30-year-old-1991-bottled-2021-wilson-and-morgan-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/speyside/speyside-30-year-old-1991-bottled-2021-wilson-and-morgan-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Shieldaig 30-year-old - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/imperial/imperial-30-year-old-1995-cask-50274-cask-strength-collection-signatory-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/imperial/imperial-30-year-old-1995-cask-50274-cask-strength-collection-signatory-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/198422",
+        "url": "https://www.whiskybase.com/whiskies/whisky/198422",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "62a8da4ab7b384477b654f04e1662d0a4d833ec2ad5e44b4779af59e7026b6c8",
+    "mode": "auto"
+  }
+}

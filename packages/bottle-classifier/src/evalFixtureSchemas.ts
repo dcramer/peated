@@ -28,12 +28,64 @@ const evalFixtureDbOutcomeSchema = z
   })
   .strict();
 
+const evalFixtureCatalogFieldObservationSchema = z
+  .object({
+    target: z.enum([
+      "matched_bottle",
+      "matched_release",
+      "candidate_bottle",
+      "candidate_release",
+    ]),
+    bottleId: z.number().int().positive().optional(),
+    releaseId: z.number().int().positive().optional(),
+    field: z.string().trim().min(1),
+    productionValue: z.unknown().optional(),
+    evidenceValue: z.unknown(),
+    source: z.enum(["image_evidence", "production_search"]),
+    issue: z.enum([
+      "missing_in_production",
+      "conflicts_with_evidence",
+      "competing_candidate",
+    ]),
+    safeToAutoFill: z.boolean(),
+    notes: z.string().trim().min(1).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      (value.target === "matched_bottle" ||
+        value.target === "candidate_bottle") &&
+      value.bottleId === undefined
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Bottle field observations must include bottleId.",
+        path: ["bottleId"],
+      });
+    }
+
+    if (
+      (value.target === "matched_release" ||
+        value.target === "candidate_release") &&
+      value.releaseId === undefined
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Release field observations must include releaseId.",
+        path: ["releaseId"],
+      });
+    }
+  });
+
 export const evalFixtureProvenanceSchema = z
   .object({
     source: z.enum(["production_miss", "curated_regression", "synthetic"]),
     verifiedSourceUrls: z.array(z.string().url()).optional(),
     fixtureImagePath: z.string().trim().min(1).optional(),
     dbOutcome: evalFixtureDbOutcomeSchema.optional(),
+    catalogFieldObservations: z
+      .array(evalFixtureCatalogFieldObservationSchema)
+      .optional(),
     notes: z.string().min(1).optional(),
   })
   .strict()
@@ -81,10 +133,11 @@ export const classifierEvalExpectationSchema = z.object({
   proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
   proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
   proposedRelease: z.record(z.string(), z.unknown()).nullable().optional(),
-  confidenceBand: z
-    .enum(["low", "review", "auto_verification", "current_assignment"])
-    .optional(),
+  expectedTier: z.enum(["auto", "review"]).optional(),
   verifyEligible: z.boolean().optional(),
+  suggestedNextStep: z
+    .enum(["confirm_match", "confirm_create", "manual_search", "needs_review"])
+    .optional(),
   summary: z.string().min(1),
 });
 

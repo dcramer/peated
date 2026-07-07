@@ -91,10 +91,20 @@ vi.mock("@peated/server/worker/client", () => ({
 }));
 
 const supportiveWebEvidenceConfidenceBasis = {
-  band: "auto_verification",
   positiveEvidence: ["Web evidence supports the required bottle identity."],
   unresolvedRisks: [],
   toolsUsed: ["openai_web_search"],
+  webEvidence: "supportive",
+};
+
+// The code-derived automation tier reads structured evidence, not the numeric
+// confidence score. Supportive web evidence (with no unresolved risks) is the
+// anchor that auto-verifies an unmatched existing bottle match; it replaces the
+// retired `band: "auto_verification"` signal.
+const autoVerificationConfidenceBasis = {
+  positiveEvidence: ["The candidate covers the observed bottle identity."],
+  unresolvedRisks: [],
+  toolsUsed: ["initial_local_candidates", "openai_web_search"],
   webEvidence: "supportive",
 };
 
@@ -851,11 +861,11 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("match_existing");
-    expect(proposal.confidence).toBe(88);
+    expect(proposal.confidence).toBeNull();
     expect(proposal.automationAssessment).toMatchObject({
-      modelConfidence: 88,
+      modelConfidence: null,
       automationEligible: false,
-      automationScore: expect.any(Number),
+      automationScore: null,
     });
   });
 
@@ -1219,6 +1229,7 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 97,
           rationale: "The listing exactly matches a canonical alias.",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1282,7 +1293,7 @@ describe("priceMatching", () => {
       releaseId: null,
       createdBottle: false,
       createdRelease: false,
-      confidence: 97,
+      confidence: null,
     });
   });
 
@@ -1319,6 +1330,7 @@ describe("priceMatching", () => {
           confidence: 98,
           rationale:
             "The raw title directly reaffirms the existing Jameson Cold Brew bottle.",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1678,6 +1690,7 @@ describe("priceMatching", () => {
           confidence: 96,
           rationale:
             "Official Glenlivet sources confirm Caribbean Reserve as the rum-cask-finished single malt release.",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -1823,6 +1836,7 @@ describe("priceMatching", () => {
           confidence: 97,
           rationale:
             "The existing bottle is the marketed identity, but the proposed canonical fields need review.",
+          confidenceBasis: autoVerificationConfidenceBasis,
           matchedBottleId: bottle.id,
           matchedReleaseId: null,
           candidateBottleIds: [bottle.id],
@@ -2173,7 +2187,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
-    expect(proposal.confidence).toBe(95);
+    expect(proposal.confidence).toBeNull();
   });
 
   test("routes same-bottle create drafts into correction review when the current bottle metadata is wrong", async ({
@@ -2842,7 +2856,7 @@ describe("priceMatching", () => {
     });
 
     expect(proposal.status).toBe("pending_review");
-    expect(proposal.confidence).toBe(96);
+    expect(proposal.confidence).toBeNull();
     expect(proposal.extractedLabel).toMatchObject({
       category: null,
       edition: "Batch 1",
@@ -2944,7 +2958,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("create_new");
-    expect(proposal.confidence).toBe(95);
+    expect(proposal.confidence).toBeNull();
     expect(updatedPrice?.bottleId).toBeNull();
   });
 
@@ -3331,6 +3345,8 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
+          identityScope: "exact_cask",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -3450,6 +3466,8 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
+          identityScope: "exact_cask",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -3747,6 +3765,8 @@ describe("priceMatching", () => {
           action: "match_existing",
           confidence: 100,
           rationale: "Classifier matched the SMWS exact-cask code.",
+          identityScope: "exact_cask",
+          confidenceBasis: autoVerificationConfidenceBasis,
           suggestedBottleId: bottle.id,
           candidateBottleIds: [bottle.id],
           proposedBottle: null,
@@ -4143,7 +4163,7 @@ describe("priceMatching", () => {
       releaseId: null,
       createdBottle: true,
       createdRelease: false,
-      confidence: 92,
+      confidence: null,
     });
     expect(queueBottleCreationVerification).toHaveBeenCalledWith({
       bottleId: proposal.suggestedBottleId,
@@ -5389,7 +5409,7 @@ describe("priceMatching", () => {
       proposalType: "match_existing",
       initialStatus: "pending_review",
       finalStatus: null,
-      confidence: 84,
+      confidence: null,
       suggestedBottleId: bottle.id,
     });
 
@@ -6361,6 +6381,265 @@ describe("priceMatching", () => {
       releaseId: release.id,
       createdBottle: false,
       createdRelease: false,
+    });
+  });
+
+  test("writes a reusable global alias when the decision asserts global_alias scope", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Global Alias Candidate",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "global_alias",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+    expect(listingAlias).toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "source_approved",
+      ignored: false,
+    });
+  });
+
+  test("does not globalize the listing title when alias scope is none", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Generic None Scope Candidate",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "none",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+
+    // The exact listing is still matched/assigned, but a generic title must not
+    // become a reusable global alias, so the retained row is ignored.
+    expect(updatedPrice?.bottleId).toBe(bottle.id);
+    expect(listingAlias).toMatchObject({
+      bottleId: bottle.id,
+      ignored: true,
+    });
+  });
+
+  test("treats missing alias scope conservatively and keeps the listing title source-scoped", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Missing Scope Candidate",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+
+    expect(listingAlias?.bottleId).toBe(bottle.id);
+    expect(listingAlias?.ignored).toBe(true);
+  });
+
+  test("leaves other aliases reusable when a none-scope listing is approved", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const canonicalAlias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Canonical Reusable Alias",
+      assignmentSource: "canonical",
+    });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Unrelated Generic Listing",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "none",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const reloadedCanonical = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, canonicalAlias.name),
+    });
+    expect(reloadedCanonical?.ignored).toBe(false);
+  });
+
+  test("keeps an existing active alias reusable when a none-scope proposal is approved", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Existing Active Alias Listing",
+      volume: 750,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: normalizeBottleAliasKey(price.name),
+      assignmentSource: "human_approved",
+      ignored: false,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "none",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+
+    // A none-scope decision must not deactivate an accepted alias that already
+    // assigns this target for future exact matches.
+    expect(listingAlias).toMatchObject({
+      bottleId: bottle.id,
+      ignored: false,
+    });
+  });
+
+  test("does not resurrect a moderator-ignored alias when a global_alias proposal is approved", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Existing Ignored Alias Listing",
+      volume: 750,
+    });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: normalizeBottleAliasKey(price.name),
+      assignmentSource: "human_approved",
+      ignored: true,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "global_alias",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: bottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+
+    // The classifier's alias scope cannot upgrade human state: a moderator
+    // deliberately ignored this alias, so approval keeps it ignored.
+    expect(listingAlias).toMatchObject({
+      bottleId: bottle.id,
+      ignored: true,
     });
   });
 });

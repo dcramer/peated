@@ -180,7 +180,8 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 25,
         suggestedReleaseId: null,
-        modelConfidence: 97,
+        webEvidence: "supportive",
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(true);
@@ -234,7 +235,8 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 25,
         suggestedReleaseId: null,
-        modelConfidence: 97,
+        webEvidence: "supportive",
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(true);
@@ -286,7 +288,8 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 13025,
         suggestedReleaseId: null,
-        modelConfidence: 97,
+        webEvidence: "supportive",
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(true);
@@ -369,7 +372,8 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 77,
         suggestedReleaseId: null,
-        modelConfidence: 97,
+        webEvidence: "supportive",
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(true);
@@ -447,7 +451,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 77,
         suggestedReleaseId: null,
-        modelConfidence: 88,
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
         plainAgeBottleAutoVerifyEligible: true,
       }),
@@ -523,7 +527,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 77,
         suggestedReleaseId: null,
-        modelConfidence: 100,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(false);
@@ -564,7 +568,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 77,
         suggestedReleaseId: null,
-        modelConfidence: 100,
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(false);
@@ -646,13 +650,14 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 1760,
         suggestedReleaseId: null,
-        modelConfidence: 96,
+        hasUnresolvedRisks: false,
+        webEvidence: "supportive",
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(true);
   });
 
-  test("does not auto-approve unmatched bottle matches below the elevated confidence threshold", () => {
+  test("does not auto-approve an unanchored unmatched bottle match with a downgraded band", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -660,7 +665,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 25,
         suggestedReleaseId: null,
-        modelConfidence: 95,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(false);
@@ -727,7 +732,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 469,
         suggestedReleaseId: null,
-        modelConfidence: 35,
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
         plainAgeBottleAutoVerifyEligible:
           assessment.plainAgeBottleAutoVerifyEligible,
@@ -785,7 +790,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 469,
         suggestedReleaseId: null,
-        modelConfidence: 93,
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
         plainAgeBottleAutoVerifyEligible:
           assessment.plainAgeBottleAutoVerifyEligible,
@@ -843,7 +848,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 2,
         suggestedReleaseId: null,
-        modelConfidence: 99,
+        hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
     ).toBe(false);
@@ -1453,7 +1458,7 @@ describe("priceMatchingAutomation", () => {
     expect(supported).toBe(false);
   });
 
-  test("does not auto-approve unmatched matches from downstream score alone", () => {
+  test("does not auto-approve an unanchored unmatched match (downgraded band)", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -1461,13 +1466,13 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
-        modelConfidence: 86,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(false);
   });
 
-  test("auto-approves the current assignment at the lower confidence threshold", () => {
+  test("auto-approves the current assignment reaffirmation without an auto_verification band", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -1475,13 +1480,13 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
-        modelConfidence: 80,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(true);
   });
 
-  test("auto-approves unmatched bottle matches when classifier confidence reaches the elevated threshold", () => {
+  test("auto-approves unmatched bottle matches when the band asserts auto verification", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -1489,13 +1494,14 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
-        modelConfidence: 96,
+        webEvidence: "supportive",
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(true);
   });
 
-  test("does not auto-approve unmatched bottle matches below the elevated threshold even when the title is clear", () => {
+  test("keeps unmatched bottle matches in review when the band is downgraded", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -1503,13 +1509,27 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 13437,
         suggestedReleaseId: null,
-        modelConfidence: 95,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(false);
   });
 
-  test("auto-approves exact-cask code matches at the exact-cask threshold", () => {
+  test("routes unmatched matches with unresolved risks to review despite an auto band", () => {
+    expect(
+      shouldVerifyStorePriceMatch({
+        action: "match_existing",
+        currentBottleId: null,
+        currentReleaseId: null,
+        suggestedBottleId: 1,
+        suggestedReleaseId: null,
+        hasUnresolvedRisks: true,
+        automationBlockers: [],
+      }),
+    ).toBe(false);
+  });
+
+  test("auto-approves exact-cask code matches via the deterministic anchor", () => {
     expect(
       shouldVerifyStorePriceMatch({
         action: "match_existing",
@@ -1518,7 +1538,7 @@ describe("priceMatchingAutomation", () => {
         identityScope: "exact_cask",
         suggestedBottleId: 41,
         suggestedReleaseId: null,
-        modelConfidence: 95,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(true);
@@ -1532,7 +1552,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: 10,
-        modelConfidence: 100,
+        hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(false);
@@ -1546,7 +1566,7 @@ describe("priceMatchingAutomation", () => {
         currentReleaseId: null,
         suggestedBottleId: 1,
         suggestedReleaseId: null,
-        modelConfidence: 99,
+        hasUnresolvedRisks: false,
         automationBlockers: ["candidate age conflicts with extracted label"],
       }),
     ).toBe(false);

@@ -8,6 +8,8 @@ Peated currently has three related but separate workflows:
 
 The new Add Bottle flow should make bottle identification the shared first step. After identification, the user can add the bottle to Library, log a tasting, view the bottle, or create the catalog bottle when the bottle is missing.
 
+Photo identification follows the same product model as the rest of the classifier: first identify the observed bottle plus exact release or bottling details, then decide whether that identity maps to an existing Peated target or a create proposal. Peated catalog search and web search are evidence sources, not substitutes for the observed bottle identity. Manual search is the fallback only when the observed bottle identity is unresolved or ambiguous.
+
 ## Goals / Non-Goals
 
 **Goals:**
@@ -45,6 +47,43 @@ Extract the scan/search/review logic from `/addTasting` into a reusable Bottle R
 
 Existing bottle matches show Add to Library, Log Tasting, and View Bottle. Missing or uncertain bottles show Search Again, Start Over, and Create Bottle when user creation is available.
 
+For scan-backed results, the classifier should preserve release and bottling traits visible on the label, including edition, batch, barrel/cask number, stated age, ABV, and expression name. If the exact identity exists in Peated, the resolver should confirm the match. If it does not exist and the identity is otherwise clear, the resolver should confirm a create proposal. Search Again should mean "the system could not identify the bottle/release," not "the target row is missing enrichment."
+
+### Review policy is audited after classifier correctness
+
+`reviewPolicy.ts` remains a final safety gate for impossible states, unknown target ids, non-whisky inputs, direct extracted-field conflicts, and explicit automation caps. It should not become a second classifier that re-scores names, requires local text-rank proof, or downgrades a correct match/create because the database row is incomplete.
+
+When a scan-backed eval fails, diagnose the layer in this order:
+
+1. Image extraction missed visible label facts.
+2. The classifier chose the wrong bottle/release outcome from available evidence.
+3. Review policy contradicted an otherwise correct classifier decision.
+
+Only the third case should relax review policy, and the relaxation should remove or narrow the deterministic gate that caused the downgrade rather than adding family-specific matching rules.
+
+### Deterministic whisky rules stay closed-form
+
+The Add Bottle resolver follows the classifier's deterministic boundary.
+Deterministic code may parse closed-form identifiers and preserve source-backed
+facts, but it should not decide whisky-family semantics from string similarity
+or brand-specific heuristics.
+
+The explicit whisky-domain exception is SMWS exact-cask identity:
+
+- SMWS cask-code syntax such as `95.71`, `RW6.5`, or `G15.1` may
+  deterministically anchor the bottle identity.
+- The curated SMWS code table may roughly derive distillery/category from the
+  first code segment.
+- A visible or extracted SMWS subtitle may be preserved in the create proposal
+  display name, for example `95.71 Prepare for Winter`.
+- The subtitle itself is not deterministic: code must not invent, correct, or
+  choose between ambiguous titles.
+
+Other single-cask, barrel, batch, private-selection, brand-prefix, and
+retailer-title patterns remain classifier/evidence decisions. They can inform
+extraction and observations, but they cannot bypass the agent or review
+contract.
+
 ### Collection entry images are user-owned images
 
 Add `image_url` to `collection_bottle`. This represents a user's photo for their saved bottle or release. It does not replace `bottles.image_url` or `bottle_releases.image_url`, and it should be serialized with collection bottle list/detail responses.
@@ -79,6 +118,7 @@ After adding to Library, keep the user in the Add Bottle flow and show an Added 
 - "Add Bottle" can still sound like catalog creation. -> Use Create Bottle consistently for the manual catalog branch.
 - Library images on collection entries may not appear in existing bottle tables. -> Serialize `imageUrl` and update Library views deliberately without changing canonical bottle art.
 - Catalog image approval could be misunderstood as private. -> Use "public image" in help text and hide the control when promotion is not allowed.
+- Deterministic review policy may block clear scan-backed classifier outcomes. -> Add evals that prove the classifier result first, then audit policy gates for deletion or narrowing instead of adding new whisky-family heuristics.
 
 ## Migration Plan
 
@@ -88,6 +128,8 @@ After adding to Library, keep the user in the Add Bottle flow and show an Added 
 4. Make `/addBottle` render the Add Bottle resolver and outcome selection.
 5. Add the Added to Library terminal state and Library row image/menu UI.
 6. Update user-facing copy to Log Tasting across navigation, buttons, titles, and empty states.
+7. Add scan-backed classifier evals for observed production misses, including extractor facts, final catalog outcome, one-click resolver expectation, and provenance.
+8. Audit review policy gates that still downgrade eval-proven correct classifier outcomes and remove or narrow those gates after the classifier layer is correct.
 
 ## Open Questions
 

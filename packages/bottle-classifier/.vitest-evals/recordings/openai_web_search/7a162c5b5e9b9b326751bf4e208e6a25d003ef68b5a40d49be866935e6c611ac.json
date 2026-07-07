@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T20:23:52.568Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Canadian Club Reserve 9 year old Triple Aged"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Canadian Club Reserve 9 year old Triple Aged",
+    "summary": "This appears to be the same bottle/product family: **Canadian Club Reserve 9 Year Old Canadian Whisky**, often labeled **“Triple Aged.”** ReserveBar has a listing under that name, and Canadian Club’s own product page confirms the core bottle-specific traits. ([reservebar.com](https://www.reservebar.com/products/canadia",
+    "results": [
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products",
+        "url": "https://www.canadianclub.com/products",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "url": "https://distiller.com/spirits/canadian-club-reserve-9-year",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://therumhowlerblog.com/2014/01/27/review-canadian-club-reserve-9-year-old/",
+        "url": "https://therumhowlerblog.com/2014/01/27/review-canadian-club-reserve-9-year-old/",
+        "domain": "therumhowlerblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "url": "https://www.strathliquor.com/product/canadian-club-reserve-aged-9-years/",
+        "domain": "strathliquor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7a162c5b5e9b9b326751bf4e208e6a25d003ef68b5a40d49be866935e6c611ac",
+    "mode": "auto"
+  }
+}

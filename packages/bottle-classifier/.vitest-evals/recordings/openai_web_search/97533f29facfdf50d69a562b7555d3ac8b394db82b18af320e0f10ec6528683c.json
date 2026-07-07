@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:24:35.420Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye 56.1 rye barrel proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye 56.1 rye barrel proof",
+    "summary": "**Wild Turkey Rare Breed Rye** appears to be the bottle you mean.\n\nConfirmed bottle-specific facts:\n\n- **Producer/brand:** Wild Turkey Distillery / Wild Turkey Bourbon. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n- **Type:** **Kentucky Straight Rye Whiskey** s",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskeyshelf.com/wild-turkey-rare-breed-rye-review/",
+        "url": "https://www.thewhiskeyshelf.com/wild-turkey-rare-breed-rye-review/",
+        "domain": "thewhiskeyshelf.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "url": "https://www.ryecentral.com/products/wild-turkey-rare-breed-barrel-proof-rye-whiskey-review",
+        "domain": "ryecentral.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.info/usa/wild-turkey/rare-breed-rye/",
+        "url": "https://www.camparigroup.info/usa/wild-turkey/rare-breed-rye/",
+        "domain": "camparigroup.info",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "97533f29facfdf50d69a562b7555d3ac8b394db82b18af320e0f10ec6528683c",
+    "mode": "auto"
+  }
+}

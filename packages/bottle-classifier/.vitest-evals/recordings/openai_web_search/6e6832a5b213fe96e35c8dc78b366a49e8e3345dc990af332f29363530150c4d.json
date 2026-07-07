@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T04:03:53.821Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 2016 cask 1661"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 8 year old 2007 57.1 2016 cask 1661",
+    "summary": "Here’s the most solid bottle-specific evidence I could confirm for **The Exclusive Malts Islay 8 year old 2007 / 2016**:\n\n- **Bottler:** **Creative Whisky Company (CWC)**, under **The Exclusive Malts** series. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc))\n- **Region / stated identi",
+    "results": [
+      {
+        "title": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "url": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "domain": "firstclassspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "url": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.gasparsliquorshoppe.com/exclusive-malts-8-year.html",
+        "url": "https://www.gasparsliquorshoppe.com/exclusive-malts-8-year.html",
+        "domain": "gasparsliquorshoppe.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://boozedancing.com/2015/09/04/whisky-review-the-exclusive-malts-batch-8-part-2/",
+        "url": "https://boozedancing.com/2015/09/04/whisky-review-the-exclusive-malts-batch-8-part-2/",
+        "domain": "boozedancing.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.just-whisky.co.uk/product/laphroaig-6-years-old-2011-the-exclusive-malts-whisky-barrel-10-year-anniversary-1388842",
+        "url": "https://www.just-whisky.co.uk/product/laphroaig-6-years-old-2011-the-exclusive-malts-whisky-barrel-10-year-anniversary-1388842",
+        "domain": "just-whisky.co.uk",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6e6832a5b213fe96e35c8dc78b366a49e8e3345dc990af332f29363530150c4d",
+    "mode": "auto"
+  }
+}

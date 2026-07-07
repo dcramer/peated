@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T16:50:30.821Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol 3 whiskey bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Vol 3 whiskey bourbon",
+    "summary": "Heaven’s Door **Bootleg Series Volume III** is a **2021 limited release** bourbon in the brand’s annual Bootleg line. The most consistently corroborated bottle-specific details are: it is a **13-year-old Kentucky bourbon**, bottled at **cask strength**, and **finished in Spanish Vino de Naranja casks**. Heaven’s Door’s",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/bourbon/heavens-door-spirits-releases-the-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://craftspiritshop.com/products/heavens-door-the-bootleg-series",
+        "url": "https://craftspiritshop.com/products/heavens-door-the-bootleg-series",
+        "domain": "craftspiritshop.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "url": "https://distiller.com/spirits/heaven-s-door-the-bootleg-series-volume-iii-sunday-afternoon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4308052be20347c729f97a0f4fd749e49c99cd39f8200c84b9b788f9feb782ae",
+    "mode": "auto"
+  }
+}

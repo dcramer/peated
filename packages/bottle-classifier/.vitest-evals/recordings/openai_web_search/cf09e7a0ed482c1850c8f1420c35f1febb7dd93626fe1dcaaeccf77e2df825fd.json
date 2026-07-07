@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T18:11:38.361Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker 2001 Distillers Edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker 2001 Distillers Edition",
+    "summary": "**Talisker 2001 Distillers Edition** appears to be the **official Diageo Distillers Edition bottling** from **Talisker Distillery** on Skye. Bottle-specific details consistently shown by whisky databases/listings are: **distilled in 2001**, **bottled in 2012**, **45.8% ABV**, **700 mL**, **original bottling**, part of ",
+    "results": [
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-18.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-10.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-10.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-10.html?cHash=46af2352bccfe032443a84cc3415fbed&tx_datamintsflaschendb_pi4%5Bgeschmack",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-10.html?cHash=46af2352bccfe032443a84cc3415fbed&tx_datamintsflaschendb_pi4%5BgeschmacksbeschreibungSearchCriteria%5D%5Bbewertung%5D=5&tx_datamintsflaschendb_pi4%5BsammlungReferer%5D=14799",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20022013.html",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-20022013.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-31.html?cHash=e6a221e0614e7786f11183d1bb9ba14c&tx_datamintsflaschendb_pi4%5BsammlungR",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-31.html?cHash=e6a221e0614e7786f11183d1bb9ba14c&tx_datamintsflaschendb_pi4%5BsammlungReferer%5D=457731",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cf09e7a0ed482c1850c8f1420c35f1febb7dd93626fe1dcaaeccf77e2df825fd",
+    "mode": "auto"
+  }
+}

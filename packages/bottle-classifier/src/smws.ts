@@ -2,6 +2,7 @@ import type { CaskFill, CaskSize, CaskType, Category } from "./classifierTypes";
 import { CASK_SIZE_IDS, CASK_TYPE_IDS } from "./classifierTypes";
 import { getExactCaskCodeAnchor } from "./exactCask";
 import { escapeRegExp } from "./identityEvidenceCore";
+import { normalizeString } from "./normalize";
 
 const FLAVOR_PROFILES = [
   "young_spritely",
@@ -333,6 +334,47 @@ export type SMWSReferenceDetails = SMWSCaskDetails & {
 
 const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
 
+// SMWS replica/anniversary presentations (for example the 40th-anniversary
+// "Maverick's 40" bottles) print the identity as two separately labeled parts,
+// "Society Distillery No. X" and "Single Cask No. Y", without the composed
+// "X.Y" code appearing anywhere on the label. These patterns recover each
+// component so the code can be composed deterministically.
+const SMWS_DISTILLERY_COMPONENT_PATTERN =
+  /\b(?:society\s+)?distillery\s+no\.?\s*([A-Z]{0,4}\d+)\b/i;
+const SMWS_CASK_COMPONENT_PATTERN =
+  /\b(?:single\s+)?cask\s+no\.?\s*(\d+)\b(?!\s*\.\d)/i;
+
+/**
+ * Composes an SMWS exact-cask code from separately labeled components.
+ *
+ * This is a closed identifier operation in the same spirit as parsing `95.71`:
+ * it fires only when the SMWS identity is anchored in the text AND both the
+ * distillery-number component and the cask-number component are present. It
+ * never composes from a single component, never generalizes to non-SMWS
+ * labels, and never invents a subtitle. Callers should try `getExactCaskCodeAnchor`
+ * first and fall back to composition only when no code is printed.
+ */
+export function composeExactCaskCodeFromComponents(
+  value: string | null | undefined,
+): string | null {
+  const normalizedValue = normalizeString(value ?? "");
+  if (!normalizedValue || !SMWS_REFERENCE_PATTERN.test(normalizedValue)) {
+    return null;
+  }
+
+  const distilleryMatch = normalizedValue.match(
+    SMWS_DISTILLERY_COMPONENT_PATTERN,
+  );
+  const caskMatch = normalizedValue.match(SMWS_CASK_COMPONENT_PATTERN);
+  const distilleryNo = distilleryMatch?.[1];
+  const caskNo = caskMatch?.[1];
+  if (!distilleryNo || !caskNo) {
+    return null;
+  }
+
+  return `${distilleryNo.toUpperCase()}.${caskNo}`;
+}
+
 export function parseDetailsFromName(name: string): SMWSCaskDetails | null {
   const caskNumberMatch = name.match(
     /(Cask No\. )?([A-Z0-9]+\.[0-9]+)\s*(.+)?/i,
@@ -370,16 +412,22 @@ export function parseReferenceName(
     return null;
   }
 
-  const code = getExactCaskCodeAnchor(name);
+  // Prefer a printed code; fall back to composing it from separately labeled
+  // distillery-number and cask-number components when no code is printed.
+  const parsedCode = getExactCaskCodeAnchor(name);
+  const code = parsedCode ?? composeExactCaskCodeFromComponents(name);
   if (!code) {
     return null;
   }
 
-  const selector =
-    name
-      .replace(SMWS_REFERENCE_PATTERN, "")
-      .replace(new RegExp(`\\b${escapeRegExp(code)}\\b`, "i"), "")
-      .trim() || null;
+  // Composed codes are not printed on the label, so there is no printed
+  // subtitle/selector to preserve alongside them.
+  const selector = parsedCode
+    ? name
+        .replace(SMWS_REFERENCE_PATTERN, "")
+        .replace(new RegExp(`\\b${escapeRegExp(code)}\\b`, "i"), "")
+        .trim() || null
+    : null;
   const details = parseDetailsFromName(code);
 
   return {

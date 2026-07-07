@@ -124,7 +124,7 @@
     "identityScope": "product",
     "matchedBottleId": 44263,
     "matchedReleaseId": null,
-    "confidenceBand": "auto_verification",
+    "expectedTier": "auto",
     "verifyEligible": true,
     "summary": "Use the uploaded bottle photo label evidence to match the existing Pōkeno Exploration Series No. 1 Totara Cask bottle. This is an existing-bottle tasting flow case, not a new-bottle creation case."
   }

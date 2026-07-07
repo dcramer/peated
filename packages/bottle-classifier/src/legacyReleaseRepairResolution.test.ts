@@ -23,7 +23,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "match",
           candidateBottleIds: [620],
-          confidence: 94,
           identityScope: "product",
           matchedBottleId: 620,
           matchedReleaseId: null,
@@ -59,7 +58,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "repair_bottle",
           candidateBottleIds: [620],
-          confidence: 94,
           identityScope: "product",
           matchedBottleId: 620,
           matchedReleaseId: null,
@@ -106,7 +104,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "match",
           candidateBottleIds: [610],
-          confidence: 98,
           identityScope: "exact_cask",
           matchedBottleId: 610,
           matchedReleaseId: null,
@@ -138,7 +135,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "create_release",
           candidateBottleIds: [501],
-          confidence: 81,
           identityScope: "product",
           matchedBottleId: null,
           matchedReleaseId: null,
@@ -185,7 +181,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "match",
           candidateBottleIds: [661],
-          confidence: 97,
           identityScope: "product",
           matchedBottleId: 661,
           matchedReleaseId: null,
@@ -221,7 +216,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "create_bottle_and_release",
           candidateBottleIds: [661],
-          confidence: 87,
           identityScope: "product",
           matchedBottleId: null,
           matchedReleaseId: null,
@@ -286,7 +280,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "create_bottle_and_release",
           candidateBottleIds: [],
-          confidence: 87,
           identityScope: "product",
           matchedBottleId: null,
           matchedReleaseId: null,
@@ -350,7 +343,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "create_bottle_and_release",
           candidateBottleIds: [],
-          confidence: 87,
           identityScope: "product",
           matchedBottleId: null,
           matchedReleaseId: null,
@@ -405,7 +397,6 @@ describe("resolveLegacyCreateParentClassification", () => {
         decision: {
           action: "create_bottle_and_release",
           candidateBottleIds: [],
-          confidence: 74,
           identityScope: "product",
           matchedBottleId: null,
           matchedReleaseId: null,

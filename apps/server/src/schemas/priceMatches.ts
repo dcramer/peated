@@ -401,7 +401,9 @@ function validateCreateNewDecisionShape(
 }
 
 const StorePriceMatchDecisionBaseSchema = z.object({
-  confidence: z.number().min(0).max(100),
+  // Numeric confidence was removed from the classifier agent contract; this
+  // field is retained as nullable telemetry and is written null.
+  confidence: z.number().min(0).max(100).nullable().default(null),
   rationale: z.string().nullable().default(null),
   candidateBottleIds: z.array(z.number().int()).default([]),
   identityScope: BottleIdentityScopeEnum.default("product"),

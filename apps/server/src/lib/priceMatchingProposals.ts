@@ -3,6 +3,7 @@ import type {
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import type { WebEvidenceJudgment } from "@peated/bottle-classifier/priceMatchingEvidence";
 import {
   getReleaseObservationFacts,
   isAddingBottleLevelReleaseTraits,
@@ -231,11 +232,6 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
   }
 }
 
-function normalizeClassifierConfidence(confidence: number): number {
-  const percentageConfidence = confidence <= 1 ? confidence * 100 : confidence;
-  return Math.min(100, Math.max(0, Math.round(percentageConfidence)));
-}
-
 function normalizeClassifierDecisionForPriceMatching(
   decision: BottleClassificationDecision,
   candidates: PriceMatchCandidate[],
@@ -299,10 +295,7 @@ function normalizeClassifierDecisionForPriceMatching(
     );
   }
 
-  return {
-    ...decision,
-    confidence: normalizeClassifierConfidence(decision.confidence),
-  };
+  return decision;
 }
 
 function buildBottleRepairInputFromProposedBottle(
@@ -567,7 +560,7 @@ function maybeBuildExistingBottleRepairDecision({
 
   return {
     action: "correction",
-    confidence: decision.confidence,
+    confidence: null,
     rationale: appendRationale(
       decision.rationale,
       "The current bottle appears to be the right base identity, but its stored bottle metadata conflicts with the extracted traits. Review this as an existing-bottle repair instead of creating a duplicate bottle.",
@@ -607,7 +600,7 @@ export function toStorePriceMatchDecision({
 
     return {
       action,
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -624,7 +617,7 @@ export function toStorePriceMatchDecision({
   if (decision.action === "repair_bottle") {
     return {
       action: "correction",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -650,7 +643,7 @@ export function toStorePriceMatchDecision({
 
     return {
       action: "create_new",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -667,7 +660,7 @@ export function toStorePriceMatchDecision({
   if (decision.action === "create_release") {
     return {
       action: "create_new",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -684,7 +677,7 @@ export function toStorePriceMatchDecision({
   if (decision.action === "create_bottle_and_release") {
     return {
       action: "create_new",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: decision.rationale,
       candidateBottleIds: decision.candidateBottleIds,
       identityScope: decision.identityScope,
@@ -703,7 +696,7 @@ export function toStorePriceMatchDecision({
     // needs the parent repair and child release drafts intact.
     return {
       action: "no_match",
-      confidence: decision.confidence,
+      confidence: null,
       rationale: appendRationale(
         decision.rationale,
         "Classifier found that the safe outcome requires repairing the existing parent bottle before creating a release; price matching cannot persist that compound repair yet.",
@@ -722,7 +715,7 @@ export function toStorePriceMatchDecision({
 
   return {
     action: "no_match",
-    confidence: decision.confidence,
+    confidence: null,
     rationale: decision.rationale,
     candidateBottleIds: decision.candidateBottleIds,
     identityScope: decision.identityScope,
@@ -804,10 +797,19 @@ function getProposalType(
   return decision.action;
 }
 
+// Structured evidence the code-derived automation tier reads. Carried
+// alongside the translated price-match decision because the derived tier no
+// longer reads the numeric `confidence` score.
+type StorePriceMatchDecisionEvidence = {
+  hasUnresolvedRisks: boolean;
+  webEvidence: WebEvidenceJudgment;
+};
+
 function getProposalStatus(
   price: StorePrice,
   decision: StorePriceMatchDecision,
   automationAssessment: StorePriceMatchAutomationAssessment | null,
+  decisionEvidence: StorePriceMatchDecisionEvidence | null,
 ): StorePriceMatchProposal["status"] {
   if (
     automationAssessment &&
@@ -818,7 +820,8 @@ function getProposalStatus(
       identityScope: decision.identityScope,
       suggestedBottleId: decision.suggestedBottleId,
       suggestedReleaseId: decision.suggestedReleaseId ?? null,
-      modelConfidence: decision.confidence,
+      hasUnresolvedRisks: decisionEvidence?.hasUnresolvedRisks ?? false,
+      webEvidence: decisionEvidence?.webEvidence ?? null,
       automationBlockers: automationAssessment.automationBlockers,
       plainAgeBottleAutoVerifyEligible:
         automationAssessment.plainAgeBottleAutoVerifyEligible,
@@ -1574,6 +1577,7 @@ export async function upsertStorePriceMatchProposal({
   extractedLabel,
   candidates,
   decision,
+  decisionEvidence,
   automationAssessment,
   searchEvidence,
   error,
@@ -1585,6 +1589,7 @@ export async function upsertStorePriceMatchProposal({
   extractedLabel: ExtractedBottleDetails | null;
   candidates: PriceMatchCandidate[];
   decision?: StorePriceMatchDecision | null;
+  decisionEvidence?: StorePriceMatchDecisionEvidence | null;
   automationAssessment?: StorePriceMatchAutomationAssessment | null;
   searchEvidence?: SearchEvidence[];
   error?: string | null;
@@ -1601,7 +1606,12 @@ export async function upsertStorePriceMatchProposal({
   const status =
     statusOverride ??
     (parsedDecision
-      ? getProposalStatus(price, parsedDecision, automationAssessment ?? null)
+      ? getProposalStatus(
+          price,
+          parsedDecision,
+          automationAssessment ?? null,
+          decisionEvidence ?? null,
+        )
       : "errored");
   const creationTarget =
     parsedDecision?.action === "create_new"
@@ -1620,6 +1630,7 @@ export async function upsertStorePriceMatchProposal({
     suggestedReleaseId: parsedDecision?.suggestedReleaseId ?? null,
     parentBottleId: parsedDecision?.parentBottleId ?? null,
     creationTarget,
+    aliasScope: parsedDecision?.aliasScope ?? null,
     candidateBottles: candidates,
     extractedLabel,
     proposedBottle: parsedDecision?.proposedBottle ?? null,
@@ -2099,6 +2110,13 @@ export async function resolveStorePriceMatchProposal(
       extractedLabel,
       candidates,
       decision,
+      decisionEvidence: {
+        hasUnresolvedRisks:
+          (classification.decision.confidenceBasis?.unresolvedRisks.length ??
+            0) > 0,
+        webEvidence:
+          classification.decision.confidenceBasis?.webEvidence ?? null,
+      },
       automationAssessment,
       searchEvidence,
       expectedProcessingToken: processingToken,
@@ -2436,6 +2454,13 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
   }
 
   const aliasKey = normalizeBottleAliasKey(proposal.price.name);
+  // Alias-safety gate: a newly assigned listing title only becomes a reusable
+  // global alias when the decision asserted `aliasScope = global_alias`. For
+  // "none"/null/missing scope the exact listing is still assigned (backfilled)
+  // and retained for provenance, but the new alias is marked ignored so a
+  // generic retailer title cannot be reused for future listings. Aliases that
+  // are already assigned to this target keep their existing ignored state.
+  const reusableGlobalAlias = proposal.aliasScope === "global_alias";
   // Store listing keys stay bottle-level unless an existing canonical release
   // alias already owns the same text, which assignBottleAliasInTransaction preserves.
   const aliasResult = await assignBottleAliasInTransaction(tx, {
@@ -2446,6 +2471,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     name: aliasKey,
     backfillNames: [proposal.price.name],
     volume: proposal.price.volume,
+    ignored: !reusableGlobalAlias,
     assignmentSource: "source_approved",
     assignedByActorId: actor.id,
   });

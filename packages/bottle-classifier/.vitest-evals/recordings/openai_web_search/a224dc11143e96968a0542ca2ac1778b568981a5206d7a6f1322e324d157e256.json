@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T20:18:33.760Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength bourbon Elijah Craig Barrel Proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength bourbon Elijah Craig Barrel Proof",
+    "summary": "**Elijah Craig Barrel Proof** is the current official name; people also commonly call it **Elijah Craig Cask Strength** informally, but the bottle/brand uses **Barrel Proof**. It’s made by **Heaven Hill Distillery** in Kentucky. ([elijahcraig.com](https://elijahcraig.com/barrel-proof?utm_source=openai))\n\nConfirmed bott",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "url": "https://en.wikipedia.org/wiki/Elijah_Craig_%28bourbon%29",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "url": "https://www.gobourbon.com/10-facts-you-may-not-know-about-elijah-craig-barrel-proof/",
+        "domain": "gobourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.mensjournal.com/drink/elijah-craig-barrel-proof-bourbon-review",
+        "url": "https://www.mensjournal.com/drink/elijah-craig-barrel-proof-bourbon-review",
+        "domain": "mensjournal.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://theliquorbarn.com/products/elijah-craig-barrel-proof",
+        "url": "https://theliquorbarn.com/products/elijah-craig-barrel-proof",
+        "domain": "theliquorbarn.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a224dc11143e96968a0542ca2ac1778b568981a5206d7a6f1322e324d157e256",
+    "mode": "auto"
+  }
+}

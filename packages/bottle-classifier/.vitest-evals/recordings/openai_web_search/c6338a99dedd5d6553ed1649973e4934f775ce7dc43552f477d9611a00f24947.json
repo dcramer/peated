@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T17:20:31.862Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon barrel 4769 5 year 64.2%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon barrel 4769 5 year 64.2%",
+    "summary": "I found a bottle-specific match for this one. It appears to be:\n\n**Willett Family Estate Bottled Single Barrel Bourbon**\n- **Producer/distillery:** Willett Distillery ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/150553/willett-05-year-old?utm_source=openai))\n- **Series:** Family Estate Bottled Single Ba",
+    "results": [
+      {
+        "title": "https://www.poundridgewine.com/willett-family-estate-bottled-single-barrel-bourbo.html",
+        "url": "https://www.poundridgewine.com/willett-family-estate-bottled-single-barrel-bourbo.html",
+        "domain": "poundridgewine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://the-right-spirit.com/2019/08/30/comparison-willett-5-year-single-barrel-bourbon-willett-4-year-small-batch-rye/",
+        "url": "https://the-right-spirit.com/2019/08/30/comparison-willett-5-year-single-barrel-bourbon-willett-4-year-small-batch-rye/",
+        "domain": "the-right-spirit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://woodencork.com/collections/willett/products/willett-family-estate-single-barrel-bourbon-5-year-old-4763-129-6-proof",
+        "url": "https://woodencork.com/collections/willett/products/willett-family-estate-single-barrel-bourbon-5-year-old-4763-129-6-proof",
+        "domain": "woodencork.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/81549/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/brand/81549/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.winedeals.com/spirits/whiskey-whisky/american/bourbon/willett-family-estate-bottled-single-barrel-bourbon-rare-release-barrel-no-4113-aged-10-years-",
+        "url": "https://www.winedeals.com/spirits/whiskey-whisky/american/bourbon/willett-family-estate-bottled-single-barrel-bourbon-rare-release-barrel-no-4113-aged-10-years-750-ml-4355.html",
+        "domain": "winedeals.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c6338a99dedd5d6553ed1649973e4934f775ce7dc43552f477d9611a00f24947",
+    "mode": "auto"
+  }
+}

@@ -240,7 +240,7 @@
     "identityScope": "product",
     "matchedBottleId": 11868,
     "matchedReleaseId": null,
-    "confidenceBand": "auto_verification",
+    "expectedTier": "auto",
     "verifyEligible": true,
     "summary": "Use the uploaded bottle photo label evidence, especially the 15-year age statement, to match existing bottle 11868 rather than the 20-year sibling 11867."
   }

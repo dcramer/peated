@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-06T15:58:07.356Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 1661 Creative Whisky Company",
+    "summary": "I found a likely match, but there’s a **conflict in the details you gave**.\n\n**Best corroborated bottle match**\n- **Bottler:** Creative Whisky Company (CWC) ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc?utm_source=openai))\n- **Series:** The Exclusive Malts ([whiskybase.com](https://w",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "url": "https://www.whiskybase.com/whiskies/whisky/82715/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "url": "https://www.spiritradar.com/whisky-db/brands/creative-whisky-company/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "url": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "domain": "maltrunners.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyhammer.com/item/149853/Balmenach/Balmenach---8-Year-Old-2007-The-Exclusive-Malts-75cl.html",
+        "url": "https://www.whiskyhammer.com/item/149853/Balmenach/Balmenach---8-Year-Old-2007-The-Exclusive-Malts-75cl.html",
+        "domain": "whiskyhammer.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "url": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://norfolkwineandspirits.com/product-tag/creative-whisky-company/",
+        "url": "https://norfolkwineandspirits.com/product-tag/creative-whisky-company/",
+        "domain": "norfolkwineandspirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "22e18a721c2b2cbc855a63c03efceb07f8ddbb56e5d75dc3b6191295460e36ee",
+    "mode": "auto"
+  }
+}
