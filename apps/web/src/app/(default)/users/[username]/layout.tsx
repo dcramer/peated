@@ -4,8 +4,6 @@ import EmptyActivity from "@peated/web/components/emptyActivity";
 import Link from "@peated/web/components/link";
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import UserAvatar from "@peated/web/components/userAvatar";
-import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
-import UserLocationChart from "@peated/web/components/userLocationChart";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
@@ -14,7 +12,7 @@ import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
 import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
-import { UserBadgeList } from "./userBadgeList";
+import { ProfileProvider } from "./profileContext";
 
 export const fetchCache = "default-no-store";
 
@@ -154,14 +152,7 @@ export default async function Layout(props: {
       {isPrivate ? (
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
-        <>
-          <div className="mb-4 px-3 lg:mb-8 lg:px-0">
-            <UserBadgeList userId={user.id} />
-          </div>
-          <div className="grid-cols mb-4 hidden grid-cols-1 gap-4 px-3 lg:grid lg:grid-cols-2 lg:px-0">
-            <UserLocationChart userId={user.id} />
-            <UserFlavorDistributionChart userId={user.id} />
-          </div>
+        <ProfileProvider userId={user.id}>
           <div className="hidden lg:block">
             <Tabs fullWidth border>
               <TabItem as={Link} href={`/users/${user.username}`} controlled>
@@ -186,7 +177,7 @@ export default async function Layout(props: {
             </Tabs>
           </div>
           {children}
-        </>
+        </ProfileProvider>
       )}
     </>
   );

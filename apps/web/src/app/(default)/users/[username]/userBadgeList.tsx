@@ -1,6 +1,7 @@
 "use client";
 
 import BadgeImage from "@peated/web/components/badgeImage";
+import { DistributionChartLegend } from "@peated/web/components/distributionChart";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -16,10 +17,11 @@ export function UserBadgeList({ userId }: { userId: number }) {
     }),
   );
 
-  if (!awardList.results) return null;
+  if (!awardList.results.length) return null;
 
   return (
-    <div className="flex justify-center lg:justify-start">
+    <div>
+      <DistributionChartLegend>Achievements</DistributionChartLegend>
       <ul className="scrollbar-none flex gap-2 overflow-x-scroll lg:flex-wrap lg:overflow-x-auto">
         {awardList.results.map((award) => {
           return (
