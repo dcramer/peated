@@ -8,7 +8,7 @@
 
 - [x] 2.1 Render Add to Library, Log Tasting, and View Bottle for existing resolver targets.
 - [x] 2.2 Render Add to Library, Log Tasting, and Create Bottle for create proposals.
-- [x] 2.3 Add concise supporting copy for create proposals explaining that the selected action will create the missing bottle first.
+- [x] 2.3 Keep create-proposal context in the bottle card subtext so actions do not need duplicate helper copy.
 - [x] 2.4 Remove the create-proposal path that creates a target and then shows a second outcome chooser.
 
 ## 3. Action-Time Commit

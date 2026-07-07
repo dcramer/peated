@@ -333,15 +333,7 @@ function CreateProposalOutcomeActions({
         ? [createButton, libraryButton, tastingButton]
         : [libraryButton, tastingButton, createButton];
 
-  return (
-    <div className="space-y-3">
-      <p className="text-muted text-sm">
-        This will create the missing bottle or bottling in Peated before
-        continuing.
-      </p>
-      <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
-    </div>
-  );
+  return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
 }
 
 function OutcomeSelection({
