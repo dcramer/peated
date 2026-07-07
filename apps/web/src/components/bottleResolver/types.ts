@@ -19,7 +19,11 @@ export type BottleResolverTarget = {
   warnings?: string[];
 };
 
-export type BottleResolverMatchedAction = "library" | "tasting";
+export type BottleResolverAction = "library" | "tasting" | "create";
+export type BottleResolverMatchedAction = Exclude<
+  BottleResolverAction,
+  "create"
+>;
 
 export type BottleResolverMatchedActionsProps = {
   bottleId: number;
@@ -30,10 +34,16 @@ export type BottleResolverMatchedActionsProps = {
   onResolve: (action: BottleResolverMatchedAction) => void;
 };
 
+export type BottleResolverCreateProposalActionsProps = {
+  createPending: boolean;
+  resolvingAction: BottleResolverAction | null;
+  onResolve: (action: BottleResolverAction) => void;
+};
+
 export type BottleResolverProps = {
   onResolve: (
     target: BottleResolverTarget,
-    action?: BottleResolverMatchedAction,
+    action?: BottleResolverAction,
   ) => Promise<void> | void;
   searchHrefForQuery: (query?: string) => string;
   createBottleHrefForResult?: (
@@ -43,6 +53,9 @@ export type BottleResolverProps = {
   title: string;
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
+  ) => ReactNode;
+  renderCreateProposalActions?: (
+    props: BottleResolverCreateProposalActionsProps,
   ) => ReactNode;
   createProposalActionLabel?: string;
   searchActionLabel?: string;

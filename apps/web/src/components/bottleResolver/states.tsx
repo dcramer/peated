@@ -14,6 +14,8 @@ import {
   SearchBottleCallout,
 } from "./panels";
 import type {
+  BottleResolverAction,
+  BottleResolverCreateProposalActionsProps,
   BottleResolverMatchedAction,
   BottleResolverMatchedActionsProps,
 } from "./types";
@@ -186,6 +188,7 @@ export function PhotoMatchCreateState({
   matchedBottleId,
   matchedReleaseId,
   renderMatchedResultActions,
+  renderCreateProposalActions,
   createProposalLabel,
   hasCreateDecision,
   proposedName,
@@ -204,12 +207,15 @@ export function PhotoMatchCreateState({
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
+  renderCreateProposalActions?: (
+    props: BottleResolverCreateProposalActionsProps,
+  ) => ReactNode;
   createProposalLabel: { title: string; description: string } | null;
   hasCreateDecision: boolean;
   proposedName: string | null;
   createPending: boolean;
   createActionLabel: string;
-  resolvingAction: BottleResolverMatchedAction | null;
+  resolvingAction: BottleResolverAction | null;
   hasExactLibraryEntry: boolean;
   loadingExactLibraryStatus: boolean;
   onLoadTarget: (
@@ -217,7 +223,10 @@ export function PhotoMatchCreateState({
     releaseId: number | null,
     action?: BottleResolverMatchedAction,
   ) => void;
-  onAcceptCreateProposal: (result: PhotoIdentification) => void;
+  onAcceptCreateProposal: (
+    result: PhotoIdentification,
+    action: BottleResolverAction,
+  ) => void;
 }) {
   const matchedCandidate = getMatchedCandidate(result);
 
@@ -244,7 +253,8 @@ export function PhotoMatchCreateState({
               releaseId: matchedReleaseId,
               hasExactLibraryEntry,
               loadingExactLibraryStatus,
-              resolvingAction,
+              resolvingAction:
+                resolvingAction === "create" ? null : resolvingAction,
               onResolve: (action) => {
                 onLoadTarget(matchedBottleId, matchedReleaseId, action);
               },
@@ -282,19 +292,33 @@ export function PhotoMatchCreateState({
         >
           <EvidencePills result={result} compact />
         </PhotoResultCard>
-        <div className="mx-auto grid w-full gap-2 sm:w-1/2">
-          {hasCreateDecision && (
-            <Button
-              color="highlight"
-              fullWidth
-              icon={<Plus className="h-4 w-4" />}
-              onClick={() => onAcceptCreateProposal(result)}
-              disabled={createPending}
-            >
-              {createPending ? "Creating..." : createActionLabel}
-            </Button>
-          )}
-        </div>
+        {hasCreateDecision && (
+          <div
+            className={
+              renderCreateProposalActions
+                ? "space-y-3"
+                : "mx-auto grid w-full gap-2 sm:w-1/2"
+            }
+          >
+            {renderCreateProposalActions ? (
+              renderCreateProposalActions({
+                createPending,
+                resolvingAction,
+                onResolve: (action) => onAcceptCreateProposal(result, action),
+              })
+            ) : (
+              <Button
+                color="highlight"
+                fullWidth
+                icon={<Plus className="h-4 w-4" />}
+                onClick={() => onAcceptCreateProposal(result, "create")}
+                disabled={createPending}
+              >
+                {createPending ? "Creating..." : createActionLabel}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

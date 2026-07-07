@@ -36,6 +36,11 @@ const corsHeaders = {
   Vary: "Origin",
 };
 
+const mockUploadImage = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+  "base64",
+);
+
 const collectionStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
 let collectionBottleId = 1;
@@ -53,6 +58,17 @@ const server = http.createServer(async (request, response) => {
   }
 
   const url = new URL(request.url ?? "/", `http://${host}:${port}`);
+  if (url.pathname.startsWith("/uploads/")) {
+    response
+      .writeHead(200, {
+        ...corsHeaders,
+        "Cache-Control": "no-store",
+        "Content-Type": "image/png",
+      })
+      .end(mockUploadImage);
+    return;
+  }
+
   if (url.pathname.startsWith("/rpc")) {
     const handled = await handleRpcRequest({ request, response, url });
     if (!handled) {
@@ -158,12 +174,22 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "bottleReleases/details": {
-      if (input?.release !== existingReleaseId) {
+      if (input?.release === existingReleaseId) {
+        sendRpcResponse(response, existingRelease);
+        return true;
+      }
+
+      if (input?.release === createdReleaseId) {
+        sendRpcResponse(response, buildCreatedRelease());
+        return true;
+      }
+
+      if (typeof input?.release !== "number") {
         sendRpcError(response, "Unexpected bottle release details payload");
         return true;
       }
 
-      sendRpcResponse(response, existingRelease);
+      sendRpcError(response, "Unexpected bottle release details payload");
       return true;
     }
     case "bottles/suggestedTags":
@@ -236,6 +262,15 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-create-existing")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+          "77777777777777777777777777777777",
         );
         return true;
       }
@@ -589,8 +624,11 @@ function mutateCollectionBottle(request, input, action) {
   if (
     input?.release !== undefined &&
     input.release !== null &&
-    (input.release !== existingReleaseId ||
-      input.bottle !== existingRelease.bottleId)
+    !(
+      (input.release === existingReleaseId &&
+        input.bottle === existingRelease.bottleId) ||
+      (input.release === createdReleaseId && input.bottle === createdBottleId)
+    )
   ) {
     throw new Error("Unexpected collection release payload");
   }
@@ -620,7 +658,12 @@ function mutateCollectionBottle(request, input, action) {
           input.bottle === existingBottleId
             ? existingBottle
             : buildBottleForId(input.bottle),
-        release: input.release === existingReleaseId ? existingRelease : null,
+        release:
+          input.release === existingReleaseId
+            ? existingRelease
+            : input.release === createdReleaseId
+              ? buildCreatedRelease()
+              : null,
         imageUrl: input.pendingImageId
           ? "http://127.0.0.1:4999/uploads/library.webp"
           : null,
@@ -880,6 +923,13 @@ function createPhotoIdentificationTarget(request, input) {
     };
   }
 
+  if (token.includes("photo-create-existing")) {
+    return {
+      bottle: existingBottle,
+      release: null,
+    };
+  }
+
   if (token.includes("photo-create-unsuitable")) {
     return {
       bottle,
@@ -890,14 +940,7 @@ function createPhotoIdentificationTarget(request, input) {
   if (token.includes("photo-create-release-default-image")) {
     return {
       bottle,
-      release: buildBottleRelease({
-        id: createdReleaseId,
-        bottleId: createdBottleId,
-        fullName: `${bottle.fullName} First Fill Oloroso`,
-        name: "First Fill Oloroso",
-        edition: "First Fill Oloroso",
-        releaseYear: 2026,
-      }),
+      release: buildCreatedRelease(),
     };
   }
 
@@ -923,12 +966,26 @@ function getExpectedPhotoCreateToken(request) {
 
   if (
     token.includes("photo-create-bottle-default-image") ||
-    token.includes("photo-create-warning")
+    token.includes("photo-create-warning") ||
+    token.includes("photo-create-existing")
   ) {
     return "playwright-create-token:create_bottle:suitable";
   }
 
   return null;
+}
+
+function buildCreatedRelease() {
+  const bottle = buildBottleForId(createdBottleId);
+
+  return buildBottleRelease({
+    id: createdReleaseId,
+    bottleId: createdBottleId,
+    fullName: `${bottle.fullName} First Fill Oloroso`,
+    name: "First Fill Oloroso",
+    edition: "First Fill Oloroso",
+    releaseYear: 2026,
+  });
 }
 
 /**
