@@ -1,6 +1,7 @@
 "use client";
 
 import useAuth from "@peated/web/hooks/useAuth";
+import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -53,6 +54,7 @@ export default function SearchPanel({
   const qs = useSearchParams();
   const intent = qs.get("intent");
   const addBottleIntent = getAddBottleIntent(intent);
+  const pendingImage = getPendingImageFromParams(qs);
   // The empty ?tasting flag is the legacy direct shortcut; intent=tasting keeps the Add Bottle resolver.
   const directToTasting = qs.has("tasting");
   const createBottleReturnAction =
@@ -135,6 +137,11 @@ export default function SearchPanel({
               if (addBottleIntent) {
                 params.set("intent", addBottleIntent);
               }
+              if (pendingImage?.id)
+                params.set("pendingImageId", pendingImage.id);
+              if (pendingImage?.imageUrl) {
+                params.set("pendingImageUrl", pendingImage.imageUrl);
+              }
               router.replace(`${location.pathname}?${params.toString()}`);
             }}
             loading={state === "loading"}
@@ -153,6 +160,7 @@ export default function SearchPanel({
           directToTasting={directToTasting}
           addBottleIntent={addBottleIntent}
           createBottleReturnAction={createBottleReturnAction}
+          pendingImage={pendingImage}
         />
       )}
     </Layout>

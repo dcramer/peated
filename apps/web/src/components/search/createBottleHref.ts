@@ -1,4 +1,5 @@
 import { toTitleCase } from "@peated/server/lib/strings";
+import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
 
 export type CreateBottleReturnAction =
   | "addBottle"
@@ -23,10 +24,12 @@ export function getCreateBottleHref({
   query,
   returnAction,
   prefill,
+  pendingImage,
 }: {
   query: string;
   returnAction?: CreateBottleReturnAction;
   prefill?: CreateBottlePrefill;
+  pendingImage?: PendingImageRouteState | null;
 }) {
   const params = new URLSearchParams({
     name: toTitleCase(query),
@@ -48,6 +51,10 @@ export function getCreateBottleHref({
   }
   if (prefill?.releaseYear !== null && prefill?.releaseYear !== undefined) {
     params.set("releaseYear", String(prefill.releaseYear));
+  }
+  if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
+  if (pendingImage?.imageUrl) {
+    params.set("pendingImageUrl", pendingImage.imageUrl);
   }
   return `/bottles/new?${params.toString()}`;
 }

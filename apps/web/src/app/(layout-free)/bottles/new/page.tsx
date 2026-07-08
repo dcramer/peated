@@ -76,6 +76,8 @@ function CreateBottleForm() {
     searchParams.get("returnAction") || searchParams.get("intent"),
   );
   const proposalId = searchParams.get("proposal");
+  const pendingImageId = searchParams.get("pendingImageId")?.trim() || null;
+  const pendingImageUrl = searchParams.get("pendingImageUrl") || null;
 
   const distiller = searchParams.get("distiller") || null;
   const brand = searchParams.get("brand") || null;
@@ -112,6 +114,7 @@ function CreateBottleForm() {
 
   const [initialData, setInitialData] = useState<BottleFormInitialData>({
     name,
+    ...(pendingImageUrl ? { imageUrl: pendingImageUrl } : {}),
     ...(brandName ? { brand: brandName } : {}),
     ...(statedAge !== null ? { statedAge } : {}),
     ...(abv !== null ? { abv } : {}),
@@ -233,6 +236,9 @@ function CreateBottleForm() {
           : await bottleCreateMutation.mutateAsync(data);
         const createdBottle = "bottle" in created ? created.bottle : created;
         const createdRelease = "release" in created ? created.release : null;
+        const nextPendingImageId = image === undefined ? pendingImageId : null;
+        const nextPendingImageUrl =
+          image === undefined ? pendingImageUrl : null;
 
         if (image) {
           const blob = await toBlob(image);
@@ -256,11 +262,14 @@ function CreateBottleForm() {
             release: createdRelease?.id ?? null,
             user: "me",
             collection: "library",
+            pendingImageId: nextPendingImageId ?? undefined,
           });
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
               releaseId: createdRelease?.id ?? null,
+              pendingImageId: nextPendingImageId,
+              pendingImageUrl: nextPendingImageUrl,
               intent: "library",
             }),
           );
@@ -275,6 +284,8 @@ function CreateBottleForm() {
             getAddBottleHref({
               bottleId: createdBottle.id,
               releaseId: createdRelease?.id ?? null,
+              pendingImageId: nextPendingImageId,
+              pendingImageUrl: nextPendingImageUrl,
             }),
           );
         } else if (returnAction === "tasting") {
@@ -282,6 +293,8 @@ function CreateBottleForm() {
             getAddBottleHref({
               bottleId: createdBottle.id,
               releaseId: createdRelease?.id ?? null,
+              pendingImageId: nextPendingImageId,
+              pendingImageUrl: nextPendingImageUrl,
               intent: "tasting",
             }),
           );

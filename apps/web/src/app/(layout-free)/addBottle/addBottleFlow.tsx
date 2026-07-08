@@ -8,6 +8,7 @@ import BottleResolver, {
   type BottleResolverCreateProposalActionsProps,
   type BottleResolverMatchedActionsProps,
   type BottleResolverTarget,
+  type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import Button from "@peated/web/components/button";
@@ -21,8 +22,12 @@ import { getCreateBottleHref } from "@peated/web/components/search/createBottleH
 import Spinner from "@peated/web/components/spinner";
 import TastingForm from "@peated/web/components/tastingForm";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
+import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
-import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
+import {
+  getBottleBottlingPath,
+  getNewBottleBottlingPath,
+} from "@peated/web/lib/bottlings";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -74,11 +79,19 @@ function parseId(value: string | null) {
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
-function getSearchHref(query = "", intent: AddBottleIntent = "choose") {
+function getSearchHref(
+  query = "",
+  intent: AddBottleIntent = "choose",
+  pendingImage?: PendingImageRef | null,
+) {
   const params = new URLSearchParams({
     intent: intent === "choose" ? "addBottle" : intent,
   });
   if (query) params.set("q", query);
+  if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
+  if (pendingImage?.imageUrl) {
+    params.set("pendingImageUrl", pendingImage.imageUrl);
+  }
   return `/search?${params.toString()}`;
 }
 
@@ -95,6 +108,21 @@ function getViewBottleHref(
   target: Pick<BottleResolverTarget, "bottle" | "release">,
 ) {
   return getViewBottleHrefByIds(target.bottle.id, target.release?.id ?? null);
+}
+
+function canSaveTargetToLibrary(target: BottleResolverTarget) {
+  return (
+    !target.hasExactLibraryEntry ||
+    Boolean(target.pendingImage && target.exactLibraryEntryImageUrl === null)
+  );
+}
+
+function getLibraryActionLabel(target: {
+  hasExactLibraryEntry: boolean;
+  canSaveLibraryPhoto?: boolean;
+}) {
+  if (!target.hasExactLibraryEntry) return "Add to Library";
+  return target.canSaveLibraryPhoto ? "Save Photo" : "In Library";
 }
 
 function FlowHeader({ children }: { children: ReactNode }) {
@@ -234,11 +262,16 @@ function MatchedOutcomeActions({
   bottleId,
   releaseId,
   hasExactLibraryEntry,
+  exactLibraryEntryImageUrl,
+  pendingImage,
   loadingExactLibraryStatus,
   resolvingAction,
   intent,
   onResolve,
 }: BottleResolverMatchedActionsProps & { intent: AddBottleIntent }) {
+  const canSaveLibraryPhoto = Boolean(
+    pendingImage && hasExactLibraryEntry && exactLibraryEntryImageUrl === null,
+  );
   const libraryButton = (
     <OutcomeButton
       key="library"
@@ -248,11 +281,11 @@ function MatchedOutcomeActions({
       disabled={
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
-        hasExactLibraryEntry
+        (hasExactLibraryEntry && !canSaveLibraryPhoto)
       }
       loading={resolvingAction === "library" || loadingExactLibraryStatus}
     >
-      {hasExactLibraryEntry ? "In Library" : "Add to Library"}
+      {getLibraryActionLabel({ hasExactLibraryEntry, canSaveLibraryPhoto })}
     </OutcomeButton>
   );
   const tastingButton = (
@@ -276,12 +309,26 @@ function MatchedOutcomeActions({
       View Bottle
     </OutcomeButton>
   );
+  const addBottlingButton =
+    releaseId === null ? (
+      <OutcomeButton
+        key="bottling"
+        href={getNewBottleBottlingPath(bottleId)}
+        icon={<Plus className="h-4 w-4" />}
+      >
+        Add Bottling
+      </OutcomeButton>
+    ) : null;
   const actionButtons =
     intent === "tasting"
-      ? [tastingButton, libraryButton, viewButton]
-      : [libraryButton, tastingButton, viewButton];
+      ? [tastingButton, libraryButton, viewButton, addBottlingButton].filter(
+          Boolean,
+        )
+      : [libraryButton, tastingButton, viewButton, addBottlingButton].filter(
+          Boolean,
+        );
 
-  return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
+  return <div className="grid gap-3 sm:grid-cols-4">{actionButtons}</div>;
 }
 
 function CreateProposalOutcomeActions({
@@ -367,11 +414,16 @@ function OutcomeSelection({
       icon={<BookOpen className="h-4 w-4" />}
       emphasized
       disabled={
-        target.hasExactLibraryEntry || addingToLibrary || loggingTasting
+        !canSaveTargetToLibrary(target) || addingToLibrary || loggingTasting
       }
       loading={addingToLibrary}
     >
-      {target.hasExactLibraryEntry ? "In Library" : "Add to Library"}
+      {getLibraryActionLabel({
+        hasExactLibraryEntry: target.hasExactLibraryEntry,
+        canSaveLibraryPhoto: Boolean(
+          target.pendingImage && target.exactLibraryEntryImageUrl === null,
+        ),
+      })}
     </OutcomeButton>
   );
   const tastingButton = (
@@ -395,10 +447,23 @@ function OutcomeSelection({
       View Bottle
     </OutcomeButton>
   );
+  const addBottlingButton = !target.release ? (
+    <OutcomeButton
+      key="bottling"
+      href={getNewBottleBottlingPath(target.bottle.id)}
+      icon={<Plus className="h-4 w-4" />}
+    >
+      Add Bottling
+    </OutcomeButton>
+  ) : null;
   const actionButtons =
     intent === "tasting"
-      ? [tastingButton, libraryButton, viewButton]
-      : [libraryButton, tastingButton, viewButton];
+      ? [tastingButton, libraryButton, viewButton, addBottlingButton].filter(
+          Boolean,
+        )
+      : [libraryButton, tastingButton, viewButton, addBottlingButton].filter(
+          Boolean,
+        );
 
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
@@ -423,12 +488,12 @@ function OutcomeSelection({
               <h2 className="font-semibold text-white">{title}</h2>
               <p className="text-muted mt-1 text-sm">{description}</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
+            <div className="grid gap-3 sm:grid-cols-4">{actionButtons}</div>
           </div>
         </section>
         <div className="grid gap-3 sm:grid-cols-2">
           <Button
-            href={getSearchHref("", intent)}
+            href={getSearchHref("", intent, target.pendingImage)}
             fullWidth
             icon={<Search className="h-4 w-4" />}
           >
@@ -525,10 +590,14 @@ function AddBottleFlowContent() {
     searchParams.get("release") ?? searchParams.get("bottling"),
   );
   const requestedFlightId = searchParams.get("flight") || null;
+  const requestedPendingImage = useMemo(
+    () => getPendingImageFromParams(new URLSearchParams(searchParams)),
+    [searchParams],
+  );
   const requestedTargetKey = useMemo(() => {
     if (!requestedBottleId) return null;
-    return `${requestedBottleId}:${requestedReleaseId ?? "base"}`;
-  }, [requestedBottleId, requestedReleaseId]);
+    return `${requestedBottleId}:${requestedReleaseId ?? "base"}:${requestedPendingImage?.id ?? "no-image"}`;
+  }, [requestedBottleId, requestedPendingImage?.id, requestedReleaseId]);
 
   const [loadedTargetKey, setLoadedTargetKey] = useState<string | null>(null);
   const [loadingTarget, setLoadingTarget] = useState(false);
@@ -599,6 +668,7 @@ function AddBottleFlowContent() {
         ]);
 
         if (cancelled) return;
+        const exactLibraryEntry = collectionStatus.results[0] ?? null;
         if (release && release.bottleId !== bottle.id) {
           setSelectedTarget(null);
           setLoadedTargetKey(null);
@@ -610,9 +680,10 @@ function AddBottleFlowContent() {
         setSelectedTarget({
           bottle,
           release,
-          hasExactLibraryEntry: collectionStatus.results.length > 0,
-          pendingImage: null,
-          previewUrl: null,
+          hasExactLibraryEntry: Boolean(exactLibraryEntry),
+          exactLibraryEntryImageUrl: exactLibraryEntry?.imageUrl ?? null,
+          pendingImage: requestedPendingImage,
+          previewUrl: requestedPendingImage?.imageUrl || null,
         });
         setLoadedTargetKey(requestedTargetKey);
       } catch (err) {
@@ -639,6 +710,7 @@ function AddBottleFlowContent() {
     loadedTargetKey,
     orpc,
     requestedBottleId,
+    requestedPendingImage,
     requestedReleaseId,
     requestedTargetKey,
   ]);
@@ -721,7 +793,7 @@ function AddBottleFlowContent() {
     }
     setLibraryError(undefined);
     setTastingDraft(null);
-    if (target.hasExactLibraryEntry) return;
+    if (!canSaveTargetToLibrary(target)) return;
 
     try {
       const entry = await libraryCreateMutation.mutateAsync({
@@ -873,15 +945,19 @@ function AddBottleFlowContent() {
   return (
     <BottleResolver
       title="Add Bottle"
-      searchHrefForQuery={(query) => getSearchHref(query, intent)}
+      searchHrefForQuery={(query, pendingImage) =>
+        getSearchHref(query, intent, pendingImage)
+      }
       createBottleHrefForResult={(
         query: string,
         prefill?: CreateBottlePrefill,
+        pendingImage?: PendingImageRef | null,
       ) =>
         getCreateBottleHref({
           query,
           returnAction: getCreateReturnAction(intent),
           prefill,
+          pendingImage,
         })
       }
       createProposalActionLabel="Create Bottle"

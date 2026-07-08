@@ -47,6 +47,21 @@ describe("search result create bottle links", () => {
     );
   });
 
+  it("preserves pending scan images for reviewed bottle creation", () => {
+    expect(
+      getCreateBottleHref({
+        query: "playwright reserve",
+        returnAction: "addBottle",
+        pendingImage: {
+          id: "pending-photo",
+          imageUrl: "http://127.0.0.1:4999/uploads/pending.webp",
+        },
+      }),
+    ).toBe(
+      "/bottles/new?name=Playwright+Reserve&returnAction=addBottle&pendingImageId=pending-photo&pendingImageUrl=http%3A%2F%2F127.0.0.1%3A4999%2Fuploads%2Fpending.webp",
+    );
+  });
+
   it("routes Add Bottle intent bottle rows through the Add Bottle flow", () => {
     expect(
       getBottleResultHref({
@@ -54,6 +69,21 @@ describe("search result create bottle links", () => {
         addBottleIntent: "addBottle",
       }),
     ).toBe("/addBottle?bottle=123&intent=addBottle");
+  });
+
+  it("preserves pending scan images for Add Bottle search results", () => {
+    expect(
+      getBottleResultHref({
+        bottleId: 123,
+        addBottleIntent: "addBottle",
+        pendingImage: {
+          id: "pending-photo",
+          imageUrl: "http://127.0.0.1:4999/uploads/pending.webp",
+        },
+      }),
+    ).toBe(
+      "/addBottle?bottle=123&pendingImageId=pending-photo&pendingImageUrl=http%3A%2F%2F127.0.0.1%3A4999%2Fuploads%2Fpending.webp&intent=addBottle",
+    );
   });
 
   it("routes tasting search shortcuts through the Add Bottle flow", () => {

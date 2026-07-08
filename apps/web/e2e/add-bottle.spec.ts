@@ -24,6 +24,9 @@ import {
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
+const pendingScanImageUrl =
+  "http://127.0.0.1:4999/uploads/playwright-photo.webp";
+
 test.describe("create bottle", () => {
   test("renders the Add Bottle resolver at the plain route", async ({
     context,
@@ -270,6 +273,9 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await expect(
+      page.getByRole("link", { name: "Add Bottling" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/bottlings/new`);
+    await expect(
       page.getByRole("link", { name: "Search Bottles" }),
     ).toHaveAttribute("href", "/search?intent=addBottle");
 
@@ -367,6 +373,49 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
   });
 
+  test("preserves scanned photos through Add Bottle search fallback", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "scan-search-library"),
+    });
+
+    await page.goto(
+      `/search?intent=addBottle&q=Lagavulin&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingScanImageUrl)}`,
+    );
+    await page.getByRole("link", { name: existingBottle.fullName }).click();
+
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const addBottleUrl = new URL(page.url());
+    expect(addBottleUrl.searchParams.get("pendingImageId")).toBe(
+      "playwright-photo-upload",
+    );
+    expect(addBottleUrl.searchParams.get("pendingImageUrl")).toBe(
+      pendingScanImageUrl,
+    );
+    await expect(page.getByAltText("Selected bottle label")).toHaveAttribute(
+      "src",
+      pendingScanImageUrl,
+    );
+    await expect(
+      page.getByRole("link", { name: "Search Bottles" }),
+    ).toHaveAttribute(
+      "href",
+      `/search?intent=addBottle&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingScanImageUrl)}`,
+    );
+
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
   test("adds a searched bottle to Library from the Add Bottle resolver", async ({
     context,
     page,
@@ -458,6 +507,9 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(
+      page.getByRole("link", { name: "Add Bottling" }),
+    ).toBeVisible();
+    await expect(
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await expectFooterBelowAction(
@@ -496,6 +548,42 @@ test.describe("add bottle flow", () => {
     const inLibraryButton = page.getByRole("button", { name: "In Library" });
     await expect(inLibraryButton).toBeVisible();
     await expect(inLibraryButton).toBeDisabled();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("saves a scanned photo onto an existing Library entry without an image", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "scan-library-fill-image"),
+    });
+
+    await page.goto(`/addBottle?bottle=${existingBottle.id}`);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    const savePhotoButton = page.getByRole("button", { name: "Save Photo" });
+    await expect(savePhotoButton).toBeVisible();
+    await expect(savePhotoButton).toBeEnabled();
+
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await savePhotoButton.click();
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByAltText("Selected bottle label")).toHaveAttribute(
+      "src",
+      /library\.webp$/,
+    );
     await expectNoHorizontalOverflow(page);
   });
 
@@ -925,6 +1013,12 @@ test.describe("add bottle flow", () => {
     const createUrl = new URL(href!, page.url());
     expect(createUrl.pathname).toBe("/bottles/new");
     expect(createUrl.searchParams.get("returnAction")).toBe("addBottle");
+    expect(createUrl.searchParams.get("pendingImageId")).toBe(
+      "playwright-photo-upload",
+    );
+    expect(createUrl.searchParams.get("pendingImageUrl")).toBe(
+      pendingScanImageUrl,
+    );
     expect(createUrl.searchParams.get("brandName")).toBe(testBrand.name);
     expect(createUrl.searchParams.get("name")).toBe(createdBottleName);
     await expectNoHorizontalOverflow(page);
@@ -985,16 +1079,73 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await page.getByRole("button", { name: "Create Bottle" }).click();
 
-    await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=addBottle$`),
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const createdUrl = new URL(page.url());
+    expect(createdUrl.pathname).toBe("/addBottle");
+    expect(createdUrl.searchParams.get("bottle")).toBe(String(createdBottleId));
+    expect(createdUrl.searchParams.get("intent")).toBe("addBottle");
+    expect(createdUrl.searchParams.get("pendingImageId")).toBe(
+      "playwright-photo-upload",
+    );
+    expect(createdUrl.searchParams.get("pendingImageUrl")).toBe(
+      pendingScanImageUrl,
     );
     await expect(
       page.getByRole("heading", { name: "Bottle found" }),
     ).toBeVisible();
+    await expect(page.getByAltText("Selected bottle label")).toHaveAttribute(
+      "src",
+      pendingScanImageUrl,
+    );
     await expect(
       page.getByText(`${testBrand.name} ${createdBottleName}`),
     ).toBeVisible();
+
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
+  });
+
+  test("clears a pending scan when the manual create image is removed", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-no-match-remove-image"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+    await page.getByRole("link", { name: "Create Bottle" }).click();
+
+    await expect(page.getByAltText("uploaded image")).toHaveAttribute(
+      "src",
+      pendingScanImageUrl,
+    );
+    await page.getByRole("button", { name: "Remove Image" }).click();
+    await expect(page.getByAltText("uploaded image")).toBeHidden();
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const createdUrl = new URL(page.url());
+    expect(createdUrl.searchParams.get("pendingImageId")).toBeNull();
+    expect(createdUrl.searchParams.get("pendingImageUrl")).toBeNull();
+    await expect(page.getByAltText("Selected bottle label")).toBeHidden();
+
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(libraryInput).not.toHaveProperty("pendingImageId");
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
   });
 });
 

@@ -6,6 +6,7 @@ import Link from "@peated/web/components/link";
 import {
   getAddBottleHref,
   type AddBottleRouteIntent,
+  type PendingImageRouteState,
 } from "@peated/web/lib/addBottle";
 import { formatBottlingCountLabel } from "@peated/web/lib/bottlings";
 import { type ReactNode } from "react";
@@ -24,13 +25,20 @@ export function getBottleResultHref({
   bottleId,
   directToTasting = false,
   addBottleIntent,
+  pendingImage,
 }: {
   bottleId: number;
   directToTasting?: boolean;
   addBottleIntent?: AddBottleRouteIntent;
+  pendingImage?: PendingImageRouteState | null;
 }) {
   if (addBottleIntent) {
-    return getAddBottleHref({ bottleId, intent: addBottleIntent });
+    return getAddBottleHref({
+      bottleId,
+      intent: addBottleIntent,
+      pendingImageId: pendingImage?.id,
+      pendingImageUrl: pendingImage?.imageUrl,
+    });
   }
 
   if (directToTasting) {
@@ -44,10 +52,12 @@ export default function BottleResultRow({
   result: { ref: bottle },
   directToTasting = false,
   addBottleIntent,
+  pendingImage,
 }: {
   result: BottleResult;
   directToTasting: boolean;
   addBottleIntent?: AddBottleRouteIntent;
+  pendingImage?: PendingImageRouteState | null;
 }) {
   const metadata: ReactNode[] = [];
   if (bottle.distillers.length)
@@ -72,6 +82,7 @@ export default function BottleResultRow({
               bottleId: bottle.id,
               directToTasting,
               addBottleIntent,
+              pendingImage,
             })}
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />

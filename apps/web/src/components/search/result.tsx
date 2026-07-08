@@ -1,3 +1,4 @@
+import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
 import type { AddBottleRouteIntent, BottleResult } from "./bottleResult";
 import BottleResultRow from "./bottleResult";
 import type { EntityResult } from "./entityResult";
@@ -11,10 +12,12 @@ export default function ResultRow({
   result,
   directToTasting = false,
   addBottleIntent,
+  pendingImage,
 }: {
   result: Result;
   directToTasting: boolean;
   addBottleIntent?: AddBottleRouteIntent;
+  pendingImage?: PendingImageRouteState | null;
 }) {
   switch (result.type) {
     case "bottle":
@@ -23,6 +26,7 @@ export default function ResultRow({
           result={result}
           directToTasting={directToTasting}
           addBottleIntent={addBottleIntent}
+          pendingImage={pendingImage}
         />
       );
     case "entity":
