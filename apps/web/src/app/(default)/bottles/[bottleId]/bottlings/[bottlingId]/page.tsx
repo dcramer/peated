@@ -1,9 +1,7 @@
-import { formatCategoryName } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import RobotImage from "@peated/web/assets/robot.png";
-import BottleHeader from "@peated/web/components/bottleHeader";
 import BottleReviews from "@peated/web/components/bottleReviews";
 import Button from "@peated/web/components/button";
 import CaskDetails from "@peated/web/components/caskDetails";
@@ -103,6 +101,11 @@ function getBottlingHighlights(bottling: Bottling) {
   ].filter(Boolean);
 }
 
+function getBottlingMetadata(bottling: Bottling) {
+  const metadata = getBottlingHighlights(bottling);
+  return metadata.length ? metadata : ["Specific bottling"];
+}
+
 function parseRouteId(value: string) {
   const id = Number(value);
 
@@ -136,11 +139,13 @@ const getBottlingPageData = cache(async function getBottlingPageData(
 });
 
 function ReleaseStat({ label, value }: { label: string; value: ReactNode }) {
+  if (value === null || value === undefined || value === "") return null;
+
   return (
     <div className="border-y border-slate-800 py-3">
       <div className="text-muted text-sm">{label}</div>
       <div className="mt-1 flex min-h-8 items-center text-2xl font-semibold tracking-tight">
-        {value || "-"}
+        {value}
       </div>
     </div>
   );
@@ -148,28 +153,30 @@ function ReleaseStat({ label, value }: { label: string; value: ReactNode }) {
 
 function ReleaseStats({ bottling }: { bottling: Bottling }) {
   const rating = formatRating(bottling.avgRating);
+  const stats = [
+    { label: "Age", value: formatAge(bottling.statedAge) },
+    { label: "ABV", value: formatAbv(bottling.abv) },
+    { label: "Tastings", value: bottling.totalTastings.toLocaleString() },
+    {
+      label: "Rating",
+      value: rating ? (
+        <span className="inline-flex items-center gap-2">
+          <SimpleRatingIndicator avgRating={bottling.avgRating} />
+          {rating}
+        </span>
+      ) : null,
+    },
+    { label: "Vintage", value: bottling.vintageYear },
+    { label: "Bottled", value: bottling.releaseYear },
+  ].filter((stat) => stat.value !== null && stat.value !== undefined);
+
+  if (!stats.length) return null;
 
   return (
-    <div className="my-6 grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-3 xl:grid-cols-6">
-      <ReleaseStat label="Age" value={formatAge(bottling.statedAge)} />
-      <ReleaseStat label="ABV" value={formatAbv(bottling.abv)} />
-      <ReleaseStat
-        label="Tastings"
-        value={bottling.totalTastings.toLocaleString()}
-      />
-      <ReleaseStat
-        label="Rating"
-        value={
-          rating ? (
-            <span className="inline-flex items-center gap-2">
-              <SimpleRatingIndicator avgRating={bottling.avgRating} />
-              {rating}
-            </span>
-          ) : null
-        }
-      />
-      <ReleaseStat label="Vintage" value={bottling.vintageYear} />
-      <ReleaseStat label="Bottled" value={bottling.releaseYear} />
+    <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 md:grid-cols-3 xl:grid-cols-4">
+      {stats.map((stat) => (
+        <ReleaseStat key={stat.label} label={stat.label} value={stat.value} />
+      ))}
     </div>
   );
 }
@@ -243,74 +250,6 @@ function ReleaseDetails({
   );
 }
 
-function ParentBottleContext({ bottle }: { bottle: Bottle }) {
-  return (
-    <section>
-      <Heading as="h3">Parent Bottle</Heading>
-      <DefinitionList>
-        <DetailRow
-          label="Brand"
-          value={
-            <Link href={`/entities/${bottle.brand.id}`} className="underline">
-              {bottle.brand.name}
-            </Link>
-          }
-        />
-        <DetailRow
-          label="Category"
-          value={
-            bottle.category ? (
-              <Link
-                href={`/bottles?category=${encodeURIComponent(
-                  bottle.category,
-                )}`}
-                className="underline"
-              >
-                {formatCategoryName(bottle.category)}
-              </Link>
-            ) : null
-          }
-        />
-        <DetailRow
-          label="Distilled At"
-          value={
-            bottle.distillers && bottle.distillers.length > 0 ? (
-              <div className="flex flex-wrap gap-x-2 gap-y-1">
-                {bottle.distillers.map((distiller) => (
-                  <Link
-                    key={distiller.id}
-                    href={`/entities/${distiller.id}`}
-                    className="underline"
-                  >
-                    {distiller.name}
-                  </Link>
-                ))}
-              </div>
-            ) : null
-          }
-        />
-        <DetailRow
-          label="Bottled By"
-          value={
-            bottle.bottler ? (
-              <Link
-                href={`/entities/${bottle.bottler.id}`}
-                className="underline"
-              >
-                {bottle.bottler.name}
-              </Link>
-            ) : null
-          }
-        />
-        <DetailRow
-          label="Bottlings"
-          value={`${bottle.numReleases.toLocaleString()} tracked`}
-        />
-      </DefinitionList>
-    </section>
-  );
-}
-
 function ReleaseImage({
   bottle,
   bottling,
@@ -322,20 +261,22 @@ function ReleaseImage({
 
   if (!imageUrl) {
     return (
-      <img
-        src={RobotImage.src}
-        className="mx-auto block h-52 w-52 lg:h-64 lg:w-64"
-        alt=""
-        aria-hidden="true"
-      />
+      <div className="flex aspect-[3/4] w-full max-w-56 items-center justify-center justify-self-center rounded border border-slate-800 bg-slate-900/40 p-6">
+        <img
+          src={RobotImage.src}
+          className="block max-h-full max-w-full object-contain opacity-80"
+          alt=""
+          aria-hidden="true"
+        />
+      </div>
     );
   }
 
   return (
-    <div className="flex w-full justify-center rounded border border-slate-800 bg-white p-3 opacity-90">
+    <div className="flex aspect-[3/4] w-full max-w-56 items-center justify-center justify-self-center rounded border border-slate-800 bg-slate-900/40 p-3">
       <img
         src={imageUrl}
-        className="block max-h-80 max-w-full rounded object-contain"
+        className="block max-h-full max-w-full rounded object-contain"
         alt=""
         aria-hidden="true"
       />
@@ -411,7 +352,7 @@ export default async function Page(props: {
 
   const releaseTitle = getReleaseTitle(bottling);
   const description = getReleaseDescription(bottle, bottling);
-  const bottlingHighlights = getBottlingHighlights(bottling);
+  const bottlingMetadata = getBottlingMetadata(bottling);
   const jsonLd: WithContext<Product> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -438,12 +379,8 @@ export default async function Page(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="w-full p-3 lg:py-0">
-        <BottleHeader bottle={bottle} compact />
-      </div>
-      <BottleTabs bottle={bottle} />
-      <div className="mt-6 px-3 lg:px-0">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+      <div className="px-3 lg:px-0">
+        <div className="grid gap-8 py-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
           <div className="min-w-0 flex-1">
             <div className="text-muted mb-2 text-sm">
               <Link
@@ -457,14 +394,20 @@ export default async function Page(props: {
                 {bottle.fullName}
               </Link>
             </div>
-            <h2 className="text-3xl font-semibold leading-tight">
-              {releaseTitle}
-            </h2>
-            {bottlingHighlights.length > 0 && (
-              <p className="text-muted mt-2 max-w-3xl">
-                {bottlingHighlights.join(" · ")}
-              </p>
-            )}
+            <h1 className="leading-tight">
+              <Link
+                href={`/bottles/${bottle.id}`}
+                className="text-muted block text-lg font-medium hover:underline"
+              >
+                {bottle.fullName}
+              </Link>
+              <span className="mt-1 block text-3xl font-semibold text-white">
+                {releaseTitle}
+              </span>
+            </h1>
+            <p className="text-muted mt-3 max-w-3xl">
+              {bottlingMetadata.join(" · ")}
+            </p>
 
             <div className="mt-6 flex flex-wrap gap-2">
               <Suspense
@@ -478,6 +421,7 @@ export default async function Page(props: {
                 <CollectionAction
                   bottleId={bottle.id}
                   releaseId={bottling.id}
+                  title="Save Bottling"
                 />
               </Suspense>
               <Button
@@ -500,17 +444,21 @@ export default async function Page(props: {
               </Button>
               <ModActions release={bottling} />
             </div>
-
-            <ReleaseStats bottling={bottling} />
           </div>
 
-          <aside className="lg:pt-7">
+          <aside className="hidden lg:block">
             <ReleaseImage bottle={bottle} bottling={bottling} />
           </aside>
         </div>
+      </div>
 
-        <div className="my-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
-          <div className="min-w-0 space-y-8">
+      <BottleTabs bottle={bottle} />
+
+      <div className="px-3 lg:px-0">
+        <div className="my-8 grid gap-8">
+          <div className="min-w-0 space-y-8 lg:max-w-3xl">
+            <ReleaseStats bottling={bottling} />
+
             <Suspense>
               <BottleReviews bottleId={bottle.id} releaseId={bottling.id} />
             </Suspense>
@@ -540,10 +488,6 @@ export default async function Page(props: {
               )}
             </section>
           </div>
-
-          <aside className="space-y-8">
-            <ParentBottleContext bottle={bottle} />
-          </aside>
         </div>
       </div>
     </>
