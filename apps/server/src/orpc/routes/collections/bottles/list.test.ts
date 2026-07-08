@@ -416,4 +416,259 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(results[0].bottle.id).toBe(bottle.id);
     expect(results[0].release).toBeNull();
   });
+
+  test("can search library bottles by text", async ({ defaults, fixtures }) => {
+    const brand = await fixtures.Entity({ name: "Search Library Brand" });
+    const matchingBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Needle Label",
+    });
+    const otherBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Ordinary Label",
+    });
+    const outsideLibraryBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Needle Outside",
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: matchingBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: otherBottle.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        query: "Needle",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([matchingBottle.id]);
+    expect(results.map((r) => r.bottle.id)).not.toContain(
+      outsideLibraryBottle.id,
+    );
+  });
+
+  test("can filter library bottles by brand", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const matchingBrand = await fixtures.Entity({ name: "Library Brand A" });
+    const otherBrand = await fixtures.Entity({ name: "Library Brand B" });
+    const matchingBottle = await fixtures.Bottle({
+      brandId: matchingBrand.id,
+      name: "Selected",
+    });
+    const otherBottle = await fixtures.Bottle({
+      brandId: otherBrand.id,
+      name: "Filtered Out",
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: matchingBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: otherBottle.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        brand: matchingBrand.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([matchingBottle.id]);
+  });
+
+  test("can filter library bottles by distillery", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const matchingDistiller = await fixtures.Entity({
+      name: "Library Distillery A",
+      type: ["distiller"],
+    });
+    const otherDistiller = await fixtures.Entity({
+      name: "Library Distillery B",
+      type: ["distiller"],
+    });
+    const matchingBottle = await fixtures.Bottle({
+      name: "Selected",
+      distillerIds: [matchingDistiller.id],
+    });
+    const otherBottle = await fixtures.Bottle({
+      name: "Filtered Out",
+      distillerIds: [otherDistiller.id],
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: matchingBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: otherBottle.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        distiller: matchingDistiller.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([matchingBottle.id]);
+  });
+
+  test("can combine library search brand and distillery filters", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const matchingBrand = await fixtures.Entity({ name: "Combined Brand A" });
+    const otherBrand = await fixtures.Entity({ name: "Combined Brand B" });
+    const matchingDistiller = await fixtures.Entity({
+      name: "Combined Distillery A",
+      type: ["distiller"],
+    });
+    const otherDistiller = await fixtures.Entity({
+      name: "Combined Distillery B",
+      type: ["distiller"],
+    });
+    const matchingBottle = await fixtures.Bottle({
+      brandId: matchingBrand.id,
+      name: "Shared Label Winner",
+      distillerIds: [matchingDistiller.id],
+    });
+    const wrongBrandBottle = await fixtures.Bottle({
+      brandId: otherBrand.id,
+      name: "Shared Label Wrong Brand",
+      distillerIds: [matchingDistiller.id],
+    });
+    const wrongDistillerBottle = await fixtures.Bottle({
+      brandId: matchingBrand.id,
+      name: "Shared Label Wrong Distillery",
+      distillerIds: [otherDistiller.id],
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: matchingBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: wrongBrandBottle.id,
+        releaseId: null,
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: wrongDistillerBottle.id,
+        releaseId: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        query: "Shared",
+        brand: matchingBrand.id,
+        distiller: matchingDistiller.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([matchingBottle.id]);
+  });
+
+  test("rejects library filters for other collection aliases", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const matchingBrand = await fixtures.Entity({ name: "Default Brand A" });
+    const otherBrand = await fixtures.Entity({ name: "Default Brand B" });
+    const matchingDistiller = await fixtures.Entity({
+      name: "Default Distillery A",
+      type: ["distiller"],
+    });
+    const otherDistiller = await fixtures.Entity({
+      name: "Default Distillery B",
+      type: ["distiller"],
+    });
+    const keptBottle = await fixtures.Bottle({
+      brandId: otherBrand.id,
+      name: "Unmatched Default Bottle",
+      distillerIds: [otherDistiller.id],
+    });
+    const defaultCollection = await getDefaultCollection(db, defaults.user.id);
+    if (!defaultCollection) {
+      throw new Error("Default collection not found");
+    }
+
+    await db.insert(collectionBottles).values({
+      collectionId: defaultCollection.id,
+      bottleId: keptBottle.id,
+      releaseId: null,
+    });
+
+    const err = await waitError(() =>
+      routerClient.collections.bottles.list(
+        {
+          user: "me",
+          collection: "default",
+          query: "Missing",
+          brand: matchingBrand.id,
+          distiller: matchingDistiller.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Collection filters are only supported for Library.]`,
+    );
+  });
 });

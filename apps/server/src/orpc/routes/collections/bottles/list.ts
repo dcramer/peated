@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottleReleases,
   bottles,
+  bottlesToDistillers,
   collectionBottles,
 } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
@@ -15,7 +17,7 @@ import { CollectionBottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -31,6 +33,9 @@ export default procedure
     z.object({
       collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
+      query: z.coerce.string().default(""),
+      brand: z.coerce.number().nullish(),
+      distiller: z.coerce.number().nullish(),
       bottle: z.coerce.number().optional(),
       release: z.coerce.number().optional(),
       baseOnly: z.coerce.boolean().optional(),
@@ -59,6 +64,14 @@ export default procedure
     const reservedCollection = isReservedCollectionSlug(input.collection)
       ? input.collection
       : null;
+    if (
+      reservedCollection !== "library" &&
+      (input.query || input.brand || input.distiller)
+    ) {
+      throw errors.BAD_REQUEST({
+        message: "Collection filters are only supported for Library.",
+      });
+    }
     const collection = reservedCollection
       ? await getReservedCollection(db, user.id, reservedCollection)
       : await db.query.collections.findFirst({
@@ -90,6 +103,39 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [
       eq(collectionBottles.collectionId, collection.id),
     ];
+    if (input.query) {
+      // Match exact aliases alongside the bottle search vector for catalog parity.
+      const exactAliasBottleIds = (
+        await db
+          .selectDistinct({ bottleId: bottleAliases.bottleId })
+          .from(bottleAliases)
+          .where(
+            and(
+              eq(sql`LOWER(${bottleAliases.name})`, input.query.toLowerCase()),
+              isNotNull(bottleAliases.bottleId),
+            ),
+          )
+      )
+        .map((row) => row.bottleId)
+        .filter((bottleId): bottleId is number => bottleId !== null);
+
+      where.push(
+        or(
+          sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${input.query})`,
+          exactAliasBottleIds.length
+            ? inArray(bottles.id, exactAliasBottleIds)
+            : undefined,
+        ),
+      );
+    }
+    if (input.brand) {
+      where.push(eq(bottles.brandId, input.brand));
+    }
+    if (input.distiller) {
+      where.push(
+        sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+      );
+    }
     if (input.bottle) {
       where.push(eq(collectionBottles.bottleId, input.bottle));
     }
