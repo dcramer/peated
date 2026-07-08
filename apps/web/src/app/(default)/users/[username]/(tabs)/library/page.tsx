@@ -87,15 +87,7 @@ function UserLibraryTable({ username }: { username: string }) {
               )
             }
             renderCollectionBottleMeta={(entry) =>
-              canEditLibrary ? (
-                <LibraryEntryStatus
-                  entry={entry}
-                  username={username}
-                  editable
-                />
-              ) : (
-                <LibraryEntryStatus entry={entry} />
-              )
+              canEditLibrary ? null : <LibraryEntryStatus entry={entry} />
             }
             renderCollectionBottleActions={
               canEditLibrary
