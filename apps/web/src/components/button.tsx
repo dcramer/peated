@@ -20,6 +20,7 @@ type BaseProps = {
   fullHeight?: boolean;
   className?: string;
   title?: string;
+  "aria-label"?: string;
   "aria-pressed"?: boolean | "false" | "true" | "mixed";
   [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };

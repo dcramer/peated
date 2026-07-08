@@ -151,6 +151,80 @@ test.describe("profile library", () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test("filters Library entries from the profile tab", async ({
+    context,
+    page,
+  }, testInfo) => {
+    const runId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const bottleId =
+      existingBottle.id +
+      600_000 +
+      (testInfo.project.name.includes("mobile") ? 100_000 : 0) +
+      (Date.now() % 100_000);
+    const savedBottleName = `${existingBottle.brand.name} 16-year-old ${bottleId}`;
+
+    await signIn(context, {
+      accessToken: [
+        testAccessToken,
+        "library-filters",
+        testInfo.project.name,
+        testInfo.workerIndex,
+        testInfo.retry,
+        runId,
+      ].join("-"),
+    });
+
+    await page.goto(`/bottles/${bottleId}`, {
+      waitUntil: "commit",
+    });
+    await page.locator('button[data-collection-action="library"]').click();
+    await expect(
+      page.locator('button[data-collection-action="library"]'),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await page.goto(`/users/${testUser.username}/library?cursor=2`, {
+      waitUntil: "commit",
+    });
+    await expect(
+      page.getByRole("link", { name: savedBottleName }).first(),
+    ).toBeVisible();
+
+    await page.getByRole("searchbox", { name: "Search library" }).fill("zzzz");
+    await page.getByRole("button", { name: "Search" }).click();
+    await expect(page).toHaveURL(/\/library\?query=zzzz$/);
+    await expect(
+      page.getByText("No library bottles match these filters."),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Clear filters" }).click();
+    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
+    await expect(
+      page.getByRole("link", { name: savedBottleName }).first(),
+    ).toBeVisible();
+
+    await page.goto(`/users/${testUser.username}/library?cursor=2`, {
+      waitUntil: "commit",
+    });
+    await page.getByRole("button", { name: /brand any brand/i }).click();
+    await page.getByPlaceholder("Search brand").fill(existingBottle.brand.name);
+    await expect(
+      page.getByRole("button", { name: existingBottle.brand.name }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: existingBottle.brand.name }).click();
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?brand=${existingBottle.brand.id}`,
+    );
+    await expect(
+      page.getByRole("button", {
+        name: new RegExp(`brand ${existingBottle.brand.name}`, "i"),
+      }),
+    ).toBeVisible();
+    await expect(page.getByPlaceholder("Search brand")).toHaveCount(0);
+    await expect(
+      page.getByRole("link", { name: savedBottleName }).first(),
+    ).toBeVisible();
+  });
+
   test("lets the owner remove a Favorites entry from the profile tab", async ({
     context,
     page,

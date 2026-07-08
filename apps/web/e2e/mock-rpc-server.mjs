@@ -106,6 +106,13 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
       return false;
+    case "entities/details":
+      if (Number(input?.entity) === testBrand.id) {
+        sendRpcResponse(response, testBrand);
+        return true;
+      }
+      sendRpcError(response, "Unexpected entity details payload");
+      return true;
     case "search":
       if (
         !Array.isArray(input?.include) ||
@@ -1346,7 +1353,7 @@ function listCollectionBottles(request, input) {
   const state = getCollectionState(request);
   const collection = getCollection(input);
   const entries = Array.from(state[collection].entries());
-  const results =
+  let results =
     input?.bottle === undefined
       ? entries.map(([, entry]) => ({
           ...entry,
@@ -1358,6 +1365,27 @@ function listCollectionBottles(request, input) {
             ...entry,
             bottle: withCollectionStatus(request, entry.bottle),
           }));
+
+  if (collection === "library" && input?.query) {
+    const query = String(input.query).toLowerCase();
+    results = results.filter((entry) =>
+      entry.bottle.fullName.toLowerCase().includes(query),
+    );
+  }
+
+  if (collection === "library" && input?.brand) {
+    results = results.filter(
+      (entry) => entry.bottle.brand?.id === Number(input.brand),
+    );
+  }
+
+  if (collection === "library" && input?.distiller) {
+    results = results.filter((entry) =>
+      entry.bottle.distillers?.some(
+        (distiller) => distiller.id === Number(input.distiller),
+      ),
+    );
+  }
 
   return {
     results,
