@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   gate:
+    name: "evals / gate"
     runs-on: ubuntu-latest
     outputs:
       evals_requested: ${{ steps.gate.outputs.evals_requested }}
@@ -67,6 +68,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   evals:
+    name: "evals / classifier"
     needs: gate
     if: needs.gate.outputs.should_run == 'true'
     runs-on: ubuntu-latest

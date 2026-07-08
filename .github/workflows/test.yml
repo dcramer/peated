@@ -1,4 +1,6 @@
-name: Test
+name: CI
+permissions:
+  contents: read
 on:
   push:
     branches:
@@ -8,15 +10,70 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
-  tflint:
-    name: "Terraform lint"
+  changes:
+    name: "changes / detect"
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
+    outputs:
+      ci: ${{ steps.filter.outputs.ci }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      infra: ${{ steps.filter.outputs.infra }}
+      packages: ${{ steps.filter.outputs.packages }}
+      package_tests: ${{ steps.filter.outputs.package_tests }}
+      repo: ${{ steps.filter.outputs.repo }}
+      server: ${{ steps.filter.outputs.server }}
+      web: ${{ steps.filter.outputs.web }}
     steps:
       - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
         with:
-          fetch-depth: 0
+          filters: |
+            ci:
+              - ".github/workflows/**"
+            e2e:
+              - "apps/web/**"
+              - "packages/design/**"
+              - "packages/orpc/**"
+            infra:
+              - ".tflint.hcl"
+              - "terraform/**"
+            packages:
+              - "packages/**"
+            package_tests:
+              - "packages/bottle-classifier/**"
+              - "packages/catalog-verifier/**"
+              - "packages/entity-classifier/**"
+            repo:
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - "turbo.json"
+            server:
+              - "apps/server/**"
+              - "apps/cli/**"
+              - "docker-compose.yml"
+              - "packages/bottle-classifier/**"
+              - "packages/catalog-verifier/**"
+              - "packages/design/**"
+              - "packages/email/**"
+              - "packages/entity-classifier/**"
+              - "packages/orpc/**"
+              - "packages/tsconfig/**"
+            web:
+              - "apps/web/**"
+              - "apps/server/**"
+              - "packages/bottle-classifier/**"
+              - "packages/design/**"
+              - "packages/orpc/**"
+              - "packages/tsconfig/**"
+
+  tflint:
+    name: "infra / terraform lint"
+    runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.infra == 'true'
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/cache@v4
         name: Cache plugin dir
         with:
@@ -35,13 +92,13 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Run TFLint
         run: tflint -f compact
-  build:
-    name: "Build packages"
+  package-build:
+    name: "build / packages"
     runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true' || needs.changes.outputs.web == 'true' || needs.changes.outputs.packages == 'true'
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -50,27 +107,59 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.18.0
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: pnpm
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Build packages
-        run: pnpm build
+        run: pnpm build:packages
+
+  server-build:
+    name: "build / server"
+    runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build server
+        run: pnpm build:server
+
+  web-build:
+    name: "build / web"
+    runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.web == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build web
+        run: pnpm build:web
 
   server-tests:
-    name: "Server tests (${{ matrix.shard }}/${{ matrix.total }})"
+    name: "test / server (${{ matrix.shard }}/${{ matrix.total }})"
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.server == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -78,8 +167,6 @@ jobs:
         total: [4]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -88,39 +175,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.18.0
+          cache: pnpm
       - name: Run docker images
         run: docker compose up -d
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Run server tests
         run: pnpm --filter @peated/server test:ci -- --shard=${{ matrix.shard }}/${{ matrix.total }}
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v4
-        if: success() || failure()
-        with:
-          check_name: "Server Tests (${{ matrix.shard }}/${{ matrix.total }})"
-          report_paths: "apps/server/junit.xml"
 
-  web-unit-tests:
-    name: "Web unit tests"
+  package-tests:
+    name: "test / packages"
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.package_tests == 'true' || needs.changes.outputs.repo == 'true'
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -129,51 +198,75 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.18.0
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
-      - uses: actions/cache@v4
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          cache: pnpm
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+      - name: Run package tests
+        run: pnpm -r --filter='./packages/*' run --if-present test
+
+  web-unit-tests:
+    name: "test / web unit"
+    runs-on: ubuntu-latest
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.repo == 'true' || needs.changes.outputs.web == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Run web unit tests
         run: pnpm --filter @peated/web test:ci
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v4
-        if: success() || failure()
-        with:
-          check_name: "Web Unit Tests"
-          report_paths: "apps/web/junit.xml"
 
   test:
-    name: "Run tests"
+    name: "ci / required"
     runs-on: ubuntu-latest
     needs:
-      - build
+      - changes
+      - tflint
+      - package-build
+      - server-build
+      - web-build
+      - package-tests
       - server-tests
       - web-unit-tests
+      - e2e
     if: always()
     steps:
       - name: Check test jobs
         run: |
-          if [[ "${{ needs.build.result }}" != "success" || "${{ needs['server-tests'].result }}" != "success" || "${{ needs['web-unit-tests'].result }}" != "success" ]]; then
+          if [[ "${{ needs.changes.result }}" != "success" ]]; then
             exit 1
           fi
+          failed=0
+          for result in \
+            "${{ needs.tflint.result }}" \
+            "${{ needs['package-build'].result }}" \
+            "${{ needs['server-build'].result }}" \
+            "${{ needs['web-build'].result }}" \
+            "${{ needs['package-tests'].result }}" \
+            "${{ needs['server-tests'].result }}" \
+            "${{ needs['web-unit-tests'].result }}" \
+            "${{ needs.e2e.result }}"; do
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              failed=1
+            fi
+          done
+          exit "$failed"
   e2e:
-    name: "Run e2e tests"
+    name: "test / web e2e"
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
+    needs: changes
+    if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.e2e == 'true' || needs.changes.outputs.repo == 'true'
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -182,20 +275,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24.18.0
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+          cache: pnpm
       - uses: actions/cache@v4
-        name: Setup pnpm cache
+        name: Setup Playwright cache
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-playwright-
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright system dependencies
+        run: pnpm --dir apps/web exec playwright install-deps chromium
       - name: Install Playwright browser
-        run: pnpm --dir apps/web exec playwright install --with-deps chromium
+        run: pnpm --dir apps/web exec playwright install chromium
       - name: Run e2e tests
         run: pnpm test:e2e
