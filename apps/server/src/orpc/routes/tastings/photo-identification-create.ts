@@ -3,6 +3,7 @@ import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
+import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToBottle,
@@ -393,11 +394,25 @@ export default procedure
     };
     const actor = await getUserActor(user);
 
-    const result = await applyClassifierCreateDecision({
-      createdByActorId: actor.id,
-      decision,
-      user,
-    });
+    let result: CreateDecisionResult;
+    try {
+      result = await applyClassifierCreateDecision({
+        createdByActorId: actor.id,
+        decision,
+        user,
+      });
+    } catch (err) {
+      if (err instanceof BottleAlreadyExistsError) {
+        throw errors.CONFLICT({
+          message: err.message,
+          data: {
+            bottle: err.bottleId,
+          },
+        });
+      }
+
+      throw err;
+    }
 
     const warning = await applyCatalogImageApproval({
       destination: getCatalogImageApprovalDestination({

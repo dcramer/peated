@@ -1302,6 +1302,66 @@ describe("POST /tastings/photo-identification", () => {
     });
   });
 
+  test("parent repair plus release creation reports alias collisions as conflicts", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "High West Photo Collision",
+      type: ["brand", "distiller"],
+    });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Midwinter Dirty Parent",
+      category: "rye",
+      edition: "Legacy Edition",
+    });
+    const existingBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A Midwinter Night's Dram",
+      category: "rye",
+    });
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-repair-parent-alias-collision",
+      decision: buildRepairParentAndCreateReleaseDecision({
+        parentBottleId: dirtyParent.id,
+        brandName: brand.name,
+        bottleName: "A Midwinter Night's Dram",
+        category: "rye",
+        releaseEdition: "Act 12 Scene 9",
+      }),
+      candidates: [
+        {
+          bottleId: dirtyParent.id,
+          releaseId: null,
+          bottleFullName: dirtyParent.fullName,
+          fullName: dirtyParent.fullName,
+        },
+      ],
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          createToken: identification.createToken!,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchObject({
+      code: "CONFLICT",
+      data: {
+        bottle: existingBottle.id,
+      },
+      message: "Bottle already exists.",
+    });
+  });
+
   test("create release rejects parent bottles outside the reviewed candidates", async ({
     defaults,
     fixtures,
