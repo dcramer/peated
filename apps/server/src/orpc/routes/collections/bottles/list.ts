@@ -13,12 +13,17 @@ import {
   reservedCollectionSlugs,
 } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
-import { CollectionBottleSchema, listResponse } from "@peated/server/schemas";
+import {
+  CollectionBottleSchema,
+  CollectionBottleStatusSchema,
+  listResponse,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
 import { and, asc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { isLibraryCollection } from "./imageHelpers";
 
 export default procedure
   .route({
@@ -39,6 +44,9 @@ export default procedure
       bottle: z.coerce.number().optional(),
       release: z.coerce.number().optional(),
       baseOnly: z.coerce.boolean().optional(),
+      status: z
+        .union([CollectionBottleStatusSchema, z.literal("unset")])
+        .optional(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
@@ -66,7 +74,10 @@ export default procedure
       : null;
     if (
       reservedCollection !== "library" &&
-      (input.query || input.brand || input.distiller)
+      (input.query ||
+        input.brand ||
+        input.distiller ||
+        (reservedCollection && input.status))
     ) {
       throw errors.BAD_REQUEST({
         message: "Collection filters are only supported for Library.",
@@ -95,6 +106,11 @@ export default procedure
 
       throw errors.NOT_FOUND({
         message: "Collection not found.",
+      });
+    }
+    if (input.status && !isLibraryCollection(collection)) {
+      throw errors.BAD_REQUEST({
+        message: "Status filtering is only supported for Library.",
       });
     }
 
@@ -143,6 +159,11 @@ export default procedure
       where.push(isNull(collectionBottles.releaseId));
     } else if (input.release) {
       where.push(eq(collectionBottles.releaseId, input.release));
+    }
+    if (input.status === "unset") {
+      where.push(isNull(collectionBottles.status));
+    } else if (input.status) {
+      where.push(eq(collectionBottles.status, input.status));
     }
 
     const results = await db

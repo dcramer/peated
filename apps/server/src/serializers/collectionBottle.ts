@@ -65,6 +65,7 @@ export const CollectionBottleSerializer = serializer({
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
+      status: item.status,
       bottle: attrs.bottle,
       release: attrs.release,
     };

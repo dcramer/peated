@@ -53,6 +53,7 @@ export default procedure
   )
   .output(CollectionBottleSchema)
   .handler(async function ({ input, context, errors }) {
+    const statusProvided = Object.hasOwn(input, "status");
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
       throw errors.NOT_FOUND({
@@ -131,6 +132,11 @@ export default procedure
         throw err;
       }
     }
+    if (statusProvided && !isLibraryCollection(collection)) {
+      throw errors.BAD_REQUEST({
+        message: "Bottle status is only supported for Library entries.",
+      });
+    }
 
     let collectionBottleResult:
       | { collectionBottle: CollectionBottle; created: boolean }
@@ -143,6 +149,7 @@ export default procedure
           collectionId: collection.id,
           bottleId: bottle.id,
           releaseId: input.release ?? null,
+          status: statusProvided ? (input.status ?? null) : null,
         })
         .onConflictDoNothing()
         .returning();
@@ -215,7 +222,10 @@ export default procedure
 
         const [updatedCollectionBottle] = await db
           .update(collectionBottles)
-          .set({ imageUrl })
+          .set({
+            imageUrl,
+            ...(statusProvided ? { status: input.status ?? null } : {}),
+          })
           .where(eq(collectionBottles.id, collectionBottle.id))
           .returning();
 
@@ -251,6 +261,21 @@ export default procedure
         });
         await removeCreatedCollectionBottle();
         throw err;
+      }
+    }
+    if (
+      statusProvided &&
+      !collectionBottleResult.created &&
+      !input.pendingImageId
+    ) {
+      const [updatedCollectionBottle] = await db
+        .update(collectionBottles)
+        .set({ status: input.status ?? null })
+        .where(eq(collectionBottles.id, collectionBottle.id))
+        .returning();
+
+      if (updatedCollectionBottle) {
+        collectionBottle = updatedCollectionBottle;
       }
     }
 

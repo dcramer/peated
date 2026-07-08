@@ -8,6 +8,10 @@ import {
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
 import Button from "@peated/web/components/button";
+import {
+  COLLECTION_BOTTLE_STATUS_META,
+  COLLECTION_BOTTLE_STATUS_VALUES,
+} from "@peated/web/components/libraryBottleStatus";
 import SelectDialog from "@peated/web/components/selectField/selectDialog";
 import type { Option } from "@peated/web/components/selectField/types";
 import TextInput from "@peated/web/components/textInput";
@@ -15,14 +19,22 @@ import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
-import { type ElementType, type FormEvent, useState } from "react";
+import { useState, type ElementType, type FormEvent } from "react";
 
 type FilterOption = {
   id: number;
   name: string;
 };
 
-const FILTER_PARAMS = ["query", "brand", "distiller", "cursor"];
+const FILTER_PARAMS = ["query", "brand", "distiller", "status", "cursor"];
+const STATUS_FILTER_OPTIONS = [
+  { value: "", label: "Any" },
+  ...COLLECTION_BOTTLE_STATUS_VALUES.map((status) => ({
+    value: status,
+    label: COLLECTION_BOTTLE_STATUS_META[status].label,
+  })),
+  { value: "unset", label: "Not set" },
+];
 
 function entityOption(entity?: FilterOption | null) {
   return entity ? { id: entity.id, name: entity.name } : undefined;
@@ -34,12 +46,14 @@ function useLibraryFilters() {
   const query = searchParams.get("query") ?? "";
   const brand = searchParams.get("brand");
   const distiller = searchParams.get("distiller");
+  const status = searchParams.get("status") ?? "";
 
   return {
     query,
     brandId: brand ? Number(brand) : null,
     distillerId: distiller ? Number(distiller) : null,
-    hasActiveFilters: Boolean(query || brand || distiller),
+    status,
+    hasActiveFilters: Boolean(query || brand || distiller || status),
   };
 }
 
@@ -53,7 +67,8 @@ export function LibraryFilters({
   const orpc = useORPC();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { query, brandId, distillerId, hasActiveFilters } = useLibraryFilters();
+  const { query, brandId, distillerId, status, hasActiveFilters } =
+    useLibraryFilters();
 
   const brandQuery = useQuery({
     ...orpc.entities.details.queryOptions({
@@ -161,6 +176,10 @@ export function LibraryFilters({
               onChange={(value) => setFilter("distiller", value?.id)}
               onClear={() => setFilter("distiller")}
             />
+            <LibraryStatusFilter
+              value={status}
+              onChange={(value) => setFilter("status", value)}
+            />
           </div>
 
           {hasActiveFilters && (
@@ -175,18 +194,66 @@ export function LibraryFilters({
           )}
         </div>
 
-        {query && (
+        {(query || status) && (
           <div className="flex flex-wrap gap-2 border-t border-slate-800 px-2 py-2">
-            <ActiveFilterChip
-              label={`Search: ${query}`}
-              onClear={() => setFilter("query")}
-            />
+            {query && (
+              <ActiveFilterChip
+                label={`Search: ${query}`}
+                onClear={() => setFilter("query")}
+              />
+            )}
+            {status && (
+              <ActiveFilterChip
+                label={`Status: ${getStatusFilterLabel(status)}`}
+                onClear={() => setFilter("status")}
+              />
+            )}
           </div>
         )}
       </div>
       <span className="sr-only" aria-live="polite">
         {loading ? "Loading library results" : ""}
       </span>
+    </div>
+  );
+}
+
+function getStatusFilterLabel(status: string) {
+  return (
+    STATUS_FILTER_OPTIONS.find((option) => option.value === status)?.label ??
+    status
+  );
+}
+
+function LibraryStatusFilter({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value?: string) => void;
+}) {
+  return (
+    <div className="relative min-w-0 sm:w-36">
+      <label className="sr-only" htmlFor="library-status">
+        Status
+      </label>
+      <select
+        id="library-status"
+        value={value}
+        onChange={(event) => onChange(event.currentTarget.value || undefined)}
+        className={classNames(
+          "h-10 w-full rounded border bg-slate-900 px-3 text-sm shadow-sm",
+          value
+            ? "border-highlight/60 text-white"
+            : "border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white",
+        )}
+      >
+        {STATUS_FILTER_OPTIONS.map((option) => (
+          <option key={option.value || "any"} value={option.value}>
+            {option.value ? option.label : `Status: ${option.label}`}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
