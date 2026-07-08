@@ -14,6 +14,7 @@ import BottlerIcon from "@peated/web/assets/bottler.svg";
 import BrandIcon from "@peated/web/assets/brand.svg";
 import DistillerIcon from "@peated/web/assets/distiller.svg";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
+import useAuth from "@peated/web/hooks/useAuth";
 import { usePathname } from "next/navigation";
 import Button from "./button";
 import FeedbackSidebarLink from "./feedbackSidebarLink";
@@ -22,6 +23,11 @@ import SidebarLink from "./sidebarLink";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const favoritesHref = user
+    ? `/users/${user.username}/favorites`
+    : "/favorites";
+  const libraryHref = user ? `/users/${user.username}/library` : "/library";
 
   return (
     <>
@@ -49,16 +55,22 @@ export default function Sidebar() {
                     Home
                   </SidebarLink>
                   <SidebarLink
-                    href="/favorites"
+                    href={favoritesHref}
                     icon={StarIcon}
-                    active={pathname.startsWith("/favorites")}
+                    active={
+                      pathname.startsWith(favoritesHref) ||
+                      pathname.startsWith("/favorites")
+                    }
                   >
                     Favorites
                   </SidebarLink>
                   <SidebarLink
-                    href="/library"
+                    href={libraryHref}
                     icon={BookOpenIcon}
-                    active={pathname.startsWith("/library")}
+                    active={
+                      pathname.startsWith(libraryHref) ||
+                      pathname.startsWith("/library")
+                    }
                   >
                     Library
                   </SidebarLink>

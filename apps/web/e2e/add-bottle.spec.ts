@@ -531,10 +531,10 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Library" }),
-    ).toHaveAttribute("href", "/library");
+    ).toHaveAttribute("href", `/users/${testUser.username}/library`);
 
     await page.getByRole("link", { name: "View Library" }).click();
-    await expect(page).toHaveURL(/\/library$/);
+    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
     await expect(
       page.getByRole("link", { name: existingBottle.fullName }),
     ).toBeVisible();

@@ -21,6 +21,7 @@ import type { CreateBottlePrefill } from "@peated/web/components/search/createBo
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import Spinner from "@peated/web/components/spinner";
 import TastingForm from "@peated/web/components/tastingForm";
+import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
@@ -583,6 +584,7 @@ function AddBottleFlowContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orpc = useORPC();
+  const { user } = useAuth();
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
   const requestedBottleId = parseId(searchParams.get("bottle"));
@@ -614,6 +616,7 @@ function AddBottleFlowContent() {
     string | undefined
   >();
   const [loadingTastingDraft, setLoadingTastingDraft] = useState(false);
+  const userLibraryHref = user ? `/users/${user.username}/library` : "/library";
 
   const libraryCreateMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
@@ -899,7 +902,7 @@ function AddBottleFlowContent() {
     return (
       <AddedToLibrary
         entry={addedEntry}
-        userLibraryHref="/library"
+        userLibraryHref={userLibraryHref}
         photoTrace={addedEntryPhotoTrace}
         onAddAnother={startOver}
       />

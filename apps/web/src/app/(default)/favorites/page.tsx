@@ -1,32 +1,15 @@
-"use client";
-
-import BottleTable from "@peated/web/components/bottleTable";
-import EmptyActivity from "@peated/web/components/emptyActivity";
-import PaginationButtons from "@peated/web/components/paginationButtons";
-import { useORPC } from "@peated/web/lib/orpc/context";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { redirectToAuth } from "@peated/web/lib/auth";
+import { getCurrentUser } from "@peated/web/lib/auth.server";
+import { redirect } from "next/navigation";
 
 export const fetchCache = "default-no-store";
 
-export default function Page() {
-  const orpc = useORPC();
-  const { data: favoriteList } = useSuspenseQuery(
-    orpc.collections.bottles.list.queryOptions({
-      input: {
-        user: "me",
-        collection: "default",
-      },
-    }),
-  );
+export default async function Page() {
+  const user = await getCurrentUser();
 
-  return (
-    <>
-      {favoriteList.results.length ? (
-        <BottleTable bottleList={favoriteList.results} />
-      ) : (
-        <EmptyActivity>No favorites recorded yet.</EmptyActivity>
-      )}
-      <PaginationButtons rel={favoriteList.rel} />
-    </>
-  );
+  if (!user) {
+    return redirectToAuth({ pathname: "/favorites" });
+  }
+
+  return redirect(`/users/${user.username}/favorites`);
 }

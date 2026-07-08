@@ -117,10 +117,10 @@ test.describe("profile library", () => {
     await page.goto("/library", {
       waitUntil: "commit",
     });
-    await expect(page.getByRole("heading", { name: "Library" })).toBeVisible();
+    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
     await expect(
-      page.getByRole("main").getByRole("link", { name: "Add Bottle" }),
-    ).toHaveAttribute("href", "/addBottle?intent=library");
+      page.getByRole("heading", { name: testUser.username }),
+    ).toBeVisible();
     await expect(
       page.getByRole("link", { name: savedBottleName }).first(),
     ).toBeVisible();
@@ -148,6 +148,56 @@ test.describe("profile library", () => {
     await expect(page.getByRole("link", { name: savedBottleName })).toHaveCount(
       0,
     );
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("lets the owner remove a Favorites entry from the profile tab", async ({
+    context,
+    page,
+  }, testInfo) => {
+    const runId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const bottleId =
+      existingBottle.id +
+      400_000 +
+      (testInfo.project.name.includes("mobile") ? 100_000 : 0) +
+      (Date.now() % 100_000);
+    const savedBottleName = `${existingBottle.brand.name} 16-year-old ${bottleId}`;
+
+    await signIn(context, {
+      accessToken: [
+        testAccessToken,
+        "favorites",
+        testInfo.project.name,
+        testInfo.workerIndex,
+        testInfo.retry,
+        runId,
+      ].join("-"),
+    });
+
+    await page.goto(`/bottles/${bottleId}`, {
+      waitUntil: "commit",
+    });
+    await page.locator('button[data-collection-action="favorites"]').click();
+
+    await page.goto(`/users/${testUser.username}/favorites`, {
+      waitUntil: "commit",
+    });
+    await expect(
+      page.getByRole("link", { name: savedBottleName }).first(),
+    ).toBeVisible();
+
+    await page.getByRole("button", { name: "Bottle options" }).click();
+    await expect(
+      page.getByRole("menuitem", { name: "Remove from Favorites" }),
+    ).toBeVisible();
+    await page.getByRole("menuitem", { name: "Remove from Favorites" }).click();
+
+    await expect(page.getByRole("link", { name: savedBottleName })).toHaveCount(
+      0,
+    );
+    await expect(
+      page.getByText("No favorites recorded yet.").filter({ visible: true }),
+    ).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
