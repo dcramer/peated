@@ -141,6 +141,39 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, bottle);
       return true;
     }
+    case "prices/matchQueue/details":
+      if (input?.proposal !== 9901) {
+        sendRpcError(
+          response,
+          "Unexpected price match proposal details payload",
+        );
+        return true;
+      }
+
+      sendRpcResponse(response, buildBottleAndReleaseProposal());
+      return true;
+    case "prices/matchQueue/createBottle": {
+      const expectedBrand =
+        input?.bottle?.brand === testBrand.id ||
+        (input?.bottle?.brand &&
+          typeof input.bottle.brand === "object" &&
+          input.bottle.brand.name === testBrand.name);
+      if (
+        input?.proposal !== 9901 ||
+        input?.bottle?.name !== createdBottleName ||
+        !expectedBrand ||
+        input?.release?.edition !== "First Fill Oloroso"
+      ) {
+        sendRpcError(response, "Unexpected price match create bottle payload");
+        return true;
+      }
+
+      sendRpcResponse(response, {
+        bottle: buildBottleForId(createdBottleId),
+        release: buildCreatedRelease(),
+      });
+      return true;
+    }
     case "bottles/details": {
       if (input?.bottle === createdBottleId) {
         sendRpcResponse(
@@ -986,6 +1019,98 @@ function buildCreatedRelease() {
     edition: "First Fill Oloroso",
     releaseYear: 2026,
   });
+}
+
+function buildBottleAndReleaseProposal() {
+  return {
+    id: 9901,
+    status: "pending_review",
+    proposalType: "create_new",
+    confidence: null,
+    modelConfidence: 90,
+    automationScore: 90,
+    automationEligible: false,
+    automationBlockers: [],
+    decisiveMatchAttributes: [],
+    plainAgeBottleAutoVerifyEligible: false,
+    differentiatingAttributes: [],
+    webEvidenceChecks: [],
+    currentBottleId: null,
+    currentReleaseId: null,
+    suggestedBottleId: null,
+    suggestedReleaseId: null,
+    parentBottleId: null,
+    creationTarget: "bottle_and_release",
+    candidateBottles: [],
+    extractedLabel: null,
+    proposedBottle: {
+      name: createdBottleName,
+      series: null,
+      category: "single_malt",
+      edition: null,
+      statedAge: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      brand: { id: testBrand.id, name: testBrand.name },
+      distillers: [{ id: testBrand.id, name: testBrand.name }],
+      bottler: null,
+    },
+    proposedRelease: {
+      edition: "First Fill Oloroso",
+      statedAge: null,
+      abv: null,
+      caskStrength: null,
+      singleCask: null,
+      vintageYear: null,
+      releaseYear: 2026,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
+      description: null,
+      tastingNotes: null,
+    },
+    searchEvidence: [],
+    rationale: null,
+    model: "playwright",
+    error: null,
+    lastEvaluatedAt: null,
+    reviewedAt: null,
+    isProcessing: false,
+    processingQueuedAt: null,
+    processingExpiresAt: null,
+    createdAt: "2026-06-07T12:00:00.000Z",
+    updatedAt: "2026-06-07T12:00:00.000Z",
+    price: {
+      id: 9902,
+      name: `${testBrand.name} ${createdBottleName}`,
+      price: 99,
+      currency: "usd",
+      imageUrl: null,
+      url: "https://example.test/bottle",
+      volume: 750,
+      updatedAt: "2026-06-07T12:00:00.000Z",
+      isValid: true,
+      site: {
+        id: 9903,
+        name: "Playwright Store",
+        type: "woodencork",
+        lastRunAt: null,
+        nextRunAt: null,
+        runEvery: null,
+      },
+    },
+    currentBottle: null,
+    currentRelease: null,
+    suggestedBottle: null,
+    suggestedRelease: null,
+    parentBottle: null,
+  };
 }
 
 /**
