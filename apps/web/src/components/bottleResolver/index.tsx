@@ -542,6 +542,7 @@ export default function BottleResolver({
               <FallbackActions
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
+                createBottleHref={matchedBottleId ? createBottleHref : null}
                 showStartOver
                 onStartOver={startOver}
               />

@@ -7,11 +7,17 @@ import type {
   BottleClassificationDecision,
   BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
+import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import type { BottleRelease, User } from "@peated/server/db/schema";
-import { bottleReleases } from "@peated/server/db/schema";
+import {
+  bottleReleases,
+  bottles,
+  changes,
+  entities,
+} from "@peated/server/db/schema";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import {
   BottleAlreadyExistsError,
@@ -23,7 +29,11 @@ import {
   createBottleReleaseInTransaction,
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
-import { and, eq } from "drizzle-orm";
+import { upsertBottleAlias } from "@peated/server/lib/db";
+import { formatBottleName } from "@peated/server/lib/format";
+import { logError } from "@peated/server/lib/log";
+import { pushUniqueJob } from "@peated/server/worker/client";
+import { and, eq, sql } from "drizzle-orm";
 import { buildClassifierCreateInputs } from "./classifierDecisionCreateInputs";
 
 export type BottleReferenceResolutionSource =
@@ -119,6 +129,95 @@ async function getExistingRelease(releaseId: number): Promise<BottleRelease> {
   return release;
 }
 
+function normalizeBrandComparison(value: string | null | undefined) {
+  return normalizeString(value ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+function parentRepairFieldsDiffer(
+  current: typeof bottles.$inferSelect,
+  next: {
+    name: string;
+    fullName: string;
+    statedAge: number | null;
+    category: typeof bottles.$inferSelect.category;
+    edition: string | null;
+    abv: number | null;
+    singleCask: boolean | null;
+    caskStrength: boolean | null;
+    vintageYear: number | null;
+    releaseYear: number | null;
+    caskSize: typeof bottles.$inferSelect.caskSize;
+    caskType: typeof bottles.$inferSelect.caskType;
+    caskFill: typeof bottles.$inferSelect.caskFill;
+  },
+) {
+  return (
+    current.name !== next.name ||
+    current.fullName !== next.fullName ||
+    current.statedAge !== next.statedAge ||
+    current.category !== next.category ||
+    current.edition !== next.edition ||
+    current.abv !== next.abv ||
+    current.singleCask !== next.singleCask ||
+    current.caskStrength !== next.caskStrength ||
+    current.vintageYear !== next.vintageYear ||
+    current.releaseYear !== next.releaseYear ||
+    current.caskSize !== next.caskSize ||
+    current.caskType !== next.caskType ||
+    current.caskFill !== next.caskFill
+  );
+}
+
+/** Queue refresh work for parent bottles whose canonical identity was repaired. */
+async function finalizeClassifierParentRepair({
+  bottleId,
+  aliasNames,
+}: {
+  bottleId: number;
+  aliasNames: string[];
+}) {
+  if (aliasNames.length === 0) {
+    return;
+  }
+
+  try {
+    await pushUniqueJob("OnBottleChange", { bottleId }, { delay: 5000 });
+  } catch (err) {
+    logError(err, {
+      bottle: {
+        id: bottleId,
+      },
+    });
+  }
+
+  for (const aliasName of aliasNames) {
+    try {
+      await pushUniqueJob(
+        "OnBottleAliasChange",
+        { name: aliasName },
+        { delay: 5000 },
+      );
+    } catch (err) {
+      logError(err, {
+        bottle: {
+          id: bottleId,
+        },
+        alias: {
+          name: aliasName,
+        },
+      });
+    }
+  }
+}
+
+/**
+ * Persist an auto-approved classifier create decision.
+ *
+ * Parent repair keeps release-only traits on the child release while reserving
+ * the repaired parent canonical alias before mutating the parent bottle.
+ */
 export async function applyClassifierCreateDecision({
   decision,
   user,
@@ -127,7 +226,11 @@ export async function applyClassifierCreateDecision({
   decision: Extract<
     BottleClassificationDecision,
     {
-      action: "create_bottle" | "create_release" | "create_bottle_and_release";
+      action:
+        | "create_bottle"
+        | "create_release"
+        | "create_bottle_and_release"
+        | "repair_parent_and_create_release";
     }
   >;
   user: User;
@@ -219,6 +322,176 @@ export async function applyClassifierCreateDecision({
       }
       throw err;
     }
+  }
+
+  if (decision.action === "repair_parent_and_create_release") {
+    const parentInput = input;
+    const newReleaseInput = releaseInput;
+    if (!parentInput || !newReleaseInput) {
+      throw new Error(
+        "Missing proposed parent bottle or release input for classifier repair_parent_and_create_release.",
+      );
+    }
+
+    let releaseResult: Awaited<
+      ReturnType<typeof createBottleReleaseInTransaction>
+    > | null = null;
+    const result = await db.transaction(async (tx) => {
+      const parentAliasNames: string[] = [];
+      const [row] = await tx
+        .select({
+          bottle: bottles,
+          brandName: entities.name,
+          brandShortName: entities.shortName,
+        })
+        .from(bottles)
+        .innerJoin(entities, eq(bottles.brandId, entities.id))
+        .where(eq(bottles.id, decision.parentBottleId))
+        .limit(1)
+        .for("update");
+
+      if (!row) {
+        throw new Error(
+          `Classifier repair parent bottle not found (${decision.parentBottleId}).`,
+        );
+      }
+
+      const proposedBrandName = normalizeBrandComparison(
+        decision.proposedBottle.brand.name,
+      );
+      const currentBrandNames = [
+        normalizeBrandComparison(row.brandName),
+        normalizeBrandComparison(row.brandShortName),
+      ].filter(Boolean);
+      if (proposedBrandName && !currentBrandNames.includes(proposedBrandName)) {
+        throw new Error(
+          `Classifier repair parent brand mismatch (${decision.parentBottleId}).`,
+        );
+      }
+
+      const fullName = formatBottleName({
+        ...row.bottle,
+        ...parentInput,
+        name: `${row.brandShortName || row.brandName} ${parentInput.name}`,
+      });
+
+      const parentRepairFields = {
+        name: parentInput.name,
+        fullName,
+        statedAge: parentInput.statedAge ?? null,
+        category: parentInput.category ?? null,
+        edition: parentInput.edition ?? null,
+        abv: parentInput.abv ?? null,
+        singleCask: parentInput.singleCask ?? null,
+        caskStrength: parentInput.caskStrength ?? null,
+        vintageYear: parentInput.vintageYear ?? null,
+        releaseYear: parentInput.releaseYear ?? null,
+        caskSize: parentInput.caskSize ?? null,
+        caskType: parentInput.caskType ?? null,
+        caskFill: parentInput.caskFill ?? null,
+      };
+
+      if (parentRepairFieldsDiffer(row.bottle, parentRepairFields)) {
+        // Reserve the repaired parent alias before mutation so canonical-name
+        // collisions surface as a conflict instead of corrupting ownership.
+        const parentAlias = await upsertBottleAlias(
+          tx,
+          fullName,
+          row.bottle.id,
+          null,
+          {
+            assignmentSource: "canonical",
+            assignedByActorId: createdByActorId,
+          },
+        );
+        if (
+          parentAlias.bottleId !== row.bottle.id ||
+          parentAlias.releaseId !== null
+        ) {
+          throw new BottleAlreadyExistsError(
+            parentAlias.bottleId ?? row.bottle.id,
+          );
+        }
+        parentAliasNames.push(parentAlias.name);
+
+        const [updatedBottle] = await tx
+          .update(bottles)
+          .set({
+            ...parentRepairFields,
+            updatedAt: sql`NOW()`,
+          })
+          .where(eq(bottles.id, row.bottle.id))
+          .returning({ id: bottles.id });
+        if (!updatedBottle) {
+          throw new Error(
+            `Classifier repair parent bottle not found (${decision.parentBottleId}).`,
+          );
+        }
+
+        await tx.insert(changes).values({
+          objectType: "bottle",
+          objectId: row.bottle.id,
+          actorId: createdByActorId,
+          displayName: fullName,
+          type: "update",
+          data: {
+            id: row.bottle.id,
+            fullName,
+            name: parentInput.name,
+          },
+        });
+      }
+
+      try {
+        releaseResult = await createBottleReleaseInTransaction(tx, {
+          bottleId: row.bottle.id,
+          createdByActorId,
+          input: newReleaseInput,
+          user,
+        });
+        return {
+          bottleId: releaseResult.release.bottleId,
+          releaseId: releaseResult.release.id,
+          createdRelease: true,
+          parentAliasNames,
+        };
+      } catch (err) {
+        if (err instanceof BottleReleaseAlreadyExistsError) {
+          const [release] = await tx
+            .select()
+            .from(bottleReleases)
+            .where(eq(bottleReleases.id, err.releaseId))
+            .limit(1);
+          if (!release) {
+            throw new Error(`Bottle release not found (${err.releaseId}).`);
+          }
+          return {
+            bottleId: release.bottleId,
+            releaseId: release.id,
+            createdRelease: false,
+            parentAliasNames,
+          };
+        }
+        throw err;
+      }
+    });
+
+    if (releaseResult) {
+      await finalizeCreatedBottleRelease(releaseResult, {
+        creationSource: "bottle_classifier",
+      });
+    }
+    await finalizeClassifierParentRepair({
+      bottleId: decision.parentBottleId,
+      aliasNames: result.parentAliasNames,
+    });
+
+    return {
+      bottleId: result.bottleId,
+      releaseId: result.releaseId,
+      createdBottle: false,
+      createdRelease: result.createdRelease,
+    };
   }
 
   if (!input || !releaseInput) {

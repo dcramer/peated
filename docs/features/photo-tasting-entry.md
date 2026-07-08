@@ -398,10 +398,18 @@ type PhotoIdentificationDecision =
       };
     }
   | {
-      action:
-        | "repair_parent_and_create_release"
-        | "repair_bottle"
-        | "no_match";
+      action: "repair_parent_and_create_release";
+      parentBottleId: number;
+      proposedBottle: {
+        name: string;
+        brand: { name: string };
+      };
+      proposedRelease: {
+        edition: string | null;
+      };
+    }
+  | {
+      action: "repair_bottle" | "no_match";
     };
 
 {
@@ -470,6 +478,10 @@ result without rerunning photo extraction or classification.
 When the pending scan is suitable as a catalog image, creation promotes it by
 default to the created bottle or release target. Unsuitable photos still create
 the bottle target, but do not write a public catalog image.
+
+If the reviewed create target collides with an existing bottle or canonical
+alias, the create route returns `409 CONFLICT` with the conflicting bottle id in
+`data.bottle`.
 
 ### Create Tasting With Selected Picture
 

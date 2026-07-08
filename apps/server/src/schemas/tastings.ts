@@ -196,6 +196,9 @@ export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
     }),
     z.object({
       action: z.literal("repair_parent_and_create_release"),
+      parentBottleId: z.number().int(),
+      proposedBottle: PhotoIdentificationProposedBottleSchema,
+      proposedRelease: PhotoIdentificationProposedReleaseSchema,
     }),
     z.object({
       action: z.literal("repair_bottle"),

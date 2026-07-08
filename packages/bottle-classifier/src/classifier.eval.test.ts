@@ -163,8 +163,8 @@ function getDerivedSuggestedNextStep(
     case "create_bottle":
     case "create_release":
     case "create_bottle_and_release":
-      return tier === "auto" ? "confirm_create" : "manual_search";
     case "repair_parent_and_create_release":
+      return tier === "auto" ? "confirm_create" : "manual_search";
     case "repair_bottle":
       return "needs_review";
     case "no_match":
@@ -896,6 +896,11 @@ const SCENARIO_CONFIG: Array<{
   {
     label: "corrections",
     scenario: "corrections",
+    threshold: 1,
+  },
+  {
+    label: "parent repair releases",
+    scenario: "parent_repair_releases",
     threshold: 1,
   },
 ];

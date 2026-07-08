@@ -374,18 +374,29 @@ export function getPhotoFailureCopyPayload(trace: PhotoFailureTrace) {
 export function FallbackActions({
   searchHref,
   searchLabel,
+  createBottleHref,
+  createBottleLabel = "Create Bottle",
   onStartOver,
   showStartOver = false,
 }: {
   searchHref: string;
   searchLabel: string;
+  createBottleHref?: string | null;
+  createBottleLabel?: string;
   onStartOver?: () => void;
   showStartOver?: boolean;
 }) {
+  const columnCount =
+    (createBottleHref ? 1 : 0) + (showStartOver && onStartOver ? 1 : 0) + 1;
+
   return (
     <div className="space-y-3">
       <OrDivider />
-      <div className="mx-auto grid w-full gap-3 sm:w-1/2 sm:grid-cols-2">
+      <div
+        className={`mx-auto grid w-full gap-3 ${
+          columnCount >= 3 ? "sm:grid-cols-3" : "sm:w-1/2 sm:grid-cols-2"
+        }`}
+      >
         <Button
           href={searchHref}
           fullWidth
@@ -393,6 +404,15 @@ export function FallbackActions({
         >
           {searchLabel}
         </Button>
+        {createBottleHref && (
+          <Button
+            href={createBottleHref}
+            fullWidth
+            icon={<Plus className="h-4 w-4" />}
+          >
+            {createBottleLabel}
+          </Button>
+        )}
         {showStartOver && onStartOver && (
           <Button
             fullWidth

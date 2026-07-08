@@ -1,8 +1,14 @@
+/**
+ * Confirms signed photo-identification create proposals without rerunning AI.
+ * The route owns token/user validation, pending-upload ownership, durable
+ * bottle/release mutation, and API-facing conflict mapping.
+ */
 import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
+import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToBottle,
@@ -84,6 +90,16 @@ function stripUnapprovedCatalogImages(
     };
   }
 
+  if (decision.action === "repair_parent_and_create_release") {
+    return {
+      ...decision,
+      proposedRelease: {
+        ...decision.proposedRelease,
+        imageUrl: null,
+      },
+    };
+  }
+
   return decision;
 }
 
@@ -118,7 +134,8 @@ function getCatalogImageApprovalDestination({
   if (
     approvalTarget === "release" &&
     (decision.action === "create_release" ||
-      decision.action === "create_bottle_and_release") &&
+      decision.action === "create_bottle_and_release" ||
+      decision.action === "repair_parent_and_create_release") &&
     result.createdRelease &&
     result.releaseId
   ) {
@@ -352,7 +369,8 @@ export default procedure
     if (
       decision.action !== "create_bottle" &&
       decision.action !== "create_release" &&
-      decision.action !== "create_bottle_and_release"
+      decision.action !== "create_bottle_and_release" &&
+      decision.action !== "repair_parent_and_create_release"
     ) {
       throw errors.BAD_REQUEST({
         message: "Photo identification result is not a create proposal.",
@@ -365,7 +383,8 @@ export default procedure
       });
     }
     if (
-      decision.action === "create_release" &&
+      (decision.action === "create_release" ||
+        decision.action === "repair_parent_and_create_release") &&
       !candidateBottleIds.includes(decision.parentBottleId)
     ) {
       throw errors.BAD_REQUEST({
@@ -380,11 +399,25 @@ export default procedure
     };
     const actor = await getUserActor(user);
 
-    const result = await applyClassifierCreateDecision({
-      createdByActorId: actor.id,
-      decision,
-      user,
-    });
+    let result: CreateDecisionResult;
+    try {
+      result = await applyClassifierCreateDecision({
+        createdByActorId: actor.id,
+        decision,
+        user,
+      });
+    } catch (err) {
+      if (err instanceof BottleAlreadyExistsError) {
+        throw errors.CONFLICT({
+          message: err.message,
+          data: {
+            bottle: err.bottleId,
+          },
+        });
+      }
+
+      throw err;
+    }
 
     const warning = await applyCatalogImageApproval({
       destination: getCatalogImageApprovalDestination({

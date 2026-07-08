@@ -117,7 +117,8 @@ function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
 
 export function getMatchedBottleId(result: PhotoIdentification | null) {
   if (
-    result?.suggestedNextStep === "confirm_match" &&
+    result &&
+    result?.suggestedNextStep !== "needs_review" &&
     result.classification.status === "classified" &&
     result.classification.decision.action === "match"
   ) {
@@ -182,6 +183,7 @@ function getCreateDecisionLike(result: PhotoIdentification | null) {
     case "create_bottle":
     case "create_release":
     case "create_bottle_and_release":
+    case "repair_parent_and_create_release":
       return result.classification.decision;
     default:
       return null;
@@ -194,7 +196,8 @@ function getProposedBottle(decision: CreateDecisionLike | null) {
   if (!decision) return null;
   if (
     decision.action === "create_bottle" ||
-    decision.action === "create_bottle_and_release"
+    decision.action === "create_bottle_and_release" ||
+    decision.action === "repair_parent_and_create_release"
   ) {
     return decision.proposedBottle;
   }
@@ -205,7 +208,8 @@ function getProposedRelease(decision: CreateDecisionLike | null) {
   if (!decision) return null;
   if (
     decision.action === "create_release" ||
-    decision.action === "create_bottle_and_release"
+    decision.action === "create_bottle_and_release" ||
+    decision.action === "repair_parent_and_create_release"
   ) {
     return decision.proposedRelease;
   }
@@ -216,7 +220,10 @@ export function getProposedName(result: PhotoIdentification | null) {
   const decision = getCreateDecision(result);
   if (!decision) return null;
 
-  if (decision.action === "create_release") {
+  if (
+    decision.action === "create_release" ||
+    decision.action === "repair_parent_and_create_release"
+  ) {
     return decision.proposedRelease.edition ?? "New release";
   }
 
@@ -237,7 +244,13 @@ export function getProposedName(result: PhotoIdentification | null) {
 
 function getParentBottleName(result: PhotoIdentification | null) {
   const decision = getCreateDecision(result);
-  if (!decision || decision.action !== "create_release") return null;
+  if (
+    !decision ||
+    (decision.action !== "create_release" &&
+      decision.action !== "repair_parent_and_create_release")
+  ) {
+    return null;
+  }
 
   const parent = result?.classification.artifacts.candidates.find(
     (candidate) =>
@@ -252,7 +265,10 @@ export function getCreateProposalLabel(result: PhotoIdentification | null) {
   if (!decision) return null;
   const parentBottleName = getParentBottleName(result);
 
-  if (decision.action === "create_release") {
+  if (
+    decision.action === "create_release" ||
+    decision.action === "repair_parent_and_create_release"
+  ) {
     return {
       title: "Bottling not in Peated",
       description: parentBottleName
@@ -323,7 +339,8 @@ export function getManualResultCopy(
   if (
     action === "create_bottle" ||
     action === "create_release" ||
-    action === "create_bottle_and_release"
+    action === "create_bottle_and_release" ||
+    action === "repair_parent_and_create_release"
   ) {
     return {
       title: "We couldn't find this bottle",

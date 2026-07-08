@@ -1,0 +1,230 @@
+{
+  "id": "image-backed-photo-repairs-laphroaig-elements-parent-and-creates-l2-0-release",
+  "name": "image-backed photo: repairs Laphroaig Elements parent and creates L2.0 release",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://api.peated.com/uploads/pending-uploads/pending-upload-dofxzsrs473oobnos4e5u4wx.webp",
+      "imageUrl": "https://api.peated.com/uploads/pending-uploads/pending-upload-dofxzsrs473oobnos4e5u4wx.webp"
+    },
+    "extractedIdentity": {
+      "brand": "Laphroaig",
+      "bottler": null,
+      "expression": "Elements",
+      "series": "Elements",
+      "distillery": ["Laphroaig"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 59.6,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": true,
+      "single_cask": null,
+      "edition": "L2.0"
+    },
+    "initialCandidates": [
+      {
+        "bottleId": 44286,
+        "releaseId": 412,
+        "bottleFullName": "Laphroaig Elements",
+        "fullName": "Laphroaig Elements - L1.0 - 58.6% ABV"
+      },
+      {
+        "bottleId": 44286,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Elements",
+        "fullName": "Laphroaig Elements"
+      },
+      {
+        "bottleId": 3262,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Lp8 ElD Elements of Islay",
+        "fullName": "Laphroaig Lp8 ElD Elements of Islay"
+      },
+      {
+        "bottleId": 2890,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Lp9 ElD Elements of Islay",
+        "fullName": "Laphroaig Lp9 ElD Elements of Islay"
+      },
+      {
+        "bottleId": 3830,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Lp6 SMS Elements of Islay",
+        "fullName": "Laphroaig Lp6 SMS Elements of Islay"
+      },
+      {
+        "bottleId": 43018,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Elements 2.0 Cask Strength",
+        "fullName": "Laphroaig Elements 2.0 Cask Strength"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": 61,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 002 - Cask Strength"
+      },
+      {
+        "bottleId": 44035,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Single Cask Selection",
+        "fullName": "Laphroaig Single Cask Selection"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": 70,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 001 - Cask Strength"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": 72,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 012 - Cask Strength"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": 71,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 003 - Cask Strength"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": null,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": 75,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 014 - Cask Strength"
+      },
+      {
+        "bottleId": 44005,
+        "releaseId": 63,
+        "bottleFullName": "Laphroaig Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 005 - Cask Strength"
+      },
+      {
+        "bottleId": 44035,
+        "releaseId": 241,
+        "bottleFullName": "Laphroaig Single Cask Selection",
+        "fullName": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - Single Cask - Oak"
+      }
+    ],
+    "imageEvidence": {
+      "sourceImageId": "it3u4hh0j10d3s9kfdcvpnob",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "gpt-5.4",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "Laphroaig Elements Laphroaig L2.0",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the uploaded bottle photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Laphroaig",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Elements",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Laphroaig"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "L2.0",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskStrength": {
+          "value": true,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.laphroaig.com/whiskies/laphroaig-elements-2-0",
+      "https://api.peated.com/uploads/pending-uploads/pending-upload-dofxzsrs473oobnos4e5u4wx.webp",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp",
+    "dbOutcome": {
+      "bottleId": 44286,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": true,
+      "summary": "Production DB outcome: repair dirty parent bottle 44286, Laphroaig Elements, then create a new L2.0 release under it. Nearby release 412 is L1.0 and must not be used for this L2.0 photo."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_release",
+        "releaseId": 412,
+        "field": "edition",
+        "productionValue": "L1.0",
+        "evidenceValue": "L2.0",
+        "source": "image_evidence",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The existing production release is Elements L1.0; the observed bottle is the distinct L2.0 release."
+      }
+    ],
+    "notes": "Added from failed image photo-identification trace 8f51724d760d30ac51763350808c5f4f. The observed pending upload was it3u4hh0j10d3s9kfdcvpnob at https://api.peated.com/uploads/pending-uploads/pending-upload-dofxzsrs473oobnos4e5u4wx.webp, expiring 2026-07-10T02:51:28.032Z, and the checked-in image preserves that label evidence for replay. Production returned suggestedNextStep manual_search and decision no_match even though diagnostics identified the correct target as a new L2.0 child release under bottle 44286. The downgrade reason was a dirty parent conflict on edition and ABV, so the expected classifier action is repair_parent_and_create_release."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "repair_parent_and_create_release",
+    "identityScope": "product",
+    "parentBottleId": 44286,
+    "proposedBottle": {
+      "brand": {
+        "name": "Laphroaig"
+      },
+      "name": "Elements",
+      "category": "single_malt",
+      "edition": null,
+      "abv": null,
+      "caskStrength": null
+    },
+    "proposedRelease": {
+      "edition": "L2.0",
+      "abv": 59.6,
+      "caskStrength": true
+    },
+    "expectedTier": "auto",
+    "suggestedNextStep": "confirm_create",
+    "summary": "Repair Laphroaig Elements bottle 44286 by clearing parent-level release traits, then create L2.0 as a new release under it; do not match L1.0 and do not use the standalone legacy-like Elements 2.0 row."
+  }
+}

@@ -344,6 +344,17 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
+      if (getAccessToken(request).includes("photo-repair-parent-create")) {
+        sendRpcResponse(
+          response,
+          buildCreateProposalPhotoIdentification({
+            action: "repair_parent_and_create_release",
+          }),
+          "88888888888888888888888888888888",
+        );
+        return true;
+      }
+
       if (
         getAccessToken(request).includes("photo-create-bottle-default-image")
       ) {
@@ -360,6 +371,15 @@ async function handleRpcRequest({ request, response, url }) {
           response,
           buildNoMatchPhotoIdentification(),
           "55555555555555555555555555555555",
+        );
+        return true;
+      }
+
+      if (getAccessToken(request).includes("photo-manual-match")) {
+        sendRpcResponse(
+          response,
+          buildManualSearchMatchPhotoIdentification(),
+          "413c334005c60d8dcc8dbf109761c5e3",
         );
         return true;
       }
@@ -826,16 +846,26 @@ function buildCreateProposalPhotoIdentification({
           parentBottleId: existingBottleId,
           proposedRelease,
         }
-      : action === "create_bottle_and_release"
+      : action === "repair_parent_and_create_release"
         ? {
             action,
-            proposedBottle,
+            parentBottleId: existingBottleId,
+            proposedBottle: {
+              ...proposedBottle,
+              name: existingBottle.name,
+            },
             proposedRelease,
           }
-        : {
-            action,
-            proposedBottle,
-          };
+        : action === "create_bottle_and_release"
+          ? {
+              action,
+              proposedBottle,
+              proposedRelease,
+            }
+          : {
+              action,
+              proposedBottle,
+            };
 
   return {
     pendingImage: {
@@ -988,6 +1018,16 @@ function createPhotoIdentificationTarget(request, input) {
     };
   }
 
+  if (token.includes("photo-repair-parent-create")) {
+    return {
+      bottle: existingBottle,
+      release: buildBottleRelease({
+        ...buildCreatedRelease(),
+        bottleId: existingBottleId,
+      }),
+    };
+  }
+
   if (token.includes("photo-create-bottle-default-image")) {
     return {
       bottle,
@@ -1006,6 +1046,10 @@ function getExpectedPhotoCreateToken(request) {
 
   if (token.includes("photo-create-release-default-image")) {
     return "playwright-create-token:create_bottle_and_release:suitable";
+  }
+
+  if (token.includes("photo-repair-parent-create")) {
+    return "playwright-create-token:repair_parent_and_create_release:suitable";
   }
 
   if (
@@ -1220,6 +1264,100 @@ function buildNoMatchPhotoIdentification() {
         action: "no_match",
         confidence: 0,
         reason: "No existing Peated bottle matched the label details.",
+      },
+    },
+  };
+}
+
+function buildManualSearchMatchPhotoIdentification() {
+  return {
+    pendingImage: {
+      id: "playwright-photo-upload",
+      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
+      expiresAt: "2026-06-07T13:00:00.000Z",
+    },
+    imageEvidence: {
+      sourceImageId: "playwright-photo-upload",
+      sourceImageHash: "playwright-photo-hash",
+      extractors: [
+        {
+          kind: "vision",
+          model: "playwright",
+          confidence: 0.75,
+          textSpans: [
+            {
+              text: `${testBrand.name} ${existingBottle.name} 2022 release`,
+              confidence: 0.75,
+            },
+          ],
+          observations: ["Single bottle label is readable."],
+        },
+      ],
+      fieldCandidates: {
+        brand: {
+          value: testBrand.name,
+          confidence: 0.75,
+          sourceExtractorIndexes: [0],
+        },
+        expression: {
+          value: existingBottle.name,
+          confidence: 0.75,
+          sourceExtractorIndexes: [0],
+        },
+        releaseYear: {
+          value: 2022,
+          confidence: 0.75,
+          sourceExtractorIndexes: [0],
+        },
+      },
+      photoSuitability: {
+        isSingleBottlePhoto: true,
+        labelReadable: true,
+        suitableAsTastingImage: true,
+        suitableAsBottleImage: true,
+        reason: null,
+      },
+      conflicts: [],
+    },
+    classification: {
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: existingBottleId,
+        matchedReleaseId: existingReleaseId,
+      },
+      artifacts: {
+        candidates: [
+          {
+            bottleId: existingBottleId,
+            releaseId: existingReleaseId,
+            bottleFullName: existingBottle.fullName,
+            fullName: existingRelease.fullName,
+          },
+          {
+            bottleId: existingBottleId,
+            releaseId: null,
+            bottleFullName: existingBottle.fullName,
+            fullName: existingBottle.fullName,
+          },
+        ],
+      },
+    },
+    suggestedNextStep: "manual_search",
+    diagnostics: {
+      extraction: {
+        status: "found",
+        summary: `${testBrand.name} ${existingBottle.name} 2022 release`,
+      },
+      candidates: {
+        count: 2,
+      },
+      classification: {
+        status: "classified",
+        action: "match",
+        confidence: null,
+        reason:
+          "Local release candidate safely matches, but the next step was downgraded.",
       },
     },
   };

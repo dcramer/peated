@@ -5,6 +5,7 @@ import { db } from "@peated/server/db";
 import {
   bottleReleases,
   bottles,
+  changes,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
@@ -14,7 +15,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
 import * as Sentry from "@sentry/node";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
@@ -262,6 +263,60 @@ function buildCreateReleaseDecision({
       vintageYear: null,
       releaseYear: null,
       imageUrl: releaseImageUrl,
+    },
+  };
+}
+
+function buildRepairParentAndCreateReleaseDecision({
+  parentBottleId,
+  brandName,
+  bottleName,
+  category = "single_malt",
+  releaseEdition,
+}: {
+  parentBottleId: number;
+  brandName: string;
+  bottleName: string;
+  category?: "bourbon" | "rye" | "single_malt";
+  releaseEdition: string;
+}) {
+  return {
+    action: "repair_parent_and_create_release",
+    rationale:
+      "Reliable photo evidence supports repairing the parent and creating the release.",
+    parentBottleId,
+    proposedBottle: {
+      name: bottleName,
+      series: null,
+      category,
+      edition: null,
+      statedAge: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      brand: {
+        id: null,
+        name: brandName,
+      },
+      distillers: [
+        {
+          id: null,
+          name: brandName,
+        },
+      ],
+      bottler: null,
+    },
+    proposedRelease: {
+      edition: releaseEdition,
+      statedAge: null,
+      abv: 49.3,
+      caskStrength: null,
+      singleCask: null,
+      vintageYear: null,
+      releaseYear: null,
+      imageUrl: null,
     },
   };
 }
@@ -1069,6 +1124,307 @@ describe("POST /tastings/photo-identification", () => {
         `^/uploads/bottle-releases/bottle_release-${response.release!.id}-pending-upload-.+\\.webp$`,
       ),
     );
+  });
+
+  test("parent repair plus release creation can be confirmed from photo identification", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "High West Photo Repair",
+      type: ["brand", "distiller"],
+    });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A Midwinter Night's Dram",
+      category: "rye",
+      edition: "Act 12",
+      abv: 49.3,
+      releaseYear: 2024,
+    });
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-repair-parent-create-release",
+      decision: buildRepairParentAndCreateReleaseDecision({
+        parentBottleId: dirtyParent.id,
+        brandName: brand.name,
+        bottleName: "A Midwinter Night's Dram",
+        category: "rye",
+        releaseEdition: "Act 12 Scene 9",
+      }),
+      candidates: [
+        {
+          bottleId: dirtyParent.id,
+          releaseId: null,
+          bottleFullName: dirtyParent.fullName,
+          fullName: dirtyParent.fullName,
+        },
+      ],
+    });
+
+    expect(identification.suggestedNextStep).toBe("confirm_create");
+    expect(identification.createToken).not.toBeNull();
+    expect(identification.classification).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "repair_parent_and_create_release",
+        parentBottleId: dirtyParent.id,
+        proposedBottle: {
+          name: "A Midwinter Night's Dram",
+          brand: {
+            name: brand.name,
+          },
+        },
+        proposedRelease: {
+          edition: "Act 12 Scene 9",
+        },
+      },
+    });
+
+    const response = await routerClient.tastings.photoIdentificationCreate(
+      {
+        createToken: identification.createToken!,
+      },
+      {
+        context: { user: defaults.user },
+      },
+    );
+
+    expect(response.bottle.id).toBe(dirtyParent.id);
+    expect(response.bottle).toMatchObject({
+      name: "A Midwinter Night's Dram",
+      category: "rye",
+      edition: null,
+      abv: null,
+      releaseYear: null,
+    });
+    expect(response.release).toMatchObject({
+      bottleId: dirtyParent.id,
+      edition: "Act 12 Scene 9",
+      abv: 49.3,
+    });
+    expect(response.release?.imageUrl).toContain(
+      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
+    );
+
+    const parentUpdateChanges = await db
+      .select({ id: changes.id })
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectType, "bottle"),
+          eq(changes.objectId, dirtyParent.id),
+          eq(changes.type, "update"),
+        ),
+      );
+    expect(parentUpdateChanges).toHaveLength(1);
+
+    const replayResponse =
+      await routerClient.tastings.photoIdentificationCreate(
+        {
+          createToken: identification.createToken!,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      );
+    expect(replayResponse.bottle.id).toBe(dirtyParent.id);
+    expect(replayResponse.release?.id).toBe(response.release?.id);
+
+    const parentUpdateChangesAfterReplay = await db
+      .select({ id: changes.id })
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectType, "bottle"),
+          eq(changes.objectId, dirtyParent.id),
+          eq(changes.type, "update"),
+        ),
+      );
+    expect(parentUpdateChangesAfterReplay).toHaveLength(1);
+  });
+
+  test("parent repair plus release creation rejects parent brand contradictions", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Correct Parent Brand",
+      type: ["brand", "distiller"],
+    });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Dirty Parent",
+      category: "single_malt",
+      edition: "Legacy Edition",
+      abv: 46,
+    });
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-repair-parent-brand-contradiction",
+      decision: buildRepairParentAndCreateReleaseDecision({
+        parentBottleId: dirtyParent.id,
+        brandName: "Wrong Parent Brand",
+        bottleName: "Dirty Parent",
+        releaseEdition: "Observed Edition",
+      }),
+      candidates: [
+        {
+          bottleId: dirtyParent.id,
+          releaseId: null,
+          bottleFullName: dirtyParent.fullName,
+          fullName: dirtyParent.fullName,
+        },
+      ],
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          createToken: identification.createToken!,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(String(err)).toContain("Classifier repair parent brand mismatch");
+    const parent = await db.query.bottles.findFirst({
+      where: eq(bottles.id, dirtyParent.id),
+    });
+    expect(parent).toMatchObject({
+      name: "Dirty Parent",
+      edition: "Legacy Edition",
+      abv: 46,
+    });
+  });
+
+  test("parent repair plus release creation reports alias collisions as conflicts", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "High West Photo Collision",
+      type: ["brand", "distiller"],
+    });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Midwinter Dirty Parent",
+      category: "rye",
+      edition: "Legacy Edition",
+    });
+    const existingBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "A Midwinter Night's Dram",
+      category: "rye",
+    });
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-repair-parent-alias-collision",
+      decision: buildRepairParentAndCreateReleaseDecision({
+        parentBottleId: dirtyParent.id,
+        brandName: brand.name,
+        bottleName: "A Midwinter Night's Dram",
+        category: "rye",
+        releaseEdition: "Act 12 Scene 9",
+      }),
+      candidates: [
+        {
+          bottleId: dirtyParent.id,
+          releaseId: null,
+          bottleFullName: dirtyParent.fullName,
+          fullName: dirtyParent.fullName,
+        },
+      ],
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          createToken: identification.createToken!,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchObject({
+      code: "CONFLICT",
+      data: {
+        bottle: existingBottle.id,
+      },
+      message: "Bottle already exists.",
+    });
+  });
+
+  test("parent repair rejects aliases already owned by a child release", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "High West Release Alias Collision",
+      type: ["brand", "distiller"],
+    });
+    const dirtyParent = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Midwinter Dirty Parent",
+      category: "rye",
+      edition: "Legacy Edition",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: dirtyParent.id,
+      edition: "Existing Child",
+    });
+    await fixtures.BottleAlias({
+      bottleId: dirtyParent.id,
+      releaseId: release.id,
+      name: "High West Release Alias Collision A Midwinter Night's Dram",
+    });
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey:
+        "photo-identification-repair-parent-release-alias-collision",
+      decision: buildRepairParentAndCreateReleaseDecision({
+        parentBottleId: dirtyParent.id,
+        brandName: brand.name,
+        bottleName: "A Midwinter Night's Dram",
+        category: "rye",
+        releaseEdition: "Act 12 Scene 9",
+      }),
+      candidates: [
+        {
+          bottleId: dirtyParent.id,
+          releaseId: null,
+          bottleFullName: dirtyParent.fullName,
+          fullName: dirtyParent.fullName,
+        },
+      ],
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.photoIdentificationCreate(
+        {
+          createToken: identification.createToken!,
+        },
+        {
+          context: { user: defaults.user },
+        },
+      ),
+    );
+
+    expect(err).toMatchObject({
+      code: "CONFLICT",
+      data: {
+        bottle: dirtyParent.id,
+      },
+      message: "Bottle already exists.",
+    });
   });
 
   test("create release rejects parent bottles outside the reviewed candidates", async ({

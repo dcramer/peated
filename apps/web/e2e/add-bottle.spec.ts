@@ -15,6 +15,7 @@ import {
   createdReleaseId,
   createdTastingId,
   existingBottle,
+  existingBottleId,
   existingRelease,
   existingReleaseId,
   photoTastingNotes,
@@ -217,7 +218,7 @@ test.describe("create bottle", () => {
         `/addBottle\\?bottle=${createdBottleId}&release=${createdReleaseId}&intent=library$`,
       ),
     );
-    await expect(page.getByText("First Fill Oloroso")).toBeVisible();
+    await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: "In Library" }),
     ).toBeVisible();
@@ -699,6 +700,35 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test("creates a release after repairing a parent from a scan", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-repair-parent-create"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
+    await expect(
+      page.getByText(`Create a new bottling for ${existingBottle.fullName}.`),
+    ).toBeVisible();
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+    const input = getRpcInput(await requestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:repair_parent_and_create_release:suitable",
+    );
+    await expect(page).toHaveURL(
+      new RegExp(`/bottles/${existingBottleId}/bottlings/${createdReleaseId}$`),
+    );
+    await expectNoHorizontalOverflow(page);
+  });
+
   test("creates from an unsuitable scan without requesting image approval", async ({
     context,
     page,
@@ -1055,6 +1085,46 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("button", { name: "Start Over" }),
     ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("keeps a downgraded scan match actionable and offers manual creation", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "photo-manual-match"),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    await expect(page.getByText(existingRelease.fullName)).toBeVisible();
+    await expect(
+      page.getByText("Matched to existing bottle in Peated"),
+    ).toBeVisible();
+    await expect(page.getByText("We couldn't confirm the match")).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
+    const createBottleLink = page.getByRole("link", {
+      name: "Create Bottle",
+    });
+    await expect(createBottleLink).toBeVisible();
+
+    const href = await createBottleLink.getAttribute("href");
+    expect(href).not.toBeNull();
+    const createUrl = new URL(href!, page.url());
+    expect(createUrl.pathname).toBe("/bottles/new");
+    expect(createUrl.searchParams.get("returnAction")).toBe("addBottle");
+    expect(createUrl.searchParams.get("pendingImageId")).toBe(
+      "playwright-photo-upload",
+    );
+    expect(createUrl.searchParams.get("pendingImageUrl")).toBe(
+      pendingScanImageUrl,
+    );
+    expect(createUrl.searchParams.get("brandName")).toBe(testBrand.name);
+    expect(createUrl.searchParams.get("name")).toBe(existingBottle.name);
     await expectNoHorizontalOverflow(page);
   });
 

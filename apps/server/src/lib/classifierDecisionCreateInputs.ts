@@ -130,7 +130,10 @@ export function buildClassifierCreateInputs(decision: {
     };
   }
 
-  if (decision.action === "create_bottle_and_release") {
+  if (
+    decision.action === "create_bottle_and_release" ||
+    decision.action === "repair_parent_and_create_release"
+  ) {
     if (!decision.proposedBottle || !decision.proposedRelease) {
       return {
         input: undefined,
