@@ -13,30 +13,23 @@ import TastingListItem from "./tastingListItem";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
-type ProfileActivityListResult = Outputs["users"]["activity"]["list"];
-type ProfileActivityEntry = ProfileActivityListResult["results"][number];
-type ProfileCollectionAddActivity = Extract<
-  ProfileActivityEntry,
-  { type: "collection_add" }
->;
-type ProfileCollectionAddItem = ProfileCollectionAddActivity["items"][number];
+type ActivityListResult = Outputs["activity"]["list"];
+type ActivityEntry = ActivityListResult["results"][number];
+type CollectionAddActivity = Extract<ActivityEntry, { type: "collection_add" }>;
+type CollectionAddItem = CollectionAddActivity["items"][number];
 
 function formatBottleCount(count: number) {
   return `${count.toLocaleString()} bottle${count === 1 ? "" : "s"}`;
 }
 
-function getCollectionLabel(activity: ProfileCollectionAddActivity) {
+function getCollectionLabel(activity: CollectionAddActivity) {
   if (activity.collection.href?.endsWith("/favorites")) {
     return "Favorites";
   }
   return activity.collection.name;
 }
 
-function CollectionLink({
-  activity,
-}: {
-  activity: ProfileCollectionAddActivity;
-}) {
+function CollectionLink({ activity }: { activity: CollectionAddActivity }) {
   const label = getCollectionLabel(activity);
 
   if (!activity.collection.href) {
@@ -53,18 +46,18 @@ function CollectionLink({
   );
 }
 
-function getCollectionItemHref(item: ProfileCollectionAddItem) {
+function getCollectionItemHref(item: CollectionAddItem) {
   if (item.release) {
     return getBottleBottlingPath(item.bottle.id, item.release.id);
   }
   return `/bottles/${item.bottle.id}`;
 }
 
-function getCollectionItemTitle(item: ProfileCollectionAddItem) {
+function getCollectionItemTitle(item: CollectionAddItem) {
   return item.release?.fullName ?? item.bottle.fullName;
 }
 
-function getCollectionItemDetail(item: ProfileCollectionAddItem) {
+function getCollectionItemDetail(item: CollectionAddItem) {
   if (item.release) {
     const bottlingName = formatBottlingName(item.release);
     return bottlingName && bottlingName !== item.release.fullName
@@ -75,7 +68,7 @@ function getCollectionItemDetail(item: ProfileCollectionAddItem) {
   return item.bottle.category ? formatCategoryName(item.bottle.category) : null;
 }
 
-function CollectionItemImage({ item }: { item: ProfileCollectionAddItem }) {
+function CollectionItemImage({ item }: { item: CollectionAddItem }) {
   const imageUrl =
     item.imageUrl ??
     item.release?.imageUrl ??
@@ -98,7 +91,7 @@ function CollectionItemImage({ item }: { item: ProfileCollectionAddItem }) {
   );
 }
 
-function CollectionPreviewItem({ item }: { item: ProfileCollectionAddItem }) {
+function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
   const detail = getCollectionItemDetail(item);
 
   return (
@@ -123,7 +116,7 @@ function CollectionPreviewItem({ item }: { item: ProfileCollectionAddItem }) {
 function CollectionAddActivityItem({
   activity,
 }: {
-  activity: ProfileCollectionAddActivity;
+  activity: CollectionAddActivity;
 }) {
   const remainingCount = activity.totalItems - activity.items.length;
 
@@ -169,10 +162,10 @@ function CollectionAddActivityItem({
   );
 }
 
-export default function ProfileActivityList({
+export default function ActivityList({
   values,
 }: {
-  values: ProfileActivityListResult["results"];
+  values: ActivityListResult["results"];
 }) {
   const [deletedTastingIds, setDeletedTastingIds] = useState<number[]>([]);
 

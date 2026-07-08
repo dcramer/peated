@@ -174,6 +174,20 @@ export function buildCollectionBottle({
   };
 }
 
+export function buildCollection({
+  id = 9601,
+  name = "Library",
+  href = `/users/${testUser.username}/library`,
+} = {}) {
+  return {
+    id,
+    name,
+    totalBottles: 1,
+    createdAt: timestamp,
+    href,
+  };
+}
+
 export function buildTasting({
   id = createdTastingId,
   bottle = existingBottle,
@@ -198,6 +212,39 @@ export function buildTasting({
     hasToasted: false,
     createdAt: timestamp,
     createdBy: testUser,
+  };
+}
+
+export function buildActivity({
+  tasting = buildTasting(),
+  collectionBottle = buildCollectionBottle({ id: 9701 }),
+} = {}) {
+  return {
+    results: [
+      {
+        id: `tasting:${tasting.id}`,
+        type: "tasting",
+        priority: "primary",
+        createdAt: tasting.createdAt,
+        tasting,
+      },
+      {
+        id: "collection_add:9101:9601:1780833600000",
+        type: "collection_add",
+        priority: "secondary",
+        createdAt: timestamp,
+        windowStart: timestamp,
+        windowEnd: timestamp,
+        createdBy: testUser,
+        collection: buildCollection(),
+        items: [collectionBottle],
+        totalItems: 1,
+      },
+    ],
+    rel: {
+      nextCursor: null,
+      prevCursor: null,
+    },
   };
 }
 

@@ -9,8 +9,8 @@ export const fetchCache = "default-no-store";
 export default function Page() {
   const filter = "local";
   const orpc = useORPC();
-  const { data: tastingList } = useSuspenseQuery(
-    orpc.tastings.list.queryOptions({
+  const { data: activityList } = useSuspenseQuery(
+    orpc.activity.list.queryOptions({
       input: {
         filter,
         limit: 10,
@@ -18,5 +18,5 @@ export default function Page() {
     }),
   );
 
-  return <ActivityFeed tastingList={tastingList} filter={filter} />;
+  return <ActivityFeed activityList={activityList} filter={filter} />;
 }

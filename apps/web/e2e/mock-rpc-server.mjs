@@ -1,6 +1,7 @@
 import http from "node:http";
 
 import {
+  buildActivity,
   buildBottle,
   buildBottleRelease,
   buildCollectionBottle,
@@ -93,6 +94,9 @@ async function handleRpcRequest({ request, response, url }) {
   const input = await readRpcInput(request, url);
 
   switch (path) {
+    case "activity/list":
+      sendRpcResponse(response, buildActivity());
+      return true;
     case "entities/list":
       if (input?.query === testBrand.name) {
         sendRpcResponse(response, {

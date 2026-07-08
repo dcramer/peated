@@ -2,7 +2,9 @@ import { db } from "@peated/server/db";
 import {
   collectionBottles,
   collections,
+  follows,
   tastings,
+  users,
 } from "@peated/server/db/schema";
 import {
   coerceActivityDate,
@@ -12,66 +14,102 @@ import {
   serializeTastingEntries,
   type CollectionAddGroup,
 } from "@peated/server/lib/activityFeed";
-import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
-import {
-  ProfileActivityEntrySchema,
-  listResponse,
-} from "@peated/server/schemas";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { ActivityEntrySchema, listResponse } from "@peated/server/schemas";
+import type { SQL } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+
+// Main activity is read-time composition over authoritative source tables. The
+// route owns visibility filtering; shared helpers own entry shaping/throttling.
+// The local filter intentionally mirrors the existing global feed until product
+// semantics define what local activity should mean.
+type ActivityFilter = "global" | "friends" | "local";
 
 type CollectionAddGroupRow = {
   collection: typeof collections.$inferSelect;
+  user: typeof users.$inferSelect;
   bucket: Date | string;
   windowStart: Date | string;
   windowEnd: Date | string;
   totalItems: string;
 };
 
+function visibleActivityUserCondition({
+  filter,
+  currentUserId,
+}: {
+  filter: ActivityFilter;
+  currentUserId?: number;
+}) {
+  if (filter === "friends" && currentUserId) {
+    return sql`${users.id} IN (
+      SELECT ${follows.toUserId}
+      FROM ${follows}
+      WHERE ${follows.fromUserId} = ${currentUserId}
+        AND ${follows.status} = 'following'
+    )`;
+  }
+
+  const visibleUsers: SQL<unknown>[] = [eq(users.private, false)];
+  if (currentUserId) {
+    visibleUsers.push(
+      eq(users.id, currentUserId),
+      sql`${users.id} IN (
+        SELECT ${follows.toUserId}
+        FROM ${follows}
+        WHERE ${follows.fromUserId} = ${currentUserId}
+          AND ${follows.status} = 'following'
+      )`,
+    );
+  }
+
+  return or(...visibleUsers);
+}
+
 export default procedure
   .route({
     method: "GET",
-    path: "/users/{user}/activity",
-    summary: "List profile activity",
+    path: "/activity",
+    summary: "List activity",
     description:
-      "Retrieve a user's profile activity feed with tastings and grouped collection additions",
-    operationId: "listUserActivity",
+      "Retrieve mixed activity with tastings and grouped collection additions",
+    operationId: "listActivity",
   })
   .input(
-    z.object({
-      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-      cursor: z.coerce.number().gte(1).default(1),
-      limit: z.coerce.number().gte(1).lte(100).default(10),
-    }),
+    z
+      .object({
+        filter: z.enum(["global", "friends", "local"]).default("global"),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(10),
+      })
+      .default({
+        filter: "global",
+        cursor: 1,
+        limit: 10,
+      }),
   )
-  .output(listResponse(ProfileActivityEntrySchema))
+  .output(listResponse(ActivityEntrySchema))
   .handler(async function ({ input, context, errors }) {
-    const user = await getUserFromId(db, input.user, context.user);
-    if (!user) {
-      if (input.user === "me") {
-        throw errors.UNAUTHORIZED();
-      }
-      throw errors.NOT_FOUND({
-        message: "User not found.",
-      });
+    if (input.filter === "friends" && !context.user) {
+      throw errors.UNAUTHORIZED();
     }
 
-    if (!(await profileVisible(db, user, context.user))) {
-      throw errors.BAD_REQUEST({
-        message: "User's profile is private.",
-      });
-    }
-
+    const userCondition = visibleActivityUserCondition({
+      filter: input.filter,
+      currentUserId: context.user?.id,
+    });
     const collectionBucket = sql<Date>`DATE_TRUNC('day', ${collectionBottles.createdAt})`;
     const collectionGroupCreatedAt = sql<Date>`MAX(${collectionBottles.createdAt})`;
+
     const [primaryCountRows, secondaryCountResult] = await Promise.all([
       db
         .select({
           count: sql<string>`COUNT(${tastings.id})`,
         })
         .from(tastings)
-        .where(eq(tastings.createdById, user.id)),
+        .innerJoin(users, eq(users.id, tastings.createdById))
+        .where(userCondition),
       db.execute<{ count: string }>(sql`
         SELECT COUNT(*) as count
         FROM (
@@ -79,8 +117,10 @@ export default procedure
           FROM ${collectionBottles}
           INNER JOIN ${collections}
             ON ${collections.id} = ${collectionBottles.collectionId}
-            AND ${collections.createdById} = ${user.id}
-          GROUP BY ${collections.id}, DATE_TRUNC('day', ${collectionBottles.createdAt})
+          INNER JOIN ${users}
+            ON ${users.id} = ${collections.createdById}
+          WHERE ${userCondition}
+          GROUP BY ${users.id}, ${collections.id}, DATE_TRUNC('day', ${collectionBottles.createdAt})
         ) activity_groups
       `),
     ]);
@@ -95,15 +135,17 @@ export default procedure
 
     const [tastingRows, collectionGroupRows] = await Promise.all([
       db
-        .select()
+        .select({ tasting: tastings })
         .from(tastings)
-        .where(eq(tastings.createdById, user.id))
+        .innerJoin(users, eq(users.id, tastings.createdById))
+        .where(userCondition)
         .orderBy(desc(tastings.createdAt))
         .limit(sourceWindow.primaryLimit)
         .offset(sourceWindow.primaryOffset),
       db
         .select({
           collection: collections,
+          user: users,
           bucket: collectionBucket,
           windowStart: sql<Date>`MIN(${collectionBottles.createdAt})`,
           windowEnd: sql<Date>`MAX(${collectionBottles.createdAt})`,
@@ -112,26 +154,25 @@ export default procedure
         .from(collectionBottles)
         .innerJoin(
           collections,
-          and(
-            eq(collections.id, collectionBottles.collectionId),
-            eq(collections.createdById, user.id),
-          ),
+          eq(collections.id, collectionBottles.collectionId),
         )
-        .groupBy(collections.id, collectionBucket)
+        .innerJoin(users, eq(users.id, collections.createdById))
+        .where(and(userCondition))
+        .groupBy(users.id, collections.id, collectionBucket)
         .orderBy(desc(collectionGroupCreatedAt))
         .limit(sourceWindow.secondaryLimit)
         .offset(sourceWindow.secondaryOffset),
     ]);
 
     const primaryEntries = await serializeTastingEntries(
-      tastingRows,
+      tastingRows.map((row) => row.tasting),
       context.user,
     );
     const secondaryEntries = await serializeCollectionAddEntries({
       groups: collectionGroupRows.map(
         (row: CollectionAddGroupRow): CollectionAddGroup => ({
           collection: row.collection,
-          user,
+          user: row.user,
           bucket: row.bucket,
           windowStart: coerceActivityDate(row.windowStart),
           windowEnd: coerceActivityDate(row.windowEnd),

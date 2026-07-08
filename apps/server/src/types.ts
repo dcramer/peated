@@ -1,5 +1,7 @@
 import type { z } from "zod";
 import type {
+  ActivityCollectionAddEntrySchema,
+  ActivityEntrySchema,
   BadgeAwardSchema,
   BadgeCheckSchema,
   BadgeCheckTypeEnum,
@@ -64,6 +66,10 @@ export type ObjectType = z.infer<typeof ObjectTypeEnum>;
 export type FollowStatus = z.infer<typeof FollowStatusEnum>;
 export type FriendStatus = z.infer<typeof FriendStatusEnum>;
 export type Point = z.infer<typeof PointSchema>;
+export type ActivityEntry = z.infer<typeof ActivityEntrySchema>;
+export type ActivityCollectionAddEntry = z.infer<
+  typeof ActivityCollectionAddEntrySchema
+>;
 export type ProfileActivityEntry = z.infer<typeof ProfileActivityEntrySchema>;
 export type ProfileCollectionAddActivity = z.infer<
   typeof ProfileCollectionAddActivitySchema
