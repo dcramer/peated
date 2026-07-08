@@ -9,13 +9,16 @@ import SingleCaskChip from "./singleCaskChip";
 export default function BottleHeader({
   bottle,
   href,
+  compact,
 }: {
   bottle: Bottle;
   href?: string;
+  compact?: boolean;
 }) {
   return (
     <PageHeader
       icon={BottleIcon}
+      compact={compact}
       title={
         <div className="flex flex-wrap items-center gap-2">
           {href ? (

@@ -15,7 +15,7 @@ import {
   getBottleBottlingPath,
   getNewBottleBottlingPath,
 } from "@peated/web/lib/bottlings";
-import ModActions from "./modActions";
+import ModActions from "../../bottlingModActions";
 
 export default function ReleaseTable({
   bottleId,

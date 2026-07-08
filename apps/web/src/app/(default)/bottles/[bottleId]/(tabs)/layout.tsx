@@ -1,10 +1,9 @@
-import Link from "@peated/web/components/link";
-import Tabs, { TabItem } from "@peated/web/components/tabs";
-import { getBottleBottlingsPath } from "@peated/web/lib/bottlings";
 import { summarize } from "@peated/web/lib/markdown";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
+import BottleFullHeader from "../bottleFullHeader";
+import BottleTabs from "../bottleTabs";
 
 export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
@@ -55,28 +54,10 @@ export default async function Layout(props: {
     client.bottles.details({ bottle: bottleId }),
   );
 
-  const baseUrl = `/bottles/${bottle.id}`;
-  const bottlingsUrl = getBottleBottlingsPath(bottle.id);
-
   return (
     <>
-      <Tabs border>
-        <TabItem as={Link} href={baseUrl} controlled>
-          Overview
-        </TabItem>
-        <TabItem as={Link} href={`${baseUrl}/tastings`} controlled>
-          Tastings ({bottle.totalTastings.toLocaleString()})
-        </TabItem>
-        <TabItem as={Link} href={bottlingsUrl} controlled match="prefix">
-          Bottlings ({bottle.numReleases.toLocaleString()})
-        </TabItem>
-        <TabItem as={Link} href={`${baseUrl}/prices`} controlled desktopOnly>
-          Prices
-        </TabItem>
-        <TabItem as={Link} href={`${baseUrl}/similar`} controlled desktopOnly>
-          Similar
-        </TabItem>
-      </Tabs>
+      <BottleFullHeader bottle={bottle} />
+      <BottleTabs bottle={bottle} />
       {children}
     </>
   );
