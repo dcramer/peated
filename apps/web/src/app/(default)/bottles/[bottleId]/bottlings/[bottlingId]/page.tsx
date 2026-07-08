@@ -3,6 +3,7 @@ import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import RobotImage from "@peated/web/assets/robot.png";
+import BottleHeader from "@peated/web/components/bottleHeader";
 import BottleReviews from "@peated/web/components/bottleReviews";
 import Button from "@peated/web/components/button";
 import CaskDetails from "@peated/web/components/caskDetails";
@@ -14,15 +15,11 @@ import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import ShareButton from "@peated/web/components/shareButton";
 import SimpleRatingIndicator from "@peated/web/components/simpleRatingIndicator";
-import SingleCaskChip from "@peated/web/components/singleCaskChip";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import TastingList from "@peated/web/components/tastingList";
 import TimeSince from "@peated/web/components/timeSince";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import {
-  formatBottlingName,
-  getBottleBottlingsPath,
-} from "@peated/web/lib/bottlings";
+import { getBottleBottlingsPath } from "@peated/web/lib/bottlings";
 import { summarize } from "@peated/web/lib/markdown";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
@@ -30,7 +27,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
-import ModActions from "../../releases/modActions";
+import BottleTabs from "../../bottleTabs";
+import ModActions from "../../bottlingModActions";
 
 type Bottle = Outputs["bottles"]["details"];
 type Bottling = Outputs["bottleReleases"]["details"];
@@ -58,7 +56,11 @@ function formatRating(avgRating: number | null | undefined) {
 }
 
 function getReleaseTitle(bottling: Bottling) {
-  return formatBottlingName(bottling) || bottling.fullName;
+  if (bottling.edition) return bottling.edition;
+  if (bottling.vintageYear) return `${bottling.vintageYear} Vintage`;
+  if (bottling.releaseYear) return `${bottling.releaseYear} Bottling`;
+
+  return bottling.fullName;
 }
 
 function getReleaseDescription(bottle: Bottle, bottling: Bottling) {
@@ -80,10 +82,10 @@ function getReleaseDescription(bottle: Bottle, bottling: Bottling) {
 
 function getBottlingHighlights(bottling: Bottling) {
   return [
+    bottling.vintageYear ? `${bottling.vintageYear} vintage` : null,
+    bottling.releaseYear ? `bottled ${bottling.releaseYear}` : null,
     formatAge(bottling.statedAge),
     formatAbv(bottling.abv),
-    bottling.releaseYear ? `${bottling.releaseYear} bottling` : null,
-    bottling.vintageYear ? `${bottling.vintageYear} vintage` : null,
     bottling.singleCask ? "single cask" : null,
     bottling.caskStrength ? "cask strength" : null,
     bottling.caskFill ? toTitleCase(bottling.caskFill) : null,
@@ -324,7 +326,7 @@ function ReleaseImage({
   }
 
   return (
-    <div className="flex w-full justify-center rounded border border-slate-900 bg-white p-3 opacity-90">
+    <div className="flex w-full justify-center rounded border border-slate-800 bg-white p-3 opacity-90">
       <img
         src={imageUrl}
         className="block max-h-80 max-w-full rounded object-contain"
@@ -428,8 +430,12 @@ export default async function Page(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <div className="w-full p-3 lg:py-0">
+        <BottleHeader bottle={bottle} compact />
+      </div>
+      <BottleTabs bottle={bottle} />
       <div className="mt-6 px-3 lg:px-0">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
           <div className="min-w-0 flex-1">
             <div className="text-muted mb-2 text-sm">
               <Link
@@ -443,51 +449,57 @@ export default async function Page(props: {
                 {bottle.fullName}
               </Link>
             </div>
-            <h2 className="flex flex-wrap items-center gap-2 text-3xl font-semibold leading-tight">
+            <h2 className="text-3xl font-semibold leading-tight">
               {releaseTitle}
-              {bottling.singleCask && <SingleCaskChip />}
             </h2>
             {bottlingHighlights.length > 0 && (
               <p className="text-muted mt-2 max-w-3xl">
                 {bottlingHighlights.join(" · ")}
               </p>
             )}
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Suspense
+                fallback={
+                  <>
+                    <SkeletonButton className="w-10" />
+                    <SkeletonButton className="w-10" />
+                  </>
+                }
+              >
+                <CollectionAction
+                  bottleId={bottle.id}
+                  releaseId={bottling.id}
+                />
+              </Suspense>
+              <Button
+                href={getAddBottleHref({
+                  bottleId: bottle.id,
+                  releaseId: bottling.id,
+                  intent: "tasting",
+                })}
+                color="primary"
+              >
+                <PeatedGlyph className="h-4 w-4" />
+                Log Tasting
+              </Button>
+              <ShareButton
+                title={bottling.fullName}
+                url={`/bottles/${bottle.id}/bottlings/${bottling.id}`}
+              />
+              <Button href={getBottleBottlingsPath(bottle.id)}>
+                All Bottlings
+              </Button>
+              <ModActions release={bottling} />
+            </div>
+
+            <ReleaseStats bottling={bottling} />
           </div>
 
-          <div className="flex flex-wrap gap-2 lg:justify-end">
-            <Suspense
-              fallback={
-                <>
-                  <SkeletonButton className="w-10" />
-                  <SkeletonButton className="w-10" />
-                </>
-              }
-            >
-              <CollectionAction bottleId={bottle.id} releaseId={bottling.id} />
-            </Suspense>
-            <Button
-              href={getAddBottleHref({
-                bottleId: bottle.id,
-                releaseId: bottling.id,
-                intent: "tasting",
-              })}
-              color="primary"
-            >
-              <PeatedGlyph className="h-4 w-4" />
-              Log Tasting
-            </Button>
-            <ShareButton
-              title={bottling.fullName}
-              url={`/bottles/${bottle.id}/bottlings/${bottling.id}`}
-            />
-            <Button href={getBottleBottlingsPath(bottle.id)}>
-              All Bottlings
-            </Button>
-            <ModActions release={bottling} />
-          </div>
+          <aside className="lg:pt-7">
+            <ReleaseImage bottle={bottle} bottling={bottling} />
+          </aside>
         </div>
-
-        <ReleaseStats bottling={bottling} />
 
         <div className="my-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem]">
           <div className="min-w-0 space-y-8">
@@ -522,7 +534,6 @@ export default async function Page(props: {
           </div>
 
           <aside className="space-y-8">
-            <ReleaseImage bottle={bottle} bottling={bottling} />
             <ParentBottleContext bottle={bottle} />
           </aside>
         </div>

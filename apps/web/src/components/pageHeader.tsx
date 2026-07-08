@@ -1,26 +1,41 @@
 import type { ElementType, ReactNode } from "react";
+import classNames from "../lib/classNames";
 
 export default function PageHeader({
   title,
   titleExtra,
   metadata,
   icon: Icon,
+  compact = false,
 }: {
   title: string | ReactNode;
   titleExtra?: ReactNode;
   metadata?: ReactNode;
   icon?: ElementType;
+  compact?: boolean;
 }) {
   return (
-    <div className="my-4 flex w-full flex-wrap justify-center gap-x-3 gap-y-4 lg:flex-nowrap lg:justify-start">
+    <div
+      className={classNames(
+        "flex w-full flex-wrap justify-center gap-x-3 lg:flex-nowrap lg:justify-start",
+        compact ? "my-3 gap-y-2" : "my-4 gap-y-4",
+      )}
+    >
       {!!Icon && (
-        <div className="hidden w-14 lg:block">
-          <Icon className="h-14 w-auto" />
+        <div
+          className={classNames("hidden lg:block", compact ? "w-10" : "w-14")}
+        >
+          <Icon className={classNames("w-auto", compact ? "h-10" : "h-14")} />
         </div>
       )}
 
       <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
-        <h1 className="max-w-full truncate text-center text-2xl font-semibold lg:mx-0 lg:text-left">
+        <h1
+          className={classNames(
+            "max-w-full truncate text-center font-semibold lg:mx-0 lg:text-left",
+            compact ? "text-xl" : "text-2xl",
+          )}
+        >
           {title}
         </h1>
         {titleExtra}
