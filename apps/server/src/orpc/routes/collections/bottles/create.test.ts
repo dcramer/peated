@@ -49,7 +49,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
   test("adds bottle to library collection", async ({ fixtures, defaults }) => {
     const bottle = await fixtures.Bottle();
 
-    await routerClient.collections.bottles.create(
+    const result = await routerClient.collections.bottles.create(
       {
         user: "me",
         collection: "library",
@@ -76,6 +76,111 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
 
     expect(bottleList).toHaveLength(1);
     expect(bottleList[0].collectionId).toBe(libraryCollection.id);
+    expect(bottleList[0].status).toBeNull();
+    expect(result.status).toBeNull();
+  });
+
+  test("adds bottle to library collection with status", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+
+    const result = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        status: "sealed",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const [collectionBottle] = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.id, result.id));
+
+    expect(result.status).toBe("sealed");
+    expect(collectionBottle.status).toBe("sealed");
+  });
+
+  test("stores library entry status independently per user", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const otherUser = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+
+    const defaultUserEntry = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        status: "sealed",
+      },
+      { context: { user: defaults.user } },
+    );
+    const otherUserEntry = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        status: "open",
+      },
+      { context: { user: otherUser } },
+    );
+
+    expect(defaultUserEntry.bottle.id).toBe(bottle.id);
+    expect(defaultUserEntry.status).toBe("sealed");
+    expect(otherUserEntry.bottle.id).toBe(bottle.id);
+    expect(otherUserEntry.status).toBe("open");
+
+    const defaultUserList = await routerClient.collections.bottles.list(
+      {
+        user: defaults.user.id,
+        collection: "library",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+    const otherUserList = await routerClient.collections.bottles.list(
+      {
+        user: otherUser.id,
+        collection: "library",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(defaultUserList.results[0].status).toBe("sealed");
+    expect(otherUserList.results[0].status).toBe("open");
+  });
+
+  test("rejects status outside Library", async ({ fixtures, defaults }) => {
+    const bottle = await fixtures.Bottle();
+
+    const err = await waitError(() =>
+      routerClient.collections.bottles.create(
+        {
+          user: "me",
+          collection: "default",
+          bottle: bottle.id,
+          status: "open",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Bottle status is only supported for Library entries.]`,
+    );
+
+    const rows = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+    expect(rows).toHaveLength(0);
   });
 
   test("saves a pending image when adding a bottle to library", async ({
@@ -229,6 +334,63 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     expect(rows).toHaveLength(1);
   });
 
+  test("updates existing library entry status only when explicitly supplied", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+
+    const first = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        status: "open",
+      },
+      { context: { user: defaults.user } },
+    );
+    const second = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+      },
+      { context: { user: defaults.user } },
+    );
+    const third = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        status: "empty",
+      },
+      { context: { user: defaults.user } },
+    );
+    const fourth = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "library",
+        bottle: bottle.id,
+        status: null,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(second.id).toBe(first.id);
+    expect(second.status).toBe("open");
+    expect(third.id).toBe(first.id);
+    expect(third.status).toBe("empty");
+    expect(fourth.id).toBe(first.id);
+    expect(fourth.status).toBeNull();
+
+    const rows = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.bottleId, bottle.id));
+    expect(rows).toHaveLength(1);
+    expect(rows[0].status).toBeNull();
+  });
+
   test("rejects collection images outside Library", async ({
     fixtures,
     defaults,
@@ -296,6 +458,56 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       .from(collectionBottles)
       .where(eq(collectionBottles.bottleId, bottle.id));
     expect(rows).toHaveLength(0);
+  });
+
+  test("does not update existing library entry status when image copy fails", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const [entry] = await db
+      .insert(collectionBottles)
+      .values({
+        collectionId: libraryCollection.id,
+        bottleId: bottle.id,
+        releaseId: null,
+        imageUrl: "/uploads/collection-bottles/existing.webp",
+        status: "open",
+      })
+      .returning();
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      ttlMs: -1000,
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const err = await waitError(() =>
+      routerClient.collections.bottles.create(
+        {
+          user: "me",
+          collection: "library",
+          bottle: bottle.id,
+          pendingImageId: pendingUpload.id,
+          status: "empty",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Pending upload has expired.]`);
+
+    const [row] = await db
+      .select()
+      .from(collectionBottles)
+      .where(eq(collectionBottles.id, entry.id));
+    expect(row.imageUrl).toBe("/uploads/collection-bottles/existing.webp");
+    expect(row.status).toBe("open");
   });
 
   test("fails and rolls back new library entry when image copy fails after validation", async ({

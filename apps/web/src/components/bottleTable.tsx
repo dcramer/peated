@@ -32,6 +32,7 @@ export default function BottleTable({
   bottleList,
   rel,
   renderCollectionBottleImage,
+  renderCollectionBottleMeta,
   renderCollectionBottleActions,
   showBottleStats = true,
   ...props
@@ -39,6 +40,7 @@ export default function BottleTable({
   bottleList: (Bottle | CollectionBottle)[];
   rel?: PagingRel;
   renderCollectionBottleImage?: (item: CollectionBottle) => ReactNode;
+  renderCollectionBottleMeta?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
   showBottleStats?: boolean;
 }) {
@@ -69,6 +71,9 @@ export default function BottleTable({
             const collectionImage =
               item.collectionBottle &&
               renderCollectionBottleImage?.(item.collectionBottle);
+            const collectionMeta =
+              item.collectionBottle &&
+              renderCollectionBottleMeta?.(item.collectionBottle);
             const mobileCollectionActions =
               item.collectionBottle &&
               renderCollectionBottleActions?.(item.collectionBottle);
@@ -118,6 +123,7 @@ export default function BottleTable({
                     {item.release?.singleCask && <SingleCaskChip />}
                   </div>
                   <div className="text-muted flex flex-col gap-y-1 text-sm">
+                    {collectionMeta}
                     {item.bottle.category &&
                       String(item.bottle.category) !== "other" && (
                         <Link
@@ -176,12 +182,17 @@ export default function BottleTable({
                 name: "actions",
                 title: "",
                 align: "right" as const,
-                value: (item: BottleRow) =>
-                  item.collectionBottle ? (
+                value: (item: BottleRow) => {
+                  const collectionActions =
+                    item.collectionBottle &&
+                    renderCollectionBottleActions(item.collectionBottle);
+
+                  return collectionActions ? (
                     <div className="hidden justify-end sm:flex">
-                      {renderCollectionBottleActions(item.collectionBottle)}
+                      {collectionActions}
                     </div>
-                  ) : null,
+                  ) : null;
+                },
                 className: "sm:w-16",
               },
             ]

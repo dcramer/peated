@@ -21,6 +21,8 @@ export const CollectionInputSchema = z.object({
   name: z.string().trim().min(1, "Required").describe("Name of the collection"),
 });
 
+export const CollectionBottleStatusSchema = z.enum(["sealed", "open", "empty"]);
+
 export const CollectionBottleSchema = z.object({
   id: z.number().describe("Unique identifier for the collection bottle entry"),
   imageUrl: z
@@ -29,6 +31,9 @@ export const CollectionBottleSchema = z.object({
     .default(null)
     .readonly()
     .describe("URL to the collection entry's image"),
+  status: CollectionBottleStatusSchema.nullable()
+    .default(null)
+    .describe("Bottle status for Library entries"),
   bottle: BottleSchema.describe("The bottle in this collection"),
   release: BottleReleaseSchema.nullish().describe(
     "Specific release of the bottle, if applicable",
@@ -41,4 +46,7 @@ export const CollectionBottleInputSchema = z.object({
     .number()
     .nullish()
     .describe("ID of the specific release, if applicable"),
+  status: CollectionBottleStatusSchema.nullish().describe(
+    "Optional bottle status for Library entries",
+  ),
 });

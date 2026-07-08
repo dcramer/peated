@@ -5,6 +5,11 @@ import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
 import type { CollectionBottle, PagingRel } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import { ImageModal } from "@peated/web/components/imageModal";
+import {
+  CollectionBottleStatusChips,
+  CollectionBottleStatusLabel,
+  type CollectionBottleStatus,
+} from "@peated/web/components/libraryBottleStatus";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -34,6 +39,9 @@ function useLibraryEntryMutations({
   const entryDeleteMutation = useMutation(
     orpc.collections.bottles.delete.mutationOptions(),
   );
+  const statusUpdateMutation = useMutation(
+    orpc.collections.bottles.update.mutationOptions(),
+  );
   const listQueryKey = orpc.collections.bottles.list.key({
     input: {
       user: username,
@@ -52,7 +60,8 @@ function useLibraryEntryMutations({
   const isBusy =
     pendingUploadMutation.isPending ||
     imageUpdateMutation.isPending ||
-    entryDeleteMutation.isPending;
+    entryDeleteMutation.isPending ||
+    statusUpdateMutation.isPending;
 
   function updateCachedEntry(updatedEntry: CollectionBottle) {
     queryClient.setQueryData<{
@@ -68,6 +77,33 @@ function useLibraryEntryMutations({
         ),
       };
     });
+    queryClient.setQueriesData<{
+      results: CollectionBottle[];
+      rel: PagingRel;
+    }>(
+      {
+        predicate: (query) => {
+          const queryKey = JSON.stringify(query.queryKey);
+          return (
+            queryKey.includes("collections") &&
+            queryKey.includes("bottles") &&
+            queryKey.includes("list") &&
+            queryKey.includes("library") &&
+            queryKey.includes(username)
+          );
+        },
+      },
+      (current) => {
+        if (!current) return current;
+
+        return {
+          ...current,
+          results: current.results.map((item) =>
+            item.id === updatedEntry.id ? updatedEntry : item,
+          ),
+        };
+      },
+    );
   }
 
   function removeCachedEntry() {
@@ -120,6 +156,33 @@ function useLibraryEntryMutations({
     }
   }
 
+  async function updateStatus(status: CollectionBottle["status"]) {
+    setError(null);
+    try {
+      const updatedEntry = await statusUpdateMutation.mutateAsync({
+        user: username,
+        collection: "library",
+        collectionBottle: entry.id,
+        status,
+      });
+
+      updateCachedEntry(updatedEntry);
+      await queryClient.invalidateQueries({
+        queryKey: listQueryKey,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: collectionStatusQueryKey,
+      });
+    } catch (err) {
+      logError(err, { context: "library_entry_status_update" });
+      setError(
+        getFormErrorMessage(err, {
+          expectedErrorNames: ["BAD_REQUEST", "FORBIDDEN", "NOT_FOUND"],
+        }),
+      );
+    }
+  }
+
   async function removeFromLibrary() {
     setError(null);
     try {
@@ -155,6 +218,7 @@ function useLibraryEntryMutations({
     isBusy,
     removeFromLibrary,
     replaceImage,
+    updateStatus,
   };
 }
 
@@ -268,6 +332,54 @@ export function LibraryEntryImage({
   );
 }
 
+export function LibraryEntryStatus({
+  entry,
+  username,
+  editable = false,
+}: {
+  entry: CollectionBottle;
+  username?: string;
+  editable?: boolean;
+}) {
+  if (!editable) {
+    return <CollectionBottleStatusLabel status={entry.status} />;
+  }
+
+  if (!username) {
+    return null;
+  }
+
+  return <EditableLibraryEntryStatus entry={entry} username={username} />;
+}
+
+function EditableLibraryEntryStatus({
+  entry,
+  username,
+}: {
+  entry: CollectionBottle;
+  username: string;
+}) {
+  const { error, isBusy, updateStatus } = useLibraryEntryMutations({
+    entry,
+    username,
+  });
+
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <CollectionBottleStatusChips
+        value={entry.status ?? null}
+        disabled={isBusy}
+        onChange={(status: CollectionBottleStatus) => void updateStatus(status)}
+      />
+      {error && (
+        <div className="text-xs font-medium text-red-300" role="alert">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function LibraryEntryActions({
   entry,
   username,
@@ -275,41 +387,59 @@ export default function LibraryEntryActions({
   entry: CollectionBottle;
   username: string;
 }) {
-  const { error, fileInputRef, isBusy, removeFromLibrary, replaceImage } =
-    useLibraryEntryMutations({
-      entry,
-      username,
-    });
+  const {
+    error,
+    fileInputRef,
+    isBusy,
+    removeFromLibrary,
+    replaceImage,
+    updateStatus,
+  } = useLibraryEntryMutations({
+    entry,
+    username,
+  });
 
   return (
     <div className="min-w-0 shrink-0">
-      <Menu as="div" className="menu">
-        <MenuButton as={Button} size="small" title="Bottle options">
-          <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
-          <span className="sr-only">Bottle options</span>
-        </MenuButton>
-        <MenuItems
-          className="absolute right-0 z-40 mt-2 w-44 origin-top-right"
-          unmount={false}
-        >
-          <MenuItem
-            as="button"
-            disabled={isBusy}
-            onClick={() => fileInputRef.current?.click()}
+      <div className="flex items-start justify-end">
+        <Menu as="div" className="menu">
+          <MenuButton as={Button} size="small" title="Bottle options">
+            <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+            <span className="sr-only">Bottle options</span>
+          </MenuButton>
+          <MenuItems
+            className="absolute right-0 z-40 mt-2 w-44 origin-top-right"
+            unmount={false}
           >
-            Edit Image
-          </MenuItem>
-          <MenuItem
-            as="button"
-            disabled={isBusy}
-            onClick={() => void removeFromLibrary()}
-          >
-            Remove from Library
-          </MenuItem>
-        </MenuItems>
-      </Menu>
+            <MenuItem
+              as="button"
+              disabled={isBusy}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Edit Image
+            </MenuItem>
+            <MenuItem
+              as="button"
+              disabled={isBusy || !entry.status}
+              onClick={() => void updateStatus(null)}
+            >
+              Clear Status
+            </MenuItem>
+            <MenuItem
+              as="button"
+              disabled={isBusy}
+              onClick={() => void removeFromLibrary()}
+            >
+              Remove from Library
+            </MenuItem>
+          </MenuItems>
+        </Menu>
+      </div>
       {error && (
-        <div className="mt-1 text-xs font-medium text-red-300" role="alert">
+        <div
+          className="mt-1 text-right text-xs font-medium text-red-300"
+          role="alert"
+        >
           {error}
         </div>
       )}

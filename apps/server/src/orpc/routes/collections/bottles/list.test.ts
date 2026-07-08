@@ -624,6 +624,173 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(results.map((r) => r.bottle.id)).toEqual([matchingBottle.id]);
   });
 
+  test("can filter library bottles by status", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const sealedBottle = await fixtures.Bottle({ name: "Status Sealed" });
+    const openBottle = await fixtures.Bottle({ name: "Status Open" });
+    const unsetBottle = await fixtures.Bottle({ name: "Status Unset" });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: sealedBottle.id,
+        releaseId: null,
+        status: "sealed",
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: openBottle.id,
+        releaseId: null,
+        status: "open",
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: unsetBottle.id,
+        releaseId: null,
+        status: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        status: "sealed",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([sealedBottle.id]);
+    expect(results[0].status).toBe("sealed");
+  });
+
+  test("can filter library bottles by status using the collection id", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const sealedBottle = await fixtures.Bottle({
+      name: "Numeric Library Status Sealed",
+    });
+    const openBottle = await fixtures.Bottle({
+      name: "Numeric Library Status Open",
+    });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: sealedBottle.id,
+        releaseId: null,
+        status: "sealed",
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: openBottle.id,
+        releaseId: null,
+        status: "open",
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: libraryCollection.id,
+        status: "sealed",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([sealedBottle.id]);
+    expect(results[0].status).toBe("sealed");
+  });
+
+  test("can filter library bottles by unset status", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const emptyBottle = await fixtures.Bottle({ name: "Status Empty" });
+    const unsetBottle = await fixtures.Bottle({ name: "Status Not Set" });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: emptyBottle.id,
+        releaseId: null,
+        status: "empty",
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: unsetBottle.id,
+        releaseId: null,
+        status: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+        status: "unset",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id)).toEqual([unsetBottle.id]);
+    expect(results[0].status).toBeNull();
+  });
+
+  test("lists all library bottles when status filter is omitted", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const sealedBottle = await fixtures.Bottle({ name: "Status Any Sealed" });
+    const unsetBottle = await fixtures.Bottle({ name: "Status Any Unset" });
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: libraryCollection.id,
+        bottleId: sealedBottle.id,
+        releaseId: null,
+        status: "sealed",
+      },
+      {
+        collectionId: libraryCollection.id,
+        bottleId: unsetBottle.id,
+        releaseId: null,
+        status: null,
+      },
+    ]);
+
+    const { results } = await routerClient.collections.bottles.list(
+      {
+        user: "me",
+        collection: "library",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results.map((r) => r.bottle.id).sort()).toEqual(
+      [sealedBottle.id, unsetBottle.id].sort(),
+    );
+  });
+
   test("rejects library filters for other collection aliases", async ({
     defaults,
     fixtures,
@@ -662,6 +829,25 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
           query: "Missing",
           brand: matchingBrand.id,
           distiller: matchingDistiller.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Collection filters are only supported for Library.]`,
+    );
+  });
+
+  test("rejects status filter for other collection aliases", async ({
+    defaults,
+  }) => {
+    const err = await waitError(() =>
+      routerClient.collections.bottles.list(
+        {
+          user: "me",
+          collection: "default",
+          status: "sealed",
         },
         { context: { user: defaults.user } },
       ),

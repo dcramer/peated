@@ -16,6 +16,10 @@ import { useFlashMessages } from "@peated/web/components/flash";
 import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
+import {
+  CollectionBottleStatusChips,
+  type CollectionBottleStatusValue,
+} from "@peated/web/components/libraryBottleStatus";
 import Link from "@peated/web/components/link";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
@@ -32,7 +36,7 @@ import {
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   BookOpen,
@@ -524,11 +528,17 @@ function AddedToLibrary({
   userLibraryHref,
   photoTrace,
   onAddAnother,
+  onStatusChange,
+  statusError,
+  updatingStatus = false,
 }: {
   entry: CollectionBottle;
   userLibraryHref: string;
   photoTrace?: BottleResolverTarget["photoTrace"] | null;
   onAddAnother: () => void;
+  onStatusChange: (status: NonNullable<CollectionBottleStatusValue>) => void;
+  statusError?: string;
+  updatingStatus?: boolean;
 }) {
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
@@ -550,6 +560,21 @@ function AddedToLibrary({
               target={{ bottle: entry.bottle, release: entry.release ?? null }}
               previewUrl={entry.imageUrl}
             />
+            {statusError && <FormError values={[statusError]} />}
+            <div className="border-t border-slate-800 pt-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-white">
+                    Bottle status
+                  </h3>
+                </div>
+                <CollectionBottleStatusChips
+                  value={entry.status ?? null}
+                  disabled={updatingStatus}
+                  onChange={onStatusChange}
+                />
+              </div>
+            </div>
           </div>
         </section>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -584,6 +609,7 @@ function AddBottleFlowContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orpc = useORPC();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
@@ -620,6 +646,9 @@ function AddBottleFlowContent() {
 
   const libraryCreateMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
+  );
+  const libraryStatusUpdateMutation = useMutation(
+    orpc.collections.bottles.update.mutationOptions(),
   );
   const tastingCreateMutation = useMutation(
     orpc.tastings.create.mutationOptions(),
@@ -822,6 +851,60 @@ function AddBottleFlowContent() {
     }
   }
 
+  async function updateAddedEntryStatus(
+    status: NonNullable<CollectionBottleStatusValue>,
+  ) {
+    if (!addedEntry) return;
+
+    setLibraryError(undefined);
+    try {
+      const updatedEntry = await libraryStatusUpdateMutation.mutateAsync({
+        user: "me",
+        collection: "library",
+        collectionBottle: addedEntry.id,
+        status,
+      });
+      setAddedEntry(updatedEntry);
+      await queryClient.invalidateQueries({
+        queryKey: orpc.collections.bottles.list.key({
+          input: {
+            user: "me",
+            collection: "library",
+          },
+        }),
+      });
+      if (user) {
+        await queryClient.invalidateQueries({
+          queryKey: orpc.collections.bottles.list.key({
+            input: {
+              user: user.username,
+              collection: "library",
+            },
+          }),
+        });
+      }
+      await queryClient.invalidateQueries({
+        queryKey: orpc.collections.bottles.list.key({
+          input: {
+            user: "me",
+            collection: "library",
+            bottle: updatedEntry.bottle.id,
+            release: updatedEntry.release?.id ?? undefined,
+            baseOnly: updatedEntry.release == null,
+          },
+        }),
+      });
+    } catch (err) {
+      logError(err, { context: "add_bottle_library_status_update" });
+      setLibraryError(
+        getFormErrorMessage(err, {
+          expectedErrorNames: ["BAD_REQUEST", "FORBIDDEN", "NOT_FOUND"],
+          fallbackMessage: "Could not update Library status.",
+        }),
+      );
+    }
+  }
+
   async function submitTasting({ image, ...data }: TastingSubmitData) {
     if (!tastingDraft) return;
 
@@ -905,6 +988,9 @@ function AddBottleFlowContent() {
         userLibraryHref={userLibraryHref}
         photoTrace={addedEntryPhotoTrace}
         onAddAnother={startOver}
+        onStatusChange={(status) => void updateAddedEntryStatus(status)}
+        statusError={libraryError}
+        updatingStatus={libraryStatusUpdateMutation.isPending}
       />
     );
   }

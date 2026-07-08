@@ -4,6 +4,7 @@ import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import LibraryEntryActions, {
   LibraryEntryImage,
+  LibraryEntryStatus,
   LibraryEntryThumbnail,
 } from "@peated/web/components/libraryEntryActions";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -43,10 +44,13 @@ function UserLibraryTable({ username }: { username: string }) {
       input: queryParams,
     }),
   );
-  const canEditLibraryImages = user?.id === profileUserId;
+  const canEditLibrary = user?.id === profileUserId;
   const libraryHref = `/users/${username}/library`;
   const hasActiveFilters = Boolean(
-    queryParams.query || queryParams.brand || queryParams.distiller,
+    queryParams.query ||
+    queryParams.brand ||
+    queryParams.distiller ||
+    queryParams.status,
   );
 
   return (
@@ -76,14 +80,25 @@ function UserLibraryTable({ username }: { username: string }) {
             rel={bottles.rel}
             showBottleStats={false}
             renderCollectionBottleImage={(entry) =>
-              canEditLibraryImages ? (
+              canEditLibrary ? (
                 <LibraryEntryImage entry={entry} username={username} />
               ) : (
                 <LibraryEntryThumbnail entry={entry} />
               )
             }
+            renderCollectionBottleMeta={(entry) =>
+              canEditLibrary ? (
+                <LibraryEntryStatus
+                  entry={entry}
+                  username={username}
+                  editable
+                />
+              ) : (
+                <LibraryEntryStatus entry={entry} />
+              )
+            }
             renderCollectionBottleActions={
-              canEditLibraryImages
+              canEditLibrary
                 ? (entry) => (
                     <LibraryEntryActions entry={entry} username={username} />
                   )

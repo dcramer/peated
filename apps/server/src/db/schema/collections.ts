@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   index,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -47,6 +48,12 @@ export const collectionsRelations = relations(collections, ({ one, many }) => ({
 export type Collection = typeof collections.$inferSelect;
 export type NewCollection = typeof collections.$inferInsert;
 
+export const collectionBottleStatusEnum = pgEnum("collection_bottle_status", [
+  "sealed",
+  "open",
+  "empty",
+]);
+
 export const collectionBottles = pgTable(
   "collection_bottle",
   {
@@ -61,6 +68,7 @@ export const collectionBottles = pgTable(
       () => bottleReleases.id,
     ),
     imageUrl: text("image_url"),
+    status: collectionBottleStatusEnum("status"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
