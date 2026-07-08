@@ -1,3 +1,8 @@
+/**
+ * Confirms signed photo-identification create proposals without rerunning AI.
+ * The route owns token/user validation, pending-upload ownership, durable
+ * bottle/release mutation, and API-facing conflict mapping.
+ */
 import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottleReleases, bottles } from "@peated/server/db/schema";

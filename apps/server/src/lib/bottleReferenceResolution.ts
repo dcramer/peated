@@ -34,10 +34,7 @@ import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, sql } from "drizzle-orm";
-import {
-  buildBottleReleaseInputFromProposedRelease,
-  buildClassifierCreateInputs,
-} from "./classifierDecisionCreateInputs";
+import { buildClassifierCreateInputs } from "./classifierDecisionCreateInputs";
 
 export type BottleReferenceResolutionSource =
   | "exact_alias"
@@ -173,6 +170,7 @@ function parentRepairFieldsDiffer(
   );
 }
 
+/** Queue refresh work for parent bottles whose canonical identity was repaired. */
 async function finalizeClassifierParentRepair({
   bottleId,
   aliasNames,
@@ -214,6 +212,12 @@ async function finalizeClassifierParentRepair({
   }
 }
 
+/**
+ * Persist an auto-approved classifier create decision.
+ *
+ * Parent repair keeps release-only traits on the child release while reserving
+ * the repaired parent canonical alias before mutating the parent bottle.
+ */
 export async function applyClassifierCreateDecision({
   decision,
   user,
@@ -322,9 +326,7 @@ export async function applyClassifierCreateDecision({
 
   if (decision.action === "repair_parent_and_create_release") {
     const parentInput = input;
-    const newReleaseInput =
-      releaseInput ??
-      buildBottleReleaseInputFromProposedRelease(decision.proposedRelease);
+    const newReleaseInput = releaseInput;
     if (!parentInput || !newReleaseInput) {
       throw new Error(
         "Missing proposed parent bottle or release input for classifier repair_parent_and_create_release.",
@@ -390,6 +392,8 @@ export async function applyClassifierCreateDecision({
       };
 
       if (parentRepairFieldsDiffer(row.bottle, parentRepairFields)) {
+        // Reserve the repaired parent alias before mutation so canonical-name
+        // collisions surface as a conflict instead of corrupting ownership.
         const parentAlias = await upsertBottleAlias(
           tx,
           fullName,
@@ -400,8 +404,13 @@ export async function applyClassifierCreateDecision({
             assignedByActorId: createdByActorId,
           },
         );
-        if (parentAlias.bottleId && parentAlias.bottleId !== row.bottle.id) {
-          throw new BottleAlreadyExistsError(parentAlias.bottleId);
+        if (
+          parentAlias.bottleId !== row.bottle.id ||
+          parentAlias.releaseId !== null
+        ) {
+          throw new BottleAlreadyExistsError(
+            parentAlias.bottleId ?? row.bottle.id,
+          );
         }
         parentAliasNames.push(parentAlias.name);
 

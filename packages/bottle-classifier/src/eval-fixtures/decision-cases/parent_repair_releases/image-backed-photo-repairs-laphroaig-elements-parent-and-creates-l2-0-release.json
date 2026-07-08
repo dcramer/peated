@@ -176,6 +176,7 @@
   "provenance": {
     "source": "production_miss",
     "verifiedSourceUrls": [
+      "https://www.laphroaig.com/whiskies/laphroaig-elements-2-0",
       "https://api.peated.com/uploads/pending-uploads/pending-upload-dofxzsrs473oobnos4e5u4wx.webp",
       "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp"
     ],

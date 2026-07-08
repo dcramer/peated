@@ -197,7 +197,7 @@
     ]
   },
   "provenance": {
-    "source": "production_miss",
+    "source": "curated_regression",
     "verifiedSourceUrls": [
       "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp",
       "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-12-scene-9.jpg"
@@ -234,7 +234,7 @@
         "notes": "The observed label uses the fuller release edition Act 12 Scene 9; the existing production release is the broader Act 12 row."
       }
     ],
-    "notes": "Added from failed image photo-identification trace 73ec524d6a6298dfe005cbf3a6778e58. The observed pending upload was zg6qndh3rdnoch7roonscz8v at https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp, expiring 2026-07-10T02:45:26.290Z, and the checked-in image preserves that label evidence for replay. The production response returned suggestedNextStep manual_search and decision no_match even though diagnostics identified the correct target as a new Act 12 Scene 9 child release under parent bottle 43397. The downgrade reason was a dirty parent conflict, so the expected classifier action is repair_parent_and_create_release rather than no_match."
+    "notes": "Added from failed image photo-identification trace 73ec524d6a6298dfe005cbf3a6778e58. The observed pending upload was zg6qndh3rdnoch7roonscz8v at https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp, expiring 2026-07-10T02:45:26.290Z, and the checked-in image preserves that label evidence for replay. The production response returned suggestedNextStep manual_search and decision no_match even though diagnostics identified the correct target as a new Act 12 Scene 9 child release under parent bottle 43397. The downgrade reason was a dirty parent conflict, so the expected classifier action is repair_parent_and_create_release rather than no_match. Kept as curated_regression because independent online verification of the exact Act 12 Scene 9 release was unavailable during fixture review."
   },
   "expected": {
     "status": "classified",

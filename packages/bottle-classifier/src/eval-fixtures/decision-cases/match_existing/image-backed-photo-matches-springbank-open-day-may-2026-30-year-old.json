@@ -81,7 +81,7 @@
     }
   },
   "provenance": {
-    "source": "production_miss",
+    "source": "curated_regression",
     "verifiedSourceUrls": [
       "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/springbank-open-day-may-2026-30-year-old.jpg"
     ],
@@ -93,7 +93,7 @@
       "createsRelease": false,
       "summary": "Production DB outcome: match existing bottle 44256, Springbank Open Day, releaseId null. Do not create a second Springbank Open Day May 2026 bottle from this photo."
     },
-    "notes": "Added from a failed image photo-identification flow using the checked-in photo as the observed source and verification artifact. The label reads Springbank Open Day - May 2026, aged 30 years, 47.8% ABV, Oloroso & Rum casks, one of 1,572 bottles; production already has bottle 44256 carrying those identity fields."
+    "notes": "Added from a failed image photo-identification flow using the checked-in photo as the observed source and replay artifact. The label reads Springbank Open Day - May 2026, aged 30 years, 47.8% ABV, Oloroso & Rum casks, one of 1,572 bottles; production already has bottle 44256 carrying those identity fields. Kept as curated_regression because independent online verification of this exact bottle was unavailable during fixture review."
   },
   "expected": {
     "status": "classified",
