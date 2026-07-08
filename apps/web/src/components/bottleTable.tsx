@@ -117,13 +117,13 @@ export default function BottleTable({
                       </BottleLink>
                     )}
                     <BottleStatusIcons bottle={item.bottle} />
+                    {collectionMeta}
                     {!item.release && item.bottle.singleCask && (
                       <SingleCaskChip />
                     )}
                     {item.release?.singleCask && <SingleCaskChip />}
                   </div>
                   <div className="text-muted flex flex-col gap-y-1 text-sm">
-                    {collectionMeta}
                     {item.bottle.category &&
                       String(item.bottle.category) !== "other" && (
                         <Link
@@ -193,7 +193,7 @@ export default function BottleTable({
                     </div>
                   ) : null;
                 },
-                className: "sm:w-16",
+                className: showBottleStats ? "sm:w-16" : "sm:w-36",
               },
             ]
           : []),

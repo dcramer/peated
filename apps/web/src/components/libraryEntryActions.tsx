@@ -1,15 +1,21 @@
 "use client";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  EllipsisVerticalIcon,
+} from "@heroicons/react/20/solid";
 import type { CollectionBottle, PagingRel } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import { ImageModal } from "@peated/web/components/imageModal";
 import {
-  CollectionBottleStatusChips,
+  COLLECTION_BOTTLE_STATUS_META,
+  COLLECTION_BOTTLE_STATUS_VALUES,
   CollectionBottleStatusLabel,
   type CollectionBottleStatus,
 } from "@peated/web/components/libraryBottleStatus";
+import classNames from "@peated/web/lib/classNames";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -332,51 +338,68 @@ export function LibraryEntryImage({
   );
 }
 
-export function LibraryEntryStatus({
-  entry,
-  username,
-  editable = false,
-}: {
-  entry: CollectionBottle;
-  username?: string;
-  editable?: boolean;
-}) {
-  if (!editable) {
-    return <CollectionBottleStatusLabel status={entry.status} />;
-  }
-
-  if (!username) {
-    return null;
-  }
-
-  return <EditableLibraryEntryStatus entry={entry} username={username} />;
+export function LibraryEntryStatus({ entry }: { entry: CollectionBottle }) {
+  return <CollectionBottleStatusLabel status={entry.status} />;
 }
 
-function EditableLibraryEntryStatus({
-  entry,
-  username,
+function LibraryEntryStatusMenu({
+  value,
+  disabled,
+  onChange,
 }: {
-  entry: CollectionBottle;
-  username: string;
+  value: CollectionBottle["status"];
+  disabled: boolean;
+  onChange: (status: CollectionBottleStatus) => void;
 }) {
-  const { error, isBusy, updateStatus } = useLibraryEntryMutations({
-    entry,
-    username,
-  });
+  const currentMeta = value ? COLLECTION_BOTTLE_STATUS_META[value] : null;
+  const label = currentMeta?.label ?? "Not set";
 
   return (
-    <div className="flex flex-col items-start gap-1">
-      <CollectionBottleStatusChips
-        value={entry.status ?? null}
-        disabled={isBusy}
-        onChange={(status: CollectionBottleStatus) => void updateStatus(status)}
-      />
-      {error && (
-        <div className="text-xs font-medium text-red-300" role="alert">
-          {error}
-        </div>
-      )}
-    </div>
+    <Menu as="div" className="menu inline-block">
+      <MenuButton
+        type="button"
+        disabled={disabled}
+        aria-label={`Change bottle status, current status ${label}`}
+        className={classNames(
+          "inline-flex h-7 items-center gap-1 rounded border px-2 text-xs font-semibold transition-colors disabled:cursor-auto disabled:opacity-70",
+          currentMeta
+            ? currentMeta.labelClassName
+            : "border-slate-700 bg-slate-900 text-slate-300",
+        )}
+      >
+        {label}
+        <ChevronDownIcon className="h-3.5 w-3.5" aria-hidden="true" />
+      </MenuButton>
+      <MenuItems
+        className="absolute right-0 z-40 mt-1 w-36 origin-top-right rounded"
+        unmount={false}
+      >
+        {COLLECTION_BOTTLE_STATUS_VALUES.map((status) => {
+          const meta = COLLECTION_BOTTLE_STATUS_META[status];
+          const selected = value === status;
+
+          return (
+            <MenuItem
+              key={status}
+              as="button"
+              disabled={disabled || selected}
+              onClick={() => onChange(status)}
+            >
+              <span className="inline-flex items-center gap-2">
+                <CheckIcon
+                  className={classNames(
+                    "h-4 w-4",
+                    selected ? "opacity-100" : "opacity-0",
+                  )}
+                  aria-hidden="true"
+                />
+                {meta.label}
+              </span>
+            </MenuItem>
+          );
+        })}
+      </MenuItems>
+    </Menu>
   );
 }
 
@@ -401,7 +424,14 @@ export default function LibraryEntryActions({
 
   return (
     <div className="min-w-0 shrink-0">
-      <div className="flex items-start justify-end">
+      <div className="flex items-start justify-end gap-2">
+        <LibraryEntryStatusMenu
+          value={entry.status ?? null}
+          disabled={isBusy}
+          onChange={(status: CollectionBottleStatus) =>
+            void updateStatus(status)
+          }
+        />
         <Menu as="div" className="menu">
           <MenuButton as={Button} size="small" title="Bottle options">
             <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
