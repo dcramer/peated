@@ -10,7 +10,10 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
-import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
+import {
+  getBottleBottlingPath,
+  getNewBottleBottlingPath,
+} from "@peated/web/lib/bottlings";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -229,6 +232,7 @@ function CreateBottleForm() {
             })
           : await bottleCreateMutation.mutateAsync(data);
         const createdBottle = "bottle" in created ? created.bottle : created;
+        const createdRelease = "release" in created ? created.release : null;
 
         if (image) {
           const blob = await toBlob(image);
@@ -249,20 +253,35 @@ function CreateBottleForm() {
         if (returnAction === "library") {
           await libraryCreateMutation.mutateAsync({
             bottle: createdBottle.id,
+            release: createdRelease?.id ?? null,
             user: "me",
             collection: "library",
           });
           router.replace(
-            getAddBottleHref({ bottleId: createdBottle.id, intent: "library" }),
+            getAddBottleHref({
+              bottleId: createdBottle.id,
+              releaseId: createdRelease?.id ?? null,
+              intent: "library",
+            }),
           );
         } else if (returnAction === "view") {
-          router.replace(`/bottles/${createdBottle.id}`);
+          router.replace(
+            createdRelease
+              ? getBottleBottlingPath(createdBottle.id, createdRelease.id)
+              : `/bottles/${createdBottle.id}`,
+          );
         } else if (returnAction === "addBottle") {
-          router.replace(getAddBottleHref({ bottleId: createdBottle.id }));
+          router.replace(
+            getAddBottleHref({
+              bottleId: createdBottle.id,
+              releaseId: createdRelease?.id ?? null,
+            }),
+          );
         } else if (returnAction === "tasting") {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
+              releaseId: createdRelease?.id ?? null,
               intent: "tasting",
             }),
           );
@@ -272,6 +291,7 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
+              releaseId: createdRelease?.id ?? null,
               intent: "tasting",
             }),
           );

@@ -184,6 +184,42 @@ test.describe("create bottle", () => {
     ).toBeVisible();
   });
 
+  test("adds the created bottling to library from a bottle-and-release proposal", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "proposal-release-library"),
+      user: {
+        ...testUser,
+        mod: true,
+      },
+    });
+
+    await page.goto("/bottles/new?proposal=9901&returnAction=library");
+
+    await expect(
+      page.getByRole("heading", { name: "Create Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Bottle")).toHaveValue(createdBottleName);
+
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(libraryInput.bottle).toBe(createdBottleId);
+    expect(libraryInput.release).toBe(createdReleaseId);
+    await expect(page).toHaveURL(
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&release=${createdReleaseId}&intent=library$`,
+      ),
+    );
+    await expect(page.getByText("First Fill Oloroso")).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "In Library" }),
+    ).toBeVisible();
+  });
+
   test("shows validation when saving without a brand", async ({
     context,
     page,
@@ -663,6 +699,39 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Bottle created" }),
     ).toBeHidden();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("creates a scan release proposal as part of Add to Library", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(
+        testInfo,
+        "photo-create-release-default-image-library",
+      ),
+    });
+
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+
+    const requestPromise = waitForPhotoIdentificationCreate(page);
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    const input = getRpcInput(await requestPromise);
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(input.createToken).toBe(
+      "playwright-create-token:create_bottle_and_release:suitable",
+    );
+    expect(libraryInput.bottle).toBe(createdBottleId);
+    expect(libraryInput.release).toBe(createdReleaseId);
+    expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+    await expect(page.getByText("First Fill Oloroso")).toBeVisible();
     await expectNoHorizontalOverflow(page);
   });
 
