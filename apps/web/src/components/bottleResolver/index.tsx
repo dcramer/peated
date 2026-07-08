@@ -56,6 +56,7 @@ export type {
   BottleResolverMatchedActionsProps,
   BottleResolverProps,
   BottleResolverTarget,
+  PendingImageRef,
 } from "./types";
 
 const loadingMessages = [
@@ -100,6 +101,7 @@ export default function BottleResolver({
     bottleId: number;
     releaseId: number | null;
     hasExactLibraryEntry: boolean;
+    imageUrl: string | null;
     loading: boolean;
   } | null>(null);
 
@@ -209,11 +211,13 @@ export default function BottleResolver({
           baseOnly: releaseId == null,
         }),
       ]);
+      const exactLibraryEntry = collectionStatus.results[0] ?? null;
       await resolveTarget(
         {
           bottle,
           release,
-          hasExactLibraryEntry: collectionStatus.results.length > 0,
+          hasExactLibraryEntry: Boolean(exactLibraryEntry),
+          exactLibraryEntryImageUrl: exactLibraryEntry?.imageUrl ?? null,
         },
         action,
       );
@@ -354,13 +358,14 @@ export default function BottleResolver({
   const createProposalLabel = getCreateProposalLabel(photoResult);
   const defaultSearchHref = searchHrefForQuery();
   const searchSeed = getSearchSeed(photoResult);
-  const searchHref = searchHrefForQuery(searchSeed);
+  const searchHref = searchHrefForQuery(searchSeed, photoResult?.pendingImage);
   const createBottlePrefill = getCreateBottlePrefill(photoResult);
   const createBottleHref =
     photoResult && createBottleHrefForResult
       ? createBottleHrefForResult(
           getCreateNameSeed(photoResult),
           createBottlePrefill,
+          photoResult.pendingImage,
         )
       : null;
   const manualResultCopy = getManualResultCopy(photoResult);
@@ -388,6 +393,7 @@ export default function BottleResolver({
       bottleId: statusBottleId,
       releaseId: statusReleaseId,
       hasExactLibraryEntry: false,
+      imageUrl: null,
       loading: true,
     });
 
@@ -400,11 +406,13 @@ export default function BottleResolver({
           release: statusReleaseId ?? undefined,
           baseOnly: statusReleaseId == null,
         });
+        const exactLibraryEntry = collectionStatus.results[0] ?? null;
         if (cancelled) return;
         setMatchedBottleStatus({
           bottleId: statusBottleId,
           releaseId: statusReleaseId,
-          hasExactLibraryEntry: collectionStatus.results.length > 0,
+          hasExactLibraryEntry: Boolean(exactLibraryEntry),
+          imageUrl: exactLibraryEntry?.imageUrl ?? null,
           loading: false,
         });
       } catch (err) {
@@ -414,6 +422,7 @@ export default function BottleResolver({
           bottleId: statusBottleId,
           releaseId: statusReleaseId,
           hasExactLibraryEntry: false,
+          imageUrl: null,
           loading: false,
         });
       }
@@ -501,6 +510,8 @@ export default function BottleResolver({
                 createActionLabel={createProposalActionLabel}
                 resolvingAction={resolvingAction}
                 hasExactLibraryEntry={matchedBottleHasExactLibraryEntry}
+                exactLibraryEntryImageUrl={matchedBottleStatus?.imageUrl}
+                pendingImage={photoResult.pendingImage}
                 loadingExactLibraryStatus={
                   matchedBottleExactLibraryStatusLoading
                 }

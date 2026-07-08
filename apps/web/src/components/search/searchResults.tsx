@@ -2,6 +2,7 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
+import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
 import ListItem from "../listItem";
 import type { AddBottleRouteIntent } from "./bottleResult";
 import {
@@ -17,6 +18,7 @@ export default function SearchResults({
   directToTasting = false,
   addBottleIntent,
   createBottleReturnAction,
+  pendingImage,
 }: {
   query: string;
   results: Outputs["search"]["results"];
@@ -24,6 +26,7 @@ export default function SearchResults({
   directToTasting?: boolean;
   addBottleIntent?: AddBottleRouteIntent;
   createBottleReturnAction?: CreateBottleReturnAction;
+  pendingImage?: PendingImageRouteState | null;
 }) {
   return (
     <ul
@@ -40,6 +43,7 @@ export default function SearchResults({
                 href={getCreateBottleHref({
                   query,
                   returnAction: createBottleReturnAction,
+                  pendingImage,
                 })}
               >
                 <span className="absolute inset-x-0 -top-px bottom-0" />
@@ -68,6 +72,7 @@ export default function SearchResults({
               result={result}
               directToTasting={directToTasting}
               addBottleIntent={addBottleIntent}
+              pendingImage={pendingImage}
             />
           </ListItem>
         );

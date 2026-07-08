@@ -196,6 +196,8 @@ export function PhotoMatchCreateState({
   createActionLabel,
   resolvingAction,
   hasExactLibraryEntry,
+  exactLibraryEntryImageUrl,
+  pendingImage,
   loadingExactLibraryStatus,
   onLoadTarget,
   onAcceptCreateProposal,
@@ -217,6 +219,8 @@ export function PhotoMatchCreateState({
   createActionLabel: string;
   resolvingAction: BottleResolverAction | null;
   hasExactLibraryEntry: boolean;
+  exactLibraryEntryImageUrl?: string | null;
+  pendingImage: PhotoIdentification["pendingImage"] | null;
   loadingExactLibraryStatus: boolean;
   onLoadTarget: (
     bottleId: number,
@@ -252,6 +256,8 @@ export function PhotoMatchCreateState({
               bottleId: matchedBottleId,
               releaseId: matchedReleaseId,
               hasExactLibraryEntry,
+              exactLibraryEntryImageUrl,
+              pendingImage,
               loadingExactLibraryStatus,
               resolvingAction:
                 resolvingAction === "create" ? null : resolvingAction,

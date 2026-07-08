@@ -4,11 +4,17 @@ import type { ReactNode } from "react";
 
 import type { PhotoIdentification } from "./helpers";
 
+export type PendingImageRef = Pick<
+  PhotoIdentification["pendingImage"],
+  "id" | "imageUrl"
+>;
+
 export type BottleResolverTarget = {
   bottle: Bottle;
   release: BottleRelease | null;
   hasExactLibraryEntry: boolean;
-  pendingImage: PhotoIdentification["pendingImage"] | null;
+  exactLibraryEntryImageUrl?: string | null;
+  pendingImage: PendingImageRef | null;
   /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
   previewUrl: string | null;
   resultSource?: "created" | "found";
@@ -29,6 +35,8 @@ export type BottleResolverMatchedActionsProps = {
   bottleId: number;
   releaseId: number | null;
   hasExactLibraryEntry: boolean;
+  exactLibraryEntryImageUrl?: string | null;
+  pendingImage: PendingImageRef | null;
   loadingExactLibraryStatus: boolean;
   resolvingAction: BottleResolverMatchedAction | null;
   onResolve: (action: BottleResolverMatchedAction) => void;
@@ -45,10 +53,14 @@ export type BottleResolverProps = {
     target: BottleResolverTarget,
     action?: BottleResolverAction,
   ) => Promise<void> | void;
-  searchHrefForQuery: (query?: string) => string;
+  searchHrefForQuery: (
+    query?: string,
+    pendingImage?: PendingImageRef | null,
+  ) => string;
   createBottleHrefForResult?: (
     query: string,
     prefill?: CreateBottlePrefill,
+    pendingImage?: PendingImageRef | null,
   ) => string;
   title: string;
   renderMatchedResultActions?: (
