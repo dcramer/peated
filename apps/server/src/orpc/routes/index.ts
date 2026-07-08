@@ -1,3 +1,4 @@
+import activity from "./activity";
 import admin from "./admin";
 import ai from "./ai";
 import auth from "./auth";
@@ -32,6 +33,7 @@ import users from "./users";
 import version from "./version";
 
 export interface Router {
+  activity: typeof activity;
   admin: typeof admin;
   ai: typeof ai;
   auth: typeof auth;
@@ -67,6 +69,7 @@ export interface Router {
 }
 
 export default {
+  activity,
   admin,
   ai,
   auth,

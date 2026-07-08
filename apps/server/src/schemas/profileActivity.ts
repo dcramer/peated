@@ -3,7 +3,7 @@ import { CollectionBottleSchema, CollectionSchema } from "./collections";
 import { TastingSchema } from "./tastings";
 import { UserSchema } from "./users";
 
-export const ProfileTastingActivitySchema = z.object({
+export const ActivityTastingEntrySchema = z.object({
   id: z.string().describe("Stable activity entry identifier"),
   type: z.literal("tasting"),
   priority: z.literal("primary"),
@@ -15,15 +15,14 @@ export const ProfileTastingActivitySchema = z.object({
   tasting: TastingSchema.describe("Tasting represented by this activity entry"),
 });
 
-export const ProfileCollectionActivityCollectionSchema =
-  CollectionSchema.extend({
-    href: z
-      .string()
-      .nullable()
-      .describe("Profile collection route when the destination is linkable"),
-  });
+export const ActivityCollectionSchema = CollectionSchema.extend({
+  href: z
+    .string()
+    .nullable()
+    .describe("Activity collection route when the destination is linkable"),
+});
 
-export const ProfileCollectionAddActivitySchema = z.object({
+export const ActivityCollectionAddEntrySchema = z.object({
   id: z.string().describe("Stable activity entry identifier"),
   type: z.literal("collection_add"),
   priority: z.literal("secondary"),
@@ -43,7 +42,7 @@ export const ProfileCollectionAddActivitySchema = z.object({
     .readonly()
     .describe("Latest collection addition represented by this entry"),
   createdBy: UserSchema.readonly().describe("User who added the items"),
-  collection: ProfileCollectionActivityCollectionSchema.describe(
+  collection: ActivityCollectionSchema.describe(
     "Destination collection for the grouped additions",
   ),
   items: z
@@ -56,7 +55,14 @@ export const ProfileCollectionAddActivitySchema = z.object({
     .describe("Total collection items represented by this entry"),
 });
 
-export const ProfileActivityEntrySchema = z.discriminatedUnion("type", [
-  ProfileTastingActivitySchema,
-  ProfileCollectionAddActivitySchema,
+export const ActivityEntrySchema = z.discriminatedUnion("type", [
+  ActivityTastingEntrySchema,
+  ActivityCollectionAddEntrySchema,
 ]);
+
+export const ProfileTastingActivitySchema = ActivityTastingEntrySchema;
+export const ProfileCollectionActivityCollectionSchema =
+  ActivityCollectionSchema;
+export const ProfileCollectionAddActivitySchema =
+  ActivityCollectionAddEntrySchema;
+export const ProfileActivityEntrySchema = ActivityEntrySchema;

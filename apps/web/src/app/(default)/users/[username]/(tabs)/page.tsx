@@ -1,8 +1,8 @@
 "use client";
 import { use } from "react";
 
+import ActivityList from "@peated/web/components/activityList";
 import EmptyActivity from "@peated/web/components/emptyActivity";
-import ProfileActivityList from "@peated/web/components/profileActivityList";
 import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
 import UserLocationChart from "@peated/web/components/userLocationChart";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -39,7 +39,7 @@ export default function UserProfilePage(props: {
 
       <div className="mt-8">
         {activity.results.length ? (
-          <ProfileActivityList values={activity.results} />
+          <ActivityList values={activity.results} />
         ) : (
           <EmptyActivity />
         )}
