@@ -112,12 +112,12 @@ function getSuggestedNextStep(
     case "create_bottle":
     case "create_release":
     case "create_bottle_and_release":
+    case "repair_parent_and_create_release":
       return isPhotoIdentificationCreateDecisionAutoCreatable(
         classification.decision,
       )
         ? "confirm_create"
         : "manual_search";
-    case "repair_parent_and_create_release":
     case "repair_bottle":
       return "needs_review";
     case "no_match":
@@ -213,6 +213,16 @@ function serializePhotoIdentificationClassification(
     case "repair_parent_and_create_release":
       serializedDecision = {
         action: "repair_parent_and_create_release",
+        parentBottleId: decision.parentBottleId,
+        proposedBottle: {
+          name: decision.proposedBottle.name,
+          brand: {
+            name: decision.proposedBottle.brand.name,
+          },
+        },
+        proposedRelease: {
+          edition: decision.proposedRelease.edition,
+        },
       };
       break;
     case "repair_bottle":

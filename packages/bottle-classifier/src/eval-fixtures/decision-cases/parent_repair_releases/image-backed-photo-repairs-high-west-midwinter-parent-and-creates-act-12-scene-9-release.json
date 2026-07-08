@@ -1,0 +1,259 @@
+{
+  "id": "image-backed-photo-repairs-high-west-midwinter-parent-and-creates-act-12-scene-9-release",
+  "name": "image-backed photo: repairs High West A Midwinter Night's Dram parent and creates Act 12 Scene 9 release",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp",
+      "imageUrl": "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp"
+    },
+    "extractedIdentity": {
+      "brand": "High West",
+      "bottler": null,
+      "expression": "A Midwinter Night's Dram",
+      "series": "A Midwinter Night's Dram",
+      "distillery": [],
+      "category": "rye",
+      "stated_age": null,
+      "abv": 49.3,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Act 12 Scene 9"
+    },
+    "imageEvidence": {
+      "sourceImageId": "zg6qndh3rdnoch7roonscz8v",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "gpt-5.4",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "High West A Midwinter Night's Dram Act 12 Scene 9 49.3% ABV",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the uploaded bottle photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "High West",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "A Midwinter Night's Dram",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "rye",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 49.3,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "Act 12 Scene 9",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true,
+        "reason": null
+      },
+      "conflicts": []
+    },
+    "initialCandidates": [
+      {
+        "kind": "release",
+        "bottleId": 43397,
+        "releaseId": 1,
+        "bottleFullName": "High West A Midwinter Night's Dram",
+        "fullName": "High West A Midwinter Night's Dram - Act 12 - 2024 Release - 49.3% ABV",
+        "brand": "High West",
+        "series": "A Midwinter Night's Dram",
+        "category": "rye",
+        "edition": "Act 12",
+        "abv": 49.3,
+        "releaseYear": 2024
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 43397,
+        "releaseId": null,
+        "bottleFullName": "High West A Midwinter Night's Dram",
+        "fullName": "High West A Midwinter Night's Dram",
+        "brand": "High West",
+        "series": "A Midwinter Night's Dram",
+        "category": "rye",
+        "edition": "Act 12",
+        "abv": 49.3,
+        "releaseYear": 2024
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 26125,
+        "releaseId": null,
+        "bottleFullName": "High West A Midwinter Night's Dram (Encore)",
+        "fullName": "High West A Midwinter Night's Dram (Encore)"
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44047,
+        "releaseId": null,
+        "bottleFullName": "High West Yippee Ki-Yay",
+        "fullName": "High West Yippee Ki-Yay"
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44040,
+        "releaseId": null,
+        "bottleFullName": "High West Rendezvous Rye",
+        "fullName": "High West Rendezvous Rye"
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44021,
+        "releaseId": null,
+        "bottleFullName": "High West Bourye",
+        "fullName": "High West Bourye"
+      },
+      {
+        "kind": "release",
+        "bottleId": 44047,
+        "releaseId": 259,
+        "bottleFullName": "High West Yippee Ki-Yay",
+        "fullName": "High West Yippee Ki-Yay - Batch 1"
+      },
+      {
+        "kind": "release",
+        "bottleId": 44040,
+        "releaseId": 246,
+        "bottleFullName": "High West Rendezvous Rye",
+        "fullName": "High West Rendezvous Rye - Batch 10"
+      },
+      {
+        "kind": "release",
+        "bottleId": 26126,
+        "releaseId": 51,
+        "bottleFullName": "High West 16-year-old Rocky Mountain Rye",
+        "fullName": "High West 16-year-old Rocky Mountain Rye - Batch 1"
+      },
+      {
+        "kind": "release",
+        "bottleId": 44040,
+        "releaseId": 255,
+        "bottleFullName": "High West Rendezvous Rye",
+        "fullName": "High West Rendezvous Rye - Batch 18426"
+      },
+      {
+        "kind": "bottle",
+        "bottleId": 44165,
+        "releaseId": null,
+        "bottleFullName": "High West 21-year-old Rocky Mountain Rye",
+        "fullName": "High West 21-year-old Rocky Mountain Rye"
+      },
+      {
+        "kind": "release",
+        "bottleId": 44047,
+        "releaseId": 267,
+        "bottleFullName": "High West Yippee Ki-Yay",
+        "fullName": "High West Yippee Ki-Yay - Batch 19C27"
+      },
+      {
+        "kind": "release",
+        "bottleId": 44165,
+        "releaseId": 396,
+        "bottleFullName": "High West 21-year-old Rocky Mountain Rye",
+        "fullName": "High West 21-year-old Rocky Mountain Rye - Batch 2"
+      },
+      {
+        "kind": "release",
+        "bottleId": 44021,
+        "releaseId": 190,
+        "bottleFullName": "High West Bourye",
+        "fullName": "High West Bourye - Batch 17A09"
+      },
+      {
+        "kind": "release",
+        "bottleId": 26123,
+        "releaseId": 50,
+        "bottleFullName": "High West Bottled in Bond",
+        "fullName": "High West Bottled in Bond - Batch 23L19"
+      }
+    ]
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-12-scene-9.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/high-west-midwinter-act-12-scene-9.jpg",
+    "dbOutcome": {
+      "bottleId": 43397,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": true,
+      "summary": "Production DB outcome: repair existing dirty parent bottle 43397 into the reusable A Midwinter Night's Dram parent, then create a new Act 12 Scene 9 child release. The observed production response returned no_match because create_release was blocked by release-like parent traits."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 43397,
+        "field": "edition",
+        "productionValue": "Act 12",
+        "evidenceValue": null,
+        "source": "production_search",
+        "issue": "conflicts_with_evidence",
+        "safeToAutoFill": false,
+        "notes": "The parent should be the reusable A Midwinter Night's Dram bottle; Act 12 belongs on a child release, and Act 12 Scene 9 needs a sibling child release."
+      },
+      {
+        "target": "candidate_release",
+        "releaseId": 1,
+        "field": "edition",
+        "productionValue": "Act 12",
+        "evidenceValue": "Act 12 Scene 9",
+        "source": "image_evidence",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The observed label uses the fuller release edition Act 12 Scene 9; the existing production release is the broader Act 12 row."
+      }
+    ],
+    "notes": "Added from failed image photo-identification trace 73ec524d6a6298dfe005cbf3a6778e58. The observed pending upload was zg6qndh3rdnoch7roonscz8v at https://api.peated.com/uploads/pending-uploads/pending-upload-xex5u9xbjkd2g08367qt384b.webp, expiring 2026-07-10T02:45:26.290Z, and the checked-in image preserves that label evidence for replay. The production response returned suggestedNextStep manual_search and decision no_match even though diagnostics identified the correct target as a new Act 12 Scene 9 child release under parent bottle 43397. The downgrade reason was a dirty parent conflict, so the expected classifier action is repair_parent_and_create_release rather than no_match."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "repair_parent_and_create_release",
+    "identityScope": "product",
+    "parentBottleId": 43397,
+    "proposedBottle": {
+      "brand": {
+        "name": "High West"
+      },
+      "name": "A Midwinter Night's Dram",
+      "category": "rye",
+      "edition": null
+    },
+    "proposedRelease": {
+      "edition": "Act 12 Scene 9",
+      "abv": 49.3
+    },
+    "suggestedNextStep": "confirm_create",
+    "summary": "Repair dirty parent bottle 43397 into the reusable High West A Midwinter Night's Dram parent, then create Act 12 Scene 9 as a child release instead of returning no_match or matching broader release 1."
+  }
+}

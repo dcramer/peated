@@ -84,6 +84,16 @@ function stripUnapprovedCatalogImages(
     };
   }
 
+  if (decision.action === "repair_parent_and_create_release") {
+    return {
+      ...decision,
+      proposedRelease: {
+        ...decision.proposedRelease,
+        imageUrl: null,
+      },
+    };
+  }
+
   return decision;
 }
 
@@ -118,7 +128,8 @@ function getCatalogImageApprovalDestination({
   if (
     approvalTarget === "release" &&
     (decision.action === "create_release" ||
-      decision.action === "create_bottle_and_release") &&
+      decision.action === "create_bottle_and_release" ||
+      decision.action === "repair_parent_and_create_release") &&
     result.createdRelease &&
     result.releaseId
   ) {
@@ -352,7 +363,8 @@ export default procedure
     if (
       decision.action !== "create_bottle" &&
       decision.action !== "create_release" &&
-      decision.action !== "create_bottle_and_release"
+      decision.action !== "create_bottle_and_release" &&
+      decision.action !== "repair_parent_and_create_release"
     ) {
       throw errors.BAD_REQUEST({
         message: "Photo identification result is not a create proposal.",
@@ -365,7 +377,8 @@ export default procedure
       });
     }
     if (
-      decision.action === "create_release" &&
+      (decision.action === "create_release" ||
+        decision.action === "repair_parent_and_create_release") &&
       !candidateBottleIds.includes(decision.parentBottleId)
     ) {
       throw errors.BAD_REQUEST({
