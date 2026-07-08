@@ -5,6 +5,7 @@ import LibraryEntryActions, {
   LibraryEntryImage,
   LibraryEntryThumbnail,
 } from "@peated/web/components/libraryEntryActions";
+import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -25,12 +26,15 @@ function UserLibraryTable({ username }: { username: string }) {
   const orpc = useORPC();
   const { user } = useAuth();
   const profileUserId = useProfileUserId();
+  const queryParams = useApiQueryParams({
+    overrides: {
+      user: username,
+      collection: "library",
+    },
+  });
   const { data: bottles } = useSuspenseQuery(
     orpc.collections.bottles.list.queryOptions({
-      input: {
-        user: username,
-        collection: "library",
-      },
+      input: queryParams,
     }),
   );
   const canEditLibraryImages = user?.id === profileUserId;
