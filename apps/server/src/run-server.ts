@@ -6,6 +6,7 @@ import type { AddressInfo } from "node:net";
 import { app } from "./app";
 import config from "./config";
 import { logError, logInfo } from "./lib/log";
+import { flushSentry } from "./sentry";
 
 const getServerUrl = (address: AddressInfo | string | null) => {
   if (!address || typeof address === "string") {
@@ -20,13 +21,23 @@ const getServerUrl = (address: AddressInfo | string | null) => {
   return `http://${host}:${address.port}/`;
 };
 
-const exitWithError = (message: string, err: unknown) => {
+let exiting = false;
+
+const exitWithError = async (message: string, err: unknown) => {
+  if (exiting) return;
+  exiting = true;
+
   logError(err, {
     extra: {
       message,
     },
   });
-  process.exit(1);
+
+  try {
+    await flushSentry(2000);
+  } finally {
+    process.exit(1);
+  }
 };
 
 const start = () => {
@@ -36,7 +47,7 @@ const start = () => {
   });
 
   server.on("error", (err) => {
-    exitWithError("Server process received an error", err);
+    void exitWithError("Server process received an error", err);
   });
 
   server.listen(config.PORT, config.HOST, () => {
@@ -49,11 +60,11 @@ const start = () => {
 };
 
 process.on("uncaughtException", (err) => {
-  exitWithError("uncaughtException received", err);
+  void exitWithError("uncaughtException received", err);
 });
 
 process.on("unhandledRejection", (err) => {
-  exitWithError("unhandledRejection received", err);
+  void exitWithError("unhandledRejection received", err);
 });
 
 start();

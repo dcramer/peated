@@ -83,6 +83,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/development/local-ui-verification.md`
 - `docs/development/orpc-client.md`
 - `docs/development/orpc-routes.md`
+- `docs/development/production-debugging.md`
 - `docs/development/schema-conventions.md`
 - `docs/development/web-caching.md`
 - `docs/features/bottle-entry-workflow.md`
