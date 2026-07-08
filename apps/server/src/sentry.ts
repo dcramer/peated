@@ -25,3 +25,7 @@ if (config.ENV !== "test") {
 }
 
 configureLogging();
+
+export async function flushSentry(timeoutMs: number) {
+  await Sentry.flush(timeoutMs);
+}

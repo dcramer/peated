@@ -16,13 +16,11 @@ import {
   sentry,
   setUser,
 } from "@sentry/hono/node";
-import { open } from "fs/promises";
 import { Hono } from "hono";
 import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import { lookup } from "mime-types";
-import { Readable } from "node:stream";
 import { setTimeout } from "node:timers/promises";
 import path from "path";
 import type { ZodIssue } from "zod";
@@ -30,8 +28,8 @@ import { ZodError } from "zod";
 import config from "./config";
 import { userToActorContext, withActorContext } from "./lib/actorContext";
 import { getUserFromHeader } from "./lib/auth";
-import { getStorage } from "./lib/gcs";
 import { httpLogger, logError, logInfo, logWarn } from "./lib/log";
+import { readFile as readUploadFile } from "./lib/uploads";
 import router from "./orpc/router";
 import {
   AuthSchema,
@@ -148,6 +146,13 @@ const rpcHandler = new RPCHandler(router, {
 const ONE_DAY = 60 * 60 * 24;
 const honoApp = new Hono();
 
+function isMissingUploadError(err: unknown) {
+  if (!err || typeof err !== "object") return false;
+
+  const { code } = err as { code?: unknown };
+  return code === "ENOENT" || code === 404;
+}
+
 export const app = honoApp
   .use(sentry(honoApp))
   .use("*", async (c, next) => {
@@ -225,34 +230,21 @@ export const app = honoApp
       return c.notFound();
     }
 
-    let stream: Readable;
-    if (process.env.USE_GCS_STORAGE) {
-      const bucketName = process.env.GCS_BUCKET_NAME as string;
-      const bucketPath = process.env.GCS_BUCKET_PATH
-        ? `${process.env.GCS_BUCKET_PATH}/`
-        : "";
-
-      const file = getStorage()
-        .bucket(bucketName)
-        .file(`${bucketPath}${filename}`);
-
-      stream = file.createReadStream();
-    } else {
-      const filepath = path.join(config.UPLOAD_PATH, filename);
-
-      try {
-        const fd = await open(filepath, "r");
-        stream = fd.createReadStream();
-      } catch (err) {
+    let body: Buffer;
+    try {
+      body = await readUploadFile({ filename });
+    } catch (err) {
+      if (isMissingUploadError(err)) {
         return c.notFound();
       }
+      throw err;
     }
 
     // Set appropriate headers
     c.header("Cache-Control", `public, max-age=${ONE_DAY}`);
     c.header("Content-Type", lookup(filename) || "application/octet-stream");
 
-    return c.body(Readable.toWeb(stream) as ReadableStream<Uint8Array>);
+    return c.body(new Uint8Array(body));
   })
   .get("/", async (c) => {
     return c.html(`

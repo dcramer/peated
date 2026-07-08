@@ -25,13 +25,22 @@ import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { Suspense, cache, type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
 import BottleTabs from "../../bottleTabs";
 import ModActions from "../../bottlingModActions";
 
 type Bottle = Outputs["bottles"]["details"];
 type Bottling = Outputs["bottleReleases"]["details"];
+type TastingListData = Outputs["tastings"]["list"];
+
+const emptyTastingList: TastingListData = {
+  results: [],
+  rel: {
+    nextCursor: null,
+    prevCursor: null,
+  },
+};
 
 function formatAge(years: number | null | undefined) {
   if (!years) return null;
@@ -104,13 +113,10 @@ function parseRouteId(value: string) {
   return id;
 }
 
-async function getBottlingPageData({
-  bottleId,
-  bottlingId,
-}: {
-  bottleId: string;
-  bottlingId: string;
-}) {
+const getBottlingPageData = cache(async function getBottlingPageData(
+  bottleId: string,
+  bottlingId: string,
+) {
   const { client } = await getAnonymousServerClient();
   const parsedBottleId = parseRouteId(bottleId);
   const parsedBottlingId = parseRouteId(bottlingId);
@@ -127,7 +133,7 @@ async function getBottlingPageData({
   }
 
   return { bottle, bottling, client };
-}
+});
 
 function ReleaseStat({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -359,10 +365,7 @@ export async function generateMetadata(props: {
 
   const { bottleId, bottlingId } = params;
 
-  const { bottle, bottling } = await getBottlingPageData({
-    bottleId,
-    bottlingId,
-  });
+  const { bottle, bottling } = await getBottlingPageData(bottleId, bottlingId);
 
   const title = `${getReleaseTitle(bottling)} - ${bottle.fullName}`;
   const description = getReleaseDescription(bottle, bottling);
@@ -390,16 +393,21 @@ export default async function Page(props: {
 
   const { bottleId, bottlingId } = params;
 
-  const { bottle, bottling, client } = await getBottlingPageData({
+  const { bottle, bottling, client } = await getBottlingPageData(
     bottleId,
     bottlingId,
-  });
+  );
 
-  const tastingList = await client.tastings.list({
-    bottle: bottle.id,
-    release: bottling.id,
-    limit: 10,
-  });
+  const fetchedTastingList = await client.tastings
+    .list({
+      bottle: bottle.id,
+      release: bottling.id,
+      limit: 10,
+    })
+    .catch(() => emptyTastingList);
+  const tastingList = fetchedTastingList?.results
+    ? fetchedTastingList
+    : emptyTastingList;
 
   const releaseTitle = getReleaseTitle(bottling);
   const description = getReleaseDescription(bottle, bottling);
