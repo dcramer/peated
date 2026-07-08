@@ -9,6 +9,7 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { use } from "react";
+import { useProfileUserId } from "../../profileContext";
 
 export default function UserLibrary(props: {
   params: Promise<{ username: string }>;
@@ -23,6 +24,7 @@ export default function UserLibrary(props: {
 function UserLibraryTable({ username }: { username: string }) {
   const orpc = useORPC();
   const { user } = useAuth();
+  const profileUserId = useProfileUserId();
   const { data: bottles } = useSuspenseQuery(
     orpc.collections.bottles.list.queryOptions({
       input: {
@@ -31,7 +33,7 @@ function UserLibraryTable({ username }: { username: string }) {
       },
     }),
   );
-  const canEditLibraryImages = user?.username === username;
+  const canEditLibraryImages = user?.id === profileUserId;
 
   return bottles.results.length ? (
     <BottleTable
