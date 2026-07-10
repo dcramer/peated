@@ -10,7 +10,10 @@ import type {
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
-import { getBottleBottlingPath } from "../lib/bottlings";
+import {
+  formatBottleBottlingName,
+  getBottleBottlingPath,
+} from "../lib/bottlings";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
@@ -34,6 +37,8 @@ export default function BottleTable({
   renderCollectionBottleImage,
   renderCollectionBottleMeta,
   renderCollectionBottleActions,
+  conciseBottlingNames = false,
+  hideLibraryStatus = false,
   showBottleStats = true,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
@@ -42,6 +47,8 @@ export default function BottleTable({
   renderCollectionBottleImage?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleMeta?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
+  conciseBottlingNames?: boolean;
+  hideLibraryStatus?: boolean;
   showBottleStats?: boolean;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
@@ -104,8 +111,11 @@ export default function BottleTable({
                           item.release.id,
                         )}
                         className="font-medium hover:underline"
+                        title={item.release.fullName}
                       >
-                        {item.release.fullName}
+                        {conciseBottlingNames
+                          ? formatBottleBottlingName(item.bottle, item.release)
+                          : item.release.fullName}
                       </Link>
                     ) : (
                       <BottleLink
@@ -116,7 +126,10 @@ export default function BottleTable({
                         {item.bottle.name}
                       </BottleLink>
                     )}
-                    <BottleStatusIcons bottle={item.bottle} />
+                    <BottleStatusIcons
+                      bottle={item.bottle}
+                      hideLibrary={hideLibraryStatus}
+                    />
                     {collectionMeta}
                     {!item.release && item.bottle.singleCask && (
                       <SingleCaskChip />

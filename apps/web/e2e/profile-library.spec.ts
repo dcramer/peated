@@ -5,6 +5,8 @@ import {
   displayImageBottleId,
   displayImageUrl,
   existingBottle,
+  existingRelease,
+  existingReleaseId,
   testAccessToken,
   testUser,
 } from "./rpc-fixtures.mjs";
@@ -106,7 +108,7 @@ test.describe("profile library", () => {
     ).toBeVisible();
     await expect(
       savedBottleRow.getByRole("img", { name: "In Library" }),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await expect(
       savedBottleRow.getByRole("img", { name: "Favorite" }),
     ).toHaveCount(0);
@@ -149,6 +151,45 @@ test.describe("profile library", () => {
       0,
     );
     await expectNoHorizontalOverflow(page);
+  });
+
+  test("renders concise bottling names in Library", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: [
+        testAccessToken,
+        "library-release-name",
+        testInfo.project.name,
+        testInfo.workerIndex,
+        testInfo.retry,
+      ].join("-"),
+    });
+
+    await page.goto(
+      `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
+    );
+    await page.getByRole("button", { name: "Add to Library" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Added to Library" }),
+    ).toBeVisible();
+
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+
+    const conciseName = `${existingBottle.fullName} - ${existingRelease.edition} (${existingRelease.releaseYear})`;
+    const bottlingLink = page.getByRole("link", { name: conciseName });
+
+    await expect(bottlingLink).toBeVisible();
+    await expect(bottlingLink).toHaveAttribute(
+      "title",
+      existingRelease.fullName,
+    );
+    await expect(
+      page.getByRole("link", { name: existingRelease.fullName, exact: true }),
+    ).toHaveCount(0);
   });
 
   test("filters Library entries from the profile tab", async ({
