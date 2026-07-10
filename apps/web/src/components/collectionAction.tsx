@@ -1,23 +1,14 @@
 "use client";
 
-import {
-  BookOpenIcon as BookOpenIconFilled,
-  StarIcon as StarIconFilled,
-} from "@heroicons/react/20/solid";
-import { BookOpenIcon, StarIcon } from "@heroicons/react/24/outline";
+import { BookOpenIcon as BookOpenIconFilled } from "@heroicons/react/20/solid";
+import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { isORPCClientError } from "@peated/orpc/client/errors";
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import React, {
-  useEffect,
-  useState,
-  type ForwardRefExoticComponent,
-  type RefAttributes,
-  type SVGProps,
-} from "react";
+import React, { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useORPC } from "../lib/orpc/context";
 import Button from "./button";
@@ -29,51 +20,11 @@ type CollectionActionProps = {
   title?: string;
 };
 
-type CollectionActionKind = "favorites" | "library";
-
-type CollectionIcon = ForwardRefExoticComponent<
-  Omit<SVGProps<SVGSVGElement>, "ref"> & RefAttributes<SVGSVGElement>
->;
-
-const COLLECTION_ACTIONS: Record<
-  CollectionActionKind,
-  {
-    collection: "default" | "library";
-    color: "primary" | "default";
-    Icon: CollectionIcon;
-    ActiveIcon: CollectionIcon;
-  }
-> = {
-  favorites: {
-    collection: "default",
-    color: "primary",
-    Icon: StarIcon,
-    ActiveIcon: StarIconFilled,
-  },
-  library: {
-    collection: "library",
-    color: "primary",
-    Icon: BookOpenIcon,
-    ActiveIcon: BookOpenIconFilled,
-  },
-};
-
-function getTitle({
-  baseOnly,
-  kind,
-  title,
-}: {
-  baseOnly: boolean;
-  kind: CollectionActionKind;
-  title?: string;
-}) {
-  if (kind === "favorites") {
-    return title ?? (baseOnly ? "Save Bottle" : "Save Specific Bottling");
-  }
-
-  return baseOnly
-    ? "Save Bottle to Library"
-    : "Save Specific Bottling to Library";
+function getTitle({ baseOnly, title }: { baseOnly: boolean; title?: string }) {
+  return (
+    title ??
+    (baseOnly ? "Save Bottle to Library" : "Save Specific Bottling to Library")
+  );
 }
 
 function SavedCollectionActionAuthenticated({
@@ -81,21 +32,17 @@ function SavedCollectionActionAuthenticated({
   releaseId,
   size,
   title,
-  kind,
-}: CollectionActionProps & { kind: CollectionActionKind }) {
+}: CollectionActionProps) {
   const { user } = useAuth();
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const [isMounted, setIsMounted] = useState(false);
-  const action = COLLECTION_ACTIONS[kind];
-  const Icon = action.Icon;
-  const ActiveIcon = action.ActiveIcon;
   const baseOnly = releaseId == null;
-  const resolvedTitle = getTitle({ baseOnly, kind, title });
-  const favoriteBottleMutation = useMutation(
+  const resolvedTitle = getTitle({ baseOnly, title });
+  const addToLibraryMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
   );
-  const unfavoriteBottleMutation = useMutation(
+  const removeFromLibraryMutation = useMutation(
     orpc.collections.bottles.delete.mutationOptions(),
   );
 
@@ -108,7 +55,7 @@ function SavedCollectionActionAuthenticated({
   const collectionStatusQuery = orpc.collections.bottles.list.queryOptions({
     input: {
       user: "me",
-      collection: action.collection,
+      collection: "library",
       bottle: bottleId,
       release: releaseId ?? undefined,
       baseOnly,
@@ -126,7 +73,6 @@ function SavedCollectionActionAuthenticated({
           releaseId={releaseId}
           size={size}
           title={title}
-          kind={kind}
         />
       );
     }
@@ -136,25 +82,25 @@ function SavedCollectionActionAuthenticated({
   const isAnyLoading =
     !isMounted ||
     isLoading ||
-    favoriteBottleMutation.isPending ||
-    unfavoriteBottleMutation.isPending;
+    addToLibraryMutation.isPending ||
+    removeFromLibraryMutation.isPending;
 
   return (
     <Button
       onClick={async () => {
         await (isCollected
-          ? unfavoriteBottleMutation.mutateAsync({
+          ? removeFromLibraryMutation.mutateAsync({
               bottle: bottleId,
               release: releaseId,
               baseOnly,
               user: "me",
-              collection: action.collection,
+              collection: "library",
             })
-          : favoriteBottleMutation.mutateAsync({
+          : addToLibraryMutation.mutateAsync({
               bottle: bottleId,
               release: releaseId,
               user: "me",
-              collection: action.collection,
+              collection: "library",
             }));
         await queryClient.invalidateQueries({
           queryKey: collectionStatusQuery.queryKey,
@@ -164,7 +110,7 @@ function SavedCollectionActionAuthenticated({
             queryKey: orpc.collections.bottles.list.key({
               input: {
                 user: "me",
-                collection: action.collection,
+                collection: "library",
               },
             }),
             exact: true,
@@ -173,7 +119,7 @@ function SavedCollectionActionAuthenticated({
             queryKey: orpc.collections.bottles.list.key({
               input: {
                 user: user.username,
-                collection: action.collection,
+                collection: "library",
               },
             }),
             exact: true,
@@ -181,16 +127,19 @@ function SavedCollectionActionAuthenticated({
         }
       }}
       disabled={isAnyLoading}
-      color={action.color}
+      color="primary"
       size={size}
       title={resolvedTitle}
       aria-pressed={isCollected}
-      data-collection-action={kind}
+      data-collection-action="library"
     >
       {isCollected ? (
-        <ActiveIcon className="text-highlight h-4 w-4" aria-hidden="true" />
+        <BookOpenIconFilled
+          className="text-highlight h-4 w-4"
+          aria-hidden="true"
+        />
       ) : (
-        <Icon className="h-4 w-4" aria-hidden="true" />
+        <BookOpenIcon className="h-4 w-4" aria-hidden="true" />
       )}
     </Button>
   );
@@ -200,53 +149,36 @@ function SavedCollectionActionUnauthenticated({
   releaseId,
   size,
   title,
-  kind,
-}: Pick<CollectionActionProps, "releaseId" | "size" | "title"> & {
-  kind: CollectionActionKind;
-}) {
-  const action = COLLECTION_ACTIONS[kind];
-  const Icon = action.Icon;
-  const resolvedTitle = getTitle({ baseOnly: releaseId == null, kind, title });
+}: Pick<CollectionActionProps, "releaseId" | "size" | "title">) {
+  const resolvedTitle = getTitle({ baseOnly: releaseId == null, title });
 
   return (
     <Button
       href="/login"
-      color={action.color}
+      color="primary"
       size={size}
       title={resolvedTitle}
-      data-collection-action={kind}
+      data-collection-action="library"
     >
-      <Icon className="h-4 w-4" aria-hidden="true" />
+      <BookOpenIcon className="h-4 w-4" aria-hidden="true" />
     </Button>
   );
 }
 
-function SavedCollectionAction({
-  kind,
-  ...props
-}: CollectionActionProps & { kind: CollectionActionKind }) {
+function SavedCollectionAction(props: CollectionActionProps) {
   const { user } = useAuth();
 
   if (!user) {
-    return <SavedCollectionActionUnauthenticated {...props} kind={kind} />;
+    return <SavedCollectionActionUnauthenticated {...props} />;
   }
 
-  return <SavedCollectionActionAuthenticated {...props} kind={kind} />;
-}
-
-export function FavoriteAction(props: CollectionActionProps) {
-  return <SavedCollectionAction {...props} kind="favorites" />;
+  return <SavedCollectionActionAuthenticated {...props} />;
 }
 
 export function LibraryAction(props: CollectionActionProps) {
-  return <SavedCollectionAction {...props} kind="library" />;
+  return <SavedCollectionAction {...props} />;
 }
 
 export default function SavedCollectionActions(props: CollectionActionProps) {
-  return (
-    <>
-      <FavoriteAction {...props} />
-      <LibraryAction {...props} />
-    </>
-  );
+  return <LibraryAction {...props} />;
 }

@@ -6,7 +6,6 @@ import {
   GiftTopIcon,
   HomeIcon,
   InformationCircleIcon,
-  StarIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import BottleIcon from "@peated/web/assets/bottle.svg";
@@ -24,9 +23,6 @@ import SidebarLink from "./sidebarLink";
 export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const favoritesHref = user
-    ? `/users/${user.username}/favorites`
-    : "/favorites";
   const libraryHref = user ? `/users/${user.username}/library` : "/library";
 
   return (
@@ -53,16 +49,6 @@ export default function Sidebar() {
                     }
                   >
                     Home
-                  </SidebarLink>
-                  <SidebarLink
-                    href={favoritesHref}
-                    icon={StarIcon}
-                    active={
-                      pathname.startsWith(favoritesHref) ||
-                      pathname.startsWith("/favorites")
-                    }
-                  >
-                    Favorites
                   </SidebarLink>
                   <SidebarLink
                     href={libraryHref}

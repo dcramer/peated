@@ -12,7 +12,7 @@ const config = {
   DISCORD_LINK: "https://discord.gg/d7GFPfy88Z",
 
   DESCRIPTION:
-    "Peated is a spirits database allowing anyone to record tasting notes, track their favorite whiskies, and discover the world of peat.",
+    "Peated is a spirits database allowing anyone to record tasting notes, build their whisky library, and discover the world of peat.",
   THEME_COLOR: "#fbbf24",
 };
 

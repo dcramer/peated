@@ -1,12 +1,8 @@
-import {
-  BookOpenIcon,
-  CheckBadgeIcon,
-  StarIcon,
-} from "@heroicons/react/20/solid";
+import { BookOpenIcon, CheckBadgeIcon } from "@heroicons/react/20/solid";
 import type { Bottle } from "@peated/server/types";
 
 type BottleStatusIconsProps = {
-  bottle: Pick<Bottle, "isFavorite" | "isLibrary" | "hasTasted">;
+  bottle: Pick<Bottle, "isLibrary" | "hasTasted">;
   className?: string;
   hideLibrary?: boolean;
 };
@@ -18,17 +14,6 @@ export default function BottleStatusIcons({
 }: BottleStatusIconsProps) {
   return (
     <>
-      {bottle.isFavorite && (
-        <span
-          role="img"
-          aria-label="Favorite"
-          title="Favorite"
-          className="inline-flex align-text-bottom"
-          data-bottle-status="favorite"
-        >
-          <StarIcon className={className} aria-hidden="true" />
-        </span>
-      )}
       {bottle.isLibrary && !hideLibrary && (
         <span
           role="img"

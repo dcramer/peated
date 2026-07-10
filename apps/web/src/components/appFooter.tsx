@@ -1,28 +1,26 @@
 "use client";
 
 import {
+  BookOpenIcon,
   GlobeAmericasIcon,
   PlusIcon,
   UserGroupIcon,
 } from "@heroicons/react/20/solid";
-import { StarIcon } from "@heroicons/react/24/outline";
 import useAuth from "@peated/web/hooks/useAuth";
 import NavLink from "./navLink";
 import NotificationsPanel from "./notifications/panel";
 
 export default function AppFooter() {
   const { user } = useAuth();
-  const favoritesHref = user
-    ? `/users/${user.username}/favorites`
-    : "/favorites";
+  const libraryHref = user ? `/users/${user.username}/library` : "/library";
 
   return (
     <nav className="sm:min-h-18 mx-auto flex min-h-14 w-full max-w-4xl items-center justify-center gap-x-6 px-3 sm:px-3 lg:px-0">
       <NavLink href="/">
         <GlobeAmericasIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
-      <NavLink href={favoritesHref}>
-        <StarIcon className="h-8 w-8 sm:h-9 sm:w-9" />
+      <NavLink href={libraryHref} aria-label="Library">
+        <BookOpenIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
 
       <NavLink

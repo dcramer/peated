@@ -216,7 +216,12 @@ export function buildTasting({
 }
 
 export function buildActivity({
-  tasting = buildTasting(),
+  tasting = buildTasting({
+    bottle: {
+      ...existingBottle,
+      isFavorite: true,
+    },
+  }),
   collectionBottle = buildCollectionBottle({ id: 9701 }),
 } = {}) {
   return {
@@ -243,6 +248,31 @@ export function buildActivity({
     ],
     rel: {
       nextCursor: null,
+      prevCursor: null,
+    },
+  };
+}
+
+export function buildFavoriteActivity({ nextCursor = null } = {}) {
+  return {
+    results: Array.from({ length: 10 }, (_, index) => ({
+      id: `collection_add:9101:9801:${1780833600000 + index}`,
+      type: "collection_add",
+      priority: "secondary",
+      createdAt: timestamp,
+      windowStart: timestamp,
+      windowEnd: timestamp,
+      createdBy: testUser,
+      collection: buildCollection({
+        id: 9801,
+        name: "Personal Favorites",
+        href: `/users/${testUser.username}/favorites`,
+      }),
+      items: [buildCollectionBottle({ id: 9802 + index })],
+      totalItems: 1,
+    })),
+    rel: {
+      nextCursor,
       prevCursor: null,
     },
   };

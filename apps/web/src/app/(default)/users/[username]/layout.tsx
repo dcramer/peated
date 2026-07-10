@@ -159,14 +159,6 @@ export default async function Layout(props: {
               </TabItem>
               <TabItem
                 as={Link}
-                href={`/users/${user.username}/favorites`}
-                controlled
-                desktopOnly
-              >
-                Favorites
-              </TabItem>
-              <TabItem
-                as={Link}
                 href={`/users/${user.username}/library`}
                 controlled
                 desktopOnly
