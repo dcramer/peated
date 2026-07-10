@@ -8,11 +8,13 @@ import type { Bottle } from "@peated/server/types";
 type BottleStatusIconsProps = {
   bottle: Pick<Bottle, "isFavorite" | "isLibrary" | "hasTasted">;
   className?: string;
+  hideLibrary?: boolean;
 };
 
 export default function BottleStatusIcons({
   bottle,
   className = "h-4 w-4",
+  hideLibrary = false,
 }: BottleStatusIconsProps) {
   return (
     <>
@@ -27,7 +29,7 @@ export default function BottleStatusIcons({
           <StarIcon className={className} aria-hidden="true" />
         </span>
       )}
-      {bottle.isLibrary && (
+      {bottle.isLibrary && !hideLibrary && (
         <span
           role="img"
           aria-label="In Library"

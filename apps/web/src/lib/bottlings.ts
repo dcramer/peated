@@ -5,6 +5,12 @@ type BottlingSummary = Pick<
   "edition" | "releaseYear" | "vintageYear" | "fullName"
 >;
 
+type BottleSummary = {
+  fullName: string;
+};
+
+const CANONICAL_TRAIT_SUFFIX = /(?: - (?:Single Cask|Cask Strength))+$/;
+
 export function getBottleBottlingsPath(bottleId: number | string) {
   return `/bottles/${bottleId}/bottlings`;
 }
@@ -45,6 +51,18 @@ export function formatBottlingName(
   }
 
   return bottling.fullName;
+}
+
+/** Builds a list-friendly full name without canonical classification suffixes. */
+export function formatBottleBottlingName(
+  bottle: BottleSummary,
+  bottling: BottlingSummary,
+) {
+  const bottlingName = formatBottlingName(bottling);
+
+  return bottlingName === bottling.fullName
+    ? bottling.fullName.replace(CANONICAL_TRAIT_SUFFIX, "")
+    : `${bottle.fullName} - ${bottlingName}`;
 }
 
 export function formatBottlingCountLabel(numReleases: number) {
