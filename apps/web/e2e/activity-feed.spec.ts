@@ -18,6 +18,19 @@ test.describe("activity feed", () => {
     await expect(
       collectionAddRow.getByRole("link", { name: "Library" }),
     ).toHaveAttribute("href", `/users/${testUser.username}/library`);
+    await expect(page.getByText("Personal Favorites")).toHaveCount(0);
+    await expect(page.getByRole("img", { name: "Favorite" })).toHaveCount(0);
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("fills profile activity after hiding a Favorites-only page", async ({
+    page,
+  }) => {
+    await page.goto(`/users/${testUser.username}`, { waitUntil: "commit" });
+
+    await expect(page.getByText(tastingNotes)).toBeVisible();
+    await expect(page.getByText("Personal Favorites")).toHaveCount(0);
+    await expect(page.getByRole("img", { name: "Favorite" })).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
   });
 });

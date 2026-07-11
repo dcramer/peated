@@ -5,6 +5,7 @@ import {
   buildBottle,
   buildBottleRelease,
   buildCollectionBottle,
+  buildFavoriteActivity,
   buildTasting,
   createdBottleId,
   createdBottleName,
@@ -95,7 +96,20 @@ async function handleRpcRequest({ request, response, url }) {
 
   switch (path) {
     case "activity/list":
-      sendRpcResponse(response, buildActivity());
+      sendRpcResponse(
+        response,
+        input?.cursor
+          ? buildActivity()
+          : buildFavoriteActivity({ nextCursor: 1 }),
+      );
+      return true;
+    case "users/activity/list":
+      sendRpcResponse(
+        response,
+        input?.cursor
+          ? buildActivity()
+          : buildFavoriteActivity({ nextCursor: 1 }),
+      );
       return true;
     case "entities/list":
       if (input?.query === testBrand.name) {

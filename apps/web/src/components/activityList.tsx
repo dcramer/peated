@@ -18,19 +18,20 @@ type ActivityEntry = ActivityListResult["results"][number];
 type CollectionAddActivity = Extract<ActivityEntry, { type: "collection_add" }>;
 type CollectionAddItem = CollectionAddActivity["items"][number];
 
+export function filterFavoriteActivity(values: ActivityListResult["results"]) {
+  return values.filter(
+    (activity) =>
+      activity.type !== "collection_add" ||
+      !activity.collection.href?.endsWith("/favorites"),
+  );
+}
+
 function formatBottleCount(count: number) {
   return `${count.toLocaleString()} bottle${count === 1 ? "" : "s"}`;
 }
 
-function getCollectionLabel(activity: CollectionAddActivity) {
-  if (activity.collection.href?.endsWith("/favorites")) {
-    return "Favorites";
-  }
-  return activity.collection.name;
-}
-
 function CollectionLink({ activity }: { activity: CollectionAddActivity }) {
-  const label = getCollectionLabel(activity);
+  const label = activity.collection.name;
 
   if (!activity.collection.href) {
     return <span className="font-semibold text-white">{label}</span>;

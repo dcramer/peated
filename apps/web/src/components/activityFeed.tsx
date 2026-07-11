@@ -2,13 +2,15 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import Glyph from "@peated/web/assets/glyph.svg";
-import ActivityList from "@peated/web/components/activityList";
+import ActivityList, {
+  filterFavoriteActivity,
+} from "@peated/web/components/activityList";
 import Alert from "@peated/web/components/alert";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import Spinner from "@peated/web/components/spinner";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useEventListener } from "usehooks-ts";
 
 export default function ActivityFeed({
@@ -34,17 +36,26 @@ export default function ActivityFeed({
       },
     }),
     queryFn: async ({ pageParam }) => {
-      return await orpc.activity.list.call({
+      const page = await orpc.activity.list.call({
         filter,
         limit: 10,
         cursor: pageParam,
       });
+      return {
+        ...page,
+        results: filterFavoriteActivity(page.results),
+      };
     },
     initialPageParam: undefined as number | undefined,
     staleTime: Infinity,
     initialData: () => {
       return {
-        pages: [activityList],
+        pages: [
+          {
+            ...activityList,
+            results: filterFavoriteActivity(activityList.results),
+          },
+        ],
         pageParams: [undefined],
       };
     },
@@ -64,6 +75,17 @@ export default function ActivityFeed({
 
   useEventListener("scroll", onScroll);
 
+  const visibleActivityCount = pages.reduce(
+    (count, page) => count + page.results.length,
+    0,
+  );
+
+  useEffect(() => {
+    if (visibleActivityCount < 10 && hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, visibleActivityCount]);
+
   if (error) {
     return (
       <EmptyActivity>
@@ -77,12 +99,18 @@ export default function ActivityFeed({
 
   return (
     <>
-      {pages.length > 1 || pages[0].results.length ? (
-        pages.map((group, i) => (
-          <Fragment key={i}>
-            <ActivityList values={group.results} />
-          </Fragment>
-        ))
+      {visibleActivityCount ? (
+        pages.map((group, i) =>
+          group.results.length ? (
+            <Fragment key={i}>
+              <ActivityList values={group.results} />
+            </Fragment>
+          ) : null,
+        )
+      ) : hasNextPage || isFetchingNextPage ? (
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : (
         <EmptyActivity href="/addBottle?intent=tasting">
           <Glyph className="h-16 w-16" />

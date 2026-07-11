@@ -42,8 +42,8 @@ export default async function Layout({
           {!user && (
             <div className="flex flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800">
               <p className="text-muted mb-4 text-sm">
-                Create a profile to record tastings, track your favorite
-                bottles, and more.
+                Create a profile to record tastings, build your bottle library,
+                and more.
               </p>
               <Button color="primary" href="/login" size="small">
                 Sign Up or Login
