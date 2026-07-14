@@ -17,6 +17,24 @@ describe("GET /users/:user", () => {
     expect(data.friendStatus).toBe("none");
   });
 
+  test("returns zero Library stats without collection entries", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+
+    const data = await routerClient.users.details(
+      { user: user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.stats.library).toEqual({
+      total: 0,
+      open: 0,
+      sealed: 0,
+    });
+  });
+
   test("get user:me", async ({ defaults }) => {
     const data = await routerClient.users.details(
       { user: "me" },

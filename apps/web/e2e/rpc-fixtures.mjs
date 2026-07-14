@@ -21,8 +21,32 @@ export const testUser = {
     tastings: 0,
     bottles: 0,
     collected: 0,
+    library: {
+      total: 0,
+      open: 0,
+      sealed: 0,
+    },
     contributions: 0,
   },
+};
+
+export const emptyLibraryStats = {
+  total: 0,
+  distillers: [],
+  age: {
+    knownCount: 0,
+    median: null,
+    oldest: null,
+    buckets: [
+      { id: "under10", label: "Under 10", count: 0 },
+      { id: "from10To12", label: "10–12", count: 0 },
+      { id: "from13To17", label: "13–17", count: 0 },
+      { id: "from18To24", label: "18–24", count: 0 },
+      { id: "atLeast25", label: "25+", count: 0 },
+      { id: "unstated", label: "Unstated", count: 0 },
+    ],
+  },
+  categories: [],
 };
 
 export const testAccessToken = "peated-playwright-access-token";
