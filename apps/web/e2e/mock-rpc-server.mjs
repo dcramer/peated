@@ -13,6 +13,7 @@ import {
   createdTastingId,
   displayImageBottleId,
   displayImageUrl,
+  emptyLibraryStats,
   emptyList,
   existingBottle,
   existingBottleId,
@@ -531,6 +532,9 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       sendRpcError(response, "Unexpected user details payload");
+      return true;
+    case "users/libraryStats":
+      sendRpcResponse(response, emptyLibraryStats);
       return true;
     case "users/badgeList":
       sendRpcResponse(response, emptyList);

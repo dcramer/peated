@@ -10,6 +10,7 @@ import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
+import { formatLibraryTabLabel } from "./libraryTabLabel";
 import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
 import { ProfileProvider } from "./profileContext";
@@ -116,9 +117,9 @@ export default async function Layout(props: {
             </div>
             <div className="mb-4 px-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
-                {user.stats.collected.toLocaleString()}
+                {user.stats.library.total.toLocaleString()}
               </span>
-              <span className="text-muted text-sm">Collected</span>
+              <span className="text-muted text-sm">Library bottles</span>
             </div>
             <div className="mb-4 pl-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
@@ -163,7 +164,7 @@ export default async function Layout(props: {
                 controlled
                 desktopOnly
               >
-                Library
+                {formatLibraryTabLabel(user.stats.library)}
               </TabItem>
             </Tabs>
           </div>

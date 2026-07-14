@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { collectionBottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -13,6 +15,24 @@ describe("GET /users/:user", () => {
     );
     expect(data.id).toEqual(user.id);
     expect(data.friendStatus).toBe("none");
+  });
+
+  test("returns zero Library stats without collection entries", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+
+    const data = await routerClient.users.details(
+      { user: user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.stats.library).toEqual({
+      total: 0,
+      open: 0,
+      sealed: 0,
+    });
   });
 
   test("get user:me", async ({ defaults }) => {
@@ -69,6 +89,67 @@ describe("GET /users/:user", () => {
     );
 
     expect(data.stats.contributions).toBe(1);
+  });
+
+  test("counts non-empty Library bottles by status", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const otherCollection = await fixtures.Collection({
+      name: "Other Collection",
+      createdById: defaults.user.id,
+    });
+    const [openBottle, sealedBottle, emptyBottle, unsetBottle, otherBottle] =
+      await Promise.all([
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+      ]);
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: library.id,
+        bottleId: openBottle.id,
+        status: "open",
+      },
+      {
+        collectionId: library.id,
+        bottleId: sealedBottle.id,
+        status: "sealed",
+      },
+      {
+        collectionId: library.id,
+        bottleId: emptyBottle.id,
+        status: "empty",
+      },
+      {
+        collectionId: library.id,
+        bottleId: unsetBottle.id,
+        status: null,
+      },
+      {
+        collectionId: otherCollection.id,
+        bottleId: otherBottle.id,
+        status: "open",
+      },
+    ]);
+
+    const data = await routerClient.users.details(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.stats.library).toEqual({
+      total: 3,
+      open: 1,
+      sealed: 1,
+    });
   });
 
   test("errors on invalid username", async () => {

@@ -6,6 +6,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { RESERVED_COLLECTIONS } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import { UserSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -35,6 +36,11 @@ export default procedure
           tastings: z.number(),
           bottles: z.number(),
           collected: z.number(),
+          library: z.object({
+            total: z.number(),
+            open: z.number(),
+            sealed: z.number(),
+          }),
           contributions: z.number(),
         }),
       }),
@@ -61,9 +67,19 @@ export default procedure
       .where(eq(tastings.createdById, user.id))
       .limit(1);
 
-    const [{ collectedBottles }] = await db
+    const [
+      {
+        collectedBottles,
+        totalLibraryBottles,
+        openLibraryBottles,
+        sealedLibraryBottles,
+      },
+    ] = await db
       .select({
         collectedBottles: sql<string>`COUNT(DISTINCT ${collectionBottles.bottleId})`,
+        totalLibraryBottles: sql<string>`COUNT(${collectionBottles.id}) FILTER (WHERE LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.library.name.toLowerCase()} AND ${collectionBottles.status} IS DISTINCT FROM 'empty')`,
+        openLibraryBottles: sql<string>`COUNT(${collectionBottles.id}) FILTER (WHERE LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.library.name.toLowerCase()} AND ${collectionBottles.status} = 'open')`,
+        sealedLibraryBottles: sql<string>`COUNT(${collectionBottles.id}) FILTER (WHERE LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.library.name.toLowerCase()} AND ${collectionBottles.status} = 'sealed')`,
       })
       .from(collections)
       .innerJoin(
@@ -94,6 +110,11 @@ export default procedure
         tastings: Number(totalTastings),
         bottles: Number(totalBottles),
         collected: Number(collectedBottles),
+        library: {
+          total: Number(totalLibraryBottles),
+          open: Number(openLibraryBottles),
+          sealed: Number(sealedLibraryBottles),
+        },
         contributions: Number(totalContributions),
       },
     };
