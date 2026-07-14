@@ -1,68 +1,95 @@
+import { db } from "@peated/server/db";
+import {
+  bottleAliases,
+  bottleReleases,
+  bottles,
+} from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { routerClient } from "@peated/server/orpc/router";
-import { BottleSchema, EntitySchema, UserSchema } from "@peated/server/schemas";
-import type { Bottle, Entity, User } from "@peated/server/types";
+import {
+  BottleReleaseSchema,
+  BottleSchema,
+  EntitySchema,
+  UserSchema,
+} from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
+import { and, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
-export type BottleResult = {
-  type: "bottle";
-  ref: Bottle;
+const SearchResultSchema = z.union([
+  z.object({
+    type: z.literal("bottle"),
+    ref: BottleSchema,
+  }),
+  z.object({
+    type: z.literal("bottling"),
+    ref: BottleReleaseSchema,
+    bottle: BottleSchema,
+  }),
+  z.object({
+    type: z.literal("entity"),
+    ref: EntitySchema,
+  }),
+  z.object({
+    type: z.literal("user"),
+    ref: UserSchema,
+  }),
+]);
+
+type Result = z.infer<typeof SearchResultSchema>;
+
+type RankedResult = Result & {
+  exactAliasMatch?: boolean;
 };
 
-export type EntityResult = {
-  type: "entity";
-  ref: Entity;
-};
+const INCLUDE_LIST = ["bottles", "bottlings", "entities", "users"] as const;
 
-export type UserResult = {
-  type: "user";
-  ref: User;
-};
-
-export type Result = BottleResult | UserResult | EntityResult;
-
-const INCLUDE_LIST = ["bottles", "entities", "users"] as const;
-
-function sortResults(query: string, unsortedResults: Result[]) {
-  const exactMatches: number[] = [];
+/** Promotes exact targets while preserving each source's rank among ties. */
+function sortResults(query: string, unsortedResults: RankedResult[]) {
   const lowerQuery = query.toLowerCase();
-  unsortedResults.forEach((value, index) => {
+
+  const isExactMatch = (value: RankedResult) => {
+    if (value.exactAliasMatch) return true;
     if (value.type === "entity") {
-      if (
+      return (
         value.ref.name.toLowerCase() === lowerQuery ||
         value.ref.shortName?.toLowerCase() === lowerQuery
-      ) {
-        exactMatches.push(index);
-      }
-    } else if (value.type === "user") {
-      if (value.ref.username.toLowerCase() === lowerQuery) {
-        exactMatches.push(index);
-      }
-    } else {
-      if (
+      );
+    }
+    if (value.type === "user") {
+      return value.ref.username.toLowerCase() === lowerQuery;
+    }
+    if (value.type === "bottling") {
+      return (
         value.ref.fullName.toLowerCase() === lowerQuery ||
         value.ref.name.toLowerCase() === lowerQuery
-      ) {
-        exactMatches.push(index);
-      }
+      );
     }
-  });
+    return (
+      value.ref.fullName.toLowerCase() === lowerQuery ||
+      value.ref.name.toLowerCase() === lowerQuery
+    );
+  };
 
-  const results = [...unsortedResults];
-  exactMatches.forEach((resultIndex, index) => {
-    const item = results.splice(resultIndex, 1);
-    results.unshift(...item);
-  });
-  return results;
+  return unsortedResults
+    .map((result, index) => ({ result, index, exact: isExactMatch(result) }))
+    .sort((left, right) => {
+      if (left.exact !== right.exact) return left.exact ? -1 : 1;
+      return left.index - right.index;
+    })
+    .map(({ result }) => result);
 }
 
+/** Aggregates global search while preserving exact bottle-release identity. */
 export default procedure
   .route({
     method: "GET",
     path: "/search",
     summary: "Global search",
     description:
-      "Search across bottles, entities, and users with configurable result types and limits",
+      "Search across bottles, bottlings, entities, and users with configurable result types and limits",
     spec: (spec) => ({
       ...spec,
       operationId: "search",
@@ -78,27 +105,12 @@ export default procedure
   .output(
     z.object({
       query: z.string(),
-      results: z.array(
-        z.union([
-          z.object({
-            type: z.literal("bottle"),
-            ref: BottleSchema,
-          }),
-          z.object({
-            type: z.literal("entity"),
-            ref: EntitySchema,
-          }),
-          z.object({
-            type: z.literal("user"),
-            ref: UserSchema,
-          }),
-        ]),
-      ),
+      results: z.array(SearchResultSchema),
     }),
   )
   .handler(async function ({ input, context, errors }) {
     const { query, include, limit } = input;
-    const promises = [];
+    const promises: Promise<RankedResult[]>[] = [];
 
     if (include.includes("bottles")) {
       promises.push(
@@ -116,6 +128,90 @@ export default procedure
             data.results.map((b: any) => ({ type: "bottle", ref: b })),
           )
           .catch(() => []),
+      );
+    }
+
+    if (include.includes("bottlings") && query) {
+      promises.push(
+        (async () => {
+          // Accepted release aliases carry an exact target that FTS cannot infer.
+          const exactAliasReleaseIds = (
+            await db
+              .selectDistinct({ releaseId: bottleAliases.releaseId })
+              .from(bottleAliases)
+              .where(
+                and(
+                  eq(sql`LOWER(${bottleAliases.name})`, query.toLowerCase()),
+                  sql`${bottleAliases.ignored} IS DISTINCT FROM TRUE`,
+                  isNotNull(bottleAliases.releaseId),
+                ),
+              )
+          )
+            .map((row) => row.releaseId)
+            .filter((releaseId): releaseId is number => releaseId !== null);
+          const exactAliasOrder = exactAliasReleaseIds.length
+            ? [
+                desc(
+                  sql<number>`CASE WHEN ${inArray(
+                    bottleReleases.id,
+                    exactAliasReleaseIds,
+                  )} THEN 1 ELSE 0 END`,
+                ),
+              ]
+            : [];
+
+          const releaseList = await db
+            .select()
+            .from(bottleReleases)
+            .where(
+              or(
+                sql`${bottleReleases.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+                exactAliasReleaseIds.length
+                  ? inArray(bottleReleases.id, exactAliasReleaseIds)
+                  : undefined,
+              ),
+            )
+            .orderBy(
+              ...exactAliasOrder,
+              desc(
+                sql`ts_rank(${bottleReleases.searchVector}, websearch_to_tsquery('english', ${query}))`,
+              ),
+              desc(bottleReleases.totalTastings),
+            )
+            .limit(limit);
+
+          if (!releaseList.length) return [];
+
+          const bottleIds = [
+            ...new Set(releaseList.map((row) => row.bottleId)),
+          ];
+          const bottleList = await db
+            .select()
+            .from(bottles)
+            .where(inArray(bottles.id, bottleIds));
+          const [serializedBottles, serializedBottlings] = await Promise.all([
+            serialize(BottleSerializer, bottleList, context.user ?? undefined),
+            serialize(
+              BottleReleaseSerializer,
+              releaseList,
+              context.user ?? undefined,
+            ),
+          ]);
+          const bottlesById = new Map(
+            serializedBottles.map((bottle) => [bottle.id, bottle]),
+          );
+          const exactAliasReleaseIdSet = new Set(exactAliasReleaseIds);
+
+          return serializedBottlings.map((bottling) => {
+            const bottle = bottlesById.get(bottling.bottleId)!;
+            return {
+              type: "bottling" as const,
+              ref: bottling,
+              bottle,
+              exactAliasMatch: exactAliasReleaseIdSet.has(bottling.id),
+            };
+          });
+        })().catch(() => []),
       );
     }
 
@@ -161,11 +257,14 @@ export default procedure
 
     const sortedResults = sortResults(
       query,
-      results.reduce((prev: any[], cur: any[]) => [...prev, ...cur], []),
+      results.reduce<RankedResult[]>((prev, cur) => [...prev, ...cur], []),
     );
 
     return {
       query,
-      results: sortedResults.slice(0, limit),
+      results: sortedResults.slice(0, limit).map((result) => {
+        const { exactAliasMatch: _exactAliasMatch, ...publicResult } = result;
+        return publicResult;
+      }),
     };
   });

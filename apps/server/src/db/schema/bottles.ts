@@ -356,6 +356,7 @@ export const bottleReleases = pgTable(
   (table) => [
     index("bottle_release_bottle_idx").on(table.bottleId),
     index("bottle_release_created_by_actor_idx").on(table.createdByActorId),
+    index("bottle_release_search_idx").using("gin", table.searchVector),
     uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
     check(
       "bottle_release_stated_age_check",

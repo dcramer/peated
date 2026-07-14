@@ -80,9 +80,11 @@ export default function SearchPanel({
 
       const isUserQuery = query.indexOf("@") !== -1 && user;
 
-      const include: ("bottles" | "entities" | "users")[] = [];
-      if (directToTasting || addBottleIntent || !isUserQuery)
+      const include: ("bottles" | "bottlings" | "entities" | "users")[] = [];
+      if (directToTasting || addBottleIntent || !isUserQuery) {
         include.push("bottles");
+        include.push("bottlings");
+      }
       if (
         !directToTasting &&
         !addBottleIntent &&

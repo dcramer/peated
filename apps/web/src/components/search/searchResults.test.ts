@@ -1,7 +1,14 @@
-import { describe, expect, it } from "vitest";
+import type { Bottle, BottleRelease } from "@peated/server/types";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
 
 import { getBottleResultHref } from "./bottleResult";
+import { getBottlingResultHref } from "./bottlingResult";
 import { getCreateBottleHref } from "./createBottleHref";
+import ResultRow from "./result";
+
+vi.mock("@peated/web/assets/bottle.svg", () => ({ default: () => null }));
 
 describe("search result create bottle links", () => {
   it("targets the Create Bottle route for missing bottles", () => {
@@ -93,5 +100,68 @@ describe("search result create bottle links", () => {
         directToTasting: true,
       }),
     ).toBe("/addBottle?bottle=123&intent=tasting");
+  });
+
+  it("links exact bottling results to the bottling page", () => {
+    expect(
+      getBottlingResultHref({
+        bottleId: 123,
+        bottlingId: 456,
+      }),
+    ).toBe("/bottles/123/bottlings/456");
+  });
+
+  it("preserves exact bottlings through Add Bottle intents", () => {
+    expect(
+      getBottlingResultHref({
+        bottleId: 123,
+        bottlingId: 456,
+        addBottleIntent: "library",
+      }),
+    ).toBe("/addBottle?bottle=123&release=456&intent=library");
+  });
+
+  it("preserves exact bottlings through tasting shortcuts", () => {
+    expect(
+      getBottlingResultHref({
+        bottleId: 123,
+        bottlingId: 456,
+        directToTasting: true,
+      }),
+    ).toBe("/addBottle?bottle=123&release=456&intent=tasting");
+  });
+
+  it("renders exact bottlings as distinct release links", () => {
+    const bottle = {
+      id: 123,
+      fullName: "Laphroaig Cairdeas",
+      category: "single_malt",
+      distillers: [],
+    } as unknown as Bottle;
+    const bottling = {
+      id: 456,
+      bottleId: bottle.id,
+      fullName: "Laphroaig Cairdeas Warehouse 1",
+      name: "Cairdeas Warehouse 1",
+      edition: "Warehouse 1",
+      releaseYear: 2022,
+      vintageYear: null,
+      abv: 52.2,
+      hasTasted: false,
+    } as BottleRelease;
+
+    const html = renderToStaticMarkup(
+      createElement(ResultRow, {
+        result: { type: "bottling", ref: bottling, bottle },
+        directToTasting: false,
+        addBottleIntent: "library",
+      }),
+    );
+
+    expect(html).toContain("Laphroaig Cairdeas - Warehouse 1 (2022)");
+    expect(html).toContain("Bottling of Laphroaig Cairdeas");
+    expect(html).toContain(
+      'href="/addBottle?bottle=123&amp;release=456&amp;intent=library"',
+    );
   });
 });

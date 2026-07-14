@@ -1,0 +1,1 @@
+CREATE INDEX "bottle_release_search_idx" ON "bottle_release" USING gin ("search_vector");

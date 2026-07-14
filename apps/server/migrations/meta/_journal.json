@@ -1352,6 +1352,13 @@
       "when": 1783536986980,
       "tag": "0192_tranquil_carnage",
       "breakpoints": false
+    },
+    {
+      "idx": 193,
+      "version": "7",
+      "when": 1784047760659,
+      "tag": "0193_slow_risque",
+      "breakpoints": false
     }
   ]
 }
