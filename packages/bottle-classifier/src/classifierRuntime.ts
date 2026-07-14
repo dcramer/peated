@@ -72,6 +72,7 @@ import {
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 
 const CLASSIFIER_MAX_TURNS = 8;
+const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
 const WHISKY_REFERENCE_PATTERN =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisk(?:e)?y)\b/i;
 
@@ -505,6 +506,7 @@ function addEntitySearchRequest(
   seen: Set<string>,
   query: string | null | undefined,
   type: SearchEntitiesArgs["type"],
+  maxRequests = Number.POSITIVE_INFINITY,
 ) {
   const normalizedQuery = query?.trim();
   if (!normalizedQuery) {
@@ -512,7 +514,7 @@ function addEntitySearchRequest(
   }
 
   const key = `${type ?? "any"}:${normalizedQuery.toLowerCase()}`;
-  if (seen.has(key)) {
+  if (seen.has(key) || requests.length >= maxRequests) {
     return;
   }
 
@@ -524,13 +526,15 @@ function addEntitySearchRequest(
   });
 }
 
-async function collectInitialResolvedEntities({
+export async function collectInitialResolvedEntities({
   candidateExpansion,
   extractedIdentity,
+  initialCandidates = [],
   options,
 }: {
   candidateExpansion: CandidateExpansionMode;
   extractedIdentity: BottleExtractedDetails | null;
+  initialCandidates?: BottleCandidate[];
   options: CreateBottleClassifierOptions;
 }): Promise<EntityResolution[]> {
   const dataSource = getBottleClassifierDataSource(options);
@@ -549,21 +553,60 @@ async function collectInitialResolvedEntities({
   for (const distillery of extractedIdentity.distillery ?? []) {
     addEntitySearchRequest(requests, seen, distillery, "distiller");
   }
+  const maxRequests = requests.length + MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS;
+  for (const candidate of initialCandidates) {
+    addEntitySearchRequest(
+      requests,
+      seen,
+      candidate.brand,
+      "brand",
+      maxRequests,
+    );
+    addEntitySearchRequest(
+      requests,
+      seen,
+      candidate.bottler,
+      "bottler",
+      maxRequests,
+    );
+    for (const distillery of candidate.distillery) {
+      addEntitySearchRequest(
+        requests,
+        seen,
+        distillery,
+        "distiller",
+        maxRequests,
+      );
+    }
+  }
 
   const searchEntities = dataSource.searchEntities;
   const resolvedEntities = new Map<number, EntityResolution>();
   const results = await Promise.all(
     requests.map(async (request) => {
       try {
-        return await searchEntities(request);
+        return {
+          request,
+          entities: await searchEntities(request),
+        };
       } catch {
-        return [];
+        return { request, entities: [] };
       }
     }),
   );
 
-  for (const result of results.flat()) {
-    mergeResolvedEntity(resolvedEntities, result);
+  for (const { request, entities } of results) {
+    for (const entity of entities) {
+      mergeResolvedEntity(resolvedEntities, {
+        ...entity,
+        retrievedFor: [
+          {
+            query: request.query,
+            requestedType: request.type ?? null,
+          },
+        ],
+      });
+    }
   }
 
   return sortedResolvedEntities(resolvedEntities);
@@ -573,6 +616,37 @@ function countWebSearchEvidenceResults(searchEvidence: BottleSearchEvidence[]) {
   return searchEvidence.reduce(
     (total, evidence) => total + evidence.results.length,
     0,
+  );
+}
+
+function hasContainedSourceEntityCandidate({
+  extractedIdentity,
+  resolvedEntities,
+}: {
+  extractedIdentity: BottleExtractedDetails | null;
+  resolvedEntities: EntityResolution[];
+}) {
+  if (!extractedIdentity) {
+    return false;
+  }
+
+  const sourceQueries = new Set<string>();
+  if (extractedIdentity.brand) {
+    sourceQueries.add(`brand:${extractedIdentity.brand.toLowerCase()}`);
+  }
+  if (extractedIdentity.bottler) {
+    sourceQueries.add(`bottler:${extractedIdentity.bottler.toLowerCase()}`);
+  }
+  for (const distillery of extractedIdentity.distillery ?? []) {
+    sourceQueries.add(`distiller:${distillery.toLowerCase()}`);
+  }
+
+  return resolvedEntities.some(
+    (entity) =>
+      entity.source.includes("contained") &&
+      entity.retrievedFor?.some(({ query, requestedType }) =>
+        sourceQueries.has(`${requestedType}:${query.toLowerCase()}`),
+      ),
   );
 }
 
@@ -1345,6 +1419,7 @@ export function createBottleClassifier(
       const resolvedEntities = await collectInitialResolvedEntities({
         candidateExpansion: parsedInput.candidateExpansion,
         extractedIdentity,
+        initialCandidates: artifacts.candidates,
         options,
       });
       artifacts = buildBottleClassificationArtifacts({
@@ -1381,9 +1456,19 @@ export function createBottleClassifier(
         searchEvidence: artifacts.searchEvidence,
         resolvedEntities: artifacts.resolvedEntities,
         investigationHint:
-          artifacts.searchEvidence.length > 0
-            ? "Initial local candidates were not exact aliases, so web evidence was gathered before the first reasoning pass. Judge source quality from the evidence content, discard weak or irrelevant results, and use local search tools if the evidence suggests a better database candidate."
-            : null,
+          [
+            artifacts.searchEvidence.length > 0
+              ? "Initial local candidates were not exact aliases, so web evidence was gathered before the first reasoning pass. Judge source quality from the evidence content, discard weak or irrelevant results, and use local search tools if the evidence suggests a better database candidate."
+              : null,
+            hasContainedSourceEntityCandidate({
+              extractedIdentity: artifacts.extractedIdentity,
+              resolvedEntities: artifacts.resolvedEntities,
+            })
+              ? "A contained local entity candidate was retrieved for an explicit source brand, bottler, or distillery field. Containment is candidate evidence only: resolve equivalence from product evidence before selecting its id, and do not propose a new null-id entity without reviewing that candidate."
+              : null,
+          ]
+            .filter((hint): hint is string => hint !== null)
+            .join(" ") || null,
         webSearchBudget,
       });
       let { decision, artifacts: reasoningArtifacts } =

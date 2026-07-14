@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-13T04:02:06.129Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Maker's Mark Kentucky Straight Bourbon Whisky official product"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Maker's Mark Kentucky Straight Bourbon Whisky official product",
+    "summary": "Official product page: Maker’s Mark® Kentucky Straight Bourbon Whisky on the Maker’s Mark website. ([makersmark.com](https://www.makersmark.com/en-us/bourbons/makers-mark?utm_source=openai))\n\nConfirmed bottle-specific details from the official page:\n- **Producer/Bottler:** Maker’s Mark Distillery, PBC, Loretto, Kentuck",
+    "results": [
+      {
+        "title": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+        "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/bourbons",
+        "url": "https://www.makersmark.com/en-us/bourbons",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/",
+        "url": "https://www.makersmark.com/en-us/",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/locate",
+        "url": "https://www.makersmark.com/en-us/locate",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/bourbons/makers-mark",
+        "url": "https://www.makersmark.com/bourbons/makers-mark",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/",
+        "url": "https://www.makersmark.com/",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bb68caa135e55f92d5a5b2d771e2e5f250937d0a1245cf2c970ccdae14c1add8",
+    "mode": "auto"
+  }
+}

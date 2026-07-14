@@ -112,6 +112,20 @@ export function stripDuplicateBrandPrefixFromBottleName(
   return name;
 }
 
+export function bottleNameDuplicatesBrand(
+  name: string,
+  brandName: string | null | undefined,
+): boolean {
+  if (!brandName) {
+    return false;
+  }
+
+  const normalizeIdentityText = (value: string) =>
+    normalizeString(value).trim().toLowerCase().replace(/\s+/g, " ");
+
+  return normalizeIdentityText(name) === normalizeIdentityText(brandName);
+}
+
 export type NormalizedBottle = {
   name: string;
   statedAge: number | null;

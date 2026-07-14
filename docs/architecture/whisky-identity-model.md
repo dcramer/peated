@@ -58,6 +58,12 @@ Observation-only facts by default:
 
 ## Naming Rules
 
+- A bottle name identifies the expression relative to its brand and must remain
+  distinct from that brand after identity-preserving normalization. A generic
+  category or style descriptor is valid only when supported by the source and
+  chosen through classifier or manual judgment; otherwise the identity remains
+  unresolved. Exact brand/name equality may be rejected structurally.
+
 - `brand` is the consumer-facing label brand.
 - `bottler` is only for a separately stated bottling house when it differs from `brand`.
 - `distillery` is the actual producer or producers.

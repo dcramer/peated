@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-13T04:12:52.691Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost Westland Distillery 42.5 whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost Westland Distillery 42.5 whisky",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Watchpost Whiskey** from the **Westland Distillery team**:\n\n- **Producer / brand:** Watchpost Whiskey, created by the team at **Westland Distillery** in Seattle, Washington. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whiskey?utm_",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/waitlist",
+        "url": "https://www.watchpostwhiskey.com/pages/waitlist",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.worldwhiskiesawards.com/winner-whisky/bronze-63702-world-whiskies-awards-2026",
+        "url": "https://www.worldwhiskiesawards.com/winner-whisky/bronze-63702-world-whiskies-awards-2026",
+        "domain": "worldwhiskiesawards.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies?language=de",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e547846b82ed8a0510d27ae757505e6a4cb219023556467df1ebfe0232e48f91",
+    "mode": "auto"
+  }
+}

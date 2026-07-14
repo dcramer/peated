@@ -1,0 +1,30 @@
+{
+  "id": "watchpost-8-year-old",
+  "referenceName": "Watchpost",
+  "expectedBottleName": "Watchpost Whiskey",
+  "summary": "Create Watchpost as the brand with the source-supported Whiskey style as its distinct core expression, preserving the American blended whiskey category, 42.5% ABV, and Westland production evidence instead of duplicating Watchpost as both brand and expression.",
+  "peatedBottleIds": [44299],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+      "https://westlanddistillery.com/products/watchpost-whiskey",
+      "https://api.peated.com/v1/bottles/44299"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/watchpost-8-year-old.webp",
+    "dbOutcome": {
+      "bottleId": 44299,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Production add-bottle flow created bottle 44299 as Watchpost Watchpost with category blend, stated age 8, 42.5% ABV, and a new Westland Distillery Co. entity 365683 instead of preserving a distinct expression and reusing an existing Westland distillery candidate."
+    },
+    "notes": "Added from the exact failed image add-bottle flow and its persisted production image. The label reads Watchpost, An American Blended Whiskey, 42.5% Alc/Vol, Westland Distillery Co., and Aged 8 Years. Official Watchpost and Westland pages describe the product as an American blended whiskey made by the Westland team from eight-year-old whiskey components."
+  },
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

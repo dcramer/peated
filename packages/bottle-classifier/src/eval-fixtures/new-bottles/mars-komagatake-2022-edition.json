@@ -1,0 +1,32 @@
+{
+  "id": "mars-komagatake-2022-edition",
+  "referenceName": "Komagatake",
+  "expectedBottleName": "Mars Komagatake",
+  "summary": "Treat Mars Komagatake 2022 Edition as the 2022 annual release under the stable Mars Komagatake expression, preserving the extracted producer evidence and single malt category instead of duplicating Komagatake as both brand and expression.",
+  "peatedBottleIds": [44298],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+      "https://api.peated.com/v1/bottles/44298"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/mars-komagatake-2022-edition.webp",
+    "dbOutcome": {
+      "bottleId": 44298,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Production add-bottle flow created bottle 44298 as Mars Komagatake - 2022 Edition with brand Mars, expression Komagatake, category single malt, 50% ABV, release year 2022, edition 2022 Edition, and distiller Shinshu (entity 238555)."
+    },
+    "notes": "Added from the exact failed image add-bottle flow. The checked-in label reads MARS, KOMAGATAKE, Single Malt Japanese Whisky, MARS SHINSHU DISTILLERY, 50% Alc/Vol, and 2022 EDITION. The official producer describes 2022 Edition as a limited annual bottling of the stable Single Malt KOMAGATAKE expression."
+  },
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle_plus_release",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": {
+      "edition": "2022 Edition",
+      "releaseYear": 2022
+    }
+  }
+}

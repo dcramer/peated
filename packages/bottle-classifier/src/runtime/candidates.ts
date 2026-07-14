@@ -106,6 +106,21 @@ export function mergeResolvedEntity(
   }
 
   existing.source = Array.from(new Set([...existing.source, ...entity.source]));
+  const retrievedFor = [...(existing.retrievedFor ?? [])];
+  for (const provenance of entity.retrievedFor ?? []) {
+    if (
+      !retrievedFor.some(
+        (existingProvenance) =>
+          existingProvenance.query === provenance.query &&
+          existingProvenance.requestedType === provenance.requestedType,
+      )
+    ) {
+      retrievedFor.push(provenance);
+    }
+  }
+  if (retrievedFor.length > 0) {
+    existing.retrievedFor = retrievedFor;
+  }
 
   if (
     entity.score !== null &&

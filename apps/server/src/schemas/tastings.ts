@@ -7,7 +7,7 @@ import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
 import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
-import { ServingStyleEnum, zDatetime } from "./common";
+import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
 
@@ -163,13 +163,29 @@ const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
 
 const PhotoIdentificationProposedBottleSchema = z.object({
   name: z.string().trim().min(1),
+  category: CategoryEnum.nullable(),
+  statedAge: z.number().nullable(),
+  abv: z.number().nullable(),
+  vintageYear: z.number().nullable(),
+  releaseYear: z.number().nullable(),
   brand: z.object({
+    id: z.number().int().nullable(),
     name: z.string().trim().min(1),
   }),
+  distillers: z.array(
+    z.object({
+      id: z.number().int().nullable(),
+      name: z.string().trim().min(1),
+    }),
+  ),
 });
 
 const PhotoIdentificationProposedReleaseSchema = z.object({
   edition: z.string().nullable(),
+  statedAge: z.number().nullable(),
+  abv: z.number().nullable(),
+  vintageYear: z.number().nullable(),
+  releaseYear: z.number().nullable(),
 });
 
 export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(

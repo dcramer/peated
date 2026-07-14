@@ -359,6 +359,85 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
+  test("rejects bottle creation when the expression duplicates the brand", () => {
+    const result = classifyShieldaigAgeCreation(
+      buildShieldaigAgeCreationDecision("Shieldaig"),
+    );
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+    });
+    expect(result.rationale).toContain(
+      "proposed bottle name duplicates the brand",
+    );
+  });
+
+  test("rejects bottle-and-release creation when the parent name duplicates the brand", () => {
+    const decision = {
+      ...buildShieldaigAgeCreationDecision("Shieldaig"),
+      action: "create_bottle_and_release",
+      proposedRelease: {
+        edition: "Batch 7",
+        statedAge: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+      },
+    } satisfies BottleClassifierAgentDecisionInput;
+    const result = classifyShieldaigAgeCreation(decision);
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+      proposedRelease: null,
+    });
+  });
+
+  test("rejects bottle repair when the repaired name duplicates the brand", () => {
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "repair_bottle",
+      rationale: "Repair the existing bottle.",
+      candidateBottleIds: [existingPrivateCask.bottleId],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: existingPrivateCask.bottleId,
+      matchedReleaseId: null,
+      parentBottleId: null,
+      proposedBottle: {
+        name: "Example",
+        brand: { name: "Example" },
+        bottler: null,
+        series: null,
+        category: "single_malt",
+        statedAge: null,
+        abv: null,
+        caskStrength: null,
+        singleCask: true,
+        vintageYear: null,
+        releaseYear: null,
+        edition: null,
+        distillers: [],
+      },
+      proposedRelease: null,
+    };
+
+    const result = finalizeBottleReferenceClassification({
+      reference: { name: "Example Private Cask" },
+      decision,
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [existingPrivateCask],
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+    });
+  });
+
   test("keeps bottle creation when bottle-level age is displayed as a word-age name", () => {
     const decision = buildShieldaigAgeCreationDecision("Speyside Thirty");
     if (!decision.proposedBottle) {
@@ -1099,6 +1178,43 @@ describe("finalizeBottleReferenceClassification", () => {
       proposedRelease: {
         statedAge: 21,
       },
+    });
+
+    const duplicateNameResult = finalizeBottleReferenceClassification({
+      reference: {
+        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
+      },
+      decision: {
+        ...decision,
+        proposedBottle: {
+          ...decision.proposedBottle!,
+          name: "Shieldaig",
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [ageBearingParentCandidate],
+        extractedIdentity: {
+          brand: "Shieldaig",
+          bottler: null,
+          expression: "Speyside",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: 21,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      }),
+    });
+
+    expect(duplicateNameResult).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+      proposedRelease: null,
     });
   });
 

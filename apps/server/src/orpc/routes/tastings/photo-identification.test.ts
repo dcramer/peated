@@ -815,6 +815,18 @@ describe("POST /tastings/photo-identification", () => {
     defaults,
     fixtures,
   }) => {
+    const brand = await fixtures.Entity({
+      name: "Pōkeno Photo Test",
+      type: ["brand"],
+    });
+    const distiller = await fixtures.Entity({
+      name: "Pōkeno Photo Distillery",
+      type: ["distiller"],
+    });
+    const secondDistiller = await fixtures.Entity({
+      name: "Pōkeno Photo Grain Distillery",
+      type: ["distiller"],
+    });
     extractPhotoBottleEvidenceMock.mockImplementation(
       async ({ pendingUpload }) => ({
         extractedIdentity: {
@@ -854,25 +866,29 @@ describe("POST /tastings/photo-identification", () => {
           vintageYear: null,
           releaseYear: null,
           brand: {
-            id: null,
-            name: "Pōkeno Photo Test",
+            id: brand.id,
+            name: brand.name,
           },
           distillers: [
             {
-              id: null,
-              name: "Pōkeno Photo Test",
+              id: distiller.id,
+              name: distiller.name,
+            },
+            {
+              id: secondDistiller.id,
+              name: secondDistiller.name,
             },
           ],
           bottler: null,
         },
         proposedRelease: {
           edition: "Exploration Series No. 1",
-          statedAge: null,
+          statedAge: 8,
           abv: 43,
           caskStrength: null,
           singleCask: null,
-          vintageYear: null,
-          releaseYear: null,
+          vintageYear: 2014,
+          releaseYear: 2023,
         },
       }),
     );
@@ -886,6 +902,38 @@ describe("POST /tastings/photo-identification", () => {
         context: { user: defaults.user },
       },
     );
+
+    expect(identification.classification).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "create_bottle_and_release",
+        proposedBottle: {
+          name: "Totara Cask",
+          category: "single_malt",
+          brand: {
+            id: brand.id,
+            name: brand.name,
+          },
+          distillers: [
+            {
+              id: distiller.id,
+              name: distiller.name,
+            },
+            {
+              id: secondDistiller.id,
+              name: secondDistiller.name,
+            },
+          ],
+        },
+        proposedRelease: {
+          edition: "Exploration Series No. 1",
+          statedAge: 8,
+          abv: 43,
+          vintageYear: 2014,
+          releaseYear: 2023,
+        },
+      },
+    });
 
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
@@ -937,9 +985,17 @@ describe("POST /tastings/photo-identification", () => {
         action: "create_bottle",
         proposedBottle: {
           name: "Review Bottle",
+          category: "single_malt",
           brand: {
+            id: null,
             name: "Low Confidence Photo Brand",
           },
+          distillers: [
+            {
+              id: null,
+              name: "Low Confidence Photo Brand",
+            },
+          ],
         },
       },
     });

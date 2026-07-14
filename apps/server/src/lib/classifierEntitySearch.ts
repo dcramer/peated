@@ -3,6 +3,8 @@ import { db } from "@peated/server/db";
 import { entities, entityAliases } from "@peated/server/db/schema";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
 
+const CONTAINED_MATCH_FETCH_MULTIPLIER = 4;
+
 export type ClassifierEntitySearchArgs = {
   query: string;
   type?: "brand" | "bottler" | "distiller" | null;
@@ -16,7 +18,7 @@ export type ClassifierEntityResolution = {
   type: ("brand" | "bottler" | "distiller")[];
   alias: string | null;
   score: number | null;
-  source: ("exact" | "text" | "prefix")[];
+  source: ("contained" | "exact" | "text" | "prefix")[];
 };
 
 function normalizeEntityLookupText(value: string) {
@@ -175,6 +177,80 @@ export async function searchClassifierEntities(
       alias: row.alias,
       score: 0.5,
       source: ["prefix"],
+    });
+  }
+
+  // Containment only widens retrieval; the length floor and low score keep it from implying identity.
+  const matchingAlias = sql<string | null>`(
+    array_agg(
+      ${entityAliases.name}
+      ORDER BY length(${normalizedSql(entityAliases.name)}) DESC, ${entityAliases.name}
+    ) FILTER (
+      WHERE length(${normalizedSql(entityAliases.name)}) >= 4
+        AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityAliases.name)} || '%'
+    )
+  )[1]`;
+  const matchingNameLength = sql<number>`CASE
+    WHEN length(${normalizedSql(entities.name)}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.name)} || '%'
+    THEN length(${normalizedSql(entities.name)})
+    ELSE 0
+  END`;
+  const matchingShortNameLength = sql<number>`CASE
+    WHEN length(${normalizedSql(entities.shortName)}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.shortName)} || '%'
+    THEN length(${normalizedSql(entities.shortName)})
+    ELSE 0
+  END`;
+  const matchingAliasLength = sql<number>`coalesce(max(CASE
+    WHEN length(${normalizedSql(entityAliases.name)}) >= 4
+      AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityAliases.name)} || '%'
+    THEN length(${normalizedSql(entityAliases.name)})
+    ELSE 0
+  END), 0)`;
+  const containedSpecificity = sql<number>`GREATEST(
+    ${matchingNameLength},
+    ${matchingShortNameLength},
+    ${matchingAliasLength}
+  )`;
+  const containedMatches = normalizedQuery
+    ? await db
+        .select({
+          entityId: entities.id,
+          name: entities.name,
+          shortName: entities.shortName,
+          type: entities.type,
+          alias: matchingAlias,
+          specificity: containedSpecificity,
+        })
+        .from(entities)
+        .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+        .where(
+          and(
+            args.type ? sql`${args.type} = ANY(${entities.type})` : undefined,
+            or(
+              sql`length(${normalizedSql(entities.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.name)} || '%'`,
+              sql`length(${normalizedSql(entities.shortName)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entities.shortName)} || '%'`,
+              sql`length(${normalizedSql(entityAliases.name)}) >= 4 AND ${normalizedQuery} LIKE '%' || ${normalizedSql(entityAliases.name)} || '%'`,
+            ),
+          ),
+        )
+        .groupBy(entities.id, entities.name, entities.shortName, entities.type)
+        .orderBy(sql`${containedSpecificity} DESC`, entities.name)
+        .limit(args.limit * CONTAINED_MATCH_FETCH_MULTIPLIER)
+    : [];
+
+  for (const row of containedMatches) {
+    const score =
+      0.25 + 0.2 * (Number(row.specificity) / normalizedQuery.length);
+    mergeResult(results, {
+      entityId: row.entityId,
+      name: row.name,
+      shortName: row.shortName,
+      type: row.type as ClassifierEntityResolution["type"],
+      alias: row.alias,
+      score,
+      source: ["contained"],
     });
   }
 

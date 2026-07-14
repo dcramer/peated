@@ -1,3 +1,4 @@
+import { bottleNameDuplicatesBrand } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
@@ -268,6 +269,12 @@ export async function createBottleInTransaction(
 
   if (!bottleData.name) {
     throw new BottleCreateBadRequestError("Invalid bottle name.");
+  }
+
+  if (bottleNameDuplicatesBrand(bottleData.name, bottleData.brand.name)) {
+    throw new BottleCreateBadRequestError(
+      "Bottle name must identify an expression distinct from the brand.",
+    );
   }
 
   const newAliases: string[] = [];

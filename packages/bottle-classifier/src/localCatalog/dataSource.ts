@@ -45,6 +45,14 @@ function includesSearchText(
   return normalizeSearchText(haystack).includes(normalizedNeedle);
 }
 
+function containedEntityScore(query: string, candidate: string) {
+  if (!candidate || !query.includes(candidate)) {
+    return 0.25;
+  }
+
+  return 0.25 + 0.2 * (candidate.length / query.length);
+}
+
 function getEntity(catalog: LocalCatalog, id: number | null | undefined) {
   return id == null
     ? null
@@ -436,22 +444,50 @@ function searchCatalogEntities(
         return false;
       }
 
+      const normalizedName = normalizeSearchText(entity.name);
+      const normalizedShortName = normalizeSearchText(entity.shortName);
       return (
-        normalizeSearchText(entity.name).includes(normalizedQuery) ||
-        normalizeSearchText(entity.shortName).includes(normalizedQuery)
+        normalizedName.includes(normalizedQuery) ||
+        normalizedShortName.includes(normalizedQuery) ||
+        (normalizedName.length >= 4 &&
+          normalizedQuery.includes(normalizedName)) ||
+        (normalizedShortName.length >= 4 &&
+          normalizedQuery.includes(normalizedShortName))
       );
     })
-    .map((entity) =>
-      EntityResolutionSchema.parse({
+    .map((entity) => {
+      const normalizedName = normalizeSearchText(entity.name);
+      const normalizedShortName = normalizeSearchText(entity.shortName);
+      const score =
+        normalizedName === normalizedQuery ||
+        normalizedShortName === normalizedQuery
+          ? 1
+          : normalizedName.includes(normalizedQuery) ||
+              normalizedShortName.includes(normalizedQuery)
+            ? 0.8
+            : Math.max(
+                containedEntityScore(normalizedQuery, normalizedName),
+                containedEntityScore(normalizedQuery, normalizedShortName),
+              );
+      const matchSource =
+        normalizedName === normalizedQuery ||
+        normalizedShortName === normalizedQuery
+          ? "exact"
+          : normalizedName.includes(normalizedQuery) ||
+              normalizedShortName.includes(normalizedQuery)
+            ? "text"
+            : "contained";
+
+      return EntityResolutionSchema.parse({
         entityId: entity.id,
         name: entity.name,
         shortName: entity.shortName,
         type: entity.type,
         alias: null,
-        score: normalizeSearchText(entity.name) === normalizedQuery ? 1 : 0.8,
-        source: ["local_catalog"],
-      }),
-    )
+        score,
+        source: ["local_catalog", matchSource],
+      });
+    })
     .sort((left, right) => {
       const scoreDelta = (right.score ?? 0) - (left.score ?? 0);
       if (scoreDelta !== 0) {

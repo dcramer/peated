@@ -30,6 +30,7 @@ import {
   inferBottleIdentityScope,
 } from "./exactCaskPolicy";
 import {
+  bottleNameDuplicatesBrand,
   normalizeBottle,
   normalizeString,
   stripDuplicateBrandPrefixFromBottleName,
@@ -2869,6 +2870,24 @@ function sanitizeClassifierDecision({
       });
     }
 
+    if (
+      bottleNameDuplicatesBrand(
+        normalizedDrafts.proposedBottle.name,
+        normalizedDrafts.proposedBottle.brand.name,
+      )
+    ) {
+      return createNoMatchDecision({
+        decision,
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded create_bottle because the proposed bottle name duplicates the brand instead of naming an expression.",
+        ),
+      });
+    }
+
     let proposedBottleDraft = normalizedDrafts.proposedBottle;
     const smwsAnchorDecision: BottleClassificationDecision = {
       ...decision,
@@ -3209,6 +3228,24 @@ function sanitizeClassifierDecision({
       });
     }
 
+    if (
+      bottleNameDuplicatesBrand(
+        normalizedDrafts.proposedBottle.name,
+        normalizedDrafts.proposedBottle.brand.name,
+      )
+    ) {
+      return createNoMatchDecision({
+        decision,
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded parent repair because the proposed bottle name duplicates the brand instead of naming an expression.",
+        ),
+      });
+    }
+
     const parentCandidate = getCreateReleaseParentCandidate({
       decision,
       artifacts,
@@ -3312,6 +3349,24 @@ function sanitizeClassifierDecision({
         rationale: appendRationale(
           decision.rationale,
           "Server downgraded bottle-and-release creation because the proposed bottle draft could not be normalized.",
+        ),
+      });
+    }
+
+    if (
+      bottleNameDuplicatesBrand(
+        normalizedDrafts.proposedBottle.name,
+        normalizedDrafts.proposedBottle.brand.name,
+      )
+    ) {
+      return createNoMatchDecision({
+        decision,
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded bottle-and-release creation because the proposed parent bottle name duplicates the brand instead of naming an expression.",
         ),
       });
     }
@@ -3555,6 +3610,24 @@ function sanitizeClassifierDecision({
         rationale: appendRationale(
           decision.rationale,
           "Server downgraded repair_bottle because the proposed bottle repair draft could not be normalized.",
+        ),
+      });
+    }
+
+    if (
+      bottleNameDuplicatesBrand(
+        normalizedDrafts.proposedBottle.name,
+        normalizedDrafts.proposedBottle.brand.name,
+      )
+    ) {
+      return createNoMatchDecision({
+        decision,
+        candidateBottleIds: filteredCandidateBottleIds,
+        observation,
+        identityScope: "product",
+        rationale: appendRationale(
+          decision.rationale,
+          "Server downgraded bottle repair because the proposed bottle name duplicates the brand instead of naming an expression.",
         ),
       });
     }

@@ -104,6 +104,27 @@ describe("POST /bottles", () => {
     });
   });
 
+  test("rejects a bottle name that duplicates its brand", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Duplicate Guard Brand" });
+
+    const err = await waitError(
+      routerClient.bottles.create(
+        {
+          name: "duplicate guard brand",
+          brand: brand.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Bottle name must identify an expression distinct from the brand.]`,
+    );
+  });
+
   test("creates a new bottle with all params", async ({
     defaults,
     fixtures,

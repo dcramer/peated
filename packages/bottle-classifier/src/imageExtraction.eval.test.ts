@@ -12,7 +12,12 @@ import {
 
 function imageFileToDataUrl(filename: string) {
   const ext = path.extname(filename).toLowerCase();
-  const mimeType = ext === ".png" ? "image/png" : "image/jpeg";
+  const mimeType =
+    ext === ".png"
+      ? "image/png"
+      : ext === ".webp"
+        ? "image/webp"
+        : "image/jpeg";
   const data = readFileSync(filename).toString("base64");
   return `data:${mimeType};base64,${data}`;
 }
