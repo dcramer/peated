@@ -709,6 +709,14 @@ export const EntityResolutionSchema = z.object({
   alias: z.string().nullable().default(null),
   score: z.number().nullable().default(null),
   source: z.array(z.string()).default([]),
+  retrievedFor: z
+    .array(
+      z.object({
+        query: z.string().min(1),
+        requestedType: EntityTypeEnum.nullable(),
+      }),
+    )
+    .optional(),
 });
 
 export const SearchEntitiesResultSchema = z.object({

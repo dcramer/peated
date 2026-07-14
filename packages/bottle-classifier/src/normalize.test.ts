@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  bottleNameDuplicatesBrand,
   normalizeBottle,
   normalizeBottleAge,
   normalizeBottleAliasKey,
@@ -126,6 +127,15 @@ describe("normalize", () => {
         "ardbeg",
       ),
     ).toBe("Traigh Bhan 19-year-old");
+  });
+
+  test("detects a bottle expression that only repeats its brand", () => {
+    expect(
+      bottleNameDuplicatesBrand("  Example   Brand ", "example brand"),
+    ).toBe(true);
+    expect(bottleNameDuplicatesBrand("8-year-old", "Example Brand")).toBe(
+      false,
+    );
   });
 
   test("normalizes simple metadata helpers", () => {

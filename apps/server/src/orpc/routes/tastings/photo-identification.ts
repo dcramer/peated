@@ -181,9 +181,19 @@ function serializePhotoIdentificationClassification(
         action: "create_bottle",
         proposedBottle: {
           name: decision.proposedBottle.name,
+          category: decision.proposedBottle.category,
+          statedAge: decision.proposedBottle.statedAge,
+          abv: decision.proposedBottle.abv,
+          vintageYear: decision.proposedBottle.vintageYear,
+          releaseYear: decision.proposedBottle.releaseYear,
           brand: {
+            id: decision.proposedBottle.brand.id,
             name: decision.proposedBottle.brand.name,
           },
+          distillers: decision.proposedBottle.distillers.map((distiller) => ({
+            id: distiller.id,
+            name: distiller.name,
+          })),
         },
       };
       break;
@@ -193,6 +203,10 @@ function serializePhotoIdentificationClassification(
         parentBottleId: decision.parentBottleId,
         proposedRelease: {
           edition: decision.proposedRelease.edition,
+          statedAge: decision.proposedRelease.statedAge,
+          abv: decision.proposedRelease.abv,
+          vintageYear: decision.proposedRelease.vintageYear,
+          releaseYear: decision.proposedRelease.releaseYear,
         },
       };
       break;
@@ -201,12 +215,26 @@ function serializePhotoIdentificationClassification(
         action: "create_bottle_and_release",
         proposedBottle: {
           name: decision.proposedBottle.name,
+          category: decision.proposedBottle.category,
+          statedAge: decision.proposedBottle.statedAge,
+          abv: decision.proposedBottle.abv,
+          vintageYear: decision.proposedBottle.vintageYear,
+          releaseYear: decision.proposedBottle.releaseYear,
           brand: {
+            id: decision.proposedBottle.brand.id,
             name: decision.proposedBottle.brand.name,
           },
+          distillers: decision.proposedBottle.distillers.map((distiller) => ({
+            id: distiller.id,
+            name: distiller.name,
+          })),
         },
         proposedRelease: {
           edition: decision.proposedRelease.edition,
+          statedAge: decision.proposedRelease.statedAge,
+          abv: decision.proposedRelease.abv,
+          vintageYear: decision.proposedRelease.vintageYear,
+          releaseYear: decision.proposedRelease.releaseYear,
         },
       };
       break;
@@ -216,12 +244,26 @@ function serializePhotoIdentificationClassification(
         parentBottleId: decision.parentBottleId,
         proposedBottle: {
           name: decision.proposedBottle.name,
+          category: decision.proposedBottle.category,
+          statedAge: decision.proposedBottle.statedAge,
+          abv: decision.proposedBottle.abv,
+          vintageYear: decision.proposedBottle.vintageYear,
+          releaseYear: decision.proposedBottle.releaseYear,
           brand: {
+            id: decision.proposedBottle.brand.id,
             name: decision.proposedBottle.brand.name,
           },
+          distillers: decision.proposedBottle.distillers.map((distiller) => ({
+            id: distiller.id,
+            name: distiller.name,
+          })),
         },
         proposedRelease: {
           edition: decision.proposedRelease.edition,
+          statedAge: decision.proposedRelease.statedAge,
+          abv: decision.proposedRelease.abv,
+          vintageYear: decision.proposedRelease.vintageYear,
+          releaseYear: decision.proposedRelease.releaseYear,
         },
       };
       break;

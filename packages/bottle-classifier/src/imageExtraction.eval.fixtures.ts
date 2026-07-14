@@ -45,6 +45,37 @@ const assetPath = (filename: string) => `${assetDir}/${filename}`;
 
 export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
   {
+    id: "image-extraction-watchpost-8-year-old",
+    name: "Watchpost 8-year-old American Blended Whiskey",
+    imagePath: assetPath("watchpost-8-year-old.webp"),
+    expected: {
+      fields: {
+        brand: "Watchpost",
+        expression: null,
+        category: "blend",
+        stated_age: null,
+        abv: 42.5,
+      },
+      distilleryIncludes: ["Westland"],
+    },
+  },
+  {
+    id: "image-extraction-mars-komagatake-2022-edition",
+    name: "Mars Komagatake 2022 Edition",
+    imagePath: assetPath("mars-komagatake-2022-edition.webp"),
+    expected: {
+      fields: {
+        brand: "Komagatake",
+        expression: null,
+        category: "single_malt",
+        abv: 50,
+        release_year: 2022,
+        edition: null,
+      },
+      distilleryIncludes: ["Shinshu"],
+    },
+  },
+  {
     id: "image-extraction-willett-family-estate-barrel-4769",
     name: "Willett Family Estate barrel 4769",
     imagePath: assetPath("willett-family-estate-barrel-4769.jpg"),

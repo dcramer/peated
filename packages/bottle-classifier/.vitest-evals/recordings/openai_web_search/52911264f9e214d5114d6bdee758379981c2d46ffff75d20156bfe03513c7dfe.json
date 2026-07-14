@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-13T04:13:04.843Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost whiskey Westland Distillery 42.5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost whiskey Westland Distillery 42.5",
+    "summary": "I found strong bottle-specific evidence for **Watchpost Whiskey by Westland Distillery**. Here’s the confirmed profile:\n\n- **Producer:** **Westland Distillery** (Seattle, Washington). Westland’s official product page explicitly presents Watchpost as a Westland release. ([westlanddistillery.com](https://westlanddistille",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/pages/flagship-info",
+        "url": "https://westlanddistillery.com/pages/flagship-info",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/blogs/news/winter-returns-a-whiskey-born-from-creative-freedom",
+        "url": "https://westlanddistillery.com/blogs/news/winter-returns-a-whiskey-born-from-creative-freedom",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.worldwhiskiesawards.com/winner-whisky/bronze-63702-world-whiskies-awards-2026",
+        "url": "https://www.worldwhiskiesawards.com/winner-whisky/bronze-63702-world-whiskies-awards-2026",
+        "domain": "worldwhiskiesawards.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "52911264f9e214d5114d6bdee758379981c2d46ffff75d20156bfe03513c7dfe",
+    "mode": "auto"
+  }
+}

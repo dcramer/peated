@@ -1,4 +1,5 @@
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
+import { CategoryEnum } from "@peated/server/schemas";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 
 export type PhotoIdentification = Outputs["tastings"]["photoIdentification"];
@@ -64,6 +65,20 @@ function getRawNumberFieldValue(
   return typeof value === "number" ? value : null;
 }
 
+function getFirstRawStringFieldValue(
+  result: PhotoIdentification | null,
+  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
+) {
+  const value = getRawFieldValue(result, field);
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    return (
+      value.find((item): item is string => typeof item === "string") ?? null
+    );
+  }
+  return null;
+}
+
 export function getSearchSeed(result: PhotoIdentification | null) {
   const brand = getFieldValue(result, "brand");
   const expression = getFieldValue(result, "expression");
@@ -73,8 +88,8 @@ export function getSearchSeed(result: PhotoIdentification | null) {
 export function getCreateNameSeed(result: PhotoIdentification | null) {
   const decision = getCreateDecisionLike(result);
   return (
-    getRawStringFieldValue(result, "expression") ??
     getProposedBottle(decision)?.name ??
+    getRawStringFieldValue(result, "expression") ??
     ""
   );
 }
@@ -86,19 +101,42 @@ export function getCreateBottlePrefill(
   const proposedBottle = getProposedBottle(decision);
   const proposedRelease = getProposedRelease(decision);
 
+  const category = CategoryEnum.safeParse(
+    proposedBottle?.category ?? getRawStringFieldValue(result, "category"),
+  );
+
   return {
+    brandId: proposedBottle?.brand.id ?? null,
     brandName:
-      getRawStringFieldValue(result, "brand") ??
       proposedBottle?.brand.name ??
+      getRawStringFieldValue(result, "brand") ??
       null,
-    statedAge: getRawNumberFieldValue(result, "statedAge"),
-    abv: getRawNumberFieldValue(result, "abv"),
+    category: category.success ? category.data : null,
+    distillerId: proposedBottle?.distillers[0]?.id ?? null,
+    distillerName:
+      proposedBottle?.distillers[0]?.name ??
+      getFirstRawStringFieldValue(result, "distillery") ??
+      null,
+    statedAge:
+      proposedBottle?.statedAge ??
+      proposedRelease?.statedAge ??
+      getRawNumberFieldValue(result, "statedAge"),
+    abv:
+      proposedBottle?.abv ??
+      proposedRelease?.abv ??
+      getRawNumberFieldValue(result, "abv"),
     edition:
-      getRawStringFieldValue(result, "edition") ??
       proposedRelease?.edition ??
+      getRawStringFieldValue(result, "edition") ??
       null,
-    vintageYear: getRawNumberFieldValue(result, "vintageYear"),
-    releaseYear: getRawNumberFieldValue(result, "releaseYear"),
+    vintageYear:
+      proposedBottle?.vintageYear ??
+      proposedRelease?.vintageYear ??
+      getRawNumberFieldValue(result, "vintageYear"),
+    releaseYear:
+      proposedBottle?.releaseYear ??
+      proposedRelease?.releaseYear ??
+      getRawNumberFieldValue(result, "releaseYear"),
   };
 }
 
@@ -188,6 +226,13 @@ function getCreateDecisionLike(result: PhotoIdentification | null) {
     default:
       return null;
   }
+}
+
+export function canUseManualBottleCreate(
+  result: PhotoIdentification | null,
+): boolean {
+  const decision = getCreateDecisionLike(result);
+  return !decision || decision.action === "create_bottle";
 }
 
 type CreateDecisionLike = NonNullable<ReturnType<typeof getCreateDecisionLike>>;

@@ -5,6 +5,7 @@ import BottleForm, {
   type BottleFormInitialData,
 } from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flash";
+import { parseCreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
@@ -19,28 +20,9 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { mergeCreateBottleInitialData } from "./createBottleInitialData";
 
 type ReturnAction = "addBottle" | "library" | "tasting" | "view";
-
-function parseDecimalParam(value: string | null, min: number, max: number) {
-  const trimmed = value?.trim();
-  if (!trimmed) return null;
-
-  const parsed = Number(trimmed);
-  return Number.isFinite(parsed) && parsed >= min && parsed <= max
-    ? parsed
-    : null;
-}
-
-function parseIntegerParam(value: string | null, min: number, max: number) {
-  const trimmed = value?.trim();
-  if (!trimmed) return null;
-
-  const parsed = Number(trimmed);
-  return Number.isInteger(parsed) && parsed >= min && parsed <= max
-    ? parsed
-    : null;
-}
 
 function getNameChoice(value: string | null) {
   const name = value?.trim();
@@ -79,25 +61,19 @@ function CreateBottleForm() {
   const pendingImageId = searchParams.get("pendingImageId")?.trim() || null;
   const pendingImageUrl = searchParams.get("pendingImageUrl") || null;
 
-  const distiller = searchParams.get("distiller") || null;
-  const brand = searchParams.get("brand") || null;
+  const prefill = parseCreateBottlePrefill(searchParams);
+  const distiller = prefill.distillerId ? String(prefill.distillerId) : null;
+  const distillerName = getNameChoice(prefill.distillerName ?? null);
+  const brand = prefill.brandId ? String(prefill.brandId) : null;
   const bottler = searchParams.get("bottler") || null;
   const series = searchParams.get("series") || null;
-  const brandName = getNameChoice(searchParams.get("brandName"));
-  const currentYear = new Date().getFullYear();
-  const statedAge = parseIntegerParam(searchParams.get("statedAge"), 0, 100);
-  const abv = parseDecimalParam(searchParams.get("abv"), 0, 100);
-  const edition = searchParams.get("edition")?.trim() || null;
-  const vintageYear = parseIntegerParam(
-    searchParams.get("vintageYear"),
-    1800,
-    currentYear,
-  );
-  const releaseYear = parseIntegerParam(
-    searchParams.get("releaseYear"),
-    1800,
-    currentYear,
-  );
+  const brandName = getNameChoice(prefill.brandName ?? null);
+  const statedAge = prefill.statedAge ?? null;
+  const abv = prefill.abv ?? null;
+  const edition = prefill.edition ?? null;
+  const vintageYear = prefill.vintageYear ?? null;
+  const releaseYear = prefill.releaseYear ?? null;
+  const category = prefill.category ?? null;
   const showBottleReleaseDetails = Boolean(
     edition || abv !== null || vintageYear !== null || releaseYear !== null,
   );
@@ -116,6 +92,8 @@ function CreateBottleForm() {
     name,
     ...(pendingImageUrl ? { imageUrl: pendingImageUrl } : {}),
     ...(brandName ? { brand: brandName } : {}),
+    ...(distillerName ? { distillers: [distillerName] } : {}),
+    ...(category ? { category } : {}),
     ...(statedAge !== null ? { statedAge } : {}),
     ...(abv !== null ? { abv } : {}),
     ...(edition ? { edition } : {}),
@@ -164,18 +142,17 @@ function CreateBottleForm() {
       (!proposalId || !proposalQuery.isLoading)
     ) {
       const proposalData = proposalQuery.data?.proposedBottle;
-      setInitialData((initialData) => ({
-        ...initialData,
-        ...(proposalData || {}),
-        name: proposalData?.name || initialData.name,
-        imageUrl: proposalQuery.data?.price.imageUrl || initialData.imageUrl,
-        distillers: distillerQuery.data
-          ? [distillerQuery.data]
-          : proposalData?.distillers || [],
-        brand: brandQuery.data || proposalData?.brand,
-        bottler: bottlerQuery.data || proposalData?.bottler,
-        series: seriesQuery.data || proposalData?.series,
-      }));
+      setInitialData((initialData) =>
+        mergeCreateBottleInitialData({
+          initialData,
+          proposalData,
+          proposalImageUrl: proposalQuery.data?.price.imageUrl,
+          distiller: distillerQuery.data,
+          brand: brandQuery.data,
+          bottler: bottlerQuery.data,
+          series: seriesQuery.data,
+        }),
+      );
       setLoading(false);
     }
   }, [

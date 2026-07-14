@@ -1,0 +1,13 @@
+{
+  "id": "johnnie-walker-black-label-family-brand",
+  "referenceName": "Black Label Islay Origin 12-year-old",
+  "expectedBottleName": "Johnnie Walker Black Label Islay Origin 12-year-old",
+  "summary": "Use direct product evidence and the other Black Label Origin siblings to resolve Black Label as an expression under Johnnie Walker, proving the family-to-brand correction is not specific to Mars Komagatake.",
+  "peatedBottleIds": [6127],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "id": "image-backed-photo-creates-mars-komagatake-2022-edition",
+  "name": "image-backed photo: creates Mars Komagatake parent and 2022 Edition release",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://fixtures.peated.invalid/photo-upload.webp",
+      "imageUrl": "https://fixtures.peated.invalid/photo-upload.webp"
+    },
+    "extractedIdentity": {
+      "brand": "Komagatake",
+      "bottler": null,
+      "expression": null,
+      "series": null,
+      "distillery": ["Mars Shinshu Distillery"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 50,
+      "release_year": 2022,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+      "https://api.peated.com/v1/bottles/44298",
+      "https://api.peated.com/v1/entities/1953",
+      "https://api.peated.com/v1/entities/238555"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/mars-komagatake-2022-edition.webp",
+    "dbOutcome": {
+      "bottleId": 44298,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Production add-bottle flow created bottle 44298 because no Mars Komagatake parent existed. The submitted draft used existing brand Mars (entity 1169) and distiller Shinshu (entity 238555), with expression Komagatake, category single malt, 50% ABV, release year 2022, and edition 2022 Edition flattened onto the bottle row."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 13160,
+        "field": "releaseYear",
+        "productionValue": 2020,
+        "evidenceValue": 2022,
+        "source": "production_search",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The nearby Mars Komagatake Limited Edition row is the 2020 annual bottling, not the photographed 2022 Edition."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 13331,
+        "field": "releaseYear",
+        "productionValue": 2019,
+        "evidenceValue": 2022,
+        "source": "production_search",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The nearby Mars Komagatake Limited Edition row is the 2019 annual bottling, not the photographed 2022 Edition."
+      }
+    ],
+    "notes": "The exact observed extraction is preserved above. At classification time no Mars Komagatake parent bottle existed, while Mars, Komagatake, and Shinshu already existed as entities. The label prints Mars Shinshu Distillery, and the official producer evidence supports reusing the existing Shinshu distiller candidate rather than creating a new entity from the longer printed form. Production entity 1953 separately identifies Komagatake as the current name for the same facility; this regression follows the reported create-flow expectation that the existing Shinshu candidate be selected. The checked-in label and official producer page establish Mars as the consumer brand, Komagatake as the stable expression, single malt as the category, and 2022 Edition as the annual bottling. Bottle 44298 is recorded only as the subsequent production outcome and is not present in the fixture catalog."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle_and_release",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Komagatake",
+      "brand": {
+        "id": 1169,
+        "name": "Mars"
+      },
+      "category": "single_malt"
+    },
+    "proposedBottleDistillerIdOneOf": [1953, 238555],
+    "proposedRelease": {
+      "edition": "2022 Edition",
+      "releaseYear": 2022,
+      "abv": 50
+    },
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create the missing Mars Komagatake parent with existing Mars and Shinshu entities, plus its 2022 Edition release."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1169,
+        "name": "Mars",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 1953,
+        "name": "Komagatake",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 238555,
+        "name": "Shinshu",
+        "type": ["distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 13160,
+        "name": "Komagatake Limited Edition",
+        "fullName": "Mars Komagatake Limited Edition",
+        "brandId": 1169,
+        "distillerIds": [1953],
+        "category": "single_malt",
+        "releaseYear": 2020
+      },
+      {
+        "id": 13331,
+        "name": "Komagatake Limited Edition",
+        "fullName": "Mars Komagatake Limited Edition",
+        "brandId": 1169,
+        "distillerIds": [1953],
+        "category": "single_malt",
+        "releaseYear": 2019
+      }
+    ],
+    "releases": [],
+    "aliases": []
+  }
+}

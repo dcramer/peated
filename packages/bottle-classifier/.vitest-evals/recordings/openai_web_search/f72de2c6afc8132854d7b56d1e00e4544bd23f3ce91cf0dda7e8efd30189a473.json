@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-14T00:43:39.075Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake 2022 limited edition 50% single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake 2022 limited edition 50% single malt",
+    "summary": "**Komagatake 2022 Limited Edition / Single Malt KOMAGATAKE 2022 Edition**\n\nConfirmed bottle details:\n\n- **Producer / bottler:** **Hombo Shuzo (Mars Whisky)**. ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/?utm_source=openai))\n- **Distillery:** **Mars Komagatake Distillery** i",
+    "results": [
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "url": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-ipa-cask-finish-bottled-in-2022/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-ipa-cask-finish-bottled-in-2022/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/2022/new-product/20220905-newproduct-whisky/",
+        "url": "https://www.hombo.co.jp/2022/new-product/20220905-newproduct-whisky/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2025/new-product/20250729-newproduct-whisky/",
+        "url": "https://www.hombo.co.jp/en/2025/new-product/20250729-newproduct-whisky/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f72de2c6afc8132854d7b56d1e00e4544bd23f3ce91cf0dda7e8efd30189a473",
+    "mode": "auto"
+  }
+}

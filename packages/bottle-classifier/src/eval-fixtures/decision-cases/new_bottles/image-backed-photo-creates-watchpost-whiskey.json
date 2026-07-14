@@ -1,0 +1,92 @@
+{
+  "id": "image-backed-photo-creates-watchpost-whiskey",
+  "name": "image-backed photo: creates Watchpost Whiskey with existing Westland distiller",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://fixtures.peated.invalid/photo-upload.webp",
+      "imageUrl": "https://fixtures.peated.invalid/photo-upload.webp"
+    },
+    "extractedIdentity": {
+      "brand": "Watchpost",
+      "bottler": null,
+      "expression": null,
+      "series": null,
+      "distillery": ["Westland Distillery Co."],
+      "category": "blend",
+      "stated_age": null,
+      "abv": 42.5,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+      "https://westlanddistillery.com/products/watchpost-whiskey",
+      "https://api.peated.com/v1/bottles/44299"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/watchpost-8-year-old.webp",
+    "dbOutcome": {
+      "bottleId": 44299,
+      "releaseId": null,
+      "createsBottle": true,
+      "createsRelease": false,
+      "summary": "Production add-bottle flow created Watchpost Watchpost with new brand Watchpost (entity 365682), category blend, stated age 8, 42.5% ABV, and new distiller Westland Distillery Co. (entity 365683) even though Westland Distillery (entity 1987) and Westland (entity 1481) already existed."
+    },
+    "notes": "The exact observed extraction is preserved above. At classification time the Watchpost brand and bottle did not exist, while Westland Distillery and Westland already existed as distiller candidates. Official Watchpost and Westland pages identify the product as Watchpost Whiskey, an American blended whiskey created by the Westland team at 42.5% ABV."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Whiskey",
+      "brand": {
+        "id": null,
+        "name": "Watchpost"
+      },
+      "distillers": [
+        {
+          "id": 1987,
+          "name": "Westland Distillery"
+        }
+      ],
+      "category": "blend",
+      "abv": 42.5
+    },
+    "proposedBottleNameExcludes": ["Watchpost"],
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create Watchpost Whiskey as a blend at 42.5% ABV and reuse the existing Westland Distillery entity candidate without adding web-only age metadata."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1987,
+        "name": "Westland Distillery",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 1481,
+        "name": "Westland",
+        "type": ["brand", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 11848,
+        "name": "Solum",
+        "fullName": "Westland Solum",
+        "brandId": 1481,
+        "distillerIds": [1987],
+        "category": "single_malt"
+      }
+    ],
+    "releases": [],
+    "aliases": []
+  }
+}

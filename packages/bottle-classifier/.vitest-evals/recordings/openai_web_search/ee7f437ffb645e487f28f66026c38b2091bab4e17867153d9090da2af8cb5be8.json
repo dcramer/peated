@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-14T00:38:04.799Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Black Label Islay Origin 12 year old whisky Johnnie Walker"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Black Label Islay Origin 12 year old whisky Johnnie Walker",
+    "summary": "You’re likely referring to **Johnnie Walker Black Label Islay Origin 12 Year Old**, a **blended Scotch whisky** from Johnnie Walker’s **Origin Series**. It is **12 years old**, like standard Black Label, but was released as an **Islay-focused edition** highlighting the smoky island style. Trade coverage says the Origin",
+    "results": [
+      {
+        "title": "https://www.johnniewalker.com/en-us/our-whisky/core-range/johnnie-walker-black-label",
+        "url": "https://www.johnniewalker.com/en-us/our-whisky/core-range/johnnie-walker-black-label",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/johnnie-walker-black-label-islay-origin",
+        "url": "https://distiller.com/spirits/johnnie-walker-black-label-islay-origin",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.wikipedia.org/wiki/Johnnie_Walker",
+        "url": "https://en.wikipedia.org/wiki/Johnnie_Walker",
+        "domain": "en.wikipedia.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://scotchwhisky.com/magazine/latest-news/26282/johnnie-walker-black-label-origin-unveiled/",
+        "url": "https://scotchwhisky.com/magazine/latest-news/26282/johnnie-walker-black-label-origin-unveiled/",
+        "domain": "scotchwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/80790/johnnie-walker-black-label-12-year-old-islay-origin",
+        "url": "https://www.thewhiskyexchange.com/p/80790/johnnie-walker-black-label-12-year-old-islay-origin",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/johnnie-walker-black-label-islay-origin-1.html?cHash=15d97288acd6a379256888ca669346ab&tx_datamintsflaschendb_pi4%",
+        "url": "https://www.whisky.com/whisky-database/details/johnnie-walker-black-label-islay-origin-1.html?cHash=15d97288acd6a379256888ca669346ab&tx_datamintsflaschendb_pi4%5BgeschmacksbeschreibungSearchCriteria%5D%5Bbewertung%5D=3&tx_datamintsflaschendb_pi4%5BsammlungReferer%5D=368797",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ee7f437ffb645e487f28f66026c38b2091bab4e17867153d9090da2af8cb5be8",
+    "mode": "auto"
+  }
+}

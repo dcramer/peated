@@ -174,5 +174,49 @@ describe("local catalog data source", () => {
         score: 1,
       }),
     ]);
+
+    await expect(
+      dataSource.searchEntities?.({
+        query: "North Shieldaig Distillery",
+        type: "brand",
+        limit: 5,
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        entityId: 3943,
+        name: "Shieldaig",
+        score: expect.any(Number),
+      }),
+    ]);
+  });
+
+  test("ranks more specific contained entity candidates first", async () => {
+    const dataSource = createLocalCatalogDataSource({
+      ...shieldaigCatalog,
+      entities: [
+        ...shieldaigCatalog.entities,
+        {
+          id: 5001,
+          name: "Northstar",
+          shortName: null,
+          type: ["distiller"],
+        },
+        {
+          id: 5002,
+          name: "Northstar Distillery",
+          shortName: null,
+          type: ["distiller"],
+        },
+      ],
+    });
+
+    const results = await dataSource.searchEntities?.({
+      query: "Northstar Distillery Co.",
+      type: "distiller",
+      limit: 5,
+    });
+
+    expect(results?.map((result) => result.entityId)).toEqual([5002, 5001]);
+    expect(results?.[0]?.score).toBeGreaterThan(results?.[1]?.score ?? 0);
   });
 });

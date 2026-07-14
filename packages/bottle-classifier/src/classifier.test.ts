@@ -1438,15 +1438,92 @@ describe("createBottleClassifier", () => {
           expect.objectContaining({
             name: "Bothan",
             type: ["brand"],
+            retrievedFor: [
+              {
+                query: "Bothan",
+                requestedType: "brand",
+              },
+            ],
           }),
           expect.objectContaining({
             name: "Alexander Murray & Co",
             type: ["bottler"],
+            retrievedFor: [
+              {
+                query: "Alexander Murray & Co",
+                requestedType: "bottler",
+              },
+            ],
           }),
         ]),
       }),
     );
     expect(result.status).toBe("classified");
+  });
+
+  test("bounds candidate-derived entity searches after source fields", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Source Brand",
+      bottler: null,
+      expression: "Expression",
+      series: null,
+      distillery: [],
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    };
+    const candidates = Array.from({ length: 20 }, (_, index) =>
+      buildBottleCandidate({
+        bottleId: 5000 + index,
+        brand: `Candidate Brand ${index}`,
+        fullName: `Candidate Brand ${index} Expression`,
+      }),
+    );
+    const searchEntities = vi.fn(async () => [] as EntityResolution[]);
+    const runBottleClassifierAgent = vi.fn(
+      async ({ resolvedEntities }): Promise<ReasoningResult> => ({
+        decision: {
+          action: "no_match",
+          rationale: "No candidate matched.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          proposedBottle: null,
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          candidates,
+          searchEvidence: [],
+          resolvedEntities: resolvedEntities ?? [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      searchBottles: vi.fn(async () => candidates),
+      searchEntities,
+      runBottleClassifierAgent,
+    });
+
+    await classifier.classifyBottleReference({
+      reference: { name: "Source Brand Expression Single Malt Whisky" },
+    });
+
+    expect(searchEntities).toHaveBeenCalledTimes(13);
+    expect(searchEntities).toHaveBeenCalledWith({
+      query: "Source Brand",
+      type: "brand",
+      limit: 5,
+    });
   });
 
   test("does not post-backfill web evidence for create decisions when the agent skipped search", async () => {

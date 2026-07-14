@@ -1,0 +1,13 @@
+{
+  "id": "makers-mark-bourbon-brand-only",
+  "referenceName": "Maker's Mark Kentucky Straight Bourbon Whisky",
+  "expectedBottleName": "Maker's Mark Kentucky Straight Bourbon Whisky",
+  "summary": "Use the source-supported Kentucky Straight Bourbon Whisky style as the bottle expression for Maker's Mark's brand-only core product instead of duplicating Maker's Mark as both brand and expression.",
+  "peatedBottleIds": [42937],
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "deterministicReleaseExpectation": "none",
+    "releaseIdentity": null
+  }
+}

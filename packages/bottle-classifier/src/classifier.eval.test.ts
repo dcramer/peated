@@ -11,6 +11,7 @@ import {
   type LiveClassifierEvalScenario,
 } from "./classifier.eval.scenarios";
 import {
+  collectInitialResolvedEntities,
   createBottleClassifier,
   finalizeBottleClassifierReasoningResult,
   prepareBottleClassifierAgentRun,
@@ -514,6 +515,22 @@ function evaluateDecisionShape(
     }
   }
 
+  if (expected.proposedBottleDistillerIdOneOf !== undefined) {
+    const selectedIds =
+      result.decision.proposedBottle?.distillers
+        .map((distiller) => distiller.id)
+        .filter((id): id is number => id !== null) ?? [];
+    if (
+      !expected.proposedBottleDistillerIdOneOf.some((id) =>
+        selectedIds.includes(id),
+      )
+    ) {
+      failures.push(
+        `proposedBottle.distillers expected an id in ${expected.proposedBottleDistillerIdOneOf.join(", ")}`,
+      );
+    }
+  }
+
   if (
     expected.proposedRelease !== undefined &&
     !deepContainsSubset(
@@ -755,12 +772,20 @@ async function prepareScenarioClassifierRun(
       )
     : undefined;
 
+  const resolvedEntities = await collectInitialResolvedEntities({
+    candidateExpansion: parsedInput.candidateExpansion,
+    extractedIdentity,
+    initialCandidates: artifacts.candidates,
+    options,
+  });
+
   const agentRun = await prepareBottleClassifierAgentRun(options, {
     reference: parsedInput.reference,
     extractedIdentity: artifacts.extractedIdentity,
     imageEvidence: artifacts.imageEvidence,
     initialCandidates: artifacts.candidates,
     candidateExpansion: parsedInput.candidateExpansion,
+    resolvedEntities,
   });
 
   return {
