@@ -3,6 +3,7 @@ import { db } from "../index";
 import {
   bottleAliases,
   bottleGroups,
+  bottleReleasePromotions,
   bottles,
   catalogTargets,
 } from "./bottles";
@@ -141,5 +142,47 @@ describe("BottleGroup and CatalogTarget constraints", () => {
     await expect(
       db.delete(bottles).where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_group_representative_membership_fk/);
+  });
+});
+
+describe("BottleRelease promotion constraints", () => {
+  test("allows multiple legacy releases to map to one promoted Bottle", async ({
+    fixtures,
+  }) => {
+    const promotedBottle = await fixtures.Bottle();
+    const firstRelease = await fixtures.BottleRelease({
+      bottleId: promotedBottle.id,
+    });
+    const secondRelease = await fixtures.BottleRelease({
+      bottleId: promotedBottle.id,
+    });
+
+    await db.insert(bottleReleasePromotions).values([
+      {
+        releaseId: firstRelease.id,
+        promotedBottleId: promotedBottle.id,
+        status: "promoted",
+        completedAt: new Date(),
+        createdByActorId: promotedBottle.createdByActorId,
+      },
+      {
+        releaseId: secondRelease.id,
+        promotedBottleId: promotedBottle.id,
+        status: "promoted",
+        completedAt: new Date(),
+        createdByActorId: promotedBottle.createdByActorId,
+      },
+    ]);
+
+    const otherPromotedBottle = await fixtures.Bottle();
+    await expect(
+      db.insert(bottleReleasePromotions).values({
+        releaseId: firstRelease.id,
+        promotedBottleId: otherPromotedBottle.id,
+        status: "promoted",
+        completedAt: new Date(),
+        createdByActorId: promotedBottle.createdByActorId,
+      }),
+    ).rejects.toThrow(/bottle_release_promotion_pkey/);
   });
 });

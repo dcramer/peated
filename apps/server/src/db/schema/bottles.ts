@@ -624,7 +624,10 @@ export const bottleReleasesRelations = relations(
 export type BottleRelease = typeof bottleReleases.$inferSelect;
 export type NewBottleRelease = typeof bottleReleases.$inferInsert;
 
-/** Retains the audited legacy-release mapping throughout compatibility. */
+/**
+ * Retains one audited mapping per legacy release throughout compatibility.
+ * Exact Bottle merges may make multiple legacy releases converge on one Bottle.
+ */
 export const bottleReleasePromotions = pgTable(
   "bottle_release_promotion",
   {
@@ -651,9 +654,7 @@ export const bottleReleasePromotions = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("bottle_release_promotion_bottle_unq").on(
-      table.promotedBottleId,
-    ),
+    index("bottle_release_promotion_bottle_idx").on(table.promotedBottleId),
     index("bottle_release_promotion_status_idx").on(table.status),
     index("bottle_release_promotion_created_by_actor_idx").on(
       table.createdByActorId,

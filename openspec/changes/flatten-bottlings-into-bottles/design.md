@@ -217,6 +217,8 @@ normal atomic fan-out path. The system does not infer that existing generic
 activity described the split expression.
 
 Bottle merge remains a distinct exact-duplicate operation. It merges two concrete Bottles and their exact targets; it does not imply that all other members of either group are duplicates.
+Every legacy release keeps its own promotion mapping, while audited exact
+Bottle merges may make multiple mappings converge on the surviving Bottle.
 
 ### Migration uses additive mappings and a shadow-read period
 
