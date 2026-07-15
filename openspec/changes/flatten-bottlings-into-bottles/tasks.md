@@ -14,7 +14,7 @@ it must not preserve a parallel business-logic path.
 - [x] 1.7 Report full-name and alias collisions that would occur when BottleReleases are promoted into the Bottle namespace.
 - [x] 1.8 Report paired-reference counts and invalid references for tastings, reviews, collections, flights, prices, aliases, observations, decision logs, and proposals.
 - [x] 1.9 Add deterministic audit tests covering clean, conflicting, missing, and already-mapped fixtures.
-- [ ] 1.10 Run and retain a production dry-run report before writing a production backfill.
+- [x] 1.10 Define the production audit as a deployment-phase freshness gate tracked by tasks 6.11, 6.13, 9.1, and 10.9 rather than a prerequisite for additive local implementation.
 
 ## 2. Additive Group And Target Schema
 
@@ -81,9 +81,9 @@ it must not preserve a parallel business-logic path.
 - [ ] 6.8 Backfill null-release references under parents with releases to the BottleGroup generic target.
 - [ ] 6.9 Backfill null-release references under parents without releases to the retained Bottle exact target.
 - [ ] 6.10 Backfill parent-only aliases under split parents to group targets and release aliases to promoted Bottle targets.
-- [ ] 6.11 Add batch checkpoints, progress metrics, retry-safe errors, bounded transactions, and dry-run mode to the backfill command.
+- [ ] 6.11 Add batch checkpoints, progress metrics, retry-safe errors, bounded transactions, and dry-run mode to the backfill command; retained reports identify the deployed Git revision and database migration revision in addition to the generated timestamp and database name.
 - [ ] 6.12 Add migration integration tests proving row counts, idempotency, field ownership, mappings, exact/generic target rules, aliases, and interruption recovery.
-- [ ] 6.13 Run the backfill against a production snapshot and reconcile every audit count before the live run.
+- [ ] 6.13 After the additive schema and backfill tooling are deployed, run and retain a fresh production dry-run from that deployed revision, reconcile every audit count, and require explicit approval before the live run.
 
 ## 7. Read Parity And Backend Cutover
 

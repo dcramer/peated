@@ -225,7 +225,16 @@ Backfill rules are deterministic:
 7. Parent-only aliases under a parent with releases become group aliases; release aliases become exact Bottle aliases.
 8. Parent rows replaced by promoted Bottles are retired only after every foreign key has moved. Old parent and nested release URLs resolve through target mappings and tombstones.
 
-Before promotion, a dry-run audit reports full-name/alias collisions, parent release-like fields alongside child releases, invalid parent/release pairs, missing creators, incompatible ages, and target counts by consumer table. Existing dirty-parent repair tooling must resolve or explicitly waive ambiguous parent data before destructive cleanup.
+The production audit is a deployment-phase freshness gate, not a prerequisite
+for additive local implementation. After the additive schema and backfill
+tooling are deployed, a dry run from that same deployed revision reports
+full-name/alias collisions, parent release-like fields alongside child releases,
+invalid parent/release pairs, missing creators, incompatible ages, and target
+counts by consumer table. The retained report identifies the Git revision,
+database migration revision, generation time, and database. Existing
+dirty-parent repair tooling must resolve or explicitly waive ambiguous parent
+data before live backfill writes, and the audit runs again at constraint
+cutover.
 
 ### Statistics count target data once
 
@@ -281,11 +290,11 @@ the implementation they covered.
 
 ## Migration Plan
 
-1. **Inventory and audit:** add read-only counts and integrity checks for all paired-reference tables, dirty parents, aliases, duplicate names, images, and legacy routes. Capture a production dry-run report.
+1. **Inventory and audit tooling:** add read-only counts and integrity checks for all paired-reference tables, dirty parents, aliases, duplicate names, images, and legacy routes. Validate the report contract locally without requiring production access.
 2. **Additive schema:** generate migrations for BottleGroup, Bottle membership, catalog targets, release-promotion mappings, group tombstones, and nullable `targetId` columns. Do not remove legacy columns.
 3. **Domain services:** implement atomic singleton creation, create-another-release, target loading, group merge/split, and idempotent aggregate recomputation with database-backed tests.
 4. **New-write cutover:** move Add Bottle, classifier creation, importers, proposals, and repair flows to create concrete Bottles and automatic groups. Keep legacy release routes as instrumented adapters.
-5. **Resumable backfill:** create groups/targets, promote releases, migrate aliases and content, and populate every consumer `targetId` according to the deterministic rules. Re-run safely until no work remains.
+5. **Resumable backfill:** after the additive schema and backfill tooling are deployed, run and retain the fresh production dry run from that revision and approve its counts before live writes. Then create groups/targets, promote releases, migrate aliases and content, and populate every consumer `targetId` according to the deterministic rules. Re-run safely until no work remains.
 6. **Parity period:** dual-read target and legacy references, assert serialized identity parity, compare exact/group counts, rebuild search indexes, and verify representative URLs and workflows.
 7. **Product cutover:** switch search, Bottle details, Library, tastings, reviews, prices, flights, activity, and moderation UI to Bottle/Group targets. Redirect old nested bottling routes.
 8. **Constraint cutover:** make required group/target columns non-null, reject new release writes, and remove paired-reference use from runtime code.
