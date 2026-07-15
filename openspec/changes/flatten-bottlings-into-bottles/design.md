@@ -40,7 +40,7 @@ BottleGroup (shared expression identity)
   -> Bottle (another concrete marketed release)
 ```
 
-BottleGroup owns the stable display identity needed for a generic target: group name, brand, bottler/distillers, category, series, stable stated age, aliases, representative Bottle, and aggregate statistics. Bottle owns its exact display name and release facts: edition, release/vintage year, release-specific age, ABV, single-cask/cask-strength flags, cask traits, exact image/content, aliases, and exact statistics.
+BottleGroup owns the stable display identity needed for a generic target: group name, brand, bottler/distillers, category, series, flavor profile, stable stated age, aliases, representative Bottle, and aggregate statistics. Bottle owns its exact display name and release facts: edition, release/vintage year, release-specific age, ABV, single-cask/cask-strength flags, cask traits, exact image/content, aliases, and exact statistics.
 
 Every Bottle has a non-null `groupId`. A BottleGroup must have at least one active Bottle after a transaction completes. User-facing pages may call a group “this expression” or “all releases”; ordinary users do not create a BottleGroup directly.
 
@@ -159,7 +159,9 @@ must have an explicit removal task:
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
 - release-only search/indexing: task 7.5;
 - nested Bottling UI: task 8.9;
-- remaining runtime/storage references: tasks 9.6, 9.7, and 9.9.
+- non-authoritative Bottle stable-field mirrors: task 9.9;
+- remaining runtime/storage references and the final zero-legacy audit: tasks 9.6,
+  9.7, and 9.10.
 
 At the end of each implementation slice, rerun the inventory and remove any
 superseded code that is not required by one of those measured compatibility
@@ -187,7 +189,7 @@ the implementation they covered.
 6. **Parity period:** dual-read target and legacy references, assert serialized identity parity, compare exact/group counts, rebuild search indexes, and verify representative URLs and workflows.
 7. **Product cutover:** switch search, Bottle details, Library, tastings, reviews, prices, flights, activity, and moderation UI to Bottle/Group targets. Redirect old nested bottling routes.
 8. **Constraint cutover:** make required group/target columns non-null, reject new release writes, and remove paired-reference use from runtime code.
-9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing `releaseId` columns and `bottle_release`; remove release routes, serializers, jobs, form pages, and legacy repair code; update architecture documentation.
+9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing `releaseId` columns and `bottle_release`; remove release routes, serializers, jobs, form pages, legacy repair code, and non-authoritative Bottle stable-field mirrors; then run the final zero-legacy audit and update architecture documentation.
 
 Rollback remains straightforward through the parity period: disable new-write cutover, read legacy columns, and retain additive records. After destructive cleanup, rollback requires restoring the pre-cleanup database snapshot or applying a forward repair, so cleanup ships separately with an explicit backup and verification checkpoint.
 

@@ -122,6 +122,12 @@ Classifier, price matching, and moderation routes:
 
 Catalog identity, aliases, search, and creation:
 
+- `apps/server/src/lib/createBottle.ts` owns the shared Bottle preparation and
+  persistence core plus the complete legacy and concrete transaction
+  operations. The legacy operation retains stable Bottle columns and distiller
+  joins until the task 9.9 compatibility-mirror cleanup.
+- `apps/server/src/lib/createConcreteBottle.ts` owns the runtime-validated
+  concrete creation service boundary used by future public adapters.
 - `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
   reader/writer from tasks 3.2/3.7; retain it through the task 9.5 read window
   and remove its legacy branch under task 9.7.

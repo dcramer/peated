@@ -42,11 +42,11 @@ it must not preserve a parallel business-logic path.
 
 ## 4. Automatic Bottle And Group Domain Services
 
-- [ ] 4.1 Implement transactional independent Bottle creation that creates a singleton group, generic target, Bottle, exact target, aliases, and change records atomically.
-- [ ] 4.2 Implement “create another release” using a trusted source Bottle to reuse its group while creating only a new Bottle and exact target.
-- [ ] 4.3 Prevent arbitrary client-supplied group ids from bypassing trusted group-reuse authorization.
-- [ ] 4.4 Apply exact duplicate detection to Bottle identity while returning likely group matches as non-blocking suggestions.
-- [ ] 4.5 Keep catalog verification, indexing, and other slow post-save work idempotent and outside the committed request path.
+- [x] 4.1 Implement transactional independent Bottle creation that creates a singleton group, generic target, Bottle, exact target, aliases, and change records atomically.
+- [x] 4.2 Implement “create another release” using a trusted source Bottle to reuse its group while creating only a new Bottle and exact target.
+- [x] 4.3 Prevent arbitrary client-supplied group ids from bypassing trusted group-reuse authorization.
+- [x] 4.4 Apply exact duplicate detection to Bottle identity while returning likely group matches as non-blocking suggestions.
+- [x] 4.5 Keep catalog verification, indexing, and other slow post-save work idempotent and outside the committed request path.
 - [ ] 4.6 Implement Bottle updates with clear stable-group versus exact-Bottle field ownership and moderator authorization.
 - [ ] 4.7 Implement an audited group merge transaction that moves member Bottles, generic targets, aliases, and activity while preserving exact ids.
 - [ ] 4.8 Implement an audited group split transaction that moves selected Bottles and keeps ambiguous generic activity on the source group by default.
@@ -123,7 +123,8 @@ it must not preserve a parallel business-logic path.
 - [ ] 9.6 Remove `releaseId` columns, release foreign keys/indexes, and `bottle_release` using a generated Drizzle migration only after backup approval.
 - [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, repair paths, enums, and compatibility branches.
 - [ ] 9.8 Remove retired legacy parent Bottle rows only after every reference and URL has a durable group or Bottle mapping.
-- [ ] 9.9 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings.
+- [ ] 9.9 Remove non-authoritative stable-field columns and distiller joins from the Bottle schema and writes with a generated migration after all readers and callers hydrate those fields from BottleGroup.
+- [ ] 9.10 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings.
 
 ## 10. Documentation And Final Verification
 

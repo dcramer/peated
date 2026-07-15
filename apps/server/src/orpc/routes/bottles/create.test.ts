@@ -22,7 +22,6 @@ const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
   pushUniqueJob: vi.fn(),
 }));
 
@@ -95,9 +94,13 @@ describe("POST /bottles", () => {
       .from(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(0);
-    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: bottle.id,
     });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      { name: bottle.fullName },
+    );
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
       bottleId: bottle.id,
       creationSource: "manual_entry",
@@ -266,7 +269,7 @@ describe("POST /bottles", () => {
     expect(brand.createdByActorId).toBe((await getUserActor(defaults.user)).id);
     expect(brand.countryId).toEqual(country.id);
     expect(brand.regionId).toEqual(region.id);
-    expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: brand.id,
     });
     expect(queueEntityCreationVerificationMock).toHaveBeenCalledWith({
@@ -858,6 +861,10 @@ describe("POST /bottles", () => {
     expect(change).toBeDefined();
     expect(change.type).toEqual("add");
     expect(change.displayName).toEqual(`${brand.name} Limited Edition`);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSeriesSearchVectors",
+      { seriesId: newSeries.id },
+    );
   });
 
   test("rejects invalid series ID", async ({ defaults, fixtures }) => {

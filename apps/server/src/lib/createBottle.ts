@@ -1,13 +1,36 @@
-import { bottleNameDuplicatesBrand } from "@peated/bottle-classifier/normalize";
+/**
+ * Shares preparation and persistence across complete legacy and concrete Bottle
+ * transactions; no partial operation is exported. Concrete stable-field and
+ * distiller mirrors remain for legacy readers until task 9.9.
+ */
+import {
+  bottleNameDuplicatesBrand,
+  normalizeBottleAge,
+  normalizeBottleAliasKey,
+  stripDuplicateBrandPrefixFromBottleName,
+} from "@peated/bottle-classifier/normalize";
+import { formatCanonicalReleaseName } from "@peated/bottle-classifier/releaseIdentity";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
-import type { Bottle, Entity, NewBottle, User } from "@peated/server/db/schema";
+import type {
+  Bottle,
+  BottleGroup,
+  CatalogTarget,
+  Entity,
+  NewBottle,
+  User,
+} from "@peated/server/db/schema";
 import {
   bottleAliases,
+  bottleGroupDistillers,
+  bottleGroups,
+  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottlesToDistillers,
+  bottleTombstones,
+  catalogTargets,
   changes,
   entities,
 } from "@peated/server/db/schema";
@@ -24,17 +47,19 @@ import {
 } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
+import { toTitleCase } from "@peated/server/lib/strings";
 import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
-import { pushJob } from "@peated/server/worker/client";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { pushUniqueJob } from "@peated/server/worker/client";
+import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
 import { getUserActor } from "./actors";
+import type { ConcreteBottleCreateInput } from "./createConcreteBottle";
 
 export class BottleCreateBadRequestError extends Error {
   constructor(message: string) {
@@ -56,6 +81,96 @@ export type CreateBottleResult = {
   newEntityIds: number[];
   seriesCreated: boolean;
 };
+
+type PreparedBottleCreate = {
+  aliasName: string;
+  bottleInsertData: NewBottle;
+  creationSource: CatalogVerificationCreationSource;
+  createdByActorId: number;
+  distillerIds: number[];
+  newEntityIds: number[];
+  seriesCreated: boolean;
+  stableFullName: string;
+  stableName: string;
+};
+
+type ConcreteIdentityPreparation = {
+  exactNormalizedFields: Pick<
+    ConcreteBottleCreateInput["exact"],
+    "statedAge" | "vintageYear" | "releaseYear" | "singleCask" | "caskStrength"
+  >;
+  stableBase:
+    | { kind: "independent"; name: string }
+    | { kind: "trusted"; fullName: string; name: string };
+  stableStatedAge: number | null;
+};
+
+/** Concrete aliases include exact cask traits without changing legacy release display. */
+function formatConcreteCaskIdentity({
+  fullName,
+  name,
+  caskType,
+  caskSize,
+  caskFill,
+}: {
+  fullName: string;
+  name: string;
+  caskType: string | null | undefined;
+  caskSize: string | null | undefined;
+  caskFill: string | null | undefined;
+}) {
+  const caskBits = [
+    caskType ? `${toTitleCase(caskType)} Cask` : null,
+    caskSize ? toTitleCase(caskSize) : null,
+    caskFill
+      ? caskFill === "other"
+        ? "Other Fill"
+        : toTitleCase(caskFill)
+      : null,
+  ].filter((value): value is string => value !== null);
+
+  if (!caskBits.length) {
+    return { fullName, name };
+  }
+
+  return {
+    fullName: [fullName, ...caskBits].join(" - "),
+    name: [name, ...caskBits].join(" - "),
+  };
+}
+
+type IndependentConcreteBottleCreateInput = Extract<
+  ConcreteBottleCreateInput,
+  { kind: "independent" }
+>;
+type StableBottleGroupInput = IndependentConcreteBottleCreateInput["stable"];
+
+export type LikelyBottleGroupSuggestion = Pick<
+  BottleGroup,
+  "id" | "name" | "fullName"
+>;
+
+export type ConcreteBottleCreateResult = CreateBottleResult & {
+  group: BottleGroup;
+  genericTarget: CatalogTarget;
+  exactTarget: CatalogTarget;
+  likelyGroups: LikelyBottleGroupSuggestion[];
+};
+
+export type TrustedSourceBottleErrorCode =
+  | "not_found"
+  | "retired"
+  | "invalid_catalog_graph";
+
+export class TrustedSourceBottleError extends Error {
+  constructor(
+    readonly code: TrustedSourceBottleErrorCode,
+    readonly sourceBottleId: number,
+  ) {
+    super(`Cannot reuse Bottle ${sourceBottleId}: ${code}.`);
+    this.name = "TrustedSourceBottleError";
+  }
+}
 
 type SmwsEntityName = {
   name: string;
@@ -237,28 +352,31 @@ async function findExistingSmwsBottleIdForCreate(
   return rows.find((row) => rowHasSmwsCode(row, code))?.bottleId ?? null;
 }
 
-/**
- * Creates all bottle-owned rows under a required actor id for write
- * attribution. Callers must resolve the actor before entering this helper.
- */
-export async function createBottleInTransaction(
+/** Writes prerequisites and reserves the alias for same-transaction Bottle insertion. */
+async function prepareBottleCreateInTransaction(
   tx: AnyTransaction,
   {
     creationSource = "manual_entry",
+    concreteIdentity,
     createdByActorId,
     input,
     context,
   }: {
     creationSource?: CatalogVerificationCreationSource;
+    concreteIdentity?: ConcreteIdentityPreparation;
     createdByActorId: number;
     input: z.infer<typeof BottleInputSchema>;
     context: Context & { user: User };
   },
-): Promise<CreateBottleResult> {
+): Promise<PreparedBottleCreate> {
   const user = context.user;
   const actorId = createdByActorId;
   const bottleData: BottlePreviewResult & Record<string, any> =
     await bottleNormalize({ input, context, entityDb: tx });
+  if (concreteIdentity) {
+    // Explicit exact input overrides traits inferred from the stable name.
+    Object.assign(bottleData, concreteIdentity.exactNormalizedFields);
+  }
 
   if (input.description !== undefined) {
     bottleData.description = input.description;
@@ -267,17 +385,24 @@ export async function createBottleInTransaction(
       (input.description && input.description !== null ? "user" : null);
   }
 
-  if (!bottleData.name) {
+  const stableName =
+    concreteIdentity?.stableBase.kind === "trusted"
+      ? concreteIdentity.stableBase.name
+      : stripDuplicateBrandPrefixFromBottleName(
+          concreteIdentity?.stableBase.name ?? bottleData.name,
+          bottleData.brand.name,
+        );
+
+  if (!stableName) {
     throw new BottleCreateBadRequestError("Invalid bottle name.");
   }
 
-  if (bottleNameDuplicatesBrand(bottleData.name, bottleData.brand.name)) {
+  if (bottleNameDuplicatesBrand(stableName, bottleData.brand.name)) {
     throw new BottleCreateBadRequestError(
       "Bottle name must identify an expression distinct from the brand.",
     );
   }
 
-  const newAliases: string[] = [];
   const newEntityIds: Set<number> = new Set();
   let seriesCreated = false;
 
@@ -366,13 +491,51 @@ export async function createBottleInTransaction(
     }
   }
 
-  const fullName = formatBottleName({
-    ...bottleData,
-    name: `${brand.shortName || brand.name} ${bottleData.name}`,
-  });
+  const stableFullName =
+    (concreteIdentity?.stableBase.kind === "trusted"
+      ? concreteIdentity.stableBase.fullName
+      : null) ??
+    formatBottleName({
+      name: `${brand.shortName || brand.name} ${stableName}`,
+    });
+  const concreteName = concreteIdentity
+    ? formatConcreteCaskIdentity({
+        ...formatCanonicalReleaseName({
+          bottleName: stableName,
+          bottleFullName: stableFullName,
+          bottleReleaseTraits: {
+            caskStrength: bottleData.caskStrength ?? null,
+            singleCask: bottleData.singleCask ?? null,
+          },
+          bottleStatedAge: concreteIdentity.stableStatedAge,
+          release: {
+            edition: bottleData.edition ?? null,
+            statedAge: bottleData.statedAge ?? null,
+            releaseYear: bottleData.releaseYear ?? null,
+            vintageYear: bottleData.vintageYear ?? null,
+            abv: bottleData.abv ?? null,
+            singleCask: bottleData.singleCask ?? null,
+            caskStrength: bottleData.caskStrength ?? null,
+            caskType: bottleData.caskType ?? null,
+            caskSize: bottleData.caskSize ?? null,
+            caskFill: bottleData.caskFill ?? null,
+          },
+        }),
+        caskType: bottleData.caskType,
+        caskSize: bottleData.caskSize,
+        caskFill: bottleData.caskFill,
+      })
+    : null;
+  const fullName =
+    concreteName?.fullName ??
+    formatBottleName({
+      ...bottleData,
+      name: `${brand.shortName || brand.name} ${bottleData.name}`,
+    });
 
   const bottleInsertData: NewBottle = {
     ...bottleData,
+    name: concreteName?.name ?? bottleData.name,
     brandId: brand.id,
     bottlerId: bottler?.id || null,
     seriesId,
@@ -393,9 +556,41 @@ export async function createBottleInTransaction(
     throw new BottleAlreadyExistsError(alias.bottleId);
   }
 
+  return {
+    aliasName: alias.name,
+    bottleInsertData,
+    creationSource,
+    createdByActorId: actorId,
+    distillerIds,
+    newEntityIds: Array.from(newEntityIds),
+    seriesCreated,
+    stableFullName,
+    stableName,
+  };
+}
+
+/**
+ * Persists Bottle and audit rows plus temporary legacy-reader mirrors inside a
+ * complete transaction.
+ */
+async function insertPreparedBottleInTransaction(
+  tx: AnyTransaction,
+  prepared: PreparedBottleCreate,
+  { groupId = null }: { groupId?: number | null } = {},
+): Promise<CreateBottleResult> {
+  const {
+    aliasName,
+    bottleInsertData,
+    creationSource,
+    createdByActorId,
+    distillerIds,
+    newEntityIds,
+    seriesCreated,
+  } = prepared;
+
   const [bottle] = await tx
     .insert(bottles)
-    .values(bottleInsertData)
+    .values({ ...bottleInsertData, groupId })
     .returning();
 
   const [newAlias] = await tx
@@ -403,18 +598,18 @@ export async function createBottleInTransaction(
     .set({
       bottleId: bottle.id,
       assignmentSource: "canonical",
-      assignedByActorId: actorId,
+      assignedByActorId: createdByActorId,
     })
     .where(
       and(
-        eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
+        eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()),
         isNull(bottleAliases.bottleId),
       ),
     )
     .returning();
 
   if (!newAlias) {
-    const existingBottleId = await getExistingBottleIdForAlias(tx, alias.name);
+    const existingBottleId = await getExistingBottleIdForAlias(tx, aliasName);
     if (existingBottleId && existingBottleId !== bottle.id) {
       throw new BottleAlreadyExistsError(existingBottleId);
     }
@@ -425,14 +620,12 @@ export async function createBottleInTransaction(
     throw new BottleAlreadyExistsError(newAlias.bottleId);
   }
 
-  newAliases.push(alias.name);
-
   const promises: Promise<any>[] = [
     tx.insert(changes).values({
       objectType: "bottle",
       objectId: bottle.id,
       createdAt: bottle.createdAt,
-      actorId,
+      actorId: createdByActorId,
       displayName: bottle.fullName,
       type: "add",
       data: {
@@ -457,12 +650,361 @@ export async function createBottleInTransaction(
 
   return {
     bottle,
-    newAliases,
-    newEntityIds: Array.from(newEntityIds),
+    newAliases: [aliasName],
+    newEntityIds,
     seriesCreated,
   };
 }
 
+/**
+ * Creates all bottle-owned rows under a required actor id for write
+ * attribution. Callers must resolve the actor before entering this helper.
+ */
+export async function createBottleInTransaction(
+  tx: AnyTransaction,
+  args: {
+    creationSource?: CatalogVerificationCreationSource;
+    createdByActorId: number;
+    input: z.infer<typeof BottleInputSchema>;
+    context: Context & { user: User };
+  },
+): Promise<CreateBottleResult> {
+  const prepared = await prepareBottleCreateInTransaction(tx, args);
+  return await insertPreparedBottleInTransaction(tx, prepared);
+}
+
+type TrustedGroupContext = {
+  group: BottleGroup;
+  genericTarget: CatalogTarget;
+  distillerIds: number[];
+};
+
+/** Locks the trusted member and returns only a complete active group graph. */
+async function loadTrustedGroupContext(
+  tx: AnyTransaction,
+  sourceBottleId: number,
+): Promise<TrustedGroupContext> {
+  const [sourceBottle] = await tx
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, sourceBottleId))
+    .for("update");
+
+  if (!sourceBottle) {
+    throw new TrustedSourceBottleError("not_found", sourceBottleId);
+  }
+
+  const retiredBottle = await tx.query.bottleTombstones.findFirst({
+    where: eq(bottleTombstones.bottleId, sourceBottleId),
+    columns: { bottleId: true },
+  });
+  if (retiredBottle) {
+    throw new TrustedSourceBottleError("retired", sourceBottleId);
+  }
+
+  if (!sourceBottle.groupId) {
+    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
+  }
+
+  const [group] = await tx
+    .select()
+    .from(bottleGroups)
+    .where(eq(bottleGroups.id, sourceBottle.groupId))
+    .for("update");
+
+  const retiredGroup = await tx.query.bottleGroupTombstones.findFirst({
+    where: eq(bottleGroupTombstones.groupId, sourceBottle.groupId),
+    columns: { groupId: true },
+  });
+  if (retiredGroup) {
+    throw new TrustedSourceBottleError("retired", sourceBottleId);
+  }
+
+  const targets = await tx
+    .select()
+    .from(catalogTargets)
+    .where(eq(catalogTargets.groupId, sourceBottle.groupId));
+  const genericTarget = targets.find((target) => target.bottleId === null);
+  const sourceExactTarget = targets.find(
+    (target) => target.bottleId === sourceBottleId,
+  );
+
+  if (!genericTarget || !sourceExactTarget) {
+    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
+  }
+
+  const distillers = await tx
+    .select({ distillerId: bottleGroupDistillers.distillerId })
+    .from(bottleGroupDistillers)
+    .where(eq(bottleGroupDistillers.groupId, sourceBottle.groupId))
+    .orderBy(asc(bottleGroupDistillers.distillerId));
+
+  return {
+    group: group!,
+    genericTarget,
+    distillerIds: distillers.map(({ distillerId }) => distillerId),
+  };
+}
+
+async function findLikelyGroups(
+  tx: AnyTransaction,
+  { brandId, name }: { brandId: number; name: string },
+): Promise<LikelyBottleGroupSuggestion[]> {
+  return await tx
+    .select({
+      id: bottleGroups.id,
+      name: bottleGroups.name,
+      fullName: bottleGroups.fullName,
+    })
+    .from(bottleGroups)
+    .leftJoin(
+      bottleGroupTombstones,
+      eq(bottleGroupTombstones.groupId, bottleGroups.id),
+    )
+    .where(
+      and(
+        eq(bottleGroups.brandId, brandId),
+        eq(sql`LOWER(${bottleGroups.name})`, name.toLowerCase()),
+        isNull(bottleGroupTombstones.groupId),
+      ),
+    )
+    .orderBy(asc(bottleGroups.id))
+    .limit(5);
+}
+
+function buildConcreteBottleInput(
+  stable: StableBottleGroupInput,
+  exact: ConcreteBottleCreateInput["exact"],
+): z.infer<typeof BottleInputSchema> {
+  const input: z.infer<typeof BottleInputSchema> = {
+    name: stable.name,
+    imageUrl: null,
+    brand: stable.brand,
+    distillers: stable.distillers,
+    bottler: stable.bottler,
+    series: stable.series,
+    category: stable.category,
+    flavorProfile: stable.flavorProfile,
+    ...exact,
+  };
+  return input;
+}
+
+function buildTrustedStableInput(
+  group: BottleGroup,
+  distillerIds: number[],
+): StableBottleGroupInput {
+  return {
+    name: group.name,
+    statedAge: group.statedAge,
+    series: group.seriesId,
+    category: group.category,
+    brand: group.brandId,
+    distillers: distillerIds,
+    bottler: group.bottlerId,
+    flavorProfile: group.flavorProfile,
+  };
+}
+
+/** Creates the group-owned rows inside the complete independent operation. */
+async function createIndependentGroupPrefix(
+  tx: AnyTransaction,
+  {
+    actorId,
+    stable,
+    stableFullName,
+    stableName,
+    brandId,
+    bottlerId,
+    seriesId,
+    category,
+    flavorProfile,
+    distillerIds,
+  }: {
+    actorId: number;
+    stable: StableBottleGroupInput;
+    stableFullName: string;
+    stableName: string;
+    brandId: number;
+    bottlerId: number | null;
+    seriesId: number | null;
+    category: (typeof bottleGroups.$inferInsert)["category"];
+    flavorProfile: (typeof bottleGroups.$inferInsert)["flavorProfile"];
+    distillerIds: number[];
+  },
+) {
+  const [group] = await tx
+    .insert(bottleGroups)
+    .values({
+      fullName: stableFullName,
+      name: stableName,
+      statedAge: stable.statedAge,
+      seriesId,
+      category,
+      brandId,
+      bottlerId,
+      flavorProfile,
+      totalBottles: 1,
+      createdByActorId: actorId,
+    })
+    .returning();
+
+  if (distillerIds.length) {
+    await tx.insert(bottleGroupDistillers).values(
+      distillerIds.map((distillerId) => ({
+        groupId: group.id,
+        distillerId,
+      })),
+    );
+  }
+
+  const [genericTarget] = await tx
+    .insert(catalogTargets)
+    .values({ groupId: group.id })
+    .returning();
+
+  return { group, genericTarget };
+}
+
+/**
+ * Owns the complete concrete Bottle graph transaction. Independent creation
+ * always makes a singleton; trusted reuse derives authority from a source Bottle.
+ */
+export async function createConcreteBottleInTransaction(
+  tx: AnyTransaction,
+  {
+    creationSource = "manual_entry",
+    createdByActorId,
+    input,
+    context,
+  }: {
+    creationSource?: CatalogVerificationCreationSource;
+    createdByActorId: number;
+    input: ConcreteBottleCreateInput;
+    context: Context & { user: User };
+  },
+): Promise<ConcreteBottleCreateResult> {
+  const trustedContext =
+    input.kind === "source_bottle"
+      ? await loadTrustedGroupContext(tx, input.sourceBottleId)
+      : null;
+  const stableInput =
+    input.kind === "source_bottle"
+      ? buildTrustedStableInput(
+          trustedContext!.group,
+          trustedContext!.distillerIds,
+        )
+      : input.stable;
+  const normalizedStable = trustedContext
+    ? null
+    : normalizeBottleAge({
+        name: normalizeBottleAliasKey(stableInput.name),
+        statedAge: stableInput.statedAge,
+      });
+  const stable = normalizedStable
+    ? { ...stableInput, ...normalizedStable }
+    : stableInput;
+  const prepared = await prepareBottleCreateInTransaction(tx, {
+    creationSource,
+    concreteIdentity: {
+      exactNormalizedFields: {
+        statedAge: input.exact.statedAge,
+        vintageYear: input.exact.vintageYear,
+        releaseYear: input.exact.releaseYear,
+        singleCask: input.exact.singleCask,
+        caskStrength: input.exact.caskStrength,
+      },
+      stableBase: trustedContext
+        ? {
+            kind: "trusted",
+            fullName: trustedContext.group.fullName,
+            name: trustedContext.group.name,
+          }
+        : { kind: "independent", name: stable.name },
+      stableStatedAge: stable.statedAge,
+    },
+    createdByActorId,
+    input: buildConcreteBottleInput(stable, input.exact),
+    context,
+  });
+
+  const likelyGroups = trustedContext
+    ? []
+    : await findLikelyGroups(tx, {
+        brandId: prepared.bottleInsertData.brandId,
+        name: prepared.stableName,
+      });
+
+  const independentGraph = trustedContext
+    ? null
+    : await createIndependentGroupPrefix(tx, {
+        actorId: createdByActorId,
+        stable,
+        stableFullName: prepared.stableFullName,
+        stableName: prepared.stableName,
+        brandId: prepared.bottleInsertData.brandId,
+        bottlerId: prepared.bottleInsertData.bottlerId ?? null,
+        seriesId: prepared.bottleInsertData.seriesId ?? null,
+        category: prepared.bottleInsertData.category,
+        flavorProfile: prepared.bottleInsertData.flavorProfile,
+        distillerIds: prepared.distillerIds,
+      });
+  const group = trustedContext?.group ?? independentGraph!.group;
+  const genericTarget =
+    trustedContext?.genericTarget ?? independentGraph!.genericTarget;
+
+  const bottleResult = await insertPreparedBottleInTransaction(tx, prepared, {
+    groupId: group.id,
+  });
+  const [exactTarget] = await tx
+    .insert(catalogTargets)
+    .values({ groupId: group.id, bottleId: bottleResult.bottle.id })
+    .returning();
+
+  const [targetedAlias] = await tx
+    .update(bottleAliases)
+    .set({ targetId: exactTarget.id })
+    .where(
+      and(
+        eq(sql`LOWER(${bottleAliases.name})`, prepared.aliasName.toLowerCase()),
+        eq(bottleAliases.bottleId, bottleResult.bottle.id),
+      ),
+    )
+    .returning({ name: bottleAliases.name });
+  if (!targetedAlias) {
+    throw new Error(
+      "Failed to assign the canonical alias to its exact target.",
+    );
+  }
+
+  let persistedGroup: BottleGroup;
+  if (trustedContext) {
+    [persistedGroup] = await tx
+      .update(bottleGroups)
+      .set({
+        totalBottles: sql`${bottleGroups.totalBottles} + 1`,
+        updatedAt: new Date(),
+      })
+      .where(eq(bottleGroups.id, group.id))
+      .returning();
+  } else {
+    [persistedGroup] = await tx
+      .update(bottleGroups)
+      .set({ representativeBottleId: bottleResult.bottle.id })
+      .where(eq(bottleGroups.id, group.id))
+      .returning();
+  }
+
+  return {
+    ...bottleResult,
+    group: persistedGroup,
+    genericTarget,
+    exactTarget,
+    likelyGroups,
+  };
+}
+
+/** Dispatches unique, best-effort work only after the Bottle transaction commits. */
 export async function finalizeCreatedBottle(
   { bottle, seriesCreated, newAliases, newEntityIds }: CreateBottleResult,
   {
@@ -472,7 +1014,7 @@ export async function finalizeCreatedBottle(
   } = {},
 ) {
   try {
-    await pushJob("OnBottleChange", { bottleId: bottle.id });
+    await pushUniqueJob("OnBottleChange", { bottleId: bottle.id });
   } catch (err) {
     logError(err, {
       bottle: {
@@ -496,7 +1038,7 @@ export async function finalizeCreatedBottle(
 
   if (bottle.seriesId && seriesCreated) {
     try {
-      await pushJob("IndexBottleSeriesSearchVectors", {
+      await pushUniqueJob("IndexBottleSeriesSearchVectors", {
         seriesId: bottle.seriesId,
       });
     } catch (err) {
@@ -513,7 +1055,7 @@ export async function finalizeCreatedBottle(
 
   for (const aliasName of newAliases) {
     try {
-      await pushJob("OnBottleAliasChange", { name: aliasName });
+      await pushUniqueJob("OnBottleAliasChange", { name: aliasName });
     } catch (err) {
       logError(err, {
         bottle: {
@@ -525,7 +1067,7 @@ export async function finalizeCreatedBottle(
 
   for (const entityId of newEntityIds) {
     try {
-      await pushJob("OnEntityChange", { entityId });
+      await pushUniqueJob("OnEntityChange", { entityId });
     } catch (err) {
       logError(err, {
         entity: {

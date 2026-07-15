@@ -7,7 +7,7 @@ second authoritative copy.
 | Concern                                                         | BottleGroup                                                       | Concrete Bottle                                                    | Observation                         | Collection unit                                       |
 | --------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------- | ----------------------------------------------------- |
 | Stable expression name and full name                            | Owns                                                              | References through `groupId`; owns its exact marketed display name | Evidence only                       | No                                                    |
-| Brand, bottler, distillers, category, series                    | Owns                                                              | Hydrated from group                                                | May preserve source claims          | No                                                    |
+| Brand, bottler, distillers, category, series, flavor profile    | Owns                                                              | Hydrated from group                                                | May preserve source claims          | No                                                    |
 | Stable stated age                                               | Owns when invariant across releases                               | Owns only a release-specific age; otherwise null and inherited     | May preserve label evidence         | No                                                    |
 | Edition or batch                                                | No                                                                | Owns                                                               | May preserve uncertain/raw value    | No                                                    |
 | Vintage and release year                                        | No                                                                | Owns                                                               | May preserve uncertain/raw value    | No                                                    |
@@ -37,6 +37,12 @@ second authoritative copy.
 - Exact aliases move with their Bottle. Stable aliases move with the group.
 - Observation and unit-level data do not create a Bottle or BottleGroup split
   without an explicit catalog decision.
+
+During the additive compatibility period, the concrete creation service also
+writes Bottle `brandId`, `bottlerId`, `category`, `seriesId`, `flavorProfile`,
+and `bottlesToDistillers` rows as non-authoritative mirrors of BottleGroup
+ownership. Legacy Bottle readers still require those fields; task 9.9 removes
+the mirrors after those readers and callers have cut over to group hydration.
 
 ## Versioned runtime contracts
 
