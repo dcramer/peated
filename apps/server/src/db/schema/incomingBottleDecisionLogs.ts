@@ -13,7 +13,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { actors } from "./actors";
-import { bottleReleases, bottles } from "./bottles";
+import { bottleReleases, bottles, catalogTargets } from "./bottles";
 import { externalSites } from "./externalSites";
 import { storePriceMatchProposals } from "./stores";
 
@@ -55,6 +55,9 @@ export const incomingBottleDecisionLogs = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
+    targetId: bigint("target_id", { mode: "number" }).references(
+      () => catalogTargets.id,
+    ),
     createdBottle: boolean("created_bottle").default(false).notNull(),
     createdRelease: boolean("created_release").default(false).notNull(),
     confidence: integer("confidence"),
@@ -77,6 +80,7 @@ export const incomingBottleDecisionLogs = pgTable(
     ),
     index("incoming_bottle_decision_bottle_idx").on(table.bottleId),
     index("incoming_bottle_decision_release_idx").on(table.releaseId),
+    index("incoming_bottle_decision_target_idx").on(table.targetId),
     index("incoming_bottle_decision_actor_ref_idx").on(table.actorId),
   ],
 );
@@ -103,6 +107,10 @@ export const incomingBottleDecisionLogsRelations = relations(
     release: one(bottleReleases, {
       fields: [incomingBottleDecisionLogs.releaseId],
       references: [bottleReleases.id],
+    }),
+    target: one(catalogTargets, {
+      fields: [incomingBottleDecisionLogs.targetId],
+      references: [catalogTargets.id],
     }),
   }),
 );

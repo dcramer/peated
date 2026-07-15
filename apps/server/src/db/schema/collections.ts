@@ -12,7 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleReleases, bottles } from "./bottles";
+import { bottleReleases, bottles, catalogTargets } from "./bottles";
 import { users } from "./users";
 
 export const collections = pgTable(
@@ -67,6 +67,9 @@ export const collectionBottles = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
+    targetId: bigint("target_id", { mode: "number" }).references(
+      () => catalogTargets.id,
+    ),
     imageUrl: text("image_url"),
     status: collectionBottleStatusEnum("status"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -77,6 +80,7 @@ export const collectionBottles = pgTable(
       .nullsNotDistinct(),
     index("collection_bottle_bottle_idx").on(table.bottleId),
     index("collection_bottle_release_idx").on(table.releaseId),
+    index("collection_bottle_target_idx").on(table.targetId),
   ],
 );
 
@@ -90,6 +94,10 @@ export const collectionBottlesRelations = relations(
     bottle: one(bottles, {
       fields: [collectionBottles.bottleId],
       references: [bottles.id],
+    }),
+    target: one(catalogTargets, {
+      fields: [collectionBottles.targetId],
+      references: [catalogTargets.id],
     }),
   }),
 );

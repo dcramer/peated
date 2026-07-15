@@ -37,7 +37,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       brandId: fromBrand.id,
       name: "12-year-old",
     });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: fromBrand.id,
       name: "12-year-old Single Malt Scotch Whisky",
       seriesId: sourceSeries.id,
@@ -115,7 +115,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       brandId: fromBrand.id,
       name: "12-year-old",
     });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: fromBrand.id,
       name: "12-year-old Single Malt Scotch Whisky",
       seriesId: sourceSeries.id,
@@ -250,7 +250,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       brandId: toBrand.id,
       name: "Elixir",
     });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: fromBrand.id,
       name: "Elixir",
       seriesId: sourceSeries.id,

@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  index,
   pgTable,
   text,
   timestamp,
@@ -11,7 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleReleases, bottles } from "./bottles";
+import { bottleReleases, bottles, catalogTargets } from "./bottles";
 import { users } from "./users";
 
 export const flights = pgTable(
@@ -54,11 +55,15 @@ export const flightBottles = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
+    targetId: bigint("target_id", { mode: "number" }).references(
+      () => catalogTargets.id,
+    ),
   },
   (table) => [
     unique()
       .on(table.flightId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
+    index("flight_bottle_target_idx").on(table.targetId),
   ],
 );
 
@@ -74,6 +79,10 @@ export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({
   release: one(bottleReleases, {
     fields: [flightBottles.releaseId],
     references: [bottleReleases.id],
+  }),
+  target: one(catalogTargets, {
+    fields: [flightBottles.targetId],
+    references: [catalogTargets.id],
   }),
 }));
 

@@ -18,16 +18,16 @@ it must not preserve a parallel business-logic path.
 
 ## 2. Additive Group And Target Schema
 
-- [ ] 2.1 Add `bottle_group` with stable identity, representative Bottle, aggregate fields, creator, timestamps, and group-tombstone support.
-- [ ] 2.2 Add nullable `groupId` membership to Bottle plus the uniqueness needed to enforce a target's `(bottleId, groupId)` relationship.
-- [ ] 2.3 Add `catalog_target` with one generic target per group, one exact target per Bottle, and database-enforced membership consistency.
-- [ ] 2.4 Add a durable, unique legacy BottleRelease-to-Bottle promotion mapping with migration status and audit metadata.
-- [ ] 2.5 Add nullable `targetId` foreign keys and indexes to every activity-bearing table while retaining legacy `bottleId`/`releaseId` columns.
-- [ ] 2.6 Add Drizzle relations and inferred types for groups, memberships, targets, mappings, and target-bearing consumers.
-- [ ] 2.7 Generate the additive migration with `pnpm db:generate`; do not hand-write SQL or edit migration metadata.
-- [ ] 2.8 Review the generated migration for lock duration, index creation, nullability, foreign-key order, and rollback feasibility.
+- [x] 2.1 Add `bottle_group` with stable identity, representative Bottle, aggregate fields, creator, timestamps, and group-tombstone support.
+- [x] 2.2 Add nullable `groupId` membership to Bottle plus the uniqueness needed to enforce a target's `(bottleId, groupId)` relationship.
+- [x] 2.3 Add `catalog_target` with one generic target per group, one exact target per Bottle, and database-enforced membership consistency.
+- [x] 2.4 Add a durable, unique legacy BottleRelease-to-Bottle promotion mapping with migration status and audit metadata.
+- [x] 2.5 Add nullable `targetId` foreign keys and indexes to every activity-bearing table while retaining legacy `bottleId`/`releaseId` columns.
+- [x] 2.6 Add Drizzle relations and inferred types for groups, memberships, targets, mappings, and target-bearing consumers.
+- [x] 2.7 Generate the additive migration with `pnpm db:generate`; do not hand-write SQL or edit migration metadata.
+- [x] 2.8 Review the generated migration for lock duration, index creation, nullability, foreign-key order, and rollback feasibility.
 - [ ] 2.9 Add database-backed constraint tests for singleton group targets, exact Bottle targets, duplicate targets, cross-group mismatches, and last-member protection.
-- [ ] 2.10 Update shared test fixtures to create valid group/Bottle/target graphs while retaining explicit legacy fixtures for migration tests.
+- [x] 2.10 Update shared test fixtures to create valid group/Bottle/target graphs while retaining explicit legacy fixtures for migration tests.
 
 ## 3. Catalog Target Runtime
 

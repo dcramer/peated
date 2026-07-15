@@ -87,7 +87,7 @@ test("merge duplicate bottle", async ({ fixtures }) => {
     totalTastings: 1,
     totalBottles: 2,
   });
-  const bottleA = await fixtures.Bottle({
+  const bottleA = await fixtures.LegacyBottle({
     brandId: entityA.id,
     name: "Duplicate",
   });
@@ -96,7 +96,7 @@ test("merge duplicate bottle", async ({ fixtures }) => {
     totalTastings: 3,
     totalBottles: 1,
   });
-  const bottleB = await fixtures.Bottle({
+  const bottleB = await fixtures.LegacyBottle({
     brandId: entityB.id,
     name: "Duplicate",
   });
@@ -126,7 +126,7 @@ test("merge unique bottle", async ({ fixtures }) => {
     totalTastings: 1,
     totalBottles: 2,
   });
-  const bottleA = await fixtures.Bottle({
+  const bottleA = await fixtures.LegacyBottle({
     brandId: entityA.id,
     name: "Unique",
     statedAge: null,
@@ -136,7 +136,7 @@ test("merge unique bottle", async ({ fixtures }) => {
     totalTastings: 3,
     totalBottles: 1,
   });
-  const bottleB = await fixtures.Bottle({
+  const bottleB = await fixtures.LegacyBottle({
     brandId: entityB.id,
     name: "More Unique",
     statedAge: null,
@@ -177,7 +177,7 @@ test("updates bottle releases when merging entities", async ({ fixtures }) => {
   });
 
   // Create a bottle with releases under entityA
-  const bottle = await fixtures.Bottle({
+  const bottle = await fixtures.LegacyBottle({
     brandId: entityA.id,
     name: "Test Bottle",
     statedAge: null,
@@ -268,13 +268,13 @@ test("handles duplicate bottles during entity merge", async ({ fixtures }) => {
   });
 
   // Create bottles with same name under different entities
-  const bottleA = await fixtures.Bottle({
+  const bottleA = await fixtures.LegacyBottle({
     brandId: entityA.id,
     name: "Duplicate",
     statedAge: null,
   });
 
-  const bottleB = await fixtures.Bottle({
+  const bottleB = await fixtures.LegacyBottle({
     brandId: entityB.id,
     name: "Duplicate",
     statedAge: null,
@@ -324,13 +324,13 @@ describe("mergeEntity", () => {
       type: ["brand"],
     });
 
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle A",
       category: "single_malt",
     });
 
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle B",
       category: "single_malt",
@@ -361,7 +361,7 @@ describe("mergeEntity", () => {
       type: ["brand"],
     });
 
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle A",
       category: "single_malt",
@@ -423,7 +423,7 @@ describe("mergeEntity", () => {
       type: ["brand"],
     });
 
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle A",
       category: "single_malt",

@@ -38,12 +38,12 @@ describe("DELETE /bottle-series/:series", () => {
     });
 
     // Create some bottles in the series
-    const bottle1 = await fixtures.Bottle({
+    const bottle1 = await fixtures.LegacyBottle({
       name: "Bottle 1",
       brandId: brand.id,
       seriesId: series.id,
     });
-    const bottle2 = await fixtures.Bottle({
+    const bottle2 = await fixtures.LegacyBottle({
       name: "Bottle 2",
       brandId: brand.id,
       seriesId: series.id,

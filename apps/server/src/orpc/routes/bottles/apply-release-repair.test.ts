@@ -179,12 +179,12 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
 
-    const parent = await fixtures.Bottle({
+    const parent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh",
       totalTastings: 50,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh (Batch 32)",
       totalTastings: 12,
@@ -479,7 +479,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       totalBottles: 1,
     });
     const distiller = await fixtures.Entity({ name: "Warehouse Distillery" });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -566,12 +566,12 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 2,
     });
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Sessions",
       totalTastings: 80,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -629,12 +629,12 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 2,
     });
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Sessions",
       totalTastings: 80,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -678,7 +678,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 1,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -725,12 +725,12 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 2,
     });
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Sessions",
       totalTastings: 80,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -803,13 +803,13 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 2,
     });
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Sessions",
       category: "single_malt",
       totalTastings: 80,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -882,7 +882,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 2,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -907,7 +907,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       reviewedAt: new Date(),
     });
 
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Sessions",
       category: "single_malt",
@@ -955,7 +955,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Festival Distillery",
       totalBottles: 1,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -1019,12 +1019,12 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Other Distillery",
       totalBottles: 1,
     });
-    const unrelatedBottle = await fixtures.Bottle({
+    const unrelatedBottle = await fixtures.LegacyBottle({
       brandId: unrelatedBrand.id,
       name: "Warehouse Session",
       totalTastings: 80,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Warehouse Session (Batch 2)",
       statedAge: 12,
@@ -1076,7 +1076,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Lagavulin",
       totalBottles: 1,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Distillers Edition",
       edition: "2011 Release",
@@ -1124,13 +1124,13 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Elijah Craig",
       totalBottles: 2,
     });
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Barrel Proof",
       category: "bourbon",
       totalTastings: 120,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Barrel Proof Kentucky Straight Bourbon (Batch C923)",
       statedAge: 12,
@@ -1174,13 +1174,13 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Rock Town",
       totalBottles: 2,
     });
-    const bourbonParent = await fixtures.Bottle({
+    const bourbonParent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Arkansas Bourbon",
       category: null,
       totalTastings: 120,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Arkansas Rye (Batch 1)",
       category: "rye",
@@ -1226,13 +1226,13 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       name: "Rock Town",
       totalBottles: 2,
     });
-    const parentBottle = await fixtures.Bottle({
+    const parentBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Arkansas Rye",
       category: "rye",
       totalTastings: 120,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Arkansas Rye (Batch 1)",
       category: "bourbon",
@@ -1278,7 +1278,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       shortName: "MAKER'S",
       totalBottles: 1,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "46",
       edition: "Batch 1",
@@ -1325,7 +1325,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
-    const dirtyParent = await fixtures.Bottle({
+    const dirtyParent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh",
       totalTastings: 100,
@@ -1334,7 +1334,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       .update(bottles)
       .set({ edition: "Batch 31" })
       .where(eq(bottles.id, dirtyParent.id));
-    const cleanParent = await fixtures.Bottle({
+    const cleanParent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh Parent Placeholder",
       totalTastings: 50,
@@ -1346,7 +1346,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
         fullName: dirtyParent.fullName,
       })
       .where(eq(bottles.id, cleanParent.id));
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh (Batch 32)",
     });
@@ -1374,7 +1374,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
-    const parent = await fixtures.Bottle({
+    const parent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh",
       totalTastings: 80,
@@ -1387,7 +1387,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       tastingNotes: null,
       createdByActorId: modActor.id,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh (Batch 32)",
       description: "Recovered legacy description",
@@ -1478,14 +1478,14 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     const brand = await fixtures.Entity({ name: "Glendronach" });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
-    const parent = await fixtures.Bottle({
+    const parent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1972 Single Cask",
       statedAge: 48,
       singleCask: true,
       totalTastings: 40,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1972 Single Cask (Batch 1)",
       statedAge: 48,
@@ -1524,7 +1524,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
-    const dirtyParent = await fixtures.Bottle({
+    const dirtyParent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh",
     });
@@ -1532,7 +1532,7 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
       .update(bottles)
       .set({ edition: "Batch 31" })
       .where(eq(bottles.id, dirtyParent.id));
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh (Batch 32)",
     });
@@ -1556,12 +1556,12 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Kilkerran" });
-    const dirtyParent = await fixtures.Bottle({
+    const dirtyParent = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Heavily Peated",
       abv: 58.4,
     });
-    const legacyBottle = await fixtures.Bottle({
+    const legacyBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "Heavily Peated (Batch 10)",
       abv: 58.4,

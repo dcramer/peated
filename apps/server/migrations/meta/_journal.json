@@ -1352,6 +1352,20 @@
       "when": 1783536986980,
       "tag": "0192_tranquil_carnage",
       "breakpoints": false
+    },
+    {
+      "idx": 193,
+      "version": "7",
+      "when": 1784086481035,
+      "tag": "0193_stiff_sleeper",
+      "breakpoints": false
+    },
+    {
+      "idx": 194,
+      "version": "7",
+      "when": 1784086491872,
+      "tag": "0194_nebulous_harpoon",
+      "breakpoints": false
     }
   ]
 }

@@ -10,7 +10,7 @@ describe("catalog migration audit", () => {
   test("reports a clean parent and release deterministically", async ({
     fixtures,
   }) => {
-    const parent = await fixtures.Bottle({
+    const parent = await fixtures.LegacyBottle({
       imageUrl: "https://peated.test/parent.jpg",
       statedAge: 12,
     });
@@ -61,7 +61,7 @@ describe("catalog migration audit", () => {
       invalidRows: 0,
     });
     expect(report.promotionMappings).toMatchObject({
-      tablePresent: false,
+      tablePresent: true,
       totalLegacyReleases: 1,
       mappedReleases: 0,
       unmappedReleases: 1,
@@ -73,7 +73,7 @@ describe("catalog migration audit", () => {
   test("reports release-like parent fields, age conflicts, and name collisions", async ({
     fixtures,
   }) => {
-    const parent = await fixtures.Bottle({
+    const parent = await fixtures.LegacyBottle({
       edition: "Batch 1",
       statedAge: 10,
     });
@@ -104,7 +104,7 @@ describe("catalog migration audit", () => {
   });
 
   test("reports missing release promotion inputs", async ({ fixtures }) => {
-    const parent = await fixtures.Bottle();
+    const parent = await fixtures.LegacyBottle();
     await fixtures.BottleRelease({ bottleId: parent.id });
 
     const report = await runCatalogMigrationAudit();
@@ -121,11 +121,11 @@ describe("catalog migration audit", () => {
   test("reports invalid Bottle and release pairs on consumer rows", async ({
     fixtures,
   }) => {
-    const releaseParent = await fixtures.Bottle();
+    const releaseParent = await fixtures.LegacyBottle();
     const release = await fixtures.BottleRelease({
       bottleId: releaseParent.id,
     });
-    const mismatchedParent = await fixtures.Bottle();
+    const mismatchedParent = await fixtures.LegacyBottle();
     await fixtures.Tasting({
       bottleId: mismatchedParent.id,
       releaseId: release.id,
@@ -185,7 +185,7 @@ describe("catalog migration audit", () => {
   test("formats the same report for human-readable CLI output", async ({
     fixtures,
   }) => {
-    await fixtures.Bottle();
+    await fixtures.LegacyBottle();
 
     const output = formatCatalogMigrationAudit(
       await runCatalogMigrationAudit(),
@@ -195,6 +195,6 @@ describe("catalog migration audit", () => {
     expect(output).toContain(
       "Parents: 1 (1 zero / 0 one / 0 multiple releases)",
     );
-    expect(output).toContain("Promotion mappings: not created (0/0 mapped)");
+    expect(output).toContain("Promotion mappings: present (0/0 mapped)");
   });
 });

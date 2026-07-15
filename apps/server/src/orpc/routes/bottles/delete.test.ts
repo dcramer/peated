@@ -19,7 +19,7 @@ import { describe, expect, test } from "vitest";
 describe("DELETE /bottles/:bottle", () => {
   test("deletes bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
-    const bottle = await fixtures.Bottle();
+    const bottle = await fixtures.LegacyBottle();
 
     const data = await routerClient.bottles.delete(
       { bottle: bottle.id },
@@ -38,7 +38,7 @@ describe("DELETE /bottles/:bottle", () => {
 
   test("requires admin", async ({ fixtures }) => {
     const user = await fixtures.User();
-    const bottle = await fixtures.Bottle();
+    const bottle = await fixtures.LegacyBottle();
 
     const err = await waitError(
       routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
@@ -50,7 +50,7 @@ describe("DELETE /bottles/:bottle", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
-    const bottle = await fixtures.Bottle();
+    const bottle = await fixtures.LegacyBottle();
 
     await fixtures.Tasting({ bottleId: bottle.id });
 
@@ -72,7 +72,7 @@ describe("DELETE /bottles/:bottle", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
-    const bottle = await fixtures.Bottle();
+    const bottle = await fixtures.LegacyBottle();
     const collection = await fixtures.Collection();
 
     await db.insert(collectionBottles).values({
@@ -99,7 +99,7 @@ describe("DELETE /bottles/:bottle", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
-    const bottle = await fixtures.Bottle();
+    const bottle = await fixtures.LegacyBottle();
     const flight = await fixtures.Flight();
 
     await db.insert(flightBottles).values({
@@ -126,7 +126,7 @@ describe("DELETE /bottles/:bottle", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
-    const bottle = await fixtures.Bottle();
+    const bottle = await fixtures.LegacyBottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
     await db

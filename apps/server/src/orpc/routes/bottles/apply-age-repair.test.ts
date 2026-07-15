@@ -38,7 +38,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
     const brand = await fixtures.Entity({ name: "Glenglassaugh" });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
       statedAge: 40,
@@ -276,7 +276,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
     const brand = await fixtures.Entity({ name: "Glenglassaugh" });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
       statedAge: 40,
@@ -382,7 +382,7 @@ describe("POST /bottles/:bottle/apply-age-repair", () => {
   test("rejects marketed-age bottles", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "Springbank" });
     const mod = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "10yo",
       statedAge: 10,

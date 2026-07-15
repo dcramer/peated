@@ -68,8 +68,8 @@ describe("POST /tastings", () => {
     defaults,
     fixtures,
   }) => {
-    const sourceBottle = await fixtures.Bottle();
-    const targetBottle = await fixtures.Bottle();
+    const sourceBottle = await fixtures.LegacyBottle();
+    const targetBottle = await fixtures.LegacyBottle();
     const release = await fixtures.BottleRelease({ bottleId: sourceBottle.id });
     const flight = await fixtures.Flight({ bottles: [sourceBottle.id] });
 

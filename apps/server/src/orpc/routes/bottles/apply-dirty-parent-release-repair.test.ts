@@ -38,7 +38,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
     const brand = await fixtures.Entity({ name: "Aberlour" });
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "A'bunadh",
       edition: "Batch 31",
@@ -232,7 +232,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
   }) => {
     const mod = await fixtures.User({ mod: true });
     const modActor = await getUserActor(mod);
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       name: "Distillers Edition",
       edition: "2011 Release",
       releaseYear: 2011,
@@ -317,7 +317,7 @@ describe("POST /bottles/:bottle/apply-dirty-parent-release-repair", () => {
 
   test("rejects non-dirty parent bottles", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       name: "Clean Parent",
     });
 

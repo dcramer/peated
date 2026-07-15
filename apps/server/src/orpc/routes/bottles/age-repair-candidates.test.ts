@@ -20,7 +20,7 @@ describe("GET /bottles/age-repair-candidates", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Glenglassaugh" });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
       statedAge: 40,
@@ -72,7 +72,7 @@ describe("GET /bottles/age-repair-candidates", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Glenglassaugh" });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
       statedAge: 40,
@@ -118,7 +118,7 @@ describe("GET /bottles/age-repair-candidates", () => {
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Springbank" });
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "10yo",
       statedAge: 10,
@@ -181,7 +181,7 @@ describe("GET /bottles/age-repair-candidates", () => {
       })),
     );
 
-    const validBottle = await fixtures.Bottle({
+    const validBottle = await fixtures.LegacyBottle({
       brandId: brand.id,
       name: "1978 Rare Cask Release",
       statedAge: 40,

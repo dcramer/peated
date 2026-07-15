@@ -29,13 +29,13 @@ describe("mergeBottle", () => {
       totalBottles: 1,
     });
 
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle A",
       category: "single_malt",
     });
 
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityB.id,
       name: "Test Bottle B",
       category: "single_malt",
@@ -77,13 +77,13 @@ describe("mergeBottle", () => {
       totalBottles: 1,
     });
 
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle A",
       category: "single_malt",
     });
 
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityB.id,
       name: "Test Bottle B",
       category: "single_malt",
@@ -119,7 +119,7 @@ describe("mergeBottle", () => {
       totalTastings: 1,
       totalBottles: 2,
     });
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Duplicate",
       category: "single_malt",
@@ -129,7 +129,7 @@ describe("mergeBottle", () => {
       totalTastings: 3,
       totalBottles: 1,
     });
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityB.id,
       name: "Duplicate",
       category: "single_malt",
@@ -160,7 +160,7 @@ describe("mergeBottle", () => {
       totalTastings: 1,
       totalBottles: 2,
     });
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Unique",
       category: "single_malt",
@@ -171,7 +171,7 @@ describe("mergeBottle", () => {
       totalTastings: 3,
       totalBottles: 1,
     });
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityB.id,
       name: "More Unique",
       category: "single_malt",
@@ -213,14 +213,14 @@ describe("mergeBottle", () => {
     });
 
     // Create a bottle with releases under entityA
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Test Bottle A",
       category: "single_malt",
       statedAge: null,
     });
 
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityB.id,
       name: "Test Bottle B",
       category: "single_malt",
@@ -313,14 +313,14 @@ describe("mergeBottle", () => {
     });
 
     // Create bottles with same name under different entities
-    const bottleA = await fixtures.Bottle({
+    const bottleA = await fixtures.LegacyBottle({
       brandId: entityA.id,
       name: "Duplicate",
       category: "single_malt",
       statedAge: null,
     });
 
-    const bottleB = await fixtures.Bottle({
+    const bottleB = await fixtures.LegacyBottle({
       brandId: entityB.id,
       name: "Duplicate",
       category: "single_malt",
@@ -373,13 +373,13 @@ describe("mergeBottle", () => {
       name: "Target Brand",
       totalBottles: 1,
     });
-    const sourceBottle = await fixtures.Bottle({
+    const sourceBottle = await fixtures.LegacyBottle({
       brandId: sourceBrand.id,
       name: "Source Bottle",
       category: "single_malt",
       statedAge: null,
     });
-    const targetBottle = await fixtures.Bottle({
+    const targetBottle = await fixtures.LegacyBottle({
       brandId: targetBrand.id,
       name: "Target Bottle",
       category: "single_malt",
@@ -478,11 +478,11 @@ describe("mergeBottle", () => {
   it("dedupes collection and flight rows while merging bottles", async ({
     fixtures,
   }) => {
-    const sourceBottle = await fixtures.Bottle({
+    const sourceBottle = await fixtures.LegacyBottle({
       name: "Source Dedupe Bottle",
       category: "single_malt",
     });
-    const targetBottle = await fixtures.Bottle({
+    const targetBottle = await fixtures.LegacyBottle({
       name: "Target Dedupe Bottle",
       category: "single_malt",
     });
@@ -537,11 +537,11 @@ describe("mergeBottle", () => {
   it("preserves collection bottle images while merging bottles", async ({
     fixtures,
   }) => {
-    const sourceBottle = await fixtures.Bottle({
+    const sourceBottle = await fixtures.LegacyBottle({
       name: "Source Image Bottle",
       category: "single_malt",
     });
-    const targetBottle = await fixtures.Bottle({
+    const targetBottle = await fixtures.LegacyBottle({
       name: "Target Image Bottle",
       category: "single_malt",
     });
@@ -578,11 +578,11 @@ describe("mergeBottle", () => {
   it("reconciles duplicate collection bottle images while merging bottles", async ({
     fixtures,
   }) => {
-    const sourceBottle = await fixtures.Bottle({
+    const sourceBottle = await fixtures.LegacyBottle({
       name: "Source Duplicate Image Bottle",
       category: "single_malt",
     });
-    const targetBottle = await fixtures.Bottle({
+    const targetBottle = await fixtures.LegacyBottle({
       name: "Target Duplicate Image Bottle",
       category: "single_malt",
     });
@@ -653,15 +653,15 @@ describe("mergeBottle", () => {
   it("dedupes multiple source collection rows while preserving an image", async ({
     fixtures,
   }) => {
-    const sourceBottleA = await fixtures.Bottle({
+    const sourceBottleA = await fixtures.LegacyBottle({
       name: "Source Multi Image Bottle A",
       category: "single_malt",
     });
-    const sourceBottleB = await fixtures.Bottle({
+    const sourceBottleB = await fixtures.LegacyBottle({
       name: "Source Multi Image Bottle B",
       category: "single_malt",
     });
-    const targetBottle = await fixtures.Bottle({
+    const targetBottle = await fixtures.LegacyBottle({
       name: "Target Multi Image Bottle",
       category: "single_malt",
     });
