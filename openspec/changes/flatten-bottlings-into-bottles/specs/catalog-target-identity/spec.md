@@ -96,3 +96,11 @@ Compatibility routes SHALL return replacement target information or redirect map
 - **WHEN** an old parent URL or API reference maps to a BottleGroup target
 - **THEN** the system returns or redirects to the group identity
 - **AND** it does not substitute the representative Bottle as the target
+
+#### Scenario: Resolve a merged source group
+
+- **WHEN** a group merge has repointed every source-generic reference and removed
+  the source generic target and BottleGroup rows
+- **THEN** the source group tombstone identifies the selected destination group
+- **AND** exact Bottle ids and exact target ids from the merged source remain
+  unchanged

@@ -30,8 +30,10 @@ Exact Bottle serializers must not require BottleGroup hydration.
 ## Invariants
 
 - Every Bottle has exactly one `groupId` and one exact CatalogTarget.
-- Every BottleGroup has exactly one generic CatalogTarget and at least one
-  active Bottle.
+- Every active BottleGroup has exactly one generic CatalogTarget and at least
+  one active Bottle. A merged source is not retained as an empty group: its
+  generic target and group rows are removed after references move, while its
+  retired id remains in the group tombstone.
 - Activity stores only `targetId`. A generic target never resolves to the
   representative Bottle as a substitute exact identity.
 - Independent creation always creates a singleton group. Reusing a group
@@ -60,6 +62,23 @@ Exact Bottle serializers must not require BottleGroup hydration.
   activity and rating aggregates unchanged. Shared series fan-out or drift
   repair may recompute only affected old and new BottleSeries `numReleases`
   membership counts.
+- A moderator group merge moves one source group into one selected destination.
+  Destination shared identity wins and atomically rematerializes every moved
+  Bottle, preserves its exact fields and exact target id, and retains its prior
+  canonical exact name as an exact alias.
+- A merge repoints source-generic consumers and stable aliases to the destination
+  generic target before removing the source target and group. Destination
+  collection rows win with blank-image fill from the source, flight duplicates
+  collapse, and tasting, Bottle identity, alias, or SMWS ambiguity rolls back
+  the transaction.
+- A merge writes BottleGroup before/after snapshots plus one Bottle update audit
+  per moved member with reversible source/destination and alias context. An
+  identical retry to the tombstoned destination is unchanged; another
+  destination conflicts.
+- Group merge uses the shared transaction-scoped BottleGroup aggregate helper
+  brought forward from task 4.11 and recomputes raw exact plus generic target
+  activity exactly once. Task 4.11 remains responsible for remaining exact and
+  reusable statistics entry points.
 - Observation and unit-level data do not create a Bottle or BottleGroup split
   without an explicit catalog decision.
 

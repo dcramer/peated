@@ -53,7 +53,13 @@ exact statistics. An exact Bottle read, serializer, search result, or page uses
 the Bottle record and does not require BottleGroup hydration to become correct
 or renderable.
 
-Every Bottle has a non-null `groupId`. A BottleGroup must have at least one active Bottle after a transaction completes. User-facing pages may call a group “this expression” or “all releases”; ordinary users do not create a BottleGroup directly.
+Every Bottle has a non-null `groupId`. Every active BottleGroup must have at
+least one active Bottle after a transaction completes. A merge does not retain
+an empty retired BottleGroup row: after its members and generic references move,
+the source generic target and group are removed while a durable tombstone keeps
+the retired group id mapped to its destination. User-facing pages may call a
+group “this expression” or “all releases”; ordinary users do not create a
+BottleGroup directly.
 
 BottleGroup is the moderator editing scope for shared values, while each Bottle
 is the durable, authoritative exact record presented to users. A shared edit is
@@ -173,7 +179,32 @@ Examples:
 
 ### Group merge and split preserve exact targets
 
-Merging BottleGroups reassigns member Bottles to the destination group, moves generic target references to the destination generic target, consolidates aliases, retains a group tombstone, and recomputes aggregates. Exact Bottle ids and exact target ids do not change.
+Group merge is an explicit moderator user action analogous to Merge Bottle. One
+request merges one source group into one selected destination; it is not a
+classifier, repair, or background inference. The destination's shared identity
+wins. Every moved Bottle is atomically rematerialized from that shared identity
+and its preserved exact fields, and every previous canonical exact name remains
+an exact alias for the same Bottle. Bottle ids and exact target ids do not
+change.
+
+The merge repoints every source-generic consumer and stable alias to the
+destination generic target before retiring the source target and group behind a
+durable tombstone. When both groups already have an entry in the same
+collection, the destination row wins except that its blank image may be filled
+from the source row. Duplicate flight membership collapses to one destination
+row. A tasting uniqueness collision or any unresolved Bottle identity, alias,
+or SMWS conflict is ambiguous and rolls back the complete merge rather than
+choosing or discarding a record.
+
+An identical retry whose source tombstone already names the selected
+destination succeeds as an unchanged operation. A source retired to another
+destination conflicts. Task 4.7 adds transactional `bottle_group` before/after
+audit snapshots plus one Bottle update audit per moved member, including enough
+source/destination and alias context for an explicit reversal. It also brings
+forward the shared BottleGroup aggregate recomputation helper so the destination
+is recalculated from raw exact and generic target activity after the move. Task
+4.11 remains open for the remaining exact-Bottle recomputation and reusable
+statistics entry points.
 
 Splitting selected Bottles creates a new group and generic target, then moves the selected Bottles without changing their ids or exact targets. Existing generic activity remains on the source group unless a moderator explicitly moves it because the system cannot infer which expression it described.
 
@@ -199,6 +230,12 @@ Before promotion, a dry-run audit reports full-name/alias collisions, parent rel
 ### Statistics count target data once
 
 Exact Bottle statistics include only activity on that Bottle's exact target. BottleGroup aggregates include activity on all member Bottle targets plus activity recorded directly against the generic group target. Group aggregation must not add already materialized Bottle totals to raw group-target rows in a way that double-counts activity.
+
+The transaction-scoped BottleGroup recomputation helper is introduced with
+group merge because a committed merge cannot leave destination aggregates
+stale. Task 4.11 completes exact-Bottle recomputation and the remaining reusable
+job/service entry points; it does not replace the merge helper with a parallel
+calculation.
 
 Representative group content is selected explicitly from a member Bottle or stored as group-level editorial content. It is not copied opportunistically from the latest release during reads.
 

@@ -1373,6 +1373,13 @@
       "when": 1784094728618,
       "tag": "0195_lush_nick_fury",
       "breakpoints": false
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1784143459049,
+      "tag": "0196_serious_warpath",
+      "breakpoints": false
     }
   ]
 }

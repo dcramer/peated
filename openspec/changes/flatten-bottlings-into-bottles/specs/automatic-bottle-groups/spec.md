@@ -60,14 +60,55 @@ BottleGroup membership SHALL mean that member Bottles are marketed versions, bat
 
 ### Requirement: Group merge is explicit and reversible
 
-The system SHALL provide an audited moderator operation to merge BottleGroups without changing member Bottle ids or exact target ids.
+The system SHALL provide an audited moderator user operation that merges one
+source BottleGroup into one explicitly selected destination without changing
+member Bottle ids or exact target ids.
 
 #### Scenario: Merge two groups
 
 - **WHEN** a moderator confirms that two groups describe the same expression
 - **THEN** all member Bottles move to the selected destination group
-- **AND** generic activity and aliases are consolidated
-- **AND** the source group resolves through a tombstone
+- **AND** the destination shared identity atomically rematerializes every moved
+  Bottle while preserving its exact fields
+- **AND** every previous canonical exact name remains an exact alias for the same
+  Bottle
+- **AND** generic activity and stable aliases repoint to the destination generic
+  target
+- **AND** the source generic target and group are removed after their references
+  move
+- **AND** the retired source group id resolves through a durable tombstone
+
+#### Scenario: Consolidate duplicate set membership
+
+- **WHEN** source and destination generic targets both occur in the same
+  collection or flight during a merge
+- **THEN** duplicate flight membership collapses to one destination row
+- **AND** the destination collection row wins
+- **AND** a blank destination collection image may be filled from the source row
+
+#### Scenario: Ambiguous merge conflict
+
+- **WHEN** a merge encounters a tasting uniqueness collision or unresolved
+  Bottle identity, alias, or SMWS conflict
+- **THEN** the complete merge rolls back
+- **AND** the system does not choose, discard, or suffix an ambiguous record
+
+#### Scenario: Retry a completed merge
+
+- **WHEN** the same source-to-destination merge is submitted after the source
+  tombstone already points to that destination
+- **THEN** the operation succeeds without adding audits or dispatching work
+- **AND** a retry naming a different destination fails with a conflict
+
+#### Scenario: Retain a reversible audit
+
+- **WHEN** a group merge commits
+- **THEN** the system stores BottleGroup before/after audit snapshots and one
+  update audit per moved Bottle
+- **AND** the audit records the actor, source, destination, moved identity, and
+  alias context needed for an explicit reversal
+- **AND** destination group aggregates are recomputed from raw exact and generic
+  target activity without double counting
 
 ### Requirement: Group split preserves exact identity
 

@@ -54,6 +54,31 @@ describe("BottleGroup and CatalogTarget constraints", () => {
     ).rejects.toThrow(/catalog_target_bottle_unq/);
   });
 
+  test("cascades exact target membership when a Bottle moves groups", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const destinationBottle = await fixtures.Bottle();
+    const targetBefore = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!targetBefore) throw new Error("Missing exact CatalogTarget fixture");
+
+    await db
+      .update(bottles)
+      .set({ groupId: destinationBottle.groupId })
+      .where(eq(bottles.id, bottle.id));
+
+    const targetAfter = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    expect(targetAfter).toMatchObject({
+      id: targetBefore.id,
+      bottleId: bottle.id,
+      groupId: destinationBottle.groupId,
+    });
+  });
+
   test("rejects an exact target from a different group", async ({
     fixtures,
   }) => {

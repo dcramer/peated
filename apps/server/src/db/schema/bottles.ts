@@ -358,7 +358,7 @@ export const catalogTargets = pgTable(
       columns: [table.bottleId, table.groupId],
       foreignColumns: [bottles.id, bottles.groupId],
       name: "catalog_target_bottle_membership_fk",
-    }),
+    }).onUpdate("cascade"),
   ],
 );
 

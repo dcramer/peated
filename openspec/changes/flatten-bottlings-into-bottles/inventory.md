@@ -131,6 +131,10 @@ Catalog identity, aliases, search, creation, and updates:
 - `apps/server/src/lib/updateConcreteBottle.ts` is the authoritative moderator
   update domain service. Task 5.3 routes and proposal flows are deferred adapters
   that must delegate to it rather than duplicate its business logic.
+- Task 4.7 adds `apps/server/src/lib/mergeBottleGroups.ts` as the authoritative
+  one-source-to-one-destination moderator group-merge service. It owns member
+  rematerialization, generic consumer and stable-alias consolidation, tombstone
+  retirement, reversible audits, and shared group aggregate recomputation.
 - `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
   reader/writer from tasks 3.2/3.7; retain it through the task 9.5 read window
   and remove its legacy branch under task 9.7.
@@ -177,7 +181,8 @@ Classifier decisions and price matching:
 - `apps/server/src/worker/jobs/createMissingBottles.ts`
 - `apps/server/src/worker/jobs/index.ts`
 - `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
-- `apps/server/src/worker/jobs/mergeBottle.ts`
+- `apps/server/src/worker/jobs/mergeBottle.ts` remains the legacy exact-Bottle
+  merge worker; group merge must not duplicate or delegate to its business logic.
 - `apps/server/src/worker/jobs/mergeEntity.ts`
 - `apps/server/src/worker/jobs/onBottleAliasChange.ts`
 - `apps/server/src/worker/jobs/onBottleReleaseChange.ts`
