@@ -29,6 +29,7 @@ export type UpsertOutcome<T> =
       id: number;
       result: T;
       created: boolean;
+      changed: boolean;
     }
   | undefined;
 
@@ -174,6 +175,10 @@ export async function findEntityByExactNameOrAlias(
   return entityByAlias?.entity ?? null;
 }
 
+/**
+ * A conditional update elects one role-adding caller; concurrent losers reload
+ * the winning row and report `changed: false`.
+ */
 async function mergeEntityTypeIfNeeded({
   db,
   entity,
@@ -182,18 +187,35 @@ async function mergeEntityTypeIfNeeded({
   db: AnyDatabase;
   entity: Entity;
   type?: EntityType;
-}): Promise<Entity> {
+}): Promise<{ result: Entity; changed: boolean }> {
   if (!type || entity.type.includes(type)) {
-    return entity;
+    return { result: entity, changed: false };
   }
 
   const [updatedEntity] = await db
     .update(entities)
-    .set({ type: [...entity.type, type] })
-    .where(eq(entities.id, entity.id))
+    .set({ type: sql`array_append(${entities.type}, ${type})` })
+    .where(
+      and(
+        eq(entities.id, entity.id),
+        sql`NOT (${type} = ANY(${entities.type}))`,
+      ),
+    )
     .returning();
 
-  return updatedEntity ?? { ...entity, type: [...entity.type, type] };
+  if (updatedEntity) {
+    return { result: updatedEntity, changed: true };
+  }
+
+  const currentEntity = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, entity.id),
+  });
+  if (!currentEntity) {
+    throw new Error(
+      `Entity ${entity.id} disappeared while adding the ${type} role.`,
+    );
+  }
+  return { result: currentEntity, changed: false };
 }
 
 /**
@@ -309,12 +331,17 @@ export const upsertEntity = async ({
       return undefined;
     }
 
-    const mergedResult = await mergeEntityTypeIfNeeded({
+    const merged = await mergeEntityTypeIfNeeded({
       db,
       entity: result,
       type,
     });
-    return { id: mergedResult.id, result: mergedResult, created: false };
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
   } else if (data.id === null) {
     data.id = undefined;
   }
@@ -327,12 +354,17 @@ export const upsertEntity = async ({
 
   const existingEntity = await findEntityByExactNameOrAlias(db, data.name);
   if (existingEntity) {
-    const mergedEntity = await mergeEntityTypeIfNeeded({
+    const merged = await mergeEntityTypeIfNeeded({
       db,
       entity: existingEntity,
       type,
     });
-    return { id: mergedEntity.id, result: mergedEntity, created: false };
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
   }
 
   const [result] = await db
@@ -371,18 +403,28 @@ export const upsertEntity = async ({
       entity: result,
     });
 
-    return { id: result.id, result, created: true };
+    return {
+      id: result.id,
+      result,
+      created: true,
+      changed: true,
+    };
   }
 
   const resultConflict = await findEntityByExactNameOrAlias(db, data.name);
 
   if (resultConflict) {
-    const mergedEntity = await mergeEntityTypeIfNeeded({
+    const merged = await mergeEntityTypeIfNeeded({
       db,
       entity: resultConflict,
       type,
     });
-    return { id: mergedEntity.id, result: mergedEntity, created: false };
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
   }
   throw new Error("We should never hit this case in upsert");
 };

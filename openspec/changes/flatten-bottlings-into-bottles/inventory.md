@@ -120,14 +120,17 @@ Classifier, price matching, and moderation routes:
 
 ## Server services and writers
 
-Catalog identity, aliases, search, and creation:
+Catalog identity, aliases, search, creation, and updates:
 
 - `apps/server/src/lib/createBottle.ts` owns the shared Bottle preparation and
   persistence core plus the complete legacy and concrete transaction
-  operations. The legacy operation retains stable Bottle columns and distiller
-  joins until the task 9.9 compatibility-mirror cleanup.
+  operations. Stable Bottle columns and distiller joins are durable exact-Bottle
+  materialization and must remain synchronized by atomic group-wide writes.
 - `apps/server/src/lib/createConcreteBottle.ts` owns the runtime-validated
   concrete creation service boundary used by future public adapters.
+- `apps/server/src/lib/updateConcreteBottle.ts` is the authoritative moderator
+  update domain service. Task 5.3 routes and proposal flows are deferred adapters
+  that must delegate to it rather than duplicate its business logic.
 - `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
   reader/writer from tasks 3.2/3.7; retain it through the task 9.5 read window
   and remove its legacy branch under task 9.7.
@@ -276,3 +279,10 @@ classify every remaining match as one of:
 1. a permanent legacy redirect or promotion mapping;
 2. retained migration/audit history;
 3. a defect blocking removal.
+
+Cleanup must also verify that exact Bottle serializers, search, details, and
+other presentation paths remain correct without BottleGroup hydration, and
+that every shared group writer atomically synchronizes complete member Bottle
+identity, effective-age normalization, distiller joins, retained exact aliases,
+collision rollback, and one existing Bottle update audit row per affected
+member.

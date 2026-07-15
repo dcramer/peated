@@ -47,19 +47,19 @@ it must not preserve a parallel business-logic path.
 - [x] 4.3 Prevent arbitrary client-supplied group ids from bypassing trusted group-reuse authorization.
 - [x] 4.4 Apply exact duplicate detection to Bottle identity while returning likely group matches as non-blocking suggestions.
 - [x] 4.5 Keep catalog verification, indexing, and other slow post-save work idempotent and outside the committed request path.
-- [ ] 4.6 Implement Bottle updates with clear stable-group versus exact-Bottle field ownership and moderator authorization.
+- [x] 4.6 Implement moderator-authorized Bottle updates: exact-only edits affect only the selected Bottle; shared edits atomically update the BottleGroup and every member's complete durable identity; effective-age normalization preserves only non-null exact overrides differing from the pre-update current group age, with exact null materializing the resulting group age; old canonical exact names remain exact aliases; collisions roll back all changes; one existing `bottle` update audit row is written per affected member with a combined row for the selected member in a mixed edit; no `bottle_group` audit enum is added; ids, targets, representative selection, activity, and Bottle/BottleGroup activity and rating aggregates remain unchanged; and shared series fan-out or drift repair recomputes only affected old and new BottleSeries `numReleases` membership counts.
 - [ ] 4.7 Implement an audited group merge transaction that moves member Bottles, generic targets, aliases, and activity while preserving exact ids.
 - [ ] 4.8 Implement an audited group split transaction that moves selected Bottles and keeps ambiguous generic activity on the source group by default.
 - [ ] 4.9 Implement exact Bottle merge independently from group merge and handle cross-group exact duplicates deliberately.
 - [ ] 4.10 Implement representative-Bottle selection and group editorial-content ownership without mutating member Bottle content.
 - [ ] 4.11 Implement idempotent exact Bottle and BottleGroup statistics recomputation without double counting.
-- [ ] 4.12 Add database-backed service tests for creation rollback, retries, duplicate conflicts, trusted reuse, merge, split, representative selection, deletion, and aggregate counts.
+- [ ] 4.12 Add database-backed service tests for creation rollback, retries, duplicate conflicts, trusted reuse, exact-only update isolation, effective-age normalization, shared-update fan-out, per-member audit cardinality, collision rollback, merge, split, representative selection, deletion, and aggregate counts.
 
 ## 5. New-Write API Cutover
 
 - [ ] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
 - [ ] 5.2 Add an authenticated “another release” Bottle create operation with explicit source Bottle context and a unique OpenAPI operation id.
-- [ ] 5.3 Change Bottle update and moderator proposal flows to persist exact fields on Bottle and stable shared edits on BottleGroup.
+- [ ] 5.3 Change Bottle update and moderator proposal flows so exact edits persist only on the selected Bottle and shared edits use the atomic BottleGroup-to-member materialization service.
 - [ ] 5.4 Convert BottleRelease create/update/delete routes into instrumented compatibility adapters over concrete Bottle operations.
 - [ ] 5.5 Update aliases and observations so new writes reference one target and exact aliases resolve directly to a Bottle.
 - [ ] 5.6 Update tasting, review, collection, flight, and price mutations to dual-write `targetId` from exact or generic intent.
@@ -75,7 +75,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 6.2 Assign parents with no releases to their singleton groups and create their exact targets without changing existing Bottle ids.
 - [ ] 6.3 Promote each legacy BottleRelease into a new concrete Bottle by combining stable parent fields with release-owned fields.
 - [ ] 6.4 Persist release-to-Bottle mappings before migrating dependents and make reruns reuse completed promotions.
-- [ ] 6.5 Copy or re-home distillers, series, tags, flavor profiles, descriptions, images, suggested tags, creators, aliases, and observations according to the ownership matrix.
+- [ ] 6.5 Copy or re-home distillers, series, tags, flavor profiles, descriptions, images, suggested tags, creators, aliases, and observations according to the ownership matrix, leaving every promoted Bottle with a complete durable exact record.
 - [ ] 6.6 Stop and report rather than invent data when promoted names/aliases collide or parent release-like fields remain ambiguous.
 - [ ] 6.7 Backfill non-null legacy release references to the promoted Bottle's exact target across every consumer table.
 - [ ] 6.8 Backfill null-release references under parents with releases to the BottleGroup generic target.
@@ -90,7 +90,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
 - [ ] 7.2 Record actionable parity mismatches with consumer table, row id, legacy ids, target id, and resolved identities.
 - [ ] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
-- [ ] 7.4 Switch Bottle list/details/search serializers to concrete Bottles and include group summaries without release-shaped nesting.
+- [ ] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
 - [ ] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
 - [ ] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
 - [ ] 7.7 Update exact and group statistics jobs to read raw target activity and verify aggregate parity with legacy totals.
@@ -123,13 +123,13 @@ it must not preserve a parallel business-logic path.
 - [ ] 9.6 Remove `releaseId` columns, release foreign keys/indexes, and `bottle_release` using a generated Drizzle migration only after backup approval.
 - [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, repair paths, enums, and compatibility branches.
 - [ ] 9.8 Remove retired legacy parent Bottle rows only after every reference and URL has a durable group or Bottle mapping.
-- [ ] 9.9 Remove non-authoritative stable-field columns and distiller joins from the Bottle schema and writes with a generated migration after all readers and callers hydrate those fields from BottleGroup.
-- [ ] 9.10 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings.
+- [ ] 9.9 Remove runtime dependence on BottleGroup hydration for exact Bottle rendering and verify all creation, shared-update, merge, split, and repair writers preserve complete durable Bottle materialization and atomic fan-out.
+- [ ] 9.10 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings, plus zero incomplete Bottle materializations or group/member synchronization defects.
 
 ## 10. Documentation And Final Verification
 
 - [ ] 10.1 Rewrite `docs/architecture/whisky-identity-model.md` around concrete Bottle, automatic BottleGroup, BottleSeries, CatalogTarget, and Observation identities.
-- [ ] 10.2 Update schema conventions to remove the single-known-release rule and define exact Bottle versus stable group field ownership.
+- [ ] 10.2 Update schema conventions to remove the single-known-release rule and define shared BottleGroup editing semantics versus complete durable exact-Bottle materialization.
 - [ ] 10.3 Update bottle-entry, photo-tasting, store-price-matching, and rating documentation for unified Bottle creation and generic group targets.
 - [ ] 10.4 Add any new migration/runbook documentation to the root `AGENTS.md` docs index.
 - [ ] 10.5 Run targeted migration, schema, service, route, serializer, worker, classifier, and repair tests after each backend slice.

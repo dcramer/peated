@@ -1,4 +1,8 @@
-import { db, type AnyDatabase } from "@peated/server/db";
+/**
+ * Owns Bottle alias reservation and assignment. Exact reservation claims only
+ * the alias row; full assignment also migrates matching stored references.
+ */
+import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type {
   BottleAlias,
   BottleAliasAssignmentSource,
@@ -6,10 +10,12 @@ import type {
 import {
   bottleAliases,
   bottles,
+  catalogTargets,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, or, sql } from "drizzle-orm";
 
@@ -24,6 +30,26 @@ export class FailedToSaveBottleAliasError extends Error {
   constructor() {
     super("Failed to save alias.");
     this.name = "FailedToSaveBottleAliasError";
+  }
+}
+
+export type ExactBottleAliasConflictCode =
+  | "another_bottle"
+  | "another_exact_target"
+  | "generic_target"
+  | "legacy_release";
+
+export class ExactBottleAliasConflictError extends Error {
+  constructor(
+    readonly code: ExactBottleAliasConflictCode,
+    readonly alias: Pick<
+      BottleAlias,
+      "name" | "bottleId" | "releaseId" | "targetId"
+    >,
+    readonly conflictingBottleId: number | null,
+  ) {
+    super(`Cannot reserve exact Bottle alias "${alias.name}": ${code}.`);
+    this.name = "ExactBottleAliasConflictError";
   }
 }
 
@@ -58,6 +84,137 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
       : {}),
     assignedByActorId: options.assignedByActorId,
   };
+}
+
+async function getExactBottleAliasConflict(
+  tx: AnyTransaction,
+  alias: BottleAlias,
+  { bottleId, targetId }: { bottleId: number; targetId: number },
+): Promise<{
+  code: ExactBottleAliasConflictCode;
+  conflictingBottleId: number | null;
+} | null> {
+  if (alias.releaseId !== null) {
+    return {
+      code: "legacy_release",
+      conflictingBottleId: alias.bottleId,
+    };
+  }
+
+  if (alias.targetId !== null && alias.targetId !== targetId) {
+    const [existingTarget] = await tx
+      .select({ bottleId: catalogTargets.bottleId })
+      .from(catalogTargets)
+      .where(eq(catalogTargets.id, alias.targetId))
+      .limit(1);
+
+    return existingTarget?.bottleId === null
+      ? { code: "generic_target", conflictingBottleId: null }
+      : {
+          code: "another_exact_target",
+          conflictingBottleId: existingTarget?.bottleId ?? null,
+        };
+  }
+
+  if (alias.bottleId !== null && alias.bottleId !== bottleId) {
+    return {
+      code: "another_bottle",
+      conflictingBottleId: alias.bottleId,
+    };
+  }
+
+  return null;
+}
+
+/** Reserves a canonical alias without migrating references or prior aliases. */
+export async function reserveExactBottleAliasInTransaction(
+  tx: AnyTransaction,
+  {
+    name,
+    bottleId,
+    targetId,
+    assignmentSource,
+    assignedByActorId,
+  }: {
+    name: string;
+    bottleId: number;
+    targetId: number;
+    assignmentSource: BottleAliasAssignmentSource;
+    assignedByActorId: number;
+  },
+): Promise<{ name: string; changed: boolean }> {
+  const aliasName = normalizeBottleAliasKey(name);
+  if (!aliasName) {
+    throw new FailedToSaveBottleAliasError();
+  }
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const [existingAlias] = await tx
+      .select()
+      .from(bottleAliases)
+      .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
+      .limit(1)
+      .for("update");
+
+    if (!existingAlias) {
+      const [insertedAlias] = await tx
+        .insert(bottleAliases)
+        .values({
+          name: aliasName,
+          bottleId,
+          releaseId: null,
+          targetId,
+          ignored: false,
+          assignmentSource,
+          assignedByActorId,
+        })
+        .onConflictDoNothing()
+        .returning();
+      if (insertedAlias) {
+        return { name: insertedAlias.name, changed: true };
+      }
+      // A concurrent insert may win the unique name; re-read it once.
+      continue;
+    }
+
+    const conflict = await getExactBottleAliasConflict(tx, existingAlias, {
+      bottleId,
+      targetId,
+    });
+    if (conflict) {
+      throw new ExactBottleAliasConflictError(
+        conflict.code,
+        existingAlias,
+        conflict.conflictingBottleId,
+      );
+    }
+
+    if (
+      existingAlias.bottleId === bottleId &&
+      existingAlias.targetId === targetId
+    ) {
+      return { name: existingAlias.name, changed: false };
+    }
+
+    const [claimedAlias] = await tx
+      .update(bottleAliases)
+      .set({
+        name: aliasName,
+        bottleId,
+        releaseId: null,
+        targetId,
+        ignored: false,
+        assignmentSource,
+        assignedByActorId,
+      })
+      .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
+      .returning();
+    if (claimedAlias) {
+      return { name: claimedAlias.name, changed: true };
+    }
+  }
+
+  throw new FailedToSaveBottleAliasError();
 }
 
 /**

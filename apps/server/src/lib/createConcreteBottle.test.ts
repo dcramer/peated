@@ -233,7 +233,7 @@ describe("concrete Bottle creation", () => {
     });
     expect(result.bottle).toMatchObject({
       name: "Old Malt 12-year-old",
-      statedAge: null,
+      statedAge: 12,
     });
   });
 

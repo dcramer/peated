@@ -1,7 +1,7 @@
 /**
  * Shares preparation and persistence across complete legacy and concrete Bottle
- * transactions; no partial operation is exported. Concrete stable-field and
- * distiller mirrors remain for legacy readers until task 9.9.
+ * transactions. Stable fields and distiller joins are durable parts of each
+ * concrete Bottle's independently renderable identity.
  */
 import {
   bottleNameDuplicatesBrand,
@@ -9,8 +9,6 @@ import {
   normalizeBottleAliasKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
-import { formatCanonicalReleaseName } from "@peated/bottle-classifier/releaseIdentity";
-import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type {
@@ -32,8 +30,8 @@ import {
   bottleTombstones,
   catalogTargets,
   changes,
-  entities,
 } from "@peated/server/db/schema";
+import { reserveExactBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   getCatalogVerificationCreationMetadata,
@@ -47,7 +45,6 @@ import {
 } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
-import { toTitleCase } from "@peated/server/lib/strings";
 import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
@@ -56,10 +53,11 @@ import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import type { z } from "zod";
 import { getUserActor } from "./actors";
-import type { ConcreteBottleCreateInput } from "./createConcreteBottle";
+import { findConflictingSmwsBottleId } from "./concreteBottleConflicts";
+import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
+import type { ConcreteBottleCreateInput } from "./concreteBottleSchemas";
 
 export class BottleCreateBadRequestError extends Error {
   constructor(message: string) {
@@ -105,40 +103,6 @@ type ConcreteIdentityPreparation = {
   stableStatedAge: number | null;
 };
 
-/** Concrete aliases include exact cask traits without changing legacy release display. */
-function formatConcreteCaskIdentity({
-  fullName,
-  name,
-  caskType,
-  caskSize,
-  caskFill,
-}: {
-  fullName: string;
-  name: string;
-  caskType: string | null | undefined;
-  caskSize: string | null | undefined;
-  caskFill: string | null | undefined;
-}) {
-  const caskBits = [
-    caskType ? `${toTitleCase(caskType)} Cask` : null,
-    caskSize ? toTitleCase(caskSize) : null,
-    caskFill
-      ? caskFill === "other"
-        ? "Other Fill"
-        : toTitleCase(caskFill)
-      : null,
-  ].filter((value): value is string => value !== null);
-
-  if (!caskBits.length) {
-    return { fullName, name };
-  }
-
-  return {
-    fullName: [fullName, ...caskBits].join(" - "),
-    name: [name, ...caskBits].join(" - "),
-  };
-}
-
 type IndependentConcreteBottleCreateInput = Extract<
   ConcreteBottleCreateInput,
   { kind: "independent" }
@@ -172,11 +136,6 @@ export class TrustedSourceBottleError extends Error {
   }
 }
 
-type SmwsEntityName = {
-  name: string;
-  shortName?: string | null;
-};
-
 async function getExistingBottleIdForAlias(
   tx: AnyTransaction,
   aliasName: string,
@@ -190,166 +149,6 @@ async function getExistingBottleIdForAlias(
     .limit(1);
 
   return result?.bottleId ?? null;
-}
-
-function getSmwsCodeFromValues(values: Array<string | null | undefined>) {
-  for (const value of values) {
-    const code = parseSmwsReferenceName(value)?.code;
-    if (code) {
-      return code;
-    }
-  }
-
-  return null;
-}
-
-function valuesHaveSmwsCode(
-  values: Array<string | null | undefined>,
-  code: string,
-) {
-  return values.some((value) => parseSmwsReferenceName(value)?.code === code);
-}
-
-function entityNameVariants(
-  entity: SmwsEntityName | null,
-  name: string | null,
-) {
-  if (!entity || !name) {
-    return [];
-  }
-
-  return [
-    entity.shortName ? `${entity.shortName} ${name}` : null,
-    `${entity.name} ${name}`,
-  ];
-}
-
-function getSmwsCodeForBottleCreate({
-  name,
-  fullName,
-  brand,
-  bottler,
-}: {
-  name: string;
-  fullName: string;
-  brand: SmwsEntityName;
-  bottler: SmwsEntityName | null;
-}) {
-  return getSmwsCodeFromValues([
-    fullName,
-    ...entityNameVariants(brand, name),
-    ...entityNameVariants(bottler, name),
-  ]);
-}
-
-function rowHasSmwsCode(
-  row: {
-    aliasName: string | null;
-    bottleName: string;
-    fullName: string;
-    brandName: string | null;
-    brandShortName: string | null;
-    bottlerName: string | null;
-    bottlerShortName: string | null;
-  },
-  code: string,
-) {
-  const brand = { name: row.brandName ?? "", shortName: row.brandShortName };
-  const bottler = {
-    name: row.bottlerName ?? "",
-    shortName: row.bottlerShortName,
-  };
-
-  return valuesHaveSmwsCode(
-    [
-      row.aliasName,
-      row.fullName,
-      ...entityNameVariants(brand, row.bottleName),
-      ...entityNameVariants(brand, row.aliasName),
-      ...entityNameVariants(bottler, row.bottleName),
-      ...entityNameVariants(bottler, row.aliasName),
-    ],
-    code,
-  );
-}
-
-async function findExistingSmwsBottleIdForCreate(
-  tx: AnyTransaction,
-  {
-    name,
-    fullName,
-    brand,
-    bottler,
-  }: {
-    name: string;
-    fullName: string;
-    brand: SmwsEntityName;
-    bottler: SmwsEntityName | null;
-  },
-): Promise<number | null> {
-  const code = getSmwsCodeForBottleCreate({
-    name,
-    fullName,
-    brand,
-    bottler,
-  });
-  if (!code) {
-    return null;
-  }
-
-  await tx.execute(
-    sql`SELECT pg_advisory_xact_lock(hashtext(${`smws:${code}`}))`,
-  );
-
-  const brandEntity = alias(entities, "smws_create_brand");
-  const bottlerEntity = alias(entities, "smws_create_bottler");
-  const codeSearch = `%${code}%`;
-  const smwsSearch = "%SMWS%";
-  const societySearch = "%Scotch Malt Whisky Society%";
-
-  const rows = await tx
-    .select({
-      bottleId: bottles.id,
-      bottleName: bottles.name,
-      fullName: bottles.fullName,
-      aliasName: bottleAliases.name,
-      brandName: brandEntity.name,
-      brandShortName: brandEntity.shortName,
-      bottlerName: bottlerEntity.name,
-      bottlerShortName: bottlerEntity.shortName,
-    })
-    .from(bottles)
-    .innerJoin(brandEntity, eq(brandEntity.id, bottles.brandId))
-    .leftJoin(bottlerEntity, eq(bottlerEntity.id, bottles.bottlerId))
-    .leftJoin(
-      bottleAliases,
-      and(
-        eq(bottleAliases.bottleId, bottles.id),
-        sql`${bottleAliases.ignored} IS DISTINCT FROM true`,
-      ),
-    )
-    .where(
-      and(
-        sql`(
-          ${bottles.name} ILIKE ${codeSearch}
-          OR ${bottles.fullName} ILIKE ${codeSearch}
-          OR ${bottleAliases.name} ILIKE ${codeSearch}
-        )`,
-        sql`(
-          LOWER(${brandEntity.name}) IN ('smws', 'the scotch malt whisky society', 'scotch malt whisky society')
-          OR LOWER(COALESCE(${brandEntity.shortName}, '')) = 'smws'
-          OR LOWER(COALESCE(${bottlerEntity.name}, '')) IN ('smws', 'the scotch malt whisky society', 'scotch malt whisky society')
-          OR LOWER(COALESCE(${bottlerEntity.shortName}, '')) = 'smws'
-          OR ${bottles.fullName} ILIKE ${smwsSearch}
-          OR ${bottles.fullName} ILIKE ${societySearch}
-          OR ${bottleAliases.name} ILIKE ${smwsSearch}
-          OR ${bottleAliases.name} ILIKE ${societySearch}
-        )`,
-      ),
-    )
-    .orderBy(bottles.id);
-
-  return rows.find((row) => rowHasSmwsCode(row, code))?.bottleId ?? null;
 }
 
 /** Writes prerequisites and reserves the alias for same-transaction Bottle insertion. */
@@ -406,7 +205,7 @@ async function prepareBottleCreateInTransaction(
   const newEntityIds: Set<number> = new Set();
   let seriesCreated = false;
 
-  const existingSmwsBottleId = await findExistingSmwsBottleIdForCreate(tx, {
+  const existingSmwsBottleId = await findConflictingSmwsBottleId(tx, {
     name: bottleData.name,
     fullName: formatBottleName({
       ...bottleData,
@@ -499,31 +298,24 @@ async function prepareBottleCreateInTransaction(
       name: `${brand.shortName || brand.name} ${stableName}`,
     });
   const concreteName = concreteIdentity
-    ? formatConcreteCaskIdentity({
-        ...formatCanonicalReleaseName({
-          bottleName: stableName,
-          bottleFullName: stableFullName,
-          bottleReleaseTraits: {
-            caskStrength: bottleData.caskStrength ?? null,
-            singleCask: bottleData.singleCask ?? null,
-          },
-          bottleStatedAge: concreteIdentity.stableStatedAge,
-          release: {
-            edition: bottleData.edition ?? null,
-            statedAge: bottleData.statedAge ?? null,
-            releaseYear: bottleData.releaseYear ?? null,
-            vintageYear: bottleData.vintageYear ?? null,
-            abv: bottleData.abv ?? null,
-            singleCask: bottleData.singleCask ?? null,
-            caskStrength: bottleData.caskStrength ?? null,
-            caskType: bottleData.caskType ?? null,
-            caskSize: bottleData.caskSize ?? null,
-            caskFill: bottleData.caskFill ?? null,
-          },
-        }),
-        caskType: bottleData.caskType,
-        caskSize: bottleData.caskSize,
-        caskFill: bottleData.caskFill,
+    ? materializeConcreteBottleIdentity({
+        stable: {
+          name: stableName,
+          fullName: stableFullName,
+          statedAge: concreteIdentity.stableStatedAge,
+        },
+        exact: {
+          edition: bottleData.edition ?? null,
+          statedAge: bottleData.statedAge ?? null,
+          releaseYear: bottleData.releaseYear ?? null,
+          vintageYear: bottleData.vintageYear ?? null,
+          abv: bottleData.abv ?? null,
+          singleCask: bottleData.singleCask ?? null,
+          caskStrength: bottleData.caskStrength ?? null,
+          caskType: bottleData.caskType ?? null,
+          caskSize: bottleData.caskSize ?? null,
+          caskFill: bottleData.caskFill ?? null,
+        },
       })
     : null;
   const fullName =
@@ -536,6 +328,7 @@ async function prepareBottleCreateInTransaction(
   const bottleInsertData: NewBottle = {
     ...bottleData,
     name: concreteName?.name ?? bottleData.name,
+    statedAge: concreteName ? concreteName.statedAge : bottleData.statedAge,
     brandId: brand.id,
     bottlerId: bottler?.id || null,
     seriesId,
@@ -569,10 +362,7 @@ async function prepareBottleCreateInTransaction(
   };
 }
 
-/**
- * Persists Bottle and audit rows plus temporary legacy-reader mirrors inside a
- * complete transaction.
- */
+/** Persists the Bottle, its durable distiller joins, alias, and audit rows. */
 async function insertPreparedBottleInTransaction(
   tx: AnyTransaction,
   prepared: PreparedBottleCreate,
@@ -961,21 +751,13 @@ export async function createConcreteBottleInTransaction(
     .values({ groupId: group.id, bottleId: bottleResult.bottle.id })
     .returning();
 
-  const [targetedAlias] = await tx
-    .update(bottleAliases)
-    .set({ targetId: exactTarget.id })
-    .where(
-      and(
-        eq(sql`LOWER(${bottleAliases.name})`, prepared.aliasName.toLowerCase()),
-        eq(bottleAliases.bottleId, bottleResult.bottle.id),
-      ),
-    )
-    .returning({ name: bottleAliases.name });
-  if (!targetedAlias) {
-    throw new Error(
-      "Failed to assign the canonical alias to its exact target.",
-    );
-  }
+  await reserveExactBottleAliasInTransaction(tx, {
+    name: prepared.aliasName,
+    bottleId: bottleResult.bottle.id,
+    targetId: exactTarget.id,
+    assignmentSource: "canonical",
+    assignedByActorId: createdByActorId,
+  });
 
   let persistedGroup: BottleGroup;
   if (trustedContext) {

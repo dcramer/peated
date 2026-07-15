@@ -11,6 +11,8 @@ Current paired references exist in tastings, reviews, collection entries, flight
 **Goals:**
 
 - Give every concrete marketed catalog entry one Bottle identity and one `bottleId`.
+- Keep every Bottle independently complete, correct, and renderable without
+  hydrating its BottleGroup.
 - Ensure every Bottle belongs to exactly one automatically created BottleGroup.
 - Make independent Bottle creation safe without automatic semantic grouping.
 - Represent exact and unknown-exactness activity with one database-enforced target id.
@@ -40,11 +42,26 @@ BottleGroup (shared expression identity)
   -> Bottle (another concrete marketed release)
 ```
 
-BottleGroup owns the stable display identity needed for a generic target: group name, brand, bottler/distillers, category, series, flavor profile, stable stated age, aliases, representative Bottle, and aggregate statistics. Bottle owns its exact display name and release facts: edition, release/vintage year, release-specific age, ABV, single-cask/cask-strength flags, cask traits, exact image/content, aliases, and exact statistics.
+BottleGroup owns the generic target's shared label and the editing semantics for
+common identity and metadata: group name, brand, bottler/distillers, category,
+series, flavor profile, stable stated age, stable aliases, representative
+Bottle, and aggregate statistics. Every Bottle durably stores the common values
+needed for its own complete identity plus its exact display name and release
+facts: edition, release/vintage year, effective stated age, ABV,
+single-cask/cask-strength flags, cask traits, exact image/content, aliases, and
+exact statistics. An exact Bottle read, serializer, search result, or page uses
+the Bottle record and does not require BottleGroup hydration to become correct
+or renderable.
 
 Every Bottle has a non-null `groupId`. A BottleGroup must have at least one active Bottle after a transaction completes. User-facing pages may call a group “this expression” or “all releases”; ordinary users do not create a BottleGroup directly.
 
-This retains normalized shared metadata without allowing the group to impersonate an exact Bottle. The alternative of putting every field on Bottle and deriving a group name from members was rejected because a safe generic name cannot be inferred by stripping years, batches, or cask tokens.
+BottleGroup is the moderator editing scope for shared values, while each Bottle
+is the durable, authoritative exact record presented to users. A shared edit is
+therefore a transactional fan-out, not a runtime inheritance relationship. This
+retains an explicit generic identity without allowing the group to impersonate
+an exact Bottle. Deriving a group name from member Bottles was rejected because
+a safe generic name cannot be inferred by stripping years, batches, or cask
+tokens.
 
 ### Group creation is automatic; semantic merging is contextual
 
@@ -99,6 +116,49 @@ The existing Add Bottle and Add Bottling field components become one add/edit Bo
 - exact duplicate checks apply to Bottle identity; likely expression-group matches are suggestions, not blocking identity decisions.
 
 The ordinary workflow never asks “Bottle or Bottling?” and never exposes a standalone Create BottleGroup form.
+
+### Shared edits atomically regenerate complete Bottles
+
+Moderator updates distinguish shared group edits from exact-only Bottle edits.
+An exact-only edit updates the selected Bottle and its exact aliases without
+mutating its BottleGroup or sibling Bottles. A shared edit updates the
+BottleGroup and atomically fans out the new common identity and metadata to
+every member Bottle, including the durable brand, bottler, distiller, category,
+series, flavor-profile, effective stated-age, and complete name materialization
+needed by exact Bottle reads.
+
+Bottle `statedAge` always stores the effective age without adding provenance
+schema. Relative to the pre-update current group age, a non-null Bottle age that
+differs is an exact override; a null or equal value means shared inheritance.
+An exact null clears the override and materializes the resulting group age on
+the Bottle. An explicit exact age equal to the shared age is semantically
+redundant and does not become a sticky override. A shared-age fan-out preserves
+the differing exact overrides identified against the current group age and
+writes the resulting group age to every other member.
+
+The fan-out regenerates each member's complete `name` and `fullName` from the
+new shared identity plus that member's preserved exact fields. In particular, a
+stable group label or prefix rename regenerates every member's complete exact
+identity. Every previous canonical exact name remains attached to the same
+Bottle as an exact alias. The transaction preflights and enforces Bottle and
+alias uniqueness; any name or alias collision, incomplete member update, or
+audit failure rolls back the group edit, all member updates, and all alias
+changes together. Indexing, verification, and other slow post-commit work
+remains idempotent and outside the committed request path.
+
+Task 4.6 uses the existing `bottle` update audit shape. A shared fan-out writes
+one transactional Bottle update row per affected member with group id and
+shared-scope context. When the selected Bottle also has exact changes, its one
+row contains the combined shared and exact context rather than writing two
+rows. Task 4.6 does not add a `bottle_group` audit enum or migration.
+
+Neither shared nor exact-only updates change Bottle ids, group membership,
+generic or exact target ids, representative selection, activity, or
+Bottle/BottleGroup activity and rating aggregates. When a shared edit changes
+series membership or repairs drift, task 4.6 recomputes only the affected old
+and new BottleSeries `numReleases` membership counts. Other statistics remain
+owned by their explicit merge, split, representative, and recomputation
+operations.
 
 ### Series remains a broader merchandising relationship
 
@@ -159,7 +219,7 @@ must have an explicit removal task:
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
 - release-only search/indexing: task 7.5;
 - nested Bottling UI: task 8.9;
-- non-authoritative Bottle stable-field mirrors: task 9.9;
+- exact-Bottle runtime dependence on BottleGroup hydration: task 9.9;
 - remaining runtime/storage references and the final zero-legacy audit: tasks 9.6,
   9.7, and 9.10.
 
@@ -173,6 +233,9 @@ the implementation they covered.
 - **Ambiguous legacy parent fields could create a missing or invented Bottle** → Audit parents with both releases and release-like fields, run existing repair tooling, and require an explicit migration disposition before retirement.
 - **The cross-cutting target migration can produce mixed reads** → Add `targetId` first, dual-read with parity assertions, backfill in resumable batches, and gate every cutover on zero null/mismatch counts.
 - **Promoted names or aliases can collide with existing Bottles** → Produce a preflight collision report and resolve through exact Bottle merge/mapping rather than suffixing or silently overwriting names.
+- **A shared edit can collide or partially rematerialize a group** → Lock and
+  update the group, all member Bottles, retained exact aliases, and audit rows in
+  one transaction; roll back the entire edit on any collision or failed member.
 - **Automatic fuzzy grouping can corrupt ratings** → Automatically create singleton groups but require trusted context or moderation for group merges.
 - **More rows are created for singleton products** → Keep groups invisible in normal UI and create group/Bottle/targets atomically; the predictable invariant is worth the storage overhead.
 - **Generic targets complicate some consumers** → Centralize polymorphism in `catalog_target` and serializers so feature tables keep one foreign key.
@@ -189,7 +252,7 @@ the implementation they covered.
 6. **Parity period:** dual-read target and legacy references, assert serialized identity parity, compare exact/group counts, rebuild search indexes, and verify representative URLs and workflows.
 7. **Product cutover:** switch search, Bottle details, Library, tastings, reviews, prices, flights, activity, and moderation UI to Bottle/Group targets. Redirect old nested bottling routes.
 8. **Constraint cutover:** make required group/target columns non-null, reject new release writes, and remove paired-reference use from runtime code.
-9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing `releaseId` columns and `bottle_release`; remove release routes, serializers, jobs, form pages, legacy repair code, and non-authoritative Bottle stable-field mirrors; then run the final zero-legacy audit and update architecture documentation.
+9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing `releaseId` columns and `bottle_release`; remove release routes, serializers, jobs, form pages, and legacy repair code; remove runtime dependence on BottleGroup hydration for exact Bottle rendering while retaining complete Bottle materialization; then run the final zero-legacy and materialization-invariant audit and update architecture documentation.
 
 Rollback remains straightforward through the parity period: disable new-write cutover, read legacy columns, and retain additive records. After destructive cleanup, rollback requires restoring the pre-cleanup database snapshot or applying a forward repair, so cleanup ships separately with an explicit backup and verification checkpoint.
 
