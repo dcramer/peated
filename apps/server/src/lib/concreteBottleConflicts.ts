@@ -2,8 +2,10 @@ import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-cla
 import type { AnyTransaction } from "@peated/server/db";
 import { bottleAliases, bottles, entities } from "@peated/server/db/schema";
 import {
+  type ExactBottleAliasBeforeSnapshot,
   ExactBottleAliasConflictError,
-  reserveExactBottleAliasInTransaction,
+  reserveExactBottleAliasWithPreimageInTransaction,
+  reserveLiteralCanonicalBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, notInArray, or, sql } from "drizzle-orm";
@@ -26,6 +28,13 @@ export type ConcreteBottleIdentityCandidate = {
   targetId: number;
   current: ConcreteBottleIdentityState;
   desired: ConcreteBottleIdentityState;
+};
+
+export type ConcreteBottleAliasMutation = {
+  name: string;
+  bottleId: number;
+  targetId: number;
+  before: ExactBottleAliasBeforeSnapshot | null;
 };
 
 export type ConcreteBottleIdentityConflictCause =
@@ -231,7 +240,10 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
     candidates: ConcreteBottleIdentityCandidate[];
     assignedByActorId: number;
   },
-): Promise<{ changedAliasNames: string[] }> {
+): Promise<{
+  changedAliasNames: string[];
+  aliasMutations: ConcreteBottleAliasMutation[];
+}> {
   const sortedCandidates = [...candidates].sort(
     (left, right) => left.bottleId - right.bottleId,
   );
@@ -325,6 +337,10 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
     string,
     { name: string; bottleId: number; targetId: number }
   >();
+  const literalReservations = new Map<
+    string,
+    { name: string; bottleId: number; targetId: number }
+  >();
   for (const candidate of identityChanges) {
     for (const name of [
       candidate.current.fullName,
@@ -344,22 +360,47 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
         targetId: candidate.targetId,
       });
     }
+
+    const literalName = candidate.current.fullName.trim();
+    const literalKey = literalName.toLowerCase();
+    const existingLiteral = literalReservations.get(literalKey);
+    if (existingLiteral && existingLiteral.bottleId !== candidate.bottleId) {
+      throw new ConcreteBottleIdentityConflictError(
+        existingLiteral.bottleId,
+        "exact_alias",
+      );
+    }
+    literalReservations.set(literalKey, {
+      name: literalName,
+      bottleId: candidate.bottleId,
+      targetId: candidate.targetId,
+    });
   }
 
   const changedAliasNames = new Set<string>();
-  for (const reservation of Array.from(reservations.values()).sort(
-    (left, right) =>
-      normalizeBottleAliasKey(left.name)
-        .toLowerCase()
-        .localeCompare(normalizeBottleAliasKey(right.name).toLowerCase()),
-  )) {
+  const aliasMutations = new Map<string, ConcreteBottleAliasMutation>();
+  const reserveAlias = async (
+    reservation: { name: string; bottleId: number; targetId: number },
+    reserve: typeof reserveExactBottleAliasWithPreimageInTransaction,
+  ) => {
     try {
-      const result = await reserveExactBottleAliasInTransaction(tx, {
+      const result = await reserve(tx, {
         ...reservation,
         assignmentSource: "canonical",
         assignedByActorId,
       });
-      if (result.changed) changedAliasNames.add(result.name);
+      if (result.changed) {
+        changedAliasNames.add(result.name);
+        const key = result.name.toLowerCase();
+        if (!aliasMutations.has(key)) {
+          aliasMutations.set(key, {
+            name: result.name,
+            bottleId: reservation.bottleId,
+            targetId: reservation.targetId,
+            before: result.before,
+          });
+        }
+      }
     } catch (error) {
       if (error instanceof ExactBottleAliasConflictError) {
         throw new ConcreteBottleIdentityConflictError(
@@ -370,7 +411,36 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
       }
       throw error;
     }
+  };
+
+  for (const reservation of Array.from(reservations.values()).sort(
+    (left, right) =>
+      normalizeBottleAliasKey(left.name)
+        .toLowerCase()
+        .localeCompare(normalizeBottleAliasKey(right.name).toLowerCase()),
+  )) {
+    await reserveAlias(
+      reservation,
+      reserveExactBottleAliasWithPreimageInTransaction,
+    );
   }
 
-  return { changedAliasNames: Array.from(changedAliasNames).sort() };
+  for (const reservation of Array.from(literalReservations.values()).sort(
+    (left, right) =>
+      left.name.toLowerCase().localeCompare(right.name.toLowerCase()),
+  )) {
+    await reserveAlias(
+      reservation,
+      reserveLiteralCanonicalBottleAliasInTransaction,
+    );
+  }
+
+  return {
+    changedAliasNames: Array.from(changedAliasNames).sort(),
+    aliasMutations: Array.from(aliasMutations.values()).sort(
+      (left, right) =>
+        left.name.toLowerCase().localeCompare(right.name.toLowerCase()) ||
+        left.name.localeCompare(right.name),
+    ),
+  };
 }

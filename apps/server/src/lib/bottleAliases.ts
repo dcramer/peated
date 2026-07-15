@@ -126,24 +126,63 @@ async function getExactBottleAliasConflict(
   return null;
 }
 
-/** Reserves a canonical alias without migrating references or prior aliases. */
-export async function reserveExactBottleAliasInTransaction(
+export type ExactBottleAliasBeforeSnapshot = Pick<
+  BottleAlias,
+  | "name"
+  | "bottleId"
+  | "releaseId"
+  | "targetId"
+  | "ignored"
+  | "assignmentSource"
+  | "assignedByActorId"
+  | "createdAt"
+>;
+
+export type ExactBottleAliasReservationWithPreimage =
+  | { name: string; changed: false }
+  | {
+      name: string;
+      changed: true;
+      before: ExactBottleAliasBeforeSnapshot | null;
+    };
+
+type ExactBottleAliasReservationInput = {
+  name: string;
+  bottleId: number;
+  targetId: number;
+  assignmentSource: BottleAliasAssignmentSource;
+  assignedByActorId: number;
+};
+
+function exactBottleAliasBeforeSnapshot(
+  alias: BottleAlias,
+): ExactBottleAliasBeforeSnapshot {
+  return {
+    name: alias.name,
+    bottleId: alias.bottleId,
+    releaseId: alias.releaseId,
+    targetId: alias.targetId,
+    ignored: alias.ignored,
+    assignmentSource: alias.assignmentSource,
+    assignedByActorId: alias.assignedByActorId,
+    createdAt: alias.createdAt,
+  };
+}
+
+/**
+ * Owns durable exact-alias reservation, returns its reversal preimage, and
+ * retries once when a concurrent unique-name insert wins.
+ */
+async function reserveExactBottleAliasNameInTransaction(
   tx: AnyTransaction,
   {
-    name,
+    name: aliasName,
     bottleId,
     targetId,
     assignmentSource,
     assignedByActorId,
-  }: {
-    name: string;
-    bottleId: number;
-    targetId: number;
-    assignmentSource: BottleAliasAssignmentSource;
-    assignedByActorId: number;
-  },
-): Promise<{ name: string; changed: boolean }> {
-  const aliasName = normalizeBottleAliasKey(name);
+  }: ExactBottleAliasReservationInput,
+): Promise<ExactBottleAliasReservationWithPreimage> {
   if (!aliasName) {
     throw new FailedToSaveBottleAliasError();
   }
@@ -171,7 +210,7 @@ export async function reserveExactBottleAliasInTransaction(
         .onConflictDoNothing()
         .returning();
       if (insertedAlias) {
-        return { name: insertedAlias.name, changed: true };
+        return { name: insertedAlias.name, changed: true, before: null };
       }
       // A concurrent insert may win the unique name; re-read it once.
       continue;
@@ -210,11 +249,49 @@ export async function reserveExactBottleAliasInTransaction(
       .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
       .returning();
     if (claimedAlias) {
-      return { name: claimedAlias.name, changed: true };
+      return {
+        name: claimedAlias.name,
+        changed: true,
+        before: exactBottleAliasBeforeSnapshot(existingAlias),
+      };
     }
   }
 
   throw new FailedToSaveBottleAliasError();
+}
+
+/** Reserves a normalized canonical alias without migrating other references. */
+export async function reserveExactBottleAliasWithPreimageInTransaction(
+  tx: AnyTransaction,
+  input: ExactBottleAliasReservationInput,
+): Promise<ExactBottleAliasReservationWithPreimage> {
+  return reserveExactBottleAliasNameInTransaction(tx, {
+    ...input,
+    name: normalizeBottleAliasKey(input.name),
+  });
+}
+
+/** Reserves the literal trimmed canonical name already persisted on a Bottle. */
+export async function reserveLiteralCanonicalBottleAliasInTransaction(
+  tx: AnyTransaction,
+  input: ExactBottleAliasReservationInput,
+): Promise<ExactBottleAliasReservationWithPreimage> {
+  return reserveExactBottleAliasNameInTransaction(tx, {
+    ...input,
+    name: input.name.trim(),
+  });
+}
+
+/** Reserves a normalized canonical alias without migrating other references. */
+export async function reserveExactBottleAliasInTransaction(
+  tx: AnyTransaction,
+  input: ExactBottleAliasReservationInput,
+): Promise<{ name: string; changed: boolean }> {
+  const result = await reserveExactBottleAliasWithPreimageInTransaction(
+    tx,
+    input,
+  );
+  return { name: result.name, changed: result.changed };
 }
 
 /**
