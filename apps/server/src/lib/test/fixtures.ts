@@ -468,6 +468,7 @@ async function createBottleFixture(
             brandId: brand.id,
             bottlerId: bottleData.bottlerId,
             flavorProfile: bottleData.flavorProfile,
+            totalBottles: 1,
             createdByActorId,
             distillerIds,
           },

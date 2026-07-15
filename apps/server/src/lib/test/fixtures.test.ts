@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
-import { bottleAliases, catalogTargets, flightBottles } from "../../db/schema";
+import {
+  bottleAliases,
+  bottleGroups,
+  catalogTargets,
+  flightBottles,
+} from "../../db/schema";
 
 describe("catalog identity fixtures", () => {
   test("standard consumers use the Bottle exact target", async ({
@@ -11,6 +16,9 @@ describe("catalog identity fixtures", () => {
       where: eq(catalogTargets.bottleId, bottle.id),
     });
     if (!exactTarget) throw new Error("Bottle fixture is missing exact target");
+    const group = await db.query.bottleGroups.findFirst({
+      where: eq(bottleGroups.id, bottle.groupId as number),
+    });
 
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
     const review = await fixtures.Review({ bottleId: bottle.id });
@@ -27,6 +35,7 @@ describe("catalog identity fixtures", () => {
     expect(price.targetId).toBe(exactTarget.id);
     expect(alias.targetId).toBe(exactTarget.id);
     expect(flightBottle?.targetId).toBe(exactTarget.id);
+    expect(group?.totalBottles).toBe(1);
   });
 
   test("legacy fixtures retain nullable group and target identity", async ({

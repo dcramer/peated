@@ -122,6 +122,9 @@ Classifier, price matching, and moderation routes:
 
 Catalog identity, aliases, search, and creation:
 
+- `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
+  reader/writer from tasks 3.2/3.7; retain it through the task 9.5 read window
+  and remove its legacy branch under task 9.7.
 - `apps/server/src/lib/bottleAliases.ts`
 - `apps/server/src/lib/bottleCreationDrafts.ts`
 - `apps/server/src/lib/bottleFinder.ts`
