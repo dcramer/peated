@@ -1,20 +1,61 @@
-import {
-  formatCanonicalReleaseName,
-  type ReleaseIdentityInput,
-} from "@peated/bottle-classifier/releaseIdentity";
+import { formatCanonicalReleaseName } from "@peated/bottle-classifier/releaseIdentity";
+import type { Bottle, BottleGroup } from "@peated/server/db/schema";
 import { toTitleCase } from "@peated/server/lib/strings";
 
-type StableConcreteBottleIdentity = {
-  name: string;
-  fullName: string;
-  statedAge: number | null;
-};
+type StableConcreteBottleIdentity = Pick<
+  BottleGroup,
+  "name" | "fullName" | "statedAge"
+>;
 
-type MaterializedConcreteBottleIdentity = {
-  name: string;
-  fullName: string;
-  statedAge: number | null;
-};
+type MaterializedConcreteBottleIdentity = Pick<
+  Bottle,
+  "name" | "fullName" | "statedAge"
+>;
+
+export type ConcreteBottleExactIdentity = Pick<
+  Bottle,
+  | "edition"
+  | "statedAge"
+  | "releaseYear"
+  | "vintageYear"
+  | "abv"
+  | "singleCask"
+  | "caskStrength"
+  | "caskType"
+  | "caskSize"
+  | "caskFill"
+>;
+
+export type ConcreteBottleExactIdentityPatch =
+  Partial<ConcreteBottleExactIdentity>;
+
+export type ConcreteBottleGroupMaterialization = Pick<
+  BottleGroup,
+  | "name"
+  | "fullName"
+  | "statedAge"
+  | "brandId"
+  | "bottlerId"
+  | "seriesId"
+  | "category"
+  | "flavorProfile"
+>;
+
+export type MaterializedConcreteBottleForGroup = Pick<
+  Bottle,
+  | "name"
+  | "fullName"
+  | "statedAge"
+  | "brandId"
+  | "bottlerId"
+  | "seriesId"
+  | "category"
+  | "flavorProfile"
+>;
+
+function valueOrCurrent<T>(value: T | undefined, current: T): T {
+  return value === undefined ? current : value;
+}
 
 /** Returns only a non-redundant exact age relative to the shared age. */
 export function getConcreteBottleExactStatedAge({
@@ -27,6 +68,33 @@ export function getConcreteBottleExactStatedAge({
   return bottleStatedAge !== null && bottleStatedAge !== stableStatedAge
     ? bottleStatedAge
     : null;
+}
+
+/** Applies an exact patch while classifying age against the source group. */
+export function getConcreteBottleExactIdentity({
+  bottle,
+  sourceGroupStatedAge,
+  exactPatch,
+}: {
+  bottle: ConcreteBottleExactIdentity;
+  sourceGroupStatedAge: number | null;
+  exactPatch?: ConcreteBottleExactIdentityPatch;
+}): ConcreteBottleExactIdentity {
+  return {
+    edition: valueOrCurrent(exactPatch?.edition, bottle.edition),
+    statedAge: getConcreteBottleExactStatedAge({
+      bottleStatedAge: valueOrCurrent(exactPatch?.statedAge, bottle.statedAge),
+      stableStatedAge: sourceGroupStatedAge,
+    }),
+    releaseYear: valueOrCurrent(exactPatch?.releaseYear, bottle.releaseYear),
+    vintageYear: valueOrCurrent(exactPatch?.vintageYear, bottle.vintageYear),
+    abv: valueOrCurrent(exactPatch?.abv, bottle.abv),
+    singleCask: valueOrCurrent(exactPatch?.singleCask, bottle.singleCask),
+    caskStrength: valueOrCurrent(exactPatch?.caskStrength, bottle.caskStrength),
+    caskType: valueOrCurrent(exactPatch?.caskType, bottle.caskType),
+    caskSize: valueOrCurrent(exactPatch?.caskSize, bottle.caskSize),
+    caskFill: valueOrCurrent(exactPatch?.caskFill, bottle.caskFill),
+  };
 }
 
 function formatConcreteCaskIdentity({
@@ -68,7 +136,7 @@ export function materializeConcreteBottleIdentity({
   exact,
 }: {
   stable: StableConcreteBottleIdentity;
-  exact: ReleaseIdentityInput;
+  exact: ConcreteBottleExactIdentity;
 }): MaterializedConcreteBottleIdentity {
   const exactStatedAge = getConcreteBottleExactStatedAge({
     bottleStatedAge: exact.statedAge,
@@ -96,5 +164,23 @@ export function materializeConcreteBottleIdentity({
   return {
     ...identity,
     statedAge: exactStatedAge ?? stable.statedAge,
+  };
+}
+
+/** Materializes only the durable Bottle fields owned by shared group identity. */
+export function materializeConcreteBottleForGroup({
+  group,
+  exact,
+}: {
+  group: ConcreteBottleGroupMaterialization;
+  exact: ConcreteBottleExactIdentity;
+}): MaterializedConcreteBottleForGroup {
+  return {
+    ...materializeConcreteBottleIdentity({ stable: group, exact }),
+    brandId: group.brandId,
+    bottlerId: group.bottlerId,
+    seriesId: group.seriesId,
+    category: group.category,
+    flavorProfile: group.flavorProfile,
   };
 }

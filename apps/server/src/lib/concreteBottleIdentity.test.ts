@@ -1,4 +1,8 @@
-import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
+import {
+  getConcreteBottleExactIdentity,
+  materializeConcreteBottleForGroup,
+  materializeConcreteBottleIdentity,
+} from "./concreteBottleIdentity";
 
 const exactIdentity = {
   edition: null,
@@ -46,5 +50,54 @@ test.each([
     name: expectedName,
     fullName: `Example Brand ${expectedName}`,
     statedAge: expectedStatedAge,
+  });
+});
+
+test("classifies patched exact identity against the source group age", () => {
+  expect(
+    getConcreteBottleExactIdentity({
+      bottle: { ...exactIdentity, statedAge: 13 },
+      sourceGroupStatedAge: 12,
+    }),
+  ).toEqual({ ...exactIdentity, statedAge: 13 });
+
+  expect(
+    getConcreteBottleExactIdentity({
+      bottle: { ...exactIdentity, statedAge: 13 },
+      sourceGroupStatedAge: 12,
+      exactPatch: { edition: "Batch 2", statedAge: 12, abv: 48 },
+    }),
+  ).toEqual({
+    ...exactIdentity,
+    edition: "Batch 2",
+    statedAge: null,
+    abv: 48,
+  });
+});
+
+test("materializes only durable shared Bottle fields", () => {
+  expect(
+    materializeConcreteBottleForGroup({
+      group: {
+        name: "Old Malt",
+        fullName: "Example Brand Old Malt",
+        statedAge: 12,
+        brandId: 1,
+        bottlerId: 2,
+        seriesId: 3,
+        category: "single_malt",
+        flavorProfile: "peated",
+      },
+      exact: { ...exactIdentity, edition: "Batch 2", statedAge: 13 },
+    }),
+  ).toEqual({
+    name: "Old Malt - Batch 2 - 13-year-old",
+    fullName: "Example Brand Old Malt - Batch 2 - 13-year-old",
+    statedAge: 13,
+    brandId: 1,
+    bottlerId: 2,
+    seriesId: 3,
+    category: "single_malt",
+    flavorProfile: "peated",
   });
 });

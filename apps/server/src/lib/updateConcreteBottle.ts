@@ -9,7 +9,6 @@ import {
   normalizeBottleAliasKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
-import type { ReleaseIdentityInput } from "@peated/bottle-classifier/releaseIdentity";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type {
   Bottle,
@@ -30,19 +29,15 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import {
-  ExactBottleAliasConflictError,
-  reserveExactBottleAliasInTransaction,
-} from "@peated/server/lib/bottleAliases";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import {
-  findConflictingSmwsBottleId,
-  getSmwsCodeForBottleIdentity,
+  ConcreteBottleIdentityConflictError,
+  reserveConcreteBottleIdentitiesInTransaction,
 } from "@peated/server/lib/concreteBottleConflicts";
 import {
-  getConcreteBottleExactStatedAge,
-  materializeConcreteBottleIdentity,
+  getConcreteBottleExactIdentity,
+  materializeConcreteBottleForGroup,
 } from "@peated/server/lib/concreteBottleIdentity";
 import {
   ConcreteBottleUpdateInputSchema,
@@ -53,16 +48,7 @@ import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import {
-  and,
-  asc,
-  eq,
-  inArray,
-  isNull,
-  notInArray,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 export { ConcreteBottleUpdateInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 export type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
@@ -195,30 +181,6 @@ function valueOrCurrent<T>(value: T | undefined, current: T): T {
   return value === undefined ? current : value;
 }
 
-function exactIdentityFor(
-  bottle: Bottle,
-  groupStatedAge: number | null,
-  patch?: ExactPatch,
-): ReleaseIdentityInput {
-  return {
-    edition: valueOrCurrent(patch?.edition, bottle.edition),
-    // Classify overrides against the pre-update group before materializing the
-    // resulting shared age, so an equal explicit age never becomes sticky.
-    statedAge: getConcreteBottleExactStatedAge({
-      bottleStatedAge: valueOrCurrent(patch?.statedAge, bottle.statedAge),
-      stableStatedAge: groupStatedAge,
-    }),
-    releaseYear: valueOrCurrent(patch?.releaseYear, bottle.releaseYear),
-    vintageYear: valueOrCurrent(patch?.vintageYear, bottle.vintageYear),
-    abv: valueOrCurrent(patch?.abv, bottle.abv),
-    singleCask: valueOrCurrent(patch?.singleCask, bottle.singleCask),
-    caskStrength: valueOrCurrent(patch?.caskStrength, bottle.caskStrength),
-    caskType: valueOrCurrent(patch?.caskType, bottle.caskType),
-    caskSize: valueOrCurrent(patch?.caskSize, bottle.caskSize),
-    caskFill: valueOrCurrent(patch?.caskFill, bottle.caskFill),
-  };
-}
-
 function desiredBottleFor({
   bottle,
   oldGroupStatedAge,
@@ -234,16 +196,17 @@ function desiredBottleFor({
   materializeSharedFields: boolean;
   regenerateIdentity: boolean;
 }): DesiredBottle {
-  const exact = exactIdentityFor(bottle, oldGroupStatedAge, exactPatch);
+  const exact = getConcreteBottleExactIdentity({
+    bottle,
+    sourceGroupStatedAge: oldGroupStatedAge,
+    exactPatch,
+  });
+  const sharedMaterialization = materializeConcreteBottleForGroup({
+    group: stable,
+    exact,
+  });
   const identity = regenerateIdentity
-    ? materializeConcreteBottleIdentity({
-        stable: {
-          name: stable.name,
-          fullName: stable.fullName,
-          statedAge: stable.statedAge,
-        },
-        exact,
-      })
+    ? sharedMaterialization
     : {
         name: bottle.name,
         fullName: bottle.fullName,
@@ -266,12 +229,20 @@ function desiredBottleFor({
     name: identity.name,
     fullName: identity.fullName,
     statedAge: identity.statedAge,
-    brandId: materializeSharedFields ? stable.brandId : bottle.brandId,
-    bottlerId: materializeSharedFields ? stable.bottlerId : bottle.bottlerId,
-    seriesId: materializeSharedFields ? stable.seriesId : bottle.seriesId,
-    category: materializeSharedFields ? stable.category : bottle.category,
+    brandId: materializeSharedFields
+      ? sharedMaterialization.brandId
+      : bottle.brandId,
+    bottlerId: materializeSharedFields
+      ? sharedMaterialization.bottlerId
+      : bottle.bottlerId,
+    seriesId: materializeSharedFields
+      ? sharedMaterialization.seriesId
+      : bottle.seriesId,
+    category: materializeSharedFields
+      ? sharedMaterialization.category
+      : bottle.category,
     flavorProfile: materializeSharedFields
-      ? stable.flavorProfile
+      ? sharedMaterialization.flavorProfile
       : bottle.flavorProfile,
     edition: exact.edition,
     abv: exact.abv,
@@ -279,9 +250,9 @@ function desiredBottleFor({
     caskStrength: exact.caskStrength,
     vintageYear: exact.vintageYear,
     releaseYear: exact.releaseYear,
-    caskSize: valueOrCurrent(exactPatch?.caskSize, bottle.caskSize),
-    caskType: valueOrCurrent(exactPatch?.caskType, bottle.caskType),
-    caskFill: valueOrCurrent(exactPatch?.caskFill, bottle.caskFill),
+    caskSize: exact.caskSize,
+    caskType: exact.caskType,
+    caskFill: exact.caskFill,
     description,
     descriptionSrc,
     imageUrl: exactPatch?.image === null ? null : bottle.imageUrl,
@@ -833,16 +804,6 @@ async function updateConcreteBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
-  const identityChanges = affectedMembers
-    .filter(
-      (member) =>
-        desiredByBottleId.get(member.id)!.fullName !== member.fullName,
-    )
-    .sort((left, right) =>
-      desiredByBottleId
-        .get(left.id)!
-        .fullName.localeCompare(desiredByBottleId.get(right.id)!.fullName),
-    );
 
   const currentBrand =
     stable.brandId === group.brandId
@@ -854,130 +815,38 @@ async function updateConcreteBottleInTransaction(
       : stable.bottlerId === group.bottlerId
         ? stable.bottler
         : await loadEntity(tx, group.bottlerId);
-  const smwsIdentityChanges = affectedMembers.filter((member) => {
-    const desired = desiredByBottleId.get(member.id)!;
-    const currentCode = getSmwsCodeForBottleIdentity({
-      name: member.name,
-      fullName: member.fullName,
-      brand: currentBrand,
-      bottler: currentBottler,
-    });
-    const desiredCode = getSmwsCodeForBottleIdentity({
-      name: desired.name,
-      fullName: desired.fullName,
-      brand: stable.brand,
-      bottler: stable.bottler,
-    });
-    return member.fullName !== desired.fullName || currentCode !== desiredCode;
-  });
-
-  const candidateOwners = new Map<string, number>();
-  for (const member of affectedMembers) {
-    const candidate = desiredByBottleId.get(member.id)!.fullName.toLowerCase();
-    const owner = candidateOwners.get(candidate);
-    if (owner !== undefined && owner !== member.id) {
-      throw new ConcreteBottleUpdateConflictError(owner);
-    }
-    candidateOwners.set(candidate, member.id);
-  }
-  if (identityChanges.length) {
-    const names = identityChanges.map(
-      (member) => desiredByBottleId.get(member.id)!.fullName,
-    );
-    const conflictingBottles = await tx
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(
-        and(
-          notInArray(bottles.id, affectedIds),
-          or(
-            ...names.map((name) =>
-              eq(sql`LOWER(${bottles.fullName})`, name.toLowerCase()),
-            ),
-          ),
-        ),
-      )
-      .limit(1);
-    if (conflictingBottles[0]) {
-      throw new ConcreteBottleUpdateConflictError(conflictingBottles[0].id);
-    }
-  }
-
-  if (smwsIdentityChanges.length) {
-    const smwsCodeOwners = new Map<string, number>();
-    for (const member of affectedMembers) {
-      const desired = desiredByBottleId.get(member.id)!;
-      const code = getSmwsCodeForBottleIdentity({
-        name: desired.name,
-        fullName: desired.fullName,
-        brand: stable.brand,
-        bottler: stable.bottler,
-      });
-      if (!code) continue;
-
-      const owner = smwsCodeOwners.get(code);
-      if (owner !== undefined && owner !== member.id) {
-        throw new ConcreteBottleUpdateConflictError(owner);
-      }
-      smwsCodeOwners.set(code, member.id);
-    }
-
-    for (const member of smwsIdentityChanges) {
-      const desired = desiredByBottleId.get(member.id)!;
-      const conflictingBottleId = await findConflictingSmwsBottleId(
-        tx,
-        {
-          name: desired.name,
-          fullName: desired.fullName,
-          brand: stable.brand,
-          bottler: stable.bottler,
-        },
-        { excludeBottleIds: affectedIds },
-      );
-      if (conflictingBottleId !== null) {
-        throw new ConcreteBottleUpdateConflictError(conflictingBottleId);
-      }
-    }
-  }
-
-  const reservations = new Map<
-    string,
-    { name: string; bottleId: number; targetId: number }
-  >();
-  for (const member of identityChanges) {
-    const target = targetByBottleId.get(member.id)!;
-    for (const name of [
-      member.fullName,
-      desiredByBottleId.get(member.id)!.fullName,
-    ]) {
-      const key = normalizeBottleAliasKey(name).toLowerCase();
-      const existing = reservations.get(key);
-      if (existing && existing.bottleId !== member.id) {
-        throw new ConcreteBottleUpdateConflictError(existing.bottleId);
-      }
-      reservations.set(key, { name, bottleId: member.id, targetId: target.id });
-    }
-  }
-  const changedAliasNames = new Set<string>();
-  for (const reservation of Array.from(reservations.values()).sort(
-    (left, right) =>
-      normalizeBottleAliasKey(left.name)
-        .toLowerCase()
-        .localeCompare(normalizeBottleAliasKey(right.name).toLowerCase()),
-  )) {
-    try {
-      const result = await reserveExactBottleAliasInTransaction(tx, {
-        ...reservation,
-        assignmentSource: "canonical",
+  let changedAliasNames: string[];
+  try {
+    ({ changedAliasNames } = await reserveConcreteBottleIdentitiesInTransaction(
+      tx,
+      {
+        candidates: affectedMembers.map((member) => {
+          const desired = desiredByBottleId.get(member.id)!;
+          return {
+            bottleId: member.id,
+            targetId: targetByBottleId.get(member.id)!.id,
+            current: {
+              name: member.name,
+              fullName: member.fullName,
+              brand: currentBrand,
+              bottler: currentBottler,
+            },
+            desired: {
+              name: desired.name,
+              fullName: desired.fullName,
+              brand: stable.brand,
+              bottler: stable.bottler,
+            },
+          };
+        }),
         assignedByActorId: actorId,
-      });
-      if (result.changed) changedAliasNames.add(result.name);
-    } catch (error) {
-      if (error instanceof ExactBottleAliasConflictError) {
-        throw new ConcreteBottleUpdateConflictError(error.conflictingBottleId);
-      }
-      throw error;
+      },
+    ));
+  } catch (error) {
+    if (error instanceof ConcreteBottleIdentityConflictError) {
+      throw new ConcreteBottleUpdateConflictError(error.conflictingBottleId);
     }
+    throw error;
   }
 
   let persistedGroup = group;
@@ -1105,7 +974,7 @@ async function updateConcreteBottleInTransaction(
     group: persistedGroup,
     changed: true,
     changedBottleIds: affectedIds,
-    changedAliasNames: Array.from(changedAliasNames).sort(),
+    changedAliasNames,
     changedEntityIds: Array.from(changedEntityIds).sort(
       (left, right) => left - right,
     ),
