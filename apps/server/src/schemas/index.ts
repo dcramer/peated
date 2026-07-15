@@ -4,6 +4,8 @@ export * from "./badges";
 export * from "./bottleReleases";
 export * from "./bottles";
 export * from "./bottleSeries";
+export * from "./catalogIdentity";
+export * from "./catalogMigrationAudit";
 export * from "./changes";
 export * from "./collections";
 export * from "./comments";
