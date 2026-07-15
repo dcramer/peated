@@ -73,6 +73,9 @@ export const tastings = pgTable(
     unique("tasting_unq")
       .on(table.bottleId, table.releaseId, table.createdById, table.createdAt)
       .nullsNotDistinct(),
+    uniqueIndex("tasting_target_unq")
+      .on(table.targetId, table.createdById, table.createdAt)
+      .where(sql`${table.targetId} IS NOT NULL`),
     index("tasting_bottle_idx").on(table.bottleId),
     index("tasting_release_idx").on(table.releaseId),
     index("tasting_target_idx").on(table.targetId),

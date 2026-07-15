@@ -38,7 +38,7 @@ it must not preserve a parallel business-logic path.
 - [x] 3.5 Add integration tests for exact, generic, retired, missing, mismatched, and legacy-mapped target loading.
 - [x] 3.6 Add a deterministic target-assignment helper used by all dual-write consumers instead of rebuilding target logic per route.
 - [x] 3.7 Instrument legacy target resolution and writes with operation and caller context so compatibility removal can be measured.
-- [ ] 3.8 Add target-aware unique constraints or conflict handling for collections, flights, aliases, and other set-membership tables.
+- [x] 3.8 Add target-aware unique constraints or conflict handling for collections, flights, aliases, and other set-membership tables.
 
 ## 4. Automatic Bottle And Group Domain Services
 

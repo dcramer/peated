@@ -78,6 +78,9 @@ export const collectionBottles = pgTable(
     unique()
       .on(table.collectionId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
+    uniqueIndex("collection_bottle_target_unq")
+      .on(table.collectionId, table.targetId)
+      .where(sql`${table.targetId} IS NOT NULL`),
     index("collection_bottle_bottle_idx").on(table.bottleId),
     index("collection_bottle_release_idx").on(table.releaseId),
     index("collection_bottle_target_idx").on(table.targetId),

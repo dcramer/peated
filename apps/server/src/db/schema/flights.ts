@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
@@ -63,6 +63,9 @@ export const flightBottles = pgTable(
     unique()
       .on(table.flightId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
+    uniqueIndex("flight_bottle_target_unq")
+      .on(table.flightId, table.targetId)
+      .where(sql`${table.targetId} IS NOT NULL`),
     index("flight_bottle_target_idx").on(table.targetId),
   ],
 );
