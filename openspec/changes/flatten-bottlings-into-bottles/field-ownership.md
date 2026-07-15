@@ -79,6 +79,14 @@ Exact Bottle serializers must not require BottleGroup hydration.
   brought forward from task 4.11 and recomputes raw exact plus generic target
   activity exactly once. Task 4.11 remains responsible for remaining exact and
   reusable statistics entry points.
+- A group split clones source shared identity and group distillers into the new
+  group, selects one moved member as its representative, and does not
+  rematerialize moved Bottles. Exact Bottle content, ids, targets, aliases, and
+  Bottle distiller rows remain unchanged; later shared identity edits use
+  atomic fan-out.
+- The split source retains group-owned editorial content, stable aliases, its
+  generic target, and generic activity. The new group starts with empty
+  explicit editorial content and its own generic target.
 - Observation and unit-level data do not create a Bottle or BottleGroup split
   without an explicit catalog decision.
 

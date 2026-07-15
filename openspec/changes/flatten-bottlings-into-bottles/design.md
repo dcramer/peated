@@ -206,7 +206,15 @@ is recalculated from raw exact and generic target activity after the move. Task
 4.11 remains open for the remaining exact-Bottle recomputation and reusable
 statistics entry points.
 
-Splitting selected Bottles creates a new group and generic target, then moves the selected Bottles without changing their ids or exact targets. Existing generic activity remains on the source group unless a moderator explicitly moves it because the system cannot infer which expression it described.
+Splitting selected Bottles creates a new group and generic target, clones the
+source shared identity and group distillers, and moves the selected Bottles
+without rematerializing them. The source retains its group-owned editorial
+content, stable aliases, generic target, and generic activity. The new group
+starts with empty explicit editorial content and an explicitly selected
+moved-member representative. Exact Bottle content, ids, targets, aliases, and
+Bottle distiller rows remain unchanged. A later shared identity edit uses the
+normal atomic fan-out path. The system does not infer that existing generic
+activity described the split expression.
 
 Bottle merge remains a distinct exact-duplicate operation. It merges two concrete Bottles and their exact targets; it does not imply that all other members of either group are duplicates.
 
