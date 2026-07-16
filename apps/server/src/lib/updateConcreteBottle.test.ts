@@ -120,6 +120,17 @@ async function loadBottleDistillers(bottleIds: number[]) {
     );
 }
 
+function selectBottleAggregates(
+  rows: Awaited<ReturnType<typeof loadGroupMembers>>,
+) {
+  return rows.map(({ id, totalTastings, avgRating, ratingStats }) => ({
+    id,
+    totalTastings,
+    avgRating,
+    ratingStats,
+  }));
+}
+
 function resetQueueMock() {
   vi.mocked(workerClient.pushUniqueJob).mockReset();
   vi.mocked(workerClient.pushUniqueJob).mockResolvedValue(undefined);
@@ -432,9 +443,27 @@ describe("concrete Bottle updates", () => {
   }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Exact Update Brand" });
+    const bottler = await fixtures.Entity({
+      name: "Exact Update Bottler",
+      type: ["bottler"],
+    });
+    const distillers = [
+      await fixtures.Entity({ name: "Exact Update Distiller A" }),
+      await fixtures.Entity({ name: "Exact Update Distiller B" }),
+    ];
+    const series = await fixtures.BottleSeries({ brandId: brand.id });
     const { first, members } = await createGroup({
       user: mod,
-      stable: { name: "Core", statedAge: 12, brand: brand.id },
+      stable: {
+        name: "Core",
+        statedAge: 12,
+        brand: brand.id,
+        bottler: bottler.id,
+        distillers: distillers.map(({ id }) => id),
+        series: series.id,
+        category: "single_malt",
+        flavorProfile: "peated",
+      },
       exacts: [
         { edition: "Batch 1", abv: 46 },
         { edition: "Batch 2", abv: 48, description: "Sibling content" },
@@ -443,6 +472,14 @@ describe("concrete Bottle updates", () => {
     resetQueueMock();
     const selectedBefore = members[0].bottle;
     const siblingBefore = members[1].bottle;
+    const selectedSharedBefore = {
+      brandId: selectedBefore.brandId,
+      bottlerId: selectedBefore.bottlerId,
+      seriesId: selectedBefore.seriesId,
+      category: selectedBefore.category,
+      flavorProfile: selectedBefore.flavorProfile,
+    };
+    const distillersBefore = await loadBottleDistillers([selectedBefore.id]);
     const [groupBefore] = await db
       .select()
       .from(bottleGroups)
@@ -492,7 +529,11 @@ describe("concrete Bottle updates", () => {
       releaseYear: identityResult.bottle.releaseYear,
       abv: identityResult.bottle.abv,
       caskStrength: identityResult.bottle.caskStrength,
+      ...selectedSharedBefore,
     });
+    expect(await loadBottleDistillers([selectedBefore.id])).toEqual(
+      distillersBefore,
+    );
 
     const aliases = await loadAliases([selectedBefore.id]);
     expect(
@@ -533,8 +574,12 @@ describe("concrete Bottle updates", () => {
         name: identityBeforeContent.name,
         fullName: identityBeforeContent.fullName,
         statedAge: identityBeforeContent.statedAge,
+        ...selectedSharedBefore,
       },
     });
+    expect(await loadBottleDistillers([selectedBefore.id])).toEqual(
+      distillersBefore,
+    );
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
     expect(await loadGroupTargets(groupBefore.id)).toEqual(targetsBefore);
   });
@@ -600,6 +645,41 @@ describe("concrete Bottle updates", () => {
     };
     const siblingExactBefore = members[1].bottle;
 
+    const seededBottleAggregates = [
+      {
+        bottleId: members[0].bottle.id,
+        totalTastings: 3,
+        avgRating: 2,
+        ratingStats: {
+          pass: 0,
+          sip: 3,
+          savor: 0,
+          total: 3,
+          avg: 2,
+          percentage: { pass: 0, sip: 100, savor: 0 },
+        },
+      },
+      {
+        bottleId: members[1].bottle.id,
+        totalTastings: 5,
+        avgRating: 1.4,
+        ratingStats: {
+          pass: 3,
+          sip: 2,
+          savor: 0,
+          total: 5,
+          avg: 1.4,
+          percentage: { pass: 60, sip: 40, savor: 0 },
+        },
+      },
+    ];
+    for (const { bottleId, ...aggregates } of seededBottleAggregates) {
+      await db.update(bottles).set(aggregates).where(eq(bottles.id, bottleId));
+    }
+    const bottleAggregatesBefore = selectBottleAggregates(
+      await loadGroupMembers(first.group.id),
+    );
+
     await db
       .update(bottles)
       .set({
@@ -649,6 +729,9 @@ describe("concrete Bottle updates", () => {
     });
 
     const updatedMembers = await loadGroupMembers(first.group.id);
+    expect(selectBottleAggregates(updatedMembers)).toEqual(
+      bottleAggregatesBefore,
+    );
     for (const member of updatedMembers) {
       expect(member).toMatchObject({
         groupId: first.group.id,
@@ -750,6 +833,9 @@ describe("concrete Bottle updates", () => {
       category: "bourbon",
       flavorProfile: "spicy_sweet",
     });
+    expect(
+      selectBottleAggregates(await loadGroupMembers(first.group.id)),
+    ).toEqual(bottleAggregatesBefore);
     expect(await loadGroupTargets(first.group.id)).toEqual(targetsBefore);
 
     const [groupBeforeNameOnly] = await db
@@ -789,6 +875,9 @@ describe("concrete Bottle updates", () => {
         flavorProfile: before.flavorProfile,
         edition: before.edition,
         abv: before.abv,
+        totalTastings: before.totalTastings,
+        avgRating: before.avgRating,
+        ratingStats: before.ratingStats,
       });
       expect(member.fullName).toMatch(/^New Shared Brand Omission Label/);
     }
