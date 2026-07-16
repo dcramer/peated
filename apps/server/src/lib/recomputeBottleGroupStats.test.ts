@@ -13,6 +13,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { and, eq } from "drizzle-orm";
 import {
   BottleGroupStatsIntegrityError,
+  recomputeBottleGroupStats,
   recomputeBottleGroupStatsInTransaction,
 } from "./recomputeBottleGroupStats";
 
@@ -139,8 +140,8 @@ describe("recomputeBottleGroupStatsInTransaction", () => {
     const firstResult = await db.transaction((tx) =>
       recomputeBottleGroupStatsInTransaction(tx, first.groupId as number),
     );
-    const secondResult = await db.transaction((tx) =>
-      recomputeBottleGroupStatsInTransaction(tx, first.groupId as number),
+    const secondResult = await recomputeBottleGroupStats(
+      first.groupId as number,
     );
 
     const expectedAverage =

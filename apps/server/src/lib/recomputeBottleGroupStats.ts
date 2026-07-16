@@ -1,5 +1,4 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
-import type { AnyTransaction } from "@peated/server/db";
+import { db, type AnyTransaction } from "@peated/server/db";
 import type { BottleGroup } from "@peated/server/db/schema";
 import {
   bottleGroups,
@@ -7,9 +6,9 @@ import {
   bottles,
   bottleTombstones,
   catalogTargets,
-  tastings,
 } from "@peated/server/db/schema";
-import { asc, eq, inArray, sql } from "drizzle-orm";
+import { aggregateCatalogTargetStatsInTransaction } from "@peated/server/lib/recomputeCatalogTargetStats";
+import { asc, eq, inArray } from "drizzle-orm";
 
 export type BottleGroupStatsIntegrityErrorCode =
   | "not_found"
@@ -35,26 +34,6 @@ export type BottleGroupStatsResult = Pick<
   | "ratingStats"
   | "updatedAt"
 >;
-
-type RawRatingStats = {
-  pass: number | string;
-  sip: number | string;
-  savor: number | string;
-  total: number | string;
-  totalTastings: number | string;
-  avg: number | string | null;
-};
-
-function countValue(value: number | string): number {
-  const count = Number(value);
-  return Number.isFinite(count) ? count : 0;
-}
-
-function averageValue(value: number | string | null): number | null {
-  if (value === null) return null;
-  const average = Number(value);
-  return Number.isFinite(average) ? average : null;
-}
 
 /** Recomputes one active group from canonical target activity inside the caller's transaction. */
 export async function recomputeBottleGroupStatsInTransaction(
@@ -136,50 +115,13 @@ export async function recomputeBottleGroupStatsInTransaction(
     genericTargets[0]!.id,
     ...activeMembers.map(({ id }) => exactTargetByBottleId.get(id)!.id),
   ];
-  const rawStatsResult = await tx.execute<RawRatingStats>(sql`
-    SELECT
-      COUNT(*) AS "totalTastings",
-      COUNT(*) FILTER (WHERE ${tastings.rating} = ${SIMPLE_RATING_VALUES.PASS}) AS "pass",
-      COUNT(*) FILTER (WHERE ${tastings.rating} = ${SIMPLE_RATING_VALUES.SIP}) AS "sip",
-      COUNT(*) FILTER (WHERE ${tastings.rating} = ${SIMPLE_RATING_VALUES.SAVOR}) AS "savor",
-      COUNT(${tastings.rating}) AS "total",
-      AVG(${tastings.rating}) AS "avg"
-    FROM ${tastings}
-    WHERE ${inArray(tastings.targetId, targetIds)}
-  `);
-  const rawStats = rawStatsResult.rows[0];
-  if (!rawStats) {
-    throw new BottleGroupStatsIntegrityError("invalid_catalog_graph", groupId);
-  }
-
-  const pass = countValue(rawStats.pass);
-  const sip = countValue(rawStats.sip);
-  const savor = countValue(rawStats.savor);
-  const total = countValue(rawStats.total);
-  const avg = averageValue(rawStats.avg);
-  const ratingStats: BottleGroup["ratingStats"] = {
-    pass,
-    sip,
-    savor,
-    total,
-    avg,
-    percentage:
-      total > 0
-        ? {
-            pass: (pass / total) * 100,
-            sip: (sip / total) * 100,
-            savor: (savor / total) * 100,
-          }
-        : { pass: 0, sip: 0, savor: 0 },
-  };
+  const stats = await aggregateCatalogTargetStatsInTransaction(tx, targetIds);
 
   const [persisted] = await tx
     .update(bottleGroups)
     .set({
       totalBottles: activeMembers.length,
-      totalTastings: countValue(rawStats.totalTastings),
-      avgRating: avg,
-      ratingStats,
+      ...stats,
       updatedAt: new Date(),
     })
     .where(eq(bottleGroups.id, groupId))
@@ -195,4 +137,13 @@ export async function recomputeBottleGroupStatsInTransaction(
     throw new BottleGroupStatsIntegrityError("invalid_catalog_graph", groupId);
   }
   return persisted;
+}
+
+/** Owns the transaction for a BottleGroup statistics recomputation. */
+export async function recomputeBottleGroupStats(
+  groupId: number,
+): Promise<BottleGroupStatsResult> {
+  return await db.transaction((tx) =>
+    recomputeBottleGroupStatsInTransaction(tx, groupId),
+  );
 }

@@ -53,6 +53,7 @@ it must not preserve a parallel business-logic path.
 - [x] 4.9 Implement exact Bottle merge independently from group merge and handle cross-group exact duplicates deliberately.
 - [x] 4.10 Implement representative-Bottle selection and group editorial-content ownership without mutating member Bottle content.
 - [ ] 4.11 Complete idempotent exact Bottle recomputation plus the remaining reusable BottleGroup statistics job/service entry points, reusing the raw-target group aggregate helper introduced by task 4.7 without double counting.
+- [x] 4.11a Add the canonical raw-target statistics core, reusable exact Bottle and BottleGroup service entry points, and focused database tests as a paired review boundary that is not deployable alone; do not activate it with a silent legacy `bottleId` fallback.
 - [ ] 4.12 Add database-backed service tests for creation rollback, retries, duplicate conflicts, trusted reuse, exact-only update isolation, effective-age normalization, shared-update fan-out, per-member audit cardinality, collision rollback, merge, split, representative selection, deletion, and aggregate counts.
 
 ## 5. New-Write API Cutover

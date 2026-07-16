@@ -272,6 +272,30 @@ stale. Task 4.11 completes exact-Bottle recomputation and the remaining reusable
 job/service entry points; it does not replace the merge helper with a parallel
 calculation.
 
+Task 4.11a establishes `aggregateCatalogTargetStatsInTransaction` in
+`apps/server/src/lib/recomputeCatalogTargetStats.ts` as the sole owner of the
+raw-target tasting query and rating math. `recomputeBottleStats` validates one
+active exact target and overwrites only that Bottle's statistics from activity
+on that target. `recomputeBottleGroupStats` validates the active group graph,
+supplies its generic target and all member exact targets to the same calculator,
+and overwrites the group aggregates without summing materialized Bottle totals.
+
+Task 4.11a is a paired review boundary and is not deployable alone. The existing
+`UpdateBottleStats` worker SQL remains active for tasting create, update, and
+delete writes: create and delete always enqueue it, while update enqueues it when
+the rating changes. All three routes also mutate Bottle statistics inline;
+create and delete update `totalTastings` and `avgRating`, while update changes
+only `avgRating`. These paths remain only until the immediate task 4.11
+activation follow-up. That follow-up must first complete, or atomically include,
+target assignment for every active tasting create, update, and delete writer so
+those writes cannot leave `targetId` null. This is the tasting subset of task
+5.6; review, collection, flight, and price consumers keep task 5.6 open. Only
+then may the follow-up delegate statistics work to the canonical services and
+remove the inline statistics logic from all three routes plus the legacy worker
+SQL. The canonical calculator must not silently fall back to `bottleId`, because
+doing so would preserve a second statistics model instead of exposing incomplete
+target writes.
+
 Representative group content is selected explicitly from a member Bottle or stored as group-level editorial content. It is not copied opportunistically from the latest release during reads.
 
 ### Compatibility is read/write translation, not a permanent second model

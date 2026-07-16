@@ -139,6 +139,14 @@ Catalog identity, aliases, search, creation, and updates:
   exact-duplicate merge owner. The moderator Bottle merge route invokes it
   synchronously; entity merge composes its transaction entry point and defers
   finalization until the entity transaction commits.
+- Task 4.11a adds `aggregateCatalogTargetStatsInTransaction` in
+  `apps/server/src/lib/recomputeCatalogTargetStats.ts` as the sole owner of
+  raw-target tasting SQL and rating math.
+  `apps/server/src/lib/recomputeBottleStats.ts` validates and overwrites one
+  exact Bottle from its exact target only, while
+  `apps/server/src/lib/recomputeBottleGroupStats.ts` validates the group graph
+  and passes the generic plus all member exact targets to the same calculator.
+  Neither service sums materialized Bottle totals.
 - `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
   reader/writer from tasks 3.2/3.7; retain it through the task 9.5 read window
   and remove its legacy branch under task 9.7.
@@ -185,6 +193,20 @@ Classifier decisions and price matching:
 - `apps/server/src/worker/jobs/createMissingBottles.ts`
 - `apps/server/src/worker/jobs/index.ts`
 - `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
+- `apps/server/src/worker/jobs/updateBottleStats.ts` still owns the active
+  legacy `bottleId` statistics SQL during the task 4.11a review boundary.
+  Tasting create and delete always enqueue that worker, and update enqueues it
+  when the rating changes. All three routes also mutate Bottle statistics
+  inline: create and delete update `totalTastings` and `avgRating`, while update
+  changes only `avgRating`. Before statistics activation, the immediate task
+  4.11 follow-up must first complete, or atomically include, target assignment
+  for every active tasting create, update, and delete writer so those writes
+  cannot leave `targetId` null. This is the tasting subset of task 5.6; review,
+  collection, flight, and price consumers keep task 5.6 open. The follow-up must
+  then delegate these paths to the canonical target-backed services and remove
+  the inline statistics logic from all three routes plus the superseded worker
+  SQL without adding a silent `bottleId` fallback. Task 4.11a is therefore not
+  independently deployable.
 - `apps/server/src/worker/jobs/mergeBottle.ts` is a measured compatibility
   adapter for queued pre-cutover payloads. It validates and translates the old
   payload into `mergeConcreteBottles` transaction calls and owns no merge
