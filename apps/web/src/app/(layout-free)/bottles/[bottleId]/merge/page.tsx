@@ -137,11 +137,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
       },
       {
         onSuccess: (newBottle) => {
-          flash(
-            <div>
-              Performing merge asynchronously. Updates may take a few minutes.
-            </div>,
-          );
+          flash(<div>Bottles merged successfully.</div>);
           router.push(`/bottles/${newBottle.id}`);
         },
       },

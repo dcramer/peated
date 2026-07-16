@@ -10,6 +10,7 @@ import {
   bottleTombstones,
   catalogTargets,
 } from "@peated/server/db/schema";
+import { readExactBottleMergePromotionHistory } from "@peated/server/lib/exactBottleMergePromotionMetadata";
 import { logInfo } from "@peated/server/lib/log";
 import type { CatalogTargetV1 } from "@peated/server/schemas/catalogIdentity";
 import { serialize } from "@peated/server/serializers";
@@ -18,7 +19,7 @@ import {
   type CatalogIdentitySerializerContext,
   type CatalogTargetSerializerItem,
 } from "@peated/server/serializers/catalogIdentity";
-import { and, eq, isNull, type SQL } from "drizzle-orm";
+import { and, eq, inArray, isNull, type SQL } from "drizzle-orm";
 import { ZodError } from "zod";
 
 export type CatalogTargetIdentity =
@@ -319,6 +320,66 @@ async function serializeTarget(
   }
 }
 
+/** Validates the durable, contiguous merge chain behind a moved promotion. */
+async function promotionConvergedByExactMerges({
+  metadata,
+  sourceGroupId,
+  destinationBottleId,
+  destinationGroupId,
+  database,
+}: {
+  metadata: unknown;
+  sourceGroupId: number;
+  destinationBottleId: number;
+  destinationGroupId: number;
+  database: AnyDatabase;
+}): Promise<boolean> {
+  const history = readExactBottleMergePromotionHistory(metadata);
+  if (!history.length) return false;
+
+  let expectedSourceBottleId: number | null = null;
+  let expectedSourceGroupId = sourceGroupId;
+  for (const event of history) {
+    if (
+      event.sourceGroupId !== expectedSourceGroupId ||
+      (expectedSourceBottleId !== null &&
+        event.sourceBottleId !== expectedSourceBottleId)
+    ) {
+      return false;
+    }
+    expectedSourceBottleId = event.destinationBottleId;
+    expectedSourceGroupId = event.destinationGroupId;
+  }
+  if (
+    expectedSourceBottleId !== destinationBottleId ||
+    expectedSourceGroupId !== destinationGroupId
+  ) {
+    return false;
+  }
+
+  const sourceBottleIds = history.map(({ sourceBottleId }) => sourceBottleId);
+  if (
+    new Set(sourceBottleIds).size !== sourceBottleIds.length ||
+    sourceBottleIds.includes(destinationBottleId)
+  ) {
+    return false;
+  }
+  const [tombstones, liveSources] = await Promise.all([
+    database.query.bottleTombstones.findMany({
+      where: inArray(bottleTombstones.bottleId, sourceBottleIds),
+    }),
+    database.query.bottles.findMany({
+      where: inArray(bottles.id, sourceBottleIds),
+      columns: { id: true },
+    }),
+  ]);
+  return (
+    liveSources.length === 0 &&
+    tombstones.length === sourceBottleIds.length &&
+    tombstones.every(({ newBottleId }) => newBottleId === destinationBottleId)
+  );
+}
+
 /**
  * Promoted releases resolve exactly; parent-only references use release
  * cardinality to choose the group target or retained Bottle target.
@@ -376,10 +437,19 @@ async function findLegacyTarget(
       release.bottle?.groupId !== undefined &&
       release.bottle.groupId !== target.groupId
     ) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { targetId: target.id },
-        "the promoted Bottle belongs to a different group than the legacy parent",
-      );
+      const convergedByExactMerge = await promotionConvergedByExactMerges({
+        metadata: promotion.auditMetadata,
+        sourceGroupId: release.bottle.groupId,
+        destinationBottleId: promotion.promotedBottleId,
+        destinationGroupId: target.groupId,
+        database,
+      });
+      if (!convergedByExactMerge) {
+        throw new CatalogTargetIntegrityMismatchError(
+          { targetId: target.id },
+          "the promoted Bottle belongs to a different group than the legacy parent",
+        );
+      }
     }
 
     return target;

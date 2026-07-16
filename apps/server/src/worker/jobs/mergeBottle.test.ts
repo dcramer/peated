@@ -1,707 +1,137 @@
 import { db } from "@peated/server/db";
 import {
-  bottleFlavorProfiles,
-  bottleObservations,
-  bottleReleases,
+  actors,
   bottles,
-  bottlesToDistillers,
-  bottleTags,
   bottleTombstones,
-  collectionBottles,
-  entities,
-  flightBottles,
-  storePriceMatchProposals,
+  changes,
 } from "@peated/server/db/schema";
-import { and, eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { getUserActor } from "@peated/server/lib/actors";
+import { and, eq, inArray } from "drizzle-orm";
+import { ZodError } from "zod";
 import mergeBottle from "./mergeBottle";
 
-describe("mergeBottle", () => {
-  it("merge A into B", async ({ fixtures }) => {
-    const entityA = await fixtures.Entity({
-      name: "Entity A",
-      totalTastings: 1,
-      totalBottles: 2,
-    });
-    const entityB = await fixtures.Entity({
-      name: "Entity B",
-      totalTastings: 3,
-      totalBottles: 1,
-    });
-
-    const bottleA = await fixtures.LegacyBottle({
-      brandId: entityA.id,
-      name: "Test Bottle A",
-      category: "single_malt",
-    });
-
-    const bottleB = await fixtures.LegacyBottle({
-      brandId: entityB.id,
-      name: "Test Bottle B",
-      category: "single_malt",
-    });
-
-    await mergeBottle({
-      fromBottleIds: [bottleA.id],
-      toBottleId: bottleB.id,
-    });
-
-    const [newBottleA] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleA.id));
-    expect(newBottleA).toBeUndefined();
-
-    const [newBottleB] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleB.id));
-    expect(newBottleB).toBeDefined();
-
-    const [tombstone] = await db
-      .select()
-      .from(bottleTombstones)
-      .where(eq(bottleTombstones.bottleId, bottleA.id));
-    expect(tombstone.newBottleId).toEqual(newBottleB.id);
+describe("MergeBottle compatibility adapter", () => {
+  test.each([
+    undefined,
+    { toBottleId: 1, fromBottleIds: [] },
+    { toBottleId: 1, fromBottleIds: [2, 2] },
+    { toBottleId: 1, fromBottleIds: [1] },
+    { toBottleId: 1, fromBottleIds: [2], unexpected: true },
+  ])("strictly rejects invalid payload %#", async (payload) => {
+    await expect(mergeBottle(payload)).rejects.toBeInstanceOf(ZodError);
   });
 
-  it("merge A from B", async ({ fixtures }) => {
-    const entityA = await fixtures.Entity({
-      name: "Entity A",
-      totalTastings: 1,
-      totalBottles: 2,
-    });
-    const entityB = await fixtures.Entity({
-      name: "Entity B",
-      totalTastings: 3,
-      totalBottles: 1,
-    });
-
-    const bottleA = await fixtures.LegacyBottle({
-      brandId: entityA.id,
-      name: "Test Bottle A",
-      category: "single_malt",
-    });
-
-    const bottleB = await fixtures.LegacyBottle({
-      brandId: entityB.id,
-      name: "Test Bottle B",
-      category: "single_malt",
-    });
-
-    await mergeBottle({
-      fromBottleIds: [bottleB.id],
-      toBottleId: bottleA.id,
-    });
-
-    const [newBottleA] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleA.id));
-    expect(newBottleA).toBeDefined();
-
-    const [newBottleB] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleB.id));
-    expect(newBottleB).toBeUndefined();
-
-    const [tombstone] = await db
-      .select()
-      .from(bottleTombstones)
-      .where(eq(bottleTombstones.bottleId, bottleB.id));
-    expect(tombstone.newBottleId).toEqual(newBottleA.id);
-  });
-
-  it("merge duplicate bottle", async ({ fixtures }) => {
-    const entityA = await fixtures.Entity({
-      name: "Entity A",
-      totalTastings: 1,
-      totalBottles: 2,
-    });
-    const bottleA = await fixtures.LegacyBottle({
-      brandId: entityA.id,
-      name: "Duplicate",
-      category: "single_malt",
-    });
-    const entityB = await fixtures.Entity({
-      name: "Entity B",
-      totalTastings: 3,
-      totalBottles: 1,
-    });
-    const bottleB = await fixtures.LegacyBottle({
-      brandId: entityB.id,
-      name: "Duplicate",
-      category: "single_malt",
-    });
-
-    await mergeBottle({
-      fromBottleIds: [bottleA.id],
-      toBottleId: bottleB.id,
-    });
-
-    const [newBottleA] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleA.id));
-    expect(newBottleA).toBeUndefined();
-
-    const [newBottleB] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleB.id));
-    expect(newBottleB).toBeDefined();
-    expect(newBottleB.name).toEqual("Duplicate");
-  });
-
-  it("merge unique bottle", async ({ fixtures }) => {
-    const entityA = await fixtures.Entity({
-      name: "Entity A",
-      totalTastings: 1,
-      totalBottles: 2,
-    });
-    const bottleA = await fixtures.LegacyBottle({
-      brandId: entityA.id,
-      name: "Unique",
-      category: "single_malt",
-      statedAge: null,
-    });
-    const entityB = await fixtures.Entity({
-      name: "Entity B",
-      totalTastings: 3,
-      totalBottles: 1,
-    });
-    const bottleB = await fixtures.LegacyBottle({
-      brandId: entityB.id,
-      name: "More Unique",
-      category: "single_malt",
-      statedAge: null,
-    });
-
-    await mergeBottle({
-      fromBottleIds: [bottleA.id],
-      toBottleId: bottleB.id,
-    });
-
-    const [newBottleA] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleA.id));
-    expect(newBottleA).toBeUndefined();
-
-    const [newBottleB] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleB.id));
-    expect(newBottleB).toBeDefined();
-    expect(newBottleB.brandId).toEqual(entityB.id);
-    expect(newBottleB.name).toEqual("More Unique");
-  });
-
-  it("updates associated bottle releases when merging bottles", async ({
+  test("merges multiple sources atomically with the queued user actor and retries inertly", async ({
     fixtures,
   }) => {
-    const entityA = await fixtures.Entity({
-      name: "Entity A",
-      totalTastings: 1,
-      totalBottles: 2,
-    });
-    const entityB = await fixtures.Entity({
-      name: "Entity B",
-      totalTastings: 3,
-      totalBottles: 1,
-    });
+    const sourceA = await fixtures.Bottle({ name: "Queued Source A" });
+    const sourceB = await fixtures.Bottle({ name: "Queued Source B" });
+    const destination = await fixtures.Bottle({ name: "Queued Destination" });
+    const mod = await fixtures.User({ mod: true });
+    const actor = await getUserActor(mod);
+    const payload = {
+      toBottleId: destination.id,
+      fromBottleIds: [sourceA.id, sourceB.id],
+    };
+    const context = {
+      actor: { type: "user" as const, userId: mod.id, username: mod.username },
+    };
 
-    // Create a bottle with releases under entityA
-    const bottleA = await fixtures.LegacyBottle({
-      brandId: entityA.id,
-      name: "Test Bottle A",
-      category: "single_malt",
-      statedAge: null,
-    });
+    await mergeBottle(payload, context);
 
-    const bottleB = await fixtures.LegacyBottle({
-      brandId: entityB.id,
-      name: "Test Bottle B",
-      category: "single_malt",
-      statedAge: null,
-    });
-
-    // Create releases for bottleA
-    const release1 = await fixtures.BottleRelease({
-      bottleId: bottleA.id,
-      edition: "Batch 1",
-      abv: 43.0,
-      statedAge: 12,
-      releaseYear: 2020,
-      vintageYear: 2008,
-    });
-
-    const release2 = await fixtures.BottleRelease({
-      bottleId: bottleA.id,
-      edition: "Limited Edition",
-      abv: 46.0,
-      statedAge: null,
-      releaseYear: 2021,
-      vintageYear: null,
-    });
-
-    await mergeBottle({
-      fromBottleIds: [bottleA.id],
-      toBottleId: bottleB.id,
-    });
-
-    // Verify bottleA is deleted
-    const [newBottleA] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleA.id));
-    expect(newBottleA).toBeUndefined();
-
-    // Verify bottleB exists
-    const [newBottleB] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleB.id));
-    expect(newBottleB).toBeDefined();
-
-    // Verify releases were moved to bottleB and names were updated
-    const [updatedRelease1] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release1.id));
-
-    const [updatedRelease2] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release2.id));
-
-    expect(updatedRelease1.bottleId).toBe(bottleB.id);
-    expect(updatedRelease1.name).toBe(
-      "Test Bottle B - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV",
-    );
-    expect(updatedRelease1.fullName).toBe(
-      "Entity B Test Bottle B - Batch 1 - 12-year-old - 2020 Release - 2008 Vintage - 43.0% ABV",
-    );
-
-    expect(updatedRelease2.bottleId).toBe(bottleB.id);
-    expect(updatedRelease2.name).toBe(
-      "Test Bottle B - Limited Edition - 2021 Release - 46.0% ABV",
-    );
-    expect(updatedRelease2.fullName).toBe(
-      "Entity B Test Bottle B - Limited Edition - 2021 Release - 46.0% ABV",
-    );
-
-    // Verify tombstone was created
-    const [tombstone] = await db
-      .select()
-      .from(bottleTombstones)
-      .where(eq(bottleTombstones.bottleId, bottleA.id));
-    expect(tombstone.newBottleId).toEqual(bottleB.id);
-  });
-
-  it("handles duplicate bottles during merge", async ({ fixtures }) => {
-    const entityA = await fixtures.Entity({
-      name: "Entity A",
-      totalTastings: 1,
-      totalBottles: 2,
-    });
-    const entityB = await fixtures.Entity({
-      name: "Entity B",
-      totalTastings: 3,
-      totalBottles: 1,
-    });
-
-    // Create bottles with same name under different entities
-    const bottleA = await fixtures.LegacyBottle({
-      brandId: entityA.id,
-      name: "Duplicate",
-      category: "single_malt",
-      statedAge: null,
-    });
-
-    const bottleB = await fixtures.LegacyBottle({
-      brandId: entityB.id,
-      name: "Duplicate",
-      category: "single_malt",
-      statedAge: null,
-    });
-
-    // Create releases for bottleA
-    const release = await fixtures.BottleRelease({
-      bottleId: bottleA.id,
-      edition: "Batch 1",
-      abv: 43.0,
-      statedAge: null,
-      releaseYear: null,
-      vintageYear: null,
-    });
-
-    await mergeBottle({
-      fromBottleIds: [bottleA.id],
-      toBottleId: bottleB.id,
-    });
-
-    // Verify bottleA was merged into bottleB
-    const [newBottleA] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottleA.id));
-    expect(newBottleA).toBeUndefined();
-
-    // Verify release was moved to bottleB and name was updated
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-
-    expect(updatedRelease.bottleId).toBe(bottleB.id);
-    expect(updatedRelease.name).toBe("Duplicate - Batch 1 - 43.0% ABV");
-    expect(updatedRelease.fullName).toBe(
-      "Entity B Duplicate - Batch 1 - 43.0% ABV",
-    );
-  });
-
-  it("repoints system-owned references and merges derived bottle data", async ({
-    fixtures,
-  }) => {
-    const sourceBrand = await fixtures.Entity({
-      name: "Source Brand",
-      totalBottles: 1,
-    });
-    const targetBrand = await fixtures.Entity({
-      name: "Target Brand",
-      totalBottles: 1,
-    });
-    const sourceBottle = await fixtures.LegacyBottle({
-      brandId: sourceBrand.id,
-      name: "Source Bottle",
-      category: "single_malt",
-      statedAge: null,
-    });
-    const targetBottle = await fixtures.LegacyBottle({
-      brandId: targetBrand.id,
-      name: "Target Bottle",
-      category: "single_malt",
-      statedAge: null,
-    });
-    const sharedDistiller = await fixtures.Entity({ name: "Shared Distiller" });
-    const sourceOnlyDistiller = await fixtures.Entity({
-      name: "Source Only Distiller",
-    });
-    const price = await fixtures.StorePrice({ bottleId: sourceBottle.id });
-
-    await db.insert(bottlesToDistillers).values([
-      { bottleId: sourceBottle.id, distillerId: sharedDistiller.id },
-      { bottleId: sourceBottle.id, distillerId: sourceOnlyDistiller.id },
-      { bottleId: targetBottle.id, distillerId: sharedDistiller.id },
-    ]);
-
-    await db.insert(bottleTags).values([
-      { bottleId: sourceBottle.id, tag: "smoky", count: 3 },
-      { bottleId: sourceBottle.id, tag: "coastal", count: 2 },
-      { bottleId: targetBottle.id, tag: "smoky", count: 2 },
-    ]);
-
-    await db.insert(bottleFlavorProfiles).values([
-      { bottleId: sourceBottle.id, flavorProfile: "peated", count: 4 },
-      { bottleId: targetBottle.id, flavorProfile: "peated", count: 1 },
-    ]);
-
-    await db.insert(bottleObservations).values({
-      bottleId: sourceBottle.id,
-      sourceType: "store_price",
-      sourceKey: "merge-bottle-observation",
-      sourceName: "Merge Bottle Observation",
-    });
-
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "approved",
-        proposalType: "match_existing",
-        currentBottleId: sourceBottle.id,
-        suggestedBottleId: sourceBottle.id,
-        parentBottleId: sourceBottle.id,
-      })
-      .returning();
-
-    await mergeBottle({
-      fromBottleIds: [sourceBottle.id],
-      toBottleId: targetBottle.id,
-    });
-
-    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
-      where: eq(storePriceMatchProposals.id, proposal.id),
-    });
-    const observation = await db.query.bottleObservations.findFirst({
-      where: (table, { eq }) => eq(table.sourceKey, "merge-bottle-observation"),
-    });
-    const smokyTag = await db.query.bottleTags.findFirst({
-      where: (table, { and, eq }) =>
-        and(eq(table.bottleId, targetBottle.id), eq(table.tag, "smoky")),
-    });
-    const peatedFlavorProfile = await db.query.bottleFlavorProfiles.findFirst({
-      where: (table, { and, eq }) =>
-        and(
-          eq(table.bottleId, targetBottle.id),
-          eq(table.flavorProfile, "peated"),
-        ),
-    });
-    const targetDistillers = await db
-      .select()
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, targetBottle.id));
-    const sourceDistillers = await db
-      .select()
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, sourceBottle.id));
-
-    expect(updatedProposal).toMatchObject({
-      currentBottleId: targetBottle.id,
-      suggestedBottleId: targetBottle.id,
-      parentBottleId: targetBottle.id,
-      status: "approved",
-    });
-    expect(observation?.bottleId).toBe(targetBottle.id);
-    expect(smokyTag?.count).toBe(5);
-    expect(peatedFlavorProfile?.count).toBe(5);
     expect(
-      targetDistillers.map((row) => row.distillerId).sort((a, b) => a - b),
+      await db
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(inArray(bottles.id, [sourceA.id, sourceB.id])),
+    ).toEqual([]);
+    expect(
+      await db
+        .select()
+        .from(bottleTombstones)
+        .where(inArray(bottleTombstones.bottleId, [sourceA.id, sourceB.id])),
     ).toEqual(
-      [sharedDistiller.id, sourceOnlyDistiller.id].sort((a, b) => a - b),
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: sourceA.id,
+          newBottleId: destination.id,
+        }),
+        expect.objectContaining({
+          bottleId: sourceB.id,
+          newBottleId: destination.id,
+        }),
+      ]),
     );
-    expect(sourceDistillers).toHaveLength(0);
+    const mergeAudits = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectType, "bottle"),
+          inArray(changes.objectId, [sourceA.id, sourceB.id]),
+          eq(changes.type, "delete"),
+        ),
+      );
+    expect(mergeAudits).toHaveLength(2);
+    expect(mergeAudits.every(({ actorId }) => actorId === actor.id)).toBe(true);
+
+    const auditCount = await db.$count(changes);
+    await mergeBottle(payload, context);
+    expect(await db.$count(changes)).toBe(auditCount);
   });
 
-  it("dedupes collection and flight rows while merging bottles", async ({
+  test("rolls back every source when a later queued merge is invalid", async ({
     fixtures,
   }) => {
-    const sourceBottle = await fixtures.LegacyBottle({
-      name: "Source Dedupe Bottle",
-      category: "single_malt",
+    const validSource = await fixtures.Bottle({ name: "Atomic Valid Source" });
+    const invalidSource = await fixtures.LegacyBottle({
+      name: "Atomic Unmigrated Source",
     });
-    const targetBottle = await fixtures.LegacyBottle({
-      name: "Target Dedupe Bottle",
-      category: "single_malt",
-    });
-    const collection = await fixtures.Collection();
-    const flight = await fixtures.Flight();
+    const destination = await fixtures.Bottle({ name: "Atomic Destination" });
 
-    await db.insert(collectionBottles).values([
-      {
-        collectionId: collection.id,
-        bottleId: sourceBottle.id,
-        releaseId: null,
-      },
-      {
-        collectionId: collection.id,
-        bottleId: targetBottle.id,
-        releaseId: null,
-      },
-    ]);
-    await db.insert(flightBottles).values([
-      { flightId: flight.id, bottleId: sourceBottle.id, releaseId: null },
-      { flightId: flight.id, bottleId: targetBottle.id, releaseId: null },
-    ]);
+    await expect(
+      mergeBottle({
+        toBottleId: destination.id,
+        fromBottleIds: [validSource.id, invalidSource.id],
+      }),
+    ).rejects.toMatchObject({ code: "unmigrated" });
 
-    await mergeBottle({
-      fromBottleIds: [sourceBottle.id],
-      toBottleId: targetBottle.id,
-    });
-
-    const mergedCollectionRows = await db
-      .select()
-      .from(collectionBottles)
-      .where(
-        and(
-          eq(collectionBottles.collectionId, collection.id),
-          eq(collectionBottles.bottleId, targetBottle.id),
-        ),
-      );
-    const mergedFlightRows = await db
-      .select()
-      .from(flightBottles)
-      .where(
-        and(
-          eq(flightBottles.flightId, flight.id),
-          eq(flightBottles.bottleId, targetBottle.id),
-        ),
-      );
-
-    expect(mergedCollectionRows).toHaveLength(1);
-    expect(mergedFlightRows).toHaveLength(1);
+    expect(
+      await db
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(eq(bottles.id, validSource.id)),
+    ).toEqual([{ id: validSource.id }]);
+    expect(
+      await db
+        .select()
+        .from(bottleTombstones)
+        .where(eq(bottleTombstones.bottleId, validSource.id)),
+    ).toEqual([]);
   });
 
-  it("preserves collection bottle images while merging bottles", async ({
+  test("attributes a context-free legacy job to the Peated system actor", async ({
     fixtures,
   }) => {
-    const sourceBottle = await fixtures.LegacyBottle({
-      name: "Source Image Bottle",
-      category: "single_malt",
-    });
-    const targetBottle = await fixtures.LegacyBottle({
-      name: "Target Image Bottle",
-      category: "single_malt",
-    });
-    const collection = await fixtures.Collection();
-
-    await db.insert(collectionBottles).values({
-      collectionId: collection.id,
-      bottleId: sourceBottle.id,
-      releaseId: null,
-      imageUrl: "/uploads/collection-bottles/source-entry.webp",
-    });
+    const source = await fixtures.Bottle({ name: "System Source" });
+    const destination = await fixtures.Bottle({ name: "System Destination" });
 
     await mergeBottle({
-      fromBottleIds: [sourceBottle.id],
-      toBottleId: targetBottle.id,
+      toBottleId: destination.id,
+      fromBottleIds: [source.id],
     });
 
-    const mergedCollectionRows = await db
-      .select()
-      .from(collectionBottles)
+    const [audit] = await db
+      .select({ actorType: actors.type, actorKey: actors.key })
+      .from(changes)
+      .innerJoin(actors, eq(changes.actorId, actors.id))
       .where(
         and(
-          eq(collectionBottles.collectionId, collection.id),
-          eq(collectionBottles.bottleId, targetBottle.id),
+          eq(changes.objectType, "bottle"),
+          eq(changes.objectId, source.id),
+          eq(changes.type, "delete"),
         ),
       );
-
-    expect(mergedCollectionRows).toHaveLength(1);
-    expect(mergedCollectionRows[0]?.imageUrl).toBe(
-      "/uploads/collection-bottles/source-entry.webp",
-    );
-  });
-
-  it("reconciles duplicate collection bottle images while merging bottles", async ({
-    fixtures,
-  }) => {
-    const sourceBottle = await fixtures.LegacyBottle({
-      name: "Source Duplicate Image Bottle",
-      category: "single_malt",
-    });
-    const targetBottle = await fixtures.LegacyBottle({
-      name: "Target Duplicate Image Bottle",
-      category: "single_malt",
-    });
-    const fillImageCollection = await fixtures.Collection();
-    const keepImageCollection = await fixtures.Collection();
-
-    await db.insert(collectionBottles).values([
-      {
-        collectionId: fillImageCollection.id,
-        bottleId: sourceBottle.id,
-        releaseId: null,
-        imageUrl: "/uploads/collection-bottles/source-fill.webp",
-      },
-      {
-        collectionId: fillImageCollection.id,
-        bottleId: targetBottle.id,
-        releaseId: null,
-        imageUrl: null,
-      },
-      {
-        collectionId: keepImageCollection.id,
-        bottleId: sourceBottle.id,
-        releaseId: null,
-        imageUrl: "/uploads/collection-bottles/source-keep.webp",
-      },
-      {
-        collectionId: keepImageCollection.id,
-        bottleId: targetBottle.id,
-        releaseId: null,
-        imageUrl: "/uploads/collection-bottles/target-existing.webp",
-      },
-    ]);
-
-    await mergeBottle({
-      fromBottleIds: [sourceBottle.id],
-      toBottleId: targetBottle.id,
-    });
-
-    const fillImageRows = await db
-      .select()
-      .from(collectionBottles)
-      .where(
-        and(
-          eq(collectionBottles.collectionId, fillImageCollection.id),
-          eq(collectionBottles.bottleId, targetBottle.id),
-        ),
-      );
-    const keepImageRows = await db
-      .select()
-      .from(collectionBottles)
-      .where(
-        and(
-          eq(collectionBottles.collectionId, keepImageCollection.id),
-          eq(collectionBottles.bottleId, targetBottle.id),
-        ),
-      );
-
-    expect(fillImageRows).toHaveLength(1);
-    expect(fillImageRows[0]?.imageUrl).toBe(
-      "/uploads/collection-bottles/source-fill.webp",
-    );
-    expect(keepImageRows).toHaveLength(1);
-    expect(keepImageRows[0]?.imageUrl).toBe(
-      "/uploads/collection-bottles/target-existing.webp",
-    );
-  });
-
-  it("dedupes multiple source collection rows while preserving an image", async ({
-    fixtures,
-  }) => {
-    const sourceBottleA = await fixtures.LegacyBottle({
-      name: "Source Multi Image Bottle A",
-      category: "single_malt",
-    });
-    const sourceBottleB = await fixtures.LegacyBottle({
-      name: "Source Multi Image Bottle B",
-      category: "single_malt",
-    });
-    const targetBottle = await fixtures.LegacyBottle({
-      name: "Target Multi Image Bottle",
-      category: "single_malt",
-    });
-    const collection = await fixtures.Collection();
-
-    await db.insert(collectionBottles).values([
-      {
-        collectionId: collection.id,
-        bottleId: sourceBottleA.id,
-        releaseId: null,
-        imageUrl: null,
-        createdAt: new Date("2024-01-01T00:00:00.000Z"),
-      },
-      {
-        collectionId: collection.id,
-        bottleId: sourceBottleB.id,
-        releaseId: null,
-        imageUrl: "/uploads/collection-bottles/source-multi.webp",
-        createdAt: new Date("2024-01-02T00:00:00.000Z"),
-      },
-    ]);
-
-    await mergeBottle({
-      fromBottleIds: [sourceBottleA.id, sourceBottleB.id],
-      toBottleId: targetBottle.id,
-    });
-
-    const mergedCollectionRows = await db
-      .select()
-      .from(collectionBottles)
-      .where(
-        and(
-          eq(collectionBottles.collectionId, collection.id),
-          eq(collectionBottles.bottleId, targetBottle.id),
-        ),
-      );
-
-    expect(mergedCollectionRows).toHaveLength(1);
-    expect(mergedCollectionRows[0]?.imageUrl).toBe(
-      "/uploads/collection-bottles/source-multi.webp",
-    );
+    expect(audit).toEqual({ actorType: "system", actorKey: "peated" });
   });
 });

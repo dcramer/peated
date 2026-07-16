@@ -7,8 +7,9 @@ import {
   bottles,
   catalogTargets,
 } from "@peated/server/db/schema";
+import { mergeConcreteBottles } from "@peated/server/lib/mergeConcreteBottles";
 import waitError from "@peated/server/lib/test/waitError";
-import { eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import {
   CatalogTargetIntegrityMismatchError,
   CatalogTargetInvalidMappingError,
@@ -317,6 +318,175 @@ describe("legacy catalog target resolution", () => {
       completedAt: new Date(),
       createdByActorId: parent.createdByActorId,
     });
+
+    await expect(
+      loadCatalogTargetByLegacyReference(
+        { bottleId: parent.id, releaseId: release.id },
+        legacyReadContext,
+      ),
+    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
+  });
+
+  test("resolves a promotion through successive audited exact merges", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promotedSource = await createBottleInGroup({
+      groupId: parent.groupId as number,
+      brandId: parent.brandId,
+      createdByActorId: parent.createdByActorId,
+      name: `${parent.fullName} merged source`,
+    });
+    const intermediate = await fixtures.Bottle();
+    const destination = await fixtures.Bottle();
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promotedSource.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+      auditMetadata: {
+        retainedEvidence: "keep-me",
+      },
+    });
+    const context = { user: mod } as Parameters<
+      typeof mergeConcreteBottles
+    >[0]["context"];
+
+    await mergeConcreteBottles({
+      sourceBottleId: promotedSource.id,
+      destinationBottleId: intermediate.id,
+      context,
+    });
+    await mergeConcreteBottles({
+      sourceBottleId: intermediate.id,
+      destinationBottleId: destination.id,
+      context,
+    });
+
+    const target = await loadCatalogTargetByLegacyReference(
+      { bottleId: parent.id, releaseId: release.id },
+      legacyReadContext,
+    );
+
+    expect(target).toMatchObject({
+      kind: "bottle",
+      bottle: { id: destination.id },
+      targetId: await getExactTargetId(destination.id),
+    });
+    expect(
+      await db
+        .select()
+        .from(bottleTombstones)
+        .where(
+          inArray(bottleTombstones.bottleId, [
+            promotedSource.id,
+            intermediate.id,
+          ]),
+        )
+        .orderBy(asc(bottleTombstones.bottleId)),
+    ).toEqual([
+      {
+        bottleId: Math.min(promotedSource.id, intermediate.id),
+        newBottleId: destination.id,
+      },
+      {
+        bottleId: Math.max(promotedSource.id, intermediate.id),
+        newBottleId: destination.id,
+      },
+    ]);
+    expect(
+      await db
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(inArray(bottles.id, [promotedSource.id, intermediate.id])),
+    ).toEqual([]);
+    expect(
+      await db.query.bottleReleasePromotions.findFirst({
+        where: eq(bottleReleasePromotions.releaseId, release.id),
+      }),
+    ).toMatchObject({
+      promotedBottleId: destination.id,
+      auditMetadata: {
+        retainedEvidence: "keep-me",
+        exactBottleMerges: [
+          {
+            sourceBottleId: promotedSource.id,
+            destinationBottleId: intermediate.id,
+          },
+          {
+            sourceBottleId: intermediate.id,
+            destinationBottleId: destination.id,
+          },
+        ],
+      },
+    });
+  });
+
+  test("rejects malformed or tampered cross-group exact-merge evidence", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promotedSource = await createBottleInGroup({
+      groupId: parent.groupId as number,
+      brandId: parent.brandId,
+      createdByActorId: parent.createdByActorId,
+      name: `${parent.fullName} tampered source`,
+    });
+    const destination = await fixtures.Bottle();
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: destination.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+      auditMetadata: {
+        exactBottleMerges: [
+          {
+            sourceBottleId: promotedSource.id,
+            sourceGroupId: parent.groupId,
+            destinationBottleId: destination.id,
+            destinationGroupId: destination.groupId,
+            actorId: 0,
+          },
+        ],
+      },
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: promotedSource.id,
+      newBottleId: destination.id,
+    });
+    await db
+      .delete(catalogTargets)
+      .where(eq(catalogTargets.bottleId, promotedSource.id));
+    await db.delete(bottles).where(eq(bottles.id, promotedSource.id));
+
+    await expect(
+      loadCatalogTargetByLegacyReference(
+        { bottleId: parent.id, releaseId: release.id },
+        legacyReadContext,
+      ),
+    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
+
+    await db
+      .update(bottleReleasePromotions)
+      .set({
+        auditMetadata: {
+          exactBottleMerges: [
+            {
+              sourceBottleId: promotedSource.id,
+              sourceGroupId: parent.groupId,
+              destinationBottleId: destination.id,
+              destinationGroupId: parent.groupId,
+              actorId: parent.createdByActorId,
+            },
+          ],
+        },
+      })
+      .where(eq(bottleReleasePromotions.releaseId, release.id));
 
     await expect(
       loadCatalogTargetByLegacyReference(

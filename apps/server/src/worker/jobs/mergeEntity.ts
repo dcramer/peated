@@ -11,10 +11,14 @@ import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import { upsertBottleAlias } from "@peated/server/lib/db";
 import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
+import {
+  finalizeConcreteBottleMerge,
+  mergeConcreteBottlesInTransaction,
+  type ConcreteBottleMergeFinalizationManifest,
+} from "@peated/server/lib/mergeConcreteBottles";
 import { ConflictError } from "@peated/server/orpc/errors";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq, inArray } from "drizzle-orm";
-import mergeBottle from "./mergeBottle";
 
 // TODO: this should happen async
 export default async function mergeEntity({
@@ -47,6 +51,7 @@ export default async function mergeEntity({
   const updatedBottleIds: number[] = [];
   const updatedReleaseIds: number[] = [];
   const updatedAliasNames = new Set<string>();
+  const bottleMergeManifests: ConcreteBottleMergeFinalizationManifest[] = [];
   await db.transaction(async (tx) => {
     const actor = await getPeatedSystemActorForDatabase(tx);
     const bottleList = await tx
@@ -80,11 +85,13 @@ export default async function mergeEntity({
         }
         // Keep duplicate bottle merges inside the current transaction so the
         // source entity cannot be deleted if the bottle merge fails.
-        await mergeBottle({
-          toBottleId: alias.bottleId,
-          fromBottleIds: [bottle.id],
-          db: tx,
-        });
+        bottleMergeManifests.push(
+          await mergeConcreteBottlesInTransaction(tx, {
+            sourceBottleId: bottle.id,
+            destinationBottleId: alias.bottleId,
+            actorId: actor.id,
+          }),
+        );
       } else {
         // there was no conflict so lets update it
         await tx
@@ -154,8 +161,8 @@ export default async function mergeEntity({
           updatedAliasNames.add(newFullName);
         }
         updatedReleaseIds.push(...releases.map((r) => r.id));
+        updatedBottleIds.push(bottle.id);
       }
-      updatedBottleIds.push(bottle.id);
     }
 
     await Promise.all([
@@ -192,6 +199,10 @@ export default async function mergeEntity({
 
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
   });
+
+  for (const manifest of bottleMergeManifests) {
+    await finalizeConcreteBottleMerge(manifest);
+  }
 
   for (const bottleId of updatedBottleIds) {
     try {

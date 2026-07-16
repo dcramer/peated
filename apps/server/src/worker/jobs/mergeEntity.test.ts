@@ -1,11 +1,14 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
+  bottleGroupTombstones,
   bottleReleases,
   bottles,
   entities,
   entityTombstones,
 } from "@peated/server/db/schema";
-import { eq } from "drizzle-orm";
+import type * as Fixtures from "@peated/server/lib/test/fixtures";
+import { asc, eq, inArray } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import mergeEntity from "./mergeEntity";
 
@@ -87,7 +90,7 @@ test("merge duplicate bottle", async ({ fixtures }) => {
     totalTastings: 1,
     totalBottles: 2,
   });
-  const bottleA = await fixtures.LegacyBottle({
+  const bottleA = await fixtures.Bottle({
     brandId: entityA.id,
     name: "Duplicate",
   });
@@ -96,7 +99,7 @@ test("merge duplicate bottle", async ({ fixtures }) => {
     totalTastings: 3,
     totalBottles: 1,
   });
-  const bottleB = await fixtures.LegacyBottle({
+  const bottleB = await fixtures.Bottle({
     brandId: entityB.id,
     name: "Duplicate",
   });
@@ -118,6 +121,106 @@ test("merge duplicate bottle", async ({ fixtures }) => {
     .where(eq(bottles.id, bottleB.id));
   expect(newBottleB).toBeDefined();
   expect(newBottleB.name).toEqual("Duplicate");
+  expect(
+    await db
+      .select()
+      .from(bottleGroupTombstones)
+      .where(eq(bottleGroupTombstones.groupId, bottleA.groupId!)),
+  ).toEqual([expect.objectContaining({ newGroupId: bottleB.groupId })]);
+});
+
+async function expectReleaseOwnedDuplicateRollback(
+  fixtures: typeof Fixtures,
+  releaseOwner: "source" | "destination",
+) {
+  const sourceEntity = await fixtures.Entity({ name: "Release Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Release Destination",
+  });
+  const sourceBottle = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    name: "Duplicate",
+  });
+  const destinationBottle = await fixtures.Bottle({
+    brandId: destinationEntity.id,
+    name: "Duplicate",
+  });
+  const release = await fixtures.BottleRelease({
+    bottleId:
+      releaseOwner === "source" ? sourceBottle.id : destinationBottle.id,
+    edition: `${releaseOwner} child`,
+  });
+  const entityIds = [sourceEntity.id, destinationEntity.id];
+  const bottleIds = [sourceBottle.id, destinationBottle.id];
+  const entitiesBefore = await db
+    .select()
+    .from(entities)
+    .where(inArray(entities.id, entityIds))
+    .orderBy(asc(entities.id));
+  const bottlesBefore = await db
+    .select()
+    .from(bottles)
+    .where(inArray(bottles.id, bottleIds))
+    .orderBy(asc(bottles.id));
+  const aliasesBefore = await db
+    .select()
+    .from(bottleAliases)
+    .where(inArray(bottleAliases.bottleId, bottleIds))
+    .orderBy(asc(bottleAliases.name));
+  const releaseBefore = await db.query.bottleReleases.findFirst({
+    where: eq(bottleReleases.id, release.id),
+  });
+
+  await expect(
+    mergeEntity({
+      fromEntityIds: [sourceEntity.id],
+      toEntityId: destinationEntity.id,
+    }),
+  ).rejects.toMatchObject({ code: "unmigrated" });
+
+  expect(
+    await db
+      .select()
+      .from(entities)
+      .where(inArray(entities.id, entityIds))
+      .orderBy(asc(entities.id)),
+  ).toEqual(entitiesBefore);
+  expect(
+    await db
+      .select()
+      .from(bottles)
+      .where(inArray(bottles.id, bottleIds))
+      .orderBy(asc(bottles.id)),
+  ).toEqual(bottlesBefore);
+  expect(
+    await db
+      .select()
+      .from(bottleAliases)
+      .where(inArray(bottleAliases.bottleId, bottleIds))
+      .orderBy(asc(bottleAliases.name)),
+  ).toEqual(aliasesBefore);
+  expect(
+    await db.query.bottleReleases.findFirst({
+      where: eq(bottleReleases.id, release.id),
+    }),
+  ).toEqual(releaseBefore);
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, sourceEntity.id),
+    }),
+  ).toBeUndefined();
+}
+
+test("rolls back duplicate merges when the source Bottle owns releases", async ({
+  fixtures,
+}) => {
+  await expectReleaseOwnedDuplicateRollback(fixtures, "source");
+});
+
+test("rolls back duplicate merges when the destination Bottle owns releases", async ({
+  fixtures,
+}) => {
+  await expectReleaseOwnedDuplicateRollback(fixtures, "destination");
 });
 
 test("merge unique bottle", async ({ fixtures }) => {
@@ -253,64 +356,6 @@ test("updates bottle releases when merging entities", async ({ fixtures }) => {
     .from(entityTombstones)
     .where(eq(entityTombstones.entityId, entityA.id));
   expect(tombstone.newEntityId).toEqual(entityB.id);
-});
-
-test("handles duplicate bottles during entity merge", async ({ fixtures }) => {
-  const entityA = await fixtures.Entity({
-    name: "Entity A",
-    totalTastings: 1,
-    totalBottles: 2,
-  });
-  const entityB = await fixtures.Entity({
-    name: "Entity B",
-    totalTastings: 3,
-    totalBottles: 1,
-  });
-
-  // Create bottles with same name under different entities
-  const bottleA = await fixtures.LegacyBottle({
-    brandId: entityA.id,
-    name: "Duplicate",
-    statedAge: null,
-  });
-
-  const bottleB = await fixtures.LegacyBottle({
-    brandId: entityB.id,
-    name: "Duplicate",
-    statedAge: null,
-  });
-
-  // Create releases for bottleA
-  const release = await fixtures.BottleRelease({
-    bottleId: bottleA.id,
-    edition: "Batch 1",
-    abv: 43.0,
-    statedAge: null,
-    releaseYear: null,
-    vintageYear: null,
-  });
-
-  await mergeEntity({
-    fromEntityIds: [entityA.id],
-    toEntityId: entityB.id,
-  });
-
-  // Verify bottleA was merged into bottleB
-  const [newBottleA] = await db
-    .select()
-    .from(bottles)
-    .where(eq(bottles.id, bottleA.id));
-  expect(newBottleA).toBeUndefined();
-
-  // Verify release was moved to bottleB
-  const [updatedRelease] = await db
-    .select()
-    .from(bottleReleases)
-    .where(eq(bottleReleases.id, release.id));
-  expect(updatedRelease.bottleId).toBe(bottleB.id);
-  expect(updatedRelease.fullName).toBe(
-    `${entityB.name} Duplicate - Batch 1 - 43.0% ABV`,
-  );
 });
 
 describe("mergeEntity", () => {

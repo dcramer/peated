@@ -1,452 +1,77 @@
-import { db as defaultDb, type AnyDatabase } from "@peated/server/db";
+/**
+ * Compatibility adapter for queued MergeBottle payloads created before the
+ * synchronous route cutover. Remove with the remaining legacy workers in 9.7.
+ */
+import { db } from "@peated/server/db";
 import {
-  bottleAliases,
-  bottleFlavorProfiles,
-  bottleObservations,
-  bottleReleases,
-  bottleTags,
-  bottleTombstones,
-  bottles,
-  bottlesToDistillers,
-  collectionBottles,
-  flightBottles,
-  reviews,
-  storePriceMatchProposals,
-  storePrices,
-  tastings,
-} from "@peated/server/db/schema";
-import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
-import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatReleaseName } from "@peated/server/lib/format";
-import { logError, logInfo } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/client";
-import { asc, eq, inArray, or, sql } from "drizzle-orm";
+  getPeatedSystemActorForDatabase,
+  getUserActorByIdForDatabase,
+} from "@peated/server/lib/actors";
+import { logInfo } from "@peated/server/lib/log";
+import {
+  finalizeConcreteBottleMerge,
+  mergeConcreteBottlesInTransaction,
+  type ConcreteBottleMergeFinalizationManifest,
+} from "@peated/server/lib/mergeConcreteBottles";
+import type { JobContext } from "@peated/server/worker/types";
+import { z } from "zod";
 
-// TODO: this should happen async
-export default async function mergeBottle({
-  toBottleId,
-  fromBottleIds,
-  db = defaultDb,
-}: {
-  toBottleId: number;
-  fromBottleIds: number[];
-  db?: AnyDatabase;
-}) {
-  logInfo("Merging bottles into {toBottleId}", {
+const MergeBottleJobArgsSchema = z
+  .object({
+    toBottleId: z.number().int().positive(),
+    fromBottleIds: z.array(z.number().int().positive()).nonempty(),
+  })
+  .strict()
+  .superRefine(({ toBottleId, fromBottleIds }, context) => {
+    if (new Set(fromBottleIds).size !== fromBottleIds.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["fromBottleIds"],
+        message: "Source Bottle IDs must be distinct.",
+      });
+    }
+    if (fromBottleIds.includes(toBottleId)) {
+      context.addIssue({
+        code: "custom",
+        path: ["fromBottleIds"],
+        message: "The destination Bottle cannot also be a source.",
+      });
+    }
+  });
+
+export default async function mergeBottle(
+  input: unknown,
+  context: JobContext = {},
+) {
+  const args = MergeBottleJobArgsSchema.parse(input);
+  logInfo("Legacy MergeBottle compatibility write", {
     extra: {
-      fromBottleIds,
-      toBottleId,
+      event: "bottle_merge.compatibility",
+      access: "write",
+      caller: "worker.jobs.mergeBottle",
+      operation: "merge_concrete_bottles",
+      toBottleId: args.toBottleId,
+      fromBottleIds: args.fromBottleIds,
     },
   });
 
-  // Get the target bottle to get its name for release updates
-  const [targetBottle] = await db
-    .select()
-    .from(bottles)
-    .where(eq(bottles.id, toBottleId));
-
-  if (!targetBottle) {
-    throw new Error(`Target bottle ${toBottleId} not found`);
-  }
-
-  // TODO: this doesnt handle duplicate bottles
-  const updatedAliasNames = new Set<string>();
-  const updatedReleaseIds = new Set<number>();
-  const updatedEntityIds = new Set<number>();
+  const manifests: ConcreteBottleMergeFinalizationManifest[] = [];
   await db.transaction(async (tx) => {
-    const actor = await getPeatedSystemActorForDatabase(tx);
-    const [
-      sourceBottles,
-      sourceCollectionRows,
-      sourceFlightRows,
-      sourceDistillerRows,
-      targetDistillerRows,
-      existingTags,
-      existingFlavorProfiles,
-    ] = await Promise.all([
-      tx.select().from(bottles).where(inArray(bottles.id, fromBottleIds)),
-      tx
-        .select()
-        .from(collectionBottles)
-        .where(inArray(collectionBottles.bottleId, fromBottleIds))
-        .orderBy(asc(collectionBottles.createdAt), asc(collectionBottles.id)),
-      tx
-        .select()
-        .from(flightBottles)
-        .where(inArray(flightBottles.bottleId, fromBottleIds)),
-      tx
-        .select()
-        .from(bottlesToDistillers)
-        .where(inArray(bottlesToDistillers.bottleId, fromBottleIds)),
-      tx
-        .select()
-        .from(bottlesToDistillers)
-        .where(eq(bottlesToDistillers.bottleId, toBottleId)),
-      tx.query.bottleTags.findMany({
-        where: inArray(bottleTags.bottleId, fromBottleIds),
-      }),
-      tx.query.bottleFlavorProfiles.findMany({
-        where: inArray(bottleFlavorProfiles.bottleId, fromBottleIds),
-      }),
-    ]);
-
-    if (sourceBottles.length !== fromBottleIds.length) {
-      const existingBottleIds = new Set(
-        sourceBottles.map((bottle) => bottle.id),
-      );
-      const missingBottleIds = fromBottleIds.filter(
-        (id) => !existingBottleIds.has(id),
-      );
-      throw new Error(
-        `Source bottle(s) not found: ${missingBottleIds.join(", ")}`,
-      );
-    }
-
-    for (const entityId of [
-      targetBottle.brandId,
-      targetBottle.bottlerId,
-      ...targetDistillerRows.map((row) => row.distillerId),
-    ]) {
-      if (entityId !== null) {
-        updatedEntityIds.add(entityId);
-      }
-    }
-
-    for (const bottle of sourceBottles) {
-      for (const entityId of [bottle.brandId, bottle.bottlerId]) {
-        if (entityId !== null) {
-          updatedEntityIds.add(entityId);
-        }
-      }
-    }
-
-    for (const row of sourceDistillerRows) {
-      updatedEntityIds.add(row.distillerId);
-    }
-
-    if (sourceCollectionRows.length > 0) {
-      // Collapse source rows before upsert; existing target images win unless blank.
-      const mergedSourceCollectionRows = Array.from(
-        sourceCollectionRows
-          .reduce((rows, row) => {
-            const key = `${row.collectionId}:${row.releaseId ?? "null"}`;
-            const existingRow = rows.get(key);
-            if (!existingRow) {
-              rows.set(key, row);
-            } else if (!existingRow.imageUrl && row.imageUrl) {
-              rows.set(key, { ...existingRow, imageUrl: row.imageUrl });
-            }
-            return rows;
-          }, new Map<string, (typeof sourceCollectionRows)[number]>())
-          .values(),
-      );
-
-      await tx
-        .insert(collectionBottles)
-        .values(
-          mergedSourceCollectionRows.map((row) => ({
-            collectionId: row.collectionId,
-            bottleId: toBottleId,
-            releaseId: row.releaseId,
-            imageUrl: row.imageUrl,
-            createdAt: row.createdAt,
-          })),
-        )
-        .onConflictDoUpdate({
-          target: [
-            collectionBottles.collectionId,
-            collectionBottles.bottleId,
-            collectionBottles.releaseId,
-          ],
-          set: {
-            imageUrl: sql<
-              string | null
-            >`COALESCE(${collectionBottles.imageUrl}, excluded.image_url)`,
-          },
-        });
-    }
-
-    if (sourceFlightRows.length > 0) {
-      await tx
-        .insert(flightBottles)
-        .values(
-          sourceFlightRows.map((row) => ({
-            flightId: row.flightId,
-            bottleId: toBottleId,
-            releaseId: row.releaseId,
-          })),
-        )
-        .onConflictDoNothing();
-    }
-
-    if (sourceDistillerRows.length > 0) {
-      await tx
-        .insert(bottlesToDistillers)
-        .values(
-          sourceDistillerRows.map((row) => ({
-            bottleId: toBottleId,
-            distillerId: row.distillerId,
-          })),
-        )
-        .onConflictDoNothing();
-    }
-
-    await Promise.all([
-      tx
-        .update(tastings)
-        .set({
-          bottleId: toBottleId,
-        })
-        .where(inArray(tastings.bottleId, fromBottleIds)),
-
-      tx
-        .update(storePrices)
-        .set({
-          bottleId: toBottleId,
-        })
-        .where(inArray(storePrices.bottleId, fromBottleIds)),
-
-      tx
-        .update(reviews)
-        .set({
-          bottleId: toBottleId,
-        })
-        .where(inArray(reviews.bottleId, fromBottleIds)),
-
-      tx
-        .update(bottleObservations)
-        .set({
-          bottleId: toBottleId,
-        })
-        .where(inArray(bottleObservations.bottleId, fromBottleIds)),
-
-      tx
-        .update(storePriceMatchProposals)
-        .set({
-          currentBottleId: sql`CASE
-            WHEN ${inArray(storePriceMatchProposals.currentBottleId, fromBottleIds)}
-              THEN ${toBottleId}
-            ELSE ${storePriceMatchProposals.currentBottleId}
-          END`,
-          suggestedBottleId: sql`CASE
-            WHEN ${inArray(storePriceMatchProposals.suggestedBottleId, fromBottleIds)}
-              THEN ${toBottleId}
-            ELSE ${storePriceMatchProposals.suggestedBottleId}
-          END`,
-          parentBottleId: sql`CASE
-            WHEN ${inArray(storePriceMatchProposals.parentBottleId, fromBottleIds)}
-              THEN ${toBottleId}
-            ELSE ${storePriceMatchProposals.parentBottleId}
-          END`,
-          updatedAt: sql`NOW()`,
-        })
-        .where(
-          or(
-            inArray(storePriceMatchProposals.currentBottleId, fromBottleIds),
-            inArray(storePriceMatchProposals.suggestedBottleId, fromBottleIds),
-            inArray(storePriceMatchProposals.parentBottleId, fromBottleIds),
-          ),
-        ),
-
-      // TODO: handle conflicts
-      tx
-        .update(bottleAliases)
-        .set({
-          bottleId: toBottleId,
-        })
-        .where(inArray(bottleAliases.bottleId, fromBottleIds)),
-    ]);
-
-    if (sourceCollectionRows.length > 0) {
-      await tx
-        .delete(collectionBottles)
-        .where(inArray(collectionBottles.bottleId, fromBottleIds));
-    }
-
-    if (sourceFlightRows.length > 0) {
-      await tx
-        .delete(flightBottles)
-        .where(inArray(flightBottles.bottleId, fromBottleIds));
-    }
-
-    // Update bottle releases with new fullName
-    const releases = await tx.query.bottleReleases.findMany({
-      where: inArray(bottleReleases.bottleId, fromBottleIds),
-    });
-
-    for (const release of releases) {
-      const newName = formatReleaseName({
-        name: targetBottle.name,
-        edition: release.edition,
-        abv: release.abv,
-        statedAge: targetBottle.statedAge ? null : release.statedAge,
-        releaseYear: release.releaseYear,
-        vintageYear: release.vintageYear,
-        singleCask: release.singleCask,
-        caskStrength: release.caskStrength,
-        caskFill: release.caskFill,
-        caskType: release.caskType,
-        caskSize: release.caskSize,
-      });
-
-      const newFullName = formatReleaseName({
-        name: targetBottle.fullName,
-        edition: release.edition,
-        abv: release.abv,
-        statedAge: targetBottle.statedAge ? null : release.statedAge,
-        releaseYear: release.releaseYear,
-        vintageYear: release.vintageYear,
-        singleCask: release.singleCask,
-        caskStrength: release.caskStrength,
-        caskFill: release.caskFill,
-        caskType: release.caskType,
-        caskSize: release.caskSize,
-      });
-
-      await tx
-        .update(bottleReleases)
-        .set({
-          bottleId: toBottleId,
-          name: newName,
-          fullName: newFullName,
-        })
-        .where(eq(bottleReleases.id, release.id));
-
-      const releaseAlias = await upsertBottleAlias(
-        tx,
-        newFullName,
-        toBottleId,
-        release.id,
-        { assignedByActorId: actor.id },
-      );
-      if (
-        releaseAlias.bottleId !== toBottleId ||
-        (releaseAlias.releaseId ?? null) !== release.id
-      ) {
-        throw new Error("Release alias already belongs to a different bottle.");
-      }
-
-      updatedAliasNames.add(newFullName);
-      updatedReleaseIds.add(release.id);
-    }
-
-    await Promise.all(
-      fromBottleIds.map((id) =>
-        tx.insert(bottleTombstones).values({
-          bottleId: id,
-          newBottleId: toBottleId,
+    const actor = context.actor
+      ? await getUserActorByIdForDatabase(tx, context.actor.userId)
+      : await getPeatedSystemActorForDatabase(tx);
+    for (const sourceBottleId of args.fromBottleIds) {
+      manifests.push(
+        await mergeConcreteBottlesInTransaction(tx, {
+          sourceBottleId,
+          destinationBottleId: args.toBottleId,
+          actorId: actor.id,
         }),
-      ),
-    );
-
-    await Promise.all(
-      existingTags.map((row) =>
-        tx
-          .insert(bottleTags)
-          .values({
-            bottleId: toBottleId,
-            tag: row.tag,
-            count: row.count,
-          })
-          .onConflictDoUpdate({
-            target: [bottleTags.bottleId, bottleTags.tag],
-            set: {
-              count: sql<number>`${bottleTags.count} + ${row.count}`,
-            },
-          }),
-      ),
-    );
-
-    await Promise.all(
-      existingFlavorProfiles.map((row) =>
-        tx
-          .insert(bottleFlavorProfiles)
-          .values({
-            bottleId: toBottleId,
-            flavorProfile: row.flavorProfile,
-            count: row.count,
-          })
-          .onConflictDoUpdate({
-            target: [
-              bottleFlavorProfiles.bottleId,
-              bottleFlavorProfiles.flavorProfile,
-            ],
-            set: {
-              count: sql<number>`${bottleFlavorProfiles.count} + ${row.count}`,
-            },
-          }),
-      ),
-    );
-
-    // wipe old bottles
-    await Promise.all([
-      tx.delete(bottleTags).where(inArray(bottleTags.bottleId, fromBottleIds)),
-      tx
-        .delete(bottleFlavorProfiles)
-        .where(inArray(bottleFlavorProfiles.bottleId, fromBottleIds)),
-      tx
-        .delete(bottlesToDistillers)
-        .where(inArray(bottlesToDistillers.bottleId, fromBottleIds)),
-    ]);
-
-    await tx.delete(bottles).where(inArray(bottles.id, fromBottleIds));
+      );
+    }
   });
 
-  for (const aliasName of updatedAliasNames) {
-    try {
-      await pushUniqueJob(
-        "OnBottleAliasChange",
-        { name: aliasName },
-        { delay: 5000 },
-      );
-    } catch (err) {
-      logError(err, {
-        alias: {
-          name: aliasName,
-        },
-      });
-    }
-  }
-
-  for (const releaseId of updatedReleaseIds) {
-    try {
-      await pushUniqueJob(
-        "OnBottleReleaseChange",
-        { releaseId },
-        { delay: 5000 },
-      );
-    } catch (err) {
-      logError(err, {
-        release: {
-          id: releaseId,
-        },
-      });
-    }
-  }
-
-  for (const entityId of updatedEntityIds) {
-    try {
-      await pushUniqueJob("OnEntityChange", { entityId }, { delay: 5000 });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: entityId,
-        },
-      });
-    }
-  }
-
-  try {
-    await pushUniqueJob(
-      "OnBottleChange",
-      { bottleId: toBottleId },
-      { delay: 5000 },
-    );
-  } catch (err) {
-    logError(err, {
-      bottle: {
-        id: toBottleId,
-      },
-    });
+  for (const manifest of manifests) {
+    await finalizeConcreteBottleMerge(manifest);
   }
 }

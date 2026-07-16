@@ -1,7 +1,11 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
+  bottleReleases,
+  bottleTombstones,
   bottles,
   entities,
+  flightBottles,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
@@ -9,7 +13,6 @@ import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
-import mergeBottle from "@peated/server/worker/jobs/mergeBottle";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -73,9 +76,24 @@ describe("POST /tastings", () => {
     const release = await fixtures.BottleRelease({ bottleId: sourceBottle.id });
     const flight = await fixtures.Flight({ bottles: [sourceBottle.id] });
 
-    await mergeBottle({
-      fromBottleIds: [sourceBottle.id],
-      toBottleId: targetBottle.id,
+    await db.transaction(async (tx) => {
+      await tx
+        .update(bottleReleases)
+        .set({ bottleId: targetBottle.id })
+        .where(eq(bottleReleases.id, release.id));
+      await tx
+        .update(flightBottles)
+        .set({ bottleId: targetBottle.id })
+        .where(eq(flightBottles.flightId, flight.id));
+      await tx
+        .update(bottleAliases)
+        .set({ bottleId: targetBottle.id })
+        .where(eq(bottleAliases.bottleId, sourceBottle.id));
+      await tx.insert(bottleTombstones).values({
+        bottleId: sourceBottle.id,
+        newBottleId: targetBottle.id,
+      });
+      await tx.delete(bottles).where(eq(bottles.id, sourceBottle.id));
     });
 
     const data = await routerClient.tastings.create(

@@ -216,7 +216,23 @@ Bottle distiller rows remain unchanged. A later shared identity edit uses the
 normal atomic fan-out path. The system does not infer that existing generic
 activity described the split expression.
 
-Bottle merge remains a distinct exact-duplicate operation. It merges two concrete Bottles and their exact targets; it does not imply that all other members of either group are duplicates.
+Bottle merge remains a distinct exact-duplicate operation. It merges two
+concrete Bottles and their exact targets; it does not imply that all other
+members of either group are duplicates. The destination Bottle remains
+independently authoritative: its identity, exact content, distillers, Bottle id,
+and exact target win. Exact consumers, aliases, promotion mappings, and derived
+counts converge on it without copying BottleGroup presentation into the Bottle.
+
+Within one group, merging its representative into another member selects the
+destination as representative. Across groups, a non-representative source may
+be removed without moving its siblings or generic activity. A representative
+with surviving siblings must first be replaced explicitly, while a singleton
+source retires its now-empty group and moves generic consumers and stable aliases
+to the destination group without selecting an arbitrary exact Bottle. Identical
+tombstone retries are unchanged and a retry naming another destination
+conflicts. Bottles that still own unmigrated `bottle_release` children are
+rejected rather than running a second legacy merge algorithm.
+
 Every legacy release keeps its own promotion mapping, while audited exact
 Bottle merges may make multiple mappings converge on the surviving Bottle.
 
@@ -273,6 +289,7 @@ must have an explicit removal task:
 - BottleRelease write adapters: tasks 5.4 and 9.4/9.7;
 - paired-reference dual writes: tasks 5.6, 7.3, and 9.6;
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
+- queued `MergeBottle` compatibility adapter: task 9.7;
 - release-only search/indexing: task 7.5;
 - nested Bottling UI: task 8.9;
 - exact-Bottle runtime dependence on BottleGroup hydration: task 9.9;
