@@ -36,6 +36,7 @@ export type JobName =
   | "ScrapeWoodenCork"
   | "ScrapeWhiskyAdvocate"
   | "CreateMissingBottles"
+  | "UpdateBottleGroupStats"
   | "UpdateBottleStats"
   | "UpdateCountryStats"
   | "UpdateEntityStats"

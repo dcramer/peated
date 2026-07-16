@@ -147,9 +147,20 @@ Catalog identity, aliases, search, creation, and updates:
   `apps/server/src/lib/recomputeBottleGroupStats.ts` validates the group graph
   and passes the generic plus all member exact targets to the same calculator.
   Neither service sums materialized Bottle totals.
+- `apps/server/src/lib/catalogTargetStatsRepair.ts` owns the exact-target-only,
+  paginated maintenance projection used by `bottles fix-stats`. It excludes
+  generic targets and targetless legacy parent Bottles. The projection does not
+  silently pre-filter graph errors: strict recomputation validates the active
+  graph and target integrity and stops on an invalid row.
 - `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
-  reader/writer from tasks 3.2/3.7; retain it through the task 9.5 read window
-  and remove its legacy branch under task 9.7.
+  reader/writer from tasks 3.2/3.7. Its
+  `resolveCatalogTargetForAssignment` boundary returns the validated target,
+  group, and nullable exact-Bottle identity used by dual-write consumers.
+  It replaces the removed ID-only assignment facade so consumers do not
+  reconstruct or re-load target identity.
+  Durable `targetId` values are authoritative; the measured legacy pair is used
+  only when a compatibility row has no target. Retain that legacy branch
+  through the task 9.5 read window and remove it under task 9.7.
 - `apps/server/src/lib/bottleAliases.ts`
 - `apps/server/src/lib/bottleCreationDrafts.ts`
 - `apps/server/src/lib/bottleFinder.ts`
@@ -193,20 +204,65 @@ Classifier decisions and price matching:
 - `apps/server/src/worker/jobs/createMissingBottles.ts`
 - `apps/server/src/worker/jobs/index.ts`
 - `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
-- `apps/server/src/worker/jobs/updateBottleStats.ts` still owns the active
-  legacy `bottleId` statistics SQL during the task 4.11a review boundary.
-  Tasting create and delete always enqueue that worker, and update enqueues it
-  when the rating changes. All three routes also mutate Bottle statistics
-  inline: create and delete update `totalTastings` and `avgRating`, while update
-  changes only `avgRating`. Before statistics activation, the immediate task
-  4.11 follow-up must first complete, or atomically include, target assignment
-  for every active tasting create, update, and delete writer so those writes
-  cannot leave `targetId` null. This is the tasting subset of task 5.6; review,
-  collection, flight, and price consumers keep task 5.6 open. The follow-up must
-  then delegate these paths to the canonical target-backed services and remove
-  the inline statistics logic from all three routes plus the superseded worker
-  SQL without adding a silent `bottleId` fallback. Task 4.11a is therefore not
-  independently deployable.
+- `apps/server/src/worker/jobs/onBottleChange.ts` refreshes Bottle details and
+  search before queueing delayed exact Bottle and BottleGroup statistics. Before
+  strict target-backed statistics activation, task 7.10 must stop or upgrade
+  any producer that can enqueue a retired legacy parent and drain or expire
+  those queued jobs because a retired parent has no active exact target.
+- `apps/server/src/worker/jobs/updateBottleStats.ts` delegates exact
+  recomputation to `recomputeBottleStats`, then delegates aggregate
+  recomputation to `recomputeBottleGroupStats`.
+- `apps/server/src/worker/jobs/updateBottleGroupStats.ts` is the generic-target
+  entry point and delegates only to `recomputeBottleGroupStats`.
+- `apps/server/src/worker/jobs/queueBottleEntityStats.ts` is the one shared
+  downstream entity-aggregate refresh helper used by both statistics jobs.
+  Both exact and generic tasting jobs carry the retained tasting `bottleId` as
+  `entityStatsBottleId` only as compatibility context for the still-legacy
+  entity aggregate. The exact job's separate `bottleId` is the validated exact
+  Bottle scope for its durable `targetId`; the compatibility Bottle does not
+  affect generic group calculation.
+  Each statistics event independently queues an idempotent downstream entity
+  refresh without stable-key coalescing; successful jobs are removed and failed
+  jobs are retained. Task 7.10 replaces this bridge with target-aware
+  queue/entity aggregation, task 9.6 removes its obsolete consumer
+  `bottleId`/`releaseId` storage, and task 9.7 removes the runtime compatibility
+  branch.
+- `apps/server/src/orpc/routes/tastings/dispatchStatsRecompute.ts` maps a
+  validated target descriptor to one independently queued, delayed idempotent
+  exact-or-group job per qualifying event. Completed jobs are removed;
+  publication failure is logged with tasting and target identity and does not
+  fail a committed tasting mutation.
+- The worker registry logs and rethrows handler failures to BullMQ. Statistics
+  jobs remove completed records but retain failed records, so a failed
+  canonical or downstream entity refresh is observable and retryable.
+- `UpdateBottleStats` intentionally rejects its previous `{ bottleId }` payload:
+  that legacy identity cannot infer whether activity belongs to a promoted
+  exact target. Before the target-backed worker is enabled, every old producer
+  must be stopped or upgraded and queued legacy payloads must be drained or
+  expired. Legacy-parent `OnBottleChange` producers and queued jobs must likewise
+  be stopped or upgraded and drained or expired before activation. Task 7.10
+  owns verification of this mixed-version queue gate, while task 7.7 owns
+  aggregate parity evidence and cutover approval.
+- Tasting create persists a resolved target. Update and delete trust a durable
+  `targetId`; only null-target compatibility rows resolve the measured legacy
+  `(bottleId, releaseId)` pair, and update persists the resolved target. Create,
+  delete, rating-changing update, and null-target repair dispatch statistics;
+  a notes-only update to a durable-target row does not. The old route-inline
+  Bottle formulas and worker-owned `bottleId` tasting query are removed. There
+  is no legacy statistics fallback.
+- This is only the task 5.6a tasting subset. Remaining review, collection,
+  flight, and price mutation dual-writes keep task 5.6 open. These commits are
+  review boundaries, not independently deployable or servable application
+  states. In the controlled production migration, the fresh retained audit must
+  identify the exact Git and migration revisions and be approved immediately
+  before any production backfill begins. The target-backed statistics path must
+  not serve until promotion and consumer target backfill are complete, required
+  target nulls and graph errors are zero, and task 7.7 has retained matching
+  target/legacy aggregate evidence plus deployment approval. Constraint and
+  cleanup gates require a newly generated retained production audit from their
+  exact Git and migration revisions, including generation time, database,
+  reconciled counts, and explicit approval; the task 6.13 pre-backfill report
+  cannot satisfy that later freshness gate.
 - `apps/server/src/worker/jobs/mergeBottle.ts` is a measured compatibility
   adapter for queued pre-cutover payloads. It validates and translates the old
   payload into `mergeConcreteBottles` transaction calls and owns no merge
@@ -219,7 +275,12 @@ Classifier decisions and price matching:
 
 ## CLI
 
-- `apps/cli/src/commands/bottles.ts`
+- `apps/cli/src/commands/bottles.ts`: `bottles fix-stats` selects exact-target
+  rows and directly dispatches their Bottle ids to the strict exact statistics
+  worker. Strict recomputation validates the active graph and target integrity
+  and stops on an invalid row rather than silently skipping it. This explicit
+  maintenance scope does not use the tasting assignment descriptor, which
+  distinguishes exact from generic user intent.
 - `apps/cli/src/commands/catalogMigration.ts`
 
 ## Migration audit

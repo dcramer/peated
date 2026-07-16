@@ -19,7 +19,7 @@ import {
   loadCatalogTargetByBottleId,
   loadCatalogTargetByGroupId,
   loadCatalogTargetByLegacyReference,
-  resolveCatalogTargetIdForAssignment,
+  resolveCatalogTargetForAssignment,
 } from "./catalogTargets";
 
 const readContext = {
@@ -498,7 +498,7 @@ describe("legacy catalog target resolution", () => {
 });
 
 describe("catalog target assignment", () => {
-  test("deterministically resolves exact, generic, durable, and legacy writes", async ({
+  test("resolves validated descriptors for target, Bottle, group, and legacy writes", async ({
     fixtures,
   }) => {
     const parent = await fixtures.Bottle();
@@ -519,31 +519,47 @@ describe("catalog target assignment", () => {
     const exactTargetId = await getExactTargetId(promoted.id);
     const genericTargetId = await getGenericTargetId(parent.groupId as number);
     await expect(
-      resolveCatalogTargetIdForAssignment({
+      resolveCatalogTargetForAssignment({
         kind: "bottle",
         bottleId: promoted.id,
       }),
-    ).resolves.toBe(exactTargetId);
+    ).resolves.toEqual({
+      targetId: exactTargetId,
+      groupId: parent.groupId,
+      bottleId: promoted.id,
+    });
     await expect(
-      resolveCatalogTargetIdForAssignment({
+      resolveCatalogTargetForAssignment({
         kind: "group",
         groupId: parent.groupId as number,
       }),
-    ).resolves.toBe(genericTargetId);
+    ).resolves.toEqual({
+      targetId: genericTargetId,
+      groupId: parent.groupId,
+      bottleId: null,
+    });
     await expect(
-      resolveCatalogTargetIdForAssignment({
+      resolveCatalogTargetForAssignment({
         kind: "target",
         targetId: exactTargetId,
       }),
-    ).resolves.toBe(exactTargetId);
+    ).resolves.toEqual({
+      targetId: exactTargetId,
+      groupId: parent.groupId,
+      bottleId: promoted.id,
+    });
     await expect(
-      resolveCatalogTargetIdForAssignment({
+      resolveCatalogTargetForAssignment({
         kind: "legacy",
         bottleId: parent.id,
         releaseId: release.id,
         context: assignmentContext,
       }),
-    ).resolves.toBe(exactTargetId);
+    ).resolves.toEqual({
+      targetId: exactTargetId,
+      groupId: parent.groupId,
+      bottleId: promoted.id,
+    });
   });
 
   test("requires operation and caller context for legacy assignment", async ({
@@ -552,7 +568,7 @@ describe("catalog target assignment", () => {
     const bottle = await fixtures.Bottle();
 
     await expect(
-      resolveCatalogTargetIdForAssignment({
+      resolveCatalogTargetForAssignment({
         kind: "legacy",
         bottleId: bottle.id,
         releaseId: null,

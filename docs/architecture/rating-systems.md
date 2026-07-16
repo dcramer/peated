@@ -107,41 +107,54 @@ const TastingInputSchema = z
 
 ### 3. Stats Calculation
 
-```typescript
-// Worker job: updateBottleStats
-const updateSimpleRatingStats = async (bottleId: number) => {
-  const stats = await db
-    .select({
-      pass: sql<number>`COUNT(*) FILTER (WHERE rating_simple = -1)`,
-      sip: sql<number>`COUNT(*) FILTER (WHERE rating_simple = 1)`,
-      savor: sql<number>`COUNT(*) FILTER (WHERE rating_simple = 2)`,
-      total: sql<number>`COUNT(*) FILTER (WHERE rating_simple IS NOT NULL)`,
-      avg: sql<number>`AVG(rating_simple) FILTER (WHERE rating_simple IS NOT NULL)`,
-    })
-    .from(tastings)
-    .where(eq(tastings.bottleId, bottleId));
+Rating statistics are calculated from raw tasting `targetId` activity by one
+shared calculator. An exact Bottle includes only tastings on its exact
+CatalogTarget. A BottleGroup includes its generic-target tastings plus every
+active member Bottle's exact-target tastings once; it never adds materialized
+Bottle totals to raw rows.
 
-  const percentages = {
-    pass: stats.total > 0 ? (stats.pass / stats.total) * 100 : 0,
-    sip: stats.total > 0 ? (stats.sip / stats.total) * 100 : 0,
-    savor: stats.total > 0 ? (stats.savor / stats.total) * 100 : 0,
-  };
+Tasting create persists a validated target. Update and delete trust an existing
+target and resolve the measured legacy `(bottleId, releaseId)` pair only for a
+pre-backfill row whose `targetId` is null. There is no `bottleId` fallback in the
+statistics calculator.
 
-  await db
-    .update(bottles)
-    .set({
-      avgRatingSimple: stats.avg,
-      ratingSimpleStats: {
-        pass: stats.pass,
-        sip: stats.sip,
-        savor: stats.savor,
-        total: stats.total,
-        percentage: percentages,
-      },
-    })
-    .where(eq(bottles.id, bottleId));
-};
-```
+After a tasting create or delete commits, a rating-changing update commits, or a
+null-target row is repaired, the route independently queues one delayed,
+idempotent statistics job for that event. Completed jobs are removed, and a
+publication failure is logged without failing the committed tasting write. A
+notes-only update to a row with a durable target does not dispatch statistics
+work:
+
+- `UpdateBottleStats` recomputes the exact Bottle and then its BottleGroup.
+- `UpdateBottleGroupStats` recomputes only the generic target's BottleGroup.
+
+Both paths use one shared downstream entity-aggregate refresh helper. Until
+entity aggregation becomes target-aware, both exact and generic tasting jobs
+carry the tasting's retained Bottle as `entityStatsBottleId` only as
+compatibility context for that refresh. For exact work, the separate `bottleId`
+remains the canonical exact CatalogTarget Bottle; for generic work, the retained
+Bottle does not choose an exact Bottle for the group calculation. Each
+statistics event independently queues an idempotent downstream entity refresh;
+the queue does not coalesce events under a stable key that could suppress later
+refreshes. Successful downstream jobs are removed and failed jobs are retained
+for diagnosis and retry. That bridge is replaced by later target-aware
+queue/entity work and legacy paired-column cleanup.
+
+Both jobs delegate to the canonical target-backed services. `totalTastings`
+counts rated and unrated tastings; averages, Pass/Sip/Savor counts, and
+percentages use rated tastings only. Re-running a job overwrites the same
+derived fields and is idempotent. Worker handlers log and rethrow failures to
+BullMQ; completed jobs are removed while failed jobs are retained for diagnosis
+and retry.
+
+This code is the implementation of a future post-backfill, parity-gated
+cutover, not an independently deployable or servable migration state. The
+implementation commits are review boundaries. During the controlled production
+migration, a fresh retained audit from the exact Git and migration revisions
+must be approved immediately before any production backfill begins. The
+target-backed statistics path must not serve until promotion and consumer
+target backfill are complete, required target nulls and graph errors are zero,
+aggregate parity evidence is retained, and deployment is explicitly approved.
 
 ### 4. Sorting Implementation
 
@@ -296,21 +309,22 @@ RENAME COLUMN rating_simple_stats TO rating_simple_stats_deprecated;
 
 ### Indexing Strategy
 
-- Index on `rating_simple` for filtering
-- Partial index excluding NULLs for efficiency
-- Consider composite index for (bottleId, rating_simple)
+- Index `tastings.targetId` for target-backed aggregate scans
+- Use a partial index on `tastings.rating` when rated-only scans require it
+- Consider a composite index on (`targetId`, `rating`) for rating aggregates
 
 ### Caching
 
-- Cache `ratingSimpleStats` in Redis
-- Invalidate on new tastings
-- TTL: 5 minutes for active bottles
+- Bottle and BottleGroup `ratingStats` are the canonical stored aggregates
+- Do not add a separately invalidated Redis cache or another materialized owner
+- Any future cache must read the canonical aggregates or derive through the same
+  raw-target recomputation contract
 
 ### Query Optimization
 
-- Use materialized views for popular bottles
-- Batch stats updates in worker jobs
-- Consider read replicas for analytics
+- Keep each committed stats event independently deliverable; delayed workers may
+  recompute idempotently, but batching or coalescing must not suppress an event
+- Read replicas may serve analytics, but must not own alternate aggregate logic
 
 ## Analytics and Monitoring
 

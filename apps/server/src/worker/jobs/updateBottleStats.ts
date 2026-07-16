@@ -1,86 +1,39 @@
-import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
-import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottlesToDistillers,
-  tastings,
-} from "@peated/server/db/schema";
-import { notEmpty, uniq } from "@peated/server/lib/filter";
-import { pushUniqueJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { logError } from "@peated/server/lib/log";
+import { recomputeBottleGroupStats } from "@peated/server/lib/recomputeBottleGroupStats";
+import { recomputeBottleStats } from "@peated/server/lib/recomputeBottleStats";
+import { z } from "zod";
+import { queueBottleEntityStats } from "./queueBottleEntityStats";
 
-export default async ({ bottleId }: { bottleId: number }) => {
-  const bottle = await db.query.bottles.findFirst({
-    where: (bottles, { eq }) => eq(bottles.id, bottleId),
-  });
-  if (!bottle) {
-    throw new Error(`Unknown bottle: ${bottleId}`);
+const UpdateBottleStatsJobArgsSchema = z
+  .object({
+    bottleId: z.number().int().positive(),
+    entityStatsBottleId: z.number().int().positive(),
+  })
+  .strict();
+export type UpdateBottleStatsJobArgs = z.infer<
+  typeof UpdateBottleStatsJobArgsSchema
+>;
+
+/**
+ * Recompute an exact Bottle target and its group. Entity refresh context is the
+ * retained tasting Bottle for tasting jobs or the changed Bottle for
+ * OnBottleChange; it does not select the statistics target.
+ */
+export default async function updateBottleStats(input: unknown): Promise<void> {
+  const { bottleId, entityStatsBottleId } =
+    UpdateBottleStatsJobArgsSchema.parse(input);
+
+  try {
+    const bottle = await recomputeBottleStats(bottleId);
+
+    await recomputeBottleGroupStats(bottle.groupId);
+    await queueBottleEntityStats(entityStatsBottleId);
+  } catch (error) {
+    logError(error, {
+      job: { name: "UpdateBottleStats" },
+      bottle: { id: bottleId },
+      extra: { entityStatsBottleId },
+    });
+    throw error;
   }
-
-  // Calculate rating stats
-  const ratingStatsQuery = sql`
-    SELECT 
-      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.PASS}) as pass,
-      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.SIP}) as sip,
-      COUNT(*) FILTER (WHERE rating = ${SIMPLE_RATING_VALUES.SAVOR}) as savor,
-      COUNT(*) FILTER (WHERE rating IS NOT NULL) as total,
-      AVG(rating) FILTER (WHERE rating IS NOT NULL) as avg
-    FROM ${tastings}
-    WHERE ${tastings.bottleId} = ${bottle.id}
-  `;
-
-  const result = await db.execute<{
-    pass: number;
-    sip: number;
-    savor: number;
-    total: number;
-    avg: number | null;
-  }>(ratingStatsQuery);
-  const stats = result.rows[0];
-
-  const ratingStats = {
-    pass: Number(stats.pass) || 0,
-    sip: Number(stats.sip) || 0,
-    savor: Number(stats.savor) || 0,
-    total: Number(stats.total) || 0,
-    avg: stats.avg ? Number(stats.avg) : null,
-    percentage: {
-      pass: 0,
-      sip: 0,
-      savor: 0,
-    },
-  };
-
-  if (ratingStats.total > 0) {
-    ratingStats.percentage = {
-      pass: (ratingStats.pass / ratingStats.total) * 100,
-      sip: (ratingStats.sip / ratingStats.total) * 100,
-      savor: (ratingStats.savor / ratingStats.total) * 100,
-    };
-  }
-
-  await db
-    .update(bottles)
-    .set({
-      totalTastings: sql`(SELECT COUNT(*) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId})`,
-      avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
-      ratingStats,
-      updatedAt: sql`NOW()`,
-    })
-    .where(eq(bottles.id, bottle.id));
-
-  const distillerIds = (
-    await db
-      .select({ distillerId: bottlesToDistillers.distillerId })
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, bottle.id))
-  ).map((d) => d.distillerId);
-
-  const allEntityIds = uniq(
-    [...distillerIds, bottle.brandId, bottle.bottlerId].filter(notEmpty),
-  );
-
-  for (const entityId of allEntityIds) {
-    await pushUniqueJob("UpdateEntityStats", { entityId }, { delay: 5000 });
-  }
-};
+}

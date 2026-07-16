@@ -115,6 +115,12 @@ export type CatalogTargetAssignmentIntent =
       context: CatalogTargetOperationContext;
     } & LegacyCatalogTargetReference);
 
+export type CatalogTargetAssignmentDescriptor = {
+  targetId: number;
+  groupId: number;
+  bottleId: number | null;
+};
+
 type LegacyCatalogTargetAccess = "read" | "write";
 
 function formatIdentity(identity: CatalogTargetIdentity): string {
@@ -149,7 +155,10 @@ function recordLegacyCatalogTargetUsage(
   });
 }
 
-async function queryCatalogTarget(database: AnyDatabase, where: SQL<unknown>) {
+async function queryHydratedCatalogTarget(
+  database: AnyDatabase,
+  where: SQL<unknown>,
+) {
   return await database.query.catalogTargets.findFirst({
     where,
     with: {
@@ -164,8 +173,43 @@ async function queryCatalogTarget(database: AnyDatabase, where: SQL<unknown>) {
 }
 
 type HydratedCatalogTarget = NonNullable<
-  Awaited<ReturnType<typeof queryCatalogTarget>>
+  Awaited<ReturnType<typeof queryHydratedCatalogTarget>>
 >;
+
+async function queryCatalogTargetAssignment(
+  database: AnyDatabase,
+  where: SQL<unknown>,
+) {
+  return await database.query.catalogTargets.findFirst({
+    where,
+    columns: {
+      id: true,
+      groupId: true,
+      bottleId: true,
+    },
+    with: {
+      group: {
+        columns: { id: true },
+      },
+      bottle: {
+        columns: {
+          id: true,
+          groupId: true,
+        },
+      },
+    },
+  });
+}
+
+type AssignmentCatalogTarget = NonNullable<
+  Awaited<ReturnType<typeof queryCatalogTargetAssignment>>
+>;
+
+type CatalogTargetIntegrityProjection = AssignmentCatalogTarget;
+type CatalogTargetQuery<T extends CatalogTargetIntegrityProjection> = (
+  database: AnyDatabase,
+  where: SQL<unknown>,
+) => Promise<T | undefined>;
 
 async function throwIfGroupRetired(
   groupId: number,
@@ -199,7 +243,7 @@ async function throwIfBottleRetired(
   }
 }
 
-function assertTargetIntegrity(target: HydratedCatalogTarget): void {
+function assertTargetIntegrity(target: CatalogTargetIntegrityProjection): void {
   if (!target.group || target.group.id !== target.groupId) {
     throw new CatalogTargetIntegrityMismatchError(
       { targetId: target.id },
@@ -230,7 +274,7 @@ function assertTargetIntegrity(target: HydratedCatalogTarget): void {
 }
 
 async function assertTargetActive(
-  target: HydratedCatalogTarget,
+  target: CatalogTargetIntegrityProjection,
   database: AnyDatabase,
 ): Promise<void> {
   await throwIfGroupRetired(target.groupId, database);
@@ -239,26 +283,27 @@ async function assertTargetActive(
   }
 }
 
-async function findTargetById(
+async function findTargetByIdUsing<T extends CatalogTargetIntegrityProjection>(
   targetId: number,
   database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
-  const target = await queryCatalogTarget(
-    database,
-    eq(catalogTargets.id, targetId),
-  );
+  queryTarget: CatalogTargetQuery<T>,
+): Promise<T> {
+  const target = await queryTarget(database, eq(catalogTargets.id, targetId));
   if (!target) throw new CatalogTargetNotFoundError({ targetId });
   assertTargetIntegrity(target);
   await assertTargetActive(target, database);
   return target;
 }
 
-async function findTargetByBottleId(
+async function findTargetByBottleIdUsing<
+  T extends CatalogTargetIntegrityProjection,
+>(
   bottleId: number,
   database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
+  queryTarget: CatalogTargetQuery<T>,
+): Promise<T> {
   await throwIfBottleRetired(bottleId, database);
-  const target = await queryCatalogTarget(
+  const target = await queryTarget(
     database,
     eq(catalogTargets.bottleId, bottleId),
   );
@@ -268,18 +313,87 @@ async function findTargetByBottleId(
   return target;
 }
 
-async function findTargetByGroupId(
+async function findTargetByGroupIdUsing<
+  T extends CatalogTargetIntegrityProjection,
+>(
   groupId: number,
   database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
+  queryTarget: CatalogTargetQuery<T>,
+): Promise<T> {
   await throwIfGroupRetired(groupId, database);
-  const target = await queryCatalogTarget(
+  const target = await queryTarget(
     database,
     and(eq(catalogTargets.groupId, groupId), isNull(catalogTargets.bottleId))!,
   );
   if (!target) throw new CatalogTargetNotFoundError({ groupId });
   assertTargetIntegrity(target);
   return target;
+}
+
+async function findTargetById(
+  targetId: number,
+  database: AnyDatabase,
+): Promise<HydratedCatalogTarget> {
+  return await findTargetByIdUsing(
+    targetId,
+    database,
+    queryHydratedCatalogTarget,
+  );
+}
+
+async function findTargetByBottleId(
+  bottleId: number,
+  database: AnyDatabase,
+): Promise<HydratedCatalogTarget> {
+  return await findTargetByBottleIdUsing(
+    bottleId,
+    database,
+    queryHydratedCatalogTarget,
+  );
+}
+
+async function findTargetByGroupId(
+  groupId: number,
+  database: AnyDatabase,
+): Promise<HydratedCatalogTarget> {
+  return await findTargetByGroupIdUsing(
+    groupId,
+    database,
+    queryHydratedCatalogTarget,
+  );
+}
+
+async function findAssignmentTargetById(
+  targetId: number,
+  database: AnyDatabase,
+): Promise<AssignmentCatalogTarget> {
+  return await findTargetByIdUsing(
+    targetId,
+    database,
+    queryCatalogTargetAssignment,
+  );
+}
+
+async function findAssignmentTargetByBottleId(
+  bottleId: number,
+  database: AnyDatabase,
+): Promise<AssignmentCatalogTarget> {
+  return await findTargetByBottleIdUsing(
+    bottleId,
+    database,
+    queryCatalogTargetAssignment,
+  );
+}
+
+async function findAssignmentTargetByGroupId(
+  groupId: number,
+  database: AnyDatabase,
+): Promise<AssignmentCatalogTarget> {
+  return await findTargetByGroupIdUsing(
+    groupId,
+    database,
+    queryCatalogTargetAssignment,
+  );
 }
 
 function toSerializerItem(
@@ -380,23 +494,40 @@ async function promotionConvergedByExactMerges({
   );
 }
 
+type CatalogTargetLoaders<T extends CatalogTargetIntegrityProjection> = {
+  byBottleId: (bottleId: number, database: AnyDatabase) => Promise<T>;
+  byGroupId: (groupId: number, database: AnyDatabase) => Promise<T>;
+};
+
 /**
- * Promoted releases resolve exactly; parent-only references use release
- * cardinality to choose the group target or retained Bottle target.
+ * Applies the one measured legacy mapping rule for every target projection:
+ * promoted releases resolve to their exact Bottle; a parent-only reference
+ * resolves to the generic group target when releases exist, and otherwise to
+ * the retained Bottle's exact target. Telemetry is emitted once per attempt.
  */
-async function findLegacyTarget(
+async function findLegacyTargetUsing<
+  T extends CatalogTargetIntegrityProjection,
+>(
   reference: LegacyCatalogTargetReference,
   context: CatalogTargetOperationContext,
   access: LegacyCatalogTargetAccess,
   database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
+  loaders: CatalogTargetLoaders<T>,
+): Promise<T> {
   recordLegacyCatalogTargetUsage(reference, context, access);
 
   if (reference.releaseId !== null) {
     const release = await database.query.bottleReleases.findFirst({
       where: (bottleReleases, { eq }) =>
         eq(bottleReleases.id, reference.releaseId as number),
-      with: { bottle: true },
+      columns: {
+        bottleId: true,
+      },
+      with: {
+        bottle: {
+          columns: { groupId: true },
+        },
+      },
     });
     if (!release || release.bottleId !== reference.bottleId) {
       throw new CatalogTargetInvalidMappingError(
@@ -421,9 +552,9 @@ async function findLegacyTarget(
       );
     }
 
-    let target: HydratedCatalogTarget;
+    let target: T;
     try {
-      target = await findTargetByBottleId(promotion.promotedBottleId, database);
+      target = await loaders.byBottleId(promotion.promotedBottleId, database);
     } catch (error) {
       if (!(error instanceof CatalogTargetNotFoundError)) throw error;
       throw new CatalogTargetIntegrityMismatchError(
@@ -457,6 +588,10 @@ async function findLegacyTarget(
 
   const parent = await database.query.bottles.findFirst({
     where: eq(bottles.id, reference.bottleId),
+    columns: {
+      id: true,
+      groupId: true,
+    },
     with: {
       releases: {
         columns: { id: true },
@@ -477,8 +612,8 @@ async function findLegacyTarget(
 
   try {
     return parent.releases.length > 0
-      ? await findTargetByGroupId(parent.groupId, database)
-      : await findTargetByBottleId(parent.id, database);
+      ? await loaders.byGroupId(parent.groupId, database)
+      : await loaders.byBottleId(parent.id, database);
   } catch (error) {
     if (!(error instanceof CatalogTargetNotFoundError)) throw error;
     throw new CatalogTargetInvalidMappingError(
@@ -489,6 +624,29 @@ async function findLegacyTarget(
         : "the retained Bottle has no exact target",
     );
   }
+}
+
+async function findLegacyTarget(
+  reference: LegacyCatalogTargetReference,
+  context: CatalogTargetOperationContext,
+  access: LegacyCatalogTargetAccess,
+  database: AnyDatabase,
+): Promise<HydratedCatalogTarget> {
+  return await findLegacyTargetUsing(reference, context, access, database, {
+    byBottleId: findTargetByBottleId,
+    byGroupId: findTargetByGroupId,
+  });
+}
+
+async function findAssignmentLegacyTarget(
+  reference: LegacyCatalogTargetReference,
+  context: CatalogTargetOperationContext,
+  database: AnyDatabase,
+): Promise<AssignmentCatalogTarget> {
+  return await findLegacyTargetUsing(reference, context, "write", database, {
+    byBottleId: findAssignmentTargetByBottleId,
+    byGroupId: findAssignmentTargetByGroupId,
+  });
 }
 
 /** Load one target by its durable target id without changing generic intent. */
@@ -539,20 +697,38 @@ export async function loadCatalogTargetByLegacyReference(
   );
 }
 
-/** Resolve the one target id a dual-write consumer must persist. */
-export async function resolveCatalogTargetIdForAssignment(
+/**
+ * Resolves an assignment descriptor whose targetId is the durable identity.
+ * Callers may persist it or use the descriptor for validation and routing;
+ * groupId and bottleId are validated scope, not alternate identity inputs.
+ */
+export async function resolveCatalogTargetForAssignment(
   intent: CatalogTargetAssignmentIntent,
   database: AnyDatabase = db,
-): Promise<number> {
+): Promise<CatalogTargetAssignmentDescriptor> {
+  let target: AssignmentCatalogTarget;
   switch (intent.kind) {
     case "target":
-      return (await findTargetById(intent.targetId, database)).id;
+      target = await findAssignmentTargetById(intent.targetId, database);
+      break;
     case "bottle":
-      return (await findTargetByBottleId(intent.bottleId, database)).id;
+      target = await findAssignmentTargetByBottleId(intent.bottleId, database);
+      break;
     case "group":
-      return (await findTargetByGroupId(intent.groupId, database)).id;
+      target = await findAssignmentTargetByGroupId(intent.groupId, database);
+      break;
     case "legacy":
-      return (await findLegacyTarget(intent, intent.context, "write", database))
-        .id;
+      target = await findAssignmentLegacyTarget(
+        intent,
+        intent.context,
+        database,
+      );
+      break;
   }
+
+  return {
+    targetId: target.id,
+    groupId: target.groupId,
+    bottleId: target.bottleId,
+  };
 }

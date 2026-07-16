@@ -25,10 +25,18 @@ export class BottleStatsIntegrityError extends Error {
   }
 }
 
-export type BottleStatsResult = Pick<
-  Bottle,
-  "id" | "groupId" | "totalTastings" | "avgRating" | "ratingStats" | "updatedAt"
->;
+export type BottleStatsResult = Omit<
+  Pick<
+    Bottle,
+    | "id"
+    | "groupId"
+    | "totalTastings"
+    | "avgRating"
+    | "ratingStats"
+    | "updatedAt"
+  >,
+  "groupId"
+> & { groupId: number };
 
 async function bottleRetired(tx: AnyTransaction, bottleId: number) {
   const [tombstone] = await tx
@@ -98,10 +106,10 @@ export async function recomputeBottleStatsInTransaction(
       ratingStats: bottles.ratingStats,
       updatedAt: bottles.updatedAt,
     });
-  if (!persisted) {
+  if (!persisted || persisted.groupId === null) {
     throw new BottleStatsIntegrityError("invalid_catalog_graph", bottleId);
   }
-  return persisted;
+  return { ...persisted, groupId: persisted.groupId };
 }
 
 /** Owns the transaction for an exact Bottle statistics recomputation. */

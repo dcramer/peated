@@ -14,7 +14,7 @@ it must not preserve a parallel business-logic path.
 - [x] 1.7 Report full-name and alias collisions that would occur when BottleReleases are promoted into the Bottle namespace.
 - [x] 1.8 Report paired-reference counts and invalid references for tastings, reviews, collections, flights, prices, aliases, observations, decision logs, and proposals.
 - [x] 1.9 Add deterministic audit tests covering clean, conflicting, missing, and already-mapped fixtures.
-- [x] 1.10 Define the production audit as a deployment-phase freshness gate tracked by tasks 6.11, 6.13, 9.1, and 10.9 rather than a prerequisite for additive local implementation.
+- [x] 1.10 Define the fresh retained production audit as a deployment-phase gate immediately before production backfill, tracked by tasks 6.11, 6.13, 9.1, and 10.9, rather than a prerequisite for additive local implementation or a reason to deploy dormant application behavior.
 
 ## 2. Additive Group And Target Schema
 
@@ -52,8 +52,9 @@ it must not preserve a parallel business-logic path.
 - [x] 4.8 Implement an audited group split transaction that moves selected Bottles and keeps ambiguous generic activity on the source group by default.
 - [x] 4.9 Implement exact Bottle merge independently from group merge and handle cross-group exact duplicates deliberately.
 - [x] 4.10 Implement representative-Bottle selection and group editorial-content ownership without mutating member Bottle content.
-- [ ] 4.11 Complete idempotent exact Bottle recomputation plus the remaining reusable BottleGroup statistics job/service entry points, reusing the raw-target group aggregate helper introduced by task 4.7 without double counting.
+- [x] 4.11 Complete idempotent exact Bottle recomputation plus the remaining reusable BottleGroup statistics job/service entry points, reusing the raw-target group aggregate helper introduced by task 4.7 without double counting.
 - [x] 4.11a Add the canonical raw-target statistics core, reusable exact Bottle and BottleGroup service entry points, and focused database tests as a paired review boundary that is not deployable alone; do not activate it with a silent legacy `bottleId` fallback.
+- [x] 4.11b Implement the post-backfill/parity-gated canonical exact and group statistics cutover: tasting create persists CatalogTargets and update repairs null targets; remove the superseded worker SQL and every inline Bottle statistics formula; independently queue one delayed idempotent exact-or-group recomputation per create, delete, rating change, or null-target repair with successful-job cleanup, failed-job retention, and nonfatal publication; have both exact and generic jobs carry the retained tasting `bottleId` as `entityStatsBottleId` solely for the shared legacy entity-refresh compatibility helper while exact `bottleId` is the validated Bottle scope for the durable `targetId`; independently queue every idempotent downstream entity event without stable-key coalescing, removing successful jobs and retaining failures; reject the old `{ bottleId }` worker payload because it cannot infer promoted exact identity; remove the entity bridge through target-aware queue work in task 7.10, obsolete consumer `bottleId`/`releaseId` storage removal in task 9.6, and runtime compatibility-branch removal in task 9.7; and do not deploy or serve this path before promotion and consumer target backfill, a zero-null valid target graph, retained parity evidence, explicit approval, stopped or upgraded old producers, and drained or expired legacy queue payloads.
 - [ ] 4.12 Add database-backed service tests for creation rollback, retries, duplicate conflicts, trusted reuse, exact-only update isolation, effective-age normalization, shared-update fan-out, per-member audit cardinality, collision rollback, merge, split, representative selection, deletion, and aggregate counts.
 
 ## 5. New-Write API Cutover
@@ -64,6 +65,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 5.4 Convert BottleRelease create/update/delete routes into instrumented compatibility adapters over concrete Bottle operations.
 - [ ] 5.5 Update aliases and observations so new writes reference one target and exact aliases resolve directly to a Bottle.
 - [ ] 5.6 Update tasting, review, collection, flight, and price mutations to dual-write `targetId` from exact or generic intent.
+- [x] 5.6a Persist `targetId` for tasting create and update, and resolve a null-target tasting update/delete from the measured legacy pair only when needed; retain the parent task for review, collection, flight, and price mutations.
 - [ ] 5.7 Update store-price matching, match proposals, and decision logs to emit `create_bottle` or group-aware match decisions instead of create-release decisions.
 - [ ] 5.8 Update classifier application and repair services to create concrete Bottles and automatic groups while retaining source evidence.
 - [ ] 5.9 Update worker jobs, importers, and CLI mutations so no supported new-write path inserts `bottle_release` directly.
@@ -82,9 +84,9 @@ it must not preserve a parallel business-logic path.
 - [ ] 6.8 Backfill null-release references under parents with releases to the BottleGroup generic target.
 - [ ] 6.9 Backfill null-release references under parents without releases to the retained Bottle exact target.
 - [ ] 6.10 Backfill parent-only aliases under split parents to group targets and release aliases to promoted Bottle targets.
-- [ ] 6.11 Add batch checkpoints, progress metrics, retry-safe errors, bounded transactions, and dry-run mode to the backfill command; retained reports identify the deployed Git revision and database migration revision in addition to the generated timestamp and database name.
+- [ ] 6.11 Add batch checkpoints, progress metrics, retry-safe errors, bounded transactions, and dry-run mode to the backfill command; retained reports identify the exact candidate Git and database migration revisions in addition to the generated timestamp and database name.
 - [ ] 6.12 Add migration integration tests proving row counts, idempotency, field ownership, mappings, exact/generic target rules, aliases, and interruption recovery.
-- [ ] 6.13 After the additive schema and backfill tooling are deployed, run and retain a fresh production dry-run from that deployed revision, reconcile every audit count, and require explicit approval before the live run.
+- [ ] 6.13 During the controlled production migration, after the additive schema and backfill tooling are available but immediately before any live backfill writes, run and retain a fresh production dry-run from that exact Git and migration revision, reconcile every audit count, and require explicit approval; do not use the audit requirement to justify an earlier dormant application deployment.
 
 ## 7. Read Parity And Backend Cutover
 
@@ -94,10 +96,10 @@ it must not preserve a parallel business-logic path.
 - [ ] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
 - [ ] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
 - [ ] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
-- [ ] 7.7 Update exact and group statistics jobs to read raw target activity and verify aggregate parity with legacy totals.
+- [ ] 7.7 After production target backfill, run and retain exact-Bottle and BottleGroup raw-target aggregate comparisons against legacy totals, resolve every mismatch, and record explicit approval before deploying or enabling the task 4.11b statistics cutover; job implementation remains owned by task 4.11b.
 - [ ] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
 - [ ] 7.9 Add retired-parent redirects to BottleGroup pages without choosing the representative Bottle as the activity target.
-- [ ] 7.10 Update cache keys, revalidation, queue payloads, and activity payloads to use exact Bottle or CatalogTarget identity consistently.
+- [ ] 7.10 Update cache keys, revalidation, queue payloads, and activity payloads to use exact Bottle or CatalogTarget identity consistently; before enabling the strict target-backed `UpdateBottleStats` worker, verify every old `{ bottleId }` producer is stopped or upgraded and every queued legacy payload is drained or expired because that payload cannot infer promoted exact identity and has no compatibility fallback; also stop or upgrade producers of legacy-parent `OnBottleChange` jobs and drain or expire those queued jobs before activation because a retired parent has no active exact target.
 - [ ] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
 
 ## 8. Unified Web Workflow
@@ -116,12 +118,12 @@ it must not preserve a parallel business-logic path.
 
 ## 9. Constraint Cutover And Legacy Removal
 
-- [ ] 9.1 Require a completed production audit, zero target nulls/mismatches, complete release mappings, rebuilt indexes, and zero supported legacy write traffic before constraint cutover.
+- [ ] 9.1 Immediately before constraint cutover, run and retain a new production audit from the exact candidate Git and migration revisions, recording its generation time and database; reconcile every count, require explicit approval, and verify zero target nulls/mismatches, complete release mappings, rebuilt indexes, and zero supported legacy write traffic. The task 6.13 immediately-pre-backfill audit does not satisfy this later freshness gate.
 - [ ] 9.2 Generate a migration making Bottle `groupId` and consumer `targetId` references non-null where the domain requires them.
 - [ ] 9.3 Deploy the constraint migration separately and verify write latency, foreign-key failures, queue health, and target parity.
 - [ ] 9.4 Disable BottleRelease writes with an explicit gone/replacement response while retaining measured read compatibility.
 - [ ] 9.5 Observe the agreed legacy read window and verify old nested URLs and API references resolve only through mappings.
-- [ ] 9.6 Remove `releaseId` columns, release foreign keys/indexes, and `bottle_release` using a generated Drizzle migration only after backup approval.
+- [ ] 9.6 Remove obsolete consumer `bottleId` columns wherever `targetId` replaces the legacy pair, plus `releaseId` columns, release foreign keys/indexes, and `bottle_release`, using a generated Drizzle migration only after backup approval.
 - [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, repair paths, enums, and compatibility branches.
 - [ ] 9.8 Remove retired legacy parent Bottle rows only after every reference and URL has a durable group or Bottle mapping.
 - [ ] 9.9 Remove runtime dependence on BottleGroup hydration for exact Bottle rendering and verify all creation, shared-update, merge, split, and repair writers preserve complete durable Bottle materialization and atomic fan-out.
@@ -137,5 +139,5 @@ it must not preserve a parallel business-logic path.
 - [ ] 10.6 Run server and web package typechecks plus file-scoped lint/format checks for every touched slice.
 - [ ] 10.7 Run classifier tests and replay/live evals when identity output or decision contracts change, committing required recordings.
 - [ ] 10.8 Run focused web Vitest and Playwright coverage for the changed form, route, redirect, and target workflows.
-- [ ] 10.9 Run the full repository test gate and production migration audit before the cleanup release.
+- [ ] 10.9 Immediately before the cleanup release, run the full repository test gate and a new retained production migration audit from the exact cleanup Git and migration revisions; record its generation time and database, reconcile every count, and require explicit approval rather than reusing the task 6.13 pre-backfill audit.
 - [ ] 10.10 Record post-deploy counts for Bottles, groups, exact/generic targets, legacy redirects, unmapped references, and aggregate parity.

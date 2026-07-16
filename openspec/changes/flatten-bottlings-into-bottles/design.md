@@ -252,15 +252,23 @@ Backfill rules are deterministic:
 8. Parent rows replaced by promoted Bottles are retired only after every foreign key has moved. Old parent and nested release URLs resolve through target mappings and tombstones.
 
 The production audit is a deployment-phase freshness gate, not a prerequisite
-for additive local implementation. After the additive schema and backfill
-tooling are deployed, a dry run from that same deployed revision reports
+for additive local implementation and not a reason to deploy dormant
+application behavior. Implementation commits are review boundaries rather than
+deployment units. Once the additive schema and backfill tooling are available
+in the controlled production migration, a dry run from that exact revision must
+run against production immediately before live backfill writes. It reports
 full-name/alias collisions, parent release-like fields alongside child releases,
 invalid parent/release pairs, missing creators, incompatible ages, and target
 counts by consumer table. The retained report identifies the Git revision,
 database migration revision, generation time, and database. Existing
 dirty-parent repair tooling must resolve or explicitly waive ambiguous parent
 data before live backfill writes, and the audit runs again at constraint
-cutover.
+cutover. Each constraint or cleanup gate uses a new retained production run from
+its exact candidate Git and migration revisions; it records its generation time
+and database, reconciles every count, and requires explicit approval. Neither
+can reuse the immediately-pre-backfill task 6.13 report as freshness evidence.
+No production backfill may begin without the fresh retained pre-backfill report
+and explicit approval.
 
 ### Statistics count target data once
 
@@ -280,21 +288,74 @@ on that target. `recomputeBottleGroupStats` validates the active group graph,
 supplies its generic target and all member exact targets to the same calculator,
 and overwrites the group aggregates without summing materialized Bottle totals.
 
-Task 4.11a is a paired review boundary and is not deployable alone. The existing
-`UpdateBottleStats` worker SQL remains active for tasting create, update, and
-delete writes: create and delete always enqueue it, while update enqueues it when
-the rating changes. All three routes also mutate Bottle statistics inline;
-create and delete update `totalTastings` and `avgRating`, while update changes
-only `avgRating`. These paths remain only until the immediate task 4.11
-activation follow-up. That follow-up must first complete, or atomically include,
-target assignment for every active tasting create, update, and delete writer so
-those writes cannot leave `targetId` null. This is the tasting subset of task
-5.6; review, collection, flight, and price consumers keep task 5.6 open. Only
-then may the follow-up delegate statistics work to the canonical services and
-remove the inline statistics logic from all three routes plus the legacy worker
-SQL. The canonical calculator must not silently fall back to `bottleId`, because
-doing so would preserve a second statistics model instead of exposing incomplete
-target writes.
+Task 4.11b implements the runtime side of the eventual post-backfill,
+parity-gated statistics cutover for tasting mutations. The shared
+`resolveCatalogTargetForAssignment` boundary returns a validated descriptor
+containing `targetId`, `groupId`, and nullable exact `bottleId`. Tasting create
+always persists the resolved target. Update and delete trust an existing durable
+target; only a row whose `targetId` is still null uses the measured legacy
+`(bottleId, releaseId)` resolver, and update persists that resolved target as a
+small compatibility backfill. This descriptor boundary replaces the former
+ID-only assignment facade so consumers do not reconstruct target identity.
+There is no statistics fallback to legacy `bottleId` activity.
+
+After a committed tasting create or delete, a rating-changing update, or a
+null-target repair, a shared dispatcher independently queues one delayed
+idempotent job from the resolved descriptor. Each qualifying event gets its own
+job rather than sharing a stable coalescing key; completed jobs are removed. A
+notes-only update to a row that already has a durable target does not dispatch
+statistics work. Exact activity dispatches `UpdateBottleStats`, which delegates
+to exact recomputation and then recomputes its BottleGroup. Generic activity
+dispatches `UpdateBottleGroupStats`, which delegates only to group recomputation.
+Both paths preserve the existing entity-aggregate refresh through one shared
+helper. Until entity statistics become target-aware, both exact and generic
+tasting jobs carry the retained tasting `bottleId` as `entityStatsBottleId`
+only as compatibility context for that refresh. An exact job's separate
+`bottleId` is the validated exact Bottle scope for its durable `targetId`; the
+compatibility Bottle on a generic job does not affect the target-backed group
+calculation.
+Every statistics event independently queues an idempotent downstream entity
+refresh rather than coalescing events under a stable key. Successful downstream
+jobs are removed and failed jobs are retained for diagnosis and retry. Task
+7.10 replaces the bridge with target-aware queue/entity work, task 9.6 removes
+its obsolete consumer `bottleId`/`releaseId` storage, and task 9.7 removes the
+runtime compatibility branch.
+Publication failure is recorded with the tasting and resolved target identity
+without failing an already committed user write. The former worker-owned raw SQL
+and every tasting-route inline Bottle statistics formula are removed; the
+canonical raw-target calculator remains the only rating-math owner.
+
+Worker handlers log and rethrow failures so BullMQ records them as failed, and
+statistics jobs retain failed records while removing successful ones. A retry
+therefore reruns the idempotent canonical services rather than losing an
+incomplete downstream refresh.
+
+`UpdateBottleStats` has a strict mixed-version cutover gate. Its previous
+`{ bottleId }` payload cannot identify whether legacy activity should resolve to
+a promoted exact target, so the target-backed worker deliberately has no
+payload fallback. Before enabling the new worker, operators must stop or
+upgrade every old producer and drain or expire every queued legacy payload.
+Queued `OnBottleChange` jobs for legacy parent Bottles pose the same activation
+risk: after promotion and parent retirement, their `bottleId` has no active
+exact target. Operators must stop or upgrade those producers and drain or
+expire those jobs as part of the same gate. The `bottles fix-stats` maintenance
+command instead selects exact-target rows and dispatches their Bottle ids
+directly; strict recomputation validates the active graph and target integrity
+and stops on an invalid row rather than silently skipping it. This explicitly
+exact maintenance intent is separate from tasting assignment descriptor
+routing. Task 7.10 owns verification of these producer and queue-payload
+transitions; task 7.7 retains the aggregate parity evidence and approval for the
+statistics cutover itself.
+
+This runnable implementation slice is not independently deployable or
+servable. The tasting work is the task 5.6a subset; remaining review,
+collection, flight, and price mutation dual-writes keep task 5.6 open. Before
+the target-backed statistics path can serve production, section 6 must complete
+promotion and consumer target backfill, the graph must have zero required null
+or invalid targets, and task 7.7 must retain matching target/legacy aggregate
+evidence and deployment approval. The fresh production audit runs immediately
+before the production migration and must approve the backfill; it does not
+authorize an earlier dormant application deployment.
 
 Representative group content is selected explicitly from a member Bottle or stored as group-level editorial content. It is not copied opportunistically from the latest release during reads.
 
@@ -311,7 +372,7 @@ input/output and delegate to the new service. Every temporarily retained path
 must have an explicit removal task:
 
 - BottleRelease write adapters: tasks 5.4 and 9.4/9.7;
-- paired-reference dual writes: tasks 5.6, 7.3, and 9.6;
+- paired-reference dual writes and storage: tasks 5.6, 7.3, and 9.6;
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
 - queued `MergeBottle` compatibility adapter: task 9.7;
 - release-only search/indexing: task 7.5;
@@ -337,19 +398,19 @@ the implementation they covered.
 - **More rows are created for singleton products** → Keep groups invisible in normal UI and create group/Bottle/targets atomically; the predictable invariant is worth the storage overhead.
 - **Generic targets complicate some consumers** → Centralize polymorphism in `catalog_target` and serializers so feature tables keep one foreign key.
 - **Old URLs and clients may depend on release ids** → Preserve permanent mappings/redirects and instrument compatibility usage before removal.
-- **A single large deployment would have a difficult rollback** → Separate additive schema, backfill, read cutover, write cutover, and destructive cleanup releases.
+- **An incompletely sequenced production migration could serve invalid target-backed behavior** → Treat review commits as non-deployable boundaries and gate application activation on the fresh audit, completed backfill, valid target graph, and retained parity; ship destructive cleanup separately after its own approval.
 
 ## Migration Plan
 
 1. **Inventory and audit tooling:** add read-only counts and integrity checks for all paired-reference tables, dirty parents, aliases, duplicate names, images, and legacy routes. Validate the report contract locally without requiring production access.
-2. **Additive schema:** generate migrations for BottleGroup, Bottle membership, catalog targets, release-promotion mappings, group tombstones, and nullable `targetId` columns. Do not remove legacy columns.
+2. **Additive schema:** generate migrations for BottleGroup, Bottle membership, catalog targets, release-promotion mappings, group tombstones, and nullable `targetId` columns. Do not remove legacy columns or treat this review slice as a deployment unit.
 3. **Domain services:** implement atomic singleton creation, create-another-release, target loading, group merge/split, and idempotent aggregate recomputation with database-backed tests.
 4. **New-write cutover:** move Add Bottle, classifier creation, importers, proposals, and repair flows to create concrete Bottles and automatic groups. Keep legacy release routes as instrumented adapters.
-5. **Resumable backfill:** after the additive schema and backfill tooling are deployed, run and retain the fresh production dry run from that revision and approve its counts before live writes. Then create groups/targets, promote releases, migrate aliases and content, and populate every consumer `targetId` according to the deterministic rules. Re-run safely until no work remains.
+5. **Resumable backfill:** in the controlled production migration, make the additive schema and backfill tooling available, then immediately run and retain the fresh production dry run from that exact revision and approve its counts before live writes. Create groups/targets, promote releases, migrate aliases and content, and populate every consumer `targetId` according to the deterministic rules. Re-run safely until no work remains; do not serve target-dependent application behavior during the incomplete state.
 6. **Parity period:** dual-read target and legacy references, assert serialized identity parity, compare exact/group counts, rebuild search indexes, and verify representative URLs and workflows.
-7. **Product cutover:** switch search, Bottle details, Library, tastings, reviews, prices, flights, activity, and moderation UI to Bottle/Group targets. Redirect old nested bottling routes.
+7. **Product cutover:** only after completed backfill, a valid zero-null target graph, retained parity evidence, and explicit approval, switch search, Bottle details, Library, tastings, reviews, prices, flights, activity, statistics workers, and moderation UI to Bottle/Group targets. Redirect old nested bottling routes.
 8. **Constraint cutover:** make required group/target columns non-null, reject new release writes, and remove paired-reference use from runtime code.
-9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing `releaseId` columns and `bottle_release`; remove release routes, serializers, jobs, form pages, and legacy repair code; remove runtime dependence on BottleGroup hydration for exact Bottle rendering while retaining complete Bottle materialization; then run the final zero-legacy and materialization-invariant audit and update architecture documentation.
+9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing obsolete consumer `bottleId` columns wherever `targetId` replaces the full legacy pair, plus `releaseId` columns and `bottle_release`, as specified by task 9.6; remove release routes, serializers, jobs, form pages, and legacy repair code; remove runtime dependence on BottleGroup hydration for exact Bottle rendering while retaining complete Bottle materialization; then run the final zero-legacy and materialization-invariant audit and update architecture documentation.
 
 Rollback remains straightforward through the parity period: disable new-write cutover, read legacy columns, and retain additive records. After destructive cleanup, rollback requires restoring the pre-cleanup database snapshot or applying a forward repair, so cleanup ships separately with an explicit backup and verification checkpoint.
 

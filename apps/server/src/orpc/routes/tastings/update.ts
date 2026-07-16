@@ -1,11 +1,7 @@
 import { db } from "@peated/server/db";
 import type { Tasting } from "@peated/server/db/schema";
-import {
-  bottleTags,
-  bottles,
-  follows,
-  tastings,
-} from "@peated/server/db/schema";
+import { bottleTags, follows, tastings } from "@peated/server/db/schema";
+import { resolveCatalogTargetForAssignment } from "@peated/server/lib/catalogTargets";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -16,9 +12,9 @@ import { validateTags } from "@peated/server/orpc/validators/tags";
 import { TastingInputSchema, TastingSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { pushJob } from "@peated/server/worker/client";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 
 const InputSchema = z.object({
   tasting: z.coerce.number(),
@@ -119,20 +115,61 @@ export default procedure
       tastingData.imageUrl = null;
     }
 
-    const newTasting = await db.transaction(async (tx) => {
+    const ratingChanged = tastingData.rating !== undefined;
+    const updated = await db.transaction(async (tx) => {
+      // Mutation and dispatch must use the target current after any concurrent backfill.
+      const [currentTasting] = await tx
+        .select()
+        .from(tastings)
+        .where(
+          and(
+            eq(tastings.id, tasting.id),
+            eq(tastings.createdById, context.user.id),
+          ),
+        )
+        .limit(1)
+        .for("update");
+      if (!currentTasting) return;
+
+      const targetWasBackfilled = currentTasting.targetId === null;
+      const shouldRecomputeStats = ratingChanged || targetWasBackfilled;
+      let target = null;
+      let persistedData = tastingData;
+      if (shouldRecomputeStats) {
+        target = await resolveCatalogTargetForAssignment(
+          currentTasting.targetId !== null
+            ? { kind: "target", targetId: currentTasting.targetId }
+            : {
+                kind: "legacy",
+                bottleId: currentTasting.bottleId,
+                releaseId: currentTasting.releaseId,
+                context: {
+                  caller: "tastings.update",
+                  operation: "backfill",
+                },
+              },
+          tx,
+        );
+        if (targetWasBackfilled) {
+          persistedData = { ...tastingData, targetId: target.targetId };
+        }
+      }
       let newTasting: Tasting | undefined;
       try {
-        newTasting = Object.values(tastingData).length
+        newTasting = Object.values(persistedData).length
           ? (
               await tx
                 .update(tastings)
-                .set(tastingData)
-                .where(eq(tastings.id, tasting.id))
+                .set(persistedData)
+                .where(eq(tastings.id, currentTasting.id))
                 .returning()
             )[0]
-          : tasting;
+          : currentTasting;
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "tasting_unq") {
+        if (
+          err?.code === "23505" &&
+          ["tasting_unq", "tasting_target_unq"].includes(err?.constraint)
+        ) {
           throw errors.CONFLICT({
             message: "Tasting already exists.",
             cause: err,
@@ -142,19 +179,9 @@ export default procedure
       }
       if (!newTasting) return;
 
-      // rating was updated
-      if (tastingData.rating !== undefined) {
-        await tx
-          .update(bottles)
-          .set({
-            avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
-          })
-          .where(eq(bottles.id, newTasting.bottleId));
-      }
-
       if (tastingData.tags !== undefined) {
         // TODO: we're being lazy - db access could be optimized
-        for (const tag of tasting.tags) {
+        for (const tag of currentTasting.tags) {
           await tx
             .update(bottleTags)
             .set({
@@ -162,7 +189,7 @@ export default procedure
             })
             .where(
               and(
-                eq(bottleTags.bottleId, tasting.bottleId),
+                eq(bottleTags.bottleId, currentTasting.bottleId),
                 eq(bottleTags.tag, tag),
                 gt(bottleTags.count, 0),
               ),
@@ -185,18 +212,22 @@ export default procedure
         }
       }
 
-      return newTasting;
+      return { tasting: newTasting, target };
     });
 
-    if (!newTasting) {
+    if (!updated) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to update tasting.",
       });
     }
+    const { tasting: newTasting, target } = updated;
 
-    // Update bottle stats if rating changed
-    if (tastingData.rating !== undefined) {
-      await pushJob("UpdateBottleStats", { bottleId: tasting.bottleId });
+    if (target) {
+      await dispatchTastingStatsRecompute(
+        newTasting.id,
+        target,
+        newTasting.bottleId,
+      );
     }
 
     return await serialize(TastingSerializer, newTasting, context.user);

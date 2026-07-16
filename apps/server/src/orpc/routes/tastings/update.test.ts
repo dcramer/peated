@@ -1,11 +1,72 @@
 import { db } from "@peated/server/db";
-import { bottleTags, bottles, tastings } from "@peated/server/db/schema";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
+import {
+  bottleReleasePromotions,
+  bottleTags,
+  bottles,
+  tastings,
+} from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import * as workerClient from "@peated/server/worker/client";
 import { and, eq, gt } from "drizzle-orm";
+import pg from "pg";
+import { beforeEach, vi } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+vi.mock("@peated/server/worker/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof workerClient>()),
+  pushJob: vi.fn().mockResolvedValue(undefined),
+}));
+
+const STATS_JOB_OPTIONS = {
+  delay: 5000,
+  removeOnComplete: true,
+  removeOnFail: false,
+};
+
+async function waitForSessionBlockedBy(
+  client: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1
+        FROM pg_stat_activity
+        WHERE $1 = ANY(pg_blocking_pids(pid))
+      ) AS blocked`,
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for tasting update to request its lock.");
+}
+
+async function promoteRelease(
+  releaseId: number,
+  bottleId: number,
+  createdByActorId: number,
+) {
+  await db.insert(bottleReleasePromotions).values({
+    releaseId,
+    promotedBottleId: bottleId,
+    status: "promoted",
+    completedAt: new Date(),
+    createdByActorId,
+  });
+}
 
 describe("PUT /tastings/:tasting", () => {
+  beforeEach(() => {
+    vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
+  });
+
   test("requires auth", async () => {
     const err = await waitError(routerClient.tastings.update({ tasting: 1 }));
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -75,7 +136,15 @@ describe("PUT /tastings/:tasting", () => {
       .select()
       .from(bottles)
       .where(eq(bottles.id, newTasting.bottleId));
-    expect(bottle.avgRating).toEqual(1);
+    expect(bottle.avgRating).toBeNull();
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      {
+        bottleId: tasting.bottleId,
+        entityStatsBottleId: tasting.bottleId,
+      },
+      STATS_JOB_OPTIONS,
+    );
   });
 
   test("updates notes", async ({ defaults, fixtures }) => {
@@ -100,6 +169,278 @@ describe("PUT /tastings/:tasting", () => {
 
     expect(omit(tasting, "notes")).toEqual(omit(newTasting, "notes"));
     expect(newTasting.notes).toEqual("hello world");
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("backfills a missing exact target and schedules exact stats", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: null,
+      createdById: defaults.user.id,
+    });
+
+    await routerClient.tastings.update(
+      { tasting: tasting.id, notes: "backfilled" },
+      { context: { user: defaults.user } },
+    );
+
+    const persisted = await db.query.tastings.findFirst({
+      where: eq(tastings.id, tasting.id),
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+    });
+    expect(persisted?.targetId).toBe(target?.id);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id, entityStatsBottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("uses a durable target without resolving an invalid legacy pair", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+    });
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      targetId: target?.id,
+      createdById: defaults.user.id,
+    });
+
+    const result = await routerClient.tastings.update(
+      { tasting: tasting.id, notes: "durable" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result.notes).toBe("durable");
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("dispatches a durable generic target without resolving an unmapped release", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    expect(target).toBeDefined();
+    expect(
+      await db.query.bottleReleasePromotions.findFirst({
+        where: (promotions, { eq }) => eq(promotions.releaseId, release.id),
+      }),
+    ).toBeUndefined();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      targetId: target!.id,
+      rating: 2,
+      createdById: defaults.user.id,
+    });
+
+    const result = await routerClient.tastings.update(
+      { tasting: tasting.id, rating: 1 },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result.rating).toBe(1);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, tasting.id),
+        columns: { targetId: true },
+      }),
+    ).toEqual({ targetId: target!.id });
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleGroupStats",
+      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("routes from the locked target when another transaction backfills it", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    expect(target).toBeDefined();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: null,
+      rating: 2,
+      createdById: defaults.user.id,
+    });
+
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let updatePromise:
+      | ReturnType<typeof routerClient.tastings.update>
+      | undefined;
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        'UPDATE "tasting" SET "target_id" = $1 WHERE "id" = $2',
+        [target!.id, tasting.id],
+      );
+
+      updatePromise = routerClient.tastings.update(
+        { tasting: tasting.id, rating: 1 },
+        { context: { user: defaults.user } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+
+      const result = await updatePromise;
+      expect(result.rating).toBe(1);
+      expect(
+        await db.query.tastings.findFirst({
+          where: eq(tastings.id, tasting.id),
+          columns: { targetId: true },
+        }),
+      ).toEqual({ targetId: target!.id });
+      expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
+      expect(workerClient.pushJob).toHaveBeenCalledWith(
+        "UpdateBottleGroupStats",
+        { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+        STATS_JOB_OPTIONS,
+      );
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await updatePromise?.catch(() => undefined);
+    }
+  });
+
+  test("backfills and dispatches a generic target when rating changes", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.BottleRelease({ bottleId: bottle.id });
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: null,
+      rating: 2,
+      createdById: defaults.user.id,
+    });
+
+    await routerClient.tastings.update(
+      { tasting: tasting.id, rating: 1 },
+      { context: { user: defaults.user } },
+    );
+
+    const persisted = await db.query.tastings.findFirst({
+      where: eq(tastings.id, tasting.id),
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    expect(persisted?.targetId).toBe(target?.id);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleGroupStats",
+      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("rolls back a null-target repair that collides on durable identity", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const firstRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Update Collision First Edition",
+      name: "Update Collision First",
+      fullName: "Fixture Update Collision First",
+    });
+    const secondRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Update Collision Second Edition",
+      name: "Update Collision Second",
+      fullName: "Fixture Update Collision Second",
+    });
+    await promoteRelease(firstRelease.id, bottle.id, bottle.createdByActorId);
+    await promoteRelease(secondRelease.id, bottle.id, bottle.createdByActorId);
+
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+    });
+    expect(target).toBeDefined();
+
+    const createdAt = new Date("2026-07-16T12:34:56.000Z");
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      releaseId: firstRelease.id,
+      targetId: target!.id,
+      createdById: defaults.user.id,
+      createdAt,
+    });
+    const legacyTasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      releaseId: secondRelease.id,
+      targetId: null,
+      createdById: defaults.user.id,
+      createdAt,
+      notes: "before collision",
+      rating: 2,
+    });
+
+    const err = await waitError(() =>
+      routerClient.tastings.update(
+        {
+          tasting: legacyTasting.id,
+          notes: "must roll back",
+          rating: 1,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, legacyTasting.id),
+        columns: { targetId: true, notes: true, rating: true },
+      }),
+    ).toEqual({
+      targetId: null,
+      notes: "before collision",
+      rating: 2,
+    });
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("updates tags", async ({ defaults, fixtures }) => {
@@ -139,5 +480,6 @@ describe("PUT /tastings/:tasting", () => {
     expect(tagList.length).toEqual(1);
     expect(tagList[0].tag).toEqual(tag.name);
     expect(tagList[0].count).toEqual(1);
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 });

@@ -1,9 +1,11 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleasePromotions,
   bottleReleases,
   bottleTombstones,
   bottles,
+  catalogTargets,
   entities,
   flightBottles,
   pendingUploads,
@@ -13,10 +15,40 @@ import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
+import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+vi.mock("@peated/server/worker/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof workerClient>()),
+  pushJob: vi.fn().mockResolvedValue(undefined),
+}));
+
+const STATS_JOB_OPTIONS = {
+  delay: 5000,
+  removeOnComplete: true,
+  removeOnFail: false,
+};
+
+async function promoteRelease(
+  releaseId: number,
+  bottleId: number,
+  createdByActorId: number,
+) {
+  await db.insert(bottleReleasePromotions).values({
+    releaseId,
+    promotedBottleId: bottleId,
+    status: "promoted",
+    completedAt: new Date(),
+    createdByActorId,
+  });
+}
 
 describe("POST /tastings", () => {
+  beforeEach(() => {
+    vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
+  });
+
   test("requires auth", async () => {
     const err = await waitError(() =>
       routerClient.tastings.create({ bottle: 1 }),
@@ -53,18 +85,92 @@ describe("POST /tastings", () => {
     expect(tasting.createdById).toEqual(defaults.user.id);
     expect(tasting.rating).toEqual(1);
     expect(tasting.notes).toBeNull();
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+    });
+    expect(tasting.targetId).toBe(target?.id);
 
     const [newBottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, bottle.id));
-    expect(newBottle.totalTastings).toBe(1);
+    expect(newBottle.totalTastings).toBe(0);
 
     const [newEntity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, entity.id));
-    expect(newEntity.totalTastings).toBe(1);
+    expect(newEntity.totalTastings).toBe(0);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id, entityStatsBottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("keeps the tasting and target when stats publication fails", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    vi.mocked(workerClient.pushJob).mockImplementation(async (name) => {
+      if (name === "UpdateBottleStats") {
+        throw new Error("stats queue unavailable");
+      }
+      return undefined;
+    });
+
+    const result = await routerClient.tastings.create(
+      { bottle: bottle.id, rating: 2 },
+      { context: { user: defaults.user } },
+    );
+
+    const tasting = await db.query.tastings.findFirst({
+      where: eq(tastings.id, result.tasting.id),
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+    });
+    expect(tasting).toMatchObject({
+      id: result.tasting.id,
+      bottleId: bottle.id,
+      targetId: target?.id,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id, entityStatsBottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("creates a generic tasting for a parent-only legacy reference", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.BottleRelease({ bottleId: bottle.id });
+
+    const result = await routerClient.tastings.create(
+      { bottle: bottle.id },
+      { context: { user: defaults.user } },
+    );
+
+    const tasting = await db.query.tastings.findFirst({
+      where: eq(tastings.id, result.tasting.id),
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    expect(tasting?.targetId).toBe(target?.id);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleGroupStats",
+      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
   });
 
   test("creates a tasting using a merged bottle id", async ({
@@ -72,7 +178,7 @@ describe("POST /tastings", () => {
     fixtures,
   }) => {
     const sourceBottle = await fixtures.LegacyBottle();
-    const targetBottle = await fixtures.LegacyBottle();
+    const targetBottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: sourceBottle.id });
     const flight = await fixtures.Flight({ bottles: [sourceBottle.id] });
 
@@ -95,6 +201,11 @@ describe("POST /tastings", () => {
       });
       await tx.delete(bottles).where(eq(bottles.id, sourceBottle.id));
     });
+    await promoteRelease(
+      release.id,
+      targetBottle.id,
+      targetBottle.createdByActorId,
+    );
 
     const data = await routerClient.tastings.create(
       {
@@ -114,6 +225,7 @@ describe("POST /tastings", () => {
     expect(tasting.bottleId).toEqual(targetBottle.id);
     expect(tasting.releaseId).toEqual(release.id);
     expect(tasting.flightId).toEqual(flight.id);
+    expect(tasting.targetId).not.toBeNull();
   });
 
   test("attaches a pending photo upload to the new tasting", async ({
@@ -420,9 +532,31 @@ describe("POST /tastings", () => {
 
   test("creates a new tasting with release", async ({ defaults, fixtures }) => {
     const bottle = await fixtures.Bottle();
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: bottle.groupId,
+        brandId: bottle.brandId,
+        createdByActorId: bottle.createdByActorId,
+        name: `${bottle.name} promoted`,
+        fullName: `${bottle.fullName} promoted`,
+      })
+      .returning();
+    if (!promotedBottle) {
+      throw new Error("Unable to create promoted Bottle fixture");
+    }
+    await db.insert(catalogTargets).values({
+      groupId: bottle.groupId as number,
+      bottleId: promotedBottle.id,
+    });
     const release = await fixtures.BottleRelease({
       bottleId: bottle.id,
     });
+    await promoteRelease(
+      release.id,
+      promotedBottle.id,
+      bottle.createdByActorId,
+    );
 
     const data = await routerClient.tastings.create(
       {
@@ -440,6 +574,43 @@ describe("POST /tastings", () => {
       .where(eq(tastings.id, data.tasting.id));
 
     expect(tasting.releaseId).toEqual(release.id);
+    expect(tasting.bottleId).toEqual(bottle.id);
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) =>
+        eq(catalogTargets.bottleId, promotedBottle.id),
+    });
+    expect(tasting.targetId).toBe(target?.id);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      {
+        bottleId: promotedBottle.id,
+        entityStatsBottleId: bottle.id,
+      },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("rejects an unmapped release without inserting a tasting", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+
+    const err = await waitError(() =>
+      routerClient.tastings.create(
+        { bottle: bottle.id, release: release.id },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toBeInstanceOf(Error);
+    expect(err.message).toContain("completed promotion mapping");
+    expect(
+      await db.query.tastings.findMany({
+        where: eq(tastings.bottleId, bottle.id),
+      }),
+    ).toHaveLength(0);
   });
 
   test("fails with invalid release", async ({ defaults, fixtures }) => {
@@ -629,45 +800,39 @@ describe("POST /tastings", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
   });
 
-  test("updates entity stats correctly", async ({ defaults, fixtures }) => {
-    const brand = await fixtures.Entity({ type: ["brand"] });
-    const distiller = await fixtures.Entity({ type: ["distiller"] });
-    const bottler = await fixtures.Entity({ type: ["bottler"] });
-
-    const bottle = await fixtures.Bottle({
-      brandId: brand.id,
-      bottlerId: bottler.id,
-      distillerIds: [distiller.id],
+  test("translates duplicate durable targets to a conflict", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const firstRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Duplicate Target First Edition",
+      name: "Duplicate Durable Target First",
+      fullName: "Fixture Duplicate Durable Target First",
     });
+    const secondRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Duplicate Target Second Edition",
+      name: "Duplicate Durable Target Second",
+      fullName: "Fixture Duplicate Durable Target Second",
+    });
+    await promoteRelease(firstRelease.id, bottle.id, bottle.createdByActorId);
+    await promoteRelease(secondRelease.id, bottle.id, bottle.createdByActorId);
+    const createdAt = new Date().toISOString();
 
     await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: 2,
-      },
+      { bottle: bottle.id, release: firstRelease.id, createdAt },
       { context: { user: defaults.user } },
     );
+    const err = await waitError(() =>
+      routerClient.tastings.create(
+        { bottle: bottle.id, release: secondRelease.id, createdAt },
+        { context: { user: defaults.user } },
+      ),
+    );
 
-    const updatedBrand = await db.query.entities.findFirst({
-      where: eq(entities.id, brand.id),
-    });
-    const updatedDistiller = await db.query.entities.findFirst({
-      where: eq(entities.id, distiller.id),
-    });
-    const updatedBottler = await db.query.entities.findFirst({
-      where: eq(entities.id, bottler.id),
-    });
-
-    expect(updatedBrand?.totalTastings).toBe(1);
-    expect(updatedDistiller?.totalTastings).toBe(1);
-    expect(updatedBottler?.totalTastings).toBe(1);
-
-    const [updatedBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-    expect(updatedBottle.totalTastings).toBe(1);
-    expect(updatedBottle.avgRating).toBe(2);
+    expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
   });
 
   test("creates a new tasting with both flight and release", async ({
@@ -676,6 +841,7 @@ describe("POST /tastings", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    await promoteRelease(release.id, bottle.id, bottle.createdByActorId);
     const flight = await fixtures.Flight({ bottles: [bottle.id] });
 
     const data = await routerClient.tastings.create(

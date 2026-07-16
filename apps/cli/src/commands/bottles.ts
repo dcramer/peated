@@ -12,6 +12,7 @@ import {
   applyRepairBackfillProposals,
   type BatchApplicableRepairBackfillProposalType,
 } from "@peated/server/lib/applyRepairBackfillProposals";
+import { getExactCatalogTargetStatsRepairPage } from "@peated/server/lib/catalogTargetStatsRepair";
 import {
   findEntityByExactNameOrAlias,
   upsertBottleAlias,
@@ -295,20 +296,31 @@ subcommand
   .argument("[bottleIds...]")
   .action(async (bottleIds) => {
     const step = 1000;
-    const baseQuery = db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(bottleIds.length ? inArray(bottles.id, bottleIds) : undefined)
-      .orderBy(asc(bottles.id));
+    const requestedBottleIds = bottleIds.map((token: string) => {
+      const bottleId = Number(token);
+      if (!Number.isSafeInteger(bottleId) || bottleId <= 0) {
+        throw new Error(
+          `Invalid Bottle ID "${token}": expected a positive safe integer.`,
+        );
+      }
+      return bottleId;
+    });
 
     let hasResults = true;
     let offset = 0;
     while (hasResults) {
       hasResults = false;
-      const query = await baseQuery.offset(offset).limit(step);
-      for (const { id } of query) {
-        console.log(`Updating stats for Bottle ${id}.`);
-        await runJob("UpdateBottleStats", { bottleId: id });
+      const query = await getExactCatalogTargetStatsRepairPage({
+        bottleIds: requestedBottleIds,
+        limit: step,
+        offset,
+      });
+      for (const { bottleId } of query) {
+        console.log(`Updating stats for Bottle ${bottleId}.`);
+        await runJob("UpdateBottleStats", {
+          bottleId,
+          entityStatsBottleId: bottleId,
+        });
         hasResults = true;
       }
       offset += step;

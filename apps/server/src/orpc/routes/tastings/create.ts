@@ -6,14 +6,13 @@ import {
   bottles,
   bottleTags,
   bottleTombstones,
-  entities,
   flightBottles,
   flights,
   follows,
   tastings,
 } from "@peated/server/db/schema";
 import { awardAllBadgeXp } from "@peated/server/lib/badges";
-import { notEmpty } from "@peated/server/lib/filter";
+import { resolveCatalogTargetForAssignment } from "@peated/server/lib/catalogTargets";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToTasting,
@@ -38,6 +37,7 @@ import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { pushJob } from "@peated/server/worker/client";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 
 async function findTastingBottle(bottleId: number) {
   return await db.query.bottles.findFirst({
@@ -177,12 +177,30 @@ export default procedure
       data.friends = input.friends;
     }
 
-    let [tasting, awards] = await db.transaction(async (tx) => {
+    const created = await db.transaction(async (tx) => {
+      const target = await resolveCatalogTargetForAssignment(
+        {
+          kind: "legacy",
+          bottleId: bottle.id,
+          releaseId: input.release ?? null,
+          context: {
+            caller: "tastings.create",
+            operation: "create",
+          },
+        },
+        tx,
+      );
       let tasting: Tasting | undefined;
       try {
-        [tasting] = await tx.insert(tastings).values(data).returning();
+        [tasting] = await tx
+          .insert(tastings)
+          .values({ ...data, targetId: target.targetId })
+          .returning();
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "tasting_unq") {
+        if (
+          err?.code === "23505" &&
+          ["tasting_unq", "tasting_target_unq"].includes(err?.constraint)
+        ) {
           throw errors.CONFLICT({
             message: "Tasting already exists.",
             cause: err,
@@ -190,15 +208,7 @@ export default procedure
         }
         throw err;
       }
-      if (!tasting) return [];
-
-      await tx
-        .update(bottles)
-        .set({
-          totalTastings: sql`${bottles.totalTastings} + 1`,
-          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
-        })
-        .where(eq(bottles.id, bottle.id));
+      if (!tasting) return null;
 
       if (tasting.releaseId) {
         await tx
@@ -209,25 +219,8 @@ export default procedure
           .where(eq(bottleReleases.id, tasting.releaseId));
       }
 
-      const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);
-
-      await Promise.all([
-        tx
-          .update(entities)
-          .set({ totalTastings: sql`${entities.totalTastings} + 1` })
-          .where(
-            inArray(
-              entities.id,
-              Array.from(
-                new Set(
-                  [bottle.brandId, ...distillerIds, bottle.bottlerId].filter(
-                    notEmpty,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ...tasting.tags.map((tag) =>
+      await Promise.all(
+        tasting.tags.map((tag) =>
           tx
             .insert(bottleTags)
             .values({
@@ -242,7 +235,7 @@ export default procedure
               },
             }),
         ),
-      ]);
+      );
 
       const awards = await awardAllBadgeXp(tx, {
         ...tasting,
@@ -255,14 +248,16 @@ export default procedure
         });
       }
 
-      return [tasting, awards];
+      return { tasting, awards, target };
     });
 
-    if (!tasting) {
+    if (!created) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to create tasting.",
       });
     }
+    let { tasting } = created;
+    const { awards, target } = created;
 
     if (input.pendingImageId) {
       try {
@@ -301,8 +296,7 @@ export default procedure
       }
     }
 
-    // Update bottle rating stats
-    await pushJob("UpdateBottleStats", { bottleId: bottle.id });
+    await dispatchTastingStatsRecompute(tasting.id, target, tasting.bottleId);
 
     return {
       tasting: await serialize(TastingSerializer, tasting, context.user),
