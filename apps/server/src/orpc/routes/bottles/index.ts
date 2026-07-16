@@ -9,6 +9,7 @@ import brandRepairCandidates from "./brand-repair-candidates";
 import brandRepairGroups from "./brand-repair-groups";
 import canonRepairCandidates from "./canon-repair-candidates";
 import create from "./create";
+import createFromSource from "./create-from-source";
 import delete_ from "./delete";
 import details from "./details";
 import imageUpdate from "./image-update";
@@ -27,6 +28,7 @@ export default base.tag("bottles").router({
   details,
   list,
   create,
+  createFromSource,
   update,
   canonRepairCandidates,
   brandRepairCandidates,

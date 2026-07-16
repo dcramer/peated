@@ -9,22 +9,26 @@ import {
   UserSchema,
 } from "../schemas";
 
+async function generateSpec() {
+  const gen = new OpenAPIGenerator({
+    schemaConverters: [new ZodToJsonSchemaConverter()],
+  });
+
+  return await gen.generate(router, {
+    info: { title: "Peated API", version: "1.0.0" },
+    servers: [{ url: "/v1" }],
+    commonSchemas: {
+      Bottle: { schema: BottleSchema, strategy: "output" },
+      Cursor: { schema: CursorSchema, strategy: "output" },
+      User: { schema: UserSchema, strategy: "output" },
+      StorePrice: { schema: StorePriceSchema, strategy: "output" },
+    },
+  });
+}
+
 describe("OpenAPI generation ($ref reuse)", () => {
   it("reuses Bottle and Cursor via $ref and composes details via allOf", async () => {
-    const gen = new OpenAPIGenerator({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-    });
-
-    const spec = await gen.generate(router, {
-      info: { title: "Peated API", version: "1.0.0" },
-      servers: [{ url: "/v1" }],
-      commonSchemas: {
-        Bottle: { schema: BottleSchema, strategy: "output" },
-        Cursor: { schema: CursorSchema, strategy: "output" },
-        User: { schema: UserSchema, strategy: "output" },
-        StorePrice: { schema: StorePriceSchema, strategy: "output" },
-      },
-    });
+    const spec = await generateSpec();
 
     // Component refs exist
     expect(spec.components?.schemas?.Bottle).toBeDefined();
@@ -56,5 +60,30 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(allOf.some((s) => s?.$ref === "#/components/schemas/Bottle")).toBe(
       true,
     );
+  });
+
+  it("exposes another-release creation with one unique operation id", async () => {
+    const spec = await generateSpec();
+    expect(spec.paths?.["/bottles/from/{bottle}"]?.post?.operationId).toBe(
+      "createBottleFromSource",
+    );
+
+    const operationIds = Object.values(spec.paths ?? {}).flatMap((path) =>
+      Object.values(path ?? {}).flatMap((operation) => {
+        if (
+          typeof operation === "object" &&
+          operation !== null &&
+          "operationId" in operation
+        ) {
+          return [operation.operationId];
+        }
+        return [];
+      }),
+    );
+    expect(
+      operationIds.filter(
+        (operationId) => operationId === "createBottleFromSource",
+      ),
+    ).toHaveLength(1);
   });
 });

@@ -60,7 +60,7 @@ it must not preserve a parallel business-logic path.
 ## 5. New-Write API Cutover
 
 - [x] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
-- [ ] 5.2 Add an authenticated “another release” Bottle create operation with explicit source Bottle context and a unique OpenAPI operation id.
+- [x] 5.2 Add an authenticated “another release” Bottle create operation with explicit source Bottle context and a unique OpenAPI operation id.
 - [ ] 5.3 Change Bottle update and moderator proposal flows so exact edits persist only on the selected Bottle and shared edits use the atomic BottleGroup-to-member materialization service.
 - [ ] 5.4 Convert BottleRelease create/update/delete routes into instrumented compatibility adapters over concrete Bottle operations.
 - [ ] 5.5 Update aliases and observations so new writes reference one target and exact aliases resolve directly to a Bottle.

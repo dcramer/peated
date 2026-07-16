@@ -1,5 +1,3 @@
-import { getUserActor } from "@peated/server/lib/actors";
-import { loadCatalogTarget } from "@peated/server/lib/catalogTargets";
 import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 import {
   BottleAlreadyExistsError,
@@ -12,6 +10,7 @@ import {
   requireVerified,
 } from "@peated/server/orpc/middleware/auth";
 import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
+import loadCreatedExactTarget from "./load-created-exact-target";
 
 export default procedure
   .use(requireVerified)
@@ -62,23 +61,7 @@ export default procedure
           },
         },
       });
-      const target = await loadCatalogTarget(result.exactTarget.id, {
-        actor: await getUserActor(context.user),
-        permissions: { canReadCatalogIdentity: true },
-      });
-
-      if (
-        target.kind !== "bottle" ||
-        target.targetId !== result.exactTarget.id ||
-        target.bottle.id !== result.bottle.id ||
-        target.group.id !== result.group.id
-      ) {
-        throw new Error(
-          "Created Bottle target does not match its catalog graph.",
-        );
-      }
-
-      return target;
+      return await loadCreatedExactTarget(result, context);
     } catch (err) {
       if (err instanceof BottleAlreadyExistsError) {
         throw errors.CONFLICT({
