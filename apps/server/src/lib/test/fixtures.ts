@@ -514,6 +514,11 @@ async function createBottleFixture(
 
     let exactTarget: dbSchema.CatalogTarget | null = null;
     if (!legacy) {
+      await tx
+        .update(bottleGroups)
+        .set({ representativeBottleId: bottle.id })
+        .where(eq(bottleGroups.id, bottle.groupId as number));
+
       const [createdExactTarget] = await tx
         .insert(catalogTargets)
         .values({

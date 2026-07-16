@@ -66,6 +66,11 @@ describe("BottleGroup and CatalogTarget constraints", () => {
     if (!targetBefore) throw new Error("Missing exact CatalogTarget fixture");
 
     await db
+      .update(bottleGroups)
+      .set({ representativeBottleId: null })
+      .where(eq(bottleGroups.id, bottle.groupId as number));
+
+    await db
       .update(bottles)
       .set({ groupId: destinationBottle.groupId })
       .where(eq(bottles.id, bottle.id));
