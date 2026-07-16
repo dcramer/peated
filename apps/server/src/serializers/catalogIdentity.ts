@@ -33,9 +33,13 @@ export type BottleGroupSummarySerializerItem = BottleGroup & {
   distillerIds: readonly number[];
 };
 
+export type ConcreteBottleSerializerItem = Bottle & {
+  distillerIds: readonly number[];
+};
+
 export type CatalogTargetSerializerItem = CatalogTarget & {
   group: BottleGroupSummarySerializerItem;
-  bottle: Bottle | null;
+  bottle: ConcreteBottleSerializerItem | null;
 };
 
 function requireReadContext(
@@ -95,7 +99,7 @@ export const BottleGroupSummarySerializer = serializer({
 export const ConcreteBottleSerializer = serializer({
   name: "concreteBottle",
   item: (
-    item: Bottle,
+    item: ConcreteBottleSerializerItem,
     _attrs: Record<string, never>,
     _currentUser?: User | null,
     context?: CatalogIdentitySerializerContext,
@@ -108,6 +112,12 @@ export const ConcreteBottleSerializer = serializer({
       groupId: item.groupId,
       fullName: item.fullName,
       name: item.name,
+      brandId: item.brandId,
+      bottlerId: item.bottlerId,
+      distillerIds: [...item.distillerIds].sort((a, b) => a - b),
+      category: item.category,
+      seriesId: item.seriesId,
+      flavorProfile: item.flavorProfile,
       edition: item.edition,
       statedAge: item.statedAge,
       abv: item.abv,
@@ -155,8 +165,11 @@ export const CatalogTargetSerializer = serializer({
       context,
     );
     const exactItems = itemList.filter(
-      (item): item is CatalogTargetSerializerItem & { bottle: Bottle } =>
-        item.bottle !== null,
+      (
+        item,
+      ): item is CatalogTargetSerializerItem & {
+        bottle: ConcreteBottleSerializerItem;
+      } => item.bottle !== null,
     );
     const bottles = await serialize(
       ConcreteBottleSerializer,

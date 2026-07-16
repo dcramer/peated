@@ -10,7 +10,7 @@ import {
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
-import { db, type AnyTransaction } from "@peated/server/db";
+import type { AnyTransaction } from "@peated/server/db";
 import type {
   Bottle,
   BottleGroup,
@@ -48,13 +48,10 @@ import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
-import { serialize } from "@peated/server/serializers";
-import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
-import { getUserActor } from "./actors";
 import { findConflictingSmwsBottleId } from "./concreteBottleConflicts";
 import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
 import type { ConcreteBottleCreateInput } from "./concreteBottleSchemas";
@@ -871,28 +868,4 @@ export async function finalizeCreatedBottle(
       });
     }
   }
-}
-
-export async function createBottle({
-  creationSource = "manual_entry",
-  input,
-  context,
-}: {
-  creationSource?: CatalogVerificationCreationSource;
-  input: z.infer<typeof BottleInputSchema>;
-  context: Context & { user: User };
-}) {
-  const actor = await getUserActor(context.user);
-  const result = await db.transaction(async (tx) =>
-    createBottleInTransaction(tx, {
-      creationSource,
-      createdByActorId: actor.id,
-      input,
-      context,
-    }),
-  );
-
-  await finalizeCreatedBottle(result, { creationSource });
-
-  return await serialize(BottleSerializer, result.bottle, context.user);
 }

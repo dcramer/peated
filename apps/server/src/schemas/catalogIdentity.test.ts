@@ -46,6 +46,12 @@ const bottle = ConcreteBottleV1Schema.parse({
   groupId: 1,
   fullName: "Example 12-year-old Batch 1",
   name: "12-year-old Batch 1",
+  brandId: 2,
+  bottlerId: 5,
+  distillerIds: [6, 7],
+  category: "single_malt",
+  seriesId: 8,
+  flavorProfile: "peated",
   edition: "Batch 1",
   statedAge: null,
   abv: 54.2,
@@ -87,7 +93,19 @@ describe("catalog identity runtime schemas", () => {
         group,
         bottle,
       }),
-    ).toMatchObject({ kind: "bottle", bottle: { id: 3, groupId: 1 } });
+    ).toMatchObject({
+      kind: "bottle",
+      bottle: {
+        id: 3,
+        groupId: 1,
+        brandId: 2,
+        bottlerId: 5,
+        distillerIds: [6, 7],
+        category: "single_malt",
+        seriesId: 8,
+        flavorProfile: "peated",
+      },
+    });
   });
 
   test("rejects an exact target without a concrete Bottle", () => {

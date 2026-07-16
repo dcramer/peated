@@ -1,12 +1,13 @@
 import { call, ORPCError } from "@orpc/server";
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
-import type { BottlePreviewResult } from "@peated/server/types";
+import { BottleSchema } from "@peated/server/schemas";
 
 import create from "./create";
+import details from "./details";
 import update from "./update";
-import { bottleNormalize } from "./validation";
 
 export default procedure
   .use(requireMod)
@@ -21,20 +22,26 @@ export default procedure
       operationId: "upsertBottle",
     }),
   })
-  .input(BottleInputSchema)
+  .input(IndependentConcreteBottleCreateRouteInputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
-    const bottleData: BottlePreviewResult & Record<string, any> =
-      await bottleNormalize({ input, context });
-
-    if (!bottleData.name) {
-      throw errors.BAD_REQUEST({
-        message: "Invalid bottle name.",
-      });
-    }
-
+  .handler(async function ({ input, context }) {
     try {
-      return await call(create, input, { context });
+      const created = await call(create, input, { context });
+      const bottle = await call(
+        details,
+        { bottle: created.bottle.id },
+        { context },
+      );
+      logInfo("Legacy Bottle upsert response compatibility read", {
+        extra: {
+          event: "bottle_upsert.compatibility",
+          access: "read",
+          caller: "bottles.upsert",
+          operation: "translate_concrete_create_response",
+          bottleId: created.bottle.id,
+        },
+      });
+      return bottle;
     } catch (err) {
       if (err instanceof ORPCError && err.status === 409) {
         return await call(

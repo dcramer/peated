@@ -93,6 +93,13 @@ Bottle catalog and repair routes:
 - `apps/server/src/orpc/routes/bottles/delete.ts`
 - `apps/server/src/orpc/routes/bottles/release-repair-candidates.ts`
 - `apps/server/src/orpc/routes/bottles/update.ts`
+- `apps/server/src/orpc/routes/bottles/upsert.ts` is a translation-only
+  compatibility route for the scraper caller in
+  `apps/server/src/lib/scraper.ts`. A successful concrete create is reloaded as
+  the retained legacy Bottle response and emits structured
+  `bottle_upsert.compatibility` telemetry. Task 5.9 cuts the scraper and any
+  remaining callers over to concrete target responses; task 9.7 removes this
+  response adapter after measured traffic reaches zero.
 - `apps/server/src/orpc/routes/bottleAliases/delete.ts`
 
 Target-bearing consumer routes:
@@ -122,6 +129,9 @@ Classifier, price matching, and moderation routes:
 
 Catalog identity, aliases, search, creation, and updates:
 
+- `apps/server/src/lib/scraper.ts` is the known caller of the legacy Bottle
+  upsert response adapter. Task 5.9 moves it to concrete target responses before
+  task 9.7 removes that measured adapter.
 - `apps/server/src/lib/createBottle.ts` owns the shared Bottle preparation and
   persistence core plus the complete legacy and concrete transaction
   operations. Stable Bottle columns and distiller joins are durable exact-Bottle

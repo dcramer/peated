@@ -63,6 +63,7 @@ const ExactBottleInputSchema = BottleInputSchema.pick({
   caskFill: true,
   description: true,
   descriptionSrc: true,
+  tastingNotes: true,
 })
   .extend({
     statedAge: z.number().int().min(0).max(100).nullable().default(null),
@@ -82,6 +83,31 @@ const ExactBottleInputSchema = BottleInputSchema.pick({
       .default(null),
   })
   .strict();
+
+const IndependentConcreteBottleCreateRouteFieldsSchema =
+  StableBottleGroupFieldsSchema.extend({
+    edition: ExactBottleInputSchema.shape.edition,
+    abv: ExactBottleInputSchema.shape.abv,
+    singleCask: ExactBottleInputSchema.shape.singleCask,
+    caskStrength: ExactBottleInputSchema.shape.caskStrength,
+    vintageYear: ExactBottleInputSchema.shape.vintageYear,
+    releaseYear: ExactBottleInputSchema.shape.releaseYear,
+    caskSize: ExactBottleInputSchema.shape.caskSize,
+    caskType: ExactBottleInputSchema.shape.caskType,
+    caskFill: ExactBottleInputSchema.shape.caskFill,
+    description: ExactBottleInputSchema.shape.description,
+    descriptionSrc: ExactBottleInputSchema.shape.descriptionSrc,
+    tastingNotes: ExactBottleInputSchema.shape.tastingNotes,
+  }).strict();
+
+/**
+ * Public independent creation reuses stable/exact validation without exposing
+ * group authority or image-upload fields; uploads use a separate route.
+ */
+export const IndependentConcreteBottleCreateRouteInputSchema =
+  IndependentConcreteBottleCreateRouteFieldsSchema.superRefine(
+    validateStableChoiceIds,
+  );
 
 const ConcreteBottleSharedPatchSchema = z
   .object({

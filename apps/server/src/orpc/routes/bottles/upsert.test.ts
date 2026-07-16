@@ -20,6 +20,25 @@ describe("PUT /bottles", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
+  test("rejects unsupported image input at the upsert boundary", async ({
+    fixtures,
+  }) => {
+    const modUser = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity();
+    const input = {
+      name: "Unsupported Image Input",
+      brand: brand.id,
+      imageUrl: "https://example.com/bottle.jpg",
+    } as Parameters<typeof routerClient.bottles.upsert>[0];
+
+    const err = await waitError(
+      routerClient.bottles.upsert(input, { context: { user: modUser } }),
+    );
+
+    expect(err.message).toBe("Input validation failed");
+    expect(await db.select().from(bottles)).toHaveLength(0);
+  });
+
   test("creates a new bottle", async ({ fixtures }) => {
     const modUser = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity();

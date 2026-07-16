@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleGroupDistillers,
   bottleGroupTombstones,
   bottleGroups,
   bottleReleasePromotions,
@@ -89,12 +90,44 @@ describe("catalog target loading", () => {
   test("loads an exact Bottle target through the runtime-owned schema", async ({
     fixtures,
   }) => {
-    const distiller = await fixtures.Entity();
+    const bottleBrand = await fixtures.Entity({ name: "Bottle Brand" });
+    const groupBrand = await fixtures.Entity({ name: "Group Brand" });
+    const bottleBottler = await fixtures.Entity({ name: "Bottle Bottler" });
+    const bottleDistiller = await fixtures.Entity({
+      name: "Bottle Distiller",
+    });
+    const groupDistiller = await fixtures.Entity({ name: "Group Distiller" });
+    const series = await fixtures.BottleSeries({ brandId: bottleBrand.id });
     const bottle = await fixtures.Bottle({
-      distillerIds: [distiller.id],
+      brandId: bottleBrand.id,
+      bottlerId: bottleBottler.id,
+      distillerIds: [bottleDistiller.id],
+      category: "single_malt",
+      seriesId: series.id,
+      flavorProfile: "peated",
+      statedAge: 12,
       edition: "Batch 7",
       releaseYear: 2026,
       abv: 55.4,
+    });
+    const groupId = bottle.groupId as number;
+
+    await db
+      .update(bottleGroups)
+      .set({
+        brandId: groupBrand.id,
+        bottlerId: null,
+        category: "blend",
+        seriesId: null,
+        flavorProfile: "light_delicate",
+      })
+      .where(eq(bottleGroups.id, groupId));
+    await db
+      .delete(bottleGroupDistillers)
+      .where(eq(bottleGroupDistillers.groupId, groupId));
+    await db.insert(bottleGroupDistillers).values({
+      groupId,
+      distillerId: groupDistiller.id,
     });
 
     const target = await loadCatalogTargetByBottleId(bottle.id, readContext);
@@ -103,13 +136,25 @@ describe("catalog target loading", () => {
       schemaVersion: 1,
       kind: "bottle",
       group: {
-        id: bottle.groupId,
-        distillerIds: [distiller.id],
+        id: groupId,
+        brandId: groupBrand.id,
+        bottlerId: null,
+        distillerIds: [groupDistiller.id],
+        category: "blend",
+        seriesId: null,
+        flavorProfile: "light_delicate",
         totalBottles: 1,
       },
       bottle: {
         id: bottle.id,
-        groupId: bottle.groupId,
+        groupId,
+        brandId: bottleBrand.id,
+        bottlerId: bottleBottler.id,
+        distillerIds: [bottleDistiller.id],
+        category: "single_malt",
+        seriesId: series.id,
+        flavorProfile: "peated",
+        statedAge: 12,
         edition: "Batch 7",
         releaseYear: 2026,
         abv: 55.4,

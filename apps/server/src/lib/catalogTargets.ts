@@ -167,7 +167,13 @@ async function queryHydratedCatalogTarget(
           distillers: true,
         },
       },
-      bottle: true,
+      bottle: {
+        with: {
+          bottlesToDistillers: {
+            columns: { distillerId: true },
+          },
+        },
+      },
     },
   });
 }
@@ -407,7 +413,14 @@ function toSerializerItem(
         ({ distillerId }) => distillerId,
       ),
     },
-    bottle: target.bottle ?? null,
+    bottle: target.bottle
+      ? {
+          ...target.bottle,
+          distillerIds: target.bottle.bottlesToDistillers.map(
+            ({ distillerId }) => distillerId,
+          ),
+        }
+      : null,
   };
 }
 

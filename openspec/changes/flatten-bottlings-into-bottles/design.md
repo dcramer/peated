@@ -374,6 +374,10 @@ must have an explicit removal task:
 - BottleRelease write adapters: tasks 5.4 and 9.4/9.7;
 - paired-reference dual writes and storage: tasks 5.6, 7.3, and 9.6;
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
+- legacy Bottle upsert response translation: task 5.1 retains a measured
+  adapter for the scraper, task 5.9 cuts the scraper and any remaining callers
+  over to concrete target responses, and task 9.7 removes the adapter after
+  measured traffic reaches zero;
 - queued `MergeBottle` compatibility adapter: task 9.7;
 - release-only search/indexing: task 7.5;
 - nested Bottling UI: task 8.9;

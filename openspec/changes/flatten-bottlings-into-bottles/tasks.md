@@ -59,7 +59,7 @@ it must not preserve a parallel business-logic path.
 
 ## 5. New-Write API Cutover
 
-- [ ] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
+- [x] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
 - [ ] 5.2 Add an authenticated “another release” Bottle create operation with explicit source Bottle context and a unique OpenAPI operation id.
 - [ ] 5.3 Change Bottle update and moderator proposal flows so exact edits persist only on the selected Bottle and shared edits use the atomic BottleGroup-to-member materialization service.
 - [ ] 5.4 Convert BottleRelease create/update/delete routes into instrumented compatibility adapters over concrete Bottle operations.
@@ -68,7 +68,7 @@ it must not preserve a parallel business-logic path.
 - [x] 5.6a Persist `targetId` for tasting create and update, and resolve a null-target tasting update/delete from the measured legacy pair only when needed; retain the parent task for review, collection, flight, and price mutations.
 - [ ] 5.7 Update store-price matching, match proposals, and decision logs to emit `create_bottle` or group-aware match decisions instead of create-release decisions.
 - [ ] 5.8 Update classifier application and repair services to create concrete Bottles and automatic groups while retaining source evidence.
-- [ ] 5.9 Update worker jobs, importers, and CLI mutations so no supported new-write path inserts `bottle_release` directly.
+- [ ] 5.9 Update worker jobs, importers, CLI mutations, and scraper/upsert callers so no supported new-write path inserts `bottle_release` directly and every caller consumes concrete target responses instead of the legacy Bottle upsert response.
 - [ ] 5.10 Add route and service integration tests for authentication, exact creation, singleton grouping, another-release grouping, conflicts, generic targets, and adapter behavior.
 - [ ] 5.11 Regenerate and inspect OpenAPI/client types and remove new compile-time dependencies on `BottleRelease` from cut-over callers.
 
@@ -124,7 +124,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 9.4 Disable BottleRelease writes with an explicit gone/replacement response while retaining measured read compatibility.
 - [ ] 9.5 Observe the agreed legacy read window and verify old nested URLs and API references resolve only through mappings.
 - [ ] 9.6 Remove obsolete consumer `bottleId` columns wherever `targetId` replaces the legacy pair, plus `releaseId` columns, release foreign keys/indexes, and `bottle_release`, using a generated Drizzle migration only after backup approval.
-- [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, repair paths, enums, and compatibility branches.
+- [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, repair paths, enums, and compatibility branches, including the measured legacy Bottle upsert response adapter after scraper/caller cutover and zero observed traffic.
 - [ ] 9.8 Remove retired legacy parent Bottle rows only after every reference and URL has a durable group or Bottle mapping.
 - [ ] 9.9 Remove runtime dependence on BottleGroup hydration for exact Bottle rendering and verify all creation, shared-update, merge, split, and repair writers preserve complete durable Bottle materialization and atomic fan-out.
 - [ ] 9.10 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings, plus zero incomplete Bottle materializations or group/member synchronization defects.

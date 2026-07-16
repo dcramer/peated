@@ -68,6 +68,12 @@ export const ConcreteBottleV1Schema = z.object({
   groupId: z.number().int().positive(),
   fullName: z.string().min(1),
   name: z.string().min(1),
+  brandId: z.number().int().positive(),
+  bottlerId: z.number().int().positive().nullable(),
+  distillerIds: z.array(z.number().int().positive()),
+  category: CategoryEnum.nullable(),
+  seriesId: z.number().int().positive().nullable(),
+  flavorProfile: FlavorProfileEnum.nullable(),
   edition: z.string().nullable(),
   statedAge: z.number().int().min(0).max(100).nullable(),
   abv: z.number().min(0).max(100).nullable(),
@@ -91,22 +97,30 @@ export const ConcreteBottleV1Schema = z.object({
   updatedAt: z.string().datetime(),
 });
 
+export const GenericCatalogTargetV1Schema = z.object({
+  schemaVersion: CatalogIdentitySchemaVersion,
+  kind: z.literal("group"),
+  targetId: z.number().int().positive(),
+  group: BottleGroupV1Schema,
+});
+
+export const ExactCatalogTargetV1Schema = z.object({
+  schemaVersion: CatalogIdentitySchemaVersion,
+  kind: z.literal("bottle"),
+  targetId: z.number().int().positive(),
+  group: BottleGroupV1Schema,
+  bottle: ConcreteBottleV1Schema,
+});
+
 export const CatalogTargetV1Schema = z.discriminatedUnion("kind", [
-  z.object({
-    schemaVersion: CatalogIdentitySchemaVersion,
-    kind: z.literal("group"),
-    targetId: z.number().int().positive(),
-    group: BottleGroupV1Schema,
-  }),
-  z.object({
-    schemaVersion: CatalogIdentitySchemaVersion,
-    kind: z.literal("bottle"),
-    targetId: z.number().int().positive(),
-    group: BottleGroupV1Schema,
-    bottle: ConcreteBottleV1Schema,
-  }),
+  GenericCatalogTargetV1Schema,
+  ExactCatalogTargetV1Schema,
 ]);
 
 export type BottleGroupV1 = z.infer<typeof BottleGroupV1Schema>;
 export type ConcreteBottleV1 = z.infer<typeof ConcreteBottleV1Schema>;
+export type GenericCatalogTargetV1 = z.infer<
+  typeof GenericCatalogTargetV1Schema
+>;
+export type ExactCatalogTargetV1 = z.infer<typeof ExactCatalogTargetV1Schema>;
 export type CatalogTargetV1 = z.infer<typeof CatalogTargetV1Schema>;
