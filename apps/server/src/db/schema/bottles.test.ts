@@ -152,9 +152,11 @@ describe("BottleRelease promotion constraints", () => {
     const promotedBottle = await fixtures.Bottle();
     const firstRelease = await fixtures.BottleRelease({
       bottleId: promotedBottle.id,
+      edition: "Promotion Mapping One",
     });
     const secondRelease = await fixtures.BottleRelease({
       bottleId: promotedBottle.id,
+      edition: "Promotion Mapping Two",
     });
 
     await db.insert(bottleReleasePromotions).values([
