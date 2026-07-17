@@ -78,6 +78,33 @@ describe("GET /bottles/release-repair-candidates", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
+  test("excludes grouped release-like Bottles from legacy repair candidates", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Candidate Guard Distillery" });
+    const legacyBottle = await fixtures.LegacyBottle({
+      brandId: brand.id,
+      name: "Archive Release (Batch 1)",
+    });
+    const groupedBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Archive Release",
+      edition: "Batch 2",
+    });
+    const user = await fixtures.User({ mod: true });
+
+    const result = await routerClient.bottles.releaseRepairCandidates(
+      { query: "Archive Release" },
+      { context: { user } },
+    );
+    const candidateIds = result.results.map(
+      (candidate) => candidate.legacyBottle.id,
+    );
+
+    expect(candidateIds).toContain(legacyBottle.id);
+    expect(candidateIds).not.toContain(groupedBottle.id);
+  });
+
   test("lists legacy batch bottles under an exact parent bottle", async ({
     fixtures,
   }) => {

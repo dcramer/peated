@@ -81,10 +81,14 @@ BottleRelease CRUD and registration:
   canonical concrete creation from an active source Bottle, emits measured
   write context, returns the exact CatalogTarget replacement, and must not
   insert BottleRelease or synthesize a release id.
-- `apps/server/src/orpc/routes/bottleReleases/delete.ts` remains the legacy
-  destructive implementation until task 5.4c defines canonical deletion and
-  replaces it with a measured promotion-mapped adapter. It must not delegate to
-  the current legacy Bottle delete route.
+- `apps/server/src/orpc/routes/bottleReleases/delete.ts` is the task 5.4c
+  measured, promotion-mapped compatibility boundary. It retains the external
+  admin authorization, path, input, and output contract, but a completed
+  mapping makes no mutation and returns an actionable merge-required result
+  naming the mapped Bottle and exact target. A missing, incomplete, or
+  inconsistent mapping conflicts. It never guesses a representative, sibling,
+  or generic target and never deletes the retained BottleRelease row. Tasks 9.4
+  and 9.7 disable and remove the adapter.
 - `apps/server/src/orpc/routes/bottleReleases/details.ts`
 - `apps/server/src/orpc/routes/bottleReleases/index.ts`
 - `apps/server/src/orpc/routes/bottleReleases/list.ts`
@@ -106,7 +110,11 @@ Bottle catalog and repair routes:
 - `apps/server/src/orpc/routes/bottles/apply-age-repair.ts`
 - `apps/server/src/orpc/routes/bottles/apply-dirty-parent-release-repair.ts`
 - `apps/server/src/orpc/routes/bottles/apply-release-repair.ts`
-- `apps/server/src/orpc/routes/bottles/delete.ts`
+- `apps/server/src/orpc/routes/bottles/delete.ts` is retained only as a measured
+  compatibility purge for ungrouped pre-migration Bottles. Grouped concrete
+  Bottles are rejected without mutation with an actionable merge-required
+  result; their retirement requires an explicit destination through
+  `mergeConcreteBottles`. Task 9.7 removes this compatibility branch.
 - `apps/server/src/orpc/routes/bottles/release-repair-candidates.ts`
 - `apps/server/src/orpc/routes/bottles/update.ts` is the task 5.3a thin
   moderator adapter. It accepts only strict shared/exact patches, delegates all
@@ -177,9 +185,13 @@ Catalog identity, aliases, search, creation, and updates:
   rematerialization, generic consumer and stable-alias consolidation, tombstone
   retirement, reversible audits, and shared group aggregate recomputation.
 - Task 4.9 adds `apps/server/src/lib/mergeConcreteBottles.ts` as the sole
-  exact-duplicate merge owner. The moderator Bottle merge route invokes it
-  synchronously; entity merge composes its transaction entry point and defers
-  finalization until the entity transaction commits.
+  exact-duplicate merge and grouped exact-Bottle retirement owner. Every
+  retirement requires an explicit surviving Bottle. The service owns exact
+  consumer consolidation, promotion-mapping repointing, aliases and tombstones,
+  representative replacement, and singleton group retirement; it never infers
+  a representative, sibling, or generic destination. The moderator Bottle merge
+  route invokes it synchronously; entity merge composes its transaction entry
+  point and defers finalization until the entity transaction commits.
 - Task 4.11a adds `aggregateCatalogTargetStatsInTransaction` in
   `apps/server/src/lib/recomputeCatalogTargetStats.ts` as the sole owner of
   raw-target tasting SQL and rating math.
@@ -218,11 +230,17 @@ Repair and migration-adjacent services:
 
 - `apps/server/src/lib/applyDirtyParentAgeRepair.ts`
 - `apps/server/src/lib/applyDirtyParentReleaseRepair.ts`
-- `apps/server/src/lib/applyLegacyReleaseRepair.ts`
+- `apps/server/src/lib/applyLegacyReleaseRepair.ts` is a task 5.4c
+  compatibility-only repair owner. Its preflight and locked transactional reads
+  require `groupId IS NULL`, so it cannot repair or delete a grouped Bottle;
+  grouped retirement uses explicit exact Bottle merge. Task 9.7 removes it.
 - `apps/server/src/lib/applyRepairBackfillProposals.ts`
 - `apps/server/src/lib/canonRepairCandidates.ts`
 - `apps/server/src/lib/dirtyParentAgeRepairCandidates.ts`
-- `apps/server/src/lib/legacyReleaseRepairCandidates.ts`
+- `apps/server/src/lib/legacyReleaseRepairCandidates.ts` is the matching
+  compatibility-only discovery owner. It offers only legacy parents with
+  `groupId IS NULL` and never presents grouped Bottles for release repair. Task
+  9.7 removes this discovery path.
 - `apps/server/src/lib/legacyReleaseRepairClassifier.ts`
 - `apps/server/src/lib/legacyReleaseRepairReviewState.ts`
 - `apps/server/src/lib/legacyReleaseRepairReviews.ts`
@@ -383,6 +401,11 @@ Routes:
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/[releaseId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/new/page.tsx`
+
+Task 5.4c removes or hides Bottle/BottleRelease delete actions that can only
+produce the merge-required compatibility response. Task 8.9 removes the nested
+Bottling UI after redirects are active, and task 9.7 removes the remaining
+compatibility branches after measured traffic reaches zero.
 
 Shared UI and client helpers:
 

@@ -109,11 +109,51 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **WHEN** a legacy BottleRelease update has no completed promotion mapping
 - **THEN** the compatibility adapter rejects the request without creating, guessing, or mirroring catalog identity
 
-#### Scenario: Delete through a legacy release reference
+#### Scenario: Retire a grouped exact Bottle
 
-- **WHEN** BottleRelease delete is converted to a compatibility adapter
-- **THEN** it delegates only to canonical concrete Bottle deletion whose permanent promotion-mapping, group membership, representative, target, and tombstone behavior is defined and validated
-- **AND** it does not reuse the superseded direct BottleRelease or legacy Bottle deletion implementation
+- **WHEN** a moderator retires a grouped exact Bottle
+- **THEN** the moderator selects an explicit surviving Bottle and the system delegates to `mergeConcreteBottles`
+- **AND** that operation owns exact-consumer consolidation, promotion-mapping repointing, aliases and tombstones, representative replacement, and singleton group retirement
+- **AND** the system does not guess a representative, sibling, or generic target as the destination
+- **AND** the promotion mapping remains live and points to the selected survivor without adding retired-promotion state
+
+#### Scenario: Delete an ungrouped pre-migration Bottle
+
+- **WHEN** the standard Bottle DELETE route receives an ungrouped pre-migration Bottle
+- **THEN** it may perform the measured legacy compatibility purge
+- **AND** the compatibility branch remains removable under task 9.7
+
+#### Scenario: Delete a grouped concrete Bottle without a destination
+
+- **WHEN** the standard Bottle DELETE route receives a grouped concrete Bottle
+- **THEN** it rejects the request without mutation with an actionable merge-required result
+- **AND** it does not create a destination-free canonical deletion path
+
+#### Scenario: Legacy release repair excludes grouped Bottles
+
+- **WHEN** legacy release-repair candidate discovery or either the preflight or locked apply read examines a Bottle
+- **THEN** only a pre-migration Bottle with `groupId IS NULL` is eligible for that compatibility path
+- **AND** a grouped Bottle is not offered, repaired, or deleted and must use an explicit exact Bottle merge
+- **AND** task 9.7 removes the retained repair compatibility
+
+#### Scenario: Delete through a completed legacy release mapping
+
+- **WHEN** an administrator invokes BottleRelease DELETE for a release with a completed internally consistent promotion mapping
+- **THEN** the compatibility adapter preserves its external admin authorization, path, input, and output contract
+- **AND** it returns an actionable merge-required result naming the mapped Bottle and exact target
+- **AND** it makes no mutation and does not delete the retained BottleRelease row
+- **AND** it does not choose a representative, sibling, or generic target
+
+#### Scenario: Delete through an invalid legacy release mapping
+
+- **WHEN** BottleRelease DELETE finds a missing, incomplete, or inconsistent promotion mapping
+- **THEN** it returns a conflict without mutating the mapped Bottle, target graph, or retained BottleRelease
+
+#### Scenario: Remove unusable delete actions
+
+- **WHEN** a Bottle or nested Bottling delete action can only produce the merge-required compatibility result
+- **THEN** the web application removes or hides that action
+- **AND** tasks 8.9 and 9.7 remove the remaining nested UI and compatibility surfaces
 
 ### Requirement: BottleRelease is retired after compatibility
 

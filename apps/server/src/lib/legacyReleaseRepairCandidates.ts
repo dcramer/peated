@@ -385,6 +385,7 @@ async function listHeuristicLegacyReleaseRepairCandidates(query = "") {
     .from(bottles)
     .where(
       and(
+        isNull(bottles.groupId),
         or(eq(bottles.numReleases, 0), isNull(bottles.numReleases)),
         or(
           isNotNull(bottles.edition),

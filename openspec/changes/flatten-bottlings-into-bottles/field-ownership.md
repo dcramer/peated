@@ -130,10 +130,34 @@ upload boundary. The retained BottleRelease is immutable compatibility input,
 not a write mirror, and the adapter issues no parallel direct alias, audit, or
 job writes. On success it returns the mapped Bottle's exact CatalogTarget and
 records the legacy release id plus replacement Bottle and target ids. Legacy
-delete cannot be translated until canonical Bottle deletion preserves the
-permanent promotion mapping and defines group, representative, target, and
-tombstone ownership. All adapters emit measured compatibility writes and are
-disabled under task 9.4 and removed under task 9.7.
+delete does not create a destination-free canonical retirement operation.
+
+A grouped exact Bottle can be retired only through the existing
+`mergeConcreteBottles` operation with an explicit surviving Bottle. That merge
+owns exact-consumer consolidation, promotion-mapping repointing, aliases and
+tombstones, representative replacement, and singleton group retirement. It
+never infers a representative, sibling, or generic target as the destination.
+Promotion mappings remain live and converge on the selected survivor, so no
+retired-promotion schema or migration is introduced.
+
+The standard Bottle DELETE route remains only as a measured compatibility
+purge for ungrouped pre-migration Bottles and rejects grouped concrete Bottles
+without mutation with an actionable merge-required result. BottleRelease DELETE
+retains its external admin authorization, path, input, and output contract,
+requires a completed internally consistent promotion mapping, makes no mutation,
+and returns merge-required with the mapped Bottle and exact target. Invalid
+mappings conflict, and the retained BottleRelease is never deleted. Delete UI
+actions that can only fail are removed or hidden; tasks 8.9 and 9.7 remove the
+remaining nested UI and compatibility surfaces. All adapters emit measured
+compatibility writes and are disabled under task 9.4 and removed under task
+9.7. These rules preserve independently complete Bottles and shared-edit
+fan-out rather than making a Bottle depend on BottleGroup hydration.
+
+Legacy release-repair candidate discovery and application are likewise limited
+to ungrouped pre-migration Bottles. Discovery and both the preflight and locked
+apply reads require `groupId IS NULL`. Grouped Bottles are not offered,
+repaired, or deleted by this compatibility path and instead require an explicit
+exact Bottle merge. Task 9.7 removes the retained repair path.
 
 ## Durable Bottle materialization
 

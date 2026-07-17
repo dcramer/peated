@@ -2,9 +2,11 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleFlavorProfiles,
+  bottleGroups,
   bottleObservations,
   bottleReleases,
   bottles,
+  catalogTargets,
   collectionBottles,
   flightBottles,
   reviews,
@@ -15,6 +17,27 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+
+async function loadGroupedBottleGraph(groupId: number) {
+  const members = await db
+    .select()
+    .from(bottles)
+    .where(eq(bottles.groupId, groupId))
+    .orderBy(bottles.id);
+
+  const group = await db
+    .select()
+    .from(bottleGroups)
+    .where(eq(bottleGroups.id, groupId))
+    .orderBy(bottleGroups.id);
+  const targets = await db
+    .select()
+    .from(catalogTargets)
+    .where(eq(catalogTargets.groupId, groupId))
+    .orderBy(catalogTargets.id);
+
+  return { group, members, targets };
+}
 
 describe("DELETE /bottles/:bottle", () => {
   test("deletes bottle", async ({ fixtures }) => {
@@ -44,6 +67,103 @@ describe("DELETE /bottles/:bottle", () => {
       routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
     );
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("returns not found for a missing bottle", async ({ fixtures }) => {
+    const user = await fixtures.User({ admin: true });
+
+    const err = await waitError(
+      routerClient.bottles.delete({ bottle: 999_999 }, { context: { user } }),
+    );
+
+    expect(err).toMatchObject({ status: 404 });
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+  });
+
+  test("requires an explicit merge destination for a grouped singleton", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle({ name: "Grouped Singleton" });
+    const groupId = bottle.groupId as number;
+    const before = await loadGroupedBottleGraph(groupId);
+    expect(before.group[0]?.representativeBottleId).toBe(bottle.id);
+    expect(before.members).toHaveLength(1);
+    expect(before.targets).toHaveLength(2);
+
+    const err = await waitError(
+      routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
+    );
+
+    expect(err).toMatchObject({ status: 409 });
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Grouped Bottles cannot be deleted directly. Merge this Bottle into an explicit destination Bottle instead.]`,
+    );
+    expect(await loadGroupedBottleGraph(groupId)).toEqual(before);
+    expect(
+      await db.query.bottleTombstones.findFirst({
+        where: (table, { eq }) => eq(table.bottleId, bottle.id),
+      }),
+    ).toBeUndefined();
+  });
+
+  test("preserves a grouped representative and non-representative", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const representative = await fixtures.Bottle({
+      name: "Grouped Representative",
+    });
+    const sibling = await fixtures.LegacyBottle({
+      brandId: representative.brandId,
+      name: "Grouped Representative - Batch 2",
+    });
+    const groupId = representative.groupId as number;
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(bottles)
+        .set({ groupId })
+        .where(eq(bottles.id, sibling.id));
+      const [target] = await tx
+        .insert(catalogTargets)
+        .values({ groupId, bottleId: sibling.id })
+        .returning({ id: catalogTargets.id });
+      if (!target) throw new Error("Unable to create sibling exact target.");
+      await tx
+        .update(bottleAliases)
+        .set({ targetId: target.id })
+        .where(eq(bottleAliases.bottleId, sibling.id));
+      await tx
+        .update(bottleGroups)
+        .set({ totalBottles: 2 })
+        .where(eq(bottleGroups.id, groupId));
+    });
+
+    const before = await loadGroupedBottleGraph(groupId);
+    expect(before.group[0]?.representativeBottleId).toBe(representative.id);
+    expect(before.members).toHaveLength(2);
+    expect(before.targets).toHaveLength(3);
+
+    for (const bottleId of [representative.id, sibling.id]) {
+      const err = await waitError(
+        routerClient.bottles.delete(
+          { bottle: bottleId },
+          { context: { user } },
+        ),
+      );
+      expect(err).toMatchObject({ status: 409 });
+      expect(err.message).toBe(
+        "Grouped Bottles cannot be deleted directly. Merge this Bottle into an explicit destination Bottle instead.",
+      );
+      expect(
+        await db.query.bottleTombstones.findFirst({
+          where: (table, { eq }) => eq(table.bottleId, bottleId),
+        }),
+      ).toBeUndefined();
+    }
+
+    expect(await loadGroupedBottleGraph(groupId)).toEqual(before);
   });
 
   test("blocks delete when the bottle is used in tastings", async ({

@@ -2,12 +2,16 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleFlavorProfiles,
+  bottleGroups,
+  bottleGroupTombstones,
   bottleObservations,
+  bottleReleasePromotions,
   bottleReleases,
   bottles,
   bottlesToDistillers,
   bottleTags,
   bottleTombstones,
+  catalogTargets,
   changes,
   collectionBottles,
   flightBottles,
@@ -18,6 +22,7 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { applyLegacyReleaseRepairInTransaction } from "@peated/server/lib/applyLegacyReleaseRepair";
 import {
   getLegacyReleaseRepairBottleFingerprint,
   getLegacyReleaseRepairParentCandidatesFingerprint,
@@ -25,7 +30,8 @@ import {
 } from "@peated/server/lib/legacyReleaseRepairReviewState";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, inArray } from "drizzle-orm";
+import * as workerClient from "@peated/server/worker/client";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
@@ -148,6 +154,41 @@ function getParentBottleReviewFingerprintInput(parentBottle: {
   };
 }
 
+async function snapshotGroupedRepairGraph() {
+  const groups = await db
+    .select()
+    .from(bottleGroups)
+    .orderBy(asc(bottleGroups.id));
+  const bottleRows = await db.select().from(bottles).orderBy(asc(bottles.id));
+  const targets = await db
+    .select()
+    .from(catalogTargets)
+    .orderBy(asc(catalogTargets.id));
+  const promotions = await db
+    .select()
+    .from(bottleReleasePromotions)
+    .orderBy(asc(bottleReleasePromotions.releaseId));
+  const bottleRetirements = await db
+    .select()
+    .from(bottleTombstones)
+    .orderBy(asc(bottleTombstones.bottleId));
+  const groupRetirements = await db
+    .select()
+    .from(bottleGroupTombstones)
+    .orderBy(asc(bottleGroupTombstones.groupId));
+  const changeRows = await db.select().from(changes).orderBy(asc(changes.id));
+
+  return {
+    groups,
+    bottles: bottleRows,
+    targets,
+    promotions,
+    bottleTombstones: bottleRetirements,
+    groupTombstones: groupRetirements,
+    changes: changeRows,
+  };
+}
+
 describe("POST /bottles/:bottle/apply-release-repair", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
@@ -169,6 +210,47 @@ describe("POST /bottles/:bottle/apply-release-repair", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("rejects grouped Bottles at preflight and locked apply-time without mutation", async ({
+    fixtures,
+  }) => {
+    const groupedBottle = await fixtures.Bottle({
+      name: "Guarded Archive Release",
+      edition: "Batch 2",
+    });
+    const mod = await fixtures.User({ mod: true });
+    const before = await snapshotGroupedRepairGraph();
+    vi.clearAllMocks();
+
+    const routeError = await waitError(
+      routerClient.bottles.applyReleaseRepair(
+        { bottle: groupedBottle.id },
+        { context: { user: mod } },
+      ),
+    );
+    expect(routeError).toMatchObject({
+      status: 400,
+      message:
+        "Grouped Bottles cannot use legacy release repair. Merge this Bottle into an explicit destination Bottle instead.",
+    });
+
+    const lockedError = await waitError(
+      db.transaction((tx) =>
+        applyLegacyReleaseRepairInTransaction(tx, {
+          legacyBottleId: groupedBottle.id,
+          user: mod,
+        }),
+      ),
+    );
+    expect(lockedError.message).toBe(
+      "Grouped Bottles cannot use legacy release repair. Merge this Bottle into an explicit destination Bottle instead.",
+    );
+
+    expect(await snapshotGroupedRepairGraph()).toEqual(before);
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
   test("moves a legacy release-like bottle under the exact parent bottle", async ({

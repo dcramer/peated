@@ -101,6 +101,9 @@ type ResolvedLegacyReleaseRepairParent = {
 
 type LegacyBottleRepairSnapshot = RepairBottle;
 
+const GROUPED_BOTTLE_REPAIR_MESSAGE =
+  "Grouped Bottles cannot use legacy release repair. Merge this Bottle into an explicit destination Bottle instead.";
+
 function getReleaseInput(legacyBottle: RepairBottle) {
   const repairIdentity = deriveLegacyReleaseRepairIdentity({
     fullName: legacyBottle.fullName,
@@ -161,6 +164,7 @@ async function getLegacyBottleForRepair(
       flavorProfile: bottles.flavorProfile,
       brandId: bottles.brandId,
       bottlerId: bottles.bottlerId,
+      groupId: bottles.groupId,
       numReleases: bottles.numReleases,
       totalTastings: bottles.totalTastings,
     })
@@ -171,6 +175,10 @@ async function getLegacyBottleForRepair(
 
   if (!legacyBottle) {
     throw new LegacyReleaseRepairBadRequestError("Bottle not found.");
+  }
+
+  if (legacyBottle.groupId !== null) {
+    throw new LegacyReleaseRepairBadRequestError(GROUPED_BOTTLE_REPAIR_MESSAGE);
   }
 
   if (legacyBottle.numReleases > 0) {
@@ -206,6 +214,7 @@ async function getLegacyBottleSnapshotForRepair(legacyBottleId: number) {
       flavorProfile: bottles.flavorProfile,
       brandId: bottles.brandId,
       bottlerId: bottles.bottlerId,
+      groupId: bottles.groupId,
       numReleases: bottles.numReleases,
       totalTastings: bottles.totalTastings,
     })
@@ -213,9 +222,15 @@ async function getLegacyBottleSnapshotForRepair(legacyBottleId: number) {
     .where(eq(bottles.id, legacyBottleId))
     .limit(1);
 
-  if (!legacyBottle || legacyBottle.numReleases > 0) {
+  if (!legacyBottle) {
     return null;
   }
+
+  if (legacyBottle.groupId !== null) {
+    throw new LegacyReleaseRepairBadRequestError(GROUPED_BOTTLE_REPAIR_MESSAGE);
+  }
+
+  if (legacyBottle.numReleases > 0) return null;
 
   return legacyBottle satisfies LegacyBottleRepairSnapshot;
 }

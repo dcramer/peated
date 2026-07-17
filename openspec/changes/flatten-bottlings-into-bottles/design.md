@@ -419,10 +419,36 @@ no parallel direct alias, audit, or job writes; those effects remain owned by
 the canonical update operation. A successful compatibility event records the
 legacy release id and replacement Bottle and target ids. Read/UI coherence must
 be handled by the staged read and product cutovers rather than by a second
-writer. Task 5.4c does not delegate to the legacy Bottle delete route. It first
-defines canonical deletion behavior for permanent promotion mappings, last
-group members, representatives, generic and exact targets, and tombstones,
-then places the legacy delete adapter over that operation.
+writer.
+
+Task 5.4c makes the existing `mergeConcreteBottles` operation the only way to
+retire a grouped exact Bottle. The moderator must select an explicit surviving
+Bottle; the merge owns exact-consumer consolidation, promotion-mapping
+repointing, aliases and tombstones, representative replacement, and singleton
+group retirement. Neither a delete route nor a compatibility adapter may guess
+the representative, a sibling, the generic target, or any other destination.
+Promotion mappings remain live and may converge on the selected survivor, so
+this slice adds no retired-promotion state or migration.
+
+The standard Bottle DELETE route is retained only as a measured compatibility
+path for ungrouped pre-migration Bottles. A grouped concrete Bottle is rejected
+without mutation with an actionable merge-required result. BottleRelease DELETE
+retains its external admin authorization, path, input, and output contract,
+but resolves the completed promotion mapping and makes no mutation: a valid
+mapping returns an actionable merge-required result naming the mapped Bottle
+and exact target, while a missing, incomplete, or inconsistent mapping returns
+a conflict. It never deletes the retained BottleRelease row. Web delete actions
+that would always reach this rejection are removed or hidden in this slice;
+tasks 8.9 and 9.7 remove the remaining nested UI and compatibility surfaces.
+These boundaries preserve the independently complete Bottle and shared-edit
+fan-out invariants rather than introducing destination-free canonical deletion.
+
+Legacy release-repair discovery and apply remain compatibility-only for
+ungrouped pre-migration Bottles. `legacyReleaseRepairCandidates.ts` filters to
+`groupId IS NULL`, and `applyLegacyReleaseRepair.ts` enforces the same condition
+in both its preflight read and locked transactional read. A grouped Bottle is
+never offered, repaired, or deleted by that path; it requires an explicit exact
+Bottle merge. Task 9.7 removes the retained repair compatibility.
 
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
@@ -447,6 +473,7 @@ must have an explicit removal task:
   over to concrete target responses, and task 9.7 removes the adapter after
   measured traffic reaches zero;
 - queued `MergeBottle` compatibility adapter: task 9.7;
+- legacy release-repair discovery and apply: task 9.7;
 - release-only search/indexing: task 7.5;
 - nested Bottling UI: task 8.9;
 - exact-Bottle runtime dependence on BottleGroup hydration: task 9.9;
