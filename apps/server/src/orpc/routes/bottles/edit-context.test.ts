@@ -1,0 +1,244 @@
+import { db } from "@peated/server/db";
+import type { User } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleTombstones,
+  bottles,
+  bottlesToDistillers,
+  catalogTargets,
+} from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
+
+async function createGroup(
+  user: User,
+  stable: Record<string, unknown>,
+  exacts: Array<Record<string, unknown>>,
+) {
+  const first = await createConcreteBottle({
+    context: { user },
+    input: { kind: "independent", stable, exact: exacts[0] },
+  });
+  const members = [first];
+  for (const exact of exacts.slice(1)) {
+    members.push(
+      await createConcreteBottle({
+        context: { user },
+        input: {
+          kind: "source_bottle",
+          sourceBottleId: first.bottle.id,
+          exact,
+        },
+      }),
+    );
+  }
+  return { first, members };
+}
+
+describe("GET /bottles/{bottle}/edit-context", () => {
+  test("requires moderator access", async ({ defaults, fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    for (const user of [null, defaults.user]) {
+      const error = await waitError(
+        routerClient.bottles.editContext(
+          { bottle: bottle.id },
+          { context: { user } },
+        ),
+      );
+      expect(error).toMatchObject({ status: 401 });
+    }
+  });
+
+  test("returns group-owned rich shared choices and Bottle-owned exact values", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Context Group Brand" });
+    const bottler = await fixtures.Entity({
+      name: "Context Group Bottler",
+      type: ["bottler"],
+    });
+    const distillers = [
+      await fixtures.Entity({ name: "Context Distiller A" }),
+      await fixtures.Entity({ name: "Context Distiller B" }),
+    ];
+    const series = await fixtures.BottleSeries({
+      name: "Context Series",
+      brandId: brand.id,
+    });
+    const { first } = await createGroup(
+      mod,
+      {
+        name: "Shared Context Label",
+        statedAge: 12,
+        brand: brand.id,
+        bottler: bottler.id,
+        distillers: distillers.map(({ id }) => id),
+        series: series.id,
+        category: "single_malt",
+        flavorProfile: "peated",
+      },
+      [
+        {
+          edition: "Batch 1",
+          statedAge: 12,
+          abv: 46,
+          releaseYear: 2025,
+          description: "Selected Bottle content",
+        },
+        { edition: "Batch 2", statedAge: 14, abv: 48 },
+      ],
+    );
+    const driftBrand = await fixtures.Entity({ name: "Drift Bottle Brand" });
+    const driftBottler = await fixtures.Entity({
+      name: "Drift Bottle Bottler",
+      type: ["bottler"],
+    });
+    const driftDistiller = await fixtures.Entity({
+      name: "Drift Bottle Distiller",
+    });
+    const driftSeries = await fixtures.BottleSeries({
+      name: "Drift Bottle Series",
+      brandId: driftBrand.id,
+    });
+    await db
+      .update(bottles)
+      .set({
+        name: "Contaminating Exact Formatted Name - Batch 1",
+        fullName:
+          "Drift Bottle Brand Contaminating Exact Formatted Name - Batch 1",
+        statedAge: 15,
+        brandId: driftBrand.id,
+        bottlerId: driftBottler.id,
+        seriesId: driftSeries.id,
+        category: "bourbon",
+        flavorProfile: "light_delicate",
+      })
+      .where(eq(bottles.id, first.bottle.id));
+    await db
+      .delete(bottlesToDistillers)
+      .where(eq(bottlesToDistillers.bottleId, first.bottle.id));
+    await db.insert(bottlesToDistillers).values({
+      bottleId: first.bottle.id,
+      distillerId: driftDistiller.id,
+    });
+
+    const result = await routerClient.bottles.editContext(
+      { bottle: first.bottle.id },
+      { context: { user: mod } },
+    );
+
+    expect(result).toMatchObject({
+      bottleId: first.bottle.id,
+      totalBottles: 2,
+      shared: {
+        name: "Shared Context Label",
+        statedAge: 12,
+        brand: { id: brand.id, name: brand.name },
+        bottler: { id: bottler.id, name: bottler.name },
+        series: { id: series.id, name: series.name },
+        category: "single_malt",
+        flavorProfile: "peated",
+      },
+      exact: {
+        edition: "Batch 1",
+        abv: 46,
+        releaseYear: 2025,
+        description: "Selected Bottle content",
+      },
+    });
+    expect(result).not.toHaveProperty("groupId");
+    expect(result).not.toHaveProperty("targetId");
+    expect(result).not.toHaveProperty("exact.statedAge");
+    expect(result).not.toHaveProperty("exact.tastingNotes");
+    expect(Object.keys(result.shared.brand)).toEqual(["id", "name"]);
+    expect(Object.keys(result.shared.distillers[0]!)).toEqual(["id", "name"]);
+    expect(result.shared.distillers.map(({ id }) => id)).toEqual(
+      distillers.map(({ id }) => id).sort((a, b) => a - b),
+    );
+    expect(result.shared.name).not.toContain("Batch 1");
+    expect(result.shared.brand.id).not.toBe(driftBrand.id);
+    expect(result.shared.bottler?.id).not.toBe(driftBottler.id);
+    expect(result.shared.series?.id).not.toBe(driftSeries.id);
+    expect(result.shared.distillers).not.toContainEqual(
+      expect.objectContaining({ id: driftDistiller.id }),
+    );
+  });
+
+  test("exposes only the group-owned age to the current form", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Inherited Age Brand" });
+    const { first } = await createGroup(
+      mod,
+      { name: "Inherited Age", statedAge: 18, brand: brand.id },
+      [{ edition: "Standard", statedAge: 21 }],
+    );
+
+    const result = await routerClient.bottles.editContext(
+      { bottle: first.bottle.id },
+      { context: { user: mod } },
+    );
+
+    expect(result.shared.statedAge).toBe(18);
+    expect(result).not.toHaveProperty("exact.statedAge");
+  });
+
+  test("maps missing Bottles to not found and inactive graphs to conflict", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const missing = await waitError(
+      routerClient.bottles.editContext(
+        { bottle: 999_999 },
+        { context: { user: mod } },
+      ),
+    );
+    expect(missing).toMatchObject({ status: 404 });
+
+    const retired = await fixtures.Bottle({ name: "Retired Edit Context" });
+    const replacement = await fixtures.Bottle({
+      name: "Replacement Edit Context",
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+    const retiredError = await waitError(
+      routerClient.bottles.editContext(
+        { bottle: retired.id },
+        { context: { user: mod } },
+      ),
+    );
+    expect(retiredError).toMatchObject({ status: 409 });
+
+    const invalid = await fixtures.Bottle({ name: "Invalid Edit Context" });
+    await db
+      .delete(bottleAliases)
+      .where(eq(bottleAliases.bottleId, invalid.id));
+    await db
+      .delete(catalogTargets)
+      .where(eq(catalogTargets.bottleId, invalid.id));
+    const invalidError = await waitError(
+      routerClient.bottles.editContext(
+        { bottle: invalid.id },
+        { context: { user: mod } },
+      ),
+    );
+    expect(invalidError).toMatchObject({ status: 409 });
+
+    const missingGroup = await fixtures.LegacyBottle({
+      name: "Missing Group Edit Context",
+    });
+    const missingGroupError = await waitError(
+      routerClient.bottles.editContext(
+        { bottle: missingGroup.id },
+        { context: { user: mod } },
+      ),
+    );
+    expect(missingGroupError).toMatchObject({ status: 409 });
+  });
+});

@@ -62,6 +62,8 @@ it must not preserve a parallel business-logic path.
 - [x] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
 - [x] 5.2 Add an authenticated “another release” Bottle create operation with explicit source Bottle context and a unique OpenAPI operation id.
 - [ ] 5.3 Change Bottle update and moderator proposal flows so exact edits persist only on the selected Bottle and shared edits use the atomic BottleGroup-to-member materialization service.
+- [x] 5.3a Cut the standard moderator Bottle update route and live edit workflow over to strict shared/exact patches, the canonical concrete update service, an exact-target response, and a group-owned edit-context projection.
+- [ ] 5.3b Compose moderator price-match correction proposals with the canonical concrete update transaction, then remove the superseded proposal-specific Bottle updater without leaving a second update business system.
 - [ ] 5.4 Convert BottleRelease create/update/delete routes into instrumented compatibility adapters over concrete Bottle operations.
 - [ ] 5.5 Update aliases and observations so new writes reference one target and exact aliases resolve directly to a Bottle.
 - [ ] 5.6 Update tasting, review, collection, flight, and price mutations to dual-write `targetId` from exact or generic intent.

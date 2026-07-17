@@ -166,6 +166,16 @@ and new BottleSeries `numReleases` membership counts. Other statistics remain
 owned by their explicit merge, split, representative, and recomputation
 operations.
 
+Task 5.3 is split into two coherent cutovers. Task 5.3a moves the standard
+moderator route and live edit workflow to strict `shared` and `exact` patches
+over the canonical service. Its mod-only edit-context read resolves the exact
+CatalogTarget, but intentionally sources shared values and rich entity/series
+choices from BottleGroup ownership; ordinary exact Bottle reads remain
+independent and do not hydrate the group. Task 5.3b separately composes
+moderator price-match correction approval with the canonical update
+transaction and removes the superseded proposal-specific updater in the same
+transactional slice.
+
 ### Series remains a broader merchandising relationship
 
 BottleGroup membership means the same marketed expression across batches, years, or editions. BottleSeries remains an optional relationship across distinct expressions in a named range. Series membership does not aggregate ratings and is never sufficient evidence to merge BottleGroups.

@@ -9,6 +9,10 @@ import create from "./create";
 import details from "./details";
 import update from "./update";
 
+/**
+ * Translation-only, measured legacy compatibility. All writes delegate to the
+ * concrete Bottle routes; OpenSpec tasks 5.9 and 9.7 remove this adapter.
+ */
 export default procedure
   .use(requireMod)
   .route({
@@ -44,14 +48,52 @@ export default procedure
       return bottle;
     } catch (err) {
       if (err instanceof ORPCError && err.status === 409) {
-        return await call(
+        const updated = await call(
           update,
           {
-            ...input,
             bottle: err.data.bottle,
+            shared: {
+              name: input.name,
+              statedAge: input.statedAge,
+              series: input.series,
+              category: input.category,
+              brand: input.brand,
+              distillers: input.distillers,
+              bottler: input.bottler,
+              flavorProfile: input.flavorProfile,
+            },
+            exact: {
+              edition: input.edition,
+              abv: input.abv,
+              singleCask: input.singleCask,
+              caskStrength: input.caskStrength,
+              vintageYear: input.vintageYear,
+              releaseYear: input.releaseYear,
+              caskSize: input.caskSize,
+              caskType: input.caskType,
+              caskFill: input.caskFill,
+              description: input.description,
+              descriptionSrc: input.descriptionSrc,
+              tastingNotes: input.tastingNotes,
+            },
           },
           { context },
         );
+        const bottle = await call(
+          details,
+          { bottle: updated.bottle.id },
+          { context },
+        );
+        logInfo("Legacy Bottle upsert response compatibility read", {
+          extra: {
+            event: "bottle_upsert.compatibility",
+            access: "read",
+            caller: "bottles.upsert",
+            operation: "translate_concrete_update_response",
+            bottleId: updated.bottle.id,
+          },
+        });
+        return bottle;
       }
       throw err;
     }

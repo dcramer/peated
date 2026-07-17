@@ -86,4 +86,62 @@ describe("OpenAPI generation ($ref reuse)", () => {
       ),
     ).toHaveLength(1);
   });
+
+  it("exposes concrete Bottle editing with unique operation ids", async () => {
+    const spec = await generateSpec();
+    expect(spec.paths?.["/bottles/{bottle}"]?.patch?.operationId).toBe(
+      "updateBottle",
+    );
+    expect(
+      spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.operationId,
+    ).toBe("getBottleEditContext");
+
+    const updateResponse: any =
+      (spec.paths?.["/bottles/{bottle}"]?.patch?.responses as any)?.[200] ??
+      (spec.paths?.["/bottles/{bottle}"]?.patch?.responses as any)?.["200"];
+    const updateSchema = updateResponse?.content?.["application/json"]
+      ?.schema as any;
+    expect(Object.keys(updateSchema?.properties ?? {})).toEqual(
+      expect.arrayContaining([
+        "schemaVersion",
+        "kind",
+        "targetId",
+        "group",
+        "bottle",
+      ]),
+    );
+    expect(updateSchema?.properties?.id).toBeUndefined();
+
+    const editContextResponse: any =
+      (
+        spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.responses as any
+      )?.[200] ??
+      (spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.responses as any)?.[
+        "200"
+      ];
+    const editContextSchema = editContextResponse?.content?.["application/json"]
+      ?.schema as any;
+    expect(Object.keys(editContextSchema?.properties ?? {})).toEqual(
+      expect.arrayContaining(["bottleId", "totalBottles", "shared", "exact"]),
+    );
+    expect(editContextSchema?.properties?.groupId).toBeUndefined();
+    expect(editContextSchema?.properties?.targetId).toBeUndefined();
+
+    const operationIds = Object.values(spec.paths ?? {}).flatMap((path) =>
+      Object.values(path ?? {}).flatMap((operation) => {
+        if (
+          typeof operation === "object" &&
+          operation !== null &&
+          "operationId" in operation
+        ) {
+          return [operation.operationId];
+        }
+        return [];
+      }),
+    );
+    expect(operationIds.filter((id) => id === "updateBottle")).toHaveLength(1);
+    expect(
+      operationIds.filter((id) => id === "getBottleEditContext"),
+    ).toHaveLength(1);
+  });
 });

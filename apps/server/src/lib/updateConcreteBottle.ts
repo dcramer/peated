@@ -998,7 +998,10 @@ async function finalizeUpdatedConcreteBottle(
     try {
       await pushUniqueJob("OnBottleAliasChange", { name });
     } catch (error) {
-      logError(error, { bottle: { id: result.bottle.id } });
+      logError(error, {
+        bottle: { id: result.bottle.id },
+        alias: { name },
+      });
     }
   }
   for (const entityId of result.changedEntityIds) {

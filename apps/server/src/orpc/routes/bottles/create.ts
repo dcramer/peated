@@ -10,7 +10,7 @@ import {
   requireVerified,
 } from "@peated/server/orpc/middleware/auth";
 import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
-import loadCreatedExactTarget from "./load-created-exact-target";
+import loadExactTarget from "./load-exact-target";
 
 export default procedure
   .use(requireVerified)
@@ -61,7 +61,14 @@ export default procedure
           },
         },
       });
-      return await loadCreatedExactTarget(result, context);
+      return await loadExactTarget(
+        {
+          bottleId: result.bottle.id,
+          groupId: result.group.id,
+          targetId: result.exactTarget.id,
+        },
+        context,
+      );
     } catch (err) {
       if (err instanceof BottleAlreadyExistsError) {
         throw errors.CONFLICT({

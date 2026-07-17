@@ -92,11 +92,18 @@ Bottle catalog and repair routes:
 - `apps/server/src/orpc/routes/bottles/apply-release-repair.ts`
 - `apps/server/src/orpc/routes/bottles/delete.ts`
 - `apps/server/src/orpc/routes/bottles/release-repair-candidates.ts`
-- `apps/server/src/orpc/routes/bottles/update.ts`
+- `apps/server/src/orpc/routes/bottles/update.ts` is the task 5.3a thin
+  moderator adapter. It accepts only strict shared/exact patches, delegates all
+  writes to `updateConcreteBottle`, and returns the validated exact target.
+- `apps/server/src/orpc/routes/bottles/edit-context.ts` is the task 5.3a
+  mod-only form projection. It validates the selected exact target, reads
+  shared choices from BottleGroup-owned ids and joins, and reads exact values
+  from the selected Bottle so the live form never treats materialized Bottle
+  drift as shared authority.
 - `apps/server/src/orpc/routes/bottles/upsert.ts` is a translation-only
   compatibility route for the scraper caller in
-  `apps/server/src/lib/scraper.ts`. A successful concrete create is reloaded as
-  the retained legacy Bottle response and emits structured
+  `apps/server/src/lib/scraper.ts`. A successful concrete create or update is
+  reloaded as the retained legacy Bottle response and emits structured
   `bottle_upsert.compatibility` telemetry. Task 5.9 cuts the scraper and any
   remaining callers over to concrete target responses; task 9.7 removes this
   response adapter after measured traffic reaches zero.
@@ -139,8 +146,10 @@ Catalog identity, aliases, search, creation, and updates:
 - `apps/server/src/lib/createConcreteBottle.ts` owns the runtime-validated
   concrete creation service boundary used by future public adapters.
 - `apps/server/src/lib/updateConcreteBottle.ts` is the authoritative moderator
-  update domain service. Task 5.3 routes and proposal flows are deferred adapters
-  that must delegate to it rather than duplicate its business logic.
+  update domain service. Task 5.3a cuts over the standard route and live edit
+  workflow. Task 5.3b composes price-match correction approval with its
+  transaction and removes the proposal-specific updater; neither adapter may
+  duplicate its business logic.
 - Task 4.7 adds `apps/server/src/lib/mergeBottleGroups.ts` as the authoritative
   one-source-to-one-destination moderator group-merge service. It owns member
   rematerialization, generic consumer and stable-alias consolidation, tombstone

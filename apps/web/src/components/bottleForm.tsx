@@ -86,7 +86,16 @@ export type BottleFormInitialData = Partial<
   bottler?: number | Entity | ChoiceLike | null;
   series?: number | ChoiceLike | null;
   imageUrl?: string | null;
-  numReleases?: number | null;
+};
+
+export type BottleFormSubmitValue = Omit<FormSchemaType, "image"> & {
+  image: HTMLCanvasElement | null | undefined;
+};
+
+export type BottleFormFieldName = keyof FormSchemaType;
+
+export type BottleFormSubmitMeta = {
+  dirtyFields: ReadonlySet<BottleFormFieldName>;
 };
 
 const toEntityChoiceValue = (
@@ -115,17 +124,18 @@ export default function BottleForm({
   returnTo,
   saveLabel,
   showBottleReleaseDetails = false,
+  sharedIdentityBottleCount,
 }: {
-  onSubmit: SubmitHandler<
-    Omit<FormSchemaType, "image"> & {
-      image: HTMLCanvasElement | null | undefined;
-    }
-  >;
+  onSubmit: (
+    value: BottleFormSubmitValue,
+    meta: BottleFormSubmitMeta,
+  ) => void | Promise<void>;
   initialData: BottleFormInitialData;
   title: string;
   returnTo?: string | null;
   saveLabel?: string;
   showBottleReleaseDetails?: boolean;
+  sharedIdentityBottleCount?: number;
 }) {
   const {
     control,
@@ -134,7 +144,7 @@ export default function BottleForm({
     getValues,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { dirtyFields, errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(BottleInputSchema),
     defaultValues: {
@@ -161,7 +171,14 @@ export default function BottleForm({
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      await onSubmit({ image, ...data });
+      await onSubmit(
+        { image, ...data },
+        {
+          dirtyFields: new Set(
+            Object.keys(dirtyFields) as Array<keyof FormSchemaType>,
+          ),
+        },
+      );
     } catch (err) {
       setError(
         getFormErrorMessage(err, {
@@ -217,11 +234,20 @@ export default function BottleForm({
             <em>Hibiki</em>), and the bottle name, if nothing else, you can use
             the full bottle label.
           </p>
-          <p>
-            Keep this form focused on the core bottle. If you care about a
-            specific batch, single cask, or other exact bottling, you can track
-            that later from the bottle page or when recording a tasting.
-          </p>
+          {sharedIdentityBottleCount !== undefined ? (
+            <p>
+              {sharedIdentityBottleCount === 1
+                ? "This group has 1 Bottle, so core identity edits update only this Bottle's identity."
+                : `Core identity edits update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this group.`}{" "}
+              Exact Bottle details below affect only this Bottle.
+            </p>
+          ) : (
+            <p>
+              Keep this form focused on the core bottle. If you care about a
+              specific batch, single cask, or other exact bottling, you can
+              track that later from the bottle page or when recording a tasting.
+            </p>
+          )}
           <p>
             Have any suggestions for making it easier to enter correct data?{" "}
             <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
@@ -426,23 +452,61 @@ export default function BottleForm({
               />
             )}
           />
+
+          <Controller
+            name="flavorProfile"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.flavorProfile}
+                placeholder="The flavor profile of the spirit."
+                suggestedOptions={[]}
+                label="Flavor Profile"
+                onRenderOption={(option) => {
+                  const classes = classesForProfile(option.id as FlavorProfile);
+                  return (
+                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                      <h4
+                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                      >
+                        {option.name}
+                      </h4>
+                      <div className="text-muted text-sm font-normal">
+                        {notesForProfile(option.id as FlavorProfile)}
+                      </div>
+                    </div>
+                  );
+                }}
+                options={flavorProfileList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? {
+                        id: value,
+                        name: formatFlavorProfile(value),
+                      }
+                    : undefined
+                }
+              />
+            )}
+          />
         </Fieldset>
 
         {showBottleReleaseDetails && (
           <Fieldset>
             <div className="text-muted text-sm leading-6">
-              {initialData.numReleases ? (
-                <p>
-                  This bottle already has tracked bottlings. These parent-level
-                  fields should usually be cleared before splitting legacy data
-                  into child bottlings.
-                </p>
-              ) : (
-                <p>
-                  Use these only when the bottle itself is the exact marketed
-                  release and there is no reusable child bottling yet.
-                </p>
-              )}
+              <p>
+                These details belong only to this exact Bottle.
+                {sharedIdentityBottleCount !== undefined && (
+                  <>
+                    {" "}
+                    {sharedIdentityBottleCount === 1
+                      ? "This group has 1 Bottle; core identity edits above update its identity."
+                      : `Core identity edits above update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this group.`}
+                  </>
+                )}
+              </p>
             </div>
 
             <TextField
@@ -450,7 +514,7 @@ export default function BottleForm({
               error={errors.edition}
               type="text"
               label="Edition / Label"
-              helpText="Optional bottle-level release label when this bottle is itself the specific marketed release."
+              helpText="Optional edition, batch, or label for this exact Bottle."
               placeholder="e.g. Batch 24, 1990 Release"
             />
 
@@ -462,7 +526,7 @@ export default function BottleForm({
               type="number"
               label="ABV"
               placeholder="e.g. 40.5"
-              helpText="Bottle-level ABV only when it belongs to the bottle identity or no child bottlings exist yet."
+              helpText="Alcohol by volume for this exact Bottle."
               suffixLabel="%"
               step="0.1"
               min="0"
@@ -477,7 +541,7 @@ export default function BottleForm({
               type="number"
               label="Release Year"
               placeholder="e.g. 1990"
-              helpText="Bottle-level release year only when there is not a reusable child bottling yet."
+              helpText="The year this exact Bottle was released."
             />
 
             <TextField
@@ -488,7 +552,7 @@ export default function BottleForm({
               type="number"
               label="Vintage Year"
               placeholder="e.g. 1986"
-              helpText="Bottle-level vintage year only when it belongs to the bottle identity or no child bottlings exist yet."
+              helpText="The distillation vintage for this exact Bottle."
             />
 
             <BooleanField
@@ -583,14 +647,19 @@ export default function BottleForm({
                   if (!result) return;
                   const currentValues = getValues();
                   if (result.description && !currentValues.description) {
-                    setValue("description", result.description);
-                    setValue("descriptionSrc", "generated");
+                    setValue("description", result.description, {
+                      shouldDirty: true,
+                    });
+                    setValue("descriptionSrc", "generated", {
+                      shouldDirty: true,
+                    });
                   }
 
                   if (result.flavorProfile && !currentValues.flavorProfile)
                     setValue(
                       "flavorProfile",
                       result.flavorProfile as FlavorProfile,
+                      { shouldDirty: true },
                     );
                 }}
                 disabled={generateDataMutation.isPending}
@@ -600,45 +669,6 @@ export default function BottleForm({
               </Button>
             )}
           </div>
-
-          <Controller
-            name="flavorProfile"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                {...field}
-                error={errors.flavorProfile}
-                placeholder="The flavor profile of the spirit."
-                suggestedOptions={[]}
-                label="Flavor Profile"
-                onRenderOption={(option) => {
-                  const classes = classesForProfile(option.id as FlavorProfile);
-                  return (
-                    <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                      <h4
-                        className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                      >
-                        {option.name}
-                      </h4>
-                      <div className="text-muted text-sm font-normal">
-                        {notesForProfile(option.id as FlavorProfile)}
-                      </div>
-                    </div>
-                  );
-                }}
-                options={flavorProfileList}
-                onChange={(value) => onChange(value?.id)}
-                value={
-                  value
-                    ? {
-                        id: value,
-                        name: formatFlavorProfile(value),
-                      }
-                    : undefined
-                }
-              />
-            )}
-          />
 
           <ImageField
             name="image"
@@ -652,7 +682,7 @@ export default function BottleForm({
             {...register("description", {
               setValueAs: (v) => (v === "" || !v ? null : v),
               onChange: () => {
-                setValue("descriptionSrc", "user");
+                setValue("descriptionSrc", "user", { shouldDirty: true });
               },
             })}
             error={errors.description}

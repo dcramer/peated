@@ -12,6 +12,7 @@ import create from "./create";
 import createFromSource from "./create-from-source";
 import delete_ from "./delete";
 import details from "./details";
+import editContext from "./edit-context";
 import imageUpdate from "./image-update";
 import list from "./list";
 import merge from "./merge";
@@ -30,6 +31,7 @@ export default base.tag("bottles").router({
   create,
   createFromSource,
   update,
+  editContext,
   canonRepairCandidates,
   brandRepairCandidates,
   brandRepairGroups,
