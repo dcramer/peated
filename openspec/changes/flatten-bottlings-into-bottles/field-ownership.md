@@ -90,6 +90,25 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Observation and unit-level data do not create a Bottle or BottleGroup split
   without an explicit catalog decision.
 
+## Legacy correction proposal mapping
+
+Until task 5.7 replaces legacy price-match proposal actions with target-aware
+contracts, a correction `proposedBottle` remains a sparse repair draft for the
+old parent/stable Bottle layer. The compatibility mapper sends required `name`
+and `brand`, non-null `series`, `category`, `statedAge`, and `bottler`, and
+non-empty `distillers` as shared BottleGroup intent. The legacy stated age is
+shared because release-specific age belonged to `proposedRelease`; the draft
+cannot yet express an exact-age repair.
+
+Non-null `edition`, `abv`, `singleCask`, `caskStrength`, `vintageYear`,
+`releaseYear`, `caskSize`, `caskType`, and `caskFill` are exact intent for the
+selected Bottle. Null fields and empty distillers mean unknown in this sparse
+contract and preserve existing values; boolean false and numeric zero remain
+explicit values. The canonical concrete update service applies both scopes in
+the same transaction as proposal approval, so shared values fan out while
+exact values remain selected-only. Task 5.7 owns target-aware proposal actions
+and an explicit exact-age contract rather than adding inference here.
+
 ## Durable Bottle materialization
 
 Bottle `brandId`, `bottlerId`, `category`, `seriesId`, `flavorProfile`,

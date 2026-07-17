@@ -211,6 +211,24 @@ unresolved because price matching cannot yet apply that compound operation.
 - `release`
 - `bottle_and_release`
 
+### Correction repair compatibility
+
+Until the Bottle/Bottling flattening project introduces target-aware proposal
+actions, `proposedBottle` on a same-bottle correction remains a sparse repair
+draft for the old parent/stable Bottle layer. Required name and brand, non-null
+series, category, stable stated age, and bottler, and non-empty distillers are
+shared catalog edits. Approval applies them through the canonical BottleGroup
+update service, so they atomically rematerialize every concrete Bottle in the
+group. Non-null edition, ABV, single-cask and cask-strength flags, vintage and
+release years, and canonical cask size, type, and fill are exact edits for only
+the selected Bottle.
+
+Null fields and empty distillers mean unknown and preserve existing catalog
+facts; false and zero remain explicit values. The legacy draft cannot express
+an exact-age repair. Target-aware actions and an explicit exact-age proposal
+contract belong to task 5.7 rather than being inferred from group size or
+current data.
+
 ## Statuses
 
 - `verified`
@@ -280,12 +298,19 @@ Auto-create only proceeds when:
 Moderators can:
 
 - approve an existing match
+- apply a same-bottle correction repair
 - ignore a proposal
 - create a bottle
 - create a release
 - create a bottle and release together
 
 Default moderation should stay bottle-first. Release creation is optional precision, not a requirement for approval.
+
+Applying a correction commits its canonical shared/exact Bottle update and
+proposal approval in one database transaction. Canonical update jobs run only
+after that transaction commits. The correction path retains its Bottle response
+for the current queue UI, but it does not maintain a separate Bottle updater or
+rewrite child BottleRelease names.
 
 Current UI limitation:
 

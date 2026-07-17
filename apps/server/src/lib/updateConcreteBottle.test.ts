@@ -21,7 +21,10 @@ import {
   ConcreteBottleUpdateConflictError,
   ConcreteBottleUpdateGraphError,
   ConcreteBottleUpdateInputError,
+  ConcreteBottleUpdateInputSchema,
+  finalizeConcreteBottleUpdate,
   updateConcreteBottle,
+  updateConcreteBottleInTransaction,
 } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray } from "drizzle-orm";
@@ -269,6 +272,67 @@ describe("concrete Bottle updates", () => {
     expect(await loadAliases([first.bottle.id])).toEqual(aliasesBefore);
     expect(await loadGroupTargets(first.group.id)).toEqual(targetsBefore);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
+  test("composes a sourced update transaction with explicit post-commit finalization", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const actor = await getUserActor(mod);
+    const brand = await fixtures.Entity({ name: "Composed Source Brand" });
+    const { first } = await createGroup({
+      user: mod,
+      stable: { name: "Composed Source", brand: brand.id },
+      exacts: [{ edition: "One" }],
+    });
+    resetQueueMock();
+
+    const manifest = await db.transaction(async (tx) => {
+      const result = await updateConcreteBottleInTransaction(tx, {
+        bottleId: first.bottle.id,
+        input: ConcreteBottleUpdateInputSchema.parse({
+          shared: {
+            brand: { name: "Composed Review Brand" },
+            distillers: [{ name: "Composed Review Distillery" }],
+          },
+        }),
+        user: mod,
+        actorId: actor.id,
+        creationSource: "price_match_review",
+      });
+      expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+      return result;
+    });
+
+    expect(manifest).toMatchObject({
+      changed: true,
+      creationSource: "price_match_review",
+      changedBottleIds: [first.bottle.id],
+    });
+    expect((await loadUpdateAudits([first.bottle.id]))[0]?.data).toMatchObject({
+      creationSource: "price_match_review",
+    });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+
+    await finalizeConcreteBottleUpdate(manifest);
+
+    const createdEntities = await db
+      .select({ id: entities.id })
+      .from(entities)
+      .where(
+        inArray(entities.name, [
+          "Composed Review Brand",
+          "Composed Review Distillery",
+        ]),
+      );
+    expect(createdEntities).toHaveLength(2);
+    for (const { id: entityId } of createdEntities) {
+      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+        "VerifyEntityCreation",
+        { entityId, creationSource: "price_match_review" },
+        { delay: 5_000 },
+      );
+    }
   });
 
   test("rejects numeric entities that lack the requested shared role", async ({

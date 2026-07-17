@@ -4,10 +4,7 @@ import type {
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
 import type { WebEvidenceJudgment } from "@peated/bottle-classifier/priceMatchingEvidence";
-import {
-  getReleaseObservationFacts,
-  isAddingBottleLevelReleaseTraits,
-} from "@peated/bottle-classifier/releaseIdentity";
+import { getReleaseObservationFacts } from "@peated/bottle-classifier/releaseIdentity";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import {
   BottleClassificationError,
@@ -21,11 +18,7 @@ import {
   actors,
   bottleObservations,
   bottleReleases,
-  bottleSeries,
   bottles,
-  bottlesToDistillers,
-  changes,
-  entities,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -38,8 +31,6 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { processSeries } from "@peated/server/lib/bottleHelpers";
-import { queueEntityCreationVerification } from "@peated/server/lib/catalogVerification";
 import {
   buildBottleInputFromProposedBottle,
   buildClassifierCreateInputs,
@@ -54,12 +45,6 @@ import {
   createBottleReleaseInTransaction,
   finalizeCreatedBottleRelease,
 } from "@peated/server/lib/createBottleRelease";
-import {
-  coerceToUpsert,
-  upsertBottleAlias,
-  upsertEntity,
-} from "@peated/server/lib/db";
-import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
 import {
   getIncomingBottleDecisionFromCreationTarget,
   recordIncomingBottleDecisionInTransaction,
@@ -88,7 +73,11 @@ import {
   textsOverlap,
 } from "@peated/server/lib/priceMatchingText";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
-import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
+import {
+  finalizeConcreteBottleUpdate,
+  updateConcreteBottleInTransaction,
+  type ConcreteBottleUpdateInput,
+} from "@peated/server/lib/updateConcreteBottle";
 import type {
   BottleInputSchema,
   BottleReleaseInputSchema,
@@ -298,59 +287,60 @@ function normalizeClassifierDecisionForPriceMatching(
   return decision;
 }
 
-function buildBottleRepairInputFromProposedBottle(
+/**
+ * Maps the sparse legacy parent/stable repair draft to canonical shared and
+ * exact patches. Unknown null fields or empty distiller lists are omitted
+ * rather than cleared.
+ */
+function buildConcreteBottleRepairInput(
   proposedBottle: ProposedBottle,
-): Partial<z.infer<typeof BottleInputSchema>> {
+): ConcreteBottleUpdateInput {
   const proposedInput = buildBottleInputFromProposedBottle(proposedBottle);
-  const repairInput: Partial<z.infer<typeof BottleInputSchema>> = {
-    brand: proposedInput.brand,
+  const shared: NonNullable<ConcreteBottleUpdateInput["shared"]> = {
     name: proposedInput.name,
+    brand: proposedInput.brand,
   };
+  const exact: NonNullable<ConcreteBottleUpdateInput["exact"]> = {};
 
-  if (proposedBottle.series !== null) {
-    repairInput.series = proposedInput.series;
-  }
+  if (proposedBottle.series !== null) shared.series = proposedInput.series!;
   if (proposedBottle.category !== null) {
-    repairInput.category = proposedInput.category;
-  }
-  if (proposedBottle.edition !== null) {
-    repairInput.edition = proposedInput.edition;
+    shared.category = proposedBottle.category;
   }
   if (proposedBottle.statedAge !== null) {
-    repairInput.statedAge = proposedInput.statedAge;
-  }
-  if (proposedBottle.abv !== null) {
-    repairInput.abv = proposedInput.abv;
-  }
-  if (proposedBottle.caskStrength !== null) {
-    repairInput.caskStrength = proposedInput.caskStrength;
-  }
-  if (proposedBottle.singleCask !== null) {
-    repairInput.singleCask = proposedInput.singleCask;
-  }
-  if (proposedBottle.vintageYear !== null) {
-    repairInput.vintageYear = proposedInput.vintageYear;
-  }
-  if (proposedBottle.releaseYear !== null) {
-    repairInput.releaseYear = proposedInput.releaseYear;
-  }
-  if (proposedBottle.caskType !== null) {
-    repairInput.caskType = proposedInput.caskType;
-  }
-  if (proposedBottle.caskSize !== null) {
-    repairInput.caskSize = proposedInput.caskSize;
-  }
-  if (proposedBottle.caskFill !== null) {
-    repairInput.caskFill = proposedInput.caskFill;
+    shared.statedAge = proposedBottle.statedAge;
   }
   if (proposedBottle.distillers.length > 0) {
-    repairInput.distillers = proposedInput.distillers;
+    shared.distillers = proposedInput.distillers;
   }
   if (proposedBottle.bottler !== null) {
-    repairInput.bottler = proposedInput.bottler;
+    shared.bottler = proposedInput.bottler!;
   }
 
-  return repairInput;
+  if (proposedBottle.edition !== null) exact.edition = proposedBottle.edition;
+  if (proposedBottle.abv !== null) exact.abv = proposedBottle.abv;
+  if (proposedBottle.singleCask !== null) {
+    exact.singleCask = proposedBottle.singleCask;
+  }
+  if (proposedBottle.caskStrength !== null) {
+    exact.caskStrength = proposedBottle.caskStrength;
+  }
+  if (proposedBottle.vintageYear !== null) {
+    exact.vintageYear = proposedBottle.vintageYear;
+  }
+  if (proposedBottle.releaseYear !== null) {
+    exact.releaseYear = proposedBottle.releaseYear;
+  }
+  if (proposedBottle.caskType !== null)
+    exact.caskType = proposedBottle.caskType;
+  if (proposedBottle.caskSize !== null)
+    exact.caskSize = proposedBottle.caskSize;
+  if (proposedBottle.caskFill !== null)
+    exact.caskFill = proposedBottle.caskFill;
+
+  return {
+    shared,
+    ...(Object.keys(exact).length > 0 ? { exact } : {}),
+  };
 }
 
 function appendRationale(
@@ -1053,450 +1043,6 @@ function getStorePriceBottleRepairDraft(
   }
 
   return parsedBottle.data;
-}
-
-async function getBottleForStorePriceRepairInTransaction(
-  tx: AnyDatabase,
-  bottleId: number,
-) {
-  const bottle = await tx.query.bottles.findFirst({
-    where: eq(bottles.id, bottleId),
-    with: {
-      brand: true,
-      bottler: true,
-      series: true,
-      bottlesToDistillers: {
-        with: {
-          distiller: true,
-        },
-      },
-    },
-  });
-
-  if (!bottle) {
-    throw new StorePriceBottleRepairBadRequestError("Bottle not found.");
-  }
-
-  return bottle;
-}
-
-async function syncBottleSeriesCountInTransaction(
-  tx: AnyTransaction,
-  seriesId: number,
-) {
-  await tx
-    .update(bottleSeries)
-    .set({
-      numReleases: sql`(
-        SELECT COUNT(*)
-        FROM ${bottles}
-        WHERE ${bottles.seriesId} = ${seriesId}
-      )`,
-    })
-    .where(eq(bottleSeries.id, seriesId));
-}
-
-async function applyBottleRepairDraftInTransaction(
-  tx: AnyTransaction,
-  {
-    bottleId,
-    proposedBottle,
-    user,
-    actor,
-  }: {
-    bottleId: number;
-    proposedBottle: ProposedBottle;
-    user: User;
-    actor: IncomingBottleDecisionActor;
-  },
-) {
-  const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
-    userId: user.id,
-  });
-  const actorId = writeActor.id;
-  const bottle = await getBottleForStorePriceRepairInTransaction(tx, bottleId);
-  const currentDistillers = bottle.bottlesToDistillers.map(
-    (row) => row.distiller,
-  );
-  const repairInput = buildBottleRepairInputFromProposedBottle(proposedBottle);
-  const currentInput = {
-    name: bottle.name,
-    series: bottle.seriesId ?? null,
-    brand: bottle.brand.id,
-    bottler: bottle.bottler?.id ?? null,
-    edition: bottle.edition,
-    statedAge: bottle.statedAge,
-    abv: bottle.abv,
-    caskStrength: bottle.caskStrength,
-    singleCask: bottle.singleCask,
-    category: bottle.category,
-    flavorProfile: bottle.flavorProfile,
-    distillers: currentDistillers.map((distiller) => distiller.id),
-    vintageYear: bottle.vintageYear,
-    releaseYear: bottle.releaseYear,
-    caskType: bottle.caskType,
-    caskSize: bottle.caskSize,
-    caskFill: bottle.caskFill,
-    description: bottle.description,
-    descriptionSrc: bottle.descriptionSrc,
-    imageUrl: bottle.imageUrl,
-  };
-  const normalizedInput: z.infer<typeof BottleInputSchema> = {
-    ...currentInput,
-    ...repairInput,
-  };
-  const bottleData: Record<string, any> = await bottleNormalize({
-    input: normalizedInput,
-    context: { user } as any,
-    entityDb: tx,
-  });
-
-  bottleData.edition = normalizedInput.edition;
-  bottleData.abv = normalizedInput.abv;
-  bottleData.flavorProfile = normalizedInput.flavorProfile;
-  bottleData.caskType = normalizedInput.caskType;
-  bottleData.caskSize = normalizedInput.caskSize;
-  bottleData.caskFill = normalizedInput.caskFill;
-
-  if (!bottleData.name) {
-    throw new StorePriceBottleRepairBadRequestError("Invalid bottle name.");
-  }
-
-  if (
-    bottle.numReleases > 0 &&
-    isAddingBottleLevelReleaseTraits({
-      current: bottle,
-      next: bottleData,
-    })
-  ) {
-    throw new StorePriceBottleRepairBadRequestError(
-      "Bottle-level release fields cannot be set while child releases exist. Move those details to bottle releases instead.",
-    );
-  }
-
-  const newAliases: string[] = [];
-  const newEntityIds = new Set<number>();
-
-  const brandUpsert = await upsertEntity({
-    db: tx,
-    data: coerceToUpsert(bottleData.brand),
-    creationSource: "price_match_review",
-    userId: user.id,
-    createdByActorId: actorId,
-    type: "brand",
-  });
-  if (!brandUpsert) {
-    throw new StorePriceBottleRepairBadRequestError(
-      "Could not identify brand.",
-    );
-  }
-  if (brandUpsert.created) newEntityIds.add(brandUpsert.id);
-  const brand = brandUpsert.result;
-
-  let bottlerId: number | null = null;
-  if (bottleData.bottler) {
-    const bottlerUpsert = await upsertEntity({
-      db: tx,
-      data: coerceToUpsert(bottleData.bottler),
-      creationSource: "price_match_review",
-      userId: user.id,
-      createdByActorId: actorId,
-      type: "bottler",
-    });
-    if (!bottlerUpsert) {
-      throw new StorePriceBottleRepairBadRequestError(
-        "Could not identify bottler.",
-      );
-    }
-    if (bottlerUpsert.created) newEntityIds.add(bottlerUpsert.id);
-    bottlerId = bottlerUpsert.id;
-  }
-
-  let seriesId: number | null = null;
-  let seriesCreated = false;
-  if (normalizedInput.series) {
-    [seriesId, seriesCreated] = await processSeries({
-      series: normalizedInput.series,
-      brand,
-      userId: user.id,
-      createdByActorId: actorId,
-      tx,
-    });
-  }
-
-  const distillerIds: number[] = [];
-  const newDistillerIds: number[] = [];
-  for (const distillerData of bottleData.distillers ?? []) {
-    const distillerUpsert = await upsertEntity({
-      db: tx,
-      data: coerceToUpsert(distillerData),
-      creationSource: "price_match_review",
-      userId: user.id,
-      createdByActorId: actorId,
-      type: "distiller",
-    });
-    if (!distillerUpsert) {
-      throw new StorePriceBottleRepairBadRequestError(
-        "Could not identify distiller.",
-      );
-    }
-    if (distillerUpsert.created) newEntityIds.add(distillerUpsert.id);
-    distillerIds.push(distillerUpsert.id);
-  }
-
-  const currentDistillerIds = currentDistillers.map(
-    (distiller) => distiller.id,
-  );
-  for (const distillerId of distillerIds) {
-    if (currentDistillerIds.includes(distillerId)) {
-      continue;
-    }
-
-    await tx.insert(bottlesToDistillers).values({
-      bottleId: bottle.id,
-      distillerId,
-    });
-    newDistillerIds.push(distillerId);
-  }
-
-  for (const distillerId of currentDistillerIds) {
-    if (distillerIds.includes(distillerId)) {
-      continue;
-    }
-
-    await tx
-      .delete(bottlesToDistillers)
-      .where(
-        and(
-          eq(bottlesToDistillers.distillerId, distillerId),
-          eq(bottlesToDistillers.bottleId, bottle.id),
-        ),
-      );
-  }
-
-  const fullName = formatBottleName({
-    ...bottleData,
-    name: `${brand.shortName || brand.name} ${bottleData.name}`,
-  });
-  const fullNameChanged = fullName !== bottle.fullName;
-  const nameChanged = bottleData.name !== bottle.name;
-  const statedAgeChanged = bottleData.statedAge !== bottle.statedAge;
-  const canonicalAlias = await upsertBottleAlias(
-    tx,
-    fullName,
-    bottle.id,
-    null,
-    {
-      assignmentSource: "canonical",
-      assignedByActorId: actorId,
-    },
-  );
-  if (canonicalAlias.bottleId && canonicalAlias.bottleId !== bottle.id) {
-    throw new BottleAlreadyExistsError(canonicalAlias.bottleId);
-  }
-  if (fullNameChanged) {
-    newAliases.push(canonicalAlias.name);
-  }
-
-  if (fullNameChanged || nameChanged || statedAgeChanged) {
-    const releases = await tx.query.bottleReleases.findMany({
-      where: eq(bottleReleases.bottleId, bottle.id),
-    });
-
-    for (const release of releases) {
-      const nextReleaseName = formatReleaseName({
-        name: bottleData.name,
-        edition: release.edition,
-        abv: release.abv,
-        statedAge: bottleData.statedAge ? null : release.statedAge,
-        releaseYear: release.releaseYear,
-        vintageYear: release.vintageYear,
-        singleCask: release.singleCask,
-        caskStrength: release.caskStrength,
-        caskFill: release.caskFill,
-        caskType: release.caskType,
-        caskSize: release.caskSize,
-      });
-      const nextReleaseFullName = formatReleaseName({
-        name: fullName,
-        edition: release.edition,
-        abv: release.abv,
-        statedAge: bottleData.statedAge ? null : release.statedAge,
-        releaseYear: release.releaseYear,
-        vintageYear: release.vintageYear,
-        singleCask: release.singleCask,
-        caskStrength: release.caskStrength,
-        caskFill: release.caskFill,
-        caskType: release.caskType,
-        caskSize: release.caskSize,
-      });
-
-      await tx
-        .update(bottleReleases)
-        .set({
-          name: nextReleaseName,
-          fullName: nextReleaseFullName,
-        })
-        .where(eq(bottleReleases.id, release.id));
-
-      const releaseAlias = await upsertBottleAlias(
-        tx,
-        nextReleaseFullName,
-        bottle.id,
-        release.id,
-        {
-          assignmentSource: "canonical",
-          assignedByActorId: actorId,
-        },
-      );
-      if (
-        releaseAlias.bottleId !== bottle.id ||
-        (releaseAlias.releaseId ?? null) !== release.id
-      ) {
-        throw new StorePriceBottleRepairBadRequestError(
-          "Release alias already belongs to a different bottle.",
-        );
-      }
-      newAliases.push(nextReleaseFullName);
-    }
-  }
-
-  const [updatedBottle] = await tx
-    .update(bottles)
-    .set({
-      name: bottleData.name,
-      fullName,
-      statedAge: bottleData.statedAge,
-      seriesId,
-      category: bottleData.category,
-      brandId: brand.id,
-      bottlerId,
-      flavorProfile: bottleData.flavorProfile,
-      edition: bottleData.edition,
-      abv: bottleData.abv,
-      singleCask: bottleData.singleCask,
-      caskStrength: bottleData.caskStrength,
-      vintageYear: bottleData.vintageYear,
-      releaseYear: bottleData.releaseYear,
-      caskSize: bottleData.caskSize,
-      caskType: bottleData.caskType,
-      caskFill: bottleData.caskFill,
-      updatedAt: sql`NOW()`,
-    })
-    .where(eq(bottles.id, bottle.id))
-    .returning();
-
-  if (!updatedBottle) {
-    throw new StorePriceBottleRepairBadRequestError(
-      "Failed to update bottle repair draft.",
-    );
-  }
-
-  if (bottle.seriesId && bottle.seriesId !== seriesId) {
-    await syncBottleSeriesCountInTransaction(tx, bottle.seriesId);
-  }
-  if (!seriesCreated && seriesId && seriesId !== bottle.seriesId) {
-    await syncBottleSeriesCountInTransaction(tx, seriesId);
-  }
-
-  await tx.insert(changes).values({
-    objectType: "bottle",
-    objectId: updatedBottle.id,
-    actorId,
-    displayName: updatedBottle.fullName,
-    type: "update",
-    data: {
-      ...bottleData,
-      distillerIds: newDistillerIds,
-      source: "price_match_review",
-    },
-  });
-
-  return {
-    bottle: updatedBottle,
-    newAliases,
-    newEntityIds: Array.from(newEntityIds),
-    seriesCreated,
-  };
-}
-
-async function finalizeStorePriceBottleRepair({
-  bottle,
-  newAliases,
-  newEntityIds,
-  seriesCreated,
-}: Awaited<ReturnType<typeof applyBottleRepairDraftInTransaction>>) {
-  try {
-    await pushUniqueJob(
-      "OnBottleChange",
-      { bottleId: bottle.id },
-      { delay: 5000 },
-    );
-  } catch (err) {
-    logError(err, {
-      bottle: {
-        id: bottle.id,
-      },
-    });
-  }
-
-  if (bottle.seriesId && seriesCreated) {
-    try {
-      await pushUniqueJob("IndexBottleSeriesSearchVectors", {
-        seriesId: bottle.seriesId,
-      });
-    } catch (err) {
-      logError(err, {
-        bottle: {
-          id: bottle.id,
-        },
-        series: {
-          id: bottle.seriesId,
-        },
-      });
-    }
-  }
-
-  for (const aliasName of newAliases) {
-    try {
-      await pushUniqueJob(
-        "OnBottleAliasChange",
-        { name: aliasName },
-        { delay: 5000 },
-      );
-    } catch (err) {
-      logError(err, {
-        bottle: {
-          id: bottle.id,
-        },
-      });
-    }
-  }
-
-  for (const entityId of newEntityIds) {
-    try {
-      await pushUniqueJob("OnEntityChange", { entityId }, { delay: 5000 });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: entityId,
-        },
-      });
-    }
-
-    try {
-      await queueEntityCreationVerification({
-        entityId,
-        creationSource: "price_match_review",
-      });
-    } catch (err) {
-      logError(err, {
-        entity: {
-          id: entityId,
-        },
-      });
-    }
-  }
 }
 
 function buildStorePriceObservationFacts(
@@ -2610,6 +2156,10 @@ export async function applyApprovedStorePriceMatch({
   await finalizeBottleAliasAssignment(aliasResult, aliasContexts);
 }
 
+/**
+ * Commits the canonical Bottle update and proposal approval atomically, then
+ * runs both retained finalizers only after that transaction commits.
+ */
 export async function applyStorePriceBottleRepairFromProposal({
   proposalId,
   user,
@@ -2621,7 +2171,7 @@ export async function applyStorePriceBottleRepairFromProposal({
   actor: IncomingBottleDecisionActor;
   expectedProcessingToken?: string;
 }) {
-  const { repairResult, aliasResult } = await db.transaction(async (tx) => {
+  const { updateManifest, aliasResult } = await db.transaction(async (tx) => {
     const proposal = await getStorePriceMatchProposalForReviewInTransaction(
       tx,
       {
@@ -2631,16 +2181,20 @@ export async function applyStorePriceBottleRepairFromProposal({
       },
     );
     const proposedBottle = getStorePriceBottleRepairDraft(proposal);
-    const repairedBottle = await applyBottleRepairDraftInTransaction(tx, {
+    const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
+      userId: user.id,
+    });
+    const updateManifest = await updateConcreteBottleInTransaction(tx, {
       bottleId: proposal.currentBottleId!,
-      proposedBottle,
+      input: buildConcreteBottleRepairInput(proposedBottle),
       user,
-      actor,
+      actorId: writeActor.id,
+      creationSource: "price_match_review",
     });
     const approvedAliasResult =
       await applyApprovedStorePriceMatchProposalInTransaction(tx, {
         proposal,
-        bottleId: repairedBottle.bottle.id,
+        bottleId: updateManifest.bottle.id,
         releaseId: null,
         reviewedById: user.id,
         decisionLog: {
@@ -2650,19 +2204,19 @@ export async function applyStorePriceBottleRepairFromProposal({
       });
 
     return {
-      repairResult: repairedBottle,
+      updateManifest,
       aliasResult: approvedAliasResult,
     };
   });
 
   await finalizeBottleAliasAssignment(aliasResult, {
     bottle: {
-      id: repairResult.bottle.id,
+      id: updateManifest.bottle.id,
     },
   });
-  await finalizeStorePriceBottleRepair(repairResult);
+  await finalizeConcreteBottleUpdate(updateManifest);
 
-  return repairResult.bottle;
+  return updateManifest.bottle;
 }
 
 export async function ignoreStorePriceMatchProposal({

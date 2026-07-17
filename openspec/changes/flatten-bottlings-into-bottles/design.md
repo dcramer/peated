@@ -174,7 +174,21 @@ choices from BottleGroup ownership; ordinary exact Bottle reads remain
 independent and do not hydrate the group. Task 5.3b separately composes
 moderator price-match correction approval with the canonical update
 transaction and removes the superseded proposal-specific updater in the same
-transactional slice.
+transactional slice. Until task 5.7 introduces target-aware proposal actions,
+the legacy `proposedBottle` repair draft retains its sparse parent/stable
+meaning: required name and brand, non-null series, category, stable stated age,
+and bottler, and non-empty distillers are shared intent; non-null edition, ABV,
+flags, years, and canonical cask fields are exact intent for the selected
+Bottle. Null fields and empty distiller lists remain omitted rather than
+clearing catalog facts.
+
+Correction approval and the canonical concrete update commit in one database
+transaction. The canonical post-commit finalizer runs only after that combined
+transaction succeeds, while the retained price-listing alias finalizer remains
+proposal orchestration. The correction route keeps its Bottle response for the
+live moderation UI, but performs no direct Bottle or BottleRelease update or
+name rewrite. Task 5.7 owns the later target-aware action, result, and explicit
+exact-age proposal contracts.
 
 ### Series remains a broader merchandising relationship
 

@@ -128,6 +128,10 @@ Target-bearing consumer routes:
 Classifier, price matching, and moderation routes:
 
 - `apps/server/src/orpc/routes/admin/incoming-bottle-decisions.ts`
+- `apps/server/src/orpc/routes/prices/matchQueue/apply-bottle-repair.ts` is the
+  task 5.3b thin moderator adapter. It retains the Bottle response consumed by
+  the live queue UI while the price-match service composes proposal approval
+  with the canonical concrete update transaction.
 - `apps/server/src/orpc/routes/prices/matchQueue/create-bottle.ts`
 - `apps/server/src/orpc/routes/prices/matchQueue/resolve.ts`
 - `apps/server/src/orpc/routes/prices/matchQueue/utils.ts`
@@ -215,7 +219,15 @@ Classifier decisions and price matching:
 - `apps/server/src/lib/incomingBottleDecisionLog.ts`
 - `apps/server/src/lib/priceMatchingAutomation.ts`
 - `apps/server/src/lib/priceMatchingDraftNormalization.ts`
-- `apps/server/src/lib/priceMatchingProposals.ts`
+- `apps/server/src/lib/priceMatchingProposals.ts` retains proposal validation,
+  approval, price assignment, decision logging, observations, and listing-alias
+  orchestration. Its task 5.3b correction composer maps the sparse legacy
+  parent/stable draft to canonical shared and exact patches and invokes the
+  transaction-scoped concrete update service. The superseded proposal-specific
+  updater, including its direct entity, series, distiller, Bottle,
+  BottleRelease-name, audit, and post-commit writes, is removed rather than
+  retained as a second business system. Release creation elsewhere in this
+  service remains until tasks 5.7 and 9.7.
 - `apps/server/src/lib/pendingUploads.ts`
 
 ## Workers and queue payloads

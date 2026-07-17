@@ -1,11 +1,14 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroupDistillers,
+  bottleGroups,
   bottleObservations,
   bottleReleases,
   bottleSeries,
   bottles,
   bottlesToDistillers,
+  catalogTargets,
   changes,
   incomingBottleDecisionLogs,
   reviews,
@@ -19,7 +22,7 @@ import type * as catalogVerificationModule from "@peated/server/lib/catalogVerif
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -53,6 +56,14 @@ describe("price match queue", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+
+    const applyError = await waitError(
+      routerClient.prices.matchQueue.applyBottleRepair(
+        { proposal: 1 },
+        { context: { user } },
+      ),
+    );
+    expect(applyError).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("lists pending and errored proposals", async ({ fixtures }) => {
@@ -543,16 +554,44 @@ describe("price match queue", () => {
       name: "Bodega Cask",
       seriesId: sourceSeries.id,
       category: "blend",
+      statedAge: 12,
+      bottlerId: brand.id,
       edition: "Port Pipe",
       abv: 46,
       caskStrength: true,
       releaseYear: 2020,
-      distillerIds: [],
+      distillerIds: [distillery.id],
+    });
+    const siblingTarget = await routerClient.bottles.createFromSource(
+      {
+        bottle: currentBottle.id,
+        edition: "Batch 2",
+        statedAge: 14,
+        abv: 50,
+        caskStrength: true,
+        releaseYear: 2021,
+      },
+      { context: { user } },
+    );
+    const siblingId = siblingTarget.bottle.id;
+    const legacyRelease = await fixtures.BottleRelease({
+      bottleId: currentBottle.id,
+      edition: "Legacy Child",
+      abv: 43,
     });
     await db
       .update(bottleSeries)
-      .set({ numReleases: 1 })
+      .set({ numReleases: 2 })
       .where(eq(bottleSeries.id, sourceSeries.id));
+    const targetsBefore = await db
+      .select({
+        id: catalogTargets.id,
+        bottleId: catalogTargets.bottleId,
+        groupId: catalogTargets.groupId,
+      })
+      .from(catalogTargets)
+      .where(eq(catalogTargets.groupId, currentBottle.groupId!))
+      .orderBy(asc(catalogTargets.id));
     const price = await fixtures.StorePrice({
       externalSiteId: site.id,
       name: "The Whistler Bodega Cask Single Malt Irish Whiskey",
@@ -608,7 +647,7 @@ describe("price match queue", () => {
           cask_fill: null,
           cask_strength: null,
           single_cask: null,
-          edition: null,
+          edition: "Bodega Review",
         },
         proposedBottle: {
           name: "Bodega Cask",
@@ -617,11 +656,11 @@ describe("price match queue", () => {
             name: targetSeries.name,
           },
           category: "single_malt",
-          edition: null,
+          edition: "Bodega Review",
           statedAge: null,
-          caskStrength: null,
+          caskStrength: false,
           singleCask: null,
-          abv: null,
+          abv: 0,
           vintageYear: null,
           releaseYear: null,
           caskType: null,
@@ -631,12 +670,7 @@ describe("price match queue", () => {
             id: brand.id,
             name: "The Whistler",
           },
-          distillers: [
-            {
-              id: distillery.id,
-              name: "Boann Distillery",
-            },
-          ],
+          distillers: [],
           bottler: null,
         },
         rationale:
@@ -652,6 +686,9 @@ describe("price match queue", () => {
     expect(result).toMatchObject({
       id: currentBottle.id,
       category: "single_malt",
+      edition: "Bodega Review",
+      abv: 0,
+      caskStrength: false,
       distillers: [
         {
           id: distillery.id,
@@ -661,15 +698,27 @@ describe("price match queue", () => {
     });
 
     const [
+      updatedGroup,
       updatedBottle,
+      updatedSibling,
       updatedPrice,
       updatedProposal,
-      distillerRows,
+      memberDistillerRows,
+      groupDistillerRows,
       updatedSourceSeries,
       updatedTargetSeries,
+      updatedLegacyRelease,
+      targetsAfter,
+      repairChanges,
     ] = await Promise.all([
+      db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, currentBottle.groupId!),
+      }),
       db.query.bottles.findFirst({
         where: eq(bottles.id, currentBottle.id),
+      }),
+      db.query.bottles.findFirst({
+        where: eq(bottles.id, siblingId),
       }),
       db.query.storePrices.findFirst({
         where: eq(storePrices.id, price.id),
@@ -677,8 +726,18 @@ describe("price match queue", () => {
       db.query.storePriceMatchProposals.findFirst({
         where: eq(storePriceMatchProposals.id, proposal.id),
       }),
-      db.query.bottlesToDistillers.findMany({
-        where: eq(bottlesToDistillers.bottleId, currentBottle.id),
+      db
+        .select()
+        .from(bottlesToDistillers)
+        .where(
+          inArray(bottlesToDistillers.bottleId, [currentBottle.id, siblingId]),
+        )
+        .orderBy(
+          asc(bottlesToDistillers.bottleId),
+          asc(bottlesToDistillers.distillerId),
+        ),
+      db.query.bottleGroupDistillers.findMany({
+        where: eq(bottleGroupDistillers.groupId, currentBottle.groupId!),
       }),
       db.query.bottleSeries.findFirst({
         where: eq(bottleSeries.id, sourceSeries.id),
@@ -686,16 +745,62 @@ describe("price match queue", () => {
       db.query.bottleSeries.findFirst({
         where: eq(bottleSeries.id, targetSeries.id),
       }),
+      db.query.bottleReleases.findFirst({
+        where: eq(bottleReleases.id, legacyRelease.id),
+      }),
+      db
+        .select({
+          id: catalogTargets.id,
+          bottleId: catalogTargets.bottleId,
+          groupId: catalogTargets.groupId,
+        })
+        .from(catalogTargets)
+        .where(eq(catalogTargets.groupId, currentBottle.groupId!))
+        .orderBy(asc(catalogTargets.id)),
+      db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "bottle"),
+            eq(changes.type, "update"),
+            inArray(changes.objectId, [currentBottle.id, siblingId]),
+          ),
+        )
+        .orderBy(asc(changes.objectId)),
     ]);
 
-    expect(updatedBottle).toMatchObject({
-      id: currentBottle.id,
+    expect(updatedGroup).toMatchObject({
+      id: currentBottle.groupId,
+      name: "Bodega Cask",
       seriesId: targetSeries.id,
       category: "single_malt",
-      edition: "Port Pipe",
-      abv: 46,
-      caskStrength: true,
+      statedAge: 12,
+      bottlerId: brand.id,
+    });
+    expect(updatedBottle).toMatchObject({
+      id: currentBottle.id,
+      groupId: currentBottle.groupId,
+      seriesId: targetSeries.id,
+      category: "single_malt",
+      statedAge: 12,
+      bottlerId: brand.id,
+      edition: "Bodega Review",
+      abv: 0,
+      caskStrength: false,
       releaseYear: 2020,
+    });
+    expect(updatedSibling).toMatchObject({
+      id: siblingId,
+      groupId: currentBottle.groupId,
+      seriesId: targetSeries.id,
+      category: "single_malt",
+      statedAge: 14,
+      bottlerId: brand.id,
+      edition: "Batch 2",
+      abv: 50,
+      caskStrength: true,
+      releaseYear: 2021,
     });
     expect(updatedPrice).toMatchObject({
       bottleId: currentBottle.id,
@@ -708,20 +813,48 @@ describe("price match queue", () => {
       suggestedBottleId: currentBottle.id,
       reviewedById: user.id,
     });
-    expect(distillerRows.map((row) => row.distillerId)).toEqual([
+    expect(memberDistillerRows).toEqual([
+      expect.objectContaining({
+        bottleId: currentBottle.id,
+        distillerId: distillery.id,
+      }),
+      expect.objectContaining({
+        bottleId: siblingId,
+        distillerId: distillery.id,
+      }),
+    ]);
+    expect(groupDistillerRows.map((row) => row.distillerId)).toEqual([
       distillery.id,
     ]);
     expect(updatedSourceSeries?.numReleases).toEqual(0);
-    expect(updatedTargetSeries?.numReleases).toEqual(1);
+    expect(updatedTargetSeries?.numReleases).toEqual(2);
+    expect(updatedLegacyRelease).toEqual(legacyRelease);
+    expect(targetsAfter).toEqual(targetsBefore);
 
-    const repairChange = await db.query.changes.findFirst({
-      where: and(
-        eq(changes.objectType, "bottle"),
-        eq(changes.objectId, currentBottle.id),
-        eq(changes.type, "update"),
-      ),
-    });
-    expect(repairChange?.actorId).toBe((await getUserActor(user)).id);
+    const actorId = (await getUserActor(user)).id;
+    expect(repairChanges).toHaveLength(2);
+    expect(repairChanges).toEqual([
+      expect.objectContaining({
+        objectId: currentBottle.id,
+        actorId,
+        data: expect.objectContaining({
+          creationSource: "price_match_review",
+          updateScope: "mixed",
+          groupId: currentBottle.groupId,
+          requestedBottleId: currentBottle.id,
+        }),
+      }),
+      expect.objectContaining({
+        objectId: siblingId,
+        actorId,
+        data: expect.objectContaining({
+          creationSource: "price_match_review",
+          updateScope: "shared",
+          groupId: currentBottle.groupId,
+          requestedBottleId: currentBottle.id,
+        }),
+      }),
+    ]);
 
     const observation = await db.query.bottleObservations.findFirst({
       where: (bottleObservations, { eq }) =>
@@ -737,11 +870,146 @@ describe("price match queue", () => {
         }),
       }),
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "OnBottleChange",
-      { bottleId: currentBottle.id },
-      { delay: 5000 },
+  });
+
+  test("rolls back the repair and proposal approval when shared fanout conflicts", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const brand = await fixtures.Entity({
+      name: "Repair Collision Brand",
+      type: ["brand"],
+    });
+    const selected = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Repair Collision Source",
+      category: "blend",
+    });
+    const sibling = await routerClient.bottles.createFromSource(
+      { bottle: selected.id, edition: "Batch 2", abv: 50 },
+      { context: { user } },
     );
+    const conflicting = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "External Conflict Owner",
+    });
+    await fixtures.BottleAlias({
+      bottleId: conflicting.id,
+      name: sibling.bottle.fullName.replace(
+        "Repair Collision Source",
+        "Repair Collision Target",
+      ),
+    });
+    const price = await fixtures.StorePrice({
+      externalSiteId: site.id,
+      name: "Repair Collision Listing",
+      bottleId: selected.id,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "correction",
+        currentBottleId: selected.id,
+        suggestedBottleId: selected.id,
+        proposedBottle: {
+          name: "Repair Collision Target",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
+          brand: { id: brand.id, name: brand.name },
+          distillers: [],
+          bottler: null,
+        },
+      })
+      .returning();
+
+    const memberIds = [selected.id, sibling.bottle.id];
+    const [groupBefore, membersBefore, aliasesBefore] = await Promise.all([
+      db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, selected.groupId!),
+      }),
+      db
+        .select()
+        .from(bottles)
+        .where(inArray(bottles.id, memberIds))
+        .orderBy(asc(bottles.id)),
+      db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
+    ]);
+
+    const error = await waitError(
+      routerClient.prices.matchQueue.applyBottleRepair(
+        { proposal: proposal.id },
+        { context: { user } },
+      ),
+    );
+    expect(error).toMatchObject({
+      status: 409,
+      data: { bottle: conflicting.id },
+    });
+
+    const [
+      groupAfter,
+      membersAfter,
+      aliasesAfter,
+      proposalAfter,
+      priceAfter,
+      observation,
+      repairChanges,
+    ] = await Promise.all([
+      db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, selected.groupId!),
+      }),
+      db
+        .select()
+        .from(bottles)
+        .where(inArray(bottles.id, memberIds))
+        .orderBy(asc(bottles.id)),
+      db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+      db.query.bottleObservations.findFirst({
+        where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+      }),
+      db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "bottle"),
+            eq(changes.type, "update"),
+            inArray(changes.objectId, memberIds),
+          ),
+        ),
+    ]);
+
+    expect(groupAfter).toEqual(groupBefore);
+    expect(membersAfter).toEqual(membersBefore);
+    expect(aliasesAfter).toEqual(aliasesBefore);
+    expect(proposalAfter).toMatchObject({
+      status: "pending_review",
+      reviewedById: null,
+      reviewedAt: null,
+    });
+    expect(priceAfter).toMatchObject({
+      bottleId: selected.id,
+      releaseId: null,
+    });
+    expect(observation).toBeUndefined();
+    expect(repairChanges).toEqual([]);
   });
 
   test("filters queue items by kind and orders ties by newest id", async ({

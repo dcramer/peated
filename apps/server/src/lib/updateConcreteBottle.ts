@@ -9,6 +9,7 @@ import {
   normalizeBottleAliasKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
+import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type {
   Bottle,
@@ -100,13 +101,15 @@ export type ConcreteBottleUpdateResult = {
   changed: boolean;
 };
 
-type ConcreteBottleUpdateTransactionResult = ConcreteBottleUpdateResult & {
-  changedBottleIds: number[];
-  changedAliasNames: string[];
-  changedEntityIds: number[];
-  newEntityIds: number[];
-  affectedSeriesIds: number[];
-};
+export type ConcreteBottleUpdateFinalizationManifest =
+  ConcreteBottleUpdateResult & {
+    creationSource: CatalogVerificationCreationSource;
+    changedBottleIds: number[];
+    changedAliasNames: string[];
+    changedEntityIds: number[];
+    newEntityIds: number[];
+    affectedSeriesIds: number[];
+  };
 
 type DesiredBottle = Pick<
   Bottle,
@@ -332,6 +335,7 @@ async function resolveStableState(
     currentDistillerIds,
     actorId,
     user,
+    creationSource,
     changedEntityIds,
     newEntityIds,
   }: {
@@ -340,6 +344,7 @@ async function resolveStableState(
     currentDistillerIds: number[];
     actorId: number;
     user: User;
+    creationSource: CatalogVerificationCreationSource;
     changedEntityIds: Set<number>;
     newEntityIds: Set<number>;
   },
@@ -369,7 +374,7 @@ async function resolveStableState(
     const result = await upsertEntity({
       db: tx,
       data: coerceToUpsert(patch.brand),
-      creationSource: "manual_entry",
+      creationSource,
       userId: user.id,
       createdByActorId: actorId,
       type: "brand",
@@ -396,7 +401,7 @@ async function resolveStableState(
     const result = await upsertEntity({
       db: tx,
       data: coerceToUpsert(patch.bottler),
-      creationSource: "manual_entry",
+      creationSource,
       userId: user.id,
       createdByActorId: actorId,
       type: "bottler",
@@ -426,7 +431,7 @@ async function resolveStableState(
       const result = await upsertEntity({
         db: tx,
         data: coerceToUpsert(choice),
-        creationSource: "manual_entry",
+        creationSource,
         userId: user.id,
         createdByActorId: actorId,
         type: "distiller",
@@ -535,11 +540,13 @@ function stableDiff(group: BottleGroup, stable: StableState) {
 function emptyResult(
   bottle: Bottle,
   group: BottleGroup,
-): ConcreteBottleUpdateTransactionResult {
+  creationSource: CatalogVerificationCreationSource,
+): ConcreteBottleUpdateFinalizationManifest {
   return {
     bottle,
     group,
     changed: false,
+    creationSource,
     changedBottleIds: [],
     changedAliasNames: [],
     changedEntityIds: [],
@@ -548,21 +555,27 @@ function emptyResult(
   };
 }
 
-/** Performs the complete locked concrete Bottle update transaction. */
-async function updateConcreteBottleInTransaction(
+/**
+ * Performs the complete locked concrete Bottle update transaction. The caller
+ * must finalize the returned manifest only after its outermost transaction
+ * commits.
+ */
+export async function updateConcreteBottleInTransaction(
   tx: AnyTransaction,
   {
     bottleId,
     input,
-    context,
+    user,
     actorId,
+    creationSource,
   }: {
     bottleId: number;
     input: ConcreteBottleUpdateInput;
-    context: Context & { user: User };
+    user: User;
     actorId: number;
+    creationSource: CatalogVerificationCreationSource;
   },
-): Promise<ConcreteBottleUpdateTransactionResult> {
+): Promise<ConcreteBottleUpdateFinalizationManifest> {
   const [discoveredBottle] = await tx
     .select({ id: bottles.id, groupId: bottles.groupId })
     .from(bottles)
@@ -695,7 +708,7 @@ async function updateConcreteBottleInTransaction(
   }
 
   if (!sharedIntent && !exactIntent) {
-    return emptyResult(lockedBottle, group);
+    return emptyResult(lockedBottle, group, creationSource);
   }
 
   const currentGroupDistillers = await tx
@@ -713,7 +726,8 @@ async function updateConcreteBottleInTransaction(
     patch: sharedIntent ? input.shared : undefined,
     currentDistillerIds: currentGroupDistillerIds,
     actorId,
-    user: context.user,
+    user,
+    creationSource,
     changedEntityIds,
     newEntityIds,
   });
@@ -797,7 +811,7 @@ async function updateConcreteBottleInTransaction(
     Object.keys(bottleDiff(selectedSharedDesired, selectedDesired)).length > 0;
 
   if (!sharedChanged && !exactChanged) {
-    return emptyResult(lockedBottle, group);
+    return emptyResult(lockedBottle, group, creationSource);
   }
 
   const affectedMembers = sharedChanged
@@ -933,6 +947,7 @@ async function updateConcreteBottleInTransaction(
       data: {
         ...bottleDiff(member, desired),
         updateScope,
+        creationSource,
         groupId,
         requestedBottleId: bottleId,
         distillerIds: sharedChanged
@@ -973,6 +988,7 @@ async function updateConcreteBottleInTransaction(
     bottle: updatedBottles.get(bottleId)!,
     group: persistedGroup,
     changed: true,
+    creationSource,
     changedBottleIds: affectedIds,
     changedAliasNames,
     changedEntityIds: Array.from(changedEntityIds).sort(
@@ -983,9 +999,9 @@ async function updateConcreteBottleInTransaction(
   };
 }
 
-/** Dispatches idempotent update work only after the database transaction commits. */
-async function finalizeUpdatedConcreteBottle(
-  result: ConcreteBottleUpdateTransactionResult,
+/** Dispatches idempotent update work only after the outer transaction commits. */
+export async function finalizeConcreteBottleUpdate(
+  result: ConcreteBottleUpdateFinalizationManifest,
 ) {
   for (const bottleId of result.changedBottleIds) {
     try {
@@ -1015,7 +1031,7 @@ async function finalizeUpdatedConcreteBottle(
     try {
       await queueEntityCreationVerification({
         entityId,
-        creationSource: "manual_entry",
+        creationSource: result.creationSource,
       });
     } catch (error) {
       logError(error, { entity: { id: entityId } });
@@ -1055,11 +1071,12 @@ export async function updateConcreteBottle({
     updateConcreteBottleInTransaction(tx, {
       bottleId,
       input,
-      context: { ...context, user },
+      user,
       actorId: actor.id,
+      creationSource: "manual_entry",
     }),
   );
-  await finalizeUpdatedConcreteBottle(result);
+  await finalizeConcreteBottleUpdate(result);
   return {
     bottle: result.bottle,
     group: result.group,
