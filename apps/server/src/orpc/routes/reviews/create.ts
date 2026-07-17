@@ -10,6 +10,12 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  isStagedTargetlessCatalogMappingError,
+  lockCatalogTargetAssignmentDescriptorInTransaction,
+  resolveCatalogTargetForAssignment,
+  type CatalogTargetAssignmentDescriptor,
+} from "@peated/server/lib/catalogTargets";
 import { mapRows } from "@peated/server/lib/db";
 import {
   getIncomingBottleDecisionFromResolutionSource,
@@ -90,32 +96,113 @@ export default procedure
     );
 
     const { review, aliasAssignment } = await db.transaction(async (tx) => {
-      const existingReview =
-        (await tx.query.reviews.findFirst({
-          where: and(
-            eq(reviews.externalSiteId, site.id),
-            eq(reviews.url, input.url),
-          ),
-        })) ??
-        (await tx.query.reviews.findFirst({
-          where: and(
-            eq(reviews.externalSiteId, site.id),
-            eq(reviews.issue, input.issue),
-            or(
-              ...reviewNameCandidates.map((name) =>
-                eq(sql`LOWER(${reviews.name})`, name),
+      let target: CatalogTargetAssignmentDescriptor | null = null;
+      if (bottleId !== null && resolution.source === "exact_alias") {
+        if (resolution.targetId !== null) {
+          target = await resolveCatalogTargetForAssignment(
+            { kind: "target", targetId: resolution.targetId },
+            tx,
+          );
+        } else {
+          try {
+            target = await resolveCatalogTargetForAssignment(
+              {
+                kind: "legacy",
+                bottleId,
+                releaseId,
+                context: {
+                  caller: "reviews.create",
+                  operation: "reuseTargetlessExactReviewAlias",
+                },
+              },
+              tx,
+            );
+          } catch (error) {
+            if (!isStagedTargetlessCatalogMappingError(error)) throw error;
+          }
+        }
+      } else if (
+        bottleId !== null &&
+        (resolution.source === "classifier_match" ||
+          resolution.source === "classifier_create_bottle" ||
+          resolution.source === "classifier_create_release" ||
+          resolution.source === "classifier_create_bottle_and_release")
+      ) {
+        try {
+          target = await resolveCatalogTargetForAssignment(
+            {
+              kind: "legacy",
+              bottleId,
+              releaseId,
+              context: {
+                caller: "reviews.create",
+                operation: "create",
+              },
+            },
+            tx,
+          );
+        } catch (error) {
+          if (
+            resolution.source === "classifier_match" ||
+            !isStagedTargetlessCatalogMappingError(error)
+          ) {
+            throw error;
+          }
+        }
+      }
+      if (target) {
+        await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+      }
+
+      // Preserve or replace identity only from the Review version locked after
+      // the catalog target, keeping the catalog-before-consumer lock order.
+      let [existingReview] = await tx
+        .select()
+        .from(reviews)
+        .where(
+          and(eq(reviews.externalSiteId, site.id), eq(reviews.url, input.url)),
+        )
+        .limit(1)
+        .for("update");
+      if (!existingReview) {
+        [existingReview] = await tx
+          .select()
+          .from(reviews)
+          .where(
+            and(
+              eq(reviews.externalSiteId, site.id),
+              eq(reviews.issue, input.issue),
+              or(
+                ...reviewNameCandidates.map((name) =>
+                  eq(sql`LOWER(${reviews.name})`, name),
+                ),
               ),
             ),
-          ),
-        }));
+          )
+          .limit(1)
+          .for("update");
+      }
 
       let review;
       if (existingReview) {
+        const incomingIdentityIsAuthoritative =
+          target !== null ||
+          (bottleId !== null && existingReview.targetId === null);
+        const identity = incomingIdentityIsAuthoritative
+          ? {
+              targetId: target?.targetId ?? null,
+              bottleId,
+              releaseId,
+            }
+          : {
+              targetId: existingReview.targetId,
+              bottleId: existingReview.bottleId,
+              releaseId: existingReview.releaseId,
+            };
         [review] = await tx
           .update(reviews)
           .set({
-            bottleId: bottleId ?? existingReview.bottleId,
-            releaseId: releaseId ?? existingReview.releaseId,
+            ...identity,
             name: reviewName,
             rating: input.rating,
             url: input.url,
@@ -125,12 +212,30 @@ export default procedure
           .returning();
       } else {
         const { rows } = await tx.execute(
-          sql`INSERT INTO ${reviews} (bottle_id, release_id, external_site_id, name, issue, rating, url)
-              VALUES (${bottleId}, ${releaseId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
+          // Every CASE uses the same authority test so conflict handling either
+          // selects or preserves the complete target/Bottle/Release tuple.
+          sql`INSERT INTO ${reviews} (target_id, bottle_id, release_id, external_site_id, name, issue, rating, url)
+              VALUES (${target?.targetId ?? null}, ${bottleId}, ${releaseId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
               ON CONFLICT (external_site_id, LOWER(name), issue)
               DO UPDATE
-              SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
-                  release_id = COALESCE(excluded.release_id, ${reviews.releaseId}),
+              SET target_id = CASE
+                    WHEN excluded.target_id IS NOT NULL
+                      OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
+                    THEN excluded.target_id
+                    ELSE ${reviews.targetId}
+                  END,
+                  bottle_id = CASE
+                    WHEN excluded.target_id IS NOT NULL
+                      OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
+                    THEN excluded.bottle_id
+                    ELSE ${reviews.bottleId}
+                  END,
+                  release_id = CASE
+                    WHEN excluded.target_id IS NOT NULL
+                      OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
+                    THEN excluded.release_id
+                    ELSE ${reviews.releaseId}
+                  END,
                   rating = excluded.rating,
                   url = excluded.url,
                   updated_at = NOW()
@@ -140,35 +245,47 @@ export default procedure
         [review] = mapRows(rows, reviews);
       }
 
-      if (!bottleId) return { review, aliasAssignment: null };
+      const appliedIncomingIdentity =
+        review.targetId === (target?.targetId ?? null) &&
+        review.bottleId === bottleId &&
+        review.releaseId === releaseId;
+      if (!bottleId || !appliedIncomingIdentity) {
+        return { review, aliasAssignment: null };
+      }
 
-      const aliasAssignment =
-        resolution.source !== "exact_alias"
-          ? await assignBottleAliasInTransaction(tx, {
-              bottleId,
-              releaseId,
+      const assignmentSource =
+        resolution.source === "exact_alias"
+          ? undefined
+          : ("classifier_approved" as const);
+      const aliasAssignment = await assignBottleAliasInTransaction(
+        tx,
+        target
+          ? {
+              target,
+              consumerIdentity: { bottleId, releaseId },
               name: aliasKey,
               backfillNames: [reviewName, rawName],
               externalSiteId: site.id,
-              assignmentSource: "classifier_approved",
+              assignmentSource,
               assignedByActorId: systemActor.id,
-              context: {
-                caller: "reviews.create",
-                operation: "assignResolvedReviewAlias",
-              },
-            })
-          : await assignBottleAliasInTransaction(tx, {
+            }
+          : {
               bottleId,
               releaseId,
+              context: {
+                caller: "reviews.create",
+                operation:
+                  resolution.source === "exact_alias"
+                    ? "reuseExactReviewAlias"
+                    : "assignResolvedReviewAlias",
+              },
               name: aliasKey,
               backfillNames: [reviewName, rawName],
               externalSiteId: site.id,
+              assignmentSource,
               assignedByActorId: systemActor.id,
-              context: {
-                caller: "reviews.create",
-                operation: "reuseExactReviewAlias",
-              },
-            });
+            },
+      );
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,

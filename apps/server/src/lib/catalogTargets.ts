@@ -82,6 +82,30 @@ export class CatalogTargetInvalidMappingError extends CatalogTargetResolutionErr
   }
 }
 
+type StagedTargetlessCatalogMappingReason =
+  | "LEGACY_PARENT_WITHOUT_GROUP"
+  | "RELEASE_WITHOUT_COMPLETED_PROMOTION";
+
+class StagedTargetlessCatalogMappingError extends CatalogTargetInvalidMappingError {
+  constructor(
+    bottleId: number,
+    releaseId: number | null,
+    readonly stagedReason: StagedTargetlessCatalogMappingReason,
+    reason: string,
+  ) {
+    super(bottleId, releaseId, reason);
+  }
+}
+
+/** Identifies only migration states that may temporarily retain a null target. */
+export function isStagedTargetlessCatalogMappingError(error: unknown): boolean {
+  return (
+    error instanceof StagedTargetlessCatalogMappingError &&
+    (error.stagedReason === "LEGACY_PARENT_WITHOUT_GROUP" ||
+      error.stagedReason === "RELEASE_WITHOUT_COMPLETED_PROMOTION")
+  );
+}
+
 export class CatalogTargetIntegrityMismatchError extends CatalogTargetResolutionError {
   constructor(
     readonly identity: CatalogTargetIdentity,
@@ -606,9 +630,10 @@ async function findLegacyTargetUsing<
       promotion.status !== "promoted" ||
       promotion.promotedBottleId === null
     ) {
-      throw new CatalogTargetInvalidMappingError(
+      throw new StagedTargetlessCatalogMappingError(
         reference.bottleId,
         reference.releaseId,
+        "RELEASE_WITHOUT_COMPLETED_PROMOTION",
         "the release does not have a completed promotion mapping",
       );
     }
@@ -664,9 +689,10 @@ async function findLegacyTargetUsing<
     throw new CatalogTargetNotFoundError({ bottleId: reference.bottleId });
   }
   if (parent.groupId === null) {
-    throw new CatalogTargetInvalidMappingError(
+    throw new StagedTargetlessCatalogMappingError(
       reference.bottleId,
       null,
+      "LEGACY_PARENT_WITHOUT_GROUP",
       "the legacy parent has not been assigned to a BottleGroup",
     );
   }

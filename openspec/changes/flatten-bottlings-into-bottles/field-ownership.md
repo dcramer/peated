@@ -80,6 +80,29 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Classifier-created unresolved reviews remain targetless until tasks 5.8/5.9
   can produce a valid concrete target; task 5.6b does not invent an exact
   Bottle for them.
+- Task 5.6c makes a known direct Review create/update intent resolve one
+  CatalogTarget descriptor and revalidate/lock it before mutating the Review.
+  The complete `{ targetId, bottleId, releaseId }` tuple is written atomically,
+  the descriptor is authoritative over the retained compatibility pair, and
+  any applicable alias assignment uses the same target. Generic Review intent
+  never selects the representative Bottle.
+- Review create/upsert treats that identity tuple as one unit. A genuinely
+  unresolved or targetless current result cannot downgrade or partially mix
+  with an existing durable target. When an existing different complete tuple
+  wins the conflict, the rejected incoming identity owns no alias creation or
+  reassignment and no decision evidence. A known mapped resolution failure is
+  an error, while classifier-created unpromoted and genuinely unresolved
+  references remain explicitly targetless until tasks 5.8/5.9.
+- Direct Review update snapshots the Review identity, resolves and locks the
+  authoritative CatalogTarget first when one applies, and then locks the
+  Review. It accepts the mutation only when the locked identity tuple still
+  matches the snapshot;
+  otherwise it rolls back and retries a bounded number of times from a fresh
+  snapshot. Explicitly clearing the association clears all three identity
+  fields; identity correction validates one complete replacement tuple; and a
+  non-identity update preserves a durable target. Only a currently targetless
+  Review may be measured-repaired from its retained pair, and an unresolvable
+  staged legacy row remains targetless.
 - Exact alias lookup returns the Bottle of a non-null exact target. A generic
   target returns no Bottle, and only a null-target legacy alias may use the
   measured pair fallback retained until task 9.7.

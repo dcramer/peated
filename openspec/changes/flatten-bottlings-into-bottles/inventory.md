@@ -155,10 +155,28 @@ Target-bearing consumer routes:
 - `apps/server/src/orpc/routes/collections/bottles/imageHelpers.ts`
 - `apps/server/src/orpc/routes/collections/bottles/list.ts`
 - `apps/server/src/orpc/routes/reviews/create.ts` is a direct user/API Review
-  writer assigned to task 5.6c. Shared alias-driven Review propagation remains
-  task 5.6b.
+  writer assigned to task 5.6c. For known exact or generic intent it resolves
+  one descriptor, locks/revalidates it before Review mutation, writes the
+  complete target and retained-pair tuple atomically, and supplies the same
+  target to applicable alias assignment. Its conflict/upsert cannot downgrade
+  an existing durable target with an unresolved current result or mix identity
+  fields from different decisions. If an existing different complete tuple wins
+  the conflict, the route neither creates nor reassigns an alias and records no
+  decision evidence for the rejected incoming identity. Known mapped resolution
+  failures are errors; genuinely unresolved and classifier-created unpromoted
+  references remain explicitly targetless until tasks 5.8/5.9. Shared
+  alias-driven Review propagation remains task 5.6b.
 - `apps/server/src/orpc/routes/reviews/list.ts`
-- `apps/server/src/orpc/routes/reviews/update.ts`
+- `apps/server/src/orpc/routes/reviews/update.ts` is the task 5.6c direct Review
+  mutation boundary. It snapshots Review identity, resolves and locks the
+  authoritative CatalogTarget first when one applies, and then locks the
+  Review. It writes only when the locked tuple matches that snapshot; a
+  mismatch rolls back and causes a bounded retry from a fresh snapshot. It
+  clears `targetId` and the retained pair together for an explicit association
+  clear, validates and writes a complete tuple for identity correction, and
+  preserves a durable target for non-identity updates. Only a currently null
+  target may be measured-repaired from its retained pair; an unresolvable
+  staged legacy row remains targetless. Review reads remain task 7.3.
 - `apps/server/src/orpc/routes/flights/create.ts` and
   `apps/server/src/orpc/routes/flights/update.ts` are direct Flight membership
   writers assigned to task 5.6e.
@@ -248,6 +266,13 @@ Catalog identity, aliases, search, creation, and updates:
   Durable `targetId` values are authoritative; the measured legacy pair is used
   only when a compatibility row has no target. Retain that legacy branch
   through the task 9.5 read window and remove it under task 9.7.
+  Task 5.6c uses this boundary once for direct Review exact or generic intent,
+  then revalidates and locks that descriptor before locking and mutating the
+  Review. Review update accepts the mutation only when its subsequently locked
+  identity still matches the snapshot used for resolution; otherwise it rolls
+  back and retries from a fresh snapshot. A durable target is never reconstructed
+  from the retained pair; only a null-target Review may use the measured pair for
+  compatibility repair, without substituting a group representative.
 - `apps/server/src/lib/bottleAliases.ts` is the task 5.5a canonical assignment
   owner for the exact/moderator alias path. An explicit exact target is validated
   and stored. Its measured targetless compatibility mode does not resolve a

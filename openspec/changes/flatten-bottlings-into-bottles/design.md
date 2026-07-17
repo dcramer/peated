@@ -607,6 +607,50 @@ boundaries in tasks 5.6c-5.6f. Create-new price approval remains tasks 5.7 and
 section 6 backfill. These boundaries keep task 5.6b from silently widening into
 a direct writer, read, classifier, creation, or migration cutover.
 
+### Direct Review mutations dual-write one validated target
+
+Task 5.6c moves only the direct user/API Review create and update paths to
+CatalogTarget dual writes. When the orchestration has known exact or generic
+intent, it resolves one `CatalogTargetAssignmentDescriptor`, revalidates and
+locks that identity before the Review mutation, and writes the complete
+`{ targetId, bottleId, releaseId }` tuple atomically. The descriptor is the
+semantic authority; the retained pair is migration compatibility. Generic
+intent stays on the BottleGroup target and never selects the representative or
+another member Bottle merely to populate the pair. Any applicable alias
+assignment receives the same target instead of performing a second semantic
+resolution. Failure to validate a known mapped match is an error and cannot be
+reclassified as targetless compatibility.
+
+Review creation's conflict/upsert behavior treats identity as one unit. A
+genuinely unresolved or targetless current reference cannot overwrite, clear,
+or partially mix with an existing durable target tuple. Classifier-created
+unpromoted Bottle/BottleRelease references and genuinely unresolved references
+remain explicitly targetless until tasks 5.8/5.9 can create valid concrete
+targets; this exception does not permit arbitrary target selection. When an
+existing different complete identity wins the upsert conflict, the incoming
+identity is rejected as a unit: creation neither creates nor reassigns an alias
+and records no decision evidence for that rejected identity.
+
+Review update takes a Review identity snapshot, resolves and locks the
+authoritative CatalogTarget for that snapshot and requested mutation when one
+applies, and only then locks the Review. The mutation commits only when the locked
+`{ targetId, bottleId, releaseId }` tuple still matches the snapshot; otherwise
+the transaction rolls back and retries a bounded number of times from a fresh
+snapshot. This target-before-consumer order avoids inverting the canonical lock
+order without allowing a stale snapshot to overwrite concurrent identity work.
+An explicit identity clear atomically clears all three identity columns. An
+identity correction resolves and validates a complete replacement tuple. A
+non-identity update preserves an existing durable target; only a currently null
+target may use measured retained-pair resolution as a small compatibility
+repair. If a staged legacy row cannot yet resolve, it remains targetless rather
+than failing an unrelated content update or inventing identity.
+
+Shared alias-driven Review propagation remains exclusively owned by task 5.6b.
+Task 5.6c does not switch Review reads, bulk-backfill existing rows, or remove
+compatibility columns and branches; those remain tasks 7.3, section 6, and task
+9.7. Like the adjacent slices, this is a code-review boundary and makes no
+deployment or activation claim.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

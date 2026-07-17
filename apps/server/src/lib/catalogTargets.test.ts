@@ -16,6 +16,7 @@ import {
   CatalogTargetInvalidMappingError,
   CatalogTargetNotFoundError,
   CatalogTargetRetiredError,
+  isStagedTargetlessCatalogMappingError,
   loadCatalogTarget,
   loadCatalogTargetByBottleId,
   loadCatalogTargetByGroupId,
@@ -321,12 +322,15 @@ describe("legacy catalog target resolution", () => {
     const otherParent = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
 
-    await expect(
+    const error = await waitError<CatalogTargetInvalidMappingError>(
       loadCatalogTargetByLegacyReference(
         { bottleId: otherParent.id, releaseId: release.id },
         legacyReadContext,
       ),
-    ).rejects.toBeInstanceOf(CatalogTargetInvalidMappingError);
+    );
+
+    expect(error).toBeInstanceOf(CatalogTargetInvalidMappingError);
+    expect(isStagedTargetlessCatalogMappingError(error)).toBe(false);
   });
 
   test("rejects a valid legacy pair without a completed promotion mapping", async ({
@@ -348,6 +352,23 @@ describe("legacy catalog target resolution", () => {
       bottleId: parent.id,
       releaseId: release.id,
     });
+    expect(isStagedTargetlessCatalogMappingError(error)).toBe(true);
+  });
+
+  test("classifies only an ungrouped legacy parent as staged targetless", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.LegacyBottle();
+
+    const error = await waitError<CatalogTargetInvalidMappingError>(
+      loadCatalogTargetByLegacyReference(
+        { bottleId: parent.id, releaseId: null },
+        legacyReadContext,
+      ),
+    );
+
+    expect(error).toBeInstanceOf(CatalogTargetInvalidMappingError);
+    expect(isStagedTargetlessCatalogMappingError(error)).toBe(true);
   });
 
   test("rejects a promotion mapped into a different group as an integrity mismatch", async ({

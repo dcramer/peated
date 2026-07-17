@@ -152,6 +152,88 @@ durable consumer target.
 - **THEN** the Review remains explicitly targetless
 - **AND** the system does not select a representative or arbitrary exact Bottle
 
+### Requirement: Direct Review mutations preserve one authoritative identity
+
+The system SHALL resolve known exact or generic intent to one validated
+CatalogTarget descriptor before a direct user/API Review mutation. It SHALL
+revalidate and lock that descriptor before mutating the Review and SHALL treat
+the descriptor as authoritative over the retained compatibility pair. For an
+update, the system SHALL snapshot Review identity, lock the authoritative target
+before locking the Review when one applies, and accept the mutation only if the
+locked identity tuple matches the snapshot. A mismatch SHALL roll back and
+trigger a bounded retry from a fresh snapshot.
+
+#### Scenario: Create a Review with known catalog intent
+
+- **WHEN** direct Review creation resolves known exact or generic intent
+- **THEN** it atomically writes the descriptor's `targetId` together with the
+  retained `bottleId` and `releaseId` compatibility pair
+- **AND** any applicable alias assignment uses that same target
+- **AND** a generic target remains BottleGroup identity without substituting a
+  representative Bottle
+
+#### Scenario: Known Review intent cannot resolve a valid target
+
+- **WHEN** a known mapped exact or generic match fails target validation
+- **THEN** the Review mutation fails without writing targetless compatibility
+- **AND** the system does not reinterpret the failure as unresolved intent
+
+#### Scenario: Review creation conflicts with a durable target
+
+- **WHEN** create/upsert encounters an existing Review with a durable target
+  and the current reference is genuinely unresolved or targetless
+- **THEN** the existing complete `targetId`/`bottleId`/`releaseId` identity is
+  preserved as one unit
+- **AND** the unresolved input does not downgrade or partially mix that identity
+
+#### Scenario: Rejected Review conflict emits no identity evidence
+
+- **WHEN** Review create/upsert preserves an existing different complete
+  identity tuple because the incoming identity loses the conflict
+- **THEN** it creates or reassigns no alias for the rejected incoming identity
+- **AND** it records no decision evidence for the rejected incoming identity
+
+#### Scenario: Correct Review identity
+
+- **WHEN** a direct Review update explicitly changes catalog identity
+- **THEN** it resolves and locks the authoritative CatalogTarget from the
+  current Review snapshot and requested correction before locking the Review
+- **AND** it validates and atomically writes one complete target and
+  retained-pair tuple only when the locked identity matches that snapshot
+
+#### Scenario: Review identity changes during an update
+
+- **WHEN** the Review identity locked after CatalogTarget resolution differs
+  from the snapshot used for that resolution
+- **THEN** the transaction rolls back without mutating the Review
+- **AND** the operation retries a bounded number of times from a fresh Review
+  snapshot
+
+#### Scenario: Clear Review identity
+
+- **WHEN** a direct Review update explicitly clears its Bottle association
+- **THEN** it atomically clears `targetId`, `bottleId`, and `releaseId`
+
+#### Scenario: Update Review content without changing identity
+
+- **WHEN** a direct Review update changes only non-identity fields
+- **THEN** it preserves an existing durable target and retained pair
+- **AND** it may measured-repair `targetId` from the retained pair only when the
+  locked Review is currently targetless
+- **AND** a staged legacy row whose retained pair cannot yet resolve remains
+  explicitly targetless
+
+#### Scenario: Defer adjacent Review cutovers
+
+- **WHEN** task 5.6c dual-writes direct Review mutations
+- **THEN** shared alias propagation remains owned by task 5.6b
+- **AND** classifier-created unpromoted Bottle or BottleRelease references remain
+  targetless until tasks 5.8/5.9
+- **AND** target-backed reads, existing-row backfill, and compatibility removal
+  remain owned by tasks 7.3, section 6, and task 9.7 respectively
+- **AND** the slice remains a code-review boundary with no deployment or
+  activation claim
+
 ### Requirement: Existing-match price evidence shares one target
 
 The system SHALL resolve one CatalogTarget for an approved existing-match or

@@ -1,6 +1,9 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
+  bottleReleasePromotions,
+  catalogTargets,
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
@@ -8,8 +11,12 @@ import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
+import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 const pushJobMock = vi.hoisted(() => vi.fn());
@@ -82,6 +89,38 @@ function buildCreateBottleDecision({
       bottler: null,
     },
   });
+}
+
+async function recordCompletedPromotion(
+  releaseId: number,
+  promotedBottleId: number,
+) {
+  await db.insert(bottleReleasePromotions).values({
+    releaseId,
+    promotedBottleId,
+    status: "promoted",
+    completedAt: new Date(),
+  });
+}
+
+async function waitForSessionBlockedBy(
+  client: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1
+        FROM pg_stat_activity
+        WHERE $1 = ANY(pg_blocking_pids(pid))
+      ) AS blocked`,
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for Review conflict upsert lock.");
 }
 
 describe("POST /reviews", () => {
@@ -178,6 +217,7 @@ describe("POST /reviews", () => {
     });
     expect(review).toBeDefined();
     expect(review?.bottleId).toBeTruthy();
+    expect(review?.targetId).toBeNull();
     expect(review?.name).toEqual(`${brand.name} Bottle Name`);
     expect(review?.issue).toEqual("Default");
     expect(review?.rating).toEqual(89);
@@ -197,6 +237,7 @@ describe("POST /reviews", () => {
     });
     expect(alias).toMatchObject({
       bottleId: bottle!.id,
+      targetId: null,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -225,6 +266,73 @@ describe("POST /reviews", () => {
     });
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: bottle!.id,
+    });
+  });
+
+  test("classifier create decisions reuse an existing exact catalog target", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const brand = await fixtures.Entity({ name: "Existing Catalog Brand" });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Existing Catalog Bottle",
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = `${bottle.fullName} critic review`;
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildCreateBottleDecision({
+        brandName: brand.name,
+        bottleName: bottle.name,
+      }),
+    );
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: reviewName,
+        issue: "Default",
+        rating: 90,
+        url: "https://example.com/reused-existing-catalog-bottle",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+    });
+    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+      where: and(
+        eq(incomingBottleDecisionLogs.sourceKind, "review"),
+        eq(incomingBottleDecisionLogs.sourceId, data.id),
+      ),
+    });
+
+    expect(review).toMatchObject({
+      targetId: target!.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(alias).toMatchObject({
+      targetId: target!.id,
+      bottleId: bottle.id,
+      releaseId: null,
+      assignmentSource: "classifier_approved",
+    });
+    expect(decisionLog).toMatchObject({
+      decision: "create_bottle",
+      bottleId: bottle.id,
+      releaseId: null,
+      createdBottle: false,
+      createdRelease: false,
     });
   });
 
@@ -352,6 +460,7 @@ describe("POST /reviews", () => {
     });
     expect(review?.bottleId).toEqual(bottle.id);
     expect(review?.releaseId).toBeTruthy();
+    expect(review?.targetId).toBeNull();
 
     const release = await db.query.bottleReleases.findFirst({
       where: (table, { eq }) => eq(table.id, review!.releaseId as number),
@@ -398,8 +507,13 @@ describe("POST /reviews", () => {
     const review = await db.query.reviews.findFirst({
       where: (table, { eq }) => eq(table.id, data.id),
     });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
     expect(review).toBeDefined();
     expect(review?.bottleId).toEqual(bottle.id);
+    expect(review?.releaseId).toBeNull();
+    expect(review?.targetId).toEqual(target?.id);
     expect(review?.name).toEqual(bottle.fullName);
     expect(review?.issue).toEqual("Default");
     expect(review?.rating).toEqual(89);
@@ -412,6 +526,716 @@ describe("POST /reviews", () => {
       ),
     });
     expect(decisionLog).toBeUndefined();
+  });
+
+  test("new review keeps generic intent on the group target", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Generic Expression",
+      vintageYear: null,
+      releaseYear: null,
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Legacy Release",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [bottle.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: bottle.id,
+              releaseId: null,
+              fullName: bottle.fullName,
+              bottleFullName: bottle.fullName,
+              alias: bottle.fullName,
+              brand: null,
+              bottler: null,
+              series: null,
+              distillery: [],
+              category: bottle.category,
+              statedAge: bottle.statedAge,
+              edition: null,
+              caskStrength: bottle.caskStrength,
+              singleCask: bottle.singleCask,
+              abv: bottle.abv,
+              vintageYear: bottle.vintageYear,
+              releaseYear: bottle.releaseYear,
+              caskType: bottle.caskType,
+              caskSize: bottle.caskSize,
+              caskFill: bottle.caskFill,
+            },
+          ],
+        },
+      ),
+    );
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: `${bottle.fullName} review title`,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/generic-expression",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, bottle.groupId!),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(
+        bottleAliases.name,
+        normalizeBottleAliasKey(`${bottle.fullName} review title`),
+      ),
+    });
+
+    expect(review).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: genericTarget?.id,
+    });
+    expect(alias).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: review?.targetId,
+    });
+    expect(review?.targetId).not.toEqual(exactTarget?.id);
+  });
+
+  test("known classifier matches with invalid legacy targets fail without writes", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({ name: "Invalid Legacy Match" });
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = "Invalid Promotion Classifier Result";
+    const reviewUrl = "https://example.com/invalid-promotion-classifier";
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          matchedReleaseId: release.id,
+          candidateBottleIds: [bottle.id],
+        },
+        { candidates: [{ bottleId: bottle.id, releaseId: release.id }] },
+      ),
+    );
+
+    const error = await waitError(() =>
+      routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue: "Default",
+          rating: 89,
+          url: reviewUrl,
+          category: bottle.category,
+        },
+        { context: { user: adminUser } },
+      ),
+    );
+
+    expect(String(error)).toContain("completed promotion mapping");
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.url, reviewUrl),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      }),
+    ).toBeUndefined();
+  });
+
+  test("unresolved conflict preserves an existing durable identity tuple", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({ name: "Durable Review Bottle" });
+    const existingReview = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: bottle.id,
+      name: "Previously Resolved Review",
+      url: "https://example.com/durable-review",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Currently Unresolved Review",
+        issue: existingReview.issue,
+        rating: 91,
+        url: existingReview.url,
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    expect(review).toMatchObject({
+      id: existingReview.id,
+      targetId: existingReview.targetId,
+      bottleId: existingReview.bottleId,
+      releaseId: existingReview.releaseId,
+      name: "Currently Unresolved Review",
+      rating: 91,
+    });
+  });
+
+  test("unresolved conflict preserves an existing targetless identity tuple", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.LegacyBottle({
+      name: "Targetless Review Bottle",
+    });
+    const existingReview = await fixtures.Review({
+      externalSiteId: site.id,
+      targetId: null,
+      bottleId: bottle.id,
+      name: "Previously Targetless Review",
+      url: "https://example.com/targetless-review",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: "Currently Unresolved Targetless Review",
+        issue: existingReview.issue,
+        rating: 92,
+        url: existingReview.url,
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      }),
+    ).toMatchObject({
+      id: existingReview.id,
+      targetId: null,
+      bottleId: bottle.id,
+      releaseId: null,
+      name: "Currently Unresolved Targetless Review",
+      rating: 92,
+    });
+  });
+
+  test("concurrent unresolved conflict preserves the committed durable identity tuple", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Concurrent Durable Review Bottle",
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    expect(target).toBeDefined();
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = "Concurrent Durable Review";
+    const issue = "Default";
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `INSERT INTO "review"
+          ("target_id", "bottle_id", "release_id", "external_site_id", "name", "issue", "rating", "url")
+         VALUES ($1, $2, NULL, $3, $4, $5, $6, $7)`,
+        [
+          target!.id,
+          bottle.id,
+          site.id,
+          reviewName,
+          issue,
+          80,
+          "https://example.com/concurrent-durable-holder",
+        ],
+      );
+
+      creation = routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue,
+          rating: 94,
+          url: "https://example.com/concurrent-durable-result",
+          category: bottle.category,
+        },
+        { context: { user: adminUser } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+
+      const data = await creation;
+      const review = await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      });
+      expect(review).toMatchObject({
+        targetId: target!.id,
+        bottleId: bottle.id,
+        releaseId: null,
+        name: reviewName,
+        rating: 94,
+        url: "https://example.com/concurrent-durable-result",
+      });
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
+  });
+
+  test("concurrent unresolved conflict preserves the committed targetless identity tuple", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.LegacyBottle({
+      name: "Concurrent Targetless Review Bottle",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = "Concurrent Targetless Review";
+    const issue = "Default";
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `INSERT INTO "review"
+          ("target_id", "bottle_id", "release_id", "external_site_id", "name", "issue", "rating", "url")
+         VALUES (NULL, $1, NULL, $2, $3, $4, $5, $6)`,
+        [
+          bottle.id,
+          site.id,
+          reviewName,
+          issue,
+          81,
+          "https://example.com/concurrent-targetless-holder",
+        ],
+      );
+
+      creation = routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue,
+          rating: 95,
+          url: "https://example.com/concurrent-targetless-result",
+          category: bottle.category,
+        },
+        { context: { user: adminUser } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+
+      const data = await creation;
+      expect(
+        await db.query.reviews.findFirst({
+          where: eq(reviews.id, data.id),
+        }),
+      ).toMatchObject({
+        targetId: null,
+        bottleId: bottle.id,
+        releaseId: null,
+        name: reviewName,
+        rating: 95,
+        url: "https://example.com/concurrent-targetless-result",
+      });
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
+  });
+
+  test("concurrent resolved conflict atomically replaces the complete identity tuple", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const heldBottle = await fixtures.Bottle({
+      name: "Concurrent Held Identity",
+    });
+    const heldTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, heldBottle.id),
+    });
+    const incomingBottle = await fixtures.Bottle({
+      name: "Concurrent Incoming Identity",
+    });
+    const incomingTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, incomingBottle.id),
+    });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = "Concurrent Resolved Review Title";
+    const issue = "Default";
+    const reviewUrl = "https://example.com/concurrent-resolved-result";
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: incomingBottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [incomingBottle.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: incomingBottle.id,
+              releaseId: null,
+            },
+          ],
+        },
+      ),
+    );
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `INSERT INTO "review"
+          ("target_id", "bottle_id", "release_id", "external_site_id", "name", "issue", "rating", "url")
+         VALUES ($1, $2, NULL, $3, $4, $5, $6, $7)`,
+        [
+          heldTarget!.id,
+          heldBottle.id,
+          site.id,
+          reviewName,
+          issue,
+          82,
+          "https://example.com/concurrent-resolved-holder",
+        ],
+      );
+
+      creation = routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue,
+          rating: 96,
+          url: reviewUrl,
+          category: incomingBottle.category,
+        },
+        { context: { user: adminUser } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+
+      const data = await creation;
+      const review = await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      });
+      const alias = await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      });
+      const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, data.id),
+        ),
+      });
+
+      expect(review).toMatchObject({
+        targetId: incomingTarget!.id,
+        bottleId: incomingBottle.id,
+        releaseId: null,
+        rating: 96,
+        url: reviewUrl,
+      });
+      expect(alias).toMatchObject({
+        targetId: incomingTarget!.id,
+        bottleId: incomingBottle.id,
+        releaseId: null,
+        assignmentSource: "classifier_approved",
+      });
+      expect(decisionLog).toMatchObject({
+        decision: "match_existing",
+        bottleId: incomingBottle.id,
+        releaseId: null,
+        createdBottle: false,
+        createdRelease: false,
+      });
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
+  });
+
+  test("concurrent classifier conflict preserves durable identity without contradictory audit evidence", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const durableBottle = await fixtures.Bottle({
+      name: "Concurrent Classifier Durable Bottle",
+    });
+    const durableTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, durableBottle.id),
+    });
+    const brand = await fixtures.Entity({ name: "Conflict Distillery" });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = `${brand.name} Classifier Conflict Bottle Review Title`;
+    const issue = "Default";
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildCreateBottleDecision({
+        brandName: brand.name,
+        bottleName: "Classifier Conflict Bottle",
+      }),
+    );
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `INSERT INTO "review"
+          ("target_id", "bottle_id", "release_id", "external_site_id", "name", "issue", "rating", "url")
+         VALUES ($1, $2, NULL, $3, $4, $5, $6, $7)`,
+        [
+          durableTarget!.id,
+          durableBottle.id,
+          site.id,
+          reviewName,
+          issue,
+          82,
+          "https://example.com/concurrent-classifier-holder",
+        ],
+      );
+
+      creation = routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue,
+          rating: 96,
+          url: "https://example.com/concurrent-classifier-result",
+          category: durableBottle.category,
+        },
+        { context: { user: adminUser } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+
+      const data = await creation;
+      const review = await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      });
+      expect(review).toMatchObject({
+        targetId: durableTarget!.id,
+        bottleId: durableBottle.id,
+        releaseId: null,
+        name: reviewName,
+        rating: 96,
+        url: "https://example.com/concurrent-classifier-result",
+      });
+      expect(
+        await db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+        }),
+      ).toBeUndefined();
+      expect(
+        await db.query.incomingBottleDecisionLogs.findFirst({
+          where: and(
+            eq(incomingBottleDecisionLogs.sourceKind, "review"),
+            eq(incomingBottleDecisionLogs.sourceId, review!.id),
+          ),
+        }),
+      ).toBeUndefined();
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
+  });
+
+  test("preselected classifier conflict preserves durable identity without contradictory evidence", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const durableBottle = await fixtures.Bottle({
+      name: "Preselected Classifier Durable Bottle",
+    });
+    const incomingParent = await fixtures.Bottle({
+      name: "Preselected Classifier Incoming Parent",
+    });
+    const existingReview = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: durableBottle.id,
+      name: "Previously Durable Classifier Review",
+      url: "https://example.com/preselected-classifier-review",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = `${incomingParent.fullName} Rejected Release`;
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "create_release",
+          parentBottleId: incomingParent.id,
+          proposedRelease: {
+            edition: "Rejected Release",
+            statedAge: null,
+            abv: null,
+            caskStrength: null,
+            singleCask: null,
+            vintageYear: null,
+            releaseYear: null,
+            caskType: null,
+            caskSize: null,
+            caskFill: null,
+            description: null,
+            tastingNotes: null,
+            imageUrl: null,
+          },
+        },
+        {
+          candidates: [
+            {
+              bottleId: incomingParent.id,
+              releaseId: null,
+            },
+          ],
+        },
+      ),
+    );
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: reviewName,
+        issue: existingReview.issue,
+        rating: 97,
+        url: existingReview.url,
+        category: incomingParent.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    expect(review).toMatchObject({
+      id: existingReview.id,
+      targetId: existingReview.targetId,
+      bottleId: durableBottle.id,
+      releaseId: null,
+      name: reviewName,
+      rating: 97,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, review!.id),
+        ),
+      }),
+    ).toBeUndefined();
+  });
+
+  test("resolved conflict replaces the complete durable identity tuple", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const previousBottle = await fixtures.Bottle({ name: "Previous Bottle" });
+    const resolvedBottle = await fixtures.Bottle({ name: "Resolved Bottle" });
+    const existingReview = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: previousBottle.id,
+      name: resolvedBottle.fullName,
+      url: "https://example.com/resolved-review",
+    });
+    const resolvedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, resolvedBottle.id),
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: resolvedBottle.fullName,
+        issue: existingReview.issue,
+        rating: 93,
+        url: "https://example.com/resolved-review-updated",
+        category: resolvedBottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    expect(review).toMatchObject({
+      id: existingReview.id,
+      targetId: resolvedTarget?.id,
+      bottleId: resolvedBottle.id,
+      releaseId: null,
+      url: "https://example.com/resolved-review-updated",
+    });
   });
 
   test("new review uses identity-preserving alias keys before classifier", async ({
@@ -444,6 +1268,296 @@ describe("POST /reviews", () => {
       releaseId: null,
       name: bottle.fullName,
     });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("durable exact aliases stay exact when the Bottle has legacy child releases", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({ name: "Exact Alias Expression" });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Legacy Child",
+    });
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, bottle.groupId!),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    const aliasName = "Authoritative Exact Review Alias";
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      targetId: exactTarget!.id,
+      name: aliasName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/authoritative-exact-review-alias",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    expect(review).toMatchObject({
+      targetId: exactTarget!.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(review?.targetId).not.toEqual(genericTarget?.id);
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("targetless exact aliases upgrade to the measured exact target", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Mappable Exact Alias Bottle",
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    const aliasName = "Mappable Targetless Exact Review Alias";
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      targetId: null,
+      name: aliasName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/mappable-targetless-exact-review-alias",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      }),
+    ).toMatchObject({
+      targetId: target!.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
+      }),
+    ).toMatchObject({
+      targetId: target!.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("targetless exact aliases upgrade to the measured generic target", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Mappable Generic Alias Bottle",
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Legacy Release",
+    });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, bottle.groupId!),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    const aliasName = "Mappable Targetless Generic Review Alias";
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      targetId: null,
+      name: aliasName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/mappable-targetless-generic-review-alias",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      }),
+    ).toMatchObject({
+      targetId: genericTarget!.id,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
+      }),
+    ).toMatchObject({
+      targetId: genericTarget!.id,
+      bottleId: null,
+      releaseId: null,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("targetless exact aliases retain staged legacy identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.LegacyBottle({
+      name: "Staged Legacy Alias Bottle",
+    });
+    const aliasName = "Staged Legacy Exact Review Alias";
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      targetId: null,
+      name: aliasName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/staged-legacy-review-alias",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    const review = await db.query.reviews.findFirst({
+      where: eq(reviews.id, data.id),
+    });
+    expect(review).toMatchObject({
+      targetId: null,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("targetless release aliases retain staged unpromoted identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.LegacyBottle({
+      name: "Staged Unpromoted Alias Bottle",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Unpromoted Release",
+    });
+    const aliasName = "Staged Unpromoted Exact Review Alias";
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      targetId: null,
+      name: aliasName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 89,
+        url: "https://example.com/staged-unpromoted-review-alias",
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      }),
+    ).toMatchObject({
+      targetId: null,
+      bottleId: bottle.id,
+      releaseId: release.id,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("invalid targetless exact alias mappings fail without review writes", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.LegacyBottle({
+      name: "Invalid Targetless Alias Parent",
+    });
+    const otherBottle = await fixtures.LegacyBottle({
+      name: "Invalid Targetless Alias Release Owner",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: otherBottle.id,
+      edition: "Wrong Parent",
+    });
+    const aliasName = "Invalid Targetless Exact Review Alias";
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      targetId: null,
+      name: aliasName,
+    });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewUrl = "https://example.com/invalid-targetless-review-alias";
+
+    const error = await waitError(() =>
+      routerClient.reviews.create(
+        {
+          site: site.type,
+          name: aliasName,
+          issue: "Default",
+          rating: 89,
+          url: reviewUrl,
+          category: bottle.category,
+        },
+        { context: { user: adminUser } },
+      ),
+    );
+
+    expect(String(error)).toContain(
+      "release does not belong to the supplied parent Bottle",
+    );
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.url, reviewUrl),
+      }),
+    ).toBeUndefined();
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
@@ -667,7 +1781,7 @@ describe("POST /reviews", () => {
 
   test("new review with existing release", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       name: "Cadboll Estate",
       vintageYear: null,
       releaseYear: null,
@@ -678,6 +1792,10 @@ describe("POST /reviews", () => {
       name: `${bottle.name} - Batch 4`,
       edition: "Batch 4",
     });
+    const promotedBottle = await fixtures.Bottle({
+      name: "Cadboll Estate Batch 4 Promoted",
+    });
+    await recordCompletedPromotion(release.id, promotedBottle.id);
     await fixtures.BottleAlias({
       bottleId: bottle.id,
       releaseId: release.id,
@@ -700,9 +1818,13 @@ describe("POST /reviews", () => {
     const review = await db.query.reviews.findFirst({
       where: (table, { eq }) => eq(table.id, data.id),
     });
+    const promotedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, promotedBottle.id),
+    });
     expect(review).toBeDefined();
     expect(review?.bottleId).toEqual(bottle.id);
     expect(review?.releaseId).toEqual(release.id);
+    expect(review?.targetId).toEqual(promotedTarget?.id);
     expect(data.bottle?.id).toEqual(bottle.id);
     expect(data.release?.id).toEqual(release.id);
   });
@@ -711,7 +1833,7 @@ describe("POST /reviews", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       name: "Calvados Cask Finished",
       vintageYear: null,
       releaseYear: null,
@@ -722,6 +1844,10 @@ describe("POST /reviews", () => {
       name: `${bottle.name} (2024 Release)`,
       releaseYear: 2024,
     });
+    const promotedBottle = await fixtures.Bottle({
+      name: "Calvados Cask Finished 2024 Promoted",
+    });
+    await recordCompletedPromotion(release.id, promotedBottle.id);
     await fixtures.BottleAlias({
       bottleId: bottle.id,
       releaseId: release.id,
@@ -761,7 +1887,7 @@ describe("POST /reviews", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       name: "Calvados Cask Finished",
       vintageYear: null,
       releaseYear: null,
@@ -772,6 +1898,10 @@ describe("POST /reviews", () => {
       name: `${bottle.name} (2024 Release)`,
       releaseYear: 2024,
     });
+    const promotedBottle = await fixtures.Bottle({
+      name: "Classifier Calvados 2024 Promoted",
+    });
+    await recordCompletedPromotion(release.id, promotedBottle.id);
     const adminUser = await fixtures.User({ admin: true });
 
     classifyBottleReferenceMock.mockResolvedValue(
@@ -842,7 +1972,7 @@ describe("POST /reviews", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
+    const bottle = await fixtures.LegacyBottle({
       name: "Calvados Cask Finished",
       vintageYear: null,
       releaseYear: null,
@@ -862,6 +1992,10 @@ describe("POST /reviews", () => {
       name: `${bottle.name} (2024 Release)`,
       releaseYear: 2024,
     });
+    const promotedBottle = await fixtures.Bottle({
+      name: "Updated Calvados 2024 Promoted",
+    });
+    await recordCompletedPromotion(release.id, promotedBottle.id);
     await fixtures.BottleAlias({
       bottleId: bottle.id,
       releaseId: release.id,

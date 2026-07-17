@@ -47,6 +47,7 @@ export type BottleReferenceResolutionSource =
 export type BottleReferenceResolution = {
   bottleId: number | null;
   releaseId: number | null;
+  targetId: number | null;
   source: BottleReferenceResolutionSource;
   error: Error | null;
   confidence: number | null;
@@ -589,6 +590,10 @@ export async function applyClassifierCreateDecision({
  * Resolve a raw external bottle reference into a bottle/release target. This
  * keeps the zero-cost exact alias fast path, but every ambiguous or new name
  * now goes through the reviewed generic classifier instead of prefix heuristics.
+ * Target-aware exact aliases carry their authoritative targetId. Classifier
+ * matches and reused create decisions leave targetId null for the writer
+ * transaction to resolve. Targetless aliases, newly created ungrouped bottles,
+ * and promotion-incomplete releases may remain targetless during migration.
  *
  * Errors are returned as unresolved results instead of being thrown so ingest
  * jobs can preserve the raw source record when classification or creation fails.
@@ -619,6 +624,7 @@ export async function resolveBottleReferenceTarget({
       return {
         bottleId: target.bottleId,
         releaseId: target.releaseId,
+        targetId: target.targetId,
         source: "exact_alias",
         error: null,
         confidence: null,
@@ -657,6 +663,7 @@ export async function resolveBottleReferenceTarget({
     return {
       bottleId: null,
       releaseId: null,
+      targetId: null,
       source: "unresolved",
       error: err instanceof Error ? err : new Error("Classifier failed."),
       confidence: null,
@@ -671,6 +678,7 @@ export async function resolveBottleReferenceTarget({
     return {
       bottleId: null,
       releaseId: null,
+      targetId: null,
       source: "unresolved",
       error: null,
       confidence: null,
@@ -699,6 +707,7 @@ export async function resolveBottleReferenceTarget({
           classification.decision.action === "match"
             ? classification.decision.matchedReleaseId
             : null,
+        targetId: null,
         source: "classifier_match",
         error: null,
         confidence: decisionConfidence,
@@ -713,6 +722,7 @@ export async function resolveBottleReferenceTarget({
       return {
         bottleId: null,
         releaseId: null,
+        targetId: null,
         source: "unresolved",
         error: null,
         confidence: decisionConfidence,
@@ -727,6 +737,7 @@ export async function resolveBottleReferenceTarget({
       return {
         bottleId: null,
         releaseId: null,
+        targetId: null,
         source: "unresolved",
         error: null,
         confidence: decisionConfidence,
@@ -746,6 +757,7 @@ export async function resolveBottleReferenceTarget({
     return {
       bottleId: result.bottleId,
       releaseId: result.releaseId,
+      targetId: null,
       source:
         classification.decision.action === "create_bottle"
           ? "classifier_create_bottle"
@@ -763,6 +775,7 @@ export async function resolveBottleReferenceTarget({
     return {
       bottleId: null,
       releaseId: null,
+      targetId: null,
       source: "unresolved",
       error:
         err instanceof Error

@@ -77,6 +77,9 @@ describe("resolveBottleReferenceTarget", () => {
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
     });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+    });
 
     const result = await resolveBottleReferenceTarget({
       reference: {
@@ -94,11 +97,56 @@ describe("resolveBottleReferenceTarget", () => {
     expect(result).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
+      targetId: target?.id,
       source: "exact_alias",
       createdBottle: false,
       createdRelease: false,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("preserves targetless staged aliases without inventing a target", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
+    const bottle = await fixtures.LegacyBottle({
+      name: "Staged Alias Bottle",
+    });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      targetId: null,
+      name: "Staged Exact Alias",
+    });
+
+    const result = await resolveBottleReferenceTarget({
+      reference: {
+        name: alias.name,
+        url: null,
+        imageUrl: null,
+        currentBottleId: null,
+        currentReleaseId: null,
+      },
+      aliasLookupNames: [alias.name],
+      createdByActorId: actor.id,
+      user,
+    });
+
+    expect(result).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: null,
+      source: "exact_alias",
+      createdBottle: false,
+      createdRelease: false,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(
+      await db.query.catalogTargets.findFirst({
+        where: (catalogTargets, { eq }) =>
+          eq(catalogTargets.bottleId, bottle.id),
+      }),
+    ).toBeUndefined();
   });
 
   test("does not normalize alias lookup names internally", async ({
