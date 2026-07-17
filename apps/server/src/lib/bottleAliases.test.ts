@@ -300,6 +300,51 @@ describe("reserveExactBottleAliasInTransaction", () => {
 });
 
 describe("assignBottleAliasInTransaction", () => {
+  test("rejects a null consumer identity for an exact target before mutation", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const name = "Invalid Null Exact Consumer";
+    const price = await fixtures.StorePrice({
+      name,
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+    });
+
+    await expect(
+      db.transaction(async (tx) =>
+        assignBottleAliasInTransaction(tx, {
+          target: {
+            targetId: target.id,
+            groupId: target.groupId,
+            bottleId: bottle.id,
+          },
+          consumerIdentity: {
+            bottleId: null,
+            releaseId: null,
+          },
+          name,
+          assignedByActorId: bottle.createdByActorId,
+        }),
+      ),
+    ).rejects.toThrow(
+      "Exact target alias assignment requires retained Bottle identity.",
+    );
+
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, name),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
+  });
+
   test("claims a matching legacy parent alias for a generic target without selecting a Bottle", async ({
     fixtures,
   }) => {

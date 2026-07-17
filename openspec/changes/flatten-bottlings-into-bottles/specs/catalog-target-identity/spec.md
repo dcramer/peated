@@ -460,12 +460,83 @@ the current active processing lease.
 
 - **WHEN** the first task 5.6f sub-slice updates automated ignored-assignment
   clearing
-- **THEN** direct create-batch ingestion remains the other task 5.6f sub-slice
+- **THEN** direct create-batch ingestion is completed by the adjacent second
+  task 5.6f sub-slice
 - **AND** alias-driven propagation remains owned by task 5.6b
 - **AND** create-new approval remains owned by tasks 5.7 and 5.5c
 - **AND** target-backed reads, existing-row backfill, broader repair and caller
   cutovers, retained-pair cleanup, and deployment remain outside this review
   boundary
+
+### Requirement: Direct StorePrice ingestion writes one authoritative identity
+
+The system SHALL resolve an accepted listing alias to one exact, generic, or
+measured targetless assignment before direct StorePrice ingestion. A validated
+target SHALL replace the complete retained identity tuple, while targetless or
+unmatched input SHALL NOT downgrade a durable target or partially mix identity
+from two decisions.
+
+#### Scenario: Ingest an exact target-backed alias
+
+- **WHEN** the accepted alias owns an active exact target
+- **THEN** ingestion locks the target hierarchy before StorePrice, history, or
+  alias mutation
+- **AND** writes its `targetId`, exact Bottle id, and null release id together
+
+#### Scenario: Ingest a generic target-backed alias
+
+- **WHEN** the accepted alias owns an active generic target
+- **THEN** an alias without a retained pair writes that target with null retained
+  Bottle and release ids
+- **AND** a retained pair is carried only when measured legacy resolution maps
+  it to that same generic target
+- **AND** an invalid or different-target pair fails without mutation
+- **AND** it neither selects the representative Bottle nor queues unresolved
+  matching work
+
+#### Scenario: Upgrade a targetless legacy alias
+
+- **WHEN** a targetless alias's retained pair resolves through the measured
+  deterministic assignment boundary
+- **THEN** ingestion locks and writes that target with the retained pair
+- **AND** canonical alias assignment upgrades the alias to the same exact or
+  generic target
+
+#### Scenario: Retain staged targetless compatibility
+
+- **WHEN** the only alias match is an ungrouped parent or an unpromoted release
+- **THEN** ingestion locks the retained parent, release when present, and
+  existing promotion mapping before re-running legacy resolution
+- **AND** it may write its measured targetless pair only when that same staged
+  state remains and the existing StorePrice is also targetless
+- **AND** completed grouping or promotion aborts stale targetless ingestion
+  without taking target hierarchy locks after the legacy locks
+- **AND** it preserves an existing durable identity tuple
+
+#### Scenario: Ingest an unmatched listing
+
+- **WHEN** neither the normalized alias key nor retained raw fallback matches
+- **THEN** a new StorePrice remains targetless and queues matching work
+- **AND** an existing StorePrice preserves its complete current identity tuple
+
+#### Scenario: Alias identity changes during ingestion
+
+- **WHEN** an alias is retargeted, ignored, or invalidated after lookup
+- **THEN** canonical alias assignment revalidates a same-name normalized source
+  after consumers and before claim
+- **AND** it claims the normalized canonical alias before revalidating a
+  distinct raw compatibility source
+- **AND** stale StorePrice, history, and alias mutations roll back together
+
+#### Scenario: Defer adjacent direct-ingestion cutovers
+
+- **WHEN** the second task 5.6f sub-slice updates create-batch ingestion
+- **THEN** normalized-key lookup and legacy raw fallback, price/image history,
+  image finalization, and post-commit job behavior remain supported
+- **AND** task 7.3 owns target-backed reads, section 6 owns existing-row
+  backfill, tasks 5.7/5.5c own create-new approval, and tasks 9.6/9.7 own
+  retained-pair and compatibility removal
+- **AND** the slice makes no deployment or activation claim
 
 ### Requirement: Existing-match price evidence shares one target
 

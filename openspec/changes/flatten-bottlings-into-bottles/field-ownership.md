@@ -187,10 +187,30 @@ Exact Bottle serializers must not require BottleGroup hydration.
   its lease returns the replacement owner's current proposal and preserves the
   StorePrice tuple without clearing it or surfacing the stale target failure.
 - Task 5.6f does not change ignored-proposal lease ownership or expiration.
-  Direct create-batch ingestion remains the other 5.6f sub-slice. Alias-driven
-  propagation remains task 5.6b, create-new approval remains tasks 5.7/5.5c,
-  and target-backed reads, backfill, broader repair/caller cutovers, cleanup,
-  and deployment remain deferred.
+  Direct create-batch ingestion is the completed adjacent 5.6f sub-slice.
+  Alias-driven propagation remains task 5.6b, create-new approval remains tasks
+  5.7/5.5c, and target-backed reads, backfill, broader repair/caller cutovers,
+  cleanup, and deployment remain deferred.
+- Direct create-batch ingestion now owns one incoming StorePrice identity
+  decision. A validated exact or generic target replaces the complete tuple;
+  generic identity stores no representative, but a retained legacy pair may be
+  carried only after it resolves to that same generic target. A deterministically
+  resolved targetless alias keeps its measured pair alongside the target.
+  Explicit staged targetless input may replace only a targetless tuple, and
+  unmatched input preserves every existing identity field.
+- Create-batch locks validated targets through BottleGroup, Bottle, then
+  CatalogTarget before StorePrice, history, or alias writes. Canonical alias
+  assignment remains the consumer synchronization and source-snapshot owner: a
+  same-name normalized source is checked before claim, while a distinct raw
+  fallback is checked after normalized canonical claim. Staged targetless
+  compatibility locks the parent, release, and promotion state and re-runs
+  resolution before StorePrice/history mutation, aborting when the staged state
+  changed rather than inverting target-after-legacy lock order.
+- Normalized-key lookup, raw fallback, price/image history, image finalization,
+  alias provenance, and post-commit job ownership are unchanged. Alias matches
+  of every valid exact, generic, or staged-targetless kind suppress resolver
+  work; unmatched listings schedule it. Reads/backfill/create-new/cleanup stay
+  assigned to task 7.3, section 6, tasks 5.7/5.5c, and tasks 9.6/9.7.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes

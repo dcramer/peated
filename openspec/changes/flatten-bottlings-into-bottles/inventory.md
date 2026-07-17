@@ -221,14 +221,26 @@ Target-bearing consumer routes:
 - `apps/server/src/orpc/routes/tastings/list.ts`
 - `apps/server/src/orpc/routes/tastings/photo-identification-create.ts`
 - `apps/server/src/orpc/routes/tastings/photo-identification.ts`
-- `apps/server/src/orpc/routes/prices/create-batch.ts` is a direct StorePrice
-  ingestion writer assigned to task 5.6f. Its existing exact-alias branch is an
-  affected task 5.6b caller: through the legacy exact target-aware alias input,
-  it passes the validated exact `targetId` plus the explicit retained
-  `(bottleId, null)` pair so matching consumers receive target-aware
-  propagation. It does not construct a CatalogTargetAssignmentDescriptor;
-  descriptor-based generic, unmatched, and direct-ingestion redesign remains
-  the other task 5.6f sub-slice after the automated ignored-assignment clear.
+- `apps/server/src/orpc/routes/prices/create-batch.ts` is the second task 5.6f
+  sub-slice and now resolves accepted aliases to one validated exact, generic,
+  or measured staged-targetless assignment. It tries the normalized alias key
+  before the retained raw fallback, locks target descriptors through the global
+  hierarchy before StorePrice/history/alias mutation, and delegates consumer
+  synchronization and source-snapshot timing to canonical alias assignment. A
+  same-name normalized source is checked after consumers before claim; a
+  distinct raw compatibility source is checked after normalized canonical
+  claim. Its
+  conflict upsert treats `{targetId,bottleId,releaseId}` as one tuple: validated
+  targets replace the tuple, targetless legacy input may replace only a
+  targetless tuple, and unmatched input preserves an existing complete tuple.
+  Generic aliases never store a representative; a retained pair is carried only
+  after it resolves to the same generic target. Resolvable targetless aliases
+  upgrade through the deterministic target boundary. Explicitly staged mappings
+  lock and revalidate their parent/release/promotion state before mutation and
+  abort if grouping or promotion completed first. Exact, generic, and
+  targetless alias matches
+  suppress resolver work, while unmatched rows retain it. Authentication,
+  batching, history, image, provenance, and post-commit behavior are unchanged.
 
 Classifier, price matching, and moderation routes:
 
@@ -292,7 +304,11 @@ Catalog identity, aliases, search, creation, and updates:
   group, and nullable exact-Bottle identity used by dual-write consumers.
   Its batch assignment lock owns the global BottleGroup, exact-Bottle, then
   CatalogTarget hierarchy for set-based writers and revalidates every
-  descriptor after acquiring the complete lock set.
+  descriptor after acquiring the complete lock set. Its staged-targetless
+  serialization operation instead locks the retained parent Bottle, any
+  BottleRelease, and existing promotion mapping before re-running legacy
+  resolution. A completed grouping or promotion aborts the stale decision; it
+  never acquires target hierarchy locks after those legacy locks.
   It replaces the removed ID-only assignment facade so consumers do not
   reconstruct or re-load target identity.
   Task 5.5b uses one measured legacy-pair resolution from this boundary for
@@ -324,17 +340,25 @@ Catalog identity, aliases, search, creation, and updates:
   retained pair to those consumers, while targetless compatibility can update
   only targetless consumers. The alias assignment input owns the retained pair
   separately from any CatalogTarget descriptor. Generic assignment never
-  selects the representative Bottle. When canonical assignment creates a new
-  alias, its post-commit finalizer queues `IndexBottleAlias` directly because
-  consumer synchronization already occurred; it does not queue
-  `OnBottleAliasChange`. Existing-alias assignment need not enqueue alias
-  indexing.
+  selects the representative Bottle and may carry either the valid generic
+  consumer projection `{bottleId:null,releaseId:null}` or a separately validated
+  measured pair. It also owns matched-source snapshot timing after consumer
+  synchronization: same-name normalized sources are checked before claim and
+  distinct raw compatibility sources after normalized canonical claim. When
+  canonical assignment creates a new alias, its post-commit finalizer queues
+  `IndexBottleAlias` directly because consumer synchronization already occurred;
+  it does not queue `OnBottleAliasChange`. Existing-alias assignment need not
+  enqueue alias indexing.
 - `apps/server/src/lib/bottleCreationDrafts.ts`
-- `apps/server/src/lib/bottleFinder.ts` owns target-aware exact alias resolution.
-  A non-null exact target returns its Bottle, while a generic target returns no
-  Bottle and never becomes a representative; only a null-target alias may use
-  the measured legacy pair fallback. Broad target-backed alias reads and Bottle
-  search/index replacement remain tasks 7.3 and 7.5.
+- `apps/server/src/lib/bottleFinder.ts` owns target-aware exact alias resolution
+  and the task 5.6f StorePrice-ingestion alias projection. Existing exact-only
+  readers still receive a Bottle only from an exact target. Direct ingestion
+  instead receives a validated exact or generic descriptor plus its explicit
+  consumer projection. A generic retained pair must resolve to that same target;
+  targetless aliases resolve through measured legacy assignment and return an
+  explicit staged decision only for the two allowed migration states. Canonical
+  source-snapshot locking remains owned by `bottleAliases.ts`. Broad target-backed
+  alias reads and Bottle search/index replacement remain tasks 7.3 and 7.5.
 - `apps/server/src/lib/bottleReferenceCandidates.ts`
 - `apps/server/src/lib/bottleReferenceResolution.ts`
 - `apps/server/src/lib/bottleReleaseIdentity.ts`
@@ -435,7 +459,7 @@ Classifier decisions and price matching:
   lease returns the replacement owner's current proposal and preserves the
   StorePrice tuple without clearing it or surfacing the stale target failure.
   Existing processing-lease behavior is unchanged. Direct create-batch
-  ingestion remains the other task 5.6f sub-slice. Task 5.6b retains
+  ingestion is completed by the adjacent task 5.6f sub-slice. Task 5.6b retains
   alias-driven propagation, tasks 5.7/5.5c retain create-new approval, task 7.3
   owns target-backed reads, section 6 owns existing-row backfill, broader
   repair/caller cutovers remain outside this sub-slice, task 9.6 removes

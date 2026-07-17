@@ -762,11 +762,62 @@ the stale target-resolution failure.
 The existing processing-token and expiration checks continue to decide whether
 the token-bearing ignored resolver owns the active lease; this identity cutover
 does not change lease acquisition, renewal, or release semantics. Direct
-create-batch StorePrice ingestion is the remaining task 5.6f sub-slice.
+create-batch StorePrice ingestion is completed by the adjacent task 5.6f
+sub-slice below.
 Alias-driven StorePrice propagation remains owned by task 5.6b, and create-new
 approval remains tasks 5.7 and 5.5c. Target-backed reads, legacy-row backfill,
 broader repair/caller cutovers, retained-pair cleanup, and any deployment or
 activation remain outside this review boundary.
+
+### Direct StorePrice ingestion writes one complete assignment
+
+The second task 5.6f sub-slice moves `prices/create-batch` from independent
+pair `COALESCE` updates to one target-authoritative StorePrice identity tuple.
+Alias lookup still tries the normalized identity-preserving key first and the
+legacy raw listing name second. A target-backed alias resolves and validates
+its exact or generic assignment descriptor; a targetless alias resolves its
+retained pair through the measured deterministic legacy boundary and stays
+targetless only for the explicit staged ungrouped-parent or
+promotion-incomplete-release states. Other retired, invalid, or inconsistent
+target states fail the transaction.
+
+A target-backed incoming decision replaces `{ targetId, bottleId, releaseId }`
+as one unit. Exact aliases retain the concrete Bottle id and null release id. A
+generic alias with no retained pair stores null retained ids and never selects a
+representative; when it does retain a legacy pair, that pair must resolve
+through measured compatibility to the same generic target before it is carried
+to the StorePrice. A resolvable targetless legacy alias likewise retains its
+measured pair alongside the resolved target. Staged targetless input may replace
+only a targetless existing tuple, while unmatched input preserves every
+existing identity field. This prevents the old independent `COALESCE`
+expressions from combining a new Bottle with an old release or downgrading a
+durable target.
+
+The route locks the resolved descriptor set through the global BottleGroup,
+Bottle, then CatalogTarget hierarchy before StorePrice, history, or alias
+mutation. Canonical alias assignment remains the sole consumer-synchronization
+owner and owns source-snapshot timing: it revalidates a same-name normalized
+source after consumers and before claim, then upgrades or creates that canonical
+alias; when lookup used a distinct raw compatibility alias, it claims the
+normalized canonical alias first and then revalidates the raw source. Concurrent
+retarget, ignore, merge, or target retirement therefore rolls back the
+StorePrice, history, and alias work instead of committing stale identity.
+
+Before a staged targetless decision mutates StorePrice or history, the canonical
+compatibility boundary locks the retained parent Bottle, then any BottleRelease
+and existing promotion mapping, and re-runs legacy resolution. The release lock
+serializes a missing promotion insert through its foreign key. If grouping or
+promotion completed first, ingestion aborts rather than acquiring target locks
+after legacy locks or committing stale targetless identity.
+
+Exact, generic, and staged targetless alias matches suppress
+`ResolveStorePriceBottle`; only unmatched listings queue it. Existing
+authentication, batching, price history, image capture/finalization, alias
+provenance, and post-commit behavior remain unchanged. Alias-driven propagation
+stays in task 5.6b, create-new approval stays in tasks 5.7/5.5c, reads and
+backfill stay in task 7.3 and section 6, and tasks 9.6/9.7 remove retained pairs
+and measured compatibility. This commit is a review boundary, not a deployment
+or activation unit.
 
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target

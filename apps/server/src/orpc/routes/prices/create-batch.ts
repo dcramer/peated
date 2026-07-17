@@ -14,7 +14,11 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { findBottleTarget } from "@peated/server/lib/bottleFinder";
+import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import {
+  lockCatalogTargetAssignmentDescriptorsInTransaction,
+  lockStagedTargetlessCatalogAssignmentInTransaction,
+} from "@peated/server/lib/catalogTargets";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -25,6 +29,10 @@ import {
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
+
+function assertNever(value: never): never {
+  throw new TypeError(`Unhandled Bottle alias assignment: ${String(value)}`);
+}
 
 export default procedure
   .use(requireAdmin)
@@ -65,38 +73,76 @@ export default procedure
               const aliasKey = normalizeBottleAliasKey(sp.name);
               // New assignments use the deterministic key, but lookup still
               // accepts legacy raw aliases created before alias keys existed.
-              const target =
-                (await findBottleTarget(
-                  aliasKey,
+              let match = await findBottleAliasAssignment(
+                aliasKey,
+                {
+                  caller: "prices.createBatch",
+                  operation: "resolveNormalizedAlias",
+                },
+                tx,
+              );
+              if (!match && aliasKey !== sp.name) {
+                match = await findBottleAliasAssignment(
+                  sp.name,
                   {
                     caller: "prices.createBatch",
-                    operation: "resolveNormalizedAlias",
+                    operation: "resolveLegacyRawAlias",
                   },
                   tx,
-                )) ??
-                (aliasKey !== sp.name
-                  ? await findBottleTarget(
-                      sp.name,
-                      {
-                        caller: "prices.createBatch",
-                        operation: "resolveLegacyRawAlias",
-                      },
+                );
+              }
+              const target = match?.kind === "target" ? match.target : null;
+              const bottleId = match?.consumerIdentity.bottleId ?? null;
+              const releaseId = match?.consumerIdentity.releaseId ?? null;
+              const targetId = target?.targetId ?? null;
+
+              // Target identity is serialized before any price, history, or
+              // alias mutation. The assignment owner revalidates the alias
+              // after consumers so merge/retarget work cannot commit stale use.
+              if (match) {
+                switch (match.kind) {
+                  case "target":
+                    await lockCatalogTargetAssignmentDescriptorsInTransaction(
                       tx,
-                    )
-                  : null);
-              const bottleId = target?.bottleId ?? null;
-              const releaseId = target?.releaseId ?? null;
+                      [match.target],
+                    );
+                    break;
+                  case "staged_targetless":
+                    await lockStagedTargetlessCatalogAssignmentInTransaction(
+                      tx,
+                      match.stagedTargetless,
+                    );
+                    break;
+                  default:
+                    assertNever(match);
+                }
+              }
 
               // XXX: maybe we should constrain on URL?
+              // The three CASE expressions deliberately share one authority
+              // predicate so a conflict can never mix two identity decisions.
               const {
                 rows: [{ id: rawPriceId, imageUrl }],
               } = await tx.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
-              INSERT INTO ${storePrices} (bottle_id, release_id, external_site_id, name, volume, price, currency, url)
-              VALUES (${bottleId}, ${releaseId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+              INSERT INTO ${storePrices} (target_id, bottle_id, release_id, external_site_id, name, volume, price, currency, url)
+              VALUES (${targetId}, ${bottleId}, ${releaseId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
               ON CONFLICT (external_site_id, LOWER(name), volume)
               DO UPDATE
-              SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
-                  release_id = COALESCE(excluded.release_id, ${storePrices.releaseId}),
+              SET target_id = CASE
+                    WHEN excluded.target_id IS NOT NULL THEN excluded.target_id
+                    WHEN excluded.bottle_id IS NOT NULL AND ${storePrices.targetId} IS NULL THEN NULL
+                    ELSE ${storePrices.targetId}
+                  END,
+                  bottle_id = CASE
+                    WHEN excluded.target_id IS NOT NULL THEN excluded.bottle_id
+                    WHEN excluded.bottle_id IS NOT NULL AND ${storePrices.targetId} IS NULL THEN excluded.bottle_id
+                    ELSE ${storePrices.bottleId}
+                  END,
+                  release_id = CASE
+                    WHEN excluded.target_id IS NOT NULL THEN excluded.release_id
+                    WHEN excluded.bottle_id IS NOT NULL AND ${storePrices.targetId} IS NULL THEN excluded.release_id
+                    ELSE ${storePrices.releaseId}
+                  END,
                   price = excluded.price,
                   currency = excluded.currency,
                   url = excluded.url,
@@ -134,26 +180,29 @@ export default procedure
                 | "aliasReleaseId"
                 | "context"
               >;
-              const aliasAssignment = bottleId
-                ? target?.targetId !== null && target?.targetId !== undefined
+              const aliasAssignment =
+                match?.kind === "target"
                   ? await assignBottleAliasInTransaction(tx, {
                       ...aliasAssignmentInput,
-                      bottleId,
-                      targetId: target.targetId,
+                      target: match.target,
+                      consumerIdentity: match.consumerIdentity,
+                      sourceAliasIdentity: match.alias,
                     })
-                  : await assignBottleAliasInTransaction(tx, {
-                      ...aliasAssignmentInput,
-                      bottleId,
-                      releaseId,
-                      context: {
-                        caller: "prices.createBatch",
-                        operation: "assignStorePriceAlias",
-                      },
-                    })
-                : null;
+                  : bottleId !== null
+                    ? await assignBottleAliasInTransaction(tx, {
+                        ...aliasAssignmentInput,
+                        bottleId,
+                        releaseId,
+                        context: {
+                          caller: "prices.createBatch",
+                          operation: "assignStorePriceAlias",
+                        },
+                        sourceAliasIdentity: match?.alias,
+                      })
+                    : null;
 
               return {
-                price: { id: priceId, imageUrl, hasAliasMatch: !!target },
+                price: { id: priceId, imageUrl, hasAliasMatch: !!match },
                 aliasAssignment,
               };
             },

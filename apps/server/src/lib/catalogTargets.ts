@@ -7,6 +7,7 @@ import {
   bottleGroups,
   bottleGroupTombstones,
   bottleReleasePromotions,
+  bottleReleases,
   bottles,
   bottleTombstones,
   catalogTargets,
@@ -82,9 +83,13 @@ export class CatalogTargetInvalidMappingError extends CatalogTargetResolutionErr
   }
 }
 
-type StagedTargetlessCatalogMappingReason =
+export type StagedTargetlessCatalogMappingReason =
   | "LEGACY_PARENT_WITHOUT_GROUP"
   | "RELEASE_WITHOUT_COMPLETED_PROMOTION";
+
+export type StagedTargetlessCatalogAssignment = LegacyCatalogTargetReference & {
+  stagedReason: StagedTargetlessCatalogMappingReason;
+};
 
 class StagedTargetlessCatalogMappingError extends CatalogTargetInvalidMappingError {
   constructor(
@@ -104,6 +109,14 @@ export function isStagedTargetlessCatalogMappingError(error: unknown): boolean {
     (error.stagedReason === "LEGACY_PARENT_WITHOUT_GROUP" ||
       error.stagedReason === "RELEASE_WITHOUT_COMPLETED_PROMOTION")
   );
+}
+
+export function getStagedTargetlessCatalogMappingReason(
+  error: unknown,
+): StagedTargetlessCatalogMappingReason | null {
+  return error instanceof StagedTargetlessCatalogMappingError
+    ? error.stagedReason
+    : null;
 }
 
 export class CatalogTargetIntegrityMismatchError extends CatalogTargetResolutionError {
@@ -259,6 +272,75 @@ export async function lockCatalogTargetAssignmentDescriptorsInTransaction(
   for (const descriptor of uniqueDescriptors) {
     await assertCatalogTargetAssignmentDescriptor(tx, descriptor);
   }
+}
+
+/**
+ * Serializes an explicit staged legacy decision without taking target locks.
+ * If grouping or promotion completed first, callers must restart from a fresh
+ * target decision instead of committing stale targetless compatibility.
+ */
+export async function lockStagedTargetlessCatalogAssignmentInTransaction(
+  tx: AnyTransaction,
+  expected: StagedTargetlessCatalogAssignment,
+): Promise<void> {
+  const [parent] = await tx
+    .select({ id: bottles.id })
+    .from(bottles)
+    .where(eq(bottles.id, expected.bottleId))
+    .limit(1)
+    .for("update");
+  if (!parent) {
+    throw new Error("Staged legacy CatalogTarget parent changed before use.");
+  }
+
+  if (expected.releaseId !== null) {
+    const [release] = await tx
+      .select({ bottleId: bottleReleases.bottleId })
+      .from(bottleReleases)
+      .where(eq(bottleReleases.id, expected.releaseId))
+      .limit(1)
+      .for("update");
+    if (!release || release.bottleId !== expected.bottleId) {
+      throw new Error(
+        "Staged legacy CatalogTarget release changed before use.",
+      );
+    }
+
+    // The release row serializes a missing promotion insert through its FK;
+    // an existing promotion row is then held through the caller transaction.
+    await tx
+      .select({ releaseId: bottleReleasePromotions.releaseId })
+      .from(bottleReleasePromotions)
+      .where(eq(bottleReleasePromotions.releaseId, expected.releaseId))
+      .limit(1)
+      .for("update");
+  }
+
+  try {
+    await resolveCatalogTargetForAssignment(
+      {
+        kind: "legacy",
+        bottleId: expected.bottleId,
+        releaseId: expected.releaseId,
+        context: {
+          caller: "catalogTargets",
+          operation: "revalidateStagedTargetlessAssignment",
+        },
+      },
+      tx,
+    );
+  } catch (error) {
+    if (
+      getStagedTargetlessCatalogMappingReason(error) === expected.stagedReason
+    ) {
+      return;
+    }
+    throw error;
+  }
+
+  throw new Error(
+    "Staged legacy CatalogTarget assignment changed before targetless use.",
+  );
 }
 
 type LegacyCatalogTargetAccess = "read" | "write";
