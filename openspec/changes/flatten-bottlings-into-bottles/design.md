@@ -407,11 +407,18 @@ validation. A missing or retired source fails explicitly. The adapter does not
 guess a member Bottle, follow a representative as exact identity, or recover
 group authority from a tombstone.
 
-Task 5.4b requires a completed release-promotion mapping before translating a
-legacy update into an exact-only canonical Bottle patch. It returns that
-Bottle's exact CatalogTarget and leaves the retained BottleRelease row
-unchanged; compatibility must not maintain a release mirror. Read/UI coherence
-must be handled by the staged read and product cutovers rather than by a second
+Task 5.4b is a measured promotion-mapped adapter. It requires a completed
+release-promotion mapping, translates only supplied legacy fields into a sparse
+exact patch, and delegates to the canonical concrete Bottle update operation
+used by the standard Bottle route. Omitted fields remain unchanged. An explicit
+null clears the corresponding nullable canonical exact value, including a null
+`imageUrl`, while a non-null legacy `imageUrl` is rejected rather than bypassing
+the canonical upload boundary. The adapter returns the mapped Bottle's exact
+CatalogTarget and leaves the retained BottleRelease row unchanged. It performs
+no parallel direct alias, audit, or job writes; those effects remain owned by
+the canonical update operation. A successful compatibility event records the
+legacy release id and replacement Bottle and target ids. Read/UI coherence must
+be handled by the staged read and product cutovers rather than by a second
 writer. Task 5.4c does not delegate to the legacy Bottle delete route. It first
 defines canonical deletion behavior for permanent promotion mappings, last
 group members, representatives, generic and exact targets, and tombstones,

@@ -91,9 +91,18 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 #### Scenario: Update a promoted legacy release
 
 - **WHEN** a moderator updates a legacy BottleRelease with a completed promotion mapping
-- **THEN** the compatibility adapter applies only the supplied exact fields to the mapped Bottle through the canonical update service
+- **THEN** the compatibility adapter translates only supplied fields into a sparse exact patch for the mapped Bottle through the canonical update operation
+- **AND** omitted fields remain unchanged and an explicit null clears the corresponding nullable canonical value
 - **AND** it returns that Bottle's exact CatalogTarget replacement
 - **AND** it does not update the retained BottleRelease row
+- **AND** it performs no parallel direct alias, audit, or job writes
+- **AND** successful compatibility telemetry records the legacy release id and replacement Bottle and target ids
+
+#### Scenario: Legacy update cannot set an image URL
+
+- **WHEN** a mapped legacy BottleRelease update supplies a non-null `imageUrl`
+- **THEN** the compatibility adapter rejects the request without mutating the mapped Bottle or retained BottleRelease
+- **AND** an explicitly supplied null `imageUrl` remains a canonical clear rather than an omitted field
 
 #### Scenario: Update an unmapped legacy release
 

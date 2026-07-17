@@ -88,10 +88,16 @@ BottleRelease CRUD and registration:
 - `apps/server/src/orpc/routes/bottleReleases/details.ts`
 - `apps/server/src/orpc/routes/bottleReleases/index.ts`
 - `apps/server/src/orpc/routes/bottleReleases/list.ts`
-- `apps/server/src/orpc/routes/bottleReleases/update.ts` remains the legacy
-  direct writer until task 5.4b replaces it with a completed-promotion resolver
-  plus exact-only canonical Bottle update. The adapter returns the exact target
-  and never mirrors changes into BottleRelease.
+- `apps/server/src/orpc/routes/bottleReleases/update.ts` is the task 5.4b
+  measured compatibility boundary. It requires a completed promotion mapping,
+  translates only supplied legacy fields into a sparse exact patch, and
+  delegates to the canonical concrete Bottle update operation used by the
+  standard Bottle route. Omitted fields remain unchanged; explicit null clears
+  the nullable canonical value, including a null `imageUrl`, while non-null
+  `imageUrl` is rejected. It returns the exact CatalogTarget replacement and
+  leaves BottleRelease unchanged, with no parallel direct alias, audit, or job
+  writes. Successful telemetry records the legacy release id and replacement
+  Bottle and target ids. Tasks 9.4 and 9.7 disable and remove the adapter.
 - `apps/server/src/orpc/routes/index.ts`
 - `apps/server/src/app.ts`
 
@@ -162,8 +168,10 @@ Catalog identity, aliases, search, creation, and updates:
 - `apps/server/src/lib/updateConcreteBottle.ts` is the authoritative moderator
   update domain service. Task 5.3a cuts over the standard route and live edit
   workflow. Task 5.3b composes price-match correction approval with its
-  transaction and removes the proposal-specific updater; neither adapter may
-  duplicate its business logic.
+  transaction and removes the proposal-specific updater. Task 5.4b maps a
+  completed legacy promotion to a sparse exact patch over the same operation;
+  none of these adapters may duplicate its business logic or issue parallel
+  alias, audit, or job writes.
 - Task 4.7 adds `apps/server/src/lib/mergeBottleGroups.ts` as the authoritative
   one-source-to-one-destination moderator group-merge service. It owns member
   rematerialization, generic consumer and stable-alias consolidation, tombstone

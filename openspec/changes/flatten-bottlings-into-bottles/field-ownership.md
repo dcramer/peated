@@ -120,14 +120,20 @@ release-shaped object with a fabricated `id`. A non-null legacy `imageUrl` is
 rejected because canonical images use the upload boundary rather than accepting
 an arbitrary stored URL.
 
-A legacy update owns no shared fields. It requires a completed promotion
-mapping and applies only to the mapped exact Bottle through the canonical
-update service. The retained BottleRelease is immutable compatibility input,
-not a write mirror. Legacy delete cannot be translated until canonical Bottle
-deletion preserves the permanent promotion mapping and defines group,
-representative, target, and tombstone ownership. All adapters emit measured
-compatibility writes and are disabled under task 9.4 and removed under task
-9.7.
+A legacy update owns no shared fields. The task 5.4b measured adapter requires a
+completed promotion mapping and sends only supplied fields as a sparse exact
+patch through the canonical concrete Bottle update operation used by the
+standard Bottle route. Omitted fields remain unchanged. An explicit null clears
+the corresponding nullable canonical value, including a null `imageUrl`, while
+a non-null legacy `imageUrl` is rejected rather than bypassing the canonical
+upload boundary. The retained BottleRelease is immutable compatibility input,
+not a write mirror, and the adapter issues no parallel direct alias, audit, or
+job writes. On success it returns the mapped Bottle's exact CatalogTarget and
+records the legacy release id plus replacement Bottle and target ids. Legacy
+delete cannot be translated until canonical Bottle deletion preserves the
+permanent promotion mapping and defines group, representative, target, and
+tombstone ownership. All adapters emit measured compatibility writes and are
+disabled under task 9.4 and removed under task 9.7.
 
 ## Durable Bottle materialization
 
