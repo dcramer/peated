@@ -8,6 +8,10 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import {
+  lockCatalogTargetAssignmentDescriptorInTransaction,
+  resolveCatalogTargetForAssignment,
+} from "@peated/server/lib/catalogTargets";
+import {
   getReservedCollection,
   isReservedCollectionSlug,
   reservedCollectionSlugs,
@@ -143,28 +147,37 @@ export default procedure
       | null
       | undefined;
     collectionBottleResult = await db.transaction(async (tx) => {
-      const [createdCollectionBottle] = await tx
-        .insert(collectionBottles)
-        .values({
-          collectionId: collection.id,
+      // CatalogTarget must be locked before collection membership rows.
+      const target = await resolveCatalogTargetForAssignment(
+        {
+          kind: "legacy",
           bottleId: bottle.id,
           releaseId: input.release ?? null,
-          status: statusProvided ? (input.status ?? null) : null,
-        })
-        .onConflictDoNothing()
-        .returning();
+          context: {
+            caller: "collections.bottles.create",
+            operation: "create",
+          },
+        },
+        tx,
+      );
+      await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
 
-      let collectionBottle = createdCollectionBottle;
-      if (collectionBottle) {
-        await tx
-          .update(collections)
-          .set({
-            totalBottles: sql`${collections.totalBottles} + 1`,
-          })
-          .where(eq(collections.id, collection.id));
-        return { collectionBottle, created: true };
-      } else {
-        const [existingCollectionBottle] = await tx
+      const findTargetMembership = async () => {
+        const [membership] = await tx
+          .select()
+          .from(collectionBottles)
+          .where(
+            and(
+              eq(collectionBottles.collectionId, collection.id),
+              eq(collectionBottles.targetId, target.targetId),
+            ),
+          )
+          .limit(1)
+          .for("update");
+        return membership;
+      };
+      const findLegacyMembership = async () => {
+        const [membership] = await tx
           .select()
           .from(collectionBottles)
           .where(
@@ -176,8 +189,105 @@ export default procedure
                 : isNull(collectionBottles.releaseId),
             ),
           )
-          .limit(1);
-        collectionBottle = existingCollectionBottle;
+          .limit(1)
+          .for("update");
+        return membership;
+      };
+      /**
+       * Reconciles against an already locked descriptor. Its canonical target
+       * wins, and only matching targetless retained state may be absorbed.
+       */
+      const reconcileExistingMembership = async () => {
+        let targetMembership = await findTargetMembership();
+        const legacyMembership = await findLegacyMembership();
+
+        if (targetMembership) {
+          if (legacyMembership && legacyMembership.id !== targetMembership.id) {
+            if (legacyMembership.targetId !== null) {
+              throw errors.CONFLICT({
+                message:
+                  "Collection membership has a conflicting catalog target.",
+              });
+            }
+
+            const imageUrl =
+              (!targetMembership.imageUrl ||
+                targetMembership.imageUrl.trim() === "") &&
+              legacyMembership.imageUrl &&
+              legacyMembership.imageUrl.trim() !== ""
+                ? legacyMembership.imageUrl
+                : targetMembership.imageUrl;
+            await tx
+              .delete(collectionBottles)
+              .where(eq(collectionBottles.id, legacyMembership.id));
+            if (imageUrl !== targetMembership.imageUrl) {
+              [targetMembership] = await tx
+                .update(collectionBottles)
+                .set({ imageUrl })
+                .where(eq(collectionBottles.id, targetMembership.id))
+                .returning();
+            }
+            await tx
+              .update(collections)
+              .set({
+                totalBottles: sql`${collections.totalBottles} - 1`,
+              })
+              .where(eq(collections.id, collection.id));
+          }
+          return targetMembership;
+        }
+
+        if (!legacyMembership) {
+          return undefined;
+        }
+        if (
+          legacyMembership.targetId !== null &&
+          legacyMembership.targetId !== target.targetId
+        ) {
+          throw errors.CONFLICT({
+            message: "Collection membership has a conflicting catalog target.",
+          });
+        }
+        if (legacyMembership.targetId === null) {
+          const [upgradedMembership] = await tx
+            .update(collectionBottles)
+            .set({ targetId: target.targetId })
+            .where(eq(collectionBottles.id, legacyMembership.id))
+            .returning();
+          return upgradedMembership;
+        }
+        return legacyMembership;
+      };
+
+      const existingMembership = await reconcileExistingMembership();
+      if (existingMembership) {
+        return { collectionBottle: existingMembership, created: false };
+      }
+
+      const [createdCollectionBottle] = await tx
+        .insert(collectionBottles)
+        .values({
+          collectionId: collection.id,
+          bottleId: bottle.id,
+          releaseId: input.release ?? null,
+          targetId: target.targetId,
+          status: statusProvided ? (input.status ?? null) : null,
+        })
+        .onConflictDoNothing()
+        .returning();
+
+      let collectionBottle: CollectionBottle | undefined =
+        createdCollectionBottle;
+      if (collectionBottle) {
+        await tx
+          .update(collections)
+          .set({
+            totalBottles: sql`${collections.totalBottles} + 1`,
+          })
+          .where(eq(collections.id, collection.id));
+        return { collectionBottle, created: true };
+      } else {
+        collectionBottle = await reconcileExistingMembership();
       }
 
       if (!collectionBottle) {

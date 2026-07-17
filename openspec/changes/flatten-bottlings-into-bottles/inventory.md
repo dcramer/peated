@@ -149,11 +149,29 @@ Bottle catalog and repair routes:
 
 Target-bearing consumer routes:
 
-- `apps/server/src/orpc/routes/collections/bottles/create.ts` and
-  `apps/server/src/orpc/routes/collections/bottles/delete.ts` are direct
-  collection mutation writers assigned to task 5.6d.
+- `apps/server/src/orpc/routes/collections/bottles/create.ts` is the task 5.6d
+  direct collection membership writer. It resolves and locks one validated
+  exact or generic target before membership, writes no new targetless rows,
+  upgrades a matching targetless legacy-pair row, and conflicts when that pair
+  is owned by a different durable target. When a canonical row and matching
+  targetless duplicate coexist, the canonical row wins with only blank-image
+  fill from the compatibility row and an atomic count correction; status,
+  ownership, and other unit state are preserved.
+- `apps/server/src/orpc/routes/collections/bottles/delete.ts` is the task 5.6d
+  target-aware removal boundary for release-specific and `baseOnly` requests.
+  When a target resolves, it locks that target first, deletes its authoritative
+  membership plus a matching targetless legacy fallback, and preserves
+  different durable targets. An ungrouped parent or release without completed
+  promotion may delete only its matching null-target retained-pair row as
+  measured staged compatibility, never a durable target; section 6 backfills
+  those rows and task 9.7 removes the fallback. A request with neither `release`
+  nor `baseOnly` remains measured retained-parent family-delete compatibility
+  assigned to task 9.7 because it intentionally spans multiple memberships;
+  exact UI removal uses `baseOnly`.
 - `apps/server/src/orpc/routes/collections/bottles/imageHelpers.ts`
-- `apps/server/src/orpc/routes/collections/bottles/list.ts`
+- `apps/server/src/orpc/routes/collections/bottles/list.ts` remains a retained
+  pair read until task 7.3. Existing-row collection target backfill remains
+  section 6, and pair storage/removal remains tasks 9.6/9.7.
 - `apps/server/src/orpc/routes/reviews/create.ts` is a direct user/API Review
   writer assigned to task 5.6c. For known exact or generic intent it resolves
   one descriptor, locks/revalidates it before Review mutation, writes the

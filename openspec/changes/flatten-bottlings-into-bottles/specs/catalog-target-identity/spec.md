@@ -234,6 +234,84 @@ trigger a bounded retry from a fresh snapshot.
 - **AND** the slice remains a code-review boundary with no deployment or
   activation claim
 
+### Requirement: Direct collection membership has one authoritative target
+
+The system SHALL resolve one validated exact or generic CatalogTarget for
+direct collection membership creation and a resolvable specific delete. It
+SHALL lock that target before the membership, SHALL write no new targetless
+membership, and SHALL treat a durable target as authoritative over the retained
+compatibility pair.
+
+#### Scenario: Add an exact or generic collection membership
+
+- **WHEN** a user adds a Bottle or unknown-exactness expression to a collection
+- **THEN** creation resolves and locks one exact or generic target before the
+  collection membership
+- **AND** it stores that target together with the retained legacy pair
+- **AND** it does not substitute a representative Bottle for generic intent
+- **AND** it does not create a targetless row when target validation fails
+
+#### Scenario: Upgrade a matching targetless membership
+
+- **WHEN** the selected retained pair already owns a targetless collection row
+  and no canonical membership exists
+- **THEN** creation upgrades that row to the validated target
+- **AND** it preserves the row's image, status, ownership, and unit-level state
+- **AND** the collection count does not increase
+
+#### Scenario: Retained pair belongs to another durable target
+
+- **WHEN** creation finds the selected retained pair on a collection row whose
+  durable target differs from the validated target
+- **THEN** the mutation conflicts without changing either identity
+- **AND** it does not reinterpret the durable target from the legacy pair
+
+#### Scenario: Consolidate canonical and targetless duplicates
+
+- **WHEN** the validated target membership and a matching targetless legacy-pair
+  membership both exist in the collection
+- **THEN** the canonical target membership remains as the destination
+- **AND** only a blank canonical image may be filled from the compatibility row
+- **AND** canonical status, ownership, non-blank image, and other unit state win
+- **AND** the duplicate is removed and the collection count is corrected in the
+  same transaction
+
+#### Scenario: Remove one resolvable selected membership
+
+- **WHEN** a delete supplies a release or explicitly selects `baseOnly` and the
+  selected pair resolves to a target
+- **THEN** it resolves and locks that pair's target before collection membership
+- **AND** it removes the target-authoritative row plus a matching targetless
+  legacy-pair fallback
+- **AND** it preserves any row owned by a different durable target
+
+#### Scenario: Remove an unresolved staged membership
+
+- **WHEN** a specific delete selects an ungrouped parent or a release without
+  completed promotion
+- **THEN** measured staged compatibility removes only the matching null-target
+  retained-pair membership
+- **AND** it never removes a membership with a durable target
+- **AND** section 6 backfills those rows and task 9.7 removes the fallback
+
+#### Scenario: Retain broad family-delete compatibility
+
+- **WHEN** a delete supplies neither a release nor `baseOnly`
+- **THEN** measured compatibility removes rows by retained parent Bottle
+  identity and may intentionally span multiple canonical memberships
+- **AND** exact UI removal uses `baseOnly` instead of this broad behavior
+- **AND** task 9.7 removes the family-delete compatibility path
+
+#### Scenario: Defer adjacent collection cutovers
+
+- **WHEN** task 5.6d dual-writes direct collection mutations
+- **THEN** collection reads and existing-row backfill remain owned by task 7.3
+  and section 6
+- **AND** legacy pair storage and compatibility removal remain owned by tasks
+  9.6 and 9.7
+- **AND** the slice remains a code-review boundary with no deployment or
+  activation claim
+
 ### Requirement: Existing-match price evidence shares one target
 
 The system SHALL resolve one CatalogTarget for an approved existing-match or

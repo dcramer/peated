@@ -2,17 +2,23 @@ import { db } from "@peated/server/db";
 import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import {
+  isStagedTargetlessCatalogMappingError,
+  lockCatalogTargetAssignmentDescriptorInTransaction,
+  resolveCatalogTargetForAssignment,
+} from "@peated/server/lib/catalogTargets";
+import {
   getReservedCollection,
   isReservedCollectionSlug,
   reservedCollectionSlugs,
 } from "@peated/server/lib/db";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -75,20 +81,74 @@ export default procedure
     }
 
     await db.transaction(async (tx) => {
+      const specificReleaseId = input.baseOnly ? null : (input.release ?? null);
+      const hasSpecificIntent = input.baseOnly || input.release != null;
+      let target = null;
+      if (hasSpecificIntent) {
+        // CatalogTarget must be locked before collection membership rows.
+        try {
+          target = await resolveCatalogTargetForAssignment(
+            {
+              kind: "legacy",
+              bottleId: input.bottle,
+              releaseId: specificReleaseId,
+              context: {
+                caller: "collections.bottles.delete",
+                operation: input.baseOnly ? "deleteBase" : "deleteRelease",
+              },
+            },
+            tx,
+          );
+        } catch (error) {
+          if (!isStagedTargetlessCatalogMappingError(error)) throw error;
+        }
+      }
+
+      if (target) {
+        await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+      }
+
+      const targetlessPair = and(
+        isNull(collectionBottles.targetId),
+        eq(collectionBottles.bottleId, input.bottle),
+        specificReleaseId === null
+          ? isNull(collectionBottles.releaseId)
+          : eq(collectionBottles.releaseId, specificReleaseId),
+      );
+
       const deleted = await tx
         .delete(collectionBottles)
         .where(
           and(
-            eq(collectionBottles.bottleId, input.bottle),
             eq(collectionBottles.collectionId, collection.id),
-            input.baseOnly
-              ? isNull(collectionBottles.releaseId)
-              : input.release
-                ? eq(collectionBottles.releaseId, input.release)
-                : undefined,
+            hasSpecificIntent
+              ? target
+                ? or(
+                    eq(collectionBottles.targetId, target.targetId),
+                    targetlessPair,
+                  )
+                : targetlessPair
+              : eq(collectionBottles.bottleId, input.bottle),
           ),
         )
         .returning();
+
+      if (!hasSpecificIntent) {
+        // This legacy family operation intentionally spans multiple retained
+        // identities. Exact removal uses baseOnly; task 9.7 removes this branch.
+        logInfo("Legacy collection Bottle family compatibility write", {
+          extra: {
+            event: "collection_bottle.compatibility",
+            caller: "collections.bottles.delete",
+            operation: "deleteFamily",
+            removalTask: "9.7",
+            collectionId: collection.id,
+            bottleId: input.bottle,
+            deletedCount: deleted.length,
+          },
+        });
+      }
+
       if (deleted.length) {
         await tx
           .update(collections)

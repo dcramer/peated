@@ -651,6 +651,45 @@ compatibility columns and branches; those remain tasks 7.3, section 6, and task
 9.7. Like the adjacent slices, this is a code-review boundary and makes no
 deployment or activation claim.
 
+### Direct collection mutations use target-authoritative membership
+
+Task 5.6d moves direct collection creation and resolvable specific delete
+mutations to one validated exact or generic CatalogTarget descriptor. Creation
+resolves and locks the descriptor before locking or writing collection
+membership, writes its `targetId` with the retained legacy pair, and never
+creates a new targetless row. The canonical `(collectionId, targetId)`
+membership is authoritative: a matching targetless legacy-pair row may be
+upgraded, while a legacy-pair collision owned by a different durable target
+conflicts rather than reinterpreting that target.
+
+When both the canonical target membership and its matching targetless
+legacy-pair compatibility row exist, creation consolidates them into the
+canonical row. The canonical row wins all unit state; only a blank canonical
+image may be filled from the compatibility row. The duplicate removal and
+collection count adjustment occur in the same transaction, preserving the
+canonical image when non-blank, status, collection ownership, and other
+unit-level state.
+
+A release-specific delete and a `baseOnly` delete resolve and lock the selected
+legacy pair's target before collection membership when one exists. They remove
+the target-authoritative membership plus only a matching targetless legacy-pair
+fallback and preserve a row owned by a different durable target. If the pair is
+an ungrouped parent or a release without completed promotion, measured staged
+compatibility may instead remove only its matching null-target retained-pair
+row; it never removes a durable target. Section 6 backfills those rows and task
+9.7 removes this fallback. The retained delete shape with neither `release` nor
+`baseOnly` remains measured legacy family-delete compatibility: it
+intentionally selects every retained row for the parent `bottleId` and can
+therefore span multiple canonical memberships. Exact UI removal supplies
+`baseOnly`; task 9.7 removes the broad family-delete adapter after compatibility
+traffic reaches zero.
+
+Collection reads remain on the retained pair until task 7.3, existing-row
+backfill remains section 6, and legacy pair storage and compatibility cleanup
+remain tasks 9.6 and 9.7. Unit image, status, and ownership behavior outside
+identity selection is unchanged. This slice is a code-review boundary and
+makes no deployment or activation claim.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

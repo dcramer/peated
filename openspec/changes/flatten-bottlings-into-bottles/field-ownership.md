@@ -124,6 +124,25 @@ Exact Bottle serializers must not require BottleGroup hydration.
   tasks 5.7/5.5c retain create-new price work, task 7.3 owns target-backed
   reads, section 6 owns backfill, and tasks 9.6/9.7 remove retained pairs and
   measured compatibility.
+- Task 5.6d resolves and locks one validated exact or generic target before
+  direct collection membership creation or a resolvable specific delete. New
+  membership is never targetless; a matching targetless legacy-pair row may be
+  upgraded, while a different durable target is authoritative and conflicts
+  rather than being overwritten.
+- Collection uniqueness is target-authoritative. If the canonical target row
+  and a matching targetless legacy duplicate coexist, the canonical row wins;
+  only its blank image may be filled from the compatibility row. Consolidation
+  atomically corrects the collection count and preserves canonical status,
+  ownership, non-blank image, and all other unit-level state.
+- Release-specific and `baseOnly` collection removal resolves and locks the
+  target before membership when one exists, removes that target plus only its
+  matching targetless fallback, and preserves a different durable target. An
+  ungrouped parent or release without completed promotion may remove only its
+  matching null-target retained-pair row as measured staged compatibility,
+  never a durable target; section 6 backfills those rows and task 9.7 removes
+  the fallback. The measured no-release/no-`baseOnly` family delete
+  intentionally spans memberships by retained parent identity until task 9.7;
+  exact UI removal uses `baseOnly`.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes
