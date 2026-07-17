@@ -665,6 +665,10 @@ describe("concrete Bottle creation", () => {
       createConcreteBottle({ context, input }),
     ).rejects.toMatchObject({
       bottleId: first.bottle.id,
+      collision: {
+        kind: "canonical_name",
+        attemptedCanonicalFullName: first.bottle.fullName,
+      },
     });
 
     const smws = await fixtures.Entity({
@@ -691,7 +695,12 @@ describe("concrete Bottle creation", () => {
           exact: { singleCask: true },
         },
       }),
-    ).rejects.toEqual(new BottleAlreadyExistsError(existing.id));
+    ).rejects.toEqual(
+      new BottleAlreadyExistsError(existing.id, {
+        kind: "smws_code",
+        attemptedCanonicalFullName: null,
+      }),
+    );
   });
 
   test("returns deterministic likely groups without using them for grouping", async ({

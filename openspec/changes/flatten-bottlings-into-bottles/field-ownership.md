@@ -116,14 +116,52 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Those target-backed alias and observation writes commit atomically. Exact or
   generic intent is preserved without representative substitution, while the
   observation remains source evidence rather than a catalog grouping decision.
-  Create-new approval remains measured targetless compatibility because it
-  still creates ungrouped legacy Bottle/BottleRelease rows. Task 5.7 replaces
-  that creation and decision vocabulary before task 5.5c assigns the newly
-  created concrete target; the targetless path is not final-state behavior.
+  Create-new approval translates its retained payload into canonical concrete
+  Bottle creation and reuses the resulting exact target for the StorePrice,
+  alias, observation, proposal, and latest attempt. Proposal and attempt current
+  and suggested identity store that target with the matching
+  `(createdBottleId, null)` compatibility projection. The path never inserts a
+  BottleRelease or enters targetless alias/observation compatibility.
+- Bottle-only create-new input supplies stable ownership, including shared
+  stated age, while exact stated age is null. Release-only input requires the
+  trusted source Bottle's group and supplies exact fields. Combined input keeps
+  Bottle stable fields; Release exact values win, with stated age winning even
+  when null and other exact values using Bottle input only as a nullish fallback.
+  Bottle `descriptionSrc` survives only when Bottle description wins. These
+  retained legacy shapes do not guarantee every field can cross the canonical
+  boundary: a non-null Bottle or Release `imageUrl` is rejected rather than
+  ignored or written outside the upload workflow.
+- Duplicate handling rolls the failed creation savepoint back before locking
+  and revalidating the existing exact descriptor and any trusted source
+  descriptor. Reuse requires exact equality with the requested canonical
+  `fullName` and an active exact target; an arbitrary or ignored alias collision,
+  fuzzy name similarity, or fuzzy SMWS collision is not reusable identity.
+  Release-only reuse is limited to the source group; cross-group or drifted
+  descriptors conflict. The later gate rejects changed proposal price, parent,
+  `creationTarget`, `proposedBottle`, `proposedRelease`, or complete StorePrice
+  `{ targetId, bottleId, releaseId }` identity.
+- Create-new approval changes the approved proposal and its own latest-attempt
+  current and suggested target/pair projections, when an attempt exists, in the
+  same transaction. Neither row may commit only part of the selected identity,
+  and cross-volume sibling proposals are not retargeted.
+- For an initial incoming assignment, a new concrete result emits a decision
+  with `create_bottle` and an active exact duplicate emits `match_existing`,
+  both with the exact target and `(bottleId, null)`. A prior source decision is
+  immutable and approval of a previously assigned price does not rewrite or
+  add one. Historical release-creation decisions remain readable until the
+  remaining classifier, caller, and cleanup tasks remove them.
+- An authorized schema-valid call reaching the retained create-new
+  compatibility handler emits structured telemetry with caller, operation,
+  payload discriminator, and handler outcome; a success also records replacement
+  Bottle and exact target ids without the raw payload. Section 8 removes
+  release-shaped callers and task 9.7 removes the route adapter only after
+  observed compatibility-handler traffic is zero.
 - Tasks 5.6c-5.6f own direct review, collection, flight, and price mutations;
-  tasks 5.7/5.5c retain create-new price work, task 7.3 owns target-backed
-  reads, section 6 owns backfill, and tasks 9.6/9.7 remove retained pairs and
-  measured compatibility.
+  tasks 5.8/5.9 own classifier and remaining caller creation, task 7.3 owns
+  target-backed reads, section 6 owns backfill, Section 8 owns release-shaped UI
+  removal, task 5.11 owns generated OpenAPI/client dependencies, and tasks
+  9.6/9.7 remove retained pairs and compatibility. This slice neither begins
+  production backfill nor authorizes deployment.
 - Task 5.6d resolves and locks one validated exact or generic target before
   direct collection membership creation or a resolvable specific delete. New
   membership is never targetless; a matching targetless legacy-pair row may be
@@ -188,8 +226,8 @@ Exact Bottle serializers must not require BottleGroup hydration.
   StorePrice tuple without clearing it or surfacing the stale target failure.
 - Task 5.6f does not change ignored-proposal lease ownership or expiration.
   Direct create-batch ingestion is the completed adjacent 5.6f sub-slice.
-  Alias-driven propagation remains task 5.6b, create-new approval remains tasks
-  5.7/5.5c, and target-backed reads, backfill, broader repair/caller cutovers,
+  Alias-driven propagation remains task 5.6b, create-new approval is the
+  separate concrete-target cutover above, and target-backed reads, backfill, broader repair/caller cutovers,
   cleanup, and deployment remain deferred.
 - Direct create-batch ingestion now owns one incoming StorePrice identity
   decision. A validated exact or generic target replaces the complete tuple;
@@ -264,9 +302,8 @@ Exact Bottle serializers must not require BottleGroup hydration.
 
 ## Legacy correction proposal mapping
 
-Until task 5.7 replaces legacy price-match proposal actions with target-aware
-contracts, a correction `proposedBottle` remains a sparse repair draft for the
-old parent/stable Bottle layer. The compatibility mapper sends required `name`
+For correction proposals, a `proposedBottle` remains a sparse repair draft for
+the old parent/stable Bottle layer. The compatibility mapper sends required `name`
 and `brand`, non-null `series`, `category`, `statedAge`, and `bottler`, and
 non-empty `distillers` as shared BottleGroup intent. The legacy stated age is
 shared because release-specific age belonged to `proposedRelease`; the draft
@@ -278,8 +315,8 @@ selected Bottle. Null fields and empty distillers mean unknown in this sparse
 contract and preserve existing values; boolean false and numeric zero remain
 explicit values. The canonical concrete update service applies both scopes in
 the same transaction as proposal approval, so shared values fan out while
-exact values remain selected-only. Task 5.7 owns target-aware proposal actions
-and an explicit exact-age contract rather than adding inference here.
+exact values remain selected-only. A later explicit contract may replace this
+sparse compatibility shape rather than adding more inference here.
 
 ## Legacy BottleRelease write adapters
 

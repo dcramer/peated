@@ -64,7 +64,13 @@ export class BottleCreateBadRequestError extends Error {
 }
 
 export class BottleAlreadyExistsError extends Error {
-  constructor(readonly bottleId: number) {
+  constructor(
+    readonly bottleId: number,
+    readonly collision: {
+      kind: "alias" | "canonical_name" | "smws_code";
+      attemptedCanonicalFullName: string | null;
+    } | null = null,
+  ) {
     super("Bottle already exists.");
     this.name = "BottleAlreadyExistsError";
   }
@@ -133,19 +139,25 @@ export class TrustedSourceBottleError extends Error {
   }
 }
 
-async function getExistingBottleIdForAlias(
+async function getExistingBottleForAlias(
   tx: AnyTransaction,
   aliasName: string,
-): Promise<number | null> {
+): Promise<{
+  bottleId: number;
+  ignored: boolean | null;
+  assignmentSource: (typeof bottleAliases.$inferSelect)["assignmentSource"];
+} | null> {
   const [result] = await tx
     .select({
       bottleId: bottleAliases.bottleId,
+      ignored: bottleAliases.ignored,
+      assignmentSource: bottleAliases.assignmentSource,
     })
     .from(bottleAliases)
     .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
     .limit(1);
 
-  return result?.bottleId ?? null;
+  return result?.bottleId ? { ...result, bottleId: result.bottleId } : null;
 }
 
 /** Writes prerequisites and reserves the alias for same-transaction Bottle insertion. */
@@ -212,7 +224,10 @@ async function prepareBottleCreateInTransaction(
     bottler: bottleData.bottler ?? null,
   });
   if (existingSmwsBottleId) {
-    throw new BottleAlreadyExistsError(existingSmwsBottleId);
+    throw new BottleAlreadyExistsError(existingSmwsBottleId, {
+      kind: "smws_code",
+      attemptedCanonicalFullName: null,
+    });
   }
 
   const brandUpsert = await upsertEntity({
@@ -343,7 +358,13 @@ async function prepareBottleCreateInTransaction(
     },
   );
   if (alias.bottleId) {
-    throw new BottleAlreadyExistsError(alias.bottleId);
+    throw new BottleAlreadyExistsError(alias.bottleId, {
+      kind:
+        alias.assignmentSource === "canonical" && alias.ignored !== true
+          ? "canonical_name"
+          : "alias",
+      attemptedCanonicalFullName: bottleInsertData.fullName,
+    });
   }
 
   return {
@@ -396,15 +417,25 @@ async function insertPreparedBottleInTransaction(
     .returning();
 
   if (!newAlias) {
-    const existingBottleId = await getExistingBottleIdForAlias(tx, aliasName);
-    if (existingBottleId && existingBottleId !== bottle.id) {
-      throw new BottleAlreadyExistsError(existingBottleId);
+    const existingAlias = await getExistingBottleForAlias(tx, aliasName);
+    if (existingAlias && existingAlias.bottleId !== bottle.id) {
+      throw new BottleAlreadyExistsError(existingAlias.bottleId, {
+        kind:
+          existingAlias.assignmentSource === "canonical" &&
+          existingAlias.ignored !== true
+            ? "canonical_name"
+            : "alias",
+        attemptedCanonicalFullName: bottleInsertData.fullName,
+      });
     }
     throw new Error("Failed to finalize bottle alias.");
   }
 
   if (newAlias.bottleId && newAlias.bottleId !== bottle.id) {
-    throw new BottleAlreadyExistsError(newAlias.bottleId);
+    throw new BottleAlreadyExistsError(newAlias.bottleId, {
+      kind: "canonical_name",
+      attemptedCanonicalFullName: bottleInsertData.fullName,
+    });
   }
 
   const promises: Promise<any>[] = [

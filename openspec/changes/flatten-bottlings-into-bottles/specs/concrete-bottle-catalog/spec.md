@@ -82,14 +82,82 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **AND** it reuses that target for both listing alias and observation identity in the approval transaction
 - **AND** an exact result identifies its concrete Bottle while a generic result remains BottleGroup identity
 - **AND** it does not select a representative Bottle for a generic result
-- **AND** existing price assignment and proposal decision vocabulary remain compatibility data until their explicit cutovers
+- **AND** the retained price-assignment pair remains compatibility data while proposal and attempt rows also persist the target
 
-#### Scenario: Approve create-new price evidence before concrete creation cutover
+#### Scenario: Translate bottle-only price evidence
 
-- **WHEN** create-new approval still produces ungrouped legacy Bottle or BottleRelease rows
-- **THEN** its listing alias and observation remain measured targetless compatibility
-- **AND** they are not treated as compliant target-backed records
-- **AND** the newly created concrete target is assigned only after the legacy creation and decision path is replaced
+- **WHEN** create-new approval receives bottle-only legacy creation input
+- **THEN** Bottle input supplies the independent Bottle's stable identity,
+  including shared stated age
+- **AND** Bottle release-shaped fields supply exact input with exact stated age
+  set to null
+- **AND** it creates one independent concrete Bottle, singleton group, and exact
+  target
+- **AND** it creates no BottleRelease
+
+#### Scenario: Translate combined price evidence
+
+- **WHEN** create-new approval receives combined Bottle and Release input
+- **THEN** Bottle input supplies the independent Bottle's stable identity
+- **AND** Release input takes exact-field precedence, including a stated age
+  that remains authoritative when null
+- **AND** other nullable exact fields use Bottle input as a nullish fallback
+- **AND** Bottle `descriptionSrc` is retained only when Bottle description wins
+- **AND** it creates one independent Bottle, singleton group, and exact target
+- **AND** it creates no BottleRelease
+
+#### Scenario: Approve another release from price evidence
+
+- **WHEN** create-new approval receives release-only input and a trusted source Bottle
+- **THEN** it creates one concrete Bottle in the source Bottle's group and one exact target
+- **AND** Release input supplies the concrete Bottle's exact fields
+- **AND** an active exact duplicate may be reused only when its canonical
+  `fullName` exactly matches the requested canonical `fullName`, its exact
+  target is active, and it belongs to that same group
+- **AND** a cross-group exact duplicate aborts the approval
+- **AND** a collision found only through an arbitrary or ignored alias, fuzzy
+  name similarity, or fuzzy SMWS matching is not reusable exact identity
+
+#### Scenario: Reject an untranslatable create-new image URL
+
+- **WHEN** any otherwise valid bottle-only, release-only, or combined legacy
+  create-new payload supplies a non-null Bottle or Release `imageUrl`
+- **THEN** the compatibility route rejects the input before committing catalog
+  or approval mutations
+- **AND** it does not ignore the image URL or write it around the canonical
+  upload boundary
+- **AND** accepting the retained payload shape does not promise that every
+  legacy field can be translated or preserved
+
+#### Scenario: Persist one concrete approval identity
+
+- **WHEN** create-new approval creates or safely reuses a concrete Bottle
+- **THEN** its listing alias, observation, StorePrice, approved proposal, and
+  that proposal's own latest attempt share the exact target
+- **AND** the approved proposal and its own latest-attempt current and suggested
+  retained projections are `(bottleId, null)`
+- **AND** no cross-volume sibling proposal is retargeted
+- **AND** an incoming decision log receives the same target and projection only
+  when the approval emits an initial source decision
+- **AND** a prior source decision remains immutable
+
+#### Scenario: Preserve the create-new compatibility response
+
+- **WHEN** a retained caller successfully approves a translatable bottle-only,
+  release-only, or combined create-new legacy payload
+- **THEN** the route returns the independently complete concrete Bottle and `release: null`
+- **AND** no BottleRelease writer or finalizer runs
+
+#### Scenario: Measure create-new compatibility-route usage
+
+- **WHEN** an authorized schema-valid request reaches the retained create-new
+  price-approval compatibility handler
+- **THEN** structured compatibility telemetry records the caller, operation,
+  legacy payload discriminator, and handler success or rejection outcome
+- **AND** a successful event includes the replacement Bottle and exact target
+  identifiers without recording the raw payload
+- **AND** task 9.7 removes the route input/output adapter only after Section 8
+  callers have migrated and observed compatibility-handler traffic is zero
 
 #### Scenario: Create through the legacy BottleRelease route
 

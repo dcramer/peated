@@ -174,8 +174,7 @@ choices from BottleGroup ownership; ordinary exact Bottle reads remain
 independent and do not hydrate the group. Task 5.3b separately composes
 moderator price-match correction approval with the canonical update
 transaction and removes the superseded proposal-specific updater in the same
-transactional slice. Until task 5.7 introduces target-aware proposal actions,
-the legacy `proposedBottle` repair draft retains its sparse parent/stable
+transactional slice. The legacy `proposedBottle` repair draft retains its sparse parent/stable
 meaning: required name and brand, non-null series, category, stable stated age,
 and bottler, and non-empty distillers are shared intent; non-null edition, ABV,
 flags, years, and canonical cask fields are exact intent for the selected
@@ -187,8 +186,8 @@ transaction. The canonical post-commit finalizer runs only after that combined
 transaction succeeds, while the retained price-listing alias finalizer remains
 proposal orchestration. The correction route keeps its Bottle response for the
 live moderation UI, but performs no direct Bottle or BottleRelease update or
-name rewrite. Task 5.7 owns the later target-aware action, result, and explicit
-exact-age proposal contracts.
+name rewrite. The create-new cutover does not expand that correction draft or
+infer an exact-age repair from its sparse null fields.
 
 ### Series remains a broader merchandising relationship
 
@@ -513,22 +512,82 @@ exact; a generic result keeps both generic and never substitutes the group's
 representative Bottle. Failure to resolve the target or write either record
 rolls back the complete approval transaction.
 
-Create-new approval remains on the measured targetless alias/observation
-compatibility path in this slice. It still creates legacy ungrouped
-Bottle/BottleRelease rows and therefore has no valid concrete CatalogTarget to
-assign.
-Task 5.7 first replaces that creation and decision vocabulary with concrete
-Bottle/target identity; task 5.5c then requires create-new approval to assign
-both records to the newly created target. The targetless result is staged
-compatibility, not compliant final-state target-backed behavior.
+Create-new approval infers the retained `bottle`, `release`, or
+`bottle_and_release` payload shape and translates it into the canonical
+concrete-Bottle input. Bottle-only and combined payloads create an independent
+Bottle with its singleton group; release-only payloads require the proposal's
+trusted source Bottle and create another Bottle in that source's group. The
+transaction never inserts or finalizes a BottleRelease.
 
-This slice does not redefine price assignment, proposal state, decision-log
-vocabulary, or their retained legacy Bottle/Release pair. Store-price and other
-consumer dual writes remain task 5.6, target-aware proposal actions and decision
-vocabulary remain task 5.7, and target-backed reads remain task 7.3. Task 9.6
-removes the retained consumer pair columns after backfill and parity; task 9.7
-removes the measured legacy resolver and targetless compatibility after traffic
-reaches zero.
+The translation preserves the supported legacy fields without introducing
+group inheritance at read time. Bottle-only input supplies the independent Bottle's
+stable identity, including shared stated age, and supplies its release-shaped
+fields as exact input with exact stated age null. Release-only input reuses the
+trusted source Bottle's group and maps all retained release fields to exact
+input. Combined input takes stable identity from Bottle input and gives Release
+input precedence for exact fields: release stated age wins even when null,
+while other nullable exact values use Bottle input as a nullish fallback.
+Description follows the same release-then-Bottle fallback, but Bottle
+`descriptionSrc` is retained only when Bottle description is the selected
+description. These are retained input shapes, not a promise that every legacy
+field is translatable: a non-null Bottle or Release `imageUrl` remains valid in
+the legacy schema but is deliberately rejected because canonical image creation
+must cross the upload boundary. The adapter neither ignores that value nor
+writes it directly.
+
+Creation takes an unlocked proposal/price preflight before the canonical
+group-first creation locks, then locks and revalidates the proposal after the
+concrete identity is known. A changed price id, parent identity,
+`creationTarget`, `proposedBottle`, `proposedRelease`, or complete StorePrice
+`{ targetId, bottleId, releaseId }` tuple aborts the transaction.
+The canonical creation attempt runs in a nested savepoint, so exact-duplicate
+reuse first rolls back any preparatory entity, series, or graph writes. After
+that rollback, duplicate handling resolves, locks, and revalidates the existing
+exact descriptor and the trusted source descriptor when one applies. It reuses
+the existing target only when the existing Bottle's canonical `fullName`
+exactly equals the requested canonical `fullName`, the exact target and
+descriptor set remain active, and a release-only duplicate remains in the
+trusted source group. A collision surfaced only through an arbitrary or ignored
+alias, fuzzy name similarity, or fuzzy SMWS matching is not safe reusable exact
+identity; it remains a conflict or suggestion. A cross-group or drifted
+descriptor also remains a conflict. A newly created Bottle uses
+`create_bottle`, while safe duplicate reuse uses `match_existing`.
+Historical `create_release` and
+`create_bottle_and_release` enum values remain readable for classifier and
+compatibility records until tasks 5.8, 5.9, and 9.7; this slice needs no enum
+migration.
+
+The selected exact target is the one assignment for StorePrice, listing alias,
+source-keyed observation, proposal current/suggested identity, and latest
+attempt. Each stores the matching `(bottleId, null)` current/suggested
+compatibility projection. The approved proposal and its own latest attempt,
+when one is present, are updated in the same approval transaction so neither
+can commit a different or partial identity. No cross-volume sibling proposal is
+retargeted. An incoming decision log is emitted only for an
+initial incoming Bottle assignment. When emitted, a new graph records
+`create_bottle` and safe duplicate reuse records `match_existing`, with the
+same exact target and retained projection. The source-key uniqueness boundary
+keeps any prior decision immutable, and approval of a previously assigned price
+does not rewrite it. Alias or observation failure rolls back the entire
+group/Bottle/target graph and every approval write. Concrete creation and alias
+finalizers run only after commit; duplicate reuse skips the creation finalizer.
+The compatibility route keeps its `{ bottle, release }` shape but always
+returns `release: null` after a successful translatable request.
+
+Every authorized schema-valid call that reaches the retained compatibility
+handler emits structured usage with caller, operation, legacy payload
+discriminator, and handler success or rejection outcome. A successful event
+includes the replacement Bottle and exact target ids without copying the raw
+payload into telemetry. Section 8 migrates callers off the release-shaped
+input/output, and task 9.7 explicitly removes this route adapter only after
+observed compatibility-handler traffic reaches zero.
+
+Target-backed reads remain task 7.3. Classifier creation and other supported
+legacy writers remain tasks 5.8 and 5.9, the Section 8 UI still needs to stop
+constructing release-shaped create payloads, task 5.11 owns generated
+OpenAPI/client dependencies, and task 9.7 removes the route adapter and
+historical compatibility branches after their gates pass. This code-review
+slice makes no deployment, production backfill, or activation claim.
 
 ### Alias-driven consumers share one assignment owner
 
@@ -555,12 +614,10 @@ Measured name-wide targetless alias compatibility may update only targetless
 matching consumers. It cannot clear, replace, or reinterpret a durable consumer
 target, even when the alias name or retained pair would otherwise match. This
 keeps a later legacy alias event from downgrading a target-aware StorePrice or
-Review. This propagation rule does not override an orchestrator's explicit
-authority over its locked selected row. Until task 5.7, create-new approval is
-such a direct writer: it replaces only the locked selected StorePrice with the
-new legacy pair and `targetId: null` before invoking targetless alias and
-observation compatibility. The subsequent name-wide propagation still cannot
-downgrade any other durable consumer.
+Review. Create-new approval no longer enters this compatibility mode: it passes
+the newly created or reused exact target through the canonical alias assignment,
+which updates the locked selected StorePrice without downgrading any other
+durable consumer.
 
 Alias unassignment uses the captured alias preimage according to the same
 identity authority rule as reads. For a target-aware consumer, `targetId` is
@@ -764,8 +821,8 @@ the token-bearing ignored resolver owns the active lease; this identity cutover
 does not change lease acquisition, renewal, or release semantics. Direct
 create-batch StorePrice ingestion is completed by the adjacent task 5.6f
 sub-slice below.
-Alias-driven StorePrice propagation remains owned by task 5.6b, and create-new
-approval remains tasks 5.7 and 5.5c. Target-backed reads, legacy-row backfill,
+Alias-driven StorePrice propagation remains owned by task 5.6b; create-new
+approval is the separate concrete-target cutover described above. Target-backed reads, legacy-row backfill,
 broader repair/caller cutovers, retained-pair cleanup, and any deployment or
 activation remain outside this review boundary.
 

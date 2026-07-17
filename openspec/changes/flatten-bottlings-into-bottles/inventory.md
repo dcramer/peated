@@ -18,21 +18,21 @@ updated with the production surface they exercise.
 
 ## Database storage
 
-| Surface                        | Legacy identity                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------------ |
-| `bottle_release`               | Concrete release table, owned by `apps/server/src/db/schema/bottles.ts`              |
-| `bottle_observation`           | `bottle_id`, nullable `release_id`                                                   |
-| `bottle_alias`                 | nullable `bottle_id`, nullable `release_id`                                          |
-| `tasting`                      | `bottle_id`, nullable `release_id`                                                   |
-| `review`                       | nullable `bottle_id`, nullable `release_id`                                          |
-| `collection_bottle`            | `bottle_id`, nullable `release_id`                                                   |
-| `flight_bottle`                | `bottle_id`, nullable `release_id`                                                   |
-| `store_price`                  | nullable `bottle_id`, nullable `release_id`                                          |
-| `incoming_bottle_decision_log` | `bottle_id`, nullable `release_id`; release-shaped decision enum values              |
-| `store_price_match_proposal`   | current and suggested Bottle/Release pairs, parent Bottle, release-shaped JSON draft |
-| `store_price_match_attempt`    | historical current and suggested Bottle/Release pairs                                |
-| `pending_upload`               | `bottle_release_image` target kind                                                   |
-| `change`                       | `bottle_release` object type and durable release-shaped payloads                     |
+| Surface                        | Legacy identity                                                                        |
+| ------------------------------ | -------------------------------------------------------------------------------------- |
+| `bottle_release`               | Concrete release table, owned by `apps/server/src/db/schema/bottles.ts`                |
+| `bottle_observation`           | `bottle_id`, nullable `release_id`                                                     |
+| `bottle_alias`                 | nullable `bottle_id`, nullable `release_id`                                            |
+| `tasting`                      | `bottle_id`, nullable `release_id`                                                     |
+| `review`                       | nullable `bottle_id`, nullable `release_id`                                            |
+| `collection_bottle`            | `bottle_id`, nullable `release_id`                                                     |
+| `flight_bottle`                | `bottle_id`, nullable `release_id`                                                     |
+| `store_price`                  | nullable `bottle_id`, nullable `release_id`                                            |
+| `incoming_bottle_decision_log` | `target_id`, `bottle_id`, nullable `release_id`; historical release-shaped decisions   |
+| `store_price_match_proposal`   | current/suggested targets and retained pairs, parent Bottle, release-shaped JSON draft |
+| `store_price_match_attempt`    | historical current/suggested targets and retained Bottle/Release pairs                 |
+| `pending_upload`               | `bottle_release_image` target kind                                                     |
+| `change`                       | `bottle_release` object type and durable release-shaped payloads                       |
 
 The Drizzle owners are:
 
@@ -316,8 +316,10 @@ Catalog identity, aliases, search, creation, and updates:
   alias and observation; exact/generic selection follows the promotion and
   parent-cardinality rules. A locked alias integrity check validates that
   descriptor rather than resolving another semantic intent. Create-new approval
-  cannot use this path while it creates ungrouped legacy rows; task 5.5c cuts it
-  over after task 5.7 supplies a newly created concrete target.
+  now receives the exact target directly from canonical concrete creation or
+  validated exact-duplicate reuse and passes that descriptor to the StorePrice,
+  alias, and observation writers. It does not re-resolve its newly created
+  `(bottleId, null)` projection through the measured legacy-pair boundary.
   Durable `targetId` values are authoritative; the measured legacy pair is used
   only when a compatibility row has no target. Retain that legacy branch
   through the task 9.5 read window and remove it under task 9.7.
@@ -408,6 +410,19 @@ Classifier decisions and price matching:
 - `apps/server/src/agents/bottleClassifier/service.ts`
 - `apps/server/src/lib/classifierDecisionCreateInputs.ts`
 - `apps/server/src/lib/incomingBottleDecisionLog.ts`
+- `apps/server/src/lib/priceMatchConcreteBottleInput.ts` is the sole translator
+  from retained price-match creation payloads to canonical concrete creation:
+  bottle-only input owns the independent Bottle's stable fields, including
+  shared stated age, while its exact stated age is null; release-only input
+  requires a trusted source Bottle and maps the release fields to exact input;
+  combined input keeps stable fields from Bottle input and gives Release input
+  precedence for exact fields. Combined release stated age wins even when null;
+  other nullable exact fields fall back to Bottle input, and Bottle
+  `descriptionSrc` is retained only when Bottle description wins. The three
+  legacy payload shapes remain valid compatibility shapes, but a non-null
+  Bottle or Release `imageUrl` is deliberately rejected because this
+  transaction cannot cross the canonical upload boundary; the translator does
+  not claim that every legacy field is accepted or silently preserved.
 - `apps/server/src/lib/priceMatchingAutomation.ts`
 - `apps/server/src/lib/priceMatchingDraftNormalization.ts`
 - `apps/server/src/lib/priceMatchingProposals.ts` retains proposal validation,
@@ -417,8 +432,7 @@ Classifier decisions and price matching:
   transaction-scoped concrete update service. The superseded proposal-specific
   updater, including its direct entity, series, distiller, Bottle,
   BottleRelease-name, audit, and post-commit writes, is removed rather than
-  retained as a second business system. Release creation elsewhere in this
-  service remains until tasks 5.7 and 9.7. For task 5.5b,
+  retained as a second business system. For task 5.5b,
   `applyApprovedStorePriceMatchInTransaction` and
   `applyStorePriceBottleRepairFromProposal` are the existing-match and
   correction orchestrators. Each owns its one measured legacy-pair resolution
@@ -429,17 +443,49 @@ Classifier decisions and price matching:
   atomically passes it to `assignBottleAliasInTransaction` while
   `upsertStorePriceObservationInTransaction` persists the same `targetId`.
   Either both target-backed identities commit or the approval rolls back.
-  Existing price assignment, proposal state, decision log vocabulary, and
-  their retained legacy pair are unchanged.
-  Create-new approval still creates ungrouped Bottle/BottleRelease rows and
-  retains measured targetless alias/observation writes. As the authoritative
-  direct writer for its locked selected StorePrice, it first replaces only that
-  row with the newly created legacy pair and `targetId: null`; this explicit
-  selected-row mutation is distinct from name-wide targetless alias
-  propagation, which cannot downgrade any other durable consumer. This is
-  compatibility, not compliant target-backed behavior. Task 5.7 replaces its
-  legacy creation and decision vocabulary, then task 5.5c assigns the newly
-  created concrete target to both records. Task 5.6b owns StorePrice and Review
+  Existing-match and correction price assignment retains its compatibility
+  pair while persisting current/suggested proposal and latest-attempt targets.
+  A finalized attempt stores the same target and matching current/suggested
+  retained pair, including `(bottleId, null)` for concrete create-new approval.
+  Create-new approval now infers the actual retained payload shape and delegates
+  exclusively to `createConcreteBottleInTransaction`; the translator rejects
+  images that cannot cross the canonical upload boundary. Bottle-only and
+  combined input create an independent concrete Bottle, while release-only input
+  requires the proposal's trusted source Bottle. No BottleRelease writer or
+  finalizer remains in this path.
+  The operation preflights proposal identity before canonical group-first locks,
+  then locks and revalidates the proposal. The concrete creation attempt runs in
+  a nested savepoint so a duplicate first rolls back all preparatory writes. It
+  then locks and revalidates the existing exact target together with the trusted
+  source descriptor when present before accepting reuse. Reuse additionally
+  requires exact equality with the requested canonical `fullName` and an active
+  exact target; an arbitrary or ignored alias collision, fuzzy name match, or
+  fuzzy SMWS collision is not reusable identity. Release-only reuse must stay in
+  the trusted source group, and cross-group duplicates conflict. The later
+  proposal/price gate rejects parent-id drift, price-id drift, changes to
+  `creationTarget`, `proposedBottle`, or `proposedRelease`, or any change to the
+  complete StorePrice `{targetId,bottleId,releaseId}` tuple.
+  A new graph uses `create_bottle`; duplicate reuse uses `match_existing`. For
+  an initial incoming assignment, the emitted source decision stores that
+  action, exact target, and `(bottleId, null)` projection. A preexisting source
+  decision remains immutable through the source conflict rule, and approval of
+  an already assigned StorePrice does not promise to rewrite or add that log.
+  The exact target and retained projection are written atomically to the
+  StorePrice, alias, observation, proposal, and latest attempt. The approved
+  proposal and its own latest-attempt current/suggested identities, when an
+  attempt is present, change in the same approval transaction so neither can
+  commit a different or partial target projection. Cross-volume sibling
+  proposals are not retargeted. Historical
+  release-create enum values remain for untouched classifier/caller records and
+  require no migration. The route preserves `{ bottle, release }` output with
+  `release: null` for a successful translatable request; post-commit concrete
+  and alias finalizers remain the only finalizers. Every authorized schema-valid
+  call reaching the compatibility handler emits structured usage with caller,
+  operation, legacy payload discriminator, and handler outcome; successful
+  usage also records replacement Bottle and exact target ids without the raw
+  payload. Section 8 removes callers' release-shaped inputs and outputs, and
+  task 9.7 removes the adapter after observed compatibility-handler traffic
+  reaches zero. Task 5.6b owns StorePrice and Review
   propagation reached through canonical alias assignment; task 5.6f owns direct
   price-row identity writers, including automated assignment clears that
   previously cleared only the retained pair.
@@ -460,11 +506,14 @@ Classifier decisions and price matching:
   StorePrice tuple without clearing it or surfacing the stale target failure.
   Existing processing-lease behavior is unchanged. Direct create-batch
   ingestion is completed by the adjacent task 5.6f sub-slice. Task 5.6b retains
-  alias-driven propagation, tasks 5.7/5.5c retain create-new approval, task 7.3
+  alias-driven propagation, tasks 5.8/5.9 retain classifier and caller creation, task 7.3
   owns target-backed reads, section 6 owns existing-row backfill, broader
   repair/caller cutovers remain outside this sub-slice, task 9.6 removes
   retained consumer pairs, and task 9.7 removes measured targetless/legacy
-  resolution. This review boundary makes no deployment or activation claim.
+  resolution. Section 8 removes release-shaped UI input/output assumptions,
+  task 5.11 owns generated OpenAPI/client cutover, and this review boundary
+  makes no deployment or activation claim. Production backfill and deployment
+  remain gated by their fresh retained audits and explicit approvals.
 - `apps/server/src/lib/pendingUploads.ts`
 
 ## Workers and queue payloads

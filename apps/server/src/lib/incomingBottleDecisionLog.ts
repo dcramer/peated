@@ -27,19 +27,6 @@ export function getIncomingBottleDecisionFromResolutionSource(
   }
 }
 
-export function getIncomingBottleDecisionFromCreationTarget(
-  creationTarget: "bottle" | "release" | "bottle_and_release",
-): IncomingBottleDecisionType {
-  switch (creationTarget) {
-    case "bottle":
-      return "create_bottle";
-    case "release":
-      return "create_release";
-    case "bottle_and_release":
-      return "create_bottle_and_release";
-  }
-}
-
 export function shouldRecordIncomingBottleDecision({
   previousBottleId,
   bottleId,
@@ -65,6 +52,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     actor,
     bottleId,
     releaseId = null,
+    targetId = null,
     createdBottle = false,
     createdRelease = false,
     confidence = null,
@@ -82,6 +70,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     actor: IncomingBottleDecisionActor;
     bottleId: number;
     releaseId?: number | null;
+    targetId?: number | null;
     createdBottle?: boolean;
     createdRelease?: boolean;
     confidence?: number | null;
@@ -107,6 +96,7 @@ export async function recordIncomingBottleDecisionInTransaction(
       actorId: actor.id,
       bottleId,
       releaseId,
+      targetId,
       createdBottle,
       createdRelease,
       confidence,

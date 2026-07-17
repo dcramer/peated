@@ -463,7 +463,7 @@ the current active processing lease.
 - **THEN** direct create-batch ingestion is completed by the adjacent second
   task 5.6f sub-slice
 - **AND** alias-driven propagation remains owned by task 5.6b
-- **AND** create-new approval remains owned by tasks 5.7 and 5.5c
+- **AND** create-new approval is handled by its separate concrete-target cutover
 - **AND** target-backed reads, existing-row backfill, broader repair and caller
   cutovers, retained-pair cleanup, and deployment remain outside this review
   boundary
@@ -568,19 +568,75 @@ price-assignment contract.
 #### Scenario: Retain adjacent compatibility contracts
 
 - **WHEN** the alias and observation are assigned their shared target
-- **THEN** existing price, proposal, and decision-log Bottle/Release pair semantics remain unchanged
-- **AND** proposal decision vocabulary remains unchanged until its explicit cutover
+- **THEN** existing-match and correction retained Bottle/Release pair semantics remain unchanged
+- **AND** their current and suggested proposal and latest-attempt identities
+  store the approved target with the matching retained pair projection
 
-#### Scenario: Approve a create-new proposal before creation cutover
+#### Scenario: Approve a create-new proposal after concrete creation cutover
 
-- **WHEN** create-new approval still creates ungrouped legacy Bottle or BottleRelease rows
-- **THEN** its authoritative direct writer replaces only the locked selected
-  StorePrice with the new legacy pair and `targetId: null`
-- **AND** name-wide targetless alias propagation preserves every other durable
-  consumer target
-- **AND** its alias and observation remain on the measured targetless compatibility path
-- **AND** the system does not claim that those records are target-backed
-- **AND** a later task assigns the newly created concrete target after creation and decision vocabulary are cut over
+- **WHEN** create-new approval creates or reuses a concrete Bottle
+- **THEN** the exact CatalogTarget is the shared StorePrice, listing-alias,
+  source-observation, proposal, and latest-attempt identity
+- **AND** proposal and attempt current and suggested identities store that target
+  with matching `(bottleId, null)` projections
+- **AND** target-aware alias assignment gives same-site, same-listing-name,
+  same-volume StorePrice rows that exact target and retained projection
+- **AND** it does not retarget a cross-volume proposal
+- **AND** failure to persist any identity rolls back the complete concrete graph and approval
+
+#### Scenario: Keep the approved proposal and its latest attempt in atomic parity
+
+- **WHEN** create-new approval stores the selected exact target and retained
+  projection on its proposal
+- **THEN** that proposal's own latest attempt, when present, receives the same
+  target and current/suggested retained projections in that approval transaction
+- **AND** no approval may commit a proposal identity without its corresponding
+  latest-attempt identity update, or vice versa
+- **AND** it does not retarget a cross-volume sibling proposal
+
+#### Scenario: Record concrete create-new vocabulary
+
+- **WHEN** create-new approval makes an initial incoming Bottle assignment and
+  no source decision already exists
+- **THEN** a newly created Bottle emits `create_bottle`, the exact target,
+  `(bottleId, null)`, `createdBottle: true`, and `createdRelease: false`
+- **AND** safe exact-duplicate reuse emits `match_existing`, the same target and
+  retained-pair shape, and no concrete creation finalizer
+- **AND** historical release-creation decision values remain readable until their explicit compatibility removal
+
+#### Scenario: Preserve prior incoming decisions
+
+- **WHEN** create-new approval encounters a prior source decision or a
+  StorePrice that already had Bottle identity
+- **THEN** it does not rewrite or add an incoming decision log for that source
+- **AND** the approved proposal, attempt, StorePrice, alias, and observation
+  still receive the selected concrete target according to their own contracts
+
+#### Scenario: Reuse a duplicate after rollback and revalidation
+
+- **WHEN** canonical create-new execution detects an exact duplicate
+- **THEN** its nested creation savepoint first rolls back all preparatory writes
+- **AND** the existing exact descriptor and any trusted source descriptor are
+  locked and revalidated before reuse
+- **AND** reuse requires the existing Bottle's canonical `fullName` to exactly
+  equal the requested canonical `fullName` and its exact target to remain active
+- **AND** an arbitrary or ignored alias collision, fuzzy name similarity, or
+  fuzzy SMWS collision is not accepted as reusable exact identity
+- **AND** release-only reuse requires both descriptors to remain active in the
+  same group
+- **AND** a changed proposal price id, parent Bottle id, `creationTarget`,
+  `proposedBottle`, `proposedRelease`, or complete StorePrice identity tuple
+  aborts approval without overwriting the newer identity
+
+#### Scenario: Defer adjacent create-new cutovers
+
+- **WHEN** the concrete create-new price-approval slice is reviewed
+- **THEN** classifier creation and remaining legacy writers stay assigned to
+  tasks 5.8 and 5.9
+- **AND** target-backed reads, existing-row backfill, release-shaped web input,
+  generated OpenAPI/client dependencies, and compatibility cleanup stay assigned
+  to task 7.3, section 6, section 8, task 5.11, and task 9.7 respectively
+- **AND** the slice neither begins production backfill nor authorizes deployment
 
 ### Requirement: Target integrity is database enforced
 
