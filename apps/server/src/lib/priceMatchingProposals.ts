@@ -32,7 +32,9 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import {
+  CatalogTargetResolutionError,
   lockCatalogTargetAssignmentDescriptorInTransaction,
+  lockCatalogTargetAssignmentDescriptorsInTransaction,
   resolveCatalogTargetForAssignment,
   type CatalogTargetAssignmentDescriptor,
 } from "@peated/server/lib/catalogTargets";
@@ -949,8 +951,9 @@ async function reloadStorePriceMatchProposal(
 
 async function reloadStorePriceMatchProposalByPriceId(
   priceId: number,
+  database: AnyDatabase,
 ): Promise<StorePriceMatchProposal> {
-  const proposal = await db.query.storePriceMatchProposals.findFirst({
+  const proposal = await database.query.storePriceMatchProposals.findFirst({
     where: eq(storePriceMatchProposals.priceId, priceId),
   });
 
@@ -1221,27 +1224,27 @@ export async function upsertStorePriceMatchProposal({
     .returning();
 
   if (!proposal && expectedProcessingToken) {
-    return await reloadStorePriceMatchProposalByPriceId(price.id);
+    return await reloadStorePriceMatchProposalByPriceId(price.id, tx);
   }
 
   return proposal;
 }
 
+/** Conditionally clears one complete durable StorePrice identity snapshot. */
 async function clearIgnoredStorePriceAssignmentInTransaction(
   tx: AnyDatabase,
   {
     priceId,
-    expectedBottleId,
-    expectedReleaseId,
+    expectedIdentity,
   }: {
     priceId: number;
-    expectedBottleId: number | null;
-    expectedReleaseId: number | null;
+    expectedIdentity: Pick<StorePrice, "targetId" | "bottleId" | "releaseId">;
   },
 ) {
   await tx
     .update(storePrices)
     .set({
+      targetId: null,
       bottleId: null,
       releaseId: null,
       updatedAt: sql`NOW()`,
@@ -1249,10 +1252,10 @@ async function clearIgnoredStorePriceAssignmentInTransaction(
     .where(
       and(
         eq(storePrices.id, priceId),
-        expectedBottleId === null
-          ? sql`${storePrices.bottleId} IS NULL`
-          : eq(storePrices.bottleId, expectedBottleId),
-        sql`${storePrices.releaseId} IS NOT DISTINCT FROM ${expectedReleaseId}`,
+        // Catalog identity is one CAS snapshot; partial matches must not clear it.
+        sql`${storePrices.targetId} IS NOT DISTINCT FROM ${expectedIdentity.targetId}`,
+        sql`${storePrices.bottleId} IS NOT DISTINCT FROM ${expectedIdentity.bottleId}`,
+        sql`${storePrices.releaseId} IS NOT DISTINCT FROM ${expectedIdentity.releaseId}`,
       ),
     );
 }
@@ -1574,6 +1577,7 @@ export async function resolveStorePriceMatchProposal(
   let extractedLabel: ExtractedBottleDetails | null = null;
   let candidates: PriceMatchCandidate[] = [];
   let searchEvidence: SearchEvidence[] = [];
+  let ignoredClassification = false;
 
   try {
     // Price matching consumes the generic bottle classifier and only layers
@@ -1608,8 +1612,14 @@ export async function resolveStorePriceMatchProposal(
     searchEvidence = classification.artifacts.searchEvidence;
 
     if (isIgnoredBottleClassification(classification)) {
-      return await db.transaction(async (tx) => {
-        const proposal = await upsertStorePriceMatchProposal({
+      ignoredClassification = true;
+      const expectedIdentity = {
+        targetId: price.targetId,
+        bottleId: price.bottleId,
+        releaseId: price.releaseId,
+      };
+      const upsertIgnoredProposal = async (tx: AnyDatabase) =>
+        await upsertStorePriceMatchProposal({
           price,
           extractedLabel,
           candidates,
@@ -1618,24 +1628,89 @@ export async function resolveStorePriceMatchProposal(
           expectedProcessingToken: processingToken,
           tx,
         });
-        await recordStorePriceMatchAttempt({ proposal, tx });
+      /** Returns a replacement owner's proposal, or requires locked drift proof for the active owner. */
+      const persistIgnoredResultIfIdentityDrifted = async (
+        resolutionError: CatalogTargetResolutionError,
+      ) =>
+        await db.transaction(async (tx) => {
+          // Recovery keeps the canonical proposal-before-StorePrice lock order.
+          const proposal = await upsertIgnoredProposal(tx);
+          if (
+            !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
+          ) {
+            await recordStorePriceMatchAttempt({ proposal, tx });
+            return proposal;
+          }
 
-        if (
-          !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
-        ) {
+          const [currentIdentity] = await tx
+            .select({
+              targetId: storePrices.targetId,
+              bottleId: storePrices.bottleId,
+              releaseId: storePrices.releaseId,
+            })
+            .from(storePrices)
+            .where(eq(storePrices.id, price.id))
+            .limit(1)
+            .for("update");
+
+          // Suppress target failure only after locked proof of complete-tuple drift.
+          if (
+            !currentIdentity ||
+            (currentIdentity.targetId === expectedIdentity.targetId &&
+              currentIdentity.bottleId === expectedIdentity.bottleId &&
+              currentIdentity.releaseId === expectedIdentity.releaseId)
+          ) {
+            throw resolutionError;
+          }
+
+          await recordStorePriceMatchAttempt({ proposal, tx });
           return proposal;
-        }
+        });
 
-        if (price.bottleId !== null || price.releaseId !== null) {
-          await clearIgnoredStorePriceAssignmentInTransaction(tx, {
-            priceId: price.id,
-            expectedBottleId: price.bottleId,
-            expectedReleaseId: price.releaseId ?? null,
+      try {
+        let targetAssignment: CatalogTargetAssignmentDescriptor | null = null;
+        if (expectedIdentity.targetId !== null) {
+          targetAssignment = await resolveCatalogTargetForAssignment({
+            kind: "target",
+            targetId: expectedIdentity.targetId,
           });
         }
 
-        return proposal;
-      });
+        return await db.transaction(async (tx) => {
+          if (targetAssignment) {
+            await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
+              targetAssignment,
+            ]);
+          }
+
+          const proposal = await upsertIgnoredProposal(tx);
+          await recordStorePriceMatchAttempt({ proposal, tx });
+          if (
+            !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
+          ) {
+            return proposal;
+          }
+
+          if (
+            expectedIdentity.targetId !== null ||
+            expectedIdentity.bottleId !== null ||
+            expectedIdentity.releaseId !== null
+          ) {
+            await clearIgnoredStorePriceAssignmentInTransaction(tx, {
+              priceId: price.id,
+              expectedIdentity,
+            });
+          }
+
+          return proposal;
+        });
+      } catch (error) {
+        if (!(error instanceof CatalogTargetResolutionError)) {
+          throw error;
+        }
+
+        return await persistIgnoredResultIfIdentityDrifted(error);
+      }
     }
 
     const classifierDecision = normalizeClassifierDecisionForPriceMatching(
@@ -1785,6 +1860,11 @@ export async function resolveStorePriceMatchProposal(
       return erroredProposal;
     }
   } catch (err) {
+    if (ignoredClassification && err instanceof CatalogTargetResolutionError) {
+      // Owned unchanged invalid targets are integrity failures, not classifier errors.
+      throw err;
+    }
+
     logError(err, {
       price: {
         id: price.id,

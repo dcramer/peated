@@ -726,6 +726,48 @@ remains section 6, and target-native Flight input remains task 8.7. Tasks 9.6
 and 9.7 remove retained pair storage and compatibility. This slice is a
 code-review boundary and makes no deployment or activation claim.
 
+### Automated ignored StorePrice clears preserve one identity tuple
+
+The first task 5.6f sub-slice changes only the automated assignment clear that
+runs when price matching classifies a listing as ignored. A StorePrice's
+`{ targetId, bottleId, releaseId }` values form one identity tuple. A non-null
+`targetId` is authoritative; the retained pair remains compatibility data and
+cannot independently authorize clearing or reconstruct a different target.
+
+Ignored resolution snapshots the complete tuple before classifier work. When
+the snapshot has a durable exact or generic target, the clear path resolves and
+locks that target through the global BottleGroup, exact-Bottle when present,
+then CatalogTarget hierarchy before locking or mutating the proposal and price
+rows. Generic identity remains on the BottleGroup target and never selects a
+representative Bottle. A targetless compatibility snapshot does not invent a
+target merely to clear an assignment and therefore needs no target lock.
+
+The StorePrice clear is one null-safe compare-and-set over all three identity
+columns. It clears `targetId`, `bottleId`, and `releaseId` together only when the
+locked current tuple still equals the snapshot. Target-only drift, pair-only
+drift, or a complete reassignment preserves the current tuple. If a concurrent
+group or Bottle merge makes the snapshotted target fail resolution but also
+changes the StorePrice tuple, that changed tuple is preserved as merge drift.
+This recovery applies whether target invalidation is observed during initial
+descriptor resolution or during hierarchy-lock revalidation after waiting.
+An ignored resolver is authorized when execution is tokenless or its token owns
+the current active processing lease. If target resolution fails for an
+authorized resolver while the StorePrice still has the unchanged snapshotted
+tuple, the operation fails as target-integrity damage instead of erasing the
+evidence or falling back to pair-only clearing. A stale resolver that lost its
+lease to a replacement owner instead returns the replacement owner's current
+proposal and preserves the StorePrice tuple without clearing it or surfacing
+the stale target-resolution failure.
+
+The existing processing-token and expiration checks continue to decide whether
+the token-bearing ignored resolver owns the active lease; this identity cutover
+does not change lease acquisition, renewal, or release semantics. Direct
+create-batch StorePrice ingestion is the remaining task 5.6f sub-slice.
+Alias-driven StorePrice propagation remains owned by task 5.6b, and create-new
+approval remains tasks 5.7 and 5.5c. Target-backed reads, legacy-row backfill,
+broader repair/caller cutovers, retained-pair cleanup, and any deployment or
+activation remain outside this review boundary.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

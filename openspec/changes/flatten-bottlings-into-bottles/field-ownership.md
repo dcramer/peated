@@ -166,6 +166,31 @@ Exact Bottle serializers must not require BottleGroup hydration.
   backfill, task 8.7 owns target-native Flight input, and tasks 9.6/9.7 remove
   retained pair storage and compatibility. Task 5.6e is not a deployment or
   activation unit.
+- A StorePrice's `{ targetId, bottleId, releaseId }` columns form one identity
+  tuple. A durable `targetId` is authoritative over its retained compatibility
+  pair; pair-only state cannot reinterpret or downgrade that target.
+- The automated ignored-assignment clear snapshots the complete StorePrice
+  identity tuple. For a durable exact or generic target, it resolves and locks
+  the BottleGroup, exact Bottle when present, and CatalogTarget before the
+  proposal and StorePrice. A targetless compatibility tuple may clear without
+  inventing or substituting a target.
+- The ignored clear uses one null-safe compare-and-set over all three identity
+  columns and clears all three together only when the current tuple still
+  equals the snapshot. Target-only drift, pair-only drift, and complete
+  reassignment preserve the current tuple.
+- If concurrent merge work invalidates the snapshotted target and also changes
+  the StorePrice tuple, the changed tuple is preserved as merge drift. An
+  ignored resolver is authorized when execution is tokenless or its token owns
+  the current active processing lease. Only for that authorized resolver is an
+  unchanged tuple whose durable target cannot resolve an integrity failure; it
+  is not silently cleared through the retained pair. A stale resolver that lost
+  its lease returns the replacement owner's current proposal and preserves the
+  StorePrice tuple without clearing it or surfacing the stale target failure.
+- Task 5.6f does not change ignored-proposal lease ownership or expiration.
+  Direct create-batch ingestion remains the other 5.6f sub-slice. Alias-driven
+  propagation remains task 5.6b, create-new approval remains tasks 5.7/5.5c,
+  and target-backed reads, backfill, broader repair/caller cutovers, cleanup,
+  and deployment remain deferred.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes

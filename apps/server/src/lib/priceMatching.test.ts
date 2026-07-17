@@ -1,10 +1,12 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
   bottleObservations,
   bottleReleasePromotions,
   bottleReleases,
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   catalogTargets,
@@ -19,7 +21,10 @@ import {
   findBottleReferenceCandidates,
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
-import { CatalogTargetInvalidMappingError } from "@peated/server/lib/catalogTargets";
+import {
+  CatalogTargetInvalidMappingError,
+  CatalogTargetRetiredError,
+} from "@peated/server/lib/catalogTargets";
 import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
@@ -30,7 +35,32 @@ import {
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import pg from "pg";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  observer: NodePgClient,
+  blockerPid: number,
+): Promise<number> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await observer.query<{ pid: number }>(
+      `SELECT pid
+       FROM pg_stat_activity
+       WHERE $1 = ANY(pg_blocking_pids(pid))
+       ORDER BY pid
+       LIMIT 1`,
+      [blockerPid],
+    );
+    const blockedPid = result.rows[0]?.pid;
+    if (blockedPid) return blockedPid;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for ignored StorePrice target lock.");
+}
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
 const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -3233,7 +3263,7 @@ describe("priceMatching", () => {
     });
   });
 
-  test("auto ignored bundle listings clear stale bottle assignments", async ({
+  test("auto ignored bundle listings clear the complete exact-target assignment", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -3274,8 +3304,11 @@ describe("priceMatching", () => {
     expect(proposal.proposalType).toBe("no_match");
     expect(proposal.currentBottleId).toBe(bottle.id);
     expect(proposal.currentReleaseId).toBe(release.id);
-    expect(updatedPrice?.bottleId).toBeNull();
-    expect(updatedPrice?.releaseId).toBeNull();
+    expect(updatedPrice).toMatchObject({
+      targetId: null,
+      bottleId: null,
+      releaseId: null,
+    });
   });
 
   test("routes unsupported novelty flavored-whiskey listings through the classifier", async ({
@@ -6162,6 +6195,719 @@ describe("priceMatching", () => {
     ).toBe(false);
   });
 
+  test("active ignored-processing owner clears durable identity and releases its lease", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const targetId = await getExactTargetId(bottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId,
+      name: "Owned Lease Gift Bundle",
+      imageUrl: null,
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+        processingToken: "lease-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      processingToken: "lease-token",
+    });
+    const [updatedProposal, updatedPrice] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, existingProposal.id),
+      }),
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ]);
+
+    expect(proposal.status).toBe("ignored");
+    expect(updatedProposal).toMatchObject({
+      status: "ignored",
+      processingToken: null,
+      processingQueuedAt: null,
+      processingExpiresAt: null,
+    });
+    expect(updatedPrice).toMatchObject({
+      targetId: null,
+      bottleId: null,
+      releaseId: null,
+    });
+  });
+
+  test("replacement owner survives ignored invalid-target recovery with unchanged identity", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const targetId = await getExactTargetId(bottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId,
+      name: "Reowned Lease Gift Bundle",
+      imageUrl: null,
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+        processingToken: "lease-token",
+        processingQueuedAt: new Date(Date.now() - 60_000),
+        processingExpiresAt: new Date(Date.now() + 10 * 60_000),
+      })
+      .returning();
+    const replacementExpiry = new Date(Date.now() + 20 * 60_000);
+
+    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+      await db
+        .update(storePriceMatchProposals)
+        .set({
+          processingToken: "other-owner",
+          processingQueuedAt: new Date(),
+          processingExpiresAt: replacementExpiry,
+        })
+        .where(eq(storePriceMatchProposals.id, existingProposal.id));
+      await db.insert(bottleTombstones).values({
+        bottleId: bottle.id,
+        newBottleId: null,
+      });
+
+      return buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      });
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      processingToken: "lease-token",
+    });
+    const [updatedProposal, updatedPrice] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, existingProposal.id),
+      }),
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ]);
+
+    expect(proposal).toMatchObject({
+      status: "pending_review",
+      processingToken: "other-owner",
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "pending_review",
+      processingToken: "other-owner",
+      processingExpiresAt: replacementExpiry,
+    });
+    expect(updatedPrice).toMatchObject({
+      targetId,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+  });
+
+  test("auto ignored listings clear a generic target without selecting a representative", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const genericTargetId = await getGenericTargetId(bottle.groupId!);
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      targetId: genericTargetId,
+      name: "Generic Expression Gift Bundle",
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal).toMatchObject({
+      status: "ignored",
+      currentBottleId: null,
+      currentReleaseId: null,
+    });
+    expect(updatedPrice).toMatchObject({
+      targetId: null,
+      bottleId: null,
+      releaseId: null,
+    });
+  });
+
+  test("auto ignored listings clear a targetless retained pair", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId: null,
+      name: "Legacy Pair Gift Bundle",
+      imageUrl: null,
+    });
+    await db
+      .update(storePrices)
+      .set({ releaseId: release.id })
+      .where(eq(storePrices.id, price.id));
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(updatedPrice).toMatchObject({
+      targetId: null,
+      bottleId: null,
+      releaseId: null,
+    });
+  });
+
+  test("invalid unchanged ignored targets fail before proposal, attempt, or price mutation", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const targetId = await getExactTargetId(bottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId,
+      name: "Retired Target Gift Bundle",
+      imageUrl: null,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    await expect(
+      resolveStorePriceMatchProposal(price.id),
+    ).rejects.toBeInstanceOf(CatalogTargetRetiredError);
+
+    const [updatedPrice, proposal, attempts] = await Promise.all([
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.priceId, price.id),
+      }),
+      db.query.storePriceMatchAttempts.findMany({
+        where: eq(storePriceMatchAttempts.priceId, price.id),
+      }),
+    ]);
+    expect(updatedPrice).toMatchObject({
+      targetId,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(proposal).toBeUndefined();
+    expect(attempts).toHaveLength(0);
+  });
+
+  test("locks an ignored durable target before proposal, attempt, and price mutation", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const bottle = await fixtures.Bottle();
+    const targetId = await getExactTargetId(bottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId,
+      name: "Target Locked Gift Bundle",
+      imageUrl: null,
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+      })
+      .returning();
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    const blocker = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let resolution: ReturnType<typeof resolveStorePriceMatchProposal> | null =
+      null;
+    let blockerReleased = false;
+
+    await blocker.connect();
+    await observer.connect();
+    try {
+      await blocker.query("BEGIN");
+      const blockerPid = (
+        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]?.pid;
+      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
+      await blocker.query(
+        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
+        [targetId],
+      );
+
+      resolution = resolveStorePriceMatchProposal(price.id);
+      void resolution.catch(() => undefined);
+      const resolverPid = await waitForSessionBlockedBy(observer, blockerPid);
+
+      const prematureMutationLocks = await observer.query<{
+        relname: string;
+      }>(
+        `SELECT relation.relname
+         FROM pg_locks AS lock
+         INNER JOIN pg_class AS relation ON relation.oid = lock.relation
+         WHERE lock.pid = $1
+           AND lock.mode = 'RowExclusiveLock'
+           AND relation.relname = ANY($2::text[])`,
+        [
+          resolverPid,
+          [
+            "store_price_match_proposal",
+            "store_price_match_attempt",
+            "store_price",
+          ],
+        ],
+      );
+      expect(prematureMutationLocks.rows).toHaveLength(0);
+
+      await blocker.query("COMMIT");
+      blockerReleased = true;
+      await resolution;
+    } finally {
+      if (!blockerReleased) {
+        await blocker.query("ROLLBACK").catch(() => undefined);
+      }
+      await blocker.end();
+      await observer.end();
+      if (resolution) await resolution.catch(() => undefined);
+    }
+
+    const [updatedProposal, updatedPrice, attempts] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, existingProposal.id),
+      }),
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+      db.query.storePriceMatchAttempts.findMany({
+        where: eq(storePriceMatchAttempts.priceId, price.id),
+      }),
+    ]);
+    expect(updatedProposal?.status).toBe("ignored");
+    expect(attempts).toHaveLength(1);
+    expect(updatedPrice).toMatchObject({
+      targetId: null,
+      bottleId: null,
+      releaseId: null,
+    });
+  });
+
+  test("auto ignored listings preserve a complete tuple after target-only drift", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const originalBottle = await fixtures.Bottle();
+    const replacementBottle = await fixtures.Bottle();
+    const originalTargetId = await getExactTargetId(originalBottle.id);
+    const replacementTargetId = await getExactTargetId(replacementBottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: originalBottle.id,
+      targetId: originalTargetId,
+      name: "Target Drift Gift Bundle",
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+      await db
+        .update(storePrices)
+        .set({ targetId: replacementTargetId })
+        .where(eq(storePrices.id, price.id));
+
+      return buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      });
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+
+    expect(proposal.status).toBe("ignored");
+    expect(updatedPrice).toMatchObject({
+      targetId: replacementTargetId,
+      bottleId: originalBottle.id,
+      releaseId: null,
+    });
+  });
+
+  test("continues an ignored proposal when concurrent retargeting invalidates the stale target", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const originalBottle = await fixtures.Bottle();
+    const replacementBottle = await fixtures.Bottle();
+    const originalTargetId = await getExactTargetId(originalBottle.id);
+    const replacementTargetId = await getExactTargetId(replacementBottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: originalBottle.id,
+      targetId: originalTargetId,
+      name: "Retargeted During Ignore Gift Bundle",
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+      await db
+        .update(storePrices)
+        .set({
+          targetId: replacementTargetId,
+          bottleId: replacementBottle.id,
+          releaseId: null,
+        })
+        .where(eq(storePrices.id, price.id));
+      await db.insert(bottleTombstones).values({
+        bottleId: originalBottle.id,
+        newBottleId: replacementBottle.id,
+      });
+
+      return buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      });
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const [updatedPrice, attempts] = await Promise.all([
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+      db.query.storePriceMatchAttempts.findMany({
+        where: eq(storePriceMatchAttempts.priceId, price.id),
+      }),
+    ]);
+
+    expect(proposal.status).toBe("ignored");
+    expect(attempts).toHaveLength(1);
+    expect(updatedPrice).toMatchObject({
+      targetId: replacementTargetId,
+      bottleId: replacementBottle.id,
+      releaseId: null,
+    });
+  });
+
+  test("recovers when a resolved target is invalidated while hierarchy locking waits", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const originalBottle = await fixtures.Bottle();
+    const replacementBottle = await fixtures.Bottle();
+    const originalTargetId = await getExactTargetId(originalBottle.id);
+    const replacementTargetId = await getExactTargetId(replacementBottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: originalBottle.id,
+      targetId: originalTargetId,
+      name: "Hierarchy Retarget Gift Bundle",
+      imageUrl: null,
+    });
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      }),
+    );
+
+    const hierarchyBlocker = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let resolution: ReturnType<typeof resolveStorePriceMatchProposal> | null =
+      null;
+    let hierarchyReleased = false;
+
+    await hierarchyBlocker.connect();
+    await observer.connect();
+    try {
+      await hierarchyBlocker.query("BEGIN");
+      const blockerPid = (
+        await hierarchyBlocker.query<{ pid: number }>(
+          "SELECT pg_backend_pid() AS pid",
+        )
+      ).rows[0]?.pid;
+      if (!blockerPid) {
+        throw new Error("Unable to load hierarchy blocker pid.");
+      }
+      await hierarchyBlocker.query(
+        "SELECT id FROM bottle_group WHERE id = $1 FOR UPDATE",
+        [originalBottle.groupId],
+      );
+
+      resolution = resolveStorePriceMatchProposal(price.id);
+      void resolution.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, blockerPid);
+
+      await hierarchyBlocker.query(
+        `UPDATE store_price
+         SET target_id = $2, bottle_id = $3, release_id = NULL
+         WHERE id = $1`,
+        [price.id, replacementTargetId, replacementBottle.id],
+      );
+      await hierarchyBlocker.query(
+        `INSERT INTO bottle_tombstone (bottle_id, new_bottle_id)
+         VALUES ($1, $2)`,
+        [originalBottle.id, replacementBottle.id],
+      );
+      await hierarchyBlocker.query("COMMIT");
+      hierarchyReleased = true;
+
+      const proposal = await resolution;
+      expect(proposal.status).toBe("ignored");
+    } finally {
+      if (!hierarchyReleased) {
+        await hierarchyBlocker.query("ROLLBACK").catch(() => undefined);
+      }
+      await hierarchyBlocker.end();
+      await observer.end();
+      if (resolution) await resolution.catch(() => undefined);
+    }
+
+    const [updatedPrice, proposals, attempts] = await Promise.all([
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+      db.query.storePriceMatchProposals.findMany({
+        where: eq(storePriceMatchProposals.priceId, price.id),
+      }),
+      db.query.storePriceMatchAttempts.findMany({
+        where: eq(storePriceMatchAttempts.priceId, price.id),
+      }),
+    ]);
+    expect(updatedPrice).toMatchObject({
+      targetId: replacementTargetId,
+      bottleId: replacementBottle.id,
+      releaseId: null,
+    });
+    expect(proposals).toHaveLength(1);
+    expect(proposals[0]?.status).toBe("ignored");
+    expect(attempts).toHaveLength(1);
+  });
+
+  test("locks proven identity drift through ignored fallback persistence", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const originalBottle = await fixtures.Bottle();
+    const replacementBottle = await fixtures.Bottle();
+    const originalTargetId = await getExactTargetId(originalBottle.id);
+    const replacementTargetId = await getExactTargetId(replacementBottle.id);
+    const price = await fixtures.StorePrice({
+      bottleId: originalBottle.id,
+      targetId: originalTargetId,
+      name: "Fallback Drift Lock Gift Bundle",
+      imageUrl: null,
+    });
+    const [existingProposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+      })
+      .returning();
+
+    vi.mocked(classifyBottleReference).mockImplementationOnce(async () => {
+      await db
+        .update(storePrices)
+        .set({
+          targetId: replacementTargetId,
+          bottleId: replacementBottle.id,
+          releaseId: null,
+        })
+        .where(eq(storePrices.id, price.id));
+      await db.insert(bottleTombstones).values({
+        bottleId: originalBottle.id,
+        newBottleId: replacementBottle.id,
+      });
+
+      return buildMockBottleReferenceClassification({
+        status: "ignored",
+        ignoreReason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
+      });
+    });
+
+    const attemptBlocker = new Client(getPostgresConnectionConfig());
+    const reverter = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let resolution: ReturnType<typeof resolveStorePriceMatchProposal> | null =
+      null;
+    let revertUpdate: Promise<unknown> | null = null;
+    let attemptBlockerReleased = false;
+    let reverterCommitted = false;
+
+    await attemptBlocker.connect();
+    await reverter.connect();
+    await observer.connect();
+    try {
+      await attemptBlocker.query("BEGIN");
+      const attemptBlockerPid = (
+        await attemptBlocker.query<{ pid: number }>(
+          "SELECT pg_backend_pid() AS pid",
+        )
+      ).rows[0]?.pid;
+      if (!attemptBlockerPid) {
+        throw new Error("Unable to load attempt blocker pid.");
+      }
+      await attemptBlocker.query(
+        "LOCK TABLE store_price_match_attempt IN ACCESS EXCLUSIVE MODE",
+      );
+
+      resolution = resolveStorePriceMatchProposal(price.id);
+      void resolution.catch(() => undefined);
+      const resolverPid = await waitForSessionBlockedBy(
+        observer,
+        attemptBlockerPid,
+      );
+
+      await reverter.query("BEGIN");
+      revertUpdate = reverter.query(
+        `UPDATE store_price
+         SET target_id = $2, bottle_id = $3, release_id = NULL
+         WHERE id = $1`,
+        [price.id, originalTargetId, originalBottle.id],
+      );
+      void revertUpdate.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, resolverPid);
+
+      const blockedProposal = await observer.query<{ status: string }>(
+        "SELECT status FROM store_price_match_proposal WHERE id = $1",
+        [existingProposal.id],
+      );
+      expect(blockedProposal.rows[0]?.status).toBe("pending_review");
+
+      await attemptBlocker.query("COMMIT");
+      attemptBlockerReleased = true;
+      const proposal = await resolution;
+      await revertUpdate;
+
+      const persistedProposal = await observer.query<{ status: string }>(
+        "SELECT status FROM store_price_match_proposal WHERE id = $1",
+        [existingProposal.id],
+      );
+      expect(proposal.status).toBe("ignored");
+      expect(persistedProposal.rows[0]?.status).toBe("ignored");
+
+      await reverter.query("COMMIT");
+      reverterCommitted = true;
+    } finally {
+      if (!attemptBlockerReleased) {
+        await attemptBlocker.query("ROLLBACK").catch(() => undefined);
+      }
+      if (resolution) await resolution.catch(() => undefined);
+      if (revertUpdate) await revertUpdate.catch(() => undefined);
+      if (!reverterCommitted) {
+        await reverter.query("ROLLBACK").catch(() => undefined);
+      }
+      await attemptBlocker.end();
+      await reverter.end();
+      await observer.end();
+    }
+
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    expect(updatedPrice).toMatchObject({
+      targetId: originalTargetId,
+      bottleId: originalBottle.id,
+      releaseId: null,
+    });
+  });
+
   test("auto ignored bundle listings do not clear assignments that changed during resolution", async ({
     fixtures,
   }) => {
@@ -6212,6 +6958,7 @@ describe("priceMatching", () => {
 
     expect(proposal.status).toBe("ignored");
     expect(updatedPrice).toMatchObject({
+      targetId: price.targetId,
       bottleId: replacementBottle.id,
       releaseId: replacementRelease.id,
     });

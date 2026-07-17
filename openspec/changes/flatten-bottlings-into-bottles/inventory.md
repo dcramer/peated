@@ -228,7 +228,7 @@ Target-bearing consumer routes:
   `(bottleId, null)` pair so matching consumers receive target-aware
   propagation. It does not construct a CatalogTargetAssignmentDescriptor;
   descriptor-based generic, unmatched, and direct-ingestion redesign remains
-  task 5.6f.
+  the other task 5.6f sub-slice after the automated ignored-assignment clear.
 
 Classifier, price matching, and moderation routes:
 
@@ -418,9 +418,29 @@ Classifier decisions and price matching:
   created concrete target to both records. Task 5.6b owns StorePrice and Review
   propagation reached through canonical alias assignment; task 5.6f owns direct
   price-row identity writers, including automated assignment clears that
-  currently clear only the retained pair. Task 7.3 owns target-backed reads,
-  task 9.6 removes retained consumer pairs, and task 9.7 removes measured
-  targetless/legacy resolution.
+  previously cleared only the retained pair.
+  The first task 5.6f sub-slice makes
+  `clearIgnoredStorePriceAssignmentInTransaction` snapshot and conditionally
+  clear the complete `{ targetId, bottleId, releaseId }` tuple. A durable exact
+  or generic target is resolved and locked through the global BottleGroup,
+  exact-Bottle when present, then CatalogTarget hierarchy before proposal and
+  StorePrice mutation. A targetless compatibility tuple may clear without
+  inventing a target. One null-safe compare-and-set clears all three columns
+  only if none changed; target-only or pair-only drift preserves the current
+  tuple. When target resolution fails after a concurrent merge changed that
+  tuple, the changed assignment is preserved. A tokenless resolver or the
+  current active processing-lease owner is authorized; only for that resolver
+  does the same failure against an unchanged tuple remain an integrity error
+  instead of falling back to a pair-only clear. A stale resolver that lost its
+  lease returns the replacement owner's current proposal and preserves the
+  StorePrice tuple without clearing it or surfacing the stale target failure.
+  Existing processing-lease behavior is unchanged. Direct create-batch
+  ingestion remains the other task 5.6f sub-slice. Task 5.6b retains
+  alias-driven propagation, tasks 5.7/5.5c retain create-new approval, task 7.3
+  owns target-backed reads, section 6 owns existing-row backfill, broader
+  repair/caller cutovers remain outside this sub-slice, task 9.6 removes
+  retained consumer pairs, and task 9.7 removes measured targetless/legacy
+  resolution. This review boundary makes no deployment or activation claim.
 - `apps/server/src/lib/pendingUploads.ts`
 
 ## Workers and queue payloads

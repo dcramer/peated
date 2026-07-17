@@ -379,6 +379,94 @@ an omitted list SHALL preserve it.
 - **AND** the slice remains a code-review boundary with no deployment or
   activation claim
 
+### Requirement: Automated ignored StorePrice clearing preserves authoritative identity
+
+The system SHALL treat a StorePrice's `{ targetId, bottleId, releaseId }` as one
+identity tuple when automated price matching clears an ignored listing. A
+durable target SHALL be authoritative over the retained compatibility pair, and
+the clear SHALL lock validated target identity before the proposal and
+StorePrice while conditionally clearing the complete tuple. An authorized
+ignored resolver SHALL mean tokenless execution or a resolver whose token owns
+the current active processing lease.
+
+#### Scenario: Clear an unchanged durable exact assignment
+
+- **WHEN** ignored resolution snapshots a StorePrice with an exact target and
+  the complete identity tuple remains unchanged
+- **THEN** it resolves and locks the BottleGroup, exact Bottle, and CatalogTarget
+  through the global hierarchy before the proposal and StorePrice
+- **AND** one null-safe compare-and-set clears `targetId`, `bottleId`, and
+  `releaseId` together
+
+#### Scenario: Clear an unchanged durable generic assignment
+
+- **WHEN** ignored resolution snapshots a StorePrice with a generic target and
+  the complete identity tuple remains unchanged
+- **THEN** it resolves and locks the BottleGroup and CatalogTarget through the
+  global hierarchy before the proposal and StorePrice
+- **AND** it clears all three identity columns together without selecting the
+  representative or another exact Bottle
+
+#### Scenario: Clear targetless compatibility identity
+
+- **WHEN** ignored resolution snapshots a targetless StorePrice whose retained
+  pair remains unchanged
+- **THEN** measured compatibility may clear the three identity columns together
+- **AND** it does not invent a CatalogTarget merely to perform the clear
+
+#### Scenario: StorePrice identity changes during ignored resolution
+
+- **WHEN** the current StorePrice differs from the snapshot in `targetId`,
+  `bottleId`, or `releaseId`
+- **THEN** the conditional clear affects no identity column
+- **AND** target-only drift, pair-only drift, and a complete reassignment are
+  preserved as one current tuple
+
+#### Scenario: A concurrent merge changes an invalidated target assignment
+
+- **WHEN** concurrent merge work changes the StorePrice identity tuple and the
+  snapshotted durable target fails during initial descriptor resolution or
+  hierarchy-lock revalidation after waiting
+- **THEN** the operation preserves the changed current tuple
+- **AND** it does not clear or reconstruct identity from the stale retained pair
+
+#### Scenario: An authorized resolver encounters an unchanged invalid target
+
+- **WHEN** the snapshotted durable target fails resolution, the StorePrice still
+  has the unchanged snapshotted identity tuple, and the ignored resolver is
+  authorized
+- **THEN** the operation fails without clearing any identity column
+- **AND** it reports target-integrity failure rather than falling back to
+  targetless pair semantics
+
+#### Scenario: A stale resolver lost its processing lease
+
+- **WHEN** target resolution fails after an ignored resolver loses its lease to
+  a replacement owner
+- **THEN** it returns the replacement owner's current proposal and preserves the
+  current StorePrice identity tuple
+- **AND** it neither clears that tuple nor surfaces the stale target-resolution
+  failure
+
+#### Scenario: Retain ignored-processing lease behavior
+
+- **WHEN** ignored resolution attempts an assignment clear
+- **THEN** the existing processing-token ownership and lease-expiration checks
+  still gate that clear
+- **AND** this identity cutover does not change lease acquisition, renewal, or
+  release behavior
+
+#### Scenario: Defer adjacent StorePrice cutovers
+
+- **WHEN** the first task 5.6f sub-slice updates automated ignored-assignment
+  clearing
+- **THEN** direct create-batch ingestion remains the other task 5.6f sub-slice
+- **AND** alias-driven propagation remains owned by task 5.6b
+- **AND** create-new approval remains owned by tasks 5.7 and 5.5c
+- **AND** target-backed reads, existing-row backfill, broader repair and caller
+  cutovers, retained-pair cleanup, and deployment remain outside this review
+  boundary
+
 ### Requirement: Existing-match price evidence shares one target
 
 The system SHALL resolve one CatalogTarget for an approved existing-match or
