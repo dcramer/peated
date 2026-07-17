@@ -32,6 +32,11 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import {
+  lockCatalogTargetAssignmentDescriptorInTransaction,
+  resolveCatalogTargetForAssignment,
+  type CatalogTargetAssignmentDescriptor,
+} from "@peated/server/lib/catalogTargets";
+import {
   buildBottleInputFromProposedBottle,
   buildClassifierCreateInputs,
 } from "@peated/server/lib/classifierDecisionCreateInputs";
@@ -1073,11 +1078,13 @@ async function upsertStorePriceObservationInTransaction(
     proposal,
     bottleId,
     releaseId = null,
+    targetId,
     createdById,
   }: {
     proposal: StorePriceMatchProposalForReview;
     bottleId: number;
     releaseId?: number | null;
+    targetId: number | null;
     createdById: number;
   },
 ) {
@@ -1088,6 +1095,7 @@ async function upsertStorePriceObservationInTransaction(
     .values({
       bottleId,
       releaseId,
+      targetId,
       sourceType: "store_price",
       sourceKey: `store_price:${proposal.price.id}`,
       sourceName: proposal.price.name,
@@ -1103,6 +1111,7 @@ async function upsertStorePriceObservationInTransaction(
       set: {
         bottleId,
         releaseId,
+        targetId,
         sourceName: proposal.price.name,
         sourceUrl: proposal.price.url,
         externalSiteId: proposal.price.externalSiteId,
@@ -1405,8 +1414,6 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     tx,
     {
       proposal,
-      bottleId: resolvedBottleId,
-      releaseId: resolvedReleaseId,
       reviewedById: user.id,
       allowSystemActor: creationSource === "price_match_automation",
       decisionLog: {
@@ -1418,6 +1425,13 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
           creationTarget,
           creationSource,
           existingReleaseId: existingRelease?.id ?? null,
+        },
+      },
+      targetAssignment: {
+        kind: "measured_legacy_create_new",
+        consumerIdentity: {
+          bottleId: resolvedBottleId,
+          releaseId: resolvedReleaseId,
         },
       },
     },
@@ -1877,6 +1891,34 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
   };
 }
 
+/**
+ * Performs an intentionally unlocked correction-identity preflight so callers
+ * can acquire catalog identity locks ahead of proposal and mutation locks.
+ */
+async function getStorePriceMatchProposalTargetPreflight(
+  tx: AnyDatabase,
+  proposalId: number,
+): Promise<StorePriceMatchProposalForReview> {
+  const [row] = await tx
+    .select({
+      proposal: storePriceMatchProposals,
+      price: storePrices,
+    })
+    .from(storePriceMatchProposals)
+    .innerJoin(
+      storePrices,
+      eq(storePrices.id, storePriceMatchProposals.priceId),
+    )
+    .where(eq(storePriceMatchProposals.id, proposalId))
+    .limit(1);
+
+  if (!row) {
+    throw new UnknownStorePriceMatchProposalError(proposalId);
+  }
+
+  return { ...row.proposal, price: row.price };
+}
+
 async function markApprovedStorePriceMatchProposalsInTransaction(
   tx: AnyDatabase,
   {
@@ -1954,19 +1996,38 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
   `);
 }
 
+type StorePriceApprovalTargetAssignment =
+  | {
+      kind: "resolved";
+      target: CatalogTargetAssignmentDescriptor;
+      consumerIdentity: {
+        bottleId: number;
+        releaseId: number | null;
+      };
+    }
+  | {
+      kind: "measured_legacy_create_new";
+      consumerIdentity: {
+        bottleId: number;
+        releaseId: number | null;
+      };
+    };
+
+/**
+ * Applies one approved proposal using either a caller-resolved catalog target
+ * or the explicit measured compatibility mode for legacy create-new writers;
+ * the selected assignment owns the retained consumer identity pair.
+ */
 export async function applyApprovedStorePriceMatchProposalInTransaction(
   tx: AnyTransaction,
   {
     proposal,
-    bottleId,
-    releaseId = null,
     reviewedById,
     allowSystemActor = false,
     decisionLog,
+    targetAssignment,
   }: {
     proposal: StorePriceMatchProposalForReview;
-    bottleId: number;
-    releaseId?: number | null;
     reviewedById: number;
     allowSystemActor?: boolean;
     decisionLog: {
@@ -1976,6 +2037,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
       createdRelease?: boolean;
       metadata?: Record<string, unknown>;
     };
+    targetAssignment: StorePriceApprovalTargetAssignment;
   },
 ) {
   const actor = await getPriceMatchWriteActorForDatabase(
@@ -1987,32 +2049,22 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     },
   );
 
-  if (releaseId !== null) {
-    const release = await tx.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, releaseId),
-    });
-
-    if (!release || release.bottleId !== bottleId) {
-      throw new Error(
-        `Release ${releaseId} does not belong to bottle ${bottleId}.`,
-      );
-    }
-  }
+  const { bottleId, releaseId } = targetAssignment.consumerIdentity;
+  const target =
+    targetAssignment.kind === "resolved" ? targetAssignment.target : null;
 
   const aliasKey = normalizeBottleAliasKey(proposal.price.name);
   // Alias-safety gate: a newly assigned listing title only becomes a reusable
   // global alias when the decision asserted `aliasScope = global_alias`. For
-  // "none"/null/missing scope the exact listing is still assigned (backfilled)
+  // "none"/null/missing scope the source listing is still assigned (backfilled)
   // and retained for provenance, but the new alias is marked ignored so a
   // generic retailer title cannot be reused for future listings. Aliases that
   // are already assigned to this target keep their existing ignored state.
   const reusableGlobalAlias = proposal.aliasScope === "global_alias";
-  // Store listing keys stay bottle-level unless an existing canonical release
-  // alias already owns the same text, which assignBottleAliasInTransaction preserves.
-  const aliasResult = await assignBottleAliasInTransaction(tx, {
-    bottleId,
-    releaseId,
-    aliasReleaseId: null,
+  // Resolved approvals promote the listing alias to its exact or generic
+  // catalog target. Legacy create-new approvals remain targetless until their
+  // writer is cut over after task 5.7.
+  const aliasInput = {
     externalSiteId: proposal.price.externalSiteId,
     name: aliasKey,
     backfillNames: [proposal.price.name],
@@ -2020,11 +2072,32 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     ignored: !reusableGlobalAlias,
     assignmentSource: "source_approved",
     assignedByActorId: actor.id,
-    context: {
-      caller: "priceMatchingProposals",
-      operation: "approveStorePriceAlias",
-    },
-  });
+  } satisfies Omit<
+    Parameters<typeof assignBottleAliasInTransaction>[1],
+    | "target"
+    | "targetId"
+    | "consumerIdentity"
+    | "bottleId"
+    | "releaseId"
+    | "aliasReleaseId"
+    | "context"
+  >;
+  const aliasResult = target
+    ? await assignBottleAliasInTransaction(tx, {
+        ...aliasInput,
+        target,
+        consumerIdentity: targetAssignment.consumerIdentity,
+      })
+    : await assignBottleAliasInTransaction(tx, {
+        ...aliasInput,
+        bottleId,
+        releaseId,
+        aliasReleaseId: null,
+        context: {
+          caller: "priceMatchingProposals",
+          operation: "approveLegacyCreatedStorePriceAlias",
+        },
+      });
 
   await markApprovedStorePriceMatchProposalsInTransaction(tx, {
     proposalId: proposal.id,
@@ -2042,6 +2115,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     proposal,
     bottleId,
     releaseId,
+    targetId: target?.targetId ?? null,
     createdById: reviewedById,
   });
 
@@ -2100,6 +2174,22 @@ export async function applyApprovedStorePriceMatchInTransaction(
     expectedProcessingToken?: string;
   },
 ) {
+  const resolvedTarget = await resolveCatalogTargetForAssignment(
+    {
+      kind: "legacy",
+      bottleId,
+      releaseId: releaseId ?? null,
+      context: {
+        caller: "priceMatchingProposals",
+        operation: "approveStorePriceMatch",
+      },
+    },
+    tx,
+  );
+  // Generic group merge locks identity before aliases and consumers. Taking
+  // the same identity lock before the proposal/price row prevents inversion.
+  await lockCatalogTargetAssignmentDescriptorInTransaction(tx, resolvedTarget);
+
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
     expectedProcessingToken,
@@ -2107,10 +2197,13 @@ export async function applyApprovedStorePriceMatchInTransaction(
 
   return await applyApprovedStorePriceMatchProposalInTransaction(tx, {
     proposal,
-    bottleId,
-    releaseId,
     reviewedById,
     allowSystemActor,
+    targetAssignment: {
+      kind: "resolved",
+      target: resolvedTarget,
+      consumerIdentity: { bottleId, releaseId: releaseId ?? null },
+    },
     decisionLog: {
       actor,
       decision: "match_existing",
@@ -2176,6 +2269,44 @@ export async function applyStorePriceBottleRepairFromProposal({
   expectedProcessingToken?: string;
 }) {
   const { updateManifest, aliasResult } = await db.transaction(async (tx) => {
+    const preflight = await getStorePriceMatchProposalTargetPreflight(
+      tx,
+      proposalId,
+    );
+    const preflightHasRepairIdentity =
+      REVIEWABLE_STORE_PRICE_MATCH_PROPOSAL_STATUSES.some(
+        (status) => status === preflight.status,
+      ) &&
+      preflight.proposalType === "correction" &&
+      preflight.currentBottleId !== null &&
+      preflight.currentBottleId === preflight.suggestedBottleId &&
+      preflight.currentReleaseId === null &&
+      preflight.suggestedReleaseId === null &&
+      preflight.proposedRelease === null;
+    const resolvedTarget = preflightHasRepairIdentity
+      ? await resolveCatalogTargetForAssignment(
+          {
+            kind: "legacy",
+            bottleId: preflight.currentBottleId!,
+            releaseId: preflight.currentReleaseId,
+            context: {
+              caller: "priceMatchingProposals",
+              operation: "approveStorePriceBottleRepair",
+            },
+          },
+          tx,
+        )
+      : null;
+    if (resolvedTarget) {
+      // Compose with updateConcreteBottleInTransaction's group-first lifecycle
+      // before acquiring the proposal lock below.
+      await lockCatalogTargetAssignmentDescriptorInTransaction(
+        tx,
+        resolvedTarget,
+        { composition: "concrete_bottle_mutation" },
+      );
+    }
+
     const proposal = await getStorePriceMatchProposalForReviewInTransaction(
       tx,
       {
@@ -2184,7 +2315,23 @@ export async function applyStorePriceBottleRepairFromProposal({
         expectedProcessingToken,
       },
     );
+    if (
+      proposal.proposalType !== preflight.proposalType ||
+      proposal.currentBottleId !== preflight.currentBottleId ||
+      proposal.currentReleaseId !== preflight.currentReleaseId ||
+      proposal.suggestedBottleId !== preflight.suggestedBottleId ||
+      proposal.suggestedReleaseId !== preflight.suggestedReleaseId
+    ) {
+      throw new StorePriceBottleRepairBadRequestError(
+        "Price match proposal identity changed during approval.",
+      );
+    }
     const proposedBottle = getStorePriceBottleRepairDraft(proposal);
+    if (!resolvedTarget) {
+      throw new StorePriceBottleRepairBadRequestError(
+        "Price match proposal identity changed during approval.",
+      );
+    }
     const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
       userId: user.id,
     });
@@ -2198,9 +2345,15 @@ export async function applyStorePriceBottleRepairFromProposal({
     const approvedAliasResult =
       await applyApprovedStorePriceMatchProposalInTransaction(tx, {
         proposal,
-        bottleId: updateManifest.bottle.id,
-        releaseId: null,
         reviewedById: user.id,
+        targetAssignment: {
+          kind: "resolved",
+          target: resolvedTarget,
+          consumerIdentity: {
+            bottleId: updateManifest.bottle.id,
+            releaseId: null,
+          },
+        },
         decisionLog: {
           actor,
           decision: "match_existing",

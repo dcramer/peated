@@ -222,6 +222,13 @@ Catalog identity, aliases, search, creation, and updates:
   group, and nullable exact-Bottle identity used by dual-write consumers.
   It replaces the removed ID-only assignment facade so consumers do not
   reconstruct or re-load target identity.
+  Task 5.5b uses one measured legacy-pair resolution from this boundary for
+  existing-match and correction approvals and reuses its descriptor for the
+  alias and observation; exact/generic selection follows the promotion and
+  parent-cardinality rules. A locked alias integrity check validates that
+  descriptor rather than resolving another semantic intent. Create-new approval
+  cannot use this path while it creates ungrouped legacy rows; task 5.5c cuts it
+  over after task 5.7 supplies a newly created concrete target.
   Durable `targetId` values are authoritative; the measured legacy pair is used
   only when a compatibility row has no target. Retain that legacy branch
   through the task 9.5 read window and remove it under task 9.7.
@@ -297,9 +304,26 @@ Classifier decisions and price matching:
   updater, including its direct entity, series, distiller, Bottle,
   BottleRelease-name, audit, and post-commit writes, is removed rather than
   retained as a second business system. Release creation elsewhere in this
-  service remains until tasks 5.7 and 9.7. Task 5.5b separately resolves one
-  target for listing-alias and observation writes in the approval transaction;
-  task 5.5a does not change observation or price-assignment semantics.
+  service remains until tasks 5.7 and 9.7. For task 5.5b,
+  `applyApprovedStorePriceMatchInTransaction` and
+  `applyStorePriceBottleRepairFromProposal` are the existing-match and
+  correction orchestrators. Each owns its one measured legacy-pair resolution
+  through `resolveCatalogTargetForAssignment` and takes the CatalogTarget
+  identity locks before the proposal/price and alias/consumer locks in its
+  transaction. `applyApprovedStorePriceMatchProposalInTransaction` does not
+  resolve semantic intent; it requires the supplied target assignment and
+  atomically passes it to `assignBottleAliasInTransaction` while
+  `upsertStorePriceObservationInTransaction` persists the same `targetId`.
+  Either both target-backed identities commit or the approval rolls back.
+  Existing price assignment, proposal state, decision log vocabulary, and
+  their retained legacy pair are unchanged.
+  Create-new approval still creates ungrouped Bottle/BottleRelease rows and
+  retains measured targetless alias/observation writes; this is compatibility,
+  not compliant target-backed behavior. Task 5.7 replaces its legacy creation
+  and decision vocabulary, then task 5.5c assigns the newly created concrete
+  target to both records. Task 5.6 owns price and other consumer target dual
+  writes, task 7.3 owns target-backed reads, task 9.6 removes retained consumer
+  pairs, and task 9.7 removes measured targetless/legacy resolution.
 - `apps/server/src/lib/pendingUploads.ts`
 
 ## Workers and queue payloads

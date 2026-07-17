@@ -2,8 +2,9 @@
  * Owns CatalogTarget resolution and assignment. Generic intent remains generic,
  * while measured legacy pairs resolve only through staged migration mappings.
  */
-import { db, type AnyDatabase } from "@peated/server/db";
+import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
+  bottleGroups,
   bottleGroupTombstones,
   bottleReleasePromotions,
   bottles,
@@ -120,6 +121,53 @@ export type CatalogTargetAssignmentDescriptor = {
   groupId: number;
   bottleId: number | null;
 };
+
+/**
+ * Locks and revalidates a resolved assignment descriptor. Callers composing
+ * with the concrete Bottle mutation lifecycle acquire its group lock first.
+ */
+export async function lockCatalogTargetAssignmentDescriptorInTransaction(
+  tx: AnyTransaction,
+  target: CatalogTargetAssignmentDescriptor,
+  { composition }: { composition?: "concrete_bottle_mutation" } = {},
+) {
+  if (composition === "concrete_bottle_mutation" || target.bottleId === null) {
+    await tx
+      .select({ id: bottleGroups.id })
+      .from(bottleGroups)
+      .where(eq(bottleGroups.id, target.groupId))
+      .limit(1)
+      .for("update");
+  }
+  if (target.bottleId !== null) {
+    await tx
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(eq(bottles.id, target.bottleId))
+      .limit(1)
+      .for("update");
+  }
+  await tx
+    .select({ id: catalogTargets.id })
+    .from(catalogTargets)
+    .where(eq(catalogTargets.id, target.targetId))
+    .limit(1)
+    .for("update");
+
+  const resolved = await resolveCatalogTargetForAssignment(
+    { kind: "target", targetId: target.targetId },
+    tx,
+  );
+  if (
+    resolved.groupId !== target.groupId ||
+    resolved.bottleId !== target.bottleId
+  ) {
+    throw new CatalogTargetIntegrityMismatchError(
+      { targetId: target.targetId },
+      "the supplied assignment target descriptor changed before use",
+    );
+  }
+}
 
 type LegacyCatalogTargetAccess = "read" | "write";
 

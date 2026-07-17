@@ -487,11 +487,48 @@ target-backed read and search/index cutovers in tasks 7.3 and 7.5, while
 migration ownership and repointing of parent and release aliases remain task
 6.10.
 
-Task 5.5a is only the alias half of task 5.5. Observation target assignment and
-the store-price approval transaction remain task 5.5b; proposal decision
-vocabulary remains task 5.7. Task 5.6 owns `targetId` mutation for store prices,
+Task 5.5a is only the alias half of task 5.5. Observation target assignment for
+existing-match and correction price approvals remains task 5.5b; create-new
+alias/observation cutover remains task 5.5c after task 5.7 replaces its creation
+and decision vocabulary. Task 5.6 owns `targetId` mutation for store prices,
 reviews, and the other remaining consumers. These boundaries prevent the alias
 slice from silently activating a second consumer or price-matching cutover.
+
+### Existing-match price approvals share one resolved target
+
+Task 5.5b keeps existing-match and correction approvals' legacy
+`(bottleId, releaseId)` input and resolves that pair once through the measured
+CatalogTarget assignment boundary. The deterministic migration rules decide
+the result: a promoted release selects its exact Bottle target, a parent-only
+reference with releases selects the generic group target, and a parent without
+releases selects the retained Bottle's exact target. The resulting descriptor
+is the single semantic assignment decision for the operation. Low-level locked
+validation inside the alias writer may recheck target integrity, but it does not
+resolve a second intent or choose another target.
+
+The existing-match or correction approval transaction supplies that same
+`targetId` to the listing-alias assignment and the source-keyed
+BottleObservation upsert. An exact result keeps the alias and observation
+exact; a generic result keeps both generic and never substitutes the group's
+representative Bottle. Failure to resolve the target or write either record
+rolls back the complete approval transaction.
+
+Create-new approval remains on the measured targetless alias/observation
+compatibility path in this slice. It still creates legacy ungrouped
+Bottle/BottleRelease rows and therefore has no valid concrete CatalogTarget to
+assign.
+Task 5.7 first replaces that creation and decision vocabulary with concrete
+Bottle/target identity; task 5.5c then requires create-new approval to assign
+both records to the newly created target. The targetless result is staged
+compatibility, not compliant final-state target-backed behavior.
+
+This slice does not redefine price assignment, proposal state, decision-log
+vocabulary, or their retained legacy Bottle/Release pair. Store-price and other
+consumer dual writes remain task 5.6, target-aware proposal actions and decision
+vocabulary remain task 5.7, and target-backed reads remain task 7.3. Task 9.6
+removes the retained consumer pair columns after backfill and parity; task 9.7
+removes the measured legacy resolver and targetless compatibility after traffic
+reaches zero.
 
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target

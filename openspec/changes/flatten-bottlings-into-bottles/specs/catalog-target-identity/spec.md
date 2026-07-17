@@ -52,6 +52,46 @@ SHALL NOT overwrite a durable target with a legacy pair.
 - **THEN** the alias row's target id and retained legacy pair are cleared together
 - **AND** consumer target-clearing semantics are not inferred from the alias row
 
+### Requirement: Existing-match price evidence shares one target
+
+The system SHALL resolve one CatalogTarget for an approved existing-match or
+correction store-price proposal and SHALL atomically use that same target for
+its listing alias and source observation without changing the retained
+price-assignment contract.
+
+#### Scenario: Approve an exact promoted release
+
+- **WHEN** an approved existing match carries a legacy pair whose release has a completed promotion
+- **THEN** the measured legacy resolver selects the promoted Bottle's exact target once
+- **AND** the listing alias and observation both store that target
+
+#### Scenario: Approve a parent-only match
+
+- **WHEN** an approved existing match carries a parent Bottle with no release id
+- **THEN** the measured legacy resolver follows the deterministic parent-cardinality rule
+- **AND** both writes use the generic group target when the parent has releases
+- **AND** both writes use the retained Bottle's exact target when it has no releases
+- **AND** a generic result does not substitute the representative Bottle
+
+#### Scenario: Approval cannot persist one target-backed record
+
+- **WHEN** target resolution, listing-alias assignment, or observation persistence fails
+- **THEN** the approval transaction rolls back
+- **AND** it does not commit different targets or only one of the two records
+
+#### Scenario: Retain adjacent compatibility contracts
+
+- **WHEN** the alias and observation are assigned their shared target
+- **THEN** existing price, proposal, and decision-log Bottle/Release pair semantics remain unchanged
+- **AND** proposal decision vocabulary remains unchanged until its explicit cutover
+
+#### Scenario: Approve a create-new proposal before creation cutover
+
+- **WHEN** create-new approval still creates ungrouped legacy Bottle or BottleRelease rows
+- **THEN** its alias and observation remain on the measured targetless compatibility path
+- **AND** the system does not claim that those records are target-backed
+- **AND** a later task assigns the newly created concrete target after creation and decision vocabulary are cut over
+
 ### Requirement: Target integrity is database enforced
 
 The system SHALL enforce one generic target per BottleGroup, one exact target per Bottle, and consistency between an exact target's Bottle and BottleGroup.

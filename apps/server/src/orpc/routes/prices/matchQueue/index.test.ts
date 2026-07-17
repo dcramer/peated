@@ -19,6 +19,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -860,15 +861,27 @@ describe("price match queue", () => {
       where: (bottleObservations, { eq }) =>
         eq(bottleObservations.sourceKey, `store_price:${price.id}`),
     });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+    const genericTargetId = targetsBefore.find(
+      ({ bottleId }) => bottleId === null,
+    )!.id;
     expect(observation).toMatchObject({
       bottleId: currentBottle.id,
       releaseId: null,
+      targetId: genericTargetId,
       facts: expect.objectContaining({
         proposalType: "correction",
         proposedBottle: expect.objectContaining({
           category: "single_malt",
         }),
       }),
+    });
+    expect(listingAlias).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: genericTargetId,
     });
   });
 
@@ -1824,7 +1837,7 @@ describe("price match queue", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Duplicate alias found (${existingBottle.id}). Not implemented.]`,
+      `[ExactBottleAliasConflictError: Cannot reserve exact Bottle alias "Conflicting Alias": another_exact_target.]`,
     );
   });
 
@@ -1870,7 +1883,7 @@ describe("price match queue", () => {
     });
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Duplicate alias found (${existingBottle.id}). Not implemented.]`,
+      `[ExactBottleAliasConflictError: Cannot reserve exact Bottle alias "Create Alias Collision": another_exact_target.]`,
     );
     expect(createdBottle).toBeUndefined();
   });

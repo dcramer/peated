@@ -2,9 +2,12 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleObservations,
+  bottleReleasePromotions,
   bottleReleases,
   bottles,
   bottlesToDistillers,
+  catalogTargets,
   changes,
   incomingBottleDecisionLogs,
   storePriceMatchAttempts,
@@ -16,6 +19,7 @@ import {
   findBottleReferenceCandidates,
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
+import { CatalogTargetInvalidMappingError } from "@peated/server/lib/catalogTargets";
 import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
@@ -25,7 +29,7 @@ import {
   ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,
 } from "@peated/server/lib/priceMatching";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -164,6 +168,25 @@ function buildMockBottleReferenceClassification(
 async function countBottles() {
   const rows = await db.select({ id: bottles.id }).from(bottles);
   return rows.length;
+}
+
+async function getExactTargetId(bottleId: number) {
+  const target = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, bottleId),
+  });
+  if (!target) throw new Error("Missing exact CatalogTarget fixture.");
+  return target.id;
+}
+
+async function getGenericTargetId(groupId: number) {
+  const target = await db.query.catalogTargets.findFirst({
+    where: and(
+      eq(catalogTargets.groupId, groupId),
+      isNull(catalogTargets.bottleId),
+    ),
+  });
+  if (!target) throw new Error("Missing generic CatalogTarget fixture.");
+  return target.id;
 }
 
 function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
@@ -668,6 +691,15 @@ describe("priceMatching", () => {
         eq(incomingBottleDecisionLogs.sourceId, price.id),
       ),
     });
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+    const observation = await db.query.bottleObservations.findFirst({
+      where: and(
+        eq(bottleObservations.sourceType, "store_price"),
+        eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+      ),
+    });
 
     expect(result.bottle.id).toBe(bottle.id);
     expect(await countBottles()).toBe(bottleCount);
@@ -679,6 +711,16 @@ describe("priceMatching", () => {
       decision: "create_bottle",
       bottleId: bottle.id,
       createdBottle: false,
+    });
+    expect(listingAlias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: null,
+    });
+    expect(observation).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: null,
     });
   });
 
@@ -6246,6 +6288,32 @@ describe("priceMatching", () => {
       edition: "Batch 7",
       releaseYear: 2024,
     });
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: bottle.groupId,
+        brandId: bottle.brandId,
+        createdByActorId: bottle.createdByActorId,
+        name: "Observation Candidate Batch 7",
+        fullName: "Observation Candidate Batch 7",
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Unable to create promoted Bottle.");
+    const [promotedTarget] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: bottle.groupId!,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!promotedTarget) throw new Error("Unable to create promoted target.");
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promotedBottle.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: bottle.createdByActorId,
+    });
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -6339,6 +6407,7 @@ describe("priceMatching", () => {
     expect(observation).toMatchObject({
       bottleId: bottle.id,
       releaseId: release.id,
+      targetId: promotedTarget.id,
       sourceType: "store_price",
       sourceKey: `store_price:${price.id}`,
       sourceName: price.name,
@@ -6382,6 +6451,200 @@ describe("priceMatching", () => {
       createdBottle: false,
       createdRelease: false,
     });
+
+    const listingAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+    });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    expect(listingAlias).toMatchObject({
+      bottleId: promotedBottle.id,
+      releaseId: null,
+      targetId: promotedTarget.id,
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: release.id,
+    });
+  });
+
+  test("keeps legacy parent intent while targeting its generic BottleGroup", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const parent = await fixtures.Bottle();
+    await fixtures.BottleRelease({ bottleId: parent.id });
+    const genericTargetId = await getGenericTargetId(parent.groupId!);
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Generic Parent Listing",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        aliasScope: "global_alias",
+      })
+      .returning();
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: parent.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const [updatedPrice, updatedProposal, listingAlias, observation] =
+      await Promise.all([
+        db.query.storePrices.findFirst({
+          where: eq(storePrices.id, price.id),
+        }),
+        db.query.storePriceMatchProposals.findFirst({
+          where: eq(storePriceMatchProposals.id, proposal.id),
+        }),
+        db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+        }),
+        db.query.bottleObservations.findFirst({
+          where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+        }),
+      ]);
+
+    expect(updatedPrice).toMatchObject({
+      bottleId: parent.id,
+      releaseId: null,
+      targetId: null,
+    });
+    expect(updatedProposal).toMatchObject({
+      currentBottleId: parent.id,
+      currentReleaseId: null,
+      suggestedBottleId: parent.id,
+      suggestedReleaseId: null,
+    });
+    expect(listingAlias).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: genericTargetId,
+    });
+    expect(observation).toMatchObject({
+      bottleId: parent.id,
+      releaseId: null,
+      targetId: genericTargetId,
+    });
+  });
+
+  test("updates an existing store-price observation to the newly approved target", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const oldBottle = await fixtures.Bottle();
+    const approvedBottle = await fixtures.Bottle();
+    const oldTargetId = await getExactTargetId(oldBottle.id);
+    const approvedTargetId = await getExactTargetId(approvedBottle.id);
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Observation Retarget Assignment",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+      })
+      .returning();
+    await db.insert(bottleObservations).values({
+      bottleId: oldBottle.id,
+      releaseId: null,
+      targetId: oldTargetId,
+      sourceType: "store_price",
+      sourceKey: `store_price:${price.id}`,
+      sourceName: "Stale Observation Assignment",
+      createdById: reviewer.id,
+    });
+
+    await applyApprovedStorePriceMatch({
+      proposalId: proposal.id,
+      bottleId: approvedBottle.id,
+      reviewedById: reviewer.id,
+      actor: await getUserActor(reviewer),
+    });
+
+    const observations = await db.query.bottleObservations.findMany({
+      where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+    });
+    expect(observations).toHaveLength(1);
+    expect(observations[0]).toMatchObject({
+      bottleId: approvedBottle.id,
+      releaseId: null,
+      targetId: approvedTargetId,
+      sourceName: price.name,
+    });
+  });
+
+  test("rolls back approval when the supplied legacy release pair is invalid", async ({
+    fixtures,
+  }) => {
+    const reviewer = await fixtures.User();
+    const requestedParent = await fixtures.Bottle();
+    const otherParent = await fixtures.Bottle();
+    const otherRelease = await fixtures.BottleRelease({
+      bottleId: otherParent.id,
+    });
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      externalSiteId: site.id,
+      name: "Invalid Mapping Listing",
+      volume: 750,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+      })
+      .returning();
+
+    await expect(
+      applyApprovedStorePriceMatch({
+        proposalId: proposal.id,
+        bottleId: requestedParent.id,
+        releaseId: otherRelease.id,
+        reviewedById: reviewer.id,
+        actor: await getUserActor(reviewer),
+      }),
+    ).rejects.toBeInstanceOf(CatalogTargetInvalidMappingError);
+
+    const [updatedPrice, updatedProposal, listingAlias, observation] =
+      await Promise.all([
+        db.query.storePrices.findFirst({
+          where: eq(storePrices.id, price.id),
+        }),
+        db.query.storePriceMatchProposals.findFirst({
+          where: eq(storePriceMatchProposals.id, proposal.id),
+        }),
+        db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
+        }),
+        db.query.bottleObservations.findFirst({
+          where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+        }),
+      ]);
+    expect(updatedPrice).toMatchObject({ bottleId: null, releaseId: null });
+    expect(updatedProposal).toMatchObject({ status: "pending_review" });
+    expect(listingAlias).toBeUndefined();
+    expect(observation).toBeUndefined();
   });
 
   test("writes a reusable global alias when the decision asserts global_alias scope", async ({
@@ -6423,9 +6686,14 @@ describe("priceMatching", () => {
     expect(updatedPrice?.bottleId).toBe(bottle.id);
     expect(listingAlias).toMatchObject({
       bottleId: bottle.id,
+      targetId: await getExactTargetId(bottle.id),
       assignmentSource: "source_approved",
       ignored: false,
     });
+    const observation = await db.query.bottleObservations.findFirst({
+      where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
+    });
+    expect(observation?.targetId).toBe(await getExactTargetId(bottle.id));
   });
 
   test("does not globalize the listing title when alias scope is none", async ({

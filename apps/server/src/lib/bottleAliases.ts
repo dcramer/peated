@@ -16,7 +16,9 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import {
+  lockCatalogTargetAssignmentDescriptorInTransaction,
   resolveCatalogTargetForAssignment,
+  type CatalogTargetAssignmentDescriptor,
   type CatalogTargetOperationContext,
 } from "@peated/server/lib/catalogTargets";
 import { logError, logInfo } from "@peated/server/lib/log";
@@ -81,19 +83,45 @@ export type BottleAliasAssignmentOptions = {
   assignedByActorId: number;
 };
 
-type BottleAliasAssignmentInput = {
-  bottleId: number;
-  releaseId?: number | null;
-  aliasReleaseId?: number | null;
+type BottleAliasAssignmentCommonInput = {
   externalSiteId?: number;
   name: string;
   backfillNames?: string[];
   volume?: number;
   ignored?: boolean;
-} & BottleAliasAssignmentOptions &
+};
+
+type BottleAliasConsumerIdentity = {
+  bottleId: number;
+  releaseId: number | null;
+};
+
+type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
+  BottleAliasAssignmentOptions &
   (
-    | { targetId: number; context?: never }
     | {
+        target: CatalogTargetAssignmentDescriptor;
+        consumerIdentity: BottleAliasConsumerIdentity;
+        bottleId?: never;
+        releaseId?: never;
+        targetId?: never;
+        context?: never;
+      }
+    | {
+        target?: never;
+        consumerIdentity?: never;
+        bottleId: number;
+        releaseId?: null;
+        aliasReleaseId?: null;
+        targetId: number;
+        context?: never;
+      }
+    | {
+        target?: never;
+        consumerIdentity?: never;
+        bottleId: number;
+        releaseId?: number | null;
+        aliasReleaseId?: number | null;
         targetId?: null;
         context: CatalogTargetOperationContext;
       }
@@ -237,12 +265,25 @@ function requireBottleAliasCompatibilityContext(
 async function getExactBottleAliasConflict(
   tx: AnyDatabase,
   alias: BottleAlias,
-  { bottleId, targetId }: { bottleId: number; targetId: number },
+  {
+    bottleId,
+    targetId,
+    legacyIdentity,
+  }: {
+    bottleId: number | null;
+    targetId: number;
+    legacyIdentity?: { bottleId: number; releaseId: number | null };
+  },
 ): Promise<{
   code: ExactBottleAliasConflictCode;
   conflictingBottleId: number | null;
 } | null> {
-  if (alias.releaseId !== null) {
+  const matchesLegacyIdentity =
+    legacyIdentity !== undefined &&
+    alias.bottleId === legacyIdentity.bottleId &&
+    alias.releaseId === legacyIdentity.releaseId;
+
+  if (alias.releaseId !== null && !matchesLegacyIdentity) {
     return {
       code: "legacy_release",
       conflictingBottleId: alias.bottleId,
@@ -264,7 +305,11 @@ async function getExactBottleAliasConflict(
         };
   }
 
-  if (alias.bottleId !== null && alias.bottleId !== bottleId) {
+  if (
+    alias.bottleId !== null &&
+    alias.bottleId !== bottleId &&
+    !matchesLegacyIdentity
+  ) {
     return {
       code: "another_bottle",
       conflictingBottleId: alias.bottleId,
@@ -302,6 +347,13 @@ type ExactBottleAliasReservationInput = {
   assignedByActorId: number;
 };
 
+type CatalogTargetAliasClaimInput = {
+  name: string;
+  bottleId: number | null;
+  targetId: number;
+  legacyIdentity?: { bottleId: number; releaseId: number | null };
+};
+
 type ExactBottleAliasClaimIntent =
   | {
       kind: "reservation";
@@ -337,14 +389,15 @@ function exactBottleAliasBeforeSnapshot(
   };
 }
 
-/** Locks and claims one exact alias for both reservation and full assignment. */
-async function claimExactBottleAliasNameInTransaction(
+/** Locks and claims one CatalogTarget alias for reservation or full assignment. */
+async function claimCatalogTargetAliasNameInTransaction(
   tx: AnyTransaction,
   {
     name: aliasName,
     bottleId,
     targetId,
-  }: Pick<ExactBottleAliasReservationInput, "name" | "bottleId" | "targetId">,
+    legacyIdentity,
+  }: CatalogTargetAliasClaimInput,
   intent: ExactBottleAliasClaimIntent,
 ): Promise<ExactBottleAliasClaimResult> {
   if (!aliasName) {
@@ -400,6 +453,7 @@ async function claimExactBottleAliasNameInTransaction(
     const conflict = await getExactBottleAliasConflict(tx, existingAlias, {
       bottleId,
       targetId,
+      legacyIdentity,
     });
     if (conflict) {
       throw new ExactBottleAliasConflictError(
@@ -409,10 +463,7 @@ async function claimExactBottleAliasNameInTransaction(
       );
     }
 
-    if (
-      existingAlias.bottleId === bottleId &&
-      existingAlias.targetId === targetId
-    ) {
+    if (existingAlias.targetId === targetId) {
       if (intent.kind === "reservation") {
         return {
           alias: existingAlias,
@@ -425,6 +476,8 @@ async function claimExactBottleAliasNameInTransaction(
       const assignmentUpdateValues = getAssignmentUpdateValues(intent);
       if (
         existingAlias.name === aliasName &&
+        existingAlias.bottleId === bottleId &&
+        existingAlias.releaseId === null &&
         !hasExplicitAssignmentOptions(intent) &&
         existingAlias.assignedByActorId === intent.assignedByActorId
       ) {
@@ -438,7 +491,12 @@ async function claimExactBottleAliasNameInTransaction(
 
       const [updatedAlias] = await tx
         .update(bottleAliases)
-        .set({ name: aliasName, ...assignmentUpdateValues })
+        .set({
+          name: aliasName,
+          bottleId,
+          releaseId: null,
+          ...assignmentUpdateValues,
+        })
         .where(eq(bottleAliases.name, existingAlias.name))
         .returning();
       if (!updatedAlias) break;
@@ -494,7 +552,7 @@ async function reserveExactBottleAliasNameInTransaction(
   tx: AnyTransaction,
   input: ExactBottleAliasReservationInput,
 ): Promise<ExactBottleAliasReservationWithPreimage> {
-  const result = await claimExactBottleAliasNameInTransaction(tx, input, {
+  const result = await claimCatalogTargetAliasNameInTransaction(tx, input, {
     kind: "reservation",
     assignmentSource: input.assignmentSource,
     assignedByActorId: input.assignedByActorId,
@@ -551,6 +609,7 @@ async function backfillBottleAliasConsumersInTransaction(
     externalSiteId,
     lookupNames,
     volume,
+    imageBottleId,
   }: {
     bottleId: number;
     releaseId: number | null;
@@ -558,6 +617,7 @@ async function backfillBottleAliasConsumersInTransaction(
     externalSiteId?: number;
     lookupNames: string[];
     volume?: number;
+    imageBottleId: number | null;
   },
 ): Promise<BottleAliasConsumerBackfillResult> {
   const matchingPrices = await tx
@@ -587,9 +647,10 @@ async function backfillBottleAliasConsumersInTransaction(
 
   const priceWithImage = matchingPrices.find((price) => !!price.imageUrl);
   return {
-    bottleImageCandidate: priceWithImage?.imageUrl
-      ? { bottleId, imageUrl: priceWithImage.imageUrl }
-      : null,
+    bottleImageCandidate:
+      priceWithImage?.imageUrl && imageBottleId !== null
+        ? { bottleId: imageBottleId, imageUrl: priceWithImage.imageUrl }
+        : null,
     reviewIds,
   };
 }
@@ -638,17 +699,17 @@ function getNextTargetlessAliasReleaseId(
 
 /**
  * Assigns an alias inside an existing transaction and records its provenance.
- * Exact mode validates and persists `targetId`; omitted targets retain measured
- * targetless compatibility for legacy callers without downgrading an existing
- * target-aware alias. `backfillNames` identify stored references to repair.
+ * A resolved descriptor assigns either its exact Bottle or generic group target
+ * while `consumerIdentity` retains the measured legacy pair. Legacy `targetId`
+ * mode accepts exact targets only. Omitted targets retain measured targetless
+ * compatibility without downgrading a target-aware alias. `backfillNames`
+ * identify stored references to repair.
  */
 export async function assignBottleAliasInTransaction(
   tx: AnyTransaction,
-  {
-    bottleId,
-    targetId = null,
-    releaseId = null,
-    aliasReleaseId = releaseId,
+  input: BottleAliasAssignmentInput,
+): Promise<BottleAliasAssignmentResult> {
+  const {
     externalSiteId,
     name,
     backfillNames = [],
@@ -656,15 +717,37 @@ export async function assignBottleAliasInTransaction(
     ignored,
     assignmentSource,
     assignedByActorId,
-    context,
-  }: BottleAliasAssignmentInput,
-): Promise<BottleAliasAssignmentResult> {
+  } = input;
+  const suppliedTarget = input.target;
+  const targetId = input.targetId ?? null;
+  const bottleId = suppliedTarget
+    ? input.consumerIdentity.bottleId
+    : input.bottleId;
+  const releaseId = suppliedTarget
+    ? input.consumerIdentity.releaseId
+    : (input.releaseId ?? null);
+  const aliasReleaseId = suppliedTarget
+    ? null
+    : targetId !== null
+      ? null
+      : input.aliasReleaseId === undefined
+        ? releaseId
+        : input.aliasReleaseId;
   if (!name.trim()) {
     throw new FailedToSaveBottleAliasError();
   }
 
-  const compatibilityContext =
-    targetId === null ? requireBottleAliasCompatibilityContext(context) : null;
+  const isTargetAware = suppliedTarget !== undefined || targetId !== null;
+  const compatibilityContext = !isTargetAware
+    ? requireBottleAliasCompatibilityContext(input.context)
+    : null;
+
+  if (suppliedTarget) {
+    await lockCatalogTargetAssignmentDescriptorInTransaction(
+      tx,
+      suppliedTarget,
+    );
+  }
 
   if (targetId !== null) {
     await validateExactBottleAliasTarget(tx, { bottleId, targetId });
@@ -676,6 +759,9 @@ export async function assignBottleAliasInTransaction(
       );
     }
   }
+
+  const assignmentTargetId = suppliedTarget?.targetId ?? targetId;
+  const aliasBottleId = suppliedTarget ? suppliedTarget.bottleId : bottleId;
 
   const assignmentOptions: BottleAliasAssignmentValues = {
     assignmentSource,
@@ -692,9 +778,9 @@ export async function assignBottleAliasInTransaction(
   let nextAliasReleaseId: number | null = null;
   let bottleImageCandidate: BottleImageCandidate | null = null;
 
-  if (targetId !== null) {
-    // Exact mode holds merge-compatible identity locks, then consumers, and
-    // only then the alias so ingestion never waits on an alias we already hold.
+  if (assignmentTargetId !== null) {
+    // Target-aware mode holds merge-compatible identity locks, then consumers,
+    // and only then the alias so ingestion never waits on an alias already held.
     nextAliasReleaseId = null;
     ({ bottleImageCandidate } = await backfillBottleAliasConsumersInTransaction(
       tx,
@@ -705,11 +791,17 @@ export async function assignBottleAliasInTransaction(
         externalSiteId,
         lookupNames: consumerLookupNames,
         volume,
+        imageBottleId: aliasBottleId,
       },
     ));
-    const claim = await claimExactBottleAliasNameInTransaction(
+    const claim = await claimCatalogTargetAliasNameInTransaction(
       tx,
-      { name, bottleId, targetId },
+      {
+        name,
+        bottleId: aliasBottleId,
+        targetId: assignmentTargetId,
+        ...(suppliedTarget ? { legacyIdentity: { bottleId, releaseId } } : {}),
+      },
       {
         kind: "assignment",
         assignmentSource,
@@ -739,6 +831,7 @@ export async function assignBottleAliasInTransaction(
         externalSiteId,
         lookupNames: consumerLookupNames,
         volume,
+        imageBottleId: bottleId,
       },
     );
     bottleImageCandidate = consumerBackfill.bottleImageCandidate;
@@ -979,8 +1072,8 @@ export async function finalizeBottleAliasAssignment(
 }
 
 /**
- * Assigns an alias and runs its post-commit image, indexing, and notification
- * side effects. Provenance options are forwarded to the transaction.
+ * Assigns an exact or generic descriptor target, a legacy exact `targetId`, or
+ * a measured targetless compatibility alias, then runs post-commit effects.
  */
 export async function assignBottleAlias(
   params: BottleAliasAssignmentInput,

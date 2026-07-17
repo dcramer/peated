@@ -299,6 +299,57 @@ describe("reserveExactBottleAliasInTransaction", () => {
 });
 
 describe("assignBottleAliasInTransaction", () => {
+  test("claims a matching legacy parent alias for a generic target without selecting a Bottle", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle();
+    await fixtures.BottleRelease({ bottleId: parent.id });
+    const target = await getGenericTarget(parent.groupId!);
+    const alias = await fixtures.BottleAlias({
+      name: "Stable Group Alias",
+      bottleId: parent.id,
+      releaseId: null,
+      targetId: null,
+    });
+    const price = await fixtures.StorePrice({
+      name: alias.name,
+      bottleId: null,
+      releaseId: null,
+    });
+
+    await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        target: {
+          targetId: target.id,
+          groupId: target.groupId,
+          bottleId: null,
+        },
+        consumerIdentity: {
+          bottleId: parent.id,
+          releaseId: null,
+        },
+        name: alias.name,
+        assignmentSource: "source_approved",
+        assignedByActorId: parent.createdByActorId,
+      }),
+    );
+
+    expect(await getAlias(alias.name)).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: target.id,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({
+      bottleId: parent.id,
+      releaseId: null,
+      targetId: null,
+    });
+  });
+
   test("validates the requested Bottle and exact target before assignment", async ({
     fixtures,
   }) => {

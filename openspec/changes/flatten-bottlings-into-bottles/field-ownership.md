@@ -51,6 +51,22 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Exact alias lookup returns the Bottle of a non-null exact target. A generic
   target returns no Bottle, and only a null-target legacy alias may use the
   measured pair fallback retained until task 9.7.
+- Existing-match and correction price approvals resolve their retained legacy
+  Bottle/Release pair once through the measured CatalogTarget assignment
+  boundary and reuse the same descriptor for both the listing alias and
+  source-keyed observation. A promoted release remains exact; a parent-only
+  reference follows deterministic cardinality to a generic group target or
+  retained exact Bottle target. Locked alias integrity validation is not a
+  second semantic resolution.
+- Those target-backed alias and observation writes commit atomically. Exact or
+  generic intent is preserved without representative substitution, while the
+  observation remains source evidence rather than a catalog grouping decision.
+  Create-new approval remains measured targetless compatibility because it
+  still creates ungrouped legacy Bottle/BottleRelease rows. Task 5.7 replaces
+  that creation and decision vocabulary before task 5.5c assigns the newly
+  created concrete target; the targetless path is not final-state behavior.
+- Task 5.6 owns price and other consumer dual writes, task 7.3 owns target-backed
+  reads, and tasks 9.6/9.7 remove retained pairs and measured compatibility.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes

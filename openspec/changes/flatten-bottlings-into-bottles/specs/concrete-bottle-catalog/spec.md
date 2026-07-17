@@ -75,6 +75,22 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **WHEN** a compatibility API receives a known legacy `releaseId`
 - **THEN** it resolves the mapped Bottle without re-creating or duplicating catalog data
 
+#### Scenario: Approve existing-match price evidence
+
+- **WHEN** existing-match or correction approval receives a retained legacy Bottle/Release pair
+- **THEN** it resolves one CatalogTarget using the deterministic promotion and parent-cardinality rules
+- **AND** it reuses that target for both listing alias and observation identity in the approval transaction
+- **AND** an exact result identifies its concrete Bottle while a generic result remains BottleGroup identity
+- **AND** it does not select a representative Bottle for a generic result
+- **AND** existing price assignment and proposal decision vocabulary remain compatibility data until their explicit cutovers
+
+#### Scenario: Approve create-new price evidence before concrete creation cutover
+
+- **WHEN** create-new approval still produces ungrouped legacy Bottle or BottleRelease rows
+- **THEN** its listing alias and observation remain measured targetless compatibility
+- **AND** they are not treated as compliant target-backed records
+- **AND** the newly created concrete target is assigned only after the legacy creation and decision path is replaced
+
 #### Scenario: Create through the legacy BottleRelease route
 
 - **WHEN** an authenticated, terms-accepted caller submits the legacy BottleRelease create input with an active source Bottle
