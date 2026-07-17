@@ -46,8 +46,40 @@ Exact Bottle serializers must not require BottleGroup hydration.
   exact/moderator path while later task 5.5 caller slices retire the remaining
   raw legacy-pair writer.
 - Moderator Bottle-alias upsert is exact intent. Alias unassignment clears the
-  alias row's target and retained legacy pair together; target-aware clearing or
-  preservation of matching store-price and review rows remains task 5.6.
+  alias row's target and retained legacy pair together. Task 5.6b clears all
+  three identity fields from a target-aware StorePrice or Review when its
+  authoritative `targetId` matches the alias snapshot, regardless of retained
+  pair drift. A targetless consumer matches only when its retained pair equals
+  the alias snapshot. Independently retargeted consumers and targetless
+  consumers with different pairs are preserved.
+- Task 5.6b makes alias-driven StorePrice and Review propagation part of the
+  canonical alias assignment transaction. A target-aware assignment writes the
+  supplied target and retained pair atomically to matching consumers. The alias
+  assignment input owns the retained pair separately from any CatalogTarget
+  descriptor. The legacy exact target-aware input carries a validated exact
+  `targetId` plus an explicit retained `(bottleId, null)` pair rather than
+  inventing a descriptor. Generic targets remain generic and never select the
+  representative Bottle.
+- Measured targetless alias compatibility may update only targetless matching
+  consumers and cannot downgrade a durable consumer target.
+- When canonical alias assignment creates a new alias, it queues
+  `IndexBottleAlias` directly after commit because consumer synchronization
+  already occurred. Existing-alias assignment need not enqueue alias indexing.
+  `OnBottleAliasChange` remains only for raw alias producers and delegates
+  StorePrice/Review synchronization to the canonical owner before indexing; it
+  does not own a parallel propagation algorithm.
+- A generic raw-alias replay resolves its retained legacy pair through measured
+  assignment and proceeds only when the result equals the stored generic
+  target. Invalid, cross-group, or release-bearing exact mismatches fail without
+  consumer writes.
+- A targetless raw-alias replay locks the retained Bottle lifecycle, then locks
+  and validates any non-null retained BottleRelease as belonging to that Bottle
+  before consumer locks. An invalid pair produces no consumer writes or alias
+  indexing. The worker then revalidates and locks the alias snapshot; the
+  measured compatibility branch remains assigned to task 9.7 removal.
+- Classifier-created unresolved reviews remain targetless until tasks 5.8/5.9
+  can produce a valid concrete target; task 5.6b does not invent an exact
+  Bottle for them.
 - Exact alias lookup returns the Bottle of a non-null exact target. A generic
   target returns no Bottle, and only a null-target legacy alias may use the
   measured pair fallback retained until task 9.7.
@@ -65,8 +97,10 @@ Exact Bottle serializers must not require BottleGroup hydration.
   still creates ungrouped legacy Bottle/BottleRelease rows. Task 5.7 replaces
   that creation and decision vocabulary before task 5.5c assigns the newly
   created concrete target; the targetless path is not final-state behavior.
-- Task 5.6 owns price and other consumer dual writes, task 7.3 owns target-backed
-  reads, and tasks 9.6/9.7 remove retained pairs and measured compatibility.
+- Tasks 5.6c-5.6f own direct review, collection, flight, and price mutations;
+  tasks 5.7/5.5c retain create-new price work, task 7.3 owns target-backed
+  reads, section 6 owns backfill, and tasks 9.6/9.7 remove retained pairs and
+  measured compatibility.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes

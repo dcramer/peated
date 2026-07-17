@@ -4599,7 +4599,11 @@ describe("priceMatching", () => {
       suggestedBottleId: expect.any(Number),
     });
     expect(proposal.suggestedBottleId).not.toBe(currentBottle.id);
-    expect(updatedPrice?.bottleId).toBe(proposal.suggestedBottleId);
+    expect(updatedPrice).toMatchObject({
+      bottleId: proposal.suggestedBottleId,
+      releaseId: null,
+      targetId: null,
+    });
     expect(createdBottle).toMatchObject({
       name: "Fresh Release",
       fullName: "Replacement Brand Fresh Release",
@@ -6519,7 +6523,7 @@ describe("priceMatching", () => {
     expect(updatedPrice).toMatchObject({
       bottleId: parent.id,
       releaseId: null,
-      targetId: null,
+      targetId: genericTargetId,
     });
     expect(updatedProposal).toMatchObject({
       currentBottleId: parent.id,
@@ -6537,6 +6541,11 @@ describe("priceMatching", () => {
       releaseId: null,
       targetId: genericTargetId,
     });
+    expect([
+      updatedPrice?.targetId,
+      listingAlias?.targetId,
+      observation?.targetId,
+    ]).toEqual([genericTargetId, genericTargetId, genericTargetId]);
   });
 
   test("updates an existing store-price observation to the newly approved target", async ({

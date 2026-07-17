@@ -9,7 +9,7 @@ import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { pushJob } from "@peated/server/worker/client";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -88,21 +88,50 @@ export default procedure
           });
         }
 
-        // clear any pinned matches as they are/were likely wrong
+        const storePriceAliasIdentity =
+          alias.targetId !== null
+            ? eq(storePrices.targetId, alias.targetId)
+            : and(
+                isNull(storePrices.targetId),
+                sql`${storePrices.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
+                sql`${storePrices.releaseId} IS NOT DISTINCT FROM ${alias.releaseId}`,
+              );
+        const reviewAliasIdentity =
+          alias.targetId !== null
+            ? eq(reviews.targetId, alias.targetId)
+            : and(
+                isNull(reviews.targetId),
+                sql`${reviews.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
+                sql`${reviews.releaseId} IS NOT DISTINCT FROM ${alias.releaseId}`,
+              );
+
+        // Clear only consumers that still carry this alias assignment.
         await tx
           .update(storePrices)
           .set({
             bottleId: null,
             releaseId: null,
+            targetId: null,
           })
-          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()));
+          .where(
+            and(
+              eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()),
+              storePriceAliasIdentity,
+            ),
+          );
         await tx
           .update(reviews)
           .set({
             bottleId: null,
             releaseId: null,
+            targetId: null,
           })
-          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()));
+          .where(
+            and(
+              eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()),
+              reviewAliasIdentity,
+            ),
+          );
 
         // Concurrent reassignment must roll back the earlier consumer clears.
         const [clearedAlias] = await tx

@@ -97,8 +97,10 @@ describe("POST /external-sites/:site/prices", () => {
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "legacy",
+      targetId: expect.any(Number),
+      assignmentSource: "source_approved",
     });
+    expect(prices[0].targetId).toBe(alias?.targetId);
     expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
       priceId: prices[0].id,
       imageUrl: "http://example.com/foo.jpg",
@@ -149,6 +151,23 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: (prices, { and, eq }) =>
+        and(
+          eq(prices.externalSiteId, site.id),
+          eq(prices.name, bottle.fullName),
+        ),
+    });
+    const exactAlias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, bottle.fullName),
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: exactAlias?.targetId,
+      imageUrl,
+    });
+    expect(exactAlias?.targetId).toEqual(expect.any(Number));
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "CapturePriceImage",
       expect.anything(),
@@ -251,6 +270,7 @@ describe("POST /external-sites/:site/prices", () => {
     expect(price).toMatchObject({
       bottleId: bottle.id,
       releaseId: release.id,
+      targetId: null,
       name: normalizedReleaseName,
     });
   });
@@ -390,13 +410,16 @@ describe("POST /external-sites/:site/prices", () => {
     });
 
     expect(price.bottleId).toBe(bottle.id);
+    expect(price.targetId).toBe(alias?.targetId);
     expect(updatedRawReview).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
+      targetId: alias?.targetId,
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "legacy",
+      targetId: expect.any(Number),
+      assignmentSource: "source_approved",
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
@@ -486,7 +509,7 @@ describe("POST /external-sites/:site/prices", () => {
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "legacy",
+      assignmentSource: "source_approved",
     });
     expect(
       await db.query.bottleAliases.findFirst({

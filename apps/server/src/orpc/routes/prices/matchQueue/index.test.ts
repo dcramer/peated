@@ -1536,9 +1536,13 @@ describe("price match queue", () => {
       currentBottleId: null,
       suggestedBottleId: null,
     });
-    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleAliasChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
       name: "Queue Approval",
     });
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      expect.anything(),
+    );
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
       {

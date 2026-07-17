@@ -19,6 +19,7 @@ import { CatalogTargetRetiredError } from "@peated/server/lib/catalogTargets";
 import { mergeConcreteBottlesInTransaction } from "@peated/server/lib/mergeConcreteBottles";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
+import * as workerClient from "@peated/server/worker/client";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { vi } from "vitest";
 
@@ -316,6 +317,11 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: null,
       releaseId: null,
     });
+    const review = await fixtures.Review({
+      name: alias.name,
+      bottleId: null,
+      releaseId: null,
+    });
 
     await db.transaction(async (tx) =>
       assignBottleAliasInTransaction(tx, {
@@ -346,7 +352,95 @@ describe("assignBottleAliasInTransaction", () => {
     ).toMatchObject({
       bottleId: parent.id,
       releaseId: null,
+      targetId: target.id,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: parent.id,
+      releaseId: null,
+      targetId: target.id,
+    });
+  });
+
+  test("retains a promoted release pair while assigning its exact target", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: parent.groupId,
+        brandId: parent.brandId,
+        createdByActorId: parent.createdByActorId,
+        name: "Promoted alias Bottle",
+        fullName: "Promoted alias Bottle",
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Unable to create promoted Bottle");
+    const [target] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: parent.groupId!,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!target) throw new Error("Unable to create promoted exact target");
+    const name = "Promoted release consumer alias";
+    const price = await fixtures.StorePrice({
+      name,
+      bottleId: null,
+      releaseId: null,
       targetId: null,
+    });
+    const review = await fixtures.Review({
+      name,
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+    });
+
+    await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        target: {
+          targetId: target.id,
+          groupId: target.groupId,
+          bottleId: promotedBottle.id,
+        },
+        consumerIdentity: {
+          bottleId: parent.id,
+          releaseId: release.id,
+        },
+        name,
+        assignedByActorId: parent.createdByActorId,
+      }),
+    );
+
+    expect(await getAlias(name)).toMatchObject({
+      bottleId: promotedBottle.id,
+      releaseId: null,
+      targetId: target.id,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: target.id,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: target.id,
     });
   });
 
@@ -391,6 +485,11 @@ describe("assignBottleAliasInTransaction", () => {
       releaseId: null,
       name: existing.name,
     });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: existing.name,
+    });
 
     const result = await db.transaction(async (tx) =>
       assignBottleAliasInTransaction(tx, {
@@ -416,7 +515,20 @@ describe("assignBottleAliasInTransaction", () => {
       await db.query.reviews.findFirst({
         where: eq(reviews.id, review.id),
       }),
-    ).toMatchObject({ bottleId: bottle.id, releaseId: null });
+    ).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: target.id,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: target.id,
+    });
   });
 
   test("upgrades a same-Bottle targetless alias to the exact target", async ({
@@ -467,6 +579,22 @@ describe("assignBottleAliasInTransaction", () => {
       assignmentSource: "human_approved",
       assignedByActorId: originalActor.id,
     });
+    const independentlyMatchedBottle = await fixtures.Bottle();
+    const independentlyMatchedTarget = await getExactTarget(
+      independentlyMatchedBottle.id,
+    );
+    const review = await fixtures.Review({
+      bottleId: independentlyMatchedBottle.id,
+      releaseId: null,
+      targetId: independentlyMatchedTarget.id,
+      name: existing.name,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: independentlyMatchedBottle.id,
+      releaseId: null,
+      targetId: independentlyMatchedTarget.id,
+      name: existing.name,
+    });
 
     await db.transaction(async (tx) =>
       assignBottleAliasInTransaction(tx, {
@@ -486,6 +614,24 @@ describe("assignBottleAliasInTransaction", () => {
       ignored: true,
       assignmentSource: "human_approved",
       assignedByActorId: originalActor.id,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: independentlyMatchedBottle.id,
+      releaseId: null,
+      targetId: independentlyMatchedTarget.id,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({
+      bottleId: independentlyMatchedBottle.id,
+      releaseId: null,
+      targetId: independentlyMatchedTarget.id,
     });
   });
 
@@ -960,6 +1106,47 @@ describe("assignBottleAliasInTransaction", () => {
         where: eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
+  });
+
+  test("indexes a new canonical assignment directly after commit", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const result = await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        targetId: target.id,
+        name: "Direct alias index failure",
+        assignmentSource: "human_approved",
+        assignedByActorId: bottle.createdByActorId,
+      }),
+    );
+    expect(result.isNew).toBe(true);
+    expect(await getAlias(result.alias.name)).toMatchObject({
+      bottleId: bottle.id,
+      targetId: target.id,
+    });
+    vi.mocked(workerClient.pushJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockRejectedValueOnce(
+      new Error("Queue unavailable"),
+    );
+
+    await expect(
+      finalizeBottleAliasAssignment(result),
+    ).resolves.toBeUndefined();
+
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
+      name: result.alias.name,
+    });
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      expect.anything(),
+    );
+    expect(await getAlias(result.alias.name)).toMatchObject({
+      bottleId: bottle.id,
+      targetId: target.id,
+    });
   });
 
   test("applies an image candidate to the merge replacement before finalization", async ({

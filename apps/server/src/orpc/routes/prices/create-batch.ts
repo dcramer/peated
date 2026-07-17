@@ -117,25 +117,43 @@ export default procedure
                 })
                 .onConflictDoNothing();
 
+              const aliasAssignmentInput = {
+                name: aliasKey,
+                backfillNames: [name, sp.name],
+                externalSiteId: site.id,
+                volume: sp.volume,
+                assignmentSource: "source_approved",
+                assignedByActorId: actor.id,
+              } satisfies Omit<
+                Parameters<typeof assignBottleAliasInTransaction>[1],
+                | "target"
+                | "targetId"
+                | "consumerIdentity"
+                | "bottleId"
+                | "releaseId"
+                | "aliasReleaseId"
+                | "context"
+              >;
               const aliasAssignment = bottleId
-                ? await assignBottleAliasInTransaction(tx, {
-                    name: aliasKey,
-                    backfillNames: [name, sp.name],
-                    bottleId,
-                    releaseId,
-                    externalSiteId: site.id,
-                    volume: sp.volume,
-                    assignmentSource: "source_approved",
-                    assignedByActorId: actor.id,
-                    context: {
-                      caller: "prices.createBatch",
-                      operation: "assignStorePriceAlias",
-                    },
-                  })
+                ? target?.targetId !== null && target?.targetId !== undefined
+                  ? await assignBottleAliasInTransaction(tx, {
+                      ...aliasAssignmentInput,
+                      bottleId,
+                      targetId: target.targetId,
+                    })
+                  : await assignBottleAliasInTransaction(tx, {
+                      ...aliasAssignmentInput,
+                      bottleId,
+                      releaseId,
+                      context: {
+                        caller: "prices.createBatch",
+                        operation: "assignStorePriceAlias",
+                      },
+                    })
                 : null;
 
               return {
-                price: { id: priceId, imageUrl, hasExactAliasTarget: !!target },
+                price: { id: priceId, imageUrl, hasAliasMatch: !!target },
                 aliasAssignment,
               };
             },
@@ -154,7 +172,7 @@ export default procedure
             });
           }
 
-          if (!price.hasExactAliasTarget) {
+          if (!price.hasAliasMatch) {
             await pushUniqueJob("ResolveStorePriceBottle", {
               priceId: price.id,
             });

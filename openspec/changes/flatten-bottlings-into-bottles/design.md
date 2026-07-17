@@ -530,6 +530,83 @@ removes the retained consumer pair columns after backfill and parity; task 9.7
 removes the measured legacy resolver and targetless compatibility after traffic
 reaches zero.
 
+### Alias-driven consumers share one assignment owner
+
+Task 5.6b extends the canonical alias assignment transaction to the StorePrice
+and Review rows selected by its alias lookup scope. A target-aware assignment
+atomically writes the supplied `targetId` together with the retained
+`(bottleId, releaseId)` compatibility pair carried separately by the alias
+assignment input. The CatalogTarget descriptor does not own that pair. The
+validated target identity remains the semantic decision: a generic target stays
+generic and never selects the BottleGroup representative merely to populate a
+consumer row.
+
+An affected caller that already resolved exact intent supplies that validated
+identity to the canonical operation even when its own direct consumer writer
+belongs to a later slice. In particular, task 5.6b updates the existing
+exact-alias branch of price create-batch to pass the validated exact `targetId`
+plus an explicit retained `(bottleId, null)` pair through the legacy exact
+target-aware alias input. That caller does not construct a
+CatalogTargetAssignmentDescriptor. The route's direct StorePrice upsert plus
+descriptor-based generic, unmatched, and broader ingestion redesign remain task
+5.6f.
+
+Measured name-wide targetless alias compatibility may update only targetless
+matching consumers. It cannot clear, replace, or reinterpret a durable consumer
+target, even when the alias name or retained pair would otherwise match. This
+keeps a later legacy alias event from downgrading a target-aware StorePrice or
+Review. This propagation rule does not override an orchestrator's explicit
+authority over its locked selected row. Until task 5.7, create-new approval is
+such a direct writer: it replaces only the locked selected StorePrice with the
+new legacy pair and `targetId: null` before invoking targetless alias and
+observation compatibility. The subsequent name-wide propagation still cannot
+downgrade any other durable consumer.
+
+Alias unassignment uses the captured alias preimage according to the same
+identity authority rule as reads. For a target-aware consumer, `targetId` is
+authoritative: the consumer matches when its `targetId` equals the alias
+snapshot's `targetId`, even when its retained pair differs, as can occur for a
+promoted release. For a targetless consumer, the retained `(bottleId,
+releaseId)` pair is the matching authority and must equal the alias snapshot's
+pair. Either match clears `targetId`, `bottleId`, and `releaseId` together. An
+independently retargeted consumer or targetless consumer with a different pair
+is preserved. The alias row remains conditionally cleared against its complete
+preimage so concurrent reassignment rolls back the earlier consumer work rather
+than committing a partial unassignment.
+
+Canonical alias assignment already synchronizes consumers in its transaction.
+When that assignment creates a new alias, its post-commit finalizer queues
+`IndexBottleAlias` directly and does not round-trip through
+`OnBottleAliasChange`; an existing-alias assignment need not enqueue alias
+indexing. The worker remains only for raw alias producers and does not retain a
+second StorePrice/Review propagation algorithm; it delegates to the canonical
+consumer synchronization operation before indexing.
+
+A replayed generic alias is safe only when its retained legacy pair resolves
+through the measured assignment boundary to the same generic target stored on
+the alias. An invalid pair, a cross-group result, or a release-bearing pair that
+resolves exact instead of to that generic target fails before synchronization,
+so the transaction writes no consumers. For a targetless raw alias, the worker
+locks the retained Bottle lifecycle first. If the retained `releaseId` is
+non-null, it then locks that BottleRelease and validates that it belongs to the
+retained Bottle before acquiring consumer locks. A missing or mismatched release
+aborts before consumer mutation, and the worker does not index the alias. After
+consumer locks, the worker revalidates and locks the alias snapshot. This
+prevents an invalid legacy pair, concurrent Bottle retirement, or alias
+reassignment from committing stale targetless propagation. The measured
+targetless compatibility path remains removable under task 9.7.
+
+Classifier-created unresolved reviews likewise remain explicitly targetless
+until tasks 5.8/5.9 replace their legacy creation and worker paths with valid
+concrete target production. Task 5.6b does not invent a representative or other
+exact Bottle for those reviews.
+
+Direct review, collection, flight, and price mutations remain separate review
+boundaries in tasks 5.6c-5.6f. Create-new price approval remains tasks 5.7 and
+5.5c, target-backed reads remain task 7.3, and existing legacy rows remain the
+section 6 backfill. These boundaries keep task 5.6b from silently widening into
+a direct writer, read, classifier, creation, or migration cutover.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

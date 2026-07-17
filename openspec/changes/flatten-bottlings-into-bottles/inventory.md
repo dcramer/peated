@@ -136,9 +136,12 @@ Bottle catalog and repair routes:
   exact CatalogTarget and delegates alias persistence to the canonical
   target-aware assignment owner. It never infers a stable group alias.
 - `apps/server/src/orpc/routes/bottleAliases/delete.ts` unassigns the alias row by
-  clearing its durable target and retained legacy pair together. Task 5.6 owns
-  target-aware clearing or preservation rules for matching review and store-price
-  consumers.
+  clearing its durable target and retained legacy pair together. Task 5.6b owns
+  clearing all three identity fields from a target-aware Review or StorePrice
+  whose authoritative `targetId` matches the alias snapshot, even if its
+  retained pair differs. A targetless consumer matches only by retained-pair
+  equality. Independently retargeted and different targetless-pair consumers
+  are preserved.
 - `apps/server/src/orpc/routes/bottleAliases/list.ts` and
   `apps/server/src/orpc/routes/bottleAliases/update.ts` retain their current read
   and ignored-state contracts until the broad target-backed read cutover in task
@@ -146,19 +149,32 @@ Bottle catalog and repair routes:
 
 Target-bearing consumer routes:
 
-- `apps/server/src/orpc/routes/collections/bottles/create.ts`
-- `apps/server/src/orpc/routes/collections/bottles/delete.ts`
+- `apps/server/src/orpc/routes/collections/bottles/create.ts` and
+  `apps/server/src/orpc/routes/collections/bottles/delete.ts` are direct
+  collection mutation writers assigned to task 5.6d.
 - `apps/server/src/orpc/routes/collections/bottles/imageHelpers.ts`
 - `apps/server/src/orpc/routes/collections/bottles/list.ts`
-- `apps/server/src/orpc/routes/reviews/create.ts`
+- `apps/server/src/orpc/routes/reviews/create.ts` is a direct user/API Review
+  writer assigned to task 5.6c. Shared alias-driven Review propagation remains
+  task 5.6b.
 - `apps/server/src/orpc/routes/reviews/list.ts`
 - `apps/server/src/orpc/routes/reviews/update.ts`
+- `apps/server/src/orpc/routes/flights/create.ts` and
+  `apps/server/src/orpc/routes/flights/update.ts` are direct Flight membership
+  writers assigned to task 5.6e.
 - `apps/server/src/orpc/routes/tastings/create.ts`
 - `apps/server/src/orpc/routes/tastings/delete.ts`
 - `apps/server/src/orpc/routes/tastings/list.ts`
 - `apps/server/src/orpc/routes/tastings/photo-identification-create.ts`
 - `apps/server/src/orpc/routes/tastings/photo-identification.ts`
-- `apps/server/src/orpc/routes/prices/create-batch.ts`
+- `apps/server/src/orpc/routes/prices/create-batch.ts` is a direct StorePrice
+  ingestion writer assigned to task 5.6f. Its existing exact-alias branch is an
+  affected task 5.6b caller: through the legacy exact target-aware alias input,
+  it passes the validated exact `targetId` plus the explicit retained
+  `(bottleId, null)` pair so matching consumers receive target-aware
+  propagation. It does not construct a CatalogTargetAssignmentDescriptor;
+  descriptor-based generic, unmatched, and direct-ingestion redesign remains
+  task 5.6f.
 
 Classifier, price matching, and moderation routes:
 
@@ -238,7 +254,17 @@ Catalog identity, aliases, search, creation, and updates:
   CatalogTarget and may write `targetId` as null, but it preserves an existing
   durable target instead of downgrading it to a legacy pair. Later task 5.5
   caller slices supply explicit exact or generic targets; task 9.7 removes the
-  targetless mode.
+  targetless mode. Task 5.6b extends this transaction's existing matching
+  StorePrice and Review propagation: a supplied exact or generic descriptor, or
+  the validated legacy exact `targetId` input, atomically writes its target and
+  retained pair to those consumers, while targetless compatibility can update
+  only targetless consumers. The alias assignment input owns the retained pair
+  separately from any CatalogTarget descriptor. Generic assignment never
+  selects the representative Bottle. When canonical assignment creates a new
+  alias, its post-commit finalizer queues `IndexBottleAlias` directly because
+  consumer synchronization already occurred; it does not queue
+  `OnBottleAliasChange`. Existing-alias assignment need not enqueue alias
+  indexing.
 - `apps/server/src/lib/bottleCreationDrafts.ts`
 - `apps/server/src/lib/bottleFinder.ts` owns target-aware exact alias resolution.
   A non-null exact target returns its Bottle, while a generic target returns no
@@ -318,17 +344,28 @@ Classifier decisions and price matching:
   Existing price assignment, proposal state, decision log vocabulary, and
   their retained legacy pair are unchanged.
   Create-new approval still creates ungrouped Bottle/BottleRelease rows and
-  retains measured targetless alias/observation writes; this is compatibility,
-  not compliant target-backed behavior. Task 5.7 replaces its legacy creation
-  and decision vocabulary, then task 5.5c assigns the newly created concrete
-  target to both records. Task 5.6 owns price and other consumer target dual
-  writes, task 7.3 owns target-backed reads, task 9.6 removes retained consumer
-  pairs, and task 9.7 removes measured targetless/legacy resolution.
+  retains measured targetless alias/observation writes. As the authoritative
+  direct writer for its locked selected StorePrice, it first replaces only that
+  row with the newly created legacy pair and `targetId: null`; this explicit
+  selected-row mutation is distinct from name-wide targetless alias
+  propagation, which cannot downgrade any other durable consumer. This is
+  compatibility, not compliant target-backed behavior. Task 5.7 replaces its
+  legacy creation and decision vocabulary, then task 5.5c assigns the newly
+  created concrete target to both records. Task 5.6b owns StorePrice and Review
+  propagation reached through canonical alias assignment; task 5.6f owns direct
+  price-row identity writers, including automated assignment clears that
+  currently clear only the retained pair. Task 7.3 owns target-backed reads,
+  task 9.6 removes retained consumer pairs, and task 9.7 removes measured
+  targetless/legacy resolution.
 - `apps/server/src/lib/pendingUploads.ts`
 
 ## Workers and queue payloads
 
-- `apps/server/src/worker/jobs/createMissingBottles.ts`
+- `apps/server/src/worker/jobs/createMissingBottles.ts` may create unresolved
+  classifier Review rows before classifier and worker creation can produce a
+  valid concrete CatalogTarget. Those rows remain explicitly targetless in task
+  5.6b; tasks 5.8/5.9 own their target-producing cutover rather than selecting a
+  representative or other arbitrary exact Bottle.
 - `apps/server/src/worker/jobs/index.ts`
 - `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
 - `apps/server/src/worker/jobs/onBottleChange.ts` refreshes Bottle details and
@@ -396,7 +433,18 @@ Classifier decisions and price matching:
   business logic. Remove its registration and job type under task 9.7 after the
   compatibility queue is drained.
 - `apps/server/src/worker/jobs/mergeEntity.ts`
-- `apps/server/src/worker/jobs/onBottleAliasChange.ts`
+- `apps/server/src/worker/jobs/onBottleAliasChange.ts` remains only for raw alias
+  producers. It delegates to the canonical alias-consumer synchronization owner
+  before indexing. A generic replay first resolves the retained legacy pair
+  through measured assignment and requires that result to equal the alias's
+  stored generic target; invalid, cross-group, or release-bearing exact
+  mismatches fail without consumer writes. A targetless replay locks the
+  retained Bottle lifecycle, then locks any non-null retained BottleRelease and
+  validates that it belongs to that Bottle before consumer locks. A missing or
+  mismatched release fails without consumer writes or alias indexing. The worker
+  then revalidates and locks the alias snapshot after consumer locks. This
+  measured targetless compatibility adapter is removed under task 9.7 and does
+  not own a second propagation algorithm.
 - `apps/server/src/worker/jobs/onBottleReleaseChange.ts`
 - `apps/server/src/worker/types.ts`
 

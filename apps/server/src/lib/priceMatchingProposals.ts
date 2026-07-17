@@ -2082,6 +2082,14 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     | "aliasReleaseId"
     | "context"
   >;
+  if (targetAssignment.kind === "measured_legacy_create_new") {
+    // The selected create-new price remains authoritative until task 5.7
+    // replaces this measured targetless writer with CatalogTarget assignment.
+    await tx
+      .update(storePrices)
+      .set({ bottleId, releaseId, targetId: null })
+      .where(eq(storePrices.id, proposal.price.id));
+  }
   const aliasResult = target
     ? await assignBottleAliasInTransaction(tx, {
         ...aliasInput,

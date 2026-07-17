@@ -50,7 +50,107 @@ SHALL NOT overwrite a durable target with a legacy pair.
 
 - **WHEN** a moderator deletes an alias association
 - **THEN** the alias row's target id and retained legacy pair are cleared together
-- **AND** consumer target-clearing semantics are not inferred from the alias row
+- **AND** a target-aware StorePrice or Review whose authoritative `targetId`
+  equals the alias snapshot has its target id and retained pair cleared together
+  even when that retained pair differs from the snapshot
+- **AND** a targetless StorePrice or Review has all three identity fields cleared
+  together only when its retained pair equals the alias snapshot
+- **AND** an independently retargeted consumer or targetless consumer with a
+  different pair is preserved
+
+### Requirement: Alias-driven consumer identity has one owner
+
+The system SHALL synchronize alias-matched StorePrice and Review identity in
+the canonical alias assignment transaction. A target-aware assignment SHALL
+write the validated target identity and retained compatibility pair atomically.
+The alias assignment input SHALL carry that pair separately from any
+CatalogTarget descriptor. Targetless compatibility SHALL NOT downgrade a
+durable consumer target.
+
+#### Scenario: Propagate an exact alias target
+
+- **WHEN** an exact target-aware alias assignment matches StorePrice or Review
+  rows in its lookup scope
+- **THEN** every matching consumer atomically receives that exact `targetId`
+  and the assignment input's retained Bottle/Release pair
+
+#### Scenario: Propagate a legacy exact target-aware input
+
+- **WHEN** an affected legacy exact caller already has a validated exact
+  `targetId` and Bottle identity
+- **THEN** it supplies that target id plus an explicit retained
+  `(bottleId, null)` pair to canonical alias assignment
+- **AND** it does not construct a CatalogTargetAssignmentDescriptor or infer
+  generic intent
+
+#### Scenario: Propagate a generic alias target
+
+- **WHEN** a generic target-aware alias assignment matches StorePrice or Review
+  rows in its lookup scope
+- **THEN** every matching consumer receives the generic `targetId` and retained
+  compatibility pair
+- **AND** the system does not substitute the BottleGroup representative or
+  another exact Bottle
+
+#### Scenario: Run targetless alias compatibility
+
+- **WHEN** measured compatibility assigns an alias without a CatalogTarget
+- **THEN** it may update only matching consumers whose `targetId` is null
+- **AND** it preserves every non-null consumer target and its authoritative
+  identity
+- **AND** this name-wide propagation rule does not replace an orchestrator's
+  explicit authority over its separately locked selected row
+
+#### Scenario: Process a staged alias-change job
+
+- **WHEN** a raw alias producer queues the retained alias-change worker
+- **THEN** it delegates to the canonical consumer synchronization operation
+- **AND** it indexes the alias only after that delegated synchronization
+- **AND** it does not implement a second propagation algorithm
+
+#### Scenario: Finalize canonical alias assignment
+
+- **WHEN** canonical alias assignment creates a new alias and commits after
+  synchronizing its consumers
+- **THEN** its finalizer queues alias indexing directly
+- **AND** it does not queue the alias-change worker to repeat synchronization
+
+#### Scenario: Reassign an existing canonical alias
+
+- **WHEN** canonical assignment synchronizes consumers for an existing alias
+- **THEN** its finalizer need not enqueue alias indexing
+
+#### Scenario: Replay a generic raw alias
+
+- **WHEN** the retained alias-change worker loads a generic target alias with a
+  legacy pair
+- **THEN** it resolves that pair through measured target assignment
+- **AND** it synchronizes consumers only when the result is the same stored
+  generic target
+- **AND** an invalid pair, cross-group result, or release-bearing exact mismatch
+  fails without writing consumers
+
+#### Scenario: Replay a targetless raw alias
+
+- **WHEN** the retained alias-change worker loads a targetless alias with a
+  Bottle identity
+- **THEN** it locks the retained Bottle lifecycle before consumer mutation
+- **AND** when `releaseId` is non-null, it locks that BottleRelease and validates
+  that it belongs to the retained Bottle before acquiring consumer locks
+- **AND** a missing or mismatched BottleRelease produces no consumer writes or
+  alias indexing
+- **AND** it revalidates and locks the alias snapshot after acquiring consumer
+  locks
+- **AND** concurrent Bottle retirement or alias reassignment cannot commit stale
+  propagation
+- **AND** the targetless compatibility path remains measured and removable
+
+#### Scenario: Classifier review has no valid target yet
+
+- **WHEN** a legacy classifier or missing-Bottle worker creates an unresolved
+  Review before concrete target creation is available
+- **THEN** the Review remains explicitly targetless
+- **AND** the system does not select a representative or arbitrary exact Bottle
 
 ### Requirement: Existing-match price evidence shares one target
 
@@ -88,7 +188,11 @@ price-assignment contract.
 #### Scenario: Approve a create-new proposal before creation cutover
 
 - **WHEN** create-new approval still creates ungrouped legacy Bottle or BottleRelease rows
-- **THEN** its alias and observation remain on the measured targetless compatibility path
+- **THEN** its authoritative direct writer replaces only the locked selected
+  StorePrice with the new legacy pair and `targetId: null`
+- **AND** name-wide targetless alias propagation preserves every other durable
+  consumer target
+- **AND** its alias and observation remain on the measured targetless compatibility path
 - **AND** the system does not claim that those records are target-backed
 - **AND** a later task assigns the newly created concrete target after creation and decision vocabulary are cut over
 

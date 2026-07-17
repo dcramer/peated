@@ -1,6 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleasePromotions,
+  bottles,
   catalogTargets,
   reviews,
   storePrices,
@@ -54,12 +56,16 @@ describe("DELETE /bottle-aliases/:name", () => {
       .from(reviews)
       .where(eq(reviews.id, review.id));
     expect(newReview.bottleId).toBeNull();
+    expect(newReview.releaseId).toBeNull();
+    expect(newReview.targetId).toBeNull();
 
     const [newStorePrice] = await db
       .select()
       .from(storePrices)
       .where(eq(storePrices.id, storePrice.id));
     expect(newStorePrice.bottleId).toBeNull();
+    expect(newStorePrice.releaseId).toBeNull();
+    expect(newStorePrice.targetId).toBeNull();
   });
 
   test("succeeds after commit when search indexing enqueue fails", async ({
@@ -209,6 +215,18 @@ describe("DELETE /bottle-aliases/:name", () => {
       targetId: genericTarget.id,
       name: "Generic Group Alias",
     });
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: genericTarget.id,
+      name: alias.name,
+    });
+    const storePrice = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: genericTarget.id,
+      name: alias.name,
+    });
 
     await routerClient.bottleAliases.delete(
       { alias: alias.name },
@@ -220,11 +238,98 @@ describe("DELETE /bottle-aliases/:name", () => {
         where: eq(bottleAliases.name, alias.name),
       }),
     ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, storePrice.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
       { bottleId: bottle.id },
     );
     expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
+  });
+
+  test("clears promoted-release consumers through their shared exact target", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: parent.groupId,
+        brandId: parent.brandId,
+        createdByActorId: parent.createdByActorId,
+        name: "Delete promoted Bottle",
+        fullName: "Delete promoted Bottle",
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Unable to create promoted Bottle");
+    const [promotedTarget] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: parent.groupId!,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!promotedTarget) throw new Error("Unable to create promoted target");
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promotedBottle.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+    });
+    const alias = await fixtures.BottleAlias({
+      bottleId: promotedBottle.id,
+      releaseId: null,
+      targetId: promotedTarget.id,
+      name: "Delete promoted release alias",
+      assignmentSource: "source_approved",
+    });
+    const review = await fixtures.Review({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: promotedTarget.id,
+      name: alias.name,
+    });
+    const storePrice = await fixtures.StorePrice({
+      bottleId: parent.id,
+      targetId: promotedTarget.id,
+      name: alias.name,
+    });
+    await db
+      .update(storePrices)
+      .set({ releaseId: release.id })
+      .where(eq(storePrices.id, storePrice.id));
+
+    await routerClient.bottleAliases.delete(
+      { alias: alias.name },
+      { context: { user } },
+    );
+
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, alias.name),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, storePrice.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
   });
 
   test("clears release matches for release aliases", async ({ fixtures }) => {
@@ -250,6 +355,10 @@ describe("DELETE /bottle-aliases/:name", () => {
       releaseId: release.id,
       name: alias.name,
     });
+    await db
+      .update(storePrices)
+      .set({ releaseId: release.id })
+      .where(eq(storePrices.id, storePrice.id));
 
     const data = await routerClient.bottleAliases.delete(
       { alias: alias.name },
@@ -274,6 +383,7 @@ describe("DELETE /bottle-aliases/:name", () => {
       .where(eq(reviews.id, review.id));
     expect(newReview.bottleId).toBeNull();
     expect(newReview.releaseId).toBeNull();
+    expect(newReview.targetId).toBeNull();
 
     const [newStorePrice] = await db
       .select()
@@ -281,5 +391,111 @@ describe("DELETE /bottle-aliases/:name", () => {
       .where(eq(storePrices.id, storePrice.id));
     expect(newStorePrice.bottleId).toBeNull();
     expect(newStorePrice.releaseId).toBeNull();
+    expect(newStorePrice.targetId).toBeNull();
+  });
+
+  test("preserves consumers independently retargeted from a target-aware alias", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const aliasBottle = await fixtures.Bottle();
+    const correctedBottle = await fixtures.Bottle();
+    const correctedTarget = await db.query.catalogTargets.findFirst({
+      where: (targets, { eq }) => eq(targets.bottleId, correctedBottle.id),
+    });
+    if (!correctedTarget) throw new Error("Missing corrected target fixture");
+    const alias = await fixtures.BottleAlias({
+      bottleId: aliasBottle.id,
+      name: "Retargeted consumer alias",
+    });
+    const review = await fixtures.Review({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: correctedTarget.id,
+      name: alias.name,
+    });
+    const storePrice = await fixtures.StorePrice({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: correctedTarget.id,
+      name: alias.name,
+    });
+
+    await routerClient.bottleAliases.delete(
+      { alias: alias.name },
+      { context: { user } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: correctedTarget.id,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, storePrice.id),
+      }),
+    ).toMatchObject({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: correctedTarget.id,
+    });
+  });
+
+  test("preserves a different targetless consumer pair", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const aliasBottle = await fixtures.Bottle();
+    const aliasRelease = await fixtures.BottleRelease({
+      bottleId: aliasBottle.id,
+    });
+    const correctedBottle = await fixtures.Bottle();
+    const alias = await fixtures.BottleAlias({
+      bottleId: aliasBottle.id,
+      releaseId: aliasRelease.id,
+      targetId: null,
+      name: "Corrected legacy consumer alias",
+    });
+    const review = await fixtures.Review({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: null,
+      name: alias.name,
+    });
+    const storePrice = await fixtures.StorePrice({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: null,
+      name: alias.name,
+    });
+
+    await routerClient.bottleAliases.delete(
+      { alias: alias.name },
+      { context: { user } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: null,
+    });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, storePrice.id),
+      }),
+    ).toMatchObject({
+      bottleId: correctedBottle.id,
+      releaseId: null,
+      targetId: null,
+    });
   });
 });
