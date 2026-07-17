@@ -385,9 +385,46 @@ Representative group content is selected explicitly from a member Bottle or stor
 
 ### Compatibility is read/write translation, not a permanent second model
 
-During migration, old release inputs resolve through the release-to-Bottle mapping and old release-shaped outputs are adapters over the new Bottle. New writes create only BottleGroup/Bottle/target records. The compatibility layer records usage so removal is gated on zero legacy write traffic and an agreed read deprecation window.
+During migration, old release inputs resolve through the release-to-Bottle
+mapping. Retained read APIs may project a legacy release shape from the new
+Bottle, while write adapters return explicit replacement identity instead of
+inventing a legacy id. New writes create only BottleGroup/Bottle/target records.
+The compatibility layer records usage so removal is gated on zero legacy write
+traffic and an agreed read deprecation window.
 
 Nested `/bottles/:oldParentId/bottlings/:releaseId` URLs permanently redirect to the promoted Bottle. A retired parent Bottle URL redirects to the BottleGroup page. APIs return explicit replacement identifiers rather than silently choosing a member Bottle for a generic target.
+
+Task 5.4 is split by mutation lifecycle. Task 5.4a retains the legacy
+BottleRelease create input, authentication, and terms-acceptance requirements,
+but treats the supplied parent Bottle only as trusted group context. The source
+must be an active Bottle with a valid group and exact target. The adapter passes
+the release-owned fields through canonical concrete creation and returns the
+versioned exact CatalogTarget result. It never inserts a BottleRelease or uses
+the created Bottle id as a fake legacy release id. Legacy `imageUrl` cannot be
+translated into the canonical upload boundary, so a non-null value is rejected
+rather than silently ignored; all remaining exact fields use canonical runtime
+validation. A missing or retired source fails explicitly. The adapter does not
+guess a member Bottle, follow a representative as exact identity, or recover
+group authority from a tombstone.
+
+Task 5.4b requires a completed release-promotion mapping before translating a
+legacy update into an exact-only canonical Bottle patch. It returns that
+Bottle's exact CatalogTarget and leaves the retained BottleRelease row
+unchanged; compatibility must not maintain a release mirror. Read/UI coherence
+must be handled by the staged read and product cutovers rather than by a second
+writer. Task 5.4c does not delegate to the legacy Bottle delete route. It first
+defines canonical deletion behavior for permanent promotion mappings, last
+group members, representatives, generic and exact targets, and tombstones,
+then places the legacy delete adapter over that operation.
+
+Every 5.4 adapter records a structured compatibility write with caller,
+operation, legacy identity where one exists, and replacement Bottle/target
+identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit
+gone/replacement response and remove the routes after measured traffic reaches
+zero. The 5.4 review commits are code-review boundaries, not independently
+deployable changes: activation remains gated on the staged migration audit,
+promotion/backfill state, valid target graph, parity evidence, and explicit
+approval.
 
 Compatibility does not permit a second business-logic implementation. When a
 new service replaces a legacy writer or reader, the old internal implementation
@@ -395,7 +432,7 @@ is deleted in the same slice; any retained route may only translate its legacy
 input/output and delegate to the new service. Every temporarily retained path
 must have an explicit removal task:
 
-- BottleRelease write adapters: tasks 5.4 and 9.4/9.7;
+- BottleRelease write adapters: tasks 5.4a-5.4c and 9.4/9.7;
 - paired-reference dual writes and storage: tasks 5.6, 7.3, and 9.6;
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
 - legacy Bottle upsert response translation: task 5.1 retains a measured

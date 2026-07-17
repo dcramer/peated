@@ -109,6 +109,26 @@ the same transaction as proposal approval, so shared values fan out while
 exact values remain selected-only. Task 5.7 owns target-aware proposal actions
 and an explicit exact-age contract rather than adding inference here.
 
+## Legacy BottleRelease write adapters
+
+The BottleRelease create adapter treats its legacy `bottle` input only as
+trusted group context and maps release-owned fields to a new exact Bottle. The
+source must be an active Bottle in a valid group; a retired parent or generic
+group cannot be converted into exact identity by choosing a representative or
+another member. The response is the new Bottle's exact CatalogTarget, never a
+release-shaped object with a fabricated `id`. A non-null legacy `imageUrl` is
+rejected because canonical images use the upload boundary rather than accepting
+an arbitrary stored URL.
+
+A legacy update owns no shared fields. It requires a completed promotion
+mapping and applies only to the mapped exact Bottle through the canonical
+update service. The retained BottleRelease is immutable compatibility input,
+not a write mirror. Legacy delete cannot be translated until canonical Bottle
+deletion preserves the permanent promotion mapping and defines group,
+representative, target, and tombstone ownership. All adapters emit measured
+compatibility writes and are disabled under task 9.4 and removed under task
+9.7.
+
 ## Durable Bottle materialization
 
 Bottle `brandId`, `bottlerId`, `category`, `seriesId`, `flavorProfile`,

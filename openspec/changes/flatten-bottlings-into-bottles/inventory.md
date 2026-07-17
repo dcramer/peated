@@ -76,12 +76,22 @@ The Drizzle owners are:
 
 BottleRelease CRUD and registration:
 
-- `apps/server/src/orpc/routes/bottleReleases/create.ts`
-- `apps/server/src/orpc/routes/bottleReleases/delete.ts`
+- `apps/server/src/orpc/routes/bottleReleases/create.ts` is the task 5.4a
+  compatibility boundary. It retains legacy input/authentication, delegates to
+  canonical concrete creation from an active source Bottle, emits measured
+  write context, returns the exact CatalogTarget replacement, and must not
+  insert BottleRelease or synthesize a release id.
+- `apps/server/src/orpc/routes/bottleReleases/delete.ts` remains the legacy
+  destructive implementation until task 5.4c defines canonical deletion and
+  replaces it with a measured promotion-mapped adapter. It must not delegate to
+  the current legacy Bottle delete route.
 - `apps/server/src/orpc/routes/bottleReleases/details.ts`
 - `apps/server/src/orpc/routes/bottleReleases/index.ts`
 - `apps/server/src/orpc/routes/bottleReleases/list.ts`
-- `apps/server/src/orpc/routes/bottleReleases/update.ts`
+- `apps/server/src/orpc/routes/bottleReleases/update.ts` remains the legacy
+  direct writer until task 5.4b replaces it with a completed-promotion resolver
+  plus exact-only canonical Bottle update. The adapter returns the exact target
+  and never mirrors changes into BottleRelease.
 - `apps/server/src/orpc/routes/index.ts`
 - `apps/server/src/app.ts`
 

@@ -6,7 +6,7 @@ import {
   hasDirtyBottleLevelStatedAgeConflict,
 } from "@peated/bottle-classifier/releaseIdentity";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
-import { db, type AnyTransaction } from "@peated/server/db";
+import type { AnyTransaction } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import { bottleReleases, bottles, changes } from "@peated/server/db/schema";
 import { findExistingBottleReleaseByIdentity } from "@peated/server/lib/bottleReleaseIdentity";
@@ -18,7 +18,6 @@ import type { CaskFill, CaskSize, CaskType } from "@peated/server/types";
 import { pushJob } from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
-import { getUserActor } from "./actors";
 
 export class BottleReleaseCreateBadRequestError extends Error {
   constructor(message: string) {
@@ -251,28 +250,4 @@ export async function finalizeCreatedBottleRelease(
       },
     });
   }
-}
-
-export async function createBottleRelease({
-  bottleId,
-  input,
-  user,
-}: {
-  bottleId: number;
-  input: z.infer<typeof BottleReleaseInputSchema>;
-  user: User;
-}) {
-  const actor = await getUserActor(user);
-  const result = await db.transaction(async (tx) =>
-    createBottleReleaseInTransaction(tx, {
-      bottleId,
-      createdByActorId: actor.id,
-      input,
-      user,
-    }),
-  );
-
-  await finalizeCreatedBottleRelease(result);
-
-  return result.release;
 }

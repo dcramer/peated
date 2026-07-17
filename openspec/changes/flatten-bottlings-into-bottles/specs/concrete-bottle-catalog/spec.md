@@ -69,6 +69,43 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **WHEN** a compatibility API receives a known legacy `releaseId`
 - **THEN** it resolves the mapped Bottle without re-creating or duplicating catalog data
 
+#### Scenario: Create through the legacy BottleRelease route
+
+- **WHEN** an authenticated, terms-accepted caller submits the legacy BottleRelease create input with an active source Bottle
+- **THEN** the system validates the exact fields through canonical concrete Bottle creation
+- **AND** it creates the Bottle in the source Bottle's trusted group without inserting a BottleRelease
+- **AND** it emits measured compatibility-write context
+- **AND** it returns the versioned exact CatalogTarget replacement without fabricating or overloading a release id
+
+#### Scenario: Legacy create cannot translate an image URL
+
+- **WHEN** the legacy BottleRelease create input contains a non-null `imageUrl`
+- **THEN** the compatibility adapter rejects the request instead of ignoring the image or bypassing the canonical upload boundary
+
+#### Scenario: Legacy create receives retired parent context
+
+- **WHEN** the legacy BottleRelease create input names a missing or retired Bottle
+- **THEN** the compatibility adapter fails explicitly
+- **AND** it does not choose a representative or another group member as exact identity
+
+#### Scenario: Update a promoted legacy release
+
+- **WHEN** a moderator updates a legacy BottleRelease with a completed promotion mapping
+- **THEN** the compatibility adapter applies only the supplied exact fields to the mapped Bottle through the canonical update service
+- **AND** it returns that Bottle's exact CatalogTarget replacement
+- **AND** it does not update the retained BottleRelease row
+
+#### Scenario: Update an unmapped legacy release
+
+- **WHEN** a legacy BottleRelease update has no completed promotion mapping
+- **THEN** the compatibility adapter rejects the request without creating, guessing, or mirroring catalog identity
+
+#### Scenario: Delete through a legacy release reference
+
+- **WHEN** BottleRelease delete is converted to a compatibility adapter
+- **THEN** it delegates only to canonical concrete Bottle deletion whose permanent promotion-mapping, group membership, representative, target, and tombstone behavior is defined and validated
+- **AND** it does not reuse the superseded direct BottleRelease or legacy Bottle deletion implementation
+
 ### Requirement: BottleRelease is retired after compatibility
 
 The system SHALL stop producing BottleRelease records and SHALL remove release-specific routes, schemas, jobs, and foreign keys only after migration parity and compatibility gates pass.

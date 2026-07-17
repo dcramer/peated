@@ -1,25 +1,26 @@
-import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
 import {
-  BottleReleaseAlreadyExistsError,
-  BottleReleaseCreateBadRequestError,
-  createBottleRelease,
-} from "@peated/server/lib/createBottleRelease";
+  BottleAlreadyExistsError,
+  BottleCreateBadRequestError,
+} from "@peated/server/lib/createBottle";
+import {
+  createConcreteBottle,
+  TrustedSourceBottleError,
+} from "@peated/server/lib/createConcreteBottle";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
-import { ConflictError } from "@peated/server/orpc/errors";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import {
-  BottleReleaseInputSchema,
-  BottleReleaseSchema,
-} from "@peated/server/schemas/bottleReleases";
-import { serialize } from "@peated/server/serializers";
-import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
-import { eq } from "drizzle-orm";
-import { z } from "zod";
+import loadExactTarget from "@peated/server/orpc/routes/bottles/load-exact-target";
+import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
+import { BottleReleaseInputSchema } from "@peated/server/schemas/bottleReleases";
+import { z, ZodError } from "zod";
 
+/**
+ * Measured translation-only compatibility over canonical concrete creation.
+ * Tasks 9.4 and 9.7 disable and then remove this legacy write surface.
+ */
 export default procedure
   .use(requireAuth)
   .use(requireTosAccepted)
@@ -39,42 +40,88 @@ export default procedure
       bottle: z.coerce.number(),
     }),
   )
-  .output(BottleReleaseSchema)
+  .output(ExactCatalogTargetV1Schema)
   .handler(async function ({ input, context, errors }) {
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, input.bottle));
-
-    if (!bottle) {
-      throw errors.NOT_FOUND({
-        message: "Bottle not found.",
+    if (input.imageUrl !== null) {
+      throw errors.BAD_REQUEST({
+        message:
+          "BottleRelease imageUrl is not supported by concrete Bottle creation.",
       });
     }
 
     try {
-      const release = await createBottleRelease({
-        bottleId: input.bottle,
-        input,
-        user: context.user,
+      const result = await createConcreteBottle({
+        context,
+        input: {
+          kind: "source_bottle",
+          sourceBottleId: input.bottle,
+          exact: {
+            edition: input.edition,
+            statedAge: input.statedAge,
+            abv: input.abv,
+            singleCask: input.singleCask,
+            caskStrength: input.caskStrength,
+            vintageYear: input.vintageYear,
+            releaseYear: input.releaseYear,
+            caskSize: input.caskSize,
+            caskType: input.caskType,
+            caskFill: input.caskFill,
+            description: input.description,
+            tastingNotes: input.tastingNotes,
+          },
+        },
+      });
+      logInfo("Legacy BottleRelease compatibility write", {
+        extra: {
+          event: "bottle_release.compatibility",
+          access: "write",
+          caller: "bottleReleases.create",
+          operation: "create_concrete_bottle_from_source",
+          sourceBottleId: input.bottle,
+          replacementBottleId: result.bottle.id,
+          replacementTargetId: result.exactTarget.id,
+        },
       });
 
-      return await serialize(BottleReleaseSerializer, release, context.user);
-    } catch (err) {
-      if (err instanceof BottleReleaseAlreadyExistsError) {
-        throw new ConflictError(
-          { id: err.releaseId },
-          undefined,
-          "A release with these attributes already exists.",
-        );
-      }
-
-      if (err instanceof BottleReleaseCreateBadRequestError) {
-        throw errors.BAD_REQUEST({
-          message: err.message,
+      return await loadExactTarget(
+        {
+          bottleId: result.bottle.id,
+          groupId: result.group.id,
+          targetId: result.exactTarget.id,
+        },
+        context,
+      );
+    } catch (error) {
+      if (error instanceof BottleAlreadyExistsError) {
+        throw errors.CONFLICT({
+          message: error.message,
+          data: { bottle: error.bottleId },
+          cause: error,
         });
       }
 
-      throw err;
+      if (error instanceof BottleCreateBadRequestError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
+      }
+
+      if (
+        error instanceof TrustedSourceBottleError &&
+        error.code === "not_found"
+      ) {
+        throw errors.NOT_FOUND({ message: error.message, cause: error });
+      }
+
+      if (error instanceof TrustedSourceBottleError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+
+      if (error instanceof ZodError) {
+        throw errors.BAD_REQUEST({
+          message: "Invalid concrete Bottle fields.",
+          cause: error,
+        });
+      }
+
+      throw error;
     }
   });
