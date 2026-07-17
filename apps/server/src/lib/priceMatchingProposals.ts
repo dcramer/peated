@@ -1955,7 +1955,7 @@ async function markApprovedStorePriceMatchProposalsInTransaction(
 }
 
 export async function applyApprovedStorePriceMatchProposalInTransaction(
-  tx: AnyDatabase,
+  tx: AnyTransaction,
   {
     proposal,
     bottleId,
@@ -2020,6 +2020,10 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     ignored: !reusableGlobalAlias,
     assignmentSource: "source_approved",
     assignedByActorId: actor.id,
+    context: {
+      caller: "priceMatchingProposals",
+      operation: "approveStorePriceAlias",
+    },
   });
 
   await markApprovedStorePriceMatchProposalsInTransaction(tx, {
@@ -2077,7 +2081,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
 }
 
 export async function applyApprovedStorePriceMatchInTransaction(
-  tx: AnyDatabase,
+  tx: AnyTransaction,
   {
     proposalId,
     bottleId,

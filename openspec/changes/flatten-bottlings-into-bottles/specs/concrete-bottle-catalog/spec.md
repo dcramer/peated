@@ -50,6 +50,12 @@ The system SHALL index, search, serialize, route, collect, price, review, and di
 - **WHEN** a legacy BottleRelease has been promoted and its name or alias is searched
 - **THEN** search returns the promoted Bottle with its exact `bottleId`
 
+#### Scenario: Resolve an exact Bottle alias
+
+- **WHEN** an accepted alias owns an exact Bottle target
+- **THEN** exact alias lookup returns that Bottle without requiring a release id
+- **AND** a generic group alias does not select a representative Bottle
+
 #### Scenario: Open an exact Bottle
 
 - **WHEN** a user opens a promoted or newly created Bottle URL

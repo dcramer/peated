@@ -14,6 +14,44 @@ The system SHALL represent the catalog subject of tastings, reviews, collection 
 - **WHEN** the expression is known but the exact Bottle is not
 - **THEN** the consumer row references the BottleGroup's generic catalog target
 
+### Requirement: Aliases preserve exact or generic target intent
+
+The system SHALL assign aliases through one validated CatalogTarget operation.
+Exact marketed aliases SHALL reference an exact Bottle target, stable aliases
+SHALL reference a generic BottleGroup target, and compatibility translation
+SHALL NOT overwrite a durable target with a legacy pair.
+
+#### Scenario: Assign a moderator Bottle alias
+
+- **WHEN** a moderator assigns an alias using a Bottle id
+- **THEN** the system resolves and stores that Bottle's active exact target
+- **AND** it does not infer a stable alias for the BottleGroup
+
+#### Scenario: Resolve an exact alias
+
+- **WHEN** an accepted alias references an exact target
+- **THEN** exact alias lookup returns that target's Bottle directly
+- **AND** it does not reconstruct a BottleRelease identity
+
+#### Scenario: Encounter a generic alias during exact lookup
+
+- **WHEN** an accepted alias references a generic target
+- **THEN** the alias remains BottleGroup identity
+- **AND** the system does not substitute the representative or another member
+  Bottle
+
+#### Scenario: Resolve a legacy targetless alias
+
+- **WHEN** a compatibility lookup encounters an alias whose `targetId` is null
+- **THEN** it may use the instrumented legacy pair resolver
+- **AND** a non-null target never uses the legacy pair fallback
+
+#### Scenario: Unassign an alias
+
+- **WHEN** a moderator deletes an alias association
+- **THEN** the alias row's target id and retained legacy pair are cleared together
+- **AND** consumer target-clearing semantics are not inferred from the alias row
+
 ### Requirement: Target integrity is database enforced
 
 The system SHALL enforce one generic target per BottleGroup, one exact target per Bottle, and consistency between an exact target's Bottle and BottleGroup.

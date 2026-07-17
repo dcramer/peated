@@ -131,7 +131,18 @@ Bottle catalog and repair routes:
   `bottle_upsert.compatibility` telemetry. Task 5.9 cuts the scraper and any
   remaining callers over to concrete target responses; task 9.7 removes this
   response adapter after measured traffic reaches zero.
-- `apps/server/src/orpc/routes/bottleAliases/delete.ts`
+- `apps/server/src/orpc/routes/bottleAliases/upsert.ts` is the task 5.5a thin
+  moderator adapter. Its Bottle input is exact intent; it resolves the active
+  exact CatalogTarget and delegates alias persistence to the canonical
+  target-aware assignment owner. It never infers a stable group alias.
+- `apps/server/src/orpc/routes/bottleAliases/delete.ts` unassigns the alias row by
+  clearing its durable target and retained legacy pair together. Task 5.6 owns
+  target-aware clearing or preservation rules for matching review and store-price
+  consumers.
+- `apps/server/src/orpc/routes/bottleAliases/list.ts` and
+  `apps/server/src/orpc/routes/bottleAliases/update.ts` retain their current read
+  and ignored-state contracts until the broad target-backed read cutover in task
+  7.3.
 
 Target-bearing consumer routes:
 
@@ -214,15 +225,38 @@ Catalog identity, aliases, search, creation, and updates:
   Durable `targetId` values are authoritative; the measured legacy pair is used
   only when a compatibility row has no target. Retain that legacy branch
   through the task 9.5 read window and remove it under task 9.7.
-- `apps/server/src/lib/bottleAliases.ts`
+- `apps/server/src/lib/bottleAliases.ts` is the task 5.5a canonical assignment
+  owner for the exact/moderator alias path. An explicit exact target is validated
+  and stored. Its measured targetless compatibility mode does not resolve a
+  CatalogTarget and may write `targetId` as null, but it preserves an existing
+  durable target instead of downgrading it to a legacy pair. Later task 5.5
+  caller slices supply explicit exact or generic targets; task 9.7 removes the
+  targetless mode.
 - `apps/server/src/lib/bottleCreationDrafts.ts`
-- `apps/server/src/lib/bottleFinder.ts`
+- `apps/server/src/lib/bottleFinder.ts` owns target-aware exact alias resolution.
+  A non-null exact target returns its Bottle, while a generic target returns no
+  Bottle and never becomes a representative; only a null-target alias may use
+  the measured legacy pair fallback. Broad target-backed alias reads and Bottle
+  search/index replacement remain tasks 7.3 and 7.5.
 - `apps/server/src/lib/bottleReferenceCandidates.ts`
 - `apps/server/src/lib/bottleReferenceResolution.ts`
 - `apps/server/src/lib/bottleReleaseIdentity.ts`
 - `apps/server/src/lib/bottleSchemaRules.ts`
 - `apps/server/src/lib/createBottleRelease.ts`
-- `apps/server/src/lib/db.ts`
+- `apps/server/src/lib/db.ts` still owns the raw legacy-pair
+  `upsertBottleAlias` writer. It remains active for
+  `createBottle.ts`, `createBottleRelease.ts`,
+  `applyDirtyParentReleaseRepair.ts`, `applyLegacyReleaseRepair.ts`,
+  `bottleReferenceResolution.ts`,
+  `repairBottleBrandDistilleryAssignments.ts`, and
+  `worker/jobs/mergeEntity.ts`, with direct coverage in `lib/db.test.ts`.
+  Active CLI callers also include the Bottle `fix-names` command and the price
+  and review `backfill-aliases` commands, while Bottle `normalize` and review
+  `backfill-aliases` contain direct bound and unbound alias inserts respectively.
+  These creation, repair, import/reference-resolution, and entity-merge callers
+  and CLI maintenance paths are outside task 5.5a; later task 5.5 caller slices
+  migrate them to explicit targets and task 9.7 removes the raw writer and
+  direct legacy-pair/unbound inserts.
 - `apps/server/src/lib/format.ts`
 - `apps/server/src/lib/search.ts`
 
@@ -263,7 +297,9 @@ Classifier decisions and price matching:
   updater, including its direct entity, series, distiller, Bottle,
   BottleRelease-name, audit, and post-commit writes, is removed rather than
   retained as a second business system. Release creation elsewhere in this
-  service remains until tasks 5.7 and 9.7.
+  service remains until tasks 5.7 and 9.7. Task 5.5b separately resolves one
+  target for listing-alias and observation writes in the approval transaction;
+  task 5.5a does not change observation or price-assignment semantics.
 - `apps/server/src/lib/pendingUploads.ts`
 
 ## Workers and queue payloads
@@ -347,7 +383,17 @@ Classifier decisions and price matching:
   worker. Strict recomputation validates the active graph and target integrity
   and stops on an invalid row rather than silently skipping it. This explicit
   maintenance scope does not use the tasting assignment descriptor, which
-  distinguishes exact from generic user intent.
+  distinguishes exact from generic user intent. The same file's `fix-names`
+  command still calls the raw pair `upsertBottleAlias`, and `normalize` directly
+  inserts a Bottle-bound alias without `targetId`.
+- `apps/cli/src/commands/prices.ts`: `prices backfill-aliases` still calls the
+  raw pair `upsertBottleAlias` for Bottle-bound price names.
+- `apps/cli/src/commands/reviews.ts`: `reviews backfill-aliases` calls the raw
+  pair `upsertBottleAlias` for Bottle-bound review names and directly inserts
+  an unbound alias for reviews without a Bottle.
+- These CLI alias maintenance paths are explicitly assigned to later task 5.5
+  caller slices; task 9.7 removes their raw pair and unbound writes after
+  target-aware replacements are active.
 - `apps/cli/src/commands/catalogMigration.ts`
 
 ## Migration audit

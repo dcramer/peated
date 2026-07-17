@@ -1,6 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottles,
+  bottleTombstones,
   catalogTargets,
   reviews,
   storePrices,
@@ -9,11 +11,26 @@ import { getUserActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
   ExactBottleAliasConflictError,
+  finalizeBottleAliasAssignment,
+  InvalidExactBottleAliasTargetError,
   reserveExactBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
+import { CatalogTargetRetiredError } from "@peated/server/lib/catalogTargets";
+import { mergeConcreteBottlesInTransaction } from "@peated/server/lib/mergeConcreteBottles";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { vi } from "vitest";
+
+vi.mock("@peated/server/worker/client", () => ({
+  pushJob: vi.fn(),
+  pushUniqueJob: vi.fn(),
+}));
+
+const compatibilityContext = {
+  caller: "bottleAliases.test",
+  operation: "assignTargetlessAlias",
+};
 
 async function getExactTarget(bottleId: number) {
   const target = await db.query.catalogTargets.findFirst({
@@ -282,6 +299,409 @@ describe("reserveExactBottleAliasInTransaction", () => {
 });
 
 describe("assignBottleAliasInTransaction", () => {
+  test("validates the requested Bottle and exact target before assignment", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+
+    const { alias } = await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        targetId: target.id,
+        name: "Validated Exact Alias",
+        assignmentSource: "human_approved",
+        assignedByActorId: bottle.createdByActorId,
+      }),
+    );
+
+    expect(alias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: target.id,
+    });
+  });
+
+  test("claims an unbound exact alias through the shared assignment path", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const assignedBy = await getUserActor(await fixtures.User({ mod: true }));
+    const existing = await fixtures.BottleAlias({
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+      name: "Unbound Exact Assignment",
+      ignored: true,
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: existing.name,
+    });
+
+    const result = await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        targetId: target.id,
+        name: existing.name,
+        ignored: false,
+        assignmentSource: "human_approved",
+        assignedByActorId: assignedBy.id,
+      }),
+    );
+
+    expect(result.isNew).toBe(false);
+    expect(await getAlias(existing.name)).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: target.id,
+      ignored: false,
+      assignmentSource: "human_approved",
+      assignedByActorId: assignedBy.id,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, releaseId: null });
+  });
+
+  test("upgrades a same-Bottle targetless alias to the exact target", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const existing = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: null,
+      name: "Targetless Alias",
+    });
+
+    await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        targetId: target.id,
+        name: existing.name,
+        assignmentSource: "human_approved",
+        assignedByActorId: bottle.createdByActorId,
+      }),
+    );
+
+    expect(await getAlias(existing.name)).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: target.id,
+    });
+  });
+
+  test("preserves an exact target when a legacy caller claims its unbound alias", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const originalActor = await getUserActor(
+      await fixtures.User({ mod: true }),
+    );
+    const legacyActor = await getUserActor(await fixtures.User({ mod: true }));
+    const existing = await fixtures.BottleAlias({
+      bottleId: null,
+      releaseId: null,
+      targetId: target.id,
+      name: "Already Targeted Alias",
+      ignored: true,
+      assignmentSource: "human_approved",
+      assignedByActorId: originalActor.id,
+    });
+
+    await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        releaseId: release.id,
+        name: existing.name,
+        assignmentSource: "source_approved",
+        assignedByActorId: legacyActor.id,
+        context: compatibilityContext,
+      }),
+    );
+
+    expect(await getAlias(existing.name)).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: target.id,
+      ignored: true,
+      assignmentSource: "human_approved",
+      assignedByActorId: originalActor.id,
+    });
+  });
+
+  test("rejects targetless reuse of a generic alias without mutating durable state", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const genericTarget = await getGenericTarget(bottle.groupId!);
+    const originalActor = await getUserActor(
+      await fixtures.User({ mod: true }),
+    );
+    const nextActor = await getUserActor(await fixtures.User({ mod: true }));
+    const existing = await fixtures.BottleAlias({
+      bottleId: null,
+      releaseId: null,
+      targetId: genericTarget.id,
+      name: "Generic Compatibility Conflict",
+      ignored: true,
+      assignmentSource: "human_approved",
+      assignedByActorId: originalActor.id,
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: existing.name,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: existing.name,
+    });
+
+    const error = await waitError(
+      db.transaction(async (tx) =>
+        assignBottleAliasInTransaction(tx, {
+          bottleId: bottle.id,
+          releaseId: release.id,
+          name: existing.name,
+          assignmentSource: "source_approved",
+          assignedByActorId: nextActor.id,
+          context: compatibilityContext,
+        }),
+      ),
+      ExactBottleAliasConflictError,
+    );
+
+    expect(error.code).toBe("generic_target");
+    expect(await getAlias(existing.name)).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: genericTarget.id,
+      ignored: true,
+      assignmentSource: "human_approved",
+      assignedByActorId: originalActor.id,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null });
+  });
+
+  test("validates that an explicit target is exact and owns the Bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
+    const otherTarget = await getExactTarget(otherBottle.id);
+    const genericTarget = await getGenericTarget(bottle.groupId!);
+
+    for (const [targetId, code] of [
+      [genericTarget.id, "generic_target"],
+      [otherTarget.id, "bottle_mismatch"],
+    ] as const) {
+      const name = `Invalid Target ${code}`;
+      const error = await waitError(
+        db.transaction(async (tx) =>
+          assignBottleAliasInTransaction(tx, {
+            bottleId: bottle.id,
+            targetId,
+            name,
+            assignedByActorId: bottle.createdByActorId,
+          }),
+        ),
+        InvalidExactBottleAliasTargetError,
+      );
+
+      expect(error.code).toBe(code);
+      expect(
+        await db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, name),
+        }),
+      ).toBeUndefined();
+    }
+  });
+
+  test("rejects a retired Bottle exact target without writing an alias", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const name = "Retired Exact Target Alias";
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const error = await waitError(
+      db.transaction(async (tx) =>
+        assignBottleAliasInTransaction(tx, {
+          bottleId: bottle.id,
+          targetId: target.id,
+          name,
+          assignedByActorId: bottle.createdByActorId,
+        }),
+      ),
+      CatalogTargetRetiredError,
+    );
+
+    expect(error).toMatchObject({
+      identity: { bottleId: bottle.id },
+      replacement: { kind: "bottle", bottleId: replacement.id },
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, name),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null });
+  });
+
+  test("rejects generic, different exact, and legacy-release ownership", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const otherBottle = await fixtures.Bottle();
+    const otherTarget = await getExactTarget(otherBottle.id);
+    const genericTarget = await getGenericTarget(bottle.groupId!);
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const conflicts = [
+      await fixtures.BottleAlias({
+        name: "Generic Assignment Conflict",
+        bottleId: null,
+        releaseId: null,
+        targetId: genericTarget.id,
+      }),
+      await fixtures.BottleAlias({
+        name: "Exact Assignment Conflict",
+        bottleId: otherBottle.id,
+        releaseId: null,
+        targetId: otherTarget.id,
+      }),
+      await fixtures.BottleAlias({
+        name: "Release Assignment Conflict",
+        bottleId: bottle.id,
+        releaseId: release.id,
+        targetId: null,
+      }),
+    ];
+
+    for (const [index, existing] of conflicts.entries()) {
+      const error = await waitError(
+        db.transaction(async (tx) =>
+          assignBottleAliasInTransaction(tx, {
+            bottleId: bottle.id,
+            targetId: target.id,
+            name: existing.name,
+            assignmentSource: "human_approved",
+            assignedByActorId: bottle.createdByActorId,
+          }),
+        ),
+        ExactBottleAliasConflictError,
+      );
+
+      expect(error.code).toBe(
+        ["generic_target", "another_exact_target", "legacy_release"][index],
+      );
+      expect(await getAlias(existing.name)).toMatchObject({
+        bottleId: existing.bottleId,
+        releaseId: existing.releaseId,
+        targetId: existing.targetId,
+      });
+    }
+  });
+
+  test("rolls back exact consumer backfills when the later alias claim conflicts", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await getExactTarget(bottle.id);
+    const otherBottle = await fixtures.Bottle();
+    const otherTarget = await getExactTarget(otherBottle.id);
+    const existing = await fixtures.BottleAlias({
+      name: "Rollback Exact Conflict",
+      bottleId: otherBottle.id,
+      releaseId: null,
+      targetId: otherTarget.id,
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      name: existing.name,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: existing.name,
+    });
+
+    const error = await waitError(
+      db.transaction(async (tx) =>
+        assignBottleAliasInTransaction(tx, {
+          bottleId: bottle.id,
+          targetId: target.id,
+          name: existing.name,
+          assignmentSource: "human_approved",
+          assignedByActorId: bottle.createdByActorId,
+        }),
+      ),
+      ExactBottleAliasConflictError,
+    );
+
+    expect(error.code).toBe("another_exact_target");
+    expect(await getAlias(existing.name)).toMatchObject({
+      bottleId: otherBottle.id,
+      releaseId: null,
+      targetId: otherTarget.id,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: null, releaseId: null });
+  });
+
   test("does not downgrade an existing canonical release alias to bottle-only", async ({
     fixtures,
   }) => {
@@ -303,6 +723,7 @@ describe("assignBottleAliasInTransaction", () => {
         aliasReleaseId: null,
         name: release.fullName,
         assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
       });
     });
 
@@ -337,6 +758,7 @@ describe("assignBottleAliasInTransaction", () => {
         releaseId: release.id,
         name: release.fullName,
         assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
       });
     });
 
@@ -371,6 +793,7 @@ describe("assignBottleAliasInTransaction", () => {
         aliasReleaseId: null,
         name: release.fullName,
         assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
       });
     });
 
@@ -418,6 +841,7 @@ describe("assignBottleAliasInTransaction", () => {
         externalSiteId: price.externalSiteId,
         volume: price.volume,
         assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
       });
     });
 
@@ -443,6 +867,93 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: bottle.id,
       releaseId: null,
     });
+  });
+
+  test("applies a matching price image only after assignment finalization", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ imageUrl: null });
+    const imageUrl = "http://example.com/assignment-candidate.jpg";
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: "Price Image Candidate",
+      imageUrl,
+    });
+
+    const result = await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        name: price.name,
+        externalSiteId: price.externalSiteId,
+        volume: price.volume,
+        assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
+      }),
+    );
+
+    expect(result.bottleImageCandidate).toEqual({
+      bottleId: bottle.id,
+      imageUrl,
+    });
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, bottle.id),
+      }),
+    ).toMatchObject({ imageUrl: null });
+
+    await finalizeBottleAliasAssignment(result);
+
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, bottle.id),
+      }),
+    ).toMatchObject({ imageUrl });
+  });
+
+  test("applies an image candidate to the merge replacement before finalization", async ({
+    fixtures,
+  }) => {
+    const source = await fixtures.Bottle({
+      name: "Image Merge Source",
+      imageUrl: null,
+    });
+    const destination = await fixtures.Bottle({
+      name: "Image Merge Destination",
+      imageUrl: null,
+    });
+    const imageUrl = "http://example.com/merged-assignment-candidate.jpg";
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      releaseId: null,
+      name: "Merged Price Image Candidate",
+      imageUrl,
+    });
+    const result = await db.transaction(async (tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: source.id,
+        name: price.name,
+        externalSiteId: price.externalSiteId,
+        volume: price.volume,
+        assignedByActorId: source.createdByActorId,
+        context: compatibilityContext,
+      }),
+    );
+
+    await db.transaction(async (tx) =>
+      mergeConcreteBottlesInTransaction(tx, {
+        sourceBottleId: source.id,
+        destinationBottleId: destination.id,
+        actorId: source.createdByActorId,
+      }),
+    );
+    await finalizeBottleAliasAssignment(result);
+
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, destination.id),
+      }),
+    ).toMatchObject({ imageUrl });
   });
 
   test("scopes stored reference backfills by external site", async ({
@@ -481,6 +992,7 @@ describe("assignBottleAliasInTransaction", () => {
         externalSiteId: price.externalSiteId,
         volume: price.volume,
         assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
       });
     });
 
@@ -524,6 +1036,7 @@ describe("assignBottleAliasInTransaction", () => {
           bottleId: bottle.id,
           name: "   ",
           assignedByActorId: bottle.createdByActorId,
+          context: compatibilityContext,
         }),
       ),
     ).rejects.toThrow("Failed to save alias.");
@@ -562,6 +1075,7 @@ describe("assignBottleAliasInTransaction", () => {
         name: "Moderator Alias",
         assignmentSource: "human_approved",
         assignedByActorId: assignedByActor.id,
+        context: compatibilityContext,
       });
     });
 
@@ -602,6 +1116,7 @@ describe("assignBottleAliasInTransaction", () => {
         aliasReleaseId: null,
         name: release.fullName,
         assignedByActorId: bottle.createdByActorId,
+        context: compatibilityContext,
       });
     });
 

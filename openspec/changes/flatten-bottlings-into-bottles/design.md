@@ -450,6 +450,49 @@ in both its preflight read and locked transactional read. A grouped Bottle is
 never offered, repaired, or deleted by that path; it requires an explicit exact
 Bottle merge. Task 9.7 removes the retained repair compatibility.
 
+### Exact alias assignment establishes a target-aware owner
+
+Task 5.5a makes `assignBottleAlias` and
+`assignBottleAliasInTransaction` the canonical owner for the exact/moderator
+alias path cut over in this slice. When supplied an exact CatalogTarget, that
+owner validates and stores the target with the retained Bottle compatibility
+identity. Its targetless mode remains an instrumented compatibility path for
+existing callers: it may persist `targetId` as null and does not resolve a
+missing target, but it must preserve an existing durable target rather than
+downgrading it to a legacy pair.
+
+The raw `apps/server/src/lib/db.ts` `upsertBottleAlias` pair writer and its
+creation, repair, import/reference-resolution, and entity-merge callers remain
+active outside the task 5.5a cutover. Later task 5.5 caller slices migrate those
+callers to explicit exact or generic CatalogTargets; task 9.7 removes the raw
+writer and the measured targetless compatibility mode after their staged use
+ends. Stable alias assignment through a generic group target is therefore a
+final-state requirement, not behavior activated by task 5.5a.
+
+Moderator `PUT /bottle-aliases` keeps its Bottle-shaped external input but treats
+that Bottle as exact intent, requires its active exact target, and delegates to
+the same assignment operation. It does not infer a stable group alias from a
+Bottle id. Alias deletion clears the alias row's `targetId`, `bottleId`, and
+`releaseId` together so a target-aware lookup cannot continue resolving an
+unassociated row. Target-aware clearing or preservation rules for matching
+store-price and review rows belong to task 5.6; task 5.5a does not invent those
+consumer semantics.
+
+Exact alias lookup treats a non-null alias `targetId` as authoritative. An exact
+target returns its Bottle without reconstructing a release pair, while a generic
+target returns no Bottle and never resolves to the representative or another
+member. Only an alias whose `targetId` is null may use the measured legacy pair
+resolver. Broader target retirement and integrity validation belongs to the
+target-backed read and search/index cutovers in tasks 7.3 and 7.5, while
+migration ownership and repointing of parent and release aliases remain task
+6.10.
+
+Task 5.5a is only the alias half of task 5.5. Observation target assignment and
+the store-price approval transaction remain task 5.5b; proposal decision
+vocabulary remains task 5.7. Task 5.6 owns `targetId` mutation for store prices,
+reviews, and the other remaining consumers. These boundaries prevent the alias
+slice from silently activating a second consumer or price-matching cutover.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit
@@ -468,6 +511,8 @@ must have an explicit removal task:
 - BottleRelease write adapters: tasks 5.4a-5.4c and 9.4/9.7;
 - paired-reference dual writes and storage: tasks 5.6, 7.3, and 9.6;
 - legacy target resolution and dual reads: tasks 3.2/3.7, 7.1/7.3, and 9.5/9.7;
+- legacy pair alias assignment and null-target alias lookup: later task 5.5
+  caller slices and task 9.7;
 - legacy Bottle upsert response translation: task 5.1 retains a measured
   adapter for the scraper, task 5.9 cuts the scraper and any remaining callers
   over to concrete target responses, and task 9.7 removes the adapter after

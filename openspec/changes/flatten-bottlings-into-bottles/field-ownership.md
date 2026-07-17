@@ -39,6 +39,18 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Independent creation always creates a singleton group. Reusing a group
   requires an existing-member, migration, curated-alias, or moderator context.
 - Exact aliases move with their Bottle. Stable aliases move with the group.
+- The completed alias cutover requires every new assignment to use one
+  validated CatalogTarget. Exact aliases reference the owning Bottle's exact
+  target; stable aliases reference the BottleGroup's generic target and never
+  select its representative Bottle. Task 5.5a establishes that owner for the
+  exact/moderator path while later task 5.5 caller slices retire the remaining
+  raw legacy-pair writer.
+- Moderator Bottle-alias upsert is exact intent. Alias unassignment clears the
+  alias row's target and retained legacy pair together; target-aware clearing or
+  preservation of matching store-price and review rows remains task 5.6.
+- Exact alias lookup returns the Bottle of a non-null exact target. A generic
+  target returns no Bottle, and only a null-target legacy alias may use the
+  measured pair fallback retained until task 9.7.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes

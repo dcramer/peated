@@ -31,7 +31,10 @@ subcommand
           if (review.name !== name) values.name = name;
 
           if (!review.bottleId) {
-            const bottleId = await findBottleId(review.name);
+            const bottleId = await findBottleId(review.name, {
+              caller: "cli.reviews",
+              operation: "normalizeNames",
+            });
             if (bottleId) review.bottleId = bottleId;
           }
 

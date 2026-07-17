@@ -10,7 +10,10 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
+import {
+  assignBottleAliasInTransaction,
+  finalizeBottleAliasAssignment,
+} from "@peated/server/lib/bottleAliases";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
@@ -56,23 +59,38 @@ export default procedure
     await chunked(input.prices, 10, async (prices) => {
       return await Promise.all(
         prices.map(async (sp) => {
-          const [price] = await db.transaction(async (tx) => {
-            const { name } = normalizeBottle({ name: sp.name });
-            const aliasKey = normalizeBottleAliasKey(sp.name);
-            // New assignments use the deterministic key, but lookup still
-            // accepts legacy raw aliases created before alias keys existed.
-            const target =
-              (await findBottleTarget(aliasKey, tx)) ??
-              (aliasKey !== sp.name
-                ? await findBottleTarget(sp.name, tx)
-                : null);
-            const bottleId = target?.bottleId ?? null;
-            const releaseId = target?.releaseId ?? null;
+          const { price, aliasAssignment } = await db.transaction(
+            async (tx) => {
+              const { name } = normalizeBottle({ name: sp.name });
+              const aliasKey = normalizeBottleAliasKey(sp.name);
+              // New assignments use the deterministic key, but lookup still
+              // accepts legacy raw aliases created before alias keys existed.
+              const target =
+                (await findBottleTarget(
+                  aliasKey,
+                  {
+                    caller: "prices.createBatch",
+                    operation: "resolveNormalizedAlias",
+                  },
+                  tx,
+                )) ??
+                (aliasKey !== sp.name
+                  ? await findBottleTarget(
+                      sp.name,
+                      {
+                        caller: "prices.createBatch",
+                        operation: "resolveLegacyRawAlias",
+                      },
+                      tx,
+                    )
+                  : null);
+              const bottleId = target?.bottleId ?? null;
+              const releaseId = target?.releaseId ?? null;
 
-            // XXX: maybe we should constrain on URL?
-            const {
-              rows: [{ id: rawPriceId, imageUrl }],
-            } = await tx.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
+              // XXX: maybe we should constrain on URL?
+              const {
+                rows: [{ id: rawPriceId, imageUrl }],
+              } = await tx.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
               INSERT INTO ${storePrices} (bottle_id, release_id, external_site_id, name, volume, price, currency, url)
               VALUES (${bottleId}, ${releaseId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
               ON CONFLICT (external_site_id, LOWER(name), volume)
@@ -85,35 +103,49 @@ export default procedure
                   updated_at = NOW()
               RETURNING id, image_url as imageUrl
             `);
-            const priceId = Number(rawPriceId);
-            const actor = await getUserActorForDatabase(tx, context.user);
+              const priceId = Number(rawPriceId);
+              const actor = await getUserActorForDatabase(tx, context.user);
 
-            await tx
-              .insert(storePriceHistories)
-              .values({
-                priceId: priceId,
-                price: sp.price,
-                currency: sp.currency,
-                volume: sp.volume,
-                date: sql`CURRENT_DATE`,
-              })
-              .onConflictDoNothing();
+              await tx
+                .insert(storePriceHistories)
+                .values({
+                  priceId: priceId,
+                  price: sp.price,
+                  currency: sp.currency,
+                  volume: sp.volume,
+                  date: sql`CURRENT_DATE`,
+                })
+                .onConflictDoNothing();
 
-            if (bottleId) {
-              await assignBottleAliasInTransaction(tx, {
-                name: aliasKey,
-                backfillNames: [name, sp.name],
-                bottleId,
-                releaseId,
-                externalSiteId: site.id,
-                volume: sp.volume,
-                assignmentSource: "source_approved",
-                assignedByActorId: actor.id,
-              });
-            }
+              const aliasAssignment = bottleId
+                ? await assignBottleAliasInTransaction(tx, {
+                    name: aliasKey,
+                    backfillNames: [name, sp.name],
+                    bottleId,
+                    releaseId,
+                    externalSiteId: site.id,
+                    volume: sp.volume,
+                    assignmentSource: "source_approved",
+                    assignedByActorId: actor.id,
+                    context: {
+                      caller: "prices.createBatch",
+                      operation: "assignStorePriceAlias",
+                    },
+                  })
+                : null;
 
-            return [{ id: priceId, imageUrl, hasExactAliasTarget: !!target }];
-          });
+              return {
+                price: { id: priceId, imageUrl, hasExactAliasTarget: !!target },
+                aliasAssignment,
+              };
+            },
+          );
+
+          if (aliasAssignment) {
+            await finalizeBottleAliasAssignment(aliasAssignment, {
+              price: { id: price.id, site: input.site, name: sp.name },
+            });
+          }
 
           if (!price.imageUrl && sp.imageUrl) {
             await pushJob("CapturePriceImage", {

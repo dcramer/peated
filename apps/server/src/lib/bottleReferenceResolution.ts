@@ -611,7 +611,10 @@ export async function resolveBottleReferenceTarget({
   );
 
   for (const aliasName of uniqueAliasLookupNames) {
-    const target = await findBottleTarget(aliasName);
+    const target = await findBottleTarget(aliasName, {
+      caller: "bottleReferenceResolution",
+      operation: "resolveBottleReferenceTarget",
+    });
     if (target) {
       return {
         bottleId: target.bottleId,

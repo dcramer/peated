@@ -1,15 +1,20 @@
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   assignBottleAlias,
-  DuplicateBottleAliasError,
+  ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
+  InvalidExactBottleAliasTargetError,
 } from "@peated/server/lib/bottleAliases";
+import {
+  CatalogTargetIntegrityMismatchError,
+  CatalogTargetNotFoundError,
+  CatalogTargetRetiredError,
+  resolveCatalogTargetForAssignment,
+} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleAliasSchema } from "@peated/server/schemas";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -25,22 +30,16 @@ export default procedure
   .input(BottleAliasSchema)
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, input.bottle));
-
-    if (!bottle) {
-      throw errors.NOT_FOUND({
-        message: "Bottle not found.",
-      });
-    }
-
     try {
+      const target = await resolveCatalogTargetForAssignment(
+        { kind: "bottle", bottleId: input.bottle },
+        db,
+      );
       const actor = await getUserActor(context.user);
       await assignBottleAlias(
         {
           bottleId: input.bottle,
+          targetId: target.targetId,
           name: input.name,
           assignmentSource: "human_approved",
           assignedByActorId: actor.id,
@@ -52,10 +51,24 @@ export default procedure
         },
       );
     } catch (err) {
-      if (err instanceof DuplicateBottleAliasError) {
-        throw errors.CONFLICT({
-          message: err.message,
+      if (
+        err instanceof ExactBottleAliasConflictError ||
+        err instanceof CatalogTargetRetiredError ||
+        err instanceof CatalogTargetIntegrityMismatchError ||
+        err instanceof InvalidExactBottleAliasTargetError
+      ) {
+        throw errors.CONFLICT({ message: err.message });
+      }
+
+      if (err instanceof CatalogTargetNotFoundError) {
+        const bottle = await db.query.bottles.findFirst({
+          where: (bottles, { eq }) => eq(bottles.id, input.bottle),
+          columns: { id: true },
         });
+        if (bottle) {
+          throw errors.CONFLICT({ message: err.message });
+        }
+        throw errors.NOT_FOUND({ message: "Bottle not found." });
       }
 
       throw errors.INTERNAL_SERVER_ERROR({

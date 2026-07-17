@@ -3,7 +3,12 @@ import {
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottles,
+  reviews,
+  storePrices,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -92,13 +97,66 @@ describe("POST /external-sites/:site/prices", () => {
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "source_approved",
+      assignmentSource: "legacy",
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
       priceId: prices[0].id,
       imageUrl: "http://example.com/foo.jpg",
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
+  });
+
+  test("finalizes a matched price image onto an empty Bottle image", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      imageUrl: null,
+    });
+    const imageUrl = "http://example.com/retailer-bottle.jpg";
+    await fixtures.StorePrice({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      name: bottle.fullName,
+      volume: 750,
+      imageUrl,
+    });
+    const user = await fixtures.User({ admin: true });
+
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name: bottle.fullName,
+            price: 9999,
+            currency: "usd",
+            volume: 750,
+            url: "http://example.com/finalized-image",
+          },
+        ],
+      },
+      { context: { user } },
+    );
+
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, bottle.id),
+      }),
+    ).toMatchObject({ imageUrl });
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "CapturePriceImage",
+      expect.anything(),
+    );
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
   });
 
   test("processes existing price", async ({ fixtures }) => {
@@ -276,7 +334,10 @@ describe("POST /external-sites/:site/prices", () => {
     expect(prices[0].bottleId).toBe(bottle.id);
     expect(prices[0].releaseId).toBeNull();
     expect(prices[0].name).toBe("Ardbeg 10-year-old");
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
   });
 
   test("falls back to existing raw aliases for legacy exact matches", async ({
@@ -335,9 +396,12 @@ describe("POST /external-sites/:site/prices", () => {
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "source_approved",
+      assignmentSource: "legacy",
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
   });
 
   test("does not use lossy normalized listing names as exact matches", async ({
@@ -422,14 +486,17 @@ describe("POST /external-sites/:site/prices", () => {
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "source_approved",
+      assignmentSource: "legacy",
     });
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, rawName),
       }),
     ).toBeUndefined();
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
   });
 
   test("does not unset bottle for existing price", async ({ fixtures }) => {

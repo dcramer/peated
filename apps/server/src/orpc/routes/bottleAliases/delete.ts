@@ -1,9 +1,15 @@
 import { db } from "@peated/server/db";
 import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
+import {
+  CatalogTargetIntegrityMismatchError,
+  CatalogTargetResolutionError,
+  resolveCatalogTargetForAssignment,
+} from "@peated/server/lib/catalogTargets";
+import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { pushJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -19,58 +25,136 @@ export default procedure
   .input(z.object({ alias: z.string() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(sql`LOWER(${bottleAliases.name})`, input.alias.toLowerCase()),
-      with: {
-        bottle: true,
-      },
-    });
+    let bottleIdsToReindex: number[];
+    try {
+      bottleIdsToReindex = await db.transaction(async (tx) => {
+        const [alias] = await tx
+          .select()
+          .from(bottleAliases)
+          .where(
+            eq(sql`LOWER(${bottleAliases.name})`, input.alias.toLowerCase()),
+          )
+          .limit(1);
 
-    if (!alias) {
-      throw errors.NOT_FOUND({
-        message: "Bottle Alias not found.",
-      });
-    }
+        if (!alias) {
+          throw errors.NOT_FOUND({
+            message: "Bottle Alias not found.",
+          });
+        }
 
-    if (alias.bottle) {
-      const { bottle } = alias;
-      if (alias.name.toLowerCase() === bottle.fullName.toLowerCase())
-        throw errors.BAD_REQUEST({
-          message: "Cannot delete canonical name",
-        });
-    }
+        const reindexBottleIds = new Set<number>();
+        const legacyBottleId = alias.bottleId;
+        if (legacyBottleId !== null) {
+          reindexBottleIds.add(legacyBottleId);
+        }
+        const legacyBottle =
+          alias.targetId !== null || legacyBottleId === null
+            ? null
+            : ((await tx.query.bottles.findFirst({
+                where: (bottles, { eq }) => eq(bottles.id, legacyBottleId),
+              })) ?? null);
 
-    await db.transaction(async (tx) => {
-      // clear any pinned matches as they are/were likely wrong
-      await Promise.all([
-        tx
+        let authoritativeBottle = legacyBottle;
+        if (alias.targetId !== null) {
+          const target = await resolveCatalogTargetForAssignment(
+            { kind: "target", targetId: alias.targetId },
+            tx,
+          );
+          if (target.bottleId === null) {
+            authoritativeBottle = null;
+          } else {
+            const exactBottleId = target.bottleId;
+            const targetBottle = await tx.query.bottles.findFirst({
+              where: (bottles, { eq }) => eq(bottles.id, exactBottleId),
+            });
+            if (!targetBottle) {
+              throw new CatalogTargetIntegrityMismatchError(
+                { targetId: alias.targetId },
+                "the exact alias target Bottle could not be loaded",
+              );
+            }
+            authoritativeBottle = targetBottle;
+            reindexBottleIds.add(targetBottle.id);
+          }
+        }
+
+        if (
+          authoritativeBottle &&
+          alias.name.toLowerCase() ===
+            authoritativeBottle.fullName.toLowerCase()
+        ) {
+          throw errors.BAD_REQUEST({
+            message: "Cannot delete canonical name",
+          });
+        }
+
+        // clear any pinned matches as they are/were likely wrong
+        await tx
           .update(storePrices)
           .set({
             bottleId: null,
             releaseId: null,
           })
-          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase())),
-        tx
+          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()));
+        await tx
           .update(reviews)
           .set({
             bottleId: null,
             releaseId: null,
           })
-          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase())),
+          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()));
 
-        // we dont actually delete aliases, just unassociate them
-        tx
+        // Concurrent reassignment must roll back the earlier consumer clears.
+        const [clearedAlias] = await tx
           .update(bottleAliases)
-          .set({ bottleId: null, releaseId: null })
+          .set({ bottleId: null, releaseId: null, targetId: null })
           .where(
-            eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
-          ),
-      ]);
-    });
+            and(
+              eq(bottleAliases.name, alias.name),
+              sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
+              sql`${bottleAliases.releaseId} IS NOT DISTINCT FROM ${alias.releaseId}`,
+              sql`${bottleAliases.targetId} IS NOT DISTINCT FROM ${alias.targetId}`,
+              sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
+              eq(bottleAliases.assignmentSource, alias.assignmentSource),
+              eq(bottleAliases.assignedByActorId, alias.assignedByActorId),
+              eq(bottleAliases.createdAt, alias.createdAt),
+            ),
+          )
+          .returning({ name: bottleAliases.name });
+        if (!clearedAlias) {
+          throw errors.CONFLICT({
+            message:
+              "Bottle Alias changed while it was being unassigned. Retry the operation.",
+          });
+        }
 
-    if (alias.bottle) {
-      await pushJob("IndexBottleSearchVectors", { bottleId: alias.bottle.id });
+        return Array.from(reindexBottleIds);
+      });
+    } catch (err) {
+      if (err instanceof CatalogTargetResolutionError) {
+        throw errors.CONFLICT({ message: err.message });
+      }
+      throw err;
     }
+
+    await Promise.all(
+      bottleIdsToReindex.map(async (bottleId) => {
+        try {
+          await pushJob("IndexBottleSearchVectors", { bottleId });
+        } catch (error) {
+          logError(error, {
+            contexts: {
+              bottle: { id: bottleId },
+              bottleAlias: { name: input.alias },
+            },
+            extra: {
+              operation: "deleteBottleAlias",
+              job: "IndexBottleSearchVectors",
+            },
+          });
+        }
+      }),
+    );
 
     return {};
   });

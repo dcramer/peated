@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleTombstones,
   bottles,
+  catalogTargets,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -15,7 +17,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 // Mock the worker client
 vi.mock("@peated/server/worker/client");
 
-describe("POST /bottle-aliases", () => {
+describe("PUT /bottle-aliases", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -38,9 +40,14 @@ describe("POST /bottle-aliases", () => {
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "New Alias"),
     });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing exact CatalogTarget fixture");
 
     expect(alias).toBeDefined();
     expect(alias?.bottleId).toBe(bottle.id);
+    expect(alias?.targetId).toBe(target.id);
     expect(alias?.assignmentSource).toBe("human_approved");
     expect(alias?.assignedByActorId).toBe(actor.id);
   });
@@ -133,6 +140,37 @@ describe("POST /bottle-aliases", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
+  test("rejects a tombstoned bottle without persisting an alias", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Retired Alias Bottle" });
+    const replacement = await fixtures.Bottle({
+      name: "Replacement Alias Bottle",
+    });
+    const user = await fixtures.User({ mod: true });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const err = await waitError(
+      routerClient.bottleAliases.upsert(
+        {
+          bottle: bottle.id,
+          name: "Retired Bottle Alias",
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchObject({ status: 409 });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "Retired Bottle Alias"),
+      }),
+    ).toBeUndefined();
+  });
+
   test("requires mod permission", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: false });
@@ -172,7 +210,7 @@ describe("POST /bottle-aliases", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: Duplicate alias found (1). Not implemented.]`,
+      `[Error: Cannot reserve exact Bottle alias "Duplicate Alias": another_exact_target.]`,
     );
   });
 

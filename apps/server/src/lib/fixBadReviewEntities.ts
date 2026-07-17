@@ -91,6 +91,10 @@ export async function fixBadReviewEntities({
           name: review.name,
           assignmentSource: "classifier_approved",
           assignedByActorId: actor.id,
+          context: {
+            caller: "fixBadReviewEntities",
+            operation: "assignReviewAlias",
+          },
         });
       } else {
         await assignBottleAlias({
@@ -98,6 +102,10 @@ export async function fixBadReviewEntities({
           releaseId: targetReleaseId,
           name: review.name,
           assignedByActorId: actor.id,
+          context: {
+            caller: "fixBadReviewEntities",
+            operation: "reuseReviewAlias",
+          },
         });
       }
 
@@ -112,6 +120,10 @@ export async function fixBadReviewEntities({
         name: review.name,
         assignmentSource: "classifier_approved",
         assignedByActorId: actor.id,
+        context: {
+          caller: "fixBadReviewEntities",
+          operation: "assignReviewAlias",
+        },
       });
     } else {
       await assignBottleAlias({
@@ -119,6 +131,10 @@ export async function fixBadReviewEntities({
         releaseId: targetReleaseId,
         name: review.name,
         assignedByActorId: actor.id,
+        context: {
+          caller: "fixBadReviewEntities",
+          operation: "reuseReviewAlias",
+        },
       });
     }
 

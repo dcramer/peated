@@ -236,7 +236,10 @@ async function identifyExactAliasReference({
 }: {
   input: ClassifyBottleReferenceInput;
 }): Promise<BottleClassificationResult | null> {
-  const target = await findBottleTarget(input.reference.name);
+  const target = await findBottleTarget(input.reference.name, {
+    caller: "bottleClassifier",
+    operation: "identifyExactAliasReference",
+  });
   if (!target) {
     return null;
   }

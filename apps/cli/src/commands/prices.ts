@@ -39,7 +39,10 @@ subcommand
           if (price.name !== name) values.name = name;
 
           if (!price.bottleId) {
-            const bottleId = await findBottleId(price.name);
+            const bottleId = await findBottleId(price.name, {
+              caller: "cli.prices",
+              operation: "normalizeNames",
+            });
             if (bottleId) price.bottleId = bottleId;
           }
 

@@ -152,6 +152,10 @@ export default procedure
               externalSiteId: site.id,
               assignmentSource: "classifier_approved",
               assignedByActorId: systemActor.id,
+              context: {
+                caller: "reviews.create",
+                operation: "assignResolvedReviewAlias",
+              },
             })
           : await assignBottleAliasInTransaction(tx, {
               bottleId,
@@ -160,6 +164,10 @@ export default procedure
               backfillNames: [reviewName, rawName],
               externalSiteId: site.id,
               assignedByActorId: systemActor.id,
+              context: {
+                caller: "reviews.create",
+                operation: "reuseExactReviewAlias",
+              },
             });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
