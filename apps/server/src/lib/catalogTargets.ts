@@ -20,7 +20,7 @@ import {
   type CatalogIdentitySerializerContext,
   type CatalogTargetSerializerItem,
 } from "@peated/server/serializers/catalogIdentity";
-import { and, eq, inArray, isNull, type SQL } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, type SQL } from "drizzle-orm";
 import { ZodError } from "zod";
 
 export type CatalogTargetIdentity =
@@ -146,6 +146,25 @@ export type CatalogTargetAssignmentDescriptor = {
   bottleId: number | null;
 };
 
+async function assertCatalogTargetAssignmentDescriptor(
+  database: AnyDatabase,
+  target: CatalogTargetAssignmentDescriptor,
+): Promise<void> {
+  const resolved = await resolveCatalogTargetForAssignment(
+    { kind: "target", targetId: target.targetId },
+    database,
+  );
+  if (
+    resolved.groupId !== target.groupId ||
+    resolved.bottleId !== target.bottleId
+  ) {
+    throw new CatalogTargetIntegrityMismatchError(
+      { targetId: target.targetId },
+      "the supplied assignment target descriptor changed before use",
+    );
+  }
+}
+
 /**
  * Locks and revalidates a resolved assignment descriptor. Callers composing
  * with the concrete Bottle mutation lifecycle acquire its group lock first.
@@ -178,18 +197,67 @@ export async function lockCatalogTargetAssignmentDescriptorInTransaction(
     .limit(1)
     .for("update");
 
-  const resolved = await resolveCatalogTargetForAssignment(
-    { kind: "target", targetId: target.targetId },
-    tx,
-  );
-  if (
-    resolved.groupId !== target.groupId ||
-    resolved.bottleId !== target.bottleId
-  ) {
-    throw new CatalogTargetIntegrityMismatchError(
-      { targetId: target.targetId },
-      "the supplied assignment target descriptor changed before use",
-    );
+  await assertCatalogTargetAssignmentDescriptor(tx, target);
+}
+
+/**
+ * Locks a descriptor set in the global group, Bottle, then target hierarchy.
+ * Sorting each layer prevents set-based writers from deadlocking each other;
+ * every supplied descriptor is revalidated after the complete set is locked.
+ */
+export async function lockCatalogTargetAssignmentDescriptorsInTransaction(
+  tx: AnyTransaction,
+  descriptors: CatalogTargetAssignmentDescriptor[],
+): Promise<void> {
+  const uniqueDescriptors = [
+    ...new Map(
+      descriptors.map((descriptor) => [
+        `${descriptor.targetId}:${descriptor.groupId}:${descriptor.bottleId ?? "null"}`,
+        descriptor,
+      ]),
+    ).values(),
+  ];
+  const groupIds = [
+    ...new Set(uniqueDescriptors.map(({ groupId }) => groupId)),
+  ].sort((a, b) => a - b);
+  const bottleIds = [
+    ...new Set(
+      uniqueDescriptors.flatMap(({ bottleId }) =>
+        bottleId === null ? [] : [bottleId],
+      ),
+    ),
+  ].sort((a, b) => a - b);
+  const targetIds = [
+    ...new Set(uniqueDescriptors.map(({ targetId }) => targetId)),
+  ].sort((a, b) => a - b);
+
+  if (groupIds.length) {
+    await tx
+      .select({ id: bottleGroups.id })
+      .from(bottleGroups)
+      .where(inArray(bottleGroups.id, groupIds))
+      .orderBy(asc(bottleGroups.id))
+      .for("update");
+  }
+  if (bottleIds.length) {
+    await tx
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(inArray(bottles.id, bottleIds))
+      .orderBy(asc(bottles.id))
+      .for("update");
+  }
+  if (targetIds.length) {
+    await tx
+      .select({ id: catalogTargets.id })
+      .from(catalogTargets)
+      .where(inArray(catalogTargets.id, targetIds))
+      .orderBy(asc(catalogTargets.id))
+      .for("update");
+  }
+
+  for (const descriptor of uniqueDescriptors) {
+    await assertCatalogTargetAssignmentDescriptor(tx, descriptor);
   }
 }
 

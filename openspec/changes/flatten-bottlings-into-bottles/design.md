@@ -690,6 +690,42 @@ remain tasks 9.6 and 9.7. Unit image, status, and ownership behavior outside
 identity selection is unchanged. This slice is a code-review boundary and
 makes no deployment or activation claim.
 
+### Direct Flight mutations replace one target-authoritative membership set
+
+Task 5.6e retains the public Flight `bottles: number[]` input as staged legacy
+compatibility. Each submitted Bottle id expresses the retained legacy
+`(bottleId, null)` intent and resolves through the deterministic CatalogTarget
+assignment boundary: a legacy parent with releases selects its generic
+BottleGroup target, while a parent without releases selects its exact Bottle
+target. The persisted membership keeps the submitted `bottleId`, a null
+`releaseId`, and the resolved `targetId` together. A generic descriptor's
+nullable Bottle identity is not substituted into the retained pair, and the
+group representative is never selected as exact identity.
+
+Flight membership is target-authoritative. Multiple submitted Bottle ids that
+resolve to the same target produce one row; the lowest submitted Bottle id is
+retained deterministically for compatibility. Creation sorts and locks every
+resolved target before inserting the Flight or any membership. An invalid or
+staged selection rolls back the complete create, and this path writes no new
+targetless membership.
+
+On update, an omitted `bottles` field preserves the membership set, an explicit
+empty list clears it, and any other explicit list is a full replacement rather
+than an incremental pair-based edit. Before deleting or replacing membership,
+the operation snapshots the existing rows, resolves the union of the requested
+and existing durable targets, locks their BottleGroups, exact Bottles, and
+CatalogTargets in the shared hierarchy and id order, then locks the Flight and
+its membership rows. A changed membership snapshot rolls back and retries a
+bounded number of times. Once stable, the operation deletes the old set and
+inserts the canonical requested target assignments atomically; explicit
+replacement also removes targetless compatibility rows instead of carrying
+them forward.
+
+Flight reads remain on the retained pair until task 7.3, existing-row backfill
+remains section 6, and target-native Flight input remains task 8.7. Tasks 9.6
+and 9.7 remove retained pair storage and compatibility. This slice is a
+code-review boundary and makes no deployment or activation claim.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

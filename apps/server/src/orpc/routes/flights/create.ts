@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import type { NewFlight } from "@peated/server/db/schema";
 import { flightBottles, flights } from "@peated/server/db/schema";
+import { lockCatalogTargetAssignmentDescriptorsInTransaction } from "@peated/server/lib/catalogTargets";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -10,6 +11,7 @@ import {
 import { FlightInputSchema, FlightSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
+import { resolveFlightTargetAssignments } from "./targetAssignments";
 
 export default procedure
   .route({
@@ -32,15 +34,25 @@ export default procedure
     };
 
     const flight = await db.transaction(async (tx) => {
+      const assignments = await resolveFlightTargetAssignments(
+        tx,
+        input.bottles ?? [],
+        { caller: "flights.create", operation: "create" },
+      );
+      await lockCatalogTargetAssignmentDescriptorsInTransaction(
+        tx,
+        assignments.map(({ target }) => target),
+      );
+
       const [flight] = await tx.insert(flights).values(data).returning();
 
-      if (input.bottles) {
-        for (const bottle of input.bottles) {
-          await tx.insert(flightBottles).values({
-            flightId: flight.id,
-            bottleId: bottle,
-          });
-        }
+      for (const { target, retainedBottleId } of assignments) {
+        await tx.insert(flightBottles).values({
+          flightId: flight.id,
+          targetId: target.targetId,
+          bottleId: retainedBottleId,
+          releaseId: null,
+        });
       }
 
       return flight;

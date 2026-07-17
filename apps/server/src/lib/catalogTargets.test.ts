@@ -21,6 +21,7 @@ import {
   loadCatalogTargetByBottleId,
   loadCatalogTargetByGroupId,
   loadCatalogTargetByLegacyReference,
+  lockCatalogTargetAssignmentDescriptorsInTransaction,
   resolveCatalogTargetForAssignment,
 } from "./catalogTargets";
 
@@ -564,6 +565,41 @@ describe("legacy catalog target resolution", () => {
 });
 
 describe("catalog target assignment", () => {
+  test("batch locks and revalidates every supplied descriptor", async ({
+    fixtures,
+  }) => {
+    const exactBottle = await fixtures.Bottle();
+    const genericBottle = await fixtures.Bottle();
+    await fixtures.BottleRelease({ bottleId: genericBottle.id });
+    const exactTarget = await resolveCatalogTargetForAssignment({
+      kind: "bottle",
+      bottleId: exactBottle.id,
+    });
+    const genericTarget = await resolveCatalogTargetForAssignment({
+      kind: "group",
+      groupId: genericBottle.groupId as number,
+    });
+
+    await expect(
+      db.transaction(async (tx) => {
+        await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
+          genericTarget,
+          exactTarget,
+          exactTarget,
+        ]);
+      }),
+    ).resolves.toBeUndefined();
+
+    await expect(
+      db.transaction(async (tx) => {
+        await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
+          exactTarget,
+          { ...genericTarget, groupId: exactTarget.groupId },
+        ]);
+      }),
+    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
+  });
+
   test("resolves validated descriptors for target, Bottle, group, and legacy writes", async ({
     fixtures,
   }) => {

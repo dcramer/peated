@@ -195,9 +195,27 @@ Target-bearing consumer routes:
   preserves a durable target for non-identity updates. Only a currently null
   target may be measured-repaired from its retained pair; an unresolvable
   staged legacy row remains targetless. Review reads remain task 7.3.
-- `apps/server/src/orpc/routes/flights/create.ts` and
-  `apps/server/src/orpc/routes/flights/update.ts` are direct Flight membership
-  writers assigned to task 5.6e.
+- `apps/server/src/orpc/routes/flights/targetAssignments.ts` is the task 5.6e
+  shared assignment boundary for staged Flight Bottle-id input. It resolves
+  every submitted `(bottleId, null)` intent through deterministic legacy
+  cardinality, preserves generic targets without representative substitution,
+  and canonicalizes duplicate target selections with the lowest retained Bottle
+  id.
+- `apps/server/src/orpc/routes/flights/create.ts` is the task 5.6e direct Flight
+  creation writer. It locks the canonical requested target set before creating
+  the Flight or membership, writes the validated `targetId` with the submitted
+  retained Bottle id and null release id, and rolls back rather than creating a
+  targetless row for an invalid or staged selection.
+- `apps/server/src/orpc/routes/flights/update.ts` is the task 5.6e direct Flight
+  replacement writer. An omitted Bottle list preserves membership, an explicit
+  empty list clears it, and any supplied list fully replaces it. Before
+  deletion, it snapshot-compares membership while locking the requested and
+  existing durable target union ahead of the Flight and membership rows; a
+  change retries from a fresh snapshot. A stable replacement removes existing
+  durable and targetless rows and inserts only the canonical requested target
+  set. Reads, existing-row backfill, target-native input, and pair cleanup remain
+  tasks 7.3, section 6, 8.7, and 9.6/9.7 respectively; this slice makes no
+  deployment claim.
 - `apps/server/src/orpc/routes/tastings/create.ts`
 - `apps/server/src/orpc/routes/tastings/delete.ts`
 - `apps/server/src/orpc/routes/tastings/list.ts`
@@ -272,6 +290,9 @@ Catalog identity, aliases, search, creation, and updates:
   reader/writer from tasks 3.2/3.7. Its
   `resolveCatalogTargetForAssignment` boundary returns the validated target,
   group, and nullable exact-Bottle identity used by dual-write consumers.
+  Its batch assignment lock owns the global BottleGroup, exact-Bottle, then
+  CatalogTarget hierarchy for set-based writers and revalidates every
+  descriptor after acquiring the complete lock set.
   It replaces the removed ID-only assignment facade so consumers do not
   reconstruct or re-load target identity.
   Task 5.5b uses one measured legacy-pair resolution from this boundary for

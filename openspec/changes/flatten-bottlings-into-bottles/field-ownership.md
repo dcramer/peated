@@ -143,6 +143,29 @@ Exact Bottle serializers must not require BottleGroup hydration.
   the fallback. The measured no-release/no-`baseOnly` family delete
   intentionally spans memberships by retained parent identity until task 9.7;
   exact UI removal uses `baseOnly`.
+- Task 5.6e keeps Flight `bottles: number[]` as staged legacy input. Each
+  submitted id is `(bottleId, null)` intent resolved by deterministic legacy
+  cardinality to an exact Bottle or generic BottleGroup target. The Flight
+  membership row retains the submitted Bottle id and null release id alongside
+  the validated target; generic intent never substitutes a representative
+  Bottle.
+- Flight membership is unique and authoritative by target. Submitted ids that
+  resolve to the same target collapse to one assignment with the lowest
+  submitted Bottle id retained deterministically. Creation locks the canonical
+  set through the BottleGroup, Bottle, then CatalogTarget hierarchy before
+  Flight and membership writes and creates no targetless row.
+- An omitted Flight `bottles` update preserves membership, an explicit empty
+  list clears it, and any explicit non-empty list fully replaces it. Replacement
+  snapshots membership, locks the union of requested and existing durable
+  targets through the shared BottleGroup, Bottle, then CatalogTarget hierarchy
+  before the Flight and membership rows, and retries from a fresh snapshot when
+  concurrent identity changes are observed. A stable replacement removes old
+  durable and targetless rows and inserts only the canonical requested target
+  assignments atomically.
+- Task 7.3 owns target-backed Flight reads, section 6 owns existing-row
+  backfill, task 8.7 owns target-native Flight input, and tasks 9.6/9.7 remove
+  retained pair storage and compatibility. Task 5.6e is not a deployment or
+  activation unit.
 - An exact Bottle read is complete without BottleGroup hydration.
 - An exact-only update mutates only the selected Bottle and its exact aliases.
 - A moderator shared edit atomically updates the BottleGroup and rematerializes

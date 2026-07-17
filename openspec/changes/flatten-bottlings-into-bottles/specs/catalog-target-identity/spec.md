@@ -312,6 +312,73 @@ compatibility pair.
 - **AND** the slice remains a code-review boundary with no deployment or
   activation claim
 
+### Requirement: Direct Flight membership has one authoritative target set
+
+The system SHALL resolve the staged Flight `bottles: number[]` input as retained
+legacy `(bottleId, null)` intent, SHALL persist one validated exact or generic
+CatalogTarget per distinct target, and SHALL lock target identity before Flight
+membership. An explicit Bottle list on update SHALL fully replace membership;
+an omitted list SHALL preserve it.
+
+#### Scenario: Create a Flight from staged Bottle-id input
+
+- **WHEN** direct Flight creation receives one or more Bottle ids
+- **THEN** each id resolves by deterministic legacy parent cardinality to an
+  exact Bottle or generic BottleGroup target
+- **AND** each membership stores the submitted retained `bottleId`, null
+  `releaseId`, and validated `targetId` together
+- **AND** generic intent does not substitute a representative Bottle
+- **AND** every requested target is locked before the Flight and membership rows
+  are inserted
+
+#### Scenario: Canonicalize duplicate Flight target selections
+
+- **WHEN** multiple submitted Bottle ids resolve to the same CatalogTarget
+- **THEN** the Flight stores one membership for that target
+- **AND** it deterministically retains the lowest submitted Bottle id as
+  compatibility identity
+
+#### Scenario: Flight selection cannot resolve
+
+- **WHEN** a submitted Bottle id is invalid or its staged legacy identity has no
+  valid active target
+- **THEN** the complete Flight create or update rolls back
+- **AND** the system does not write a targetless membership
+
+#### Scenario: Replace a Flight membership set
+
+- **WHEN** a Flight update supplies a `bottles` list
+- **THEN** the supplied list is the complete desired membership set
+- **AND** an empty list clears all membership
+- **AND** the operation locks the union of requested and existing durable
+  targets through the BottleGroup, Bottle, then CatalogTarget hierarchy before
+  the Flight and membership rows
+- **AND** it removes previous durable and targetless rows and inserts only the
+  canonical requested assignments atomically
+
+#### Scenario: Flight membership changes during replacement
+
+- **WHEN** locked Flight membership differs from the snapshot used to resolve
+  and lock its existing target set
+- **THEN** the transaction rolls back without replacing membership
+- **AND** the operation retries a bounded number of times from a fresh snapshot
+
+#### Scenario: Update Flight metadata without replacing membership
+
+- **WHEN** a Flight update omits the `bottles` field
+- **THEN** existing membership is preserved unchanged
+
+#### Scenario: Defer adjacent Flight cutovers
+
+- **WHEN** task 5.6e dual-writes direct Flight mutations
+- **THEN** Flight reads and existing-row backfill remain owned by task 7.3 and
+  section 6
+- **AND** target-native Flight input remains owned by task 8.7
+- **AND** retained pair storage and compatibility removal remain owned by tasks
+  9.6 and 9.7
+- **AND** the slice remains a code-review boundary with no deployment or
+  activation claim
+
 ### Requirement: Existing-match price evidence shares one target
 
 The system SHALL resolve one CatalogTarget for an approved existing-match or
