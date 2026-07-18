@@ -39,6 +39,16 @@ Decision actions are `match`, `repair_bottle`, `create_bottle`,
 `create_release`, `create_bottle_and_release`,
 `repair_parent_and_create_release`, and `no_match`.
 
+During the Bottle/Bottling flattening migration, the release-shaped create
+actions remain classifier and stored-evidence vocabulary only. Application
+persists one independently complete concrete Bottle and exact CatalogTarget:
+`create_release` may use its reviewed parent as trusted group context, while
+`create_bottle_and_release` creates an independent singleton. The legacy
+`repair_parent_and_create_release` action never mutates its parent; it creates
+an independent singleton from the complete proposed Bottle and release facts,
+with the parent id retained only as evidence. None of these application paths
+creates a BottleRelease.
+
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
 policy.
@@ -64,9 +74,10 @@ target.
   they should not block a clear match or create outcome.
 - Use repair actions only when a stored field conflict makes the selected target
   identity unsafe.
-- Use `repair_parent_and_create_release` when a supported child release cannot
-  safely be created until an existing parent bottle is repaired into a clean
-  reusable parent.
+- The legacy `repair_parent_and_create_release` output may describe source
+  evidence that disagrees with a candidate parent, but application must not
+  mutate that parent. It creates an independent concrete Bottle for review and
+  later grouping.
 - Return `no_match` only when the bottle/release identity is unresolved or when
   creating would invent an ambiguous hybrid.
 

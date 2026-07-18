@@ -11,6 +11,17 @@ Deterministic name cleanup is governed by
 - `bottle_release`: optional precision under a bottle when a user cares about a specific batch, vintage, annual release, or other marketed variant.
 - `bottle_observation`: internal store-price evidence tied to a bottle or release. This is where exact listing facts live before they are promoted into canonical identity.
 
+## Transitional Bottle/Bottling Flattening Contract
+
+During the Bottle/Bottling flattening migration, `BottleGroup` owns the editing
+scope for fields shared by all of its members, while every `Bottle` remains an
+independently complete identity for the exact marketed bottle. A shared group
+edit must rematerialize every affected member atomically. Classifier input with
+the legacy `repair_parent_and_create_release` action never mutates the selected
+parent; it creates a new, independent singleton Bottle instead. The
+`BottleRelease` descriptions below remain compatibility semantics for paths not
+yet migrated and will be removed or rewritten by the later cleanup.
+
 ## Field Ownership
 
 Bottle identity:

@@ -5,36 +5,31 @@ import {
 } from "@peated/bottle-classifier";
 import type {
   BottleClassificationDecision,
+  BottleConfidenceBasis,
   BottleExtractedDetails,
+  BottleIdentityBasis,
+  BottleObservation,
 } from "@peated/bottle-classifier/internal/types";
-import { normalizeString } from "@peated/bottle-classifier/normalize";
+import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import type { BottleRelease, User } from "@peated/server/db/schema";
-import {
-  bottleReleases,
-  bottles,
-  changes,
-  entities,
-} from "@peated/server/db/schema";
+import type { User } from "@peated/server/db/schema";
+import { bottles } from "@peated/server/db/schema";
 import { findBottleTarget } from "@peated/server/lib/bottleFinder";
 import {
+  lockCatalogTargetAssignmentDescriptorInTransaction,
+  lockCatalogTargetAssignmentDescriptorsInTransaction,
+  resolveCatalogTargetForAssignment,
+  type CatalogTargetAssignmentDescriptor,
+} from "@peated/server/lib/catalogTargets";
+import {
   BottleAlreadyExistsError,
-  createBottleInTransaction,
+  createConcreteBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
-import {
-  BottleReleaseAlreadyExistsError,
-  createBottleReleaseInTransaction,
-  finalizeCreatedBottleRelease,
-} from "@peated/server/lib/createBottleRelease";
-import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatBottleName } from "@peated/server/lib/format";
-import { logError } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, sql } from "drizzle-orm";
-import { buildClassifierCreateInputs } from "./classifierDecisionCreateInputs";
+import { eq } from "drizzle-orm";
+import { buildClassifierConcreteBottleInput } from "./classifierDecisionCreateInputs";
 
 export type BottleReferenceResolutionSource =
   | "exact_alias"
@@ -42,7 +37,17 @@ export type BottleReferenceResolutionSource =
   | "classifier_create_bottle"
   | "classifier_create_release"
   | "classifier_create_bottle_and_release"
+  | "classifier_repair_parent_and_create_release"
   | "unresolved";
+
+export type BottleReferenceClassifierEvidence = {
+  action: BottleClassificationDecision["action"];
+  parentBottleId: number | null;
+  identityScope: BottleClassificationDecision["identityScope"] | null;
+  observation: BottleObservation | null;
+  identityBasis: BottleIdentityBasis | null;
+  confidenceBasis: BottleConfidenceBasis | null;
+};
 
 export type BottleReferenceResolution = {
   bottleId: number | null;
@@ -53,9 +58,34 @@ export type BottleReferenceResolution = {
   confidence: number | null;
   model: string | null;
   rationale: string | null;
+  classifierEvidence: BottleReferenceClassifierEvidence | null;
   createdBottle: boolean;
   createdRelease: boolean;
 };
+
+type ClassifierCreateDecision = Extract<
+  BottleClassificationDecision,
+  {
+    action:
+      | "create_bottle"
+      | "create_release"
+      | "create_bottle_and_release"
+      | "repair_parent_and_create_release";
+  }
+>;
+
+function projectClassifierEvidence(
+  decision: BottleClassificationDecision,
+): BottleReferenceClassifierEvidence {
+  return {
+    action: decision.action,
+    parentBottleId: decision.parentBottleId ?? null,
+    identityScope: decision.identityScope ?? null,
+    observation: decision.observation ?? null,
+    identityBasis: decision.identityBasis ?? null,
+    confidenceBasis: decision.confidenceBasis ?? null,
+  };
+}
 
 function getKnownCandidateBottleIds(
   classification: BottleClassificationResult,
@@ -75,11 +105,7 @@ function getKnownCandidateReleaseIds(
   );
 }
 
-/**
- * The reviewed classifier may match or reuse only candidates it was shown.
- * Keeping this adapter check local prevents ingestion jobs from silently
- * trusting stale or malformed ids if the classifier/runtime contract changes.
- */
+/** The reviewed classifier may match or reuse only candidates it was shown. */
 function assertKnownClassifierTarget(
   decision: BottleClassificationDecision,
   classification: BottleClassificationResult,
@@ -107,7 +133,8 @@ function assertKnownClassifierTarget(
   }
 
   if (
-    decision.action === "create_release" &&
+    (decision.action === "create_release" ||
+      decision.action === "repair_parent_and_create_release") &&
     !candidateBottleIds.has(decision.parentBottleId)
   ) {
     throw new Error(
@@ -116,487 +143,154 @@ function assertKnownClassifierTarget(
   }
 }
 
-async function getExistingRelease(releaseId: number): Promise<BottleRelease> {
-  const [release] = await db
-    .select()
-    .from(bottleReleases)
-    .where(eq(bottleReleases.id, releaseId))
-    .limit(1);
-
-  if (!release) {
-    throw new Error(`Bottle release not found (${releaseId}).`);
+function getDecisionSmwsCode(decision: ClassifierCreateDecision) {
+  if (decision.identityScope !== "exact_cask" || !decision.proposedBottle) {
+    return null;
   }
-
-  return release;
-}
-
-function normalizeBrandComparison(value: string | null | undefined) {
-  return normalizeString(value ?? "")
-    .trim()
-    .toLowerCase();
-}
-
-function parentRepairFieldsDiffer(
-  current: typeof bottles.$inferSelect,
-  next: {
-    name: string;
-    fullName: string;
-    statedAge: number | null;
-    category: typeof bottles.$inferSelect.category;
-    edition: string | null;
-    abv: number | null;
-    singleCask: boolean | null;
-    caskStrength: boolean | null;
-    vintageYear: number | null;
-    releaseYear: number | null;
-    caskSize: typeof bottles.$inferSelect.caskSize;
-    caskType: typeof bottles.$inferSelect.caskType;
-    caskFill: typeof bottles.$inferSelect.caskFill;
-  },
-) {
   return (
-    current.name !== next.name ||
-    current.fullName !== next.fullName ||
-    current.statedAge !== next.statedAge ||
-    current.category !== next.category ||
-    current.edition !== next.edition ||
-    current.abv !== next.abv ||
-    current.singleCask !== next.singleCask ||
-    current.caskStrength !== next.caskStrength ||
-    current.vintageYear !== next.vintageYear ||
-    current.releaseYear !== next.releaseYear ||
-    current.caskSize !== next.caskSize ||
-    current.caskType !== next.caskType ||
-    current.caskFill !== next.caskFill
+    parseSmwsReferenceName(`SMWS ${decision.proposedBottle.name}`)?.code ??
+    (decision.observation?.caskNumber
+      ? parseSmwsReferenceName(`SMWS ${decision.observation.caskNumber}`)?.code
+      : null) ??
+    null
   );
 }
 
-/** Queue refresh work for parent bottles whose canonical identity was repaired. */
-async function finalizeClassifierParentRepair({
-  bottleId,
-  aliasNames,
+function isSafeClassifierDuplicate({
+  decision,
+  error,
+  existingBottle,
 }: {
-  bottleId: number;
-  aliasNames: string[];
+  decision: ClassifierCreateDecision;
+  error: BottleAlreadyExistsError;
+  existingBottle: typeof bottles.$inferSelect;
 }) {
-  if (aliasNames.length === 0) {
-    return;
+  if (
+    error.collision?.kind === "canonical_name" &&
+    error.collision.attemptedCanonicalFullName !== null
+  ) {
+    return (
+      existingBottle.fullName === error.collision.attemptedCanonicalFullName
+    );
   }
 
-  try {
-    await pushUniqueJob("OnBottleChange", { bottleId }, { delay: 5000 });
-  } catch (err) {
-    logError(err, {
-      bottle: {
-        id: bottleId,
-      },
-    });
-  }
-
-  for (const aliasName of aliasNames) {
-    try {
-      await pushUniqueJob(
-        "OnBottleAliasChange",
-        { name: aliasName },
-        { delay: 5000 },
-      );
-    } catch (err) {
-      logError(err, {
-        bottle: {
-          id: bottleId,
-        },
-        alias: {
-          name: aliasName,
-        },
-      });
-    }
-  }
+  if (error.collision?.kind !== "smws_code") return false;
+  const decisionCode = getDecisionSmwsCode(decision);
+  if (!decisionCode) return false;
+  return [existingBottle.name, existingBottle.fullName].some(
+    (name) => parseSmwsReferenceName(name)?.code === decisionCode,
+  );
 }
 
 /**
- * Persist an auto-approved classifier create decision.
- *
- * Parent repair keeps release-only traits on the child release while reserving
- * the repaired parent canonical alias before mutating the parent bottle.
+ * Persists every create-shaped classifier action as one complete concrete
+ * Bottle. Legacy action names remain evidence and never select BottleRelease
+ * storage or authorize mutation of a trusted source Bottle.
  */
 export async function applyClassifierCreateDecision({
   decision,
   user,
   createdByActorId,
 }: {
-  decision: Extract<
-    BottleClassificationDecision,
-    {
-      action:
-        | "create_bottle"
-        | "create_release"
-        | "create_bottle_and_release"
-        | "repair_parent_and_create_release";
-    }
-  >;
+  decision: ClassifierCreateDecision;
   user: User;
   createdByActorId: number;
 }): Promise<{
   bottleId: number;
-  releaseId: number | null;
+  releaseId: null;
+  targetId: number;
   createdBottle: boolean;
-  createdRelease: boolean;
+  createdRelease: false;
 }> {
-  const { input, releaseInput } = buildClassifierCreateInputs(decision);
-
-  if (decision.action === "create_bottle") {
-    if (!input) {
-      throw new Error(
-        "Missing proposed bottle input for classifier create_bottle.",
-      );
-    }
+  const input = buildClassifierConcreteBottleInput(decision);
+  const result = await db.transaction(async (tx) => {
+    let created: Awaited<
+      ReturnType<typeof createConcreteBottleInTransaction>
+    > | null = null;
+    let target: CatalogTargetAssignmentDescriptor;
+    let bottle: typeof bottles.$inferSelect;
 
     try {
-      const result = await db.transaction(async (tx) =>
-        createBottleInTransaction(tx, {
+      // Duplicate preparation may create entities or a group prefix. Keep it in
+      // a savepoint so reuse starts from a clean transaction state.
+      created = await tx.transaction(async (creationTx) =>
+        createConcreteBottleInTransaction(creationTx, {
           creationSource: "bottle_classifier",
           createdByActorId,
           input,
           context: { user },
         }),
       );
-
-      await finalizeCreatedBottle(result, {
-        creationSource: "bottle_classifier",
-      });
-
-      return {
-        bottleId: result.bottle.id,
-        releaseId: null,
-        createdBottle: true,
-        createdRelease: false,
+      bottle = created.bottle;
+      target = {
+        targetId: created.exactTarget.id,
+        groupId: created.group.id,
+        bottleId: created.bottle.id,
       };
-    } catch (err) {
-      if (err instanceof BottleAlreadyExistsError) {
-        return {
-          bottleId: err.bottleId,
-          releaseId: null,
-          createdBottle: false,
-          createdRelease: false,
-        };
-      }
-      throw err;
-    }
-  }
+    } catch (error) {
+      if (!(error instanceof BottleAlreadyExistsError)) throw error;
 
-  if (decision.action === "create_release") {
-    if (!releaseInput) {
-      throw new Error(
-        "Missing proposed release input for classifier create_release.",
+      const existingTarget = await resolveCatalogTargetForAssignment(
+        { kind: "bottle", bottleId: error.bottleId },
+        tx,
       );
-    }
-
-    try {
-      const result = await db.transaction(async (tx) =>
-        createBottleReleaseInTransaction(tx, {
-          bottleId: decision.parentBottleId,
-          createdByActorId,
-          input: releaseInput,
-          user,
-        }),
-      );
-
-      await finalizeCreatedBottleRelease(result, {
-        creationSource: "bottle_classifier",
-      });
-
-      return {
-        bottleId: result.release.bottleId,
-        releaseId: result.release.id,
-        createdBottle: false,
-        createdRelease: true,
-      };
-    } catch (err) {
-      if (err instanceof BottleReleaseAlreadyExistsError) {
-        const release = await getExistingRelease(err.releaseId);
-        return {
-          bottleId: release.bottleId,
-          releaseId: release.id,
-          createdBottle: false,
-          createdRelease: false,
-        };
-      }
-      throw err;
-    }
-  }
-
-  if (decision.action === "repair_parent_and_create_release") {
-    const parentInput = input;
-    const newReleaseInput = releaseInput;
-    if (!parentInput || !newReleaseInput) {
-      throw new Error(
-        "Missing proposed parent bottle or release input for classifier repair_parent_and_create_release.",
-      );
-    }
-
-    let releaseResult: Awaited<
-      ReturnType<typeof createBottleReleaseInTransaction>
-    > | null = null;
-    const result = await db.transaction(async (tx) => {
-      const parentAliasNames: string[] = [];
-      const [row] = await tx
-        .select({
-          bottle: bottles,
-          brandName: entities.name,
-          brandShortName: entities.shortName,
-        })
-        .from(bottles)
-        .innerJoin(entities, eq(bottles.brandId, entities.id))
-        .where(eq(bottles.id, decision.parentBottleId))
-        .limit(1)
-        .for("update");
-
-      if (!row) {
-        throw new Error(
-          `Classifier repair parent bottle not found (${decision.parentBottleId}).`,
-        );
-      }
-
-      const proposedBrandName = normalizeBrandComparison(
-        decision.proposedBottle.brand.name,
-      );
-      const currentBrandNames = [
-        normalizeBrandComparison(row.brandName),
-        normalizeBrandComparison(row.brandShortName),
-      ].filter(Boolean);
-      if (proposedBrandName && !currentBrandNames.includes(proposedBrandName)) {
-        throw new Error(
-          `Classifier repair parent brand mismatch (${decision.parentBottleId}).`,
-        );
-      }
-
-      const fullName = formatBottleName({
-        ...row.bottle,
-        ...parentInput,
-        name: `${row.brandShortName || row.brandName} ${parentInput.name}`,
-      });
-
-      const parentRepairFields = {
-        name: parentInput.name,
-        fullName,
-        statedAge: parentInput.statedAge ?? null,
-        category: parentInput.category ?? null,
-        edition: parentInput.edition ?? null,
-        abv: parentInput.abv ?? null,
-        singleCask: parentInput.singleCask ?? null,
-        caskStrength: parentInput.caskStrength ?? null,
-        vintageYear: parentInput.vintageYear ?? null,
-        releaseYear: parentInput.releaseYear ?? null,
-        caskSize: parentInput.caskSize ?? null,
-        caskType: parentInput.caskType ?? null,
-        caskFill: parentInput.caskFill ?? null,
-      };
-
-      if (parentRepairFieldsDiffer(row.bottle, parentRepairFields)) {
-        // Reserve the repaired parent alias before mutation so canonical-name
-        // collisions surface as a conflict instead of corrupting ownership.
-        const parentAlias = await upsertBottleAlias(
+      if (input.kind === "source_bottle") {
+        const sourceTarget = await resolveCatalogTargetForAssignment(
+          { kind: "bottle", bottleId: input.sourceBottleId },
           tx,
-          fullName,
-          row.bottle.id,
-          null,
-          {
-            assignmentSource: "canonical",
-            assignedByActorId: createdByActorId,
-          },
         );
-        if (
-          parentAlias.bottleId !== row.bottle.id ||
-          parentAlias.releaseId !== null
-        ) {
-          throw new BottleAlreadyExistsError(
-            parentAlias.bottleId ?? row.bottle.id,
-          );
-        }
-        parentAliasNames.push(parentAlias.name);
-
-        const [updatedBottle] = await tx
-          .update(bottles)
-          .set({
-            ...parentRepairFields,
-            updatedAt: sql`NOW()`,
-          })
-          .where(eq(bottles.id, row.bottle.id))
-          .returning({ id: bottles.id });
-        if (!updatedBottle) {
-          throw new Error(
-            `Classifier repair parent bottle not found (${decision.parentBottleId}).`,
-          );
-        }
-
-        await tx.insert(changes).values({
-          objectType: "bottle",
-          objectId: row.bottle.id,
-          actorId: createdByActorId,
-          displayName: fullName,
-          type: "update",
-          data: {
-            id: row.bottle.id,
-            fullName,
-            name: parentInput.name,
-          },
-        });
-      }
-
-      try {
-        releaseResult = await createBottleReleaseInTransaction(tx, {
-          bottleId: row.bottle.id,
-          createdByActorId,
-          input: newReleaseInput,
-          user,
-        });
-        return {
-          bottleId: releaseResult.release.bottleId,
-          releaseId: releaseResult.release.id,
-          createdRelease: true,
-          parentAliasNames,
-        };
-      } catch (err) {
-        if (err instanceof BottleReleaseAlreadyExistsError) {
-          const [release] = await tx
-            .select()
-            .from(bottleReleases)
-            .where(eq(bottleReleases.id, err.releaseId))
-            .limit(1);
-          if (!release) {
-            throw new Error(`Bottle release not found (${err.releaseId}).`);
-          }
-          return {
-            bottleId: release.bottleId,
-            releaseId: release.id,
-            createdRelease: false,
-            parentAliasNames,
-          };
-        }
-        throw err;
-      }
-    });
-
-    if (releaseResult) {
-      await finalizeCreatedBottleRelease(releaseResult, {
-        creationSource: "bottle_classifier",
-      });
-    }
-    await finalizeClassifierParentRepair({
-      bottleId: decision.parentBottleId,
-      aliasNames: result.parentAliasNames,
-    });
-
-    return {
-      bottleId: result.bottleId,
-      releaseId: result.releaseId,
-      createdBottle: false,
-      createdRelease: result.createdRelease,
-    };
-  }
-
-  if (!input || !releaseInput) {
-    throw new Error(
-      "Missing proposed bottle or release input for classifier create_bottle_and_release.",
-    );
-  }
-
-  const result = await db.transaction(async (tx) => {
-    let bottleResult;
-    let bottleId: number;
-
-    try {
-      bottleResult = await createBottleInTransaction(tx, {
-        creationSource: "bottle_classifier",
-        createdByActorId,
-        input,
-        context: { user },
-      });
-      bottleId = bottleResult.bottle.id;
-    } catch (err) {
-      if (!(err instanceof BottleAlreadyExistsError)) {
-        throw err;
-      }
-      bottleId = err.bottleId;
-    }
-
-    let releaseResult;
-
-    try {
-      releaseResult = await createBottleReleaseInTransaction(tx, {
-        bottleId,
-        createdByActorId,
-        input: releaseInput,
-        user,
-      });
-    } catch (err) {
-      if (!(err instanceof BottleReleaseAlreadyExistsError)) {
-        throw err;
-      }
-
-      const [release] = await tx
-        .select()
-        .from(bottleReleases)
-        .where(
-          and(
-            eq(bottleReleases.id, err.releaseId),
-            eq(bottleReleases.bottleId, bottleId),
-          ),
-        )
-        .limit(1);
-
-      if (!release) {
-        throw new Error(
-          `Bottle release not found for existing classifier create_bottle_and_release result (${err.releaseId}).`,
+        await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
+          sourceTarget,
+          existingTarget,
+        ]);
+        if (sourceTarget.groupId !== existingTarget.groupId) throw error;
+      } else {
+        await lockCatalogTargetAssignmentDescriptorInTransaction(
+          tx,
+          existingTarget,
+          { composition: "concrete_bottle_mutation" },
         );
       }
 
-      return {
-        bottleResult,
-        releaseResult: null,
-        bottleId,
-        releaseId: release.id,
-      };
+      const existingBottle = await tx.query.bottles.findFirst({
+        where: eq(bottles.id, error.bottleId),
+      });
+      if (
+        !existingBottle ||
+        !isSafeClassifierDuplicate({ decision, error, existingBottle })
+      ) {
+        throw error;
+      }
+      bottle = existingBottle;
+      target = existingTarget;
     }
 
-    return {
-      bottleResult,
-      releaseResult,
-      bottleId,
-      releaseId: releaseResult.release.id,
-    };
+    return { bottle, created, target };
   });
 
-  if (result.bottleResult) {
-    await finalizeCreatedBottle(result.bottleResult, {
-      creationSource: "bottle_classifier",
-    });
-  }
-  if (result.releaseResult) {
-    await finalizeCreatedBottleRelease(result.releaseResult, {
+  if (result.created) {
+    await finalizeCreatedBottle(result.created, {
       creationSource: "bottle_classifier",
     });
   }
 
   return {
-    bottleId: result.bottleId,
-    releaseId: result.releaseId,
-    createdBottle: !!result.bottleResult,
-    createdRelease: !!result.releaseResult,
+    bottleId: result.bottle.id,
+    releaseId: null,
+    targetId: result.target.targetId,
+    createdBottle: result.created !== null,
+    createdRelease: false,
   };
 }
 
 /**
- * Resolve a raw external bottle reference into a bottle/release target. This
- * keeps the zero-cost exact alias fast path, but every ambiguous or new name
- * now goes through the reviewed generic classifier instead of prefix heuristics.
- * Target-aware exact aliases carry their authoritative targetId. Classifier
- * matches and reused create decisions leave targetId null for the writer
- * transaction to resolve. Targetless aliases, newly created ungrouped bottles,
- * and promotion-incomplete releases may remain targetless during migration.
+ * Resolve a raw external bottle reference into catalog identity. Exact aliases
+ * retain their accepted fast path; ambiguous references use the reviewed
+ * classifier. Create-shaped actions return their canonical exact target while
+ * retaining the original classifier action in `source`.
  *
- * Errors are returned as unresolved results instead of being thrown so ingest
- * jobs can preserve the raw source record when classification or creation fails.
+ * Errors are returned as unresolved results so ingestion can preserve its raw
+ * source record when classification or persistence fails.
  */
 export async function resolveBottleReferenceTarget({
   reference,
@@ -630,6 +324,7 @@ export async function resolveBottleReferenceTarget({
         confidence: null,
         model: null,
         rationale: null,
+        classifierEvidence: null,
         createdBottle: false,
         createdRelease: false,
       };
@@ -659,16 +354,17 @@ export async function resolveBottleReferenceTarget({
           }
         : null,
     });
-  } catch (err) {
+  } catch (error) {
     return {
       bottleId: null,
       releaseId: null,
       targetId: null,
       source: "unresolved",
-      error: err instanceof Error ? err : new Error("Classifier failed."),
+      error: error instanceof Error ? error : new Error("Classifier failed."),
       confidence: null,
       model: config.OPENAI_MODEL,
       rationale: null,
+      classifierEvidence: null,
       createdBottle: false,
       createdRelease: false,
     };
@@ -684,6 +380,7 @@ export async function resolveBottleReferenceTarget({
       confidence: null,
       model: config.OPENAI_MODEL,
       rationale: null,
+      classifierEvidence: null,
       createdBottle: false,
       createdRelease: false,
     };
@@ -691,11 +388,11 @@ export async function resolveBottleReferenceTarget({
 
   try {
     assertKnownClassifierTarget(classification.decision, classification);
-    // Numeric confidence was removed from the classifier contract; the stored
-    // telemetry column is written null. Automation gating is derived from the
-    // structured evidence, not this value.
     const decisionConfidence = null;
     const decisionRationale = classification.decision.rationale ?? null;
+    const classifierEvidence = projectClassifierEvidence(
+      classification.decision,
+    );
 
     if (
       classification.decision.action === "match" ||
@@ -713,6 +410,7 @@ export async function resolveBottleReferenceTarget({
         confidence: decisionConfidence,
         model: config.OPENAI_MODEL,
         rationale: decisionRationale,
+        classifierEvidence,
         createdBottle: false,
         createdRelease: false,
       };
@@ -728,21 +426,7 @@ export async function resolveBottleReferenceTarget({
         confidence: decisionConfidence,
         model: config.OPENAI_MODEL,
         rationale: decisionRationale,
-        createdBottle: false,
-        createdRelease: false,
-      };
-    }
-
-    if (classification.decision.action === "repair_parent_and_create_release") {
-      return {
-        bottleId: null,
-        releaseId: null,
-        targetId: null,
-        source: "unresolved",
-        error: null,
-        confidence: decisionConfidence,
-        model: config.OPENAI_MODEL,
-        rationale: decisionRationale,
+        classifierEvidence,
         createdBottle: false,
         createdRelease: false,
       };
@@ -753,37 +437,38 @@ export async function resolveBottleReferenceTarget({
       user,
       createdByActorId,
     });
+    const source: BottleReferenceResolutionSource =
+      classification.decision.action === "create_bottle"
+        ? "classifier_create_bottle"
+        : classification.decision.action === "create_release"
+          ? "classifier_create_release"
+          : classification.decision.action === "create_bottle_and_release"
+            ? "classifier_create_bottle_and_release"
+            : "classifier_repair_parent_and_create_release";
 
     return {
-      bottleId: result.bottleId,
-      releaseId: result.releaseId,
-      targetId: null,
-      source:
-        classification.decision.action === "create_bottle"
-          ? "classifier_create_bottle"
-          : classification.decision.action === "create_release"
-            ? "classifier_create_release"
-            : "classifier_create_bottle_and_release",
+      ...result,
+      source,
       error: null,
       confidence: decisionConfidence,
       model: config.OPENAI_MODEL,
       rationale: decisionRationale,
-      createdBottle: result.createdBottle,
-      createdRelease: result.createdRelease,
+      classifierEvidence,
     };
-  } catch (err) {
+  } catch (error) {
     return {
       bottleId: null,
       releaseId: null,
       targetId: null,
       source: "unresolved",
       error:
-        err instanceof Error
-          ? err
+        error instanceof Error
+          ? error
           : new Error("Failed to apply classifier decision."),
       confidence: null,
       model: config.OPENAI_MODEL,
       rationale: null,
+      classifierEvidence: null,
       createdBottle: false,
       createdRelease: false,
     };

@@ -145,12 +145,55 @@ durable consumer target.
   propagation
 - **AND** the targetless compatibility path remains measured and removable
 
-#### Scenario: Classifier review has no valid target yet
+### Requirement: Classifier creation returns canonical exact identity
 
-- **WHEN** a legacy classifier or missing-Bottle worker creates an unresolved
-  Review before concrete target creation is available
-- **THEN** the Review remains explicitly targetless
+The system SHALL apply every successful create-shaped classifier decision as
+one complete concrete Bottle and SHALL return that Bottle's active exact
+CatalogTarget with a null retained release id. It SHALL retain a bounded
+projection of the original classifier evidence without returning full
+artifacts, candidates, search evidence, or duplicate proposed payloads.
+
+#### Scenario: Create or safely reuse from a classifier decision
+
+- **WHEN** a create-shaped classifier decision creates a concrete Bottle or
+  safely reuses an exact canonical duplicate
+- **THEN** the result contains the active exact target and matching
+  `(bottleId, null)` projection
+- **AND** creation records `create_bottle` while safe reuse records
+  `match_existing`
+- **AND** retained evidence includes the original action, nullable parent Bottle
+  id, identity scope, observation, identity basis, and confidence basis
+- **AND** the path does not insert a BottleRelease or use a raw alias writer
+- **AND** canonical concrete creation still reserves the required canonical
+  exact alias for the Bottle
+
+#### Scenario: Classifier resolution has no valid target
+
+- **WHEN** classification returns `no_match`, classifier execution fails, or
+  applying the decision cannot produce a valid exact target
+- **THEN** the resolution remains explicitly targetless
+- **AND** classifier failure exposes no retained classifier-evidence projection
 - **AND** the system does not select a representative or arbitrary exact Bottle
+
+#### Scenario: Create a Bottle from reviewed photo identification
+
+- **WHEN** an approved photo-identification create decision succeeds
+- **THEN** it returns the complete Bottle backed by the active exact target
+- **AND** its retained compatibility response has `release: null`
+- **AND** it creates neither a BottleRelease nor a photo/reference ingestion
+  alias
+- **AND** canonical concrete creation still reserves the Bottle's required
+  canonical exact alias
+
+#### Scenario: Defer missing-Bottle worker consumer assignment
+
+- **WHEN** the missing-Bottle worker receives a successful classifier resolution
+  before its task 5.9 consumer cutover
+- **THEN** its decision audit may store the concrete Bottle, exact target, and
+  bounded classifier evidence
+- **AND** its explicitly unconverted Review and alias target assignment remains
+  governed by task 5.9
+- **AND** unresolved and `no_match` Review rows remain targetless
 
 ### Requirement: Direct Review mutations preserve one authoritative identity
 
@@ -227,8 +270,9 @@ trigger a bounded retry from a fresh snapshot.
 
 - **WHEN** task 5.6c dual-writes direct Review mutations
 - **THEN** shared alias propagation remains owned by task 5.6b
-- **AND** classifier-created unpromoted Bottle or BottleRelease references remain
-  targetless until tasks 5.8/5.9
+- **AND** successful direct task 5.8 classifier creation or safe reuse writes its
+  exact target, while the explicitly unconverted task 5.9 worker consumer may
+  remain targetless
 - **AND** target-backed reads, existing-row backfill, and compatibility removal
   remain owned by tasks 7.3, section 6, and task 9.7 respectively
 - **AND** the slice remains a code-review boundary with no deployment or
@@ -631,8 +675,8 @@ price-assignment contract.
 #### Scenario: Defer adjacent create-new cutovers
 
 - **WHEN** the concrete create-new price-approval slice is reviewed
-- **THEN** classifier creation and remaining legacy writers stay assigned to
-  tasks 5.8 and 5.9
+- **THEN** task 5.8 classifier application produces canonical exact targets and
+  task 5.9 retains only the remaining caller/worker consumer cutovers
 - **AND** target-backed reads, existing-row backfill, release-shaped web input,
   generated OpenAPI/client dependencies, and compatibility cleanup stay assigned
   to task 7.3, section 6, section 8, task 5.11, and task 9.7 respectively

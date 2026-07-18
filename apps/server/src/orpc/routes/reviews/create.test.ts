@@ -217,7 +217,6 @@ describe("POST /reviews", () => {
     });
     expect(review).toBeDefined();
     expect(review?.bottleId).toBeTruthy();
-    expect(review?.targetId).toBeNull();
     expect(review?.name).toEqual(`${brand.name} Bottle Name`);
     expect(review?.issue).toEqual("Default");
     expect(review?.rating).toEqual(89);
@@ -226,18 +225,27 @@ describe("POST /reviews", () => {
     const bottle = await db.query.bottles.findFirst({
       where: (table, { eq }) => eq(table.id, review!.bottleId as number),
     });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle!.id),
+    });
     expect(bottle).toBeDefined();
     expect(bottle?.fullName).toEqual(`${brand.name} Bottle Name`);
     expect(bottle?.name).toEqual("Bottle Name");
     expect(bottle?.category).toEqual("single_malt");
     expect(bottle?.brandId).toEqual(brand.id);
+    expect(review).toMatchObject({
+      targetId: target!.id,
+      bottleId: bottle!.id,
+      releaseId: null,
+    });
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, `${brand.name} Bottle Name`),
     });
     expect(alias).toMatchObject({
       bottleId: bottle!.id,
-      targetId: null,
+      releaseId: null,
+      targetId: target!.id,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -256,12 +264,22 @@ describe("POST /reviews", () => {
       actorId: systemActor.id,
       bottleId: bottle!.id,
       releaseId: null,
+      targetId: target!.id,
       createdBottle: true,
       createdRelease: false,
       confidence: null,
       rationale: "test fixture",
       metadata: expect.objectContaining({
+        classifierEvidence: {
+          action: "create_bottle",
+          parentBottleId: null,
+          identityScope: null,
+          observation: null,
+          identityBasis: null,
+          confidenceBasis: null,
+        },
         initiatedByUserId: adminUser.id,
+        resolutionSource: "classifier_create_bottle",
       }),
     });
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
@@ -278,6 +296,15 @@ describe("POST /reviews", () => {
       brandId: brand.id,
       name: "Existing Catalog Bottle",
     });
+    await db
+      .update(bottleAliases)
+      .set({ assignmentSource: "canonical" })
+      .where(
+        and(
+          eq(bottleAliases.bottleId, bottle.id),
+          eq(bottleAliases.name, bottle.fullName),
+        ),
+      );
     const target = await db.query.catalogTargets.findFirst({
       where: eq(catalogTargets.bottleId, bottle.id),
     });
@@ -328,11 +355,23 @@ describe("POST /reviews", () => {
       assignmentSource: "classifier_approved",
     });
     expect(decisionLog).toMatchObject({
-      decision: "create_bottle",
+      decision: "match_existing",
       bottleId: bottle.id,
       releaseId: null,
+      targetId: target!.id,
       createdBottle: false,
       createdRelease: false,
+      metadata: expect.objectContaining({
+        classifierEvidence: {
+          action: "create_bottle",
+          parentBottleId: null,
+          identityScope: null,
+          observation: null,
+          identityBasis: null,
+          confidenceBasis: null,
+        },
+        resolutionSource: "classifier_create_bottle",
+      }),
     });
   });
 
@@ -382,7 +421,7 @@ describe("POST /reviews", () => {
     expect(duplicateBrand).toBeUndefined();
   });
 
-  test("new review can create a release under a classifier-selected parent", async ({
+  test("new review creates a concrete Bottle in the classifier-selected group", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -398,6 +437,30 @@ describe("POST /reviews", () => {
         {
           action: "create_release",
           parentBottleId: bottle.id,
+          identityScope: "product",
+          observation: {
+            selector: "2011 release label",
+            caskNumber: null,
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: null,
+            market: null,
+            exclusive: null,
+          },
+          identityBasis: {
+            bottleTraits: ["brand", "expression"],
+            releaseTraits: ["edition"],
+            observationTraits: ["label selector"],
+            yearInterpretation: "none",
+            siblingEvidence: "single_known_release",
+            uncertainties: [],
+          },
+          confidenceBasis: {
+            positiveEvidence: ["classifier-selected parent"],
+            unresolvedRisks: [],
+            toolsUsed: ["initial_local_candidates"],
+            webEvidence: "not_used",
+          },
           proposedRelease: {
             edition: "2011 Release",
             statedAge: null,
@@ -458,15 +521,24 @@ describe("POST /reviews", () => {
     const review = await db.query.reviews.findFirst({
       where: (table, { eq }) => eq(table.id, data.id),
     });
-    expect(review?.bottleId).toEqual(bottle.id);
-    expect(review?.releaseId).toBeTruthy();
-    expect(review?.targetId).toBeNull();
-
-    const release = await db.query.bottleReleases.findFirst({
-      where: (table, { eq }) => eq(table.id, review!.releaseId as number),
+    const createdBottle = await db.query.bottles.findFirst({
+      where: (table, { eq }) => eq(table.id, review!.bottleId as number),
     });
-    expect(release?.bottleId).toEqual(bottle.id);
-    expect(release?.edition).toEqual("2011 Release");
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, createdBottle!.id),
+    });
+
+    expect(createdBottle).toMatchObject({
+      groupId: bottle.groupId,
+      edition: "2011 Release",
+    });
+    expect(createdBottle?.id).not.toEqual(bottle.id);
+    expect(review).toMatchObject({
+      bottleId: createdBottle!.id,
+      releaseId: null,
+      targetId: target!.id,
+    });
+    expect(await db.query.bottleReleases.findMany()).toHaveLength(0);
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -475,11 +547,43 @@ describe("POST /reviews", () => {
       ),
     });
     expect(decisionLog).toMatchObject({
-      decision: "create_release",
-      bottleId: bottle.id,
-      releaseId: release!.id,
-      createdBottle: false,
-      createdRelease: true,
+      decision: "create_bottle",
+      bottleId: createdBottle!.id,
+      releaseId: null,
+      targetId: target!.id,
+      createdBottle: true,
+      createdRelease: false,
+      metadata: expect.objectContaining({
+        classifierEvidence: {
+          action: "create_release",
+          parentBottleId: bottle.id,
+          identityScope: "product",
+          observation: {
+            selector: "2011 release label",
+            caskNumber: null,
+            barrelNumber: null,
+            bottleNumber: null,
+            outturn: null,
+            market: null,
+            exclusive: null,
+          },
+          identityBasis: {
+            bottleTraits: ["brand", "expression"],
+            releaseTraits: ["edition"],
+            observationTraits: ["label selector"],
+            yearInterpretation: "none",
+            siblingEvidence: "single_known_release",
+            uncertainties: [],
+          },
+          confidenceBasis: {
+            positiveEvidence: ["classifier-selected parent"],
+            unresolvedRisks: [],
+            toolsUsed: ["initial_local_candidates"],
+            webEvidence: "not_used",
+          },
+        },
+        resolutionSource: "classifier_create_release",
+      }),
     });
   });
 

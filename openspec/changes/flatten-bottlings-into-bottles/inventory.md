@@ -181,9 +181,12 @@ Target-bearing consumer routes:
   fields from different decisions. If an existing different complete tuple wins
   the conflict, the route neither creates nor reassigns an alias and records no
   decision evidence for the rejected incoming identity. Known mapped resolution
-  failures are errors; genuinely unresolved and classifier-created unpromoted
-  references remain explicitly targetless until tasks 5.8/5.9. Shared
-  alias-driven Review propagation remains task 5.6b.
+  failures are errors. Under task 5.8, successful classifier creation or safe
+  reuse supplies the active exact target and `(bottleId, null)` projection to
+  the Review, canonical alias assignment, and incoming decision log; the log
+  retains the bounded original classifier evidence. This direct path has no raw
+  alias or BottleRelease writer. Only `no_match` and failed/unresolved decisions
+  remain targetless. Shared alias-driven Review propagation remains task 5.6b.
 - `apps/server/src/orpc/routes/reviews/list.ts`
 - `apps/server/src/orpc/routes/reviews/update.ts` is the task 5.6c direct Review
   mutation boundary. It snapshots Review identity, resolves and locks the
@@ -219,7 +222,14 @@ Target-bearing consumer routes:
 - `apps/server/src/orpc/routes/tastings/create.ts`
 - `apps/server/src/orpc/routes/tastings/delete.ts`
 - `apps/server/src/orpc/routes/tastings/list.ts`
-- `apps/server/src/orpc/routes/tastings/photo-identification-create.ts`
+- `apps/server/src/orpc/routes/tastings/photo-identification-create.ts` applies
+  an approved create-shaped classifier decision through the same task 5.8
+  concrete creation owner. Success returns one independently complete Bottle
+  backed by its active exact target, always returns `release: null`, and does not
+  insert a BottleRelease or write a photo/reference ingestion alias. Canonical
+  concrete creation still reserves the Bottle's required canonical exact alias.
+  The reviewed decision remains the caller's structured evidence; optional
+  catalog-image promotion is a separate post-creation side effect.
 - `apps/server/src/orpc/routes/tastings/photo-identification.ts`
 - `apps/server/src/orpc/routes/prices/create-batch.ts` is the second task 5.6f
   sub-slice and now resolves accepted aliases to one validated exact, generic,
@@ -362,7 +372,16 @@ Catalog identity, aliases, search, creation, and updates:
   source-snapshot locking remains owned by `bottleAliases.ts`. Broad target-backed
   alias reads and Bottle search/index replacement remain tasks 7.3 and 7.5.
 - `apps/server/src/lib/bottleReferenceCandidates.ts`
-- `apps/server/src/lib/bottleReferenceResolution.ts`
+- `apps/server/src/lib/bottleReferenceResolution.ts` owns task 5.8 classifier
+  application and reference resolution. Every create-shaped action delegates to
+  canonical concrete creation and returns one exact target with
+  `(bottleId, null)`; safe canonical duplicate reuse returns the same active
+  exact target only after rollback and revalidation. The result carries only a
+  bounded classifier-evidence projection (original action, parent id, identity
+  scope, observation, identity basis, and confidence basis). Exact aliases and
+  classifier failures carry no classifier evidence, and `no_match`/unresolved
+  results remain targetless. This service no longer owns a raw alias or
+  BottleRelease writer.
 - `apps/server/src/lib/bottleReleaseIdentity.ts`
 - `apps/server/src/lib/bottleSchemaRules.ts`
 - `apps/server/src/lib/createBottleRelease.ts`
@@ -370,7 +389,6 @@ Catalog identity, aliases, search, creation, and updates:
   `upsertBottleAlias` writer. It remains active for
   `createBottle.ts`, `createBottleRelease.ts`,
   `applyDirtyParentReleaseRepair.ts`, `applyLegacyReleaseRepair.ts`,
-  `bottleReferenceResolution.ts`,
   `repairBottleBrandDistilleryAssignments.ts`, and
   `worker/jobs/mergeEntity.ts`, with direct coverage in `lib/db.test.ts`.
   Active CLI callers also include the Bottle `fix-names` command and the price
@@ -408,8 +426,14 @@ Repair and migration-adjacent services:
 Classifier decisions and price matching:
 
 - `apps/server/src/agents/bottleClassifier/service.ts`
-- `apps/server/src/lib/classifierDecisionCreateInputs.ts`
-- `apps/server/src/lib/incomingBottleDecisionLog.ts`
+- `apps/server/src/lib/classifierDecisionCreateInputs.ts` projects each retained
+  create-shaped classifier action into the one canonical concrete-Bottle input;
+  action names remain evidence and never select BottleRelease storage.
+- `apps/server/src/lib/incomingBottleDecisionLog.ts` maps successful task 5.8
+  concrete creation to `create_bottle` and safe reuse to `match_existing`, while
+  accepting the exact target and retained `(bottleId, null)` projection from the
+  caller. Review callers persist the bounded original classifier evidence in
+  metadata instead of reconstructing an action from the resolution source.
 - `apps/server/src/lib/priceMatchConcreteBottleInput.ts` is the sole translator
   from retained price-match creation payloads to canonical concrete creation:
   bottle-only input owns the independent Bottle's stable fields, including
@@ -506,8 +530,9 @@ Classifier decisions and price matching:
   StorePrice tuple without clearing it or surfacing the stale target failure.
   Existing processing-lease behavior is unchanged. Direct create-batch
   ingestion is completed by the adjacent task 5.6f sub-slice. Task 5.6b retains
-  alias-driven propagation, tasks 5.8/5.9 retain classifier and caller creation, task 7.3
-  owns target-backed reads, section 6 owns existing-row backfill, broader
+  alias-driven propagation, task 5.8 owns classifier application, task 5.9 owns
+  the remaining caller/worker consumer cutover, task 7.3 owns target-backed
+  reads, section 6 owns existing-row backfill, broader
   repair/caller cutovers remain outside this sub-slice, task 9.6 removes
   retained consumer pairs, and task 9.7 removes measured targetless/legacy
   resolution. Section 8 removes release-shaped UI input/output assumptions,
@@ -518,11 +543,14 @@ Classifier decisions and price matching:
 
 ## Workers and queue payloads
 
-- `apps/server/src/worker/jobs/createMissingBottles.ts` may create unresolved
-  classifier Review rows before classifier and worker creation can produce a
-  valid concrete CatalogTarget. Those rows remain explicitly targetless in task
-  5.6b; tasks 5.8/5.9 own their target-producing cutover rather than selecting a
-  representative or other arbitrary exact Bottle.
+- `apps/server/src/worker/jobs/createMissingBottles.ts` now consumes the task 5.8
+  resolution's concrete Bottle, exact target, and bounded classifier evidence,
+  and records that exact target/evidence on its incoming decision audit. Its
+  retained Review and alias assignment still calls canonical alias assignment
+  with only the legacy pair and does not authoritatively apply the returned
+  descriptor to the Review; that precise consumer cutover remains task 5.9.
+  `no_match` and failed/unresolved reviews stay targetless, and the worker never
+  selects a representative or arbitrary exact Bottle.
 - `apps/server/src/worker/jobs/index.ts`
 - `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
 - `apps/server/src/worker/jobs/onBottleChange.ts` refreshes Bottle details and

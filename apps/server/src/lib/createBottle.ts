@@ -50,7 +50,7 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { findConflictingSmwsBottleId } from "./concreteBottleConflicts";
 import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
@@ -497,17 +497,38 @@ type TrustedGroupContext = {
   distillerIds: number[];
 };
 
-/** Locks the trusted member and returns only a complete active group graph. */
+/** Locks the trusted graph in Group -> Bottle -> CatalogTarget order. */
 async function loadTrustedGroupContext(
   tx: AnyTransaction,
   sourceBottleId: number,
 ): Promise<TrustedGroupContext> {
+  const [discoveredSource] = await tx
+    .select({ groupId: bottles.groupId })
+    .from(bottles)
+    .where(eq(bottles.id, sourceBottleId))
+    .limit(1);
+
+  if (!discoveredSource) {
+    throw new TrustedSourceBottleError("not_found", sourceBottleId);
+  }
+  if (!discoveredSource.groupId) {
+    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
+  }
+
+  const [group] = await tx
+    .select()
+    .from(bottleGroups)
+    .where(eq(bottleGroups.id, discoveredSource.groupId))
+    .for("update");
+  if (!group) {
+    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
+  }
+
   const [sourceBottle] = await tx
     .select()
     .from(bottles)
     .where(eq(bottles.id, sourceBottleId))
     .for("update");
-
   if (!sourceBottle) {
     throw new TrustedSourceBottleError("not_found", sourceBottleId);
   }
@@ -519,19 +540,12 @@ async function loadTrustedGroupContext(
   if (retiredBottle) {
     throw new TrustedSourceBottleError("retired", sourceBottleId);
   }
-
-  if (!sourceBottle.groupId) {
+  if (sourceBottle.groupId !== group.id) {
     throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
   }
 
-  const [group] = await tx
-    .select()
-    .from(bottleGroups)
-    .where(eq(bottleGroups.id, sourceBottle.groupId))
-    .for("update");
-
   const retiredGroup = await tx.query.bottleGroupTombstones.findFirst({
-    where: eq(bottleGroupTombstones.groupId, sourceBottle.groupId),
+    where: eq(bottleGroupTombstones.groupId, group.id),
     columns: { groupId: true },
   });
   if (retiredGroup) {
@@ -541,7 +555,17 @@ async function loadTrustedGroupContext(
   const targets = await tx
     .select()
     .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, sourceBottle.groupId));
+    .where(
+      and(
+        eq(catalogTargets.groupId, group.id),
+        or(
+          isNull(catalogTargets.bottleId),
+          eq(catalogTargets.bottleId, sourceBottleId),
+        ),
+      ),
+    )
+    .orderBy(asc(catalogTargets.id))
+    .for("update");
   const genericTarget = targets.find((target) => target.bottleId === null);
   const sourceExactTarget = targets.find(
     (target) => target.bottleId === sourceBottleId,
@@ -554,11 +578,11 @@ async function loadTrustedGroupContext(
   const distillers = await tx
     .select({ distillerId: bottleGroupDistillers.distillerId })
     .from(bottleGroupDistillers)
-    .where(eq(bottleGroupDistillers.groupId, sourceBottle.groupId))
+    .where(eq(bottleGroupDistillers.groupId, group.id))
     .orderBy(asc(bottleGroupDistillers.distillerId));
 
   return {
-    group: group!,
+    group,
     genericTarget,
     distillerIds: distillers.map(({ distillerId }) => distillerId),
   };

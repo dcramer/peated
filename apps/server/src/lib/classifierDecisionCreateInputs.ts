@@ -7,6 +7,7 @@ import type {
   BottleReleaseInputSchema,
 } from "@peated/server/schemas";
 import type { z } from "zod";
+import { buildLegacyConcreteBottleInput } from "./legacyConcreteBottleInput";
 
 type BottleCreateInput = z.infer<typeof BottleInputSchema>;
 type BottleReleaseCreateInput = z.infer<typeof BottleReleaseInputSchema>;
@@ -153,4 +154,30 @@ export function buildClassifierCreateInputs(decision: {
     input: undefined,
     releaseInput: undefined,
   };
+}
+
+/**
+ * Maps legacy classifier action shapes to one concrete Bottle create input.
+ * The action remains evidence; it no longer selects a second persisted entity
+ * type or authorizes mutation of the trusted source Bottle.
+ */
+export function buildClassifierConcreteBottleInput(decision: {
+  action: string;
+  parentBottleId?: number | null;
+  proposedBottle?: ProposedBottle | null;
+  proposedRelease?: ProposedRelease | null;
+}) {
+  const { input: bottleInput, releaseInput } =
+    buildClassifierCreateInputs(decision);
+  const parentBottleId =
+    decision.action === "create_release"
+      ? (decision.parentBottleId ?? null)
+      : null;
+
+  return buildLegacyConcreteBottleInput({
+    bottleInput,
+    releaseInput,
+    parentBottleId,
+    source: "classifier",
+  }).input;
 }

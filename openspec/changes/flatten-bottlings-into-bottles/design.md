@@ -512,6 +512,8 @@ exact; a generic result keeps both generic and never substitutes the group's
 representative Bottle. Failure to resolve the target or write either record
 rolls back the complete approval transaction.
 
+### Create-new price approval creates one complete Bottle
+
 Create-new approval infers the retained `bottle`, `release`, or
 `bottle_and_release` payload shape and translates it into the canonical
 concrete-Bottle input. Bottle-only and combined payloads create an independent
@@ -552,9 +554,10 @@ alias, fuzzy name similarity, or fuzzy SMWS matching is not safe reusable exact
 identity; it remains a conflict or suggestion. A cross-group or drifted
 descriptor also remains a conflict. A newly created Bottle uses
 `create_bottle`, while safe duplicate reuse uses `match_existing`.
-Historical `create_release` and
-`create_bottle_and_release` enum values remain readable for classifier and
-compatibility records until tasks 5.8, 5.9, and 9.7; this slice needs no enum
+Historical `create_release` and `create_bottle_and_release` enum values remain
+readable. Task 5.8 retains the original classifier action as evidence while
+emitting concrete decision vocabulary; tasks 5.9 and 9.7 own remaining producer
+cutover and explicit compatibility removal, so this price slice needs no enum
 migration.
 
 The selected exact target is the one assignment for StorePrice, listing alias,
@@ -582,12 +585,36 @@ payload into telemetry. Section 8 migrates callers off the release-shaped
 input/output, and task 9.7 explicitly removes this route adapter only after
 observed compatibility-handler traffic reaches zero.
 
-Target-backed reads remain task 7.3. Classifier creation and other supported
-legacy writers remain tasks 5.8 and 5.9, the Section 8 UI still needs to stop
-constructing release-shaped create payloads, task 5.11 owns generated
-OpenAPI/client dependencies, and task 9.7 removes the route adapter and
-historical compatibility branches after their gates pass. This code-review
-slice makes no deployment, production backfill, or activation claim.
+Target-backed reads remain task 7.3. Task 5.8 owns the adjacent classifier
+application cutover, other supported legacy writers remain task 5.9, the
+Section 8 UI still needs to stop constructing release-shaped create payloads,
+task 5.11 owns generated OpenAPI/client dependencies, and task 9.7 removes the
+route adapter and historical compatibility branches after their gates pass.
+This code-review slice makes no deployment, production backfill, or activation
+claim.
+
+### Classifier application creates one complete Bottle
+
+Task 5.8 collapses every create-shaped classifier application into the
+canonical concrete-Bottle creation service. `create_bottle` and the retained
+combined legacy shape create one independently complete Bottle in an automatic
+singleton group. A retained `create_release` input may use its validated parent
+Bottle only as trusted source context for automatic group reuse. The retained
+`repair_parent_and_create_release` shape does not repair or mutate that parent,
+and does not reuse its group: it combines the proposed shared and exact facts
+into one new independently complete Bottle and singleton group. Its parent id
+remains source evidence only. There is no user-facing parent-repair action and
+none of these paths inserts or finalizes a BottleRelease.
+
+Every successful result returns the active exact CatalogTarget, the concrete
+Bottle id, a null retained release id, and `createdRelease: false`. Safe exact
+duplicate reuse returns that same target only after the canonical attempt has
+rolled back and the active target, canonical name, and trusted group context
+have been revalidated. New decision logs use `create_bottle` for an actual
+concrete creation and `match_existing` for safe reuse, while metadata retains
+the original classifier action and structured evidence. The historical action
+labels remain readable compatibility inputs until their producers and stored
+records are removed by the later classifier/caller cleanup tasks.
 
 ### Alias-driven consumers share one assignment owner
 
@@ -653,10 +680,12 @@ prevents an invalid legacy pair, concurrent Bottle retirement, or alias
 reassignment from committing stale targetless propagation. The measured
 targetless compatibility path remains removable under task 9.7.
 
-Classifier-created unresolved reviews likewise remain explicitly targetless
-until tasks 5.8/5.9 replace their legacy creation and worker paths with valid
-concrete target production. Task 5.6b does not invent a representative or other
-exact Bottle for those reviews.
+Classifier `no_match` and unresolved reviews remain explicitly targetless.
+Task 5.8 gives successful classifier creation or safe reuse an active exact
+target and retained decision evidence. The missing-Bottle worker consumes that
+result, but its Review and alias target assignment remains the precise task 5.9
+consumer cutover; task 5.6b does not invent a representative or other exact
+Bottle for an unresolved review.
 
 Direct review, collection, flight, and price mutations remain separate review
 boundaries in tasks 5.6c-5.6f. Create-new price approval remains tasks 5.7 and
@@ -680,13 +709,14 @@ reclassified as targetless compatibility.
 
 Review creation's conflict/upsert behavior treats identity as one unit. A
 genuinely unresolved or targetless current reference cannot overwrite, clear,
-or partially mix with an existing durable target tuple. Classifier-created
-unpromoted Bottle/BottleRelease references and genuinely unresolved references
-remain explicitly targetless until tasks 5.8/5.9 can create valid concrete
-targets; this exception does not permit arbitrary target selection. When an
-existing different complete identity wins the upsert conflict, the incoming
-identity is rejected as a unit: creation neither creates nor reassigns an alias
-and records no decision evidence for that rejected identity.
+or partially mix with an existing durable target tuple. Successful direct
+classifier creation or safe reuse writes its exact target under task 5.8;
+`no_match`, failed resolution, and the not-yet-converted task 5.9 worker
+consumer remain explicitly targetless without permitting arbitrary target
+selection. When an existing different complete identity wins the upsert
+conflict, the incoming identity is rejected as a unit: creation neither creates
+nor reassigns an alias and records no decision evidence for that rejected
+identity.
 
 Review update takes a Review identity snapshot, resolves and locks the
 authoritative CatalogTarget for that snapshot and requested mutation when one

@@ -39,6 +39,9 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Independent creation always creates a singleton group. Reusing a group
   requires an existing-member, migration, curated-alias, or moderator context.
 - Exact aliases move with their Bottle. Stable aliases move with the group.
+  Canonical concrete creation reserves the Bottle's required canonical exact
+  alias; a caller that creates no photo/reference ingestion alias does not
+  bypass that identity reservation.
 - The completed alias cutover requires every new assignment to use one
   validated CatalogTarget. Exact aliases reference the owning Bottle's exact
   target; stable aliases reference the BottleGroup's generic target and never
@@ -77,9 +80,12 @@ Exact Bottle serializers must not require BottleGroup hydration.
   before consumer locks. An invalid pair produces no consumer writes or alias
   indexing. The worker then revalidates and locks the alias snapshot; the
   measured compatibility branch remains assigned to task 9.7 removal.
-- Classifier-created unresolved reviews remain targetless until tasks 5.8/5.9
-  can produce a valid concrete target; task 5.6b does not invent an exact
-  Bottle for them.
+- Successful direct task 5.8 classifier creation or safe reuse returns and
+  writes the active exact target with `(bottleId, null)`. `no_match`, classifier
+  failure, and unresolved decisions remain targetless. The missing-Bottle worker
+  may audit task 5.8's concrete target and bounded evidence, but its explicitly
+  unconverted Review and alias target assignment remains task 5.9 work; task
+  5.6b does not invent an exact Bottle for those rows.
 - Task 5.6c makes a known direct Review create/update intent resolve one
   CatalogTarget descriptor and revalidate/lock it before mutating the Review.
   The complete `{ targetId, bottleId, releaseId }` tuple is written atomically,
@@ -91,8 +97,9 @@ Exact Bottle serializers must not require BottleGroup hydration.
   with an existing durable target. When an existing different complete tuple
   wins the conflict, the rejected incoming identity owns no alias creation or
   reassignment and no decision evidence. A known mapped resolution failure is
-  an error, while classifier-created unpromoted and genuinely unresolved
-  references remain explicitly targetless until tasks 5.8/5.9.
+  an error. Successful direct task 5.8 classifier creation or safe reuse writes
+  its exact target; genuinely unresolved results and the explicitly unconverted
+  task 5.9 worker consumer remain targetless.
 - Direct Review update snapshots the Review identity, resolves and locks the
   authoritative CatalogTarget first when one applies, and then locks the
   Review. It accepts the mutation only when the locked identity tuple still
@@ -157,11 +164,12 @@ Exact Bottle serializers must not require BottleGroup hydration.
   release-shaped callers and task 9.7 removes the route adapter only after
   observed compatibility-handler traffic is zero.
 - Tasks 5.6c-5.6f own direct review, collection, flight, and price mutations;
-  tasks 5.8/5.9 own classifier and remaining caller creation, task 7.3 owns
-  target-backed reads, section 6 owns backfill, Section 8 owns release-shaped UI
-  removal, task 5.11 owns generated OpenAPI/client dependencies, and tasks
-  9.6/9.7 remove retained pairs and compatibility. This slice neither begins
-  production backfill nor authorizes deployment.
+  task 5.8 owns classifier application, task 5.9 owns the remaining caller and
+  worker consumer cutover, task 7.3 owns target-backed reads, section 6 owns
+  backfill, Section 8 owns release-shaped UI removal, task 5.11 owns generated
+  OpenAPI/client dependencies, and tasks 9.6/9.7 remove retained pairs and
+  compatibility. This slice neither begins production backfill nor authorizes
+  deployment.
 - Task 5.6d resolves and locks one validated exact or generic target before
   direct collection membership creation or a resolvable specific delete. New
   membership is never targetless; a matching targetless legacy-pair row may be

@@ -475,9 +475,14 @@ proposals. The token signs the pending upload id, create decision, reviewed
 candidate bottle ids, and photo suitability so creation can persist the reviewed
 result without rerunning photo extraction or classification.
 
-When the pending scan is suitable as a catalog image, creation promotes it by
-default to the created bottle or release target. Unsuitable photos still create
-the bottle target, but do not write a public catalog image.
+Every accepted create-shaped decision now creates or safely reuses one concrete
+Bottle and exact CatalogTarget. Release-shaped action names are retained signed
+classifier evidence, not a request to write BottleRelease. The compatibility
+response returns the concrete `bottle` and `release: null`.
+
+When the pending scan is suitable as a catalog image and a new Bottle was
+created, creation promotes it to that Bottle. Unsuitable photos and safe reuse
+still return the target without writing a public catalog image.
 
 If the reviewed create target collides with an existing bottle or canonical
 alias, the create route returns `409 CONFLICT` with the conflicting bottle id in
@@ -510,8 +515,8 @@ reuse after leaving `/addTasting`. The current route should:
 - create the tasting through the existing deterministic path
 - upload the selected picture through the existing image update path when
   selected
-- promote the image to a bottle or release only after the tasting and any
-  required bottle/release creation are durable
+- promote the image to a concrete Bottle only after the tasting and any
+  required Bottle creation are durable
 - return partial-success information if image copy or promotion fails after the
   tasting is created
 - avoid re-running image identification during final tasting save
@@ -647,17 +652,19 @@ Attach to tasting:
 - allow user to turn off attachment before save
 - never attach if the pending image is expired or owned by another user
 
-Promote to bottle or release:
+Promote to catalog Bottle:
 
-- never overwrite an existing bottle or release image
+- never overwrite an existing Bottle image
 - for photo-identification create, promote suitable scans by default when the
-  target image slot is empty
+  concrete Bottle image slot is empty; the active exact target identifies that
+  Bottle and no BottleRelease image is created
 - for tasting create, only promote when `promoteImageToBottle = "if_empty"`
 - only promote when `photoSuitability.suitableAsBottleImage = true`
-- if the confirmed target is a release and the release has an image field, prefer
-  release image over parent bottle image
-- if a new bottle or release is created in the same flow, promotion can happen
-  after the new row is durable
+- only a still-unconverted legacy tasting target may retain BottleRelease image
+  promotion; in that compatibility branch, prefer its release image over the
+  parent Bottle image
+- if a concrete Bottle is created in the same flow, promotion can happen only
+  after the Bottle and exact target are durable
 
 Promotion failures should not roll back a successfully created tasting. They
 should be logged and returned as partial-success metadata the UI can explain.
@@ -875,7 +882,9 @@ Scope:
 - extend tasting create schema with `pendingImageId`, `attachImageToTasting`,
   `promoteImageToBottle`, and optional `photoIdentificationId`
 - attach pending image to tasting by copying it into the tasting namespace
-- promote image to release or bottle only under deterministic policy
+- promote image to the selected exact Bottle under deterministic policy; only a
+  still-unconverted legacy tasting target may use retained BottleRelease image
+  promotion compatibility
 - return partial-success metadata for image failures after tasting persistence
 - link tasting to photo-identification trace when provided
 
@@ -885,9 +894,11 @@ API integration tests:
 - creates tasting without attaching pending image
 - rejects pending images owned by another user
 - rejects expired pending images while preserving normal tasting validation
-- does not overwrite existing bottle/release image
+- does not overwrite an existing Bottle image or a retained legacy
+  BottleRelease image
 - promotes to empty target image when allowed
-- prefers release image over parent bottle image when release target is selected
+- prefers a retained BottleRelease image over its parent only in the
+  still-unconverted legacy tasting compatibility branch
 - returns partial success when image copy fails after tasting creation
 - does not re-run extraction or classifier during tasting save
 
@@ -928,18 +939,22 @@ Only add photo-driven creation after existing-bottle matching works well.
 Scope:
 
 - decide whether v1 permits immediate create from photo lookup
-- if enabled, route creation through existing bottle/release creation and review
-  policy
+- if enabled, route every create-shaped classifier action through canonical
+  concrete Bottle creation and return its active exact target; a release-shaped
+  action is retained evidence, not BottleRelease storage
 - show canonical fields before confirmation
 - queue catalog verification after creation
-- ensure image promotion happens only after durable creation
+- promote only to the concrete Bottle image, and only after the Bottle and exact
+  target are durable
 
 Tests:
 
 - proposed new bottle requires reviewed classifier evidence
-- proposed new release requires reviewed classifier evidence and parent context
+- a release-shaped proposal requires reviewed classifier evidence and trusted
+  parent context, then creates one complete concrete Bottle in that group
 - ambiguous age/year/cask fields downgrade to manual review or manual search
-- created bottle/release can receive promoted image only when policy allows
+- the created concrete Bottle can receive the promoted image only when policy
+  allows
 
 This phase should be gated by eval results from real photo fixtures.
 
@@ -1012,8 +1027,9 @@ Do not broaden the feature until each gate is satisfied:
   search remain required before saving?
 - Should existing bottles without images default to promotion on, or should the
   checkbox default off unless the bottle was created in this flow?
-- Should release image promotion happen before parent bottle promotion whenever
-  a release is selected?
+- How long should still-unconverted legacy tasting targets preserve
+  BottleRelease-over-parent image promotion, given that photo-driven creation
+  now always promotes to the concrete Bottle selected by its exact target?
 - What TTL is appropriate for pending images in production?
 - Should the first shipped version allow photo-driven bottle creation, or only
   existing-bottle matching plus manual add-bottle fallback?

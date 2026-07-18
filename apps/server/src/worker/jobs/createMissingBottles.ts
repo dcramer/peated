@@ -85,6 +85,7 @@ export default async function createMissingBottles() {
       const bottleId = resolution.bottleId;
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
+        { createdBottle: resolution.createdBottle },
       );
 
       const aliasAssignment = await db.transaction(async (tx) => {
@@ -134,6 +135,7 @@ export default async function createMissingBottles() {
             actor: systemActor,
             bottleId,
             releaseId: resolution.releaseId,
+            targetId: resolution.targetId,
             createdBottle: resolution.createdBottle,
             createdRelease: resolution.createdRelease,
             confidence: resolution.confidence,
@@ -141,6 +143,11 @@ export default async function createMissingBottles() {
             rationale: resolution.rationale,
             metadata: {
               resolutionSource: resolution.source,
+              ...(resolution.classifierEvidence
+                ? {
+                    classifierEvidence: resolution.classifierEvidence,
+                  }
+                : {}),
               issue: review.issue,
             },
           });

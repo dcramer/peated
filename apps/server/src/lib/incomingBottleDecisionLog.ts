@@ -10,18 +10,25 @@ export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
+/**
+ * Legacy classifier source names remain evidence; audit decisions record the
+ * persisted concrete Bottle effect (`create_bottle` or `match_existing`), never release creation.
+ */
 export function getIncomingBottleDecisionFromResolutionSource(
   source: string,
+  { createdBottle }: { createdBottle: boolean },
 ): IncomingBottleDecisionType | null {
   switch (source) {
     case "classifier_match":
       return "match_existing";
     case "classifier_create_bottle":
-      return "create_bottle";
+      return createdBottle === false ? "match_existing" : "create_bottle";
     case "classifier_create_release":
-      return "create_release";
+      return createdBottle ? "create_bottle" : "match_existing";
     case "classifier_create_bottle_and_release":
-      return "create_bottle_and_release";
+      return createdBottle ? "create_bottle" : "match_existing";
+    case "classifier_repair_parent_and_create_release":
+      return createdBottle === false ? "match_existing" : "create_bottle";
     default:
       return null;
   }

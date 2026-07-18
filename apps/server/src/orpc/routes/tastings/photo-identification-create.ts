@@ -1,18 +1,17 @@
 /**
  * Confirms signed photo-identification create proposals without rerunning AI.
  * The route owns token/user validation, pending-upload ownership, durable
- * bottle/release mutation, and API-facing conflict mapping.
+ * concrete Bottle creation, and API-facing conflict mapping.
  */
 import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
-import { bottleReleases, bottles } from "@peated/server/db/schema";
+import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToBottle,
-  copyPendingImageToBottleRelease,
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
@@ -27,7 +26,6 @@ import {
 import { BottleReleaseSchema, BottleSchema } from "@peated/server/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import bottleReleasesDetails from "../bottleReleases/details";
 import bottlesDetails from "../bottles/details";
 import { isPhotoIdentificationCreateDecisionAutoCreatable } from "./photo-identification";
 
@@ -35,7 +33,6 @@ type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
 };
 
-type CatalogImageApprovalTarget = "bottle" | "release";
 const CatalogImageWarningSchema = z.object({
   code: z.literal("CATALOG_IMAGE_COPY_FAILED"),
   message: z.string(),
@@ -52,21 +49,14 @@ type PhotoSuitability = Awaited<
   ReturnType<typeof verifyPhotoIdentificationCreateToken>
 >["photoSuitability"];
 
-const catalogImageWarningMessage: Record<CatalogImageApprovalTarget, string> = {
-  bottle: "The bottle was created, but the public image was not saved.",
-  release: "The release was created, but the public image was not saved.",
-};
-
-function buildCatalogImageWarning(
-  target: CatalogImageApprovalTarget,
-): CatalogImageWarning {
+function buildCatalogImageWarning(): CatalogImageWarning {
   return {
     code: "CATALOG_IMAGE_COPY_FAILED",
-    message: catalogImageWarningMessage[target],
+    message: "The bottle was created, but the public image was not saved.",
   };
 }
 
-/** Scan-created releases only promote suitable source photos, never classifier-proposed images. */
+/** Classifier-proposed image URLs never bypass the pending-upload boundary. */
 function stripUnapprovedCatalogImages(
   decision: CreateDecision,
 ): CreateDecision {
@@ -103,64 +93,33 @@ function stripUnapprovedCatalogImages(
   return decision;
 }
 
-function getCatalogImageApprovalDestination({
-  approvalTarget,
-  decision,
+function shouldPromoteCatalogImage({
   result,
   photoSuitability,
   pendingPurpose,
 }: {
-  approvalTarget: CatalogImageApprovalTarget;
-  decision: CreateDecision;
   result: CreateDecisionResult;
   photoSuitability: PhotoSuitability;
   pendingPurpose: string;
-}): { target: CatalogImageApprovalTarget; id: number } | null {
+}) {
   if (
     pendingPurpose !== "photo_tasting_entry" ||
-    photoSuitability.suitableAsBottleImage !== true
+    photoSuitability.suitableAsBottleImage !== true ||
+    !result.createdBottle
   ) {
-    return null;
+    return false;
   }
-
-  if (
-    approvalTarget === "bottle" &&
-    decision.action === "create_bottle" &&
-    result.createdBottle
-  ) {
-    return { target: "bottle", id: result.bottleId };
-  }
-
-  if (
-    approvalTarget === "release" &&
-    (decision.action === "create_release" ||
-      decision.action === "create_bottle_and_release" ||
-      decision.action === "repair_parent_and_create_release") &&
-    result.createdRelease &&
-    result.releaseId
-  ) {
-    return { target: "release", id: result.releaseId };
-  }
-
-  return null;
-}
-
-function getDefaultCatalogImageApprovalTarget(
-  decision: CreateDecision,
-): CatalogImageApprovalTarget {
-  return decision.action === "create_bottle" ? "bottle" : "release";
+  return true;
 }
 
 function logCatalogImageApprovalError(
   err: unknown,
   {
-    destination,
     pendingImageId,
     userId,
     decision,
     result,
   }: {
-    destination: { target: CatalogImageApprovalTarget; id: number };
     pendingImageId: string;
     userId: number;
     decision: CreateDecision;
@@ -169,8 +128,8 @@ function logCatalogImageApprovalError(
 ) {
   logError(err, {
     catalogImagePromotion: {
-      target: destination.target,
-      targetId: destination.id,
+      target: "bottle",
+      targetId: result.targetId,
       pendingImageId,
       userId,
       action: decision.action,
@@ -183,113 +142,67 @@ function logCatalogImageApprovalError(
 }
 
 async function applyCatalogImageApproval({
-  destination,
+  promote,
   pendingImageId,
   userId,
   decision,
   result,
 }: {
-  destination: { target: CatalogImageApprovalTarget; id: number } | null;
+  promote: boolean;
   pendingImageId: string;
   userId: number;
   decision: CreateDecision;
   result: CreateDecisionResult;
 }): Promise<CatalogImageWarning | undefined> {
-  if (!destination) {
+  if (!promote) {
     return undefined;
   }
 
   try {
-    if (destination.target === "bottle") {
-      const [existingBottle] = await db
-        .select({ imageUrl: bottles.imageUrl })
-        .from(bottles)
-        .where(eq(bottles.id, destination.id))
-        .limit(1);
-      if (!existingBottle || existingBottle.imageUrl) {
-        return undefined;
-      }
-
-      const imageUrl = await copyPendingImageToBottle({
-        id: pendingImageId,
-        userId,
-        purpose: "photo_tasting_entry",
-        bottleId: destination.id,
-      });
-
-      const [updatedBottle] = await db
-        .update(bottles)
-        .set({ imageUrl })
-        .where(and(eq(bottles.id, destination.id), isNull(bottles.imageUrl)))
-        .returning({ id: bottles.id });
-      if (!updatedBottle) {
-        logCatalogImageApprovalError(
-          new Error("Catalog image was copied but not saved to the bottle."),
-          {
-            destination,
-            pendingImageId,
-            userId,
-            decision,
-            result,
-          },
-        );
-        return buildCatalogImageWarning(destination.target);
-      }
-
-      return undefined;
-    }
-
-    const [existingRelease] = await db
-      .select({ imageUrl: bottleReleases.imageUrl })
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, destination.id))
+    const [existingBottle] = await db
+      .select({ imageUrl: bottles.imageUrl })
+      .from(bottles)
+      .where(eq(bottles.id, result.bottleId))
       .limit(1);
-    if (!existingRelease || existingRelease.imageUrl) {
+    if (!existingBottle || existingBottle.imageUrl) {
       return undefined;
     }
 
-    const imageUrl = await copyPendingImageToBottleRelease({
+    const imageUrl = await copyPendingImageToBottle({
       id: pendingImageId,
       userId,
       purpose: "photo_tasting_entry",
-      releaseId: destination.id,
+      bottleId: result.bottleId,
     });
 
-    const [updatedRelease] = await db
-      .update(bottleReleases)
+    const [updatedBottle] = await db
+      .update(bottles)
       .set({ imageUrl })
-      .where(
-        and(
-          eq(bottleReleases.id, destination.id),
-          isNull(bottleReleases.imageUrl),
-        ),
-      )
-      .returning({ id: bottleReleases.id });
-    if (!updatedRelease) {
+      .where(and(eq(bottles.id, result.bottleId), isNull(bottles.imageUrl)))
+      .returning({ id: bottles.id });
+    if (!updatedBottle) {
       logCatalogImageApprovalError(
-        new Error("Catalog image was copied but not saved to the release."),
+        new Error("Catalog image was copied but not saved to the bottle."),
         {
-          destination,
           pendingImageId,
           userId,
           decision,
           result,
         },
       );
-      return buildCatalogImageWarning(destination.target);
+      return buildCatalogImageWarning();
     }
 
     return undefined;
   } catch (err) {
     logCatalogImageApprovalError(err, {
-      destination,
       pendingImageId,
       userId,
       decision,
       result,
     });
 
-    return buildCatalogImageWarning(destination.target);
+    return buildCatalogImageWarning();
   }
 }
 
@@ -302,7 +215,7 @@ export default procedure
     path: "/tastings/photo-identification-create",
     summary: "Create bottle target from photo identification",
     description:
-      "Create the bottle or release target from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
+      "Create a concrete Bottle target from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
     operationId: "createTastingBottleTargetFromPhotoIdentification",
   })
   .input(
@@ -420,9 +333,7 @@ export default procedure
     }
 
     const warning = await applyCatalogImageApproval({
-      destination: getCatalogImageApprovalDestination({
-        approvalTarget: getDefaultCatalogImageApprovalTarget(decision),
-        decision,
+      promote: shouldPromoteCatalogImage({
         result,
         photoSuitability,
         pendingPurpose: pendingImage.purpose,
@@ -438,17 +349,9 @@ export default procedure
       { bottle: result.bottleId },
       { context: authenticatedContext },
     );
-    const release = result.releaseId
-      ? await call(
-          bottleReleasesDetails,
-          { release: result.releaseId },
-          { context: authenticatedContext },
-        )
-      : null;
-
     return {
       bottle,
-      release,
+      release: null,
       ...(warning ? { warnings: [warning] } : {}),
     };
   });

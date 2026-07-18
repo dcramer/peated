@@ -3,9 +3,11 @@ import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
+  bottleGroups,
   bottleReleases,
   bottles,
-  changes,
+  catalogTargets,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
@@ -15,13 +17,12 @@ import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
 import * as Sentry from "@sentry/node";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
-const copyPendingImageToBottleReleaseMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributesMock = vi.hoisted(() => vi.fn());
 const originalOpenAiApiKey = config.OPENAI_API_KEY;
@@ -42,14 +43,9 @@ vi.mock("@peated/server/lib/pendingUploads", async (importOriginal) => {
   copyPendingImageToBottleMock.mockImplementation(
     actual.copyPendingImageToBottle,
   );
-  copyPendingImageToBottleReleaseMock.mockImplementation(
-    actual.copyPendingImageToBottleRelease,
-  );
-
   return {
     ...actual,
     copyPendingImageToBottle: copyPendingImageToBottleMock,
-    copyPendingImageToBottleRelease: copyPendingImageToBottleReleaseMock,
   };
 });
 function buildImageEvidence(
@@ -392,13 +388,31 @@ async function countRows() {
   };
 }
 
+async function countCatalogRows() {
+  const [bottleRows, groupRows, targetRows, aliasRows, releaseRows] =
+    await Promise.all([
+      db.select({ id: bottles.id }).from(bottles),
+      db.select({ id: bottleGroups.id }).from(bottleGroups),
+      db.select({ id: catalogTargets.id }).from(catalogTargets),
+      db.select({ name: bottleAliases.name }).from(bottleAliases),
+      db.select({ id: bottleReleases.id }).from(bottleReleases),
+    ]);
+
+  return {
+    bottles: bottleRows.length,
+    groups: groupRows.length,
+    targets: targetRows.length,
+    aliases: aliasRows.length,
+    releases: releaseRows.length,
+  };
+}
+
 describe("POST /tastings/photo-identification", () => {
   beforeEach(() => {
     config.OPENAI_API_KEY = undefined;
     classifyBottleReferenceMock.mockReset();
     extractPhotoBottleEvidenceMock.mockReset();
     copyPendingImageToBottleMock.mockClear();
-    copyPendingImageToBottleReleaseMock.mockClear();
     sentrySpanSetAttributeMock.mockClear();
     sentrySpanSetAttributesMock.mockClear();
     vi.mocked(Sentry.startSpan).mockImplementation(
@@ -811,7 +825,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("creates bottle and release from a reviewed photo identification proposal", async ({
+  test("translates a reviewed bottle-and-release proposal into one concrete Bottle", async ({
     defaults,
     fixtures,
   }) => {
@@ -935,6 +949,7 @@ describe("POST /tastings/photo-identification", () => {
       },
     });
 
+    const before = await countRows();
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
         createToken: identification.createToken!,
@@ -944,11 +959,23 @@ describe("POST /tastings/photo-identification", () => {
       },
     );
 
-    expect(response.bottle.fullName).toBe("Pōkeno Photo Test Totara Cask");
-    expect(response.release).toMatchObject({
-      bottleId: response.bottle.id,
+    expect(response.bottle).toMatchObject({
       edition: "Exploration Series No. 1",
       abv: 43,
+      vintageYear: 2014,
+      releaseYear: 2023,
+    });
+    expect(response.release).toBeNull();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, response.bottle.id),
+    });
+    expect(target).toMatchObject({
+      bottleId: response.bottle.id,
+      groupId: expect.any(Number),
+    });
+    await expect(countRows()).resolves.toMatchObject({
+      bottles: before.bottles + 1,
+      releases: before.releases,
     });
   });
 
@@ -1052,6 +1079,36 @@ describe("POST /tastings/photo-identification", () => {
     await expect(countRows()).resolves.toEqual(before);
   });
 
+  test("rejects a signed create proposal owned by another user", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-create-wrong-user",
+      decision: buildCreateBottleDecision({
+        brandName: "Photo Ownership Brand",
+        bottleName: "Owned Create Proposal",
+      }),
+    });
+    const otherUser = await fixtures.User();
+    const before = await countRows();
+
+    const err = await waitError(
+      routerClient.tastings.photoIdentificationCreate(
+        { createToken: identification.createToken! },
+        { context: { user: otherUser } },
+      ),
+    );
+
+    expect(err).toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Photo identification create proposal is no longer valid.",
+    });
+    await expect(countRows()).resolves.toEqual(before);
+  });
+
   test("default bottle image promotion writes the canonical bottle image", async ({
     defaults,
     fixtures,
@@ -1091,7 +1148,84 @@ describe("POST /tastings/photo-identification", () => {
     );
   });
 
-  test("default release image promotion writes the canonical release image", async ({
+  test("canonical duplicate confirmation reuses the exact Bottle without promoting an image", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Photo Canonical Reuse Brand",
+      type: ["brand", "distiller"],
+    });
+    const existingBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [brand.id],
+      name: "Canonical Reuse Bottle",
+      category: "single_malt",
+      imageUrl: null,
+    });
+    const [canonicalAlias] = await db
+      .update(bottleAliases)
+      .set({ assignmentSource: "canonical" })
+      .where(eq(bottleAliases.bottleId, existingBottle.id))
+      .returning();
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, existingBottle.id),
+    });
+    expect(canonicalAlias).toMatchObject({
+      bottleId: existingBottle.id,
+      targetId: exactTarget?.id,
+      name: existingBottle.fullName,
+      assignmentSource: "canonical",
+    });
+    expect(exactTarget).toMatchObject({
+      bottleId: existingBottle.id,
+      groupId: existingBottle.groupId,
+    });
+
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-canonical-duplicate-reuse",
+      decision: buildCreateBottleDecision({
+        brandName: brand.name,
+        bottleName: existingBottle.name,
+      }),
+    });
+    const before = await countCatalogRows();
+    copyPendingImageToBottleMock.mockClear();
+
+    const response = await routerClient.tastings.photoIdentificationCreate(
+      { createToken: identification.createToken! },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response).toMatchObject({
+      bottle: {
+        id: existingBottle.id,
+        imageUrl: null,
+      },
+      release: null,
+    });
+    expect(response.warnings).toBeUndefined();
+    expect(copyPendingImageToBottleMock).not.toHaveBeenCalled();
+    await expect(countCatalogRows()).resolves.toEqual(before);
+    await expect(
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, response.bottle.id),
+      }),
+    ).resolves.toMatchObject({
+      id: exactTarget?.id,
+      bottleId: existingBottle.id,
+      groupId: existingBottle.groupId,
+    });
+    await expect(
+      db.query.bottles.findFirst({
+        where: eq(bottles.id, existingBottle.id),
+      }),
+    ).resolves.toMatchObject({ imageUrl: null });
+  });
+
+  test("legacy bottle-and-release image promotion writes the concrete Bottle image", async ({
     defaults,
     fixtures,
   }) => {
@@ -1116,22 +1250,22 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.bottle.imageUrl).toBeNull();
-    expect(response.release?.imageUrl).toContain(
-      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
+    expect(response.release).toBeNull();
+    expect(response.bottle.imageUrl).toContain(
+      `/uploads/bottles/bottle-${response.bottle.id}-pending-upload-`,
     );
 
-    const release = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, response.release!.id),
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, response.bottle.id),
     });
-    expect(release?.imageUrl).toMatch(
+    expect(bottle?.imageUrl).toMatch(
       new RegExp(
-        `^/uploads/bottle-releases/bottle_release-${response.release!.id}-pending-upload-.+\\.webp$`,
+        `^/uploads/bottles/bottle-${response.bottle.id}-pending-upload-.+\\.webp$`,
       ),
     );
   });
 
-  test("default existing bottle release image promotion writes the canonical release image", async ({
+  test("legacy create-release promotion creates and images a concrete Bottle", async ({
     defaults,
     fixtures,
   }) => {
@@ -1157,6 +1291,7 @@ describe("POST /tastings/photo-identification", () => {
       ],
     });
 
+    const before = await countRows();
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
         createToken: identification.createToken!,
@@ -1167,22 +1302,29 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.bottle.id).toBe(existingBottle.id);
-    expect(response.release?.imageUrl).toContain(
-      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
-    );
-
-    const release = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, response.release!.id),
-    });
-    expect(release?.imageUrl).toMatch(
-      new RegExp(
-        `^/uploads/bottle-releases/bottle_release-${response.release!.id}-pending-upload-.+\\.webp$`,
+    expect(response.bottle.id).not.toBe(existingBottle.id);
+    expect(response.bottle).toMatchObject({
+      edition: "Existing Parent Release Image Edition",
+      imageUrl: expect.stringContaining(
+        `/uploads/bottles/bottle-${response.bottle.id}-pending-upload-`,
       ),
-    );
+    });
+    expect(response.release).toBeNull();
+
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, response.bottle.id),
+    });
+    expect(target).toMatchObject({
+      bottleId: response.bottle.id,
+      groupId: existingBottle.groupId,
+    });
+    await expect(countRows()).resolves.toMatchObject({
+      bottles: before.bottles + 1,
+      releases: before.releases,
+    });
   });
 
-  test("parent repair plus release creation can be confirmed from photo identification", async ({
+  test("translates a repair-parent proposal into a concrete Bottle without mutating the parent", async ({
     defaults,
     fixtures,
   }) => {
@@ -1238,6 +1380,7 @@ describe("POST /tastings/photo-identification", () => {
       },
     });
 
+    const before = await countRows();
     const response = await routerClient.tastings.photoIdentificationCreate(
       {
         createToken: identification.createToken!,
@@ -1247,34 +1390,34 @@ describe("POST /tastings/photo-identification", () => {
       },
     );
 
-    expect(response.bottle.id).toBe(dirtyParent.id);
+    expect(response.bottle.id).not.toBe(dirtyParent.id);
     expect(response.bottle).toMatchObject({
-      name: "A Midwinter Night's Dram",
       category: "rye",
-      edition: null,
-      abv: null,
-      releaseYear: null,
-    });
-    expect(response.release).toMatchObject({
-      bottleId: dirtyParent.id,
       edition: "Act 12 Scene 9",
       abv: 49.3,
     });
-    expect(response.release?.imageUrl).toContain(
-      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
-    );
-
-    const parentUpdateChanges = await db
-      .select({ id: changes.id })
-      .from(changes)
-      .where(
-        and(
-          eq(changes.objectType, "bottle"),
-          eq(changes.objectId, dirtyParent.id),
-          eq(changes.type, "update"),
-        ),
-      );
-    expect(parentUpdateChanges).toHaveLength(1);
+    expect(response.release).toBeNull();
+    const persistedParent = await db.query.bottles.findFirst({
+      where: eq(bottles.id, dirtyParent.id),
+    });
+    expect(persistedParent).toMatchObject({
+      name: dirtyParent.name,
+      edition: "Act 12",
+      abv: 49.3,
+      releaseYear: 2024,
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, response.bottle.id),
+    });
+    expect(target).toMatchObject({
+      bottleId: response.bottle.id,
+      groupId: expect.any(Number),
+    });
+    expect(target?.groupId).not.toBe(dirtyParent.groupId);
+    await expect(countRows()).resolves.toMatchObject({
+      bottles: before.bottles + 1,
+      releases: before.releases,
+    });
 
     const replayResponse =
       await routerClient.tastings.photoIdentificationCreate(
@@ -1285,201 +1428,11 @@ describe("POST /tastings/photo-identification", () => {
           context: { user: defaults.user },
         },
       );
-    expect(replayResponse.bottle.id).toBe(dirtyParent.id);
-    expect(replayResponse.release?.id).toBe(response.release?.id);
-
-    const parentUpdateChangesAfterReplay = await db
-      .select({ id: changes.id })
-      .from(changes)
-      .where(
-        and(
-          eq(changes.objectType, "bottle"),
-          eq(changes.objectId, dirtyParent.id),
-          eq(changes.type, "update"),
-        ),
-      );
-    expect(parentUpdateChangesAfterReplay).toHaveLength(1);
-  });
-
-  test("parent repair plus release creation rejects parent brand contradictions", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({
-      name: "Correct Parent Brand",
-      type: ["brand", "distiller"],
-    });
-    const dirtyParent = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Dirty Parent",
-      category: "single_malt",
-      edition: "Legacy Edition",
-      abv: 46,
-    });
-    const identification = await identifyCreateProposal({
-      fixtures,
-      user: defaults.user,
-      idempotencyKey: "photo-identification-repair-parent-brand-contradiction",
-      decision: buildRepairParentAndCreateReleaseDecision({
-        parentBottleId: dirtyParent.id,
-        brandName: "Wrong Parent Brand",
-        bottleName: "Dirty Parent",
-        releaseEdition: "Observed Edition",
-      }),
-      candidates: [
-        {
-          bottleId: dirtyParent.id,
-          releaseId: null,
-          bottleFullName: dirtyParent.fullName,
-          fullName: dirtyParent.fullName,
-        },
-      ],
-    });
-
-    const err = await waitError(() =>
-      routerClient.tastings.photoIdentificationCreate(
-        {
-          createToken: identification.createToken!,
-        },
-        {
-          context: { user: defaults.user },
-        },
-      ),
-    );
-
-    expect(String(err)).toContain("Classifier repair parent brand mismatch");
-    const parent = await db.query.bottles.findFirst({
-      where: eq(bottles.id, dirtyParent.id),
-    });
-    expect(parent).toMatchObject({
-      name: "Dirty Parent",
-      edition: "Legacy Edition",
-      abv: 46,
-    });
-  });
-
-  test("parent repair plus release creation reports alias collisions as conflicts", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({
-      name: "High West Photo Collision",
-      type: ["brand", "distiller"],
-    });
-    const dirtyParent = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Midwinter Dirty Parent",
-      category: "rye",
-      edition: "Legacy Edition",
-    });
-    const existingBottle = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "A Midwinter Night's Dram",
-      category: "rye",
-    });
-    const identification = await identifyCreateProposal({
-      fixtures,
-      user: defaults.user,
-      idempotencyKey: "photo-identification-repair-parent-alias-collision",
-      decision: buildRepairParentAndCreateReleaseDecision({
-        parentBottleId: dirtyParent.id,
-        brandName: brand.name,
-        bottleName: "A Midwinter Night's Dram",
-        category: "rye",
-        releaseEdition: "Act 12 Scene 9",
-      }),
-      candidates: [
-        {
-          bottleId: dirtyParent.id,
-          releaseId: null,
-          bottleFullName: dirtyParent.fullName,
-          fullName: dirtyParent.fullName,
-        },
-      ],
-    });
-
-    const err = await waitError(() =>
-      routerClient.tastings.photoIdentificationCreate(
-        {
-          createToken: identification.createToken!,
-        },
-        {
-          context: { user: defaults.user },
-        },
-      ),
-    );
-
-    expect(err).toMatchObject({
-      code: "CONFLICT",
-      data: {
-        bottle: existingBottle.id,
-      },
-      message: "Bottle already exists.",
-    });
-  });
-
-  test("parent repair rejects aliases already owned by a child release", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({
-      name: "High West Release Alias Collision",
-      type: ["brand", "distiller"],
-    });
-    const dirtyParent = await fixtures.Bottle({
-      brandId: brand.id,
-      name: "Midwinter Dirty Parent",
-      category: "rye",
-      edition: "Legacy Edition",
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: dirtyParent.id,
-      edition: "Existing Child",
-    });
-    await fixtures.BottleAlias({
-      bottleId: dirtyParent.id,
-      releaseId: release.id,
-      name: "High West Release Alias Collision A Midwinter Night's Dram",
-    });
-    const identification = await identifyCreateProposal({
-      fixtures,
-      user: defaults.user,
-      idempotencyKey:
-        "photo-identification-repair-parent-release-alias-collision",
-      decision: buildRepairParentAndCreateReleaseDecision({
-        parentBottleId: dirtyParent.id,
-        brandName: brand.name,
-        bottleName: "A Midwinter Night's Dram",
-        category: "rye",
-        releaseEdition: "Act 12 Scene 9",
-      }),
-      candidates: [
-        {
-          bottleId: dirtyParent.id,
-          releaseId: null,
-          bottleFullName: dirtyParent.fullName,
-          fullName: dirtyParent.fullName,
-        },
-      ],
-    });
-
-    const err = await waitError(() =>
-      routerClient.tastings.photoIdentificationCreate(
-        {
-          createToken: identification.createToken!,
-        },
-        {
-          context: { user: defaults.user },
-        },
-      ),
-    );
-
-    expect(err).toMatchObject({
-      code: "CONFLICT",
-      data: {
-        bottle: dirtyParent.id,
-      },
-      message: "Bottle already exists.",
+    expect(replayResponse.bottle.id).toBe(response.bottle.id);
+    expect(replayResponse.release).toBeNull();
+    await expect(countRows()).resolves.toMatchObject({
+      bottles: before.bottles + 1,
+      releases: before.releases,
     });
   });
 
@@ -1553,7 +1506,7 @@ describe("POST /tastings/photo-identification", () => {
     );
   });
 
-  test("release create strips classifier release image URLs and uses pending upload image", async ({
+  test("legacy release image URLs are stripped before imaging the concrete Bottle", async ({
     defaults,
     fixtures,
   }) => {
@@ -1579,17 +1532,17 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.bottle.imageUrl).toBeNull();
-    expect(response.release?.imageUrl).toContain(
-      `/uploads/bottle-releases/bottle_release-${response.release?.id}-pending-upload-`,
+    expect(response.release).toBeNull();
+    expect(response.bottle.imageUrl).toContain(
+      `/uploads/bottles/bottle-${response.bottle.id}-pending-upload-`,
     );
 
-    const release = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, response.release!.id),
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, response.bottle.id),
     });
-    expect(release?.imageUrl).toMatch(
+    expect(bottle?.imageUrl).toMatch(
       new RegExp(
-        `^/uploads/bottle-releases/bottle_release-${response.release!.id}-pending-upload-.+\\.webp$`,
+        `^/uploads/bottles/bottle-${response.bottle.id}-pending-upload-.+\\.webp$`,
       ),
     );
   });
@@ -1669,12 +1622,12 @@ describe("POST /tastings/photo-identification", () => {
     expect(bottle?.imageUrl).toBeNull();
   });
 
-  test("release copy failure after creation returns warning and keeps the created release", async ({
+  test("legacy release-shaped copy failure keeps the created concrete Bottle", async ({
     defaults,
     fixtures,
   }) => {
-    const copyError = new Error("release copy failed");
-    copyPendingImageToBottleReleaseMock.mockRejectedValueOnce(copyError);
+    const copyError = new Error("bottle copy failed");
+    copyPendingImageToBottleMock.mockRejectedValueOnce(copyError);
 
     const identification = await identifyCreateProposal({
       fixtures,
@@ -1699,18 +1652,18 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.warnings).toEqual([
       {
         code: "CATALOG_IMAGE_COPY_FAILED",
-        message: "The release was created, but the public image was not saved.",
+        message: "The bottle was created, but the public image was not saved.",
       },
     ]);
     expect(response.bottle.id).toBeTruthy();
-    expect(response.release?.id).toBeTruthy();
-    expect(response.release?.imageUrl).toBeNull();
+    expect(response.bottle.imageUrl).toBeNull();
+    expect(response.release).toBeNull();
 
-    const release = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, response.release!.id),
+    const bottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, response.bottle.id),
     });
-    expect(release).toBeDefined();
-    expect(release?.imageUrl).toBeNull();
+    expect(bottle).toBeDefined();
+    expect(bottle?.imageUrl).toBeNull();
   });
 
   test("catalog image update race returns warning and keeps the created bottle", async ({

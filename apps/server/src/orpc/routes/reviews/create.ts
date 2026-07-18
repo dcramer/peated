@@ -30,6 +30,22 @@ import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { and, eq, or, sql } from "drizzle-orm";
 
+const classifierCreateResolutionSources = [
+  "classifier_create_bottle",
+  "classifier_create_release",
+  "classifier_create_bottle_and_release",
+  "classifier_repair_parent_and_create_release",
+] as const;
+
+type ClassifierCreateResolutionSource =
+  (typeof classifierCreateResolutionSources)[number];
+
+function isClassifierCreateResolutionSource(
+  source: string,
+): source is ClassifierCreateResolutionSource {
+  return classifierCreateResolutionSources.some((value) => value === source);
+}
+
 export default procedure
   .use(requireAdmin)
   .route({
@@ -87,8 +103,18 @@ export default procedure
     }
     const bottleId = resolution.bottleId;
     const releaseId = resolution.releaseId;
+    const classifierCreateSource = isClassifierCreateResolutionSource(
+      resolution.source,
+    )
+      ? resolution.source
+      : null;
     const reviewName =
-      resolution.releaseId != null && rawName !== normalizedName
+      (resolution.releaseId != null ||
+        classifierCreateSource === "classifier_create_release" ||
+        classifierCreateSource === "classifier_create_bottle_and_release" ||
+        classifierCreateSource ===
+          "classifier_repair_parent_and_create_release") &&
+      rawName !== normalizedName
         ? rawName
         : normalizedName;
     const reviewNameCandidates = Array.from(
@@ -97,37 +123,12 @@ export default procedure
 
     const { review, aliasAssignment } = await db.transaction(async (tx) => {
       let target: CatalogTargetAssignmentDescriptor | null = null;
-      if (bottleId !== null && resolution.source === "exact_alias") {
-        if (resolution.targetId !== null) {
-          target = await resolveCatalogTargetForAssignment(
-            { kind: "target", targetId: resolution.targetId },
-            tx,
-          );
-        } else {
-          try {
-            target = await resolveCatalogTargetForAssignment(
-              {
-                kind: "legacy",
-                bottleId,
-                releaseId,
-                context: {
-                  caller: "reviews.create",
-                  operation: "reuseTargetlessExactReviewAlias",
-                },
-              },
-              tx,
-            );
-          } catch (error) {
-            if (!isStagedTargetlessCatalogMappingError(error)) throw error;
-          }
-        }
-      } else if (
-        bottleId !== null &&
-        (resolution.source === "classifier_match" ||
-          resolution.source === "classifier_create_bottle" ||
-          resolution.source === "classifier_create_release" ||
-          resolution.source === "classifier_create_bottle_and_release")
-      ) {
+      if (resolution.targetId !== null) {
+        target = await resolveCatalogTargetForAssignment(
+          { kind: "target", targetId: resolution.targetId },
+          tx,
+        );
+      } else if (bottleId !== null && resolution.source === "exact_alias") {
         try {
           target = await resolveCatalogTargetForAssignment(
             {
@@ -136,18 +137,42 @@ export default procedure
               releaseId,
               context: {
                 caller: "reviews.create",
-                operation: "create",
+                operation: "reuseTargetlessExactReviewAlias",
               },
             },
             tx,
           );
         } catch (error) {
-          if (
-            resolution.source === "classifier_match" ||
-            !isStagedTargetlessCatalogMappingError(error)
-          ) {
-            throw error;
-          }
+          if (!isStagedTargetlessCatalogMappingError(error)) throw error;
+        }
+      } else if (
+        bottleId !== null &&
+        resolution.source === "classifier_match"
+      ) {
+        target = await resolveCatalogTargetForAssignment(
+          {
+            kind: "legacy",
+            bottleId,
+            releaseId,
+            context: {
+              caller: "reviews.create",
+              operation: "create",
+            },
+          },
+          tx,
+        );
+      }
+
+      if (classifierCreateSource !== null) {
+        if (bottleId === null || releaseId !== null || target === null) {
+          throw new Error(
+            "Classifier concrete Bottle creation returned an incomplete target identity.",
+          );
+        }
+        if (target.bottleId !== bottleId) {
+          throw new Error(
+            "Classifier concrete Bottle creation returned a non-exact or mismatched target.",
+          );
         }
       }
       if (target) {
@@ -185,9 +210,15 @@ export default procedure
 
       let review;
       if (existingReview) {
+        const classifierCreateConflictsWithDurableIdentity =
+          classifierCreateSource !== null &&
+          target !== null &&
+          existingReview.targetId !== null &&
+          existingReview.targetId !== target.targetId;
         const incomingIdentityIsAuthoritative =
-          target !== null ||
-          (bottleId !== null && existingReview.targetId === null);
+          !classifierCreateConflictsWithDurableIdentity &&
+          (target !== null ||
+            (bottleId !== null && existingReview.targetId === null));
         const identity = incomingIdentityIsAuthoritative
           ? {
               targetId: target?.targetId ?? null,
@@ -219,19 +250,22 @@ export default procedure
               ON CONFLICT (external_site_id, LOWER(name), issue)
               DO UPDATE
               SET target_id = CASE
-                    WHEN excluded.target_id IS NOT NULL
+                    WHEN (excluded.target_id IS NOT NULL
+                        AND (${classifierCreateSource === null} OR ${reviews.targetId} IS NULL))
                       OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
                     THEN excluded.target_id
                     ELSE ${reviews.targetId}
                   END,
                   bottle_id = CASE
-                    WHEN excluded.target_id IS NOT NULL
+                    WHEN (excluded.target_id IS NOT NULL
+                        AND (${classifierCreateSource === null} OR ${reviews.targetId} IS NULL))
                       OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
                     THEN excluded.bottle_id
                     ELSE ${reviews.bottleId}
                   END,
                   release_id = CASE
-                    WHEN excluded.target_id IS NOT NULL
+                    WHEN (excluded.target_id IS NOT NULL
+                        AND (${classifierCreateSource === null} OR ${reviews.targetId} IS NULL))
                       OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
                     THEN excluded.release_id
                     ELSE ${reviews.releaseId}
@@ -289,6 +323,7 @@ export default procedure
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
+        { createdBottle: resolution.createdBottle },
       );
       if (
         decision !== null &&
@@ -308,6 +343,7 @@ export default procedure
           actor: systemActor,
           bottleId,
           releaseId,
+          targetId: target?.targetId ?? null,
           createdBottle: resolution.createdBottle,
           createdRelease: resolution.createdRelease,
           confidence: resolution.confidence,
@@ -315,6 +351,11 @@ export default procedure
           rationale: resolution.rationale,
           metadata: {
             resolutionSource: resolution.source,
+            ...(resolution.classifierEvidence
+              ? {
+                  classifierEvidence: resolution.classifierEvidence,
+                }
+              : {}),
             issue: input.issue,
             initiatedByUserId: context.user!.id,
           },

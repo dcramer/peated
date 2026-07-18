@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
   bottleGroupDistillers,
@@ -21,7 +22,47 @@ import {
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq, isNull } from "drizzle-orm";
+import pg from "pg";
 import { vi } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  observer: NodePgClient,
+  blockerPid: number,
+): Promise<number> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await observer.query<{ pid: number }>(
+      `SELECT pid
+       FROM pg_stat_activity
+       WHERE $1 = ANY(pg_blocking_pids(pid))
+       ORDER BY pid
+       LIMIT 1`,
+      [blockerPid],
+    );
+    const blockedPid = result.rows[0]?.pid;
+    if (blockedPid) return blockedPid;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for trusted Bottle graph lock.");
+}
+
+async function expectNowaitLockFailure(
+  observer: NodePgClient,
+  query: string,
+  values: unknown[],
+) {
+  await observer.query("BEGIN");
+  try {
+    await expect(observer.query(query, values)).rejects.toMatchObject({
+      code: "55P03",
+    });
+  } finally {
+    await observer.query("ROLLBACK");
+  }
+}
 
 function contextFor(user: Parameters<typeof getUserActor>[0]) {
   return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
@@ -211,6 +252,201 @@ describe("concrete Bottle creation", () => {
           ),
         ),
     ).toHaveLength(1);
+  });
+
+  test("revalidates trusted membership after waiting for the discovered group", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Membership Recheck Brand" });
+    const source = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input: {
+        kind: "independent",
+        stable: { name: "Membership Recheck Source", brand: brand.id },
+        exact: { edition: "Original" },
+      },
+    });
+    const destination = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input: {
+        kind: "independent",
+        stable: { name: "Membership Recheck Destination", brand: brand.id },
+        exact: { edition: "Original" },
+      },
+    });
+    const mover = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let creation: ReturnType<typeof createConcreteBottle> | null = null;
+    let moverCommitted = false;
+
+    await mover.connect();
+    await observer.connect();
+    try {
+      await mover.query("BEGIN");
+      const moverPid = (
+        await mover.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]?.pid;
+      if (!moverPid) throw new Error("Unable to load membership mover pid.");
+
+      await mover.query(
+        `SELECT id
+         FROM bottle_group
+         WHERE id = ANY($1::bigint[])
+         ORDER BY id
+         FOR UPDATE`,
+        [[source.group.id, destination.group.id]],
+      );
+
+      creation = createConcreteBottle({
+        context: contextFor(defaults.user),
+        input: {
+          kind: "source_bottle",
+          sourceBottleId: source.bottle.id,
+          exact: { edition: "Must Revalidate" },
+        },
+      });
+      void creation.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, moverPid);
+
+      await observer.query("BEGIN");
+      await expect(
+        observer.query(
+          "SELECT id FROM bottle WHERE id = $1 FOR UPDATE NOWAIT",
+          [source.bottle.id],
+        ),
+      ).resolves.toBeDefined();
+      await observer.query("ROLLBACK");
+
+      await mover.query("SELECT id FROM bottle WHERE id = $1 FOR UPDATE", [
+        source.bottle.id,
+      ]);
+      await mover.query(
+        `SELECT id
+         FROM catalog_target
+         WHERE bottle_group_id = $1
+           AND (bottle_id IS NULL OR bottle_id = $2)
+         ORDER BY id
+         FOR UPDATE`,
+        [source.group.id, source.bottle.id],
+      );
+      await mover.query(
+        `UPDATE bottle_group
+         SET representative_bottle_id = NULL,
+             total_bottles = total_bottles - 1
+         WHERE id = $1`,
+        [source.group.id],
+      );
+      await mover.query("UPDATE bottle SET group_id = $2 WHERE id = $1", [
+        source.bottle.id,
+        destination.group.id,
+      ]);
+      await mover.query(
+        `UPDATE bottle_group
+         SET total_bottles = total_bottles + 1
+         WHERE id = $1`,
+        [destination.group.id],
+      );
+      await mover.query("COMMIT");
+      moverCommitted = true;
+
+      const error = await waitError(creation, TrustedSourceBottleError);
+      expect(error).toMatchObject({
+        code: "invalid_catalog_graph",
+        sourceBottleId: source.bottle.id,
+      });
+    } finally {
+      if (!moverCommitted) {
+        await mover.query("ROLLBACK").catch(() => undefined);
+      }
+      if (creation) await creation.catch(() => undefined);
+      await mover.end();
+      await observer.end();
+    }
+
+    expect(
+      await db
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(eq(bottles.edition, "Must Revalidate")),
+    ).toEqual([]);
+  });
+
+  test("locks trusted Group and Bottle before required CatalogTargets", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Hierarchy Lock Brand" });
+    const source = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input: {
+        kind: "independent",
+        stable: { name: "Hierarchy Lock Source", brand: brand.id },
+        exact: { edition: "Original" },
+      },
+    });
+    const targetBlocker = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let creation: ReturnType<typeof createConcreteBottle> | null = null;
+    let blockerCommitted = false;
+
+    expect(source.genericTarget.id).toBeLessThan(source.exactTarget.id);
+    await targetBlocker.connect();
+    await observer.connect();
+    try {
+      await targetBlocker.query("BEGIN");
+      const blockerPid = (
+        await targetBlocker.query<{ pid: number }>(
+          "SELECT pg_backend_pid() AS pid",
+        )
+      ).rows[0]?.pid;
+      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
+      await targetBlocker.query(
+        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
+        [source.exactTarget.id],
+      );
+
+      creation = createConcreteBottle({
+        context: contextFor(defaults.user),
+        input: {
+          kind: "source_bottle",
+          sourceBottleId: source.bottle.id,
+          exact: { edition: "Hierarchy Child" },
+        },
+      });
+      void creation.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, blockerPid);
+
+      await expectNowaitLockFailure(
+        observer,
+        "SELECT id FROM bottle_group WHERE id = $1 FOR UPDATE NOWAIT",
+        [source.group.id],
+      );
+      await expectNowaitLockFailure(
+        observer,
+        "SELECT id FROM bottle WHERE id = $1 FOR UPDATE NOWAIT",
+        [source.bottle.id],
+      );
+      await expectNowaitLockFailure(
+        observer,
+        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE NOWAIT",
+        [source.genericTarget.id],
+      );
+
+      await targetBlocker.query("COMMIT");
+      blockerCommitted = true;
+      await expect(creation).resolves.toMatchObject({
+        group: { id: source.group.id },
+        bottle: { edition: "Hierarchy Child" },
+      });
+    } finally {
+      if (!blockerCommitted) {
+        await targetBlocker.query("ROLLBACK").catch(() => undefined);
+      }
+      if (creation) await creation.catch(() => undefined);
+      await targetBlocker.end();
+      await observer.end();
+    }
   });
 
   test("keeps an age stated by the stable name on the group", async ({
