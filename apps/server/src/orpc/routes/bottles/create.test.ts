@@ -57,17 +57,39 @@ describe("POST /bottles", () => {
     config.OPENAI_API_KEY = undefined;
   });
 
-  test("requires authentication", async () => {
-    const err = await waitError(
-      routerClient.bottles.create(
-        {
-          name: "Delicious Wood",
-          brand: 1,
-        },
-        { context: { user: null } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  test("requires authentication, verification, and accepted terms without writes", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity();
+    const unverifiedUser = await fixtures.User({ verified: false });
+    const noTermsUser = await fixtures.User({ termsAcceptedAt: null });
+    const graphBefore = {
+      bottles: await db.select().from(bottles),
+      groups: await db.select().from(bottleGroups),
+      targets: await db.select().from(catalogTargets),
+    };
+    const cases = [
+      ["unauthenticated", null, 401],
+      ["unverified", unverifiedUser, 401],
+      ["terms not accepted", noTermsUser, 403],
+    ] as const;
+
+    for (const [label, user, status] of cases) {
+      const error = await waitError(
+        routerClient.bottles.create(
+          {
+            name: `Denied Bottle ${label}`,
+            brand: brand.id,
+          },
+          { context: { user } },
+        ),
+      );
+      expect(error, label).toMatchObject({ status });
+    }
+
+    expect(await db.select().from(bottles)).toEqual(graphBefore.bottles);
+    expect(await db.select().from(bottleGroups)).toEqual(graphBefore.groups);
+    expect(await db.select().from(catalogTargets)).toEqual(graphBefore.targets);
   });
 
   test("rejects invalid numeric fields at the route boundary", async ({
@@ -851,7 +873,7 @@ describe("POST /bottles", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("updates statedAge bottle w/ age signal", async ({
+  test("preserves marketed age wording without inferring structured statedAge", async ({
     defaults,
     fixtures,
   }) => {
@@ -866,13 +888,21 @@ describe("POST /bottles", () => {
       },
       { context: { user: defaults.user } },
     );
-    expect(data.bottle.id).toBeDefined();
+    expect(data.bottle).toMatchObject({
+      name: "Delicious Wood 12-year-old",
+      fullName: `${brand.name} Delicious Wood 12-year-old`,
+      statedAge: null,
+    });
 
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, data.bottle.id));
-    expect(bottle.statedAge).toEqual(12);
+    expect(bottle).toMatchObject({
+      name: "Delicious Wood 12-year-old",
+      fullName: `${brand.name} Delicious Wood 12-year-old`,
+      statedAge: null,
+    });
   });
 
   test("removes duplicated brand name", async ({ defaults, fixtures }) => {

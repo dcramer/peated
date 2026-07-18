@@ -796,6 +796,31 @@ describe("POST /tastings/photo-identification", () => {
     await expect(countRows()).resolves.toEqual(before);
   });
 
+  test("rejects create proposals before token validation when authentication requirements fail", async ({
+    fixtures,
+  }) => {
+    const unverifiedUser = await fixtures.User({ verified: false });
+    const noTermsUser = await fixtures.User({ termsAcceptedAt: null });
+    const before = await countCatalogRows();
+    const cases = [
+      ["unauthenticated", null, 401],
+      ["unverified", unverifiedUser, 401],
+      ["terms not accepted", noTermsUser, 403],
+    ] as const;
+
+    for (const [label, user, status] of cases) {
+      const error = await waitError(
+        routerClient.tastings.photoIdentificationCreate(
+          { createToken: "middleware-only-token" },
+          { context: { user } },
+        ),
+      );
+
+      expect(error, label).toMatchObject({ status });
+      await expect(countCatalogRows(), label).resolves.toEqual(before);
+    }
+  });
+
   test("signs candidate ids only inside the reviewed classifier decision", async ({
     defaults,
     fixtures,

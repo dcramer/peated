@@ -10,14 +10,35 @@ describe("PUT /bottles", () => {
     config.OPENAI_API_KEY = undefined;
   });
 
-  test("requires authentication", async () => {
-    const err = await waitError(
-      routerClient.bottles.upsert({
-        name: "Delicious Wood",
-        brand: 1,
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  test("requires moderator access without Bottle or group writes", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity();
+    const graphBefore = {
+      bottles: await db.select().from(bottles),
+      groups: await db.select().from(bottleGroups),
+    };
+    const cases = [
+      ["unauthenticated", null],
+      ["authenticated non-moderator", defaults.user],
+    ] as const;
+
+    for (const [label, user] of cases) {
+      const error = await waitError(
+        routerClient.bottles.upsert(
+          {
+            name: `Denied Compatibility Bottle ${label}`,
+            brand: brand.id,
+          },
+          { context: { user } },
+        ),
+      );
+      expect(error, label).toMatchObject({ status: 401 });
+    }
+
+    expect(await db.select().from(bottles)).toEqual(graphBefore.bottles);
+    expect(await db.select().from(bottleGroups)).toEqual(graphBefore.groups);
   });
 
   test("rejects unsupported image input at the upsert boundary", async ({

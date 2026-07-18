@@ -67,6 +67,36 @@ describe("price match queue", () => {
       ),
     );
     expect(applyError).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+
+    const beforeCreate = await Promise.all([
+      db
+        .select({ id: storePriceMatchProposals.id })
+        .from(storePriceMatchProposals),
+      db.select({ id: bottles.id }).from(bottles),
+      db.select({ id: bottleGroups.id }).from(bottleGroups),
+      db.select({ id: catalogTargets.id }).from(catalogTargets),
+    ]);
+    const createError = await waitError(
+      routerClient.prices.matchQueue.createBottle(
+        {
+          proposal: 1,
+          bottle: { name: "Unauthorized Queue Create", brand: 1 },
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(createError).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    await expect(
+      Promise.all([
+        db
+          .select({ id: storePriceMatchProposals.id })
+          .from(storePriceMatchProposals),
+        db.select({ id: bottles.id }).from(bottles),
+        db.select({ id: bottleGroups.id }).from(bottleGroups),
+        db.select({ id: catalogTargets.id }).from(catalogTargets),
+      ]),
+    ).resolves.toEqual(beforeCreate);
   });
 
   test("lists pending and errored proposals", async ({ fixtures }) => {
