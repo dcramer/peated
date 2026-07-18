@@ -14,6 +14,7 @@ import {
   reviews,
   tastings,
 } from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -173,40 +174,44 @@ describe("DELETE /bottle-releases/{release}", () => {
     const admin = await fixtures.User({ admin: true });
     const parent = await fixtures.Bottle({ name: "Delete Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await routerClient.bottles.createFromSource(
-      { bottle: parent.id, edition: "Delete Exact" },
-      { context: { user: admin } },
-    );
+    const promoted = await createConcreteBottle({
+      context: { user: admin },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: { edition: "Delete Exact" },
+      },
+    });
     await promoteRelease(release.id, promoted.bottle.id);
 
     await db.insert(bottleAliases).values({
       name: "Delete Retained Alias",
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.targetId,
+      targetId: promoted.exactTarget.id,
       assignedByActorId: release.createdByActorId,
     });
     await db.insert(collectionBottles).values({
       collectionId: (await fixtures.Collection()).id,
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.targetId,
+      targetId: promoted.exactTarget.id,
     });
     await db.insert(flightBottles).values({
       flightId: (await fixtures.Flight()).id,
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.targetId,
+      targetId: promoted.exactTarget.id,
     });
     await fixtures.Tasting({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.targetId,
+      targetId: promoted.exactTarget.id,
     });
     await fixtures.Review({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.targetId,
+      targetId: promoted.exactTarget.id,
       name: release.fullName,
     });
 
@@ -222,7 +227,7 @@ describe("DELETE /bottle-releases/{release}", () => {
 
     expect(error).toMatchObject({
       status: 409,
-      message: `BottleRelease ${release.id} maps to Bottle ${promoted.bottle.id} through exact target ${promoted.targetId}; merge that Bottle into an explicit destination instead.`,
+      message: `BottleRelease ${release.id} maps to Bottle ${promoted.bottle.id} through exact target ${promoted.exactTarget.id}; merge that Bottle into an explicit destination instead.`,
     });
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
@@ -235,10 +240,14 @@ describe("DELETE /bottle-releases/{release}", () => {
     const admin = await fixtures.User({ admin: true });
     const parent = await fixtures.Bottle({ name: "Delete Merge Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await routerClient.bottles.createFromSource(
-      { bottle: parent.id, edition: "Delete Merge Source" },
-      { context: { user: admin } },
-    );
+    const promoted = await createConcreteBottle({
+      context: { user: admin },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: { edition: "Delete Merge Source" },
+      },
+    });
     const survivor = await fixtures.Bottle({ name: "Delete Merge Survivor" });
     await promoteRelease(release.id, promoted.bottle.id);
 

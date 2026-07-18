@@ -115,6 +115,12 @@ BottleRelease CRUD and registration:
 
 Bottle catalog routes:
 
+- `apps/server/src/orpc/routes/bottles/create-from-source.ts` and its
+  `/bottles/from/{bottle}` contract are superseded public group-selection
+  surfaces. Task 5.2 removes the route and task 5.11 removes its generated
+  OpenAPI/client contract. Internal trusted-source creation remains reachable
+  only from the explicitly retained migration, compatibility, and
+  system-controlled boundaries inventoried below.
 - `apps/server/src/orpc/routes/bottles/delete.ts` is retained only as a measured
   compatibility purge for ungrouped pre-migration Bottles. Grouped concrete
   Bottles are rejected without mutation with an actionable merge-required
@@ -709,6 +715,12 @@ Routes:
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/[releaseId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/new/page.tsx`
+
+Task 8.3 replaces the nested new-bottling route with a prefilled standard
+Bottle-create flow. The selected Bottle supplies independently durable draft
+values only; the submit path creates a singleton group and never calls the
+public trusted-source route removed by task 5.2. Later grouping is automatic
+and outside this manual workflow.
 
 Task 5.4c removes or hides Bottle/BottleRelease delete actions that can only
 produce the merge-required compatibility response. Task 8.9 removes the nested

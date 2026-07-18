@@ -14,7 +14,9 @@ Current paired references exist in tastings, reviews, collection entries, flight
 - Keep every Bottle independently complete, correct, and renderable without
   hydrating its BottleGroup.
 - Ensure every Bottle belongs to exactly one automatically created BottleGroup.
-- Make independent Bottle creation safe without automatic semantic grouping.
+- Make every ordinary/manual Bottle creation independent and prevent callers
+  from selecting or reusing BottleGroup identity.
+- Keep automatic semantic grouping outside the ordinary creation request.
 - Represent exact and unknown-exactness activity with one database-enforced target id.
 - Promote every existing `bottle_release` into a Bottle without losing source data, user activity, aliases, images, or URL reachability.
 - Preserve generic activity from an old parent with known releases at the group level rather than assigning it to an arbitrary exact Bottle.
@@ -69,16 +71,27 @@ an exact Bottle. Deriving a group name from member Bottles was rejected because
 a safe generic name cannot be inferred by stripping years, batches, or cask
 tokens.
 
-### Group creation is automatic; semantic merging is contextual
+### Group creation is automatic and outside manual identity selection
 
-The Bottle creation service creates the BottleGroup, its generic target, the Bottle, and its exact target in one transaction. Independent creation always creates a singleton group. A caller may reuse a group only through a trusted context:
+The ordinary Bottle creation service creates a fresh BottleGroup, its generic
+target, the complete Bottle, and its exact target in one transaction. Every
+manual or ordinary public/API creation starts in a singleton group, including a
+Bottle created from an “add another release” prefilled form. No supported
+ordinary caller supplies a group id, source Bottle as grouping authority, or
+other group-reuse instruction.
 
-- “Add another release” from an existing Bottle;
-- migration from an existing parent and its releases;
-- an exact curated group identifier or accepted alias relationship;
-- a moderator-approved group merge.
+Trusted group reuse remains an internal capability only for deterministic
+legacy migration, measured compatibility adapters whose old contracts require
+source context, and explicitly system-controlled grouping operations. A
+separate automatic grouping process may later consolidate singleton groups; it
+is not part of the user submission and does not turn prefill data into group
+authority. Moderator merge/split remains an audited exceptional correction
+boundary, not the normal way a user assigns a BottleGroup.
 
-Search and classifier logic may suggest likely groups, but unreviewed name similarity, series equality, or shared brand metadata cannot silently merge groups. False separation is repairable without corrupting aggregates; false grouping is not.
+Search and classifier evidence may inform that separate grouping process, but
+name similarity, series equality, or shared brand metadata alone is not enough
+to silently merge groups. False separation is repairable without corrupting
+aggregates; false grouping is not.
 
 The alternative of deterministic grouping by a normalized identity key was rejected because the normalization contract explicitly cannot decide release scope or discard identity-bearing batch, year, cask, retailer, brand, or distillery information.
 
@@ -117,8 +130,11 @@ The alternative of nullable `groupId` and `bottleId` columns on every consumer w
 The existing Add Bottle and Add Bottling field components become one add/edit Bottle form. It accepts stable group fields and exact Bottle fields in one draft, but the creation service owns persistence:
 
 - independent creation creates a singleton group automatically;
-- “another release” pre-fills stable fields from the source group and creates only a new Bottle in that group;
-- inactive or inferred group identifiers are never accepted from arbitrary query parameters;
+- “another release” pre-fills a complete independent draft from the selected
+  Bottle and submits the same standard Bottle creation mutation, which creates
+  a new singleton group;
+- source Bottle and group identifiers are never accepted as ordinary creation
+  authority from routes, forms, or query parameters;
 - exact duplicate checks apply to Bottle identity; likely expression-group matches are suggestions, not blocking identity decisions.
 
 The ordinary workflow never asks “Bottle or Bottling?” and never exposes a standalone Create BottleGroup form.
@@ -603,8 +619,8 @@ complete marketed Bottle and creates an automatic singleton group. The
 classifier never selects a parent, source group, or BottleRelease operation;
 automatic group discovery and later curation are separate concerns.
 
-Every successful result returns the active exact CatalogTarget, the concrete
-Bottle id, a null retained release id, and `createdRelease: false`. Safe exact
+Every successful result returns the active exact CatalogTarget and concrete
+Bottle id. Safe exact
 duplicate reuse returns that same target only after the canonical attempt has
 rolled back, the collision resolves to an exact Bottle whose canonical
 `fullName` exactly matches the requested value, and its exact target is still
@@ -953,7 +969,10 @@ the implementation they covered.
 - **A shared edit can collide or partially rematerialize a group** → Lock and
   update the group, all member Bottles, retained exact aliases, and audit rows in
   one transaction; roll back the entire edit on any collision or failed member.
-- **Automatic fuzzy grouping can corrupt ratings** → Automatically create singleton groups but require trusted context or moderation for group merges.
+- **Incorrect automatic grouping can corrupt ratings** → Create singleton
+  groups synchronously, keep grouping outside the creation request, require
+  stronger evidence than fuzzy similarity, and retain audited merge/split
+  correction boundaries.
 - **More rows are created for singleton products** → Keep groups invisible in normal UI and create group/Bottle/targets atomically; the predictable invariant is worth the storage overhead.
 - **Generic targets complicate some consumers** → Centralize polymorphism in `catalog_target` and serializers so feature tables keep one foreign key.
 - **Old URLs and clients may depend on release ids** → Preserve permanent mappings/redirects and instrument compatibility usage before removal.
@@ -963,7 +982,10 @@ the implementation they covered.
 
 1. **Inventory and audit tooling:** add read-only counts and integrity checks for all paired-reference tables, dirty parents, aliases, duplicate names, images, and legacy routes. Validate the report contract locally without requiring production access.
 2. **Additive schema:** generate migrations for BottleGroup, Bottle membership, catalog targets, release-promotion mappings, group tombstones, and nullable `targetId` columns. Do not remove legacy columns or treat this review slice as a deployment unit.
-3. **Domain services:** implement atomic singleton creation, create-another-release, target loading, group merge/split, and idempotent aggregate recomputation with database-backed tests.
+3. **Domain services:** implement atomic singleton creation, keep trusted-source
+   group reuse internal to migration/compatibility/system contexts, add target
+   loading and group merge/split, and provide idempotent aggregate recomputation
+   with database-backed tests.
 4. **New-write cutover:** move Add Bottle, classifier creation, importers, proposals, and supported maintenance flows to create concrete Bottles and automatic groups. Remove obsolete age/release repair workflows and keep legacy release routes as instrumented adapters.
 5. **Resumable backfill:** in the controlled production migration, make the additive schema and backfill tooling available, then immediately run and retain the fresh production dry run from that exact revision and approve its counts before live writes. Create groups/targets, promote releases, migrate aliases and content, and populate every consumer `targetId` according to the deterministic rules. Re-run safely until no work remains; do not serve target-dependent application behavior during the incomplete state.
 6. **Parity period:** dual-read target and legacy references, assert serialized identity parity, compare exact/group counts, rebuild search indexes, and verify representative URLs and workflows.

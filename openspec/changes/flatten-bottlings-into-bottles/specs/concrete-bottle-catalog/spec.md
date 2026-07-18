@@ -14,6 +14,9 @@ The system SHALL represent every concrete marketed release as a Bottle with its 
 - **WHEN** a user starts “add another release” from an existing Bottle and submits different exact release fields
 - **THEN** the system creates another Bottle rather than a BottleRelease
 - **AND** both Bottles remain distinct exact catalog entries
+- **AND** the source Bottle supplies prefill data only
+- **AND** the new Bottle starts in its own singleton BottleGroup for later
+  automatic grouping
 
 ### Requirement: Concrete fields have one owner
 
@@ -74,11 +77,15 @@ The web application SHALL provide one Add Bottle workflow for both ordinary and 
 - **THEN** the same Bottle form accepts those values
 - **AND** the submit action is labeled as creating a Bottle
 
-#### Scenario: Add from an existing group member
+#### Scenario: Add from an existing Bottle
 
 - **WHEN** a user chooses to add another release from a Bottle page
-- **THEN** the form reuses the existing group identity and pre-fills its stable fields
-- **AND** only a new concrete Bottle is created
+- **THEN** the form pre-fills a complete draft from the selected Bottle's durable
+  fields
+- **AND** it submits the standard independent Bottle creation mutation
+- **AND** the new Bottle receives a singleton group rather than reusing the
+  selected Bottle's group
+- **AND** later grouping is automatic and outside the manual workflow
 
 ### Requirement: Bottle search and details are first class
 

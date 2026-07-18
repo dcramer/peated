@@ -8,6 +8,7 @@ import {
   catalogTargets,
   changes,
 } from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -55,31 +56,38 @@ describe("PATCH /bottle-releases/{release}", () => {
       statedAge: 12,
       abv: 55,
     });
-    const promoted = await routerClient.bottles.createFromSource(
-      {
-        bottle: parent.id,
-        edition: "Mapped Batch",
-        abv: 55,
-        singleCask: true,
-        caskStrength: true,
-        vintageYear: 2008,
-        releaseYear: 2020,
-        caskType: "bourbon",
-        caskSize: "hogshead",
-        caskFill: "refill",
-        description: "Original promoted description",
-        tastingNotes: {
-          nose: "Old nose",
-          palate: "Old palate",
-          finish: "Old finish",
+    const promoted = await createConcreteBottle({
+      context: { user: mod },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: {
+          edition: "Mapped Batch",
+          abv: 55,
+          singleCask: true,
+          caskStrength: true,
+          vintageYear: 2008,
+          releaseYear: 2020,
+          caskType: "bourbon",
+          caskSize: "hogshead",
+          caskFill: "refill",
+          description: "Original promoted description",
+          tastingNotes: {
+            nose: "Old nose",
+            palate: "Old palate",
+            finish: "Old finish",
+          },
         },
       },
-      { context: { user: mod } },
-    );
-    const sibling = await routerClient.bottles.createFromSource(
-      { bottle: parent.id, edition: "Untouched Sibling", abv: 46 },
-      { context: { user: mod } },
-    );
+    });
+    const sibling = await createConcreteBottle({
+      context: { user: mod },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: { edition: "Untouched Sibling", abv: 46 },
+      },
+    });
     await promoteRelease(release.id, promoted.bottle.id);
 
     const [releaseBefore] = await db
@@ -125,7 +133,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     expect(result).toMatchObject({
       schemaVersion: 1,
       kind: "bottle",
-      targetId: promoted.targetId,
+      targetId: promoted.exactTarget.id,
       group: { id: parent.groupId },
       bottle: {
         id: promoted.bottle.id,
@@ -173,7 +181,7 @@ describe("PATCH /bottle-releases/{release}", () => {
       expect.objectContaining({
         bottleId: promoted.bottle.id,
         releaseId: null,
-        targetId: promoted.targetId,
+        targetId: promoted.exactTarget.id,
         assignmentSource: "canonical",
       }),
     ]);
@@ -256,10 +264,14 @@ describe("PATCH /bottle-releases/{release}", () => {
     const mod = await fixtures.User({ mod: true });
     const parent = await fixtures.Bottle({ name: "Image Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await routerClient.bottles.createFromSource(
-      { bottle: parent.id, edition: "Image Mapped" },
-      { context: { user: mod } },
-    );
+    const promoted = await createConcreteBottle({
+      context: { user: mod },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: { edition: "Image Mapped" },
+      },
+    });
     await promoteRelease(release.id, promoted.bottle.id);
     await db
       .update(bottles)
@@ -384,14 +396,22 @@ describe("PATCH /bottle-releases/{release}", () => {
     const mod = await fixtures.User({ mod: true });
     const parent = await fixtures.Bottle({ name: "Collision Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await routerClient.bottles.createFromSource(
-      { bottle: parent.id, edition: "First Identity" },
-      { context: { user: mod } },
-    );
-    const conflicting = await routerClient.bottles.createFromSource(
-      { bottle: parent.id, edition: "Second Identity" },
-      { context: { user: mod } },
-    );
+    const promoted = await createConcreteBottle({
+      context: { user: mod },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: { edition: "First Identity" },
+      },
+    });
+    const conflicting = await createConcreteBottle({
+      context: { user: mod },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: { edition: "Second Identity" },
+      },
+    });
     await promoteRelease(release.id, promoted.bottle.id);
 
     const bottlesBefore = await db

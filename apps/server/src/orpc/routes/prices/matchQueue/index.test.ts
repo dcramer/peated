@@ -21,6 +21,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -607,17 +608,20 @@ describe("price match queue", () => {
       releaseYear: 2020,
       distillerIds: [distillery.id],
     });
-    const siblingTarget = await routerClient.bottles.createFromSource(
-      {
-        bottle: currentBottle.id,
-        edition: "Batch 2",
-        statedAge: 14,
-        abv: 50,
-        caskStrength: true,
-        releaseYear: 2021,
+    const siblingTarget = await createConcreteBottle({
+      context: { user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: currentBottle.id,
+        exact: {
+          edition: "Batch 2",
+          statedAge: 14,
+          abv: 50,
+          caskStrength: true,
+          releaseYear: 2021,
+        },
       },
-      { context: { user } },
-    );
+    });
     const siblingId = siblingTarget.bottle.id;
     const legacyRelease = await fixtures.BottleRelease({
       bottleId: currentBottle.id,
@@ -943,10 +947,14 @@ describe("price match queue", () => {
       name: "Repair Collision Source",
       category: "blend",
     });
-    const sibling = await routerClient.bottles.createFromSource(
-      { bottle: selected.id, edition: "Batch 2", abv: 50 },
-      { context: { user } },
-    );
+    const sibling = await createConcreteBottle({
+      context: { user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: selected.id,
+        exact: { edition: "Batch 2", abv: 50 },
+      },
+    });
     const conflicting = await fixtures.Bottle({
       brandId: brand.id,
       name: "External Conflict Owner",
@@ -1636,10 +1644,14 @@ describe("price match queue", () => {
   }) => {
     const user = await fixtures.User({ mod: true });
     const sourceBottle = await fixtures.Bottle({ name: "Generic Match" });
-    const representative = await routerClient.bottles.createFromSource(
-      { bottle: sourceBottle.id, edition: "Representative" },
-      { context: { user } },
-    );
+    const representative = await createConcreteBottle({
+      context: { user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: sourceBottle.id,
+        exact: { edition: "Representative" },
+      },
+    });
     await db
       .update(bottleGroups)
       .set({ representativeBottleId: representative.bottle.id })
@@ -2205,15 +2217,18 @@ describe("price match queue", () => {
       brandId: brand.id,
       seriesId: series.id,
     });
-    const existing = await routerClient.bottles.createFromSource(
-      {
-        bottle: sourceBottle.id,
-        edition: "Batch 9",
-        statedAge: 15,
-        abv: 54,
+    const existing = await createConcreteBottle({
+      context: { user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: sourceBottle.id,
+        exact: {
+          edition: "Batch 9",
+          statedAge: 15,
+          abv: 54,
+        },
       },
-      { context: { user } },
-    );
+    });
     const price = await fixtures.StorePrice({
       name: "Retry Expression Batch 9 Listing",
       bottleId: null,
@@ -2291,13 +2306,13 @@ describe("price match queue", () => {
     expect(updatedPrice).toMatchObject({
       bottleId: existing.bottle.id,
       releaseId: null,
-      targetId: existing.targetId,
+      targetId: existing.exactTarget.id,
     });
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
       bottleId: existing.bottle.id,
       releaseId: null,
-      targetId: existing.targetId,
+      targetId: existing.exactTarget.id,
       createdBottle: false,
       createdRelease: false,
     });

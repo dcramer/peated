@@ -279,7 +279,6 @@ export default procedure
           releaseId,
           targetId: target?.targetId ?? null,
           createdBottle: resolution.createdBottle,
-          createdRelease: resolution.createdRelease,
           confidence: resolution.confidence,
           model: resolution.model,
           rationale: resolution.rationale,

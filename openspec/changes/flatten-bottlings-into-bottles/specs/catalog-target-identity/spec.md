@@ -644,7 +644,7 @@ price-assignment contract.
 - **WHEN** create-new approval makes an initial incoming Bottle assignment and
   no source decision already exists
 - **THEN** a newly created Bottle emits `create_bottle`, the exact target,
-  `(bottleId, null)`, `createdBottle: true`, and `createdRelease: false`
+  `(bottleId, null)`, and `createdBottle: true`
 - **AND** safe exact-duplicate reuse emits `match_existing`, the same target and
   retained-pair shape, and no concrete creation finalizer
 - **AND** historical release-creation decision values remain readable until their explicit compatibility removal

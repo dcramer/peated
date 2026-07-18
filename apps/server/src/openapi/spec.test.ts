@@ -1,10 +1,11 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { describe, expect, it } from "vitest";
-import router from "../orpc/router";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import router, { type Outputs } from "../orpc/router";
 import {
   BottleSchema,
   CursorSchema,
+  type ExactCatalogTargetV1,
   StorePriceSchema,
   UserSchema,
 } from "../schemas";
@@ -24,6 +25,41 @@ async function generateSpec() {
       StorePrice: { schema: StorePriceSchema, strategy: "output" },
     },
   });
+}
+
+function getJsonResponseSchema(operation: any) {
+  const response = operation?.responses?.[200] ?? operation?.responses?.["200"];
+  return response?.content?.["application/json"]?.schema as any;
+}
+
+function getOperationIds(spec: Awaited<ReturnType<typeof generateSpec>>) {
+  return Object.values(spec.paths ?? {}).flatMap((path) =>
+    Object.values(path ?? {}).flatMap((operation) => {
+      if (
+        typeof operation === "object" &&
+        operation !== null &&
+        "operationId" in operation
+      ) {
+        return [operation.operationId];
+      }
+      return [];
+    }),
+  );
+}
+
+function expectExactTargetResponse(schema: any) {
+  expect(Object.keys(schema?.properties ?? {})).toEqual(
+    expect.arrayContaining([
+      "schemaVersion",
+      "kind",
+      "targetId",
+      "group",
+      "bottle",
+    ]),
+  );
+  expect(schema?.properties?.release).toBeUndefined();
+  expect(schema?.properties?.releaseId).toBeUndefined();
+  expect(JSON.stringify(schema)).not.toContain("BottleRelease");
 }
 
 describe("OpenAPI generation ($ref reuse)", () => {
@@ -62,33 +98,13 @@ describe("OpenAPI generation ($ref reuse)", () => {
     );
   });
 
-  it("exposes another-release creation with one unique operation id", async () => {
+  it("exposes release-free concrete Bottle mutation contracts", async () => {
     const spec = await generateSpec();
-    expect(spec.paths?.["/bottles/from/{bottle}"]?.post?.operationId).toBe(
-      "createBottleFromSource",
-    );
 
-    const operationIds = Object.values(spec.paths ?? {}).flatMap((path) =>
-      Object.values(path ?? {}).flatMap((operation) => {
-        if (
-          typeof operation === "object" &&
-          operation !== null &&
-          "operationId" in operation
-        ) {
-          return [operation.operationId];
-        }
-        return [];
-      }),
-    );
-    expect(
-      operationIds.filter(
-        (operationId) => operationId === "createBottleFromSource",
-      ),
-    ).toHaveLength(1);
-  });
+    expect(spec.paths?.["/bottles/from/{bottle}"]).toBeUndefined();
+    expect(getOperationIds(spec)).not.toContain("createBottleFromSource");
 
-  it("exposes concrete Bottle editing with unique operation ids", async () => {
-    const spec = await generateSpec();
+    expect(spec.paths?.["/bottles"]?.post?.operationId).toBe("createBottle");
     expect(spec.paths?.["/bottles/{bottle}"]?.patch?.operationId).toBe(
       "updateBottle",
     );
@@ -96,52 +112,53 @@ describe("OpenAPI generation ($ref reuse)", () => {
       spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.operationId,
     ).toBe("getBottleEditContext");
 
-    const updateResponse: any =
-      (spec.paths?.["/bottles/{bottle}"]?.patch?.responses as any)?.[200] ??
-      (spec.paths?.["/bottles/{bottle}"]?.patch?.responses as any)?.["200"];
-    const updateSchema = updateResponse?.content?.["application/json"]
-      ?.schema as any;
-    expect(Object.keys(updateSchema?.properties ?? {})).toEqual(
-      expect.arrayContaining([
-        "schemaVersion",
-        "kind",
-        "targetId",
-        "group",
-        "bottle",
-      ]),
+    expectExactTargetResponse(
+      getJsonResponseSchema(spec.paths?.["/bottles"]?.post),
     );
-    expect(updateSchema?.properties?.id).toBeUndefined();
+    expectExactTargetResponse(
+      getJsonResponseSchema(spec.paths?.["/bottles/{bottle}"]?.patch),
+    );
 
-    const editContextResponse: any =
-      (
-        spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.responses as any
-      )?.[200] ??
-      (spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.responses as any)?.[
-        "200"
-      ];
-    const editContextSchema = editContextResponse?.content?.["application/json"]
-      ?.schema as any;
+    const editContextSchema = getJsonResponseSchema(
+      spec.paths?.["/bottles/{bottle}/edit-context"]?.get,
+    );
     expect(Object.keys(editContextSchema?.properties ?? {})).toEqual(
       expect.arrayContaining(["bottleId", "totalBottles", "shared", "exact"]),
     );
     expect(editContextSchema?.properties?.groupId).toBeUndefined();
     expect(editContextSchema?.properties?.targetId).toBeUndefined();
 
-    const operationIds = Object.values(spec.paths ?? {}).flatMap((path) =>
-      Object.values(path ?? {}).flatMap((operation) => {
-        if (
-          typeof operation === "object" &&
-          operation !== null &&
-          "operationId" in operation
-        ) {
-          return [operation.operationId];
-        }
-        return [];
-      }),
-    );
+    const operationIds = getOperationIds(spec);
+    expect(operationIds.filter((id) => id === "createBottle")).toHaveLength(1);
     expect(operationIds.filter((id) => id === "updateBottle")).toHaveLength(1);
     expect(
       operationIds.filter((id) => id === "getBottleEditContext"),
     ).toHaveLength(1);
+
+    expectTypeOf<
+      Outputs["bottles"]["create"]
+    >().toEqualTypeOf<ExactCatalogTargetV1>();
+    expectTypeOf<
+      Outputs["bottles"]["update"]
+    >().toEqualTypeOf<ExactCatalogTargetV1>();
+    expectTypeOf<
+      "createFromSource" extends keyof Outputs["bottles"] ? true : false
+    >().toEqualTypeOf<false>();
+  });
+
+  it("keeps photo creation release compatibility null-only", async () => {
+    const spec = await generateSpec();
+    const photoCreateSchema = getJsonResponseSchema(
+      spec.paths?.["/tastings/photo-identification-create"]?.post,
+    );
+    const releaseSchema = photoCreateSchema?.properties?.release;
+
+    expect(releaseSchema?.type).toBe("null");
+    expect(releaseSchema?.anyOf).toBeUndefined();
+    expect(releaseSchema?.oneOf).toBeUndefined();
+    expect(JSON.stringify(releaseSchema)).not.toContain("BottleRelease");
+    expectTypeOf<
+      Outputs["tastings"]["photoIdentificationCreate"]["release"]
+    >().toEqualTypeOf<null>();
   });
 });

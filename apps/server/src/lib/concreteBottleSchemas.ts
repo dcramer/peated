@@ -84,15 +84,6 @@ const ExactBottleInputSchema = BottleInputSchema.pick({
   })
   .strict();
 
-/**
- * The source Bottle identifies trusted group context; BottleGroup retains
- * shared edit authority while this request supplies only exact fields.
- */
-export const SourceBottleConcreteCreateRouteInputSchema =
-  ExactBottleInputSchema.extend({
-    bottle: z.coerce.number().int().positive(),
-  }).strict();
-
 const IndependentConcreteBottleCreateRouteFieldsSchema =
   StableBottleGroupFieldsSchema.extend({
     edition: ExactBottleInputSchema.shape.edition,
@@ -196,7 +187,11 @@ export type ConcreteBottleUpdateInput = z.infer<
   typeof ConcreteBottleUpdateInputSchema
 >;
 
-/** Runtime contract consumed by concrete Bottle creation adapters. */
+/**
+ * Runtime contract consumed by concrete Bottle creation adapters. Ordinary
+ * callers use `independent`; source authority is reserved for migration,
+ * measured compatibility, and system-controlled grouping.
+ */
 export const ConcreteBottleCreateInputSchema = z.discriminatedUnion("kind", [
   z
     .object({

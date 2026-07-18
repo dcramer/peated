@@ -6,28 +6,53 @@ The system SHALL assign every Bottle to exactly one BottleGroup and SHALL create
 
 #### Scenario: Create a singleton Bottle
 
-- **WHEN** a Bottle is created without a trusted existing group context
+- **WHEN** a Bottle is created through an ordinary manual or public/API workflow
 - **THEN** the system atomically creates a singleton BottleGroup and assigns the Bottle to it
 - **AND** the user is not asked to create or name a separate group
+- **AND** no source Bottle or group identifier is accepted as grouping authority
 
 #### Scenario: Atomic creation fails
 
 - **WHEN** creation of the group, Bottle, or required targets fails
 - **THEN** none of those records are committed
 
-### Requirement: Trusted context reuses a group
+### Requirement: Trusted group reuse is internal
 
-The system SHALL reuse an existing BottleGroup when another Bottle is created through an explicit existing-member, migrated-parent, curated-alias, or moderator-approved context.
+The system SHALL expose trusted group reuse only to deterministic migration,
+measured legacy compatibility adapters, and explicitly system-controlled
+grouping operations, never as an ordinary/manual Bottle creation choice.
 
-#### Scenario: Add another release from a Bottle
+#### Scenario: Prefill another release from a Bottle
 
-- **WHEN** a user creates another release from an existing Bottle
-- **THEN** the new Bottle receives the existing Bottle's `groupId`
+- **WHEN** a user starts “add another release” from an existing Bottle
+- **THEN** the form may prefill a complete Bottle draft from that Bottle
+- **AND** submission uses ordinary independent creation and receives a new
+  singleton BottleGroup
+- **AND** the source Bottle's `groupId` is not creation authority
 
 #### Scenario: Migrate parent releases
 
 - **WHEN** multiple BottleReleases under one legacy parent are promoted
 - **THEN** every promoted Bottle belongs to the BottleGroup created from that parent
+
+#### Scenario: Translate a legacy source-bound create
+
+- **WHEN** a retained measured compatibility adapter receives a legacy contract
+  whose source Bottle defines deterministic group context
+- **THEN** the adapter may invoke internal trusted-source creation
+- **AND** no ordinary client gains that capability
+
+### Requirement: Semantic grouping runs outside ordinary creation
+
+The system SHALL keep automatic semantic grouping separate from the ordinary
+Bottle creation request and SHALL NOT require a user to choose a BottleGroup.
+
+#### Scenario: Group a newly created singleton
+
+- **WHEN** a later system-controlled grouping process establishes that two
+  singleton groups represent the same expression
+- **THEN** it may consolidate them through the audited group operation
+- **AND** the original Bottle creation remains an independently valid operation
 
 ### Requirement: Uncertain grouping is not automatic
 
@@ -35,7 +60,8 @@ The system MUST NOT merge independently created BottleGroups solely because thei
 
 #### Scenario: Likely name match
 
-- **WHEN** an independently created Bottle resembles a Bottle in another group but no trusted relationship exists
+- **WHEN** an independently created Bottle resembles a Bottle in another group
+  but the automatic grouping policy lacks sufficient evidence
 - **THEN** the system keeps the new Bottle in its singleton group
 - **AND** may present the other group as a reviewable suggestion
 

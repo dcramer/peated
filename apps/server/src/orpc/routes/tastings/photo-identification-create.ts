@@ -23,7 +23,7 @@ import {
   requireTosAccepted,
   requireVerified,
 } from "@peated/server/orpc/middleware";
-import { BottleReleaseSchema, BottleSchema } from "@peated/server/schemas";
+import { BottleSchema } from "@peated/server/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import bottlesDetails from "../bottles/details";
@@ -99,7 +99,6 @@ function logCatalogImageApprovalError(
       bottleId: result.bottleId,
       releaseId: result.releaseId,
       createdBottle: result.createdBottle,
-      createdRelease: result.createdRelease,
     },
   });
 }
@@ -189,7 +188,7 @@ export default procedure
   .output(
     z.object({
       bottle: BottleSchema,
-      release: BottleReleaseSchema.nullable(),
+      release: z.null(),
       warnings: z
         .array(CatalogImageWarningSchema)
         .optional()

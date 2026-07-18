@@ -36,8 +36,11 @@ Exact Bottle serializers must not require BottleGroup hydration.
   retired id remains in the group tombstone.
 - Activity stores only `targetId`. A generic target never resolves to the
   representative Bottle as a substitute exact identity.
-- Independent creation always creates a singleton group. Reusing a group
-  requires an existing-member, migration, curated-alias, or moderator context.
+- Every ordinary/manual/public Bottle creation creates a singleton group,
+  including a prefilled “add another release” flow. A source Bottle supplies
+  draft values only and never group authority. Trusted group reuse is internal
+  to deterministic migration, measured compatibility adapters, and explicitly
+  system-controlled grouping operations.
 - Exact aliases move with their Bottle. Stable aliases move with the group.
   Canonical concrete creation reserves the Bottle's required canonical exact
   alias; a caller that creates no photo/reference ingestion alias does not

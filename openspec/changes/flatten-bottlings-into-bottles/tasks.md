@@ -43,8 +43,8 @@ it must not preserve a parallel business-logic path.
 ## 4. Automatic Bottle And Group Domain Services
 
 - [x] 4.1 Implement transactional independent Bottle creation that creates a singleton group, generic target, Bottle, exact target, aliases, and change records atomically.
-- [x] 4.2 Implement “create another release” using a trusted source Bottle to reuse its group while creating only a new Bottle and exact target.
-- [x] 4.3 Prevent arbitrary client-supplied group ids from bypassing trusted group-reuse authorization.
+- [x] 4.2 Implement trusted-source group reuse as an internal concrete-creation capability limited to deterministic migration, measured compatibility adapters, and explicitly system-controlled grouping operations; it is not an ordinary/manual creation contract.
+- [x] 4.3 Prevent arbitrary client-supplied group or source-Bottle authority from reaching internal trusted group reuse; every ordinary creation uses the independent singleton path.
 - [x] 4.4 Apply exact duplicate detection to Bottle identity while returning likely group matches as non-blocking suggestions.
 - [x] 4.5 Keep catalog verification, indexing, and other slow post-save work idempotent and outside the committed request path.
 - [x] 4.6 Implement moderator-authorized Bottle updates: exact-only edits affect only the selected Bottle; shared edits atomically update the BottleGroup and every member's complete durable identity; effective-age normalization preserves only non-null exact overrides differing from the pre-update current group age, with exact null materializing the resulting group age; old canonical exact names remain exact aliases; collisions roll back all changes; one existing `bottle` update audit row is written per affected member with a combined row for the selected member in a mixed edit; no `bottle_group` audit enum is added; ids, targets, representative selection, activity, and Bottle/BottleGroup activity and rating aggregates remain unchanged; and shared series fan-out or drift repair recomputes only affected old and new BottleSeries `numReleases` membership counts.
@@ -60,7 +60,7 @@ it must not preserve a parallel business-logic path.
 ## 5. New-Write API Cutover
 
 - [x] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
-- [x] 5.2 Add an authenticated “another release” Bottle create operation with explicit source Bottle context and a unique OpenAPI operation id.
+- [x] 5.2 Remove the public trusted-source `/bottles/from/{bottle}` creation operation and its generated contract; the standard Bottle create operation is the only ordinary creation API and always creates an independent Bottle with a singleton group.
 - [x] 5.3 Change Bottle update and moderator proposal flows so exact edits persist only on the selected Bottle and shared edits use the atomic BottleGroup-to-member materialization service.
 - [x] 5.3a Cut the standard moderator Bottle update route and live edit workflow over to strict shared/exact patches, the canonical concrete update service, an exact-target response, and a group-owned edit-context projection.
 - [x] 5.3b Compose moderator price-match correction proposals with the canonical concrete update transaction, then remove the superseded proposal-specific Bottle updater without leaving a second update business system.
@@ -82,8 +82,8 @@ it must not preserve a parallel business-logic path.
 - [x] 5.7 Replace the create-new price-approval legacy Bottle/BottleRelease writer with canonical concrete Bottle plus CatalogTarget creation in the same approval transaction, and update store-price matching, match proposals, and decision logs to emit `create_bottle` or group-aware match decisions instead of create-release decisions; expose the newly created target for task 5.5c without retaining a second creation business system.
 - [x] 5.8 Collapse classifier application to one `create_bottle` action carrying an independently complete concrete Bottle plus its exact target; create a singleton group automatically without classifier-selected parent/source-group context, never write/finalize BottleRelease, and retain bounded structured source evidence while emitting `create_bottle` or `match_existing` decisions.
 - [x] 5.9 Update worker jobs, importers, CLI mutations, scraper/upsert callers, and classifier-driven Review/price/photo consumers so no supported new-write path inserts `bottle_release` directly, every caller consumes concrete target responses instead of the legacy Bottle upsert response, and stale consumer identity cannot override a concurrent retarget; route grouped entity and brand/distillery maintenance through canonical shared-update fan-out, isolate direct Bottle/BottleRelease/raw-alias entity-merge compatibility to `groupId IS NULL` for task 9.7 removal, and remove obsolete CLI alias/repair commands plus the age/release repair services, routes, pages, verifier workstreams, and finding kinds in the same cutover.
-- [x] 5.10 Add route and service integration tests for authentication, exact creation, singleton grouping, another-release grouping, conflicts, generic targets, and adapter behavior.
-- [ ] 5.11 Regenerate and inspect OpenAPI/client types and remove new compile-time dependencies on `BottleRelease` from cut-over callers.
+- [x] 5.10 Add route and service integration tests for authentication, exact creation, singleton grouping for every ordinary create including prefilled “another release,” absence of public trusted-source grouping, conflicts, generic targets, and internal compatibility-adapter behavior.
+- [x] 5.11 Regenerate and inspect OpenAPI/client types, remove the public trusted-source creation operation, and remove new `BottleRelease`, `createdRelease`, and release-shaped compile-time dependencies from cut-over callers while preserving explicitly staged legacy adapter contracts.
 
 ## 6. Resumable Legacy Backfill
 
@@ -119,14 +119,14 @@ it must not preserve a parallel business-logic path.
 
 - [ ] 8.1 Merge the existing BottleForm and ReleaseForm field ownership into one reusable concrete Bottle add/edit form.
 - [ ] 8.2 Make `/bottles/new` accept all exact fields and always submit one Bottle creation mutation.
-- [ ] 8.3 Replace Add Bottling with “Add another release,” prefilled from an existing Bottle and backed by the trusted reuse operation.
+- [ ] 8.3 Replace Add Bottling with “Add another release,” prefilled from the selected Bottle's independently complete durable fields and submitted through the standard independent Bottle creation mutation; it creates a singleton group and does not select or reuse the source BottleGroup.
 - [ ] 8.4 Remove the Bottle-versus-Bottling choice, hidden release-detail mode, and any query-prefill behavior that changes entity type.
 - [ ] 8.5 Update search results and Bottle pages to show exact Bottle details with an unobtrusive related-releases/group link.
 - [ ] 8.6 Add a BottleGroup page for generic activity, aggregates, related Bottles, and moderator merge/split controls.
 - [ ] 8.7 Update tasting, Library, collection, flight, price, review, and photo-identification flows to carry one `targetId` and display whether exactness is known.
 - [ ] 8.8 Update return intents and post-create image uploads to use the created concrete Bottle without reconstructing a release pair.
 - [ ] 8.9 Remove nested Bottling edit/detail/list UI after redirects and compatibility coverage are active.
-- [ ] 8.10 Add focused web tests for unified form fields, singleton creation, another release, exact/generic target selection, redirects, and return intents.
+- [ ] 8.10 Add focused web tests for unified form fields, singleton creation, prefilled independent “another release,” absence of manual group selection, exact/generic target selection, redirects, and return intents.
 - [ ] 8.11 Verify Add Bottle, edit Bottle, add another release, group details, Library, and tasting flows at desktop and mobile widths using the local verification playbook.
 
 ## 9. Constraint Cutover And Legacy Removal

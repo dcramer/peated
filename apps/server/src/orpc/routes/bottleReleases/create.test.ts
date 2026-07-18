@@ -9,6 +9,7 @@ import {
   catalogTargets,
   changes,
 } from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -363,14 +364,17 @@ describe("POST /bottle-releases", () => {
   }) => {
     const currentYear = new Date().getFullYear();
     const source = await fixtures.Bottle({ name: "Duplicate Source" });
-    const existing = await routerClient.bottles.createFromSource(
-      {
-        bottle: source.id,
-        edition: "Batch 1",
-        releaseYear: currentYear,
+    const existing = await createConcreteBottle({
+      context: { user: defaults.user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: source.id,
+        exact: {
+          edition: "Batch 1",
+          releaseYear: currentYear,
+        },
       },
-      { context: { user: defaults.user } },
-    );
+    });
     const beforeBottles = await db.select().from(bottles);
     const beforeTargets = await db.select().from(catalogTargets);
     const beforeAliases = await db.select().from(bottleAliases);

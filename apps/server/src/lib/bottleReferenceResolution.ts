@@ -63,7 +63,6 @@ export type BottleReferenceResolution = {
   rationale: string | null;
   classifierEvidence: BottleReferenceClassifierEvidence | null;
   createdBottle: boolean;
-  createdRelease: boolean;
 };
 
 /** Locks the complete target/projection decision before a consumer persists it. */
@@ -182,7 +181,6 @@ export async function applyClassifierCreateDecision({
   releaseId: null;
   targetId: number;
   createdBottle: boolean;
-  createdRelease: false;
   assignment: { kind: "target" } & CatalogTargetConsumerAssignment;
 }> {
   const input = buildClassifierConcreteBottleInput(decision.proposedBottle);
@@ -211,7 +209,6 @@ export async function applyClassifierCreateDecision({
       consumerIdentity: { bottleId: result.bottle.id, releaseId: null },
     },
     createdBottle: result.createResult !== null,
-    createdRelease: false,
   };
 }
 
@@ -261,7 +258,6 @@ export async function resolveBottleReferenceTarget({
         rationale: null,
         classifierEvidence: null,
         createdBottle: false,
-        createdRelease: false,
       };
     }
     if (match?.kind === "staged_targetless") {
@@ -278,7 +274,6 @@ export async function resolveBottleReferenceTarget({
         rationale: null,
         classifierEvidence: null,
         createdBottle: false,
-        createdRelease: false,
       };
     }
   }
@@ -316,7 +311,6 @@ export async function resolveBottleReferenceTarget({
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
-      createdRelease: false,
     };
   }
 
@@ -330,7 +324,6 @@ export async function resolveBottleReferenceTarget({
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
-      createdRelease: false,
     };
   }
 
@@ -387,7 +380,6 @@ export async function resolveBottleReferenceTarget({
         rationale: decisionRationale,
         classifierEvidence,
         createdBottle: false,
-        createdRelease: false,
       };
     }
 
@@ -401,7 +393,6 @@ export async function resolveBottleReferenceTarget({
         rationale: decisionRationale,
         classifierEvidence,
         createdBottle: false,
-        createdRelease: false,
       };
     }
 
@@ -419,7 +410,6 @@ export async function resolveBottleReferenceTarget({
       rationale: decisionRationale,
       classifierEvidence,
       createdBottle: result.createdBottle,
-      createdRelease: result.createdRelease,
     };
   } catch (error) {
     if (error instanceof CatalogTargetResolutionError) throw error;
@@ -435,7 +425,6 @@ export async function resolveBottleReferenceTarget({
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
-      createdRelease: false,
     };
   }
 }

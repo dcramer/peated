@@ -80,9 +80,10 @@ establishes that it identifies the marketed Bottle.
 ### Automatic Group Assignment
 
 Independent Bottle creation atomically creates a singleton BottleGroup, its
-generic target, the Bottle, and its exact target. Trusted existing-member,
-migration, or curated context may reuse a known group. Classifier output never
-contains a parent or group selection, and clients cannot supply an arbitrary
+generic target, the Bottle, and its exact target. Trusted group reuse is limited
+to deterministic migration, measured compatibility adapters, and explicitly
+system-controlled grouping. Classifier output never contains a parent or group
+selection, and manual or ordinary API clients cannot supply a source Bottle or
 group id to bypass that boundary.
 
 Likely same-expression matches may be suggestions. Similar names, shared brand,
@@ -190,9 +191,9 @@ an invalid target leave the source unresolved or route it to review.
 
 The Add Bottle workflow accepts stable expression fields and structured exact
 fields in one form and always creates one Bottle. Independent entry receives an
-automatic singleton group. A trusted existing-member context may create another
-Bottle in that member's group without exposing group selection as ordinary
-input.
+automatic singleton group. “Add another release” may prefill the same form from
+an existing Bottle, but submission still uses independent creation and starts in
+a singleton group. Automatic grouping happens outside the manual workflow.
 
 ### Store Prices And Reviews
 

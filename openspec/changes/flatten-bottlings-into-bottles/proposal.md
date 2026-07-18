@@ -6,7 +6,11 @@ Peated currently models a marketed release as a parent `bottle` plus an optional
 
 - Make every concrete catalog entry a Bottle, including records currently represented as Bottle+Bottling pairs.
 - Add an automatically managed BottleGroup for the shared expression identity across related Bottles; every Bottle belongs to exactly one group, and ordinary creation never asks the user to create or select a group.
-- Create a singleton group automatically for an independently created Bottle, and reuse a known group when creating “another release” from an existing Bottle or migrating an existing parent and its bottlings.
+- Create a singleton group automatically for every ordinary Bottle creation,
+  including “add another release”; that action only prefills a complete Bottle
+  draft from an existing Bottle. Grouping happens outside the manual creation
+  workflow, while trusted group reuse remains internal to migration,
+  compatibility, and explicitly system-controlled operations.
 - Replace paired bottle/release references with one catalog-target reference that points to either an exact Bottle or its BottleGroup when exact release identity is unknown.
 - Collapse Add Bottle and Add Bottling into one Bottle form with all concrete identity fields.
 - Add explicit, reversible BottleGroup merge and split operations; name-based identity logic may suggest grouping but must not silently merge uncertain expressions.

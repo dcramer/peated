@@ -138,9 +138,9 @@ describe("resolveBottleReferenceTarget", () => {
       },
       source: "exact_alias",
       createdBottle: false,
-      createdRelease: false,
       classifierEvidence: null,
     });
+    expect(result).not.toHaveProperty("createdRelease");
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
@@ -287,7 +287,6 @@ describe("resolveBottleReferenceTarget", () => {
       },
       source: "exact_alias",
       createdBottle: false,
-      createdRelease: false,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
     expect(
@@ -527,8 +526,8 @@ describe("resolveBottleReferenceTarget", () => {
       source: "classifier_create_bottle",
       error: null,
       createdBottle: true,
-      createdRelease: false,
     });
+    expect(result).not.toHaveProperty("createdRelease");
     expect(result).not.toHaveProperty("groupId");
     const assignment = result.assignment;
     if (!assignment || assignment.kind !== "target") {
@@ -638,7 +637,6 @@ describe("resolveBottleReferenceTarget", () => {
       source: "classifier_create_bottle",
       error: null,
       createdBottle: false,
-      createdRelease: false,
     });
     const assignment = result.assignment;
     if (!assignment || assignment.kind !== "target") {

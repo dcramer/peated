@@ -164,7 +164,6 @@ export default async function createMissingBottles() {
                   ? assignment.target.targetId
                   : null,
               createdBottle: resolution.createdBottle,
-              createdRelease: resolution.createdRelease,
               confidence: resolution.confidence,
               model: resolution.model,
               rationale: resolution.rationale,
