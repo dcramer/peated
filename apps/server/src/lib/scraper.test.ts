@@ -1,6 +1,9 @@
+import { ORPCError } from "@orpc/client";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import scrapePrices, {
+  handleBottle,
   type ScrapePricesCallback,
   type StorePrice,
 } from "./scraper";
@@ -8,11 +11,203 @@ import waitError from "./test/waitError";
 
 vi.mock("@peated/server/lib/orpc-client/server", () => ({
   orpcClient: {
+    bottles: {
+      create: vi.fn(),
+      update: vi.fn(),
+      imageUpdate: vi.fn(),
+    },
     prices: {
       createBatch: vi.fn(),
     },
   },
 }));
+
+function exactTarget({
+  bottleId,
+  imageUrl = null,
+}: {
+  bottleId: number;
+  imageUrl?: string | null;
+}): ExactCatalogTargetV1 {
+  return {
+    schemaVersion: 1,
+    kind: "bottle",
+    targetId: bottleId + 1000,
+    group: { id: bottleId + 2000 },
+    bottle: {
+      id: bottleId,
+      imageUrl,
+    },
+  } as ExactCatalogTargetV1;
+}
+
+describe("handleBottle", () => {
+  const originalAccessToken = process.env.ACCESS_TOKEN;
+  const bottleInput = {
+    name: "Cask No. 1.2",
+    brand: 7,
+    statedAge: 12,
+    edition: "Batch 3",
+    abv: 57.2,
+    singleCask: true,
+    category: "single_malt" as const,
+  };
+  const priceInput = {
+    name: "Cask No. 1.2",
+    price: 12_000,
+    currency: "usd" as const,
+    url: "https://example.com/products/1-2",
+    volume: 700,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.ACCESS_TOKEN = "test-token";
+  });
+
+  afterEach(() => {
+    vi.resetAllMocks();
+    if (originalAccessToken === undefined) {
+      delete process.env.ACCESS_TOKEN;
+    } else {
+      process.env.ACCESS_TOKEN = originalAccessToken;
+    }
+    vi.unstubAllGlobals();
+  });
+
+  it("creates a concrete Bottle and consumes its exact target for image upload", async () => {
+    const target = exactTarget({ bottleId: 41 });
+    const imageBlob = new Blob(["image"]);
+    vi.mocked(orpcClient.bottles.create).mockResolvedValue(target);
+    vi.mocked(orpcClient.bottles.imageUpdate).mockResolvedValue({
+      imageUrl: "https://api.example.com/uploads/bottles/1.webp",
+    });
+    vi.mocked(orpcClient.prices.createBatch).mockResolvedValue({} as never);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ blob: vi.fn().mockResolvedValue(imageBlob) }),
+    );
+
+    await handleBottle(
+      bottleInput,
+      priceInput,
+      "https://example.com/images/1-2.jpg",
+    );
+
+    expect(orpcClient.bottles.create).toHaveBeenCalledOnce();
+    const [createInput] = vi.mocked(orpcClient.bottles.create).mock.calls[0];
+    expect(createInput).toMatchObject({
+      name: bottleInput.name,
+      brand: bottleInput.brand,
+      statedAge: bottleInput.statedAge,
+      edition: bottleInput.edition,
+      abv: bottleInput.abv,
+      singleCask: bottleInput.singleCask,
+      category: bottleInput.category,
+    });
+    expect(createInput).not.toHaveProperty("imageUrl");
+    expect(createInput).not.toHaveProperty("image");
+    expect(orpcClient.bottles.update).not.toHaveBeenCalled();
+    expect(orpcClient.bottles.imageUpdate).toHaveBeenCalledWith({
+      bottle: target.bottle.id,
+      file: imageBlob,
+    });
+    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
+      site: "smws",
+      prices: [priceInput],
+    });
+  });
+
+  it("directs a canonical create conflict to the strict concrete update", async () => {
+    const conflictBottleId = 52;
+    const target = exactTarget({ bottleId: conflictBottleId });
+    vi.mocked(orpcClient.bottles.create).mockRejectedValue(
+      new ORPCError("CONFLICT", {
+        defined: true,
+        data: { bottle: conflictBottleId },
+      }),
+    );
+    vi.mocked(orpcClient.bottles.update).mockResolvedValue(target);
+
+    await handleBottle(bottleInput);
+
+    expect(orpcClient.bottles.update).toHaveBeenCalledOnce();
+    expect(orpcClient.bottles.update).toHaveBeenCalledWith({
+      bottle: conflictBottleId,
+      shared: expect.objectContaining({
+        name: bottleInput.name,
+        statedAge: bottleInput.statedAge,
+        brand: bottleInput.brand,
+        category: bottleInput.category,
+      }),
+      exact: expect.objectContaining({
+        edition: bottleInput.edition,
+        abv: bottleInput.abv,
+        singleCask: bottleInput.singleCask,
+      }),
+    });
+    const [updateInput] = vi.mocked(orpcClient.bottles.update).mock.calls[0];
+    expect(updateInput.exact).not.toHaveProperty("statedAge");
+    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
+  });
+
+  it("stops after a non-conflict create failure", async () => {
+    vi.mocked(orpcClient.bottles.create).mockRejectedValue(
+      new Error("API unavailable"),
+    );
+
+    await handleBottle(bottleInput, priceInput);
+
+    expect(orpcClient.bottles.update).not.toHaveBeenCalled();
+    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
+    expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
+  });
+
+  it("does not call the API when flat input cannot satisfy concrete creation", async () => {
+    await handleBottle({ ...bottleInput, name: "" }, priceInput);
+
+    expect(orpcClient.bottles.create).not.toHaveBeenCalled();
+    expect(orpcClient.bottles.update).not.toHaveBeenCalled();
+    expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
+  });
+
+  it("stops after the conflict-directed update fails", async () => {
+    vi.mocked(orpcClient.bottles.create).mockRejectedValue(
+      new ORPCError("CONFLICT", {
+        defined: true,
+        data: { bottle: 63 },
+      }),
+    );
+    vi.mocked(orpcClient.bottles.update).mockRejectedValue(
+      new ORPCError("BAD_REQUEST", { defined: true }),
+    );
+
+    await handleBottle(bottleInput, priceInput);
+
+    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
+    expect(orpcClient.prices.createBatch).not.toHaveBeenCalled();
+  });
+
+  it("continues price ingestion when image transfer fails", async () => {
+    vi.mocked(orpcClient.bottles.create).mockResolvedValue(
+      exactTarget({ bottleId: 74 }),
+    );
+    vi.mocked(orpcClient.prices.createBatch).mockResolvedValue({} as never);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("image down")));
+
+    await handleBottle(
+      bottleInput,
+      priceInput,
+      "https://example.com/images/1-2.jpg",
+    );
+
+    expect(orpcClient.bottles.imageUpdate).not.toHaveBeenCalled();
+    expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
+      site: "smws",
+      prices: [priceInput],
+    });
+  });
+});
 
 describe("scrapePrices", () => {
   beforeEach(() => {

@@ -18,9 +18,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottles/{bottle}/apply-brand-repair",
-    summary: "Apply bottle brand/entity repair",
+    summary: "Apply BottleGroup-wide brand/entity repair",
     description:
-      "Move a bottle onto the correct brand entity, optionally preserving the source entity as a distillery link and re-homing its series under the target brand. Requires moderator privileges",
+      "Repair the BottleGroup shared brand identity and fan the resulting name, optional distillery link, and re-homed series out to every concrete Bottle member. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "applyBottleBrandRepair",
@@ -39,8 +39,8 @@ export default procedure
       bottleId: z.number(),
       bottleFullName: z.string(),
       distilleryAdded: z.boolean(),
+      groupId: z.number(),
       message: z.string(),
-      releaseCount: z.number(),
       seriesAction: RepairSeriesActionSchema,
       status: z.literal("applied"),
     }),
@@ -130,7 +130,7 @@ export default procedure
       });
     }
 
-    if (appliedItem.status !== "applied") {
+    if (appliedItem.status !== "applied" || appliedItem.groupId === null) {
       throw errors.BAD_REQUEST({
         message: appliedItem.message,
       });
@@ -140,8 +140,8 @@ export default procedure
       bottleId: appliedItem.bottleId,
       bottleFullName: appliedItem.bottleFullName,
       distilleryAdded: appliedItem.distilleryAdded,
+      groupId: appliedItem.groupId,
       message: appliedItem.message,
-      releaseCount: appliedItem.releaseCount,
       seriesAction: appliedItem.seriesAction,
       status: "applied" as const,
     };

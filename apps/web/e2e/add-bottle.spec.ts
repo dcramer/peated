@@ -669,15 +669,12 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("creates a release from a scan when Create Bottle is clicked", async ({
+  test("creates a complete bottle from a scan when Create Bottle is clicked", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(
-        testInfo,
-        "photo-create-release-default-image",
-      ),
+      accessToken: uniqueAccessToken(testInfo, "photo-create-complete-bottle"),
     });
 
     await page.goto("/addBottle");
@@ -688,43 +685,58 @@ test.describe("add bottle flow", () => {
     const input = getRpcInput(await requestPromise);
 
     expect(input.createToken).toBe(
-      "playwright-create-token:create_bottle_and_release:suitable",
+      "playwright-create-token:create_bottle:suitable",
     );
     expect(input).not.toHaveProperty("catalogImageApproval");
-    await expect(page).toHaveURL(
-      new RegExp(`/bottles/${createdBottleId}/bottlings/${createdReleaseId}$`),
-    );
+    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
     await expect(
-      page.getByText(`${testBrand.name} ${createdBottleName}`),
+      page.getByRole("heading", {
+        name: `${testBrand.name} ${createdBottleName}`,
+      }),
     ).toBeVisible();
+    await expect(page.locator('dt:has-text("Bottle Label") + dd')).toHaveText(
+      "First Fill Oloroso",
+    );
+    await expect(page.locator('dt:has-text("ABV") + dd')).toHaveText("46.0%");
+    await expect(page.locator('dt:has-text("Release Year") + dd')).toHaveText(
+      "2026",
+    );
     await expectNoHorizontalOverflow(page);
   });
 
-  test("creates a release after repairing a parent from a scan", async ({
+  test("prefills exact bottle fields from a scan before creating it", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "photo-repair-parent-create"),
+      accessToken: uniqueAccessToken(testInfo, "photo-create-prefilled-bottle"),
     });
 
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
+    await page.getByRole("button", { name: "Show all details" }).click();
     await expect(
-      page.getByText(`Create a new bottling for ${existingBottle.fullName}.`),
+      page.getByText(`${testBrand.name} ${createdBottleName}`, { exact: true }),
     ).toBeVisible();
+    await expect(page.getByText("Edition:", { exact: true })).toBeVisible();
+    await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
 
     const requestPromise = waitForPhotoIdentificationCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
     const input = getRpcInput(await requestPromise);
 
     expect(input.createToken).toBe(
-      "playwright-create-token:repair_parent_and_create_release:suitable",
+      "playwright-create-token:create_bottle:suitable",
     );
-    await expect(page).toHaveURL(
-      new RegExp(`/bottles/${existingBottleId}/bottlings/${createdReleaseId}$`),
+    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expect(
+      page.getByRole("heading", {
+        name: `${testBrand.name} ${createdBottleName}`,
+      }),
+    ).toBeVisible();
+    await expect(page.locator('dt:has-text("Bottle Label") + dd')).toHaveText(
+      "First Fill Oloroso",
     );
     await expectNoHorizontalOverflow(page);
   });
@@ -820,14 +832,14 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("creates a scan release proposal as part of Add to Library", async ({
+  test("creates a complete scan bottle as part of Add to Library", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
       accessToken: uniqueAccessToken(
         testInfo,
-        "photo-create-release-default-image-library",
+        "photo-create-complete-bottle-library",
       ),
     });
 
@@ -841,10 +853,10 @@ test.describe("add bottle flow", () => {
     const libraryInput = getRpcInput(await libraryRequestPromise);
 
     expect(input.createToken).toBe(
-      "playwright-create-token:create_bottle_and_release:suitable",
+      "playwright-create-token:create_bottle:suitable",
     );
     expect(libraryInput.bottle).toBe(createdBottleId);
-    expect(libraryInput.release).toBe(createdReleaseId);
+    expect(libraryInput.release).toBeNull();
     expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),

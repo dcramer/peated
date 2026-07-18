@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:30:21.764Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake 2022 50% single malt Mars Shinshu"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake 2022 50% single malt Mars Shinshu",
+    "summary": "Here’s the bottle-specific ID for **Mars Shinshu Komagatake 2022 Edition**:\n\n- **Full name:** **Single Malt KOMAGATAKE 2022 Edition**. ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/?utm_source=openai))\n- **Producer / bottler:** **Hombo Shuzo / Mars Whisky**. The whisky is mad",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/mars-komagatake-shinshu-2.html",
+        "url": "https://www.whisky.com/whisky-database/details/mars-komagatake-shinshu-2.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://dekanta.com/products/mars-whisky-komagatake-22-year-old",
+        "url": "https://dekanta.com/products/mars-whisky-komagatake-22-year-old",
+        "domain": "dekanta.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+        "url": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.jpwhisky.net/new-komagatake-2022edition-2-19547/",
+        "url": "https://en.jpwhisky.net/new-komagatake-2022edition-2-19547/",
+        "domain": "en.jpwhisky.net",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9cad1a159cee331f2c673a207bd50b5a249f7547b20afe8aad0ed5392329ba32",
+    "mode": "auto"
+  }
+}

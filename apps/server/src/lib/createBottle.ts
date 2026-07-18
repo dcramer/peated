@@ -9,6 +9,7 @@ import {
   normalizeBottleAliasKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
+import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import type { AnyTransaction } from "@peated/server/db";
 import type {
@@ -34,6 +35,12 @@ import {
 import { reserveExactBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
+  lockCatalogTargetAssignmentDescriptorInTransaction,
+  lockCatalogTargetAssignmentDescriptorsInTransaction,
+  resolveCatalogTargetForAssignment,
+  type CatalogTargetAssignmentDescriptor,
+} from "@peated/server/lib/catalogTargets";
+import {
   getCatalogVerificationCreationMetadata,
   queueBottleCreationVerification,
   queueEntityCreationVerification,
@@ -52,7 +59,10 @@ import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 import type { z } from "zod";
-import { findConflictingSmwsBottleId } from "./concreteBottleConflicts";
+import {
+  findConflictingSmwsBottleId,
+  getSmwsCodeForBottleIdentity,
+} from "./concreteBottleConflicts";
 import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
 import type { ConcreteBottleCreateInput } from "./concreteBottleSchemas";
 
@@ -69,6 +79,7 @@ export class BottleAlreadyExistsError extends Error {
     readonly collision: {
       kind: "alias" | "canonical_name" | "smws_code";
       attemptedCanonicalFullName: string | null;
+      attemptedSmwsCode?: string | null;
     } | null = null,
   ) {
     super("Bottle already exists.");
@@ -214,7 +225,7 @@ async function prepareBottleCreateInTransaction(
   const newEntityIds: Set<number> = new Set();
   let seriesCreated = false;
 
-  const existingSmwsBottleId = await findConflictingSmwsBottleId(tx, {
+  const attemptedSmwsIdentity = {
     name: bottleData.name,
     fullName: formatBottleName({
       ...bottleData,
@@ -222,11 +233,17 @@ async function prepareBottleCreateInTransaction(
     }),
     brand: bottleData.brand,
     bottler: bottleData.bottler ?? null,
-  });
+  };
+  const attemptedSmwsCode = getSmwsCodeForBottleIdentity(attemptedSmwsIdentity);
+  const existingSmwsBottleId = await findConflictingSmwsBottleId(
+    tx,
+    attemptedSmwsIdentity,
+  );
   if (existingSmwsBottleId) {
     throw new BottleAlreadyExistsError(existingSmwsBottleId, {
       kind: "smws_code",
       attemptedCanonicalFullName: null,
+      attemptedSmwsCode,
     });
   }
 
@@ -737,14 +754,15 @@ export async function createConcreteBottleInTransaction(
           trustedContext!.distillerIds,
         )
       : input.stable;
+  // Exact age is name-normalization context only; it cannot become group-owned state.
   const normalizedStable = trustedContext
     ? null
     : normalizeBottleAge({
         name: normalizeBottleAliasKey(stableInput.name),
-        statedAge: stableInput.statedAge,
+        statedAge: stableInput.statedAge ?? input.exact.statedAge,
       });
   const stable = normalizedStable
-    ? { ...stableInput, ...normalizedStable }
+    ? { ...stableInput, name: normalizedStable.name }
     : stableInput;
   const prepared = await prepareBottleCreateInTransaction(tx, {
     creationSource,
@@ -836,6 +854,121 @@ export async function createConcreteBottleInTransaction(
     exactTarget,
     likelyGroups,
   };
+}
+
+export type ConcreteBottleCreateOrReuseResult = {
+  bottle: Bottle;
+  target: CatalogTargetAssignmentDescriptor & { bottleId: number };
+  createResult: ConcreteBottleCreateResult | null;
+};
+
+function isSafeConcreteBottleReuse(
+  error: BottleAlreadyExistsError,
+  existingBottle: Bottle,
+) {
+  if (
+    error.collision?.kind === "canonical_name" &&
+    error.collision.attemptedCanonicalFullName !== null
+  ) {
+    return (
+      existingBottle.fullName === error.collision.attemptedCanonicalFullName
+    );
+  }
+
+  if (
+    error.collision?.kind !== "smws_code" ||
+    !error.collision.attemptedSmwsCode
+  ) {
+    return false;
+  }
+
+  return [existingBottle.name, existingBottle.fullName].some(
+    (name) =>
+      parseSmwsReferenceName(name)?.code === error.collision!.attemptedSmwsCode,
+  );
+}
+
+/**
+ * Owns the savepoint-backed concrete create-or-safe-reuse decision. Reuse is
+ * limited to an exact canonical-name collision or the structurally verified
+ * SMWS code that caused creation to conflict. Source-Bottle input additionally
+ * constrains reuse to the source's still-active group.
+ */
+export async function createOrReuseConcreteBottleInTransaction(
+  tx: AnyTransaction,
+  {
+    creationSource,
+    createdByActorId,
+    input,
+    context,
+  }: {
+    creationSource: CatalogVerificationCreationSource;
+    createdByActorId: number;
+    input: ConcreteBottleCreateInput;
+    context: Context & { user: User };
+  },
+): Promise<ConcreteBottleCreateOrReuseResult> {
+  try {
+    const createResult = await tx.transaction(async (creationTx) =>
+      createConcreteBottleInTransaction(creationTx, {
+        creationSource,
+        createdByActorId,
+        input,
+        context,
+      }),
+    );
+    return {
+      bottle: createResult.bottle,
+      target: {
+        targetId: createResult.exactTarget.id,
+        groupId: createResult.group.id,
+        bottleId: createResult.bottle.id,
+      },
+      createResult,
+    };
+  } catch (error) {
+    if (!(error instanceof BottleAlreadyExistsError)) throw error;
+
+    const existingTarget = await resolveCatalogTargetForAssignment(
+      { kind: "bottle", bottleId: error.bottleId },
+      tx,
+    );
+    if (existingTarget.bottleId === null) throw error;
+
+    if (input.kind === "source_bottle") {
+      const sourceTarget = await resolveCatalogTargetForAssignment(
+        { kind: "bottle", bottleId: input.sourceBottleId },
+        tx,
+      );
+      await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
+        sourceTarget,
+        existingTarget,
+      ]);
+      if (sourceTarget.groupId !== existingTarget.groupId) throw error;
+    } else {
+      await lockCatalogTargetAssignmentDescriptorInTransaction(
+        tx,
+        existingTarget,
+        { composition: "concrete_bottle_mutation" },
+      );
+    }
+
+    const existingBottle = await tx.query.bottles.findFirst({
+      where: eq(bottles.id, error.bottleId),
+    });
+    if (!existingBottle || !isSafeConcreteBottleReuse(error, existingBottle)) {
+      throw error;
+    }
+
+    return {
+      bottle: existingBottle,
+      target: {
+        ...existingTarget,
+        bottleId: existingTarget.bottleId,
+      },
+      createResult: null,
+    };
+  }
 }
 
 /** Dispatches unique, best-effort work only after the Bottle transaction commits. */

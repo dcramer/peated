@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleReleasePromotions,
   bottles,
   bottleTombstones,
   catalogTargets,
@@ -434,6 +435,13 @@ describe("assignBottleAliasInTransaction", () => {
       })
       .returning();
     if (!target) throw new Error("Unable to create promoted exact target");
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promotedBottle.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+    });
     const name = "Promoted release consumer alias";
     const price = await fixtures.StorePrice({
       name,

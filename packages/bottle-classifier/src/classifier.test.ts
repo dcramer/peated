@@ -969,9 +969,7 @@ describe("createBottleClassifier", () => {
         observation: null,
         matchedBottleId: null,
         matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: null,
-        proposedRelease: null,
       },
       newItems: [
         {
@@ -986,6 +984,10 @@ describe("createBottleClassifier", () => {
     });
 
     expect(reasoning.artifacts.searchEvidence).toEqual([webSearchEvidence]);
+    expect(reasoning.decision).toMatchObject({
+      parentBottleId: null,
+      proposedRelease: null,
+    });
   });
 
   test("auto ignores obvious non-whisky references when extraction fails", async () => {
@@ -2600,7 +2602,7 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("resolves create_bottle drafts that duplicate surfaced bottle candidates", async () => {
+  test("downgrades create_bottle drafts that duplicate surfaced bottle candidates", async () => {
     const springbank10YearOldIdentity: BottleExtractedDetails = {
       brand: "Springbank",
       bottler: null,
@@ -2691,7 +2693,7 @@ describe("createBottleClassifier", () => {
       proposedBottle: null,
     });
     expect(result.decision.rationale).toContain(
-      "duplicates an existing local bottle candidate",
+      "exact existing Bottle candidate may already cover",
     );
   });
 
@@ -2699,7 +2701,7 @@ describe("createBottleClassifier", () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
         decision: {
-          action: "create_bottle_and_release",
+          action: "create_bottle",
           rationale:
             "Web evidence suggests Johnnie Walker Blenders' Batch Sherry Cask Finish EXP#7.",
           identityScope: "product",
@@ -2717,19 +2719,19 @@ describe("createBottleClassifier", () => {
           parentBottleId: null,
           candidateBottleIds: [],
           proposedBottle: {
-            name: "Blenders' Sherry Cask Finish",
+            name: "Blenders' Sherry Cask Finish EXP#7 12-year-old 2018 Release",
             series: {
               id: null,
               name: "Blenders' Batch",
             },
             category: "blend",
-            edition: null,
-            statedAge: null,
-            caskStrength: null,
-            singleCask: null,
-            abv: null,
+            edition: "EXP#7",
+            statedAge: 12,
+            caskStrength: false,
+            singleCask: false,
+            abv: 40,
             vintageYear: null,
-            releaseYear: null,
+            releaseYear: 2018,
             brand: {
               id: null,
               name: "Johnnie Walker",
@@ -2737,18 +2739,7 @@ describe("createBottleClassifier", () => {
             distillers: [],
             bottler: null,
           },
-          proposedRelease: {
-            edition: "EXP#7",
-            statedAge: 12,
-            abv: 40,
-            caskStrength: false,
-            singleCask: false,
-            vintageYear: null,
-            releaseYear: 2018,
-            description: "Sherry cask finish travel-retail release.",
-            tastingNotes: null,
-            imageUrl: null,
-          },
+          proposedRelease: null,
         },
         artifacts: {
           extractedIdentity: null,
@@ -3649,7 +3640,7 @@ describe("createBottleClassifier", () => {
       matchedReleaseId: null,
       identityScope: "product",
       proposedBottle: {
-        name: "Reserve",
+        name: "Reserve 9-year-old",
         statedAge: 9,
       },
     });
@@ -3908,7 +3899,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("splits non-SMWS year-marked exact-cask bottle creation into bottle and release", async () => {
+  test("keeps non-SMWS year-marked creation on one complete Bottle", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Talisker",
       bottler: null,
@@ -3938,7 +3929,7 @@ describe("createBottleClassifier", () => {
           parentBottleId: null,
           candidateBottleIds: [],
           proposedBottle: {
-            name: "Distillers Edition",
+            name: "2001 The Distillers Edition",
             series: {
               id: null,
               name: "The Distillers Edition",
@@ -3998,18 +3989,17 @@ describe("createBottleClassifier", () => {
     }
 
     expect(result.decision).toMatchObject({
-      action: "create_bottle_and_release",
+      action: "create_bottle",
       identityScope: "product",
       proposedBottle: {
+        name: "The Distillers Edition",
         brand: {
           name: "Talisker",
         },
-        name: "Distillers Edition",
-      },
-      proposedRelease: {
         vintageYear: 2001,
         releaseYear: 2012,
       },
+      proposedRelease: null,
     });
   });
 
@@ -4103,9 +4093,97 @@ describe("createBottleClassifier", () => {
       action: "create_bottle",
       identityScope: "exact_cask",
       proposedBottle: {
-        name: "Islay 8-year-old 2007",
+        name: "Islay 8-year-old",
         statedAge: 8,
         vintageYear: 2007,
+      },
+      proposedRelease: null,
+    });
+  });
+
+  test("keeps an exact-cask marker structured outside the stable bottle name", async () => {
+    const extractedIdentity: BottleExtractedDetails = {
+      brand: "Willett",
+      bottler: null,
+      expression: "Family Estate Bottled Single Barrel Bourbon",
+      series: "Family Estate Bottled",
+      distillery: ["Willett"],
+      category: "bourbon",
+      stated_age: 5,
+      abv: 64.2,
+      release_year: null,
+      vintage_year: null,
+      cask_strength: true,
+      single_cask: true,
+      edition: "Barrel No. 4769",
+    };
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          rationale: "The label identifies one exact single-barrel Bottle.",
+          identityScope: "exact_cask",
+          observation: {
+            selector: null,
+            caskNumber: "4769",
+            barrelNumber: "4769",
+            bottleNumber: null,
+            outturn: null,
+            market: null,
+            exclusive: null,
+          },
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
+          matchedBottleId: null,
+          matchedReleaseId: null,
+          parentBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "Family Estate Bottled Single Barrel Bourbon",
+            series: { id: null, name: "Family Estate Bottled" },
+            category: "bourbon",
+            edition: "Barrel No. 4769",
+            statedAge: 5,
+            caskStrength: true,
+            singleCask: true,
+            abv: 64.2,
+            vintageYear: null,
+            releaseYear: null,
+            brand: { id: null, name: "Willett" },
+            distillers: [{ id: null, name: "Willett" }],
+            bottler: null,
+          },
+          proposedRelease: null,
+        },
+        artifacts: {
+          extractedIdentity,
+          searchEvidence: [],
+          candidates: [],
+          resolvedEntities: [],
+        },
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity,
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Willett Family Estate Barrel No. 4769" },
+      extractedIdentity,
+      initialCandidates: [],
+    });
+
+    expect(result.status).toBe("classified");
+    if (result.status !== "classified") {
+      throw new Error("Expected a classified result");
+    }
+
+    expect(result.decision).toMatchObject({
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: {
+        name: "Family Estate Bottled Single Barrel Bourbon 5-year-old",
+        edition: "Barrel No. 4769",
       },
       proposedRelease: null,
     });

@@ -110,9 +110,6 @@ function getSuggestedNextStep(
         ? "confirm_match"
         : "manual_search";
     case "create_bottle":
-    case "create_release":
-    case "create_bottle_and_release":
-    case "repair_parent_and_create_release":
       return isPhotoIdentificationCreateDecisionAutoCreatable(
         classification.decision,
       )
@@ -182,8 +179,11 @@ function serializePhotoIdentificationClassification(
         proposedBottle: {
           name: decision.proposedBottle.name,
           category: decision.proposedBottle.category,
+          edition: decision.proposedBottle.edition,
           statedAge: decision.proposedBottle.statedAge,
           abv: decision.proposedBottle.abv,
+          caskStrength: decision.proposedBottle.caskStrength,
+          singleCask: decision.proposedBottle.singleCask,
           vintageYear: decision.proposedBottle.vintageYear,
           releaseYear: decision.proposedBottle.releaseYear,
           brand: {
@@ -194,76 +194,6 @@ function serializePhotoIdentificationClassification(
             id: distiller.id,
             name: distiller.name,
           })),
-        },
-      };
-      break;
-    case "create_release":
-      serializedDecision = {
-        action: "create_release",
-        parentBottleId: decision.parentBottleId,
-        proposedRelease: {
-          edition: decision.proposedRelease.edition,
-          statedAge: decision.proposedRelease.statedAge,
-          abv: decision.proposedRelease.abv,
-          vintageYear: decision.proposedRelease.vintageYear,
-          releaseYear: decision.proposedRelease.releaseYear,
-        },
-      };
-      break;
-    case "create_bottle_and_release":
-      serializedDecision = {
-        action: "create_bottle_and_release",
-        proposedBottle: {
-          name: decision.proposedBottle.name,
-          category: decision.proposedBottle.category,
-          statedAge: decision.proposedBottle.statedAge,
-          abv: decision.proposedBottle.abv,
-          vintageYear: decision.proposedBottle.vintageYear,
-          releaseYear: decision.proposedBottle.releaseYear,
-          brand: {
-            id: decision.proposedBottle.brand.id,
-            name: decision.proposedBottle.brand.name,
-          },
-          distillers: decision.proposedBottle.distillers.map((distiller) => ({
-            id: distiller.id,
-            name: distiller.name,
-          })),
-        },
-        proposedRelease: {
-          edition: decision.proposedRelease.edition,
-          statedAge: decision.proposedRelease.statedAge,
-          abv: decision.proposedRelease.abv,
-          vintageYear: decision.proposedRelease.vintageYear,
-          releaseYear: decision.proposedRelease.releaseYear,
-        },
-      };
-      break;
-    case "repair_parent_and_create_release":
-      serializedDecision = {
-        action: "repair_parent_and_create_release",
-        parentBottleId: decision.parentBottleId,
-        proposedBottle: {
-          name: decision.proposedBottle.name,
-          category: decision.proposedBottle.category,
-          statedAge: decision.proposedBottle.statedAge,
-          abv: decision.proposedBottle.abv,
-          vintageYear: decision.proposedBottle.vintageYear,
-          releaseYear: decision.proposedBottle.releaseYear,
-          brand: {
-            id: decision.proposedBottle.brand.id,
-            name: decision.proposedBottle.brand.name,
-          },
-          distillers: decision.proposedBottle.distillers.map((distiller) => ({
-            id: distiller.id,
-            name: distiller.name,
-          })),
-        },
-        proposedRelease: {
-          edition: decision.proposedRelease.edition,
-          statedAge: decision.proposedRelease.statedAge,
-          abv: decision.proposedRelease.abv,
-          vintageYear: decision.proposedRelease.vintageYear,
-          releaseYear: decision.proposedRelease.releaseYear,
         },
       };
       break;
@@ -399,19 +329,11 @@ function getClassificationLogAttributes(
   if ("matchedReleaseId" in decision && decision.matchedReleaseId !== null) {
     attrs[`${prefix}.matched_release_id`] = decision.matchedReleaseId;
   }
-  if ("parentBottleId" in decision && decision.parentBottleId !== null) {
-    attrs[`${prefix}.parent_bottle_id`] = decision.parentBottleId;
-  }
   if ("proposedBottle" in decision && decision.proposedBottle) {
     attrs[`${prefix}.proposed_bottle_brand`] =
       decision.proposedBottle.brand.name;
     attrs[`${prefix}.proposed_bottle_name`] = decision.proposedBottle.name;
   }
-  if ("proposedRelease" in decision && decision.proposedRelease?.edition) {
-    attrs[`${prefix}.proposed_release_edition`] =
-      decision.proposedRelease.edition;
-  }
-
   return attrs;
 }
 
@@ -819,9 +741,6 @@ export default procedure
             pendingImageId: pendingImage.id,
             decision: classification.decision,
             photoSuitability: imageEvidence.photoSuitability,
-            candidateBottleIds: classification.artifacts.candidates.map(
-              (candidate) => candidate.bottleId,
-            ),
           })
         : null;
 

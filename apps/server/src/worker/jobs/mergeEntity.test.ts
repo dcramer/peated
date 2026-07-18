@@ -1,16 +1,30 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroupDistillers,
+  bottleGroups,
   bottleGroupTombstones,
   bottleReleases,
   bottles,
+  bottleSeries,
+  changes,
   entities,
   entityTombstones,
 } from "@peated/server/db/schema";
+import type { getUserActor } from "@peated/server/lib/actors";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import type * as Fixtures from "@peated/server/lib/test/fixtures";
-import { asc, eq, inArray } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import { and, asc, eq, inArray } from "drizzle-orm";
+import { beforeEach, describe, expect, it } from "vitest";
 import mergeEntity from "./mergeEntity";
+
+function contextFor(user: Parameters<typeof getUserActor>[0]) {
+  return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
+}
+
+beforeEach(async ({ fixtures }) => {
+  await fixtures.User({ admin: true, username: "dcramer" });
+});
 
 test("merge A into B", async ({ fixtures }) => {
   const entityA = await fixtures.Entity({
@@ -129,6 +143,166 @@ test("merge duplicate bottle", async ({ fixtures }) => {
   ).toEqual([expect.objectContaining({ newGroupId: bottleB.groupId })]);
 });
 
+test("preflights exact batch duplicates from BottleGroup authority", async ({
+  defaults,
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Batch Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Batch Destination",
+  });
+  const source = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    name: "Annual",
+  });
+  const sourceBatch = await createConcreteBottle({
+    context: contextFor(defaults.user),
+    input: {
+      kind: "source_bottle",
+      sourceBottleId: source.id,
+      exact: { edition: "Batch 2" },
+    },
+  });
+  const destinationBatch = await createConcreteBottle({
+    context: contextFor(defaults.user),
+    input: {
+      kind: "independent",
+      stable: { brand: destinationEntity.id, name: "Annual" },
+      exact: { edition: "Batch 2" },
+    },
+  });
+  await db
+    .update(bottles)
+    .set({ name: "Drifted Member", fullName: "Batch Source Drifted Member" })
+    .where(eq(bottles.id, sourceBatch.bottle.id));
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, sourceBatch.bottle.id),
+    }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, destinationBatch.bottle.id),
+    }),
+  ).toMatchObject({ fullName: "Batch Destination Annual - Batch 2" });
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+  ).toMatchObject({
+    brandId: destinationEntity.id,
+    fullName: "Batch Destination Annual",
+  });
+});
+
+test("fans merged shared entity roles through every BottleGroup member", async ({
+  defaults,
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({
+    name: "Shared Source",
+    type: ["brand", "bottler", "distiller"],
+  });
+  const destinationEntity = await fixtures.Entity({
+    name: "Shared Destination",
+    type: ["brand", "bottler", "distiller"],
+  });
+  const sourceSeries = await fixtures.BottleSeries({
+    brandId: sourceEntity.id,
+    name: "Range",
+  });
+  const first = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    bottlerId: sourceEntity.id,
+    distillerIds: [sourceEntity.id],
+    name: "Expression",
+    seriesId: sourceSeries.id,
+  });
+  const second = await createConcreteBottle({
+    context: contextFor(defaults.user),
+    input: {
+      kind: "source_bottle",
+      sourceBottleId: first.id,
+      exact: { edition: "Batch 2" },
+    },
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.bottleGroups.findFirst({
+      where: eq(bottleGroups.id, first.groupId!),
+    }),
+  ).toMatchObject({
+    brandId: destinationEntity.id,
+    bottlerId: destinationEntity.id,
+    fullName: "Shared Destination Expression",
+  });
+  const members = await db.query.bottles.findMany({
+    where: eq(bottles.groupId, first.groupId!),
+    orderBy: (table, { asc }) => [asc(table.id)],
+  });
+  expect(members).toHaveLength(2);
+  expect(members).toEqual([
+    expect.objectContaining({
+      id: first.id,
+      brandId: destinationEntity.id,
+      bottlerId: destinationEntity.id,
+      fullName: "Shared Destination Expression",
+    }),
+    expect.objectContaining({
+      id: second.bottle.id,
+      brandId: destinationEntity.id,
+      bottlerId: destinationEntity.id,
+      fullName: "Shared Destination Expression - Batch 2",
+    }),
+  ]);
+  expect(
+    await db
+      .select()
+      .from(bottleGroupDistillers)
+      .where(eq(bottleGroupDistillers.groupId, first.groupId!)),
+  ).toEqual([{ groupId: first.groupId, distillerId: destinationEntity.id }]);
+  expect(
+    await db.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, sourceSeries.id),
+    }),
+  ).toBeUndefined();
+  const targetSeries = await db.query.bottleSeries.findFirst({
+    where: and(
+      eq(bottleSeries.brandId, destinationEntity.id),
+      eq(bottleSeries.name, sourceSeries.name),
+    ),
+  });
+  expect(targetSeries).toMatchObject({
+    fullName: "Shared Destination Range",
+    numReleases: 2,
+  });
+  expect(members.map(({ seriesId }) => seriesId)).toEqual([
+    targetSeries!.id,
+    targetSeries!.id,
+  ]);
+  expect(
+    await db.query.changes.findFirst({
+      where: and(
+        eq(changes.objectType, "bottle"),
+        eq(changes.objectId, first.id),
+        eq(changes.type, "update"),
+      ),
+      orderBy: (table, { desc }) => [desc(table.createdAt)],
+    }),
+  ).toMatchObject({
+    data: expect.objectContaining({ creationSource: "repair_workflow" }),
+  });
+});
+
 async function expectReleaseOwnedDuplicateRollback(
   fixtures: typeof Fixtures,
   releaseOwner: "source" | "destination",
@@ -229,9 +403,14 @@ test("merge unique bottle", async ({ fixtures }) => {
     totalTastings: 1,
     totalBottles: 2,
   });
+  const sourceSeries = await fixtures.BottleSeries({
+    brandId: entityA.id,
+    name: "Legacy Range",
+  });
   const bottleA = await fixtures.LegacyBottle({
     brandId: entityA.id,
     name: "Unique",
+    seriesId: sourceSeries.id,
     statedAge: null,
   });
   const entityB = await fixtures.Entity({
@@ -244,7 +423,6 @@ test("merge unique bottle", async ({ fixtures }) => {
     name: "More Unique",
     statedAge: null,
   });
-
   await mergeEntity({
     fromEntityIds: [entityA.id],
     toEntityId: entityB.id,
@@ -257,6 +435,16 @@ test("merge unique bottle", async ({ fixtures }) => {
   expect(newBottleA).toBeDefined();
   expect(newBottleA.brandId).toEqual(entityB.id);
   expect(newBottleA.name).toEqual("Unique");
+  expect(newBottleA.seriesId).toEqual(sourceSeries.id);
+  expect(
+    await db.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, sourceSeries.id),
+    }),
+  ).toMatchObject({
+    brandId: entityB.id,
+    fullName: "Entity B Legacy Range",
+    numReleases: 1,
+  });
 
   const [newBottleB] = await db
     .select()

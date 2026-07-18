@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import {
   classifierEvalFixtureSchema,
-  legacyReleaseRepairResolutionEvalFixtureSchema,
   listFixtureFiles,
   realWorldNewBottleFixtureSchema,
 } from "./evalFixtureSchemas";
@@ -14,7 +13,6 @@ const fixtureRootDir = fileURLToPath(
 );
 const decisionFixtureDir = `${fixtureRootDir}/decision-cases`;
 const newBottleFixtureDir = `${fixtureRootDir}/new-bottles`;
-const legacyRepairFixtureDir = `${fixtureRootDir}/legacy-release-repair`;
 
 function inferDecisionScenario(
   fixture: ReturnType<typeof classifierEvalFixtureSchema.parse>,
@@ -45,10 +43,6 @@ function inferDecisionScenario(
 
     if (fixture.expected.action === "match") {
       return "match_existing";
-    }
-
-    if (fixture.expected.action === "repair_parent_and_create_release") {
-      return "parent_repair_releases";
     }
   }
 
@@ -93,23 +87,6 @@ describe("eval fixture validation", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  test("keeps legacy release repair fixtures schema-valid", () => {
-    const ids: string[] = [];
-
-    for (const filename of listFixtureFiles(legacyRepairFixtureDir)) {
-      const fixture = legacyReleaseRepairResolutionEvalFixtureSchema.parse(
-        JSON.parse(readFileSync(filename, "utf8")),
-      );
-
-      ids.push(fixture.id);
-      expect(fixture.referenceName.length).toBeGreaterThan(0);
-      expect(fixture.name.length).toBeGreaterThan(0);
-    }
-
-    expect(ids.length).toBeGreaterThan(0);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
-
   test("rejects production-miss decision fixtures without observed input context", () => {
     const result = classifierEvalFixtureSchema.safeParse({
       id: "missing-observed-input",
@@ -128,7 +105,7 @@ describe("eval fixture validation", () => {
       },
       expected: {
         status: "classified",
-        action: "repair_parent_and_create_release",
+        action: "create_bottle",
         summary: "Should reject before judging the outcome.",
       },
     });
@@ -215,12 +192,6 @@ describe("eval fixture validation", () => {
       ...listFixtureFiles(newBottleFixtureDir).map(
         (filename) =>
           realWorldNewBottleFixtureSchema.parse(
-            JSON.parse(readFileSync(filename, "utf8")),
-          ).id,
-      ),
-      ...listFixtureFiles(legacyRepairFixtureDir).map(
-        (filename) =>
-          legacyReleaseRepairResolutionEvalFixtureSchema.parse(
             JSON.parse(readFileSync(filename, "utf8")),
           ).id,
       ),

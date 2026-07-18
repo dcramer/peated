@@ -147,22 +147,24 @@ durable consumer target.
 
 ### Requirement: Classifier creation returns canonical exact identity
 
-The system SHALL apply every successful create-shaped classifier decision as
-one complete concrete Bottle and SHALL return that Bottle's active exact
+The system SHALL expose one `create_bottle` classifier action containing one
+complete concrete Bottle and SHALL return that Bottle's active exact
 CatalogTarget with a null retained release id. It SHALL retain a bounded
-projection of the original classifier evidence without returning full
+projection of classifier evidence without returning full
 artifacts, candidates, search evidence, or duplicate proposed payloads.
 
 #### Scenario: Create or safely reuse from a classifier decision
 
-- **WHEN** a create-shaped classifier decision creates a concrete Bottle or
+- **WHEN** a `create_bottle` classifier decision creates a concrete Bottle or
   safely reuses an exact canonical duplicate
 - **THEN** the result contains the active exact target and matching
   `(bottleId, null)` projection
 - **AND** creation records `create_bottle` while safe reuse records
   `match_existing`
-- **AND** retained evidence includes the original action, nullable parent Bottle
-  id, identity scope, observation, identity basis, and confidence basis
+- **AND** retained evidence includes the action, identity scope, observation,
+  identity basis, and confidence basis
+- **AND** creation uses an automatic singleton group without classifier-selected
+  parent or source-group context
 - **AND** the path does not insert a BottleRelease or use a raw alias writer
 - **AND** canonical concrete creation still reserves the required canonical
   exact alias for the Bottle
@@ -185,14 +187,13 @@ artifacts, candidates, search evidence, or duplicate proposed payloads.
 - **AND** canonical concrete creation still reserves the Bottle's required
   canonical exact alias
 
-#### Scenario: Defer missing-Bottle worker consumer assignment
+#### Scenario: Assign a resolved missing-Bottle worker consumer
 
 - **WHEN** the missing-Bottle worker receives a successful classifier resolution
-  before its task 5.9 consumer cutover
-- **THEN** its decision audit may store the concrete Bottle, exact target, and
-  bounded classifier evidence
-- **AND** its explicitly unconverted Review and alias target assignment remains
-  governed by task 5.9
+- **THEN** its decision audit, alias, and matching Review consumers atomically
+  receive the same validated CatalogTarget and retained identity projection
+- **AND** a Review whose identity changes after the worker snapshot is preserved
+  rather than overwritten by the stale resolution
 - **AND** unresolved and `no_match` Review rows remain targetless
 
 ### Requirement: Direct Review mutations preserve one authoritative identity
@@ -662,10 +663,10 @@ price-assignment contract.
 - **THEN** its nested creation savepoint first rolls back all preparatory writes
 - **AND** the existing exact descriptor and any trusted source descriptor are
   locked and revalidated before reuse
-- **AND** reuse requires the existing Bottle's canonical `fullName` to exactly
-  equal the requested canonical `fullName` and its exact target to remain active
+- **AND** reuse requires either exact canonical `fullName` equality or an exact
+  structurally parsed SMWS code match, and its exact target remains active
 - **AND** an arbitrary or ignored alias collision, fuzzy name similarity, or
-  fuzzy SMWS collision is not accepted as reusable exact identity
+  fuzzy or substring-only SMWS collision is not accepted as reusable exact identity
 - **AND** release-only reuse requires both descriptors to remain active in the
   same group
 - **AND** a changed proposal price id, parent Bottle id, `creationTarget`,

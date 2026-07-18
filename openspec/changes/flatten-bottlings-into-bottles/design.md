@@ -174,12 +174,18 @@ choices from BottleGroup ownership; ordinary exact Bottle reads remain
 independent and do not hydrate the group. Task 5.3b separately composes
 moderator price-match correction approval with the canonical update
 transaction and removes the superseded proposal-specific updater in the same
-transactional slice. The legacy `proposedBottle` repair draft retains its sparse parent/stable
-meaning: required name and brand, non-null series, category, stable stated age,
-and bottler, and non-empty distillers are shared intent; non-null edition, ABV,
-flags, years, and canonical cask fields are exact intent for the selected
-Bottle. Null fields and empty distiller lists remain omitted rather than
-clearing catalog facts.
+transactional slice. The `proposedBottle` repair draft remains sparse. Live
+classifier corrections persist `statedAgeScope: exact`, making a non-null
+`statedAge` exact intent for the selected Bottle. Historical unmarked proposals
+retain their original shared-age interpretation until they are drained or
+migrated. Required name and brand, non-null series, category, and bottler, and
+non-empty distillers are shared intent; non-null edition, ABV, flags, years, and
+canonical cask fields are exact intent for the selected Bottle. Marked or
+unmarked null age, other null fields, and empty distiller lists remain omitted
+rather than clearing catalog facts. Task 9.7 removes both the marker and
+unmarked fallback after the historical proposal population is gone; from that
+point forward, every non-null correction `statedAge` is exact intent for the
+selected Bottle by default, while null remains a sparse unknown.
 
 Correction approval and the canonical concrete update commit in one database
 transaction. The canonical post-commit finalizer runs only after that combined
@@ -283,9 +289,9 @@ run against production immediately before live backfill writes. It reports
 full-name/alias collisions, parent release-like fields alongside child releases,
 invalid parent/release pairs, missing creators, incompatible ages, and target
 counts by consumer table. The retained report identifies the Git revision,
-database migration revision, generation time, and database. Existing
-dirty-parent repair tooling must resolve or explicitly waive ambiguous parent
-data before live backfill writes, and the audit runs again at constraint
+database migration revision, generation time, and database. Every ambiguous
+parent reported by that audit must receive an explicit migration disposition
+before live backfill writes, and the audit runs again at constraint
 cutover. Each constraint or cleanup gate uses a new retained production run from
 its exact candidate Git and migration revisions; it records its generation time
 and database, reconciles every count, and requires explicit approval. Neither
@@ -442,13 +448,6 @@ tasks 8.9 and 9.7 remove the remaining nested UI and compatibility surfaces.
 These boundaries preserve the independently complete Bottle and shared-edit
 fan-out invariants rather than introducing destination-free canonical deletion.
 
-Legacy release-repair discovery and apply remain compatibility-only for
-ungrouped pre-migration Bottles. `legacyReleaseRepairCandidates.ts` filters to
-`groupId IS NULL`, and `applyLegacyReleaseRepair.ts` enforces the same condition
-in both its preflight read and locked transactional read. A grouped Bottle is
-never offered, repaired, or deleted by that path; it requires an explicit exact
-Bottle merge. Task 9.7 removes the retained repair compatibility.
-
 ### Exact alias assignment establishes a target-aware owner
 
 Task 5.5a makes `assignBottleAlias` and
@@ -460,13 +459,15 @@ existing callers: it may persist `targetId` as null and does not resolve a
 missing target, but it must preserve an existing durable target rather than
 downgrading it to a legacy pair.
 
-The raw `apps/server/src/lib/db.ts` `upsertBottleAlias` pair writer and its
-creation, repair, import/reference-resolution, and entity-merge callers remain
-active outside the task 5.5a cutover. Later task 5.5 caller slices migrate those
-callers to explicit exact or generic CatalogTargets; task 9.7 removes the raw
-writer and the measured targetless compatibility mode after their staged use
-ends. Stable alias assignment through a generic group target is therefore a
-final-state requirement, not behavior activated by task 5.5a.
+The raw `apps/server/src/lib/db.ts` `upsertBottleAlias` pair primitive remains
+inside canonical creation only as a transactional name reservation that is
+upgraded to the new exact target before commit. Outside creation, only the
+explicitly isolated `groupId IS NULL` branch of `mergeEntity` retains the raw
+writer for pre-migration Bottle/BottleRelease compatibility. Grouped entity
+merge and brand/distillery maintenance delegate shared changes to the canonical
+BottleGroup update transaction, which atomically fans out complete member
+identity and canonical aliases. Task 9.7 removes the ungrouped branch, raw
+primitive, and measured targetless compatibility after migration.
 
 Moderator `PUT /bottle-aliases` keeps its Bottle-shaped external input but treats
 that Bottle as exact intent, requires its active exact target, and delegates to
@@ -547,18 +548,19 @@ reuse first rolls back any preparatory entity, series, or graph writes. After
 that rollback, duplicate handling resolves, locks, and revalidates the existing
 exact descriptor and the trusted source descriptor when one applies. It reuses
 the existing target only when the existing Bottle's canonical `fullName`
-exactly equals the requested canonical `fullName`, the exact target and
+exactly equals the requested canonical `fullName` or its structurally parsed
+SMWS code exactly matches, the exact target and
 descriptor set remain active, and a release-only duplicate remains in the
 trusted source group. A collision surfaced only through an arbitrary or ignored
-alias, fuzzy name similarity, or fuzzy SMWS matching is not safe reusable exact
+alias, fuzzy name similarity, or fuzzy or substring-only SMWS matching is not safe reusable exact
 identity; it remains a conflict or suggestion. A cross-group or drifted
 descriptor also remains a conflict. A newly created Bottle uses
 `create_bottle`, while safe duplicate reuse uses `match_existing`.
-Historical `create_release` and `create_bottle_and_release` enum values remain
-readable. Task 5.8 retains the original classifier action as evidence while
-emitting concrete decision vocabulary; tasks 5.9 and 9.7 own remaining producer
-cutover and explicit compatibility removal, so this price slice needs no enum
-migration.
+Historical release-shaped enum values remain readable in persisted audit rows,
+but no live classifier or proposal producer emits them. New classifier creation
+has one `create_bottle` action carrying the complete marketed Bottle. Tasks 5.9
+and 9.7 own remaining caller cutover and persisted compatibility removal, so
+this price slice needs no enum migration.
 
 The selected exact target is the one assignment for StorePrice, listing alias,
 source-keyed observation, proposal current/suggested identity, and latest
@@ -595,26 +597,23 @@ claim.
 
 ### Classifier application creates one complete Bottle
 
-Task 5.8 collapses every create-shaped classifier application into the
-canonical concrete-Bottle creation service. `create_bottle` and the retained
-combined legacy shape create one independently complete Bottle in an automatic
-singleton group. A retained `create_release` input may use its validated parent
-Bottle only as trusted source context for automatic group reuse. The retained
-`repair_parent_and_create_release` shape does not repair or mutate that parent,
-and does not reuse its group: it combines the proposed shared and exact facts
-into one new independently complete Bottle and singleton group. Its parent id
-remains source evidence only. There is no user-facing parent-repair action and
-none of these paths inserts or finalizes a BottleRelease.
+Task 5.8 routes classifier `create_bottle` through the canonical
+concrete-Bottle creation service. The proposal contains one independently
+complete marketed Bottle and creates an automatic singleton group. The
+classifier never selects a parent, source group, or BottleRelease operation;
+automatic group discovery and later curation are separate concerns.
 
 Every successful result returns the active exact CatalogTarget, the concrete
 Bottle id, a null retained release id, and `createdRelease: false`. Safe exact
 duplicate reuse returns that same target only after the canonical attempt has
-rolled back and the active target, canonical name, and trusted group context
-have been revalidated. New decision logs use `create_bottle` for an actual
-concrete creation and `match_existing` for safe reuse, while metadata retains
-the original classifier action and structured evidence. The historical action
-labels remain readable compatibility inputs until their producers and stored
-records are removed by the later classifier/caller cleanup tasks.
+rolled back, the collision resolves to an exact Bottle whose canonical
+`fullName` exactly matches the requested value, and its exact target is still
+active. Classifier creation supplies no trusted parent or group context and
+duplicate reuse does not infer one. New decision logs use `create_bottle` for
+an actual concrete creation and `match_existing` for safe reuse, while metadata
+retains bounded structured classifier evidence. Historical action labels remain
+readable only on persisted compatibility records until later cleanup tasks
+remove them.
 
 ### Alias-driven consumers share one assignment owner
 
@@ -682,10 +681,13 @@ targetless compatibility path remains removable under task 9.7.
 
 Classifier `no_match` and unresolved reviews remain explicitly targetless.
 Task 5.8 gives successful classifier creation or safe reuse an active exact
-target and retained decision evidence. The missing-Bottle worker consumes that
-result, but its Review and alias target assignment remains the precise task 5.9
-consumer cutover; task 5.6b does not invent a representative or other exact
-Bottle for an unresolved review.
+target and retained decision evidence. Task 5.9 makes the missing-Bottle worker
+consume that descriptor through canonical alias, Review, StorePrice, and
+incoming-decision propagation in one transaction. The worker compares the
+selected Review's identity snapshot under lock, so stale classifier work cannot
+overwrite a concurrent retarget. `no_match`, failed resolution, and genuinely
+unresolved Reviews remain targetless without inventing a representative or
+other exact Bottle.
 
 Direct review, collection, flight, and price mutations remain separate review
 boundaries in tasks 5.6c-5.6f. Create-new price approval remains tasks 5.7 and
@@ -711,12 +713,13 @@ Review creation's conflict/upsert behavior treats identity as one unit. A
 genuinely unresolved or targetless current reference cannot overwrite, clear,
 or partially mix with an existing durable target tuple. Successful direct
 classifier creation or safe reuse writes its exact target under task 5.8;
-`no_match`, failed resolution, and the not-yet-converted task 5.9 worker
-consumer remain explicitly targetless without permitting arbitrary target
-selection. When an existing different complete identity wins the upsert
-conflict, the incoming identity is rejected as a unit: creation neither creates
-nor reassigns an alias and records no decision evidence for that rejected
-identity.
+task 5.9 applies the same exact target through the missing-Bottle worker only
+while the selected Review still has its snapshotted identity. `no_match`, failed
+resolution, and genuinely unresolved consumers remain explicitly targetless
+without permitting arbitrary target selection. When an existing different
+complete identity wins the upsert conflict, the incoming identity is rejected
+as a unit: creation neither creates nor reassigns an alias and records no
+decision evidence for that rejected identity.
 
 Review update takes a Review identity snapshot, resolves and locks the
 authoritative CatalogTarget for that snapshot and requested mutation when one
@@ -931,7 +934,6 @@ must have an explicit removal task:
   over to concrete target responses, and task 9.7 removes the adapter after
   measured traffic reaches zero;
 - queued `MergeBottle` compatibility adapter: task 9.7;
-- legacy release-repair discovery and apply: task 9.7;
 - release-only search/indexing: task 7.5;
 - nested Bottling UI: task 8.9;
 - exact-Bottle runtime dependence on BottleGroup hydration: task 9.9;
@@ -945,7 +947,7 @@ the implementation they covered.
 
 ## Risks / Trade-offs
 
-- **Ambiguous legacy parent fields could create a missing or invented Bottle** → Audit parents with both releases and release-like fields, run existing repair tooling, and require an explicit migration disposition before retirement.
+- **Ambiguous legacy parent fields could create a missing or invented Bottle** → Audit parents with both releases and release-like fields and require an explicit migration disposition before retirement.
 - **The cross-cutting target migration can produce mixed reads** → Add `targetId` first, dual-read with parity assertions, backfill in resumable batches, and gate every cutover on zero null/mismatch counts.
 - **Promoted names or aliases can collide with existing Bottles** → Produce a preflight collision report and resolve through exact Bottle merge/mapping rather than suffixing or silently overwriting names.
 - **A shared edit can collide or partially rematerialize a group** → Lock and
@@ -962,12 +964,12 @@ the implementation they covered.
 1. **Inventory and audit tooling:** add read-only counts and integrity checks for all paired-reference tables, dirty parents, aliases, duplicate names, images, and legacy routes. Validate the report contract locally without requiring production access.
 2. **Additive schema:** generate migrations for BottleGroup, Bottle membership, catalog targets, release-promotion mappings, group tombstones, and nullable `targetId` columns. Do not remove legacy columns or treat this review slice as a deployment unit.
 3. **Domain services:** implement atomic singleton creation, create-another-release, target loading, group merge/split, and idempotent aggregate recomputation with database-backed tests.
-4. **New-write cutover:** move Add Bottle, classifier creation, importers, proposals, and repair flows to create concrete Bottles and automatic groups. Keep legacy release routes as instrumented adapters.
+4. **New-write cutover:** move Add Bottle, classifier creation, importers, proposals, and supported maintenance flows to create concrete Bottles and automatic groups. Remove obsolete age/release repair workflows and keep legacy release routes as instrumented adapters.
 5. **Resumable backfill:** in the controlled production migration, make the additive schema and backfill tooling available, then immediately run and retain the fresh production dry run from that exact revision and approve its counts before live writes. Create groups/targets, promote releases, migrate aliases and content, and populate every consumer `targetId` according to the deterministic rules. Re-run safely until no work remains; do not serve target-dependent application behavior during the incomplete state.
 6. **Parity period:** dual-read target and legacy references, assert serialized identity parity, compare exact/group counts, rebuild search indexes, and verify representative URLs and workflows.
 7. **Product cutover:** only after completed backfill, a valid zero-null target graph, retained parity evidence, and explicit approval, switch search, Bottle details, Library, tastings, reviews, prices, flights, activity, statistics workers, and moderation UI to Bottle/Group targets. Redirect old nested bottling routes.
 8. **Constraint cutover:** make required group/target columns non-null, reject new release writes, and remove paired-reference use from runtime code.
-9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing obsolete consumer `bottleId` columns wherever `targetId` replaces the full legacy pair, plus `releaseId` columns and `bottle_release`, as specified by task 9.6; remove release routes, serializers, jobs, form pages, and legacy repair code; remove runtime dependence on BottleGroup hydration for exact Bottle rendering while retaining complete Bottle materialization; then run the final zero-legacy and materialization-invariant audit and update architecture documentation.
+9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing obsolete consumer `bottleId` columns wherever `targetId` replaces the full legacy pair, plus `releaseId` columns and `bottle_release`, as specified by task 9.6; remove release routes, serializers, jobs, form pages, and remaining compatibility code; remove runtime dependence on BottleGroup hydration for exact Bottle rendering while retaining complete Bottle materialization; then run the final zero-legacy and materialization-invariant audit and update architecture documentation.
 
 Rollback remains straightforward through the parity period: disable new-write cutover, read legacy columns, and retain additive records. After destructive cleanup, rollback requires restoring the pre-cleanup database snapshot or applying a forward repair, so cleanup ships separately with an explicit backup and verification checkpoint.
 

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:06:57.261Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "High West High Country 23J12 batch"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "High West High Country 23J12 batch",
+    "summary": "For **High West High Country batch 23J12**, the bottle-specific evidence points to this being a **2023 release** of **High West High Country American Single Malt Whiskey**, bottled at **88 proof / 44% ABV** in a **750 mL** bottle. Multiple auction listings identify that exact batch code, “23J12,” with those details. ([",
+    "results": [
+      {
+        "title": "https://highwest.com/products/high-country-american-single-malt",
+        "url": "https://highwest.com/products/high-country-american-single-malt",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://highwest.com/pages/product-information",
+        "url": "https://highwest.com/pages/product-information",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://highwest.com/pages/why-we-blend",
+        "url": "https://highwest.com/pages/why-we-blend",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://ship.highwest.com/collections/limited-release",
+        "url": "https://ship.highwest.com/collections/limited-release",
+        "domain": "ship.highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://greatlakes.hibid.com/lot/287611977/high-west-high-country-single-malt-whiskey--2023-",
+        "url": "https://greatlakes.hibid.com/lot/287611977/high-west-high-country-single-malt-whiskey--2023-",
+        "domain": "greatlakes.hibid.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.liveauctioneers.com/item/226546454_high-west-high-country-single-malt-whiskey-2023-niles-il",
+        "url": "https://www.liveauctioneers.com/item/226546454_high-west-high-country-single-malt-whiskey-2023-niles-il",
+        "domain": "liveauctioneers.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fd52b93bea74f679a1cd6ff6ec9d042b2a4debd5c857f17a81daed2c2463fc40",
+    "mode": "auto"
+  }
+}

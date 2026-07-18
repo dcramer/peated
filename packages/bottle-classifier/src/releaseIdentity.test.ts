@@ -8,7 +8,6 @@ import {
   getCanonicalReleaseAliasNames,
   getReleaseObservationFacts,
   getResolvedReleaseIdentity,
-  hasBlockingBottleLevelReleaseTraits,
   hasBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
   hasExtractedReleaseIdentity,
@@ -44,88 +43,6 @@ describe("releaseIdentity", () => {
       edition: "Batch 24",
       abv: 58.4,
     });
-  });
-
-  test("allows stable marketed parent traits, including hyphenated spellings, to be inherited by child releases", () => {
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Glendronach 1972 Single Cask",
-          fullName: "Glendronach 1972 Single Cask",
-          statedAge: 48,
-          singleCask: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 48,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Warehouse Single-Cask Archive",
-          fullName: "Warehouse Single-Cask Archive",
-          statedAge: 12,
-          singleCask: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 12,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Warehouse Cask-Strength Archive",
-          fullName: "Warehouse Cask-Strength Archive",
-          statedAge: 12,
-          caskStrength: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 12,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: null,
-          caskStrength: true,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Warehouse Archive",
-          fullName: "Warehouse Archive",
-          statedAge: 48,
-          singleCask: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 48,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
-      }),
-    ).toBe(true);
   });
 
   test("returns only populated release observation facts", () => {
@@ -216,6 +133,28 @@ describe("releaseIdentity", () => {
     ).toEqual({
       name: "Lagavulin Distillers Edition - 2011 Release - 43.0% ABV",
       fullName: "Lagavulin Distillers Edition - 2011 Release - 43.0% ABV",
+    });
+  });
+
+  test("does not duplicate exact age already marketed in the stable name", () => {
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Speyside 12-year-old",
+        bottleFullName: "Shieldaig Speyside 12-year-old",
+        bottleStatedAge: null,
+        release: {
+          edition: null,
+          statedAge: 12,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: null,
+          caskStrength: null,
+        },
+      }),
+    ).toEqual({
+      name: "Speyside 12-year-old",
+      fullName: "Shieldaig Speyside 12-year-old",
     });
   });
 

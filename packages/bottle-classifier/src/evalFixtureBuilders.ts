@@ -2,7 +2,6 @@ import type {
   BottleCandidate,
   BottleExtractedDetails,
 } from "./classifierTypes";
-import type { LegacyReleaseRepairParentCandidate } from "./legacyReleaseRepairIdentity";
 
 export function buildBottleCandidate(
   candidate: Pick<BottleCandidate, "bottleId" | "fullName"> &
@@ -49,27 +48,5 @@ export function buildExtractedIdentity(
     single_cask: null,
     edition: null,
     ...identity,
-  };
-}
-
-export function buildLegacyReleaseRepairParentCandidate(
-  candidate: Pick<LegacyReleaseRepairParentCandidate, "fullName" | "id"> &
-    Partial<LegacyReleaseRepairParentCandidate>,
-): LegacyReleaseRepairParentCandidate {
-  const { fullName, id, ...overrides } = candidate;
-
-  return {
-    abv: null,
-    category: null,
-    caskStrength: null,
-    edition: null,
-    fullName,
-    id,
-    releaseYear: null,
-    singleCask: null,
-    statedAge: null,
-    totalTastings: null,
-    vintageYear: null,
-    ...overrides,
   };
 }

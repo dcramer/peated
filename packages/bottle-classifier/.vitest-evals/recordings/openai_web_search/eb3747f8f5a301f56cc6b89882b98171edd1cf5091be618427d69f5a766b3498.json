@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:14:22.184Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye 56.1 rye whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye 56.1 rye whiskey",
+    "summary": "**Wild Turkey Rare Breed Rye** is a **barrel proof straight rye whiskey** from **Wild Turkey Distillery**. The **56.1% ABV** you gave equals **112.2 proof**, which matches the official bottling strength. Wild Turkey describes it as **uncut and non-chill filtered** and says it was launched in **2020** as a **permanent e",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/what-is-rye-whiskey/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/latest-news/rye-whiskey-vs-bourbon/",
+        "url": "https://www.wildturkeybourbon.com/en-us/latest-news/rye-whiskey-vs-bourbon/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/en-us/products/masters-keep-cornerstone-rye/",
+        "url": "https://www.wildturkeybourbon.com/en-us/products/masters-keep-cornerstone-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+        "url": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "eb3747f8f5a301f56cc6b89882b98171edd1cf5091be618427d69f5a766b3498",
+    "mode": "auto"
+  }
+}

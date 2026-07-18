@@ -2,7 +2,7 @@
   "id": "mars-komagatake-2022-edition",
   "referenceName": "Komagatake",
   "expectedBottleName": "Mars Komagatake",
-  "summary": "Treat Mars Komagatake 2022 Edition as the 2022 annual release under the stable Mars Komagatake expression, preserving the extracted producer evidence and single malt category instead of duplicating Komagatake as both brand and expression.",
+  "summary": "Treat Mars Komagatake 2022 Edition as one complete Bottle with edition 2022 Edition and releaseYear 2022, preserving the extracted producer evidence and single malt category instead of duplicating Komagatake as both brand and expression.",
   "peatedBottleIds": [44298],
   "provenance": {
     "source": "production_miss",
@@ -22,9 +22,8 @@
   },
   "expected": {
     "handlingStrategy": "classifier_required",
-    "classifierExpectation": "bottle_plus_release",
-    "deterministicReleaseExpectation": "none",
-    "releaseIdentity": {
+    "classifierExpectation": "bottle",
+    "exactBottleIdentity": {
       "edition": "2022 Edition",
       "releaseYear": 2022
     }

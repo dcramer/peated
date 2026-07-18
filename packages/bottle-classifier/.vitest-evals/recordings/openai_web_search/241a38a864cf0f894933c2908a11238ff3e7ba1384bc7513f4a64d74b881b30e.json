@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:27:44.968Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% 4th Edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46% 4th Edition",
+    "summary": "Confirmed bottle details for **Glenmorangie The Quinta Ruban 14 Years Old**:\n\n- **Producer / bottler:** Glenmorangie, official distillery bottling. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n- **Name:** **The Quinta Ruban 14 Years Old**. ([glenmorangie.com](http",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/Scotch/comments/viky7q",
+        "url": "https://www.reddit.com/r/Scotch/comments/viky7q",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Glenmorangie-14-year-old-Quinta-Ruban-46",
+        "url": "https://whiskyadvocate.com/Glenmorangie-14-year-old-Quinta-Ruban-46",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "url": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/Scotch/comments/iyoz7c",
+        "url": "https://www.reddit.com/r/Scotch/comments/iyoz7c",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "241a38a864cf0f894933c2908a11238ff3e7ba1384bc7513f4a64d74b881b30e",
+    "mode": "auto"
+  }
+}

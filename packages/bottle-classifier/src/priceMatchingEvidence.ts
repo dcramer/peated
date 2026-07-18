@@ -213,24 +213,14 @@ export function deriveAutomationTier(
 
 // Maps the agent decision action enum onto the shared automation risk class.
 export function agentActionRiskClass(
-  action:
-    | "match"
-    | "create_bottle"
-    | "create_release"
-    | "create_bottle_and_release"
-    | "repair_parent_and_create_release"
-    | "repair_bottle"
-    | "no_match",
+  action: "match" | "create_bottle" | "repair_bottle" | "no_match",
 ): AutomationActionRiskClass {
   switch (action) {
     case "match":
       return "match";
     case "create_bottle":
-    case "create_release":
-    case "create_bottle_and_release":
       return "create";
     case "repair_bottle":
-    case "repair_parent_and_create_release":
       return "repair";
     default:
       return "none";

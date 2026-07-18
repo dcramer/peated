@@ -9,13 +9,10 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import {
-  isStagedTargetlessCatalogMappingError,
-  lockCatalogTargetAssignmentDescriptorInTransaction,
-  resolveCatalogTargetForAssignment,
-  type CatalogTargetAssignmentDescriptor,
-} from "@peated/server/lib/catalogTargets";
+  lockBottleReferenceResolutionAssignmentInTransaction,
+  resolveBottleReferenceTarget,
+} from "@peated/server/lib/bottleReferenceResolution";
 import { mapRows } from "@peated/server/lib/db";
 import {
   getIncomingBottleDecisionFromResolutionSource,
@@ -29,22 +26,6 @@ import { ReviewInputSchema, ReviewSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ReviewSerializer } from "@peated/server/serializers/review";
 import { and, eq, or, sql } from "drizzle-orm";
-
-const classifierCreateResolutionSources = [
-  "classifier_create_bottle",
-  "classifier_create_release",
-  "classifier_create_bottle_and_release",
-  "classifier_repair_parent_and_create_release",
-] as const;
-
-type ClassifierCreateResolutionSource =
-  (typeof classifierCreateResolutionSources)[number];
-
-function isClassifierCreateResolutionSource(
-  source: string,
-): source is ClassifierCreateResolutionSource {
-  return classifierCreateResolutionSources.some((value) => value === source);
-}
 
 export default procedure
   .use(requireAdmin)
@@ -101,20 +82,11 @@ export default procedure
         },
       });
     }
-    const bottleId = resolution.bottleId;
-    const releaseId = resolution.releaseId;
-    const classifierCreateSource = isClassifierCreateResolutionSource(
-      resolution.source,
-    )
-      ? resolution.source
-      : null;
+    const bottleId = resolution.assignment?.consumerIdentity.bottleId ?? null;
+    const releaseId = resolution.assignment?.consumerIdentity.releaseId ?? null;
+    const classifierCreated = resolution.source === "classifier_create_bottle";
     const reviewName =
-      (resolution.releaseId != null ||
-        classifierCreateSource === "classifier_create_release" ||
-        classifierCreateSource === "classifier_create_bottle_and_release" ||
-        classifierCreateSource ===
-          "classifier_repair_parent_and_create_release") &&
-      rawName !== normalizedName
+      releaseId != null && rawName !== normalizedName
         ? rawName
         : normalizedName;
     const reviewNameCandidates = Array.from(
@@ -122,48 +94,16 @@ export default procedure
     );
 
     const { review, aliasAssignment } = await db.transaction(async (tx) => {
-      let target: CatalogTargetAssignmentDescriptor | null = null;
-      if (resolution.targetId !== null) {
-        target = await resolveCatalogTargetForAssignment(
-          { kind: "target", targetId: resolution.targetId },
+      const lockedAssignment =
+        await lockBottleReferenceResolutionAssignmentInTransaction(
           tx,
+          resolution,
+          { caller: "reviews.create", operation: "persistResolution" },
         );
-      } else if (bottleId !== null && resolution.source === "exact_alias") {
-        try {
-          target = await resolveCatalogTargetForAssignment(
-            {
-              kind: "legacy",
-              bottleId,
-              releaseId,
-              context: {
-                caller: "reviews.create",
-                operation: "reuseTargetlessExactReviewAlias",
-              },
-            },
-            tx,
-          );
-        } catch (error) {
-          if (!isStagedTargetlessCatalogMappingError(error)) throw error;
-        }
-      } else if (
-        bottleId !== null &&
-        resolution.source === "classifier_match"
-      ) {
-        target = await resolveCatalogTargetForAssignment(
-          {
-            kind: "legacy",
-            bottleId,
-            releaseId,
-            context: {
-              caller: "reviews.create",
-              operation: "create",
-            },
-          },
-          tx,
-        );
-      }
+      const target =
+        lockedAssignment?.kind === "target" ? lockedAssignment.target : null;
 
-      if (classifierCreateSource !== null) {
+      if (classifierCreated) {
         if (bottleId === null || releaseId !== null || target === null) {
           throw new Error(
             "Classifier concrete Bottle creation returned an incomplete target identity.",
@@ -175,10 +115,6 @@ export default procedure
           );
         }
       }
-      if (target) {
-        await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
-      }
-
       // Preserve or replace identity only from the Review version locked after
       // the catalog target, keeping the catalog-before-consumer lock order.
       let [existingReview] = await tx
@@ -211,7 +147,7 @@ export default procedure
       let review;
       if (existingReview) {
         const classifierCreateConflictsWithDurableIdentity =
-          classifierCreateSource !== null &&
+          classifierCreated &&
           target !== null &&
           existingReview.targetId !== null &&
           existingReview.targetId !== target.targetId;
@@ -251,21 +187,21 @@ export default procedure
               DO UPDATE
               SET target_id = CASE
                     WHEN (excluded.target_id IS NOT NULL
-                        AND (${classifierCreateSource === null} OR ${reviews.targetId} IS NULL))
+                        AND (${!classifierCreated} OR ${reviews.targetId} IS NULL))
                       OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
                     THEN excluded.target_id
                     ELSE ${reviews.targetId}
                   END,
                   bottle_id = CASE
                     WHEN (excluded.target_id IS NOT NULL
-                        AND (${classifierCreateSource === null} OR ${reviews.targetId} IS NULL))
+                        AND (${!classifierCreated} OR ${reviews.targetId} IS NULL))
                       OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
                     THEN excluded.bottle_id
                     ELSE ${reviews.bottleId}
                   END,
                   release_id = CASE
                     WHEN (excluded.target_id IS NOT NULL
-                        AND (${classifierCreateSource === null} OR ${reviews.targetId} IS NULL))
+                        AND (${!classifierCreated} OR ${reviews.targetId} IS NULL))
                       OR (excluded.bottle_id IS NOT NULL AND ${reviews.targetId} IS NULL)
                     THEN excluded.release_id
                     ELSE ${reviews.releaseId}
@@ -291,21 +227,24 @@ export default procedure
         resolution.source === "exact_alias"
           ? undefined
           : ("classifier_approved" as const);
-      const aliasAssignment = await assignBottleAliasInTransaction(
-        tx,
-        target
-          ? {
-              target,
-              consumerIdentity: { bottleId, releaseId },
-              name: aliasKey,
-              backfillNames: [reviewName, rawName],
-              externalSiteId: site.id,
-              assignmentSource,
-              assignedByActorId: systemActor.id,
-            }
-          : {
-              bottleId,
-              releaseId,
+      if (!lockedAssignment) {
+        throw new Error("Bottle resolution returned no locked assignment.");
+      }
+      const aliasInput = {
+        name: aliasKey,
+        backfillNames: [reviewName, rawName],
+        externalSiteId: site.id,
+        assignmentSource,
+        assignedByActorId: systemActor.id,
+      };
+      const aliasAssignment =
+        lockedAssignment.kind === "target"
+          ? await assignBottleAliasInTransaction(tx, {
+              ...lockedAssignment,
+              ...aliasInput,
+            })
+          : await assignBottleAliasInTransaction(tx, {
+              ...lockedAssignment,
               context: {
                 caller: "reviews.create",
                 operation:
@@ -313,13 +252,8 @@ export default procedure
                     ? "reuseExactReviewAlias"
                     : "assignResolvedReviewAlias",
               },
-              name: aliasKey,
-              backfillNames: [reviewName, rawName],
-              externalSiteId: site.id,
-              assignmentSource,
-              assignedByActorId: systemActor.id,
-            },
-      );
+              ...aliasInput,
+            });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,

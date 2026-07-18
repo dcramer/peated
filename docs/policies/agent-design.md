@@ -34,16 +34,23 @@
 
 ## Bottle Database Agents
 
-- Bottle classifier decides identity.
+- Bottle classifier decides concrete Bottle identity; it does not assign
+  BottleGroups.
+- Supported classifier actions are `match`, `create_bottle`, `repair_bottle`,
+  and `no_match`.
 - Existing-bottle identification and full canonical classification are separate
-  contracts. Match-only flows may use local evidence; create, repair, release,
-  and parent-repair flows require the full classifier evidence bar.
+  contracts. Match-only flows may use local evidence; `create_bottle` and
+  `repair_bottle` require the full classifier evidence bar.
+- Every marketed release is one independently complete Bottle. `create_bottle`
+  carries that complete Bottle and never chooses a parent, source group, or
+  BottleGroup.
+- BottleGroup assignment happens automatically downstream, outside classifier
+  and manual identity intervention.
 - Price matching owns persistence.
 - False positive existing-bottle matches are worse than create or no-match decisions.
 - New bottle creation may be more permissive when sampling or review gates
   exist; automatic verification still needs corroborating evidence or a
   closed-form anchor.
-- Release creation requires explicit release evidence.
 - Brand and entity identity is not prefix matching.
 - Source facts are observations, not instructions.
 - Deterministic post-agent gates may block only impossible states, unknown IDs,

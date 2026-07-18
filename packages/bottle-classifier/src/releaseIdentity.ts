@@ -187,34 +187,6 @@ function isInheritedBottleLevelReleaseTrait({
   );
 }
 
-export function hasBlockingBottleLevelReleaseTraits({
-  bottle,
-  release,
-}: {
-  bottle: BottleReleaseIdentityBottleInput;
-  release: Partial<ReleaseIdentityInput>;
-}) {
-  return BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS.some((field) => {
-    const value = bottle[field];
-    if (value === null || value === undefined) {
-      return false;
-    }
-
-    if (
-      (field === "singleCask" || field === "caskStrength") &&
-      isInheritedBottleLevelReleaseTrait({
-        bottle,
-        field,
-        release,
-      })
-    ) {
-      return false;
-    }
-
-    return true;
-  });
-}
-
 function nameMarketsStatedAge({
   name,
   statedAge,
@@ -371,8 +343,14 @@ export function formatCanonicalReleaseName({
   for (const field of RELEASE_IDENTITY_FIELDS) {
     if (
       field === "statedAge" &&
-      bottleStatedAge !== null &&
-      resolvedRelease.statedAge === bottleStatedAge
+      resolvedRelease.statedAge !== null &&
+      ((bottleStatedAge !== null &&
+        resolvedRelease.statedAge === bottleStatedAge) ||
+        bottleMarketsStatedAge({
+          name: bottleName,
+          fullName: bottleFullName,
+          statedAge: resolvedRelease.statedAge,
+        }))
     ) {
       continue;
     }

@@ -1,7 +1,7 @@
 # Legacy BottleRelease Inventory
 
 This is the source inventory for the compatibility and cleanup gates. It was
-captured on 2026-07-14 from production source files with:
+recaptured on 2026-07-17 from production source files with:
 
 ```sh
 rg -l -S 'releaseId|release_id|bottle_release|bottleReleases|BottleRelease' \
@@ -33,6 +33,13 @@ updated with the production surface they exercise.
 | `store_price_match_attempt`    | historical current/suggested targets and retained Bottle/Release pairs                 |
 | `pending_upload`               | `bottle_release_image` target kind                                                     |
 | `change`                       | `bottle_release` object type and durable release-shaped payloads                       |
+| `legacy_release_repair_review` | Retained review decisions for the removed legacy release-repair workflow               |
+
+The `legacy_release_repair_review` table and its
+`legacy_release_repair_review_resolution` enum have no live workflow after task
+5.9, but remain generated database schema. Task 9.6 removes both through a
+Drizzle-generated migration; task 9.7 verifies that no runtime schema export or
+compatibility branch remains. No migration is generated in task 5.9.
 
 The Drizzle owners are:
 
@@ -42,6 +49,7 @@ The Drizzle owners are:
 - `apps/server/src/db/schema/flights.ts`
 - `apps/server/src/db/schema/incomingBottleDecisionLogs.ts`
 - `apps/server/src/db/schema/pendingUploads.ts`
+- `apps/server/src/db/schema/repairs.ts`
 - `apps/server/src/db/schema/reviews.ts`
 - `apps/server/src/db/schema/stores.ts`
 - `apps/server/src/db/schema/tastings.ts`
@@ -105,17 +113,13 @@ BottleRelease CRUD and registration:
 - `apps/server/src/orpc/routes/index.ts`
 - `apps/server/src/app.ts`
 
-Bottle catalog and repair routes:
+Bottle catalog routes:
 
-- `apps/server/src/orpc/routes/bottles/apply-age-repair.ts`
-- `apps/server/src/orpc/routes/bottles/apply-dirty-parent-release-repair.ts`
-- `apps/server/src/orpc/routes/bottles/apply-release-repair.ts`
 - `apps/server/src/orpc/routes/bottles/delete.ts` is retained only as a measured
   compatibility purge for ungrouped pre-migration Bottles. Grouped concrete
   Bottles are rejected without mutation with an actionable merge-required
   result; their retirement requires an explicit destination through
   `mergeConcreteBottles`. Task 9.7 removes this compatibility branch.
-- `apps/server/src/orpc/routes/bottles/release-repair-candidates.ts`
 - `apps/server/src/orpc/routes/bottles/update.ts` is the task 5.3a thin
   moderator adapter. It accepts only strict shared/exact patches, delegates all
   writes to `updateConcreteBottle`, and returns the validated exact target.
@@ -125,12 +129,11 @@ Bottle catalog and repair routes:
   from the selected Bottle so the live form never treats materialized Bottle
   drift as shared authority.
 - `apps/server/src/orpc/routes/bottles/upsert.ts` is a translation-only
-  compatibility route for the scraper caller in
-  `apps/server/src/lib/scraper.ts`. A successful concrete create or update is
-  reloaded as the retained legacy Bottle response and emits structured
-  `bottle_upsert.compatibility` telemetry. Task 5.9 cuts the scraper and any
-  remaining callers over to concrete target responses; task 9.7 removes this
-  response adapter after measured traffic reaches zero.
+  compatibility route with no supported in-repository caller after task 5.9. A
+  successful concrete create or update is reloaded as the retained legacy
+  Bottle response and emits structured `bottle_upsert.compatibility` telemetry.
+  Task 9.7 removes this measured response adapter after observed traffic reaches
+  zero.
 - `apps/server/src/orpc/routes/bottleAliases/upsert.ts` is the task 5.5a thin
   moderator adapter. Its Bottle input is exact intent; it resolves the active
   exact CatalogTarget and delegates alias persistence to the canonical
@@ -222,6 +225,11 @@ Target-bearing consumer routes:
 - `apps/server/src/orpc/routes/tastings/create.ts`
 - `apps/server/src/orpc/routes/tastings/delete.ts`
 - `apps/server/src/orpc/routes/tastings/list.ts`
+- `apps/server/src/orpc/routes/tastings/update.ts` trusts a durable target and
+  uses the measured legacy pair only to repair a null `targetId` when rating or
+  target state requires recomputation. It persists that descriptor before
+  dispatching exact or group statistics; task 9.7 removes the fallback after
+  backfill and parity.
 - `apps/server/src/orpc/routes/tastings/photo-identification-create.ts` applies
   an approved create-shaped classifier decision through the same task 5.8
   concrete creation owner. Success returns one independently complete Bottle
@@ -267,15 +275,19 @@ Classifier, price matching, and moderation routes:
 
 Catalog identity, aliases, search, creation, and updates:
 
-- `apps/server/src/lib/scraper.ts` is the known caller of the legacy Bottle
-  upsert response adapter. Task 5.9 moves it to concrete target responses before
-  task 9.7 removes that measured adapter.
+- `apps/server/src/lib/scraper.ts` calls canonical Bottle create directly,
+  handles the defined exact-duplicate conflict through canonical Bottle update,
+  and consumes the returned exact CatalogTarget for image work. It no longer
+  calls or reconstructs the legacy Bottle upsert response.
 - `apps/server/src/lib/createBottle.ts` owns the shared Bottle preparation and
   persistence core plus the complete legacy and concrete transaction
   operations. Stable Bottle columns and distiller joins are durable exact-Bottle
   materialization and must remain synchronized by atomic group-wide writes.
 - `apps/server/src/lib/createConcreteBottle.ts` owns the runtime-validated
   concrete creation service boundary used by future public adapters.
+- `apps/server/src/lib/concreteBottleIdentity.ts` materializes complete exact
+  Bottle names and effective shared/exact age from retained release traits. It
+  is a final concrete-Bottle identity owner, not a BottleRelease writer.
 - `apps/server/src/lib/updateConcreteBottle.ts` is the authoritative moderator
   update domain service. Task 5.3a cuts over the standard route and live edit
   workflow. Task 5.3b composes price-match correction approval with its
@@ -308,6 +320,11 @@ Catalog identity, aliases, search, creation, and updates:
   generic targets and targetless legacy parent Bottles. The projection does not
   silently pre-filter graph errors: strict recomputation validates the active
   graph and target integrity and stops on an invalid row.
+- `apps/server/src/lib/consolidateCatalogTargetConsumers.ts` is the canonical
+  transaction-scoped consumer consolidation owner used by group and exact
+  target merges. Retained pair columns remain compatibility preimages until
+  task 9.6 removes them; the service never derives target identity from those
+  pairs.
 - `apps/server/src/lib/catalogTargets.ts` is the instrumented compatibility
   reader/writer from tasks 3.2/3.7. Its
   `resolveCatalogTargetForAssignment` boundary returns the validated target,
@@ -362,6 +379,11 @@ Catalog identity, aliases, search, creation, and updates:
   it does not queue `OnBottleAliasChange`. Existing-alias assignment need not
   enqueue alias indexing.
 - `apps/server/src/lib/bottleCreationDrafts.ts`
+- `apps/server/src/lib/legacyConcreteBottleInput.ts` is the retained translation
+  boundary for price-proposal Bottle/BottleRelease-shaped evidence. It emits one
+  canonical concrete-Bottle input, rejects untranslatable image URLs, and never
+  writes BottleRelease. Section 8 removes release-shaped callers and task 9.7
+  removes this translator after measured compatibility traffic reaches zero.
 - `apps/server/src/lib/bottleFinder.ts` owns target-aware exact alias resolution
   and the task 5.6f StorePrice-ingestion alias projection. Existing exact-only
   readers still receive a Bottle only from an exact target. Direct ingestion
@@ -373,62 +395,45 @@ Catalog identity, aliases, search, creation, and updates:
   alias reads and Bottle search/index replacement remain tasks 7.3 and 7.5.
 - `apps/server/src/lib/bottleReferenceCandidates.ts`
 - `apps/server/src/lib/bottleReferenceResolution.ts` owns task 5.8 classifier
-  application and reference resolution. Every create-shaped action delegates to
-  canonical concrete creation and returns one exact target with
+  application and reference resolution. The live `create_bottle` action
+  delegates to canonical concrete creation and returns one exact target with
   `(bottleId, null)`; safe canonical duplicate reuse returns the same active
   exact target only after rollback and revalidation. The result carries only a
-  bounded classifier-evidence projection (original action, parent id, identity
-  scope, observation, identity basis, and confidence basis). Exact aliases and
+  bounded classifier-evidence projection (action, identity scope, observation,
+  identity basis, and confidence basis). Exact aliases and
   classifier failures carry no classifier evidence, and `no_match`/unresolved
   results remain targetless. This service no longer owns a raw alias or
   BottleRelease writer.
 - `apps/server/src/lib/bottleReleaseIdentity.ts`
 - `apps/server/src/lib/bottleSchemaRules.ts`
-- `apps/server/src/lib/createBottleRelease.ts`
 - `apps/server/src/lib/db.ts` still owns the raw legacy-pair
-  `upsertBottleAlias` writer. It remains active for
-  `createBottle.ts`, `createBottleRelease.ts`,
-  `applyDirtyParentReleaseRepair.ts`, `applyLegacyReleaseRepair.ts`,
-  `repairBottleBrandDistilleryAssignments.ts`, and
-  `worker/jobs/mergeEntity.ts`, with direct coverage in `lib/db.test.ts`.
-  Active CLI callers also include the Bottle `fix-names` command and the price
-  and review `backfill-aliases` commands, while Bottle `normalize` and review
-  `backfill-aliases` contain direct bound and unbound alias inserts respectively.
-  These creation, repair, import/reference-resolution, and entity-merge callers
-  and CLI maintenance paths are outside task 5.5a; later task 5.5 caller slices
-  migrate them to explicit targets and task 9.7 removes the raw writer and
-  direct legacy-pair/unbound inserts.
+  `upsertBottleAlias` primitive. Canonical creation uses it only to reserve a
+  canonical name inside its transaction, then upgrades that alias to the new
+  exact target before commit. `worker/jobs/mergeEntity.ts` uses it only in the
+  explicitly isolated `groupId IS NULL` pre-migration branch. Task 9.7 removes
+  that ungrouped compatibility branch and the raw primitive.
 - `apps/server/src/lib/format.ts`
 - `apps/server/src/lib/search.ts`
 
-Repair and migration-adjacent services:
+Active repair and migration-adjacent services:
 
-- `apps/server/src/lib/applyDirtyParentAgeRepair.ts`
-- `apps/server/src/lib/applyDirtyParentReleaseRepair.ts`
-- `apps/server/src/lib/applyLegacyReleaseRepair.ts` is a task 5.4c
-  compatibility-only repair owner. Its preflight and locked transactional reads
-  require `groupId IS NULL`, so it cannot repair or delete a grouped Bottle;
-  grouped retirement uses explicit exact Bottle merge. Task 9.7 removes it.
-- `apps/server/src/lib/applyRepairBackfillProposals.ts`
 - `apps/server/src/lib/canonRepairCandidates.ts`
-- `apps/server/src/lib/dirtyParentAgeRepairCandidates.ts`
-- `apps/server/src/lib/legacyReleaseRepairCandidates.ts` is the matching
-  compatibility-only discovery owner. It offers only legacy parents with
-  `groupId IS NULL` and never presents grouped Bottles for release repair. Task
-  9.7 removes this discovery path.
-- `apps/server/src/lib/legacyReleaseRepairClassifier.ts`
-- `apps/server/src/lib/legacyReleaseRepairReviewState.ts`
-- `apps/server/src/lib/legacyReleaseRepairReviews.ts`
-- `apps/server/src/lib/repairBackfillProposals.ts`
-- `apps/server/src/lib/repairBottleBrandDistilleryAssignments.ts`
-- `apps/server/src/lib/fixBadReviewEntities.ts`
+- `apps/server/src/lib/repairBottleBrandDistilleryAssignments.ts` groups
+  candidates by BottleGroup and delegates one shared brand, distillery, and
+  series edit per group to `updateConcreteBottleInTransaction`, which owns the
+  atomic member fan-out and canonical aliases. It refuses ungrouped
+  pre-migration Bottles and performs no direct grouped-Bottle or raw-alias
+  mutation.
+- `apps/server/src/lib/fixBadReviewEntities.ts` resolves one validated target
+  descriptor, then atomically assigns it through the canonical alias/Review
+  propagation owner. A Review identity changed since discovery is preserved.
 
 Classifier decisions and price matching:
 
 - `apps/server/src/agents/bottleClassifier/service.ts`
-- `apps/server/src/lib/classifierDecisionCreateInputs.ts` projects each retained
-  create-shaped classifier action into the one canonical concrete-Bottle input;
-  action names remain evidence and never select BottleRelease storage.
+- `apps/server/src/lib/classifierDecisionCreateInputs.ts` projects the single
+  live `create_bottle` action into independent canonical concrete-Bottle input;
+  classifier output never selects a parent, source group, or BottleRelease.
 - `apps/server/src/lib/incomingBottleDecisionLog.ts` maps successful task 5.8
   concrete creation to `create_bottle` and safe reuse to `match_existing`, while
   accepting the exact target and retained `(bottleId, null)` projection from the
@@ -482,9 +487,10 @@ Classifier decisions and price matching:
   a nested savepoint so a duplicate first rolls back all preparatory writes. It
   then locks and revalidates the existing exact target together with the trusted
   source descriptor when present before accepting reuse. Reuse additionally
-  requires exact equality with the requested canonical `fullName` and an active
-  exact target; an arbitrary or ignored alias collision, fuzzy name match, or
-  fuzzy SMWS collision is not reusable identity. Release-only reuse must stay in
+  requires exact equality with the requested canonical `fullName` or an exact
+  structurally parsed SMWS code match and an active exact target; an arbitrary
+  or ignored alias collision, fuzzy name match, or fuzzy or substring-only SMWS
+  collision is not reusable identity. Release-only reuse must stay in
   the trusted source group, and cross-group duplicates conflict. The later
   proposal/price gate rejects parent-id drift, price-id drift, changes to
   `creationTarget`, `proposedBottle`, or `proposedRelease`, or any change to the
@@ -545,12 +551,12 @@ Classifier decisions and price matching:
 
 - `apps/server/src/worker/jobs/createMissingBottles.ts` now consumes the task 5.8
   resolution's concrete Bottle, exact target, and bounded classifier evidence,
-  and records that exact target/evidence on its incoming decision audit. Its
-  retained Review and alias assignment still calls canonical alias assignment
-  with only the legacy pair and does not authoritatively apply the returned
-  descriptor to the Review; that precise consumer cutover remains task 5.9.
-  `no_match` and failed/unresolved reviews stay targetless, and the worker never
-  selects a representative or arbitrary exact Bottle.
+  and passes the validated descriptor atomically through canonical alias,
+  Review, StorePrice, and incoming-decision propagation. It compares the
+  selected Review's identity snapshot under lock so a concurrent retarget wins
+  over stale classifier work. `no_match` and failed/unresolved reviews stay
+  targetless, and the worker never selects a representative or arbitrary exact
+  Bottle.
 - `apps/server/src/worker/jobs/index.ts`
 - `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
 - `apps/server/src/worker/jobs/onBottleChange.ts` refreshes Bottle details and
@@ -617,7 +623,11 @@ Classifier decisions and price matching:
   payload into `mergeConcreteBottles` transaction calls and owns no merge
   business logic. Remove its registration and job type under task 9.7 after the
   compatibility queue is drained.
-- `apps/server/src/worker/jobs/mergeEntity.ts`
+- `apps/server/src/worker/jobs/mergeEntity.ts` delegates grouped brand,
+  bottler, distiller, and series changes to the canonical shared BottleGroup
+  update transaction, including exact duplicate merges before fan-out. Its
+  direct Bottle/BottleRelease/raw-alias logic is restricted to an explicit
+  `groupId IS NULL` pre-migration compatibility branch removed by task 9.7.
 - `apps/server/src/worker/jobs/onBottleAliasChange.ts` remains only for raw alias
   producers. It delegates to the canonical alias-consumer synchronization owner
   before indexing. A generic replay first resolves the retained legacy pair
@@ -640,17 +650,13 @@ Classifier decisions and price matching:
   worker. Strict recomputation validates the active graph and target integrity
   and stops on an invalid row rather than silently skipping it. This explicit
   maintenance scope does not use the tasting assignment descriptor, which
-  distinguishes exact from generic user intent. The same file's `fix-names`
-  command still calls the raw pair `upsertBottleAlias`, and `normalize` directly
-  inserts a Bottle-bound alias without `targetId`.
-- `apps/cli/src/commands/prices.ts`: `prices backfill-aliases` still calls the
-  raw pair `upsertBottleAlias` for Bottle-bound price names.
-- `apps/cli/src/commands/reviews.ts`: `reviews backfill-aliases` calls the raw
-  pair `upsertBottleAlias` for Bottle-bound review names and directly inserts
-  an unbound alias for reviews without a Bottle.
-- These CLI alias maintenance paths are explicitly assigned to later task 5.5
-  caller slices; task 9.7 removes their raw pair and unbound writes after
-  target-aware replacements are active.
+  distinguishes exact from generic user intent. Its brand/distillery repair
+  command delegates grouped work to the canonical shared-update fan-out.
+- `apps/cli/src/commands/prices.ts` and
+  `apps/cli/src/commands/reviews.ts` retain name-normalization maintenance but
+  no longer expose raw Bottle-alias backfill writers.
+- Obsolete Bottle name/normalization and price/review alias-backfill commands
+  have been removed rather than retained as a second mutation system.
 - `apps/cli/src/commands/catalogMigration.ts`
 
 ## Migration audit
@@ -672,8 +678,7 @@ Classifier decisions and price matching:
 - `packages/bottle-classifier/src/exactCask.ts`
 - `packages/bottle-classifier/src/index.ts`
 - `packages/bottle-classifier/src/instructions.ts`
-- `packages/bottle-classifier/src/legacyReleaseRepairIdentity.ts`
-- `packages/bottle-classifier/src/legacyReleaseRepairResolution.ts`
+- `packages/bottle-classifier/src/legacyReleaseIdentityEvidence.ts`
 - `packages/bottle-classifier/src/localCatalog/candidates.ts`
 - `packages/bottle-classifier/src/localCatalog/dataSource.ts`
 - `packages/bottle-classifier/src/localCatalog/schema.ts`
@@ -681,6 +686,7 @@ Classifier decisions and price matching:
 - `packages/bottle-classifier/src/releaseIdentity.ts`
 - `packages/bottle-classifier/src/reviewPolicy.ts`
 - `packages/bottle-classifier/src/runtime/candidates.ts`
+- `packages/bottle-classifier/AGENTS.md`
 - `packages/bottle-classifier/README.md`
 - `packages/bottle-classifier/package.json`
 
@@ -692,7 +698,6 @@ though it is not executed in the request path.
 
 Routes:
 
-- `apps/web/src/app/(admin)/admin/(default)/release-repairs/page.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/page.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
@@ -736,6 +741,8 @@ Admin exports and test protocol fixtures that encode release fields:
 ## Documentation
 
 - `docs/architecture/bottle-creation-alias-system.md`
+- `docs/architecture/bottle-classifier.md`
+- `docs/architecture/rating-systems.md`
 - `docs/architecture/whisky-identity-model.md`
 - `docs/development/production-debugging.md`
 - `docs/features/photo-tasting-entry.md`

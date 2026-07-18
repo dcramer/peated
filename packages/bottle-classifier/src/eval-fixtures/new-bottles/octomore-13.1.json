@@ -1,13 +1,13 @@
 {
   "id": "octomore-dot-expression",
   "referenceName": "Octomore 13.1",
-  "expectedBottleName": "Octomore 13.1",
-  "summary": "Treat Octomore 13.1 as a distinct bottle identity, not as Octomore 13 with a child release.",
+  "expectedBottleName": "Octomore 13.1 5-year-old",
+  "expectedBottleNames": ["Octomore 13.1 5-year-old", "Octomore 13.1"],
+  "summary": "Treat Octomore 13.1 as one independently complete Bottle; reviewed web evidence may enrich it with the marketed 5-year-old age, but the source does not require that optional field.",
   "peatedBottleIds": [1535],
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
-    "deterministicReleaseExpectation": "none",
-    "releaseIdentity": null
+    "exactBottleIdentity": null
   }
 }

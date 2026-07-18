@@ -140,14 +140,14 @@
         "name": "Willett"
       },
       "category": "bourbon",
+      "edition": "Barrel No. 4769",
       "statedAge": 5,
       "abv": 64.2,
       "caskStrength": true,
       "singleCask": true
     },
-    "proposedBottleNameIncludes": ["Family Estate", "Single Barrel", "4769"],
-    "proposedBottleNameExcludes": ["2504", "Small Batch"],
-    "proposedRelease": null,
+    "proposedBottleNameIncludes": ["Family Estate", "Single Barrel"],
+    "proposedBottleNameExcludes": ["4769", "2504", "Small Batch"],
     "verifyEligible": false,
     "suggestedNextStep": "confirm_create",
     "summary": "Create a new exact-cask Willett Family Estate barrel 4769 bottle."

@@ -159,6 +159,15 @@ export type CatalogTargetAssignmentDescriptor = {
   bottleId: number | null;
 };
 
+export type CatalogTargetConsumerIdentity =
+  | { bottleId: number; releaseId: number | null }
+  | { bottleId: null; releaseId: null };
+
+export type CatalogTargetConsumerAssignment = {
+  target: CatalogTargetAssignmentDescriptor;
+  consumerIdentity: CatalogTargetConsumerIdentity;
+};
+
 async function assertCatalogTargetAssignmentDescriptor(
   database: AnyDatabase,
   target: CatalogTargetAssignmentDescriptor,
@@ -211,6 +220,78 @@ export async function lockCatalogTargetAssignmentDescriptorInTransaction(
     .for("update");
 
   await assertCatalogTargetAssignmentDescriptor(tx, target);
+}
+
+function assignmentDescriptorsMatch(
+  left: CatalogTargetAssignmentDescriptor,
+  right: CatalogTargetAssignmentDescriptor,
+) {
+  return (
+    left.targetId === right.targetId &&
+    left.groupId === right.groupId &&
+    left.bottleId === right.bottleId
+  );
+}
+
+/**
+ * Locks one authoritative target together with its retained consumer
+ * projection. Exact targets fast-path their concrete `{ bottleId, null }`
+ * projection, while promoted exact targets and generic targets may carry a
+ * measured legacy pair. A retained pair is resolved before and again after the
+ * target lock so drift cannot commit as a mixed assignment.
+ */
+export async function lockCatalogTargetConsumerAssignmentInTransaction(
+  tx: AnyTransaction,
+  assignment: CatalogTargetConsumerAssignment,
+  context: CatalogTargetOperationContext,
+): Promise<void> {
+  const { target, consumerIdentity } = assignment;
+  if (
+    target.bottleId !== null &&
+    consumerIdentity.bottleId === target.bottleId &&
+    consumerIdentity.releaseId === null
+  ) {
+    await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+    return;
+  }
+
+  if (consumerIdentity.bottleId === null) {
+    if (target.bottleId !== null) {
+      throw new CatalogTargetIntegrityMismatchError(
+        { targetId: target.targetId },
+        "the exact target is missing its retained Bottle projection",
+      );
+    }
+    await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+    return;
+  }
+
+  const resolveRetainedPair = () =>
+    resolveCatalogTargetForAssignment(
+      {
+        kind: "legacy",
+        bottleId: consumerIdentity.bottleId!,
+        releaseId: consumerIdentity.releaseId,
+        context,
+      },
+      tx,
+    );
+  const beforeLock = await resolveRetainedPair();
+  if (!assignmentDescriptorsMatch(beforeLock, target)) {
+    throw new CatalogTargetIntegrityMismatchError(
+      { targetId: target.targetId },
+      "the retained Bottle pair does not resolve to its target",
+    );
+  }
+
+  await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+  const afterLock = await resolveRetainedPair();
+  if (!assignmentDescriptorsMatch(afterLock, target)) {
+    throw new CatalogTargetIntegrityMismatchError(
+      { targetId: target.targetId },
+      "the retained Bottle pair changed while locking its target",
+    );
+  }
 }
 
 /**

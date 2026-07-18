@@ -164,8 +164,11 @@ const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
 const PhotoIdentificationProposedBottleSchema = z.object({
   name: z.string().trim().min(1),
   category: CategoryEnum.nullable(),
+  edition: z.string().nullable(),
   statedAge: z.number().nullable(),
   abv: z.number().nullable(),
+  caskStrength: z.boolean().nullable(),
+  singleCask: z.boolean().nullable(),
   vintageYear: z.number().nullable(),
   releaseYear: z.number().nullable(),
   brand: z.object({
@@ -180,14 +183,6 @@ const PhotoIdentificationProposedBottleSchema = z.object({
   ),
 });
 
-const PhotoIdentificationProposedReleaseSchema = z.object({
-  edition: z.string().nullable(),
-  statedAge: z.number().nullable(),
-  abv: z.number().nullable(),
-  vintageYear: z.number().nullable(),
-  releaseYear: z.number().nullable(),
-});
-
 export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
   "action",
   [
@@ -199,22 +194,6 @@ export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
     z.object({
       action: z.literal("create_bottle"),
       proposedBottle: PhotoIdentificationProposedBottleSchema,
-    }),
-    z.object({
-      action: z.literal("create_release"),
-      parentBottleId: z.number().int(),
-      proposedRelease: PhotoIdentificationProposedReleaseSchema,
-    }),
-    z.object({
-      action: z.literal("create_bottle_and_release"),
-      proposedBottle: PhotoIdentificationProposedBottleSchema,
-      proposedRelease: PhotoIdentificationProposedReleaseSchema,
-    }),
-    z.object({
-      action: z.literal("repair_parent_and_create_release"),
-      parentBottleId: z.number().int(),
-      proposedBottle: PhotoIdentificationProposedBottleSchema,
-      proposedRelease: PhotoIdentificationProposedReleaseSchema,
     }),
     z.object({
       action: z.literal("repair_bottle"),

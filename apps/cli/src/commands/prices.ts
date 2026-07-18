@@ -6,9 +6,7 @@ import {
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
-import { upsertBottleAlias } from "@peated/server/lib/db";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
 
@@ -108,28 +106,6 @@ subcommand
       offset += step;
     }
   });
-
-subcommand.command("backfill-aliases").action(async (options) => {
-  const step = 1000;
-  const systemActor = await getPeatedSystemActor();
-  const baseQuery = db.select().from(storePrices).orderBy(asc(storePrices.id));
-
-  let hasResults = true;
-  let offset = 0;
-  while (hasResults) {
-    hasResults = false;
-    const query = await baseQuery.offset(offset).limit(step);
-    for (const price of query) {
-      if (price.bottleId) {
-        await upsertBottleAlias(db, price.name, price.bottleId, null, {
-          assignedByActorId: systemActor.id,
-        });
-      }
-      hasResults = true;
-    }
-    offset += step;
-  }
-});
 
 subcommand.command("backfill-images").action(async (options) => {
   await db

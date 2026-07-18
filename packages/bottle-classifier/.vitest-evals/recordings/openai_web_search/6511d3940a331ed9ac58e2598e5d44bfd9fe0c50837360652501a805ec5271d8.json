@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:40:58.148Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake 2022 50% single malt limited edition Mars"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake 2022 50% single malt limited edition Mars",
+    "summary": "This appears to be **Single Malt KOMAGATAKE 2022 Edition** from **Mars Whisky / Hombo Shuzo**, not a bottle officially titled “Limited Edition.” Mars’s own product page names it **“2022 Edition”**, lists it as **700 ml**, **50% ABV**, and marks it **discontinued**. It is an **official bottling** of **Japanese single ma",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.highroadspirits.com/mars",
+        "url": "https://www.highroadspirits.com/mars",
+        "domain": "highroadspirits.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://dekanta.com/products/mars-whisky-komagatake-22-year-old",
+        "url": "https://dekanta.com/products/mars-whisky-komagatake-22-year-old",
+        "domain": "dekanta.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "url": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6511d3940a331ed9ac58e2598e5d44bfd9fe0c50837360652501a805ec5271d8",
+    "mode": "auto"
+  }
+}

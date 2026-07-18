@@ -1,4 +1,4 @@
-import { db, type AnyDatabase } from "@peated/server/db";
+import type { AnyDatabase } from "@peated/server/db";
 import {
   incomingBottleDecisionLogs,
   type Actor,
@@ -10,10 +10,7 @@ export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
-/**
- * Legacy classifier source names remain evidence; audit decisions record the
- * persisted concrete Bottle effect (`create_bottle` or `match_existing`), never release creation.
- */
+/** Audit decisions record the concrete Bottle effect, never a classifier verb. */
 export function getIncomingBottleDecisionFromResolutionSource(
   source: string,
   { createdBottle }: { createdBottle: boolean },
@@ -22,12 +19,6 @@ export function getIncomingBottleDecisionFromResolutionSource(
     case "classifier_match":
       return "match_existing";
     case "classifier_create_bottle":
-      return createdBottle === false ? "match_existing" : "create_bottle";
-    case "classifier_create_release":
-      return createdBottle ? "create_bottle" : "match_existing";
-    case "classifier_create_bottle_and_release":
-      return createdBottle ? "create_bottle" : "match_existing";
-    case "classifier_repair_parent_and_create_release":
       return createdBottle === false ? "match_existing" : "create_bottle";
     default:
       return null;
@@ -120,12 +111,4 @@ export async function recordIncomingBottleDecisionInTransaction(
     .returning();
 
   return log ?? null;
-}
-
-export async function recordIncomingBottleDecision(
-  input: Parameters<typeof recordIncomingBottleDecisionInTransaction>[1],
-) {
-  return await db.transaction(async (tx) =>
-    recordIncomingBottleDecisionInTransaction(tx, input),
-  );
 }

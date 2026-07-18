@@ -1,16 +1,9 @@
-import type {
-  ProposedBottle,
-  ProposedRelease,
-} from "@peated/bottle-classifier/internal/types";
-import type {
-  BottleInputSchema,
-  BottleReleaseInputSchema,
-} from "@peated/server/schemas";
+import type { ProposedBottle } from "@peated/bottle-classifier/internal/types";
+import type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottleSchemas";
+import type { BottleInputSchema } from "@peated/server/schemas";
 import type { z } from "zod";
-import { buildLegacyConcreteBottleInput } from "./legacyConcreteBottleInput";
 
 type BottleCreateInput = z.infer<typeof BottleInputSchema>;
-type BottleReleaseCreateInput = z.infer<typeof BottleReleaseInputSchema>;
 
 function buildBottleEntityInput(
   choice: {
@@ -70,114 +63,40 @@ export function buildBottleInputFromProposedBottle(
 }
 
 /**
- * Proposed releases already mirror the persisted release schema closely. The
- * remaining normalization here is just to fill nullable fields the route layer
- * still requires explicitly.
+ * Maps the classifier's one create action to independent concrete Bottle
+ * creation. Group assignment is automatic; classifier output never selects a
+ * parent or trusted source group.
  */
-export function buildBottleReleaseInputFromProposedRelease(
-  proposedRelease: ProposedRelease,
-): BottleReleaseCreateInput {
+export function buildClassifierConcreteBottleInput(
+  proposedBottle: ProposedBottle,
+): ConcreteBottleCreateInput {
+  const input = buildBottleInputFromProposedBottle(proposedBottle);
   return {
-    ...proposedRelease,
-    description: proposedRelease.description ?? null,
-    imageUrl: proposedRelease.imageUrl ?? null,
-    tastingNotes: proposedRelease.tastingNotes ?? null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
+    kind: "independent",
+    stable: {
+      name: input.name,
+      statedAge: null,
+      series: input.series,
+      category: input.category,
+      brand: input.brand,
+      distillers: input.distillers,
+      bottler: input.bottler,
+      flavorProfile: input.flavorProfile,
+    },
+    exact: {
+      edition: input.edition,
+      statedAge: input.statedAge,
+      abv: input.abv,
+      singleCask: input.singleCask,
+      caskStrength: input.caskStrength,
+      vintageYear: input.vintageYear,
+      releaseYear: input.releaseYear,
+      caskSize: input.caskSize,
+      caskType: input.caskType,
+      caskFill: input.caskFill,
+      description: input.description,
+      descriptionSrc: input.descriptionSrc,
+      tastingNotes: input.tastingNotes,
+    },
   };
-}
-
-/**
- * Convert a reviewed classifier decision into bottle and/or release create
- * inputs. Non-create decisions intentionally map to no inputs so callers must
- * handle matches and no-match results explicitly.
- */
-export function buildClassifierCreateInputs(decision: {
-  action: string;
-  proposedBottle?: ProposedBottle | null;
-  proposedRelease?: ProposedRelease | null;
-}): {
-  input?: BottleCreateInput;
-  releaseInput?: BottleReleaseCreateInput;
-} {
-  if (decision.action === "create_bottle") {
-    if (!decision.proposedBottle) {
-      return {
-        input: undefined,
-        releaseInput: undefined,
-      };
-    }
-
-    return {
-      input: buildBottleInputFromProposedBottle(decision.proposedBottle),
-      releaseInput: undefined,
-    };
-  }
-
-  if (decision.action === "create_release") {
-    if (!decision.proposedRelease) {
-      return {
-        input: undefined,
-        releaseInput: undefined,
-      };
-    }
-
-    return {
-      input: undefined,
-      releaseInput: buildBottleReleaseInputFromProposedRelease(
-        decision.proposedRelease,
-      ),
-    };
-  }
-
-  if (
-    decision.action === "create_bottle_and_release" ||
-    decision.action === "repair_parent_and_create_release"
-  ) {
-    if (!decision.proposedBottle || !decision.proposedRelease) {
-      return {
-        input: undefined,
-        releaseInput: undefined,
-      };
-    }
-
-    return {
-      input: buildBottleInputFromProposedBottle(decision.proposedBottle),
-      releaseInput: buildBottleReleaseInputFromProposedRelease(
-        decision.proposedRelease,
-      ),
-    };
-  }
-
-  return {
-    input: undefined,
-    releaseInput: undefined,
-  };
-}
-
-/**
- * Maps legacy classifier action shapes to one concrete Bottle create input.
- * The action remains evidence; it no longer selects a second persisted entity
- * type or authorizes mutation of the trusted source Bottle.
- */
-export function buildClassifierConcreteBottleInput(decision: {
-  action: string;
-  parentBottleId?: number | null;
-  proposedBottle?: ProposedBottle | null;
-  proposedRelease?: ProposedRelease | null;
-}) {
-  const { input: bottleInput, releaseInput } =
-    buildClassifierCreateInputs(decision);
-  const parentBottleId =
-    decision.action === "create_release"
-      ? (decision.parentBottleId ?? null)
-      : null;
-
-  return buildLegacyConcreteBottleInput({
-    bottleInput,
-    releaseInput,
-    parentBottleId,
-    source: "classifier",
-  }).input;
 }

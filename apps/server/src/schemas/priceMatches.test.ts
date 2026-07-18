@@ -243,6 +243,35 @@ describe("StorePriceMatchDecisionSchema", () => {
     ).toBe(false);
   });
 
+  test("preserves exact-age repair scope while accepting unmarked legacy drafts", () => {
+    const exactRepair = StorePriceMatchDecisionSchema.parse({
+      action: "correction",
+      confidence: null,
+      suggestedBottleId: 1,
+      proposedBottle: {
+        ...baseProposedBottle,
+        statedAge: 12,
+        statedAgeScope: "exact",
+      },
+    });
+    const legacyRepair = StorePriceMatchDecisionSchema.parse({
+      action: "correction",
+      confidence: null,
+      suggestedBottleId: 1,
+      proposedBottle: {
+        ...baseProposedBottle,
+        statedAge: 12,
+      },
+    });
+
+    expect(exactRepair.proposedBottle).toMatchObject({
+      statedAge: 12,
+      statedAgeScope: "exact",
+    });
+    expect(legacyRepair.proposedBottle).toMatchObject({ statedAge: 12 });
+    expect(legacyRepair.proposedBottle).not.toHaveProperty("statedAgeScope");
+  });
+
   test("rejects suggested bottle ids for create_new and no_match", () => {
     expect(
       StorePriceMatchDecisionSchema.safeParse({

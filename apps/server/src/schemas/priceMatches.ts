@@ -301,6 +301,14 @@ export const ProposedBottleSchema = z.object({
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 });
 
+/**
+ * Persisted classifier repair drafts mark exact Bottle age ownership. Older
+ * correction rows omit the marker and retain their legacy shared-age meaning.
+ */
+export const StorePriceBottleRepairDraftSchema = ProposedBottleSchema.extend({
+  statedAgeScope: z.literal("exact").optional(),
+});
+
 export const ProposedReleaseSchema = BottleReleaseInputSchema.omit({
   image: true,
 });
@@ -438,7 +446,8 @@ export const StorePriceMatchDecisionSchema = z
       suggestedReleaseId: z.number().int().nullable().optional(),
       parentBottleId: z.null().optional(),
       creationTarget: z.null().optional(),
-      proposedBottle: ProposedBottleSchema.nullable().default(null),
+      proposedBottle:
+        StorePriceBottleRepairDraftSchema.nullable().default(null),
       proposedRelease: z.null().optional(),
     }),
     StorePriceMatchCreateNewDecisionSchema,

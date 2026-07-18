@@ -39,11 +39,11 @@ import {
 } from "@peated/server/lib/catalogTargets";
 import {
   buildBottleInputFromProposedBottle,
-  buildClassifierCreateInputs,
+  buildClassifierConcreteBottleInput,
 } from "@peated/server/lib/classifierDecisionCreateInputs";
+import type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottleSchemas";
 import {
-  BottleAlreadyExistsError,
-  createConcreteBottleInTransaction,
+  createOrReuseConcreteBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import {
@@ -83,12 +83,13 @@ import type {
   BottleInputSchema,
   BottleReleaseInputSchema,
   PriceMatchSearchEvidenceSchema,
+  ProposedBottleSchema,
   ProposedReleaseSchema,
 } from "@peated/server/schemas";
 import {
   ExtractedBottleDetailsSchema,
   PriceMatchCandidateSchema,
-  ProposedBottleSchema,
+  StorePriceBottleRepairDraftSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
@@ -100,6 +101,9 @@ type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
 type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
+type StorePriceBottleRepairDraft = z.infer<
+  typeof StorePriceBottleRepairDraftSchema
+>;
 type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
 type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
@@ -145,19 +149,6 @@ function withStoreCaskBottleDefaults(
   return proposedBottle
     ? {
         ...proposedBottle,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
-      }
-    : null;
-}
-
-function withStoreCaskReleaseDefaults(
-  proposedRelease: BottleClassificationDecision["proposedRelease"],
-): ProposedRelease | null {
-  return proposedRelease
-    ? {
-        ...proposedRelease,
         caskType: null,
         caskSize: null,
         caskFill: null,
@@ -270,41 +261,17 @@ function normalizeClassifierDecisionForPriceMatching(
     );
   }
 
-  // Price matching consumes the classifier's reviewed result. Keep the adapter
-  // layer limited to persistence compatibility checks instead of re-running
-  // classifier policy here.
-  if (
-    decision.action === "create_release" &&
-    !candidates.some(
-      (candidate) => candidate.bottleId === decision.parentBottleId,
-    )
-  ) {
-    throw new Error(
-      `Classifier returned unknown parent bottle id (${decision.parentBottleId}).`,
-    );
-  }
-
-  if (
-    decision.action === "repair_parent_and_create_release" &&
-    !candidates.some(
-      (candidate) => candidate.bottleId === decision.parentBottleId,
-    )
-  ) {
-    throw new Error(
-      `Classifier returned unknown repair parent bottle id (${decision.parentBottleId}).`,
-    );
-  }
-
   return decision;
 }
 
 /**
- * Maps the sparse legacy parent/stable repair draft to canonical shared and
- * exact patches. Unknown null fields or empty distiller lists are omitted
- * rather than cleared.
+ * Maps sparse persisted repair drafts to canonical shared and exact patches.
+ * Classifier repairs mark stated age as exact Bottle data; unmarked historical
+ * drafts retain the legacy shared-age contract. Unknown null fields or empty
+ * distiller lists are omitted rather than cleared.
  */
 function buildConcreteBottleRepairInput(
-  proposedBottle: ProposedBottle,
+  proposedBottle: StorePriceBottleRepairDraft,
 ): ConcreteBottleUpdateInput {
   const proposedInput = buildBottleInputFromProposedBottle(proposedBottle);
   const shared: NonNullable<ConcreteBottleUpdateInput["shared"]> = {
@@ -318,7 +285,11 @@ function buildConcreteBottleRepairInput(
     shared.category = proposedBottle.category;
   }
   if (proposedBottle.statedAge !== null) {
-    shared.statedAge = proposedBottle.statedAge;
+    if (proposedBottle.statedAgeScope === "exact") {
+      exact.statedAge = proposedBottle.statedAge;
+    } else {
+      shared.statedAge = proposedBottle.statedAge;
+    }
   }
   if (proposedBottle.distillers.length > 0) {
     shared.distillers = proposedInput.distillers;
@@ -352,6 +323,13 @@ function buildConcreteBottleRepairInput(
     shared,
     ...(Object.keys(exact).length > 0 ? { exact } : {}),
   };
+}
+
+function buildClassifierBottleRepairDraft(
+  proposedBottle: BottleClassificationDecision["proposedBottle"],
+): StorePriceBottleRepairDraft | null {
+  const normalized = withStoreCaskBottleDefaults(proposedBottle);
+  return normalized ? { ...normalized, statedAgeScope: "exact" } : null;
 }
 
 function appendRationale(
@@ -573,7 +551,7 @@ function maybeBuildExistingBottleRepairDecision({
     suggestedReleaseId: null,
     parentBottleId: null,
     creationTarget: null,
-    proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
+    proposedBottle: buildClassifierBottleRepairDraft(decision.proposedBottle),
     proposedRelease: null,
   };
 }
@@ -627,7 +605,7 @@ export function toStorePriceMatchDecision({
       suggestedReleaseId: null,
       parentBottleId: null,
       creationTarget: null,
-      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
+      proposedBottle: buildClassifierBottleRepairDraft(decision.proposedBottle),
       proposedRelease: null,
     };
   }
@@ -658,62 +636,6 @@ export function toStorePriceMatchDecision({
     };
   }
 
-  if (decision.action === "create_release") {
-    return {
-      action: "create_new",
-      confidence: null,
-      rationale: decision.rationale,
-      candidateBottleIds: decision.candidateBottleIds,
-      identityScope: decision.identityScope,
-      aliasScope: decision.aliasScope ?? "none",
-      suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: decision.parentBottleId,
-      creationTarget: "release",
-      proposedBottle: null,
-      proposedRelease: withStoreCaskReleaseDefaults(decision.proposedRelease),
-    };
-  }
-
-  if (decision.action === "create_bottle_and_release") {
-    return {
-      action: "create_new",
-      confidence: null,
-      rationale: decision.rationale,
-      candidateBottleIds: decision.candidateBottleIds,
-      identityScope: decision.identityScope,
-      aliasScope: decision.aliasScope ?? "none",
-      suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: null,
-      creationTarget: "bottle_and_release",
-      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
-      proposedRelease: withStoreCaskReleaseDefaults(decision.proposedRelease),
-    };
-  }
-
-  if (decision.action === "repair_parent_and_create_release") {
-    // Price matching cannot apply this compound mutation yet, but review still
-    // needs the parent repair and child release drafts intact.
-    return {
-      action: "no_match",
-      confidence: null,
-      rationale: appendRationale(
-        decision.rationale,
-        "Classifier found that the safe outcome requires repairing the existing parent bottle before creating a release; price matching cannot persist that compound repair yet.",
-      ),
-      candidateBottleIds: decision.candidateBottleIds,
-      identityScope: decision.identityScope,
-      aliasScope: decision.aliasScope ?? "none",
-      suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: decision.parentBottleId,
-      creationTarget: null,
-      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
-      proposedRelease: withStoreCaskReleaseDefaults(decision.proposedRelease),
-    };
-  }
-
   return {
     action: "no_match",
     confidence: null,
@@ -728,20 +650,6 @@ export function toStorePriceMatchDecision({
     proposedBottle: null,
     proposedRelease: null,
   };
-}
-
-function isReviewOnlyParentRepairDecision(
-  decision: StorePriceMatchDecision,
-): boolean {
-  return (
-    decision.action === "no_match" &&
-    decision.parentBottleId !== null &&
-    decision.parentBottleId !== undefined &&
-    decision.proposedBottle !== null &&
-    decision.proposedBottle !== undefined &&
-    decision.proposedRelease !== null &&
-    decision.proposedRelease !== undefined
-  );
 }
 
 export class StorePriceMatchProposalAlreadyProcessingError extends Error {
@@ -775,12 +683,6 @@ function getProposalType(
   price: StorePrice,
   decision: StorePriceMatchDecision,
 ): StorePriceMatchProposal["proposalType"] {
-  // Compound parent repair proposals stay unresolved even when the price has a
-  // current assignment; correction apply paths only handle simple bottle repair.
-  if (isReviewOnlyParentRepairDecision(decision)) {
-    return "no_match";
-  }
-
   if (decision.action === "create_new") {
     return "create_new";
   }
@@ -966,7 +868,9 @@ function shouldAutoCreateStorePriceMatchProposal({
 }) {
   return (
     decision.action === "create_new" &&
-    (decision.proposedBottle !== null || decision.proposedRelease !== null) &&
+    decision.creationTarget === "bottle" &&
+    decision.proposedBottle !== null &&
+    decision.proposedRelease === null &&
     automationAssessment?.automationEligible === true
   );
 }
@@ -1035,37 +939,28 @@ async function canContinueStorePriceMatchProcessing(
 }
 
 function buildStorePriceMatchCreateInputs(decision: StorePriceMatchDecision) {
-  if (decision.action !== "create_new") {
+  if (
+    decision.action !== "create_new" ||
+    decision.creationTarget !== "bottle" ||
+    decision.proposedBottle === null
+  ) {
     return {
+      concreteInput: undefined,
       input: undefined,
       releaseInput: undefined,
     };
   }
 
-  // Callers sanitize create_new decisions first, so these drafts are already
-  // normalized and aligned with the explicit bottle-vs-release target.
-  return buildClassifierCreateInputs(
-    decision.creationTarget === "bottle"
-      ? {
-          action: "create_bottle",
-          proposedBottle: decision.proposedBottle!,
-        }
-      : decision.creationTarget === "release"
-        ? {
-            action: "create_release",
-            proposedRelease: decision.proposedRelease!,
-          }
-        : {
-            action: "create_bottle_and_release",
-            proposedBottle: decision.proposedBottle!,
-            proposedRelease: decision.proposedRelease!,
-          },
-  );
+  return {
+    concreteInput: buildClassifierConcreteBottleInput(decision.proposedBottle),
+    input: undefined,
+    releaseInput: undefined,
+  };
 }
 
 function getStorePriceBottleRepairDraft(
   proposal: StorePriceMatchProposalForReview,
-): ProposedBottle {
+): StorePriceBottleRepairDraft {
   if (
     proposal.currentBottleId === null ||
     proposal.suggestedBottleId === null ||
@@ -1079,7 +974,9 @@ function getStorePriceBottleRepairDraft(
     );
   }
 
-  const parsedBottle = ProposedBottleSchema.safeParse(proposal.proposedBottle);
+  const parsedBottle = StorePriceBottleRepairDraftSchema.safeParse(
+    proposal.proposedBottle,
+  );
   if (!parsedBottle.success) {
     throw new StorePriceBottleRepairBadRequestError(
       "Price match proposal does not contain a valid bottle repair draft.",
@@ -1302,6 +1199,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   tx: AnyTransaction,
   {
     proposalId,
+    concreteInput,
     input,
     releaseInput,
     user,
@@ -1310,6 +1208,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     expectedProcessingToken,
   }: {
     proposalId: number;
+    concreteInput?: ConcreteBottleCreateInput;
     input?: z.infer<typeof BottleInputSchema>;
     releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
     user: User;
@@ -1322,85 +1221,35 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     tx,
     proposalId,
   );
-  const { creationTarget, input: concreteInput } =
-    buildPriceMatchConcreteBottleInput({
-      bottleInput: input,
-      releaseInput,
-      parentBottleId: preflight.parentBottleId,
-    });
+  if (concreteInput && (input || releaseInput)) {
+    throw new Error(
+      "Canonical classifier input cannot be combined with legacy price-match creation input.",
+    );
+  }
+  const resolvedCreateInput = concreteInput
+    ? { creationTarget: "bottle" as const, input: concreteInput }
+    : buildPriceMatchConcreteBottleInput({
+        bottleInput: input,
+        releaseInput,
+        parentBottleId: preflight.parentBottleId,
+      });
+  const { creationTarget, input: resolvedConcreteInput } = resolvedCreateInput;
 
   const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
     userId: user.id,
     allowSystemActor: creationSource === "price_match_automation",
   });
 
-  let createResult: Awaited<
-    ReturnType<typeof createConcreteBottleInTransaction>
-  > | null = null;
-  let resolvedBottle;
-  let resolvedTarget: CatalogTargetAssignmentDescriptor;
-  try {
-    // The nested transaction is a savepoint: duplicate preparation may have
-    // mutated canonical helpers, and all of it must roll back before reuse.
-    createResult = await tx.transaction(async (creationTx) =>
-      createConcreteBottleInTransaction(creationTx, {
-        creationSource,
-        createdByActorId: writeActor.id,
-        input: concreteInput,
-        context: { user },
-      }),
-    );
-    resolvedBottle = createResult.bottle;
-    resolvedTarget = {
-      targetId: createResult.exactTarget.id,
-      groupId: createResult.group.id,
-      bottleId: createResult.bottle.id,
-    };
-  } catch (error) {
-    if (!(error instanceof BottleAlreadyExistsError)) throw error;
-    // Only exact canonical-name collisions are reusable; aliases and SMWS codes
-    // remain conflicts, and source reuse must stay inside its trusted group.
-    if (
-      error.collision?.kind !== "canonical_name" ||
-      error.collision.attemptedCanonicalFullName === null
-    ) {
-      throw error;
-    }
-
-    const existingTarget = await resolveCatalogTargetForAssignment(
-      { kind: "bottle", bottleId: error.bottleId },
-      tx,
-    );
-    if (concreteInput.kind === "source_bottle") {
-      const sourceTarget = await resolveCatalogTargetForAssignment(
-        { kind: "bottle", bottleId: concreteInput.sourceBottleId },
-        tx,
-      );
-      await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
-        sourceTarget,
-        existingTarget,
-      ]);
-      if (sourceTarget.groupId !== existingTarget.groupId) throw error;
-    } else {
-      await lockCatalogTargetAssignmentDescriptorInTransaction(
-        tx,
-        existingTarget,
-        { composition: "concrete_bottle_mutation" },
-      );
-    }
-    const existingBottle = await tx.query.bottles.findFirst({
-      where: eq(bottles.id, error.bottleId),
-    });
-    if (
-      !existingBottle ||
-      existingBottle.fullName !== error.collision.attemptedCanonicalFullName
-    ) {
-      throw error;
-    }
-
-    resolvedBottle = existingBottle;
-    resolvedTarget = existingTarget;
-  }
+  const {
+    createResult,
+    bottle: resolvedBottle,
+    target: resolvedTarget,
+  } = await createOrReuseConcreteBottleInTransaction(tx, {
+    creationSource,
+    createdByActorId: writeActor.id,
+    input: resolvedConcreteInput,
+    context: { user },
+  });
 
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
@@ -1458,6 +1307,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
 
 export async function createBottleFromStorePriceMatchProposal({
   proposalId,
+  concreteInput,
   input,
   releaseInput,
   user,
@@ -1466,6 +1316,7 @@ export async function createBottleFromStorePriceMatchProposal({
   expectedProcessingToken,
 }: {
   proposalId: number;
+  concreteInput?: ConcreteBottleCreateInput;
   input?: z.infer<typeof BottleInputSchema>;
   releaseInput?: z.infer<typeof BottleReleaseInputSchema>;
   user: User;
@@ -1476,6 +1327,7 @@ export async function createBottleFromStorePriceMatchProposal({
   const result = await db.transaction(async (tx) =>
     createBottleFromStorePriceMatchProposalInTransaction(tx, {
       proposalId,
+      concreteInput,
       input,
       releaseInput,
       user,
@@ -1791,7 +1643,11 @@ export async function resolveStorePriceMatchProposal(
       }
 
       const createInputs = buildStorePriceMatchCreateInputs(decision);
-      if (!createInputs.input && !createInputs.releaseInput) {
+      if (
+        !createInputs.concreteInput &&
+        !createInputs.input &&
+        !createInputs.releaseInput
+      ) {
         throw new Error(
           `Unable to auto-create price match proposal without creation inputs (${proposal.id}).`,
         );

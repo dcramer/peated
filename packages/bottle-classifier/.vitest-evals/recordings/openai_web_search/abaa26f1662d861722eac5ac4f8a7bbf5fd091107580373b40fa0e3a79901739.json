@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:21:56.402Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost whiskey 42.5% Westland Distillery Co"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost whiskey 42.5% Westland Distillery Co",
+    "summary": "I found bottle-specific evidence for this whiskey.\n\n**Likely bottle:** **Watchpost Whiskey** by **Westland Distillery Co.**  \n**Confirmed traits:**\n- **Producer / blender:** Westland Distillery, Seattle, Washington. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whiskey?utm_source=openai))\n",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/about",
+        "url": "https://www.watchpostwhiskey.com/pages/about",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://directionsforme.org/product/249413",
+        "url": "https://directionsforme.org/product/249413",
+        "domain": "directionsforme.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "abaa26f1662d861722eac5ac4f8a7bbf5fd091107580373b40fa0e3a79901739",
+    "mode": "auto"
+  }
+}

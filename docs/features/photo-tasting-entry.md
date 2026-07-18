@@ -15,14 +15,14 @@ Let a user record a tasting by taking or uploading a bottle photo instead of
 starting with text search. The photo-assisted path should identify the bottle,
 let the user confirm or correct the match, and then create the same tasting
 record the existing search path creates. Like the existing search-based bottle
-picker, the photo path must be able to land on either an existing bottle/release
-or a new bottle/release proposal. Ideally, a clear label photo should drive the
-new-bottle path automatically enough that the user reviews fields instead of
-starting from scratch.
+picker, the photo path must be able to land on either an existing concrete
+Bottle or a proposal for one independently complete new Bottle. Ideally, a
+clear label photo should drive the new-Bottle path automatically enough that
+the user reviews fields instead of starting from scratch.
 
 The uploaded photo may also become the tasting image. If the flow creates a new
-bottle or release, or finds an existing bottle or release without an image, the
-same photo may be promoted as that bottle or release image when policy allows.
+Bottle, or finds an existing Bottle without an image, the same photo may be
+promoted as that Bottle image when policy allows.
 
 ## Experience Goals
 
@@ -49,7 +49,7 @@ measure each phase separately before optimizing prompts or models.
 
 - Do not create tastings directly from model output without user confirmation.
 - Do not replace the existing text search flow.
-- Do not overwrite existing bottle or release images silently.
+- Do not overwrite existing Bottle images silently.
 - Do not treat vision model guesses as canonical identity without classifier
   review and local candidate search.
 - Do not store abandoned upload blobs permanently.
@@ -69,21 +69,22 @@ choosing a bottle before the tasting form, not a modal or minor enhancement
 inside the existing bottle detail page flow.
 
 The photo path should identify what bottle target the tasting belongs to before
-the user reaches the tasting form. That target may be an existing bottle/release
-or a reviewed new bottle/release proposal:
+the user reaches the tasting form. The live workflow either selects an existing
+concrete Bottle target or reviews one independently complete new Bottle
+proposal:
 
 1. User uploads or takes a photo.
 2. Server stores a pending processed image.
 3. Server extracts label evidence from the image.
 4. Server classifies the bottle reference using the existing bottle classifier.
-5. UI shows the photo, extracted evidence, and suggested bottle/release outcome.
+5. UI shows the photo, extracted evidence, and suggested Bottle outcome.
 6. User confirms an existing match, opens full bottle search, chooses another
-   candidate, or reviews the proposed new bottle/release fields.
-7. Server creates any approved new bottle/release before tasting save when the
+   candidate, or reviews the proposed complete Bottle fields.
+7. Server creates any approved new Bottle before tasting save when the
    confirmed photo-identification result is a creation proposal.
 8. User records tasting notes, rating, tags, serving style, flight, and friends.
 9. Server creates the tasting and attaches the pending image if selected.
-10. Server may promote the image to a bottle or release image under deterministic
+10. Server may promote the image to the Bottle image under deterministic
     policy.
 
 Low-confidence photo identification should fall back to seeded full search
@@ -105,7 +106,7 @@ not like a separate moderation workflow.
 
 Expose the new experience at `/addTasting` and route general record-tasting
 entry points there. Keep existing bottle-scoped deep links that already know the
-target bottle or bottling on `/bottles/[bottleId]/addTasting`.
+target Bottle on `/bottles/[bottleId]/addTasting`.
 
 On the new page, show a photo-first choice with manual search as the explicit
 fallback:
@@ -144,22 +145,21 @@ review.
 When identification succeeds, show a compact confirmation view:
 
 - uploaded photo preview
-- proposed bottle or release
+- proposed Bottle
 - confidence or review state in plain language
 - extracted key facts, such as brand, expression, age, vintage, ABV, and edition
-- a clear primary action to continue with the proposed bottle
+- a clear primary action to continue with the proposed Bottle
 - secondary actions to search bottles or start over
 
 The UI should distinguish these photo-identification outcomes:
 
-- matched existing bottle/release
-- proposed new bottle
-- proposed new release under an existing bottle
+- matched existing concrete Bottle
+- proposed independently complete new Bottle
 - uncertain result requiring manual search
 
 When the result proposes creation, the UI should show the proposed canonical
 name and important fields before the user continues. A strong photo result
-should prefill as much of the new bottle/release proposal as possible, including
+should prefill as much of the new Bottle proposal as possible, including
 brand, series, expression, category, age, ABV, vintage, release year, edition,
 and cask details when visible. The user should not need to understand classifier
 internals, but they should be able to spot obvious errors such as the wrong age
@@ -191,8 +191,8 @@ restart the tasting entry flow just to try another photo.
 ### Tasting Form
 
 After the user confirms, manually selects, or approves creation of a
-bottle/release, continue to the normal tasting form with the resolved
-bottle/release fixed at the top. The uploaded photo should appear in the normal
+Bottle, continue to the normal tasting form with the resolved Bottle fixed at
+the top. The uploaded photo should appear in the normal
 tasting picture field as the default selected image, as if the user had already
 chosen it in that field.
 
@@ -203,11 +203,11 @@ picture control, while preserving the user's ability to replace it, remove it,
 or save without a picture. Saving the tasting should attach the image only if the
 picture field still references the pending upload at submit time.
 
-If policy allows using the same photo as a bottle or release image, expose that
+If policy allows using the same photo as a Bottle image, expose that
 as a separate secondary choice from the tasting picture field. Hide or disable
 the promotion option when policy says promotion is not allowed, such as when the
-existing bottle already has an image or the photo is unsuitable as a canonical
-bottle image.
+existing Bottle already has an image or the photo is unsuitable as a canonical
+Bottle image.
 
 For the first standalone version, the form may reuse the existing tasting form
 component if it can support a bottle chosen inside the page. Avoid changing the
@@ -247,7 +247,9 @@ Recommended object layout:
 - `pending-uploads/<id>.webp`
 - `tastings/<id>.webp`
 - `bottles/<id>.webp`
-- `bottle-releases/<id>.webp`
+
+The retained `bottle-releases/<id>.webp` namespace is staged migration
+compatibility only. The live photo workflow does not write it.
 
 In local development, the same namespaces map into `UPLOAD_PATH`.
 
@@ -272,7 +274,7 @@ pendingUploads {
     | "photo_tasting_entry"
     | "tasting_image"
     | "bottle_image"
-    | "bottle_release_image"
+    | "bottle_release_image" // staged migration compatibility only
     | "badge_image"
     | "avatar";
   status: "pending" | "attached" | "expired";
@@ -324,7 +326,8 @@ Required behavior:
 - age: chosen pending upload TTL, for example 2 or 3 days
 
 The lifecycle rule must not match permanent prefixes such as `tastings/`,
-`bottles/`, `bottle-releases/`, `badges/`, or `avatars/`.
+`bottles/`, `badges/`, or `avatars/`. While staged BottleRelease compatibility
+exists, it must also exclude the retained `bottle-releases/` prefix.
 
 This is an operational setup step outside the application migration. The app
 should still store `expiresAt` and run cleanup jobs so the database reflects
@@ -362,6 +365,7 @@ Output:
 ```ts
 type PhotoIdentificationCandidate = {
   bottleId: number;
+  // Staged legacy response compatibility only; live selection uses bottleId.
   releaseId?: number | null;
   bottleFullName?: string | null;
   fullName: string;
@@ -371,41 +375,24 @@ type PhotoIdentificationDecision =
   | {
       action: "match";
       matchedBottleId: number;
+      // Staged legacy response compatibility only; new matches are Bottles.
       matchedReleaseId: number | null;
     }
   | {
       action: "create_bottle";
       proposedBottle: {
         name: string;
-        brand: { name: string };
-      };
-    }
-  | {
-      action: "create_release";
-      parentBottleId: number;
-      proposedRelease: {
+        category: string | null;
+        // Exact marketed traits belong directly to this Bottle.
         edition: string | null;
-      };
-    }
-  | {
-      action: "create_bottle_and_release";
-      proposedBottle: {
-        name: string;
-        brand: { name: string };
-      };
-      proposedRelease: {
-        edition: string | null;
-      };
-    }
-  | {
-      action: "repair_parent_and_create_release";
-      parentBottleId: number;
-      proposedBottle: {
-        name: string;
-        brand: { name: string };
-      };
-      proposedRelease: {
-        edition: string | null;
+        statedAge: number | null;
+        abv: number | null;
+        caskStrength: boolean | null;
+        singleCask: boolean | null;
+        vintageYear: number | null;
+        releaseYear: number | null;
+        brand: { id: number | null; name: string };
+        distillers: Array<{ id: number | null; name: string }>;
       };
     }
   | {
@@ -475,10 +462,11 @@ proposals. The token signs the pending upload id, create decision, reviewed
 candidate bottle ids, and photo suitability so creation can persist the reviewed
 result without rerunning photo extraction or classification.
 
-Every accepted create-shaped decision now creates or safely reuses one concrete
-Bottle and exact CatalogTarget. Release-shaped action names are retained signed
-classifier evidence, not a request to write BottleRelease. The compatibility
-response returns the concrete `bottle` and `release: null`.
+Every accepted `create_bottle` decision describes one independently complete
+marketed Bottle and creates or safely reuses that concrete Bottle and its exact
+CatalogTarget. Photo classification never chooses a parent or BottleGroup. The
+staged compatibility response returns the concrete `bottle` and
+`release: null`; no live workflow creates a BottleRelease.
 
 When the pending scan is suitable as a catalog image and a new Bottle was
 created, creation promotes it to that Bottle. Unsuitable photos and safe reuse
@@ -657,7 +645,7 @@ Promote to catalog Bottle:
 - never overwrite an existing Bottle image
 - for photo-identification create, promote suitable scans by default when the
   concrete Bottle image slot is empty; the active exact target identifies that
-  Bottle and no BottleRelease image is created
+  Bottle and no staged legacy BottleRelease image is created
 - for tasting create, only promote when `promoteImageToBottle = "if_empty"`
 - only promote when `photoSuitability.suitableAsBottleImage = true`
 - only a still-unconverted legacy tasting target may retain BottleRelease image
@@ -674,12 +662,12 @@ should be logged and returned as partial-success metadata the UI can explain.
 Photo lookup can safely streamline matching an existing bottle. Creation needs a
 stricter bar.
 
-For matched existing bottles or releases:
+For matched existing concrete Bottles:
 
 - a strong local candidate can be returned quickly without web evidence
 - user confirmation is enough to continue to the tasting form
 
-For proposed new bottles or releases:
+For a proposed new Bottle:
 
 - show the proposed canonical fields before the user continues
 - require classifier-reviewed evidence, not only raw OCR or vision text
@@ -706,8 +694,9 @@ image evidence prefilled.
 - AI providers receive only the processed image needed for extraction. Do not
   send unrelated tasting notes, friend tags, or private user context to the
   image extraction step.
-- Tasting creation validates the confirmed bottle/release IDs independently from
-  any prior photo identification result.
+- Tasting creation validates the confirmed Bottle target independently from any
+  prior photo identification result. Retained release ids are staged
+  compatibility data, not live selection authority.
 
 ## Background Work
 
@@ -720,7 +709,7 @@ Candidate background jobs:
 - expire pending upload records whose `expiresAt` has passed
 - delete attached pending objects early after permanent copies exist
 - record classifier traces for review and eval sampling
-- run catalog verification for newly created bottles or releases
+- run catalog verification for newly created Bottles
 
 All jobs should be idempotent.
 
@@ -739,7 +728,7 @@ Record timing for each user-visible phase:
 - response serialization
 - tasting save
 - image attachment copy
-- bottle or release image promotion copy
+- Bottle image promotion copy
 
 Track outcome metrics alongside timing:
 
@@ -867,7 +856,7 @@ API integration tests:
 - oversized upload fails before model calls
 - extraction or classifier failure rejects the photo-identification request
 - rate-limited request fails cleanly
-- route does not create bottles, releases, or tastings
+- route does not create Bottles or tastings
 
 Classifier calls in route tests should use a test adapter/fake at the server
 boundary. The classifier's own behavior remains covered by package evals and
@@ -939,9 +928,9 @@ Only add photo-driven creation after existing-bottle matching works well.
 Scope:
 
 - decide whether v1 permits immediate create from photo lookup
-- if enabled, route every create-shaped classifier action through canonical
-  concrete Bottle creation and return its active exact target; a release-shaped
-  action is retained evidence, not BottleRelease storage
+- if enabled, route the single `create_bottle` classifier action through
+  canonical independent concrete Bottle creation and return its active exact
+  target; grouping happens automatically outside photo classification
 - show canonical fields before confirmation
 - queue catalog verification after creation
 - promote only to the concrete Bottle image, and only after the Bottle and exact
@@ -950,8 +939,8 @@ Scope:
 Tests:
 
 - proposed new bottle requires reviewed classifier evidence
-- a release-shaped proposal requires reviewed classifier evidence and trusted
-  parent context, then creates one complete concrete Bottle in that group
+- `create_bottle` carries all fields needed for one independently complete
+  concrete Bottle and never requires trusted parent or group context
 - ambiguous age/year/cask fields downgrade to manual review or manual search
 - the created concrete Bottle can receive the promoted image only when policy
   allows

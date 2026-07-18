@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:03:15.284Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost whiskey Westland 42.5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost whiskey Westland 42.5",
+    "summary": "If you mean the bottle **Watchpost Whiskey by Westland** at **42.5% ABV**, here’s the bottle-specific summary I could confirm:\n\n- **Name:** Watchpost Whiskey  \n- **Producer / blender:** **Westland Distillery**, Seattle, Washington. Watchpost’s own site says it is blended by the team at Westland. ([watchpostwhiskey.com]",
+    "results": [
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/about",
+        "url": "https://www.watchpostwhiskey.com/pages/about",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://directionsforme.org/product/249413",
+        "url": "https://directionsforme.org/product/249413",
+        "domain": "directionsforme.org",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+        "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+        "domain": "thewhiskeywench.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "22e084a1d810faeab5a6efbafb2a5ee550802979c5d303ce6b050515546f8929",
+    "mode": "auto"
+  }
+}

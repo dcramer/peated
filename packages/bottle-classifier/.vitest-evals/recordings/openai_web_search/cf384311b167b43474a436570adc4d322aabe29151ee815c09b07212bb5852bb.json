@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:27:21.995Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost Westland Distillery Co. 42.5 whisky"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost Westland Distillery Co. 42.5 whisky",
+    "summary": "**Watchpost Whiskey** appears to be a **Westland Distillery-produced American blended whiskey**, not a standard Westland single malt. Confirmed bottle-specific details:\n\n- **Producer/blender:** Watchpost is **blended by the team at Westland Distillery** in Seattle, Washington. ([watchpostwhiskey.com](https://www.watchp",
+    "results": [
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/about",
+        "url": "https://www.watchpostwhiskey.com/pages/about",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/privacy-policy",
+        "url": "https://www.watchpostwhiskey.com/pages/privacy-policy",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://directionsforme.org/product/249413",
+        "url": "https://directionsforme.org/product/249413",
+        "domain": "directionsforme.org",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cf384311b167b43474a436570adc4d322aabe29151ee815c09b07212bb5852bb",
+    "mode": "auto"
+  }
+}

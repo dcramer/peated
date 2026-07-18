@@ -22,6 +22,7 @@ import {
   loadCatalogTargetByGroupId,
   loadCatalogTargetByLegacyReference,
   lockCatalogTargetAssignmentDescriptorsInTransaction,
+  lockCatalogTargetConsumerAssignmentInTransaction,
   resolveCatalogTargetForAssignment,
 } from "./catalogTargets";
 
@@ -565,6 +566,90 @@ describe("legacy catalog target resolution", () => {
 });
 
 describe("catalog target assignment", () => {
+  test("accepts a promoted legacy pair retained on its exact Bottle target", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await createBottleInGroup({
+      groupId: parent.groupId as number,
+      brandId: parent.brandId,
+      createdByActorId: parent.createdByActorId,
+      name: `${parent.fullName} retained assignment`,
+    });
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promoted.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+    });
+    const target = await resolveCatalogTargetForAssignment({
+      kind: "bottle",
+      bottleId: promoted.id,
+    });
+
+    await expect(
+      db.transaction((tx) =>
+        lockCatalogTargetConsumerAssignmentInTransaction(
+          tx,
+          {
+            target,
+            consumerIdentity: {
+              bottleId: parent.id,
+              releaseId: release.id,
+            },
+          },
+          assignmentContext,
+        ),
+      ),
+    ).resolves.toBeUndefined();
+  });
+
+  test("rejects a promoted legacy pair retained on a different exact target", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await createBottleInGroup({
+      groupId: parent.groupId as number,
+      brandId: parent.brandId,
+      createdByActorId: parent.createdByActorId,
+      name: `${parent.fullName} promoted assignment`,
+    });
+    const differentBottle = await fixtures.Bottle();
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promoted.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+    });
+    const differentTarget = await resolveCatalogTargetForAssignment({
+      kind: "bottle",
+      bottleId: differentBottle.id,
+    });
+
+    await expect(
+      db.transaction((tx) =>
+        lockCatalogTargetConsumerAssignmentInTransaction(
+          tx,
+          {
+            target: differentTarget,
+            consumerIdentity: {
+              bottleId: parent.id,
+              releaseId: release.id,
+            },
+          },
+          assignmentContext,
+        ),
+      ),
+    ).rejects.toMatchObject({
+      code: "CATALOG_TARGET_INTEGRITY_MISMATCH",
+      reason: "the retained Bottle pair does not resolve to its target",
+    });
+  });
+
   test("batch locks and revalidates every supplied descriptor", async ({
     fixtures,
   }) => {

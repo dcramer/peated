@@ -11,6 +11,21 @@ import {
   type WebEvidenceJudgment,
 } from "./priceMatchingEvidence";
 
+export function exactEditionMarkersMatch(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): boolean {
+  const normalizeMarker = (value: string | null | undefined) =>
+    (value ?? "")
+      .toLowerCase()
+      .replace(/\b(?:no|number)\b\.?/g, " ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  return normalizeMarker(left) === normalizeMarker(right);
+}
+
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(
@@ -245,7 +260,7 @@ export function getExistingMatchIdentityConflicts({
   if (
     extractedLabel?.edition &&
     targetCandidate.edition &&
-    !textsOverlap(extractedLabel.edition, targetCandidate.edition)
+    !exactEditionMarkersMatch(extractedLabel.edition, targetCandidate.edition)
   ) {
     conflicts.push("edition");
   }

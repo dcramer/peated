@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:49:24.987Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost whiskey Westland Distillery 42.5 blend"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost whiskey Westland Distillery 42.5 blend",
+    "summary": "**Watchpost Whiskey** is a **42.5% ABV American blended whiskey** created by the team at **Westland Distillery** in Seattle. It is not a pure Westland single malt; it’s a blend. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whiskey?utm_source=openai))\n\nConfirmed bottle details:\n- **Brand:*",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/about",
+        "url": "https://www.watchpostwhiskey.com/pages/about",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey",
+        "url": "https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://directionsforme.org/product/249413",
+        "url": "https://directionsforme.org/product/249413",
+        "domain": "directionsforme.org",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0a3b71324cd9405ec11d85bd0cb9cb298bc96ccacac3e170981ddba1bee7e5d6",
+    "mode": "auto"
+  }
+}

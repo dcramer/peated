@@ -1,6 +1,6 @@
 {
   "id": "image-backed-photo-creates-mars-komagatake-2022-edition",
-  "name": "image-backed photo: creates Mars Komagatake parent and 2022 Edition release",
+  "name": "image-backed photo: creates complete Mars Komagatake 2022 Edition Bottle",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -67,7 +67,7 @@
   },
   "expected": {
     "status": "classified",
-    "action": "create_bottle_and_release",
+    "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
       "name": "Komagatake",
@@ -75,16 +75,14 @@
         "id": 1169,
         "name": "Mars"
       },
-      "category": "single_malt"
-    },
-    "proposedBottleDistillerIdOneOf": [1953, 238555],
-    "proposedRelease": {
+      "category": "single_malt",
       "edition": "2022 Edition",
       "releaseYear": 2022,
       "abv": 50
     },
+    "proposedBottleDistillerIdOneOf": [1953, 238555],
     "suggestedNextStep": "confirm_create",
-    "summary": "Create the missing Mars Komagatake parent with existing Mars and Shinshu entities, plus its 2022 Edition release."
+    "summary": "Create one independently complete Mars Komagatake 2022 Edition Bottle with the existing Mars and Shinshu entities; classification does not create a parent or select a group."
   },
   "localCatalog": {
     "entities": [

@@ -7,7 +7,6 @@
   "expected": {
     "handlingStrategy": "block_if_uncertain",
     "classifierExpectation": "review_required",
-    "deterministicReleaseExpectation": "none",
-    "releaseIdentity": null
+    "exactBottleIdentity": null
   }
 }

@@ -46,8 +46,8 @@ Exact Bottle serializers must not require BottleGroup hydration.
   validated CatalogTarget. Exact aliases reference the owning Bottle's exact
   target; stable aliases reference the BottleGroup's generic target and never
   select its representative Bottle. Task 5.5a establishes that owner for the
-  exact/moderator path while later task 5.5 caller slices retire the remaining
-  raw legacy-pair writer.
+  exact/moderator path, task 5.9 moves grouped maintenance through canonical
+  fan-out, and task 9.7 retires the isolated ungrouped legacy-pair writer.
 - Moderator Bottle-alias upsert is exact intent. Alias unassignment clears the
   alias row's target and retained legacy pair together. Task 5.6b clears all
   three identity fields from a target-aware StorePrice or Review when its
@@ -82,10 +82,11 @@ Exact Bottle serializers must not require BottleGroup hydration.
   measured compatibility branch remains assigned to task 9.7 removal.
 - Successful direct task 5.8 classifier creation or safe reuse returns and
   writes the active exact target with `(bottleId, null)`. `no_match`, classifier
-  failure, and unresolved decisions remain targetless. The missing-Bottle worker
-  may audit task 5.8's concrete target and bounded evidence, but its explicitly
-  unconverted Review and alias target assignment remains task 5.9 work; task
-  5.6b does not invent an exact Bottle for those rows.
+  failure, and unresolved decisions remain targetless. Task 5.9 makes the
+  missing-Bottle worker pass task 5.8's validated descriptor through canonical
+  alias, Review, StorePrice, and incoming-decision propagation atomically. It
+  compares the Review identity snapshot under lock so stale classifier work
+  preserves a concurrent retarget instead of overwriting it.
 - Task 5.6c makes a known direct Review create/update intent resolve one
   CatalogTarget descriptor and revalidate/lock it before mutating the Review.
   The complete `{ targetId, bottleId, releaseId }` tuple is written atomically,
@@ -98,8 +99,9 @@ Exact Bottle serializers must not require BottleGroup hydration.
   wins the conflict, the rejected incoming identity owns no alias creation or
   reassignment and no decision evidence. A known mapped resolution failure is
   an error. Successful direct task 5.8 classifier creation or safe reuse writes
-  its exact target; genuinely unresolved results and the explicitly unconverted
-  task 5.9 worker consumer remain targetless.
+  its exact target, and task 5.9 applies that target through the worker only
+  while its selected Review identity remains unchanged. Genuinely unresolved
+  results remain targetless.
 - Direct Review update snapshots the Review identity, resolves and locks the
   authoritative CatalogTarget first when one applies, and then locks the
   Review. It accepts the mutation only when the locked identity tuple still
@@ -141,12 +143,17 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Duplicate handling rolls the failed creation savepoint back before locking
   and revalidating the existing exact descriptor and any trusted source
   descriptor. Reuse requires exact equality with the requested canonical
-  `fullName` and an active exact target; an arbitrary or ignored alias collision,
-  fuzzy name similarity, or fuzzy SMWS collision is not reusable identity.
+  `fullName` or an exact structurally parsed SMWS code match and an active exact
+  target; an arbitrary or ignored alias collision, fuzzy name similarity, or
+  fuzzy or substring-only SMWS collision is not reusable identity.
   Release-only reuse is limited to the source group; cross-group or drifted
   descriptors conflict. The later gate rejects changed proposal price, parent,
   `creationTarget`, `proposedBottle`, `proposedRelease`, or complete StorePrice
   `{ targetId, bottleId, releaseId }` identity.
+- Classifier duplicate reuse is the independent-creation subset: the collision
+  must resolve to an exact Bottle with an active exact target and a canonical
+  `fullName` exactly equal to the requested value. It does not receive or infer
+  trusted parent, source-Bottle, or BottleGroup context.
 - Create-new approval changes the approved proposal and its own latest-attempt
   current and suggested target/pair projections, when an attempt exists, in the
   same transaction. Neither row may commit only part of the selected identity,
@@ -311,11 +318,17 @@ Exact Bottle serializers must not require BottleGroup hydration.
 ## Legacy correction proposal mapping
 
 For correction proposals, a `proposedBottle` remains a sparse repair draft for
-the old parent/stable Bottle layer. The compatibility mapper sends required `name`
-and `brand`, non-null `series`, `category`, `statedAge`, and `bottler`, and
-non-empty `distillers` as shared BottleGroup intent. The legacy stated age is
-shared because release-specific age belonged to `proposedRelease`; the draft
-cannot yet express an exact-age repair.
+the old parent/stable Bottle layer. Live classifier correction producers persist
+`statedAgeScope: exact`; when that marker accompanies a non-null `statedAge`,
+the compatibility mapper treats the value as exact intent for only the selected
+Bottle. Historical unmarked proposals retain their original interpretation: a
+non-null `statedAge` is shared BottleGroup intent because release-specific age
+belonged to `proposedRelease` when those drafts were written.
+
+The mapper sends required `name` and `brand`, non-null `series`, `category`, and
+`bottler`, and non-empty `distillers` as shared BottleGroup intent. Marked and
+unmarked null `statedAge` values remain sparse unknowns and preserve existing
+Bottle and BottleGroup values.
 
 Non-null `edition`, `abv`, `singleCask`, `caskStrength`, `vintageYear`,
 `releaseYear`, `caskSize`, `caskType`, and `caskFill` are exact intent for the
@@ -323,8 +336,12 @@ selected Bottle. Null fields and empty distillers mean unknown in this sparse
 contract and preserve existing values; boolean false and numeric zero remain
 explicit values. The canonical concrete update service applies both scopes in
 the same transaction as proposal approval, so shared values fan out while
-exact values remain selected-only. A later explicit contract may replace this
-sparse compatibility shape rather than adding more inference here.
+exact values remain selected-only. After pending historical correction
+proposals are drained or migrated, task 9.7 removes the `statedAgeScope` marker
+and the unmarked shared-age fallback together rather than retaining two repair
+contracts. After that removal, every non-null correction `statedAge` is exact
+intent for the selected Bottle by default; null remains a sparse unknown that
+preserves both Bottle and BottleGroup age.
 
 ## Legacy BottleRelease write adapters
 
@@ -369,12 +386,6 @@ remaining nested UI and compatibility surfaces. All adapters emit measured
 compatibility writes and are disabled under task 9.4 and removed under task
 9.7. These rules preserve independently complete Bottles and shared-edit
 fan-out rather than making a Bottle depend on BottleGroup hydration.
-
-Legacy release-repair candidate discovery and application are likewise limited
-to ungrouped pre-migration Bottles. Discovery and both the preflight and locked
-apply reads require `groupId IS NULL`. Grouped Bottles are not offered,
-repaired, or deleted by this compatibility path and instead require an explicit
-exact Bottle merge. Task 9.7 removes the retained repair path.
 
 ## Durable Bottle materialization
 

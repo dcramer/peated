@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:37:42.978Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Canadian Club Reserve 9 years"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club 9 year old Reserve Canadian Whisky ReserveBar Canadian Club Reserve 9 years",
+    "summary": "Here’s the bottle-specific info I could confirm for **Canadian Club Reserve 9 Year Old Canadian Whisky** as sold on **ReserveBar**:\n\n- **Producer / brand:** **Canadian Club**. The official Canadian Club product page lists it as **“Reserve 9 Year Old Canadian Whisky.”** ([canadianclub.com](https://www.canadianclub.com/p",
+    "results": [
+      {
+        "title": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "url": "https://www.canadianclub.com/products/reserve-9-year-old-canadian-whisky",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.lcbo.com/en/canadian-club-reserve-311977",
+        "url": "https://www.lcbo.com/en/canadian-club-reserve-311977",
+        "domain": "lcbo.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.canadianclub.com/products/whiskies",
+        "url": "https://www.canadianclub.com/products/whiskies",
+        "domain": "canadianclub.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reservebar.com/products/redemption-9-year-old-barrel-proof-bourbon-whiskey/GROUPING-304873",
+        "url": "https://www.reservebar.com/products/redemption-9-year-old-barrel-proof-bourbon-whiskey/GROUPING-304873",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "858806d1dea34dbcacac2b6fa9e3818b0bb9a6f61f31761b7f27c685f847a950",
+    "mode": "auto"
+  }
+}

@@ -17,10 +17,11 @@ During the Bottle/Bottling flattening migration, `BottleGroup` owns the editing
 scope for fields shared by all of its members, while every `Bottle` remains an
 independently complete identity for the exact marketed bottle. A shared group
 edit must rematerialize every affected member atomically. Classifier input with
-the legacy `repair_parent_and_create_release` action never mutates the selected
-parent; it creates a new, independent singleton Bottle instead. The
-`BottleRelease` descriptions below remain compatibility semantics for paths not
-yet migrated and will be removed or rewritten by the later cleanup.
+`create_bottle` always describes one complete observed Bottle and never selects
+a parent or group. Automatic grouping happens outside classifier and manual
+intervention. The `BottleRelease` descriptions below remain compatibility
+semantics for paths not yet migrated and will be removed or rewritten by the
+later cleanup.
 
 ## Field Ownership
 

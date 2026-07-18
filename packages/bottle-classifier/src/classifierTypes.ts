@@ -147,7 +147,7 @@ const BottleCandidateFamilyContextSchema = z
       .array(BottleReleaseTraitFieldEnum)
       .default([])
       .describe(
-        "Release-like traits stored on the parent bottle row, usually indicating legacy or single-known-release data rather than clean parent identity.",
+        "Exact traits stored on a legacy parent Bottle row before flattening. This is migration evidence only and does not authorize parent repair or group selection.",
       ),
     childReleaseCount: z.number().int().min(0).default(0),
     siblingReleases: z.array(BottleCandidateReleaseSiblingSchema).default([]),
@@ -155,7 +155,7 @@ const BottleCandidateFamilyContextSchema = z
       .array(BottleCandidateBottleSiblingSchema)
       .default([])
       .describe(
-        "Same-family bottle rows returned by local search, useful when deciding whether a source trait must stay in displayed bottle identity or move to a child release.",
+        "Same-family Bottle rows returned by local search, useful for identifying the complete marketed Bottle without selecting a BottleGroup.",
       ),
   })
   .strict();
@@ -184,7 +184,7 @@ export const BottleCandidateSchema = z
       .enum(["bottle", "release"])
       .optional()
       .describe(
-        "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
+        "Transitional candidate discriminator: `bottle` is a Bottle row and `release` is a retained legacy bottle_release candidate. Both are match evidence; neither authorizes parent creation, repair, or group selection.",
       ),
     bottleId: z.number().int(),
     releaseId: z.number().int().nullable().optional(),
@@ -413,19 +413,19 @@ export const BottleIdentityBasisSchema = z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Traits treated as stable parent bottle identity, such as brand, expression, series, category, and stable age.",
+        "Stable facts on the complete Bottle, such as brand, expression, series, category, and stable age.",
       ),
     releaseTraits: z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Traits treated as reusable child release identity, such as batch, edition, vintage year, release year, release-specific ABV, or cask details.",
+        "Exact marketed-version traits retained on the complete Bottle, such as batch, edition, vintage year, release year, exact ABV, or cask details.",
       ),
     observationTraits: z
       .array(z.string().trim().min(1))
       .default([])
       .describe(
-        "Exact source facts preserved as observations instead of canonical bottle or release identity.",
+        "Exact source facts preserved as observations instead of canonical Bottle identity.",
       ),
     yearInterpretation: z
       .enum([
@@ -548,39 +548,6 @@ const CreateBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   proposedRelease: z.null().default(null),
 });
 
-const CreateReleaseDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
-  action: z.literal("create_release"),
-  matchedBottleId: z.null().default(null),
-  matchedReleaseId: z.null().default(null),
-  parentBottleId: z.number().int(),
-  proposedBottle: z.null().default(null),
-  proposedRelease: ProposedReleaseSchema,
-});
-
-const CreateBottleAndReleaseDecisionSchema =
-  BottleClassifierDecisionBaseSchema.extend({
-    action: z.literal("create_bottle_and_release"),
-    matchedBottleId: z.null().default(null),
-    matchedReleaseId: z.null().default(null),
-    parentBottleId: z.null().default(null),
-    proposedBottle: ProposedBottleSchema,
-    proposedRelease: ProposedReleaseSchema,
-  });
-
-const RepairParentAndCreateReleaseDecisionSchema =
-  BottleClassifierDecisionBaseSchema.extend({
-    action: z.literal("repair_parent_and_create_release"),
-    matchedBottleId: z.null().default(null),
-    matchedReleaseId: z.null().default(null),
-    parentBottleId: z.number().int(),
-    proposedBottle: ProposedBottleSchema.describe(
-      "Repair draft for the existing parent bottle after moving release-specific traits off the parent identity.",
-    ),
-    proposedRelease: ProposedReleaseSchema.describe(
-      "New release identity to create under the repaired parent.",
-    ),
-  });
-
 const RepairBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("repair_bottle"),
   matchedBottleId: z.number().int(),
@@ -602,9 +569,6 @@ const NoMatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
 type BottleClassificationDecisionInput =
   | z.infer<typeof MatchDecisionSchema>
   | z.infer<typeof CreateBottleDecisionSchema>
-  | z.infer<typeof CreateReleaseDecisionSchema>
-  | z.infer<typeof CreateBottleAndReleaseDecisionSchema>
-  | z.infer<typeof RepairParentAndCreateReleaseDecisionSchema>
   | z.infer<typeof RepairBottleDecisionSchema>
   | z.infer<typeof NoMatchDecisionSchema>;
 
@@ -612,20 +576,6 @@ function validateBottleClassificationDecisionShape(
   value: BottleClassificationDecisionInput,
   ctx: z.RefinementCtx,
 ) {
-  if (
-    value.identityScope === "exact_cask" &&
-    (value.action === "create_release" ||
-      value.action === "create_bottle_and_release" ||
-      value.action === "repair_parent_and_create_release")
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["identityScope"],
-      message:
-        "Exact-cask identity cannot create a child release beneath the bottle.",
-    });
-  }
-
   if (value.identityScope === "exact_cask" && value.matchedReleaseId !== null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -640,9 +590,6 @@ export const BottleClassificationDecisionSchema = z
   .discriminatedUnion("action", [
     MatchDecisionSchema,
     CreateBottleDecisionSchema,
-    CreateReleaseDecisionSchema,
-    CreateBottleAndReleaseDecisionSchema,
-    RepairParentAndCreateReleaseDecisionSchema,
     RepairBottleDecisionSchema,
     NoMatchDecisionSchema,
   ])
@@ -652,30 +599,15 @@ const AgentProposedBottleSchema = ProposedBottleSchema.extend({
   abv: z.number().nullable().default(null),
 });
 
-const AgentProposedReleaseSchema = ProposedReleaseSchema.extend({
-  abv: z.number().nullable().default(null),
-});
-
 export const BottleClassifierAgentDecisionSchema = z.object({
   action: z
-    .enum([
-      "match",
-      "create_bottle",
-      "create_release",
-      "create_bottle_and_release",
-      "repair_parent_and_create_release",
-      "repair_bottle",
-      "no_match",
-    ])
+    .enum(["match", "create_bottle", "repair_bottle", "no_match"])
     .describe(
       [
         "Decision action.",
         "match: existing bottle or release/bottling safely covers the marketed identity; set matchedBottleId and optionally matchedReleaseId.",
         "repair_bottle: existing bottle is the right identity but needs bottle-level field repair; set matchedBottleId and proposedBottle.",
-        "create_bottle: create a standalone bottle with no child bottling; set proposedBottle only.",
-        "create_release: add a child bottling under a clean existing parent; set parentBottleId and proposedRelease.",
-        "create_bottle_and_release: create a missing stable parent plus child bottling; set proposedBottle and proposedRelease.",
-        "repair_parent_and_create_release: repair an existing family parent that stores bottling traits, then add the child bottling; set parentBottleId, proposedBottle, and proposedRelease.",
+        "create_bottle: create one independently complete concrete bottle; set proposedBottle only, including every marketed release trait needed to identify it.",
         "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
       ].join(" "),
     ),
@@ -688,13 +620,11 @@ export const BottleClassifierAgentDecisionSchema = z.object({
   confidenceBasis: BottleConfidenceBasisSchema.nullable().default(null),
   matchedBottleId: z.number().int().nullable().default(null),
   matchedReleaseId: z.number().int().nullable().default(null),
-  parentBottleId: z.number().int().nullable().default(null),
   proposedBottle: AgentProposedBottleSchema.nullable()
     .default(null)
     .describe(
-      "Required for create_bottle, create_bottle_and_release, repair_parent_and_create_release, and repair_bottle. The draft may be minimal: include supported brand/name identity and leave unknown optional fields null.",
+      "Required for create_bottle and repair_bottle. A create draft describes one independently complete concrete bottle, including every supported marketed release trait; unknown optional fields may remain null.",
     ),
-  proposedRelease: AgentProposedReleaseSchema.nullable().default(null),
 });
 
 export const BottleClassifierAgentResponseSchema = z.object({
@@ -756,6 +686,8 @@ export type BottleClassifierAgentDecision = Omit<
   "aliasScope"
 > & {
   aliasScope?: AliasScope | null;
+  parentBottleId: null;
+  proposedRelease: null;
 };
 export type BottleClassificationDecision = BottleClassificationDecisionOutput;
 export type BottleClassifierAgentDecisionInput = Omit<
@@ -763,6 +695,8 @@ export type BottleClassifierAgentDecisionInput = Omit<
   "aliasScope"
 > & {
   aliasScope?: AliasScope | null;
+  parentBottleId?: null;
+  proposedRelease?: null;
 };
 export type BottleObservation = z.infer<typeof BottleObservationSchema>;
 export type EntityResolution = z.infer<typeof EntityResolutionSchema>;

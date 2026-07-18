@@ -1,14 +1,16 @@
 import { db } from "@peated/server/db";
 import {
-  bottleReleases,
+  bottleGroupDistillers,
+  bottleGroups,
   bottleSeries,
   bottles,
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
-import { getUserActorByIdForDatabase } from "@peated/server/lib/actors";
+import type { getUserActor } from "@peated/server/lib/actors";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const pushUniqueJobMock = vi.hoisted(() => vi.fn());
@@ -17,35 +19,31 @@ vi.mock("@peated/server/worker/client", () => ({
   pushUniqueJob: pushUniqueJobMock,
 }));
 
+function contextFor(user: Parameters<typeof getUserActor>[0]) {
+  return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
+}
+
 describe("repairBottleBrandDistilleryAssignments", () => {
   beforeEach(() => {
     pushUniqueJobMock.mockReset();
   });
 
-  test("previews Jura-style repairs without mutating bottle data", async ({
+  test("previews one shared BottleGroup repair without mutating members", async ({
     fixtures,
   }) => {
     const fromBrand = await fixtures.Entity({
       name: "Isle of Jura",
       type: ["brand", "distiller"],
     });
-    const toBrand = await fixtures.Entity({
-      name: "Jura",
-      type: ["brand"],
-    });
+    const toBrand = await fixtures.Entity({ name: "Jura", type: ["brand"] });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: fromBrand.id,
       name: "12-year-old",
     });
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       brandId: fromBrand.id,
       name: "12-year-old Single Malt Scotch Whisky",
       seriesId: sourceSeries.id,
-    });
-    const targetBottleFullName = "Jura 12-year-old Single Malt Scotch Whisky";
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "2024 Release",
     });
 
     const result = await repairBottleBrandDistilleryAssignments({
@@ -64,42 +62,129 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       total: 1,
     });
     expect(result.items).toEqual([
-      {
-        bottleFullName: targetBottleFullName,
+      expect.objectContaining({
+        bottleFullName: "Jura 12-year-old Single Malt Scotch Whisky",
         bottleId: bottle.id,
         distilleryAdded: true,
-        message: `brand Isle of Jura -> Jura; rename ${bottle.fullName} -> ${targetBottleFullName}; add distillery Isle of Jura; create series 12-year-old; 1 release(s) reindexed`,
-        releaseCount: 1,
+        groupId: bottle.groupId,
+        message: expect.stringContaining(
+          `BottleGroup ${bottle.groupId} fan-out`,
+        ),
         seriesAction: "create_new",
         status: "planned",
-      },
+      }),
     ]);
-
-    const [unchangedBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-    expect(unchangedBottle.brandId).toEqual(fromBrand.id);
-    expect(unchangedBottle.fullName).toEqual(bottle.fullName);
-    expect(unchangedBottle.seriesId).toEqual(sourceSeries.id);
-
-    const distilleryLinks = await db
-      .select()
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
-    expect(distilleryLinks).toHaveLength(0);
-
-    const targetSeries = await db.query.bottleSeries.findFirst({
-      where: and(
-        eq(bottleSeries.brandId, toBrand.id),
-        eq(bottleSeries.name, sourceSeries.name),
-      ),
-    });
-    expect(targetSeries).toBeUndefined();
+    expect(
+      await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+    ).toMatchObject({ brandId: fromBrand.id, seriesId: sourceSeries.id });
     expect(pushUniqueJobMock).not.toHaveBeenCalled();
   });
 
-  test("repairs the bottle brand, canonical names, distillery, and target series", async ({
+  test("previews exact batch identity from BottleGroup authority despite member drift", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const fromBrand = await fixtures.Entity({
+      name: "Source Brand",
+      type: ["brand", "distiller"],
+    });
+    const toBrand = await fixtures.Entity({ name: "Target Brand" });
+    const sourceSeries = await fixtures.BottleSeries({
+      brandId: fromBrand.id,
+      name: "Annual Range",
+    });
+    const first = await fixtures.Bottle({
+      brandId: fromBrand.id,
+      distillerIds: [fromBrand.id],
+      name: "Annual",
+      seriesId: sourceSeries.id,
+    });
+    const second = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: first.id,
+        exact: { edition: "Batch 2" },
+      },
+    });
+    await db
+      .update(bottles)
+      .set({ name: "Drifted Member", fullName: "Source Brand Drifted Member" })
+      .where(eq(bottles.id, second.bottle.id));
+    const memberIds = [first.id, second.bottle.id];
+    const [
+      membersBefore,
+      groupBefore,
+      distillersBefore,
+      seriesBefore,
+      auditsBefore,
+    ] = await Promise.all([
+      db.query.bottles.findMany({
+        where: eq(bottles.groupId, first.groupId!),
+        orderBy: (table, { asc }) => [asc(table.id)],
+      }),
+      db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.groupId!),
+      }),
+      db
+        .select()
+        .from(bottleGroupDistillers)
+        .where(eq(bottleGroupDistillers.groupId, first.groupId!)),
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, sourceSeries.id),
+      }),
+      db.select().from(changes).where(inArray(changes.objectId, memberIds)),
+    ]);
+    pushUniqueJobMock.mockReset();
+
+    const result = await repairBottleBrandDistilleryAssignments({
+      bottleIds: [second.bottle.id],
+      dryRun: true,
+      fromBrand,
+      toBrand,
+    });
+
+    expect(result.items).toEqual([
+      expect.objectContaining({
+        bottleId: second.bottle.id,
+        bottleFullName: "Target Brand Annual - Batch 2",
+        groupId: first.groupId,
+        status: "planned",
+      }),
+    ]);
+    expect(
+      await db.query.bottles.findMany({
+        where: eq(bottles.groupId, first.groupId!),
+        orderBy: (table, { asc }) => [asc(table.id)],
+      }),
+    ).toEqual(membersBefore);
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.groupId!),
+      }),
+    ).toEqual(groupBefore);
+    expect(
+      await db
+        .select()
+        .from(bottleGroupDistillers)
+        .where(eq(bottleGroupDistillers.groupId, first.groupId!)),
+    ).toEqual(distillersBefore);
+    expect(
+      await db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, sourceSeries.id),
+      }),
+    ).toEqual(seriesBefore);
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(inArray(changes.objectId, memberIds)),
+    ).toEqual(auditsBefore);
+    expect(pushUniqueJobMock).not.toHaveBeenCalled();
+  });
+
+  test("fans shared brand, distillery, name, and series changes to every concrete Bottle", async ({
+    defaults,
     fixtures,
   }) => {
     const systemUser = await fixtures.User({ admin: true });
@@ -107,26 +192,27 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       name: "Isle of Jura",
       type: ["brand", "distiller"],
     });
-    const toBrand = await fixtures.Entity({
-      name: "Jura",
-      type: ["brand"],
-    });
+    const toBrand = await fixtures.Entity({ name: "Jura", type: ["brand"] });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: fromBrand.id,
-      name: "12-year-old",
+      name: "Annual",
     });
-    const bottle = await fixtures.LegacyBottle({
+    const first = await fixtures.Bottle({
       brandId: fromBrand.id,
-      name: "12-year-old Single Malt Scotch Whisky",
+      name: "Annual",
       seriesId: sourceSeries.id,
     });
-    const targetBottleFullName = "Jura 12-year-old Single Malt Scotch Whisky";
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "2024 Release",
+    const second = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: first.id,
+        exact: { edition: "Batch 2" },
+      },
     });
 
     const result = await repairBottleBrandDistilleryAssignments({
+      bottleIds: [first.id],
       distilleryId: fromBrand.id,
       dryRun: false,
       fromBrand,
@@ -134,114 +220,76 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       user: systemUser,
     });
 
-    expect(result.summary).toEqual({
-      applied: 1,
-      failed: 0,
-      planned: 0,
-      seriesCreated: 1,
-      seriesReused: 0,
-      total: 1,
+    expect(result.summary).toMatchObject({ applied: 1, failed: 0, total: 1 });
+    expect(result.items[0]).toMatchObject({ groupId: first.groupId });
+    const members = await db.query.bottles.findMany({
+      where: eq(bottles.groupId, first.groupId!),
+      orderBy: (table, { asc }) => [asc(table.id)],
     });
+    expect(members).toHaveLength(2);
+    expect(members.map(({ brandId }) => brandId)).toEqual([
+      toBrand.id,
+      toBrand.id,
+    ]);
+    expect(members.map(({ fullName }) => fullName)).toEqual([
+      "Jura Annual",
+      "Jura Annual - Batch 2",
+    ]);
+    expect(members.map(({ seriesId }) => seriesId)).toEqual([
+      expect.any(Number),
+      expect.any(Number),
+    ]);
+    expect(members[0]!.seriesId).toEqual(members[1]!.seriesId);
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.groupId!),
+      }),
+    ).toMatchObject({ brandId: toBrand.id, seriesId: members[0]!.seriesId });
+    expect(
+      await db
+        .select()
+        .from(bottleGroupDistillers)
+        .where(eq(bottleGroupDistillers.groupId, first.groupId!)),
+    ).toEqual([{ groupId: first.groupId, distillerId: fromBrand.id }]);
+    expect(
+      await db
+        .select()
+        .from(bottlesToDistillers)
+        .where(eq(bottlesToDistillers.bottleId, second.bottle.id)),
+    ).toEqual([{ bottleId: second.bottle.id, distillerId: fromBrand.id }]);
 
-    const [updatedBottle] = await db
+    const updateChanges = await db
       .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-    expect(updatedBottle.brandId).toEqual(toBrand.id);
-    expect(updatedBottle.fullName).toEqual(targetBottleFullName);
-    expect(updatedBottle.seriesId).not.toEqual(sourceSeries.id);
-
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-    expect(updatedRelease.name).toEqual(
-      "12-year-old Single Malt Scotch Whisky - 2024 Release",
-    );
-    expect(updatedRelease.fullName).toEqual(
-      "Jura 12-year-old Single Malt Scotch Whisky - 2024 Release",
-    );
-
-    const distilleryLinks = await db
-      .select()
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
-    expect(distilleryLinks).toHaveLength(1);
-    expect(distilleryLinks[0]?.distillerId).toEqual(fromBrand.id);
-
-    const [reindexedSeries] = await db
-      .select()
-      .from(bottleSeries)
-      .where(eq(bottleSeries.id, updatedBottle.seriesId!));
-    expect(reindexedSeries.brandId).toEqual(toBrand.id);
-    expect(reindexedSeries.name).toEqual(sourceSeries.name);
-
-    const [updatedSourceSeries] = await db
-      .select()
-      .from(bottleSeries)
-      .where(eq(bottleSeries.id, sourceSeries.id));
-    expect(updatedSourceSeries.numReleases).toEqual(0);
-    expect(reindexedSeries.numReleases).toEqual(1);
-
-    const change = await db.query.changes.findFirst({
-      where: and(
-        eq(changes.objectId, bottle.id),
-        eq(changes.objectType, "bottle"),
-        eq(changes.type, "update"),
-      ),
-      orderBy: (changes, { desc }) => [desc(changes.createdAt)],
+      .from(changes)
+      .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update")));
+    expect(updateChanges).toHaveLength(2);
+    expect(updateChanges.map(({ data }) => data)).toEqual([
+      expect.objectContaining({
+        updateScope: "shared",
+        groupId: first.groupId,
+        creationSource: "repair_workflow",
+      }),
+      expect.objectContaining({
+        updateScope: "shared",
+        groupId: first.groupId,
+        creationSource: "repair_workflow",
+      }),
+    ]);
+    expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: first.id,
     });
-    const systemUserActor = await getUserActorByIdForDatabase(
-      db,
-      systemUser.id,
-    );
-    expect(change?.actorId).toEqual(systemUserActor.id);
-    expect(change?.data).toEqual({
-      brandId: toBrand.id,
-      fullName: targetBottleFullName,
-      distillerIds: [fromBrand.id],
-      seriesId: reindexedSeries.id,
+    expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: second.bottle.id,
     });
-
-    expect(pushUniqueJobMock).toHaveBeenCalledWith(
-      "OnBottleChange",
-      { bottleId: bottle.id },
-      { delay: 5000 },
-    );
-    expect(pushUniqueJobMock).toHaveBeenCalledWith(
-      "OnBottleReleaseChange",
-      { releaseId: release.id },
-      { delay: 5000 },
-    );
-    expect(pushUniqueJobMock).toHaveBeenCalledWith(
-      "IndexBottleSeriesSearchVectors",
-      { seriesId: reindexedSeries.id },
-      { delay: 5000 },
-    );
-    expect(pushUniqueJobMock).toHaveBeenCalledWith(
-      "OnEntityChange",
-      { entityId: fromBrand.id },
-      { delay: 5000 },
-    );
-    expect(pushUniqueJobMock).toHaveBeenCalledWith(
-      "OnEntityChange",
-      { entityId: toBrand.id },
-      { delay: 5000 },
-    );
   });
 
-  test("reuses an existing target-brand series and avoids duplicate distillery links", async ({
-    fixtures,
-  }) => {
+  test("reuses an existing target-brand series", async ({ fixtures }) => {
     const systemUser = await fixtures.User({ admin: true });
     const fromBrand = await fixtures.Entity({
       name: "Isle of Jura",
       type: ["brand", "distiller"],
     });
-    const toBrand = await fixtures.Entity({
-      name: "Jura",
-      type: ["brand"],
-    });
+    const toBrand = await fixtures.Entity({ name: "Jura", type: ["brand"] });
     const sourceSeries = await fixtures.BottleSeries({
       brandId: fromBrand.id,
       name: "Elixir",
@@ -250,7 +298,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       brandId: toBrand.id,
       name: "Elixir",
     });
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       brandId: fromBrand.id,
       name: "Elixir",
       seriesId: sourceSeries.id,
@@ -265,32 +313,97 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       user: systemUser,
     });
 
-    expect(result.summary).toEqual({
+    expect(result.summary).toMatchObject({
       applied: 1,
       failed: 0,
-      planned: 0,
       seriesCreated: 0,
       seriesReused: 1,
-      total: 1,
+    });
+    expect(
+      await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+    ).toMatchObject({
+      brandId: toBrand.id,
+      fullName: "Jura Elixir",
+      seriesId: targetSeries.id,
+    });
+    expect(
+      await db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, targetSeries.id),
+      }),
+    ).toMatchObject({ numReleases: 1 });
+  });
+
+  test("uses the BottleGroup series when the selected member has drifted", async ({
+    fixtures,
+  }) => {
+    const systemUser = await fixtures.User({ admin: true });
+    const fromBrand = await fixtures.Entity({ name: "Source Brand" });
+    const toBrand = await fixtures.Entity({ name: "Target Brand" });
+    const authoritativeSeries = await fixtures.BottleSeries({
+      brandId: fromBrand.id,
+      name: "Authoritative Range",
+    });
+    const driftedSeries = await fixtures.BottleSeries({
+      brandId: fromBrand.id,
+      name: "Drifted Range",
+    });
+    const targetSeries = await fixtures.BottleSeries({
+      brandId: toBrand.id,
+      name: authoritativeSeries.name,
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: fromBrand.id,
+      name: "Expression",
+      seriesId: authoritativeSeries.id,
+    });
+    await db
+      .update(bottles)
+      .set({ seriesId: driftedSeries.id })
+      .where(eq(bottles.id, bottle.id));
+
+    const result = await repairBottleBrandDistilleryAssignments({
+      bottleIds: [bottle.id],
+      dryRun: false,
+      fromBrand,
+      toBrand,
+      user: systemUser,
     });
 
-    const [updatedBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-    expect(updatedBottle.brandId).toEqual(toBrand.id);
-    expect(updatedBottle.fullName).toEqual("Jura Elixir");
-    expect(updatedBottle.seriesId).toEqual(targetSeries.id);
+    expect(result.summary).toMatchObject({
+      applied: 1,
+      failed: 0,
+      seriesCreated: 0,
+      seriesReused: 1,
+    });
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, bottle.groupId!),
+      }),
+    ).toMatchObject({ seriesId: targetSeries.id });
+    expect(
+      await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+    ).toMatchObject({ seriesId: targetSeries.id });
+  });
 
-    const distilleryLinks = await db
-      .select()
-      .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, bottle.id));
-    expect(distilleryLinks).toHaveLength(1);
-    expect(pushUniqueJobMock).not.toHaveBeenCalledWith(
-      "IndexBottleSeriesSearchVectors",
-      expect.anything(),
-      expect.anything(),
-    );
+  test("refuses to mutate an ungrouped pre-migration Bottle", async ({
+    fixtures,
+  }) => {
+    const systemUser = await fixtures.User({ admin: true });
+    const fromBrand = await fixtures.Entity({ name: "Legacy Brand" });
+    const toBrand = await fixtures.Entity({ name: "Target Brand" });
+    const bottle = await fixtures.LegacyBottle({ brandId: fromBrand.id });
+
+    const result = await repairBottleBrandDistilleryAssignments({
+      dryRun: false,
+      fromBrand,
+      toBrand,
+      user: systemUser,
+    });
+
+    expect(result.summary).toMatchObject({ failed: 1, applied: 0 });
+    expect(result.items[0]?.message).toContain("BottleGroup migration");
+    expect(
+      await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+    ).toMatchObject({ brandId: fromBrand.id });
   });
 });

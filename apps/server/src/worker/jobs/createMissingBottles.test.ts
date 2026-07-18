@@ -10,7 +10,7 @@ import {
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
@@ -134,6 +134,7 @@ describe("createMissingBottles", () => {
     const target = await db.query.catalogTargets.findFirst({
       where: eq(catalogTargets.bottleId, bottle!.id),
     });
+    expect(updatedReview?.targetId).toEqual(target!.id);
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
@@ -141,7 +142,7 @@ describe("createMissingBottles", () => {
     expect(alias).toMatchObject({
       bottleId: updatedReview?.bottleId,
       targetId: target!.id,
-      assignmentSource: "canonical",
+      assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
 
@@ -149,6 +150,7 @@ describe("createMissingBottles", () => {
       where: eq(storePrices.id, price.id),
     });
     expect(updatedPrice?.bottleId).toEqual(updatedReview?.bottleId);
+    expect(updatedPrice?.targetId).toEqual(target!.id);
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -186,142 +188,6 @@ describe("createMissingBottles", () => {
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: updatedReview?.bottleId,
     });
-  });
-
-  test("audits release-shaped creation as a concrete Bottle", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const systemUser = await fixtures.User({ admin: true });
-    const systemActor = await getPeatedSystemActor();
-    const parent = await fixtures.Bottle({
-      name: "Worker Release Family",
-      statedAge: 12,
-    });
-    const review = await fixtures.Review({
-      externalSiteId: site.id,
-      bottleId: null,
-      releaseId: null,
-      name: `${parent.fullName} Batch 24`,
-      issue: "Batch review",
-      url: "https://example.com/worker-release-shaped-create",
-    });
-    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification(
-        {
-          action: "create_release",
-          parentBottleId: parent.id,
-          identityScope: "product",
-          observation: {
-            selector: "Batch 24 label",
-            caskNumber: null,
-            barrelNumber: null,
-            bottleNumber: null,
-            outturn: null,
-            market: null,
-            exclusive: null,
-          },
-          identityBasis: {
-            bottleTraits: ["brand", "expression"],
-            releaseTraits: ["edition"],
-            observationTraits: ["label selector"],
-            yearInterpretation: "none",
-            siblingEvidence: "single_known_release",
-            uncertainties: [],
-          },
-          confidenceBasis: {
-            positiveEvidence: ["classifier-selected parent"],
-            unresolvedRisks: [],
-            toolsUsed: ["initial_local_candidates"],
-            webEvidence: "not_used",
-          },
-          proposedRelease: {
-            edition: "Batch 24",
-            statedAge: null,
-            abv: 54.1,
-            caskStrength: true,
-            singleCask: false,
-            vintageYear: null,
-            releaseYear: 2024,
-            caskType: null,
-            caskSize: null,
-            caskFill: null,
-            description: null,
-            tastingNotes: null,
-            imageUrl: null,
-          },
-        },
-        {
-          candidates: [{ bottleId: parent.id, releaseId: null }],
-        },
-      ),
-    );
-
-    await createMissingBottles();
-
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
-    });
-    const createdBottle = await db.query.bottles.findFirst({
-      where: (bottles, { eq }) => eq(bottles.id, updatedReview!.bottleId!),
-    });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, createdBottle!.id),
-    });
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review.id),
-      ),
-    });
-
-    expect(createdBottle).toMatchObject({
-      groupId: parent.groupId,
-      edition: "Batch 24",
-    });
-    expect(createdBottle!.id).not.toBe(parent.id);
-    expect(decisionLog).toMatchObject({
-      decision: "create_bottle",
-      bottleId: createdBottle!.id,
-      releaseId: null,
-      targetId: target!.id,
-      createdBottle: true,
-      createdRelease: false,
-      metadata: expect.objectContaining({
-        classifierEvidence: {
-          action: "create_release",
-          parentBottleId: parent.id,
-          identityScope: "product",
-          observation: {
-            selector: "Batch 24 label",
-            caskNumber: null,
-            barrelNumber: null,
-            bottleNumber: null,
-            outturn: null,
-            market: null,
-            exclusive: null,
-          },
-          identityBasis: {
-            bottleTraits: ["brand", "expression"],
-            releaseTraits: ["edition"],
-            observationTraits: ["label selector"],
-            yearInterpretation: "none",
-            siblingEvidence: "single_known_release",
-            uncertainties: [],
-          },
-          confidenceBasis: {
-            positiveEvidence: ["classifier-selected parent"],
-            unresolvedRisks: [],
-            toolsUsed: ["initial_local_candidates"],
-            webEvidence: "not_used",
-          },
-        },
-        resolutionSource: "classifier_create_release",
-        issue: review.issue,
-      }),
-    });
-    expect(await db.select().from(bottleReleases)).toEqual([]);
   });
 
   test("audits safe canonical create reuse as an existing Bottle match", async ({
@@ -443,5 +309,160 @@ describe("createMissingBottles", () => {
     });
     expect(unchangedReview?.bottleId).toBeNull();
     expect(unchangedReview?.releaseId).toBeNull();
+  });
+
+  test("assigns an explicitly staged unpromoted classifier match", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const systemUser = await fixtures.User({ admin: true });
+    const parent = await fixtures.LegacyBottle({
+      name: "Worker Unpromoted Parent",
+    });
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+      name: "Worker Unpromoted Release Review",
+      issue: "Default",
+      url: "https://example.com/worker-unpromoted-review",
+    });
+    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: parent.id,
+          matchedReleaseId: release.id,
+          candidateBottleIds: [parent.id],
+        },
+        { candidates: [{ bottleId: parent.id, releaseId: release.id }] },
+      ),
+    );
+
+    await createMissingBottles();
+
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).toMatchObject({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: null,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
+      }),
+    ).toMatchObject({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: null,
+      assignmentSource: "classifier_approved",
+    });
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, review.id),
+        ),
+      }),
+    ).toMatchObject({
+      decision: "match_existing",
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: null,
+    });
+  });
+
+  test("skips target-aware generic Reviews whose retained Bottle is null", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const systemUser = await fixtures.User({ admin: true });
+    const member = await fixtures.Bottle({ name: "Generic Review Group" });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, member.groupId!),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      targetId: genericTarget!.id,
+      bottleId: null,
+      releaseId: null,
+      name: "Generic Review Group",
+      issue: "Default",
+      url: "https://example.com/generic-review",
+    });
+    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
+
+    await createMissingBottles();
+
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: genericTarget!.id,
+    });
+  });
+
+  test("preserves a Review retargeted while classification runs", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const systemUser = await fixtures.User({ admin: true });
+    const suggestedBottle = await fixtures.Bottle({
+      name: "Suggested Worker Bottle",
+    });
+    const concurrentBottle = await fixtures.Bottle({
+      name: "Concurrent Worker Bottle",
+    });
+    const concurrentTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, concurrentBottle.id),
+    });
+    const review = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: null,
+      releaseId: null,
+      name: "Concurrent Worker Review",
+      issue: "Default",
+      url: "https://example.com/concurrent-worker-review",
+    });
+    getAutomationModeratorUserMock.mockResolvedValue(systemUser);
+    classifyBottleReferenceMock.mockImplementationOnce(async () => {
+      await db
+        .update(reviews)
+        .set({
+          bottleId: concurrentBottle.id,
+          releaseId: null,
+          targetId: concurrentTarget!.id,
+        })
+        .where(eq(reviews.id, review.id));
+      return buildClassification(
+        {
+          action: "match",
+          matchedBottleId: suggestedBottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [suggestedBottle.id],
+        },
+        { candidates: [{ bottleId: suggestedBottle.id, releaseId: null }] },
+      );
+    });
+
+    await createMissingBottles();
+
+    const preserved = await db.query.reviews.findFirst({
+      where: eq(reviews.id, review.id),
+    });
+    expect(preserved).toMatchObject({
+      bottleId: concurrentBottle.id,
+      releaseId: null,
+      targetId: concurrentTarget!.id,
+    });
   });
 });

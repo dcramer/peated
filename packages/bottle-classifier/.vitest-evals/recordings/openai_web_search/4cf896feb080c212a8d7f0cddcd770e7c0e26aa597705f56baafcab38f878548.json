@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:14:44.522Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 cask 1661 Creative Whisky Company"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1 cask 1661 Creative Whisky Company",
+    "summary": "I found a strong bottle-specific match, but there’s one important discrepancy:\n\n- **Producer/Bottler:** **Creative Whisky Company**\n- **Series:** **The Exclusive Malts**\n- **Region label:** **Islay**\n- **Vintage/distilled:** **17 October 2007**\n- **Age:** **8 years old**\n- **Bottled:** **May 2016**\n- **ABV:** **57.1%**",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc",
+        "url": "https://www.whiskybase.com/whiskies/whisky/154439/islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "url": "https://www.whisky.com/whisky-database/details/bunnahabhain-the-exclusive-malts.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/Scotch/comments/1d4i8st",
+        "url": "https://www.reddit.com/r/Scotch/comments/1d4i8st",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskyfun.com/archivejanuary08-1.html",
+        "url": "https://www.whiskyfun.com/archivejanuary08-1.html",
+        "domain": "whiskyfun.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "url": "https://maltrunners.com/2024/05/29/speyside-8-exclusive-regions/",
+        "domain": "maltrunners.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://norfolkwineandspirits.com/product-tag/creative-whisky-company/",
+        "url": "https://norfolkwineandspirits.com/product-tag/creative-whisky-company/",
+        "domain": "norfolkwineandspirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4cf896feb080c212a8d7f0cddcd770e7c0e26aa597705f56baafcab38f878548",
+    "mode": "auto"
+  }
+}

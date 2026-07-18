@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:08:59.473Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 Year Old official 46%",
+    "summary": "**Glenmorangie The Quinta Ruban 14 Year Old** is an **official bottling** from **Glenmorangie**, bottled at **46.0% ABV**. Glenmorangie’s official product page confirms it as a **14-year-old** single malt in the core range. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=open",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/collections/all?page=1",
+        "url": "https://www.glenmorangie.com/en-us/collections/all?page=1",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "url": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.target.com/p/-/A-54625391",
+        "url": "https://www.target.com/p/-/A-54625391",
+        "domain": "target.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ocado.com/products/glenmorangie-quinta-ruban-14-years-old-single-malt-whisky/66338011",
+        "url": "https://www.ocado.com/products/glenmorangie-quinta-ruban-14-years-old-single-malt-whisky/66338011",
+        "domain": "ocado.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/products/scotch/glenmorangie-quinta-ruban-scotch?productSize=0",
+        "url": "https://www.abc.virginia.gov/products/scotch/glenmorangie-quinta-ruban-scotch?productSize=0",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "324ba7e2aa086bed7121c3b6c8b306055df654f15285d72735f5bdd8d1db767f",
+    "mode": "auto"
+  }
+}

@@ -24,7 +24,6 @@
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
-    "deterministicReleaseExpectation": "none",
-    "releaseIdentity": null
+    "exactBottleIdentity": null
   }
 }

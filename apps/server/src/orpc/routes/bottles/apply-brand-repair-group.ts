@@ -12,9 +12,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/bottles/apply-brand-repair-group",
-    summary: "Apply grouped bottle brand/entity repair",
+    summary: "Apply BottleGroup-wide brand/entity repairs",
     description:
-      "Move every currently eligible bottle in a source-brand to target-brand repair cluster, optionally preserving the source entity as a distillery link. Requires moderator privileges",
+      "Group eligible candidate Bottles by BottleGroup, then fan each shared brand, optional distillery, and series repair out to every concrete member. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "applyBottleBrandRepairGroup",
@@ -31,9 +31,16 @@ export default procedure
   .output(
     z.object({
       appliedCount: z.number(),
+      appliedGroupCount: z.number(),
+      appliedGroupIds: z.array(z.number()),
       bottleIds: z.array(z.number()),
       candidateCount: z.number(),
+      candidateBottleCount: z.number(),
+      candidateBottleIds: z.array(z.number()),
       failedCount: z.number(),
+      failedGroupCount: z.number(),
+      failedGroupIds: z.array(z.number()),
+      groupIds: z.array(z.number()),
       status: z.literal("applied"),
     }),
   )
@@ -98,12 +105,38 @@ export default procedure
       toBrand,
       user: context.user,
     });
+    const groupIds = Array.from(
+      new Set(
+        result.items.flatMap(({ groupId }) =>
+          groupId === null ? [] : [groupId],
+        ),
+      ),
+    ).sort((left, right) => left - right);
+    const groupIdsForStatus = (status: "applied" | "failed") =>
+      Array.from(
+        new Set(
+          result.items.flatMap((item) =>
+            item.status === status && item.groupId !== null
+              ? [item.groupId]
+              : [],
+          ),
+        ),
+      ).sort((left, right) => left - right);
+    const appliedGroupIds = groupIdsForStatus("applied");
+    const failedGroupIds = groupIdsForStatus("failed");
 
     return {
       appliedCount: result.summary.applied,
+      appliedGroupCount: appliedGroupIds.length,
+      appliedGroupIds,
       bottleIds,
       candidateCount: bottleIds.length,
+      candidateBottleCount: bottleIds.length,
+      candidateBottleIds: bottleIds,
       failedCount: result.summary.failed,
+      failedGroupCount: failedGroupIds.length,
+      failedGroupIds,
+      groupIds,
       status: "applied" as const,
     };
   });

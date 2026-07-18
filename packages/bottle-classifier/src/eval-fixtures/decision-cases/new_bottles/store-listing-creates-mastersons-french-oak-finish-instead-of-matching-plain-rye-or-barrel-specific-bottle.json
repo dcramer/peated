@@ -176,7 +176,7 @@
       "releaseId": null,
       "createsBottle": true,
       "createsRelease": false,
-      "summary": "Create a clean Masterson's 10-year-old Straight Rye French Oak Finish bottle for the store price. Do not redirect to the plain Masterson's 10-year-old Rye bottle 44029 or its batch-coded child releases; do not match the narrower Barrel F2-038 bottle 16442."
+      "summary": "Create a complete Masterson's 10-year-old Straight Rye French Oak Finish Bottle for the store price. Do not redirect to the plain Masterson's 10-year-old Rye Bottle 44029 or its batch-coded legacy candidates; do not match the narrower Barrel F2-038 Bottle 16442."
     },
     "notes": "Caskers search results list Masterson's 10 Year Old Straight Rye Whiskey and Masterson's 10 Year Old Rye Whiskey Barrel Finished in French Oak as separate product pages, so the French Oak wording is not merely an optional title suffix for the plain rye candidate. The existing Barrel F2-038 bottle is narrower than the observed store listing, so the correct current DB outcome is a clean French Oak bottle creation."
   },

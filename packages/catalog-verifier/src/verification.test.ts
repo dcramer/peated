@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
+  CatalogVerificationFindingKindEnum,
+  CatalogVerificationWorkstreamEnum,
   buildCatalogVerificationCreationMetadata,
   buildCatalogVerificationResult,
   getCatalogVerificationSkipReason,
@@ -7,6 +9,19 @@ import {
 } from "./verification";
 
 describe("catalog verifier policy", () => {
+  test("exposes only active verification workstreams and finding kinds", () => {
+    expect(CatalogVerificationWorkstreamEnum.options).toEqual([
+      "brand-repairs",
+      "canon-repairs",
+      "entity-audits",
+    ]);
+    expect(CatalogVerificationFindingKindEnum.options).toEqual([
+      "brand_repair_candidate",
+      "canon_repair_candidate",
+      "entity_audit_candidate",
+    ]);
+  });
+
   test("runs verification for manual entries", () => {
     expect(shouldRunCatalogVerification("manual_entry")).toBe(true);
     expect(getCatalogVerificationSkipReason("manual_entry")).toBeNull();

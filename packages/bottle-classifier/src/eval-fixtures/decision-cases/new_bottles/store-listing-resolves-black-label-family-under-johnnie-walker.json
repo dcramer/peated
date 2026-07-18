@@ -1,0 +1,88 @@
+{
+  "id": "store-listing-resolves-black-label-family-under-johnnie-walker",
+  "name": "store listing: resolves Black Label family under Johnnie Walker",
+  "input": {
+    "reference": {
+      "name": "Black Label Islay Origin 12-year-old",
+      "url": "https://www.prnewswire.com/news-releases/decouvrez-les-saveurs-de-l-ecosse-avec-la-gamme-johnnie-walker-black-label-origin-891724152.html"
+    },
+    "extractedIdentity": {
+      "brand": "Black Label",
+      "bottler": null,
+      "expression": "Islay Origin",
+      "series": null,
+      "distillery": [],
+      "category": "blend",
+      "stated_age": 12,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    }
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.prnewswire.com/news-releases/decouvrez-les-saveurs-de-l-ecosse-avec-la-gamme-johnnie-walker-black-label-origin-891724152.html",
+      "https://api.peated.com/v1/bottles/6127",
+      "https://api.peated.com/v1/bottles/13606"
+    ],
+    "notes": "This promotes the existing real-world Black Label Islay Origin corpus case into the structured decision suite. The launch announcement identifies the four products as the Johnnie Walker Black Label Origin series, and the Peated catalog siblings consistently use Johnnie Walker as brand with Black Label retained in the Bottle name. Producer/distiller entity reuse is covered separately by the verified Watchpost production-miss fixture because this blend does not have one canonical distillery role."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Black Label Islay Origin 12-year-old",
+      "brand": {
+        "id": 1093,
+        "name": "Johnnie Walker"
+      },
+      "category": "blend",
+      "statedAge": 12
+    },
+    "proposedBottleNameIncludes": [
+      "Black Label",
+      "Islay Origin",
+      "12-year-old"
+    ],
+    "summary": "Use the verified sibling family and launch evidence to keep Johnnie Walker as the resolved brand and Black Label Islay Origin 12-year-old as the independently complete Bottle name."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1093,
+        "name": "Johnnie Walker",
+        "type": ["brand", "bottler", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 13606,
+        "name": "Black Label Lowlands Origin",
+        "fullName": "Johnnie Walker Black Label Lowlands Origin",
+        "brandId": 1093,
+        "category": "blend"
+      },
+      {
+        "id": 13607,
+        "name": "Black Label Speyside Origin",
+        "fullName": "Johnnie Walker Black Label Speyside Origin",
+        "brandId": 1093,
+        "category": "blend"
+      },
+      {
+        "id": 13608,
+        "name": "Black Label Highlands Origin",
+        "fullName": "Johnnie Walker Black Label Highlands Origin",
+        "brandId": 1093,
+        "category": "blend"
+      }
+    ],
+    "releases": [],
+    "aliases": []
+  }
+}

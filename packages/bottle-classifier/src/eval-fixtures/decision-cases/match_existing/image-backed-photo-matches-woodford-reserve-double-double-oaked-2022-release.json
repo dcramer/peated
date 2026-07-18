@@ -230,9 +230,9 @@
     "identityScope": "product",
     "matchedBottleId": 44022,
     "matchedReleaseId": 195,
-    "expectedTier": "auto",
-    "verifyEligible": true,
-    "suggestedNextStep": "confirm_match",
-    "summary": "Match existing Woodford Reserve Double Double Oaked 2022 release 195 under bottle 44022."
+    "expectedTier": "review",
+    "verifyEligible": false,
+    "suggestedNextStep": "manual_search",
+    "summary": "Match retained Woodford Reserve Double Double Oaked 2022 release 195 under bottle 44022, while routing the fresh legacy-release match through review until flattening removes that transitional target."
   }
 }

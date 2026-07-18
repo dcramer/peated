@@ -151,26 +151,155 @@ describe("fixBadReviewEntities", () => {
     });
     expect(updatedReview?.bottleId).toEqual(correctBottle.id);
     expect(updatedReview?.releaseId).toBeNull();
+    expect(updatedReview?.targetId).not.toBeNull();
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, review.name),
     });
     expect(alias).toMatchObject({
       bottleId: correctBottle.id,
-      assignmentSource: "legacy",
+      targetId: updatedReview?.targetId,
     });
 
     const siblingReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, sameNameReview.id),
     });
     expect(siblingReview?.bottleId).toEqual(correctBottle.id);
+    expect(siblingReview?.targetId).toEqual(updatedReview?.targetId);
 
     const siblingPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, sameNamePrice.id),
     });
     expect(siblingPrice?.bottleId).toEqual(correctBottle.id);
+    expect(siblingPrice?.targetId).toEqual(updatedReview?.targetId);
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: correctBottle.id,
+    });
+  });
+
+  test("reassigns through an explicitly staged targetless exact alias", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const wrongBottle = await fixtures.Bottle({
+      name: "Wrong Staged Alias Bottle",
+    });
+    const stagedBottle = await fixtures.LegacyBottle({
+      name: "Staged Exact Alias Bottle",
+    });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const alias = await fixtures.BottleAlias({
+      bottleId: stagedBottle.id,
+      releaseId: null,
+      targetId: null,
+      name: "Staged Exact Alias Review",
+    });
+    const [review] = await db
+      .insert(reviews)
+      .values({
+        externalSiteId: site.id,
+        bottleId: wrongBottle.id,
+        releaseId: null,
+        targetId: null,
+        name: alias.name,
+        issue: "Default",
+        rating: 90,
+        url: "https://example.com/staged-exact-alias-review",
+      })
+      .returning();
+
+    const summary = await fixBadReviewEntities({ user });
+
+    expect(summary).toEqual({
+      scanned: 1,
+      reassigned: 1,
+      unresolved: 0,
+      errored: 0,
+      unchanged: 0,
+    });
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).toMatchObject({
+      bottleId: stagedBottle.id,
+      releaseId: null,
+      targetId: null,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("reassigns through an explicitly staged unpromoted classifier match", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const wrongBottle = await fixtures.Bottle({
+      name: "Wrong Unpromoted Match Bottle",
+    });
+    const stagedParent = await fixtures.LegacyBottle({
+      name: "Unpromoted Match Parent",
+    });
+    const stagedRelease = await fixtures.BottleRelease({
+      bottleId: stagedParent.id,
+    });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const [review] = await db
+      .insert(reviews)
+      .values({
+        externalSiteId: site.id,
+        bottleId: wrongBottle.id,
+        releaseId: null,
+        targetId: null,
+        name: "Unpromoted Classifier Match Review",
+        issue: "Default",
+        rating: 90,
+        url: "https://example.com/unpromoted-classifier-match-review",
+      })
+      .returning();
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: stagedParent.id,
+          matchedReleaseId: stagedRelease.id,
+          candidateBottleIds: [stagedParent.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: stagedParent.id,
+              releaseId: stagedRelease.id,
+              fullName: stagedRelease.fullName,
+              bottleFullName: stagedParent.fullName,
+            },
+          ],
+        },
+      ),
+    );
+
+    const summary = await fixBadReviewEntities({ user });
+
+    expect(summary).toEqual({
+      scanned: 1,
+      reassigned: 1,
+      unresolved: 0,
+      errored: 0,
+      unchanged: 0,
+    });
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).toMatchObject({
+      bottleId: stagedParent.id,
+      releaseId: stagedRelease.id,
+      targetId: null,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, review.name),
+      }),
+    ).toMatchObject({
+      bottleId: stagedParent.id,
+      releaseId: stagedRelease.id,
+      targetId: null,
+      assignmentSource: "classifier_approved",
     });
   });
 
@@ -256,5 +385,136 @@ describe("fixBadReviewEntities", () => {
     });
     expect(unchangedReview?.bottleId).toEqual(bottle.id);
     expect(unchangedReview?.releaseId).toBeNull();
+  });
+
+  test("propagates alias assignment failures and rolls back Review changes", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const wrongBottle = await fixtures.Bottle({
+      name: "Wrong Assignment Bottle",
+    });
+    const suggestedBottle = await fixtures.Bottle({
+      name: "Suggested Assignment Bottle",
+    });
+    const conflictingBottle = await fixtures.Bottle({
+      name: "Conflicting Assignment Bottle",
+    });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const [review] = await db
+      .insert(reviews)
+      .values({
+        externalSiteId: site.id,
+        bottleId: wrongBottle.id,
+        name: "Assignment Conflict Review",
+        issue: "Default",
+        rating: 90,
+        url: "https://example.com/assignment-conflict-review",
+      })
+      .returning();
+
+    classifyBottleReferenceMock.mockImplementationOnce(async () => {
+      await db
+        .update(bottleAliases)
+        .set({ name: review.name })
+        .where(eq(bottleAliases.bottleId, conflictingBottle.id));
+      return buildClassification(
+        {
+          action: "match",
+          matchedBottleId: suggestedBottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [suggestedBottle.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: suggestedBottle.id,
+              releaseId: null,
+              fullName: suggestedBottle.fullName,
+              bottleFullName: suggestedBottle.fullName,
+            },
+          ],
+        },
+      );
+    });
+
+    await expect(fixBadReviewEntities({ user })).rejects.toThrow(
+      /Cannot reserve exact Bottle alias/,
+    );
+
+    expect(
+      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).toMatchObject({
+      bottleId: wrongBottle.id,
+      releaseId: null,
+      targetId: null,
+    });
+  });
+
+  test("does not overwrite a Review retargeted while classification runs", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const wrongBottle = await fixtures.Bottle({ name: "Wrong Bottle" });
+    const suggestedBottle = await fixtures.Bottle({ name: "Suggested Bottle" });
+    const concurrentBottle = await fixtures.Bottle({
+      name: "Concurrent Bottle",
+    });
+    const concurrentTarget = await db.query.catalogTargets.findFirst({
+      where: (table, { eq }) => eq(table.bottleId, concurrentBottle.id),
+    });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const [review] = await db
+      .insert(reviews)
+      .values({
+        externalSiteId: site.id,
+        bottleId: wrongBottle.id,
+        name: "Suggested Bottle Review",
+        issue: "Default",
+        rating: 90,
+        url: "https://example.com/concurrent-review",
+      })
+      .returning();
+
+    classifyBottleReferenceMock.mockImplementationOnce(async () => {
+      await db
+        .update(reviews)
+        .set({
+          bottleId: concurrentBottle.id,
+          releaseId: null,
+          targetId: concurrentTarget!.id,
+        })
+        .where(eq(reviews.id, review.id));
+      return buildClassification(
+        {
+          action: "match",
+          matchedBottleId: suggestedBottle.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [suggestedBottle.id],
+        },
+        {
+          candidates: [
+            {
+              bottleId: suggestedBottle.id,
+              releaseId: null,
+              fullName: suggestedBottle.fullName,
+              bottleFullName: suggestedBottle.fullName,
+            },
+          ],
+        },
+      );
+    });
+
+    const summary = await fixBadReviewEntities({ user });
+    const preserved = await db.query.reviews.findFirst({
+      where: eq(reviews.id, review.id),
+    });
+
+    expect(summary).toMatchObject({ reassigned: 0, unchanged: 1 });
+    expect(preserved).toMatchObject({
+      bottleId: concurrentBottle.id,
+      releaseId: null,
+      targetId: concurrentTarget!.id,
+    });
   });
 });

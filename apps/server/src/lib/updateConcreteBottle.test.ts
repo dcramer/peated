@@ -19,9 +19,11 @@ import waitError from "@peated/server/lib/test/waitError";
 import {
   ConcreteBottleUpdateAuthorizationError,
   ConcreteBottleUpdateConflictError,
+  ConcreteBottleUpdateExpectedStateError,
   ConcreteBottleUpdateGraphError,
   ConcreteBottleUpdateInputError,
   ConcreteBottleUpdateInputSchema,
+  concreteBottleUpdateExpectedSharedState,
   finalizeConcreteBottleUpdate,
   updateConcreteBottle,
   updateConcreteBottleInTransaction,
@@ -333,6 +335,122 @@ describe("concrete Bottle updates", () => {
         { delay: 5_000 },
       );
     }
+  });
+
+  test("rejects a maintenance edit planned from stale shared authority", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const actor = await getUserActor(mod);
+    const sourceBrand = await fixtures.Entity({ name: "Snapshot Source" });
+    const targetBrand = await fixtures.Entity({ name: "Snapshot Target" });
+    const distiller = await fixtures.Entity({
+      name: "Snapshot Distillery",
+      type: ["distiller"],
+    });
+    const { first } = await createGroup({
+      user: mod,
+      stable: {
+        name: "Original Authority",
+        brand: sourceBrand.id,
+        distillers: [distiller.id],
+      },
+      exacts: [{ edition: "Batch 1" }],
+    });
+    const groupBefore = await db.query.bottleGroups.findFirst({
+      where: eq(bottleGroups.id, first.group.id),
+    });
+    if (!groupBefore) throw new Error("Expected BottleGroup fixture.");
+    const distillersBefore = await db
+      .select({ distillerId: bottleGroupDistillers.distillerId })
+      .from(bottleGroupDistillers)
+      .where(eq(bottleGroupDistillers.groupId, first.group.id));
+    const expectedSharedState = concreteBottleUpdateExpectedSharedState({
+      group: groupBefore,
+      distillerIds: distillersBefore.map(({ distillerId }) => distillerId),
+      series: null,
+    });
+
+    await updateConcreteBottle({
+      bottleId: first.bottle.id,
+      input: { shared: { name: "New Authority" } },
+      context: contextFor(mod),
+    });
+
+    const error = await waitError(
+      db.transaction((tx) =>
+        updateConcreteBottleInTransaction(tx, {
+          bottleId: first.bottle.id,
+          input: { shared: { brand: targetBrand.id } },
+          expectedSharedState,
+          user: mod,
+          actorId: actor.id,
+          creationSource: "repair_workflow",
+        }),
+      ),
+      ConcreteBottleUpdateExpectedStateError,
+    );
+    expect(error).toMatchObject({ groupId: first.group.id });
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.group.id),
+      }),
+    ).toMatchObject({ brandId: sourceBrand.id, name: "New Authority" });
+  });
+
+  test("rejects a cached destination series that changed before the group lock", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const actor = await getUserActor(mod);
+    const brand = await fixtures.Entity({ name: "Series Snapshot Brand" });
+    const targetSeries = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Target Range",
+    });
+    const { first } = await createGroup({
+      user: mod,
+      stable: { name: "Series Snapshot", brand: brand.id },
+      exacts: [{ edition: "Batch 1" }],
+    });
+    const groupBefore = await db.query.bottleGroups.findFirst({
+      where: eq(bottleGroups.id, first.group.id),
+    });
+    if (!groupBefore) throw new Error("Expected BottleGroup fixture.");
+    const expectedSharedState = concreteBottleUpdateExpectedSharedState({
+      group: groupBefore,
+      distillerIds: [],
+      referencedSeries: [targetSeries],
+      series: null,
+    });
+    await db
+      .update(bottleSeries)
+      .set({
+        name: "Renamed Range",
+        fullName: "Series Snapshot Brand Renamed Range",
+      })
+      .where(eq(bottleSeries.id, targetSeries.id));
+
+    const error = await waitError(
+      db.transaction((tx) =>
+        updateConcreteBottleInTransaction(tx, {
+          bottleId: first.bottle.id,
+          input: { shared: { series: targetSeries.id } },
+          expectedSharedState,
+          user: mod,
+          actorId: actor.id,
+          creationSource: "repair_workflow",
+        }),
+      ),
+      ConcreteBottleUpdateExpectedStateError,
+    );
+
+    expect(error).toMatchObject({ groupId: first.group.id });
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.group.id),
+      }),
+    ).toMatchObject({ seriesId: null });
   });
 
   test("rejects numeric entities that lack the requested shared role", async ({

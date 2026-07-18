@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:23:22.839Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old release batch annual edition ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old release batch annual edition ABV",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** is an **annual small-batch release**, and the **ABV varies by batch/edition** rather than staying fixed. Ardbeg’s official archive identifies it as a 19-year-old expression released in limited annual batches. ([ardbeg.com](https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Yea",
+    "results": [
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-5-1100173.html",
+        "url": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-5-1100173.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com.hk/products/ardbeg-19-years-old-traigh-bhan-batch-7",
+        "url": "https://www.ardbeg.com.hk/products/ardbeg-19-years-old-traigh-bhan-batch-7",
+        "domain": "ardbeg.com.hk",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/library/products/pdfs/quarterly-price-list-july--september-2026.pdf?hash=F796C66A73E94AC83463146457F3A008&rev=92909d5553824154a6f38",
+        "url": "https://www.abc.virginia.gov/library/products/pdfs/quarterly-price-list-july--september-2026.pdf?hash=F796C66A73E94AC83463146457F3A008&rev=92909d5553824154a6f385b9d6b53a8a",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5aab6f281c6c1dadf2dd2ec6f3764aa2df6ce7681a8373d5c05efd689c8c363f",
+    "mode": "auto"
+  }
+}

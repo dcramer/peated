@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T18:44:13.857Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Glenlivet Caribbean Reserve product rum barrel selection"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Glenlivet Caribbean Reserve product rum barrel selection",
+    "summary": "**The Glenlivet Caribbean Reserve – Rum Barrel Selection**\n\nConfirmed bottle details:\n\n- **Producer:** The Glenlivet, Speyside single malt Scotch whisky. ([theglenlivet.com](https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/?utm_source=openai))\n- **Product name / edition:** **Caribbean Rese",
+    "results": [
+      {
+        "title": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+        "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve-single-malt-scotch/",
+        "domain": "theglenlivet.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://secretwhiskeysociety.com/glenlivet-caribbean-reserve-review-rum-barrel-selection/",
+        "url": "https://secretwhiskeysociety.com/glenlivet-caribbean-reserve-review-rum-barrel-selection/",
+        "domain": "secretwhiskeysociety.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/239506/glenlivet-caribbean-reserve",
+        "url": "https://www.whiskybase.com/whiskies/whisky/239506/glenlivet-caribbean-reserve",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.masterofmalt.com/whiskies/the-glenlivet/the-glenlivet-caribbean-reserve-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/the-glenlivet/the-glenlivet-caribbean-reserve-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.theglenlivet.com/en/product-information/",
+        "url": "https://www.theglenlivet.com/en/product-information/",
+        "domain": "theglenlivet.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve",
+        "url": "https://distiller.com/spirits/the-glenlivet-caribbean-reserve",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3eb523807a753eb84ed76c4a02ae0e42dae58a644d6791c94ba2e2a092c33e62",
+    "mode": "auto"
+  }
+}

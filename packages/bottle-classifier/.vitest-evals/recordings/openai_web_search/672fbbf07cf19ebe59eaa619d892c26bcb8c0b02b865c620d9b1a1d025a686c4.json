@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:06:45.109Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Mars Komagatake 2022 50% single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Mars Komagatake 2022 50% single malt",
+    "summary": "Confirmed bottle details for **Mars Komagatake 2022 Edition Single Malt**:\n\n- **Producer / owner:** **Hombo Shuzo / Mars Whisky**. ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/?utm_source=openai))\n- **Distillery:** **Mars Komagatake Distillery** in Japan. The official Englis",
+    "results": [
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "url": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-ipa-cask-finish-bottled-in-2022/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-ipa-cask-finish-bottled-in-2022/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2023/new-product/20230821-newproduct-whisky/",
+        "url": "https://www.hombo.co.jp/en/2023/new-product/20230821-newproduct-whisky/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "672fbbf07cf19ebe59eaa619d892c26bcb8c0b02b865c620d9b1a1d025a686c4",
+    "mode": "auto"
+  }
+}

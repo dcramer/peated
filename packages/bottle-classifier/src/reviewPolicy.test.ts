@@ -38,29 +38,6 @@ const wrongFamilyExactCodeCandidate: BottleCandidate = {
   brand: "Other",
 };
 
-const repairParentCandidate: BottleCandidate = {
-  bottleId: 730,
-  releaseId: null,
-  kind: "bottle",
-  alias: null,
-  fullName: "Maker's Mark Private Selection",
-  bottleFullName: "Maker's Mark Private Selection",
-  brand: "Maker's Mark",
-  bottler: null,
-  series: null,
-  distillery: [],
-  category: "bourbon",
-  statedAge: null,
-  edition: null,
-  caskStrength: null,
-  singleCask: null,
-  abv: null,
-  vintageYear: null,
-  releaseYear: null,
-  score: null,
-  source: ["repair_parent"],
-};
-
 const ageBearingParentCandidate: BottleCandidate = {
   bottleId: 44175,
   releaseId: null,
@@ -82,39 +59,6 @@ const ageBearingParentCandidate: BottleCandidate = {
   releaseYear: null,
   score: 1,
   source: ["exact"],
-};
-
-const cleanCadbollParentCandidate: BottleCandidate = {
-  bottleId: 660,
-  releaseId: null,
-  kind: "bottle",
-  alias: null,
-  fullName: "Glenmorangie The Cadboll Estate",
-  bottleFullName: "Glenmorangie The Cadboll Estate",
-  brand: "Glenmorangie",
-  bottler: null,
-  series: null,
-  distillery: [],
-  category: "single_malt",
-  statedAge: 15,
-  edition: null,
-  caskStrength: null,
-  singleCask: null,
-  abv: null,
-  vintageYear: null,
-  releaseYear: null,
-  score: 0.86,
-  source: ["vector"],
-};
-
-const dirtyCadbollSiblingCandidate: BottleCandidate = {
-  ...cleanCadbollParentCandidate,
-  bottleId: 661,
-  alias: null,
-  fullName: "Glenmorangie The Cadboll Estate Batch 2",
-  bottleFullName: "Glenmorangie The Cadboll Estate Batch 2",
-  edition: "Batch 2",
-  score: 0.91,
 };
 
 const shieldaigSiblingAgeCandidate: BottleCandidate = {
@@ -255,7 +199,354 @@ function classifyAgeCreationWithoutSiblingConflict(
   });
 }
 
+function classifyStructuredExactName({
+  referenceName,
+  proposedName,
+  brand = "Example",
+  expression,
+  edition = null,
+  vintageYear = null,
+  releaseYear = null,
+}: {
+  referenceName: string;
+  proposedName: string;
+  brand?: string;
+  expression: string | null;
+  edition?: string | null;
+  vintageYear?: number | null;
+  releaseYear?: number | null;
+}) {
+  return finalizeBottleReferenceClassification({
+    reference: { name: referenceName },
+    decision: {
+      action: "create_bottle",
+      rationale: "The reviewed source supports one complete Bottle.",
+      candidateBottleIds: [],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      proposedBottle: {
+        name: proposedName,
+        series: null,
+        category: "single_malt",
+        edition,
+        statedAge: null,
+        caskStrength: null,
+        singleCask: null,
+        abv: null,
+        vintageYear,
+        releaseYear,
+        brand: { id: null, name: brand },
+        distillers: [],
+        bottler: null,
+      },
+    },
+    artifacts: buildBottleClassificationArtifacts({
+      candidates: [],
+      extractedIdentity: {
+        brand,
+        bottler: null,
+        expression,
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: null,
+        abv: null,
+        release_year: releaseYear,
+        vintage_year: vintageYear,
+        cask_strength: null,
+        single_cask: null,
+        edition,
+      },
+    }),
+  });
+}
+
 describe("finalizeBottleReferenceClassification", () => {
+  test("removes a parenthesized structured edition without leaving empty punctuation", () => {
+    const result = classifyStructuredExactName({
+      referenceName: "Elijah Craig Barrel Proof Batch C923",
+      proposedName: "Barrel Proof (Batch C923)",
+      brand: "Elijah Craig",
+      expression: "Barrel Proof",
+      edition: "Batch C923",
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Barrel Proof",
+        edition: "Batch C923",
+      },
+    });
+  });
+
+  test("collapses internal dash separators after removing a structured edition", () => {
+    const result = classifyStructuredExactName({
+      referenceName: "Example Special Reserve Batch 2 Cask Strength",
+      proposedName: "Special Reserve - Batch 2 - Cask Strength",
+      expression: "Special Reserve Cask Strength",
+      edition: "Batch 2",
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Special Reserve - Cask Strength",
+        edition: "Batch 2",
+      },
+    });
+  });
+
+  test("collapses internal comma separators after removing a structured edition", () => {
+    const result = classifyStructuredExactName({
+      referenceName: "Example Special Reserve Batch 2 Cask Strength",
+      proposedName: "Special Reserve, Batch 2, Cask Strength",
+      expression: "Special Reserve Cask Strength",
+      edition: "Batch 2",
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Special Reserve Cask Strength",
+        edition: "Batch 2",
+      },
+    });
+  });
+
+  test("removes a labeled structured vintage from the stable expression", () => {
+    const result = classifyStructuredExactName({
+      referenceName: "Example Special Reserve 1994 Vintage",
+      proposedName: "Special Reserve 1994 Vintage",
+      expression: "Special Reserve",
+      vintageYear: 1994,
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "Special Reserve",
+        vintageYear: 1994,
+      },
+    });
+  });
+
+  test("rejects a create draft whose name contains only structured exact identity", () => {
+    const result = classifyStructuredExactName({
+      referenceName: "Example 1994 Vintage",
+      proposedName: "1994 Vintage",
+      expression: null,
+      vintageYear: 1994,
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+    });
+    expect(result.rationale).toContain(
+      "no stable expression distinct from the brand",
+    );
+  });
+
+  test("rejects a create draft when exact-trait removal leaves only the brand", () => {
+    const result = classifyStructuredExactName({
+      referenceName: "Example 1994 Vintage",
+      proposedName: "1994 Vintage Example",
+      expression: null,
+      vintageYear: 1994,
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+    });
+  });
+
+  test("downgrades a create draft when a Bottle with release fields may already cover it", () => {
+    const candidate: BottleCandidate = {
+      bottleId: 38004,
+      releaseId: null,
+      kind: "bottle",
+      alias: "Trestle Spirit of Eclipse",
+      fullName: "Trestle Spirit of Eclipse",
+      bottleFullName: "Trestle Spirit of Eclipse",
+      brand: "Old Trestle",
+      bottler: "Old Trestle",
+      series: null,
+      distillery: ["Old Trestle"],
+      category: "blend",
+      statedAge: null,
+      edition: null,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: 2011,
+      score: 0.85,
+      source: ["vector", "text"],
+    };
+    const result = finalizeBottleReferenceClassification({
+      reference: { name: "Bottle photo upload" },
+      decision: {
+        action: "create_bottle",
+        rationale: "The source shows Trestle Spirit of Eclipse at 50% ABV.",
+        candidateBottleIds: [candidate.bottleId],
+        identityScope: "product",
+        observation: null,
+        confidenceBasis: {
+          positiveEvidence: ["readable exact bottle label"],
+          unresolvedRisks: [
+            {
+              category: "trait_conflict",
+              note: "candidate has a release year and lacks optional ABV",
+            },
+          ],
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_needed",
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        proposedBottle: {
+          name: "Spirit of Eclipse",
+          series: null,
+          category: "blend",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: 50,
+          vintageYear: null,
+          releaseYear: null,
+          brand: { id: null, name: "Trestle" },
+          distillers: [{ id: null, name: "Old Trestle" }],
+          bottler: { id: null, name: "Old Trestle" },
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        extractedIdentity: {
+          brand: "Trestle",
+          bottler: "Old Trestle",
+          expression: "Spirit of Eclipse",
+          series: null,
+          distillery: ["Old Trestle"],
+          category: "blend",
+          stated_age: null,
+          abv: 50,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        candidates: [candidate],
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      candidateBottleIds: [38004],
+      matchedBottleId: null,
+      matchedReleaseId: null,
+      proposedBottle: null,
+      confidenceBasis: {
+        unresolvedRisks: [
+          {
+            category: "trait_conflict",
+            note: "candidate has a release year and lacks optional ABV",
+          },
+        ],
+      },
+    });
+  });
+
+  test("does not resolve a complete edition create draft to a partial-edition Bottle", () => {
+    const candidate: BottleCandidate = {
+      bottleId: 43397,
+      releaseId: null,
+      kind: "bottle",
+      alias: null,
+      fullName: "High West A Midwinter Night's Dram",
+      bottleFullName: "High West A Midwinter Night's Dram",
+      brand: "High West",
+      bottler: null,
+      series: "A Midwinter Night's Dram",
+      distillery: [],
+      category: "rye",
+      statedAge: null,
+      edition: "Act 12",
+      caskStrength: null,
+      singleCask: null,
+      abv: 49.3,
+      vintageYear: null,
+      releaseYear: 2024,
+      score: 1,
+      source: ["exact"],
+    };
+    const result = finalizeBottleReferenceClassification({
+      reference: {
+        name: "High West A Midwinter Night's Dram Act 12 Scene 9",
+      },
+      decision: {
+        action: "create_bottle",
+        rationale: "The label identifies the complete Scene 9 edition.",
+        candidateBottleIds: [candidate.bottleId],
+        identityScope: "product",
+        observation: null,
+        confidenceBasis: {
+          positiveEvidence: ["readable complete edition marker"],
+          unresolvedRisks: [],
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_needed",
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        proposedBottle: {
+          name: "A Midwinter Night's Dram",
+          series: { id: null, name: "A Midwinter Night's Dram" },
+          category: "rye",
+          edition: "Act 12 Scene 9",
+          statedAge: null,
+          caskStrength: null,
+          singleCask: null,
+          abv: 49.3,
+          vintageYear: null,
+          releaseYear: null,
+          brand: { id: null, name: "High West" },
+          distillers: [],
+          bottler: null,
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        extractedIdentity: {
+          brand: "High West",
+          bottler: null,
+          expression: "A Midwinter Night's Dram",
+          series: "A Midwinter Night's Dram",
+          distillery: [],
+          category: "rye",
+          stated_age: null,
+          abv: 49.3,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: "Act 12 Scene 9",
+        },
+        candidates: [candidate],
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "A Midwinter Night's Dram",
+        edition: "Act 12 Scene 9",
+      },
+    });
+  });
+
   test("defaults missing alias metadata to no alias", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
@@ -269,9 +560,7 @@ describe("finalizeBottleReferenceClassification", () => {
         observation: null,
         matchedBottleId: existingPrivateCask.bottleId,
         matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: null,
-        proposedRelease: null,
       },
       artifacts: buildBottleClassificationArtifacts({
         candidates: [existingPrivateCask],
@@ -281,6 +570,8 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "match",
       aliasScope: "none",
+      parentBottleId: null,
+      proposedRelease: null,
     });
   });
 
@@ -314,7 +605,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("restores bottle-level age when same-family conflict proves it belongs in the display name", () => {
+  test("restores source-marketed bottle age in the display name", () => {
     const result = classifyShieldaigAgeCreation(
       buildShieldaigAgeCreationDecision("Speyside"),
     );
@@ -331,7 +622,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("does not downgrade omitted bottle age without same-family age conflict evidence", () => {
+  test("restores source-marketed bottle age without sibling conflict evidence", () => {
     const result = classifyAgeCreationWithoutSiblingConflict(
       buildShieldaigAgeCreationDecision("Speyside"),
     );
@@ -339,8 +630,67 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "create_bottle",
       proposedBottle: {
-        name: "Speyside",
+        name: "Speyside 30-year-old",
         statedAge: 30,
+      },
+    });
+  });
+
+  test("keeps a reviewed web-supported age selected by the model", () => {
+    const decision = buildShieldaigAgeCreationDecision("13.1 5-year-old");
+    const result = finalizeBottleReferenceClassification({
+      reference: { name: "Octomore 13.1" },
+      decision: {
+        ...decision,
+        rationale:
+          "Reviewed producer evidence identifies Octomore 13.1 as five years old.",
+        confidenceBasis: {
+          positiveEvidence: ["producer product page states five years old"],
+          unresolvedRisks: [],
+          toolsUsed: ["openai_web_search"],
+          webEvidence: "supportive",
+        },
+        proposedBottle: {
+          ...decision.proposedBottle!,
+          name: "13.1 5-year-old",
+          statedAge: 5,
+          brand: { id: null, name: "Octomore" },
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [],
+        searchEvidence: [
+          {
+            provider: "openai",
+            query: "Octomore 13.1 age official",
+            summary:
+              "The producer page describes Octomore 13.1 as aged five years.",
+            results: [],
+          },
+        ],
+        extractedIdentity: {
+          brand: "Octomore",
+          bottler: null,
+          expression: "13.1",
+          series: null,
+          distillery: ["Bruichladdich"],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: {
+        name: "13.1 5-year-old",
+        statedAge: 5,
       },
     });
   });
@@ -371,29 +721,6 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result.rationale).toContain(
       "proposed bottle name duplicates the brand",
     );
-  });
-
-  test("rejects bottle-and-release creation when the parent name duplicates the brand", () => {
-    const decision = {
-      ...buildShieldaigAgeCreationDecision("Shieldaig"),
-      action: "create_bottle_and_release",
-      proposedRelease: {
-        edition: "Batch 7",
-        statedAge: null,
-        abv: null,
-        caskStrength: null,
-        singleCask: null,
-        vintageYear: null,
-        releaseYear: null,
-      },
-    } satisfies BottleClassifierAgentDecisionInput;
-    const result = classifyShieldaigAgeCreation(decision);
-
-    expect(result).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
-      proposedRelease: null,
-    });
   });
 
   test("rejects bottle repair when the repaired name duplicates the brand", () => {
@@ -483,35 +810,6 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("restores bottle-level age for bottle-and-release creation when same-family conflict proves it belongs in the parent display name", () => {
-    const decision = {
-      ...buildShieldaigAgeCreationDecision("Speyside"),
-      action: "create_bottle_and_release",
-      proposedRelease: {
-        edition: "Batch 1",
-        statedAge: null,
-        abv: null,
-        caskStrength: null,
-        singleCask: null,
-        vintageYear: null,
-        releaseYear: null,
-      },
-    } satisfies BottleClassifierAgentDecisionInput;
-
-    const result = classifyShieldaigAgeCreation(decision);
-
-    expect(result).toMatchObject({
-      action: "create_bottle_and_release",
-      proposedBottle: {
-        name: "Speyside 30-year-old",
-        statedAge: 30,
-      },
-      proposedRelease: {
-        edition: "Batch 1",
-      },
-    });
-  });
-
   test("does not let generic cask details bypass duplicate product creation checks", () => {
     const decision: BottleClassifierAgentDecisionInput = {
       action: "create_bottle",
@@ -565,13 +863,16 @@ describe("finalizeBottleReferenceClassification", () => {
     expect(result).toMatchObject({
       action: "no_match",
       identityScope: "product",
+      candidateBottleIds: [existingPrivateCask.bottleId],
       matchedBottleId: null,
       matchedReleaseId: null,
       parentBottleId: null,
       proposedBottle: null,
       proposedRelease: null,
     });
-    expect(result.rationale).toContain("duplicates an existing local bottle");
+    expect(result.rationale).toContain(
+      "exact existing Bottle candidate may already cover",
+    );
   });
 
   test("does not resolve exact-cask creation to a wrong-family code match", () => {
@@ -649,65 +950,158 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("lets reviewed repair parents anchor child release creation", () => {
-    const decision: BottleClassifierAgentDecisionInput = {
-      action: "create_release",
-      rationale:
-        "The local repair parent is the reusable product and S2B13 is release identity.",
-      candidateBottleIds: [repairParentCandidate.bottleId],
-      identityScope: "product",
-      observation: null,
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: repairParentCandidate.bottleId,
-      proposedBottle: null,
-      proposedRelease: {
-        edition: "S2B13",
-        statedAge: null,
-        abv: null,
-        releaseYear: null,
-        vintageYear: null,
-        caskStrength: null,
-        singleCask: null,
-      },
+  test("does not block exact-cask creation for a containment-only candidate name", () => {
+    const containmentCandidate: BottleCandidate = {
+      ...existingPrivateCask,
+      bottleId: 102,
+      alias: "Example Private Cask No. 12.1 Reserve",
+      fullName: "Example Private Cask No. 12.1 Reserve",
+      bottleFullName: "Example Private Cask No. 12.1 Reserve",
     };
-
     const result = finalizeBottleReferenceClassification({
-      reference: {
-        name: "Maker's Mark Private Selection S2B13",
-      },
-      decision,
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [repairParentCandidate],
-        extractedIdentity: {
-          brand: "Maker's Mark",
+      reference: { name: "Example Private Cask No. 12.1" },
+      decision: {
+        action: "create_bottle",
+        rationale: "The label supports an exact-cask Bottle.",
+        candidateBottleIds: [containmentCandidate.bottleId],
+        identityScope: "exact_cask",
+        observation: {
+          caskNumber: "12.1",
+          barrelNumber: null,
+          bottleNumber: null,
+          outturn: null,
+          market: null,
+          exclusive: null,
+          selector: null,
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        proposedBottle: {
+          name: "Private Cask No. 12.1",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: true,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          brand: { id: null, name: "Example" },
+          distillers: [],
           bottler: null,
-          expression: null,
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [containmentCandidate],
+        extractedIdentity: {
+          brand: "Example",
+          bottler: null,
+          expression: "Private Cask No. 12.1",
           series: null,
           distillery: [],
-          category: "bourbon",
+          category: "single_malt",
           stated_age: null,
           abv: null,
           release_year: null,
           vintage_year: null,
           cask_strength: null,
-          single_cask: null,
-          edition: "S2B13",
+          single_cask: true,
+          edition: null,
         },
       }),
     });
 
     expect(result).toMatchObject({
-      action: "create_release",
-      identityScope: "product",
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: repairParentCandidate.bottleId,
-      proposedBottle: null,
-      proposedRelease: {
-        edition: "S2B13",
-      },
+      action: "create_bottle",
+      identityScope: "exact_cask",
+      proposedBottle: { name: "Private Cask No. 12.1" },
     });
+  });
+
+  test("conservatively downgrades a structural exact-cask duplicate with its risk evidence", () => {
+    const exactCandidate: BottleCandidate = {
+      ...existingPrivateCask,
+      bottleId: 102,
+      alias: "Example Private Cask No. 12.1",
+      fullName: "Example Private Cask No. 12.1",
+      bottleFullName: "Example Private Cask No. 12.1",
+    };
+    const unresolvedRisk = {
+      category: "identity_ambiguity" as const,
+      note: "the agent did not select the surfaced exact-code candidate",
+    };
+    const result = finalizeBottleReferenceClassification({
+      reference: { name: "Example Private Cask No. 12.1" },
+      decision: {
+        action: "create_bottle",
+        rationale: "The label supports an exact-cask Bottle.",
+        candidateBottleIds: [exactCandidate.bottleId],
+        identityScope: "exact_cask",
+        observation: {
+          caskNumber: "12.1",
+          barrelNumber: null,
+          bottleNumber: null,
+          outturn: null,
+          market: null,
+          exclusive: null,
+          selector: null,
+        },
+        confidenceBasis: {
+          positiveEvidence: ["readable exact cask code"],
+          unresolvedRisks: [unresolvedRisk],
+          toolsUsed: ["initial_local_candidates"],
+          webEvidence: "not_needed",
+        },
+        matchedBottleId: null,
+        matchedReleaseId: null,
+        proposedBottle: {
+          name: "Private Cask No. 12.1",
+          series: null,
+          category: "single_malt",
+          edition: null,
+          statedAge: null,
+          caskStrength: null,
+          singleCask: true,
+          abv: null,
+          vintageYear: null,
+          releaseYear: null,
+          brand: { id: null, name: "Example" },
+          distillers: [],
+          bottler: null,
+        },
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [exactCandidate],
+        extractedIdentity: {
+          brand: "Example",
+          bottler: null,
+          expression: "Private Cask No. 12.1",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: true,
+          edition: null,
+        },
+      }),
+    });
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      identityScope: "exact_cask",
+      candidateBottleIds: [exactCandidate.bottleId],
+      matchedBottleId: null,
+      proposedBottle: null,
+      confidenceBasis: { unresolvedRisks: [unresolvedRisk] },
+    });
+    expect(result.rationale).toContain(
+      "reviewed action must select that Bottle explicitly",
+    );
   });
 
   test("lets readable image evidence anchor exact-cask bottle creation automation", () => {
@@ -1038,265 +1432,6 @@ describe("finalizeBottleReferenceClassification", () => {
         statedAge: 14,
         abv: 57,
         vintageYear: 2007,
-      },
-    });
-  });
-
-  test("downgrades release creation when the parent has conflicting bottle-level release traits", () => {
-    const decision: BottleClassifierAgentDecisionInput = {
-      action: "create_release",
-      rationale:
-        "The local parent matches the family, but the source age differs.",
-      candidateBottleIds: [ageBearingParentCandidate.bottleId],
-      identityScope: "product",
-      observation: null,
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: ageBearingParentCandidate.bottleId,
-      proposedBottle: null,
-      proposedRelease: {
-        edition: null,
-        statedAge: 21,
-        abv: null,
-        releaseYear: null,
-        vintageYear: null,
-        caskStrength: null,
-        singleCask: null,
-      },
-    };
-
-    const result = finalizeBottleReferenceClassification({
-      reference: {
-        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
-      },
-      decision,
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [ageBearingParentCandidate],
-        extractedIdentity: {
-          brand: "Shieldaig",
-          bottler: null,
-          expression: "Speyside",
-          series: null,
-          distillery: [],
-          category: "single_malt",
-          stated_age: 21,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-      }),
-    });
-
-    expect(result).toMatchObject({
-      action: "no_match",
-      matchedBottleId: null,
-      parentBottleId: null,
-      proposedRelease: null,
-    });
-    expect(result.rationale).toContain("repair_parent_and_create_release");
-  });
-
-  test("keeps parent repair plus release creation decisions", () => {
-    const decision: BottleClassifierAgentDecisionInput = {
-      action: "repair_parent_and_create_release",
-      rationale:
-        "The existing parent should be repaired into a clean reusable Shieldaig Speyside bottle before creating the supported 21-year-old child release.",
-      candidateBottleIds: [ageBearingParentCandidate.bottleId],
-      identityScope: "product",
-      observation: null,
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: ageBearingParentCandidate.bottleId,
-      proposedBottle: {
-        name: "Speyside",
-        brand: {
-          name: "Shieldaig",
-        },
-        bottler: null,
-        series: null,
-        category: "single_malt",
-        statedAge: null,
-        abv: null,
-        caskStrength: null,
-        singleCask: null,
-        vintageYear: null,
-        releaseYear: null,
-        edition: null,
-        distillers: [],
-      },
-      proposedRelease: {
-        edition: null,
-        statedAge: 21,
-        abv: null,
-        releaseYear: null,
-        vintageYear: null,
-        caskStrength: null,
-        singleCask: null,
-      },
-    };
-
-    const result = finalizeBottleReferenceClassification({
-      reference: {
-        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
-      },
-      decision,
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [ageBearingParentCandidate],
-        extractedIdentity: {
-          brand: "Shieldaig",
-          bottler: null,
-          expression: "Speyside",
-          series: null,
-          distillery: [],
-          category: "single_malt",
-          stated_age: 21,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-      }),
-    });
-
-    expect(result).toMatchObject({
-      action: "repair_parent_and_create_release",
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: ageBearingParentCandidate.bottleId,
-      proposedBottle: {
-        name: "Speyside",
-        brand: {
-          name: "Shieldaig",
-        },
-        statedAge: null,
-      },
-      proposedRelease: {
-        statedAge: 21,
-      },
-    });
-
-    const duplicateNameResult = finalizeBottleReferenceClassification({
-      reference: {
-        name: "Shieldaig Speyside Single Malt 21-year-old Scotch Whisky",
-      },
-      decision: {
-        ...decision,
-        proposedBottle: {
-          ...decision.proposedBottle!,
-          name: "Shieldaig",
-        },
-      },
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [ageBearingParentCandidate],
-        extractedIdentity: {
-          brand: "Shieldaig",
-          bottler: null,
-          expression: "Speyside",
-          series: null,
-          distillery: [],
-          category: "single_malt",
-          stated_age: 21,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-      }),
-    });
-
-    expect(duplicateNameResult).toMatchObject({
-      action: "no_match",
-      proposedBottle: null,
-      proposedRelease: null,
-    });
-  });
-
-  test("keeps parent repair on the classifier-selected dirty parent", () => {
-    const decision: BottleClassifierAgentDecisionInput = {
-      action: "repair_parent_and_create_release",
-      rationale:
-        "The selected candidate is a dirty same-family bottling row, so repair it before creating the Batch 2 bottling.",
-      candidateBottleIds: [
-        dirtyCadbollSiblingCandidate.bottleId,
-        cleanCadbollParentCandidate.bottleId,
-      ],
-      identityScope: "product",
-      observation: null,
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: dirtyCadbollSiblingCandidate.bottleId,
-      proposedBottle: {
-        name: "The Cadboll Estate",
-        brand: {
-          id: null,
-          name: "Glenmorangie",
-        },
-        bottler: null,
-        series: null,
-        category: "single_malt",
-        statedAge: 15,
-        abv: null,
-        caskStrength: null,
-        singleCask: null,
-        vintageYear: null,
-        releaseYear: null,
-        edition: null,
-        distillers: [],
-      },
-      proposedRelease: {
-        edition: "Batch 2",
-        statedAge: null,
-        abv: null,
-        releaseYear: null,
-        vintageYear: null,
-        caskStrength: null,
-        singleCask: null,
-      },
-    };
-
-    const result = finalizeBottleReferenceClassification({
-      reference: {
-        name: "Glenmorangie The Cadboll Estate Batch 2 15-year-old",
-      },
-      decision,
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [dirtyCadbollSiblingCandidate, cleanCadbollParentCandidate],
-        extractedIdentity: {
-          brand: "Glenmorangie",
-          bottler: null,
-          expression: "The Cadboll Estate",
-          series: null,
-          distillery: [],
-          category: "single_malt",
-          stated_age: 15,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: "Batch 2",
-        },
-      }),
-    });
-
-    expect(result).toMatchObject({
-      action: "repair_parent_and_create_release",
-      matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: dirtyCadbollSiblingCandidate.bottleId,
-      proposedBottle: {
-        name: "The Cadboll Estate",
-        edition: null,
-      },
-      proposedRelease: {
-        edition: "Batch 2",
       },
     });
   });

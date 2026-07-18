@@ -20,9 +20,13 @@ import {
   CatalogTargetIntegrityMismatchError,
   CatalogTargetInvalidMappingError,
   lockCatalogTargetAssignmentDescriptorInTransaction,
+  lockCatalogTargetConsumerAssignmentInTransaction,
+  lockStagedTargetlessCatalogAssignmentInTransaction,
   resolveCatalogTargetForAssignment,
   type CatalogTargetAssignmentDescriptor,
+  type CatalogTargetConsumerIdentity,
   type CatalogTargetOperationContext,
+  type StagedTargetlessCatalogAssignment,
 } from "@peated/server/lib/catalogTargets";
 import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
@@ -40,6 +44,13 @@ export class FailedToSaveBottleAliasError extends Error {
   constructor() {
     super("Failed to save alias.");
     this.name = "FailedToSaveBottleAliasError";
+  }
+}
+
+export class StaleBottleAliasReviewIdentityError extends Error {
+  constructor(readonly reviewId: number) {
+    super(`Review ${reviewId} changed while its Bottle alias was resolving.`);
+    this.name = "StaleBottleAliasReviewIdentityError";
   }
 }
 
@@ -93,6 +104,7 @@ type BottleAliasAssignmentCommonInput = {
   volume?: number;
   ignored?: boolean;
   sourceAliasIdentity?: BottleAliasIdentitySnapshot;
+  expectedReview?: BottleAliasReviewIdentitySnapshot;
 };
 
 export type BottleAliasIdentitySnapshot = Pick<
@@ -100,22 +112,27 @@ export type BottleAliasIdentitySnapshot = Pick<
   "name" | "bottleId" | "releaseId" | "targetId" | "ignored"
 >;
 
-type BottleAliasConsumerIdentity =
-  | { bottleId: number; releaseId: number | null }
-  | { bottleId: null; releaseId: null };
+export type BottleAliasReviewIdentitySnapshot = Pick<
+  typeof reviews.$inferSelect,
+  "id" | "name" | "bottleId" | "releaseId" | "targetId"
+>;
 
 type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
   BottleAliasAssignmentOptions &
   (
     | {
+        kind?: "target";
         target: CatalogTargetAssignmentDescriptor;
-        consumerIdentity: BottleAliasConsumerIdentity;
+        consumerIdentity: CatalogTargetConsumerIdentity;
         bottleId?: never;
         releaseId?: never;
+        aliasReleaseId?: never;
         targetId?: never;
         context?: never;
+        stagedTargetless?: never;
       }
     | {
+        kind?: never;
         target?: never;
         consumerIdentity?: never;
         bottleId: number;
@@ -123,8 +140,24 @@ type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
         aliasReleaseId?: null;
         targetId: number;
         context?: never;
+        stagedTargetless?: never;
       }
     | {
+        kind: "staged_targetless";
+        target?: never;
+        consumerIdentity: {
+          bottleId: number;
+          releaseId: number | null;
+        };
+        bottleId?: never;
+        releaseId?: never;
+        aliasReleaseId?: never;
+        targetId?: never;
+        context: CatalogTargetOperationContext;
+        stagedTargetless: StagedTargetlessCatalogAssignment;
+      }
+    | {
+        kind?: never;
         target?: never;
         consumerIdentity?: never;
         bottleId: number;
@@ -132,6 +165,7 @@ type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
         aliasReleaseId?: number | null;
         targetId?: null;
         context: CatalogTargetOperationContext;
+        stagedTargetless?: never;
       }
   );
 
@@ -665,6 +699,7 @@ async function syncBottleAliasConsumersInTransaction(
     lookupNames,
     volume,
     imageBottleId,
+    expectedReview,
   }: {
     bottleId: number | null;
     releaseId: number | null;
@@ -674,6 +709,7 @@ async function syncBottleAliasConsumersInTransaction(
     lookupNames: string[];
     volume?: number;
     imageBottleId: number | null;
+    expectedReview?: BottleAliasReviewIdentitySnapshot;
   },
 ): Promise<BottleAliasConsumerBackfillResult> {
   const matchingPrices = await tx
@@ -701,6 +737,7 @@ async function syncBottleAliasConsumersInTransaction(
     targetId,
     externalSiteId,
     lookupNames,
+    expectedReview,
   });
 
   const priceWithImage = matchingPrices.find((price) => !!price.imageUrl);
@@ -721,14 +758,40 @@ async function updateBottleAliasReviewsInTransaction(
     targetId,
     externalSiteId,
     lookupNames,
+    expectedReview,
   }: {
     bottleId: number | null;
     releaseId: number | null;
     targetId: number | null;
     externalSiteId?: number;
     lookupNames: string[];
+    expectedReview?: BottleAliasReviewIdentitySnapshot;
   },
 ) {
+  if (expectedReview) {
+    const [lockedReview] = await tx
+      .select({
+        id: reviews.id,
+        name: reviews.name,
+        bottleId: reviews.bottleId,
+        releaseId: reviews.releaseId,
+        targetId: reviews.targetId,
+      })
+      .from(reviews)
+      .where(eq(reviews.id, expectedReview.id))
+      .limit(1)
+      .for("update");
+    if (
+      !lockedReview ||
+      lockedReview.name !== expectedReview.name ||
+      lockedReview.bottleId !== expectedReview.bottleId ||
+      lockedReview.releaseId !== expectedReview.releaseId ||
+      lockedReview.targetId !== expectedReview.targetId
+    ) {
+      throw new StaleBottleAliasReviewIdentityError(expectedReview.id);
+    }
+  }
+
   const matchingReviews = await tx
     .update(reviews)
     .set({ bottleId, releaseId, targetId })
@@ -766,10 +829,14 @@ function getNextTargetlessAliasReleaseId(
  * identity. A target resolved from a targetless legacy alias may keep that
  * measured pair for compatibility. Legacy `targetId` mode accepts exact targets
  * only. Omitted targets retain measured targetless compatibility without
- * downgrading a target-aware alias. `backfillNames` identify stored references
- * to repair. A same-name source snapshot is checked against the alias row
- * already locked by the claim; a distinct raw source is locked after the
- * normalized canonical claim.
+ * downgrading a target-aware alias. `stagedTargetless` binds that compatibility
+ * write to its measured retained pair and revalidates the staged state under
+ * lock. `backfillNames` identify stored references to repair. A same-name source
+ * snapshot is checked against the alias row already locked by the claim; a
+ * distinct raw source is locked after the normalized canonical claim.
+ * `expectedReview` locks and compares the selected Review's complete identity
+ * before name-wide propagation so a stale resolution cannot overwrite a
+ * concurrent retarget.
  */
 export async function assignBottleAliasInTransaction(
   tx: AnyTransaction,
@@ -784,22 +851,27 @@ export async function assignBottleAliasInTransaction(
     assignmentSource,
     assignedByActorId,
     sourceAliasIdentity,
+    expectedReview,
   } = input;
   const suppliedTarget = input.target;
+  const consumerIdentity = input.consumerIdentity;
   const targetId = input.targetId ?? null;
-  const bottleId = suppliedTarget
-    ? input.consumerIdentity.bottleId
+  const stagedTargetless = input.stagedTargetless;
+  const bottleId = consumerIdentity
+    ? consumerIdentity.bottleId
     : input.bottleId;
-  const releaseId = suppliedTarget
-    ? input.consumerIdentity.releaseId
+  const releaseId = consumerIdentity
+    ? consumerIdentity.releaseId
     : (input.releaseId ?? null);
   const aliasReleaseId = suppliedTarget
     ? null
-    : targetId !== null
-      ? null
-      : input.aliasReleaseId === undefined
-        ? releaseId
-        : input.aliasReleaseId;
+    : consumerIdentity
+      ? consumerIdentity.releaseId
+      : targetId !== null
+        ? null
+        : input.aliasReleaseId === undefined
+          ? releaseId
+          : input.aliasReleaseId;
   if (!name.trim()) {
     throw new FailedToSaveBottleAliasError();
   }
@@ -809,10 +881,25 @@ export async function assignBottleAliasInTransaction(
     ? requireBottleAliasCompatibilityContext(input.context)
     : null;
 
+  if (!isTargetAware && stagedTargetless) {
+    if (
+      stagedTargetless.bottleId !== bottleId ||
+      stagedTargetless.releaseId !== releaseId
+    ) {
+      throw new TypeError(
+        "Staged targetless alias identity must match its retained Bottle pair.",
+      );
+    }
+    await lockStagedTargetlessCatalogAssignmentInTransaction(
+      tx,
+      stagedTargetless,
+    );
+  }
+
   if (
     suppliedTarget !== undefined &&
     suppliedTarget.bottleId !== null &&
-    input.consumerIdentity.bottleId === null
+    consumerIdentity?.bottleId === null
   ) {
     throw new TypeError(
       "Exact target alias assignment requires retained Bottle identity.",
@@ -820,9 +907,13 @@ export async function assignBottleAliasInTransaction(
   }
 
   if (suppliedTarget) {
-    await lockCatalogTargetAssignmentDescriptorInTransaction(
+    await lockCatalogTargetConsumerAssignmentInTransaction(
       tx,
-      suppliedTarget,
+      { target: suppliedTarget, consumerIdentity: consumerIdentity! },
+      {
+        caller: "bottleAliases",
+        operation: "assignBottleAliasInTransaction",
+      },
     );
   }
 
@@ -877,6 +968,7 @@ export async function assignBottleAliasInTransaction(
         lookupNames: consumerLookupNames,
         volume,
         imageBottleId: aliasBottleId,
+        expectedReview,
       },
     ));
     const claim = await claimCatalogTargetAliasNameInTransaction(
@@ -932,6 +1024,7 @@ export async function assignBottleAliasInTransaction(
       lookupNames: consumerLookupNames,
       volume,
       imageBottleId: bottleId,
+      expectedReview,
     });
     bottleImageCandidate = consumerBackfill.bottleImageCandidate;
 

@@ -13,11 +13,9 @@ export type CatalogVerificationCreationSource = z.infer<
 >;
 
 export const CatalogVerificationWorkstreamEnum = z.enum([
-  "age-repairs",
   "brand-repairs",
   "canon-repairs",
   "entity-audits",
-  "release-repairs",
 ]);
 
 export type CatalogVerificationWorkstream = z.infer<
@@ -25,11 +23,9 @@ export type CatalogVerificationWorkstream = z.infer<
 >;
 
 export const CatalogVerificationFindingKindEnum = z.enum([
-  "age_repair_candidate",
   "brand_repair_candidate",
   "canon_repair_candidate",
   "entity_audit_candidate",
-  "release_repair_candidate",
 ]);
 
 export const CatalogVerificationFindingSchema = z

@@ -162,9 +162,6 @@ function getDerivedSuggestedNextStep(
     case "match":
       return tier === "auto" ? "confirm_match" : "manual_search";
     case "create_bottle":
-    case "create_release":
-    case "create_bottle_and_release":
-    case "repair_parent_and_create_release":
       return tier === "auto" ? "confirm_create" : "manual_search";
     case "repair_bottle":
       return "needs_review";
@@ -279,10 +276,8 @@ function getNormalizationBottleIdentity(
           (candidate) =>
             candidate.releaseId === result.decision.matchedReleaseId,
         )
-      : result.artifacts.candidates.find((candidate) =>
-          result.decision.action === "create_release"
-            ? candidate.bottleId === result.decision.parentBottleId
-            : candidate.bottleId === result.decision.matchedBottleId,
+      : result.artifacts.candidates.find(
+          (candidate) => candidate.bottleId === result.decision.matchedBottleId,
         );
 
   if (matchedCandidate) {
@@ -296,7 +291,9 @@ function getNormalizationBottleIdentity(
   return getProposedBottleIdentityText(result.decision.proposedBottle);
 }
 
-function getNormalizationReleaseIdentity(result: BottleClassificationResult): {
+function getNormalizationExactBottleIdentity(
+  result: BottleClassificationResult,
+): {
   edition: string | null;
   releaseYear: number | null;
   vintageYear: number | null;
@@ -305,36 +302,44 @@ function getNormalizationReleaseIdentity(result: BottleClassificationResult): {
     return null;
   }
 
-  if (result.decision.proposedRelease) {
-    return {
-      edition: result.decision.proposedRelease.edition,
-      releaseYear: result.decision.proposedRelease.releaseYear,
-      vintageYear: result.decision.proposedRelease.vintageYear,
+  if (result.decision.proposedBottle) {
+    const exactIdentity = {
+      edition: result.decision.proposedBottle.edition,
+      releaseYear: result.decision.proposedBottle.releaseYear,
+      vintageYear: result.decision.proposedBottle.vintageYear,
     };
+
+    return Object.values(exactIdentity).some((value) => value !== null)
+      ? exactIdentity
+      : null;
   }
 
-  const matchedRelease =
+  const matchedCandidate =
     result.decision.matchedReleaseId !== null
       ? result.artifacts.candidates.find(
           (candidate) =>
             candidate.releaseId === result.decision.matchedReleaseId,
         )
-      : null;
-  if (!matchedRelease) {
+      : result.artifacts.candidates.find(
+          (candidate) =>
+            candidate.bottleId === result.decision.matchedBottleId &&
+            candidate.releaseId == null,
+        );
+  if (!matchedCandidate) {
     return null;
   }
 
   return {
-    edition: matchedRelease.edition,
-    releaseYear: matchedRelease.releaseYear,
-    vintageYear: matchedRelease.vintageYear,
+    edition: matchedCandidate.edition,
+    releaseYear: matchedCandidate.releaseYear,
+    vintageYear: matchedCandidate.vintageYear,
   };
 }
 
-function releaseIdentityMatches(
-  actual: ReturnType<typeof getNormalizationReleaseIdentity>,
+function exactBottleIdentityMatches(
+  actual: ReturnType<typeof getNormalizationExactBottleIdentity>,
   expected: NonNullable<
-    RealWorldNewBottleEvalCase["expected"]["releaseIdentity"]
+    RealWorldNewBottleEvalCase["expected"]["exactBottleIdentity"]
   >,
 ): boolean {
   if (actual === null) {
@@ -444,15 +449,6 @@ function evaluateDecisionShape(
     );
   }
 
-  if (
-    expected.parentBottleId !== undefined &&
-    result.decision.parentBottleId !== expected.parentBottleId
-  ) {
-    failures.push(
-      `parentBottleId expected ${expected.parentBottleId} but got ${result.decision.parentBottleId}`,
-    );
-  }
-
   if (expected.expectedTier !== undefined) {
     const derivedTier = getDerivedAutomationTier(testCase, result);
     if (derivedTier !== expected.expectedTier) {
@@ -531,16 +527,6 @@ function evaluateDecisionShape(
     }
   }
 
-  if (
-    expected.proposedRelease !== undefined &&
-    !deepContainsSubset(
-      result.decision.proposedRelease,
-      expected.proposedRelease,
-    )
-  ) {
-    failures.push("proposedRelease missing expected fields");
-  }
-
   return getShapeVerdict(failures);
 }
 
@@ -584,7 +570,7 @@ function evaluateNormalizationShape(
     );
   }
 
-  const releaseIdentity = getNormalizationReleaseIdentity(result);
+  const exactBottleIdentity = getNormalizationExactBottleIdentity(result);
 
   if (classifierExpectations.includes("exact_cask")) {
     if (result.decision.identityScope !== "exact_cask") {
@@ -593,47 +579,29 @@ function evaluateNormalizationShape(
       );
     }
 
-    if (releaseIdentity !== null) {
-      failures.push("exact_cask expected no child release identity");
-    }
-
     return getShapeVerdict(failures);
   }
 
-  if (classifierExpectations.includes("bottle_plus_release")) {
-    const hasReleaseAction =
-      result.decision.action === "create_release" ||
-      result.decision.action === "create_bottle_and_release" ||
-      result.decision.matchedReleaseId !== null;
-
-    if (!hasReleaseAction && classifierExpectations.includes("bottle")) {
-      return getShapeVerdict(failures);
-    }
-
+  const exactIdentityOptions =
+    expectation.exactBottleIdentities ??
+    (expectation.exactBottleIdentity !== null
+      ? [expectation.exactBottleIdentity]
+      : []);
+  if (exactIdentityOptions.length > 0) {
     if (result.decision.identityScope !== "product") {
       failures.push(
         `identityScope expected product but got ${result.decision.identityScope}`,
       );
     }
 
-    if (!hasReleaseAction) {
-      failures.push("expected a release match or release creation action");
-    }
-
-    const releaseIdentityOptions =
-      expectation.releaseIdentities ??
-      (expectation.releaseIdentity !== null
-        ? [expectation.releaseIdentity]
-        : []);
-
-    if (releaseIdentityOptions.length === 0) {
-      failures.push("fixture missing expected release identity");
-    } else if (
-      !releaseIdentityOptions.some((expectedReleaseIdentity) =>
-        releaseIdentityMatches(releaseIdentity, expectedReleaseIdentity),
+    if (
+      !exactIdentityOptions.some((expectedExactIdentity) =>
+        exactBottleIdentityMatches(exactBottleIdentity, expectedExactIdentity),
       )
     ) {
-      failures.push("release identity did not match expected edition/year");
+      failures.push(
+        "exact Bottle identity did not match expected edition/year",
+      );
     }
 
     return getShapeVerdict(failures);
@@ -645,13 +613,8 @@ function evaluateNormalizationShape(
     );
   }
 
-  if (
-    result.decision.action === "create_release" ||
-    result.decision.action === "create_bottle_and_release" ||
-    result.decision.matchedReleaseId !== null ||
-    releaseIdentity !== null
-  ) {
-    failures.push("bottle fixture should not create or match a child release");
+  if (result.decision.matchedReleaseId !== null) {
+    failures.push("bottle fixture should not match a legacy child release");
   }
 
   return getShapeVerdict(failures);
@@ -865,9 +828,6 @@ const classifierHarness = openaiAgentsHarness<
   output: ({ result }) => {
     return toJsonValue(result) ?? null;
   },
-  // vitest-evals strict replay intentionally fails when a prompt/tool change
-  // makes a new web-search call. Record those new tool results with:
-  // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
   // The harness rejects replay policies for tools absent from the prepared
   // agent, so keep this aligned with Firecrawl-vs-OpenAI tool selection.
   toolReplay: {
@@ -921,11 +881,6 @@ const SCENARIO_CONFIG: Array<{
   {
     label: "corrections",
     scenario: "corrections",
-    threshold: 1,
-  },
-  {
-    label: "parent repair releases",
-    scenario: "parent_repair_releases",
     threshold: 1,
   },
 ];

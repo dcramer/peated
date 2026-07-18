@@ -4,6 +4,7 @@ import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
+  StaleBottleAliasReviewIdentityError,
 } from "@peated/server/lib/bottleAliases";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import {
@@ -28,7 +29,13 @@ export default async function createMissingBottles() {
     const missingInReviews = await db
       .select()
       .from(reviews)
-      .where(and(isNull(reviews.bottleId), gt(reviews.id, cursor)))
+      .where(
+        and(
+          isNull(reviews.bottleId),
+          isNull(reviews.targetId),
+          gt(reviews.id, cursor),
+        ),
+      )
       .orderBy(asc(reviews.id))
       .limit(100);
 
@@ -56,12 +63,13 @@ export default async function createMissingBottles() {
         createdByActorId: systemActor.id,
       });
 
-      if (resolution.bottleId) {
+      const resolvedIdentity = resolution.assignment?.consumerIdentity ?? null;
+      if (resolvedIdentity?.bottleId) {
         logInfo("Resolved bottle for review {reviewId}", {
           extra: {
             reviewId: review.id,
-            bottleId: resolution.bottleId,
-            releaseId: resolution.releaseId,
+            bottleId: resolvedIdentity.bottleId,
+            releaseId: resolvedIdentity.releaseId,
             source: resolution.source,
           },
         });
@@ -82,79 +90,107 @@ export default async function createMissingBottles() {
         continue;
       }
 
-      const bottleId = resolution.bottleId;
+      const bottleId = resolvedIdentity!.bottleId!;
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
         { createdBottle: resolution.createdBottle },
       );
 
-      const aliasAssignment = await db.transaction(async (tx) => {
-        const aliasAssignment =
-          resolution.source !== "exact_alias"
-            ? await assignBottleAliasInTransaction(tx, {
-                bottleId,
-                releaseId: resolution.releaseId,
-                name: aliasKey,
-                backfillNames: [review.name],
-                externalSiteId: review.externalSiteId,
-                assignmentSource: "classifier_approved",
-                assignedByActorId: systemActor.id,
-                context: {
-                  caller: "createMissingBottles",
-                  operation: "assignResolvedReviewAlias",
-                },
-              })
-            : await assignBottleAliasInTransaction(tx, {
-                bottleId,
-                releaseId: resolution.releaseId,
-                name: aliasKey,
-                backfillNames: [review.name],
-                externalSiteId: review.externalSiteId,
-                assignedByActorId: systemActor.id,
-                context: {
-                  caller: "createMissingBottles",
-                  operation: "reuseExactReviewAlias",
-                },
-              });
+      let aliasAssignment;
+      try {
+        aliasAssignment = await db.transaction(async (tx) => {
+          const assignment = resolution.assignment;
+          if (!assignment) {
+            throw new Error("Bottle resolution returned no assignment.");
+          }
+          if (
+            resolution.source === "classifier_create_bottle" &&
+            (assignment.kind !== "target" ||
+              assignment.target.bottleId !== bottleId)
+          ) {
+            throw new Error(
+              "Classifier Bottle creation returned an incomplete exact target.",
+            );
+          }
 
-        if (
-          decision !== null &&
-          shouldRecordIncomingBottleDecision({
-            previousBottleId: review.bottleId,
-            bottleId,
-            decision,
-          })
-        ) {
-          await recordIncomingBottleDecisionInTransaction(tx, {
-            sourceKind: "review",
-            sourceId: review.id,
+          const aliasInput = {
+            name: aliasKey,
+            backfillNames: [review.name],
             externalSiteId: review.externalSiteId,
-            name: review.name,
-            url: review.url,
-            decision,
-            actor: systemActor,
-            bottleId,
-            releaseId: resolution.releaseId,
-            targetId: resolution.targetId,
-            createdBottle: resolution.createdBottle,
-            createdRelease: resolution.createdRelease,
-            confidence: resolution.confidence,
-            model: resolution.model,
-            rationale: resolution.rationale,
-            metadata: {
-              resolutionSource: resolution.source,
-              ...(resolution.classifierEvidence
-                ? {
-                    classifierEvidence: resolution.classifierEvidence,
-                  }
-                : {}),
-              issue: review.issue,
-            },
-          });
-        }
+            ...(resolution.source === "exact_alias"
+              ? {}
+              : { assignmentSource: "classifier_approved" as const }),
+            assignedByActorId: systemActor.id,
+            expectedReview: review,
+          };
+          const aliasAssignment =
+            assignment.kind === "target"
+              ? await assignBottleAliasInTransaction(tx, {
+                  ...assignment,
+                  ...aliasInput,
+                })
+              : await assignBottleAliasInTransaction(tx, {
+                  ...assignment,
+                  context: {
+                    caller: "createMissingBottles",
+                    operation:
+                      resolution.source === "exact_alias"
+                        ? "reuseExactReviewAlias"
+                        : "assignResolvedReviewAlias",
+                  },
+                  ...aliasInput,
+                });
 
-        return aliasAssignment;
-      });
+          if (
+            decision !== null &&
+            shouldRecordIncomingBottleDecision({
+              previousBottleId: review.bottleId,
+              bottleId,
+              decision,
+            })
+          ) {
+            await recordIncomingBottleDecisionInTransaction(tx, {
+              sourceKind: "review",
+              sourceId: review.id,
+              externalSiteId: review.externalSiteId,
+              name: review.name,
+              url: review.url,
+              decision,
+              actor: systemActor,
+              bottleId,
+              releaseId: assignment.consumerIdentity.releaseId,
+              targetId:
+                assignment.kind === "target"
+                  ? assignment.target.targetId
+                  : null,
+              createdBottle: resolution.createdBottle,
+              createdRelease: resolution.createdRelease,
+              confidence: resolution.confidence,
+              model: resolution.model,
+              rationale: resolution.rationale,
+              metadata: {
+                resolutionSource: resolution.source,
+                ...(resolution.classifierEvidence
+                  ? {
+                      classifierEvidence: resolution.classifierEvidence,
+                    }
+                  : {}),
+                issue: review.issue,
+              },
+            });
+          }
+
+          return aliasAssignment;
+        });
+      } catch (error) {
+        if (error instanceof StaleBottleAliasReviewIdentityError) {
+          logInfo("Skipped stale bottle resolution for review {reviewId}", {
+            extra: { reviewId: review.id },
+          });
+          continue;
+        }
+        throw error;
+      }
 
       await finalizeBottleAliasAssignment(aliasAssignment, {
         review: {

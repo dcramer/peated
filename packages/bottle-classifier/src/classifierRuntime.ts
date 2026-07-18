@@ -168,9 +168,13 @@ export type BottleClassifier = {
 function parseAgentDecision(
   decision: BottleClassifierAgentDecisionInput,
 ): BottleClassifierAgentDecision {
-  return BottleClassifierAgentDecisionSchema.parse(
-    normalizePotentialProofLikeDecision(decision),
-  );
+  return {
+    ...BottleClassifierAgentDecisionSchema.parse(
+      normalizePotentialProofLikeDecision(decision),
+    ),
+    parentBottleId: null,
+    proposedRelease: null,
+  };
 }
 
 function createIgnoredReferenceClassification(

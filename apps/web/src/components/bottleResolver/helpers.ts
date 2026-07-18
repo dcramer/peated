@@ -88,7 +88,7 @@ export function getSearchSeed(result: PhotoIdentification | null) {
 export function getCreateNameSeed(result: PhotoIdentification | null) {
   const decision = getCreateDecisionLike(result);
   return (
-    getProposedBottle(decision)?.name ??
+    decision?.proposedBottle.name ??
     getRawStringFieldValue(result, "expression") ??
     ""
   );
@@ -98,8 +98,7 @@ export function getCreateBottlePrefill(
   result: PhotoIdentification | null,
 ): CreateBottlePrefill {
   const decision = getCreateDecisionLike(result);
-  const proposedBottle = getProposedBottle(decision);
-  const proposedRelease = getProposedRelease(decision);
+  const proposedBottle = decision?.proposedBottle ?? null;
 
   const category = CategoryEnum.safeParse(
     proposedBottle?.category ?? getRawStringFieldValue(result, "category"),
@@ -118,24 +117,17 @@ export function getCreateBottlePrefill(
       getFirstRawStringFieldValue(result, "distillery") ??
       null,
     statedAge:
-      proposedBottle?.statedAge ??
-      proposedRelease?.statedAge ??
-      getRawNumberFieldValue(result, "statedAge"),
-    abv:
-      proposedBottle?.abv ??
-      proposedRelease?.abv ??
-      getRawNumberFieldValue(result, "abv"),
+      proposedBottle?.statedAge ?? getRawNumberFieldValue(result, "statedAge"),
+    abv: proposedBottle?.abv ?? getRawNumberFieldValue(result, "abv"),
     edition:
-      proposedRelease?.edition ??
+      proposedBottle?.edition ??
       getRawStringFieldValue(result, "edition") ??
       null,
     vintageYear:
       proposedBottle?.vintageYear ??
-      proposedRelease?.vintageYear ??
       getRawNumberFieldValue(result, "vintageYear"),
     releaseYear:
       proposedBottle?.releaseYear ??
-      proposedRelease?.releaseYear ??
       getRawNumberFieldValue(result, "releaseYear"),
   };
 }
@@ -217,117 +209,23 @@ function getCreateDecisionLike(result: PhotoIdentification | null) {
     return null;
   }
 
-  switch (result.classification.decision.action) {
-    case "create_bottle":
-    case "create_release":
-    case "create_bottle_and_release":
-    case "repair_parent_and_create_release":
-      return result.classification.decision;
-    default:
-      return null;
-  }
-}
-
-export function canUseManualBottleCreate(
-  result: PhotoIdentification | null,
-): boolean {
-  const decision = getCreateDecisionLike(result);
-  return !decision || decision.action === "create_bottle";
-}
-
-type CreateDecisionLike = NonNullable<ReturnType<typeof getCreateDecisionLike>>;
-
-function getProposedBottle(decision: CreateDecisionLike | null) {
-  if (!decision) return null;
-  if (
-    decision.action === "create_bottle" ||
-    decision.action === "create_bottle_and_release" ||
-    decision.action === "repair_parent_and_create_release"
-  ) {
-    return decision.proposedBottle;
-  }
-  return null;
-}
-
-function getProposedRelease(decision: CreateDecisionLike | null) {
-  if (!decision) return null;
-  if (
-    decision.action === "create_release" ||
-    decision.action === "create_bottle_and_release" ||
-    decision.action === "repair_parent_and_create_release"
-  ) {
-    return decision.proposedRelease;
-  }
-  return null;
+  return result.classification.decision.action === "create_bottle"
+    ? result.classification.decision
+    : null;
 }
 
 export function getProposedName(result: PhotoIdentification | null) {
   const decision = getCreateDecision(result);
   if (!decision) return null;
 
-  if (
-    decision.action === "create_release" ||
-    decision.action === "repair_parent_and_create_release"
-  ) {
-    return decision.proposedRelease.edition ?? "New release";
-  }
-
-  if (decision.action === "create_bottle_and_release") {
-    return [
-      decision.proposedBottle.brand.name,
-      decision.proposedBottle.name,
-      decision.proposedRelease.edition,
-    ]
-      .filter(Boolean)
-      .join(" ");
-  }
-
   return [decision.proposedBottle.brand.name, decision.proposedBottle.name]
     .filter(Boolean)
     .join(" ");
 }
 
-function getParentBottleName(result: PhotoIdentification | null) {
-  const decision = getCreateDecision(result);
-  if (
-    !decision ||
-    (decision.action !== "create_release" &&
-      decision.action !== "repair_parent_and_create_release")
-  ) {
-    return null;
-  }
-
-  const parent = result?.classification.artifacts.candidates.find(
-    (candidate) =>
-      candidate.bottleId === decision.parentBottleId &&
-      (candidate.releaseId === null || candidate.releaseId === undefined),
-  );
-  return parent?.bottleFullName || parent?.fullName || null;
-}
-
 export function getCreateProposalLabel(result: PhotoIdentification | null) {
   const decision = getCreateDecision(result);
   if (!decision) return null;
-  const parentBottleName = getParentBottleName(result);
-
-  if (
-    decision.action === "create_release" ||
-    decision.action === "repair_parent_and_create_release"
-  ) {
-    return {
-      title: "Bottling not in Peated",
-      description: parentBottleName
-        ? `Create a new bottling for ${parentBottleName}.`
-        : "Create a new bottling for this bottle.",
-    };
-  }
-
-  if (decision.action === "create_bottle_and_release") {
-    return {
-      title: "Bottle not in Peated",
-      description: "Create the bottle and its specific bottling.",
-    };
-  }
 
   return {
     title: "Bottle not in Peated",
@@ -381,12 +279,7 @@ export function getManualResultCopy(
     };
   }
 
-  if (
-    action === "create_bottle" ||
-    action === "create_release" ||
-    action === "create_bottle_and_release" ||
-    action === "repair_parent_and_create_release"
-  ) {
+  if (action === "create_bottle") {
     return {
       title: "We couldn't find this bottle",
       description:

@@ -14,6 +14,7 @@ import { db, type AnyTransaction } from "@peated/server/db";
 import type {
   Bottle,
   BottleGroup,
+  BottleSeries,
   Entity,
   User,
 } from "@peated/server/db/schema";
@@ -95,6 +96,13 @@ export class ConcreteBottleUpdateConflictError extends Error {
   }
 }
 
+export class ConcreteBottleUpdateExpectedStateError extends Error {
+  constructor(readonly groupId: number) {
+    super(`BottleGroup ${groupId} shared authority changed before update.`);
+    this.name = "ConcreteBottleUpdateExpectedStateError";
+  }
+}
+
 export type ConcreteBottleUpdateResult = {
   bottle: Bottle;
   group: BottleGroup;
@@ -152,6 +160,67 @@ type StableState = Pick<
   distillerIds: number[];
 };
 
+const expectedGroupKeys = [
+  "id",
+  "name",
+  "fullName",
+  "statedAge",
+  "brandId",
+  "bottlerId",
+  "seriesId",
+  "category",
+  "flavorProfile",
+  "representativeBottleId",
+] as const satisfies ReadonlyArray<keyof BottleGroup>;
+
+type ExpectedSeries = Pick<
+  BottleSeries,
+  "id" | "brandId" | "name" | "fullName" | "description"
+>;
+
+export type ConcreteBottleUpdateExpectedSharedState = {
+  group: Pick<BottleGroup, (typeof expectedGroupKeys)[number]>;
+  distillerIds: number[];
+  series: ExpectedSeries | null;
+  referencedSeries: ExpectedSeries[];
+};
+
+/** Captures the shared authority a maintenance caller used to plan an edit. */
+export function concreteBottleUpdateExpectedSharedState({
+  group,
+  distillerIds,
+  referencedSeries = [],
+  series,
+}: {
+  group: BottleGroup;
+  distillerIds: number[];
+  referencedSeries?: BottleSeries[];
+  series: BottleSeries | null;
+}): ConcreteBottleUpdateExpectedSharedState {
+  return {
+    group: Object.fromEntries(
+      expectedGroupKeys.map((key) => [key, group[key]]),
+    ) as ConcreteBottleUpdateExpectedSharedState["group"],
+    distillerIds: [...distillerIds].sort((left, right) => left - right),
+    series: series
+      ? {
+          id: series.id,
+          brandId: series.brandId,
+          name: series.name,
+          fullName: series.fullName,
+          description: series.description,
+        }
+      : null,
+    referencedSeries: referencedSeries.map((row) => ({
+      id: row.id,
+      brandId: row.brandId,
+      name: row.name,
+      fullName: row.fullName,
+      description: row.description,
+    })),
+  };
+}
+
 function hasFields(value: object | undefined): boolean {
   return value !== undefined && Object.keys(value).length > 0;
 }
@@ -177,6 +246,16 @@ function sameValues(left: readonly number[], right: readonly number[]) {
   return (
     left.length === right.length &&
     left.every((value, index) => value === right[index])
+  );
+}
+
+function sameExpectedSeries(current: BottleSeries, expected: ExpectedSeries) {
+  return (
+    current.id === expected.id &&
+    current.brandId === expected.brandId &&
+    current.name === expected.name &&
+    current.fullName === expected.fullName &&
+    current.description === expected.description
   );
 }
 
@@ -558,19 +637,22 @@ function emptyResult(
 /**
  * Performs the complete locked concrete Bottle update transaction. The caller
  * must finalize the returned manifest only after its outermost transaction
- * commits.
+ * commits. Optional expected shared state is compared while the BottleGroup
+ * and every referenced series preimage remain locked.
  */
 export async function updateConcreteBottleInTransaction(
   tx: AnyTransaction,
   {
     bottleId,
     input,
+    expectedSharedState,
     user,
     actorId,
     creationSource,
   }: {
     bottleId: number;
     input: ConcreteBottleUpdateInput;
+    expectedSharedState?: ConcreteBottleUpdateExpectedSharedState;
     user: User;
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
@@ -719,6 +801,43 @@ export async function updateConcreteBottleInTransaction(
   const currentGroupDistillerIds = currentGroupDistillers.map(
     ({ distillerId }) => distillerId,
   );
+  if (expectedSharedState) {
+    const groupChanged = expectedGroupKeys.some(
+      (key) =>
+        JSON.stringify(group[key]) !==
+        JSON.stringify(expectedSharedState.group[key]),
+    );
+    const expectedSeriesById = new Map(
+      [
+        expectedSharedState.series,
+        ...expectedSharedState.referencedSeries,
+      ].flatMap((series) => (series ? [[series.id, series] as const] : [])),
+    );
+    const expectedSeriesIds = Array.from(expectedSeriesById.keys()).sort(
+      (left, right) => left - right,
+    );
+    const currentSeriesRows = expectedSeriesIds.length
+      ? await tx
+          .select()
+          .from(bottleSeries)
+          .where(inArray(bottleSeries.id, expectedSeriesIds))
+          .orderBy(asc(bottleSeries.id))
+          .for("share")
+      : [];
+    const seriesChanged =
+      currentSeriesRows.length !== expectedSeriesById.size ||
+      currentSeriesRows.some((series) => {
+        const expected = expectedSeriesById.get(series.id);
+        return !expected || !sameExpectedSeries(series, expected);
+      });
+    if (
+      groupChanged ||
+      !sameValues(currentGroupDistillerIds, expectedSharedState.distillerIds) ||
+      seriesChanged
+    ) {
+      throw new ConcreteBottleUpdateExpectedStateError(groupId);
+    }
+  }
   const changedEntityIds = new Set<number>();
   const newEntityIds = new Set<number>();
   const stable = await resolveStableState(tx, {

@@ -300,10 +300,7 @@ describe("agentActionRiskClass", () => {
   test.each([
     ["match", "match"],
     ["create_bottle", "create"],
-    ["create_release", "create"],
-    ["create_bottle_and_release", "create"],
     ["repair_bottle", "repair"],
-    ["repair_parent_and_create_release", "repair"],
     ["no_match", "none"],
   ] as const)("maps %s to %s", (action, expected) => {
     expect(agentActionRiskClass(action)).toBe(expected);

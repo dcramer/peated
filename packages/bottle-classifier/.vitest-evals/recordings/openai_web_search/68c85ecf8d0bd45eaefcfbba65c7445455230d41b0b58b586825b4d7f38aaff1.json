@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:41:40.241Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Barrel Proof C923"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Barrel Proof C923",
+    "summary": "**Elijah Craig Barrel Proof C923** is the **third 2023 batch** of Elijah Craig Barrel Proof. In Elijah Craig’s batch code system, **“C” = third release of the year** and **“923” = September 2023**. It is listed by the brand as **133.0 proof (66.5% ABV)** with an age of **13 years, 7 months**. ([elijahcraig.com](https:/",
+    "results": [
+      {
+        "title": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "url": "https://www.drinkhacker.com/2023/12/10/review-elijah-craig-barrel-proof-batch-c923-september-2023/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/1tk4jyr/review_215_elijah_craig_barrel_proof_c923/",
+        "url": "https://www.reddit.com/r/bourbon/comments/1tk4jyr/review_215_elijah_craig_barrel_proof_c923/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "url": "https://whiskeyconsensus.com/elijah-craig-barrel-proof-batch-c923-review/",
+        "domain": "whiskeyconsensus.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/whiskey/comments/1tk4k2w/review_215_elijah_craig_barrel_proof_c923/",
+        "url": "https://www.reddit.com/r/whiskey/comments/1tk4k2w/review_215_elijah_craig_barrel_proof_c923/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "68c85ecf8d0bd45eaefcfbba65c7445455230d41b0b58b586825b4d7f38aaff1",
+    "mode": "auto"
+  }
+}

@@ -2,7 +2,7 @@ import {
   BOTTLE_RELEASE_TRAIT_FIELDS,
   mergeBottleCandidateFamilyContext,
 } from "@peated/bottle-classifier/internal/types";
-import { deriveLegacyReleaseRepairIdentity } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
+import { deriveLegacyReleaseIdentityEvidence } from "@peated/bottle-classifier/legacyReleaseIdentityEvidence";
 import {
   normalizeBottle,
   normalizeBottleBatchNumber,
@@ -478,7 +478,7 @@ function getParentSearchSignals({
   extractedLabel: BottleReferenceIdentity | null;
 }): BottleReferenceSearchSignals {
   const normalizedSearchName = normalizeBottle({ name: searchName });
-  const derivedLegacyReleaseIdentity = deriveLegacyReleaseRepairIdentity({
+  const derivedLegacyReleaseIdentity = deriveLegacyReleaseIdentityEvidence({
     fullName: searchName,
     edition: extractedLabel?.edition ?? null,
     releaseYear: extractedLabel?.release_year ?? null,

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T18:41:10.356Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 year old official 46%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 year old official 46%",
+    "summary": "**Glenmorangie Quinta Ruban 14 Year Old Official Bottling, 46%**:\n\n- **Producer / bottler:** Glenmorangie; this is an **official distillery bottling**. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n- **Style:** Highland **single malt Scotch whisky**. ([glenmorangie",
+    "results": [
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "url": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/162531/glenmorangie-14-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/162531/glenmorangie-14-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/54/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/54/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/35885/glenmorangie-quinta-ruban",
+        "url": "https://www.whiskybase.com/whiskies/whisky/35885/glenmorangie-quinta-ruban",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us",
+        "url": "https://www.glenmorangie.com/en-us",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "6832b1109e814bcf85e180ed97b35ffb0cadd12353055b4861d35c34aea13b15",
+    "mode": "auto"
+  }
+}

@@ -392,8 +392,7 @@
     },
     "proposedBottleNameIncludes": ["18-year-old", "Single Barrel"],
     "proposedBottleNameExcludes": ["4040", "No. 4040", "Barrel No."],
-    "proposedRelease": null,
     "verifyEligible": false,
-    "summary": "Create the uncoded Elijah Craig 18-year-old Single Barrel bottle. Do not match the narrower local No. 4040 barrel row, and do not turn the generic age-stated single-barrel product into a child release."
+    "summary": "Create the complete uncoded Elijah Craig 18-year-old Single Barrel Bottle. Do not match the narrower local No. 4040 barrel row or infer an unsupported group relationship."
   }
 }

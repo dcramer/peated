@@ -122,12 +122,6 @@ export default function Admin() {
   const bottleNameRepairs = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "canon-repairs",
   )!;
-  const bottleReleaseRepairs = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "release-repairs",
-  )!;
-  const ageRepairs = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "age-repairs",
-  )!;
 
   const queueQuery = useQuery(
     orpc.prices.matchQueue.list.queryOptions({
@@ -250,36 +244,6 @@ export default function Admin() {
                   .
                 </div>
               </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Bottle still contains release detail
-                </div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Split parent and child records in{" "}
-                  <Link
-                    href={bottleReleaseRepairs.href}
-                    className="font-medium text-white underline"
-                  >
-                    {bottleReleaseRepairs.pageTitle}
-                  </Link>
-                  .
-                </div>
-              </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Parent age is dirty
-                </div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Move release-specific ages in{" "}
-                  <Link
-                    href={ageRepairs.href}
-                    className="font-medium text-white underline"
-                  >
-                    {ageRepairs.pageTitle}
-                  </Link>
-                  .
-                </div>
-              </div>
             </div>
           </div>
 
@@ -359,22 +323,6 @@ export default function Admin() {
             summary={bottleNameRepairs.summary}
             title={bottleNameRepairs.pageTitle}
             whenToUse={bottleNameRepairs.whenToUse}
-          />
-          <WorkbenchCard
-            detail="Open this queue to review the current parent and release split candidates."
-            href={bottleReleaseRepairs.href}
-            hrefLabel="Open Bottle / Release Repairs"
-            summary={bottleReleaseRepairs.summary}
-            title={bottleReleaseRepairs.pageTitle}
-            whenToUse={bottleReleaseRepairs.whenToUse}
-          />
-          <WorkbenchCard
-            detail="Open this queue to review parent bottles whose age should move onto a child release."
-            href={ageRepairs.href}
-            hrefLabel="Open Parent Age Repairs"
-            summary={ageRepairs.summary}
-            title={ageRepairs.pageTitle}
-            whenToUse={ageRepairs.whenToUse}
           />
         </section>
       </div>

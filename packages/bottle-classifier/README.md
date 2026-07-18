@@ -69,15 +69,16 @@ normalizeBottleCreationDrafts({
 
 These are the package-owned pure helpers that downstream server code should
 compose instead of re-implementing. They are the main low-cost surface for
-deterministic edge-case tests.
+deterministic edge-case tests. `creationTarget` and `proposedRelease` remain
+legacy migration inputs to the normalization helper; the live classifier does
+not emit release-creation decisions.
 
 Use the narrow subpath exports for specialized or internal-only surfaces:
 
 ```ts
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import { normalizeBottleCreationDrafts } from "@peated/bottle-classifier/bottleCreationDrafts";
-import { deriveLegacyReleaseRepairIdentity } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
-import { resolveLegacyCreateParentClassification } from "@peated/bottle-classifier/legacyReleaseRepairResolution";
+import { deriveLegacyReleaseIdentityEvidence } from "@peated/bottle-classifier/legacyReleaseIdentityEvidence";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 ```
 
@@ -121,24 +122,22 @@ Package-specific reminders:
 - [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts
 - [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction
 - [`src/normalize.ts`](./src/normalize.ts): bottle/name/category/volume normalization
-- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): bottle-versus-release identity helpers
+- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): legacy bottle-versus-release identity helpers retained during flattening
 - [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): create-draft normalization
 - [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): shared evidence checks
-- [`src/legacyReleaseRepairIdentity.ts`](./src/legacyReleaseRepairIdentity.ts): legacy release-repair discovery helpers
-- [`src/legacyReleaseRepairResolution.ts`](./src/legacyReleaseRepairResolution.ts): repair-facing result interpretation
+- [`src/legacyReleaseIdentityEvidence.ts`](./src/legacyReleaseIdentityEvidence.ts): transitional structural evidence for matching retained legacy release candidates; never a creation or grouping authority
 - [`src/smws.ts`](./src/smws.ts): SMWS parsing and exact-code behavior
 - [`src/eval-fixtures/`](./src/eval-fixtures): file-backed eval fixtures
 - [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts): live classifier eval runner
-- [`src/legacyReleaseRepairResolution.eval.test.ts`](./src/legacyReleaseRepairResolution.eval.test.ts): live repair-boundary eval runner
 
 ## Iteration Workflow
 
 When changing classifier behavior:
 
 1. Update or add a focused unit test only for deterministic behavior.
-2. Update or add the relevant file-backed eval fixtures when the behavior changes bottle versus release identity boundaries.
+2. Update or add the relevant file-backed eval fixtures when the behavior changes exact Bottle identity boundaries.
 3. Update or add realistic positive and negative eval fixtures when the behavior is model-sensitive.
-   Confidence calibration belongs here too: cases that should be safe for downstream auto-verification need explicit eval expectations for the high-confidence band, while review-only matches should stay below it.
+   When automation behavior matters, assert the code-derived `expected.expectedTier: auto | review`. The tier comes from action risk, unresolved risks, and structured evidence or deterministic anchors; it does not read model-supplied numeric scores.
 4. Keep prompts, schemas, deterministic review logic, and pure normalization helpers aligned. Do not patch around package behavior in the server wrapper.
 5. Do not solve one failed family by teaching the prompt that exact family name. Generalize the rule in prompt or policy, and use eval fixtures to hold the concrete regression.
 6. Run package typecheck, focused unit tests, and fixture validation for routine changes. Run live evals only when explicitly requested or when doing an intentional scoped eval pass.
@@ -147,9 +146,9 @@ When adding an eval from a real production miss:
 
 1. Start with the exact observed input: listing title, URL, extracted identity, local candidates, current assignment, and the failing classifier or automation outcome.
 2. Web-verify the real bottle before writing the expected result. Prioritize producer/brand pages, official shops, independent whisky databases, competition records, reviews, and publications whose content specifically confirms the bottle traits. Treat retailer copy as the source listing, not proof by itself.
-3. Decide the Peated DB outcome explicitly: exact `bottleId`, exact `releaseId` or `null`, whether a `bottle_release` should be created, whether a parent split is required, and which source facts should remain observation-only.
-4. Apply `docs/architecture/whisky-identity-model.md`: bottle-first when the product identity is clear, release only for reusable canonical variants, and preserve exact listing details as observations when they are not canonical identity.
-5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.confidenceBand` / `expected.verifyEligible` when downstream automation depends on the confidence band.
+3. Decide the Peated DB outcome explicitly: exact `bottleId` or one complete Bottle creation, the retained legacy `releaseId` only when an existing release candidate is the exact match, and which source facts should remain observation-only. The classifier never creates a `bottle_release`, repairs a parent, or selects a BottleGroup.
+4. Apply `docs/architecture/whisky-identity-model.md`: every marketed release must remain independently correct as a Bottle, including its supported exact traits; BottleGroup assignment is automatic downstream.
+5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.expectedTier` when the automation outcome is part of the regression. Use `expected.verifyEligible` only when deliberately asserting the retained downstream existing-match verification compatibility projection; it is not the primary tier.
 6. Add `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome` so future reviewers can see the web verification and the intended DB action without rediscovering it from memory.
 7. If the family is ambiguous enough to regress in both directions, add paired positive and negative fixtures rather than a one-sided example.
 
@@ -186,6 +185,7 @@ Live eval commands:
 ```bash
 pnpm evals
 pnpm --filter @peated/bottle-classifier evals
+pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
 ```
 
 `pnpm evals` is the intended repo-root entrypoint. It forwards extra Vitest args
@@ -207,9 +207,8 @@ when `FIRECRAWL_API_KEY` enables that tool; otherwise it replays
 
 Replay recordings default to the package-local upstream-style
 `packages/bottle-classifier/.vitest-evals/recordings/` directory via
-`VITEST_EVALS_REPLAY_DIR`. `VITEST_EVALS_REPLAY_MODE` defaults to `auto`, which
-replays an existing recording and records a new one on a miss. Set it to
-`strict`, `record`, or `off` to use the upstream `vitest-evals` replay modes.
+`VITEST_EVALS_REPLAY_DIR`. The normal commands above replay an existing
+recording and record a new one on a miss automatically.
 Replay JSON is reproducible eval evidence, not a disposable local cache. Review
 and commit replay changes only when they are intentional.
 

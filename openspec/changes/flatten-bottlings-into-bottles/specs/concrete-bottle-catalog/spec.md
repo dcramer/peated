@@ -25,6 +25,45 @@ The system SHALL store edition, release year, vintage year, release-specific age
 - **THEN** those attributes are persisted on that Bottle
 - **AND** no corresponding child-release record is created
 
+### Requirement: Correction age ownership is migration-safe
+
+The system SHALL interpret sparse correction-proposal `statedAge` values using
+the staged `statedAgeScope` contract until historical proposals are drained or
+migrated, and SHALL make exact Bottle ownership the only live contract after
+that transition.
+
+#### Scenario: Apply a marked exact age correction
+
+- **WHEN** a correction proposal supplies a non-null `statedAge` with
+  `statedAgeScope: exact`
+- **THEN** approval applies the age only to the selected Bottle
+- **AND** sibling Bottles and the BottleGroup shared age remain unchanged
+
+#### Scenario: Apply a historical unmarked age correction
+
+- **WHEN** a historical correction proposal supplies a non-null `statedAge`
+  without `statedAgeScope`
+- **THEN** approval treats the age as shared BottleGroup intent
+- **AND** the canonical shared-update transaction rematerializes every member
+  Bottle according to the effective-age fan-out rules
+
+#### Scenario: Preserve sparse null age
+
+- **WHEN** a marked or unmarked correction proposal supplies a null
+  `statedAge`
+- **THEN** approval treats the field as an unknown sparse value
+- **AND** it changes neither the selected Bottle age nor the BottleGroup shared
+  age
+
+#### Scenario: Remove the historical ownership fallback
+
+- **WHEN** pending historical correction proposals have been drained or
+  migrated under task 9.7
+- **THEN** the system removes `statedAgeScope` and the unmarked shared-age
+  fallback together
+- **AND** every subsequent non-null correction `statedAge` is exact intent for
+  the selected Bottle by default
+
 ### Requirement: Bottle creation is one workflow
 
 The web application SHALL provide one Add Bottle workflow for both ordinary and precisely identified products and SHALL NOT require the user to choose between Bottle and Bottling creation.
@@ -112,11 +151,13 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **THEN** it creates one concrete Bottle in the source Bottle's group and one exact target
 - **AND** Release input supplies the concrete Bottle's exact fields
 - **AND** an active exact duplicate may be reused only when its canonical
-  `fullName` exactly matches the requested canonical `fullName`, its exact
-  target is active, and it belongs to that same group
+  `fullName` exactly matches the requested canonical `fullName` or its
+  structurally parsed SMWS code exactly matches, its exact target is active,
+  and it belongs to that same group
 - **AND** a cross-group exact duplicate aborts the approval
 - **AND** a collision found only through an arbitrary or ignored alias, fuzzy
-  name similarity, or fuzzy SMWS matching is not reusable exact identity
+  name similarity, or fuzzy or substring-only SMWS matching is not reusable
+  exact identity
 
 #### Scenario: Reject an untranslatable create-new image URL
 
@@ -218,13 +259,6 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **WHEN** the standard Bottle DELETE route receives a grouped concrete Bottle
 - **THEN** it rejects the request without mutation with an actionable merge-required result
 - **AND** it does not create a destination-free canonical deletion path
-
-#### Scenario: Legacy release repair excludes grouped Bottles
-
-- **WHEN** legacy release-repair candidate discovery or either the preflight or locked apply read examines a Bottle
-- **THEN** only a pre-migration Bottle with `groupId IS NULL` is eligible for that compatibility path
-- **AND** a grouped Bottle is not offered, repaired, or deleted and must use an explicit exact Bottle merge
-- **AND** task 9.7 removes the retained repair compatibility
 
 #### Scenario: Delete through a completed legacy release mapping
 

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:34:20.275Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon",
+    "summary": "Heaven’s Door **Bootleg Series Vol. 3** is a **13-year-old Kentucky straight bourbon whiskey** from Heaven’s Door, released in **late 2021**, and then **finished in Vino de Naranja casks**. Heaven’s Door described it as their **first-ever Kentucky bourbon release** in the Bootleg line. ([prnewswire.com](https://www.prn",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "domain": "prnewswire.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/post/best-bourbons-of-the-21st-century",
+        "url": "https://www.heavensdoor.com/post/best-bourbons-of-the-21st-century",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/post/gear-patrol-best-things-i-drank-last-month",
+        "url": "https://www.heavensdoor.com/post/gear-patrol-best-things-i-drank-last-month",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://www.breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/asset-library",
+        "url": "https://www.heavensdoor.com/asset-library",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "ae3aae4b9743ef51daa8825c62fbdf7e48adac7ea7b78d7a9f45a516cbb53450",
+    "mode": "auto"
+  }
+}

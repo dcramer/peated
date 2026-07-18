@@ -5,20 +5,29 @@ import {
 } from "@peated/server/constants";
 import { logError, logInfo } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
 import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";
-import type { z } from "zod";
+import { z } from "zod";
 import config from "../config";
 import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
 import BatchQueue from "./batchQueue";
+import {
+  buildConcreteBottleUpdatePatch,
+  buildIndependentConcreteBottleRouteInput,
+} from "./flatConcreteBottleInput";
 import { formatBottleName } from "./format";
 
 const CACHE = ".cache";
 
 const CACHE_EXPIRE = 60 * 60 * 18 * 1000;
+
+const BottleConflictDataSchema = z.object({
+  bottle: z.number().int().positive(),
+});
 
 if (!existsSync(CACHE)) {
   mkdirSync(CACHE);
@@ -164,12 +173,63 @@ export async function handleBottle(
       },
     });
 
-    const {
-      data: bottleResult,
-      error,
-      isDefined,
-    } = await safe(orpcClient.bottles.upsert(bottle));
-    if (error && (!isDefined || error.name !== "CONFLICT")) {
+    let createInput: ReturnType<
+      typeof buildIndependentConcreteBottleRouteInput
+    >;
+    try {
+      createInput = buildIndependentConcreteBottleRouteInput(bottle);
+    } catch (error) {
+      logError(error, {
+        extra: {
+          bottle,
+        },
+      });
+      return;
+    }
+    const createResult = await safe(orpcClient.bottles.create(createInput));
+
+    let target: ExactCatalogTargetV1 | undefined = createResult.data;
+    if (createResult.error) {
+      if (!createResult.isDefined || createResult.error.code !== "CONFLICT") {
+        logError(createResult.error, {
+          extra: {
+            bottle,
+          },
+        });
+        return;
+      }
+
+      const conflict = BottleConflictDataSchema.safeParse(
+        createResult.error.data,
+      );
+      if (!conflict.success) {
+        logError(createResult.error, {
+          extra: {
+            bottle,
+          },
+        });
+        return;
+      }
+
+      const updateResult = await safe(
+        orpcClient.bottles.update({
+          bottle: conflict.data.bottle,
+          ...buildConcreteBottleUpdatePatch(createInput),
+        }),
+      );
+      if (updateResult.error) {
+        logError(updateResult.error, {
+          extra: {
+            bottle,
+          },
+        });
+        return;
+      }
+      target = updateResult.data;
+    }
+
+    if (!target) {
+      const error = new Error("Bottle create/update returned no exact target.");
       logError(error, {
         extra: {
           bottle,
@@ -178,11 +238,11 @@ export async function handleBottle(
       return;
     }
 
-    if (bottleResult && !bottleResult.imageUrl && imageUrl) {
+    if (!target.bottle.imageUrl && imageUrl) {
       try {
         const blob = await downloadFileAsBlob(imageUrl);
         await orpcClient.bottles.imageUpdate({
-          bottle: bottleResult.id,
+          bottle: target.bottle.id,
           file: blob,
         });
       } catch (err) {

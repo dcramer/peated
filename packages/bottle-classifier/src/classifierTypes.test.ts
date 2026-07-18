@@ -26,6 +26,8 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(jsonSchema.oneOf).toBeUndefined();
     expect(jsonSchema.anyOf).toBeUndefined();
     expect(jsonSchema.properties?.decision).toBeUndefined();
+    expect(jsonSchema.properties?.parentBottleId).toBeUndefined();
+    expect(jsonSchema.properties?.proposedRelease).toBeUndefined();
     expect((jsonSchema.required ?? []).sort()).toEqual(
       Object.keys(jsonSchema.properties ?? {}).sort(),
     );
@@ -127,8 +129,8 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       },
     });
     const decision = BottleClassifierAgentDecisionSchema.parse({
-      action: "create_release",
-      rationale: "A second vintage establishes the reusable parent.",
+      action: "create_bottle",
+      rationale: "The source identifies a complete 1994 Vintage Bottle.",
       candidateBottleIds: [100],
       identityScope: "product",
       aliasScope: "none",
@@ -154,9 +156,10 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       },
       matchedBottleId: null,
       matchedReleaseId: null,
-      parentBottleId: 100,
-      proposedBottle: null,
-      proposedRelease: {
+      proposedBottle: {
+        name: "18-year-old 1994 Vintage",
+        brand: { id: null, name: "Example" },
+        statedAge: 18,
         vintageYear: 1994,
       },
     });
@@ -193,38 +196,52 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     ).toBe(false);
   });
 
-  test("parses parent repair plus release creation decisions", () => {
-    const decision = BottleClassificationDecisionSchema.parse({
-      action: "repair_parent_and_create_release",
-      rationale:
-        "The existing parent has a bottle-level age that must move before adding the sibling age statement.",
-      candidateBottleIds: [44175],
-      parentBottleId: 44175,
-      proposedBottle: {
-        name: "Speyside",
-        brand: {
-          id: 3943,
-          name: "Shieldaig",
-        },
-        category: "single_malt",
-        statedAge: null,
-      },
-      proposedRelease: {
-        statedAge: 21,
-      },
-    });
-
-    expect(decision).toMatchObject({
-      action: "repair_parent_and_create_release",
-      parentBottleId: 44175,
+  test.each([
+    "create_release",
+    "create_bottle_and_release",
+    "repair_parent_and_create_release",
+  ])("rejects obsolete live action %s", (action) => {
+    const otherwiseValidAgentDecision = {
+      action: "no_match" as const,
+      rationale: null,
+      candidateBottleIds: [],
+      identityScope: null,
+      aliasScope: null,
+      observation: null,
+      identityBasis: null,
+      confidenceBasis: null,
       matchedBottleId: null,
-      proposedBottle: {
-        name: "Speyside",
-        statedAge: null,
-      },
-      proposedRelease: {
-        statedAge: 21,
-      },
-    });
+      matchedReleaseId: null,
+      proposedBottle: null,
+    };
+    const otherwiseValidPersistedDecision = {
+      ...otherwiseValidAgentDecision,
+      identityScope: "product" as const,
+      aliasScope: undefined,
+      parentBottleId: null,
+      proposedRelease: null,
+    };
+
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse(otherwiseValidAgentDecision)
+        .success,
+    ).toBe(true);
+    expect(
+      BottleClassificationDecisionSchema.safeParse(
+        otherwiseValidPersistedDecision,
+      ).success,
+    ).toBe(true);
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        ...otherwiseValidAgentDecision,
+        action,
+      }).success,
+    ).toBe(false);
+    expect(
+      BottleClassificationDecisionSchema.safeParse({
+        ...otherwiseValidPersistedDecision,
+        action,
+      }).success,
+    ).toBe(false);
   });
 });

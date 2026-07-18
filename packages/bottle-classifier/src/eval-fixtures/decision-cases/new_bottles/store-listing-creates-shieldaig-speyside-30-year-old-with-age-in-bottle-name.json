@@ -49,7 +49,6 @@
       "statedAge": 30
     },
     "proposedBottleNameIncludes": ["Speyside", "30-year-old"],
-    "proposedRelease": null,
     "verifyEligible": false,
     "summary": "Create a new Shieldaig Speyside 30-year-old bottle and keep the age statement in the displayed bottle identity because same-family aged bottles would otherwise be confusing."
   },

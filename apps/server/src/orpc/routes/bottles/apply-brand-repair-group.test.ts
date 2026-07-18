@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -53,6 +54,20 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       bottleId: reserveBottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged Batch Repair",
     });
+    const reserveBatch = await createConcreteBottle({
+      context: { user: mod } as Parameters<
+        typeof createConcreteBottle
+      >[0]["context"],
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: reserveBottle.id,
+        exact: { edition: "Batch 2" },
+      },
+    });
+    await fixtures.BottleAlias({
+      bottleId: reserveBatch.bottle.id,
+      name: "Canadian Club Reserve 9-year-old Triple Aged Batch 2 Repair",
+    });
 
     const premiumBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
@@ -95,9 +110,28 @@ describe("POST /bottles/apply-brand-repair-group", () => {
 
     expect(result).toMatchObject({
       appliedCount: 2,
-      bottleIds: expect.arrayContaining([reserveBottle.id, premiumBottle.id]),
-      candidateCount: 2,
+      appliedGroupCount: 2,
+      appliedGroupIds: [reserveBottle.groupId!, premiumBottle.groupId!].sort(
+        (left, right) => left - right,
+      ),
+      bottleIds: expect.arrayContaining([
+        reserveBottle.id,
+        reserveBatch.bottle.id,
+        premiumBottle.id,
+      ]),
+      candidateBottleCount: 3,
+      candidateBottleIds: expect.arrayContaining([
+        reserveBottle.id,
+        reserveBatch.bottle.id,
+        premiumBottle.id,
+      ]),
+      candidateCount: 3,
       failedCount: 0,
+      failedGroupCount: 0,
+      failedGroupIds: [],
+      groupIds: [reserveBottle.groupId!, premiumBottle.groupId!].sort(
+        (left, right) => left - right,
+      ),
       status: "applied",
     });
 
@@ -106,6 +140,12 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       .from(bottles)
       .where(eq(bottles.id, reserveBottle.id));
     expect(updatedReserveBottle?.brandId).toEqual(canadianClub.id);
+
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, reserveBatch.bottle.id),
+      }),
+    ).toMatchObject({ brandId: canadianClub.id });
 
     const [updatedPremiumBottle] = await db
       .select()

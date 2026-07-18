@@ -206,10 +206,8 @@ async function handleRpcRequest({ request, response, url }) {
           response,
           withCollectionStatus(
             request,
-            buildBottle({
-              id: createdBottleId,
-              name: createdBottleName,
-              brand: testBrand,
+            buildCreatedBottle({
+              includeExactBottleDetails: isExactBottlePhotoScenario(request),
             }),
           ),
         );
@@ -318,17 +316,14 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-warning")) {
-        sendRpcResponse(
-          response,
-          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
-        );
+        sendRpcResponse(response, buildCreateProposalPhotoIdentification());
         return true;
       }
 
       if (getAccessToken(request).includes("photo-create-existing")) {
         sendRpcResponse(
           response,
-          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+          buildCreateProposalPhotoIdentification(),
           "77777777777777777777777777777777",
         );
         return true;
@@ -338,7 +333,6 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({
-            action: "create_bottle",
             suitableAsBottleImage: false,
           }),
           "44444444444444444444444444444444",
@@ -346,24 +340,22 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      if (
-        getAccessToken(request).includes("photo-create-release-default-image")
-      ) {
+      if (getAccessToken(request).includes("photo-create-complete-bottle")) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({
-            action: "create_bottle_and_release",
+            includeExactBottleDetails: true,
           }),
           "22222222222222222222222222222222",
         );
         return true;
       }
 
-      if (getAccessToken(request).includes("photo-repair-parent-create")) {
+      if (getAccessToken(request).includes("photo-create-prefilled-bottle")) {
         sendRpcResponse(
           response,
           buildCreateProposalPhotoIdentification({
-            action: "repair_parent_and_create_release",
+            includeExactBottleDetails: true,
           }),
           "88888888888888888888888888888888",
         );
@@ -375,7 +367,7 @@ async function handleRpcRequest({ request, response, url }) {
       ) {
         sendRpcResponse(
           response,
-          buildCreateProposalPhotoIdentification({ action: "create_bottle" }),
+          buildCreateProposalPhotoIdentification(),
           "44444444444444444444444444444444",
         );
         return true;
@@ -739,7 +731,12 @@ function mutateCollectionBottle(request, input, action) {
         bottle:
           input.bottle === existingBottleId
             ? existingBottle
-            : buildBottleForId(input.bottle),
+            : input.bottle === createdBottleId
+              ? buildCreatedBottle({
+                  includeExactBottleDetails:
+                    isExactBottlePhotoScenario(request),
+                })
+              : buildBottleForId(input.bottle),
         release:
           input.release === existingReleaseId
             ? existingRelease
@@ -822,29 +819,20 @@ function updateCollectionBottleImage(request, input) {
 }
 
 function buildCreateProposalPhotoIdentification({
-  action,
+  includeExactBottleDetails = false,
   suitableAsBottleImage = true,
-}) {
-  const proposedRelease = {
-    edition: "First Fill Oloroso",
-    statedAge: null,
-    abv: 46,
-    caskStrength: null,
-    singleCask: null,
-    vintageYear: null,
-    releaseYear: 2026,
-  };
+} = {}) {
   const proposedBottle = {
     name: createdBottleName,
     category: "single_malt",
     series: null,
-    edition: null,
+    edition: includeExactBottleDetails ? "First Fill Oloroso" : null,
     statedAge: null,
     caskStrength: null,
     singleCask: null,
-    abv: null,
+    abv: includeExactBottleDetails ? 46 : null,
     vintageYear: null,
-    releaseYear: null,
+    releaseYear: includeExactBottleDetails ? 2026 : null,
     brand: {
       id: testBrand.id,
       name: testBrand.name,
@@ -857,33 +845,10 @@ function buildCreateProposalPhotoIdentification({
     ],
     bottler: null,
   };
-  const decision =
-    action === "create_release"
-      ? {
-          action,
-          parentBottleId: existingBottleId,
-          proposedRelease,
-        }
-      : action === "repair_parent_and_create_release"
-        ? {
-            action,
-            parentBottleId: existingBottleId,
-            proposedBottle: {
-              ...proposedBottle,
-              name: existingBottle.name,
-            },
-            proposedRelease,
-          }
-        : action === "create_bottle_and_release"
-          ? {
-              action,
-              proposedBottle,
-              proposedRelease,
-            }
-          : {
-              action,
-              proposedBottle,
-            };
+  const decision = {
+    action: "create_bottle",
+    proposedBottle,
+  };
 
   return {
     pendingImage: {
@@ -935,10 +900,10 @@ function buildCreateProposalPhotoIdentification({
           sourceExtractorIndexes: [0],
         },
         edition:
-          action === "create_bottle"
+          proposedBottle.edition === null
             ? undefined
             : {
-                value: proposedRelease.edition,
+                value: proposedBottle.edition,
                 confidence: 0.88,
                 sourceExtractorIndexes: [0],
               },
@@ -979,12 +944,12 @@ function buildCreateProposalPhotoIdentification({
       },
       classification: {
         status: "classified",
-        action,
+        action: "create_bottle",
         confidence: 92,
         reason: "Create proposal fixture.",
       },
     },
-    createToken: `playwright-create-token:${action}:${suitableAsBottleImage ? "suitable" : "unsuitable"}`,
+    createToken: `playwright-create-token:create_bottle:${suitableAsBottleImage ? "suitable" : "unsuitable"}`,
   };
 }
 
@@ -995,10 +960,8 @@ function createPhotoIdentificationTarget(request, input) {
   }
 
   const token = getAccessToken(request);
-  const bottle = buildBottle({
-    id: createdBottleId,
-    name: createdBottleName,
-    brand: testBrand,
+  const bottle = buildCreatedBottle({
+    includeExactBottleDetails: isExactBottlePhotoScenario(request),
   });
 
   if (token.includes("photo-create-warning")) {
@@ -1029,24 +992,11 @@ function createPhotoIdentificationTarget(request, input) {
     };
   }
 
-  if (token.includes("photo-create-release-default-image")) {
-    return {
-      bottle,
-      release: buildCreatedRelease(),
-    };
-  }
-
-  if (token.includes("photo-repair-parent-create")) {
-    return {
-      bottle: existingBottle,
-      release: buildBottleRelease({
-        ...buildCreatedRelease(),
-        bottleId: existingBottleId,
-      }),
-    };
-  }
-
-  if (token.includes("photo-create-bottle-default-image")) {
+  if (
+    token.includes("photo-create-bottle-default-image") ||
+    token.includes("photo-create-complete-bottle") ||
+    token.includes("photo-create-prefilled-bottle")
+  ) {
     return {
       bottle,
       release: null,
@@ -1062,16 +1012,10 @@ function getExpectedPhotoCreateToken(request) {
     return "playwright-create-token:create_bottle:unsuitable";
   }
 
-  if (token.includes("photo-create-release-default-image")) {
-    return "playwright-create-token:create_bottle_and_release:suitable";
-  }
-
-  if (token.includes("photo-repair-parent-create")) {
-    return "playwright-create-token:repair_parent_and_create_release:suitable";
-  }
-
   if (
     token.includes("photo-create-bottle-default-image") ||
+    token.includes("photo-create-complete-bottle") ||
+    token.includes("photo-create-prefilled-bottle") ||
     token.includes("photo-create-warning") ||
     token.includes("photo-create-existing")
   ) {
@@ -1079,6 +1023,31 @@ function getExpectedPhotoCreateToken(request) {
   }
 
   return null;
+}
+
+function isExactBottlePhotoScenario(request) {
+  const token = getAccessToken(request);
+  return (
+    token.includes("photo-create-complete-bottle") ||
+    token.includes("photo-create-prefilled-bottle")
+  );
+}
+
+function buildCreatedBottle({ includeExactBottleDetails = false } = {}) {
+  const bottle = buildBottle({
+    id: createdBottleId,
+    name: createdBottleName,
+    brand: testBrand,
+  });
+  if (!includeExactBottleDetails) return bottle;
+
+  return {
+    ...bottle,
+    fullName: `${bottle.fullName} First Fill Oloroso`,
+    edition: "First Fill Oloroso",
+    abv: 46,
+    releaseYear: 2026,
+  };
 }
 
 function buildCreatedRelease() {

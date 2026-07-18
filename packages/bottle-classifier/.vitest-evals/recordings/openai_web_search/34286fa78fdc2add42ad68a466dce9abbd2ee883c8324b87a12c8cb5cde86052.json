@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:00:15.437Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake single malt 50% 2022"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake single malt 50% 2022",
+    "summary": "You’re most likely referring to **Single Malt KOMAGATAKE 2022 Edition** from **Mars Whisky / Hombo Shuzo**, distilled at the **Shinshu Distillery** in Nagano, Japan. It is an **official bottling**, **50% ABV**, in a **700 ml** bottle, and the official product page lists it as **discontinued**. ([hombo.co.jp](https://ww",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/mars-komagatake-2022",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/mars-komagatake-2022",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://dekanta.com/products/komagatake-27-years-single-malt",
+        "url": "https://dekanta.com/products/komagatake-27-years-single-malt",
+        "domain": "dekanta.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://dekanta.com/products/mars-komagatake-limited-edition-2020",
+        "url": "https://dekanta.com/products/mars-komagatake-limited-edition-2020",
+        "domain": "dekanta.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://dekanta.com/products/mars-whisky-komagatake-22-year-old",
+        "url": "https://dekanta.com/products/mars-whisky-komagatake-22-year-old",
+        "domain": "dekanta.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "34286fa78fdc2add42ad68a466dce9abbd2ee883c8324b87a12c8cb5cde86052",
+    "mode": "auto"
+  }
+}

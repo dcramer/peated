@@ -56,43 +56,6 @@ function buildCatalogImageWarning(): CatalogImageWarning {
   };
 }
 
-/** Classifier-proposed image URLs never bypass the pending-upload boundary. */
-function stripUnapprovedCatalogImages(
-  decision: CreateDecision,
-): CreateDecision {
-  if (decision.action === "create_release") {
-    return {
-      ...decision,
-      proposedRelease: {
-        ...decision.proposedRelease,
-        imageUrl: null,
-      },
-    };
-  }
-
-  if (decision.action === "create_bottle_and_release") {
-    return {
-      ...decision,
-      proposedRelease: {
-        ...decision.proposedRelease,
-        imageUrl: null,
-      },
-    };
-  }
-
-  if (decision.action === "repair_parent_and_create_release") {
-    return {
-      ...decision,
-      proposedRelease: {
-        ...decision.proposedRelease,
-        imageUrl: null,
-      },
-    };
-  }
-
-  return decision;
-}
-
 function shouldPromoteCatalogImage({
   result,
   photoSuitability,
@@ -273,18 +236,8 @@ export default procedure
       }
       throw err;
     }
-    const {
-      candidateBottleIds,
-      decision: createDecision,
-      photoSuitability,
-    } = createTokenPayload;
-    let decision = createDecision;
-    if (
-      decision.action !== "create_bottle" &&
-      decision.action !== "create_release" &&
-      decision.action !== "create_bottle_and_release" &&
-      decision.action !== "repair_parent_and_create_release"
-    ) {
+    const { decision, photoSuitability } = createTokenPayload;
+    if (decision.action !== "create_bottle") {
       throw errors.BAD_REQUEST({
         message: "Photo identification result is not a create proposal.",
       });
@@ -295,17 +248,6 @@ export default procedure
           "Photo identification result needs review before creating a bottle.",
       });
     }
-    if (
-      (decision.action === "create_release" ||
-        decision.action === "repair_parent_and_create_release") &&
-      !candidateBottleIds.includes(decision.parentBottleId)
-    ) {
-      throw errors.BAD_REQUEST({
-        message: "Photo identification result is not a valid create proposal.",
-      });
-    }
-    decision = stripUnapprovedCatalogImages(decision);
-
     const authenticatedContext: AuthenticatedContext = {
       ...context,
       user,

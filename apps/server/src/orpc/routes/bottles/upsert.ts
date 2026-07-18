@@ -1,5 +1,6 @@
 import { call, ORPCError } from "@orpc/server";
 import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import { buildConcreteBottleUpdatePatch } from "@peated/server/lib/flatConcreteBottleInput";
 import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -11,7 +12,8 @@ import update from "./update";
 
 /**
  * Translation-only, measured legacy compatibility. All writes delegate to the
- * concrete Bottle routes; OpenSpec tasks 5.9 and 9.7 remove this adapter.
+ * concrete Bottle routes. Task 5.9 removes supported callers; task 9.7 removes
+ * this measured adapter after observed traffic reaches zero.
  */
 export default procedure
   .use(requireMod)
@@ -52,30 +54,7 @@ export default procedure
           update,
           {
             bottle: err.data.bottle,
-            shared: {
-              name: input.name,
-              statedAge: input.statedAge,
-              series: input.series,
-              category: input.category,
-              brand: input.brand,
-              distillers: input.distillers,
-              bottler: input.bottler,
-              flavorProfile: input.flavorProfile,
-            },
-            exact: {
-              edition: input.edition,
-              abv: input.abv,
-              singleCask: input.singleCask,
-              caskStrength: input.caskStrength,
-              vintageYear: input.vintageYear,
-              releaseYear: input.releaseYear,
-              caskSize: input.caskSize,
-              caskType: input.caskType,
-              caskFill: input.caskFill,
-              description: input.description,
-              descriptionSrc: input.descriptionSrc,
-              tastingNotes: input.tastingNotes,
-            },
+            ...buildConcreteBottleUpdatePatch(input),
           },
           { context },
         );

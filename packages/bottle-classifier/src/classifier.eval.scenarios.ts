@@ -11,14 +11,12 @@ export type ClassifierEvalScenario =
   | "new_bottles"
   | "match_existing"
   | "corrections"
-  | "parent_repair_releases"
   | "ignore_or_reject";
 
 export const LIVE_CLASSIFIER_EVAL_SCENARIOS = [
   "new_bottles",
   "match_existing",
   "corrections",
-  "parent_repair_releases",
 ] as const;
 
 export type LiveClassifierEvalScenario =
@@ -69,10 +67,6 @@ function inferDecisionScenario(
 
     if (testCase.expected.action === "match") {
       return "match_existing";
-    }
-
-    if (testCase.expected.action === "repair_parent_and_create_release") {
-      return "parent_repair_releases";
     }
   }
 

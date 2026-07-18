@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:21:42.157Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Mars Komagatake Limited Edition 2022 50% official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Mars Komagatake Limited Edition 2022 50% official",
+    "summary": "**Mars Komagatake Limited Edition 2022 50% Official** refers to **Single Malt KOMAGATAKE 2022 Edition**, an **official bottling** from **Hombo Shuzo / Mars Whisky**. It is a **Japanese single malt** produced at the **Mars Komagatake Distillery** in Miyada, Nagano. ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-",
+    "results": [
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "url": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/2022/new-product/20220905-newproduct-whisky/",
+        "url": "https://www.hombo.co.jp/2022/new-product/20220905-newproduct-whisky/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/new-product/20240325-newproduct-whisky-02/",
+        "url": "https://www.hombo.co.jp/en/2024/new-product/20240325-newproduct-whisky-02/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-tsuniki-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-tsuniki-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "12630997e29a952dabc311a6e26be4bf6e5feb8a333d67a88b1bd0909bb00f99",
+    "mode": "auto"
+  }
+}

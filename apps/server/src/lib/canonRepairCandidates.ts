@@ -1,4 +1,4 @@
-import { hasVariantLegacyReleaseRepairParentName } from "@peated/bottle-classifier/legacyReleaseRepairIdentity";
+import { hasVariantLegacyReleaseFamilyName } from "@peated/bottle-classifier/legacyReleaseIdentityEvidence";
 import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { hasBottleLevelReleaseTraits } from "@peated/bottle-classifier/releaseIdentity";
 import { db } from "@peated/server/db";
@@ -142,7 +142,7 @@ function canCanonRepairPair(
   if (
     hasBottleLevelReleaseTraits(source) ||
     hasBottleLevelReleaseTraits(target) ||
-    !hasVariantLegacyReleaseRepairParentName(source.fullName, target.fullName)
+    !hasVariantLegacyReleaseFamilyName(source.fullName, target.fullName)
   ) {
     return false;
   }

@@ -23,7 +23,8 @@ The package has three distinct contracts:
 
 - `name`
 - optional `url` and `imageUrl`
-- optional current bottle/release ids
+- optional current Bottle id and, during staged compatibility, a retained legacy
+  release id for matching an existing legacy candidate
 - optional trace metadata
 - optional seeded extracted identity or candidates for closed review flows
 
@@ -35,19 +36,13 @@ It returns either `ignored` with a reason, or `classified` with:
 - web/search evidence used for reasoning
 - resolved brand, bottler, and distillery entities
 
-Decision actions are `match`, `repair_bottle`, `create_bottle`,
-`create_release`, `create_bottle_and_release`,
-`repair_parent_and_create_release`, and `no_match`.
-
-During the Bottle/Bottling flattening migration, the release-shaped create
-actions remain classifier and stored-evidence vocabulary only. Application
-persists one independently complete concrete Bottle and exact CatalogTarget:
-`create_release` may use its reviewed parent as trusted group context, while
-`create_bottle_and_release` creates an independent singleton. The legacy
-`repair_parent_and_create_release` action never mutates its parent; it creates
-an independent singleton from the complete proposed Bottle and release facts,
-with the parent id retained only as evidence. None of these application paths
-creates a BottleRelease.
+Decision actions are `match`, `repair_bottle`, `create_bottle`, and `no_match`.
+`create_bottle` proposes one complete observed marketed Bottle: a stable
+expression in `proposedBottle.name` plus every supported exact field, including
+edition, vintage year, release year, exact age, ABV, and cask flags. Canonical
+downstream materialization combines those values without duplicating exact
+markers in the stable name, creates the independently correct Bottle, and
+manages grouping automatically. The classifier never selects a BottleGroup.
 
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
@@ -55,16 +50,16 @@ policy.
 
 ## Correctness Bar
 
-The classifier should first identify the observed bottle family and exact
-release/bottling details, then choose the safest Peated DB outcome for that
-target.
+The classifier should first identify the observed Bottle's stable marketed
+expression and exact structured fields, then choose the safest Peated DB outcome
+for that complete Bottle.
 
 - Treat local Peated search as prior-art evidence: it answers whether the exact
   target already exists and shows nearby modeling patterns. Nearby local rows
   must not erase clear source identity.
-- Match an existing candidate only when it covers the identified bottle and
-  release/bottling identity without unsupported extra identity traits.
-- Create a bottle or release only when reviewed source, label, image,
+- Match an existing candidate only when it covers the complete identified Bottle
+  without conflicting source-stated identity traits.
+- Create a Bottle only when reviewed source, label, image,
   local-catalog, or web evidence supports the missing canonical identity.
   Automatic verification of creation requires corroborating evidence or a
   closed-form deterministic anchor.
@@ -74,11 +69,7 @@ target.
   they should not block a clear match or create outcome.
 - Use repair actions only when a stored field conflict makes the selected target
   identity unsafe.
-- The legacy `repair_parent_and_create_release` output may describe source
-  evidence that disagrees with a candidate parent, but application must not
-  mutate that parent. It creates an independent concrete Bottle for review and
-  later grouping.
-- Return `no_match` only when the bottle/release identity is unresolved or when
+- Return `no_match` only when the Bottle identity is unresolved or when
   creating would invent an ambiguous hybrid.
 
 False positive existing-bottle matches are worse than `no_match` or reviewed
@@ -90,12 +81,12 @@ evidence bars:
 - Local identification may stop at an existing match when local evidence is
   sufficient for the requested workflow. It must return `no_match` when the
   local evidence is ambiguous, incomplete, or requires canonical interpretation.
-- Full classification is required when the caller wants a create, repair,
-  release, parent-repair, or other canonical DB outcome.
+- Full classification is required when the caller wants a create, repair, or
+  other canonical DB outcome.
 - Web evidence is not required for every existing local match. It is one way to
-  corroborate missing canonical identity, but creation and release outcomes may
-  also be supported by reviewed label/image evidence, closed-form deterministic
-  anchors, or explicit local parent/sibling evidence where policy allows them.
+  corroborate missing canonical identity, but complete-Bottle creation may also
+  be supported by reviewed label/image evidence, closed-form deterministic
+  anchors, or explicit local sibling evidence where policy allows it.
 - Manual-search consumers should treat `no_match` as unresolved identity, not as
   a generic fallback for clear identities that happen to expose catalog repair
   or enrichment work.
@@ -108,7 +99,8 @@ The pipeline is:
 
 1. Extract structured identity from image or text.
 2. Ignore obvious non-whisky and non-single-bottle rows.
-3. Retrieve local bottle/release candidates.
+3. Retrieve local Bottle candidates and any retained legacy release candidates
+   exposed solely for staged existing-match compatibility.
 4. Run deterministic resolvers before the agent. Today this is limited to SMWS
    code references.
 5. Resolve local brand, bottler, and distillery entities.
@@ -127,16 +119,16 @@ semantic identity decision the classifier did not make.
 The proposed match-only local identification pipeline is:
 
 1. Accept already-extracted identity and image/text evidence.
-2. Retrieve local bottle/release candidates.
+2. Retrieve local Bottle candidates.
 3. Return a strict deterministic match only for an unambiguous literal stored
    alias or other closed-form local id assertion.
 4. Otherwise run a local-identification agent with local bottle search tools
    only.
-5. Return `match` only when an existing bottle or release safely covers the
+5. Return `match` only when an existing Bottle safely covers the
    marketed identity; otherwise return `no_match`.
 
-Local identification must not use web search, create bottles, create releases,
-repair bottles, repair parents, or normalize a missing bottle into existence.
+Local identification must not use web search, create or repair Bottles, or
+normalize a missing Bottle into existence.
 If the caller needs those outcomes, it should fall through to full
 classification.
 
@@ -159,8 +151,9 @@ Deterministic code is allowed for closed-form behavior:
 Deterministic code is not allowed for whisky-family semantics. Brand prefixes,
 years, batch-like tokens, `single cask`, `barrel`, producer names, domain names,
 retailer wording, vector similarity, text-search rank, fuzzy aliases, and
-comparable-name matches are not enough to choose bottle versus release scope,
-create canonical identity, or bypass agent judgment.
+comparable-name matches are not enough to choose stable-versus-exact field
+placement, create canonical identity, assign a BottleGroup, or bypass agent
+judgment.
 
 Post-agent deterministic review must not turn a classifier `match` into
 `no_match` merely because code cannot prove the match from local text, fuzzy
@@ -170,9 +163,10 @@ automation tier, but only binary invalid state or direct extracted-field
 conflict may erase the agent's semantic match.
 
 A literal stored alias shortcut is allowed only when the normalized input
-matches a non-ignored stored alias attached to exactly one bottle or release. If
-there are multiple targets, fuzzy/comparable-only matches, release-parent
-ambiguity, or any required whisky interpretation, fall through to the agent.
+matches a non-ignored stored alias attached to exactly one Bottle or one
+explicit retained legacy release candidate. If there are multiple targets,
+fuzzy/comparable-only matches, legacy candidate ambiguity, or any required
+whisky interpretation, fall through to the agent.
 
 If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
@@ -211,8 +205,8 @@ Deterministic SMWS code must not:
 - generalize SMWS cask-code behavior to non-SMWS single-cask, barrel, batch, or
   private-selection labels
 - use brand-prefix, retailer-title, or fuzzy-name similarity to prove a match
-- create a release split solely because a cask code, subtitle, age, ABV, or year
-  appears on the label
+- assign a BottleGroup or remove exact Bottle fields solely because a cask code,
+  subtitle, age, ABV, or year appears on the label
 
 Outside this exception, single-cask and bottling identity remains model-led and
 evidence-reviewed. Code may preserve exact observations and block impossible
@@ -251,7 +245,7 @@ there against this boundary:
 Use the agent for:
 
 - source interpretation and reliability
-- bottle versus release placement
+- stable proposed expression versus structured exact-Bottle fields
 - source fact versus canonical identity
 - over-specific candidate detection
 - supportive, weak, conflicting, or unnecessary web-evidence judgment
@@ -282,7 +276,8 @@ evidence by itself.
 The full classifier agent has read-only tools for local candidates, local
 entities, and live web evidence:
 
-- `search_bottles`: local Peated bottle and release candidates
+- `search_bottles`: local Peated Bottle candidates plus explicit retained legacy
+  release candidates available only for staged existing-match compatibility
 - `search_entities`: local Peated brand, distillery, and bottler entities
 - `firecrawl_web_search`: configured default live web evidence search with
   scraped page excerpts
@@ -302,19 +297,20 @@ new canonical identity.
 
 ## Identity Scope
 
-`identityScope = product` is the default stable bottle-family identity.
+`identityScope = product` is the default complete marketed Bottle identity.
 
 Use `identityScope = exact_cask` only when the exact cask is the marketed bottle
 identity. SMWS code references qualify because the code is the bottle identity
 anchor. Generic cask or barrel wording does not qualify without reliable evidence
 that the product is marketed as that exact single-cask identity.
 
-Exact-cask identity does not create child releases.
+Exact-cask identity remains one independently complete Bottle; BottleGroup
+assignment is automatic downstream.
 
 ## Evals
 
-Classifier evals should score final action, ids, create drafts, release scope,
-required fields, and incorrect fields. There is no numeric confidence to
+Classifier evals should score final action, ids, create drafts, identity scope,
+required exact-Bottle fields, and incorrect fields. There is no numeric confidence to
 calibrate; instead evals assert the code-derived automation tier
 (`expectedTier: auto | review`) computed deterministically from the decision by
 `deriveAutomationTier`, and that derivation is covered by unit tests rather than

@@ -12,7 +12,6 @@ export const PhotoIdentificationCreateTokenPayloadSchema = z
     pendingImageId: z.string().trim().min(1),
     decision: BottleClassificationDecisionSchema,
     photoSuitability: ImagePhotoSuitabilitySchema,
-    candidateBottleIds: z.array(z.number().int().positive()),
     iat: z.number().optional(),
     exp: z.number().optional(),
   })

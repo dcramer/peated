@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import {
-  canUseManualBottleCreate,
   createIdempotencyKey,
   getCreateBottlePrefill,
   getCreateDecision,
@@ -362,9 +361,7 @@ export default function BottleResolver({
   const searchHref = searchHrefForQuery(searchSeed, photoResult?.pendingImage);
   const createBottlePrefill = getCreateBottlePrefill(photoResult);
   const createBottleHref =
-    photoResult &&
-    createBottleHrefForResult &&
-    canUseManualBottleCreate(photoResult)
+    photoResult && createBottleHrefForResult
       ? createBottleHrefForResult(
           getCreateNameSeed(photoResult),
           createBottlePrefill,

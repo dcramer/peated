@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:21:17.894Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1% cask 1661 312 bottles"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Exclusive Malts Islay 2007 8 year old 57.1% cask 1661 312 bottles",
+    "summary": "I found **partial confirmation**, but **not enough to fully verify** the exact bottle as stated.\n\n**What I could confirm**\n- **Bottler:** **Creative Whisky Company (CWC)**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/175742/isle-of-islay-2007-cwc))\n- **Series:** **The Exclusive Malts**. ([whiskybase.co",
+    "results": [
+      {
+        "title": "Isle of Islay 2007 CWC - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/175742/isle-of-islay-2007-cwc",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "url": "https://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-8.html",
+        "domain": "divingforpearlsblog.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/87590",
+        "url": "https://www.whiskybase.com/market/whisky/87590",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/Scotch/comments/jvzhbp",
+        "url": "https://www.reddit.com/r/Scotch/comments/jvzhbp",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thecasks.com/2015/08/18/the-exclusive-malts-2007-balmenach-8-year-old-port-pipe-matured-review/",
+        "url": "https://thecasks.com/2015/08/18/the-exclusive-malts-2007-balmenach-8-year-old-port-pipe-matured-review/",
+        "domain": "thecasks.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "url": "https://www.firstclassspirits.com/webshop/winkel-op-smaak-profiel/kruidig/the-creative-whisky-company-islay-8-years-old-2007-exclusive-malts-2/",
+        "domain": "firstclassspirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8d5116b06b978adea12d2027a975815a0d3d551db58d2406bc93ef0c3656b3c3",
+    "mode": "auto"
+  }
+}

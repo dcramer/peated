@@ -12,6 +12,7 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { buildClassifierConcreteBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import {
   ConcreteBottleCreateInputSchema,
@@ -20,6 +21,7 @@ import {
   createConcreteBottleInTransaction,
 } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
+import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq, isNull } from "drizzle-orm";
 import pg from "pg";
@@ -182,6 +184,60 @@ describe("concrete Bottle creation", () => {
       actorId: result.bottle.createdByActorId,
       displayName: result.bottle.fullName,
       type: "add",
+    });
+  });
+
+  test("preserves classifier exact age through singleton creation and shared rematerialization", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({
+      name: "Classifier Exact Age Brand",
+      type: ["brand"],
+    });
+    const input = buildClassifierConcreteBottleInput({
+      name: "Speyside 12-year-old",
+      series: null,
+      category: "single_malt",
+      edition: null,
+      statedAge: 12,
+      caskStrength: null,
+      singleCask: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      brand: { id: brand.id, name: brand.name },
+      distillers: [],
+      bottler: null,
+    });
+
+    const created = await createConcreteBottle({
+      context: contextFor(mod),
+      creationSource: "bottle_classifier",
+      input,
+    });
+
+    expect(created.group).toMatchObject({
+      name: "Speyside 12-year-old",
+      statedAge: null,
+    });
+    expect(created.bottle).toMatchObject({
+      name: "Speyside 12-year-old",
+      fullName: "Classifier Exact Age Brand Speyside 12-year-old",
+      statedAge: 12,
+    });
+
+    const rematerialized = await updateConcreteBottle({
+      bottleId: created.bottle.id,
+      input: { shared: { statedAge: 15 } },
+      context: contextFor(mod),
+    });
+
+    expect(rematerialized.group.statedAge).toBe(15);
+    expect(rematerialized.bottle).toMatchObject({
+      name: "Speyside 12-year-old",
+      fullName: "Classifier Exact Age Brand Speyside 12-year-old",
+      statedAge: 12,
     });
   });
 
@@ -449,7 +505,7 @@ describe("concrete Bottle creation", () => {
     }
   });
 
-  test("keeps an age stated by the stable name on the group", async ({
+  test("normalizes age wording without inferring structured age ownership", async ({
     defaults,
     fixtures,
   }) => {
@@ -465,11 +521,11 @@ describe("concrete Bottle creation", () => {
 
     expect(result.group).toMatchObject({
       name: "Old Malt 12-year-old",
-      statedAge: 12,
+      statedAge: null,
     });
     expect(result.bottle).toMatchObject({
       name: "Old Malt 12-year-old",
-      statedAge: 12,
+      statedAge: null,
     });
   });
 
@@ -935,6 +991,7 @@ describe("concrete Bottle creation", () => {
       new BottleAlreadyExistsError(existing.id, {
         kind: "smws_code",
         attemptedCanonicalFullName: null,
+        attemptedSmwsCode: "35.331",
       }),
     );
   });

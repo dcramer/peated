@@ -2,7 +2,11 @@ import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import { bottles, reviews } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { assignBottleAlias } from "@peated/server/lib/bottleAliases";
+import {
+  assignBottleAliasInTransaction,
+  finalizeBottleAliasAssignment,
+  StaleBottleAliasReviewIdentityError,
+} from "@peated/server/lib/bottleAliases";
 import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { and, eq, ne } from "drizzle-orm";
 
@@ -19,7 +23,8 @@ export type FixBadReviewEntitiesResult = {
  *
  * This stays intentionally conservative: it never rewrites or deletes the
  * current bottle record. It only reassigns the review when an exact alias or
- * reviewed classifier result returns a concrete replacement target.
+ * reviewed classifier result returns replacement identity, including the
+ * explicit staged targetless states retained for migration.
  */
 export async function fixBadReviewEntities({
   user,
@@ -67,7 +72,8 @@ export async function fixBadReviewEntities({
       user,
     });
 
-    if (!resolution.bottleId) {
+    const resolvedIdentity = resolution.assignment?.consumerIdentity ?? null;
+    if (!resolvedIdentity?.bottleId) {
       if (resolution.error) {
         summary.errored += 1;
         continue;
@@ -77,68 +83,58 @@ export async function fixBadReviewEntities({
       continue;
     }
 
-    const targetBottleId = resolution.bottleId;
-    const targetReleaseId = resolution.releaseId;
+    const targetBottleId = resolvedIdentity.bottleId;
+    const targetReleaseId = resolvedIdentity.releaseId;
     const isSameTarget =
       targetBottleId === review.bottleId &&
-      targetReleaseId === review.releaseId;
+      targetReleaseId === review.releaseId &&
+      (resolution.assignment?.kind === "target"
+        ? resolution.assignment.target.targetId
+        : null) === review.targetId;
+
+    try {
+      const aliasAssignment = await db.transaction(async (tx) => {
+        const assignment = resolution.assignment;
+        if (!assignment) {
+          throw new Error("Bottle resolution returned no assignment.");
+        }
+        const aliasInput = {
+          name: review.name,
+          assignmentSource:
+            resolution.source === "exact_alias"
+              ? undefined
+              : ("classifier_approved" as const),
+          assignedByActorId: actor.id,
+          expectedReview: review,
+        };
+        return assignment.kind === "target"
+          ? await assignBottleAliasInTransaction(tx, {
+              ...assignment,
+              ...aliasInput,
+            })
+          : await assignBottleAliasInTransaction(tx, {
+              ...assignment,
+              context: {
+                caller: "fixBadReviewEntities",
+                operation: "assignReviewAlias",
+              },
+              ...aliasInput,
+            });
+      });
+      await finalizeBottleAliasAssignment(aliasAssignment);
+    } catch (error) {
+      if (error instanceof StaleBottleAliasReviewIdentityError) {
+        summary.unchanged += 1;
+        continue;
+      }
+      throw error;
+    }
 
     if (isSameTarget) {
-      if (resolution.source !== "exact_alias") {
-        await assignBottleAlias({
-          bottleId: targetBottleId,
-          releaseId: targetReleaseId,
-          name: review.name,
-          assignmentSource: "classifier_approved",
-          assignedByActorId: actor.id,
-          context: {
-            caller: "fixBadReviewEntities",
-            operation: "assignReviewAlias",
-          },
-        });
-      } else {
-        await assignBottleAlias({
-          bottleId: targetBottleId,
-          releaseId: targetReleaseId,
-          name: review.name,
-          assignedByActorId: actor.id,
-          context: {
-            caller: "fixBadReviewEntities",
-            operation: "reuseReviewAlias",
-          },
-        });
-      }
-
       summary.unchanged += 1;
-      continue;
-    }
-
-    if (resolution.source !== "exact_alias") {
-      await assignBottleAlias({
-        bottleId: targetBottleId,
-        releaseId: targetReleaseId,
-        name: review.name,
-        assignmentSource: "classifier_approved",
-        assignedByActorId: actor.id,
-        context: {
-          caller: "fixBadReviewEntities",
-          operation: "assignReviewAlias",
-        },
-      });
     } else {
-      await assignBottleAlias({
-        bottleId: targetBottleId,
-        releaseId: targetReleaseId,
-        name: review.name,
-        assignedByActorId: actor.id,
-        context: {
-          caller: "fixBadReviewEntities",
-          operation: "reuseReviewAlias",
-        },
-      });
+      summary.reassigned += 1;
     }
-
-    summary.reassigned += 1;
   }
 
   return summary;

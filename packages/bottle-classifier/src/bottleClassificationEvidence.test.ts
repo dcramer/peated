@@ -531,6 +531,40 @@ describe("bottleClassificationEvidence", () => {
     ).toEqual([]);
   });
 
+  test("treats a partial marketed edition marker as an existing-match conflict", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 43397,
+      fullName: "High West A Midwinter Night's Dram Act 12",
+      brand: "High West",
+      category: "rye",
+      edition: "Act 12",
+      abv: 49.3,
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName:
+          "High West A Midwinter Night's Dram Act 12 Scene 9 49.3% ABV",
+        extractedLabel: {
+          brand: "High West",
+          bottler: null,
+          expression: "A Midwinter Night's Dram",
+          series: "A Midwinter Night's Dram",
+          distillery: [],
+          category: "rye",
+          stated_age: null,
+          abv: 49.3,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: "Act 12 Scene 9",
+        },
+        targetCandidate,
+      }),
+    ).toContain("edition");
+  });
+
   test("does not treat the legacy generic spirit category as a hard existing-match conflict", () => {
     expect(
       getExistingMatchIdentityConflicts({

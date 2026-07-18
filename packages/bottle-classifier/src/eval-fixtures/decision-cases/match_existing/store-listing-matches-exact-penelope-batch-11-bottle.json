@@ -1,0 +1,78 @@
+{
+  "id": "store-listing-matches-exact-penelope-batch-11-bottle",
+  "name": "store listing: matches the exact Penelope Batch 11 Bottle",
+  "input": {
+    "reference": {
+      "name": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+      "url": "https://shop.example/products/penelope-batch-11"
+    },
+    "extractedIdentity": {
+      "brand": "Penelope",
+      "bottler": null,
+      "expression": "Bourbon Barrel Strength Straight Bourbon Whiskey",
+      "series": null,
+      "distillery": [],
+      "category": "bourbon",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Batch 11"
+    },
+    "initialCandidates": [
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey Batch 11",
+        "bottleFullName": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)",
+        "brand": "Penelope",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["exact"],
+        "bottleId": 54069,
+        "fullName": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey (Batch 11)"
+      },
+      {
+        "kind": "bottle",
+        "releaseId": null,
+        "alias": null,
+        "bottleFullName": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey",
+        "brand": "Penelope",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "bourbon",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.89,
+        "source": ["text"],
+        "bottleId": 54068,
+        "fullName": "Penelope Bourbon Barrel Strength Straight Bourbon Whiskey"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 54069,
+    "summary": "Match the independently complete Penelope Bourbon Barrel Strength Batch 11 Bottle instead of the broader non-batch Bottle."
+  }
+}

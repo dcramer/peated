@@ -421,172 +421,6 @@ describe("POST /reviews", () => {
     expect(duplicateBrand).toBeUndefined();
   });
 
-  test("new review creates a concrete Bottle in the classifier-selected group", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "Distillers Edition",
-      vintageYear: null,
-      releaseYear: null,
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification(
-        {
-          action: "create_release",
-          parentBottleId: bottle.id,
-          identityScope: "product",
-          observation: {
-            selector: "2011 release label",
-            caskNumber: null,
-            barrelNumber: null,
-            bottleNumber: null,
-            outturn: null,
-            market: null,
-            exclusive: null,
-          },
-          identityBasis: {
-            bottleTraits: ["brand", "expression"],
-            releaseTraits: ["edition"],
-            observationTraits: ["label selector"],
-            yearInterpretation: "none",
-            siblingEvidence: "single_known_release",
-            uncertainties: [],
-          },
-          confidenceBasis: {
-            positiveEvidence: ["classifier-selected parent"],
-            unresolvedRisks: [],
-            toolsUsed: ["initial_local_candidates"],
-            webEvidence: "not_used",
-          },
-          proposedRelease: {
-            edition: "2011 Release",
-            statedAge: null,
-            abv: null,
-            caskStrength: null,
-            singleCask: null,
-            vintageYear: null,
-            releaseYear: null,
-            caskType: null,
-            caskSize: null,
-            caskFill: null,
-            description: null,
-            tastingNotes: null,
-            imageUrl: null,
-          },
-        },
-        {
-          candidates: [
-            {
-              bottleId: bottle.id,
-              releaseId: null,
-              fullName: bottle.fullName,
-              bottleFullName: bottle.fullName,
-              alias: bottle.fullName,
-              brand: null,
-              bottler: null,
-              series: null,
-              distillery: [],
-              category: bottle.category,
-              statedAge: bottle.statedAge,
-              edition: null,
-              caskStrength: bottle.caskStrength,
-              singleCask: bottle.singleCask,
-              abv: bottle.abv,
-              vintageYear: bottle.vintageYear,
-              releaseYear: bottle.releaseYear,
-              caskType: bottle.caskType,
-              caskSize: bottle.caskSize,
-              caskFill: bottle.caskFill,
-            },
-          ],
-        },
-      ),
-    );
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: `${bottle.fullName} 2011 Release`,
-        issue: "Default",
-        rating: 89,
-        url: "https://example.com",
-        category: bottle.category,
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    const createdBottle = await db.query.bottles.findFirst({
-      where: (table, { eq }) => eq(table.id, review!.bottleId as number),
-    });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, createdBottle!.id),
-    });
-
-    expect(createdBottle).toMatchObject({
-      groupId: bottle.groupId,
-      edition: "2011 Release",
-    });
-    expect(createdBottle?.id).not.toEqual(bottle.id);
-    expect(review).toMatchObject({
-      bottleId: createdBottle!.id,
-      releaseId: null,
-      targetId: target!.id,
-    });
-    expect(await db.query.bottleReleases.findMany()).toHaveLength(0);
-
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review!.id),
-      ),
-    });
-    expect(decisionLog).toMatchObject({
-      decision: "create_bottle",
-      bottleId: createdBottle!.id,
-      releaseId: null,
-      targetId: target!.id,
-      createdBottle: true,
-      createdRelease: false,
-      metadata: expect.objectContaining({
-        classifierEvidence: {
-          action: "create_release",
-          parentBottleId: bottle.id,
-          identityScope: "product",
-          observation: {
-            selector: "2011 release label",
-            caskNumber: null,
-            barrelNumber: null,
-            bottleNumber: null,
-            outturn: null,
-            market: null,
-            exclusive: null,
-          },
-          identityBasis: {
-            bottleTraits: ["brand", "expression"],
-            releaseTraits: ["edition"],
-            observationTraits: ["label selector"],
-            yearInterpretation: "none",
-            siblingEvidence: "single_known_release",
-            uncertainties: [],
-          },
-          confidenceBasis: {
-            positiveEvidence: ["classifier-selected parent"],
-            unresolvedRisks: [],
-            toolsUsed: ["initial_local_candidates"],
-            webEvidence: "not_used",
-          },
-        },
-        resolutionSource: "classifier_create_release",
-      }),
-    });
-  });
-
   test("new review with existing bottle", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const bottle = await fixtures.Bottle({
@@ -728,7 +562,7 @@ describe("POST /reviews", () => {
     expect(review?.targetId).not.toEqual(exactTarget?.id);
   });
 
-  test("known classifier matches with invalid legacy targets fail without writes", async ({
+  test("known classifier matches preserve explicitly staged unpromoted identity", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -750,31 +584,114 @@ describe("POST /reviews", () => {
       ),
     );
 
-    const error = await waitError(() =>
-      routerClient.reviews.create(
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: reviewName,
+        issue: "Default",
+        rating: 89,
+        url: reviewUrl,
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
+    );
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, data.id),
+      }),
+    ).toMatchObject({
+      targetId: null,
+      bottleId: bottle.id,
+      releaseId: release.id,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      }),
+    ).toMatchObject({
+      targetId: null,
+      bottleId: bottle.id,
+      releaseId: release.id,
+    });
+  });
+
+  test("grouping drift invalidates a staged targetless match before Review mutation", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const parent = await fixtures.LegacyBottle({
+      name: "Concurrent Staged Review Parent",
+    });
+    const groupedBottle = await fixtures.Bottle({
+      name: "Concurrent Staged Review Group Member",
+    });
+    const adminUser = await fixtures.User({ admin: true });
+    const reviewName = "Concurrent Staged Review Match";
+    const reviewUrl = "https://example.com/concurrent-staged-review";
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: parent.id,
+          matchedReleaseId: null,
+          candidateBottleIds: [parent.id],
+        },
+        { candidates: [{ bottleId: parent.id, releaseId: null }] },
+      ),
+    );
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `UPDATE "bottle" SET "group_id" = $1 WHERE "id" = $2`,
+        [groupedBottle.groupId, parent.id],
+      );
+      await client.query(
+        `INSERT INTO "catalog_target" ("bottle_group_id", "bottle_id") VALUES ($1, $2)`,
+        [groupedBottle.groupId, parent.id],
+      );
+
+      creation = routerClient.reviews.create(
         {
           site: site.type,
           name: reviewName,
           issue: "Default",
           rating: 89,
           url: reviewUrl,
-          category: bottle.category,
+          category: parent.category,
         },
         { context: { user: adminUser } },
-      ),
-    );
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
 
-    expect(String(error)).toContain("completed promotion mapping");
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.url, reviewUrl),
-      }),
-    ).toBeUndefined();
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
-      }),
-    ).toBeUndefined();
+      const error = await waitError(creation);
+      expect(String(error)).toContain("changed before targetless use");
+      expect(
+        await db.query.reviews.findFirst({
+          where: eq(reviews.url, reviewUrl),
+        }),
+      ).toBeUndefined();
+      expect(
+        await db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+        }),
+      ).toBeUndefined();
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
   });
 
   test("unresolved conflict preserves an existing durable identity tuple", async ({
@@ -1212,15 +1129,15 @@ describe("POST /reviews", () => {
     }
   });
 
-  test("preselected classifier conflict preserves durable identity without contradictory evidence", async ({
+  test("preselected classifier conflict preserves durable Review identity without contradictory evidence", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const durableBottle = await fixtures.Bottle({
       name: "Preselected Classifier Durable Bottle",
     });
-    const incomingParent = await fixtures.Bottle({
-      name: "Preselected Classifier Incoming Parent",
+    const incomingBrand = await fixtures.Entity({
+      name: "Preselected Classifier Incoming Brand",
     });
     const existingReview = await fixtures.Review({
       externalSiteId: site.id,
@@ -1229,15 +1146,17 @@ describe("POST /reviews", () => {
       url: "https://example.com/preselected-classifier-review",
     });
     const adminUser = await fixtures.User({ admin: true });
-    const reviewName = `${incomingParent.fullName} Rejected Release`;
+    const reviewName = `${incomingBrand.name} Rejected Bottle`;
 
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
-          action: "create_release",
-          parentBottleId: incomingParent.id,
-          proposedRelease: {
-            edition: "Rejected Release",
+          action: "create_bottle",
+          proposedBottle: {
+            name: "Rejected Bottle",
+            series: null,
+            category: "single_malt",
+            edition: null,
             statedAge: null,
             abv: null,
             caskStrength: null,
@@ -1247,19 +1166,12 @@ describe("POST /reviews", () => {
             caskType: null,
             caskSize: null,
             caskFill: null,
-            description: null,
-            tastingNotes: null,
-            imageUrl: null,
+            brand: { id: incomingBrand.id, name: incomingBrand.name },
+            distillers: [],
+            bottler: null,
           },
         },
-        {
-          candidates: [
-            {
-              bottleId: incomingParent.id,
-              releaseId: null,
-            },
-          ],
-        },
+        { candidates: [] },
       ),
     );
 
@@ -1270,7 +1182,7 @@ describe("POST /reviews", () => {
         issue: existingReview.issue,
         rating: 97,
         url: existingReview.url,
-        category: incomingParent.category,
+        category: "single_malt",
       },
       { context: { user: adminUser } },
     );
@@ -1290,7 +1202,11 @@ describe("POST /reviews", () => {
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
       }),
-    ).toBeUndefined();
+    ).toMatchObject({
+      bottleId: expect.any(Number),
+      releaseId: null,
+      targetId: expect.any(Number),
+    });
     expect(
       await db.query.incomingBottleDecisionLogs.findFirst({
         where: and(
