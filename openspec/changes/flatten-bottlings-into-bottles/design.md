@@ -285,15 +285,89 @@ Bottle merges may make multiple mappings converge on the surviving Bottle.
 
 Generated Drizzle migrations add BottleGroup, Bottle membership, catalog targets, mapping/tombstone data, and nullable target references before changing existing data. Application backfill code, rather than hand-authored migration SQL, performs resumable batches and records an auditable mapping from every legacy release id to its promoted Bottle id.
 
+The core promotion service scans legacy parents by ascending-id keyset pages and
+processes one complete parent family per bounded transaction. It locks the
+parent, its releases in ascending id order, and any existing promotion mappings
+before mutation. Checkpoint persistence, command-level progress, dry-run
+reporting, and production revision evidence remain task 6.11; the core service
+returns a cursor-ready result but does not begin consumer backfill or perform
+production access.
+
+The legacy parent's nullable `groupId` is the durable staging link to the
+migration-created group. For a parent with no releases, that row becomes the
+complete concrete Bottle, receives its exact target, and becomes the group
+representative without changing its id. For a parent with releases, the parent
+row is not reclassified as an exact marketed Bottle and receives no invented
+exact target. It temporarily retains `groupId` only so measured legacy generic
+resolution and later parent retirement can find the group; promoted Bottles
+are the complete active exact members. This staged legacy meaning is private to
+migration and compatibility code and does not make a parent or group id manual
+creation authority.
+
+Each release promotion uses this precedence:
+
+- group identity and every durable common Bottle value come from the legacy
+  parent: shared name basis, brand, bottler, distillers, category, series,
+  flavor profile, and stable stated age;
+- the release owns its marketed `name`/`fullName`, edition, release and vintage
+  years, ABV, single-cask and cask-strength flags, cask size/type/fill, and a
+  non-null release stated age override;
+- release-owned exact editorial/content values win when present; otherwise the
+  applicable parent content is copied into the promoted Bottle as durable data,
+  never inherited by hydrating BottleGroup at read time;
+- the promoted Bottle preserves the legacy release creator and timestamps,
+  while the group preserves parent creation provenance; missing required
+  provenance is a blocking condition rather than permission to use the batch
+  actor;
+- joins and content that are common or parent-owned are copied to every
+  promoted Bottle as required by the ownership matrix;
+- the core promotion claims the promoted Bottle's required canonical exact
+  alias for its exact target in the same parent-family transaction. That claim
+  uses the canonical alias reservation boundary and its database uniqueness,
+  without synchronizing alias consumers. Re-homing every other legacy parent
+  or release alias and every observation is the separate task 6.5b,
+  coordinated with tasks 6.7 and 6.10.
+
+The transaction chooses the Bottle promoted from the lowest legacy release id
+as representative. The choice is deterministic presentation only and never
+substitutes that Bottle for generic activity.
+
+A release mapping becomes `promoted` only after the complete Bottle, exact
+target, durable fields, required joins, and required canonical exact alias
+exist. The alias is claimed for that exact target before mapping completion, so
+a concurrent canonical identity claim either serializes through the same unique
+alias row or rolls back the complete parent family. A rerun may reuse a
+completed mapping only after validating that the legacy release still belongs
+to the locked parent and that the mapped Bottle, parent group, exact target,
+canonical alias, planned canonical identity, and complete materialization
+agree. Missing or inconsistent mapped state stops with parent/release context;
+it is not silently repaired or duplicated. Earlier parent transactions remain
+safely committed when a later parent stops.
+
+Before its first write, the parent-family transaction preflights the complete
+planned canonical Bottle names and required canonical alias claims plus
+ambiguous release-like parent fields. It enumerates every canonical Bottle and
+alias row matching each planned identity; it never selects one arbitrary match
+and ignores the rest. Except for the Bottle proven to belong to the same
+structurally identical completed mapping on rerun, any conflicting match or
+unresolved ownership decision rolls back or prevents every write for that
+parent family. The service never suffixes, overwrites, drops, chooses a
+different Bottle, or records a completed mapping for a partial promotion. Task
+6.6 is therefore complete only when this mutation-path preflight and the
+concurrency-safe alias claim exist and are validated; the earlier read-only
+inventory is necessary evidence but is not the write gate itself. Broader
+legacy alias and observation classification remains task 6.5b rather than
+expanding this core slice into consumer backfill.
+
 Backfill rules are deterministic:
 
 1. Create one BottleGroup from every legacy parent Bottle's stable identity.
 2. A parent with no releases remains the concrete Bottle, preserving its id, and joins its singleton group.
-3. For a parent with releases, create one concrete Bottle per release by combining stable parent identity with release-owned fields. Assign all promoted Bottles to the parent's group.
+3. For a parent with releases, create one independently complete concrete Bottle per release by applying the parent/release precedence contract. Assign all promoted Bottles to the parent's group and select the lowest-release-id promotion as representative.
 4. Map legacy references with a non-null `releaseId` to the promoted Bottle's exact target.
 5. Map legacy references with a null `releaseId` under a parent that has releases to the group's generic target.
 6. Map legacy references with a null `releaseId` under a parent with no releases to the retained Bottle's exact target.
-7. Parent-only aliases under a parent with releases become group aliases; release aliases become exact Bottle aliases.
+7. The core transaction first claims each promoted Bottle's required canonical exact alias. In the coordinated alias/observation phase, every remaining parent-only alias under a parent with releases becomes a group alias and every remaining release alias becomes an exact Bottle alias after the core mappings and targets are complete.
 8. Parent rows replaced by promoted Bottles are retired only after every foreign key has moved. Old parent and nested release URLs resolve through target mappings and tombstones.
 
 The production audit is a deployment-phase freshness gate, not a prerequisite

@@ -75,6 +75,7 @@ export class InvalidExactBottleAliasTargetError extends Error {
 export type ExactBottleAliasConflictCode =
   | "another_bottle"
   | "another_exact_target"
+  | "canonical_metadata"
   | "generic_target"
   | "legacy_release";
 
@@ -83,7 +84,13 @@ export class ExactBottleAliasConflictError extends Error {
     readonly code: ExactBottleAliasConflictCode,
     readonly alias: Pick<
       BottleAlias,
-      "name" | "bottleId" | "releaseId" | "targetId"
+      | "name"
+      | "bottleId"
+      | "releaseId"
+      | "targetId"
+      | "ignored"
+      | "assignmentSource"
+      | "assignedByActorId"
     >,
     readonly conflictingBottleId: number | null,
   ) {
@@ -669,6 +676,56 @@ export async function reserveLiteralCanonicalBottleAliasInTransaction(
     ...input,
     name: input.name.trim(),
   });
+}
+
+export type LegacyPromotionCanonicalAliasInput = {
+  name: string;
+  promotedBottleId: number;
+  targetId: number;
+  legacyBottleId: number;
+  legacyReleaseId: number;
+  assignedByActorId: number;
+};
+
+/** Claims one promoted legacy release's canonical exact alias without consumers. */
+export async function reserveLegacyPromotionCanonicalAliasInTransaction(
+  tx: AnyTransaction,
+  input: LegacyPromotionCanonicalAliasInput,
+): Promise<{ changed: boolean }> {
+  const literalName = input.name.trim();
+  const result = await claimCatalogTargetAliasNameInTransaction(
+    tx,
+    {
+      name: literalName,
+      bottleId: input.promotedBottleId,
+      targetId: input.targetId,
+      legacyIdentity: {
+        bottleId: input.legacyBottleId,
+        releaseId: input.legacyReleaseId,
+      },
+    },
+    {
+      kind: "reservation",
+      assignmentSource: "canonical",
+      assignedByActorId: input.assignedByActorId,
+    },
+  );
+  if (
+    result.alias.name !== literalName ||
+    result.alias.bottleId !== input.promotedBottleId ||
+    result.alias.releaseId !== null ||
+    result.alias.targetId !== input.targetId ||
+    result.alias.ignored !== false ||
+    result.alias.assignmentSource !== "canonical" ||
+    result.alias.assignedByActorId !== input.assignedByActorId
+  ) {
+    throw new ExactBottleAliasConflictError(
+      "canonical_metadata",
+      result.alias,
+      result.alias.bottleId,
+    );
+  }
+  return { changed: result.changed };
 }
 
 /** Reserves a normalized canonical alias without migrating other references. */

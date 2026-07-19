@@ -34,6 +34,12 @@ grouping operations, never as an ordinary/manual Bottle creation choice.
 
 - **WHEN** multiple BottleReleases under one legacy parent are promoted
 - **THEN** every promoted Bottle belongs to the BottleGroup created from that parent
+- **AND** the Bottle promoted from the lowest legacy release id is selected as
+  representative deterministically
+- **AND** every promoted Bottle claims its required canonical exact alias for
+  its exact target before its release mapping is completed
+- **AND** this migration grouping is internal automation, not a manual parent,
+  release, or group-selection workflow
 
 #### Scenario: Translate a legacy source-bound create
 

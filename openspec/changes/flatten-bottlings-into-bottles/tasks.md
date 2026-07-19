@@ -87,12 +87,13 @@ it must not preserve a parallel business-logic path.
 
 ## 6. Resumable Legacy Backfill
 
-- [ ] 6.1 Implement idempotent batched creation of one BottleGroup and generic target for every legacy parent Bottle.
-- [ ] 6.2 Assign parents with no releases to their singleton groups and create their exact targets without changing existing Bottle ids.
-- [ ] 6.3 Promote each legacy BottleRelease into a new concrete Bottle by combining stable parent fields with release-owned fields.
-- [ ] 6.4 Persist release-to-Bottle mappings before migrating dependents and make reruns reuse completed promotions.
-- [ ] 6.5 Copy or re-home distillers, series, tags, flavor profiles, descriptions, images, suggested tags, creators, aliases, and observations according to the ownership matrix, leaving every promoted Bottle with a complete durable exact record.
-- [ ] 6.6 Stop and report rather than invent data when promoted names/aliases collide or parent release-like fields remain ambiguous.
+- [x] 6.1 Implement an idempotent keyset-batched service that processes one locked legacy parent family per bounded transaction, creates or validates exactly one BottleGroup and generic target, and records the group's id on the staged legacy parent without exposing grouping as manual authority.
+- [x] 6.2 Within that parent-family transaction, retain a parent with no releases as the independently complete Bottle, assign it to its singleton group, create or validate its exact target, select it as representative, and preserve its Bottle id.
+- [x] 6.3 Within that parent-family transaction, promote every legacy BottleRelease into an independently complete concrete Bottle using the deterministic parent/release precedence contract, assign all promoted Bottles to the parent's migration-created group, and select the Bottle promoted from the lowest legacy release id as representative.
+- [x] 6.4 Persist a completed release-to-Bottle mapping only after its promoted Bottle, durable exact fields, joins, exact target, and required canonical exact alias are complete; claim that alias atomically for the exact target before mapping completion; on rerun, validate and reuse a structurally identical completed promotion and stop on a missing or inconsistent mapped graph before any dependent migration.
+- [x] 6.5a Materialize every promoted Bottle's stable and exact fields, creator/timestamps, distillers, series, tags, flavor profile, descriptions, images, tasting notes, suggested tags, and required canonical exact alias according to the ownership and precedence matrix so exact reads never require BottleGroup hydration.
+- [ ] 6.5b Re-home every remaining legacy parent/release alias and observation to the already-created generic or exact targets in coordination with consumer backfill task 6.7 and alias-target task 6.10, without weakening durable target authority or duplicating alias business logic; the required canonical exact alias claimed by task 6.5a is not repeated here.
+- [x] 6.6 Add the core parent-family preflight and concurrency-safe canonical alias claim: enumerate every canonical Bottle and alias row matching each planned promoted identity, stop and report rather than selecting an arbitrary match, inventing, suffixing, overwriting, or partially promoting when identity collides or parent release-like fields remain ambiguous, and allow only the Bottle proven by the same structurally identical completed mapping on rerun; the earlier read-only audit alone does not complete this task.
 - [ ] 6.7 Backfill non-null legacy release references to the promoted Bottle's exact target across every consumer table.
 - [ ] 6.8 Backfill null-release references under parents with releases to the BottleGroup generic target.
 - [ ] 6.9 Backfill null-release references under parents without releases to the retained Bottle exact target.

@@ -400,6 +400,46 @@ the same transaction that updates names and aliases. Task 9.9 removes runtime
 dependence on group hydration for exact Bottle rendering; it does not remove
 this Bottle materialization.
 
+## Legacy promotion precedence
+
+The Section 6 parent-family transaction applies one deterministic precedence
+contract before a release mapping may become complete:
+
+- BottleGroup identity and the promoted Bottle's durable common fields come
+  from the legacy parent: shared name basis, brand, bottler, distillers,
+  category, series, flavor profile, and stable stated age.
+- The legacy release owns marketed `name` and `fullName`, edition, release and
+  vintage years, ABV, single-cask and cask-strength flags, cask size/type/fill,
+  and a non-null release-specific stated-age override.
+- Release-owned exact description, image, tasting notes, suggested tags, and
+  other exact content win when present. Applicable parent content is copied as
+  a fallback so the promoted Bottle is durably complete; it is never supplied
+  through BottleGroup hydration at read time.
+- The promoted Bottle preserves the release creator and timestamps. The group
+  preserves parent creation provenance. Missing required provenance blocks the
+  family rather than falling back to the migration actor.
+- Parent-owned joins are copied to BottleGroup ownership and to every promoted
+  Bottle wherever complete exact materialization requires them. Release-owned
+  joins remain exact.
+- Each promoted Bottle's canonical `fullName` is also its required canonical
+  exact alias. The core parent-family transaction claims that one alias for the
+  promoted Bottle's exact target through the canonical reservation boundary
+  before marking its release mapping complete. Database alias uniqueness makes
+  that identity claim concurrency-safe without migrating alias consumers.
+- Every other parent-only alias under a parent with releases is stable generic
+  identity, and every other release alias is exact identity. Re-homing those
+  remaining aliases, together with observations, is task 6.5b coordinated with
+  tasks 6.7 and 6.10, after the core promotion graph and mappings exist.
+
+Preflight enumerates every canonical Bottle and alias row matching each planned
+promoted identity. A structurally identical completed mapping may validate its
+own Bottle and canonical alias; the migration never chooses one arbitrary
+matching Bottle while ignoring other matches.
+
+For a parent with releases, `parent.groupId` is only the durable staging link
+used by migration and measured compatibility. It does not make the legacy
+parent a promoted exact Bottle and does not authorize manual group reuse.
+
 ## Versioned runtime contracts
 
 `apps/server/src/schemas/catalogIdentity.ts` owns the v1 BottleGroup, concrete

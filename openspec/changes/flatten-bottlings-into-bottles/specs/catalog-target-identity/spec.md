@@ -735,6 +735,50 @@ The migration SHALL populate target ids from legacy references using release pro
 
 The system SHALL provide idempotent backfill commands and dry-run reports covering every target-bearing table, legacy release mapping, collision, and unresolved identity condition.
 
+#### Scenario: Process a keyset parent batch
+
+- **WHEN** the core promotion service processes legacy parents
+- **THEN** it selects them in ascending-id keyset order
+- **AND** it processes one locked parent family per bounded transaction
+- **AND** it returns cursor-ready progress without beginning consumer backfill
+
+#### Scenario: Promote one parent family atomically
+
+- **WHEN** a legacy parent with releases passes promotion preflight
+- **THEN** one transaction creates or validates its group and generic target,
+  every complete promoted Bottle and exact target, and their completed mappings
+- **AND** the Bottle promoted from the lowest legacy release id becomes the
+  deterministic representative
+- **AND** each promoted Bottle's required canonical exact alias is atomically
+  claimed for its exact target before its mapping becomes complete
+- **AND** no mapping becomes complete before its Bottle is independently
+  correct without BottleGroup hydration
+
+#### Scenario: Reuse a completed promotion
+
+- **WHEN** a rerun encounters a completed release mapping
+- **THEN** it validates the release-parent relationship, mapped Bottle, parent
+  group, exact target, required canonical exact alias, canonical identity, and
+  durable materialization
+- **AND** it reuses a matching graph without creating duplicate records
+- **AND** any missing or inconsistent mapped state stops with parent and release
+  context rather than being silently healed
+
+#### Scenario: Promotion preflight finds a collision
+
+- **WHEN** any canonical Bottle or alias row matching a planned promoted
+  identity conflicts, or release-like parent fields remain ambiguous
+- **THEN** the parent-family transaction performs no partial promotion
+- **AND** it enumerates every matching canonical Bottle and alias row rather
+  than selecting one arbitrary match
+- **AND** only the Bottle proven by the same structurally identical completed
+  mapping may be accepted on rerun
+- **AND** it does not suffix, overwrite, discard, or invent identity
+- **AND** the required canonical exact alias claim uses database uniqueness so a
+  concurrent conflicting claim rolls back the parent family
+- **AND** completion of the earlier read-only audit alone does not satisfy this
+  mutation-path preflight
+
 #### Scenario: Backfill is interrupted
 
 - **WHEN** a target backfill batch stops before completion and is run again
