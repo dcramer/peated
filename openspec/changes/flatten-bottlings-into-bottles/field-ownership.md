@@ -45,6 +45,19 @@ Exact Bottle serializers must not require BottleGroup hydration.
   Canonical concrete creation reserves the Bottle's required canonical exact
   alias; a caller that creates no photo/reference ingestion alias does not
   bypass that identity reservation.
+- Section 6 re-homes remaining legacy aliases and observations in a separate
+  parent-family target-only phase after promotion. The measured legacy-pair
+  assignment resolver is the sole semantic resolver. Each family pair is
+  resolved optimistically, then re-resolved and revalidated after acquiring
+  canonical group, Bottle when exact, and target locks plus its migration
+  evidence locks. The phase includes ignored aliases, preserves alias names,
+  embeddings, ignored state, assignment provenance, timestamps, retained
+  pairs, and all observation source/content/provenance fields, and sets or
+  validates only `targetId`. Task 6.5a's canonical exact alias is excluded from
+  selection and mutation; combined integration evidence proves it remains
+  unchanged. A conflicting nonnull target or descriptor/pair drift rolls back
+  the family; the backfill does not heal it, synchronize alias consumers,
+  index or rename aliases, or backfill the consumers owned by tasks 6.7-6.9.
 - The completed alias cutover requires every new assignment to use one
   validated CatalogTarget. Exact aliases reference the owning Bottle's exact
   target; stable aliases reference the BottleGroup's generic target and never

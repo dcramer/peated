@@ -359,6 +359,40 @@ inventory is necessary evidence but is not the write gate itself. Broader
 legacy alias and observation classification remains task 6.5b rather than
 expanding this core slice into consumer backfill.
 
+Task 6.5b/6.10 is a separate parent-family alias and observation backfill after
+the core promotion graph is complete. The measured legacy-pair assignment
+resolver is its sole semantic resolver: a non-null release requires that
+release's completed promotion and exact target; a null release under a parent
+with releases resolves to the generic group target; and a null release under a
+parent without releases resolves to the retained Bottle's exact target. The
+phase resolves each distinct retained pair optimistically to plan the family,
+then acquires the canonical group, Bottle when exact, and CatalogTarget locks
+plus the applicable parent, release, and promotion-mapping evidence locks. It
+re-resolves and revalidates each pair against that locked state before locking
+the family aliases and observations, then sets or validates only their
+`targetId` values.
+
+Every remaining legacy alias participates, including ignored aliases. Alias
+name, embedding, ignored state, assignment source, assigning actor, creation
+time, and retained `(bottleId, releaseId)` evidence remain unchanged. The
+required canonical exact alias already claimed by task 6.5a is excluded from
+selection and mutation. Its unchanged state is covered by integration evidence
+for the combined promotion and dependent backfill, not independently
+revalidated by this phase.
+Observations likewise preserve their retained pair plus source identity,
+source URL/site, raw and parsed evidence, facts, creator, and timestamps. A
+nonnull target equal to the locked descriptor is a validated rerun; a different
+nonnull target, invalid descriptor, changed pair, or incomplete promotion is a
+family conflict that rolls back instead of being overwritten or healed.
+
+This target-only phase does not invoke canonical alias assignment, propagate
+identity to StorePrices or Reviews, enqueue alias indexing, rename or recreate
+aliases, or backfill any other consumer. Tasks 6.7-6.9 own those consumer
+tables. Task 6.11 owns command/checkpoint/dry-run behavior and must sequence
+this dependent phase after completed core promotion while excluding the
+canonical alias and any other overlap. Production execution remains gated by
+task 6.13; the later cleanup release remains separately gated by task 10.9.
+
 Backfill rules are deterministic:
 
 1. Create one BottleGroup from every legacy parent Bottle's stable identity.
@@ -367,7 +401,12 @@ Backfill rules are deterministic:
 4. Map legacy references with a non-null `releaseId` to the promoted Bottle's exact target.
 5. Map legacy references with a null `releaseId` under a parent that has releases to the group's generic target.
 6. Map legacy references with a null `releaseId` under a parent with no releases to the retained Bottle's exact target.
-7. The core transaction first claims each promoted Bottle's required canonical exact alias. In the coordinated alias/observation phase, every remaining parent-only alias under a parent with releases becomes a group alias and every remaining release alias becomes an exact Bottle alias after the core mappings and targets are complete.
+7. The core transaction first claims each promoted Bottle's required canonical
+   exact alias. The separate alias/observation phase preserves that alias,
+   target-backs every other parent-only alias under a parent with releases with
+   the generic group target, and target-backs every release alias with the
+   promoted Bottle's exact target. It preserves retained pairs and evidence and
+   changes no alias consumer.
 8. Parent rows replaced by promoted Bottles are retired only after every foreign key has moved. Old parent and nested release URLs resolve through target mappings and tombstones.
 
 The production audit is a deployment-phase freshness gate, not a prerequisite

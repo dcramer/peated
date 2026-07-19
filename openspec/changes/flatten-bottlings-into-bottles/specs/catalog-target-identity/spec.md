@@ -731,6 +731,45 @@ The migration SHALL populate target ids from legacy references using release pro
 - **WHEN** a legacy row has a null `releaseId` and its parent has no releases
 - **THEN** it maps to the retained Bottle's exact target
 
+#### Scenario: Target-back legacy aliases and observations
+
+- **WHEN** the separate post-promotion alias and observation phase processes a
+  locked parent family
+- **THEN** the measured legacy-pair assignment resolver is the sole semantic
+  resolver for each distinct retained pair
+- **AND** each pair is first resolved optimistically, then re-resolved and
+  revalidated after the canonical group, Bottle when exact, and target locks
+  plus applicable parent, release, and promotion-mapping evidence locks are
+  acquired
+- **AND** its aliases and observations are locked and changed only after that
+  post-lock resolution agrees
+- **AND** each row has only its null `targetId` set, or its matching nonnull
+  `targetId` validated on rerun
+- **AND** alias retained pairs, names, embeddings, ignored state, assignment
+  provenance, and timestamps remain unchanged
+- **AND** observation retained pairs, source identity, URLs/sites, raw and
+  parsed evidence, facts, creator, and timestamps remain unchanged
+
+#### Scenario: Exclude the canonical promotion alias
+
+- **WHEN** the alias phase selects remaining legacy aliases after promotion
+- **THEN** the required canonical exact alias already claimed by promotion task
+  6.5a is excluded from selection and mutation rather than independently
+  revalidated, reassigned, or recreated by this phase
+- **AND** integration evidence for the combined promotion and dependent
+  backfill proves its state remains unchanged
+- **AND** ignored legacy aliases remain included in the remaining target-only
+  backfill
+
+#### Scenario: Reject target or descriptor drift
+
+- **WHEN** an alias or observation has a different nonnull target, its retained
+  pair changes, its descriptor is invalid, or its promotion is incomplete
+- **THEN** the parent-family alias and observation transaction rolls back
+- **AND** the phase does not overwrite or heal the conflicting state
+- **AND** it does not synchronize alias consumers, enqueue indexing, rename an
+  alias, or backfill another consumer table
+
 ### Requirement: Target migration is auditable and resumable
 
 The system SHALL provide idempotent backfill commands and dry-run reports covering every target-bearing table, legacy release mapping, collision, and unresolved identity condition.

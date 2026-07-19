@@ -41,6 +41,16 @@ grouping operations, never as an ordinary/manual Bottle creation choice.
 - **AND** this migration grouping is internal automation, not a manual parent,
   release, or group-selection workflow
 
+#### Scenario: Preserve generic intent for a split legacy parent alias
+
+- **WHEN** the post-promotion alias phase encounters a parent-only alias under a
+  legacy parent with releases
+- **THEN** the measured legacy resolver assigns the alias to that parent's
+  generic BottleGroup target
+- **AND** it does not substitute the representative or another member Bottle
+- **AND** it preserves the retained legacy pair, ignored state, and assignment
+  provenance
+
 #### Scenario: Translate a legacy source-bound create
 
 - **WHEN** a retained measured compatibility adapter receives a legacy contract

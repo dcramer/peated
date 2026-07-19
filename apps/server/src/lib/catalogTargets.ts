@@ -296,12 +296,15 @@ export async function lockCatalogTargetConsumerAssignmentInTransaction(
 
 /**
  * Locks a descriptor set in the global group, Bottle, then target hierarchy.
- * Sorting each layer prevents set-based writers from deadlocking each other;
- * every supplied descriptor is revalidated after the complete set is locked.
+ * Required additional Bottles join the sorted Bottle layer without becoming
+ * target descriptors. Every descriptor is revalidated after all locks exist.
  */
 export async function lockCatalogTargetAssignmentDescriptorsInTransaction(
   tx: AnyTransaction,
   descriptors: CatalogTargetAssignmentDescriptor[],
+  {
+    requiredAdditionalBottleIds = [],
+  }: { requiredAdditionalBottleIds?: number[] } = {},
 ): Promise<void> {
   const uniqueDescriptors = [
     ...new Map(
@@ -315,11 +318,12 @@ export async function lockCatalogTargetAssignmentDescriptorsInTransaction(
     ...new Set(uniqueDescriptors.map(({ groupId }) => groupId)),
   ].sort((a, b) => a - b);
   const bottleIds = [
-    ...new Set(
-      uniqueDescriptors.flatMap(({ bottleId }) =>
+    ...new Set([
+      ...requiredAdditionalBottleIds,
+      ...uniqueDescriptors.flatMap(({ bottleId }) =>
         bottleId === null ? [] : [bottleId],
       ),
-    ),
+    ]),
   ].sort((a, b) => a - b);
   const targetIds = [
     ...new Set(uniqueDescriptors.map(({ targetId }) => targetId)),
@@ -334,12 +338,21 @@ export async function lockCatalogTargetAssignmentDescriptorsInTransaction(
       .for("update");
   }
   if (bottleIds.length) {
-    await tx
+    const lockedBottles = await tx
       .select({ id: bottles.id })
       .from(bottles)
       .where(inArray(bottles.id, bottleIds))
       .orderBy(asc(bottles.id))
       .for("update");
+    const lockedBottleIds = new Set(lockedBottles.map(({ id }) => id));
+    const missingRequiredBottleId = requiredAdditionalBottleIds.find(
+      (bottleId) => !lockedBottleIds.has(bottleId),
+    );
+    if (missingRequiredBottleId !== undefined) {
+      throw new CatalogTargetNotFoundError({
+        bottleId: missingRequiredBottleId,
+      });
+    }
   }
   if (targetIds.length) {
     await tx

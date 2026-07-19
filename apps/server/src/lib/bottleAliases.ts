@@ -119,6 +119,13 @@ export type BottleAliasIdentitySnapshot = Pick<
   "name" | "bottleId" | "releaseId" | "targetId" | "ignored"
 >;
 
+export class BottleAliasIdentityChangedError extends Error {
+  constructor(readonly aliasName: string) {
+    super(`Bottle alias identity changed during assignment (${aliasName}).`);
+    this.name = "BottleAliasIdentityChangedError";
+  }
+}
+
 export type BottleAliasReviewIdentitySnapshot = Pick<
   typeof reviews.$inferSelect,
   "id" | "name" | "bottleId" | "releaseId" | "targetId"
@@ -224,7 +231,7 @@ function getAssignmentUpdateValues(options: BottleAliasAssignmentValues) {
 function assertBottleAliasIdentitySnapshot(
   lockedAlias: BottleAliasIdentitySnapshot | undefined,
   snapshot: BottleAliasIdentitySnapshot,
-): void {
+): asserts lockedAlias is BottleAliasIdentitySnapshot {
   if (
     !lockedAlias ||
     lockedAlias.name !== snapshot.name ||
@@ -233,9 +240,7 @@ function assertBottleAliasIdentitySnapshot(
     lockedAlias.targetId !== snapshot.targetId ||
     lockedAlias.ignored !== snapshot.ignored
   ) {
-    throw new Error(
-      `Bottle alias identity changed during assignment (${snapshot.name}).`,
-    );
+    throw new BottleAliasIdentityChangedError(snapshot.name);
   }
 }
 
@@ -257,6 +262,27 @@ async function lockBottleAliasIdentitySnapshotInTransaction(
     .limit(1)
     .for("update");
   assertBottleAliasIdentitySnapshot(lockedAlias, snapshot);
+}
+
+/** Backfills only targetId after locking the complete retained alias identity. */
+export async function backfillLegacyBottleAliasTargetInTransaction(
+  tx: AnyTransaction,
+  snapshot: BottleAliasIdentitySnapshot,
+  targetId: number,
+): Promise<"updated" | "reused"> {
+  await lockBottleAliasIdentitySnapshotInTransaction(tx, snapshot);
+  if (snapshot.targetId === targetId) return "reused";
+  if (snapshot.targetId !== null) {
+    throw new TypeError(
+      `Legacy Bottle alias ${snapshot.name} already has another target.`,
+    );
+  }
+
+  await tx
+    .update(bottleAliases)
+    .set({ targetId })
+    .where(eq(bottleAliases.name, snapshot.name));
+  return "updated";
 }
 
 async function validateExactBottleAliasTarget(
