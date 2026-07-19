@@ -41,6 +41,38 @@ The `legacy_release_repair_review` table and its
 Drizzle-generated migration; task 9.7 verifies that no runtime schema export or
 compatibility branch remains. No migration is generated in task 5.9.
 
+### Section 6.7-6.9 remaining-consumer scope
+
+After the task 6.5b/6.10 alias and observation phase, the remaining target
+backfill comprises eight physical tables and ten independently resolved logical
+slots:
+
+| Physical table                 | Logical target slot(s)        | Stable migration locator                          |
+| ------------------------------ | ----------------------------- | ------------------------------------------------- |
+| `tasting`                      | `target_id`                   | `id`                                              |
+| `review`                       | `target_id`                   | `id`                                              |
+| `collection_bottle`            | `target_id`                   | `id`                                              |
+| `flight_bottle`                | `target_id`                   | `(flight_id, bottle_id, release_id)` retained key |
+| `store_price`                  | `target_id`                   | `id`                                              |
+| `incoming_bottle_decision_log` | `target_id`                   | `id`                                              |
+| `store_price_match_proposal`   | current and suggested targets | `id` plus the independently planned logical slot  |
+| `store_price_match_attempt`    | current and suggested targets | `id` plus the independently planned logical slot  |
+
+Each selected slot keeps its Bottle/Release pair and every non-target value
+unchanged. An optional slot whose Bottle and release are both null is outside
+retained-family selection and remains entirely untouched, including preservation
+of any existing target.
+`parent_bottle_id`, release-shaped proposal JSON, decision vocabulary, and
+created flags are compatibility evidence, not additional target slots.
+
+`pending_upload` and `change` retain historical release-shaped kinds or
+payloads but have no additive CatalogTarget column to populate. The retired
+`legacy_release_repair_review` table likewise has no live target-bearing
+workflow and remains assigned to generated cleanup in tasks 9.6/9.7. Activity
+feeds are derived from target-bearing consumers rather than backed by a
+separate paired-reference table; task 7.3 owns their read cutover and task 7.10
+owns activity and queue payload identity.
+
 The Drizzle owners are:
 
 - `apps/server/src/db/schema/bottles.ts`

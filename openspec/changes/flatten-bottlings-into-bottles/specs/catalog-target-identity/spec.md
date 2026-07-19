@@ -770,6 +770,53 @@ The migration SHALL populate target ids from legacy references using release pro
 - **AND** it does not synchronize alias consumers, enqueue indexing, rename an
   alias, or backfill another consumer table
 
+#### Scenario: Backfill all remaining consumer slots for one parent family
+
+- **WHEN** tasks 6.7-6.9 process a promoted parent family
+- **THEN** one atomic phase covers ten logical target slots across `tasting`,
+  `review`, `collection_bottle`, `flight_bottle`, `store_price`,
+  `incoming_bottle_decision_log`, and the independent current and suggested
+  slots on `store_price_match_proposal` and `store_price_match_attempt`
+- **AND** one shared helper resolves the parent-only reference and every family
+  release reference, locks the canonical group/Bottle/target descriptors plus
+  parent/release/promotion evidence, and re-resolves them before consumer locks
+- **AND** a non-null release maps to its promoted Bottle's exact target
+- **AND** a null release under a parent with releases maps to the generic group
+  target
+- **AND** a null release under a parent without releases maps to the retained
+  Bottle's exact target
+
+#### Scenario: Preserve optional unresolved absence
+
+- **WHEN** a nullable consumer slot has both Bottle and release ids null
+- **THEN** the slot is not selected or mutated
+- **AND** the migration preserves its target whether null or nonnull and does
+  not invent retained-family intent
+- **AND** proposal and attempt current and suggested slots are evaluated
+  independently even when both belong to the same row
+
+#### Scenario: Reject remaining-consumer drift or collision
+
+- **WHEN** a selected consumer pair is invalid, a locked row or logical slot
+  differs from its preflight, a nonnull target differs from the resolved target,
+  or the target would collide with tasting, collection, or Flight membership
+  uniqueness
+- **THEN** every remaining-consumer write for that parent family rolls back
+- **AND** the migration does not overwrite or heal the target, choose or
+  consolidate a membership row, or change a collection count
+- **AND** a matching nonnull target is validated as idempotent reuse
+
+#### Scenario: Preserve consumer evidence during target backfill
+
+- **WHEN** a remaining consumer target is populated or reused
+- **THEN** its Bottle/Release pair and every non-target field remain unchanged,
+  including content, unit state, provenance, processing state, decision
+  vocabulary, JSON evidence, and timestamps
+- **AND** the migration invokes no runtime writer, alias propagation,
+  statistics, indexing, queue, price-matching, proposal-approval, or decision
+  side effect
+- **AND** target-backed reads remain a later cutover
+
 ### Requirement: Target migration is auditable and resumable
 
 The system SHALL provide idempotent backfill commands and dry-run reports covering every target-bearing table, legacy release mapping, collision, and unresolved identity condition.

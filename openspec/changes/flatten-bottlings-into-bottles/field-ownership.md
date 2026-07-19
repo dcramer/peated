@@ -58,6 +58,34 @@ Exact Bottle serializers must not require BottleGroup hydration.
   unchanged. A conflicting nonnull target or descriptor/pair drift rolls back
   the family; the backfill does not heal it, synchronize alias consumers,
   index or rename aliases, or backfill the consumers owned by tasks 6.7-6.9.
+- Tasks 6.7-6.9 backfill ten remaining logical target slots across eight
+  physical tables in one atomic parent-family phase: tastings, reviews,
+  collection memberships, Flight memberships, StorePrices, incoming decision
+  logs, and the independent current/suggested slots on proposals and attempts.
+  One shared family helper resolves the parent-only pair and every release pair,
+  locks the canonical group/Bottle/target graph plus parent/release/promotion
+  evidence, and re-resolves before any consumer mutation. Selection uses either
+  the retained parent Bottle or a family release so inverse invalid pairs are
+  rejected rather than skipped. Optional null/null slots are outside
+  retained-family selection and remain entirely untouched, preserving any
+  existing target without inventing family intent.
+- The remaining-consumer phase locks fixed row locators in deterministic order,
+  validates the complete retained pair and target snapshot, and changes only a
+  null target. A matching nonnull target is idempotent reuse; a different
+  nonnull target, pair/row drift, incomplete promotion, or target-membership
+  uniqueness collision rolls back the full parent family without healing,
+  choosing a winner, consolidating rows, or changing collection counts.
+- Every retained pair and non-target field remains owned by its existing row,
+  including tasting/review content, collection unit state, price and history,
+  decision evidence, proposal/attempt current and suggested evidence,
+  processing state, provenance, JSON payloads, and timestamps. Proposal and
+  attempt current/suggested slots resolve independently and update together
+  only after the complete row and family preflight succeeds.
+- This migration phase does not invoke runtime mutation systems, consumer
+  consolidation, alias propagation, statistics, indexing, queues, price
+  matching, proposal approval, or decision creation. It adds no command or
+  production behavior; task 6.11 sequences it after core promotion alongside
+  the separate, non-overlapping alias/observation phase. Task 7.3 owns reads.
 - The completed alias cutover requires every new assignment to use one
   validated CatalogTarget. Exact aliases reference the owning Bottle's exact
   target; stable aliases reference the BottleGroup's generic target and never

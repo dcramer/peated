@@ -4,24 +4,17 @@
  */
 import { asc, eq, inArray, or } from "drizzle-orm";
 import { db, type AnyConnection, type AnyTransaction } from "../db";
-import {
-  bottleAliases,
-  bottleObservations,
-  bottleReleasePromotions,
-  bottleReleases,
-  bottles,
-} from "../db/schema";
+import { bottleAliases, bottleObservations } from "../db/schema";
 import {
   backfillLegacyBottleAliasTargetInTransaction,
   BottleAliasIdentityChangedError,
   type BottleAliasIdentitySnapshot,
 } from "./bottleAliases";
 import {
-  CatalogTargetResolutionError,
-  lockCatalogTargetAssignmentDescriptorsInTransaction,
-  resolveCatalogTargetForAssignment,
-  type CatalogTargetAssignmentDescriptor,
-} from "./catalogTargets";
+  CatalogMigrationFamilyTargetError,
+  lockCatalogMigrationFamilyTargetsInTransaction,
+} from "./catalogMigrationFamilyTargets";
+import type { CatalogTargetAssignmentDescriptor } from "./catalogTargets";
 
 export type CatalogMigrationAliasObservationTable =
   | "bottle_alias"
@@ -61,11 +54,6 @@ export type CatalogMigrationAliasObservationParentResult = {
   observationsReused: number;
 };
 
-type LegacyReference = {
-  bottleId: number;
-  releaseId: number | null;
-};
-
 type AliasPlan = {
   snapshot: BottleAliasIdentitySnapshot;
   target: CatalogTargetAssignmentDescriptor;
@@ -87,17 +75,6 @@ function errorDetails(error: unknown): Record<string, unknown> {
   };
 }
 
-function descriptorsMatch(
-  left: CatalogTargetAssignmentDescriptor,
-  right: CatalogTargetAssignmentDescriptor,
-): boolean {
-  return (
-    left.targetId === right.targetId &&
-    left.groupId === right.groupId &&
-    left.bottleId === right.bottleId
-  );
-}
-
 function rowError(
   code: CatalogMigrationAliasObservationBackfillErrorCode,
   parentId: number,
@@ -116,39 +93,6 @@ function rowError(
   );
 }
 
-async function resolveLegacyTarget(
-  tx: AnyTransaction,
-  parentId: number,
-  reference: LegacyReference,
-  table: CatalogMigrationAliasObservationTable | null,
-  rowId: string | number | null,
-  operation: string,
-): Promise<CatalogTargetAssignmentDescriptor> {
-  try {
-    return await resolveCatalogTargetForAssignment(
-      {
-        kind: "legacy",
-        ...reference,
-        context: {
-          caller: "catalogMigrationAliasObservationBackfill",
-          operation,
-        },
-      },
-      tx,
-    );
-  } catch (error) {
-    if (!(error instanceof CatalogTargetResolutionError)) throw error;
-    throw new CatalogMigrationAliasObservationBackfillError(
-      "target_resolution_failed",
-      parentId,
-      table,
-      rowId,
-      errorDetails(error),
-      { cause: error },
-    );
-  }
-}
-
 function assertTargetCompatible(
   parentId: number,
   table: CatalogMigrationAliasObservationTable,
@@ -161,67 +105,6 @@ function assertTargetCompatible(
       actualTargetId,
       expectedTargetId,
     });
-  }
-}
-
-async function loadParentFamilyReleaseIds(
-  tx: AnyTransaction,
-  parentId: number,
-): Promise<number[]> {
-  const [parent] = await tx
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(eq(bottles.id, parentId))
-    .limit(1);
-  if (!parent) {
-    throw new CatalogMigrationAliasObservationBackfillError(
-      "parent_not_found",
-      parentId,
-      null,
-      null,
-    );
-  }
-
-  return (
-    await tx
-      .select({ id: bottleReleases.id })
-      .from(bottleReleases)
-      .where(eq(bottleReleases.bottleId, parentId))
-      .orderBy(asc(bottleReleases.id))
-  ).map(({ id }) => id);
-}
-
-async function lockParentFamilyAfterCatalogTargets(
-  tx: AnyTransaction,
-  parentId: number,
-  expectedReleaseIds: number[],
-): Promise<void> {
-  const releases = await tx
-    .select({ id: bottleReleases.id })
-    .from(bottleReleases)
-    .where(eq(bottleReleases.bottleId, parentId))
-    .orderBy(asc(bottleReleases.id))
-    .for("update");
-  const lockedReleaseIds = releases.map(({ id }) => id);
-  if (
-    lockedReleaseIds.length !== expectedReleaseIds.length ||
-    lockedReleaseIds.some((id, index) => id !== expectedReleaseIds[index])
-  ) {
-    throw new CatalogMigrationAliasObservationBackfillError(
-      "target_graph_changed",
-      parentId,
-      null,
-      null,
-      { expectedReleaseIds, actualReleaseIds: lockedReleaseIds },
-    );
-  }
-  if (lockedReleaseIds.length) {
-    await tx
-      .select({ releaseId: bottleReleasePromotions.releaseId })
-      .from(bottleReleasePromotions)
-      .where(inArray(bottleReleasePromotions.releaseId, lockedReleaseIds))
-      .orderBy(asc(bottleReleasePromotions.releaseId))
-      .for("update");
   }
 }
 
@@ -422,83 +305,25 @@ export async function backfillLegacyCatalogAliasObservationsForParent(
   database: AnyConnection = db,
 ): Promise<CatalogMigrationAliasObservationParentResult> {
   return await database.transaction(async (tx) => {
-    const releaseIds = await loadParentFamilyReleaseIds(tx, parentId);
-
-    const familyTargets: CatalogTargetAssignmentDescriptor[] = [];
-    for (const releaseId of [null, ...releaseIds]) {
-      familyTargets.push(
-        await resolveLegacyTarget(
-          tx,
-          parentId,
-          { bottleId: parentId, releaseId },
-          null,
-          releaseId,
-          "validateParentFamily",
-        ),
-      );
-    }
-
+    let family;
     try {
-      await lockCatalogTargetAssignmentDescriptorsInTransaction(
+      family = await lockCatalogMigrationFamilyTargetsInTransaction(
         tx,
-        familyTargets,
-        { requiredAdditionalBottleIds: [parentId] },
+        parentId,
+        { caller: "catalogMigrationAliasObservationBackfill" },
       );
-      await lockParentFamilyAfterCatalogTargets(tx, parentId, releaseIds);
     } catch (error) {
-      if (error instanceof CatalogMigrationAliasObservationBackfillError) {
-        throw error;
-      }
-      if (!(error instanceof CatalogTargetResolutionError)) throw error;
+      if (!(error instanceof CatalogMigrationFamilyTargetError)) throw error;
       throw new CatalogMigrationAliasObservationBackfillError(
-        "target_graph_changed",
+        error.code,
         parentId,
         null,
-        null,
-        errorDetails(error),
+        error.releaseId,
+        error.details,
         { cause: error },
       );
     }
-
-    const targetByReleaseId = new Map<
-      number | null,
-      CatalogTargetAssignmentDescriptor
-    >();
-    for (const [index, releaseId] of [null, ...releaseIds].entries()) {
-      let lockedTarget: CatalogTargetAssignmentDescriptor;
-      try {
-        lockedTarget = await resolveLegacyTarget(
-          tx,
-          parentId,
-          { bottleId: parentId, releaseId },
-          null,
-          releaseId,
-          "revalidateParentFamily",
-        );
-      } catch (error) {
-        if (!(error instanceof CatalogMigrationAliasObservationBackfillError)) {
-          throw error;
-        }
-        throw new CatalogMigrationAliasObservationBackfillError(
-          "target_graph_changed",
-          parentId,
-          null,
-          releaseId,
-          errorDetails(error),
-          { cause: error },
-        );
-      }
-      if (!descriptorsMatch(familyTargets[index]!, lockedTarget)) {
-        throw new CatalogMigrationAliasObservationBackfillError(
-          "target_graph_changed",
-          parentId,
-          null,
-          releaseId,
-          { expected: familyTargets[index], actual: lockedTarget },
-        );
-      }
-      targetByReleaseId.set(releaseId, lockedTarget);
-    }
+    const { releaseIds, targetByReleaseId } = family;
 
     const aliasPlans = await loadAliasPlans(
       tx,

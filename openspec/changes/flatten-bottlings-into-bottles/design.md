@@ -393,6 +393,59 @@ this dependent phase after completed core promotion while excluding the
 canonical alias and any other overlap. Production execution remains gated by
 task 6.13; the later cleanup release remains separately gated by task 10.9.
 
+Tasks 6.7-6.9 share one remaining-consumer parent-family phase. It owns eight
+physical tables and ten logical target slots: `tasting`, `review`,
+`collection_bottle`, `flight_bottle`, `store_price`,
+`incoming_bottle_decision_log`, the current and suggested slots on
+`store_price_match_proposal`, and the current and suggested slots on
+`store_price_match_attempt`. The phase resolves the complete parent family
+through one shared helper, including the parent-only reference and every child
+release reference, then locks the resulting descriptor set through the global
+BottleGroup, Bottle, and CatalogTarget hierarchy. It also locks the applicable
+legacy parent, releases, and completed promotion mappings as migration
+evidence, re-resolves the family, and proceeds only when every descriptor still
+matches.
+
+Consumer selection uses either side of the retained pair: a row or logical
+slot participates when its Bottle is the parent or its release belongs to the
+family. This catches a release paired with a null or different Bottle instead
+of silently leaving invalid evidence behind. A nullable logical slot with both
+Bottle and release null is outside retained-family selection and is not
+mutated; the migration preserves its target whether null or nonnull and does
+not invent legacy family intent from that target.
+The current and suggested proposal/attempt slots are planned and validated
+independently even when both occur on one physical row; all applicable slots on
+that row are updated together only after the complete family preflight passes.
+
+The phase snapshots fixed row locators and complete retained identity before
+locking consumers in deterministic table and row order. `flight_bottle`, which
+has no surrogate id, uses its retained `(flightId, bottleId, releaseId)` key;
+the other tables use their primary ids plus the applicable logical slot. After
+locking, any missing row, pair drift, or target drift aborts the parent family.
+It sets only a null target to the resolved descriptor or reuses an equal
+nonnull target. A different nonnull target is authoritative conflict evidence
+and is never overwritten or healed.
+
+Before mutation, the same preflight detects target-membership uniqueness
+collisions for tastings, collections, and flights. Migration does not invoke
+the destructive merge/consolidation rules used by moderator Bottle or group
+merges, does not choose a winning row, and does not change collection counts.
+One conflict in any of the ten slots rolls back every remaining-consumer target
+write for that parent family. Every retained pair and every non-target column,
+including content, unit state, provenance, processing state, JSON evidence,
+decision vocabulary, and timestamps, remains byte-for-byte owned by its
+existing row.
+
+This remaining-consumer phase directly performs target-only migration writes;
+it does not call tasting statistics dispatch, Review or alias propagation,
+collection or Flight mutation services, price ingestion/history/matching,
+proposal approval or lease orchestration, decision writers, indexing, queues,
+or other runtime business logic. It does not change reads, which remain task
+7.3, and it adds no command, production access, or deployment claim. Task 6.11
+must run it only after the parent-family core promotion completes and coordinate
+it with the separate 6.5b/6.10 alias-observation phase without table overlap or
+duplicate selection.
+
 Backfill rules are deterministic:
 
 1. Create one BottleGroup from every legacy parent Bottle's stable identity.
