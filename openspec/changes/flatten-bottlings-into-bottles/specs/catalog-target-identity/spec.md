@@ -868,8 +868,100 @@ The system SHALL provide idempotent backfill commands and dry-run reports coveri
 #### Scenario: Backfill is interrupted
 
 - **WHEN** a target backfill batch stops before completion and is run again
-- **THEN** completed mappings are reused
-- **AND** remaining rows are processed without duplicate Bottles, groups, or targets
+- **THEN** the retained external checkpoint replays its `activeParentId`
+  directly before selecting another parent, even when a zero-release parent's
+  completed core phase means it no longer matches legacy-parent selection
+- **AND** completed phase state and mappings are validated and reused
+- **AND** remaining rows are processed without duplicate Bottles, groups, or
+  targets
+
+#### Scenario: Retain a revisioned dry-run report
+
+- **WHEN** an operator runs the backfill command without write authority
+- **THEN** it produces a versioned external JSON report through only read-only
+  revision evidence, the existing catalog migration audit, and parent selection
+- **AND** it does not call or simulate core, alias/observation, or consumer
+  mutation services
+- **AND** the report records its generation time, database name, exact full Git
+  commit, and latest applied Drizzle migration id, hash, and timestamp
+- **AND** execution is refused unless the applied migration hash and timestamp
+  equal the latest candidate migration in the checkout
+- **AND** the CLI creates the retained file atomically without overwriting an
+  existing dry-run report
+- **AND** after publishing the retained file it fsyncs the containing directory
+  before reporting success
+- **AND** production resolves the configured full Git revision while every
+  nonproduction run ignores configured version metadata and requires clean
+  current `HEAD`
+
+#### Scenario: Run one approved bounded write batch
+
+- **WHEN** an operator supplies a completed retained dry run and explicit
+  approval bound to a strictly later approval time, audit, Git commit, database,
+  and Drizzle revision
+- **THEN** the command persists the active parent before mutation and invokes
+  core promotion, alias/observation target backfill, and remaining-consumer
+  target backfill in that order as three separate bounded transactions
+- **AND** only after all three phases succeed does it add cumulative phase and
+  per-consumer-slot metrics, clear the active parent, advance the after cursor,
+  and atomically retain that advanced checkpoint
+- **AND** after publishing or replacing a checkpoint it fsyncs the containing
+  directory before reporting checkpoint success
+- **AND** one invocation processes no more than the requested bounded batch
+- **AND** resume requires the retained write report, approved dry run, approval,
+  and current revision evidence to match exactly
+- **AND** the invocation holds an exclusive report lock for the complete
+  read/run/checkpoint sequence and fails closed when that lock exists
+- **AND** a stale lock has no automatic timeout or takeover and may be removed
+  operationally only after confirming that no writer remains live
+
+#### Scenario: Validate a retained run state
+
+- **WHEN** a retained report is created or loaded
+- **THEN** its runtime schema enforces mode/status/checkpoint relationships and
+  ascending completed/active/next cursor order
+- **AND** every count equals updated plus reused and approver identity is trimmed
+  and nonblank
+- **AND** a complete dry run may retain its next read-only candidate while a
+  complete write retains no active or next parent
+- **AND** failure variants permit only locators owned by their core,
+  alias/observation, consumer, or checkpoint phase
+- **AND** operation and composite failure parents identify the active parent,
+  while a checkpoint-only failure identifies the active or pre-core next parent
+- **AND** a checkpoint failure may omit its parent only for a final checkpoint
+  with no active or next work
+
+#### Scenario: A migration phase fails
+
+- **WHEN** a checkpoint or parent-family phase fails
+- **THEN** the command stops at the first failure without running a later phase
+  or exposing an unretained cursor or metrics advance
+- **AND** its versioned report contains only the failure phase, stable code,
+  retryability, parent/release identity, and applicable typed
+  table/surface/row/projection locator
+- **AND** if persisting that operation failure also fails, the observable
+  checkpoint failure preserves the sanitized original operation failure
+- **AND** raw error details, connection data, and stacks are not retained
+
+#### Scenario: Use only the canonical batch orchestrator
+
+- **WHEN** the command selects and processes a bounded parent batch
+- **THEN** it uses the read-only parent selector and canonical three-phase
+  orchestrator
+- **AND** no core-only `backfillLegacyCatalogBatch` wrapper or second batch
+  mutation path remains
+
+#### Scenario: Verify coordinated migration behavior
+
+- **WHEN** migration integration tests exercise clean, reused, conflicting, and
+  interrupted parent families
+- **THEN** they prove row counts, mappings, field ownership, exact versus
+  generic target selection, canonical-alias exclusion, and idempotent replay
+  across the three phase transactions
+- **AND** they prove dry run performs no mutation, revision/approval drift
+  blocks writes, active-family replay recovers a zero-release parent, and a
+  first failure prevents later-phase writes and checkpoint advancement
+- **AND** they use no production data or production execution
 
 #### Scenario: Audit finds an ambiguous parent
 

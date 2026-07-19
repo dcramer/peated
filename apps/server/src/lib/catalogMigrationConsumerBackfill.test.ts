@@ -17,10 +17,10 @@ import {
   storePrices,
   tastings,
 } from "../db/schema";
+import { CATALOG_MIGRATION_CONSUMER_SLOTS } from "../schemas/catalogMigrationRun";
 import { backfillLegacyCatalogParent } from "./catalogMigrationBackfill";
 import {
   backfillLegacyCatalogConsumersForParent,
-  CATALOG_MIGRATION_CONSUMER_SLOTS,
   CatalogMigrationConsumerBackfillError,
 } from "./catalogMigrationConsumerBackfill";
 

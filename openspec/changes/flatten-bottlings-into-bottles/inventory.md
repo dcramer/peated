@@ -91,6 +91,12 @@ The Drizzle owners are:
 - `apps/server/src/schemas/bottleReleases.ts`
 - `apps/server/src/schemas/bottles.ts`
 - `apps/server/src/schemas/catalogMigrationAudit.ts`
+- `apps/server/src/schemas/catalogMigrationRun.ts` owns the versioned external
+  report/checkpoint, mode/status/cursor/count invariants, exact revision
+  evidence, cumulative phase metrics, approval binding, and discriminated or
+  composite sanitized failure contract with parent/checkpoint coherence for
+  tasks 6.11-6.12. Task 10.10 removes this migration-only run schema after all
+  required evidence is retained.
 - `apps/server/src/schemas/collections.ts`
 - `apps/server/src/schemas/index.ts`
 - `apps/server/src/schemas/priceMatches.ts`
@@ -695,13 +701,58 @@ Classifier decisions and price matching:
   no longer expose raw Bottle-alias backfill writers.
 - Obsolete Bottle name/normalization and price/review alias-backfill commands
   have been removed rather than retained as a second mutation system.
-- `apps/cli/src/commands/catalogMigration.ts`
+- `apps/cli/src/commands/catalogMigration.ts` exposes the retained-report dry
+  run and one-bounded-batch approved write/resume command. It does not imply
+  that the command has run against production. Task 10.10 removes only its
+  migration-only backfill operation after all later evidence gates, retaining
+  the read-only audit operation through those gates.
+- `apps/cli/src/commands/catalogMigrationRuntime.ts` uses configured `VERSION`
+  only in production and always resolves clean current `HEAD` outside
+  production. It parses retained reports and owns atomic same-directory report
+  files, parent-directory fsync after publication or replacement, and the
+  fail-closed exclusive write lock. Task 10.10 removes this backfill-only
+  runtime after all required evidence is retained.
+- `apps/cli/src/commands/catalogMigrationRuntime.test.ts` covers that file and
+  lock boundary and is removed with it under task 10.10.
+- `apps/cli/vitest.config.mts`, the CLI package test script, the migration-added
+  CLI `esbuild`/`vite`/`vitest` development dependencies, and their matching
+  `pnpm-lock.yaml` entries exist only to test this migration tooling. Task 10.10
+  removes them with the runtime test unless another retained CLI test has taken
+  explicit ownership of that infrastructure.
 
-## Migration audit
+## Migration audit and backfill orchestration
 
 - `apps/server/src/lib/catalogMigrationAudit.ts`
+- `apps/server/src/lib/catalogMigrationBackfill.ts` owns the core parent-family
+  transaction and exports the shared ascending-keyset parent selector used by
+  the orchestrator. Its superseded core-only batch wrapper is removed; task
+  10.10 removes the remaining migration-only selector/core service and its
+  integration test.
+- `apps/server/src/lib/catalogMigrationAliasObservationBackfill.ts` owns the
+  separate alias/observation parent-family transaction and is removed with its
+  integration test under task 10.10.
+- `apps/server/src/lib/catalogMigrationConsumerBackfill.ts` owns the separate
+  remaining-consumer parent-family transaction and consumes the runtime-owned
+  logical-slot contract. Task 10.10 removes it and its integration test.
+- `apps/server/src/lib/catalogMigrationRevision.ts` loads the database name and
+  latest applied Drizzle revision read-only and requires its hash/timestamp to
+  match the latest candidate migration before reporting or writes. Task 10.10
+  removes this backfill-run evidence helper.
+- `apps/server/src/lib/catalogMigrationOrchestrator.ts` owns the external
+  active/after/next checkpoint lifecycle, approved dry-run binding, strict
+  core-to-alias/observation-to-consumer transaction order, cumulative metrics,
+  active-family replay, stop-first/composite failures, and one bounded batch per
+  call. Task 10.10 removes this migration-only orchestrator.
+- `apps/server/src/lib/catalogMigrationOrchestrator.test.ts` covers the 6.11-
+  6.12 coordination and interruption contract without production access and is
+  removed with the orchestrator under task 10.10.
 - `apps/server/src/lib/test/fixtures.ts` supplies legacy graph fixtures to the
   integration suite and is not a production reader or writer.
+
+The read-only `catalogMigrationAudit` service, schema, and CLI operation remain
+available through the task 9.1 constraint gate, task 9.10 final legacy audit,
+and task 10.9 cleanup-release audit. They are not part of task 10.10's
+write-tooling removal until all required audit evidence has been retained.
 
 ## Classifier contract and runtime
 

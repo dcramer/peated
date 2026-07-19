@@ -5,6 +5,7 @@
 import { asc, eq, inArray, or } from "drizzle-orm";
 import { db, type AnyConnection, type AnyTransaction } from "../db";
 import { bottleAliases, bottleObservations } from "../db/schema";
+import type { CatalogMigrationAliasObservationTable } from "../schemas/catalogMigrationRun";
 import {
   backfillLegacyBottleAliasTargetInTransaction,
   BottleAliasIdentityChangedError,
@@ -15,10 +16,6 @@ import {
   lockCatalogMigrationFamilyTargetsInTransaction,
 } from "./catalogMigrationFamilyTargets";
 import type { CatalogTargetAssignmentDescriptor } from "./catalogTargets";
-
-export type CatalogMigrationAliasObservationTable =
-  | "bottle_alias"
-  | "bottle_observation";
 
 export type CatalogMigrationAliasObservationBackfillErrorCode =
   | "parent_not_found"

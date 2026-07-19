@@ -288,10 +288,10 @@ Generated Drizzle migrations add BottleGroup, Bottle membership, catalog targets
 The core promotion service scans legacy parents by ascending-id keyset pages and
 processes one complete parent family per bounded transaction. It locks the
 parent, its releases in ascending id order, and any existing promotion mappings
-before mutation. Checkpoint persistence, command-level progress, dry-run
-reporting, and production revision evidence remain task 6.11; the core service
-returns a cursor-ready result but does not begin consumer backfill or perform
-production access.
+before mutation. The core service returns a cursor-ready result but does not
+begin consumer backfill, own a checkpoint, or perform production access. Task
+6.11 owns the external checkpoint and coordinates this service with the two
+dependent parent-family phases.
 
 The legacy parent's nullable `groupId` is the durable staging link to the
 migration-created group. For a parent with no releases, that row becomes the
@@ -445,6 +445,80 @@ or other runtime business logic. It does not change reads, which remain task
 must run it only after the parent-family core promotion completes and coordinate
 it with the separate 6.5b/6.10 alias-observation phase without table overlap or
 duplicate selection.
+
+Task 6.11 retains one versioned JSON report as the command's audit artifact and
+checkpoint; it does not add a database checkpoint table. The report records an
+exact full Git commit, database name, generation time, and the latest applied
+Drizzle migration id, hash, and creation timestamp. Before either dry-run or
+write behavior, the revision reader requires that applied migration hash and
+timestamp to equal the latest candidate migration in the running checkout. In
+production, the exact Git commit comes from the configured `VERSION`; in every
+nonproduction environment it always comes from a clean worktree's current
+`HEAD`, never from `VERSION`. A dry run invokes only that read-only revision
+check, the existing migration audit, and read-only parent selection. It does
+not call any migration mutation service and does not pretend to simulate the
+three write transactions.
+
+The CLI creates a dry-run report atomically through a same-directory,
+permission-restricted temporary file and refuses to overwrite it. A write must
+name a completed dry-run report and record approver identity and a timestamp
+strictly after that report was generated. The approval is bound to the dry
+run's exact Git, database, Drizzle revision, and audit contents. A resumed write
+must also match the retained write report's approval and revision evidence
+exactly; the CLI refuses to open an existing write report without explicit
+resume. A write invocation exclusively owns the report through a
+permission-restricted sibling lock file for its entire read/run/checkpoint
+sequence. Existing locks fail closed; no automatic stale-lock timeout or
+takeover exists. An operator may remove a stale lock only after independently
+confirming that no writer is live. Once the invocation creates or resumes its
+write report, each checkpoint atomically replaces that owned file and fsyncs
+the containing directory before returning success.
+
+The report's runtime schema is the durable state-machine owner. It requires
+each row count to equal updated plus reused, trims and rejects a blank approver,
+and enforces mode/status/checkpoint relationships plus ascending
+after/active/next cursor order. A dry run is complete read-only evidence and may
+retain its next candidate; a complete write cannot retain an active or next
+parent. Failure evidence is phase-discriminated so core, alias/observation,
+consumer, and checkpoint locators cannot be mixed. If persisting an operation
+failure also fails, the returned checkpoint failure preserves the sanitized
+original operation failure rather than hiding the storage-boundary failure.
+Operation and composite failure parents equal the active parent. A
+checkpoint-only failure identifies the active or pre-core next parent, while a
+null parent is valid only for a final checkpoint with no active or next work.
+
+Each write invocation processes at most one bounded parent batch. Before
+starting a family, the orchestrator persists `activeParentId`; it then runs core
+promotion, alias/observation target backfill, and remaining-consumer target
+backfill in that order through their three separate bounded transactions. Only
+after all three phases succeed does it calculate cumulative core, alias,
+observation, and per-consumer-slot metrics, clear the active parent, advance
+`afterParentId`, and persist the advanced checkpoint. A checkpoint failure does
+not expose the proposed cursor or metrics as retained progress.
+
+Resume replays `activeParentId` directly instead of rediscovering it through the
+legacy-parent selector. This includes a zero-release parent that core promotion
+has already transformed so it no longer matches that selector. The idempotency
+contracts of each phase make that replay safe. The first phase or checkpoint
+failure stops the batch and records only a sanitized phase, stable error code,
+retryability, parent/release identity, and typed table/surface/row/projection
+locator where applicable; raw error details, connection data, and stacks are
+not part of the retained schema.
+
+This orchestration is additive local tooling and makes no production execution
+or deployment claim. Task 6.13 remains the separate controlled-production gate:
+an actual fresh retained production dry run from the exact candidate revision
+must be reconciled and approved before any live production backfill write.
+The canonical orchestrator is the only batch writer; the superseded core-only
+`backfillLegacyCatalogBatch` wrapper is removed, leaving only read-only parent
+selection and the single-parent core transaction beneath it. After all required
+backfill, cleanup-audit, and post-deploy evidence is retained, task 10.10 removes
+the migration-only backfill command/runtime, run schema, orchestrator, revision
+helper, core/alias/consumer services, their integration tests, and the
+migration-added CLI Vitest configuration, test script, development dependencies,
+and matching lockfile entries. The read-only catalog migration audit command,
+schema, and service remain available through tasks 9.1, 9.10, and 10.9 and are
+not removed prematurely with write tooling.
 
 Backfill rules are deterministic:
 

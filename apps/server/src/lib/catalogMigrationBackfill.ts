@@ -4,7 +4,12 @@
  * resume safely without exposing a partially promoted family.
  */
 import { and, asc, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
-import { db, type AnyConnection, type AnyTransaction } from "../db";
+import {
+  db,
+  type AnyConnection,
+  type AnyDatabase,
+  type AnyTransaction,
+} from "../db";
 import {
   bottleAliases,
   bottleFlavorProfiles,
@@ -65,13 +70,9 @@ export type CatalogMigrationParentResult = {
   outcome: "created" | "reused";
 };
 
-export type CatalogMigrationBatchResult = {
-  afterParentId: number;
-  nextParentId: number | null;
-  processed: number;
-  created: number;
-  reused: number;
-  parents: CatalogMigrationParentResult[];
+export type LegacyCatalogParentCandidateOptions = {
+  afterParentId?: number;
+  limit?: number;
 };
 
 const PARENT_EXACT_FIELDS = [
@@ -1137,52 +1138,36 @@ export async function backfillLegacyCatalogParent(
   });
 }
 
-/** Processes an ascending parent-id page, committing one parent per transaction. */
-export async function backfillLegacyCatalogBatch(
-  {
-    afterParentId = 0,
-    limit = 100,
-  }: { afterParentId?: number; limit?: number } = {},
-  database: AnyConnection = db,
-): Promise<CatalogMigrationBatchResult> {
+/** Selects an ascending page of legacy parent ids without changing data. */
+export async function selectLegacyCatalogParentIds(
+  { afterParentId = 0, limit = 100 }: LegacyCatalogParentCandidateOptions = {},
+  database: AnyDatabase = db,
+): Promise<number[]> {
   if (!Number.isInteger(limit) || limit < 1 || limit > 1_000) {
     throw new CatalogMigrationBackfillError(
       "invalid_limit",
       afterParentId,
       null,
-      {
-        limit,
-      },
+      { limit },
     );
   }
-  const candidates = await database
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(
-      and(
-        gt(bottles.id, afterParentId),
-        or(
-          isNull(bottles.groupId),
-          sql`EXISTS (
-            SELECT 1 FROM ${bottleReleases}
-            WHERE ${bottleReleases.bottleId} = ${bottles.id}
-          )`,
+  return (
+    await database
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(
+        and(
+          gt(bottles.id, afterParentId),
+          or(
+            isNull(bottles.groupId),
+            sql`EXISTS (
+              SELECT 1 FROM ${bottleReleases}
+              WHERE ${bottleReleases.bottleId} = ${bottles.id}
+            )`,
+          ),
         ),
-      ),
-    )
-    .orderBy(asc(bottles.id))
-    .limit(limit);
-  const parents: CatalogMigrationParentResult[] = [];
-  for (const candidate of candidates) {
-    parents.push(await backfillLegacyCatalogParent(candidate.id, database));
-  }
-  const lastParentId = candidates.at(-1)?.id ?? null;
-  return {
-    afterParentId,
-    nextParentId: candidates.length === limit ? lastParentId : null,
-    processed: parents.length,
-    created: parents.filter(({ outcome }) => outcome === "created").length,
-    reused: parents.filter(({ outcome }) => outcome === "reused").length,
-    parents,
-  };
+      )
+      .orderBy(asc(bottles.id))
+      .limit(limit)
+  ).map(({ id }) => id);
 }

@@ -15,22 +15,16 @@ import {
   tastings,
 } from "../db/schema";
 import {
+  CATALOG_MIGRATION_CONSUMER_SLOTS,
+  type CatalogMigrationConsumerProjection,
+  type CatalogMigrationConsumerSlot,
+  type CatalogMigrationConsumerSurface,
+} from "../schemas/catalogMigrationRun";
+import {
   CatalogMigrationFamilyTargetError,
   lockCatalogMigrationFamilyTargetsInTransaction,
 } from "./catalogMigrationFamilyTargets";
 import type { CatalogTargetAssignmentDescriptor } from "./catalogTargets";
-
-export type CatalogMigrationConsumerSurface =
-  | "tasting"
-  | "review"
-  | "collection_bottle"
-  | "flight_bottle"
-  | "store_price"
-  | "incoming_bottle_decision_log"
-  | "store_price_match_proposal"
-  | "store_price_match_attempt";
-
-export type CatalogMigrationConsumerProjection = "current" | "suggested" | null;
 
 export type CatalogMigrationConsumerBackfillErrorCode =
   | "parent_not_found"
@@ -64,22 +58,6 @@ export type CatalogMigrationConsumerBackfillCounts = {
   updated: number;
   reused: number;
 };
-
-export const CATALOG_MIGRATION_CONSUMER_SLOTS = [
-  "tasting",
-  "review",
-  "collection_bottle",
-  "flight_bottle",
-  "store_price",
-  "incoming_bottle_decision_log",
-  "store_price_match_proposal.current",
-  "store_price_match_proposal.suggested",
-  "store_price_match_attempt.current",
-  "store_price_match_attempt.suggested",
-] as const;
-
-export type CatalogMigrationConsumerSlot =
-  (typeof CATALOG_MIGRATION_CONSUMER_SLOTS)[number];
 
 export type CatalogMigrationConsumerBackfillResult = {
   parentId: number;

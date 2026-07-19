@@ -86,6 +86,40 @@ Exact Bottle serializers must not require BottleGroup hydration.
   matching, proposal approval, or decision creation. It adds no command or
   production behavior; task 6.11 sequences it after core promotion alongside
   the separate, non-overlapping alias/observation phase. Task 7.3 owns reads.
+- Task 6.11's versioned external JSON artifact owns migration-run evidence,
+  approval, `activeParentId`/`afterParentId`/`nextParentId`, cumulative phase
+  metrics, and sanitized typed failure locators. No database checkpoint table
+  owns this command state. The CLI owns atomic creation of a new retained dry
+  report, refuses to open an existing write report without explicit resume, and
+  atomically replaces the write checkpoint once the invocation owns it. Report
+  publication and replacement fsync the containing directory before returning
+  success. A write holds an exclusive sibling lock for the complete
+  read/run/checkpoint sequence; an existing lock fails closed and operational
+  stale-lock removal requires independent confirmation that no writer remains
+  live.
+- The runtime schema owns mode/status/checkpoint and ascending cursor
+  invariants, count reconciliation, trimmed nonblank approver identity, and
+  phase-discriminated failure locators. A checkpoint-storage failure may retain
+  one sanitized original operation failure; no failure may mix locators from
+  different phases. Operation and composite failure parents equal the active
+  parent; a checkpoint-only failure identifies active or pre-core next work,
+  while a null failure parent is reserved for a final no-work checkpoint.
+  Dry-run `complete` may identify a next candidate, while write `complete` owns
+  neither active nor next work.
+- The orchestrator persists `activeParentId` before core mutation, then invokes
+  the core, alias/observation, and remaining-consumer owners in order through
+  three separate bounded parent-family transactions. It advances the cursor
+  and metrics only after every phase succeeds and the advanced checkpoint is
+  retained. Resume owns direct replay of the active family, including a
+  zero-release parent no longer visible to legacy-parent selection.
+- Dry-run ownership remains read-only audit and revision evidence, not a
+  simulation of mutation services. Write authority requires approval bound to
+  that completed dry report strictly after its generated time and to its exact
+  Git commit, database, audit, and applied-equals-candidate Drizzle revision.
+  Production Git evidence comes from configured `VERSION`; nonproduction always
+  uses clean current `HEAD`. This local tooling makes no production execution
+  claim; task 6.13 owns the actual fresh retained and approved production audit
+  gate before any production backfill write.
 - The completed alias cutover requires every new assignment to use one
   validated CatalogTarget. Exact aliases reference the owning Bottle's exact
   target; stable aliases reference the BottleGroup's generic target and never

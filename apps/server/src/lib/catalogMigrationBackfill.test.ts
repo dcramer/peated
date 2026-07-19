@@ -15,9 +15,9 @@ import {
   catalogTargets,
 } from "../db/schema";
 import {
-  backfillLegacyCatalogBatch,
   backfillLegacyCatalogParent,
   CatalogMigrationBackfillError,
+  selectLegacyCatalogParentIds,
 } from "./catalogMigrationBackfill";
 
 async function tableCount(table: AnyPgTable) {
@@ -59,10 +59,10 @@ async function expectParentUnchanged(parentId: number) {
 
 describe("legacy catalog migration backfill", () => {
   test.each([0, -1, 1.5, 1_001])(
-    "rejects invalid batch limit %s",
+    "rejects invalid selector limit %s",
     async (limit) => {
       const error = await expectBackfillError(
-        backfillLegacyCatalogBatch({ limit }),
+        selectLegacyCatalogParentIds({ limit }),
         "invalid_limit",
       );
       expect(error.details).toEqual({ limit });
@@ -426,44 +426,6 @@ describe("legacy catalog migration backfill", () => {
       tags: await tableCount(bottleTags),
       flavorProfiles: await tableCount(bottleFlavorProfiles),
     }).toEqual(countsBeforeRerun);
-  });
-
-  test("processes legacy parents in resumable keyset pages", async ({
-    fixtures,
-  }) => {
-    const parents = [
-      await fixtures.LegacyBottle(),
-      await fixtures.LegacyBottle(),
-      await fixtures.LegacyBottle(),
-    ].sort((left, right) => left.id - right.id);
-    await fixtures.Bottle();
-
-    const firstPage = await backfillLegacyCatalogBatch({ limit: 2 });
-    expect(firstPage).toMatchObject({
-      afterParentId: 0,
-      nextParentId: parents[1]?.id,
-      processed: 2,
-      created: 2,
-      reused: 0,
-    });
-    expect(firstPage.parents.map(({ parentId }) => parentId)).toEqual(
-      parents.slice(0, 2).map(({ id }) => id),
-    );
-
-    const secondPage = await backfillLegacyCatalogBatch({
-      afterParentId: firstPage.nextParentId!,
-      limit: 2,
-    });
-    expect(secondPage).toMatchObject({
-      afterParentId: parents[1]?.id,
-      nextParentId: null,
-      processed: 1,
-      created: 1,
-      reused: 0,
-    });
-    expect(secondPage.parents.map(({ parentId }) => parentId)).toEqual([
-      parents[2]?.id,
-    ]);
   });
 
   test("claims and preserves a release canonical alias for its promoted Bottle", async ({
