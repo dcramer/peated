@@ -55,7 +55,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "axios": "~1.16.0",
+    "axios": "~1.18.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.40.3",
     "cheerio": "1.2.0",
