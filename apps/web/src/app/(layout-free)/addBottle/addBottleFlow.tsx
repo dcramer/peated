@@ -24,7 +24,9 @@ import Link from "@peated/web/components/link";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import Spinner from "@peated/web/components/spinner";
-import TastingForm from "@peated/web/components/tastingForm";
+import TastingForm, {
+  type TastingCreateFormSubmitData,
+} from "@peated/web/components/tastingForm";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
@@ -48,20 +50,12 @@ import {
   Wine,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  type ComponentProps,
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 type AddBottleIntent = "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
 type SuggestedTags = Outputs["bottles"]["suggestedTags"];
-type TastingSubmitData = Parameters<
-  ComponentProps<typeof TastingForm>["onSubmit"]
->[0];
+type TastingSubmitData = TastingCreateFormSubmitData;
 type TastingDraft = BottleResolverTarget & {
   suggestedTags: SuggestedTags;
   createdAt: string;
@@ -913,11 +907,6 @@ function AddBottleFlowContent() {
 
     const { tasting, awards } = await tastingCreateMutation.mutateAsync({
       ...data,
-      bottle: tastingDraft.bottle.id,
-      release:
-        data.release === undefined
-          ? (tastingDraft.release?.id ?? null)
-          : data.release,
       flight: requestedFlightId,
       createdAt: tastingDraft.createdAt,
       pendingImageId,

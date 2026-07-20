@@ -4,27 +4,20 @@ import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { Tasting, User } from "../db/schema";
-import {
-  bottleReleases,
-  bottles,
-  tastingBadgeAwards,
-  tastings,
-  toasts,
-  users,
-} from "../db/schema";
+import { tastingBadgeAwards, toasts, users } from "../db/schema";
+import { loadCatalogTargetReadsWithParity } from "../lib/catalogTargetReadParity";
+import { CatalogTargetIntegrityMismatchError } from "../lib/catalogTargets";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type TastingSchema } from "../schemas";
+import type { CatalogTargetV1 } from "../schemas/catalogIdentity";
 import { BadgeAwardSerializer } from "./badgeAward";
-import { BottleSerializer } from "./bottle";
-import { BottleReleaseSerializer } from "./bottleRelease";
 import { UserSerializer } from "./user";
 
 type TastingAttrs = {
   hasToasted: boolean;
   createdBy: ReturnType<(typeof UserSerializer)["item"]>;
-  bottle: ReturnType<(typeof BottleSerializer)["item"]>;
-  release: ReturnType<(typeof BottleReleaseSerializer)["item"]> | null;
+  target: CatalogTargetV1;
   friends: ReturnType<(typeof UserSerializer)["item"]>[];
   awards: ReturnType<(typeof BadgeAwardSerializer)["item"]>[];
 };
@@ -36,18 +29,32 @@ export const TastingSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
-    const results = await db
-      .select({
-        id: tastings.id,
-        bottle: bottles,
-        release: bottleReleases,
-        createdBy: users,
-      })
-      .from(tastings)
-      .innerJoin(users, eq(tastings.createdById, users.id))
-      .innerJoin(bottles, eq(tastings.bottleId, bottles.id))
-      .leftJoin(bottleReleases, eq(tastings.releaseId, bottleReleases.id))
-      .where(inArray(tastings.id, itemIds));
+    const { targets } = await loadCatalogTargetReadsWithParity(
+      itemList.map((item) => ({
+        consumerTable: "tasting",
+        rowLocator: { id: item.id },
+        targetId: item.targetId,
+        legacy: { bottleId: item.bottleId, releaseId: item.releaseId },
+      })),
+      {
+        actor: null,
+        permissions: { canReadCatalogIdentity: true },
+        caller: "TastingSerializer",
+        operation: "serialize",
+      },
+    );
+    const targetByTastingId = Object.fromEntries(
+      itemList.map((item, index) => {
+        const target = targets[index];
+        if (!target) {
+          throw new CatalogTargetIntegrityMismatchError(
+            { bottleId: item.bottleId },
+            `tasting ${item.id} has no durable CatalogTarget`,
+          );
+        }
+        return [item.id, target];
+      }),
+    );
 
     const userToastsList: number[] = currentUser
       ? (
@@ -63,34 +70,15 @@ export const TastingSerializer = serializer({
         ).map((t) => t.tastingId)
       : [];
 
-    const bottlesByRef = Object.fromEntries(
-      (
-        await serialize(
-          BottleSerializer,
-          results.map((r) => r.bottle),
-          currentUser,
-        )
-      ).map((data, index) => [results[index].id, data]),
-    );
-
-    const releaseList = Array.from(
-      new Set(results.map((r) => r.release).filter(notEmpty)),
-    );
-    const releasesById = Object.fromEntries(
-      (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
-        (data, index) => [releaseList[index].id, data],
-      ),
-    );
-
     // TODO: combine friends + createdBy
-    const usersByRef = Object.fromEntries(
-      (
-        await serialize(
-          UserSerializer,
-          results.map((r) => r.createdBy),
-          currentUser,
-        )
-      ).map((data, index) => [results[index].id, data]),
+    const creatorIds = [...new Set(itemList.map((item) => item.createdById))];
+    const creatorList = creatorIds.length
+      ? await db.select().from(users).where(inArray(users.id, creatorIds))
+      : [];
+    const creatorsById = Object.fromEntries(
+      (await serialize(UserSerializer, creatorList, currentUser)).map(
+        (data, index) => [creatorList[index].id, data],
+      ),
     );
 
     const friendIds = Array.from(
@@ -148,11 +136,8 @@ export const TastingSerializer = serializer({
           item.id,
           {
             hasToasted: userToastsList.includes(item.id),
-            createdBy: usersByRef[item.id],
-            bottle: bottlesByRef[item.id],
-            release: item.releaseId
-              ? (releasesById[item.releaseId] ?? null)
-              : null,
+            createdBy: creatorsById[item.createdById],
+            target: targetByTastingId[item.id],
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
           },
@@ -185,8 +170,7 @@ export const TastingSerializer = serializer({
 
       awards: attrs.awards,
 
-      bottle: attrs.bottle,
-      release: attrs.release,
+      target: attrs.target,
       createdBy: attrs.createdBy,
       hasToasted: attrs.hasToasted,
     };

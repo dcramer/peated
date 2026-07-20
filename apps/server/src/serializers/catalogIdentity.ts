@@ -42,7 +42,7 @@ export type CatalogTargetSerializerItem = CatalogTarget & {
   bottle: ConcreteBottleSerializerItem | null;
 };
 
-function requireReadContext(
+export function assertCatalogIdentityReadContext(
   context?: CatalogIdentitySerializerContext,
 ): asserts context is CatalogIdentitySerializerContext {
   if (!context) {
@@ -65,7 +65,7 @@ export const BottleGroupSummarySerializer = serializer({
     _currentUser?: User | null,
     context?: CatalogIdentitySerializerContext,
   ): BottleGroupV1 => {
-    requireReadContext(context);
+    assertCatalogIdentityReadContext(context);
 
     return BottleGroupV1Schema.parse({
       schemaVersion: CATALOG_IDENTITY_SCHEMA_VERSION,
@@ -104,7 +104,7 @@ export const ConcreteBottleSerializer = serializer({
     _currentUser?: User | null,
     context?: CatalogIdentitySerializerContext,
   ): ConcreteBottleV1 => {
-    requireReadContext(context);
+    assertCatalogIdentityReadContext(context);
 
     return ConcreteBottleV1Schema.parse({
       schemaVersion: CATALOG_IDENTITY_SCHEMA_VERSION,
@@ -155,7 +155,7 @@ export const CatalogTargetSerializer = serializer({
     _currentUser?: User | null,
     context?: CatalogIdentitySerializerContext,
   ): Promise<Record<number, CatalogTargetAttrs>> => {
-    requireReadContext(context);
+    assertCatalogIdentityReadContext(context);
 
     const groups = await serialize(
       BottleGroupSummarySerializer,
@@ -201,7 +201,7 @@ export const CatalogTargetSerializer = serializer({
     _currentUser?: User | null,
     context?: CatalogIdentitySerializerContext,
   ): CatalogTargetV1 => {
-    requireReadContext(context);
+    assertCatalogIdentityReadContext(context);
 
     if (item.groupId !== item.group.id) {
       throw new Error(`Catalog target ${item.id} has a mismatched group`);

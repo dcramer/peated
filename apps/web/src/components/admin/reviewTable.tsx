@@ -1,5 +1,5 @@
+import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Link from "@peated/web/components/link";
-import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
 
 import type { PagingRel, Review } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
@@ -46,23 +46,8 @@ export default function ReviewTable({
                     {review.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
-                    {review.release ? (
-                      <Link
-                        href={getBottleBottlingPath(
-                          review.release.bottleId,
-                          review.release.id,
-                        )}
-                        className="hover:underline"
-                      >
-                        [{review.release.id}] ({review.release.fullName})
-                      </Link>
-                    ) : review.bottle ? (
-                      <Link
-                        href={`/bottles/${review.bottle.id}`}
-                        className="hover:underline"
-                      >
-                        [{review.bottle.id}] ({review.bottle.fullName})
-                      </Link>
+                    {review.target ? (
+                      <CatalogTargetIdentity target={review.target} compact />
                     ) : (
                       <em>No Bottle</em>
                     )}

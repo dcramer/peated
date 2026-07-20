@@ -17,6 +17,7 @@ import { logInfo } from "@peated/server/lib/log";
 import type { CatalogTargetV1 } from "@peated/server/schemas/catalogIdentity";
 import { serialize } from "@peated/server/serializers";
 import {
+  assertCatalogIdentityReadContext,
   CatalogTargetSerializer,
   type CatalogIdentitySerializerContext,
   type CatalogTargetSerializerItem,
@@ -494,6 +495,31 @@ async function queryHydratedCatalogTarget(
   });
 }
 
+async function queryHydratedCatalogTargets(
+  database: AnyDatabase,
+  targetIds: number[],
+) {
+  if (!targetIds.length) return [];
+
+  return await database.query.catalogTargets.findMany({
+    where: inArray(catalogTargets.id, targetIds),
+    with: {
+      group: {
+        with: {
+          distillers: true,
+        },
+      },
+      bottle: {
+        with: {
+          bottlesToDistillers: {
+            columns: { distillerId: true },
+          },
+        },
+      },
+    },
+  });
+}
+
 type HydratedCatalogTarget = NonNullable<
   Awaited<ReturnType<typeof queryHydratedCatalogTarget>>
 >;
@@ -533,6 +559,32 @@ type CatalogTargetQuery<T extends CatalogTargetIntegrityProjection> = (
   where: SQL<unknown>,
 ) => Promise<T | undefined>;
 
+function assertGroupNotRetired(
+  groupId: number,
+  groupTombstone?: { newGroupId: number },
+): void {
+  if (groupTombstone) {
+    throw new CatalogTargetRetiredError(
+      { groupId },
+      { kind: "group", groupId: groupTombstone.newGroupId },
+    );
+  }
+}
+
+function assertBottleNotRetired(
+  bottleId: number,
+  bottleTombstone?: { newBottleId: number | null },
+): void {
+  if (bottleTombstone) {
+    throw new CatalogTargetRetiredError(
+      { bottleId },
+      bottleTombstone.newBottleId === null
+        ? null
+        : { kind: "bottle", bottleId: bottleTombstone.newBottleId },
+    );
+  }
+}
+
 async function throwIfGroupRetired(
   groupId: number,
   database: AnyDatabase,
@@ -540,12 +592,7 @@ async function throwIfGroupRetired(
   const tombstone = await database.query.bottleGroupTombstones.findFirst({
     where: eq(bottleGroupTombstones.groupId, groupId),
   });
-  if (tombstone) {
-    throw new CatalogTargetRetiredError(
-      { groupId },
-      { kind: "group", groupId: tombstone.newGroupId },
-    );
-  }
+  assertGroupNotRetired(groupId, tombstone);
 }
 
 async function throwIfBottleRetired(
@@ -555,14 +602,7 @@ async function throwIfBottleRetired(
   const tombstone = await database.query.bottleTombstones.findFirst({
     where: eq(bottleTombstones.bottleId, bottleId),
   });
-  if (tombstone) {
-    throw new CatalogTargetRetiredError(
-      { bottleId },
-      tombstone.newBottleId === null
-        ? null
-        : { kind: "bottle", bottleId: tombstone.newBottleId },
-    );
-  }
+  assertBottleNotRetired(bottleId, tombstone);
 }
 
 function assertTargetIntegrity(target: CatalogTargetIntegrityProjection): void {
@@ -599,9 +639,19 @@ async function assertTargetActive(
   target: CatalogTargetIntegrityProjection,
   database: AnyDatabase,
 ): Promise<void> {
-  await throwIfGroupRetired(target.groupId, database);
+  const [groupTombstone, bottleTombstone] = await Promise.all([
+    database.query.bottleGroupTombstones.findFirst({
+      where: eq(bottleGroupTombstones.groupId, target.groupId),
+    }),
+    target.bottleId === null
+      ? undefined
+      : database.query.bottleTombstones.findFirst({
+          where: eq(bottleTombstones.bottleId, target.bottleId),
+        }),
+  ]);
+  assertGroupNotRetired(target.groupId, groupTombstone);
   if (target.bottleId !== null) {
-    await throwIfBottleRetired(target.bottleId, database);
+    assertBottleNotRetired(target.bottleId, bottleTombstone);
   }
 }
 
@@ -842,8 +892,9 @@ async function findLegacyTargetUsing<
   access: LegacyCatalogTargetAccess,
   database: AnyDatabase,
   loaders: CatalogTargetLoaders<T>,
+  recordUsage = true,
 ): Promise<T> {
-  recordLegacyCatalogTargetUsage(reference, context, access);
+  if (recordUsage) recordLegacyCatalogTargetUsage(reference, context, access);
 
   if (reference.releaseId !== null) {
     const release = await database.query.bottleReleases.findFirst({
@@ -973,11 +1024,20 @@ async function findAssignmentLegacyTarget(
   reference: LegacyCatalogTargetReference,
   context: CatalogTargetOperationContext,
   database: AnyDatabase,
+  access: LegacyCatalogTargetAccess = "write",
+  recordUsage = true,
 ): Promise<AssignmentCatalogTarget> {
-  return await findLegacyTargetUsing(reference, context, "write", database, {
-    byBottleId: findAssignmentTargetByBottleId,
-    byGroupId: findAssignmentTargetByGroupId,
-  });
+  return await findLegacyTargetUsing(
+    reference,
+    context,
+    access,
+    database,
+    {
+      byBottleId: findAssignmentTargetByBottleId,
+      byGroupId: findAssignmentTargetByGroupId,
+    },
+    recordUsage,
+  );
 }
 
 /** Load one target by its durable target id without changing generic intent. */
@@ -990,6 +1050,79 @@ export async function loadCatalogTarget(
     await findTargetById(targetId, database),
     context,
   );
+}
+
+export type CatalogTargetBatchResolution =
+  | { ok: true; target: CatalogTargetV1 }
+  | { ok: false; error: unknown };
+
+/** Batch-hydrate targets while retaining each target's own resolution error. */
+export async function loadCatalogTargetBatch(
+  targetIds: number[],
+  context: CatalogIdentitySerializerContext,
+  database: AnyDatabase = db,
+): Promise<Map<number, CatalogTargetBatchResolution>> {
+  assertCatalogIdentityReadContext(context);
+
+  const uniqueTargetIds = [...new Set(targetIds)];
+  const targets = await queryHydratedCatalogTargets(database, uniqueTargetIds);
+  const targetById = new Map(targets.map((target) => [target.id, target]));
+  const groupIds = [...new Set(targets.map((target) => target.groupId))];
+  const bottleIds = [
+    ...new Set(
+      targets.flatMap((target) =>
+        target.bottleId === null ? [] : [target.bottleId],
+      ),
+    ),
+  ];
+  const [groupTombstoneRows, bottleTombstoneRows] = await Promise.all([
+    groupIds.length
+      ? database.query.bottleGroupTombstones.findMany({
+          where: inArray(bottleGroupTombstones.groupId, groupIds),
+        })
+      : [],
+    bottleIds.length
+      ? database.query.bottleTombstones.findMany({
+          where: inArray(bottleTombstones.bottleId, bottleIds),
+        })
+      : [],
+  ]);
+  const groupTombstoneById = new Map(
+    groupTombstoneRows.map((tombstone) => [tombstone.groupId, tombstone]),
+  );
+  const bottleTombstoneById = new Map(
+    bottleTombstoneRows.map((tombstone) => [tombstone.bottleId, tombstone]),
+  );
+
+  const entries: [number, CatalogTargetBatchResolution][] = await Promise.all(
+    uniqueTargetIds.map(async (targetId) => {
+      try {
+        const target = targetById.get(targetId);
+        if (!target) throw new CatalogTargetNotFoundError({ targetId });
+        assertTargetIntegrity(target);
+        assertGroupNotRetired(
+          target.groupId,
+          groupTombstoneById.get(target.groupId),
+        );
+        if (target.bottleId !== null) {
+          assertBottleNotRetired(
+            target.bottleId,
+            bottleTombstoneById.get(target.bottleId),
+          );
+        }
+        return [
+          targetId,
+          { ok: true, target: await serializeTarget(target, context) },
+        ] as [number, CatalogTargetBatchResolution];
+      } catch (error) {
+        return [targetId, { ok: false, error }] as [
+          number,
+          CatalogTargetBatchResolution,
+        ];
+      }
+    }),
+  );
+  return new Map(entries);
 }
 
 /** Load the exact target owned by one concrete Bottle. */
@@ -1026,6 +1159,86 @@ export async function loadCatalogTargetByLegacyReference(
     await findLegacyTarget(reference, context, "read", database),
     context,
   );
+}
+
+export type LegacyCatalogTargetReadFilter = {
+  bottleId?: number;
+  releaseId?: number;
+};
+
+/**
+ * Translates retained list filters through one measured compatibility owner.
+ * Task 9.7 removes this adapter with Bottle/Release query input.
+ */
+export async function resolveLegacyCatalogTargetFilterForRead(
+  filter: LegacyCatalogTargetReadFilter,
+  context: CatalogTargetOperationContext,
+  database: AnyDatabase = db,
+): Promise<CatalogTargetAssignmentDescriptor | null> {
+  assertOperationContext(context);
+  if (filter.bottleId === undefined && filter.releaseId === undefined) {
+    throw new TypeError("A legacy Bottle or release filter is required.");
+  }
+
+  let resolvedBottleId = filter.bottleId ?? null;
+  let outcome: "resolved" | "not_found" | "mismatched_pair" | "error" = "error";
+  try {
+    if (filter.releaseId !== undefined) {
+      const release = await database.query.bottleReleases.findFirst({
+        where: eq(bottleReleases.id, filter.releaseId),
+        columns: { bottleId: true },
+      });
+      if (!release) {
+        outcome = "not_found";
+        return null;
+      }
+      if (
+        filter.bottleId !== undefined &&
+        filter.bottleId !== release.bottleId
+      ) {
+        outcome = "mismatched_pair";
+        return null;
+      }
+      resolvedBottleId = release.bottleId;
+    }
+
+    try {
+      const target = await findAssignmentLegacyTarget(
+        {
+          bottleId: resolvedBottleId!,
+          releaseId: filter.releaseId ?? null,
+        },
+        context,
+        database,
+        "read",
+        false,
+      );
+      outcome = "resolved";
+      return {
+        targetId: target.id,
+        groupId: target.groupId,
+        bottleId: target.bottleId,
+      };
+    } catch (error) {
+      if (error instanceof CatalogTargetNotFoundError) {
+        outcome = "not_found";
+        return null;
+      }
+      throw error;
+    }
+  } finally {
+    logInfo("Legacy catalog target filter compatibility", {
+      extra: {
+        event: "catalog_target.compatibility",
+        access: "read",
+        caller: context.caller,
+        operation: context.operation,
+        bottleId: resolvedBottleId,
+        releaseId: filter.releaseId ?? null,
+        outcome,
+      },
+    });
+  }
 }
 
 /**

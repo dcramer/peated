@@ -5,8 +5,7 @@ import {
 import { z } from "zod";
 import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
-import { BottleReleaseSchema } from "./bottleReleases";
-import { BottleSchema } from "./bottles";
+import { CatalogTargetV1Schema } from "./catalogIdentity";
 import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
@@ -24,12 +23,9 @@ export const TastingSchema = z.object({
     .nullable()
     .default(null)
     .describe("User's tasting notes and observations"),
-  bottle: BottleSchema.describe("The bottle that was tasted"),
-  release: BottleReleaseSchema.nullable()
-    .default(null)
-    .describe(
-      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
-    ),
+  target: CatalogTargetV1Schema.describe(
+    "Exact Bottle or generic BottleGroup that was tasted",
+  ),
   rating: z
     .union([
       z.literal(SIMPLE_RATING_VALUES.PASS),
@@ -88,6 +84,7 @@ export const TastingSchema = z.object({
 
 export const TastingInputSchema = TastingSchema.omit({
   id: true,
+  target: true,
   awards: true,
   comments: true,
   toasts: true,

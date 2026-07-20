@@ -138,8 +138,11 @@ describe("PATCH /reviews/:review", () => {
       where: eq(catalogTargets.bottleId, promotedBottle.id),
     });
     expect(updatedReview.targetId).toBe(target?.id);
-    expect(newReviewData.bottle?.id).toBe(bottle.id);
-    expect(newReviewData.release?.id).toBe(release.id);
+    expect(newReviewData.target).toMatchObject({
+      kind: "bottle",
+      targetId: target?.id,
+      bottle: { id: promotedBottle.id },
+    });
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -188,8 +191,11 @@ describe("PATCH /reviews/:review", () => {
       where: eq(catalogTargets.bottleId, otherBottle.id),
     });
     expect(updatedReview.targetId).toBe(target?.id);
-    expect(newReviewData.bottle?.id).toBe(otherBottle.id);
-    expect(newReviewData.release).toBeNull();
+    expect(newReviewData.target).toMatchObject({
+      kind: "bottle",
+      targetId: target?.id,
+      bottle: { id: otherBottle.id },
+    });
   });
 
   test("rejects mismatched bottle and release updates", async ({

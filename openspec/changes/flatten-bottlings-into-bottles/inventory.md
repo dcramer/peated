@@ -1,7 +1,7 @@
 # Legacy BottleRelease Inventory
 
 This is the source inventory for the compatibility and cleanup gates. It was
-recaptured on 2026-07-17 from production source files with:
+recaptured on 2026-07-20 from production source files with:
 
 ```sh
 rg -l -S 'releaseId|release_id|bottle_release|bottleReleases|BottleRelease' \
@@ -113,8 +113,12 @@ The Drizzle owners are:
 - `apps/server/src/serializers/bottle.ts`
 - `apps/server/src/serializers/bottleRelease.ts`
 - `apps/server/src/serializers/collectionBottle.ts`
-- `apps/server/src/serializers/review.ts`
-- `apps/server/src/serializers/tasting.ts`
+- `apps/server/src/serializers/review.ts` and
+  `apps/server/src/serializers/tasting.ts` now hydrate their authoritative
+  CatalogTargets and compare them with the retained pair through the shared
+  parity reader. Tasting activity entries reuse the target-backed tasting
+  serializer. Tasks 7.1-7.3 remain open for collections, flights, prices,
+  aliases, observations, decisions, proposals, and remaining activity reads.
 - `apps/server/src/lib/activityFeed.ts`
 - `apps/server/src/orpc/routes/users/library-stats.ts`
 
@@ -234,7 +238,10 @@ Target-bearing consumer routes:
   retains the bounded original classifier evidence. This direct path has no raw
   alias or BottleRelease writer. Only `no_match` and failed/unresolved decisions
   remain targetless. Shared alias-driven Review propagation remains task 5.6b.
-- `apps/server/src/orpc/routes/reviews/list.ts`
+- `apps/server/src/orpc/routes/reviews/list.ts` now filters and returns
+  target-backed Review identity. Its retained Bottle/Release list input is a
+  measured translation adapter removed under task 9.7; it does not make the
+  legacy pair authoritative over a durable target.
 - `apps/server/src/orpc/routes/reviews/update.ts` is the task 5.6c direct Review
   mutation boundary. It snapshots Review identity, resolves and locks the
   authoritative CatalogTarget first when one applies, and then locks the
@@ -244,7 +251,9 @@ Target-bearing consumer routes:
   clear, validates and writes a complete tuple for identity correction, and
   preserves a durable target for non-identity updates. Only a currently null
   target may be measured-repaired from its retained pair; an unresolvable
-  staged legacy row remains targetless. Review reads remain task 7.3.
+  staged legacy row remains targetless. Review serialization is now part of the
+  partial task 7.1-7.3 cutover; other named consumers still keep those tasks
+  open.
 - `apps/server/src/orpc/routes/flights/targetAssignments.ts` is the task 5.6e
   shared assignment boundary for staged Flight Bottle-id input. It resolves
   every submitted `(bottleId, null)` intent through deterministic legacy
@@ -268,7 +277,10 @@ Target-bearing consumer routes:
   deployment claim.
 - `apps/server/src/orpc/routes/tastings/create.ts`
 - `apps/server/src/orpc/routes/tastings/delete.ts`
-- `apps/server/src/orpc/routes/tastings/list.ts`
+- `apps/server/src/orpc/routes/tastings/list.ts` now filters and returns
+  target-backed Tasting identity. Its retained Bottle/Release list input is a
+  measured translation adapter removed under task 9.7; a durable target remains
+  authoritative and generic filtering never selects a representative Bottle.
 - `apps/server/src/orpc/routes/tastings/update.ts` trusts a durable target and
   uses the measured legacy pair only to repair a null `targetId` when rating or
   target state requires recomputation. It persists that descriptor before
@@ -394,6 +406,9 @@ Catalog identity, aliases, search, creation, and updates:
   Durable `targetId` values are authoritative; the measured legacy pair is used
   only when a compatibility row has no target. Retain that legacy branch
   through the task 9.5 read window and remove it under task 9.7.
+  `resolveLegacyCatalogTargetFilterForRead` is the measured Bottle/Release list
+  input adapter used by the partial tasting and Review cutover; task 9.7 removes
+  it after callers carry target identity directly.
   Task 5.6c uses this boundary once for direct Review exact or generic intent,
   then revalidates and locks that descriptor before locking and mutating the
   Review. Review update accepts the mutation only when its subsequently locked
@@ -401,6 +416,14 @@ Catalog identity, aliases, search, creation, and updates:
   back and retries from a fresh snapshot. A durable target is never reconstructed
   from the retained pair; only a null-target Review may use the measured pair for
   compatibility repair, without substituting a group representative.
+- `apps/server/src/lib/catalogTargetReadParity.ts` is the shared task 7.1-7.2
+  parity owner for target-bearing serializers and route filters. It batch-loads
+  authoritative targets, compares them with measured legacy-pair resolution,
+  records correlated consumer/row mismatch evidence, and records bounded
+  target-versus-legacy filter-membership drift without changing authoritative
+  results. It never falls back when a durable target is invalid. Its legacy
+  comparison is removed with runtime compatibility under task 9.7 after the
+  remaining task 7.1-7.3 consumers and parity gates complete.
 - `apps/server/src/lib/bottleAliases.ts` is the task 5.5a canonical assignment
   owner for the exact/moderator alias path. An explicit exact target is validated
   and stored. Its measured targetless compatibility mode does not resolve a
@@ -734,6 +757,10 @@ Classifier decisions and price matching:
 - `apps/server/src/lib/catalogMigrationConsumerBackfill.ts` owns the separate
   remaining-consumer parent-family transaction and consumes the runtime-owned
   logical-slot contract. Task 10.10 removes it and its integration test.
+- `apps/server/src/lib/catalogMigrationFamilyTargets.ts` is the shared
+  BottleRelease-family resolver and lock/revalidation owner used by the
+  alias/observation and remaining-consumer backfills. Task 10.10 removes it
+  with those migration-only backfills after their evidence is retained.
 - `apps/server/src/lib/catalogMigrationRevision.ts` loads the database name and
   latest applied Drizzle revision read-only and requires its hash/timestamp to
   match the latest candidate migration before reporting or writes. Task 10.10
@@ -825,6 +852,9 @@ Shared UI and client helpers:
 - `apps/web/src/components/releaseForm.tsx`
 - `apps/web/src/components/tastingForm.tsx`
 - `apps/web/src/lib/addBottle.ts`
+- `apps/web/src/lib/tastingForm.ts` shapes the validated form submission. Create
+  still carries the staged Bottle/Release identity until task 8.7 moves tasting
+  creation to one `targetId`; edit is content-only and cannot mutate identity.
 - `apps/web/src/lib/bottlings.ts`
 
 Admin exports and test protocol fixtures that encode release fields:

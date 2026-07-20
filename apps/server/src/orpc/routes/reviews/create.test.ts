@@ -1845,8 +1845,11 @@ describe("POST /reviews", () => {
     expect(review?.bottleId).toEqual(bottle.id);
     expect(review?.releaseId).toEqual(release.id);
     expect(review?.targetId).toEqual(promotedTarget?.id);
-    expect(data.bottle?.id).toEqual(bottle.id);
-    expect(data.release?.id).toEqual(release.id);
+    expect(data.target).toMatchObject({
+      kind: "bottle",
+      targetId: promotedTarget?.id,
+      bottle: { id: promotedBottle.id },
+    });
   });
 
   test("preserves raw release alias text when normalization would strip release identity", async ({

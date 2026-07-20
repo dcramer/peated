@@ -1,12 +1,17 @@
 import { db } from "@peated/server/db";
 import {
+  bottleGroupDistillers,
+  bottleGroups,
   bottles,
   bottlesToDistillers,
+  catalogTargets,
   follows,
   tastings,
   users,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { recordCatalogTargetReadFilterParity } from "@peated/server/lib/catalogTargetReadParity";
+import { resolveLegacyCatalogTargetFilterForRead } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { TastingSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -52,28 +57,85 @@ export default procedure
   }) {
     const offset = (cursor - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [];
-    if (input.bottle) {
-      where.push(eq(tastings.bottleId, input.bottle));
-    }
-
-    if (input.release) {
-      where.push(eq(tastings.releaseId, input.release));
+    const baseWhere: (SQL<unknown> | undefined)[] = [];
+    const targetWhere: SQL<unknown>[] = [];
+    const parityFilters: {
+      filter: "catalog_reference" | "entity";
+      targetWhere: SQL<unknown>;
+      legacyWhere: SQL<unknown>;
+    }[] = [];
+    if (input.bottle || input.release) {
+      const target = await resolveLegacyCatalogTargetFilterForRead(
+        {
+          bottleId: input.bottle,
+          releaseId: input.release,
+        },
+        { caller: "tastings.list", operation: "filter" },
+      );
+      const authoritativeWhere = target
+        ? eq(tastings.targetId, target.targetId)
+        : sql`false`;
+      const legacyWhere = and(
+        input.bottle === undefined
+          ? undefined
+          : eq(tastings.bottleId, input.bottle),
+        input.release === undefined
+          ? undefined
+          : eq(tastings.releaseId, input.release),
+      )!;
+      targetWhere.push(authoritativeWhere);
+      parityFilters.push({
+        filter: "catalog_reference",
+        targetWhere: authoritativeWhere,
+        legacyWhere,
+      });
     }
 
     if (input.entity) {
-      where.push(
-        sql`EXISTS(
-          SELECT FROM ${bottles}
-          WHERE (${bottles.brandId} = ${input.entity}
-             OR ${bottles.bottlerId} = ${input.entity}
-             OR EXISTS(
-              SELECT FROM ${bottlesToDistillers}
-              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                AND ${bottlesToDistillers.distillerId} = ${input.entity}
-             )) AND ${bottles.id} = ${tastings.bottleId}
-          )`,
-      );
+      const authoritativeWhere = sql`EXISTS(
+          SELECT FROM ${catalogTargets}
+          WHERE ${catalogTargets.id} = ${tastings.targetId}
+            AND (
+              (${catalogTargets.bottleId} IS NOT NULL AND EXISTS(
+                SELECT FROM ${bottles}
+                WHERE ${bottles.id} = ${catalogTargets.bottleId}
+                  AND (${bottles.brandId} = ${input.entity}
+                    OR ${bottles.bottlerId} = ${input.entity}
+                    OR EXISTS(
+                      SELECT FROM ${bottlesToDistillers}
+                      WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+                        AND ${bottlesToDistillers.distillerId} = ${input.entity}
+                    ))
+              ))
+              OR (${catalogTargets.bottleId} IS NULL AND EXISTS(
+                SELECT FROM ${bottleGroups}
+                WHERE ${bottleGroups.id} = ${catalogTargets.groupId}
+                  AND (${bottleGroups.brandId} = ${input.entity}
+                    OR ${bottleGroups.bottlerId} = ${input.entity}
+                    OR EXISTS(
+                      SELECT FROM ${bottleGroupDistillers}
+                      WHERE ${bottleGroupDistillers.groupId} = ${bottleGroups.id}
+                        AND ${bottleGroupDistillers.distillerId} = ${input.entity}
+                    ))
+              ))
+            )
+          )`;
+      const legacyWhere = sql`EXISTS(
+        SELECT FROM ${bottles}
+        WHERE (${bottles.brandId} = ${input.entity}
+          OR ${bottles.bottlerId} = ${input.entity}
+          OR EXISTS(
+            SELECT FROM ${bottlesToDistillers}
+            WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${bottlesToDistillers.distillerId} = ${input.entity}
+          )) AND ${bottles.id} = ${tastings.bottleId}
+      )`;
+      targetWhere.push(authoritativeWhere);
+      parityFilters.push({
+        filter: "entity",
+        targetWhere: authoritativeWhere,
+        legacyWhere,
+      });
     }
 
     if (input.user) {
@@ -89,7 +151,7 @@ export default procedure
         }
       }
 
-      where.push(eq(tastings.createdById, selectedUser.id));
+      baseWhere.push(eq(tastings.createdById, selectedUser.id));
     }
 
     const limitPrivate = input.filter !== "friends";
@@ -97,13 +159,13 @@ export default procedure
       if (!context.user) {
         throw errors.UNAUTHORIZED();
       }
-      where.push(
+      baseWhere.push(
         sql`${tastings.createdById} IN (SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${context.user.id} AND ${follows.status} = 'following')`,
       );
     }
 
     if (limitPrivate) {
-      where.push(
+      baseWhere.push(
         or(
           eq(users.private, false),
           ...(context.user
@@ -122,10 +184,51 @@ export default procedure
       .select({ tastings })
       .from(tastings)
       .innerJoin(users, eq(users.id, tastings.createdById))
-      .where(where ? and(...where) : undefined)
+      .where(and(...baseWhere, ...targetWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(desc(tastings.createdAt));
+
+    await Promise.all(
+      parityFilters.map(async (parityFilter) => {
+        const candidates = await db
+          .select({
+            id: tastings.id,
+            targetId: tastings.targetId,
+            bottleId: tastings.bottleId,
+            releaseId: tastings.releaseId,
+            targetMatches: sql<boolean>`COALESCE(${parityFilter.targetWhere}, false)`,
+            legacyMatches: sql<boolean>`COALESCE(${parityFilter.legacyWhere}, false)`,
+          })
+          .from(tastings)
+          .innerJoin(users, eq(users.id, tastings.createdById))
+          .where(
+            and(
+              ...baseWhere,
+              or(parityFilter.targetWhere, parityFilter.legacyWhere),
+            ),
+          )
+          .limit(limit + 1)
+          .offset(offset)
+          .orderBy(desc(tastings.createdAt));
+
+        recordCatalogTargetReadFilterParity(
+          candidates.map((candidate) => ({
+            consumerTable: "tasting",
+            rowLocator: { id: candidate.id },
+            targetId: candidate.targetId,
+            legacy: {
+              bottleId: candidate.bottleId,
+              releaseId: candidate.releaseId,
+            },
+            filter: parityFilter.filter,
+            targetMatches: candidate.targetMatches,
+            legacyMatches: candidate.legacyMatches,
+          })),
+          { caller: "tastings.list", operation: "filter" },
+        );
+      }),
+    );
 
     return {
       results: await serialize(
