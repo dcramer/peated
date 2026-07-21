@@ -15,13 +15,13 @@ import { db } from "../db";
 import {
   comments,
   users,
-  type Bottle,
   type Comment,
   type Tasting,
   type User,
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
+import { loadCatalogTarget } from "./catalogTargets";
 import { logError, logInfo } from "./log";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
@@ -29,7 +29,6 @@ let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 type CommentWithRelations = Comment & {
   createdBy: User;
   tasting: Tasting & {
-    bottle: Bottle;
     createdBy: User;
   };
 };
@@ -93,6 +92,18 @@ export async function notifyComment({
   // dont notify self
   if (comment.createdById === comment.tasting.createdById) return;
 
+  if (comment.tasting.targetId === null) {
+    throw new Error(`Tasting ${comment.tasting.id} has no CatalogTarget`);
+  }
+  const target = await loadCatalogTarget(comment.tasting.targetId, {
+    actor: null,
+    permissions: { canReadCatalogIdentity: true },
+  });
+  const exactBottleSpecified = target.kind === "bottle";
+  const targetLabel = exactBottleSpecified
+    ? target.bottle.fullName
+    : target.group.fullName;
+
   const userIds =
     comment.createdById === comment.tasting.createdById
       ? []
@@ -133,7 +144,22 @@ export async function notifyComment({
   const commentUrl = `${config.URL_PREFIX}/tastings/${comment.tasting.id}#c_${comment.id}`;
 
   const html = await render(
-    NewCommentTemplate({ baseUrl: config.URL_PREFIX, comment }),
+    NewCommentTemplate({
+      baseUrl: config.URL_PREFIX,
+      comment: {
+        id: comment.id,
+        comment: comment.comment,
+        createdBy: {
+          username: comment.createdBy.username,
+          pictureUrl: comment.createdBy.pictureUrl,
+        },
+        tasting: {
+          id: comment.tasting.id,
+          targetLabel,
+          exactBottleSpecified,
+        },
+      },
+    }),
   );
 
   logInfo("Sending comment notification email for comment {commentId}", {
@@ -149,7 +175,7 @@ export async function notifyComment({
         ...getMailDefaults(),
         to: email,
         subject: "New Comment on Tasting",
-        text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
+        text: `View this comment on Peated: ${commentUrl}\n\n${targetLabel}${exactBottleSpecified ? "" : "\nExact bottle not specified"}\n\n${comment.comment}`,
         html,
       });
     } catch (err) {

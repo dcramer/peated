@@ -99,6 +99,11 @@ The Drizzle owners are:
   required evidence is retained.
 - `apps/server/src/schemas/collections.ts`
 - `apps/server/src/schemas/index.ts`
+- `apps/server/src/schemas/notifications.ts` owns a strict type-discriminated
+  response contract. Friend-request, toast, and comment references remain
+  nullable, while toast and comment references use a narrow notification-owned
+  `{ id, target }` projection carrying the tasting id and one authoritative
+  CatalogTarget.
 - `apps/server/src/schemas/priceMatches.ts`
 - `apps/server/src/schemas/reviews.ts`
 - `apps/server/src/schemas/shared.ts`
@@ -141,6 +146,13 @@ The Drizzle owners are:
 - `apps/server/src/lib/activityFeed.ts` passes raw collection memberships to
   the target-backed serializer; it no longer joins retained Bottle or
   BottleRelease identity for collection previews.
+- `apps/server/src/serializers/notification.ts` matches the discriminated
+  notification contract at serialization time. Toast and comment references
+  hydrate that narrow projection through the shared CatalogTarget parity reader,
+  so exact and generic activity expose their durable target without a broad
+  Tasting projection or legacy Bottle-shaped fallback. Friend-request
+  references are actionable only when the referenced follow's sender and
+  recipient match the notification identity; corrupt references fail closed.
 - `apps/server/src/orpc/routes/users/library-stats.ts`
 
 ## API routes
@@ -213,12 +225,11 @@ Bottle catalog routes:
   their generic/exact/alias response boundaries, and their bounded moderator
   request shapes. This additive API surface is review slicing only: it makes no
   deployment, activation, production-audit, or backfill-execution claim.
-- `apps/server/src/orpc/routes/bottles/create-from-source.ts` and its
-  `/bottles/from/{bottle}` contract are superseded public group-selection
-  surfaces. Task 5.2 removes the route and task 5.11 removes its generated
-  OpenAPI/client contract. Internal trusted-source creation remains reachable
-  only from the explicitly retained migration, compatibility, and
-  system-controlled boundaries inventoried below.
+- The former `apps/server/src/orpc/routes/bottles/create-from-source.ts` and its
+  `/bottles/from/{bottle}` public group-selection contract were removed by tasks
+  5.2 and 5.11. Internal trusted-source creation remains reachable only from the
+  explicitly retained migration, compatibility, and system-controlled
+  boundaries inventoried below.
 - `apps/server/src/orpc/routes/bottles/delete.ts` is retained only as a measured
   compatibility purge for ungrouped pre-migration Bottles. Grouped concrete
   Bottles are rejected without mutation with an actionable merge-required
@@ -445,9 +456,12 @@ Catalog identity, aliases, search, creation, and updates:
   and consumes the returned exact CatalogTarget for image work. It no longer
   calls or reconstructs the legacy Bottle upsert response.
 - `apps/server/src/lib/createBottle.ts` owns the shared Bottle preparation and
-  persistence core plus the complete legacy and concrete transaction
-  operations. Stable Bottle columns and distiller joins are durable exact-Bottle
-  materialization and must remain synchronized by atomic group-wide writes.
+  persistence core plus canonical concrete transaction operations. Its
+  superseded exported ungrouped transaction wrapper has been removed; retained
+  compatibility reaches the private persistence core only through an explicit
+  trusted concrete-creation boundary. Stable Bottle columns and distiller joins
+  are durable exact-Bottle materialization and must remain synchronized by
+  atomic group-wide writes.
 - `apps/server/src/lib/createConcreteBottle.ts` owns the runtime-validated
   concrete creation service boundary used by future public adapters.
 - `apps/server/src/lib/concreteBottleIdentity.ts` materializes complete exact
@@ -485,6 +499,12 @@ Catalog identity, aliases, search, creation, and updates:
   generic targets and targetless legacy parent Bottles. The projection does not
   silently pre-filter graph errors: strict recomputation validates the active
   graph and target integrity and stops on an invalid row.
+- `apps/server/src/lib/email.ts` and
+  `packages/email/src/templates/newCommentEmail.tsx` render comment activity
+  from the tasting's durable `targetId`. The email boundary receives the exact
+  Bottle or generic BottleGroup label instead of a hydrated `tasting.bottle`;
+  it has no representative-Bottle or legacy-pair fallback, and generic activity
+  explicitly states that the exact Bottle was not specified.
 - `apps/server/src/lib/consolidateCatalogTargetConsumers.ts` is the canonical
   transaction-scoped consumer consolidation owner used by group and exact
   target merges. Retained pair columns remain compatibility preimages until
@@ -768,6 +788,17 @@ Classifier decisions and price matching:
   strict target-backed statistics activation, task 7.10 must stop or upgrade
   any producer that can enqueue a retired legacy parent and drain or expire
   those queued jobs because a retired parent has no active exact target.
+- `apps/server/src/worker/jobs/notifyDiscordOnTasting.ts` keeps the stable
+  `{ tastingId }` job identity, loads the tasting's durable `targetId`, and
+  renders either the exact Bottle or generic BottleGroup label, explicitly
+  identifying generic activity as lacking an exact Bottle. It no longer hydrates
+  `tasting.bottle` or substitutes a representative Bottle.
+- `apps/server/src/worker/jobs/processNotification.ts` keeps the stable
+  `{ notificationId }` job identity and delegates comment email rendering from
+  the tasting's durable target without hydrating `tasting.bottle`. A missing
+  target, retired target, or target-integrity failure is not translated through
+  legacy identity: it escapes the worker boundary so BullMQ retains the failure
+  for diagnosis and retry.
 - `apps/server/src/worker/jobs/updateBottleStats.ts` delegates exact
   recomputation to `recomputeBottleStats`, then delegates aggregate
   recomputation to `recomputeBottleGroupStats`.
@@ -822,6 +853,10 @@ Classifier decisions and price matching:
   exact Git and migration revisions, including generation time, database,
   reconciled counts, and explicit approval; the task 6.13 pre-backfill report
   cannot satisfy that later freshness gate.
+- The activity-notification sub-slice does not complete task 7.10. Remaining
+  cache/search-key and revalidation review, statistics queue/entity-aggregate
+  cutover, and operational producer-stop and queue-drain evidence stay deferred
+  to the rest of that task.
 - `apps/server/src/worker/jobs/mergeBottle.ts` is a measured compatibility
   adapter for queued pre-cutover payloads. It validates and translates the old
   payload into `mergeConcreteBottles` transaction calls and owns no merge
@@ -1004,6 +1039,11 @@ Shared UI and client helpers:
 - `apps/web/src/components/releaseField.tsx`
 - `apps/web/src/components/releaseForm.tsx`
 - `apps/web/src/components/tastingForm.tsx`
+- `apps/web/src/components/notifications/entry.tsx` narrows the strict
+  notification union and renders toast/comment activity with the referenced
+  CatalogTarget label. Exact activity names its Bottle; generic activity names
+  its BottleGroup, states that the exact Bottle was not specified, and never
+  links or labels a representative Bottle.
 - `apps/web/src/lib/addBottle.ts`
 - Collection tables, activity previews, image/status actions, and the
   post-scan Library confirmation now render one CatalogTarget. Exact entries

@@ -1,5 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
+import { loadCatalogTarget } from "@peated/server/lib/catalogTargets";
 import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -17,12 +18,21 @@ export default async function ({ tastingId }: { tastingId: number }) {
     where: (tastings, { eq }) => eq(tastings.id, tastingId),
     with: {
       createdBy: true,
-      bottle: true,
     },
   });
   if (!tasting) {
     throw new Error(`Unknown tasting: ${tastingId}`);
   }
+  if (tasting.targetId === null) {
+    throw new Error(`Tasting ${tastingId} has no CatalogTarget`);
+  }
+
+  const target = await loadCatalogTarget(tasting.targetId, {
+    actor: null,
+    permissions: { canReadCatalogIdentity: true },
+  });
+  const targetLabel =
+    target.kind === "bottle" ? target.bottle.fullName : target.group.fullName;
 
   // TODO: pretty sure we're mismatched timezones on db + server, and need normalization
   // move db to UTC (if its not, or if its not storing tzinfo), and then run all these checks
@@ -32,6 +42,13 @@ export default async function ({ tastingId }: { tastingId: number }) {
   // }
 
   const fields = [];
+  if (target.kind === "group")
+    fields.push({
+      name: "Bottle",
+      value: "Exact bottle not specified",
+      inline: true,
+    });
+
   if (tasting.rating !== null)
     fields.push({
       name: "Rating",
@@ -73,7 +90,7 @@ export default async function ({ tastingId }: { tastingId: number }) {
             ? absoluteUrl(config.API_SERVER, tasting.createdBy.pictureUrl)
             : null,
         },
-        title: tasting.bottle.fullName,
+        title: targetLabel,
         url: `${config.URL_PREFIX}/tastings/${tasting.id}`,
         description: tasting.notes || null,
         fields,

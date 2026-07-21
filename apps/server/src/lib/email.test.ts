@@ -1,4 +1,11 @@
 import config from "@peated/server/config";
+import { db } from "@peated/server/db";
+import {
+  bottleGroups,
+  bottleTombstones,
+  catalogTargets,
+} from "@peated/server/db/schema";
+import { eq } from "drizzle-orm";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
@@ -69,6 +76,7 @@ describe("notifyComment", () => {
       createdById: author.id,
     });
     const comment = await fixtures.Comment({
+      tastingId: tasting.id,
       comment: "**An Comment** on _life_",
       createdById: author.id,
     });
@@ -79,7 +87,6 @@ describe("notifyComment", () => {
         createdBy: author,
         tasting: {
           ...tasting,
-          bottle,
           createdBy: author,
         },
       },
@@ -88,7 +95,7 @@ describe("notifyComment", () => {
     expect(outbox.length).toBe(0);
   });
 
-  test("constructs appropriate email", async ({ fixtures }) => {
+  test("renders the exact Bottle label", async ({ fixtures }) => {
     const otherAuthor = await fixtures.User({
       verified: true,
     });
@@ -97,11 +104,17 @@ describe("notifyComment", () => {
       verified: true,
     });
     const bottle = await fixtures.Bottle();
+    const groupLabel = "Distinct Exact Email Group Label";
+    await db
+      .update(bottleGroups)
+      .set({ fullName: groupLabel })
+      .where(eq(bottleGroups.id, bottle.groupId as number));
     const tasting = await fixtures.Tasting({
       bottleId: bottle.id,
       createdById: author.id,
     });
     const comment = await fixtures.Comment({
+      tastingId: tasting.id,
       comment: "**An Comment** on _life_",
       createdById: otherAuthor.id,
     });
@@ -112,7 +125,6 @@ describe("notifyComment", () => {
         createdBy: otherAuthor,
         tasting: {
           ...tasting,
-          bottle,
           createdBy: author,
         },
       },
@@ -122,6 +134,131 @@ describe("notifyComment", () => {
     const msg = outbox[0];
     expect(msg.to).toBe(author.email);
     expect(msg.subject).toBe("New Comment on Tasting");
+    expect(msg.html).toContain(bottle.fullName);
+    expect(msg.html).not.toContain(groupLabel);
+    expect(msg.html).not.toContain("Exact bottle not specified");
+    expect(msg.text).toContain(bottle.fullName);
+    expect(msg.text).not.toContain(groupLabel);
+    expect(msg.text).not.toContain("Exact bottle not specified");
+  });
+
+  test("renders the generic BottleGroup label without choosing a Bottle", async ({
+    fixtures,
+  }) => {
+    const otherAuthor = await fixtures.User({ verified: true });
+    const author = await fixtures.User({
+      email: "joe@example.com",
+      verified: true,
+    });
+    const bottle = await fixtures.Bottle({ name: "Exact Label" });
+    const groupLabel = "Generic Email Label";
+    await db
+      .update(bottleGroups)
+      .set({ fullName: groupLabel })
+      .where(eq(bottleGroups.id, bottle.groupId as number));
+    const groupTarget = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      with: { group: true },
+    });
+    if (!groupTarget) throw new Error("Missing generic target fixture");
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: groupTarget.id,
+      createdById: author.id,
+    });
+    const comment = await fixtures.Comment({
+      tastingId: tasting.id,
+      comment: "Generic target comment",
+      createdById: otherAuthor.id,
+    });
+
+    await notifyComment({
+      comment: {
+        ...comment,
+        createdBy: otherAuthor,
+        tasting: { ...tasting, createdBy: author },
+      },
+      transport,
+    });
+
+    expect(outbox).toHaveLength(1);
+    expect(outbox[0]?.html).toContain(groupLabel);
+    expect(outbox[0]?.html).not.toContain(bottle.fullName);
+    expect(outbox[0]?.html).toContain("Exact bottle not specified");
+    expect(outbox[0]?.text).toContain(groupLabel);
+    expect(outbox[0]?.text).not.toContain(bottle.fullName);
+    expect(outbox[0]?.text).toContain("Exact bottle not specified");
+  });
+
+  test("rejects a targetless tasting", async ({ fixtures }) => {
+    const otherAuthor = await fixtures.User({ verified: true });
+    const author = await fixtures.User({
+      email: "joe@example.com",
+      verified: true,
+    });
+    const bottle = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: null,
+      createdById: author.id,
+    });
+    const comment = await fixtures.Comment({
+      tastingId: tasting.id,
+      createdById: otherAuthor.id,
+    });
+
+    await expect(
+      notifyComment({
+        comment: {
+          ...comment,
+          createdBy: otherAuthor,
+          tasting: { ...tasting, createdBy: author },
+        },
+        transport,
+      }),
+    ).rejects.toThrow(`Tasting ${tasting.id} has no CatalogTarget`);
+    expect(outbox).toHaveLength(0);
+  });
+
+  test("rejects a retired exact target", async ({ fixtures }) => {
+    const otherAuthor = await fixtures.User({ verified: true });
+    const author = await fixtures.User({
+      email: "joe@example.com",
+      verified: true,
+    });
+    const bottle = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: author.id,
+    });
+    const comment = await fixtures.Comment({
+      tastingId: tasting.id,
+      createdById: otherAuthor.id,
+    });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing exact target fixture");
+    await db.insert(bottleTombstones).values({ bottleId: bottle.id });
+
+    await expect(
+      notifyComment({
+        comment: {
+          ...comment,
+          createdBy: otherAuthor,
+          tasting: { ...tasting, createdBy: author },
+        },
+        transport,
+      }),
+    ).rejects.toMatchObject({
+      code: "CATALOG_TARGET_RETIRED",
+      identity: { bottleId: bottle.id },
+    });
+    expect(outbox).toHaveLength(0);
   });
 });
 

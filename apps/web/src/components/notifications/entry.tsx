@@ -1,10 +1,14 @@
 "use client";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
+import type { CatalogTargetV1 } from "@peated/server/schemas";
 import type { Notification } from "@peated/server/types";
 import Link from "@peated/web/components/link";
+import {
+  getCatalogTargetLabel,
+  getCatalogTargetScopeLabel,
+} from "@peated/web/lib/catalogTarget";
 import classNames from "@peated/web/lib/classNames";
-import type { FriendRequestNotification } from "@peated/web/types";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";
@@ -61,11 +65,11 @@ export default function NotificationEntry({
               <NotificationEntryRef
                 notification={notification}
                 onArchive={onArchive}
-                onMarkRead={onMarkRead}
               />
             </div>
             <div className="flex min-h-full flex-shrink">
               <button
+                aria-label="Dismiss notification"
                 onClick={(e) => {
                   e.stopPropagation();
                   onArchive();
@@ -85,7 +89,9 @@ export default function NotificationEntry({
 const getLink = ({ notification }: { notification: Notification }) => {
   switch (notification.type) {
     case "friend_request":
-      return `/users/${notification.fromUser?.username}`;
+      return notification.fromUser
+        ? `/users/${notification.fromUser.username}`
+        : null;
     case "comment":
     case "toast":
       if (notification.ref) return `/tastings/${notification.ref.id}`;
@@ -95,21 +101,28 @@ const getLink = ({ notification }: { notification: Notification }) => {
   }
 };
 
-const getStatusMessage = ({ notification }: { notification: Notification }) => {
+export const getStatusMessage = ({
+  notification,
+}: {
+  notification: Notification;
+}) => {
   switch (notification.type) {
     case "friend_request":
       return <>sent you a friend request</>;
     case "toast":
       return (
         <>
-          toasted
-          {notification.ref && "bottle" in notification.ref ? (
-            <Link
-              href={`/tastings/${notification.ref.id}`}
-              className="mx-1 font-semibold"
-            >
-              {notification.ref.bottle.fullName}
-            </Link>
+          toasted{" "}
+          {notification.ref ? (
+            <>
+              <Link
+                href={`/tastings/${notification.ref.id}`}
+                className="font-semibold"
+              >
+                {getCatalogTargetLabel(notification.ref.target)}
+              </Link>
+              <CatalogTargetScope target={notification.ref.target} />
+            </>
           ) : (
             "unknown tasting"
           )}
@@ -118,16 +131,19 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
     case "comment":
       return (
         <>
-          commented on
-          {notification.ref && "bottle" in notification.ref ? (
-            <Link
-              href={`/tastings/${notification.ref.id}`}
-              className="mx-1 font-semibold"
-            >
-              {notification.ref.bottle.fullName}
-            </Link>
+          commented on{" "}
+          {notification.ref ? (
+            <>
+              <Link
+                href={`/tastings/${notification.ref.id}`}
+                className="font-semibold"
+              >
+                {getCatalogTargetLabel(notification.ref.target)}
+              </Link>
+              <CatalogTargetScope target={notification.ref.target} />
+            </>
           ) : (
-            " an unknown tasting"
+            "an unknown tasting"
           )}
         </>
       );
@@ -136,27 +152,30 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
   }
 };
 
+const CatalogTargetScope = ({ target }: { target: CatalogTargetV1 }) => {
+  if (target.kind === "bottle") return null;
+
+  return (
+    <>
+      {" "}
+      <span className="text-muted text-xs">
+        ({getCatalogTargetScopeLabel(target)})
+      </span>
+    </>
+  );
+};
+
 const NotificationEntryRef = ({
   notification,
   onArchive,
-  onMarkRead,
 }: {
   notification: Notification;
   onArchive: () => void;
-  onMarkRead: () => void;
 }) => {
-  const props = {
-    notification,
-    onArchive,
-    onMarkRead,
-  };
   switch (notification.type) {
     case "friend_request":
       return (
-        <FriendRequestEntry
-          {...props}
-          notification={notification as FriendRequestNotification}
-        />
+        <FriendRequestEntry notification={notification} onArchive={onArchive} />
       );
     default:
       return null;

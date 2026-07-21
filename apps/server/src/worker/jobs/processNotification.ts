@@ -20,7 +20,6 @@ export default async function processNotification({
         createdBy: true,
         tasting: {
           with: {
-            bottle: true,
             createdBy: true,
           },
         },

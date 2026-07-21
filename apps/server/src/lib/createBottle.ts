@@ -491,23 +491,6 @@ async function insertPreparedBottleInTransaction(
   };
 }
 
-/**
- * Creates all bottle-owned rows under a required actor id for write
- * attribution. Callers must resolve the actor before entering this helper.
- */
-export async function createBottleInTransaction(
-  tx: AnyTransaction,
-  args: {
-    creationSource?: CatalogVerificationCreationSource;
-    createdByActorId: number;
-    input: z.infer<typeof BottleInputSchema>;
-    context: Context & { user: User };
-  },
-): Promise<CreateBottleResult> {
-  const prepared = await prepareBottleCreateInTransaction(tx, args);
-  return await insertPreparedBottleInTransaction(tx, prepared);
-}
-
 type TrustedGroupContext = {
   group: BottleGroup;
   genericTarget: CatalogTarget;

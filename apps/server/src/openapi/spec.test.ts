@@ -1,13 +1,16 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { describe, expect, expectTypeOf, it } from "vitest";
+import type { z } from "zod";
 import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
   type BottleGroupAliasV1,
   BottleSchema,
+  type CatalogTargetV1,
   CursorSchema,
   type ExactCatalogTargetV1,
   type GenericCatalogTargetV1,
+  type NotificationSchema,
   StorePriceSchema,
   UserSchema,
 } from "../schemas";
@@ -326,6 +329,94 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<
       "groupId" extends keyof Inputs["bottleGroups"]["merge"] ? true : false
     >().toEqualTypeOf<false>();
+  });
+
+  it("publishes discriminated target-backed notification contracts", async () => {
+    const spec = await generateSpec();
+    const listItemSchema = getJsonResponseSchema(
+      spec.paths?.["/notifications"]?.get,
+    )?.properties?.results?.items;
+    const updateSchema = getJsonResponseSchema(
+      spec.paths?.["/notifications/{notification}"]?.patch,
+    );
+
+    for (const schema of [listItemSchema, updateSchema]) {
+      expect(schema?.anyOf).toHaveLength(3);
+      const variants = Object.fromEntries(
+        schema.anyOf.map((variant: any) => [
+          variant.properties?.type?.const,
+          variant,
+        ]),
+      );
+      expect(Object.keys(variants).sort()).toEqual([
+        "comment",
+        "friend_request",
+        "toast",
+      ]);
+
+      const friendRef = variants.friend_request.properties.ref;
+      expect(friendRef.anyOf).toHaveLength(2);
+      expect(friendRef.anyOf).toContainEqual({ type: "null" });
+      const friendRefObject = friendRef.anyOf.find(
+        (candidate: any) => candidate.type === "object",
+      );
+      expect(Object.keys(friendRefObject.properties)).toEqual([
+        "status",
+        "userId",
+      ]);
+      expect(friendRefObject.required).toEqual(["status", "userId"]);
+      expect(friendRefObject.properties.userId).toMatchObject({
+        type: "integer",
+        exclusiveMinimum: 0,
+      });
+
+      for (const type of ["toast", "comment"] as const) {
+        const ref = variants[type].properties.ref;
+        expect(ref.anyOf).toHaveLength(2);
+        expect(ref.anyOf).toContainEqual({ type: "null" });
+        const refObject = ref.anyOf.find(
+          (candidate: any) => candidate.type === "object",
+        );
+        expect(Object.keys(refObject.properties)).toEqual(["id", "target"]);
+        expect(refObject.required).toEqual(["id", "target"]);
+        expect(refObject.properties.id).toMatchObject({
+          type: "integer",
+          exclusiveMinimum: 0,
+        });
+        const [genericTarget, exactTarget] = refObject.properties.target.anyOf;
+        expectGenericTargetResponse(genericTarget);
+        expectExactTargetResponse(exactTarget);
+      }
+    }
+
+    type NotificationContract = z.infer<typeof NotificationSchema>;
+    type NotificationList = {
+      results: NotificationContract[];
+      rel: { nextCursor: number | null; prevCursor: number | null };
+    };
+    expectTypeOf<
+      Outputs["notifications"]["list"]
+    >().toEqualTypeOf<NotificationList>();
+    expectTypeOf<
+      Outputs["notifications"]["update"]
+    >().toEqualTypeOf<NotificationContract>();
+    type ToastNotification = Extract<
+      Outputs["notifications"]["update"],
+      { type: "toast" }
+    >;
+    type FriendRequestNotification = Extract<
+      Outputs["notifications"]["update"],
+      { type: "friend_request" }
+    >;
+    expectTypeOf<
+      NonNullable<ToastNotification["ref"]>["target"]
+    >().toEqualTypeOf<CatalogTargetV1>();
+    expectTypeOf<
+      NonNullable<FriendRequestNotification["ref"]>
+    >().toEqualTypeOf<{
+      status: "pending" | "friends" | "none";
+      userId: number;
+    }>();
   });
 
   it("keeps photo creation release compatibility null-only", async () => {

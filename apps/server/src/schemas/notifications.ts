@@ -1,16 +1,11 @@
 import { z } from "zod";
+import { CatalogTargetV1Schema } from "./catalogIdentity";
+import { FriendStatusEnum } from "./shared";
 import { UserSchema } from "./users";
 
-export const NotificationTypeEnum = z.enum([
-  "friend_request",
-  "toast",
-  "comment",
-]);
-
-export const NotificationSchema = z.object({
+const NotificationBaseSchema = z.object({
   id: z.number().describe("Unique identifier for the notification"),
   objectId: z.number().describe("ID of the object this notification refers to"),
-  type: NotificationTypeEnum.describe("Type of notification"),
   fromUser: UserSchema.nullable().describe(
     "User who triggered this notification",
   ),
@@ -19,10 +14,40 @@ export const NotificationSchema = z.object({
     .datetime()
     .describe("Timestamp when the notification was created"),
   read: z.boolean().describe("Whether the notification has been read"),
-  ref: z.any().nullable().describe("Reference object for the notification"),
-  // TODO:
-  // ref: z.union([TastingSchema, FriendSchema, z.null()]),
 });
+
+const TastingNotificationRefSchema = z.object({
+  id: z.number().int().positive().describe("Referenced tasting ID"),
+  target: CatalogTargetV1Schema.describe(
+    "Exact Bottle or generic BottleGroup referenced by the notification",
+  ),
+});
+
+const FriendRequestNotificationRefSchema = z.object({
+  status: FriendStatusEnum,
+  userId: z.number().int().positive().describe("User who sent the request"),
+});
+
+export const NotificationSchema = z.discriminatedUnion("type", [
+  NotificationBaseSchema.extend({
+    type: z.literal("friend_request").describe("Type of notification"),
+    ref: FriendRequestNotificationRefSchema.nullable().describe(
+      "Friend request referenced by this notification",
+    ),
+  }),
+  NotificationBaseSchema.extend({
+    type: z.literal("toast").describe("Type of notification"),
+    ref: TastingNotificationRefSchema.nullable().describe(
+      "Tasting referenced by this toast notification",
+    ),
+  }),
+  NotificationBaseSchema.extend({
+    type: z.literal("comment").describe("Type of notification"),
+    ref: TastingNotificationRefSchema.nullable().describe(
+      "Tasting referenced by this comment notification",
+    ),
+  }),
+]);
 
 export const NotificationInputSchema = z.object({
   read: z.boolean().describe("Whether to mark the notification as read"),
