@@ -15,6 +15,7 @@ import {
 import { eq } from "drizzle-orm";
 import {
   loadCatalogTargetReadsWithParity,
+  loadLegacyCatalogTargetReadBatch,
   recordCatalogTargetReadFilterParity,
 } from "./catalogTargetReadParity";
 
@@ -197,6 +198,23 @@ describe("CatalogTarget read parity", () => {
       { kind: "group", group: { id: genericParent.groupId } },
       { kind: "bottle", bottle: { id: promotedBottle.id } },
     ]);
+    expect(result.legacyTargets).toMatchObject([
+      { kind: "bottle", bottle: { id: exactBottle.id } },
+      { kind: "group", group: { id: genericParent.groupId } },
+      { kind: "bottle", bottle: { id: promotedBottle.id } },
+    ]);
+
+    const retained = await loadLegacyCatalogTargetReadBatch(
+      [
+        { bottleId: genericParent.id, releaseId: null },
+        { bottleId: promotionParent.id, releaseId: release.id },
+      ],
+      { ...readContext, operation: "filter_membership" },
+    );
+    expect(retained.map(({ target }) => target)).toMatchObject([
+      { kind: "group", group: { id: genericParent.groupId } },
+      { kind: "bottle", bottle: { id: promotedBottle.id } },
+    ]);
   });
 
   test("returns actionable, sanitized mismatch evidence", async ({
@@ -268,6 +286,66 @@ describe("CatalogTarget read parity", () => {
     expect(JSON.stringify(result.mismatches)).not.toContain("stack");
   });
 
+  test("correlates exact alias parity and drift by stable alias name", async ({
+    fixtures,
+  }) => {
+    const matchingBottle = await fixtures.Bottle();
+    const driftTargetBottle = await fixtures.Bottle();
+    const driftLegacyBottle = await fixtures.Bottle();
+    const matchingAlias = await fixtures.BottleAlias({
+      bottleId: matchingBottle.id,
+      name: "Matching catalog alias",
+    });
+    const driftAlias = await fixtures.BottleAlias({
+      bottleId: driftLegacyBottle.id,
+      targetId: await exactTargetId(driftTargetBottle.id),
+      name: "Drifting catalog alias",
+    });
+
+    const result = await loadCatalogTargetReadsWithParity(
+      [matchingAlias, driftAlias].map((alias) => ({
+        consumerTable: "bottle_alias" as const,
+        rowLocator: { name: alias.name },
+        targetId: alias.targetId,
+        legacy: {
+          bottleId: alias.bottleId,
+          releaseId: alias.releaseId,
+        },
+      })),
+      { ...readContext, operation: "alias_resolution" },
+    );
+
+    expect(result.targets).toMatchObject([
+      { kind: "bottle", bottle: { id: matchingBottle.id } },
+      { kind: "bottle", bottle: { id: driftTargetBottle.id } },
+    ]);
+    expect(result.mismatches).toEqual([
+      {
+        consumerTable: "bottle_alias",
+        rowLocator: { name: driftAlias.name },
+        legacyBottleId: driftLegacyBottle.id,
+        legacyReleaseId: null,
+        targetId: driftAlias.targetId,
+        caller: readContext.caller,
+        operation: "alias_resolution",
+        targetResolution: {
+          status: "resolved",
+          kind: "bottle",
+          targetId: driftAlias.targetId,
+          groupId: driftTargetBottle.groupId,
+          bottleId: driftTargetBottle.id,
+        },
+        legacyResolution: {
+          status: "resolved",
+          kind: "bottle",
+          targetId: await exactTargetId(driftLegacyBottle.id),
+          groupId: driftLegacyBottle.groupId,
+          bottleId: driftLegacyBottle.id,
+        },
+      },
+    ]);
+  });
+
   test("returns actionable filter-membership evidence", () => {
     const mismatches = recordCatalogTargetReadFilterParity(
       [
@@ -308,6 +386,49 @@ describe("CatalogTarget read parity", () => {
       },
     ]);
     expect(JSON.stringify(mismatches)).not.toContain("stack");
+  });
+
+  test("correlates alias filter-membership drift by stable alias name", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Filtered catalog alias",
+    });
+
+    const mismatches = recordCatalogTargetReadFilterParity(
+      [
+        {
+          consumerTable: "bottle_alias",
+          rowLocator: { name: alias.name },
+          targetId: alias.targetId,
+          legacy: {
+            bottleId: alias.bottleId,
+            releaseId: alias.releaseId,
+          },
+          filter: "query",
+          targetMatches: true,
+          legacyMatches: false,
+        },
+      ],
+      { caller: readContext.caller, operation: "alias_filter" },
+    );
+
+    expect(mismatches).toEqual([
+      {
+        consumerTable: "bottle_alias",
+        rowLocator: { name: alias.name },
+        legacyBottleId: bottle.id,
+        legacyReleaseId: null,
+        targetId: alias.targetId,
+        caller: readContext.caller,
+        operation: "alias_filter",
+        filter: "query",
+        targetMatches: true,
+        legacyMatches: false,
+      },
+    ]);
   });
 
   test("never falls back from a missing or retired durable target", async ({

@@ -14,6 +14,7 @@ import {
   ExactBottleAliasConflictError,
   finalizeBottleAliasAssignment,
   InvalidExactBottleAliasTargetError,
+  listUnmatchedBottleAliasNames,
   reserveExactBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
 import { CatalogTargetRetiredError } from "@peated/server/lib/catalogTargets";
@@ -60,6 +61,47 @@ async function getAlias(name: string) {
   if (!alias) throw new Error("Bottle alias fixture not found.");
   return alias;
 }
+
+describe("listUnmatchedBottleAliasNames", () => {
+  test("uses targetless identity regardless of retained Bottle drift", async ({
+    fixtures,
+  }) => {
+    const retainedBottle = await fixtures.Bottle();
+    const authoritativeBottle = await fixtures.Bottle();
+    const staleBottle = await fixtures.Bottle();
+    const exactTarget = await getExactTarget(authoritativeBottle.id);
+    await fixtures.BottleAlias({
+      name: "Targetless Retained Alias",
+      bottleId: retainedBottle.id,
+      targetId: null,
+    });
+    await db.insert(bottleAliases).values({
+      name: "Targeted Null Retained Alias",
+      bottleId: null,
+      releaseId: null,
+      targetId: exactTarget.id,
+      assignedByActorId: authoritativeBottle.createdByActorId,
+    });
+    await fixtures.BottleAlias({
+      name: "Targeted Stale Retained Alias",
+      bottleId: staleBottle.id,
+      targetId: exactTarget.id,
+    });
+    await fixtures.BottleAlias({
+      name: "Targetless Ignored Alias",
+      bottleId: retainedBottle.id,
+      targetId: null,
+      ignored: true,
+    });
+
+    const names = await listUnmatchedBottleAliasNames({
+      limit: 1000,
+      offset: 0,
+    });
+
+    expect(names).toEqual(["Targetless Retained Alias"]);
+  });
+});
 
 describe("reserveExactBottleAliasInTransaction", () => {
   test("preserves an existing exact-target reservation", async ({

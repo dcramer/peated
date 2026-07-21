@@ -1211,8 +1211,43 @@ returned StorePrice response independently.
 This is another partial consumer review boundary. Existing-row backfill and
 production activation remain gated by section 6 and the retained parity/audit
 sequence; retained StorePrice pair storage and measured compatibility remain
-tasks 9.6/9.7. Aliases, observations, decisions, proposals, and remaining
-activity reads keep tasks 7.1-7.3 open.
+tasks 9.6/9.7. Observations, decisions, proposals, and remaining activity reads
+keep tasks 7.1-7.3 open.
+
+### BottleAlias reads use authoritative CatalogTargets
+
+The task 7.1a-7.3a alias slice makes the BottleAlias list filter and hydrate
+through durable CatalogTarget identity. A Bottle filter first resolves that
+Bottle's active exact target and selects aliases by `targetId`; `onlyUnknown`
+means `targetId IS NULL`. Each response carries a nullable discriminated exact
+Bottle, generic BottleGroup, or null target. The retained compatibility
+`bottleId` output is derived only from an exact target, so generic identity never
+selects the representative Bottle and targetless identity stays explicitly
+unknown.
+
+Hydration records target-versus-retained resolution parity with the unique alias
+name as the stable `bottle_alias` locator. Bottle-filter parity separately
+samples the union of authoritative and retained candidates; its legacy side
+resolves completed BottleRelease promotions semantically instead of comparing a
+raw parent id to the promoted Bottle. `onlyUnknown` parity compares target-null
+membership with the retained Bottle-null predicate. These bounded measurements
+record caller, operation, target, retained pair, and resolved identity evidence,
+but never alter the target-backed result. A selected Bottle or returned alias
+whose durable target is missing, retired, or inconsistent fails closed as a
+conflict rather than falling back.
+
+Brand-repair query and supporting-alias evidence likewise accepts only aliases
+whose durable target resolves to a live exact Bottle. Candidate scans exclude
+Bottle and BottleGroup tombstones; generic and targetless aliases cannot become
+exact repair evidence. A separate bounded alias-name parity sample measures
+legacy drift without influencing ranking or membership, and route boundaries
+translate invalid durable targets to conflicts. The labels `dump-unmatched`
+command now selects null `targetId`, matching the same unknown definition.
+
+This completes only the alias-read sub-slice. Other specialized alias readers,
+observations, decisions, proposals, and remaining activity reads keep parent
+tasks 7.1-7.3 open; retained pairs and parity adapters remain until tasks
+9.6/9.7. The slice makes no production activation or backfill claim.
 
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target

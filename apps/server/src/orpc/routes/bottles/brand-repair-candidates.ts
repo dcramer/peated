@@ -1,4 +1,5 @@
 import { getBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
+import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
@@ -72,6 +73,13 @@ export default procedure
       }),
     }),
   )
-  .handler(async function ({ input }) {
-    return await getBrandRepairCandidates(input);
+  .handler(async function ({ input, errors }) {
+    try {
+      return await getBrandRepairCandidates(input);
+    } catch (error) {
+      if (error instanceof CatalogTargetResolutionError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
+    }
   });

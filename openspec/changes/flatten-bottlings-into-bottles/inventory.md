@@ -141,8 +141,8 @@ The Drizzle owners are:
   nullable authoritative CatalogTarget and records retained-pair parity using
   the `store_price` row id. Price-change serialization loads its required exact
   or generic target without reconstructing a Bottle from the retained pair.
-  Tasks 7.1-7.3 remain open for aliases, observations, decisions, proposals,
-  and remaining activity reads.
+  Tasks 7.1-7.3 remain open for observations, decisions, proposals, and
+  remaining activity reads.
 - `apps/server/src/lib/activityFeed.ts` passes raw collection memberships to
   the target-backed serializer; it no longer joins retained Bottle or
   BottleRelease identity for collection previews.
@@ -260,10 +260,22 @@ Bottle catalog routes:
   retained pair differs. A targetless consumer matches only by retained-pair
   equality. Independently retargeted and different targetless-pair consumers
   are preserved.
-- `apps/server/src/orpc/routes/bottleAliases/list.ts` and
-  `apps/server/src/orpc/routes/bottleAliases/update.ts` retain their current read
-  and ignored-state contracts until the broad target-backed read cutover in task
-  7.3.
+- `apps/server/src/orpc/routes/bottleAliases/list.ts` now filters Bottle
+  membership through the selected Bottle's active exact target and defines
+  `onlyUnknown` as a null `targetId`. It hydrates every returned row through the
+  shared parity reader and returns a nullable discriminated exact Bottle,
+  generic BottleGroup, or null target; the compatibility `bottleId` is projected
+  only from an exact target. Generic aliases never select a representative.
+  Bottle-filter parity resolves retained promoted-release references
+  semantically, records drift by unique alias name, and cannot affect the
+  authoritative page. Invalid selected or returned durable targets fail closed
+  with a conflict. `apps/server/src/orpc/routes/bottleAliases/update.ts` retains
+  only its existing ignored-state mutation contract for later cleanup.
+- `apps/server/src/orpc/routes/bottles/brand-repair-candidates.ts` and
+  `brand-repair-groups.ts` expose brand-repair candidate reads that accept alias
+  membership only from validated live exact targets. Their bounded alias-name
+  parity sample is telemetry, never candidate authority, and a malformed or
+  retired durable target fails closed as a conflict.
 
 Target-bearing consumer routes:
 
@@ -550,9 +562,19 @@ Catalog identity, aliases, search, creation, and updates:
   authoritative targets, compares them with measured legacy-pair resolution,
   records correlated consumer/row mismatch evidence, and records bounded
   target-versus-legacy filter-membership drift without changing authoritative
-  results. It never falls back when a durable target is invalid. Its legacy
-  comparison is removed with runtime compatibility under task 9.7 after the
-  remaining task 7.1-7.3 consumers and parity gates complete.
+  results. `loadLegacyCatalogTargetReadBatch` resolves each distinct retained
+  pair once per batch and returns aligned legacy targets and resolution
+  evidence; the alias list and brand-repair filters use that shared semantic
+  resolver rather than rebuilding legacy membership. BottleAlias evidence uses
+  the table's unique alias name as its stable locator because the table has no
+  numeric row id. It never falls back when a durable target is invalid. Its
+  legacy comparison is removed with runtime compatibility under task 9.7 after
+  the remaining task 7.1-7.3 consumers and parity gates complete.
+- `apps/server/src/lib/brandRepairCandidates.ts` uses only live exact
+  CatalogTargets for Bottle candidate scans and for query/supporting alias
+  membership. Generic, targetless, tombstoned, and retired identities cannot
+  become repair evidence, and bounded target-versus-retained alias parity is
+  recorded separately from candidate selection.
 - `apps/server/src/lib/bottleAliases.ts` is the task 5.5a canonical assignment
   owner for the exact/moderator alias path. An explicit exact target is validated
   and stored. Its measured targetless compatibility mode does not resolve a
@@ -576,6 +598,9 @@ Catalog identity, aliases, search, creation, and updates:
   enqueue alias indexing. Bottle search reindexing comes only from the validated
   assignment target's exact Bottle id; a generic or targetless alias never uses
   its retained Bottle pair or a group representative as indexing identity.
+  `listUnmatchedBottleAliasNames` also owns the bounded maintenance read: it
+  selects only the ordered name projection for non-ignored aliases whose
+  `targetId` is null.
 - `apps/server/src/lib/bottleCreationDrafts.ts`
 - `apps/server/src/lib/legacyConcreteBottleInput.ts` is the retained translation
   boundary for price-proposal Bottle/BottleRelease-shaped evidence. It emits one
@@ -589,8 +614,10 @@ Catalog identity, aliases, search, creation, and updates:
   consumer projection. A generic retained pair must resolve to that same target;
   targetless aliases resolve through measured legacy assignment and return an
   explicit staged decision only for the two allowed migration states. Canonical
-  source-snapshot locking remains owned by `bottleAliases.ts`. Broad target-backed
-  alias reads and Bottle search/index replacement remain tasks 7.3 and 7.5.
+  source-snapshot locking remains owned by `bottleAliases.ts`. The general alias
+  list is target-backed under task 7.3a; remaining specialized alias readers and
+  retained compatibility stay in tasks 7.3 and 9.7, while Bottle search/index
+  replacement remains task 7.5.
 - `apps/server/src/lib/bottleReferenceCandidates.ts` searches ordinary exact
   Bottle targets. Text and brand candidates require an exact CatalogTarget;
   vector and exact-alias candidates resolve accepted aliases through their
@@ -889,6 +916,9 @@ Classifier decisions and price matching:
 
 ## CLI
 
+- `apps/cli/src/commands/labels.ts`: `labels dump-unmatched` is a thin adapter
+  over `listUnmatchedBottleAliasNames`; it paginates the server-owned query in
+  1,000-row batches and writes each returned name to stdout.
 - `apps/cli/src/commands/bottles.ts`: `bottles fix-stats` selects exact-target
   rows and directly dispatches their target ids to the strict exact statistics
   worker. Strict recomputation validates the active graph and target integrity

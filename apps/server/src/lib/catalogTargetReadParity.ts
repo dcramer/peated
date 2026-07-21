@@ -12,13 +12,19 @@ import type { CatalogIdentitySerializerContext } from "@peated/server/serializer
 
 type CatalogTargetReadParityIdentity = {
   targetId: number | null;
-  legacy: {
-    bottleId: number | null;
-    releaseId: number | null;
-  };
+  legacy: CatalogTargetReadLegacyReference;
+};
+
+type CatalogTargetReadLegacyReference = {
+  bottleId: number | null;
+  releaseId: number | null;
 };
 
 type CorrelatedConsumerLocator =
+  | {
+      consumerTable: "bottle_alias";
+      rowLocator: { name: string };
+    }
   | {
       consumerTable: "collection_bottle";
       rowLocator: { id: number };
@@ -76,8 +82,14 @@ type CatalogIdentityResolution =
   | { status: "missing" }
   | { status: "error"; code: string };
 
+type CatalogTargetReadLegacyResult = {
+  target: CatalogTargetV1 | null;
+  resolution: CatalogIdentityResolution;
+};
+
 export type CatalogTargetReadParityResult = {
   targets: (CatalogTargetV1 | null)[];
+  legacyTargets: (CatalogTargetV1 | null)[];
   mismatches: CatalogTargetReadParityMismatch[];
 };
 
@@ -125,6 +137,58 @@ function resolutionError(error: unknown): CatalogIdentityResolution {
   };
 }
 
+/** Resolves retained references once per distinct pair for bounded parity reads. */
+export async function loadLegacyCatalogTargetReadBatch(
+  references: CatalogTargetReadLegacyReference[],
+  context: CatalogTargetReadParityContext,
+  database: AnyDatabase = db,
+): Promise<CatalogTargetReadLegacyResult[]> {
+  if (!context.caller.trim() || !context.operation.trim()) {
+    throw new TypeError(
+      "Catalog target read parity requires caller and operation context.",
+    );
+  }
+
+  const byReference = new Map<string, Promise<CatalogTargetReadLegacyResult>>();
+  const resolve = (
+    reference: CatalogTargetReadLegacyReference,
+  ): Promise<CatalogTargetReadLegacyResult> => {
+    if (reference.bottleId === null) {
+      return Promise.resolve({
+        target: null,
+        resolution:
+          reference.releaseId === null
+            ? { status: "missing" }
+            : { status: "error", code: "LEGACY_RELEASE_WITHOUT_BOTTLE" },
+      });
+    }
+
+    const key = `${reference.bottleId}:${reference.releaseId ?? "null"}`;
+    let pending = byReference.get(key);
+    if (!pending) {
+      const legacyReference: LegacyCatalogTargetReference = {
+        bottleId: reference.bottleId,
+        releaseId: reference.releaseId,
+      };
+      pending = loadCatalogTargetByLegacyReference(
+        legacyReference,
+        context,
+        database,
+      ).then(
+        (target) => ({ target, resolution: resolvedIdentity(target) }),
+        (error: unknown) => ({
+          target: null,
+          resolution: resolutionError(error),
+        }),
+      );
+      byReference.set(key, pending);
+    }
+    return pending;
+  };
+
+  return await Promise.all(references.map(resolve));
+}
+
 function identitiesMatch(
   target: ResolvedCatalogIdentity,
   legacy: ResolvedCatalogIdentity,
@@ -150,6 +214,11 @@ function consumerLocator(
   item: CatalogTargetReadParityItem,
 ): CorrelatedConsumerLocator {
   switch (item.consumerTable) {
+    case "bottle_alias":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
     case "collection_bottle":
       return {
         consumerTable: item.consumerTable,
@@ -253,33 +322,25 @@ export async function loadCatalogTargetReadsWithParity(
     context,
     database,
   );
-
-  const legacyByReference = new Map<string, Promise<CatalogTargetV1>>();
-  const resolveLegacy = (
-    reference: LegacyCatalogTargetReference,
-  ): Promise<CatalogTargetV1> => {
-    const key = `${reference.bottleId}:${reference.releaseId ?? "null"}`;
-    let pending = legacyByReference.get(key);
-    if (!pending) {
-      pending = loadCatalogTargetByLegacyReference(
-        reference,
-        context,
-        database,
-      );
-      legacyByReference.set(key, pending);
-    }
-    return pending;
-  };
+  const legacyResults = await loadLegacyCatalogTargetReadBatch(
+    items.map(({ legacy }) => legacy),
+    context,
+    database,
+  );
 
   const targets: (CatalogTargetV1 | null)[] = [];
+  const legacyTargets: (CatalogTargetV1 | null)[] = [];
   const mismatches: CatalogTargetReadParityMismatch[] = [];
   let authoritativeError: unknown;
-  for (const item of items) {
+  for (const [index, item] of items.entries()) {
     let target: CatalogTargetV1 | null = null;
     let targetResolution: CatalogIdentityResolution = { status: "missing" };
     let durableError: unknown;
     if (item.targetId !== null) {
-      const durableResolution = targetResolutions.get(item.targetId)!;
+      const durableResolution = targetResolutions.get(item.targetId);
+      if (!durableResolution) {
+        throw new Error(`Missing CatalogTarget batch result: ${item.targetId}`);
+      }
       if (durableResolution.ok) {
         target = durableResolution.target;
         targetResolution = resolvedIdentity(durableResolution.target);
@@ -290,27 +351,12 @@ export async function loadCatalogTargetReadsWithParity(
     }
     targets.push(target);
 
-    let legacyResolution: CatalogIdentityResolution;
-    if (item.legacy.bottleId === null) {
-      legacyResolution =
-        item.legacy.releaseId === null
-          ? { status: "missing" }
-          : {
-              status: "error",
-              code: "LEGACY_RELEASE_WITHOUT_BOTTLE",
-            };
-    } else {
-      try {
-        legacyResolution = resolvedIdentity(
-          await resolveLegacy({
-            bottleId: item.legacy.bottleId,
-            releaseId: item.legacy.releaseId,
-          }),
-        );
-      } catch (error) {
-        legacyResolution = resolutionError(error);
-      }
+    const legacyResult = legacyResults[index];
+    if (!legacyResult) {
+      throw new Error(`Missing legacy CatalogTarget batch result: ${index}`);
     }
+    const legacyResolution = legacyResult.resolution;
+    legacyTargets.push(legacyResult.target);
 
     if (durableError) authoritativeError ??= durableError;
 
@@ -333,5 +379,5 @@ export async function loadCatalogTargetReadsWithParity(
   }
 
   if (authoritativeError) throw authoritativeError;
-  return { targets, mismatches };
+  return { targets, legacyTargets, mismatches };
 }

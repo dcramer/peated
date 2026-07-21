@@ -2,11 +2,37 @@ import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroupTombstones,
+  bottleReleasePromotions,
+  bottleReleases,
   bottles,
+  bottleTombstones,
+  catalogTargets,
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
-import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
+import {
+  loadCatalogTargetReadsWithParity,
+  loadLegacyCatalogTargetReadBatch,
+  recordCatalogTargetReadFilterParity,
+} from "@peated/server/lib/catalogTargetReadParity";
+import {
+  CatalogTargetResolutionError,
+  loadCatalogTargetBatch,
+} from "@peated/server/lib/catalogTargets";
+import type { CatalogTargetV1 } from "@peated/server/schemas";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  or,
+  sql,
+} from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 const MAX_PREFIX_WORDS = 8;
 const MAX_SCAN_LIMIT = 2000;
@@ -180,6 +206,320 @@ type RankedTargetCandidate = {
   supportingReferences: BrandRepairSupportingReference[];
   targetBrand: CandidateBrand;
 };
+
+type AliasRow = Pick<
+  typeof bottleAliases.$inferSelect,
+  "bottleId" | "name" | "releaseId" | "targetId"
+>;
+
+type AliasParityRow = AliasRow & {
+  targetBottleId: number | null;
+  targetBrandId: number | null;
+};
+
+const MAX_PARITY_SAMPLE = 100;
+const aliasTargetBottles = alias(bottles, "brand_repair_alias_target_bottle");
+const aliasLegacyBottles = alias(bottles, "brand_repair_alias_legacy_bottle");
+const aliasPromotedBottles = alias(
+  bottles,
+  "brand_repair_alias_promoted_bottle",
+);
+const aliasReadContext = {
+  actor: null,
+  permissions: { canReadCatalogIdentity: true },
+} as const;
+
+function activeExactBottleTargetJoin() {
+  return and(
+    eq(bottles.id, catalogTargets.bottleId),
+    eq(bottles.groupId, catalogTargets.groupId),
+  );
+}
+
+function activeExactBottleConditions() {
+  return and(
+    sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+    sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
+  );
+}
+
+/** Alias repair evidence belongs only to its validated live exact target. */
+async function loadAuthoritativeAliasMembership(
+  rows: AliasRow[],
+  targetMatches: (bottleId: number, brandId: number) => boolean,
+): Promise<Array<{ bottleId: number; name: string }>> {
+  const targetIds = rows.flatMap(({ targetId }) =>
+    targetId === null ? [] : [targetId],
+  );
+  const resolutions = await loadCatalogTargetBatch(targetIds, aliasReadContext);
+
+  return rows.flatMap((row) => {
+    if (row.targetId === null) return [];
+    const resolution = resolutions.get(row.targetId);
+    if (!resolution) {
+      throw new Error(`Missing CatalogTarget batch result: ${row.targetId}`);
+    }
+    if (!resolution.ok) throw resolution.error;
+    const { target } = resolution;
+    if (
+      target.kind !== "bottle" ||
+      !targetMatches(target.bottle.id, target.bottle.brandId)
+    ) {
+      return [];
+    }
+    return [{ bottleId: target.bottle.id, name: row.name }];
+  });
+}
+
+async function recordAliasMembershipParity({
+  filter,
+  legacyMatches,
+  operation,
+  rows,
+  targetMatches,
+}: {
+  filter: "catalog_reference" | "entity" | "query";
+  legacyMatches: (
+    row: AliasParityRow,
+    legacyTarget: CatalogTargetV1 | null,
+  ) => boolean;
+  operation: string;
+  rows: AliasParityRow[];
+  targetMatches: (row: AliasParityRow) => boolean;
+}): Promise<void> {
+  const parityItems = rows.map((row) => ({
+    consumerTable: "bottle_alias" as const,
+    rowLocator: { name: row.name },
+    targetId: row.targetId,
+    legacy: {
+      bottleId: row.bottleId,
+      releaseId: row.releaseId,
+    },
+  }));
+  const context = {
+    ...aliasReadContext,
+    caller: "brandRepairCandidates",
+    operation,
+  } as const;
+
+  let legacyTargets: (CatalogTargetV1 | null)[];
+  try {
+    ({ legacyTargets } = await loadCatalogTargetReadsWithParity(
+      parityItems,
+      context,
+    ));
+  } catch (error) {
+    // Parity-only durable errors cannot control results; authoritative rows are
+    // validated independently before they contribute alias evidence.
+    if (!(error instanceof CatalogTargetResolutionError)) throw error;
+    legacyTargets = (
+      await loadLegacyCatalogTargetReadBatch(
+        parityItems.map(({ legacy }) => legacy),
+        context,
+      )
+    ).map(({ target }) => target);
+  }
+
+  recordCatalogTargetReadFilterParity(
+    rows.map((row, index) => {
+      const parityItem = parityItems[index];
+      if (!parityItem) {
+        throw new Error(`Missing alias parity item: ${index}`);
+      }
+      return {
+        ...parityItem,
+        filter,
+        targetMatches: targetMatches(row),
+        legacyMatches: legacyMatches(row, legacyTargets[index] ?? null),
+      };
+    }),
+    context,
+  );
+}
+
+async function getQueryAliasMembership({
+  currentBrandId,
+  query,
+}: {
+  currentBrandId?: number;
+  query: string;
+}): Promise<Array<{ bottleId: number; name: string }>> {
+  const authoritativeRows = await db
+    .select({
+      bottleId: bottleAliases.bottleId,
+      name: bottleAliases.name,
+      releaseId: bottleAliases.releaseId,
+      targetId: bottleAliases.targetId,
+    })
+    .from(bottleAliases)
+    .innerJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
+    .innerJoin(
+      aliasTargetBottles,
+      eq(aliasTargetBottles.id, catalogTargets.bottleId),
+    )
+    .where(
+      and(
+        eq(bottleAliases.ignored, false),
+        ilike(bottleAliases.name, `%${query}%`),
+        isNotNull(catalogTargets.bottleId),
+        currentBrandId
+          ? eq(aliasTargetBottles.brandId, currentBrandId)
+          : undefined,
+      ),
+    )
+    .orderBy(asc(bottleAliases.name))
+    .limit(MAX_SCAN_LIMIT);
+
+  const parityRows = await db
+    .select({
+      bottleId: bottleAliases.bottleId,
+      name: bottleAliases.name,
+      releaseId: bottleAliases.releaseId,
+      targetBottleId: aliasTargetBottles.id,
+      targetBrandId: aliasTargetBottles.brandId,
+      targetId: bottleAliases.targetId,
+    })
+    .from(bottleAliases)
+    .leftJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
+    .leftJoin(
+      aliasTargetBottles,
+      eq(aliasTargetBottles.id, catalogTargets.bottleId),
+    )
+    .leftJoin(
+      aliasLegacyBottles,
+      eq(aliasLegacyBottles.id, bottleAliases.bottleId),
+    )
+    .leftJoin(
+      bottleReleases,
+      and(
+        eq(bottleReleases.id, bottleAliases.releaseId),
+        eq(bottleReleases.bottleId, bottleAliases.bottleId),
+      ),
+    )
+    .leftJoin(
+      bottleReleasePromotions,
+      and(
+        eq(bottleReleasePromotions.releaseId, bottleReleases.id),
+        eq(bottleReleasePromotions.status, "promoted"),
+      ),
+    )
+    .leftJoin(
+      aliasPromotedBottles,
+      eq(aliasPromotedBottles.id, bottleReleasePromotions.promotedBottleId),
+    )
+    .where(
+      and(
+        eq(bottleAliases.ignored, false),
+        ilike(bottleAliases.name, `%${query}%`),
+        currentBrandId
+          ? or(
+              eq(aliasTargetBottles.brandId, currentBrandId),
+              eq(aliasLegacyBottles.brandId, currentBrandId),
+              eq(aliasPromotedBottles.brandId, currentBrandId),
+            )
+          : undefined,
+      ),
+    )
+    .orderBy(asc(bottleAliases.name))
+    .limit(MAX_PARITY_SAMPLE);
+
+  await recordAliasMembershipParity({
+    filter: currentBrandId ? "entity" : "query",
+    legacyMatches: (_row, target) =>
+      target?.kind === "bottle" &&
+      (currentBrandId === undefined ||
+        target.bottle.brandId === currentBrandId),
+    operation: "query_alias_membership",
+    rows: parityRows,
+    targetMatches: (row) =>
+      row.targetBottleId !== null &&
+      (currentBrandId === undefined || row.targetBrandId === currentBrandId),
+  });
+
+  return await loadAuthoritativeAliasMembership(
+    authoritativeRows,
+    (_bottleId, brandId) =>
+      currentBrandId === undefined || brandId === currentBrandId,
+  );
+}
+
+async function getSupportingAliasMembership(
+  candidateBottleIds: number[],
+): Promise<Array<{ bottleId: number; name: string }>> {
+  const candidateIds = new Set(candidateBottleIds);
+  const authoritativeRows = await db
+    .select({
+      bottleId: bottleAliases.bottleId,
+      name: bottleAliases.name,
+      releaseId: bottleAliases.releaseId,
+      targetId: bottleAliases.targetId,
+    })
+    .from(bottleAliases)
+    .innerJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
+    .where(
+      and(
+        eq(bottleAliases.ignored, false),
+        inArray(catalogTargets.bottleId, candidateBottleIds),
+      ),
+    )
+    .orderBy(asc(bottleAliases.name));
+
+  const parityRows = await db
+    .select({
+      bottleId: bottleAliases.bottleId,
+      name: bottleAliases.name,
+      releaseId: bottleAliases.releaseId,
+      targetBottleId: catalogTargets.bottleId,
+      targetBrandId: aliasTargetBottles.brandId,
+      targetId: bottleAliases.targetId,
+    })
+    .from(bottleAliases)
+    .leftJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
+    .leftJoin(
+      aliasTargetBottles,
+      eq(aliasTargetBottles.id, catalogTargets.bottleId),
+    )
+    .leftJoin(
+      bottleReleases,
+      and(
+        eq(bottleReleases.id, bottleAliases.releaseId),
+        eq(bottleReleases.bottleId, bottleAliases.bottleId),
+      ),
+    )
+    .leftJoin(
+      bottleReleasePromotions,
+      and(
+        eq(bottleReleasePromotions.releaseId, bottleReleases.id),
+        eq(bottleReleasePromotions.status, "promoted"),
+      ),
+    )
+    .where(
+      and(
+        eq(bottleAliases.ignored, false),
+        or(
+          inArray(catalogTargets.bottleId, candidateBottleIds),
+          inArray(bottleAliases.bottleId, candidateBottleIds),
+          inArray(bottleReleasePromotions.promotedBottleId, candidateBottleIds),
+        ),
+      ),
+    )
+    .orderBy(asc(bottleAliases.name))
+    .limit(MAX_PARITY_SAMPLE);
+
+  await recordAliasMembershipParity({
+    filter: "catalog_reference",
+    legacyMatches: (_row, target) =>
+      target?.kind === "bottle" && candidateIds.has(target.bottle.id),
+    operation: "supporting_alias_membership",
+    rows: parityRows,
+    targetMatches: (row) =>
+      row.targetBottleId !== null && candidateIds.has(row.targetBottleId),
+  });
+
+  return await loadAuthoritativeAliasMembership(authoritativeRows, (bottleId) =>
+    candidateIds.has(bottleId),
+  );
+}
 
 function normalizeComparableText(value: string): string {
   return normalizeString(value).toLowerCase().trim();
@@ -523,7 +863,13 @@ async function getCandidateBottles({
           totalTastings: bottles.totalTastings,
         })
         .from(bottles)
-        .where(eq(bottles.brandId, currentBrandId))
+        .innerJoin(catalogTargets, activeExactBottleTargetJoin())
+        .where(
+          and(
+            eq(bottles.brandId, currentBrandId),
+            activeExactBottleConditions(),
+          ),
+        )
         .orderBy(desc(bottles.totalTastings), desc(bottles.id))
         .limit(MAX_SCAN_LIMIT);
     }
@@ -532,26 +878,16 @@ async function getCandidateBottles({
       db
         .select({ id: bottles.id })
         .from(bottles)
+        .innerJoin(catalogTargets, activeExactBottleTargetJoin())
         .where(
           and(
             eq(bottles.brandId, currentBrandId),
             ilike(bottles.fullName, `%${query}%`),
+            activeExactBottleConditions(),
           ),
         )
         .limit(MAX_SCAN_LIMIT),
-      db
-        .select({ bottleId: bottleAliases.bottleId })
-        .from(bottleAliases)
-        .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
-        .where(
-          and(
-            eq(bottles.brandId, currentBrandId),
-            eq(bottleAliases.ignored, false),
-            isNotNull(bottleAliases.bottleId),
-            ilike(bottleAliases.name, `%${query}%`),
-          ),
-        )
-        .limit(MAX_SCAN_LIMIT),
+      getQueryAliasMembership({ currentBrandId, query }),
     ]);
 
     const bottleIds = new Set<number>();
@@ -560,9 +896,7 @@ async function getCandidateBottles({
     }
 
     for (const row of matchingAliasRows) {
-      if (row.bottleId !== null) {
-        bottleIds.add(row.bottleId);
-      }
+      bottleIds.add(row.bottleId);
     }
 
     if (bottleIds.size === 0) {
@@ -579,10 +913,12 @@ async function getCandidateBottles({
         totalTastings: bottles.totalTastings,
       })
       .from(bottles)
+      .innerJoin(catalogTargets, activeExactBottleTargetJoin())
       .where(
         and(
           eq(bottles.brandId, currentBrandId),
           inArray(bottles.id, Array.from(bottleIds).slice(0, MAX_SCAN_LIMIT)),
+          activeExactBottleConditions(),
         ),
       )
       .orderBy(desc(bottles.totalTastings), desc(bottles.id));
@@ -599,7 +935,8 @@ async function getCandidateBottles({
         totalTastings: bottles.totalTastings,
       })
       .from(bottles)
-      .where(isNotNull(bottles.brandId))
+      .innerJoin(catalogTargets, activeExactBottleTargetJoin())
+      .where(and(isNotNull(bottles.brandId), activeExactBottleConditions()))
       .orderBy(desc(bottles.totalTastings), desc(bottles.id))
       .limit(MAX_SCAN_LIMIT);
   }
@@ -624,19 +961,15 @@ async function getCandidateBottles({
       db
         .select({ id: bottles.id })
         .from(bottles)
-        .where(ilike(bottles.fullName, `%${query}%`))
-        .limit(MAX_SCAN_LIMIT),
-      db
-        .select({ bottleId: bottleAliases.bottleId })
-        .from(bottleAliases)
+        .innerJoin(catalogTargets, activeExactBottleTargetJoin())
         .where(
           and(
-            eq(bottleAliases.ignored, false),
-            isNotNull(bottleAliases.bottleId),
-            ilike(bottleAliases.name, `%${query}%`),
+            ilike(bottles.fullName, `%${query}%`),
+            activeExactBottleConditions(),
           ),
         )
         .limit(MAX_SCAN_LIMIT),
+      getQueryAliasMembership({ query }),
     ]);
 
   const bottleIds = new Set<number>();
@@ -646,9 +979,7 @@ async function getCandidateBottles({
   }
 
   for (const row of matchingAliasRows) {
-    if (row.bottleId !== null) {
-      bottleIds.add(row.bottleId);
-    }
+    bottleIds.add(row.bottleId);
   }
 
   const matchingBrandIds = matchingBrandRows.map(({ id }) => id);
@@ -656,7 +987,13 @@ async function getCandidateBottles({
     const brandBottleRows = await db
       .select({ id: bottles.id })
       .from(bottles)
-      .where(inArray(bottles.brandId, matchingBrandIds))
+      .innerJoin(catalogTargets, activeExactBottleTargetJoin())
+      .where(
+        and(
+          inArray(bottles.brandId, matchingBrandIds),
+          activeExactBottleConditions(),
+        ),
+      )
       .limit(MAX_SCAN_LIMIT);
 
     for (const { id } of brandBottleRows) {
@@ -678,10 +1015,12 @@ async function getCandidateBottles({
       totalTastings: bottles.totalTastings,
     })
     .from(bottles)
+    .innerJoin(catalogTargets, activeExactBottleTargetJoin())
     .where(
       and(
         isNotNull(bottles.brandId),
         inArray(bottles.id, Array.from(bottleIds).slice(0, MAX_SCAN_LIMIT)),
+        activeExactBottleConditions(),
       ),
     )
     .orderBy(desc(bottles.totalTastings), desc(bottles.id));
@@ -722,19 +1061,7 @@ async function collectBrandRepairCandidates({
 
   const [currentBrands, aliasRows, brandRows] = await Promise.all([
     db.select().from(entities).where(inArray(entities.id, currentBrandIds)),
-    db
-      .select({
-        bottleId: bottleAliases.bottleId,
-        name: bottleAliases.name,
-      })
-      .from(bottleAliases)
-      .where(
-        and(
-          eq(bottleAliases.ignored, false),
-          isNotNull(bottleAliases.bottleId),
-          inArray(bottleAliases.bottleId, candidateBottleIds),
-        ),
-      ),
+    getSupportingAliasMembership(candidateBottleIds),
     db
       .select({
         alias: entityAliases.name,
@@ -750,10 +1077,6 @@ async function collectBrandRepairCandidates({
   );
   const aliasesByBottleId = new Map<number, string[]>();
   for (const row of aliasRows) {
-    if (row.bottleId === null) {
-      continue;
-    }
-
     aliasesByBottleId.set(row.bottleId, [
       ...(aliasesByBottleId.get(row.bottleId) ?? []),
       row.name,

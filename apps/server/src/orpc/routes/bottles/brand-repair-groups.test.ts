@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -11,6 +13,29 @@ describe("GET /bottles/brand-repair-groups", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("returns conflict when selected alias evidence has a retired target", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Retired Group Candidate" });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: null,
+    });
+
+    const error = await waitError(
+      routerClient.bottles.brandRepairGroups(
+        { query: bottle.fullName },
+        { context: { user } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      status: 409,
+      message: `Catalog target is retired (bottleId=${bottle.id}).`,
+    });
   });
 
   test("groups a generic source brand into stronger eligible target brands", async ({

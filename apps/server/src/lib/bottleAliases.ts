@@ -31,7 +31,31 @@ import {
 import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+
+/** Lists targetless, non-ignored aliases for bounded maintenance output. */
+export async function listUnmatchedBottleAliasNames(
+  {
+    limit,
+    offset,
+  }: {
+    limit: number;
+    offset: number;
+  },
+  database: AnyDatabase = db,
+): Promise<string[]> {
+  const rows = await database
+    .select({ name: bottleAliases.name })
+    .from(bottleAliases)
+    .where(
+      and(eq(bottleAliases.ignored, false), isNull(bottleAliases.targetId)),
+    )
+    .orderBy(asc(bottleAliases.name))
+    .offset(offset)
+    .limit(limit);
+
+  return rows.map(({ name }) => name);
+}
 
 export class DuplicateBottleAliasError extends Error {
   constructor(readonly bottleId: number) {

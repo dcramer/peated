@@ -105,8 +105,11 @@ it must not preserve a parallel business-logic path.
 ## 7. Read Parity And Backend Cutover
 
 - [ ] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
-- [ ] 7.2 Record actionable parity mismatches with consumer table, row id, legacy ids, target id, and resolved identities.
+- [x] 7.1a Add bounded dual-read resolution and filter-membership parity to BottleAlias list and brand-repair alias reads, including semantic promoted-release resolution, without allowing parity to select authoritative results.
+- [ ] 7.2 Record actionable parity mismatches with consumer table, stable row locator, legacy ids, target id, and resolved identities.
+- [x] 7.2a Add strict `bottle_alias` parity correlation by unique alias name for both resolution and filter-membership drift, retaining target, legacy, caller, and operation evidence.
 - [ ] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
+- [x] 7.3a Switch BottleAlias list filtering and hydration, brand-repair candidate/supporting-alias membership, and the labels unmatched dump to authoritative CatalogTarget identity; return nullable exact/generic targets without representative substitution and fail closed on invalid durable targets.
 - [x] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
 - [x] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
 - [x] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
