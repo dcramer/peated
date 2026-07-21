@@ -1,10 +1,19 @@
 import { db } from "@peated/server/db";
-import { bottleReleases, bottles } from "@peated/server/db/schema";
+import {
+  bottleGroupTombstones,
+  bottleReleasePromotions,
+  bottleReleases,
+  bottleTombstones,
+  bottles,
+  catalogTargets,
+  type BottleRelease,
+} from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { BottleReleaseSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
-import { and, asc, desc, eq, type SQL, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql, type SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
 const SORT_OPTIONS = [
@@ -25,6 +34,47 @@ const SORT_OPTIONS = [
 ] as const;
 
 const DEFAULT_SORT = "releaseYear";
+const promotedBottles = alias(bottles, "promoted_bottles");
+
+// Task 9.7 retains only the legacy ids required by this response shape. Every
+// identity, content, and aggregate field must come from the promoted Bottle.
+function projectLegacyRelease({
+  releaseId,
+  legacyBottleId,
+  bottle,
+}: {
+  releaseId: number;
+  legacyBottleId: number;
+  bottle: typeof promotedBottles.$inferSelect;
+}): BottleRelease {
+  return {
+    id: releaseId,
+    bottleId: legacyBottleId,
+    fullName: bottle.fullName,
+    name: bottle.name,
+    searchVector: bottle.searchVector,
+    edition: bottle.edition,
+    vintageYear: bottle.vintageYear,
+    releaseYear: bottle.releaseYear,
+    abv: bottle.abv,
+    singleCask: bottle.singleCask,
+    caskStrength: bottle.caskStrength,
+    statedAge: bottle.statedAge,
+    caskSize: bottle.caskSize,
+    caskType: bottle.caskType,
+    caskFill: bottle.caskFill,
+    description: bottle.description,
+    descriptionSrc: bottle.descriptionSrc,
+    imageUrl: bottle.imageUrl,
+    tastingNotes: bottle.tastingNotes,
+    suggestedTags: bottle.suggestedTags,
+    avgRating: bottle.avgRating,
+    totalTastings: bottle.totalTastings,
+    createdAt: bottle.createdAt,
+    updatedAt: bottle.updatedAt,
+    createdByActorId: bottle.createdByActorId,
+  };
+}
 
 export default procedure
   .route({
@@ -66,65 +116,89 @@ export default procedure
 
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleReleases.bottleId, bottle.id),
+      sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${promotedBottles.id})`,
+      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
     ];
 
     if (query) {
       where.push(
-        sql`${bottleReleases.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${promotedBottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
     }
 
     let orderBy: SQL<unknown>;
     switch (sort) {
       case "edition":
-        orderBy = asc(bottleReleases.edition);
+        orderBy = asc(promotedBottles.edition);
         break;
       case "-edition":
-        orderBy = desc(bottleReleases.edition);
+        orderBy = desc(promotedBottles.edition);
         break;
       case "name":
-        orderBy = asc(bottleReleases.name);
+        orderBy = asc(promotedBottles.name);
         break;
       case "-name":
-        orderBy = desc(bottleReleases.name);
+        orderBy = desc(promotedBottles.name);
         break;
       case "statedAge":
-        orderBy = sql`${bottleReleases.statedAge} ASC NULLS FIRST`;
+        orderBy = sql`${promotedBottles.statedAge} ASC NULLS FIRST`;
         break;
       case "-statedAge":
-        orderBy = sql`${bottleReleases.statedAge} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.statedAge} DESC NULLS LAST`;
         break;
       case "vintageYear":
-        orderBy = sql`${bottleReleases.vintageYear} ASC NULLS FIRST`;
+        orderBy = sql`${promotedBottles.vintageYear} ASC NULLS FIRST`;
         break;
       case "-vintageYear":
-        orderBy = sql`${bottleReleases.vintageYear} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.vintageYear} DESC NULLS LAST`;
         break;
       case "releaseYear":
-        orderBy = sql`${bottleReleases.releaseYear} ASC NULLS FIRST`;
+        orderBy = sql`${promotedBottles.releaseYear} ASC NULLS FIRST`;
         break;
       case "-releaseYear":
-        orderBy = sql`${bottleReleases.releaseYear} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.releaseYear} DESC NULLS LAST`;
         break;
       case "numTastings":
-        orderBy = asc(bottleReleases.totalTastings);
+        orderBy = asc(promotedBottles.totalTastings);
         break;
       case "-numTastings":
-        orderBy = desc(bottleReleases.totalTastings);
+        orderBy = desc(promotedBottles.totalTastings);
         break;
       case "avgRating":
-        orderBy = sql`${bottleReleases.avgRating} ASC NULLS LAST`;
+        orderBy = sql`${promotedBottles.avgRating} ASC NULLS LAST`;
         break;
       case "-avgRating":
-        orderBy = sql`${bottleReleases.avgRating} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.avgRating} DESC NULLS LAST`;
         break;
       default:
-        orderBy = asc(bottleReleases.name);
+        orderBy = asc(promotedBottles.name);
     }
 
     const results = await db
-      .select()
+      .select({
+        releaseId: bottleReleases.id,
+        legacyBottleId: bottleReleases.bottleId,
+        bottle: promotedBottles,
+      })
       .from(bottleReleases)
+      .innerJoin(
+        bottleReleasePromotions,
+        and(
+          eq(bottleReleasePromotions.releaseId, bottleReleases.id),
+          eq(bottleReleasePromotions.status, "promoted"),
+        ),
+      )
+      .innerJoin(
+        promotedBottles,
+        eq(promotedBottles.id, bottleReleasePromotions.promotedBottleId),
+      )
+      .innerJoin(
+        catalogTargets,
+        and(
+          eq(catalogTargets.bottleId, promotedBottles.id),
+          eq(catalogTargets.groupId, promotedBottles.groupId),
+        ),
+      )
       .where(where ? and(...where) : undefined)
       .orderBy(orderBy, asc(bottleReleases.id))
       .limit(limit + 1)
@@ -133,7 +207,7 @@ export default procedure
     return {
       results: await serialize(
         BottleReleaseSerializer,
-        results.slice(0, limit),
+        results.slice(0, limit).map(projectLegacyRelease),
         context.user ?? undefined,
       ),
       rel: {

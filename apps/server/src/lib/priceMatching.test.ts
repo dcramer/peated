@@ -21,6 +21,7 @@ import {
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import {
   findBottleReferenceCandidates,
+  getBottleCandidateById,
   searchBottleCandidates,
 } from "@peated/server/lib/bottleReferenceCandidates";
 import {
@@ -329,6 +330,234 @@ describe("priceMatching", () => {
         }),
       ]),
     );
+  });
+
+  test("resolves exact aliases through their CatalogTarget instead of the retained pair", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const targetBottle = await fixtures.Bottle({
+      name: "Authoritative Exact Candidate",
+      edition: "Target edition",
+    });
+    const legacyParent = await fixtures.LegacyBottle({
+      name: "Retained Pair Parent",
+    });
+    const legacyRelease = await fixtures.BottleRelease({
+      bottleId: legacyParent.id,
+      name: "Retained Pair Release",
+    });
+    await fixtures.BottleAlias({
+      bottleId: legacyParent.id,
+      releaseId: legacyRelease.id,
+      targetId: await getExactTargetId(targetBottle.id),
+      name: "Target Authority Alias ZXQ",
+    });
+
+    const candidates = await searchBottleCandidates({
+      query: "Target Authority Alias ZXQ",
+      limit: 15,
+    });
+
+    expect(candidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: "bottle",
+          bottleId: targetBottle.id,
+          releaseId: null,
+          alias: "Target Authority Alias ZXQ",
+          fullName: targetBottle.fullName,
+          edition: "Target edition",
+          source: expect.arrayContaining(["exact"]),
+        }),
+      ]),
+    );
+    expect(
+      candidates.some(
+        (candidate) =>
+          candidate.bottleId === legacyParent.id ||
+          candidate.releaseId === legacyRelease.id,
+      ),
+    ).toBe(false);
+  });
+
+  test("does not turn generic or ignored aliases into exact Bottle candidates", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const member = await fixtures.Bottle({ name: "Alias Scope Member" });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, member.groupId!),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!genericTarget)
+      throw new Error("Missing generic CatalogTarget fixture.");
+
+    await fixtures.BottleAlias({
+      bottleId: member.id,
+      targetId: genericTarget.id,
+      name: "Generic Alias Scope ZXQ",
+    });
+    await fixtures.BottleAlias({
+      bottleId: member.id,
+      targetId: await getExactTargetId(member.id),
+      ignored: true,
+      name: "Ignored Alias Scope ZXQ",
+    });
+
+    const genericCandidates = await searchBottleCandidates({
+      query: "Generic Alias Scope ZXQ",
+      limit: 15,
+    });
+    const ignoredCandidates = await searchBottleCandidates({
+      query: "Ignored Alias Scope ZXQ",
+      limit: 15,
+    });
+
+    expect(genericCandidates).toEqual([]);
+    expect(ignoredCandidates).toEqual([]);
+  });
+
+  test("excludes tombstoned Bottles from exact, text, and direct candidate lookup", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const retired = await fixtures.Bottle({
+      name: "Retired Candidate Identity ZXQ",
+    });
+    const replacement = await fixtures.Bottle({
+      name: "Replacement Candidate Identity",
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    await expect(
+      searchBottleCandidates({
+        query: retired.fullName,
+        limit: 15,
+      }),
+    ).resolves.toEqual([]);
+    await expect(getBottleCandidateById(retired.id)).resolves.toBeNull();
+  });
+
+  test("resolves an explicit historical release id only through a completed promotion", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const parent = await fixtures.Bottle({ name: "Historical Parent" });
+    const promotedRelease = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Historical Promoted Release",
+    });
+    const pendingRelease = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Historical Pending Release",
+    });
+    const unmappedRelease = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Historical Unmapped Release",
+    });
+    const crossGroupRelease = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Historical Cross-Group Release",
+    });
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: parent.groupId,
+        brandId: parent.brandId,
+        createdByActorId: parent.createdByActorId,
+        name: "Promoted Ordinary Bottle",
+        fullName: "Promoted Ordinary Bottle",
+        edition: "Promoted edition",
+        releaseYear: 2024,
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Unable to create promoted Bottle.");
+    await db.insert(catalogTargets).values({
+      groupId: parent.groupId!,
+      bottleId: promotedBottle.id,
+    });
+    const crossGroupBottle = await fixtures.Bottle({
+      name: "Cross-Group Promotion",
+    });
+    await db.insert(bottleReleasePromotions).values([
+      {
+        releaseId: promotedRelease.id,
+        promotedBottleId: promotedBottle.id,
+        status: "promoted",
+        completedAt: new Date(),
+      },
+      {
+        releaseId: pendingRelease.id,
+        promotedBottleId: promotedBottle.id,
+        status: "pending",
+      },
+      {
+        releaseId: crossGroupRelease.id,
+        promotedBottleId: crossGroupBottle.id,
+        status: "promoted",
+        completedAt: new Date(),
+      },
+    ]);
+
+    await expect(
+      getBottleCandidateById(parent.id, promotedRelease.id),
+    ).resolves.toMatchObject({
+      kind: "bottle",
+      bottleId: promotedBottle.id,
+      releaseId: null,
+      fullName: promotedBottle.fullName,
+      edition: promotedBottle.edition,
+      releaseYear: promotedBottle.releaseYear,
+    });
+    await expect(
+      getBottleCandidateById(parent.id, pendingRelease.id),
+    ).resolves.toBeNull();
+    await expect(
+      getBottleCandidateById(parent.id, unmappedRelease.id),
+    ).resolves.toBeNull();
+    await expect(
+      getBottleCandidateById(parent.id, crossGroupRelease.id),
+    ).resolves.toBeNull();
+
+    await db.insert(bottleTombstones).values({
+      bottleId: promotedBottle.id,
+      newBottleId: (await fixtures.Bottle({ name: "Promotion Survivor" })).id,
+    });
+    await expect(
+      getBottleCandidateById(parent.id, promotedRelease.id),
+    ).resolves.toBeNull();
+  });
+
+  test("does not search the legacy BottleRelease text index", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = undefined;
+
+    const parent = await fixtures.LegacyBottle({
+      name: "Unindexed Legacy Parent",
+    });
+    await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Legacy Release Text Only ZXQ",
+      fullName: "Legacy Release Text Only ZXQ",
+    });
+
+    await expect(
+      searchBottleCandidates({
+        query: "Legacy Release Text Only ZXQ",
+        limit: 15,
+      }),
+    ).resolves.toEqual([]);
   });
 
   test("finds age-specific photo candidates when stored bottles are missing ABV", async ({
@@ -4791,7 +5020,59 @@ describe("priceMatching", () => {
     });
   });
 
-  test("enriches candidates with bottler, series, distillery, and release metadata", async ({
+  test("penalizes an ordinary Bottle stated-age conflict", async ({
+    fixtures,
+  }) => {
+    config.OPENAI_API_KEY = "test-openai-key";
+    const { getOpenAIEmbedding } =
+      await import("@peated/server/lib/openaiEmbeddings");
+    const queryEmbedding = [1, ...Array.from({ length: 3071 }, () => 0)];
+    const embeddingWithCosineSimilarity = (similarity: number) => [
+      similarity,
+      Math.sqrt(1 - similarity ** 2),
+      ...Array.from({ length: 3070 }, () => 0),
+    ];
+    vi.mocked(getOpenAIEmbedding).mockResolvedValue(queryEmbedding);
+
+    const brand = await fixtures.Entity({ name: "Age Ranking Evidence" });
+    const mismatched = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Mismatch Candidate",
+      statedAge: 18,
+    });
+    const matching = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Matching Candidate",
+      statedAge: 12,
+    });
+    await db
+      .update(bottles)
+      .set({ fullName: "Age Ranking Mismatch Candidate" })
+      .where(eq(bottles.id, mismatched.id));
+    await fixtures.BottleAlias({
+      bottleId: mismatched.id,
+      targetId: await getExactTargetId(mismatched.id),
+      name: "Age Ranking Mismatch Alias",
+      embedding: embeddingWithCosineSimilarity(0.9),
+    });
+    await fixtures.BottleAlias({
+      bottleId: matching.id,
+      targetId: await getExactTargetId(matching.id),
+      name: "Age Ranking Matching Alias",
+      embedding: embeddingWithCosineSimilarity(0.72),
+    });
+
+    const candidates = await searchBottleCandidates({
+      query: "Age Ranking Evidence",
+      stated_age: 12,
+      currentBottleId: null,
+      limit: 15,
+    });
+
+    expect(candidates[0]?.bottleId).toBe(matching.id);
+  });
+
+  test("enriches candidates from the independently complete Bottle", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -4819,23 +5100,6 @@ describe("priceMatching", () => {
       distillerIds: [distiller.id],
       name: "Reserve",
       category: "single_malt",
-      statedAge: null,
-      edition: null,
-      caskStrength: null,
-      singleCask: null,
-      abv: null,
-      vintageYear: null,
-      releaseYear: null,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
-    });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      name: "Independent Label Small Batch Reserve Batch 7",
-    });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
       statedAge: 12,
       edition: "Batch 7",
       caskStrength: true,
@@ -4847,7 +5111,10 @@ describe("priceMatching", () => {
       caskSize: "port_pipe",
       caskFill: "1st_fill",
     });
-
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Independent Label Small Batch Reserve Batch 7",
+    });
     const [candidate] = await searchBottleCandidates({
       query: "Independent Label Small Batch Reserve Batch 7",
       brand: brand.name,
@@ -4888,10 +5155,10 @@ describe("priceMatching", () => {
       caskSize: "port_pipe",
       caskFill: "1st_fill",
     });
-    expect(candidate?.source).toEqual(expect.arrayContaining(["release"]));
+    expect(candidate).toMatchObject({ kind: "bottle", releaseId: null });
   });
 
-  test("surfaces an existing Distillers Edition release from apostrophe retailer wording without web search", async ({
+  test("surfaces an exact Distillers Edition Bottle from apostrophe retailer wording without web search", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -4904,13 +5171,8 @@ describe("priceMatching", () => {
     const bottle = await fixtures.Bottle({
       brandId: lagavulin.id,
       distillerIds: [lagavulin.id],
-      name: "Distillers Edition",
-      category: "single_malt",
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
       name: "Distillers Edition 2023 Release",
-      fullName: "Lagavulin Distillers Edition 2023 Release",
+      category: "single_malt",
       releaseYear: 2023,
     });
 
@@ -4919,10 +5181,6 @@ describe("priceMatching", () => {
     await db.execute(
       sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} = ${bottle.id}`,
     );
-    await db.execute(
-      sql`UPDATE ${bottleReleases} SET search_vector = NULL WHERE ${bottleReleases.id} = ${release.id}`,
-    );
-
     const candidates = await searchBottleCandidates({
       query:
         "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
@@ -4948,30 +5206,15 @@ describe("priceMatching", () => {
 
     expect(candidates[0]).toMatchObject({
       bottleId: bottle.id,
-      releaseId: release.id,
-      kind: "release",
-      fullName: release.fullName,
+      releaseId: null,
+      kind: "bottle",
+      fullName: bottle.fullName,
       releaseYear: 2023,
+      source: expect.arrayContaining(["brand"]),
     });
-    expect(candidates).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          bottleId: bottle.id,
-          releaseId: release.id,
-          kind: "release",
-          source: expect.arrayContaining(["brand", "release"]),
-        }),
-        expect.objectContaining({
-          bottleId: bottle.id,
-          releaseId: null,
-          kind: "bottle",
-          fullName: bottle.fullName,
-        }),
-      ]),
-    );
   });
 
-  test("does not synthesize an arbitrary release when multiple releases tie on metadata", async ({
+  test("keeps same-year marketed variants as ordinary Bottle candidates", async ({
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
@@ -4981,30 +5224,23 @@ describe("priceMatching", () => {
       shortName: "Lagavulin",
       type: ["brand", "distiller"],
     });
-    const bottle = await fixtures.Bottle({
+    const springBottle = await fixtures.Bottle({
       brandId: lagavulin.id,
       distillerIds: [lagavulin.id],
-      name: "Distillers Edition",
-      category: "single_malt",
-    });
-    const springRelease = await fixtures.BottleRelease({
-      bottleId: bottle.id,
       name: "Distillers Edition 2023 Spring Release",
-      fullName: "Lagavulin Distillers Edition 2023 Spring Release",
+      category: "single_malt",
       releaseYear: 2023,
     });
-    const autumnRelease = await fixtures.BottleRelease({
-      bottleId: bottle.id,
+    const autumnBottle = await fixtures.Bottle({
+      brandId: lagavulin.id,
+      distillerIds: [lagavulin.id],
       name: "Distillers Edition 2023 Autumn Release",
-      fullName: "Lagavulin Distillers Edition 2023 Autumn Release",
+      category: "single_malt",
       releaseYear: 2023,
     });
 
     await db.execute(
-      sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} = ${bottle.id}`,
-    );
-    await db.execute(
-      sql`UPDATE ${bottleReleases} SET search_vector = NULL WHERE ${bottleReleases.id} IN (${springRelease.id}, ${autumnRelease.id})`,
+      sql`UPDATE ${bottles} SET search_vector = NULL WHERE ${bottles.id} IN (${springBottle.id}, ${autumnBottle.id})`,
     );
 
     const candidates = await searchBottleCandidates({
@@ -5033,19 +5269,22 @@ describe("priceMatching", () => {
     expect(candidates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          bottleId: bottle.id,
+          bottleId: springBottle.id,
           releaseId: null,
           kind: "bottle",
-          fullName: bottle.fullName,
+          fullName: springBottle.fullName,
+        }),
+        expect.objectContaining({
+          bottleId: autumnBottle.id,
+          releaseId: null,
+          kind: "bottle",
+          fullName: autumnBottle.fullName,
         }),
       ]),
     );
-    expect(
-      candidates.some(
-        (candidate) =>
-          candidate.bottleId === bottle.id && candidate.kind === "release",
-      ),
-    ).toBe(false);
+    expect(candidates.every((candidate) => candidate.kind === "bottle")).toBe(
+      true,
+    );
   });
 
   test("adds a reusable parent candidate for age-statement listings", async ({

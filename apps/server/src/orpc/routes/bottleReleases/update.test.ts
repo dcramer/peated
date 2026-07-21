@@ -252,10 +252,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       "OnBottleAliasChange",
       { name: result.bottle.fullName },
     );
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "OnBottleReleaseChange",
-      expect.anything(),
-    );
   });
 
   test("rejects image URLs, preserves an omitted image, and clears explicit null", async ({

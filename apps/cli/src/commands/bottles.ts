@@ -1,11 +1,6 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottleReleases,
-  bottles,
-  entities,
-} from "@peated/server/db/schema";
+import { bottleAliases, bottles, entities } from "@peated/server/db/schema";
 import { getExactCatalogTargetStatsRepairPage } from "@peated/server/lib/catalogTargetStatsRepair";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
@@ -138,7 +133,7 @@ subcommand
   .command("index-search")
   .description("Update bottle search indexes")
   .argument("[bottleIds...]")
-  .action(async (bottleIds, options) => {
+  .action(async (bottleIds) => {
     const step = 1000;
     const bottleQuery = db
       .select({ id: bottles.id })
@@ -158,34 +153,11 @@ subcommand
       }
       offset += step;
     }
-
-    const releaseQuery = db
-      .select({ id: bottleReleases.id })
-      .from(bottleReleases)
-      .where(
-        bottleIds.length
-          ? inArray(bottleReleases.bottleId, bottleIds)
-          : undefined,
-      )
-      .orderBy(asc(bottleReleases.id));
-
-    hasResults = true;
-    offset = 0;
-    while (hasResults) {
-      hasResults = false;
-      const query = await releaseQuery.offset(offset).limit(step);
-      for (const { id } of query) {
-        console.log(`Indexing search vectors for Bottle Release ${id}.`);
-        await runJob("IndexBottleReleaseSearchVectors", { releaseId: id });
-        hasResults = true;
-      }
-      offset += step;
-    }
   });
 
 subcommand
   .command("index-aliases")
-  .description("Update bottle alias indexes")
+  .description("Rebuild exact alias embeddings and clear ineligible aliases")
   .option("--only-missing")
   .action(async (options) => {
     const step = 1000;

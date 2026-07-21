@@ -112,9 +112,12 @@ Bottle entry flow.
 ## Candidate Generation
 
 Candidate search presents independently complete Bottles, keyed by `bottleId`.
-During staged migration, retained BottleRelease rows and their release metadata
-may contribute retrieval evidence, but they resolve through promotion mappings
-and are never presented as a separately selectable catalog product.
+Text and brand retrieval require an exact CatalogTarget for the ordinary
+Bottle. Accepted exact aliases resolve through their authoritative target;
+generic, targetless, and ignored aliases do not produce Bottle candidates. An
+explicit historical release id can contribute only by resolving through its
+completed promotion mapping to the promoted Bottle, never through retained
+BottleRelease metadata.
 
 Sources:
 
@@ -122,7 +125,6 @@ Sources:
 - `exact`
 - `vector`
 - `text`
-- `release_text`
 - `brand`
 
 Important behavior:

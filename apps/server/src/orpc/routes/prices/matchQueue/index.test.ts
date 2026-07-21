@@ -1918,10 +1918,6 @@ describe("price match queue", () => {
       bottleId: result.bottle.id,
       creationSource: "price_match_review",
     });
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "OnBottleReleaseChange",
-      expect.anything(),
-    );
   });
 
   test("combines legacy bottle and release inputs into one concrete Bottle", async ({

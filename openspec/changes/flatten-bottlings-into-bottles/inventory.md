@@ -162,7 +162,13 @@ BottleRelease CRUD and registration:
   and 9.7 disable and remove the adapter.
 - `apps/server/src/orpc/routes/bottleReleases/details.ts`
 - `apps/server/src/orpc/routes/bottleReleases/index.ts`
-- `apps/server/src/orpc/routes/bottleReleases/list.ts`
+- `apps/server/src/orpc/routes/bottleReleases/list.ts` retains its legacy
+  parent/release ids and BottleRelease response only as a task 9.7 compatibility
+  projection. It lists completed promotion mappings, renders fields from the
+  promoted ordinary Bottle, and applies query/sort/pagination through that
+  Bottle's active exact search identity. It does not read
+  `bottle_release.search_vector`, expose incomplete promotions, or return a
+  Bottle/BottleGroup tombstoned identity.
 - `apps/server/src/orpc/routes/bottleReleases/update.ts` is the task 5.4b
   measured compatibility boundary. It requires a completed promotion mapping,
   translates only supplied legacy fields into a sparse exact patch, and
@@ -534,7 +540,16 @@ Catalog identity, aliases, search, creation, and updates:
   explicit staged decision only for the two allowed migration states. Canonical
   source-snapshot locking remains owned by `bottleAliases.ts`. Broad target-backed
   alias reads and Bottle search/index replacement remain tasks 7.3 and 7.5.
-- `apps/server/src/lib/bottleReferenceCandidates.ts`
+- `apps/server/src/lib/bottleReferenceCandidates.ts` searches ordinary exact
+  Bottle targets. Text and brand candidates require an exact CatalogTarget;
+  vector and exact-alias candidates resolve accepted aliases through their
+  authoritative exact target rather than the retained pair. Generic and
+  ignored aliases cannot become exact candidates. The release-only text lookup
+  and release-row enrichment/synthesis are removed, so all candidate metadata
+  comes from the independently complete Bottle. An explicitly supplied
+  historical release id remains compatibility input only when its completed
+  promotion mapping resolves to an active ordinary promoted Bottle. Every
+  ordinary candidate query excludes Bottle and BottleGroup tombstones.
 - `apps/server/src/lib/bottleReferenceResolution.ts` owns task 5.8 classifier
   application and reference resolution. The live `create_bottle` action
   delegates to canonical concrete creation and returns one exact target with
@@ -555,6 +570,12 @@ Catalog identity, aliases, search, creation, and updates:
   that ungrouped compatibility branch and the raw primitive.
 - `apps/server/src/lib/format.ts`
 - `apps/server/src/lib/search.ts`
+
+After production promotion/backfill and before search cutover is approved, the
+ordinary Bottle search index must be rebuilt for every promoted Bottle and the
+retained task 9.1 gate must verify that rebuild. Release-only index jobs or
+`bottle_release.search_vector` are not an alternative index and cannot satisfy
+that gate.
 
 Active repair and migration-adjacent services:
 
@@ -698,8 +719,21 @@ Classifier decisions and price matching:
   over stale classifier work. `no_match` and failed/unresolved reviews stay
   targetless, and the worker never selects a representative or arbitrary exact
   Bottle.
-- `apps/server/src/worker/jobs/index.ts`
-- `apps/server/src/worker/jobs/indexBottleReleaseSearchVectors.ts`
+- `apps/server/src/worker/jobs/index.ts` registers only the ordinary Bottle and
+  alias search-index jobs. Task 7.5 removes the release-only index and
+  change-handler registrations rather than retaining dormant compatibility
+  workers.
+- `apps/server/src/worker/jobs/indexBottleSearchVectors.ts` builds the ordinary
+  Bottle search vector from independently complete Bottle fields and accepted,
+  non-ignored aliases whose authoritative exact CatalogTarget resolves to that
+  Bottle. Generic, targetless, and ignored aliases do not enrich an exact
+  Bottle's search vector, and the worker does not read BottleRelease fields or
+  `bottle_release.search_vector`.
+- `apps/server/src/worker/jobs/indexBottleAlias.ts` indexes an accepted alias
+  only when its authoritative CatalogTarget resolves to a live exact Bottle and
+  BottleGroup. It builds the embedding from the independently complete Bottle
+  and clears the embedding for ignored, targetless, generic, tombstoned, or
+  concurrently changed aliases; it has no BottleRelease fallback.
 - `apps/server/src/worker/jobs/onBottleChange.ts` refreshes Bottle details and
   search before queueing delayed exact Bottle and BottleGroup statistics. Before
   strict target-backed statistics activation, task 7.10 must stop or upgrade
@@ -781,8 +815,9 @@ Classifier decisions and price matching:
   then revalidates and locks the alias snapshot after consumer locks. This
   measured targetless compatibility adapter is removed under task 9.7 and does
   not own a second propagation algorithm.
-- `apps/server/src/worker/jobs/onBottleReleaseChange.ts`
-- `apps/server/src/worker/types.ts`
+- `apps/server/src/worker/types.ts` exposes only the ordinary Bottle and alias
+  search jobs. The release-only search and change job names, handlers, and
+  registrations are removed together at the task 7.5 boundary.
 
 ## CLI
 

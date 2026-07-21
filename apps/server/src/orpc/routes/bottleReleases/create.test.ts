@@ -270,10 +270,6 @@ describe("POST /bottle-releases", () => {
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: result.bottle.id,
     });
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "OnBottleReleaseChange",
-      expect.anything(),
-    );
   });
 
   test("rejects unsupported image URLs and canonical future years without writes", async ({

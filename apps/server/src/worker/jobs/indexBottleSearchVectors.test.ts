@@ -1,0 +1,146 @@
+import { db } from "@peated/server/db";
+import {
+  bottleAliases,
+  bottles,
+  catalogTargets,
+} from "@peated/server/db/schema";
+import { and, eq, isNull, sql } from "drizzle-orm";
+import { describe, expect, test } from "vitest";
+import indexBottleSearchVectors from "./indexBottleSearchVectors";
+
+async function searchVectorMatches(bottleId: number, query: string) {
+  const [result] = await db
+    .select({
+      matches: sql<boolean>`COALESCE(
+        ${bottles.searchVector} @@ websearch_to_tsquery('english', ${query}),
+        FALSE
+      )`,
+    })
+    .from(bottles)
+    .where(eq(bottles.id, bottleId));
+
+  if (!result) throw new Error(`Bottle fixture not found: ${bottleId}`);
+  return result.matches;
+}
+
+describe("indexBottleSearchVectors", () => {
+  test("indexes durable Bottle identity and only authoritative accepted exact aliases", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Search Index Brand",
+      shortName: "SIB",
+    });
+    const bottler = await fixtures.Entity({ name: "Independent Bottler" });
+    const distiller = await fixtures.Entity({ name: "Vector Distillery" });
+    const bottle = await fixtures.Bottle({
+      name: "Core Expression",
+      brandId: brand.id,
+      bottlerId: bottler.id,
+      distillerIds: [distiller.id],
+      edition: "Promoted Batch Solstice",
+      statedAge: 19,
+      abv: 57.4,
+      vintageYear: 1998,
+      releaseYear: 2018,
+      singleCask: true,
+      caskStrength: true,
+      caskType: "oloroso",
+    });
+    const unrelatedBottle = await fixtures.Bottle({
+      name: "Unrelated Expression",
+    });
+    await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Legacy Child Eclipse",
+    });
+
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, bottle.groupId!),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!exactTarget || !genericTarget) {
+      throw new Error("CatalogTarget fixtures not found.");
+    }
+
+    await fixtures.BottleAlias({
+      name: "Authoritative Alias Aurora",
+      bottleId: unrelatedBottle.id,
+      targetId: exactTarget.id,
+      ignored: false,
+    });
+    await fixtures.BottleAlias({
+      name: "Excluded Generic Quasar",
+      bottleId: bottle.id,
+      targetId: genericTarget.id,
+      ignored: false,
+    });
+    await fixtures.BottleAlias({
+      name: "Ignored Exact Nebula",
+      bottleId: bottle.id,
+      targetId: exactTarget.id,
+      ignored: true,
+    });
+    await fixtures.BottleAlias({
+      name: "Targetless Legacy Pulsar",
+      bottleId: bottle.id,
+      targetId: null,
+      ignored: false,
+    });
+
+    await db
+      .update(bottles)
+      .set({ searchVector: null })
+      .where(eq(bottles.id, bottle.id));
+    await indexBottleSearchVectors({ bottleId: bottle.id });
+
+    expect(
+      await searchVectorMatches(bottle.id, "Promoted Batch Solstice"),
+    ).toBe(true);
+    expect(await searchVectorMatches(bottle.id, "1998 vintage")).toBe(true);
+    expect(await searchVectorMatches(bottle.id, "Independent Bottler")).toBe(
+      true,
+    );
+    expect(await searchVectorMatches(bottle.id, "Vector Distillery")).toBe(
+      true,
+    );
+    expect(
+      await searchVectorMatches(bottle.id, "Authoritative Alias Aurora"),
+    ).toBe(true);
+    expect(
+      await searchVectorMatches(bottle.id, "Excluded Generic Quasar"),
+    ).toBe(false);
+    expect(await searchVectorMatches(bottle.id, "Ignored Exact Nebula")).toBe(
+      false,
+    );
+    expect(
+      await searchVectorMatches(bottle.id, "Targetless Legacy Pulsar"),
+    ).toBe(false);
+    expect(await searchVectorMatches(bottle.id, "Legacy Child Eclipse")).toBe(
+      false,
+    );
+
+    expect(
+      await db
+        .select({ name: bottleAliases.name })
+        .from(bottleAliases)
+        .where(eq(bottleAliases.targetId, exactTarget.id)),
+    ).toEqual(
+      expect.arrayContaining([
+        { name: "Authoritative Alias Aurora" },
+        { name: "Ignored Exact Nebula" },
+      ]),
+    );
+  });
+
+  test("rejects an unknown Bottle", async () => {
+    await expect(
+      indexBottleSearchVectors({ bottleId: 2_147_483_647 }),
+    ).rejects.toThrow("Unknown bottle: 2147483647");
+  });
+});

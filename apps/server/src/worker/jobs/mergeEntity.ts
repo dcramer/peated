@@ -77,7 +77,6 @@ export default async function mergeEntity({
 
   const automationUser = await getAutomationModeratorUser();
   const updatedBottleIds: number[] = [];
-  const updatedReleaseIds: number[] = [];
   const updatedAliasNames = new Set<string>();
   const bottleMergeManifests: ConcreteBottleMergeFinalizationManifest[] = [];
   const bottleUpdateManifests: ConcreteBottleUpdateFinalizationManifest[] = [];
@@ -365,7 +364,6 @@ export default async function mergeEntity({
         }
         updatedAliasNames.add(next.fullName);
       }
-      updatedReleaseIds.push(...releases.map(({ id }) => id));
       updatedBottleIds.push(bottle.id);
     }
 
@@ -465,17 +463,6 @@ export default async function mergeEntity({
       );
     } catch (err) {
       logError(err, { bottle: { id: bottleId } });
-    }
-  }
-  for (const releaseId of updatedReleaseIds) {
-    try {
-      await pushUniqueJob(
-        "IndexBottleReleaseSearchVectors",
-        { releaseId },
-        { delay: 5000 },
-      );
-    } catch (err) {
-      logError(err, { release: { id: releaseId } });
     }
   }
   for (const name of updatedAliasNames) {
