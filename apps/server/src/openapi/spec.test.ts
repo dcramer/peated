@@ -3,9 +3,11 @@ import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
+  type BottleGroupAliasV1,
   BottleSchema,
   CursorSchema,
   type ExactCatalogTargetV1,
+  type GenericCatalogTargetV1,
   StorePriceSchema,
   UserSchema,
 } from "../schemas";
@@ -61,6 +63,16 @@ function expectExactTargetResponse(schema: any) {
       "bottle",
     ]),
   );
+  expect(schema?.properties?.release).toBeUndefined();
+  expect(schema?.properties?.releaseId).toBeUndefined();
+  expect(JSON.stringify(schema)).not.toContain("BottleRelease");
+}
+
+function expectGenericTargetResponse(schema: any) {
+  expect(Object.keys(schema?.properties ?? {})).toEqual(
+    expect.arrayContaining(["schemaVersion", "kind", "targetId", "group"]),
+  );
+  expect(schema?.properties?.bottle).toBeUndefined();
   expect(schema?.properties?.release).toBeUndefined();
   expect(schema?.properties?.releaseId).toBeUndefined();
   expect(JSON.stringify(schema)).not.toContain("BottleRelease");
@@ -147,6 +159,137 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<ExactCatalogTargetV1>();
     expectTypeOf<
       "createFromSource" extends keyof Outputs["bottles"] ? true : false
+    >().toEqualTypeOf<false>();
+  });
+
+  it("publishes BottleGroup reads and bounded moderator operations", async () => {
+    const spec = await generateSpec();
+    const operations = [
+      ["/bottle-groups", "get", "listBottleGroups"],
+      ["/bottle-groups/{group}", "get", "getBottleGroup"],
+      ["/bottle-groups/{group}/bottles", "get", "listBottleGroupBottles"],
+      ["/bottle-groups/{group}/aliases", "get", "listBottleGroupAliases"],
+      ["/bottle-groups/{group}/merge-targets", "post", "mergeBottleGroup"],
+      ["/bottle-groups/{group}/split", "post", "splitBottleGroup"],
+      [
+        "/bottle-groups/{group}/presentation",
+        "patch",
+        "updateBottleGroupPresentation",
+      ],
+    ] as const;
+    const operationIds = getOperationIds(spec);
+
+    for (const [path, method, operationId] of operations) {
+      expect((spec.paths?.[path] as any)?.[method]?.operationId).toBe(
+        operationId,
+      );
+      expect(operationIds.filter((id) => id === operationId)).toHaveLength(1);
+    }
+    expect(
+      Object.entries(spec.paths ?? {}).flatMap(([path, pathItem]) =>
+        path.startsWith("/bottle-groups")
+          ? Object.values(pathItem ?? {}).filter(
+              (operation) =>
+                typeof operation === "object" &&
+                operation !== null &&
+                "operationId" in operation,
+            )
+          : [],
+      ),
+    ).toHaveLength(7);
+
+    const groupListItem = getJsonResponseSchema(
+      spec.paths?.["/bottle-groups"]?.get,
+    )?.properties?.results?.items;
+    const groupDetails = getJsonResponseSchema(
+      spec.paths?.["/bottle-groups/{group}"]?.get,
+    );
+    const relatedBottleItem = getJsonResponseSchema(
+      spec.paths?.["/bottle-groups/{group}/bottles"]?.get,
+    )?.properties?.results?.items;
+    const aliasItem = getJsonResponseSchema(
+      spec.paths?.["/bottle-groups/{group}/aliases"]?.get,
+    )?.properties?.results?.items;
+
+    expectGenericTargetResponse(groupListItem);
+    expectGenericTargetResponse(groupDetails);
+    expectExactTargetResponse(relatedBottleItem);
+    expect(Object.keys(aliasItem?.properties ?? {})).toEqual([
+      "name",
+      "assignmentSource",
+      "createdAt",
+    ]);
+    expect(aliasItem?.properties?.targetId).toBeUndefined();
+    expect(aliasItem?.properties?.bottle).toBeUndefined();
+    expect(aliasItem?.properties?.release).toBeUndefined();
+    expect(aliasItem?.properties?.releaseId).toBeUndefined();
+    expect(JSON.stringify(aliasItem)).not.toContain("BottleRelease");
+
+    const mergeRequest = getJsonRequestSchema(
+      spec.paths?.["/bottle-groups/{group}/merge-targets"]?.post,
+    );
+    const splitRequest = getJsonRequestSchema(
+      spec.paths?.["/bottle-groups/{group}/split"]?.post,
+    );
+    const presentationRequest = getJsonRequestSchema(
+      spec.paths?.["/bottle-groups/{group}/presentation"]?.patch,
+    );
+    expect(Object.keys(mergeRequest?.properties ?? {})).toEqual([
+      "destinationGroupId",
+    ]);
+    expect(Object.keys(splitRequest?.properties ?? {})).toEqual([
+      "movedBottleIds",
+      "newRepresentativeBottleId",
+      "sourceRepresentativeBottleId",
+    ]);
+    expect(Object.keys(presentationRequest?.properties ?? {})).toEqual([
+      "representativeBottleId",
+      "description",
+      "descriptionSrc",
+      "imageUrl",
+      "tastingNotes",
+    ]);
+    for (const sharedIdentityField of [
+      "name",
+      "fullName",
+      "brandId",
+      "bottlerId",
+      "distillerIds",
+      "category",
+      "seriesId",
+      "statedAge",
+      "flavorProfile",
+      "groupId",
+      "targetId",
+    ]) {
+      expect(
+        presentationRequest?.properties?.[sharedIdentityField],
+      ).toBeUndefined();
+    }
+
+    type CursorResult<T> = {
+      results: T[];
+      rel: { nextCursor: number | null; prevCursor: number | null };
+    };
+    expectTypeOf<Outputs["bottleGroups"]["list"]>().toEqualTypeOf<
+      CursorResult<GenericCatalogTargetV1>
+    >();
+    expectTypeOf<
+      Outputs["bottleGroups"]["details"]
+    >().toEqualTypeOf<GenericCatalogTargetV1>();
+    expectTypeOf<Outputs["bottleGroups"]["bottles"]>().toEqualTypeOf<
+      CursorResult<ExactCatalogTargetV1>
+    >();
+    expectTypeOf<Outputs["bottleGroups"]["aliases"]>().toEqualTypeOf<
+      CursorResult<BottleGroupAliasV1>
+    >();
+    expectTypeOf<
+      "name" extends keyof Inputs["bottleGroups"]["updatePresentation"]
+        ? true
+        : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "groupId" extends keyof Inputs["bottleGroups"]["merge"] ? true : false
     >().toEqualTypeOf<false>();
   });
 

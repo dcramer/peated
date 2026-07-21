@@ -109,7 +109,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
 - [x] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
 - [x] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
-- [ ] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
+- [x] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
 - [ ] 7.7 After production target backfill, run and retain exact-Bottle and BottleGroup raw-target aggregate comparisons against legacy totals, resolve every mismatch, and record explicit approval before deploying or enabling the task 4.11b statistics cutover; job implementation remains owned by task 4.11b.
 - [ ] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
 - [ ] 7.9 Add retired-parent redirects to BottleGroup pages without choosing the representative Bottle as the activity target.

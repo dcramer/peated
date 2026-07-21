@@ -184,6 +184,27 @@ BottleRelease CRUD and registration:
 
 Bottle catalog routes:
 
+- `apps/server/src/lib/bottleGroupReads.ts` is the BottleGroup read owner. Group
+  list/details return only the generic CatalogTarget and group-owned aggregate
+  statistics. Related-release listing is paginated and returns each member as
+  an independently complete exact Bottle target, while stable-alias listing is
+  paginated and selects only non-ignored aliases whose `targetId` directly owns
+  the group's generic target. These reads fail closed on malformed target
+  graphs, expose retired replacement identity through one discriminated 409
+  payload, and never substitute the representative Bottle.
+- `apps/server/src/orpc/routes/bottleGroups/` registers public list, details,
+  related-Bottle, and stable-alias reads plus moderator-only merge, split, and
+  presentation operations. The mutation routes are thin delegates to
+  `mergeBottleGroups`, `splitBottleGroup`, and
+  `updateBottleGroupPresentation`; they do not implement another grouping,
+  shared-identity, aggregate, alias, or member-update system. Presentation
+  input cannot change shared Bottle identity. Ordinary/manual Bottle creation
+  still cannot select or reuse a group, and no route derives exact identity
+  from a representative.
+- `apps/server/src/openapi/spec.test.ts` locks the seven BottleGroup operations,
+  their generic/exact/alias response boundaries, and their bounded moderator
+  request shapes. This additive API surface is review slicing only: it makes no
+  deployment, activation, production-audit, or backfill-execution claim.
 - `apps/server/src/orpc/routes/bottles/create-from-source.ts` and its
   `/bottles/from/{bottle}` contract are superseded public group-selection
   surfaces. Task 5.2 removes the route and task 5.11 removes its generated

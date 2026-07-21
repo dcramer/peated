@@ -1,6 +1,7 @@
 export * from "./actors";
 export * from "./auth";
 export * from "./badges";
+export * from "./bottleGroups";
 export * from "./bottleReleases";
 export * from "./bottles";
 export * from "./bottleSeries";
