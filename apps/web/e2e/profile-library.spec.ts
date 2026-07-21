@@ -8,8 +8,8 @@ import {
 import { Buffer } from "node:buffer";
 
 import {
-  displayImageBottleId,
-  displayImageUrl,
+  bottleImageBottleId,
+  bottleImageUrl,
   existingBottle,
   existingRelease,
   existingReleaseId,
@@ -20,31 +20,31 @@ import {
 import { signIn } from "./session";
 
 test.describe("profile library", () => {
-  test("renders a bottle display image fallback on the detail page", async ({
+  test("renders a Bottle-owned image on the detail page", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
       accessToken: [
         testAccessToken,
-        "display-image",
+        "bottle-image",
         testInfo.project.name,
       ].join("-"),
     });
 
-    await page.goto(`/bottles/${displayImageBottleId}`, {
+    await page.goto(`/bottles/${bottleImageBottleId}`, {
       waitUntil: "commit",
     });
 
     await expect(
-      page.getByRole("heading", { name: "Lagavulin Display Image Reserve" }),
+      page.getByRole("heading", { name: "Lagavulin Bottle Image Reserve" }),
     ).toBeVisible();
-    const displayImage = page.locator(`img[src="${displayImageUrl}"]`);
+    const bottleImage = page.locator(`img[src="${bottleImageUrl}"]`);
 
     if (testInfo.project.name.includes("mobile")) {
-      await expect(displayImage).toHaveCount(1);
+      await expect(bottleImage).toHaveCount(1);
     } else {
-      await expect(displayImage).toBeVisible();
+      await expect(bottleImage).toBeVisible();
     }
 
     const schemaTexts = await page
@@ -52,10 +52,13 @@ test.describe("profile library", () => {
       .evaluateAll((scripts) =>
         scripts.map((script) => script.textContent ?? ""),
       );
-    expect(schemaTexts.some((text) => text.includes('"@type":"Product"'))).toBe(
-      true,
-    );
-    expect(schemaTexts.join("\n")).not.toContain(displayImageUrl);
+    const productSchema = schemaTexts
+      .map((text) => JSON.parse(text) as { "@type"?: string; image?: string })
+      .find((schema) => schema["@type"] === "Product");
+    expect(productSchema).toMatchObject({
+      "@type": "Product",
+      image: bottleImageUrl,
+    });
   });
 
   test("saves a bottle to Library with Favorites hidden", async ({

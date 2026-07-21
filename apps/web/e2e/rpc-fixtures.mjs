@@ -75,16 +75,14 @@ export const createdBottleId = 9302;
 export const existingReleaseId = 9303;
 export const createdReleaseId = 9304;
 export const createdTastingId = 9401;
-export const displayImageBottleId = 9501;
-export const displayImageUrl =
-  "http://127.0.0.1:4999/uploads/display-bottle.webp";
+export const bottleImageBottleId = 9501;
+export const bottleImageUrl = "http://127.0.0.1:4999/uploads/bottle-image.webp";
 
 export function buildBottle({
   id = existingBottleId,
   name = "16-year-old",
   brand = testBrand,
   imageUrl = null,
-  displayImageUrl = null,
   totalTastings = 0,
   people = 0,
   hasTasted = false,
@@ -111,7 +109,6 @@ export function buildBottle({
     description: null,
     descriptionSrc: null,
     imageUrl,
-    displayImageUrl: displayImageUrl ?? imageUrl,
     flavorProfile: null,
     tastingNotes: null,
     suggestedTags: [],
@@ -130,7 +127,6 @@ export function buildBottle({
     },
     totalTastings,
     people,
-    numReleases: 0,
     lastPrice: null,
     createdBy: null,
     createdAt: timestamp,
@@ -231,7 +227,7 @@ function buildBottleGroup({
     representativeBottleId,
     description: bottle.description,
     descriptionSrc: bottle.descriptionSrc,
-    imageUrl: bottle.displayImageUrl ?? bottle.imageUrl,
+    imageUrl: bottle.imageUrl,
     flavorProfile: bottle.flavorProfile,
     tastingNotes: bottle.tastingNotes,
     suggestedTags: bottle.suggestedTags,
@@ -298,9 +294,7 @@ export function buildExactCatalogTarget({
       caskFill: release ? release.caskFill : bottle.caskFill,
       description: release ? release.description : bottle.description,
       descriptionSrc: bottle.descriptionSrc,
-      imageUrl: release
-        ? release.imageUrl
-        : (bottle.displayImageUrl ?? bottle.imageUrl),
+      imageUrl: release ? release.imageUrl : bottle.imageUrl,
       tastingNotes: release ? release.tastingNotes : bottle.tastingNotes,
       suggestedTags: release ? release.suggestedTags : bottle.suggestedTags,
       avgRating: release ? release.avgRating : bottle.avgRating,

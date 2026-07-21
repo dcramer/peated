@@ -1,16 +1,20 @@
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, it } from "vitest";
 import { serialize } from ".";
 import { db } from "../db";
 import {
+  bottleGroups,
   bottles,
   bottleSeries,
   bottlesToDistillers,
+  catalogTargets,
   collectionBottles,
   collections,
   entities,
   users,
 } from "../db/schema";
 import { RESERVED_COLLECTIONS } from "../lib/db";
+import { BottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
 
 async function getExactTargetId(bottleId: number): Promise<number> {
@@ -221,7 +225,7 @@ describe("BottleSerializer", () => {
     });
   });
 
-  it("serializes a bottle with and without a series", async function ({
+  it("serializes an independently complete bottle and its group summary", async function ({
     fixtures,
   }) {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
@@ -242,10 +246,13 @@ describe("BottleSerializer", () => {
       brandId: brand.id,
     });
 
-    const results = await serialize(BottleSerializer, [
-      bottleWithSeries,
-      bottleWithoutSeries,
-    ]);
+    const results = await serialize(
+      BottleSerializer,
+      [bottleWithSeries, bottleWithoutSeries],
+      undefined,
+      [],
+      { includeGroupSummary: true },
+    );
 
     expect(results).toHaveLength(2);
 
@@ -253,6 +260,11 @@ describe("BottleSerializer", () => {
     expect(results[0]).toMatchObject({
       id: bottleWithSeries.id,
       name: bottleWithSeries.name,
+      group: {
+        id: bottleWithSeries.groupId,
+        representativeBottleId: bottleWithSeries.id,
+        totalBottles: 1,
+      },
       series: expect.objectContaining({
         id: series.id,
         name: series.name,
@@ -270,28 +282,97 @@ describe("BottleSerializer", () => {
       name: bottleWithoutSeries.name,
       series: null,
     });
+    expect(BottleSchema.safeParse(results[0]).success).toBe(true);
   });
 
-  it("serializes the number of tracked bottlings", async function ({
+  it("keeps sibling Bottle identity independent from a shared group summary", async ({
     fixtures,
-  }) {
-    const bottle = await fixtures.Bottle();
+  }) => {
+    const brand = await fixtures.Entity({ name: "Springbank" });
+    const first = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Batch 23",
+      edition: "Batch 23",
+      imageUrl: "bottles/batch-23.jpg",
+    });
+    const second = await fixtures.LegacyBottle({
+      brandId: brand.id,
+      name: "Batch 24",
+      edition: "Batch 24",
+      imageUrl: "bottles/batch-24.jpg",
+    });
+
+    await db
+      .update(bottles)
+      .set({ groupId: first.groupId })
+      .where(eq(bottles.id, second.id));
+    await db.insert(catalogTargets).values({
+      groupId: first.groupId as number,
+      bottleId: second.id,
+    });
+    await db
+      .update(bottleGroups)
+      .set({ totalBottles: 2 })
+      .where(eq(bottleGroups.id, first.groupId as number));
+
+    const [firstResult, secondResult] = await serialize(
+      BottleSerializer,
+      [first, { ...second, groupId: first.groupId }],
+      undefined,
+      [],
+      { includeGroupSummary: true },
+    );
+
+    expect(firstResult.group).toEqual(secondResult.group);
+    expect(firstResult).toMatchObject({
+      name: "Batch 23",
+      edition: "Batch 23",
+      imageUrl: expect.stringContaining("bottles/batch-23.jpg"),
+    });
+    expect(secondResult).toMatchObject({
+      name: "Batch 24",
+      edition: "Batch 24",
+      imageUrl: expect.stringContaining("bottles/batch-24.jpg"),
+    });
+  });
+
+  it("does not hydrate image or release counts from BottleRelease", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ imageUrl: null });
 
     await fixtures.BottleRelease({
       bottleId: bottle.id,
       edition: "Batch 24",
-    });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "S2B13",
-    });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Store Pick",
+      imageUrl: "bottlings/batch-24.jpg",
     });
 
     const [result] = await serialize(BottleSerializer, [bottle]);
 
-    expect(result.numReleases).toBe(3);
+    expect(result.imageUrl).toBeNull();
+    expect(result).not.toHaveProperty("displayImageUrl");
+    expect(result).not.toHaveProperty("numReleases");
+  });
+
+  it("serializes independently without a target unless group enrichment is requested", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.LegacyBottle({ name: "Missing Target" });
+
+    const [result] = await serialize(BottleSerializer, [bottle]);
+
+    expect(result).toMatchObject({
+      id: bottle.id,
+      name: "Missing Target",
+      imageUrl: null,
+    });
+    expect(BottleSchema.safeParse(result).success).toBe(true);
+    expect(result).not.toHaveProperty("group");
+
+    await expect(
+      serialize(BottleSerializer, [bottle], undefined, [], {
+        includeGroupSummary: true,
+      }),
+    ).rejects.toThrow(`Catalog target not found (bottleId=${bottle.id}).`);
   });
 });

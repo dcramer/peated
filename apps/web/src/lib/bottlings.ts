@@ -64,7 +64,3 @@ export function formatBottleBottlingName(
     ? bottling.fullName.replace(CANONICAL_TRAIT_SUFFIX, "")
     : `${bottle.fullName} - ${bottlingName}`;
 }
-
-export function formatBottlingCountLabel(numReleases: number) {
-  return `${numReleases} bottling${numReleases === 1 ? "" : "s"}`;
-}

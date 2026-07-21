@@ -1,7 +1,13 @@
 import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleTombstones,
+  catalogTargets,
+} from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { and, eq, isNull } from "drizzle-orm";
 
 describe("GET /bottles", () => {
   test("lists bottles", async ({ fixtures }) => {
@@ -11,6 +17,7 @@ describe("GET /bottles", () => {
     const { results } = await routerClient.bottles.list({});
 
     expect(results.length).toBe(2);
+    expect(results.every((result) => result.group?.id)).toBe(true);
   });
 
   test("lists bottles with query", async ({ fixtures }) => {
@@ -25,30 +32,134 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
-  test("lists parent bottles for exact release aliases", async ({
+  test("resolves exact aliases through their authoritative target", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Private Selection" });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "S2B13",
-      name: "Private Selection - S2B13",
-      fullName: `${bottle.fullName} - S2B13`,
+    const retainedBottle = await fixtures.Bottle({ name: "Retained Parent" });
+    const retainedRelease = await fixtures.BottleRelease({
+      bottleId: retainedBottle.id,
     });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing exact target fixture");
 
     await db.insert(bottleAliases).values({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-      assignedByActorId: release.createdByActorId,
+      bottleId: retainedBottle.id,
+      releaseId: retainedRelease.id,
+      targetId: target.id,
+      name: "Exact Target Alias",
+      assignedByActorId: bottle.createdByActorId,
     });
 
     const { results } = await routerClient.bottles.list({
-      query: release.fullName,
+      query: "Exact Target Alias",
     });
 
     expect(results.length).toBe(1);
     expect(results[0].id).toBe(bottle.id);
+    expect(results[0].group?.id).toBe(bottle.groupId);
+  });
+
+  test("does not resolve generic or ignored aliases to a Bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Alias Boundary" });
+    const [genericTarget, exactTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, bottle.id),
+      }),
+    ]);
+    if (!genericTarget || !exactTarget) {
+      throw new Error("Missing CatalogTarget fixture");
+    }
+    await db.insert(bottleAliases).values([
+      {
+        bottleId: bottle.id,
+        targetId: genericTarget.id,
+        name: "Generic Target Alias",
+        assignedByActorId: bottle.createdByActorId,
+      },
+      {
+        bottleId: bottle.id,
+        targetId: exactTarget.id,
+        name: "Ignored Exact Alias",
+        ignored: true,
+        assignedByActorId: bottle.createdByActorId,
+      },
+    ]);
+
+    const [genericResults, ignoredResults] = await Promise.all([
+      routerClient.bottles.list({ query: "Generic Target Alias" }),
+      routerClient.bottles.list({ query: "Ignored Exact Alias" }),
+    ]);
+
+    expect(genericResults.results).toHaveLength(0);
+    expect(ignoredResults.results).toHaveLength(0);
+  });
+
+  test("excludes a legacy Bottle without an exact target", async ({
+    fixtures,
+  }) => {
+    const legacyBottle = await fixtures.LegacyBottle({
+      name: "Legacy Orphan Token",
+    });
+    const bottle = await fixtures.Bottle({ name: "Current Bottle" });
+
+    const { results } = await routerClient.bottles.list({ sort: "name" });
+    const search = await routerClient.bottles.list({
+      query: "Legacy Orphan Token",
+    });
+
+    expect(results.map((result) => result.id)).toEqual([bottle.id]);
+    expect(search.results).toHaveLength(0);
+    expect(results.some((result) => result.id === legacyBottle.id)).toBe(false);
+  });
+
+  test("excludes a retired Bottle even while its exact target remains", async ({
+    fixtures,
+  }) => {
+    const retired = await fixtures.Bottle({ name: "Retired Bottle" });
+    const replacement = await fixtures.Bottle({ name: "Replacement Bottle" });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    const { results } = await routerClient.bottles.list({ sort: "name" });
+
+    expect(results.map((result) => result.id)).toEqual([replacement.id]);
+  });
+
+  test("keeps exact sibling Bottles distinct in list results", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const first = await fixtures.Bottle({ name: "Sibling Batch" });
+    const second = await createConcreteBottle({
+      context: { user: defaults.user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: first.id,
+        exact: { edition: "Batch Two", releaseYear: 2026 },
+      },
+    });
+
+    const { results } = await routerClient.bottles.list({
+      brand: first.brandId,
+      sort: "name",
+    });
+
+    expect(results.map((result) => result.id).sort((a, b) => a - b)).toEqual(
+      [first.id, second.bottle.id].sort((a, b) => a - b),
+    );
   });
 
   test("lists bottles with 'The' prefix", async ({ fixtures }) => {
@@ -243,23 +354,36 @@ describe("GET /bottles", () => {
   test("lists bottles with tag filter", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
     const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
+    const target1 = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle1.id),
+    });
+    const target2 = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle2.id),
+    });
+    if (!target1 || !target2) throw new Error("Missing exact target fixture");
 
-    // Create tastings with tags
     await fixtures.Tasting({
-      bottleId: bottle1.id,
+      bottleId: bottle2.id,
+      targetId: target1.id,
       tags: ["smoky", "peated"],
     });
     await fixtures.Tasting({
-      bottleId: bottle2.id,
-      tags: ["fruity", "sweet"],
+      bottleId: bottle1.id,
+      targetId: target2.id,
+      tags: ["retained-only"],
     });
 
-    const { results } = await routerClient.bottles.list({
-      tag: "smoky",
-    });
+    const [targetMatch, retainedMatch] = await Promise.all([
+      routerClient.bottles.list({ tag: "smoky" }),
+      routerClient.bottles.list({ tag: "retained-only" }),
+    ]);
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+    expect(targetMatch.results.map((result) => result.id)).toEqual([
+      bottle1.id,
+    ]);
+    expect(retainedMatch.results.map((result) => result.id)).toEqual([
+      bottle2.id,
+    ]);
   });
 
   test("lists bottles with query matching brand and name", async ({

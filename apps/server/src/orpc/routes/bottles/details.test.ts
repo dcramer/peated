@@ -6,11 +6,12 @@ import {
   catalogTargets,
   storePrices,
 } from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import type * as LogModule from "@peated/server/lib/log";
 import { logTelemetryError } from "@peated/server/lib/log";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 vi.mock("@peated/server/lib/log", async (importOriginal) => {
   const actual = await importOriginal<typeof LogModule>();
@@ -28,10 +29,11 @@ describe("GET /bottles/:bottle", () => {
       bottle: bottle.id,
     });
     expect(data.id).toEqual(bottle.id);
+    expect(data.group?.id).toEqual(bottle.groupId);
     expect("createdBy" in data).toBe(false);
   });
 
-  test("uses bottle image as display image", async ({ fixtures }) => {
+  test("uses the Bottle's own image", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({
       imageUrl: "https://example.com/bottle.png",
     });
@@ -45,10 +47,12 @@ describe("GET /bottles/:bottle", () => {
     });
 
     expect(data.imageUrl).toBe("https://example.com/bottle.png");
-    expect(data.displayImageUrl).toBe("https://example.com/bottle.png");
+    expect("displayImageUrl" in data).toBe(false);
   });
 
-  test("uses bottling image as display fallback", async ({ fixtures }) => {
+  test("does not fall back to a retained Bottling image", async ({
+    fixtures,
+  }) => {
     const bottle = await fixtures.Bottle({
       imageUrl: null,
     });
@@ -70,11 +74,23 @@ describe("GET /bottles/:bottle", () => {
     });
 
     expect(data.imageUrl).toBeNull();
-    expect(data.displayImageUrl).toBe("https://example.com/release-b.png");
+    expect("displayImageUrl" in data).toBe(false);
   });
 
   test("errors on invalid bottle", async () => {
     const err = await waitError(routerClient.bottles.details({ bottle: 1 }));
+    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+  });
+
+  test("fails closed for a legacy Bottle without an exact target", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.LegacyBottle();
+
+    const err = await waitError(
+      routerClient.bottles.details({ bottle: bottle.id }),
+    );
+
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
@@ -88,6 +104,64 @@ describe("GET /bottles/:bottle", () => {
 
     const data = await routerClient.bottles.details({ bottle: 999 });
     expect(data.id).toEqual(bottle1.id);
+  });
+
+  test("counts people through the Bottle's exact target", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Selected Bottle" });
+    const sibling = await createConcreteBottle({
+      context: { user: defaults.user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: bottle.id,
+        exact: { edition: "Sibling Edition", releaseYear: 2026 },
+      },
+    });
+    const [target, siblingTarget, genericTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, bottle.id),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, sibling.bottle.id),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+    ]);
+    if (!target || !siblingTarget || !genericTarget) {
+      throw new Error("Missing CatalogTarget fixture");
+    }
+    const exactPerson = await fixtures.User();
+    const siblingPerson = await fixtures.User();
+    const genericPerson = await fixtures.User();
+    await fixtures.Tasting({
+      bottleId: sibling.bottle.id,
+      targetId: target.id,
+      createdById: exactPerson.id,
+    });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: siblingTarget.id,
+      createdById: siblingPerson.id,
+    });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: genericTarget.id,
+      createdById: genericPerson.id,
+    });
+
+    const [selectedDetails, siblingDetails] = await Promise.all([
+      routerClient.bottles.details({ bottle: bottle.id }),
+      routerClient.bottles.details({ bottle: sibling.bottle.id }),
+    ]);
+
+    expect(selectedDetails.people).toBe(1);
+    expect(siblingDetails.people).toBe(1);
   });
 
   test("selects lastPrice through the Bottle exact target", async ({

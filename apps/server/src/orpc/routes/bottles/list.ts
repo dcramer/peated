@@ -2,8 +2,11 @@ import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroupTombstones,
   bottles,
   bottlesToDistillers,
+  bottleTombstones,
+  catalogTargets,
   entities,
   tastings,
 } from "@peated/server/db/schema";
@@ -76,12 +79,17 @@ export default procedure
     const exactAliasBottleIds = query
       ? (
           await db
-            .selectDistinct({ bottleId: bottleAliases.bottleId })
+            .selectDistinct({ bottleId: catalogTargets.bottleId })
             .from(bottleAliases)
+            .innerJoin(
+              catalogTargets,
+              eq(catalogTargets.id, bottleAliases.targetId),
+            )
             .where(
               and(
                 eq(sql`LOWER(${bottleAliases.name})`, query.toLowerCase()),
-                isNotNull(bottleAliases.bottleId),
+                sql`${bottleAliases.ignored} IS NOT TRUE`,
+                isNotNull(catalogTargets.bottleId),
               ),
             )
         )
@@ -91,6 +99,10 @@ export default procedure
       : [];
 
     const where: (SQL<unknown> | undefined)[] = [];
+    where.push(
+      sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
+    );
 
     if (query) {
       where.push(
@@ -139,7 +151,7 @@ export default procedure
     }
     if (rest.tag) {
       where.push(
-        sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
+        sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.targetId} = ${catalogTargets.id})`,
       );
     }
     if (rest.minRating !== null && rest.minRating !== undefined) {
@@ -205,6 +217,13 @@ export default procedure
     const results = await db
       .select({ bottles })
       .from(bottles)
+      .innerJoin(
+        catalogTargets,
+        and(
+          eq(catalogTargets.bottleId, bottles.id),
+          eq(catalogTargets.groupId, bottles.groupId),
+        ),
+      )
       .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
@@ -227,6 +246,7 @@ export default procedure
         results.slice(0, limit).map((r) => r.bottles),
         context.user,
         ["description", "tastingNotes"],
+        { includeGroupSummary: true },
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

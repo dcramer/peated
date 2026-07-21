@@ -5,6 +5,10 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
+import {
+  CatalogTargetNotFoundError,
+  CatalogTargetRetiredError,
+} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import loadBottlePriceTargetId, {
   legacyStorePriceBottleMembership,
@@ -70,7 +74,18 @@ export default procedure
       }
     }
 
-    const targetId = await loadBottlePriceTargetId(bottle.id);
+    let targetId: number;
+    try {
+      targetId = await loadBottlePriceTargetId(bottle.id);
+    } catch (error) {
+      if (
+        error instanceof CatalogTargetNotFoundError ||
+        error instanceof CatalogTargetRetiredError
+      ) {
+        throw errors.NOT_FOUND({ message: "Bottle not found." });
+      }
+      throw error;
+    }
     const targetWhere = eq(storePrices.targetId, targetId);
     const legacyWhere = legacyStorePriceBottleMembership(bottle.id);
 
@@ -115,10 +130,12 @@ export default procedure
         count: sql<string>`COUNT(DISTINCT ${tastings.createdById})`,
       })
       .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
+      .where(eq(tastings.targetId, targetId));
 
     return {
-      ...(await serialize(BottleSerializer, bottle, context.user)),
+      ...(await serialize(BottleSerializer, bottle, context.user, [], {
+        includeGroupSummary: true,
+      })),
       people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)

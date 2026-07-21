@@ -127,33 +127,11 @@ export type BottleSeries = typeof bottleSeries.$inferSelect;
 export type NewBottleSeries = typeof bottleSeries.$inferInsert;
 
 /**
- * Represents the stable parent product from a brand.
- * This is the default identity object that most users taste, search, and collect.
- * Child releases are optional and only used when a reusable marketed distinction
- * should aggregate separately across users, prices, and stats.
+ * Represents one independently complete marketed release.
  *
- * A bottle may temporarily carry release-like traits when only one marketed
- * form is known, or when older data predates an explicit release split. Once
- * sibling evidence establishes a reusable parent, varying vintage, bottling
- * year, ABV, edition, and cask traits belong on bottle_release rows.
- *
- * Some fields (description, imageUrl, etc.) are materialized from child
- * releases when they exist.
- *
- * Examples:
- * 1. Ardbeg Supernova
- *    - Brand: Ardbeg
- *    - Series: Supernova
- *    - Can have child releases such as 2019 Release or later annual releases
- *
- * 2. Macallan 18
- *    - Brand: Macallan
- *    - Series: 18-year-old
- *    - Can have child releases by vintage year (1993, 1994, etc.)
- *
- * 3. Octomore 13.1
- *    - One bottle
- *    - `13.1` is part of the bottle identity, not a child release
+ * Shared BottleGroup edits are durably materialized here so exact reads never
+ * depend on group hydration. Release-specific identity, content, and aggregate
+ * state also belong directly to this row.
  */
 export const bottles = pgTable(
   "bottle",
@@ -167,8 +145,7 @@ export const bottles = pgTable(
     // canonical name excluding brand
     name: varchar("name", { length: 255 }).notNull(),
 
-    // statedAge is only present on the expression level if its always the same across any release
-    // and when it is present, it will be included in the canonical expression name
+    // Effective stated age for this exact marketed Bottle.
     statedAge: smallint("stated_age"),
 
     // a NULL series represents a "core bottling"
@@ -187,9 +164,7 @@ export const bottles = pgTable(
     ),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
-    // Legacy or single-known-release traits can remain on bottle. Once a
-    // reusable child release boundary is clear, new canonical release data
-    // should prefer bottle_release.
+    // Exact marketed-release identity.
     edition: varchar("edition", { length: 255 }),
     abv: doublePrecision("abv"),
     singleCask: boolean("single_cask"),
@@ -200,7 +175,7 @@ export const bottles = pgTable(
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
 
-    // Materialized fields from child releases
+    // Exact content and aggregate state.
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),
@@ -217,6 +192,7 @@ export const bottles = pgTable(
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),
+    // Retained legacy compatibility state; new reads use BottleGroup totals.
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
       .notNull(),
@@ -248,7 +224,11 @@ export const bottles = pgTable(
 export type Bottle = typeof bottles.$inferSelect;
 export type NewBottle = typeof bottles.$inferInsert;
 
-/** Owns stable expression identity; any representative must be a member. */
+/**
+ * Owns generic identity, aggregate presentation, and shared editing semantics.
+ * Member Bottles durably materialize shared values; any representative must be
+ * a member and does not substitute for an exact Bottle identity.
+ */
 export const bottleGroups = pgTable(
   "bottle_group",
   {
@@ -514,33 +494,9 @@ export const bottleGroupTombstonesRelations = relations(
 );
 
 /**
- * Represents a shared canonical release under a parent bottle.
- *
- * Use this table when the distinction should aggregate across users, searches,
- * prices, and stats. Release rows carry the typed identity traits that are not
- * stable on the parent bottle, such as edition, distillation/vintage year,
- * bottling/release year, release-specific age, ABV, and cask traits.
- *
- * If a detail is exact but not yet strong enough to justify a canonical split,
- * preserve it in bottle_observation first.
- *
- * Examples:
- * 1. Ardbeg Supernova 2019 Release
- *    - Bottle: Ardbeg Supernova
- *    - Release Year: 2019
- *    - ABV: 53.8%
- *    - Release-specific details: ppm, cask types, etc.
- *
- * 2. Springbank 12 Cask Strength Batch 24
- *    - Bottle: Springbank 12 Cask Strength
- *    - Edition: Batch 24
- *    - ABV: 57.2%
- *    - Release-specific details: batch label, exact ABV
- *
- * 3. Maker's Mark Private Selection S2B13
- *    - Bottle: Maker's Mark Private Selection
- *    - Edition: S2B13
- *    - Release-specific details: pick code and other marketed variation
+ * Legacy compatibility schema retained for the staged migration.
+ * Canonical marketed releases are Bottle rows; OpenSpec tasks 9.6 and 9.7
+ * remove this table after its remaining compatibility readers and writers.
  */
 export const bottleReleases = pgTable(
   "bottle_release",

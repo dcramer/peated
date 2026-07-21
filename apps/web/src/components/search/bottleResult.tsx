@@ -8,7 +8,6 @@ import {
   type AddBottleRouteIntent,
   type PendingImageRouteState,
 } from "@peated/web/lib/addBottle";
-import { formatBottlingCountLabel } from "@peated/web/lib/bottlings";
 import { type ReactNode } from "react";
 import Join from "../join";
 export type BottleResult = {
@@ -86,14 +85,7 @@ export default function BottleResultRow({
             })}
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            <div className="flex flex-col gap-x-2 sm:flex-row sm:items-center">
-              <span>{bottle.fullName}</span>
-              {bottle.numReleases > 0 && (
-                <span className="text-muted text-sm">
-                  {formatBottlingCountLabel(bottle.numReleases)}
-                </span>
-              )}
-            </div>
+            <span>{bottle.fullName}</span>
           </Link>
           <BottleStatusIcons bottle={bottle} />
         </div>

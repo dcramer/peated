@@ -1,6 +1,8 @@
 import http from "node:http";
 
 import {
+  bottleImageBottleId,
+  bottleImageUrl,
   buildActivity,
   buildBottle,
   buildBottleRelease,
@@ -13,8 +15,6 @@ import {
   createdBottleName,
   createdReleaseId,
   createdTastingId,
-  displayImageBottleId,
-  displayImageUrl,
   emptyLibraryStats,
   emptyList,
   existingBottle,
@@ -1528,11 +1528,11 @@ function buildBottleForId(id) {
     });
   }
 
-  if (id === displayImageBottleId) {
+  if (id === bottleImageBottleId) {
     return buildBottle({
-      id: displayImageBottleId,
-      name: "Display Image Reserve",
-      displayImageUrl,
+      id: bottleImageBottleId,
+      name: "Bottle Image Reserve",
+      imageUrl: bottleImageUrl,
     });
   }
 

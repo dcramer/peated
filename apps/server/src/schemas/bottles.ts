@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BottleSeriesInputSchema, BottleSeriesSchema } from "./bottleSeries";
+import { BottleGroupV1Schema } from "./catalogIdentity";
 import {
   CaskFillEnum,
   CaskSizeEnum,
@@ -15,14 +16,13 @@ export const BottleSchema = z.object({
   fullName: z
     .string()
     .readonly()
-    .describe("Canonical name including the brand"),
+    .describe("Canonical marketed Bottle name including the brand"),
 
-  name: z
-    .string()
-    .trim()
-    .describe(
-      "Expression name for the bottle (e.g., Supernova for Ardbeg Supernova)",
-    ),
+  name: z.string().trim().describe("Marketed Bottle name excluding the brand"),
+
+  group: BottleGroupV1Schema.optional().describe(
+    "Shared editing and aggregate context for this independently complete Bottle",
+  ),
 
   series: BottleSeriesSchema.nullable()
     .default(null)
@@ -32,24 +32,19 @@ export const BottleSchema = z.object({
     .default(null)
     .describe("Category of the whisky (e.g., Scotch, Bourbon, etc.)"),
 
-  // These release-like traits can still live on the bottle when no reusable
-  // child release exists yet, and they also support older rows that predate
-  // explicit bottle_release splits.
   edition: z
     .string()
     .trim()
     .nullable()
     .default(null)
-    .describe(
-      "Optional release-like label stored on the bottle when no child release exists yet",
-    ),
+    .describe("Optional edition label for this concrete bottle"),
   statedAge: z
     .number()
     .min(0)
     .max(100)
     .nullable()
     .default(null)
-    .describe("Official age statement in years"),
+    .describe("Effective stated age for this exact Bottle, in years"),
   caskStrength: z
     .boolean()
     .nullable()
@@ -74,18 +69,14 @@ export const BottleSchema = z.object({
     .lte(new Date().getFullYear())
     .nullable()
     .default(null)
-    .describe(
-      "Distillation year when it belongs to the bottle identity or no child release exists yet",
-    ),
+    .describe("Distillation year for this exact marketed Bottle"),
   releaseYear: z
     .number()
     .gte(1800)
     .lte(new Date().getFullYear())
     .nullable()
     .default(null)
-    .describe(
-      "Release year when it belongs to the bottle identity or no child release exists yet",
-    ),
+    .describe("Release year for this exact marketed Bottle"),
 
   caskType: CaskTypeEnum.nullable()
     .default(null)
@@ -122,15 +113,6 @@ export const BottleSchema = z.object({
     .default(null)
     .readonly()
     .describe("URL to the bottle's image"),
-  displayImageUrl: z
-    .string()
-    .url()
-    .nullable()
-    .default(null)
-    .readonly()
-    .describe(
-      "Best available image URL for displaying this bottle, preferring the bottle image and falling back to a bottling image",
-    ),
   flavorProfile: FlavorProfileEnum.nullable()
     .default(null)
     .describe("Primary flavor characteristics of the whisky"),
@@ -177,12 +159,6 @@ export const BottleSchema = z.object({
     .gte(0)
     .readonly()
     .describe("Total number of recorded tastings for this bottle"),
-  numReleases: z
-    .number()
-    .gte(0)
-    .readonly()
-    .describe("Number of specific releases recorded under this bottle"),
-
   createdAt: z
     .string()
     .datetime()
@@ -227,6 +203,7 @@ const BrandChoice = z
 export const BottleInputSchema = BottleSchema.omit({
   id: true,
   fullName: true,
+  group: true,
   suggestedTags: true,
   avgRating: true,
   ratingStats: true,
@@ -236,8 +213,6 @@ export const BottleInputSchema = BottleSchema.omit({
   isFavorite: true,
   isLibrary: true,
   hasTasted: true,
-  numReleases: true,
-  displayImageUrl: true,
 }).extend({
   name: z
     .string()

@@ -107,7 +107,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
 - [ ] 7.2 Record actionable parity mismatches with consumer table, row id, legacy ids, target id, and resolved identities.
 - [ ] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
-- [ ] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
+- [x] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
 - [ ] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
 - [ ] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
 - [ ] 7.7 After production target backfill, run and retain exact-Bottle and BottleGroup raw-target aggregate comparisons against legacy totals, resolve every mismatch, and record explicit approval before deploying or enabling the task 4.11b statistics cutover; job implementation remains owned by task 4.11b.
