@@ -162,6 +162,41 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<false>();
   });
 
+  it("publishes the legacy BottleRelease redirect target", async () => {
+    const spec = await generateSpec();
+    const operation = spec.paths?.["/bottle-releases/{release}/target"]?.get;
+
+    expect(operation?.operationId).toBe("getBottleReleaseTarget");
+    expect(operation?.parameters).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "release",
+          in: "path",
+          required: true,
+        }),
+        expect.objectContaining({
+          name: "bottle",
+          in: "query",
+          required: true,
+        }),
+      ]),
+    );
+    const responseSchema = getJsonResponseSchema(operation);
+    expect(responseSchema?.type).toBe("object");
+    expect(responseSchema?.required).toEqual(["bottleId"]);
+    expect(Object.keys(responseSchema?.properties ?? {})).toEqual(["bottleId"]);
+    expect(responseSchema?.properties?.bottleId).toMatchObject({
+      type: "integer",
+      exclusiveMinimum: 0,
+    });
+    expect(responseSchema?.oneOf).toBeUndefined();
+    expect(responseSchema?.anyOf).toBeUndefined();
+
+    expectTypeOf<Outputs["bottleReleases"]["target"]>().toEqualTypeOf<{
+      bottleId: number;
+    }>();
+  });
+
   it("publishes BottleGroup reads and bounded moderator operations", async () => {
     const spec = await generateSpec();
     const operations = [

@@ -22,6 +22,8 @@ import {
   existingRelease,
   existingReleaseId,
   failingTastingNotes,
+  legacyIncompleteReleaseId,
+  legacyPromotedBottleId,
   photoTastingNotes,
   priceChangeList,
   priceSite,
@@ -269,6 +271,29 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       sendRpcError(response, "Unexpected bottle release details payload");
+      return true;
+    }
+    case "bottleReleases/target": {
+      if (
+        input?.bottle === existingBottleId &&
+        input?.release === legacyIncompleteReleaseId
+      ) {
+        sendRpcConflict(
+          response,
+          "Legacy BottleRelease mapping is incomplete.",
+        );
+        return true;
+      }
+
+      if (
+        input?.bottle === existingBottleId &&
+        input?.release === existingReleaseId
+      ) {
+        sendRpcResponse(response, { bottleId: legacyPromotedBottleId });
+        return true;
+      }
+
+      sendRpcNotFound(response, "Legacy BottleRelease mapping not found.");
       return true;
     }
     case "bottles/suggestedTags":
@@ -1719,6 +1744,42 @@ function sendRpcUnauthorized(response) {
           code: "UNAUTHORIZED",
           status: 401,
           message: "Unauthorized.",
+        },
+      }),
+    );
+}
+
+function sendRpcNotFound(response, message) {
+  response
+    .writeHead(404, {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    })
+    .end(
+      JSON.stringify({
+        json: {
+          defined: true,
+          code: "NOT_FOUND",
+          status: 404,
+          message,
+        },
+      }),
+    );
+}
+
+function sendRpcConflict(response, message) {
+  response
+    .writeHead(409, {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    })
+    .end(
+      JSON.stringify({
+        json: {
+          defined: true,
+          code: "CONFLICT",
+          status: 409,
+          message,
         },
       }),
     );

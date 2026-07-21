@@ -169,6 +169,14 @@ BottleRelease CRUD and registration:
   Bottle's active exact search identity. It does not read
   `bottle_release.search_vector`, expose incomplete promotions, or return a
   Bottle/BottleGroup tombstoned identity.
+- `apps/server/src/orpc/routes/bottleReleases/target.ts` is the task 7.8
+  anonymous measured read adapter for legacy nested-Bottling redirects. It
+  delegates the supplied parent/release pair to
+  `loadCatalogTargetByLegacyReference`, requires an exact-Bottle response, and
+  projects only that exact Bottle's positive id for the redirect consumer. It
+  never selects a representative or generic target. Missing or mismatched pairs
+  return not found, while incomplete, corrupt, or retired mappings conflict.
+  Task 9.7 removes the adapter after measured redirect traffic is gone.
 - `apps/server/src/orpc/routes/bottleReleases/update.ts` is the task 5.4b
   measured compatibility boundary. It requires a completed promotion mapping,
   translates only supplied legacy fields into a sparse exact patch, and
@@ -947,14 +955,29 @@ Routes:
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/page.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
-- `apps/web/src/app/(default)/bottles/[bottleId]/bottlings/[bottlingId]/page.tsx`
 - `apps/web/src/app/(layout-free)/addBottle/addBottleFlow.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/addTasting/page.tsx`
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/[bottlingId]/route.ts`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/[bottlingId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/new/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/[releaseId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/new/page.tsx`
+
+Task 7.8 moves the legacy nested-Bottling detail URL out of the exact-Bottle
+layout and makes the layout-free route its permanent redirect owner. It parses
+the retained parent/release ids, calls the anonymous measured
+`bottleReleases.target` adapter, preserves query parameters, and permanently
+redirects only to the returned exact Bottle URL. The superseded roughly
+940-line BottleRelease detail renderer is removed rather than retained as a
+second read system. The nested list and edit routes remain measured
+compatibility owned by task 8.9; task 8.3 owns replacing the nested new route.
+
+Task 7.9 remains deferred until a BottleGroup page and a durable retired-parent
+to BottleGroup destination exist. That redirect must preserve generic group
+identity and must never substitute the representative or another member Bottle.
+This review slice makes no production deployment, activation, audit, or
+backfill claim.
 
 Task 8.3 replaces the nested new-bottling route with a prefilled standard
 Bottle-create flow. The selected Bottle supplies independently durable draft

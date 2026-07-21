@@ -111,7 +111,7 @@ it must not preserve a parallel business-logic path.
 - [x] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
 - [x] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
 - [ ] 7.7 After production target backfill, run and retain exact-Bottle and BottleGroup raw-target aggregate comparisons against legacy totals, resolve every mismatch, and record explicit approval before deploying or enabling the task 4.11b statistics cutover; job implementation remains owned by task 4.11b.
-- [ ] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
+- [x] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
 - [ ] 7.9 Add retired-parent redirects to BottleGroup pages without choosing the representative Bottle as the activity target.
 - [ ] 7.10 Update cache keys, revalidation, queue payloads, and activity payloads to use exact Bottle or CatalogTarget identity consistently; before enabling the strict target-backed `UpdateBottleStats` worker, verify every old `{ bottleId }` producer is stopped or upgraded and every queued legacy payload is drained or expired because that payload cannot infer promoted exact identity and has no compatibility fallback; also stop or upgrade producers of legacy-parent `OnBottleChange` jobs and drain or expire those queued jobs before activation because a retired parent has no active exact target.
 - [ ] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
