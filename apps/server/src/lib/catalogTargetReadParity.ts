@@ -38,6 +38,10 @@ type CorrelatedConsumerLocator =
       };
     }
   | {
+      consumerTable: "incoming_bottle_decision_log";
+      rowLocator: { id: number };
+    }
+  | {
       consumerTable: "review";
       rowLocator: { id: number };
     }
@@ -225,6 +229,11 @@ function consumerLocator(
         rowLocator: item.rowLocator,
       };
     case "flight_bottle":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+    case "incoming_bottle_decision_log":
       return {
         consumerTable: item.consumerTable,
         rowLocator: item.rowLocator,

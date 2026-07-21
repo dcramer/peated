@@ -1211,8 +1211,8 @@ returned StorePrice response independently.
 This is another partial consumer review boundary. Existing-row backfill and
 production activation remain gated by section 6 and the retained parity/audit
 sequence; retained StorePrice pair storage and measured compatibility remain
-tasks 9.6/9.7. Observations, decisions, proposals, and remaining activity reads
-keep tasks 7.1-7.3 open.
+tasks 9.6/9.7. Proposals, adjacent analytics, specialized alias readers, and
+other actual consumers keep tasks 7.1-7.3 open.
 
 ### BottleAlias reads use authoritative CatalogTargets
 
@@ -1245,9 +1245,44 @@ translate invalid durable targets to conflicts. The labels `dump-unmatched`
 command now selects null `targetId`, matching the same unknown definition.
 
 This completes only the alias-read sub-slice. Other specialized alias readers,
-observations, decisions, proposals, and remaining activity reads keep parent
-tasks 7.1-7.3 open; retained pairs and parity adapters remain until tasks
-9.6/9.7. The slice makes no production activation or backfill claim.
+proposals, adjacent analytics, and other actual consumers keep parent tasks
+7.1-7.3 open; retained pairs and parity adapters remain until tasks 9.6/9.7.
+The slice makes no production activation or backfill claim.
+
+### Incoming decision reads use authoritative CatalogTargets
+
+The task 7.1b-7.3b incoming-decision slice makes the admin decision-log route
+hydrate its nullable durable `targetId` through the shared CatalogTarget parity
+reader. The decision-log primary id is the stable row locator for
+target-versus-retained resolution evidence. Retained parent/release identity is
+resolved semantically, including completed release promotion, but remains
+parity evidence only and cannot select or replace the authoritative result.
+
+The route returns a nullable discriminated CatalogTarget instead of joining or
+returning legacy Bottle and BottleRelease objects. An exact target returns its
+independently complete Bottle, a generic target remains BottleGroup identity
+without representative substitution, and a targetless historical row remains
+explicitly null. A missing, retired, or inconsistent nonnull durable target
+fails closed as a conflict response rather than falling back to the retained
+pair. Historical decision values and `createdBottle`/`createdRelease` flags
+remain readable audit fields; this read cutover does not reinterpret persisted
+history. Existing admin authorization, actor/source filters, deterministic
+ordering, and pagination remain unchanged.
+
+The admin page renders nonnull results through the shared CatalogTarget
+identity component and labels a null target explicitly unknown. It no longer
+constructs a nested Bottling link. Task 7.11a covers exact, generic, promoted,
+targetless, invalid-target, authorization, filtering, ordering, pagination, and
+focused UI rendering behavior.
+
+`bottle_observation` has no outward route or serializer to cut over: it remains
+internal source evidence owned by target-aware price-matching writes, migration,
+and merge/consolidation operations. The activity routes likewise compose the
+already target-backed Tasting and collection-membership serializers, so this
+slice does not invent a second observation or activity read system. Proposal
+and adjacent analytics reads, plus other remaining consumers, keep parent tasks
+7.1-7.3 and 7.11 open. This slice makes no production backfill, deployment, or
+activation claim.
 
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target

@@ -106,10 +106,13 @@ it must not preserve a parallel business-logic path.
 
 - [ ] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
 - [x] 7.1a Add bounded dual-read resolution and filter-membership parity to BottleAlias list and brand-repair alias reads, including semantic promoted-release resolution, without allowing parity to select authoritative results.
+- [x] 7.1b Add row-correlated target-versus-retained resolution parity to the incoming Bottle decision-log read, keyed by the stable decision-log id and including semantic promoted-release resolution, without allowing parity to select the authoritative result.
 - [ ] 7.2 Record actionable parity mismatches with consumer table, stable row locator, legacy ids, target id, and resolved identities.
 - [x] 7.2a Add strict `bottle_alias` parity correlation by unique alias name for both resolution and filter-membership drift, retaining target, legacy, caller, and operation evidence.
+- [x] 7.2b Record incoming Bottle decision-log parity mismatches with the `incoming_bottle_decision_log` table, stable row id, retained Bottle/Release ids, target id, caller, operation, and resolved identities.
 - [ ] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
 - [x] 7.3a Switch BottleAlias list filtering and hydration, brand-repair candidate/supporting-alias membership, and the labels unmatched dump to authoritative CatalogTarget identity; return nullable exact/generic targets without representative substitution and fail closed on invalid durable targets.
+- [x] 7.3b Switch the admin incoming Bottle decision-log route and UI to a nullable authoritative CatalogTarget, remove Bottle/BottleRelease joins and nested release output, preserve historical decision vocabulary and creation flags as audit evidence, render generic and unknown identity without representative substitution, and return conflict for an invalid nonnull durable target.
 - [x] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
 - [x] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
 - [x] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
@@ -121,6 +124,7 @@ it must not preserve a parallel business-logic path.
 - [x] 7.10b Move local cache/revalidation, alias search indexing, statistics queue payloads, and entity aggregation to exact Bottle or CatalogTarget identity; remove the superseded Bottle-based entity helper and cover exact/generic ownership plus producer fan-out.
 - [ ] 7.10c Before deployment activation, retain evidence that old Bottle-id statistics and legacy-parent `OnBottleChange` producers are stopped or upgraded and their queued legacy payloads are drained or expired.
 - [ ] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
+- [x] 7.11a Add incoming Bottle decision-log integration coverage for exact, generic, promoted-release, targetless, invalid-target, authorization, filter, deterministic ordering, and pagination behavior, plus focused admin rendering coverage for exact, generic, and unknown targets.
 
 ## 8. Unified Web Workflow
 

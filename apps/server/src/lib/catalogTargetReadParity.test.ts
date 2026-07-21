@@ -5,6 +5,7 @@ import {
   bottles,
   bottleTombstones,
   catalogTargets,
+  incomingBottleDecisionLogs,
 } from "@peated/server/db/schema";
 import {
   CatalogTargetNotFoundError,
@@ -332,6 +333,135 @@ describe("CatalogTarget read parity", () => {
           status: "resolved",
           kind: "bottle",
           targetId: driftAlias.targetId,
+          groupId: driftTargetBottle.groupId,
+          bottleId: driftTargetBottle.id,
+        },
+        legacyResolution: {
+          status: "resolved",
+          kind: "bottle",
+          targetId: await exactTargetId(driftLegacyBottle.id),
+          groupId: driftLegacyBottle.groupId,
+          bottleId: driftLegacyBottle.id,
+        },
+      },
+    ]);
+  });
+
+  test("correlates decision-log parity by stable id", async ({ fixtures }) => {
+    const matchingBottle = await fixtures.Bottle();
+    const driftTargetBottle = await fixtures.Bottle();
+    const driftLegacyBottle = await fixtures.Bottle();
+    const promotionParent = await fixtures.Bottle();
+    if (promotionParent.groupId === null) {
+      throw new Error("Missing BottleGroup fixture");
+    }
+    const release = await fixtures.BottleRelease({
+      bottleId: promotionParent.id,
+    });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: promotionParent.groupId,
+        brandId: promotionParent.brandId,
+        name: `${promotionParent.name} decision promoted`,
+        fullName: `${promotionParent.fullName} decision promoted`,
+        createdByActorId: promotionParent.createdByActorId,
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Missing promoted Bottle fixture");
+    const [promotedTarget] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: promotionParent.groupId,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!promotedTarget) throw new Error("Missing promoted target fixture");
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promotedBottle.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: promotionParent.createdByActorId,
+    });
+
+    const [matchingDecision, driftDecision, promotedDecision] = await db
+      .insert(incomingBottleDecisionLogs)
+      .values([
+        {
+          sourceKind: "store_price",
+          sourceId: 1,
+          externalSiteId: site.id,
+          name: "Matching decision",
+          decision: "match_existing",
+          actorId: matchingBottle.createdByActorId,
+          bottleId: matchingBottle.id,
+          targetId: await exactTargetId(matchingBottle.id),
+        },
+        {
+          sourceKind: "store_price",
+          sourceId: 2,
+          externalSiteId: site.id,
+          name: "Drifting decision",
+          decision: "match_existing",
+          actorId: driftLegacyBottle.createdByActorId,
+          bottleId: driftLegacyBottle.id,
+          targetId: await exactTargetId(driftTargetBottle.id),
+        },
+        {
+          sourceKind: "store_price",
+          sourceId: 3,
+          externalSiteId: site.id,
+          name: "Promoted decision",
+          decision: "match_existing",
+          actorId: promotionParent.createdByActorId,
+          bottleId: promotionParent.id,
+          releaseId: release.id,
+          targetId: promotedTarget.id,
+        },
+      ])
+      .returning();
+    if (!matchingDecision || !driftDecision || !promotedDecision) {
+      throw new Error("Missing incoming Bottle decision fixtures");
+    }
+
+    const result = await loadCatalogTargetReadsWithParity(
+      [matchingDecision, driftDecision, promotedDecision].map((decision) => ({
+        consumerTable: "incoming_bottle_decision_log" as const,
+        rowLocator: { id: decision.id },
+        targetId: decision.targetId,
+        legacy: {
+          bottleId: decision.bottleId,
+          releaseId: decision.releaseId,
+        },
+      })),
+      { ...readContext, operation: "decision_log_resolution" },
+    );
+
+    expect(result.targets).toMatchObject([
+      { kind: "bottle", bottle: { id: matchingBottle.id } },
+      { kind: "bottle", bottle: { id: driftTargetBottle.id } },
+      { kind: "bottle", bottle: { id: promotedBottle.id } },
+    ]);
+    expect(result.legacyTargets).toMatchObject([
+      { kind: "bottle", bottle: { id: matchingBottle.id } },
+      { kind: "bottle", bottle: { id: driftLegacyBottle.id } },
+      { kind: "bottle", bottle: { id: promotedBottle.id } },
+    ]);
+    expect(result.mismatches).toEqual([
+      {
+        consumerTable: "incoming_bottle_decision_log",
+        rowLocator: { id: driftDecision.id },
+        legacyBottleId: driftLegacyBottle.id,
+        legacyReleaseId: null,
+        targetId: driftDecision.targetId,
+        caller: readContext.caller,
+        operation: "decision_log_resolution",
+        targetResolution: {
+          status: "resolved",
+          kind: "bottle",
+          targetId: driftDecision.targetId,
           groupId: driftTargetBottle.groupId,
           bottleId: driftTargetBottle.id,
         },

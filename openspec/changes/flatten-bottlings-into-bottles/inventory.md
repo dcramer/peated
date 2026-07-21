@@ -141,11 +141,20 @@ The Drizzle owners are:
   nullable authoritative CatalogTarget and records retained-pair parity using
   the `store_price` row id. Price-change serialization loads its required exact
   or generic target without reconstructing a Bottle from the retained pair.
-  Tasks 7.1-7.3 remain open for observations, decisions, proposals, and
-  remaining activity reads.
+- `apps/server/src/lib/catalogTargetReadParity.ts` now correlates incoming
+  Bottle decision-log resolution parity by the stable
+  `incoming_bottle_decision_log` primary id. Completed parent/release promotion
+  participates in semantic legacy comparison, but the retained pair remains
+  evidence and cannot choose the returned target.
 - `apps/server/src/lib/activityFeed.ts` passes raw collection memberships to
   the target-backed serializer; it no longer joins retained Bottle or
   BottleRelease identity for collection previews.
+- `bottle_observation` has no outward route or serializer. Runtime access is
+  limited to target-aware price-matching evidence writes, migration, and
+  merge/consolidation operations, so task 7.3 does not require inventing an
+  observation read surface. Activity routes already compose the target-backed
+  Tasting and collection serializers. Parent tasks 7.1-7.3 remain open for
+  proposals, adjacent analytics, and other actual readers.
 - `apps/server/src/serializers/notification.ts` matches the discriminated
   notification contract at serialization time. Toast and comment references
   hydrate that narrow projection through the shared CatalogTarget parity reader,
@@ -450,7 +459,15 @@ Target-bearing consumer routes:
 
 Classifier, price matching, and moderation routes:
 
-- `apps/server/src/orpc/routes/admin/incoming-bottle-decisions.ts`
+- `apps/server/src/orpc/routes/admin/incoming-bottle-decisions.ts` now returns
+  each row's nullable authoritative CatalogTarget and records retained-pair
+  parity using the decision-log id. It removes Bottle/BottleRelease joins and
+  output. Exact targets return independently complete Bottles; generic targets
+  remain BottleGroup identity without representative substitution; targetless
+  history returns null; and an invalid nonnull durable target becomes a 409
+  conflict instead of falling back. Historical decision vocabulary and created
+  flags remain audit evidence, while authorization, filters, deterministic
+  ordering, and pagination are preserved.
 - `apps/server/src/orpc/routes/prices/matchQueue/apply-bottle-repair.ts` is the
   task 5.3b thin moderator adapter. It retains the Bottle response consumed by
   the live queue UI while the price-match service composes proposal approval
@@ -1020,6 +1037,9 @@ though it is not executed in the request path.
 
 Routes:
 
+- `apps/web/src/app/(admin)/admin/(default)/incoming-decisions/page.tsx` renders
+  nonnull decision identity through `CatalogTargetIdentity`, labels null as an
+  unknown target, and no longer builds a nested Bottling link.
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/page.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
