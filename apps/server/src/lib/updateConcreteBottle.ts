@@ -113,6 +113,7 @@ export type ConcreteBottleUpdateFinalizationManifest =
   ConcreteBottleUpdateResult & {
     creationSource: CatalogVerificationCreationSource;
     changedBottleIds: number[];
+    changedTargetIds: number[];
     changedAliasNames: string[];
     changedEntityIds: number[];
     newEntityIds: number[];
@@ -627,6 +628,7 @@ function emptyResult(
     changed: false,
     creationSource,
     changedBottleIds: [],
+    changedTargetIds: [],
     changedAliasNames: [],
     changedEntityIds: [],
     newEntityIds: [],
@@ -1109,6 +1111,9 @@ export async function updateConcreteBottleInTransaction(
     changed: true,
     creationSource,
     changedBottleIds: affectedIds,
+    changedTargetIds: affectedIds.map(
+      (changedBottleId) => targetByBottleId.get(changedBottleId)!.id,
+    ),
     changedAliasNames,
     changedEntityIds: Array.from(changedEntityIds).sort(
       (left, right) => left - right,
@@ -1122,11 +1127,11 @@ export async function updateConcreteBottleInTransaction(
 export async function finalizeConcreteBottleUpdate(
   result: ConcreteBottleUpdateFinalizationManifest,
 ) {
-  for (const bottleId of result.changedBottleIds) {
+  for (const targetId of result.changedTargetIds) {
     try {
-      await pushUniqueJob("OnBottleChange", { bottleId });
+      await pushUniqueJob("OnBottleChange", { targetId });
     } catch (error) {
-      logError(error, { bottle: { id: bottleId } });
+      logError(error, { extra: { targetId } });
     }
   }
   for (const name of result.changedAliasNames) {

@@ -1,36 +1,45 @@
+import {
+  CatalogTargetIntegrityMismatchError,
+  resolveCatalogTargetForAssignment,
+} from "@peated/server/lib/catalogTargets";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStats } from "@peated/server/lib/recomputeBottleGroupStats";
 import { z } from "zod";
-import { queueBottleEntityStats } from "./queueBottleEntityStats";
+import { queueCatalogTargetEntityStats } from "./queueCatalogTargetEntityStats";
 
-const UpdateBottleGroupStatsJobArgsSchema = z
+export const UpdateBottleGroupStatsJobArgsSchema = z
   .object({
-    groupId: z.number().int().positive(),
-    entityStatsBottleId: z.number().int().positive(),
+    targetId: z.number().int().positive(),
   })
   .strict();
 export type UpdateBottleGroupStatsJobArgs = z.infer<
   typeof UpdateBottleGroupStatsJobArgsSchema
 >;
 
-/**
- * Recompute group statistics; the retained Bottle only supplies legacy entity
- * refresh context and never selects a representative or group calculation.
- */
+/** Recompute one generic target's group and its group-owned entities. */
 export default async function updateBottleGroupStats(
   input: unknown,
 ): Promise<void> {
-  const { groupId, entityStatsBottleId } =
-    UpdateBottleGroupStatsJobArgsSchema.parse(input);
+  const { targetId } = UpdateBottleGroupStatsJobArgsSchema.parse(input);
 
   try {
-    await recomputeBottleGroupStats(groupId);
-    await queueBottleEntityStats(entityStatsBottleId);
+    const target = await resolveCatalogTargetForAssignment({
+      kind: "target",
+      targetId,
+    });
+    if (target.bottleId !== null) {
+      throw new CatalogTargetIntegrityMismatchError(
+        { targetId },
+        "UpdateBottleGroupStats requires a generic BottleGroup target",
+      );
+    }
+
+    await recomputeBottleGroupStats(target.groupId);
+    await queueCatalogTargetEntityStats(target);
   } catch (error) {
     logError(error, {
       job: { name: "UpdateBottleGroupStats" },
-      bottleGroup: { id: groupId },
-      bottle: { id: entityStatsBottleId },
+      extra: { targetId },
     });
     throw error;
   }

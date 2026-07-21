@@ -246,7 +246,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     ).toEqual([siblingBefore]);
 
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      bottleId: promoted.bottle.id,
+      targetId: promoted.exactTarget.id,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "OnBottleAliasChange",

@@ -114,6 +114,9 @@ it must not preserve a parallel business-logic path.
 - [x] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
 - [ ] 7.9 Add retired-parent redirects to BottleGroup pages without choosing the representative Bottle as the activity target.
 - [ ] 7.10 Update cache keys, revalidation, queue payloads, and activity payloads to use exact Bottle or CatalogTarget identity consistently; before enabling the strict target-backed `UpdateBottleStats` worker, verify every old `{ bottleId }` producer is stopped or upgraded and every queued legacy payload is drained or expired because that payload cannot infer promoted exact identity and has no compatibility fallback; also stop or upgrade producers of legacy-parent `OnBottleChange` jobs and drain or expire those queued jobs before activation because a retired parent has no active exact target.
+- [x] 7.10a Move activity notifications and notification delivery to authoritative CatalogTarget identity, rendering exact Bottle or generic BottleGroup labels without representative fallback.
+- [x] 7.10b Move local cache/revalidation, alias search indexing, statistics queue payloads, and entity aggregation to exact Bottle or CatalogTarget identity; remove the superseded Bottle-based entity helper and cover exact/generic ownership plus producer fan-out.
+- [ ] 7.10c Before deployment activation, retain evidence that old Bottle-id statistics and legacy-parent `OnBottleChange` producers are stopped or upgraded and their queued legacy payloads are drained or expired.
 - [ ] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
 
 ## 8. Unified Web Workflow

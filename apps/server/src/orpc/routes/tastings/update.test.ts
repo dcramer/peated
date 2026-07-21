@@ -139,10 +139,7 @@ describe("PUT /tastings/:tasting", () => {
     expect(bottle.avgRating).toBeNull();
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
-      {
-        bottleId: tasting.bottleId,
-        entityStatsBottleId: tasting.bottleId,
-      },
+      { targetId: tasting.targetId },
       STATS_JOB_OPTIONS,
     );
   });
@@ -197,7 +194,7 @@ describe("PUT /tastings/:tasting", () => {
     expect(persisted?.targetId).toBe(target?.id);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
-      { bottleId: bottle.id, entityStatsBottleId: bottle.id },
+      { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -269,7 +266,7 @@ describe("PUT /tastings/:tasting", () => {
     expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleGroupStats",
-      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      { targetId: target!.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -329,7 +326,7 @@ describe("PUT /tastings/:tasting", () => {
       expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
       expect(workerClient.pushJob).toHaveBeenCalledWith(
         "UpdateBottleGroupStats",
-        { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+        { targetId: target!.id },
         STATS_JOB_OPTIONS,
       );
     } finally {
@@ -370,7 +367,7 @@ describe("PUT /tastings/:tasting", () => {
     expect(persisted?.targetId).toBe(target?.id);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleGroupStats",
-      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
   });

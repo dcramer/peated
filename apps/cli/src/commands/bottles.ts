@@ -117,12 +117,9 @@ subcommand
         limit: step,
         offset,
       });
-      for (const { bottleId } of query) {
+      for (const { bottleId, targetId } of query) {
         console.log(`Updating stats for Bottle ${bottleId}.`);
-        await runJob("UpdateBottleStats", {
-          bottleId,
-          entityStatsBottleId: bottleId,
-        });
+        await runJob("UpdateBottleStats", { targetId });
         hasResults = true;
       }
       offset += step;

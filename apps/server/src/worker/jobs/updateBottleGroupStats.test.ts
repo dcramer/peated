@@ -1,34 +1,40 @@
 import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  bottleGroupDistillers,
   bottleGroups,
   bottles,
   catalogTargets,
 } from "@peated/server/db/schema";
 import { pushJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
+import { beforeEach, vi } from "vitest";
 import updateBottleGroupStats from "./updateBottleGroupStats";
 
-test("recomputes the target group and schedules only the retained member Bottle entities", async ({
+beforeEach(() => {
+  vi.mocked(pushJob).mockClear();
+});
+
+test("recomputes a generic target and queues only group-owned entities", async ({
   fixtures,
 }) => {
-  const representativeBrand = await fixtures.Entity({
-    name: "Representative Brand",
+  const groupBrand = await fixtures.Entity({ name: "Group Stats Brand" });
+  const groupBottler = await fixtures.Entity({ name: "Group Stats Bottler" });
+  const groupDistiller = await fixtures.Entity({
+    name: "Group Stats Distiller",
   });
-  const representativeBottler = await fixtures.Entity({
-    name: "Representative Bottler",
+  const memberBrand = await fixtures.Entity({ name: "Drifted Member Brand" });
+  const memberBottler = await fixtures.Entity({
+    name: "Drifted Member Bottler",
   });
-  const representativeDistiller = await fixtures.Entity({
-    name: "Representative Distiller",
+  const memberDistiller = await fixtures.Entity({
+    name: "Drifted Member Distiller",
   });
   const bottle = await fixtures.Bottle({
-    brandId: representativeBrand.id,
-    bottlerId: representativeBottler.id,
-    distillerIds: [representativeDistiller.id],
+    brandId: groupBrand.id,
+    bottlerId: groupBottler.id,
+    distillerIds: [groupDistiller.id],
   });
-  const memberBrand = await fixtures.Entity({ name: "Member Brand" });
-  const memberBottler = await fixtures.Entity({ name: "Member Bottler" });
-  const memberDistiller = await fixtures.Entity({ name: "Member Distiller" });
   const member = await fixtures.LegacyBottle({
     brandId: memberBrand.id,
     bottlerId: memberBottler.id,
@@ -42,8 +48,6 @@ test("recomputes the target group and schedules only the retained member Bottle 
     groupId: bottle.groupId as number,
     bottleId: member.id,
   });
-  expect(member.id).not.toBe(bottle.id);
-  expect(member.id).not.toBe(bottle.groupId);
 
   const targets = await db
     .select()
@@ -51,26 +55,20 @@ test("recomputes the target group and schedules only the retained member Bottle 
     .where(eq(catalogTargets.groupId, bottle.groupId as number));
   const exactTarget = targets.find(({ bottleId }) => bottleId === bottle.id);
   const genericTarget = targets.find(({ bottleId }) => bottleId === null);
-  if (!exactTarget || !genericTarget) {
-    throw new Error("Missing Bottle target fixtures");
-  }
+  if (!exactTarget || !genericTarget) throw new Error("Missing target fixture");
 
   await fixtures.Tasting({
-    bottleId: bottle.id,
+    bottleId: member.id,
     targetId: exactTarget.id,
     rating: SIMPLE_RATING_VALUES.PASS,
   });
   await fixtures.Tasting({
-    bottleId: bottle.id,
+    bottleId: member.id,
     targetId: genericTarget.id,
     rating: SIMPLE_RATING_VALUES.SAVOR,
   });
 
-  const result = await updateBottleGroupStats({
-    groupId: bottle.groupId as number,
-    entityStatsBottleId: member.id,
-  });
-  expect(result).toBeUndefined();
+  await updateBottleGroupStats({ targetId: genericTarget.id });
 
   const [persistedGroup] = await db
     .select()
@@ -80,21 +78,10 @@ test("recomputes the target group and schedules only the retained member Bottle 
     totalBottles: 2,
     totalTastings: 2,
     avgRating: (SIMPLE_RATING_VALUES.PASS + SIMPLE_RATING_VALUES.SAVOR) / 2,
-    ratingStats: {
-      pass: 1,
-      sip: 0,
-      savor: 1,
-      total: 2,
-      avg: (SIMPLE_RATING_VALUES.PASS + SIMPLE_RATING_VALUES.SAVOR) / 2,
-    },
   });
 
   expect(pushJob).toHaveBeenCalledTimes(3);
-  for (const entityId of [
-    memberDistiller.id,
-    memberBrand.id,
-    memberBottler.id,
-  ]) {
+  for (const entityId of [groupBrand.id, groupBottler.id, groupDistiller.id]) {
     expect(pushJob).toHaveBeenCalledWith(
       "UpdateEntityStats",
       { entityId },
@@ -102,10 +89,9 @@ test("recomputes the target group and schedules only the retained member Bottle 
     );
   }
   for (const entityId of [
-    representativeDistiller.id,
-    representativeBrand.id,
-    representativeBottler.id,
-    bottle.groupId as number,
+    memberBrand.id,
+    memberBottler.id,
+    memberDistiller.id,
   ]) {
     expect(pushJob).not.toHaveBeenCalledWith(
       "UpdateEntityStats",
@@ -115,29 +101,65 @@ test("recomputes the target group and schedules only the retained member Bottle 
   }
 });
 
+test("queues one refresh when one Entity fills every generic group role", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Deduplicated Group Entity" });
+  const bottle = await fixtures.Bottle({ brandId: entity.id });
+  await db
+    .update(bottleGroups)
+    .set({ brandId: entity.id, bottlerId: entity.id })
+    .where(eq(bottleGroups.id, bottle.groupId as number));
+  await db.insert(bottleGroupDistillers).values({
+    groupId: bottle.groupId as number,
+    distillerId: entity.id,
+  });
+  const target = await db.query.catalogTargets.findFirst({
+    where: (catalogTargets, { and, eq, isNull }) =>
+      and(
+        eq(catalogTargets.groupId, bottle.groupId as number),
+        isNull(catalogTargets.bottleId),
+      ),
+  });
+  if (!target) throw new Error("Missing generic target fixture");
+
+  await updateBottleGroupStats({ targetId: target.id });
+
+  expect(pushJob).toHaveBeenCalledTimes(1);
+  expect(pushJob).toHaveBeenCalledWith(
+    "UpdateEntityStats",
+    { entityId: entity.id },
+    { delay: 5000, removeOnComplete: true, removeOnFail: false },
+  );
+});
+
 test.each([
   undefined,
   {},
-  { groupId: 0 },
-  { groupId: -1 },
-  { groupId: 1.5 },
-  { groupId: "1" },
+  { targetId: 0 },
+  { targetId: -1 },
+  { targetId: 1.5 },
+  { targetId: "1" },
+  { targetId: 1, unexpected: true },
   { groupId: 1 },
-  { groupId: 1, entityStatsBottleId: 0 },
-  { groupId: 1, entityStatsBottleId: -1 },
-  { groupId: 1, entityStatsBottleId: 1.5 },
-  { groupId: 1, entityStatsBottleId: "1" },
-  { groupId: 1, entityStatsBottleId: 1, unexpected: true },
 ])("rejects malformed job input %#", async (input) => {
   await expect(updateBottleGroupStats(input)).rejects.toThrow();
 });
 
-test("rethrows a BottleGroup statistics execution failure", async () => {
-  const groupId = 2_000_000_000;
+test("rejects an exact target", async ({ fixtures }) => {
+  const bottle = await fixtures.Bottle();
+  const target = await db.query.catalogTargets.findFirst({
+    where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
+  });
+  if (!target) throw new Error("Missing exact target fixture");
 
-  await expect(
-    updateBottleGroupStats({ groupId, entityStatsBottleId: 1 }),
-  ).rejects.toThrow(
-    `Cannot recompute BottleGroup ${groupId} statistics: not_found.`,
+  await expect(updateBottleGroupStats({ targetId: target.id })).rejects.toThrow(
+    "UpdateBottleGroupStats requires a generic BottleGroup target",
   );
+});
+
+test("rejects a missing target", async () => {
+  await expect(
+    updateBottleGroupStats({ targetId: 2_000_000_000 }),
+  ).rejects.toThrow("Catalog target not found");
 });

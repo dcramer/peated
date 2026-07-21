@@ -269,7 +269,7 @@ describe("POST /bottles", () => {
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(0);
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      bottleId: bottle.id,
+      targetId: data.targetId,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "OnBottleAliasChange",

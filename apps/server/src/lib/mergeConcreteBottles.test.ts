@@ -1608,7 +1608,7 @@ describe("exact concrete Bottle merges", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
     await finalizeConcreteBottleMerge(manifest);
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      bottleId: destination.first.bottle.id,
+      targetId: destination.first.exactTarget.id,
     });
   });
 });

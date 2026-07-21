@@ -100,6 +100,7 @@ export type ConcreteBottleMergeResult = {
 
 export type ConcreteBottleMergeFinalizationManifest =
   ConcreteBottleMergeResult & {
+    destinationTargetId: number;
     aliasNames: string[];
     entityIds: number[];
     seriesIds: number[];
@@ -109,11 +110,13 @@ function inertManifest(
   sourceBottleId: number,
   destinationBottleId: number,
   destinationBottle: Bottle,
+  destinationTargetId: number,
 ): ConcreteBottleMergeFinalizationManifest {
   return {
     sourceBottleId,
     destinationBottleId,
     destinationBottle,
+    destinationTargetId,
     changed: false,
     aliasNames: [],
     entityIds: [],
@@ -451,7 +454,7 @@ function bottleSnapshot(
 async function loadRetryDestinationSnapshot(
   tx: AnyTransaction,
   destinationBottleId: number,
-): Promise<Bottle> {
+): Promise<{ bottle: Bottle; targetId: number }> {
   const [destination] = await tx
     .select()
     .from(bottles)
@@ -484,7 +487,7 @@ async function loadRetryDestinationSnapshot(
     .limit(1)
     .for("update");
   const targets = await tx
-    .select({ bottleId: catalogTargets.bottleId })
+    .select({ id: catalogTargets.id, bottleId: catalogTargets.bottleId })
     .from(catalogTargets)
     .where(eq(catalogTargets.groupId, destination.groupId))
     .for("update");
@@ -493,18 +496,21 @@ async function loadRetryDestinationSnapshot(
     .from(bottleGroupTombstones)
     .where(eq(bottleGroupTombstones.groupId, destination.groupId))
     .limit(1);
+  const exactTarget = targets.find(
+    ({ bottleId }) => bottleId === destinationBottleId,
+  );
   if (
     retiredGroup ||
     representative?.groupId !== destination.groupId ||
     !targets.some(({ bottleId }) => bottleId === null) ||
-    !targets.some(({ bottleId }) => bottleId === destinationBottleId)
+    !exactTarget
   ) {
     throw new ConcreteBottleMergeGraphError(
       "invalid_catalog_graph",
       destinationBottleId,
     );
   }
-  return destination;
+  return { bottle: destination, targetId: exactTarget.id };
 }
 
 /**
@@ -547,10 +553,15 @@ export async function mergeConcreteBottlesInTransaction(
     throw new ConcreteBottleMergeGraphError("retired", destinationBottleId);
   }
   if (sourceTombstone?.newBottleId === destinationBottleId) {
+    const destination = await loadRetryDestinationSnapshot(
+      tx,
+      destinationBottleId,
+    );
     return inertManifest(
       sourceBottleId,
       destinationBottleId,
-      await loadRetryDestinationSnapshot(tx, destinationBottleId),
+      destination.bottle,
+      destination.targetId,
     );
   }
   if (sourceTombstone) {
@@ -1245,6 +1256,7 @@ export async function mergeConcreteBottlesInTransaction(
     sourceBottleId,
     destinationBottleId,
     destinationBottle,
+    destinationTargetId: destinationExactTarget.id,
     changed: true,
     aliasNames: Array.from(
       new Set([
@@ -1281,7 +1293,7 @@ export async function finalizeConcreteBottleMerge(
       Record<string, number | string>,
     ]
   > = [
-    ["OnBottleChange", { bottleId: manifest.destinationBottleId }],
+    ["OnBottleChange", { targetId: manifest.destinationTargetId }],
     ...manifest.aliasNames.map(
       (name) => ["OnBottleAliasChange", { name }] as const,
     ),

@@ -93,10 +93,7 @@ describe("DELETE /tastings/:tasting", () => {
     expect(bottle?.avgRating).toBeNull();
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
-      {
-        bottleId: tasting.bottleId,
-        entityStatsBottleId: tasting.bottleId,
-      },
+      { targetId: tasting.targetId },
       STATS_JOB_OPTIONS,
     );
   });
@@ -112,6 +109,14 @@ describe("DELETE /tastings/:tasting", () => {
       targetId: null,
       createdById: defaults.user.id,
     });
+    const target = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, bottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    if (!target) throw new Error("Missing generic target fixture");
 
     await routerClient.tastings.delete(
       { tasting: tasting.id },
@@ -125,7 +130,7 @@ describe("DELETE /tastings/:tasting", () => {
     ).toBeUndefined();
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleGroupStats",
-      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      { targetId: target.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -169,7 +174,7 @@ describe("DELETE /tastings/:tasting", () => {
     expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleGroupStats",
-      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      { targetId: target!.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -226,7 +231,7 @@ describe("DELETE /tastings/:tasting", () => {
     expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleGroupStats",
-      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      { targetId: genericTarget!.id },
       STATS_JOB_OPTIONS,
     );
   });

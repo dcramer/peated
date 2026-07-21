@@ -103,7 +103,7 @@ describe("POST /tastings", () => {
     expect(newEntity.totalTastings).toBe(0);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
-      { bottleId: bottle.id, entityStatsBottleId: bottle.id },
+      { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -138,7 +138,7 @@ describe("POST /tastings", () => {
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
-      { bottleId: bottle.id, entityStatsBottleId: bottle.id },
+      { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -168,7 +168,7 @@ describe("POST /tastings", () => {
     expect(tasting?.targetId).toBe(target?.id);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleGroupStats",
-      { groupId: bottle.groupId, entityStatsBottleId: bottle.id },
+      { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
   });
@@ -582,10 +582,7 @@ describe("POST /tastings", () => {
     expect(tasting.targetId).toBe(target?.id);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
-      {
-        bottleId: promotedBottle.id,
-        entityStatsBottleId: bottle.id,
-      },
+      { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
   });

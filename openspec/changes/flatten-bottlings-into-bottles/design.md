@@ -592,19 +592,17 @@ notes-only update to a row that already has a durable target does not dispatch
 statistics work. Exact activity dispatches `UpdateBottleStats`, which delegates
 to exact recomputation and then recomputes its BottleGroup. Generic activity
 dispatches `UpdateBottleGroupStats`, which delegates only to group recomputation.
-Both paths preserve the existing entity-aggregate refresh through one shared
-helper. Until entity statistics become target-aware, both exact and generic
-tasting jobs carry the retained tasting `bottleId` as `entityStatsBottleId`
-only as compatibility context for that refresh. An exact job's separate
-`bottleId` is the validated exact Bottle scope for its durable `targetId`; the
-compatibility Bottle on a generic job does not affect the target-backed group
-calculation.
+Both paths carry only the authoritative `targetId`, resolve and validate its
+kind at the worker boundary, and refresh entity aggregates through one shared
+target-aware helper. Exact activity derives brand, bottler, and distillers from
+the independently complete Bottle; generic activity derives those owners from
+the BottleGroup without selecting a representative. Entity tasting totals join
+through CatalogTarget and do not consult the retained Bottle/Release pair.
 Every statistics event independently queues an idempotent downstream entity
 refresh rather than coalescing events under a stable key. Successful downstream
-jobs are removed and failed jobs are retained for diagnosis and retry. Task
-7.10 replaces the bridge with target-aware queue/entity work, task 9.6 removes
-its obsolete consumer `bottleId`/`releaseId` storage, and task 9.7 removes the
-runtime compatibility branch.
+jobs are removed and failed jobs are retained for diagnosis and retry. Task 9.6
+removes obsolete consumer `bottleId`/`releaseId` storage, and task 9.7 removes
+the remaining runtime compatibility branches.
 Publication failure is recorded with the tasting and resolved target identity
 without failing an already committed user write. The former worker-owned raw SQL
 and every tasting-route inline Bottle statistics formula are removed; the
@@ -615,22 +613,17 @@ statistics jobs retain failed records while removing successful ones. A retry
 therefore reruns the idempotent canonical services rather than losing an
 incomplete downstream refresh.
 
-`UpdateBottleStats` has a strict mixed-version cutover gate. Its previous
-`{ bottleId }` payload cannot identify whether legacy activity should resolve to
-a promoted exact target, so the target-backed worker deliberately has no
-payload fallback. Before enabling the new worker, operators must stop or
-upgrade every old producer and drain or expire every queued legacy payload.
-Queued `OnBottleChange` jobs for legacy parent Bottles pose the same activation
-risk: after promotion and parent retirement, their `bottleId` has no active
-exact target. Operators must stop or upgrade those producers and drain or
-expire those jobs as part of the same gate. The `bottles fix-stats` maintenance
-command instead selects exact-target rows and dispatches their Bottle ids
-directly; strict recomputation validates the active graph and target integrity
-and stops on an invalid row rather than silently skipping it. This explicitly
-exact maintenance intent is separate from tasting assignment descriptor
-routing. Task 7.10 owns verification of these producer and queue-payload
-transitions; task 7.7 retains the aggregate parity evidence and approval for the
-statistics cutover itself.
+`OnBottleChange`, `UpdateBottleStats`, and `UpdateBottleGroupStats` have strict
+`{ targetId }` payloads with no legacy fallback. `OnBottleChange` requires an
+active exact target before deriving Bottle details, search, or statistics work;
+the two statistics workers reject the wrong target kind. Before enabling these
+workers, operators must stop or upgrade old Bottle-id producers and drain or
+expire queued legacy payloads, including jobs naming a parent that will retire.
+The `bottles fix-stats` maintenance command selects exact target rows and
+dispatches their target ids; strict recomputation validates the active graph and
+stops on an invalid row rather than silently skipping it. Task 7.10 owns the
+remaining operational producer and queue-drain evidence; task 7.7 retains the
+aggregate parity evidence and approval for the statistics cutover itself.
 
 This runnable implementation slice is not independently deployable or
 servable. The tasting work is the task 5.6a subset; remaining review,

@@ -573,7 +573,9 @@ Catalog identity, aliases, search, creation, and updates:
   canonical assignment creates a new alias, its post-commit finalizer queues
   `IndexBottleAlias` directly because consumer synchronization already occurred;
   it does not queue `OnBottleAliasChange`. Existing-alias assignment need not
-  enqueue alias indexing.
+  enqueue alias indexing. Bottle search reindexing comes only from the validated
+  assignment target's exact Bottle id; a generic or targetless alias never uses
+  its retained Bottle pair or a group representative as indexing identity.
 - `apps/server/src/lib/bottleCreationDrafts.ts`
 - `apps/server/src/lib/legacyConcreteBottleInput.ts` is the retained translation
   boundary for price-proposal Bottle/BottleRelease-shaped evidence. It emits one
@@ -799,40 +801,40 @@ Classifier decisions and price matching:
   target, retired target, or target-integrity failure is not translated through
   legacy identity: it escapes the worker boundary so BullMQ retains the failure
   for diagnosis and retry.
-- `apps/server/src/worker/jobs/updateBottleStats.ts` delegates exact
-  recomputation to `recomputeBottleStats`, then delegates aggregate
-  recomputation to `recomputeBottleGroupStats`.
-- `apps/server/src/worker/jobs/updateBottleGroupStats.ts` is the generic-target
-  entry point and delegates only to `recomputeBottleGroupStats`.
-- `apps/server/src/worker/jobs/queueBottleEntityStats.ts` is the one shared
-  downstream entity-aggregate refresh helper used by both statistics jobs.
-  Both exact and generic tasting jobs carry the retained tasting `bottleId` as
-  `entityStatsBottleId` only as compatibility context for the still-legacy
-  entity aggregate. The exact job's separate `bottleId` is the validated exact
-  Bottle scope for its durable `targetId`; the compatibility Bottle does not
-  affect generic group calculation.
-  Each statistics event independently queues an idempotent downstream entity
-  refresh without stable-key coalescing; successful jobs are removed and failed
-  jobs are retained. Task 7.10 replaces this bridge with target-aware
-  queue/entity aggregation, task 9.6 removes its obsolete consumer
-  `bottleId`/`releaseId` storage, and task 9.7 removes the runtime compatibility
-  branch.
+- `apps/server/src/worker/jobs/updateBottleStats.ts` owns a strict
+  `{targetId}` payload, requires that target to be exact, derives its Bottle and
+  group, and delegates to the canonical exact and group recomputation services.
+- `apps/server/src/worker/jobs/updateBottleGroupStats.ts` owns the same strict
+  payload shape, requires a generic target, and delegates only to canonical
+  group recomputation.
+- `apps/server/src/worker/jobs/queueCatalogTargetEntityStats.ts` is the shared
+  downstream entity-refresh helper. Exact targets queue the independently
+  complete Bottle's brand, bottler, and distillers; generic targets queue the
+  BottleGroup's owners without representative fallback. `UpdateEntityStats`
+  counts active concrete Bottles through exact targets and counts tastings by
+  joining their authoritative CatalogTarget, using Bottle ownership for exact
+  activity and group ownership for generic activity. Targetless legacy tastings
+  do not fall back to their retained pair. Each statistics event independently
+  queues idempotent refreshes without stable-key coalescing; successful jobs are
+  removed and failed jobs are retained.
 - `apps/server/src/orpc/routes/tastings/dispatchStatsRecompute.ts` maps a
   validated target descriptor to one independently queued, delayed idempotent
-  exact-or-group job per qualifying event. Completed jobs are removed;
+  exact-or-group `{targetId}` job per qualifying event. Completed jobs are removed;
   publication failure is logged with tasting and target identity and does not
   fail a committed tasting mutation.
 - The worker registry logs and rethrows handler failures to BullMQ. Statistics
   jobs remove completed records but retain failed records, so a failed
   canonical or downstream entity refresh is observable and retryable.
-- `UpdateBottleStats` intentionally rejects its previous `{ bottleId }` payload:
-  that legacy identity cannot infer whether activity belongs to a promoted
-  exact target. Before the target-backed worker is enabled, every old producer
-  must be stopped or upgraded and queued legacy payloads must be drained or
-  expired. Legacy-parent `OnBottleChange` producers and queued jobs must likewise
-  be stopped or upgraded and drained or expired before activation. Task 7.10
-  owns verification of this mixed-version queue gate, while task 7.7 owns
-  aggregate parity evidence and cutover approval.
+- `apps/server/src/worker/jobs/onBottleChange.ts` also owns a strict
+  `{targetId}` payload and requires an active exact target before deriving its
+  Bottle details, search, and statistics work. Concrete creation, update, group
+  merge, and exact merge finalizers preserve exact target ids in their
+  transaction results and dispatch that identity after commit. The maintenance
+  CLI likewise selects exact target rows and dispatches their target ids.
+  Before activation, old Bottle-id producers must be stopped or upgraded and
+  queued legacy statistics or parent `OnBottleChange` payloads must be drained
+  or expired. That deployment evidence remains open under task 7.10; task 7.7
+  owns aggregate parity evidence and cutover approval.
 - Tasting create persists a resolved target. Update and delete trust a durable
   `targetId`; only null-target compatibility rows resolve the measured legacy
   `(bottleId, releaseId)` pair, and update persists the resolved target. Create,
@@ -853,10 +855,12 @@ Classifier decisions and price matching:
   exact Git and migration revisions, including generation time, database,
   reconciled counts, and explicit approval; the task 6.13 pre-backfill report
   cannot satisfy that later freshness gate.
-- The activity-notification sub-slice does not complete task 7.10. Remaining
-  cache/search-key and revalidation review, statistics queue/entity-aggregate
-  cutover, and operational producer-stop and queue-drain evidence stay deferred
-  to the rest of that task.
+- Task 7.10's local application work now includes target-backed notification
+  payloads, authoritative alias reindexing, typed target-aware Library cache
+  updates, and target-owned statistics/entity queues. No persistent catalog
+  response cache exists to migrate, and exact Bottle search revalidation remains
+  Bottle-owned. Only the deployment-time producer-stop and legacy queue-drain
+  evidence remains before these strict workers may be activated.
 - `apps/server/src/worker/jobs/mergeBottle.ts` is a measured compatibility
   adapter for queued pre-cutover payloads. It validates and translates the old
   payload into `mergeConcreteBottles` transaction calls and owns no merge
@@ -886,11 +890,10 @@ Classifier decisions and price matching:
 ## CLI
 
 - `apps/cli/src/commands/bottles.ts`: `bottles fix-stats` selects exact-target
-  rows and directly dispatches their Bottle ids to the strict exact statistics
+  rows and directly dispatches their target ids to the strict exact statistics
   worker. Strict recomputation validates the active graph and target integrity
   and stops on an invalid row rather than silently skipping it. This explicit
-  maintenance scope does not use the tasting assignment descriptor, which
-  distinguishes exact from generic user intent. Its brand/distillery repair
+  maintenance scope cannot select a generic target. Its brand/distillery repair
   command delegates grouped work to the canonical shared-update fan-out.
 - `apps/cli/src/commands/prices.ts` and
   `apps/cli/src/commands/reviews.ts` retain name-normalization maintenance but
@@ -1050,7 +1053,9 @@ Shared UI and client helpers:
   link their independently complete Bottle; generic entries show the group
   label and scope without a Bottle link or representative. Existing generic
   Library entries mutate by target id, while generic creation remains disabled
-  at the non-null retained-Bottle storage boundary described above.
+  at the non-null retained-Bottle storage boundary described above. Library
+  cache updates use the typed collection-list query prefix and globally unique
+  collection-entry ids rather than serialized query-key substring matching.
 - Flight detail, overlay, and edit routes consume the details response's target
   list directly. Exact entries retain their quick panel, Flight-scoped tasting
   action, target-keyed status indicators, and distiller display. Generic

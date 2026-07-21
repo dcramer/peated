@@ -369,7 +369,7 @@ describe("assignBottleAliasInTransaction", () => {
       releaseId: null,
     });
 
-    await db.transaction(async (tx) =>
+    const result = await db.transaction(async (tx) =>
       assignBottleAliasInTransaction(tx, {
         target: {
           targetId: target.id,
@@ -386,11 +386,18 @@ describe("assignBottleAliasInTransaction", () => {
       }),
     );
 
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    await finalizeBottleAliasAssignment(result);
+
     expect(await getAlias(alias.name)).toMatchObject({
       bottleId: null,
       releaseId: null,
       targetId: target.id,
     });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      expect.anything(),
+    );
     expect(
       await db.query.storePrices.findFirst({
         where: eq(storePrices.id, price.id),
@@ -456,7 +463,7 @@ describe("assignBottleAliasInTransaction", () => {
       targetId: null,
     });
 
-    await db.transaction(async (tx) =>
+    const result = await db.transaction(async (tx) =>
       assignBottleAliasInTransaction(tx, {
         target: {
           targetId: target.id,
@@ -472,6 +479,9 @@ describe("assignBottleAliasInTransaction", () => {
       }),
     );
 
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    await finalizeBottleAliasAssignment(result);
+
     expect(await getAlias(name)).toMatchObject({
       bottleId: promotedBottle.id,
       releaseId: null,
@@ -486,6 +496,14 @@ describe("assignBottleAliasInTransaction", () => {
       releaseId: release.id,
       targetId: target.id,
     });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: promotedBottle.id },
+    );
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: parent.id },
+    );
     expect(
       await db.query.reviews.findFirst({
         where: eq(reviews.id, review.id),
@@ -1152,6 +1170,7 @@ describe("assignBottleAliasInTransaction", () => {
       }),
     ).toMatchObject({ imageUrl: null });
 
+    vi.mocked(workerClient.pushUniqueJob).mockClear();
     await finalizeBottleAliasAssignment(result);
 
     expect(
@@ -1159,6 +1178,10 @@ describe("assignBottleAliasInTransaction", () => {
         where: eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      expect.anything(),
+    );
   });
 
   test("indexes a new canonical assignment directly after commit", async ({

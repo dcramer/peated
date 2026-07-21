@@ -128,17 +128,17 @@ work:
 - `UpdateBottleStats` recomputes the exact Bottle and then its BottleGroup.
 - `UpdateBottleGroupStats` recomputes only the generic target's BottleGroup.
 
-Both paths use one shared downstream entity-aggregate refresh helper. Until
-entity aggregation becomes target-aware, both exact and generic tasting jobs
-carry the tasting's retained Bottle as `entityStatsBottleId` only as
-compatibility context for that refresh. For exact work, the separate `bottleId`
-remains the canonical exact CatalogTarget Bottle; for generic work, the retained
-Bottle does not choose an exact Bottle for the group calculation. Each
-statistics event independently queues an idempotent downstream entity refresh;
-the queue does not coalesce events under a stable key that could suppress later
-refreshes. Successful downstream jobs are removed and failed jobs are retained
-for diagnosis and retry. That bridge is replaced by later target-aware
-queue/entity work and legacy paired-column cleanup.
+Both paths carry only the authoritative `targetId`. The exact worker derives its
+Bottle and BottleGroup from that target; the generic worker derives its
+BottleGroup without selecting a representative. Their shared downstream helper
+queues entity aggregates from the same identity: exact activity uses the
+Bottle's brand, bottler, and distillers, while generic activity uses the
+BottleGroup's owners. Entity tasting totals likewise join through CatalogTarget
+and never consult the retained Bottle/Release pair. Each statistics event
+independently queues idempotent downstream refreshes; the queue does not
+coalesce events under a stable key that could suppress later refreshes.
+Successful jobs are removed and failed jobs are retained for diagnosis and
+retry.
 
 Both jobs delegate to the canonical target-backed services. `totalTastings`
 counts rated and unrated tastings; averages, Pass/Sip/Savor counts, and

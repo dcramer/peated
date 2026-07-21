@@ -187,6 +187,7 @@ export type BottleAliasAssignmentResult = {
   alias: BottleAlias;
   isNew: boolean;
   bottleImageCandidate: BottleImageCandidate | null;
+  exactTargetBottleId: number | null;
 };
 
 type BottleImageCandidate = {
@@ -1268,6 +1269,7 @@ export async function assignBottleAliasInTransaction(
     alias,
     isNew,
     bottleImageCandidate,
+    exactTargetBottleId: assignmentTargetId === null ? null : aliasBottleId,
   };
 }
 
@@ -1433,7 +1435,12 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
  * nonfatal side effects.
  */
 export async function finalizeBottleAliasAssignment(
-  { alias, isNew, bottleImageCandidate }: BottleAliasAssignmentResult,
+  {
+    alias,
+    isNew,
+    bottleImageCandidate,
+    exactTargetBottleId,
+  }: BottleAliasAssignmentResult,
   contexts?: Record<string, Record<string, any>>,
 ) {
   if (bottleImageCandidate) {
@@ -1510,10 +1517,10 @@ export async function finalizeBottleAliasAssignment(
     }
   }
 
-  if (alias.bottleId) {
+  if (exactTargetBottleId !== null) {
     try {
       await pushUniqueJob("IndexBottleSearchVectors", {
-        bottleId: alias.bottleId,
+        bottleId: exactTargetBottleId,
       });
     } catch (err) {
       logError(err, contexts);

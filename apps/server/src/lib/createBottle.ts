@@ -956,7 +956,13 @@ export async function createOrReuseConcreteBottleInTransaction(
 
 /** Dispatches unique, best-effort work only after the Bottle transaction commits. */
 export async function finalizeCreatedBottle(
-  { bottle, seriesCreated, newAliases, newEntityIds }: CreateBottleResult,
+  {
+    bottle,
+    exactTarget,
+    seriesCreated,
+    newAliases,
+    newEntityIds,
+  }: ConcreteBottleCreateResult,
   {
     creationSource = "manual_entry",
   }: {
@@ -964,7 +970,7 @@ export async function finalizeCreatedBottle(
   } = {},
 ) {
   try {
-    await pushUniqueJob("OnBottleChange", { bottleId: bottle.id });
+    await pushUniqueJob("OnBottleChange", { targetId: exactTarget.id });
   } catch (err) {
     logError(err, {
       bottle: {

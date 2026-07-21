@@ -223,11 +223,7 @@ export default procedure
     const { tasting: newTasting, target } = updated;
 
     if (target) {
-      await dispatchTastingStatsRecompute(
-        newTasting.id,
-        target,
-        newTasting.bottleId,
-      );
+      await dispatchTastingStatsRecompute(newTasting.id, target);
     }
 
     return await serialize(TastingSerializer, newTasting, context.user);

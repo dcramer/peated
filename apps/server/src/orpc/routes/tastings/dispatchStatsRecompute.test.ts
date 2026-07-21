@@ -16,31 +16,25 @@ beforeEach(() => {
 
 test("builds exact and generic recomputation payloads", () => {
   expect(
-    buildTastingStatsRecomputeJob(
-      {
-        targetId: 20,
-        groupId: 30,
-        bottleId: 40,
-      },
-      50,
-    ),
+    buildTastingStatsRecomputeJob({
+      targetId: 20,
+      groupId: 30,
+      bottleId: 40,
+    }),
   ).toEqual({
     name: "UpdateBottleStats",
-    args: { bottleId: 40, entityStatsBottleId: 50 },
+    args: { targetId: 20 },
   });
 
   expect(
-    buildTastingStatsRecomputeJob(
-      {
-        targetId: 21,
-        groupId: 31,
-        bottleId: null,
-      },
-      50,
-    ),
+    buildTastingStatsRecomputeJob({
+      targetId: 21,
+      groupId: 31,
+      bottleId: null,
+    }),
   ).toEqual({
     name: "UpdateBottleGroupStats",
-    args: { groupId: 31, entityStatsBottleId: 50 },
+    args: { targetId: 21 },
   });
 });
 
@@ -50,20 +44,16 @@ test("queues independent delayed work and does not fail the committed request", 
   );
 
   await expect(
-    dispatchTastingStatsRecompute(
-      10,
-      {
-        targetId: 20,
-        groupId: 30,
-        bottleId: 40,
-      },
-      50,
-    ),
+    dispatchTastingStatsRecompute(10, {
+      targetId: 20,
+      groupId: 30,
+      bottleId: 40,
+    }),
   ).resolves.toBeUndefined();
 
   expect(workerClient.pushJob).toHaveBeenCalledWith(
     "UpdateBottleStats",
-    { bottleId: 40, entityStatsBottleId: 50 },
+    { targetId: 20 },
     {
       delay: 5000,
       removeOnComplete: true,

@@ -98,6 +98,7 @@ export type BottleGroupMergeResult = {
 };
 
 type BottleGroupMergeTransactionResult = BottleGroupMergeResult & {
+  movedTargetIds: number[];
   changedAliasNames: string[];
   affectedEntityIds: number[];
   affectedSeriesIds: number[];
@@ -114,6 +115,7 @@ function inertResult(
     destinationGroupId,
     changed: false,
     movedBottleIds: [],
+    movedTargetIds: [],
     changedAliasNames: [],
     affectedEntityIds: [],
     affectedSeriesIds: [],
@@ -647,6 +649,7 @@ async function mergeBottleGroupsInTransaction(
     destinationGroupId,
     changed: true,
     movedBottleIds: sourceMembers.map(({ id }) => id),
+    movedTargetIds: sourceMembers.map(({ id }) => targetByBottleId.get(id)!.id),
     changedAliasNames: Array.from(
       new Set([
         ...stableAliases.map(({ name }) => name),
@@ -662,11 +665,11 @@ async function mergeBottleGroupsInTransaction(
 async function finalizeBottleGroupMerge(
   result: BottleGroupMergeTransactionResult,
 ) {
-  for (const bottleId of result.movedBottleIds) {
+  for (const targetId of result.movedTargetIds) {
     try {
-      await pushUniqueJob("OnBottleChange", { bottleId });
+      await pushUniqueJob("OnBottleChange", { targetId });
     } catch (error) {
-      logError(error, { bottle: { id: bottleId } });
+      logError(error, { extra: { targetId } });
     }
   }
   for (const name of result.changedAliasNames) {

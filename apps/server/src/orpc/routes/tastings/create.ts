@@ -296,7 +296,7 @@ export default procedure
       }
     }
 
-    await dispatchTastingStatsRecompute(tasting.id, target, tasting.bottleId);
+    await dispatchTastingStatsRecompute(tasting.id, target);
 
     return {
       tasting: await serialize(TastingSerializer, tasting, context.user),

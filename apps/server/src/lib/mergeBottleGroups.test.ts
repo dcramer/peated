@@ -440,9 +440,14 @@ describe("BottleGroup merges", () => {
         }),
       ]),
     );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      bottleId: result.movedBottleIds[0],
-    });
+    expect(
+      vi
+        .mocked(workerClient.pushUniqueJob)
+        .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
+        .map(([, payload]) => payload),
+    ).toEqual(
+      source.members.map(({ exactTarget }) => ({ targetId: exactTarget.id })),
+    );
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: sourceBrand.id,
     });

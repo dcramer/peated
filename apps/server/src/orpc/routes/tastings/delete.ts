@@ -135,11 +135,7 @@ export default procedure
       return { tasting: lockedTasting, target };
     });
 
-    await dispatchTastingStatsRecompute(
-      deleted.tasting.id,
-      deleted.target,
-      deleted.tasting.bottleId,
-    );
+    await dispatchTastingStatsRecompute(deleted.tasting.id, deleted.target);
 
     return {};
   });

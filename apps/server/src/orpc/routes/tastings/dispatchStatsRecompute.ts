@@ -14,39 +14,30 @@ type TastingStatsRecomputeJob =
       args: UpdateBottleGroupStatsJobArgs;
     };
 
-/**
- * Route exact targets to Bottle stats and generic targets to group stats.
- * target.bottleId is the validated exact scope for target.targetId;
- * entityStatsBottleId is retained legacy entity context in both branches and
- * never selects group calculations.
- */
+/** Route exact and generic target identities to their dedicated workers. */
 export function buildTastingStatsRecomputeJob(
   target: CatalogTargetAssignmentDescriptor,
-  entityStatsBottleId: number,
 ): TastingStatsRecomputeJob {
   return target.bottleId !== null
     ? {
         name: "UpdateBottleStats",
-        args: { bottleId: target.bottleId, entityStatsBottleId },
+        args: { targetId: target.targetId },
       }
     : {
         name: "UpdateBottleGroupStats",
-        args: { groupId: target.groupId, entityStatsBottleId },
+        args: { targetId: target.targetId },
       };
 }
 
 /**
- * Queue recomputation after commit. Both jobs carry the retained tasting Bottle
- * only for legacy entity refresh, never as a group representative or group
- * calculation input. Publication failures are logged and swallowed because the
- * write is durable.
+ * Queue recomputation after commit. Publication failures are logged and
+ * swallowed because the authoritative tasting write is already durable.
  */
 export async function dispatchTastingStatsRecompute(
   tastingId: number,
   target: CatalogTargetAssignmentDescriptor,
-  entityStatsBottleId: number,
 ): Promise<void> {
-  const job = buildTastingStatsRecomputeJob(target, entityStatsBottleId);
+  const job = buildTastingStatsRecomputeJob(target);
 
   try {
     await pushJob(job.name, job.args, {
@@ -61,7 +52,6 @@ export async function dispatchTastingStatsRecompute(
         tastingId,
         targetId: target.targetId,
         groupId: target.groupId,
-        entityStatsBottleId,
         targetBottleId: target.bottleId,
       },
     });
