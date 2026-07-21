@@ -23,6 +23,9 @@ import {
   existingReleaseId,
   failingTastingNotes,
   photoTastingNotes,
+  priceChangeList,
+  priceSite,
+  storePriceList,
   suggestedTags,
   tastingNotes,
   testBrand,
@@ -202,6 +205,23 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     }
+    case "prices/changeList":
+      sendRpcResponse(response, priceChangeList);
+      return true;
+    case "prices/list":
+      if (input?.site !== priceSite.type) {
+        sendRpcError(response, "Unexpected price list payload");
+        return true;
+      }
+      sendRpcResponse(response, storePriceList);
+      return true;
+    case "externalSites/details":
+      if (input?.site !== priceSite.type) {
+        sendRpcError(response, "Unexpected external site details payload");
+        return true;
+      }
+      sendRpcResponse(response, priceSite);
+      return true;
     case "bottles/details": {
       if (input?.bottle === createdBottleId) {
         sendRpcResponse(
@@ -1184,6 +1204,7 @@ function buildBottleAndReleaseProposal() {
       volume: 750,
       updatedAt: "2026-06-07T12:00:00.000Z",
       isValid: true,
+      target: null,
       site: {
         id: 9903,
         name: "Playwright Store",

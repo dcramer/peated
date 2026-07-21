@@ -36,6 +36,10 @@ type CorrelatedConsumerLocator =
       rowLocator: { id: number };
     }
   | {
+      consumerTable: "store_price";
+      rowLocator: { id: number };
+    }
+  | {
       consumerTable: "tasting";
       rowLocator: { id: number };
     };
@@ -79,7 +83,12 @@ export type CatalogTargetReadParityResult = {
 
 export type CatalogTargetReadFilterParityCandidate =
   CatalogTargetReadParityItem & {
-    filter: "catalog_reference" | "entity" | "only_unknown" | "query";
+    filter:
+      | "assigned"
+      | "catalog_reference"
+      | "entity"
+      | "only_unknown"
+      | "query";
     targetMatches: boolean;
     legacyMatches: boolean;
   };
@@ -152,6 +161,11 @@ function consumerLocator(
         rowLocator: item.rowLocator,
       };
     case "review":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+    case "store_price":
       return {
         consumerTable: item.consumerTable,
         rowLocator: item.rowLocator,

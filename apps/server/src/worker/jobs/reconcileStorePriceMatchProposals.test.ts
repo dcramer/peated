@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  catalogTargets,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -85,6 +86,40 @@ describe("reconcileStorePriceMatchProposals", () => {
 
     expect(result).toEqual({ queuedCount: 0 });
     expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("uses targetId rather than the retained Bottle pair to identify unmatched rows", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing exact target fixture");
+    const targetBacked = await fixtures.StorePrice({
+      bottleId: null,
+      targetId: target.id,
+      name: "Target-backed drifted listing",
+    });
+    const targetless = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId: null,
+      name: "Targetless retained listing",
+    });
+    await agePrice(targetBacked.id, 60);
+    await agePrice(targetless.id, 60);
+
+    const result = await reconcileStorePriceMatchProposals();
+
+    expect(result).toEqual({ queuedCount: 1 });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: targetless.id },
+    );
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: targetBacked.id },
+    );
   });
 
   test("honors the minimum age guard", async ({ fixtures }) => {

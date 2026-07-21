@@ -127,7 +127,7 @@ export default procedure
     const proposalRows = await db
       .select({
         createdAt: storePrices.createdAt,
-        bottleId: storePrices.bottleId,
+        targetId: storePrices.targetId,
         enteredQueueAt: storePriceMatchProposals.enteredQueueAt,
         status: storePriceMatchProposals.status,
       })
@@ -159,7 +159,7 @@ export default procedure
 
       const requiredQueueReview = didProposalRequireQueueReview(row);
       const matchedSuccessfully =
-        row.status === "approved" && row.bottleId !== null;
+        row.status === "approved" && row.targetId !== null;
 
       if (matchedSuccessfully) {
         dayStats.matchedSuccessfully += 1;

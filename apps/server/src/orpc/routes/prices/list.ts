@@ -10,8 +10,9 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import { recordStorePriceReadParity } from "./read-parity";
 
 export default procedure
   .use(requireAdmin)
@@ -20,7 +21,7 @@ export default procedure
     path: "/prices",
     summary: "List store prices",
     description:
-      "Retrieve store prices with filtering by site, validity, and unknown bottles. Requires admin privileges",
+      "Retrieve store prices with filtering by site, validity, and unresolved catalog listings. Requires admin privileges",
     operationId: "listPrices",
   })
   .input(
@@ -46,7 +47,10 @@ export default procedure
     context,
     errors,
   }) {
-    const where: (SQL<unknown> | undefined)[] = [eq(storePrices.hidden, false)];
+    const baseWhere: (SQL<unknown> | undefined)[] = [
+      eq(storePrices.hidden, false),
+    ];
+    const targetWhere: SQL<unknown>[] = [];
 
     if (input.site) {
       const site = await db.query.externalSites.findFirst({
@@ -58,19 +62,19 @@ export default procedure
           message: "Site not found.",
         });
       }
-      where.push(eq(storePrices.externalSiteId, site.id));
+      baseWhere.push(eq(storePrices.externalSiteId, site.id));
     }
 
     if (input.onlyValid) {
-      where.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
+      baseWhere.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
     }
 
     if (input.onlyUnknown) {
-      where.push(isNull(storePrices.bottleId));
+      targetWhere.push(isNull(storePrices.targetId));
     }
 
     if (query) {
-      where.push(ilike(storePrices.name, `%${query}%`));
+      baseWhere.push(ilike(storePrices.name, `%${query}%`));
     }
 
     const offset = (cursor - 1) * limit;
@@ -78,13 +82,41 @@ export default procedure
     const results = await db
       .select()
       .from(storePrices)
-      .where(where ? and(...where) : undefined)
+      .where(and(...baseWhere, ...targetWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(
         desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
         asc(storePrices.name),
       );
+
+    if (input.onlyUnknown) {
+      const authoritativeWhere = isNull(storePrices.targetId);
+      const legacyWhere = isNull(storePrices.bottleId);
+      const candidates = await db
+        .select({
+          id: storePrices.id,
+          targetId: storePrices.targetId,
+          bottleId: storePrices.bottleId,
+          releaseId: storePrices.releaseId,
+          targetMatches: sql<boolean>`COALESCE(${authoritativeWhere}, false)`,
+          legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
+        })
+        .from(storePrices)
+        .where(and(...baseWhere, or(authoritativeWhere, legacyWhere)))
+        .limit(limit + 1)
+        .offset(offset)
+        .orderBy(
+          desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
+          asc(storePrices.name),
+        );
+
+      await recordStorePriceReadParity(
+        candidates,
+        { caller: "prices.list", operation: "filter" },
+        "only_unknown",
+      );
+    }
 
     return {
       results: await serialize(

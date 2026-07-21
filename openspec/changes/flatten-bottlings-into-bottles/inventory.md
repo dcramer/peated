@@ -131,8 +131,13 @@ The Drizzle owners are:
   `apps/server/src/serializers/tasting.ts` now hydrate their authoritative
   CatalogTargets and compare them with the retained pair through the shared
   parity reader. Tasting activity entries reuse the target-backed tasting
-  serializer. Tasks 7.1-7.3 remain open for prices, aliases, observations,
-  decisions, proposals, and remaining activity reads.
+  serializer.
+- `apps/server/src/serializers/storePrice.ts` now batch-hydrates each listing's
+  nullable authoritative CatalogTarget and records retained-pair parity using
+  the `store_price` row id. Price-change serialization loads its required exact
+  or generic target without reconstructing a Bottle from the retained pair.
+  Tasks 7.1-7.3 remain open for aliases, observations, decisions, proposals,
+  and remaining activity reads.
 - `apps/server/src/lib/activityFeed.ts` passes raw collection memberships to
   the target-backed serializer; it no longer joins retained Bottle or
   BottleRelease identity for collection previews.
@@ -358,6 +363,32 @@ Target-bearing consumer routes:
   targetless alias matches
   suppress resolver work, while unmatched rows retain it. Authentication,
   batching, history, image, provenance, and post-commit behavior are unchanged.
+- `apps/server/src/orpc/routes/prices/list.ts` now treats `targetId` as the
+  authoritative assigned/unknown predicate, records bounded parity against the
+  retained Bottle predicate, and returns the nullable target directly.
+- `apps/server/src/orpc/routes/prices/change-list.ts` now groups changes by
+  `targetId` plus currency and returns the exact Bottle or generic BottleGroup
+  target together with target-keyed current-user Library and tasted state.
+  Anonymous state is false and retained pairs do not affect either flag.
+  `apps/server/src/orpc/routes/bottles/prices/list.ts`,
+  `apps/server/src/orpc/routes/bottles/prices/history.ts`, and the Bottle details
+  last-price query select only the requested Bottle's exact target; retained
+  pair drift and generic group activity cannot populate a Bottle-specific
+  price surface. Bottle-scoped parity treats a raw retained Bottle id or a valid
+  retained parent/release pair with a completed promotion to the selected
+  Bottle as semantic legacy membership, without consulting target data. Bottle
+  details compares only the target and semantic legacy top candidates. The
+  admin `onlyUnknown` parity query independently paginates a bounded
+  target/legacy union sample; displaced excluded rows and rows outside that
+  sample can remain unseen, so it is not exhaustive. Price changes run parity
+  after selecting the authoritative target page and inspect only a bounded
+  sample of StorePrice rows behind that page, so they cannot observe legacy-only
+  rows outside it.
+- `apps/server/src/orpc/routes/admin/review-workbench-stats.ts` counts a listing
+  as matched only when `targetId` is non-null, and
+  `apps/server/src/worker/jobs/reconcileStorePriceMatchProposals.ts` queues only
+  targetless listings. Their retained Bottle columns no longer decide assigned
+  state.
 
 Classifier, price matching, and moderation routes:
 

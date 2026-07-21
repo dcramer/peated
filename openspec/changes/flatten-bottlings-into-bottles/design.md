@@ -1177,6 +1177,50 @@ backfill stay in task 7.3 and section 6, and tasks 9.6/9.7 remove retained pairs
 and measured compatibility. This commit is a review boundary, not a deployment
 or activation unit.
 
+### StorePrice reads use authoritative CatalogTargets
+
+The current partial tasks 7.1-7.3 StorePrice read cutover adds the listing's
+nullable authoritative CatalogTarget to every StorePrice response and records
+row-correlated retained-pair parity during batch hydration. A non-null target
+is never replaced by retained-pair identity, including when the pair drifts;
+a targetless listing stays explicitly null. The admin unknown filter,
+review-workbench matched predicate, and reconciliation-worker unmatched
+predicate now use `targetId` rather than `bottleId`.
+
+Bottle-specific current prices, history, and details resolve the selected
+Bottle's exact target first and query prices only through that target. Generic
+BottleGroup prices remain generic and cannot appear on a representative or
+retained Bottle merely because of compatibility columns. Price-change results
+group by authoritative target plus currency and return the discriminated target
+identity, so exact and generic changes remain distinct without a Bottle-shaped
+fallback. Their Library and tasted indicators are queried by target id for the
+current user, including generic targets, and are false anonymously.
+
+Bottle-scoped filter parity samples the union of target matches and semantic
+legacy matches before the authoritative result filter. The semantic legacy
+predicate includes both a raw retained `bottleId` match and a retained
+`{ parent bottleId, releaseId }` whose release belongs to that parent and has a
+completed promotion to the selected concrete Bottle. It does not consult
+CatalogTarget data. Bottle details compares the single newest target-backed
+candidate with the single newest semantic legacy candidate.
+
+The admin `onlyUnknown` parity query paginates independently over a bounded
+target/legacy union sample. It can expose excluded retained-only or target-only
+rows in that sample with their StorePrice row ids, but it is not exhaustive:
+union ordering can displace a row relative to the authoritative page and rows
+outside the sample remain unseen. Price-change parity likewise runs only after
+the authoritative target page is selected: it samples StorePrice rows behind
+those returned target ids, capped at ten times the page's target count and one
+thousand rows total. It therefore cannot observe legacy-only rows that fall
+outside the authoritative page. Serializer parity still validates every
+returned StorePrice response independently.
+
+This is another partial consumer review boundary. Existing-row backfill and
+production activation remain gated by section 6 and the retained parity/audit
+sequence; retained StorePrice pair storage and measured compatibility remain
+tasks 9.6/9.7. Aliases, observations, decisions, proposals, and remaining
+activity reads keep tasks 7.1-7.3 open.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

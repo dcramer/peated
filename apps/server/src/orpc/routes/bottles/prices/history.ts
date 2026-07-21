@@ -5,9 +5,13 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
+import { recordStorePriceReadParity } from "@peated/server/orpc/routes/prices/read-parity";
 import { CurrencyEnum } from "@peated/server/schemas";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+import loadBottlePriceTargetId, {
+  legacyStorePriceBottleMembership,
+} from "./load-target";
 
 export default procedure
   .route({
@@ -51,6 +55,14 @@ export default procedure
       });
     }
 
+    const targetId = await loadBottlePriceTargetId(bottle.id);
+    const targetWhere = eq(storePrices.targetId, targetId);
+    const legacyWhere = legacyStorePriceBottleMembership(bottle.id);
+    const baseWhere = [
+      eq(storePrices.currency, input.currency),
+      sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
+    ];
+
     const results = await db
       .select({
         date: storePriceHistories.date,
@@ -60,15 +72,27 @@ export default procedure
       })
       .from(storePriceHistories)
       .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))
-      .where(
-        and(
-          eq(storePrices.currency, input.currency),
-          eq(storePrices.bottleId, bottle.id),
-          sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
-        ),
-      )
+      .where(and(...baseWhere, targetWhere))
       .groupBy(storePriceHistories.date)
       .orderBy(desc(storePriceHistories.date));
+
+    const parityCandidates = await db
+      .selectDistinct({
+        id: storePrices.id,
+        targetId: storePrices.targetId,
+        bottleId: storePrices.bottleId,
+        releaseId: storePrices.releaseId,
+        targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
+        legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
+      })
+      .from(storePriceHistories)
+      .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))
+      .where(and(...baseWhere, or(targetWhere, legacyWhere)));
+    await recordStorePriceReadParity(
+      parityCandidates,
+      { caller: "bottles.prices.history", operation: "filter" },
+      "catalog_reference",
+    );
 
     return {
       results: results.map((r) => ({

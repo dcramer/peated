@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  catalogTargets,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -11,6 +12,7 @@ import { describe, expect, test } from "vitest";
 type StorePriceFixtureFactory = (
   data?: Partial<{
     bottleId: null | number;
+    targetId: null | number;
     hidden: boolean;
     imageUrl: null | string;
     name: string;
@@ -60,13 +62,16 @@ async function createProposalFixture(
   {
     bottleId,
     storePrice,
+    targetId,
   }: {
     bottleId: number;
     storePrice: StorePriceFixtureFactory;
+    targetId?: number | null;
   },
 ) {
   const price = await storePrice({
     bottleId: status === "approved" ? bottleId : null,
+    ...(targetId === undefined ? {} : { targetId }),
     hidden,
     imageUrl: null,
     name: `Fixture ${Math.random().toString(36).slice(2)}`,
@@ -224,5 +229,43 @@ describe("GET /admin/review-workbench/stats", () => {
       hoursSince(oldestActionableEnteredQueueAt),
       0,
     );
+  });
+
+  test("counts approved listings as matched only through targetId", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing exact target fixture");
+    const createdAt = daysAgoAt(0, 8);
+    await createProposalFixture(
+      { createdAt, status: "approved" },
+      {
+        bottleId: bottle.id,
+        storePrice: fixtures.StorePrice,
+        targetId: null,
+      },
+    );
+    await createProposalFixture(
+      { createdAt, status: "approved" },
+      {
+        bottleId: bottle.id,
+        storePrice: fixtures.StorePrice,
+        targetId: target.id,
+      },
+    );
+
+    const result = await routerClient.admin.reviewWorkbenchStats(undefined, {
+      context: { user },
+    });
+
+    expect(result.snapshot.today).toMatchObject({
+      newListings: 2,
+      matchedSuccessfully: 1,
+      autoResolved: 1,
+    });
   });
 });

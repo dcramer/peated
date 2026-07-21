@@ -330,6 +330,94 @@ export function buildGenericCatalogTarget() {
   };
 }
 
+export const priceChangeExactTarget = buildExactCatalogTarget();
+export const priceChangeGenericTarget = buildGenericCatalogTarget();
+
+export const priceChangeList = {
+  results: [
+    {
+      id: priceChangeExactTarget.targetId,
+      price: 7_999,
+      previousPrice: 8_999,
+      currency: "usd",
+      target: priceChangeExactTarget,
+      isLibrary: true,
+      hasTasted: false,
+    },
+    {
+      id: priceChangeGenericTarget.targetId,
+      price: 6_499,
+      previousPrice: 5_999,
+      currency: "usd",
+      target: priceChangeGenericTarget,
+      isLibrary: false,
+      hasTasted: true,
+    },
+  ],
+  rel: {
+    nextCursor: null,
+    prevCursor: null,
+  },
+};
+
+export const priceSite = {
+  id: 9901,
+  type: "whiskyadvocate",
+  name: "Whisky Advocate",
+  lastRunAt: timestamp,
+  nextRunAt: null,
+  runEvery: 60,
+};
+
+export const exactStorePriceName = "Exact bottle store listing";
+export const genericStorePriceName = "Generic range store listing";
+export const targetlessStorePriceName = "Unresolved store listing";
+
+export const storePriceList = {
+  results: [
+    {
+      id: 9902,
+      name: exactStorePriceName,
+      price: 7_999,
+      currency: "usd",
+      url: "https://example.com/exact-bottle",
+      volume: 750,
+      updatedAt: timestamp,
+      imageUrl: null,
+      isValid: true,
+      target: priceChangeExactTarget,
+    },
+    {
+      id: 9903,
+      name: genericStorePriceName,
+      price: 6_499,
+      currency: "usd",
+      url: "https://example.com/generic-range",
+      volume: 750,
+      updatedAt: timestamp,
+      imageUrl: null,
+      isValid: true,
+      target: priceChangeGenericTarget,
+    },
+    {
+      id: 9904,
+      name: targetlessStorePriceName,
+      price: 5_499,
+      currency: "usd",
+      url: "https://example.com/unresolved",
+      volume: 750,
+      updatedAt: timestamp,
+      imageUrl: null,
+      isValid: true,
+      target: null,
+    },
+  ],
+  rel: {
+    nextCursor: null,
+    prevCursor: null,
+  },
+};
+
 /**
  * @typedef {object} CollectionBottleFixtureOptions
  * @property {number} [id]
@@ -384,8 +472,7 @@ export function buildTasting({
     id,
     imageUrl: null,
     notes,
-    bottle,
-    release: null,
+    target: buildExactCatalogTarget({ bottle }),
     rating,
     tags,
     color: null,

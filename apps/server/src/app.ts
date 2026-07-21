@@ -35,7 +35,6 @@ import {
   AuthSchema,
   BadgeAwardSchema,
   BadgeSchema,
-  BottlePriceChangeSchema,
   BottleReleaseSchema,
   // Core domain
   BottleSchema,
@@ -50,6 +49,7 @@ import {
   ExternalSiteSchema,
   FlightSchema,
   NotificationSchema,
+  PriceChangeSchema,
   RegionSchema,
   ReviewSchema,
   StorePriceSchema,
@@ -312,8 +312,8 @@ export const app = honoApp
           Flight: { schema: FlightSchema, strategy: "output" },
           ExternalSite: { schema: ExternalSiteSchema, strategy: "output" },
           StorePrice: { schema: StorePriceSchema, strategy: "output" },
-          BottlePriceChange: {
-            schema: BottlePriceChangeSchema,
+          PriceChange: {
+            schema: PriceChangeSchema,
             strategy: "output",
           },
           // Shared

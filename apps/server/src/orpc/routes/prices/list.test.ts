@@ -1,8 +1,13 @@
 import { db } from "@peated/server/db";
-import { externalSites, storePrices } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  catalogTargets,
+  externalSites,
+  storePrices,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("GET /prices", () => {
@@ -54,23 +59,124 @@ describe("GET /prices", () => {
     expect(result.results[0].id).toBe(price1.id);
   });
 
-  test("filters unknown prices", async ({ fixtures }) => {
+  test("treats targetId as authoritative for unknown filtering", async ({
+    fixtures,
+  }) => {
     const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle();
-    const site = await fixtures.ExternalSiteOrExisting();
-    const price1 = await fixtures.StorePrice({
-      bottleId: null,
-      externalSiteId: site.id,
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
     });
-    await fixtures.StorePrice({ bottleId: bottle.id, externalSiteId: site.id }); // Known bottle
+    if (!exactTarget) throw new Error("Missing exact target fixture");
+    const site = await fixtures.ExternalSiteOrExisting();
+    const targetlessWithLegacyPair = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId: null,
+      externalSiteId: site.id,
+      name: "Targetless legacy listing",
+    });
+    await fixtures.StorePrice({
+      bottleId: null,
+      targetId: exactTarget.id,
+      externalSiteId: site.id,
+      name: "Target-backed drifted listing",
+    });
 
     const result = await routerClient.prices.list(
       { onlyUnknown: true },
       { context: { user: admin } },
     );
 
-    expect(result.results.length).toBe(1);
-    expect(result.results[0].id).toBe(price1.id);
+    expect(result.results.map(({ id }) => id)).toEqual([
+      targetlessWithLegacyPair.id,
+    ]);
+    expect(result.results[0]?.target).toBeNull();
+  });
+
+  test("returns exact, generic, null, and authoritative mismatched targets", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const exactBottle = await fixtures.Bottle({ name: "Exact price" });
+    const genericParent = await fixtures.Bottle({ name: "Generic price" });
+    await fixtures.BottleRelease({ bottleId: genericParent.id });
+    const mismatchBottle = await fixtures.Bottle({ name: "Mismatch price" });
+    const site = await fixtures.ExternalSiteOrExisting();
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, exactBottle.id),
+    });
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, genericParent.groupId as number),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!exactTarget || !genericTarget) {
+      throw new Error("Missing CatalogTarget fixture");
+    }
+    const exact = await fixtures.StorePrice({
+      bottleId: exactBottle.id,
+      targetId: exactTarget.id,
+      externalSiteId: site.id,
+      name: "A exact",
+    });
+    const generic = await fixtures.StorePrice({
+      bottleId: genericParent.id,
+      targetId: genericTarget.id,
+      externalSiteId: site.id,
+      name: "B generic",
+    });
+    const targetless = await fixtures.StorePrice({
+      bottleId: null,
+      targetId: null,
+      externalSiteId: site.id,
+      name: "C targetless",
+    });
+    const mismatch = await fixtures.StorePrice({
+      bottleId: mismatchBottle.id,
+      targetId: exactTarget.id,
+      externalSiteId: site.id,
+      name: "D mismatch",
+    });
+
+    const result = await routerClient.prices.list(
+      {},
+      { context: { user: admin } },
+    );
+    const byId = Object.fromEntries(
+      result.results.map((price) => [price.id, price]),
+    );
+
+    expect(byId[exact.id]?.target).toMatchObject({
+      kind: "bottle",
+      bottle: { id: exactBottle.id },
+    });
+    expect(byId[generic.id]?.target).toMatchObject({
+      kind: "group",
+      group: { id: genericParent.groupId },
+    });
+    expect(byId[targetless.id]?.target).toBeNull();
+    expect(byId[mismatch.id]?.target).toMatchObject({
+      kind: "bottle",
+      bottle: { id: exactBottle.id },
+    });
+  });
+
+  test("fails closed for a retired authoritative target", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const retired = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    await fixtures.StorePrice({ bottleId: retired.id });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    await expect(
+      routerClient.prices.list({}, { context: { user: admin } }),
+    ).rejects.toMatchObject({ code: "CATALOG_TARGET_RETIRED" });
   });
 
   test("filters prices by query", async ({ fixtures }) => {

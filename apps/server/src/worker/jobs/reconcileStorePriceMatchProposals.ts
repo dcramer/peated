@@ -17,7 +17,7 @@ function clampInteger(value: number, min: number, max: number) {
 }
 
 /**
- * Reconciles legacy unmatched store prices that never produced match proposals.
+ * Reconciles targetless store prices that never produced match proposals.
  *
  * The matcher still owns proposal creation; this job only redispatches eligible
  * visible rows and relies on the proposal table to bound durable duplicates.
@@ -40,7 +40,7 @@ export default async function reconcileStorePriceMatchProposals({
     )
     .where(
       sql`${storePrices.hidden} = false
-        AND ${storePrices.bottleId} IS NULL
+        AND ${storePrices.targetId} IS NULL
         AND ${storePriceMatchProposals.id} IS NULL
         AND ${storePrices.updatedAt} <= NOW() - make_interval(mins => ${minAgeMinutes})`,
     )
@@ -51,7 +51,7 @@ export default async function reconcileStorePriceMatchProposals({
 
   for (const price of prices) {
     // Bypass unique enqueue here: stale unique BullMQ ids are one reason these
-    // legacy rows can be missing proposals in the first place.
+    // targetless rows can be missing proposals in the first place.
     try {
       await pushJob("ResolveStorePriceBottle", {
         priceId: price.id,

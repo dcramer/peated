@@ -176,7 +176,7 @@ describe("CatalogTarget read parity", () => {
           legacy: { bottleId: exactBottle.id, releaseId: null },
         },
         {
-          consumerTable: "review",
+          consumerTable: "store_price",
           rowLocator: { id: 2 },
           targetId: await genericTargetId(genericParent.groupId as number),
           legacy: { bottleId: genericParent.id, releaseId: null },
@@ -218,7 +218,7 @@ describe("CatalogTarget read parity", () => {
           legacy: { bottleId: otherBottle.id, releaseId: null },
         },
         {
-          consumerTable: "review",
+          consumerTable: "store_price",
           rowLocator: { id: 42 },
           targetId,
           legacy: {
@@ -253,7 +253,7 @@ describe("CatalogTarget read parity", () => {
         }),
       }),
       expect.objectContaining({
-        consumerTable: "review",
+        consumerTable: "store_price",
         rowLocator: { id: 42 },
         legacyBottleId: targetBottle.id,
         legacyReleaseId: otherRelease.id,

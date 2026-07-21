@@ -6,6 +6,10 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
+import loadBottlePriceTargetId, {
+  legacyStorePriceBottleMembership,
+} from "@peated/server/orpc/routes/bottles/prices/load-target";
+import { recordStorePriceReadParity } from "@peated/server/orpc/routes/prices/read-parity";
 import {
   BottleSchema,
   StorePriceSchema,
@@ -14,7 +18,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
 // Compose details as Bottle schema + extra fields to allow OpenAPI $ref via allOf
@@ -66,12 +70,45 @@ export default procedure
       }
     }
 
+    const targetId = await loadBottlePriceTargetId(bottle.id);
+    const targetWhere = eq(storePrices.targetId, targetId);
+    const legacyWhere = legacyStorePriceBottleMembership(bottle.id);
+
     const [lastPrice] = await db
-      .select()
+      .select({
+        ...getTableColumns(storePrices),
+        targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
+        legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
+      })
       .from(storePrices)
-      .where(and(eq(storePrices.bottleId, bottle.id)))
-      .orderBy(desc(storePrices.updatedAt))
+      .where(targetWhere)
+      .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
       .limit(1);
+    const [legacyTopPrice] = await db
+      .select({
+        id: storePrices.id,
+        targetId: storePrices.targetId,
+        bottleId: storePrices.bottleId,
+        releaseId: storePrices.releaseId,
+        targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
+        legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
+      })
+      .from(storePrices)
+      .where(legacyWhere)
+      .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
+      .limit(1);
+    const priceParityCandidates = [
+      ...new Map(
+        [lastPrice, legacyTopPrice].flatMap((price) =>
+          price ? [[price.id, price] as const] : [],
+        ),
+      ).values(),
+    ];
+    await recordStorePriceReadParity(
+      priceParityCandidates,
+      { caller: "bottles.details", operation: "lastPriceFilter" },
+      "catalog_reference",
+    );
 
     const [{ count: totalPeople }] = await db
       .select({
