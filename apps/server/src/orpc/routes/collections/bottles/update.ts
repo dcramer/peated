@@ -18,10 +18,10 @@ import {
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
-  findCollectionBottleWithTarget,
+  findCollectionBottleEntry,
   isLibraryCollection,
   serializeCollectionBottleEntry,
-} from "./imageHelpers";
+} from "./collectionBottleHelpers";
 
 async function findCollectionById(collectionId: number) {
   return await db.query.collections.findFirst({
@@ -85,7 +85,7 @@ export default procedure
       });
     }
 
-    const collectionBottle = await findCollectionBottleWithTarget({
+    const collectionBottle = await findCollectionBottleEntry({
       collectionBottleId: input.collectionBottle,
       collectionId: collection.id,
     });
@@ -100,7 +100,7 @@ export default procedure
       .set({ status: input.status })
       .where(eq(collectionBottles.id, collectionBottle.id));
 
-    const result = await findCollectionBottleWithTarget({
+    const result = await findCollectionBottleEntry({
       collectionBottleId: collectionBottle.id,
       collectionId: collection.id,
     });

@@ -9,6 +9,7 @@ describe("GET /flights", () => {
 
     expect(data.results).toHaveLength(1);
     expect(data.results[0].id).toEqual(flight.publicId);
+    expect(data.results[0]).not.toHaveProperty("targets");
     expect(data.rel.nextCursor).toBeNull();
     expect(data.rel.prevCursor).toBeNull();
   });

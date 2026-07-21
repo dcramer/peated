@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, flightBottles } from "@peated/server/db/schema";
+import { bottleAliases } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
@@ -260,35 +260,6 @@ describe("GET /bottles", () => {
 
     expect(results.length).toBe(1);
     expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("lists bottles with flight filter", async ({ fixtures }) => {
-    const flight = await fixtures.Flight({ name: "Test Flight" });
-    const bottle1 = await fixtures.Bottle({ name: "Flight Bottle" });
-    const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
-
-    // Add bottle to flight using direct DB insert
-    await db.insert(flightBottles).values({
-      flightId: flight.id,
-      bottleId: bottle1.id,
-    });
-
-    const { results } = await routerClient.bottles.list({
-      flight: flight.publicId,
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
-  });
-
-  test("returns empty results for invalid flight", async ({ fixtures }) => {
-    await fixtures.Bottle({ name: "Some Bottle" });
-
-    const { results } = await routerClient.bottles.list({
-      flight: "invalid-flight-id",
-    });
-
-    expect(results.length).toBe(0);
   });
 
   test("lists bottles with query matching brand and name", async ({

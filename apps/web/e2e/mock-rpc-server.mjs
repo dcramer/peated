@@ -5,7 +5,9 @@ import {
   buildBottle,
   buildBottleRelease,
   buildCollectionBottle,
+  buildExactCatalogTarget,
   buildFavoriteActivity,
+  buildGenericCatalogTarget,
   buildTasting,
   createdBottleId,
   createdBottleName,
@@ -569,6 +571,9 @@ async function handleRpcRequest({ request, response, url }) {
     case "collections/bottles/imageUpdate":
       sendRpcResponse(response, updateCollectionBottleImage(request, input));
       return true;
+    case "collections/bottles/update":
+      sendRpcResponse(response, updateCollectionBottleStatus(request, input));
+      return true;
     case "collections/bottles/delete":
       mutateCollectionBottle(request, input, "delete");
       sendRpcResponse(response, {});
@@ -608,9 +613,18 @@ function getCollectionState(request) {
   const token = getAccessToken(request);
 
   if (!collectionStateByToken.has(token)) {
+    const library = new Map();
+    if (token.includes("library-generic")) {
+      const genericEntry = buildCollectionBottle({
+        id: collectionBottleId++,
+        target: buildGenericCatalogTarget(),
+        hasTasted: true,
+      });
+      library.set(genericEntry.target.targetId, genericEntry);
+    }
     collectionStateByToken.set(token, {
       default: new Map(),
-      library: new Map(),
+      library,
     });
   }
 
@@ -683,28 +697,63 @@ function getCollection(input) {
   return input.collection;
 }
 
-/**
- * Match the API's base-bottle versus specific-release distinction in the mock
- * store key.
- */
-function getCollectionKey(input) {
-  return `${input?.bottle}:${input?.release ?? "base"}`;
+function getLegacyCollectionRelease(input) {
+  if (input?.release === undefined || input.release === null) return null;
+
+  if (
+    input.release === existingReleaseId &&
+    input.bottle === existingRelease.bottleId
+  ) {
+    return existingRelease;
+  }
+  if (input.release === createdReleaseId && input.bottle === createdBottleId) {
+    return buildCreatedRelease();
+  }
+
+  throw new Error("Unexpected collection release payload");
+}
+
+function buildLegacyCollectionTarget(request, input) {
+  if (typeof input?.bottle !== "number") {
+    throw new Error("Expected target or retained bottle collection identity");
+  }
+
+  const bottle =
+    input.bottle === existingBottleId
+      ? existingBottle
+      : input.bottle === createdBottleId
+        ? buildCreatedBottle({
+            includeExactBottleDetails: isExactBottlePhotoScenario(request),
+          })
+        : buildBottleForId(input.bottle);
+
+  return buildExactCatalogTarget({
+    bottle,
+    release: getLegacyCollectionRelease(input),
+  });
+}
+
+function resolveCollectionMutationTarget(request, entries, input) {
+  if (input?.target !== undefined) {
+    if (typeof input.target !== "number" || input?.bottle !== undefined) {
+      throw new Error("Unexpected target collection mutation payload");
+    }
+
+    const target = Array.from(entries.values()).find(
+      (entry) => entry.target.targetId === input.target,
+    )?.target;
+    if (!target) {
+      throw new Error("Unknown CatalogTarget collection mutation payload");
+    }
+    return target;
+  }
+
+  return buildLegacyCollectionTarget(request, input);
 }
 
 function mutateCollectionBottle(request, input, action) {
-  if (input?.user !== "me" || typeof input?.bottle !== "number") {
+  if (input?.user !== "me") {
     throw new Error("Unexpected collection mutation payload");
-  }
-  if (
-    input?.release !== undefined &&
-    input.release !== null &&
-    !(
-      (input.release === existingReleaseId &&
-        input.bottle === existingRelease.bottleId) ||
-      (input.release === createdReleaseId && input.bottle === createdBottleId)
-    )
-  ) {
-    throw new Error("Unexpected collection release payload");
   }
   if (
     input?.pendingImageId !== undefined &&
@@ -716,7 +765,8 @@ function mutateCollectionBottle(request, input, action) {
   const state = getCollectionState(request);
   const collection = getCollection(input);
   const entries = state[collection];
-  const key = getCollectionKey(input);
+  const target = resolveCollectionMutationTarget(request, entries, input);
+  const key = target.targetId;
 
   if (action === "delete") {
     entries.delete(key);
@@ -728,24 +778,11 @@ function mutateCollectionBottle(request, input, action) {
       key,
       buildCollectionBottle({
         id: collectionBottleId++,
-        bottle:
-          input.bottle === existingBottleId
-            ? existingBottle
-            : input.bottle === createdBottleId
-              ? buildCreatedBottle({
-                  includeExactBottleDetails:
-                    isExactBottlePhotoScenario(request),
-                })
-              : buildBottleForId(input.bottle),
-        release:
-          input.release === existingReleaseId
-            ? existingRelease
-            : input.release === createdReleaseId
-              ? buildCreatedRelease()
-              : null,
+        target,
         imageUrl: input.pendingImageId
           ? "http://127.0.0.1:4999/uploads/library.webp"
           : null,
+        status: input.status ?? null,
       }),
     );
   } else {
@@ -795,14 +832,23 @@ function replaceCollectionBottleEntry(request, updatedEntry) {
   for (const [key, entry] of entries.entries()) {
     if (entry.id === updatedEntry.id) {
       entries.set(key, updatedEntry);
-      return {
-        ...updatedEntry,
-        bottle: withCollectionStatus(request, updatedEntry.bottle),
-      };
+      return updatedEntry;
     }
   }
 
   throw new Error("Collection entry missing for image replacement");
+}
+
+function updateCollectionBottleStatus(request, input) {
+  if (![null, "sealed", "open", "empty"].includes(input?.status)) {
+    throw new Error("Unexpected collection bottle status payload");
+  }
+
+  const entry = findCollectionBottleEntry(request, input);
+  return replaceCollectionBottleEntry(request, {
+    ...entry,
+    status: input.status,
+  });
 }
 
 function updateCollectionBottleImage(request, input) {
@@ -1446,8 +1492,9 @@ function withCollectionStatus(request, bottle) {
 }
 
 function hasBottleInCollection(collection, bottleId) {
-  return Array.from(collection.keys()).some((key) =>
-    key.startsWith(`${bottleId}:`),
+  return Array.from(collection.values()).some(
+    (entry) =>
+      entry.target.kind === "bottle" && entry.target.bottle.id === bottleId,
   );
 }
 
@@ -1478,37 +1525,48 @@ function listCollectionBottles(request, input) {
   const state = getCollectionState(request);
   const collection = getCollection(input);
   const entries = Array.from(state[collection].entries());
-  let results =
-    input?.bottle === undefined
-      ? entries.map(([, entry]) => ({
-          ...entry,
-          bottle: withCollectionStatus(request, entry.bottle),
-        }))
-      : entries
-          .filter(([key]) => key === getCollectionKey(input))
-          .map(([, entry]) => ({
-            ...entry,
-            bottle: withCollectionStatus(request, entry.bottle),
-          }));
+  let results = entries.map(([, entry]) => entry);
+
+  if (input?.target !== undefined) {
+    results = results.filter(
+      (entry) => entry.target.targetId === Number(input.target),
+    );
+  } else if (input?.bottle !== undefined) {
+    const target = buildLegacyCollectionTarget(request, input);
+    results = results.filter(
+      (entry) => entry.target.targetId === target.targetId,
+    );
+  }
 
   if (collection === "library" && input?.query) {
     const query = String(input.query).toLowerCase();
     results = results.filter((entry) =>
-      entry.bottle.fullName.toLowerCase().includes(query),
+      getCollectionTargetOwner(entry.target)
+        .fullName.toLowerCase()
+        .includes(query),
     );
   }
 
   if (collection === "library" && input?.brand) {
     results = results.filter(
-      (entry) => entry.bottle.brand?.id === Number(input.brand),
+      (entry) =>
+        getCollectionTargetOwner(entry.target).brandId === Number(input.brand),
     );
   }
 
   if (collection === "library" && input?.distiller) {
     results = results.filter((entry) =>
-      entry.bottle.distillers?.some(
-        (distiller) => distiller.id === Number(input.distiller),
+      getCollectionTargetOwner(entry.target).distillerIds.includes(
+        Number(input.distiller),
       ),
+    );
+  }
+
+  if (collection === "library" && input?.status) {
+    results = results.filter((entry) =>
+      input.status === "unset"
+        ? entry.status === null
+        : entry.status === input.status,
     );
   }
 
@@ -1519,6 +1577,10 @@ function listCollectionBottles(request, input) {
       prevCursor: null,
     },
   };
+}
+
+function getCollectionTargetOwner(target) {
+  return target.kind === "bottle" ? target.bottle : target.group;
 }
 
 async function readRpcInput(request, url) {

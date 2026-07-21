@@ -8,16 +8,18 @@ import type { ComponentPropsWithoutRef } from "react";
 import Join from "./join";
 import Tooltip from "./tooltip";
 
+type Distiller = {
+  id: string | number | undefined | null;
+  name: string;
+};
+
 type Props = {
   data: {
     brand: {
       id: string | number | undefined | null;
       name: string;
     };
-    distillers?: {
-      id: string | number | undefined | null;
-      name: string;
-    }[];
+    distillers?: Distiller[];
     caskFill?: CaskFill | null;
     caskSize?: CaskSize | null;
     caskType?: CaskType | null;
@@ -59,7 +61,7 @@ export const Brand = ({ data: { brand } }: Props) => {
   );
 };
 
-export const Distillers = ({ data: { distillers } }: Props) => {
+export const Distillers = ({ distillers }: { distillers?: Distiller[] }) => {
   if (!distillers?.length) return null;
 
   if (distillers.length > 1) {

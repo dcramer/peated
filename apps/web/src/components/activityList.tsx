@@ -4,9 +4,10 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 import {
-  formatBottlingName,
-  getBottleBottlingPath,
-} from "@peated/web/lib/bottlings";
+  getCatalogTargetHref,
+  getCatalogTargetLabel,
+  getCatalogTargetScopeLabel,
+} from "@peated/web/lib/catalogTarget";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";
@@ -48,33 +49,26 @@ function CollectionLink({ activity }: { activity: CollectionAddActivity }) {
 }
 
 function getCollectionItemHref(item: CollectionAddItem) {
-  if (item.release) {
-    return getBottleBottlingPath(item.bottle.id, item.release.id);
-  }
-  return `/bottles/${item.bottle.id}`;
+  return getCatalogTargetHref(item.target);
 }
 
 function getCollectionItemTitle(item: CollectionAddItem) {
-  return item.release?.fullName ?? item.bottle.fullName;
+  return getCatalogTargetLabel(item.target);
 }
 
 function getCollectionItemDetail(item: CollectionAddItem) {
-  if (item.release) {
-    const bottlingName = formatBottlingName(item.release);
-    return bottlingName && bottlingName !== item.release.fullName
-      ? bottlingName
-      : item.bottle.fullName;
-  }
-
-  return item.bottle.category ? formatCategoryName(item.bottle.category) : null;
+  const owner =
+    item.target.kind === "bottle" ? item.target.bottle : item.target.group;
+  const category = owner.category ? formatCategoryName(owner.category) : null;
+  return [getCatalogTargetScopeLabel(item.target), category]
+    .filter(Boolean)
+    .join(" · ");
 }
 
 function CollectionItemImage({ item }: { item: CollectionAddItem }) {
-  const imageUrl =
-    item.imageUrl ??
-    item.release?.imageUrl ??
-    item.bottle.displayImageUrl ??
-    item.bottle.imageUrl;
+  const owner =
+    item.target.kind === "bottle" ? item.target.bottle : item.target.group;
+  const imageUrl = item.imageUrl ?? owner.imageUrl;
 
   if (!imageUrl) {
     return null;
@@ -94,18 +88,29 @@ function CollectionItemImage({ item }: { item: CollectionAddItem }) {
 
 function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
   const detail = getCollectionItemDetail(item);
+  const href = getCollectionItemHref(item);
+  const title = getCollectionItemTitle(item);
 
   return (
     <li className="flex min-w-0 items-center gap-x-3 px-3 py-2">
       <CollectionItemImage item={item} />
       <div className="min-w-0 flex-1">
-        <Link
-          href={getCollectionItemHref(item)}
-          className="block truncate text-sm font-semibold text-white hover:underline"
-          title={getCollectionItemTitle(item)}
-        >
-          {getCollectionItemTitle(item)}
-        </Link>
+        {href ? (
+          <Link
+            href={href}
+            className="block truncate text-sm font-semibold text-white hover:underline"
+            title={title}
+          >
+            {title}
+          </Link>
+        ) : (
+          <div
+            className="block truncate text-sm font-semibold text-white"
+            title={title}
+          >
+            {title}
+          </div>
+        )}
         {detail ? (
           <div className="text-muted truncate text-xs">{detail}</div>
         ) : null}

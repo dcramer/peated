@@ -4,6 +4,28 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
+async function insertTargetBackedCollectionBottles(
+  values:
+    | typeof collectionBottles.$inferInsert
+    | (typeof collectionBottles.$inferInsert)[],
+) {
+  const valueList = Array.isArray(values) ? values : [values];
+  await db.insert(collectionBottles).values(
+    await Promise.all(
+      valueList.map(async (value) => {
+        if (value.targetId !== undefined) return value;
+        const target = await db.query.catalogTargets.findFirst({
+          where: (catalogTargets, { eq }) =>
+            eq(catalogTargets.bottleId, value.bottleId),
+          columns: { id: true },
+        });
+        if (!target) throw new Error("Exact target fixture missing");
+        return { ...value, targetId: target.id };
+      }),
+    ),
+  );
+}
+
 describe("GET /activity", () => {
   test("returns tastings and grouped collection additions", async ({
     fixtures,
@@ -17,11 +39,20 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: user.id,
     });
-    const [firstBottle, secondBottle] = await Promise.all([
+    const [firstBottle, secondBottle, genericBottle] = await Promise.all([
       fixtures.Bottle(),
       fixtures.Bottle(),
+      fixtures.Bottle({ name: "Generic activity preview" }),
     ]);
-    await db.insert(collectionBottles).values([
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, genericBottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    if (!genericTarget) throw new Error("Generic target fixture missing");
+    await insertTargetBackedCollectionBottles([
       {
         collectionId: collection.id,
         bottleId: firstBottle.id,
@@ -31,6 +62,12 @@ describe("GET /activity", () => {
         collectionId: collection.id,
         bottleId: secondBottle.id,
         createdAt: new Date("2026-01-03T12:10:00Z"),
+      },
+      {
+        collectionId: collection.id,
+        bottleId: genericBottle.id,
+        targetId: genericTarget.id,
+        createdAt: new Date("2026-01-03T12:20:00Z"),
       },
     ]);
 
@@ -58,8 +95,24 @@ describe("GET /activity", () => {
         id: collection.id,
         href: `/users/${user.username}/library`,
       },
-      totalItems: 2,
+      totalItems: 3,
     });
+    const collectionItems =
+      result.results[1].type === "collection_add"
+        ? result.results[1].items
+        : [];
+    expect(
+      collectionItems.filter((item) => item.target.kind === "bottle"),
+    ).toHaveLength(2);
+    const genericItem = collectionItems.find(
+      (item) => item.target.kind === "group",
+    );
+    expect(genericItem?.target).toMatchObject({
+      kind: "group",
+      targetId: genericTarget.id,
+      group: { id: genericBottle.groupId },
+    });
+    expect(genericItem?.target).not.toHaveProperty("bottle");
   });
 
   test("hides private users from anonymous global activity", async ({
@@ -79,7 +132,7 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: privateUser.id,
     });
-    await db.insert(collectionBottles).values({
+    await insertTargetBackedCollectionBottles({
       collectionId: privateCollection.id,
       bottleId: (await fixtures.Bottle()).id,
       createdAt: new Date("2026-01-03T12:45:00Z"),
@@ -117,7 +170,7 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: friend.id,
     });
-    await db.insert(collectionBottles).values({
+    await insertTargetBackedCollectionBottles({
       collectionId: collection.id,
       bottleId: (await fixtures.Bottle()).id,
       createdAt: new Date("2026-01-03T12:00:00Z"),
@@ -186,7 +239,7 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: stranger.id,
     });
-    await db.insert(collectionBottles).values([
+    await insertTargetBackedCollectionBottles([
       {
         collectionId: friendCollection.id,
         bottleId: (await fixtures.Bottle()).id,
@@ -233,7 +286,7 @@ describe("GET /activity", () => {
       fixtures.Bottle(),
       fixtures.Bottle(),
     ]);
-    await db.insert(collectionBottles).values(
+    await insertTargetBackedCollectionBottles(
       bottles.map((bottle, index) => ({
         collectionId: collection.id,
         bottleId: bottle.id,
@@ -272,7 +325,7 @@ describe("GET /activity", () => {
         name: `Shelf ${i}`,
         createdById: user.id,
       });
-      await db.insert(collectionBottles).values({
+      await insertTargetBackedCollectionBottles({
         collectionId: collection.id,
         bottleId: (await fixtures.Bottle()).id,
         createdAt: new Date(`2026-01-03T1${i}:00:00Z`),

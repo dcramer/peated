@@ -1,4 +1,10 @@
-import { expect, type Locator, type Page, test } from "@playwright/test";
+import {
+  expect,
+  type Locator,
+  type Page,
+  type Request,
+  test,
+} from "@playwright/test";
 import { Buffer } from "node:buffer";
 
 import {
@@ -7,6 +13,7 @@ import {
   existingBottle,
   existingRelease,
   existingReleaseId,
+  genericCollectionTargetLabel,
   testAccessToken,
   testUser,
 } from "./rpc-fixtures.mjs";
@@ -184,12 +191,70 @@ test.describe("profile library", () => {
 
     await expect(bottlingLink).toBeVisible();
     await expect(bottlingLink).toHaveAttribute(
-      "title",
-      existingRelease.fullName,
+      "href",
+      `/bottles/${existingReleaseId}`,
     );
     await expect(
       page.getByRole("link", { name: existingRelease.fullName, exact: true }),
     ).toHaveCount(0);
+  });
+
+  test("keeps generic Library targets independent from representative bottles", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: [
+        testAccessToken,
+        "library-generic",
+        testInfo.project.name,
+        testInfo.workerIndex,
+        testInfo.retry,
+      ].join("-"),
+    });
+
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+
+    const genericRow = page.locator("tr").filter({
+      hasText: genericCollectionTargetLabel,
+    });
+    await expect(genericRow).toBeVisible();
+    await expect(
+      genericRow.getByText("Exact bottle not specified"),
+    ).toBeVisible();
+    await expect(
+      genericRow.getByRole("link", { name: genericCollectionTargetLabel }),
+    ).toHaveCount(0);
+    await expect(
+      genericRow.locator(`a[href="/bottles/${existingBottle.id}"]`),
+    ).toHaveCount(0);
+    await expect(genericRow.getByRole("img", { name: "Tasted" })).toBeVisible();
+
+    await genericRow
+      .getByRole("button", {
+        name: "Change bottle status, current status Not set",
+      })
+      .click();
+    await page.getByRole("menuitem", { name: "Open" }).click();
+    await expect(
+      genericRow.getByRole("button", {
+        name: "Change bottle status, current status Open",
+      }),
+    ).toBeVisible();
+
+    const deleteRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/delete"),
+    );
+    await genericRow.getByRole("button", { name: "Bottle options" }).click();
+    await page.getByRole("menuitem", { name: "Remove from Library" }).click();
+    const deleteInput = getRpcInput(await deleteRequestPromise);
+
+    expect(deleteInput.target).toBeGreaterThan(0);
+    expect(deleteInput).not.toHaveProperty("bottle");
+    expect(deleteInput).not.toHaveProperty("release");
+    await expect(genericRow).toHaveCount(0);
   });
 
   test("filters Library entries from the profile tab", async ({
@@ -404,4 +469,11 @@ async function expectNoHorizontalOverflow(page: Page) {
       { message: "page should not create horizontal overflow" },
     )
     .toBeLessThanOrEqual(1);
+}
+
+function getRpcInput(request: Request) {
+  const postData = request.postData();
+  expect(postData).toBeTruthy();
+
+  return JSON.parse(postData!).json;
 }

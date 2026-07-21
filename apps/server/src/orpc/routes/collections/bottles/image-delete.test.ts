@@ -2,12 +2,32 @@ import { db } from "@peated/server/db";
 import {
   bottleReleases,
   bottles,
+  catalogTargets,
   collectionBottles,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+
+async function exactTargetId(bottleId: number) {
+  const target = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, bottleId),
+  });
+  if (!target) throw new Error("Exact target fixture missing");
+  return target.id;
+}
+
+async function genericTargetId(groupId: number) {
+  const target = await db.query.catalogTargets.findFirst({
+    where: and(
+      eq(catalogTargets.groupId, groupId),
+      isNull(catalogTargets.bottleId),
+    ),
+  });
+  if (!target) throw new Error("Generic target fixture missing");
+  return target.id;
+}
 
 describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/image", () => {
   test("requires authentication", async () => {
@@ -39,6 +59,7 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
         releaseId: release.id,
+        targetId: await exactTargetId(bottle.id),
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();
@@ -71,6 +92,43 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
     expect(canonicalRelease?.imageUrl).toBe(
       "/uploads/bottle-releases/canonical-release.webp",
     );
+  });
+
+  test("returns the generic target after removing its entry image", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const retainedBottle = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const targetId = await genericTargetId(retainedBottle.groupId as number);
+    const [entry] = await db
+      .insert(collectionBottles)
+      .values({
+        collectionId: libraryCollection.id,
+        bottleId: retainedBottle.id,
+        targetId,
+        imageUrl: "/uploads/collection-bottles/generic.webp",
+      })
+      .returning();
+
+    const result = await routerClient.collections.bottles.imageDelete(
+      {
+        user: "me",
+        collection: "library",
+        collectionBottle: entry.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result).toMatchObject({
+      id: entry.id,
+      imageUrl: null,
+      target: { kind: "group", targetId },
+    });
+    expect(result.target).not.toHaveProperty("bottle");
   });
 
   test("rejects removing another user's library entry image", async ({

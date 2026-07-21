@@ -5,24 +5,30 @@ import {
   getCatalogTargetLabel,
   getCatalogTargetScopeLabel,
 } from "@peated/web/lib/catalogTarget";
+import type { MouseEventHandler } from "react";
 
 export default function CatalogTargetIdentity({
   target,
   compact = false,
+  onClick,
 }: {
   target: CatalogTargetV1;
   compact?: boolean;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 }) {
   const href = getCatalogTargetHref(target);
   const label = getCatalogTargetLabel(target);
   const identity = href ? (
-    <Link href={href} className="font-semibold hover:underline">
+    <Link
+      href={href}
+      className="font-semibold hover:underline"
+      onClick={onClick}
+    >
       {label}
     </Link>
   ) : (
     <span className="font-semibold">{label}</span>
   );
-
   if (compact) {
     return (
       <span className="inline-flex flex-wrap items-baseline gap-x-2">

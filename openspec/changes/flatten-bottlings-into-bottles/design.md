@@ -1026,15 +1026,22 @@ row; it never removes a durable target. Section 6 backfills those rows and task
 9.7 removes this fallback. The retained delete shape with neither `release` nor
 `baseOnly` remains measured legacy family-delete compatibility: it
 intentionally selects every retained row for the parent `bottleId` and can
-therefore span multiple canonical memberships. Exact UI removal supplies
-`baseOnly`; task 9.7 removes the broad family-delete adapter after compatibility
-traffic reaches zero.
+therefore span multiple canonical memberships. Target-backed UI removal
+supplies `targetId` directly; `baseOnly` remains only retained compatibility.
+Task 9.7 removes the broad family-delete adapter after compatibility traffic
+reaches zero.
 
-Collection reads remain on the retained pair until task 7.3, existing-row
-backfill remains section 6, and legacy pair storage and compatibility cleanup
-remain tasks 9.6 and 9.7. Unit image, status, and ownership behavior outside
-identity selection is unchanged. This slice is a code-review boundary and
-makes no deployment or activation claim.
+The current partial task 7.3 collection read cutover now requires and hydrates
+the membership's authoritative CatalogTarget, records retained-pair parity, and
+uses target identity for serialization, ordering, filtering, and Library
+actions. A targetless membership is an integrity error rather than permission
+to fall back to the retained pair. This read cutover does not satisfy the
+section 6 existing-row backfill gate, enable generic target-native creation
+while retained `bottleId` storage is non-null, or remove the retained input and
+family-delete adapters; those remain tasks 8.7, 9.6, and 9.7. Unit image,
+status, and ownership behavior outside identity selection is unchanged. The
+partial consumer slice is a code-review boundary and makes no deployment or
+activation claim.
 
 ### Direct Flight mutations replace one target-authoritative membership set
 
@@ -1067,10 +1074,15 @@ inserts the canonical requested target assignments atomically; explicit
 replacement also removes targetless compatibility rows instead of carrying
 them forward.
 
-Flight reads remain on the retained pair until task 7.3, existing-row backfill
-remains section 6, and target-native Flight input remains task 8.7. Tasks 9.6
-and 9.7 remove retained pair storage and compatibility. This slice is a
-code-review boundary and makes no deployment or activation claim.
+The current partial task 7.3 Flight read cutover keeps the bounded base Flight
+response target-free while the Flight details response hydrates its ordered
+authoritative CatalogTargets, records retained-pair parity, and carries
+target-keyed viewer state. A generic member remains group identity without
+representative substitution. Existing-row backfill remains section 6, the
+public Bottle-id membership input remains staged compatibility until task 8.7,
+and tasks 9.6 and 9.7 remove retained pair storage and compatibility. The
+partial consumer slice is a code-review boundary and makes no deployment or
+activation claim.
 
 ### Automated ignored StorePrice clears preserve one identity tuple
 

@@ -1,13 +1,10 @@
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type { Flight } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
   bottlesToDistillers,
   entities,
-  flightBottles,
-  flights,
   tastings,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -61,7 +58,6 @@ export default procedure
       series: z.coerce.number().nullish(),
       tag: z.string().nullish(),
       flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
-      flight: z.string().nullish(),
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
       caskType: CaskTypeEnum.nullish(),
@@ -157,26 +153,6 @@ export default procedure
       );
     }
 
-    let flight: Flight | null = null;
-    if (rest.flight) {
-      [flight] = await db
-        .select()
-        .from(flights)
-        .where(eq(flights.publicId, rest.flight));
-      if (!flight) {
-        return {
-          results: [],
-          rel: {
-            nextCursor: null,
-            prevCursor: null,
-          },
-        };
-      }
-      where.push(
-        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`,
-      );
-    }
-
     let orderBy: SQL<unknown>;
     switch (rest.sort) {
       case "rank":
@@ -251,9 +227,6 @@ export default procedure
         results.slice(0, limit).map((r) => r.bottles),
         context.user,
         ["description", "tastingNotes"],
-        {
-          flight,
-        },
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

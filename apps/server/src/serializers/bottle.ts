@@ -3,11 +3,12 @@ import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import type { Bottle, Flight, User } from "../db/schema";
+import type { Bottle, User } from "../db/schema";
 import {
   bottleReleases,
   bottleSeries,
   bottlesToDistillers,
+  catalogTargets,
   collectionBottles,
   collections,
   entities,
@@ -32,20 +33,29 @@ type Attrs = {
   displayImageUrl: string | null;
 };
 
-type Context =
-  | {
-      flight?: Flight | null;
-    }
-  | undefined;
-
 export const BottleSerializer = serializer({
   name: "bottle",
   attrs: async (
     itemList: Bottle[],
     currentUser?: User,
-    context?: Context,
   ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
+    // Actor state belongs to exact targets; retained consumer pairs are compatibility only.
+    const exactTargets = itemIds.length
+      ? await db
+          .select({
+            id: catalogTargets.id,
+            bottleId: catalogTargets.bottleId,
+          })
+          .from(catalogTargets)
+          .where(inArray(catalogTargets.bottleId, itemIds))
+      : [];
+    const targetIdByBottleId = new Map(
+      exactTargets.flatMap((target) =>
+        target.bottleId === null ? [] : [[target.bottleId, target.id] as const],
+      ),
+    );
+    const exactTargetIds = exactTargets.map((target) => target.id);
     const missingImageIds = itemList
       .filter((item) => !item.imageUrl)
       .map((item) => item.id);
@@ -138,10 +148,10 @@ export const BottleSerializer = serializer({
       else distillersByBottleId[d.bottleId].push(entitiesById[d.distillerId]);
     });
 
-    const getReservedCollectionBottleSet = async (
+    const getReservedCollectionTargetSet = async (
       collectionSlug: ReservedCollectionSlug,
     ) => {
-      if (!currentUser || !itemIds.length) {
+      if (!currentUser || !exactTargetIds.length) {
         return new Set<number>();
       }
 
@@ -157,61 +167,49 @@ export const BottleSerializer = serializer({
       return new Set(
         (
           await db
-            .selectDistinct({ bottleId: collectionBottles.bottleId })
+            .selectDistinct({ targetId: collectionBottles.targetId })
             .from(collectionBottles)
             .where(
               and(
-                inArray(collectionBottles.bottleId, itemIds),
+                inArray(collectionBottles.targetId, exactTargetIds),
                 eq(collectionBottles.collectionId, collection.id),
               ),
             )
-        ).map((r) => r.bottleId),
+        ).flatMap((row) => (row.targetId === null ? [] : [row.targetId])),
       );
     };
 
     const [favoriteSet, librarySet] = await Promise.all([
-      getReservedCollectionBottleSet("default"),
-      getReservedCollectionBottleSet("library"),
+      getReservedCollectionTargetSet("default"),
+      getReservedCollectionTargetSet("library"),
     ]);
 
-    // identify bottles which have a tasting recorded for the current user
-    // note: this is contextual based on the query - if they're asking for a flight,
-    // said flight should be available in the context and this will reflect
-    // if they've recorded a tasting _in that context_
-    const tastedSet = currentUser
-      ? new Set(
-          (context?.flight
-            ? await db
-                .selectDistinct({ bottleId: tastings.bottleId })
+    const tastedSet =
+      currentUser && exactTargetIds.length
+        ? new Set(
+            (
+              await db
+                .selectDistinct({ targetId: tastings.targetId })
                 .from(tastings)
                 .where(
                   and(
-                    inArray(tastings.bottleId, itemIds),
-                    eq(tastings.flightId, context.flight.id),
+                    inArray(tastings.targetId, exactTargetIds),
                     eq(tastings.createdById, currentUser.id),
                   ),
                 )
-            : await db
-                .selectDistinct({ bottleId: tastings.bottleId })
-                .from(tastings)
-                .where(
-                  and(
-                    inArray(tastings.bottleId, itemIds),
-                    eq(tastings.createdById, currentUser.id),
-                  ),
-                )
-          ).map((r) => r.bottleId),
-        )
-      : new Set();
+            ).flatMap((row) => (row.targetId === null ? [] : [row.targetId])),
+          )
+        : new Set();
 
     return Object.fromEntries(
       itemList.map((item) => {
+        const targetId = targetIdByBottleId.get(item.id);
         return [
           item.id,
           {
-            isFavorite: favoriteSet.has(item.id),
-            isLibrary: librarySet.has(item.id),
-            hasTasted: tastedSet.has(item.id),
+            isFavorite: targetId ? favoriteSet.has(targetId) : false,
+            isLibrary: targetId ? librarySet.has(targetId) : false,
+            hasTasted: targetId ? tastedSet.has(targetId) : false,
             numReleases: releaseCountByBottleId[item.id] ?? 0,
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
@@ -225,12 +223,7 @@ export const BottleSerializer = serializer({
     );
   },
 
-  item: (
-    item: Bottle,
-    attrs: Attrs,
-    currentUser?: User,
-    context?: Context,
-  ): z.infer<typeof BottleSchema> => {
+  item: (item: Bottle, attrs: Attrs): z.infer<typeof BottleSchema> => {
     return {
       id: item.id,
 

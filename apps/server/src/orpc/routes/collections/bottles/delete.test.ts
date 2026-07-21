@@ -118,7 +118,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
     ).toMatchObject({ totalBottles: 0 });
   });
 
-  test("deletes a generic target membership by base-only intent", async ({
+  test("deletes a generic target membership by target identity", async ({
     fixtures,
     defaults,
   }) => {
@@ -142,8 +142,7 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       {
         user: "me",
         collection: collection.id,
-        bottle: parent.id,
-        baseOnly: true,
+        target: targetId,
       },
       { context: { user: defaults.user } },
     );
@@ -158,6 +157,130 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
         where: eq(collections.id, collection.id),
       }),
     ).toMatchObject({ totalBottles: 0 });
+  });
+
+  test("rejects incomplete or ambiguous target-native delete identity", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const targetId = await getExactTargetId(bottle.id);
+    const collection = await fixtures.Collection({
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    const [membership] = await db
+      .insert(collectionBottles)
+      .values({
+        bottleId: bottle.id,
+        collectionId: collection.id,
+        targetId,
+      })
+      .returning();
+
+    type DeleteInput = Parameters<
+      typeof routerClient.collections.bottles.delete
+    >[0];
+    const invalidInputs = [
+      ["missing catalog reference", { user: "me", collection: collection.id }],
+      [
+        "combined CatalogTarget and base-only intent",
+        {
+          user: "me",
+          collection: collection.id,
+          target: targetId,
+          baseOnly: true,
+        },
+      ],
+      [
+        "combined CatalogTarget and Bottle",
+        {
+          user: "me",
+          collection: collection.id,
+          target: targetId,
+          bottle: bottle.id,
+        },
+      ],
+      [
+        "combined CatalogTarget and BottleRelease",
+        {
+          user: "me",
+          collection: collection.id,
+          target: targetId,
+          release: 1,
+        },
+      ],
+    ] as unknown as [string, DeleteInput][];
+
+    for (const [label, input] of invalidInputs) {
+      const error = await waitError(() =>
+        routerClient.collections.bottles.delete(input, {
+          context: { user: defaults.user },
+        }),
+      );
+      expect(error, label).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Input validation failed",
+      });
+    }
+    expect(
+      await db.query.collectionBottles.findFirst({
+        where: eq(collectionBottles.id, membership!.id),
+      }),
+    ).toBeDefined();
+    expect(
+      await db.query.collections.findFirst({
+        where: eq(collections.id, collection.id),
+      }),
+    ).toMatchObject({ totalBottles: 1 });
+  });
+
+  test("target-native delete preserves unrelated targetless compatibility rows", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const targetBottle = await fixtures.Bottle();
+    const targetlessBottle = await fixtures.Bottle();
+    const targetId = await getExactTargetId(targetBottle.id);
+    const collection = await fixtures.Collection({
+      createdById: defaults.user.id,
+      totalBottles: 2,
+    });
+    const [, targetlessMembership] = await db
+      .insert(collectionBottles)
+      .values([
+        {
+          bottleId: targetBottle.id,
+          collectionId: collection.id,
+          targetId,
+        },
+        {
+          bottleId: targetlessBottle.id,
+          collectionId: collection.id,
+          targetId: null,
+        },
+      ])
+      .returning();
+
+    await routerClient.collections.bottles.delete(
+      { user: "me", collection: collection.id, target: targetId },
+      { context: { user: defaults.user } },
+    );
+
+    const remaining = await db.query.collectionBottles.findMany({
+      where: eq(collectionBottles.collectionId, collection.id),
+    });
+    expect(remaining).toEqual([
+      expect.objectContaining({
+        id: targetlessMembership!.id,
+        targetId: null,
+      }),
+    ]);
+    expect(
+      await db.query.collections.findFirst({
+        where: eq(collections.id, collection.id),
+      }),
+    ).toMatchObject({ totalBottles: 1 });
   });
 
   test("deletes a promoted release membership by its exact target", async ({

@@ -24,18 +24,36 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import {
-  CollectionBottleInputSchema,
+  CollectionBottleLegacyInputSchema,
   CollectionBottleSchema,
+  CollectionBottleTargetInputSchema,
 } from "@peated/server/schemas";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
-  copyPendingImageForCollectionBottle,
-  findCollectionBottleWithTarget,
+  findCollectionBottleEntry,
   isLibraryCollection,
   serializeCollectionBottleEntry,
+} from "./collectionBottleHelpers";
+import {
+  copyPendingImageForCollectionBottle,
   validatePendingImageForCollectionBottle,
 } from "./imageHelpers";
+
+const CollectionBottleCreateCommonInputSchema = z.object({
+  collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+  pendingImageId: z.string().trim().min(1).optional(),
+  user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
+});
+
+const CollectionBottleCreateInputSchema = z.union([
+  CollectionBottleCreateCommonInputSchema.extend(
+    CollectionBottleTargetInputSchema.shape,
+  ).strict(),
+  CollectionBottleCreateCommonInputSchema.extend(
+    CollectionBottleLegacyInputSchema.shape,
+  ).strict(),
+]);
 
 export default procedure
   .use(requireAuth)
@@ -43,20 +61,71 @@ export default procedure
   .route({
     method: "POST",
     path: "/users/{user}/collections/{collection}/bottles",
-    summary: "Add bottle to collection",
+    summary: "Add a CatalogTarget to a collection",
     description:
-      "Add a bottle (and optionally a specific release) to a user's collection. Requires authentication and ownership",
+      "Add one authoritative exact-Bottle or generic-BottleGroup CatalogTarget to a user's collection. Staged retained Bottle/BottleRelease input is translated to that target. Generic target creation remains blocked until collection storage no longer requires a retained Bottle. Requires authentication and ownership.",
     operationId: "addBottleToCollection",
+    spec: (spec) => {
+      const requestBody = spec.requestBody;
+      if (!requestBody || "$ref" in requestBody) return spec;
+      const json = requestBody.content?.["application/json"];
+      const schema = json?.schema;
+      if (
+        !schema ||
+        typeof schema === "boolean" ||
+        "$ref" in schema ||
+        schema.type !== "object"
+      ) {
+        return spec;
+      }
+      const properties = schema.properties ?? {};
+      const oneOf: NonNullable<typeof schema.oneOf> = [
+        {
+          type: "object",
+          properties: {
+            pendingImageId: properties.pendingImageId,
+            status: properties.status,
+            target: properties.target,
+          },
+          required: ["target"],
+          additionalProperties: false,
+        },
+        {
+          type: "object",
+          properties: {
+            bottle: properties.bottle,
+            pendingImageId: properties.pendingImageId,
+            release: properties.release,
+            status: properties.status,
+          },
+          required: ["bottle"],
+          additionalProperties: false,
+        },
+      ];
+      return {
+        ...spec,
+        requestBody: {
+          ...requestBody,
+          required: true,
+          content: {
+            ...requestBody.content,
+            "application/json": {
+              ...json,
+              schema: { oneOf },
+            },
+          },
+        },
+      };
+    },
   })
-  .input(
-    CollectionBottleInputSchema.extend({
-      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
-      pendingImageId: z.string().trim().min(1).optional(),
-      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-    }),
-  )
+  .input(CollectionBottleCreateInputSchema)
   .output(CollectionBottleSchema)
   .handler(async function ({ input, context, errors }) {
+    const targetInput = "target" in input ? { target: input.target } : null;
+    const legacyInput =
+      "bottle" in input
+        ? { bottle: input.bottle, release: input.release }
+        : null;
     const statusProvided = Object.hasOwn(input, "status");
     const user = await getUserFromId(db, input.user, context.user);
     if (!user) {
@@ -92,21 +161,23 @@ export default procedure
       });
     }
 
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, input.bottle));
-    if (!bottle) {
-      throw errors.NOT_FOUND({
-        message: "Cannot find bottle.",
-      });
+    if (legacyInput) {
+      const [bottle] = await db
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(eq(bottles.id, legacyInput.bottle));
+      if (!bottle) {
+        throw errors.NOT_FOUND({
+          message: "Cannot find bottle.",
+        });
+      }
     }
 
-    if (input.release) {
+    if (legacyInput?.release) {
       const release = await db.query.bottleReleases.findFirst({
         where: and(
-          eq(bottleReleases.id, input.release),
-          eq(bottleReleases.bottleId, bottle.id),
+          eq(bottleReleases.id, legacyInput.release),
+          eq(bottleReleases.bottleId, legacyInput.bottle),
         ),
       });
       if (!release) {
@@ -149,18 +220,34 @@ export default procedure
     collectionBottleResult = await db.transaction(async (tx) => {
       // CatalogTarget must be locked before collection membership rows.
       const target = await resolveCatalogTargetForAssignment(
-        {
-          kind: "legacy",
-          bottleId: bottle.id,
-          releaseId: input.release ?? null,
-          context: {
-            caller: "collections.bottles.create",
-            operation: "create",
-          },
-        },
+        targetInput
+          ? { kind: "target", targetId: targetInput.target }
+          : {
+              kind: "legacy",
+              bottleId: legacyInput!.bottle,
+              releaseId: legacyInput!.release ?? null,
+              context: {
+                caller: "collections.bottles.create",
+                operation: "create",
+              },
+            },
         tx,
       );
       await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+      if (targetInput && target.bottleId === null) {
+        // Retained storage still requires bottleId; tasks 8.7 and 9.6 remove
+        // that column before generic target-native creation can be enabled.
+        throw errors.BAD_REQUEST({
+          message:
+            "Generic collection creation requires target-native collection storage.",
+        });
+      }
+      const retainedBottleId = targetInput
+        ? target.bottleId!
+        : legacyInput!.bottle;
+      const retainedReleaseId = targetInput
+        ? null
+        : (legacyInput!.release ?? null);
 
       const findTargetMembership = async () => {
         const [membership] = await tx
@@ -183,9 +270,9 @@ export default procedure
           .where(
             and(
               eq(collectionBottles.collectionId, collection.id),
-              eq(collectionBottles.bottleId, bottle.id),
-              input.release != null
-                ? eq(collectionBottles.releaseId, input.release)
+              eq(collectionBottles.bottleId, retainedBottleId),
+              retainedReleaseId !== null
+                ? eq(collectionBottles.releaseId, retainedReleaseId)
                 : isNull(collectionBottles.releaseId),
             ),
           )
@@ -268,8 +355,8 @@ export default procedure
         .insert(collectionBottles)
         .values({
           collectionId: collection.id,
-          bottleId: bottle.id,
-          releaseId: input.release ?? null,
+          bottleId: retainedBottleId,
+          releaseId: retainedReleaseId,
           targetId: target.targetId,
           status: statusProvided ? (input.status ?? null) : null,
         })
@@ -389,7 +476,7 @@ export default procedure
       }
     }
 
-    const result = await findCollectionBottleWithTarget({
+    const result = await findCollectionBottleEntry({
       collectionBottleId: collectionBottle.id,
       collectionId: collection.id,
     });

@@ -110,16 +110,32 @@ The Drizzle owners are:
 
 ## Serializers and read models
 
-- `apps/server/src/serializers/bottle.ts`
+- `apps/server/src/serializers/bottle.ts` now derives current-user favorite,
+  Library, and tasted state only through each concrete Bottle's exact
+  CatalogTarget. Generic targets and drifted retained Bottle ids cannot mark a
+  representative or unrelated Bottle.
 - `apps/server/src/serializers/bottleRelease.ts`
-- `apps/server/src/serializers/collectionBottle.ts`
+- `apps/server/src/serializers/collectionBottle.ts` now batch-hydrates the
+  membership's authoritative CatalogTarget through the shared read-parity
+  owner. Its response contains one required discriminated target and no
+  BottleRelease-shaped nesting. A targetless membership is an integrity error;
+  a retained-pair mismatch is evidence and cannot override the durable target.
+  Current-user tasted state is likewise keyed by that target.
+- `apps/server/src/serializers/flight.ts` keeps the bounded base Flight response
+  target-free while its details serializer batch-hydrates ordered exact or
+  generic membership targets with composite `flight_bottle` parity locators.
+  Its Flight-specific projection adds target-owned distillers plus target-keyed
+  Library and per-Flight tasted state without adding actor state to the shared
+  CatalogTarget identity contract.
 - `apps/server/src/serializers/review.ts` and
   `apps/server/src/serializers/tasting.ts` now hydrate their authoritative
   CatalogTargets and compare them with the retained pair through the shared
   parity reader. Tasting activity entries reuse the target-backed tasting
-  serializer. Tasks 7.1-7.3 remain open for collections, flights, prices,
-  aliases, observations, decisions, proposals, and remaining activity reads.
-- `apps/server/src/lib/activityFeed.ts`
+  serializer. Tasks 7.1-7.3 remain open for prices, aliases, observations,
+  decisions, proposals, and remaining activity reads.
+- `apps/server/src/lib/activityFeed.ts` passes raw collection memberships to
+  the target-backed serializer; it no longer joins retained Bottle or
+  BottleRelease identity for collection previews.
 - `apps/server/src/orpc/routes/users/library-stats.ts`
 
 ## API routes
@@ -207,22 +223,41 @@ Target-bearing consumer routes:
   is owned by a different durable target. When a canonical row and matching
   targetless duplicate coexist, the canonical row wins with only blank-image
   fill from the compatibility row and an atomic count correction; status,
-  ownership, and other unit state are preserved.
+  ownership, and other unit state are preserved. Target-native exact input
+  stores the independently complete Bottle with a null retained release. The
+  generated contract and runtime validator expose target-native and retained
+  identity as two strict complete alternatives, so clients cannot combine or
+  omit the identity discriminant.
+  Target-native generic creation remains unavailable while the retained
+  `collection_bottle.bottleId` column is non-null; it never invents the
+  representative Bottle. Existing generic rows support target-native read,
+  filter, delete, status, and image actions. The remaining generic-create
+  storage/input cutover stays mapped to tasks 8.7 and 9.6.
 - `apps/server/src/orpc/routes/collections/bottles/delete.ts` is the task 5.6d
   target-aware removal boundary for release-specific and `baseOnly` requests.
-  When a target resolves, it locks that target first, deletes its authoritative
-  membership plus a matching targetless legacy fallback, and preserves
-  different durable targets. An ungrouped parent or release without completed
-  promotion may delete only its matching null-target retained-pair row as
-  measured staged compatibility, never a durable target; section 6 backfills
-  those rows and task 9.7 removes the fallback. A request with neither `release`
-  nor `baseOnly` remains measured retained-parent family-delete compatibility
-  assigned to task 9.7 because it intentionally spans multiple memberships;
-  exact UI removal uses `baseOnly`.
-- `apps/server/src/orpc/routes/collections/bottles/imageHelpers.ts`
-- `apps/server/src/orpc/routes/collections/bottles/list.ts` remains a retained
-  pair read until task 7.3. Existing-row collection target backfill remains
-  section 6, and pair storage/removal remains tasks 9.6/9.7.
+  Target input locks and deletes only its authoritative membership. A specific
+  retained input may delete that resolved target plus its caller-pair
+  targetless fallback while preserving different durable targets. An ungrouped
+  parent or release without completed promotion may delete only its matching
+  null-target retained-pair row as measured staged compatibility, never a
+  durable target; section 6 backfills those rows and task 9.7 removes the
+  fallback. A request with neither `release` nor `baseOnly` remains measured
+  retained-parent family-delete compatibility assigned to task 9.7 because it
+  intentionally spans multiple memberships; target-backed Library removal uses
+  the target id directly. Its generated contract likewise exposes distinct
+  strict target-native and retained alternatives, structurally excluding
+  `baseOnly`, Bottle, and BottleRelease fields from target-native requests.
+- `apps/server/src/orpc/routes/collections/bottles/collectionBottleHelpers.ts`
+  owns collection-entry loading, authoritative serialization, and the reserved
+  Library predicate shared by list, status, image, and create routes.
+- `apps/server/src/orpc/routes/collections/bottles/imageHelpers.ts` owns only
+  pending-image purpose, validation, and copy behavior.
+- `apps/server/src/orpc/routes/collections/bottles/list.ts` now filters, orders,
+  and returns authoritative target-backed membership identity. Query, entity,
+  and retained catalog-reference filters record bounded target-versus-pair
+  membership parity; the retained Bottle/Release filter is a measured adapter
+  removed under task 9.7. Existing-row target backfill remains section 6, and
+  pair storage/removal remains tasks 9.6/9.7.
 - `apps/server/src/orpc/routes/reviews/create.ts` is a direct user/API Review
   writer assigned to task 5.6c. For known exact or generic intent it resolves
   one descriptor, locks/revalidates it before Review mutation, writes the
@@ -275,6 +310,14 @@ Target-bearing consumer routes:
   set. Reads, existing-row backfill, target-native input, and pair cleanup remain
   tasks 7.3, section 6, 8.7, and 9.6/9.7 respectively; this slice makes no
   deployment claim.
+- `apps/server/src/orpc/routes/flights/details.ts` now returns the Flight's
+  authoritative ordered CatalogTargets with target-owned distillers and
+  target-keyed viewer state. Generic members remain group identity without
+  representative substitution. The superseded `flight` filter on the ordinary
+  Bottle list was removed because it could expose a retained Bottle as exact
+  identity for a generic membership. Flight list/create/update keep their
+  bounded target-free response; target-native membership input remains task
+  8.7.
 - `apps/server/src/orpc/routes/tastings/create.ts`
 - `apps/server/src/orpc/routes/tastings/delete.ts`
 - `apps/server/src/orpc/routes/tastings/list.ts` now filters and returns
@@ -852,6 +895,19 @@ Shared UI and client helpers:
 - `apps/web/src/components/releaseForm.tsx`
 - `apps/web/src/components/tastingForm.tsx`
 - `apps/web/src/lib/addBottle.ts`
+- Collection tables, activity previews, image/status actions, and the
+  post-scan Library confirmation now render one CatalogTarget. Exact entries
+  link their independently complete Bottle; generic entries show the group
+  label and scope without a Bottle link or representative. Existing generic
+  Library entries mutate by target id, while generic creation remains disabled
+  at the non-null retained-Bottle storage boundary described above.
+- Flight detail, overlay, and edit routes consume the details response's target
+  list directly. Exact entries retain their quick panel, Flight-scoped tasting
+  action, target-keyed status indicators, and distiller display. Generic
+  memberships cannot start an exact tasting or be rewritten through the staged
+  Bottle-id form; metadata edits preserve them. Exact-only membership editing
+  remains the measured task 8.7 compatibility input until every target-bearing
+  flow is target-native.
 - `apps/web/src/lib/tastingForm.ts` shapes the validated form submission. Create
   still carries the staged Bottle/Release identity until task 8.7 moves tasting
   creation to one `targetId`; edit is content-only and cannot mutate identity.

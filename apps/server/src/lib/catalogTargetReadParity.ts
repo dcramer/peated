@@ -18,15 +18,30 @@ type CatalogTargetReadParityIdentity = {
   };
 };
 
-export type CatalogTargetReadParityItem = CatalogTargetReadParityIdentity & {
-  consumerTable: "review" | "tasting";
-  rowLocator: { id: number };
-};
+type CorrelatedConsumerLocator =
+  | {
+      consumerTable: "collection_bottle";
+      rowLocator: { id: number };
+    }
+  | {
+      consumerTable: "flight_bottle";
+      rowLocator: {
+        bottleId: number;
+        flightId: number;
+        releaseId: number | null;
+      };
+    }
+  | {
+      consumerTable: "review";
+      rowLocator: { id: number };
+    }
+  | {
+      consumerTable: "tasting";
+      rowLocator: { id: number };
+    };
 
-type CorrelatedConsumerLocator = Pick<
-  CatalogTargetReadParityItem,
-  "consumerTable" | "rowLocator"
->;
+export type CatalogTargetReadParityItem = CatalogTargetReadParityIdentity &
+  CorrelatedConsumerLocator;
 
 type CatalogTargetReadParityMismatchDetails = {
   legacyBottleId: number | null;
@@ -64,7 +79,7 @@ export type CatalogTargetReadParityResult = {
 
 export type CatalogTargetReadFilterParityCandidate =
   CatalogTargetReadParityItem & {
-    filter: "catalog_reference" | "entity" | "only_unknown";
+    filter: "catalog_reference" | "entity" | "only_unknown" | "query";
     targetMatches: boolean;
     legacyMatches: boolean;
   };
@@ -122,6 +137,33 @@ function recordMismatch(mismatch: CatalogTargetReadParityMismatch): void {
   });
 }
 
+function consumerLocator(
+  item: CatalogTargetReadParityItem,
+): CorrelatedConsumerLocator {
+  switch (item.consumerTable) {
+    case "collection_bottle":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+    case "flight_bottle":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+    case "review":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+    case "tasting":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+  }
+}
+
 /** Records bounded route-filter membership drift without changing list results. */
 export function recordCatalogTargetReadFilterParity(
   candidates: CatalogTargetReadFilterParityCandidate[],
@@ -136,8 +178,7 @@ export function recordCatalogTargetReadFilterParity(
   return candidates.flatMap((candidate) => {
     if (candidate.targetMatches === candidate.legacyMatches) return [];
     const mismatch: CatalogTargetReadFilterParityMismatch = {
-      consumerTable: candidate.consumerTable,
-      rowLocator: candidate.rowLocator,
+      ...consumerLocator(candidate),
       legacyBottleId: candidate.legacy.bottleId,
       legacyReleaseId: candidate.legacy.releaseId,
       targetId: candidate.targetId,
@@ -164,8 +205,7 @@ function mismatchFor(
   legacyResolution: CatalogIdentityResolution,
 ): CatalogTargetReadParityMismatch {
   return {
-    consumerTable: item.consumerTable,
-    rowLocator: item.rowLocator,
+    ...consumerLocator(item),
     legacyBottleId: item.legacy.bottleId,
     legacyReleaseId: item.legacy.releaseId,
     targetId: item.targetId,

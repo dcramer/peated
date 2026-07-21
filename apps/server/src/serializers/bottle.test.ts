@@ -10,10 +10,17 @@ import {
   entities,
   users,
 } from "../db/schema";
-import { getUserActor } from "../lib/actors";
 import { RESERVED_COLLECTIONS } from "../lib/db";
-import { Entity, User } from "../lib/test/fixtures";
 import { BottleSerializer } from "./bottle";
+
+async function getExactTargetId(bottleId: number): Promise<number> {
+  const target = await db.query.catalogTargets.findFirst({
+    where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottleId),
+    columns: { id: true },
+  });
+  if (!target) throw new Error("Missing exact CatalogTarget fixture");
+  return target.id;
+}
 
 describe("BottleSerializer", () => {
   beforeEach(async () => {
@@ -26,31 +33,14 @@ describe("BottleSerializer", () => {
   });
 
   describe("isFavorite", () => {
-    it("should be false when another user has favorited the bottle", async () => {
-      // Create two users - one who will favorite the bottle and one who will view it
-      const favoriter = await User();
-      const viewer = await User();
-      const favoriterActor = await getUserActor(favoriter);
+    it("should be false when another user has favorited the bottle", async ({
+      fixtures,
+    }) => {
+      const favoriter = await fixtures.User();
+      const viewer = await fixtures.User();
+      const bottle = await fixtures.Bottle();
+      const targetId = await getExactTargetId(bottle.id);
 
-      // Create a brand entity for the bottle
-      const brand = await Entity({
-        name: "Test Brand",
-        type: ["brand"],
-        createdByActorId: favoriterActor.id,
-      });
-
-      // Create a bottle
-      const [bottle] = await db
-        .insert(bottles)
-        .values({
-          brandId: brand.id,
-          name: "Test Bottle",
-          fullName: "Test Brand Test Bottle",
-          createdByActorId: brand.createdByActorId,
-        })
-        .returning();
-
-      // Create default collection for the favoriter
       const [collection] = await db
         .insert(collections)
         .values({
@@ -62,35 +52,21 @@ describe("BottleSerializer", () => {
       // Add bottle to favoriter's collection
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
+        targetId,
         collectionId: collection.id,
       });
 
-      // Serialize the bottle for the viewer
       const [result] = await serialize(BottleSerializer, [bottle], viewer);
 
-      // The bottle should not be marked as favorite for the viewer
       expect(result.isFavorite).toBe(false);
     });
 
-    it("should reflect the current user's legacy default collection", async () => {
-      const viewer = await User();
-      const viewerActor = await getUserActor(viewer);
-
-      const brand = await Entity({
-        name: "Legacy Brand",
-        type: ["brand"],
-        createdByActorId: viewerActor.id,
-      });
-
-      const [bottle] = await db
-        .insert(bottles)
-        .values({
-          brandId: brand.id,
-          name: "Legacy Bottle",
-          fullName: "Legacy Brand Legacy Bottle",
-          createdByActorId: brand.createdByActorId,
-        })
-        .returning();
+    it("should reflect the current user's legacy default collection", async ({
+      fixtures,
+    }) => {
+      const viewer = await fixtures.User();
+      const bottle = await fixtures.Bottle({ name: "Legacy Bottle" });
+      const targetId = await getExactTargetId(bottle.id);
 
       const [legacyCollection] = await db
         .insert(collections)
@@ -102,6 +78,7 @@ describe("BottleSerializer", () => {
 
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
+        targetId,
         collectionId: legacyCollection.id,
       });
 
@@ -113,26 +90,13 @@ describe("BottleSerializer", () => {
   });
 
   describe("isLibrary", () => {
-    it("should reflect the current user's library collection only", async () => {
-      const owner = await User();
-      const viewer = await User();
-      const ownerActor = await getUserActor(owner);
-
-      const brand = await Entity({
-        name: "Library Brand",
-        type: ["brand"],
-        createdByActorId: ownerActor.id,
-      });
-
-      const [bottle] = await db
-        .insert(bottles)
-        .values({
-          brandId: brand.id,
-          name: "Library Bottle",
-          fullName: "Library Brand Library Bottle",
-          createdByActorId: brand.createdByActorId,
-        })
-        .returning();
+    it("should reflect the current user's library collection only", async ({
+      fixtures,
+    }) => {
+      const owner = await fixtures.User();
+      const viewer = await fixtures.User();
+      const bottle = await fixtures.Bottle({ name: "Library Bottle" });
+      const targetId = await getExactTargetId(bottle.id);
 
       const [ownerLibrary] = await db
         .insert(collections)
@@ -144,6 +108,7 @@ describe("BottleSerializer", () => {
 
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
+        targetId,
         collectionId: ownerLibrary.id,
       });
 
@@ -165,6 +130,7 @@ describe("BottleSerializer", () => {
 
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
+        targetId,
         collectionId: viewerLibrary.id,
       });
 
@@ -172,6 +138,86 @@ describe("BottleSerializer", () => {
 
       expect(result.isLibrary).toBe(true);
       expect(result.isFavorite).toBe(false);
+    });
+  });
+
+  it("derives actor state only from exact CatalogTarget identity", async ({
+    fixtures,
+  }) => {
+    const viewer = await fixtures.User();
+    const exactBottle = await fixtures.Bottle({ name: "Exact Target" });
+    const otherBottle = await fixtures.Bottle({ name: "Other Target" });
+    const exactTargetId = await getExactTargetId(exactBottle.id);
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: (catalogTargets, { and, eq, isNull }) =>
+        and(
+          eq(catalogTargets.groupId, otherBottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+    });
+    if (!genericTarget)
+      throw new Error("Missing generic CatalogTarget fixture");
+
+    const [favorites, library] = await db
+      .insert(collections)
+      .values([
+        {
+          name: RESERVED_COLLECTIONS.default.name,
+          createdById: viewer.id,
+        },
+        {
+          name: RESERVED_COLLECTIONS.library.name,
+          createdById: viewer.id,
+        },
+      ])
+      .returning();
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: favorites.id,
+        bottleId: otherBottle.id,
+        targetId: exactTargetId,
+      },
+      {
+        collectionId: library.id,
+        bottleId: otherBottle.id,
+        targetId: genericTarget.id,
+      },
+    ]);
+    await fixtures.Tasting({
+      bottleId: otherBottle.id,
+      targetId: exactTargetId,
+      createdById: viewer.id,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    await fixtures.Tasting({
+      bottleId: otherBottle.id,
+      targetId: genericTarget.id,
+      createdById: viewer.id,
+      createdAt: new Date("2026-01-02T00:00:00.000Z"),
+    });
+
+    const [exactResult, otherResult] = await serialize(
+      BottleSerializer,
+      [exactBottle, otherBottle],
+      viewer,
+    );
+    expect(exactResult).toMatchObject({
+      isFavorite: true,
+      isLibrary: false,
+      hasTasted: true,
+    });
+    expect(otherResult).toMatchObject({
+      isFavorite: false,
+      isLibrary: false,
+      hasTasted: false,
+    });
+
+    const anonymousResults = await serialize(BottleSerializer, [exactBottle]);
+    expect(anonymousResults[0]).toMatchObject({
+      isFavorite: false,
+      isLibrary: false,
+      hasTasted: false,
     });
   });
 

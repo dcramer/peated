@@ -1,64 +1,81 @@
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
-import { serialize, serializer } from ".";
+import { serializer } from ".";
 import config from "../config";
-import type {
-  Bottle,
-  BottleRelease,
-  CollectionBottle,
-  User,
-} from "../db/schema";
-import { notEmpty } from "../lib/filter";
+import { db } from "../db";
+import { type CollectionBottle, tastings, type User } from "../db/schema";
+import { loadCatalogTargetReadsWithParity } from "../lib/catalogTargetReadParity";
+import { CatalogTargetIntegrityMismatchError } from "../lib/catalogTargets";
 import { absoluteUrl } from "../lib/urls";
 import { type CollectionBottleSchema } from "../schemas";
-import { BottleSerializer } from "./bottle";
-import { BottleReleaseSerializer } from "./bottleRelease";
+import type { CatalogTargetV1 } from "../schemas/catalogIdentity";
 
 type CollectionBottleAttrs = {
-  bottle: ReturnType<(typeof BottleSerializer)["item"]>;
-  release: ReturnType<(typeof BottleReleaseSerializer)["item"]> | null;
+  target: CatalogTargetV1;
+  hasTasted: boolean;
 };
 
 export const CollectionBottleSerializer = serializer({
   name: "collectionBottle",
   attrs: async (
-    itemList: (CollectionBottle & {
-      bottle: Bottle;
-      release: BottleRelease | null;
-    })[],
+    itemList: CollectionBottle[],
     currentUser?: User,
   ): Promise<Record<number, CollectionBottleAttrs>> => {
-    const bottleList = itemList.map((i) => i.bottle);
-    const bottlesById = Object.fromEntries(
-      (await serialize(BottleSerializer, bottleList, currentUser)).map(
-        (data, index) => [bottleList[index].id, data],
-      ),
+    const { targets } = await loadCatalogTargetReadsWithParity(
+      itemList.map((item) => ({
+        consumerTable: "collection_bottle",
+        rowLocator: { id: item.id },
+        targetId: item.targetId,
+        legacy: { bottleId: item.bottleId, releaseId: item.releaseId },
+      })),
+      {
+        actor: null,
+        permissions: { canReadCatalogIdentity: true },
+        caller: "CollectionBottleSerializer",
+        operation: "serialize",
+      },
     );
-
-    const releaseList = itemList.map((i) => i.release).filter(notEmpty);
-    const releasesById = Object.fromEntries(
-      (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
-        (data, index) => [releaseList[index].id, data],
-      ),
+    const targetIds = targets.flatMap((target) =>
+      target ? [target.targetId] : [],
+    );
+    const tastedTargetIds = new Set(
+      currentUser && targetIds.length
+        ? (
+            await db
+              .selectDistinct({ targetId: tastings.targetId })
+              .from(tastings)
+              .where(
+                and(
+                  eq(tastings.createdById, currentUser.id),
+                  inArray(tastings.targetId, targetIds),
+                ),
+              )
+          ).flatMap(({ targetId }) => (targetId === null ? [] : [targetId]))
+        : [],
     );
     return Object.fromEntries(
-      itemList.map((item) => {
+      itemList.map((item, index) => {
+        const target = targets[index];
+        if (!target) {
+          throw new CatalogTargetIntegrityMismatchError(
+            { bottleId: item.bottleId },
+            `collection membership ${item.id} has no durable CatalogTarget`,
+          );
+        }
         return [
           item.id,
           {
-            bottle: bottlesById[item.bottleId],
-            release: item.releaseId ? releasesById[item.releaseId] : null,
+            target,
+            hasTasted: tastedTargetIds.has(target.targetId),
           },
         ];
       }),
     );
   },
   item: (
-    item: CollectionBottle & {
-      bottle: Bottle;
-      release: BottleRelease | null;
-    },
+    item: CollectionBottle,
     attrs: CollectionBottleAttrs,
-    currentUser?: User,
+    _currentUser?: User,
   ): z.infer<typeof CollectionBottleSchema> => {
     return {
       id: item.id,
@@ -66,8 +83,8 @@ export const CollectionBottleSerializer = serializer({
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
       status: item.status,
-      bottle: attrs.bottle,
-      release: attrs.release,
+      target: attrs.target,
+      hasTasted: attrs.hasTasted,
     };
   },
 });

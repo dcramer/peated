@@ -1,7 +1,7 @@
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { describe, expect, expectTypeOf, it } from "vitest";
-import router, { type Outputs } from "../orpc/router";
+import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
   BottleSchema,
   CursorSchema,
@@ -30,6 +30,10 @@ async function generateSpec() {
 function getJsonResponseSchema(operation: any) {
   const response = operation?.responses?.[200] ?? operation?.responses?.["200"];
   return response?.content?.["application/json"]?.schema as any;
+}
+
+function getJsonRequestSchema(operation: any) {
+  return operation?.requestBody?.content?.["application/json"]?.schema as any;
 }
 
 function getOperationIds(spec: Awaited<ReturnType<typeof generateSpec>>) {
@@ -160,5 +164,106 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<
       Outputs["tastings"]["photoIdentificationCreate"]["release"]
     >().toEqualTypeOf<null>();
+  });
+
+  it("publishes explicit target-native and retained collection input variants", async () => {
+    const spec = await generateSpec();
+    const createSchema = getJsonRequestSchema(
+      spec.paths?.["/users/{user}/collections/{collection}/bottles"]?.post,
+    );
+    const deleteSchema = getJsonRequestSchema(
+      spec.paths?.["/users/{user}/collections/{collection}/bottles"]?.delete,
+    );
+    const createAlternatives = createSchema?.oneOf;
+    const deleteAlternatives = deleteSchema?.oneOf;
+
+    expect(createAlternatives).toHaveLength(2);
+    expect(deleteAlternatives).toHaveLength(2);
+
+    const targetCreate = createAlternatives?.find(
+      (schema: any) => schema.properties?.target,
+    );
+    const legacyCreate = createAlternatives?.find(
+      (schema: any) => schema.properties?.bottle,
+    );
+    expect(targetCreate).toMatchObject({
+      type: "object",
+      required: ["target"],
+      additionalProperties: false,
+      properties: {
+        target: { type: "integer", exclusiveMinimum: 0 },
+        pendingImageId: { type: "string", minLength: 1 },
+      },
+    });
+    expect(targetCreate?.properties?.bottle).toBeUndefined();
+    expect(targetCreate?.properties?.release).toBeUndefined();
+    expect(legacyCreate).toMatchObject({
+      type: "object",
+      required: ["bottle"],
+      additionalProperties: false,
+      properties: {
+        bottle: { type: "number" },
+        pendingImageId: { type: "string", minLength: 1 },
+      },
+    });
+    expect(legacyCreate?.properties?.target).toBeUndefined();
+    expect(JSON.stringify(legacyCreate?.properties?.release)).toContain(
+      "number",
+    );
+
+    const targetDelete = deleteAlternatives?.find(
+      (schema: any) => schema.properties?.target,
+    );
+    const legacyDelete = deleteAlternatives?.find(
+      (schema: any) => schema.properties?.bottle,
+    );
+    expect(targetDelete).toMatchObject({
+      type: "object",
+      required: ["target"],
+      additionalProperties: false,
+    });
+    expect(targetDelete?.properties?.baseOnly).toBeUndefined();
+    expect(targetDelete?.properties?.bottle).toBeUndefined();
+    expect(targetDelete?.properties?.release).toBeUndefined();
+    expect(legacyDelete).toMatchObject({
+      type: "object",
+      required: ["bottle"],
+      additionalProperties: false,
+      properties: { bottle: { type: "number" } },
+    });
+    expect(legacyDelete?.properties?.target).toBeUndefined();
+    expect(legacyDelete?.properties?.baseOnly).toBeDefined();
+
+    type TargetCreateInput = Extract<
+      Inputs["collections"]["bottles"]["create"],
+      { target: number }
+    >;
+    type LegacyCreateInput = Extract<
+      Inputs["collections"]["bottles"]["create"],
+      { bottle: number }
+    >;
+    type TargetDeleteInput = Extract<
+      Inputs["collections"]["bottles"]["delete"],
+      { target: number }
+    >;
+    type LegacyDeleteInput = Extract<
+      Inputs["collections"]["bottles"]["delete"],
+      { bottle: number }
+    >;
+    expectTypeOf<TargetCreateInput["target"]>().toEqualTypeOf<number>();
+    expectTypeOf<LegacyCreateInput["bottle"]>().toEqualTypeOf<number>();
+    expectTypeOf<LegacyCreateInput["release"]>().toEqualTypeOf<
+      number | null | undefined
+    >();
+    expectTypeOf<LegacyDeleteInput["baseOnly"]>().toEqualTypeOf<unknown>();
+    expectTypeOf<
+      "release" extends keyof TargetCreateInput ? true : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "target" extends keyof LegacyCreateInput ? true : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "baseOnly" extends keyof TargetDeleteInput ? true : false
+    >().toEqualTypeOf<false>();
   });
 });

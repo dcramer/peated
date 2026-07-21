@@ -7,14 +7,20 @@ type BottleStatusIconsProps = {
   hideLibrary?: boolean;
 };
 
-export default function BottleStatusIcons({
-  bottle,
+export function BottleStatusIndicators({
+  hasTasted,
+  isLibrary,
   className = "h-4 w-4",
   hideLibrary = false,
-}: BottleStatusIconsProps) {
+}: {
+  hasTasted: boolean;
+  isLibrary: boolean;
+  className?: string;
+  hideLibrary?: boolean;
+}) {
   return (
     <>
-      {bottle.isLibrary && !hideLibrary && (
+      {isLibrary && !hideLibrary && (
         <span
           role="img"
           aria-label="In Library"
@@ -25,7 +31,7 @@ export default function BottleStatusIcons({
           <BookOpenIcon className={className} aria-hidden="true" />
         </span>
       )}
-      {bottle.hasTasted && (
+      {hasTasted && (
         <span
           role="img"
           aria-label="Tasted"
@@ -37,5 +43,20 @@ export default function BottleStatusIcons({
         </span>
       )}
     </>
+  );
+}
+
+export default function BottleStatusIcons({
+  bottle,
+  className = "h-4 w-4",
+  hideLibrary = false,
+}: BottleStatusIconsProps) {
+  return (
+    <BottleStatusIndicators
+      hasTasted={bottle.hasTasted}
+      isLibrary={bottle.isLibrary}
+      className={className}
+      hideLibrary={hideLibrary}
+    />
   );
 }

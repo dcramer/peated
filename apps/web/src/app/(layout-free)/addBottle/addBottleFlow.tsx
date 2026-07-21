@@ -12,6 +12,7 @@ import BottleResolver, {
 } from "@peated/web/components/bottleResolver";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import Button from "@peated/web/components/button";
+import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import { useFlashMessages } from "@peated/web/components/flash";
 import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
@@ -159,6 +160,25 @@ function TargetPanel({
             color="inherit"
             noGutter
           />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CollectionTargetPanel({ entry }: { entry: CollectionBottle }) {
+  return (
+    <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        {entry.imageUrl && (
+          <img
+            src={entry.imageUrl}
+            alt="Selected bottle label"
+            className="h-24 w-24 shrink-0 rounded object-cover"
+          />
+        )}
+        <div className="min-w-0 flex-1">
+          <CatalogTargetIdentity target={entry.target} compact />
         </div>
       </div>
     </section>
@@ -550,10 +570,7 @@ function AddedToLibrary({
                 </p>
               </div>
             </div>
-            <TargetPanel
-              target={{ bottle: entry.bottle, release: entry.release ?? null }}
-              previewUrl={entry.imageUrl}
-            />
+            <CollectionTargetPanel entry={entry} />
             {statusError && <FormError values={[statusError]} />}
             <div className="border-t border-slate-800 pt-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -882,9 +899,7 @@ function AddBottleFlowContent() {
           input: {
             user: "me",
             collection: "library",
-            bottle: updatedEntry.bottle.id,
-            release: updatedEntry.release?.id ?? undefined,
-            baseOnly: updatedEntry.release == null,
+            target: updatedEntry.target.targetId,
           },
         }),
       });

@@ -184,17 +184,178 @@ export function buildBottleRelease({
 
 export const existingRelease = buildBottleRelease();
 
-export function buildCollectionBottle({
-  id = 1,
+/**
+ * @typedef {Omit<ReturnType<typeof buildBottle>, "bottler" | "series"> & {
+ *   bottler: {id: number} | null,
+ *   series: {id: number} | null
+ * }} FixtureBottle
+ */
+/** @typedef {ReturnType<typeof buildBottleRelease>} FixtureBottleRelease */
+/** @typedef {import("@peated/server/schemas").BottleGroupV1} BottleGroupV1 */
+/** @typedef {import("@peated/server/schemas").CatalogTargetV1} CatalogTargetV1 */
+/** @typedef {import("@peated/server/schemas").ExactCatalogTargetV1} ExactCatalogTargetV1 */
+/** @typedef {import("@peated/server/schemas").GenericCatalogTargetV1} GenericCatalogTargetV1 */
+/** @typedef {import("@peated/server/types").CollectionBottle} CollectionBottle */
+
+/**
+ * @typedef {object} BottleGroupFixtureOptions
+ * @property {number} [id]
+ * @property {string} [fullName]
+ * @property {string} [name]
+ * @property {FixtureBottle} [bottle]
+ * @property {number | null} [representativeBottleId]
+ */
+
+/**
+ * @param {BottleGroupFixtureOptions} [options]
+ * @returns {BottleGroupV1}
+ */
+function buildBottleGroup({
+  id,
+  fullName,
+  name,
+  bottle = existingBottle,
+  representativeBottleId = bottle.id,
+} = {}) {
+  return {
+    schemaVersion: 1,
+    id: id ?? 30_000_000 + bottle.id,
+    fullName: fullName ?? bottle.fullName,
+    name: name ?? bottle.name,
+    brandId: bottle.brand.id,
+    bottlerId: bottle.bottler?.id ?? null,
+    distillerIds: bottle.distillers.map((distiller) => distiller.id),
+    category: /** @type {BottleGroupV1["category"]} */ (bottle.category),
+    seriesId: bottle.series?.id ?? null,
+    statedAge: bottle.statedAge,
+    representativeBottleId,
+    description: bottle.description,
+    descriptionSrc: bottle.descriptionSrc,
+    imageUrl: bottle.displayImageUrl ?? bottle.imageUrl,
+    flavorProfile: bottle.flavorProfile,
+    tastingNotes: bottle.tastingNotes,
+    suggestedTags: bottle.suggestedTags,
+    avgRating: bottle.avgRating,
+    ratingStats: bottle.ratingStats,
+    totalTastings: bottle.totalTastings,
+    totalBottles: 1,
+    createdByActorId: testUser.id,
+    createdAt: bottle.createdAt,
+    updatedAt: bottle.updatedAt,
+  };
+}
+
+/**
+ * @typedef {object} ExactCatalogTargetFixtureOptions
+ * @property {FixtureBottle} [bottle]
+ * @property {FixtureBottleRelease | null} [release]
+ */
+
+/**
+ * @param {ExactCatalogTargetFixtureOptions} [options]
+ * @returns {ExactCatalogTargetV1}
+ */
+export function buildExactCatalogTarget({
   bottle = existingBottle,
   release = null,
+} = {}) {
+  const group = buildBottleGroup({ bottle });
+  const concreteBottleId = release?.id ?? bottle.id;
+  const fullName = release
+    ? `${bottle.fullName} - ${release.edition ?? release.name}${
+        release.releaseYear ? ` (${release.releaseYear})` : ""
+      }`
+    : bottle.fullName;
+
+  return {
+    schemaVersion: 1,
+    kind: "bottle",
+    targetId: (release ? 20_000_000 : 10_000_000) + (release?.id ?? bottle.id),
+    group,
+    bottle: {
+      schemaVersion: 1,
+      id: concreteBottleId,
+      groupId: group.id,
+      fullName,
+      name: release?.name ?? bottle.name,
+      brandId: bottle.brand.id,
+      bottlerId: bottle.bottler?.id ?? null,
+      distillerIds: bottle.distillers.map((distiller) => distiller.id),
+      category: /** @type {ExactCatalogTargetV1["bottle"]["category"]} */ (
+        bottle.category
+      ),
+      seriesId: bottle.series?.id ?? null,
+      flavorProfile: bottle.flavorProfile,
+      edition: release ? release.edition : bottle.edition,
+      statedAge: release ? release.statedAge : bottle.statedAge,
+      abv: release ? release.abv : bottle.abv,
+      singleCask: release ? release.singleCask : bottle.singleCask,
+      caskStrength: release ? release.caskStrength : bottle.caskStrength,
+      vintageYear: release ? release.vintageYear : bottle.vintageYear,
+      releaseYear: release ? release.releaseYear : bottle.releaseYear,
+      caskSize: release ? release.caskSize : bottle.caskSize,
+      caskType: release ? release.caskType : bottle.caskType,
+      caskFill: release ? release.caskFill : bottle.caskFill,
+      description: release ? release.description : bottle.description,
+      descriptionSrc: bottle.descriptionSrc,
+      imageUrl: release
+        ? release.imageUrl
+        : (bottle.displayImageUrl ?? bottle.imageUrl),
+      tastingNotes: release ? release.tastingNotes : bottle.tastingNotes,
+      suggestedTags: release ? release.suggestedTags : bottle.suggestedTags,
+      avgRating: release ? release.avgRating : bottle.avgRating,
+      ratingStats: bottle.ratingStats,
+      totalTastings: release ? release.totalTastings : bottle.totalTastings,
+      createdByActorId: testUser.id,
+      createdAt: release ? release.createdAt : bottle.createdAt,
+      updatedAt: release ? release.updatedAt : bottle.updatedAt,
+    },
+  };
+}
+
+export const genericCollectionTargetLabel = "Lagavulin Core Range";
+
+/** @returns {GenericCatalogTargetV1} */
+export function buildGenericCatalogTarget() {
+  return {
+    schemaVersion: 1,
+    kind: "group",
+    targetId: 40_000_001,
+    group: buildBottleGroup({
+      id: 40_000_002,
+      fullName: genericCollectionTargetLabel,
+      name: "Core Range",
+      representativeBottleId: existingBottle.id,
+    }),
+  };
+}
+
+/**
+ * @typedef {object} CollectionBottleFixtureOptions
+ * @property {number} [id]
+ * @property {CatalogTargetV1} [target]
+ * @property {string | null} [imageUrl]
+ * @property {CollectionBottle["status"]} [status]
+ * @property {boolean} [hasTasted]
+ */
+
+/**
+ * @param {CollectionBottleFixtureOptions} [options]
+ * @returns {CollectionBottle}
+ */
+export function buildCollectionBottle({
+  id = 1,
+  target = buildExactCatalogTarget(),
   imageUrl = null,
+  status = null,
+  hasTasted = false,
 } = {}) {
   return {
     id,
     imageUrl,
-    bottle,
-    release,
+    status,
+    target,
+    hasTasted,
   };
 }
 

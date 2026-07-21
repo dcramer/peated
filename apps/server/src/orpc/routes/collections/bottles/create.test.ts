@@ -87,6 +87,62 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
+  test("rejects ambiguous target inputs without mutating collection membership", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const collection = await fixtures.Collection({
+      createdById: defaults.user.id,
+    });
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Exact target fixture not found");
+    type CreateInput = Parameters<
+      typeof routerClient.collections.bottles.create
+    >[0];
+    const invalidInputs = [
+      ["missing catalog reference", { user: "me", collection: collection.id }],
+      [
+        "combined Bottle and CatalogTarget",
+        {
+          user: "me",
+          collection: collection.id,
+          bottle: bottle.id,
+          target: target.id,
+        },
+      ],
+      [
+        "combined CatalogTarget and BottleRelease",
+        {
+          user: "me",
+          collection: collection.id,
+          target: target.id,
+          release: release.id,
+        },
+      ],
+    ] as unknown as [string, CreateInput][];
+
+    for (const [label, input] of invalidInputs) {
+      const error = await waitError(() =>
+        routerClient.collections.bottles.create(input, {
+          context: { user: defaults.user },
+        }),
+      );
+      expect(error, label).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Input validation failed",
+      });
+    }
+    expect(
+      await db.query.collectionBottles.findMany({
+        where: eq(collectionBottles.collectionId, collection.id),
+      }),
+    ).toHaveLength(0);
+  });
+
   test("adds bottle to default collection", async ({ fixtures, defaults }) => {
     const bottle = await fixtures.Bottle();
 
@@ -110,6 +166,61 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
 
     expect(bottleList.length).toBe(1);
     expect(bottleList[0].targetId).toBe(target.id);
+  });
+
+  test("adds an exact Bottle through target-native input", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Exact target fixture not found");
+
+    const result = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        target: target.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result.target).toMatchObject({
+      kind: "bottle",
+      targetId: target.id,
+      bottle: { id: bottle.id },
+    });
+  });
+
+  test("does not invent retained Bottle identity for generic target creation", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, bottle.groupId as number),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!genericTarget) throw new Error("Generic target fixture not found");
+
+    const error = await waitError(() =>
+      routerClient.collections.bottles.create(
+        {
+          user: "me",
+          collection: "default",
+          target: genericTarget.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error.message).toBe(
+      "Generic collection creation requires target-native collection storage.",
+    );
   });
 
   test("stores the generic group target for a parent-only selection with releases", async ({
@@ -567,9 +678,19 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       { context: { user: otherUser } },
     );
 
-    expect(defaultUserEntry.bottle.id).toBe(bottle.id);
+    expect(defaultUserEntry.target.kind).toBe("bottle");
+    expect(
+      defaultUserEntry.target.kind === "bottle"
+        ? defaultUserEntry.target.bottle.id
+        : null,
+    ).toBe(bottle.id);
     expect(defaultUserEntry.status).toBe("sealed");
-    expect(otherUserEntry.bottle.id).toBe(bottle.id);
+    expect(otherUserEntry.target.kind).toBe("bottle");
+    expect(
+      otherUserEntry.target.kind === "bottle"
+        ? otherUserEntry.target.bottle.id
+        : null,
+    ).toBe(bottle.id);
     expect(otherUserEntry.status).toBe("open");
 
     const defaultUserList = await routerClient.collections.bottles.list(
@@ -689,7 +810,8 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(result.release?.id).toBe(release.id);
+    expect(result.target.kind).toBe("bottle");
+    expect(result.target.targetId).toBe(target.id);
     expect(result.imageUrl).toContain("/uploads/collection-bottles/");
 
     const [[collectionBottle], canonicalBottle, canonicalRelease] =

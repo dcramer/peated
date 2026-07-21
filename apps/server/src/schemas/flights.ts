@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { BottleSchema } from "./bottles";
+import { CatalogTargetV1Schema } from "./catalogIdentity";
+import { EntitySchema } from "./entities";
 import { UserSchema } from "./users";
 
 export const FlightSchema = z.object({
@@ -13,6 +14,27 @@ export const FlightSchema = z.object({
     .optional()
     .describe("Timestamp when the flight was created"),
   createdBy: UserSchema.optional().describe("User who created this flight"),
+});
+
+export const FlightTargetSchema = z.object({
+  target: CatalogTargetV1Schema.describe(
+    "Exact Bottle or generic BottleGroup identity",
+  ),
+  distillers: z
+    .array(EntitySchema)
+    .describe("Distillers owned by the target's exact Bottle or BottleGroup"),
+  hasTasted: z
+    .boolean()
+    .describe("Whether the current user has tasted this target in the flight"),
+  isLibrary: z
+    .boolean()
+    .describe("Whether the current user has this target in their Library"),
+});
+
+export const FlightDetailsSchema = FlightSchema.extend({
+  targets: z
+    .array(FlightTargetSchema)
+    .describe("Ordered catalog targets and flight-specific viewer state"),
 });
 
 export const FlightInputSchema = z.object({
@@ -31,12 +53,4 @@ export const FlightInputSchema = z.object({
     .array(z.number())
     .optional()
     .describe("Array of bottle IDs to include in the flight"),
-});
-
-export const FlightBottleSchema = z.object({
-  bottle: BottleSchema.describe("The bottle in this flight"),
-});
-
-export const FlightBottleInputSchema = z.object({
-  bottle: z.number().describe("ID of the bottle to add to the flight"),
 });

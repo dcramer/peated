@@ -2,14 +2,34 @@ import { db } from "@peated/server/db";
 import {
   bottleReleases,
   bottles,
+  catalogTargets,
   collectionBottles,
 } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+
+async function exactTargetId(bottleId: number) {
+  const target = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, bottleId),
+  });
+  if (!target) throw new Error("Exact target fixture missing");
+  return target.id;
+}
+
+async function genericTargetId(groupId: number) {
+  const target = await db.query.catalogTargets.findFirst({
+    where: and(
+      eq(catalogTargets.groupId, groupId),
+      isNull(catalogTargets.bottleId),
+    ),
+  });
+  if (!target) throw new Error("Generic target fixture missing");
+  return target.id;
+}
 
 describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/image", () => {
   test("requires authentication", async () => {
@@ -42,6 +62,7 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
         releaseId: release.id,
+        targetId: await exactTargetId(bottle.id),
         imageUrl: "/uploads/collection-bottles/old.webp",
       })
       .returning();
@@ -63,7 +84,7 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
     );
 
     expect(result.id).toBe(entry.id);
-    expect(result.release?.id).toBe(release.id);
+    expect(result.target.kind).toBe("bottle");
     expect(result.imageUrl).toContain("/uploads/collection-bottles/");
 
     const [updatedEntry] = await db
@@ -84,6 +105,49 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
     expect(canonicalRelease?.imageUrl).toBe(
       "/uploads/bottle-releases/canonical-release.webp",
     );
+  });
+
+  test("returns the generic target after replacing its entry image", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const retainedBottle = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const targetId = await genericTargetId(retainedBottle.groupId as number);
+    const [entry] = await db
+      .insert(collectionBottles)
+      .values({
+        collectionId: libraryCollection.id,
+        bottleId: retainedBottle.id,
+        targetId,
+      })
+      .returning();
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const result = await routerClient.collections.bottles.imageUpdate(
+      {
+        user: "me",
+        collection: "library",
+        collectionBottle: entry.id,
+        pendingImageId: pendingUpload.id,
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result).toMatchObject({
+      id: entry.id,
+      target: { kind: "group", targetId },
+    });
+    expect(result.target).not.toHaveProperty("bottle");
+    expect(result.imageUrl).toContain("/uploads/collection-bottles/");
   });
 
   test("rejects replacing another user's library entry image", async ({

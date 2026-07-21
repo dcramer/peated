@@ -17,9 +17,27 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { CollectionBottleInputSchema } from "@peated/server/schemas";
+import {
+  CollectionBottleLegacyInputSchema,
+  CollectionBottleTargetInputSchema,
+} from "@peated/server/schemas";
 import { and, eq, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
+
+const CollectionBottleDeleteCommonInputSchema = z.object({
+  collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+  user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
+});
+
+const CollectionBottleDeleteInputSchema = z.union([
+  CollectionBottleDeleteCommonInputSchema.extend(
+    CollectionBottleTargetInputSchema.shape,
+  ).strict(),
+  CollectionBottleDeleteCommonInputSchema.extend({
+    ...CollectionBottleLegacyInputSchema.shape,
+    baseOnly: z.coerce.boolean().optional(),
+  }).strict(),
+]);
 
 export default procedure
   .use(requireAuth)
@@ -27,18 +45,63 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/users/{user}/collections/{collection}/bottles",
-    summary: "Remove bottle from collection",
+    summary: "Remove a CatalogTarget from a collection",
     description:
-      "Remove a bottle (and optionally a specific release) from a user's collection. Requires authentication and ownership",
+      "Remove one authoritative CatalogTarget membership from a user's collection. Staged retained Bottle/BottleRelease and base-only inputs are translated to a target; the legacy Bottle-only shape temporarily retains family-wide deletion semantics. Requires authentication and ownership.",
     operationId: "removeBottleFromCollection",
+    spec: (spec) => {
+      const requestBody = spec.requestBody;
+      if (!requestBody || "$ref" in requestBody) return spec;
+      const json = requestBody.content?.["application/json"];
+      const schema = json?.schema;
+      if (
+        !schema ||
+        typeof schema === "boolean" ||
+        "$ref" in schema ||
+        schema.type !== "object"
+      ) {
+        return spec;
+      }
+      const properties = schema.properties ?? {};
+      const oneOf: NonNullable<typeof schema.oneOf> = [
+        {
+          type: "object",
+          properties: {
+            status: properties.status,
+            target: properties.target,
+          },
+          required: ["target"],
+          additionalProperties: false,
+        },
+        {
+          type: "object",
+          properties: {
+            baseOnly: properties.baseOnly,
+            bottle: properties.bottle,
+            release: properties.release,
+            status: properties.status,
+          },
+          required: ["bottle"],
+          additionalProperties: false,
+        },
+      ];
+      return {
+        ...spec,
+        requestBody: {
+          ...requestBody,
+          required: true,
+          content: {
+            ...requestBody.content,
+            "application/json": {
+              ...json,
+              schema: { oneOf },
+            },
+          },
+        },
+      };
+    },
   })
-  .input(
-    CollectionBottleInputSchema.extend({
-      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
-      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-      baseOnly: z.coerce.boolean().optional(),
-    }),
-  )
+  .input(CollectionBottleDeleteInputSchema)
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
@@ -81,22 +144,30 @@ export default procedure
     }
 
     await db.transaction(async (tx) => {
-      const specificReleaseId = input.baseOnly ? null : (input.release ?? null);
-      const hasSpecificIntent = input.baseOnly || input.release != null;
+      const hasTargetIntent = "target" in input;
+      const targetId = hasTargetIntent ? input.target : undefined;
+      const baseOnly = "baseOnly" in input ? input.baseOnly : undefined;
+      const retainedBottleId = "bottle" in input ? input.bottle : undefined;
+      const specificReleaseId =
+        !baseOnly && "release" in input ? (input.release ?? null) : null;
+      const hasSpecificIntent =
+        hasTargetIntent || baseOnly || specificReleaseId !== null;
       let target = null;
       if (hasSpecificIntent) {
         // CatalogTarget must be locked before collection membership rows.
         try {
           target = await resolveCatalogTargetForAssignment(
-            {
-              kind: "legacy",
-              bottleId: input.bottle,
-              releaseId: specificReleaseId,
-              context: {
-                caller: "collections.bottles.delete",
-                operation: input.baseOnly ? "deleteBase" : "deleteRelease",
-              },
-            },
+            hasTargetIntent
+              ? { kind: "target", targetId: input.target }
+              : {
+                  kind: "legacy",
+                  bottleId: retainedBottleId!,
+                  releaseId: specificReleaseId,
+                  context: {
+                    caller: "collections.bottles.delete",
+                    operation: baseOnly ? "deleteBase" : "deleteRelease",
+                  },
+                },
             tx,
           );
         } catch (error) {
@@ -108,13 +179,16 @@ export default procedure
         await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
       }
 
-      const targetlessPair = and(
-        isNull(collectionBottles.targetId),
-        eq(collectionBottles.bottleId, input.bottle),
-        specificReleaseId === null
-          ? isNull(collectionBottles.releaseId)
-          : eq(collectionBottles.releaseId, specificReleaseId),
-      );
+      const targetlessPair =
+        hasTargetIntent || retainedBottleId === undefined
+          ? sql`false`
+          : and(
+              isNull(collectionBottles.targetId),
+              eq(collectionBottles.bottleId, retainedBottleId),
+              specificReleaseId === null
+                ? isNull(collectionBottles.releaseId)
+                : eq(collectionBottles.releaseId, specificReleaseId),
+            );
 
       const deleted = await tx
         .delete(collectionBottles)
@@ -128,14 +202,14 @@ export default procedure
                     targetlessPair,
                   )
                 : targetlessPair
-              : eq(collectionBottles.bottleId, input.bottle),
+              : eq(collectionBottles.bottleId, retainedBottleId!),
           ),
         )
         .returning();
 
       if (!hasSpecificIntent) {
         // This legacy family operation intentionally spans multiple retained
-        // identities. Exact removal uses baseOnly; task 9.7 removes this branch.
+        // identities. Target-native removal bypasses it; task 9.7 removes it.
         logInfo("Legacy collection Bottle family compatibility write", {
           extra: {
             event: "collection_bottle.compatibility",
@@ -143,7 +217,7 @@ export default procedure
             operation: "deleteFamily",
             removalTask: "9.7",
             collectionId: collection.id,
-            bottleId: input.bottle,
+            bottleId: retainedBottleId!,
             deletedCount: deleted.length,
           },
         });
