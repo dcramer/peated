@@ -1,4 +1,5 @@
 import { formatCategoryName } from "@peated/server/lib/format";
+import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
@@ -15,6 +16,69 @@ export type BottleResult = {
   ref: Bottle;
 };
 export type { AddBottleRouteIntent };
+
+type BottleMetadataItem = {
+  key: string;
+  content: ReactNode;
+};
+
+function getBottleMetadata(bottle: Bottle): BottleMetadataItem[] {
+  const metadata: BottleMetadataItem[] = [];
+
+  if (bottle.distillers.length) {
+    metadata.push({
+      key: "distillers",
+      content: (
+        <Join divider=", ">
+          {bottle.distillers.map((distiller) => (
+            <span key={distiller.id}>{distiller.name}</span>
+          ))}
+        </Join>
+      ),
+    });
+  }
+
+  if (bottle.category) {
+    metadata.push({
+      key: "category",
+      content: formatCategoryName(bottle.category),
+    });
+  }
+  if (bottle.statedAge !== null) {
+    metadata.push({ key: "age", content: `${bottle.statedAge} years` });
+  }
+  if (bottle.abv !== null) {
+    metadata.push({ key: "abv", content: `${bottle.abv.toFixed(1)}% ABV` });
+  }
+  if (bottle.vintageYear !== null) {
+    metadata.push({
+      key: "vintage",
+      content: `${bottle.vintageYear} vintage`,
+    });
+  }
+  if (bottle.releaseYear !== null) {
+    metadata.push({
+      key: "release",
+      content: `${bottle.releaseYear} release`,
+    });
+  }
+  if (bottle.singleCask) {
+    metadata.push({ key: "single-cask", content: "Single cask" });
+  }
+  if (bottle.caskStrength) {
+    metadata.push({ key: "cask-strength", content: "Cask strength" });
+  }
+
+  const caskDetails = [bottle.caskFill, bottle.caskType, bottle.caskSize]
+    .filter((value): value is NonNullable<typeof value> => value !== null)
+    .map(toTitleCase)
+    .join(" ");
+  if (caskDetails) {
+    metadata.push({ key: "cask-details", content: `${caskDetails} cask` });
+  }
+
+  return metadata;
+}
 
 /**
  * Builds the bottle-row destination, with Add Bottle route intents taking
@@ -58,17 +122,7 @@ export default function BottleResultRow({
   addBottleIntent?: AddBottleRouteIntent;
   pendingImage?: PendingImageRouteState | null;
 }) {
-  const metadata: ReactNode[] = [];
-  if (bottle.distillers.length)
-    metadata.push(
-      <span>
-        <Join divider=", ">
-          {bottle.distillers.map((d) => (
-            <span key={d.id}>{d.name}</span>
-          ))}
-        </Join>
-      </span>,
-    );
+  const metadata = getBottleMetadata(bottle);
 
   return (
     <>
@@ -89,21 +143,16 @@ export default function BottleResultRow({
           </Link>
           <BottleStatusIcons bottle={bottle} />
         </div>
-        <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
-          {metadata.length ? (
-            <Join divider={<>&middot;</>}>{metadata}</Join>
-          ) : null}
-        </div>
-      </div>
-      <div className="flex items-center gap-x-4">
-        <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <div className="text-muted leading-6">
-            {bottle.category && formatCategoryName(bottle.category)}
+        {metadata.length ? (
+          <div className="text-muted mt-1 flex flex-wrap text-sm leading-5">
+            {metadata.map(({ key, content }, index) => (
+              <span key={key} className="inline-flex whitespace-nowrap">
+                {index ? <span className="mx-1.5">&middot;</span> : null}
+                {content}
+              </span>
+            ))}
           </div>
-          <div className="text-muted mt-1 text-sm leading-5">
-            {bottle.statedAge ? `${bottle.statedAge} years` : null}
-          </div>
-        </div>
+        ) : null}
       </div>
     </>
   );

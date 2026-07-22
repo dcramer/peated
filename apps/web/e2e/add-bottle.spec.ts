@@ -14,6 +14,7 @@ import {
   createdBottleId,
   createdBottleName,
   createdTastingId,
+  exactSearchBottle,
   existingBottle,
   existingBottleId,
   existingRelease,
@@ -463,17 +464,57 @@ test.describe("add bottle flow", () => {
     });
 
     await page.goto("/search?intent=addBottle&q=Lagavulin");
-    await page.getByRole("link", { name: existingBottle.fullName }).click();
+    const result = page.locator(".card").filter({
+      has: page.getByRole("link", { name: exactSearchBottle.fullName }),
+    });
+    const bottleLink = result.getByRole("link", {
+      name: exactSearchBottle.fullName,
+    });
 
-    await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${existingBottle.id}&intent=addBottle$`),
+    await expect(bottleLink).toHaveAttribute(
+      "href",
+      `/addBottle?bottle=${exactSearchBottle.id}&intent=addBottle`,
     );
+    const expectedMetadata = [
+      testBrand.name,
+      "Single Malt",
+      "21 years",
+      "55.1% ABV",
+      "2004 vintage",
+      "2025 release",
+      "Single cask",
+      "Cask strength",
+      "1st Fill Oloroso Hogshead cask",
+    ];
+    const metadataItems = result.locator(".inline-flex.whitespace-nowrap");
+    await expect(metadataItems).toHaveCount(expectedMetadata.length);
+    for (const [index, metadata] of expectedMetadata.entries()) {
+      const item = metadataItems.nth(index);
+      await expect(item).toBeVisible();
+      await expect(item).toHaveText(index ? `·${metadata}` : metadata);
+    }
+    await expectNoHorizontalOverflow(page);
+
+    await bottleLink.click();
+
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const addBottleUrl = new URL(page.url());
+    expect(addBottleUrl.pathname).toBe("/addBottle");
+    expect(addBottleUrl.searchParams.get("bottle")).toBe(
+      String(exactSearchBottle.id),
+    );
+    expect(addBottleUrl.searchParams.get("intent")).toBe("addBottle");
+    expect(addBottleUrl.searchParams.get("release")).toBeNull();
+    await expect(
+      page.getByRole("link", { name: exactSearchBottle.fullName }),
+    ).toHaveAttribute("href", `/bottles/${exactSearchBottle.id}`);
     await expect(
       page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
     await expect(
       page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
   });
 
   test("preserves scanned photos through Add Bottle search fallback", async ({

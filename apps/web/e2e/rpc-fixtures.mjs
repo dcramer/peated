@@ -140,6 +140,24 @@ export function buildBottle({
 
 export const existingBottle = buildBottle();
 
+export const exactSearchBottle = {
+  ...buildBottle({
+    id: 9307,
+    name: "21-year-old",
+  }),
+  fullName: `${testBrand.name} 21-year-old - Cask 42`,
+  statedAge: 21,
+  edition: "Cask 42",
+  abv: 55.1,
+  vintageYear: 2004,
+  releaseYear: 2025,
+  singleCask: true,
+  caskStrength: true,
+  caskFill: "1st_fill",
+  caskType: "oloroso",
+  caskSize: "hogshead",
+};
+
 export const anotherReleaseSourceBottle = {
   ...existingBottle,
   fullName: `${existingBottle.fullName} Distillers Edition`,

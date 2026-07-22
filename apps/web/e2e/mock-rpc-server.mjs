@@ -16,6 +16,7 @@ import {
   createdTastingId,
   emptyLibraryStats,
   emptyList,
+  exactSearchBottle,
   existingBottle,
   existingBottleId,
   existingRelease,
@@ -165,7 +166,12 @@ async function handleRpcRequest({ request, response, url }) {
         results: [
           {
             type: "bottle",
-            ref: withCollectionStatus(request, existingBottle),
+            ref: withCollectionStatus(
+              request,
+              getAccessToken(request).includes("search-route")
+                ? exactSearchBottle
+                : existingBottle,
+            ),
           },
         ],
       });
@@ -356,7 +362,9 @@ async function handleRpcRequest({ request, response, url }) {
             ? getAccessToken(request).includes("add-another-release")
               ? anotherReleaseSourceBottle
               : existingBottle
-            : buildBottleForId(input.bottle),
+            : input.bottle === exactSearchBottle.id
+              ? exactSearchBottle
+              : buildBottleForId(input.bottle),
         ),
       );
       return true;
