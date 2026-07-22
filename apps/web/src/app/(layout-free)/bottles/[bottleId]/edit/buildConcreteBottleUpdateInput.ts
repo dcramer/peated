@@ -9,8 +9,8 @@ type ExactPatch = NonNullable<ConcreteBottleUpdateInput["exact"]>;
 
 /**
  * Partitions only dirty fields rendered by the live form into sparse
- * shared/exact patches. The visible stated age is shared; the exact age
- * override and non-rendered tasting notes remain untouched.
+ * shared/exact patches. The two stated-age controls preserve their distinct
+ * shared and Bottle-specific ownership; non-rendered tasting notes stay untouched.
  */
 export function buildConcreteBottleUpdateInput(
   value: BottleFormSubmitValue,
@@ -31,6 +31,9 @@ export function buildConcreteBottleUpdateInput(
   }
 
   if (dirtyFields.has("edition")) exact.edition = value.edition;
+  if (dirtyFields.has("exactStatedAge")) {
+    exact.statedAge = value.exactStatedAge ?? null;
+  }
   if (dirtyFields.has("abv")) exact.abv = value.abv;
   if (dirtyFields.has("singleCask")) exact.singleCask = value.singleCask;
   if (dirtyFields.has("caskStrength")) {

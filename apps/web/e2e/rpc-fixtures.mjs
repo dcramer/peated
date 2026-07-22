@@ -73,7 +73,6 @@ export const testBrand = {
 export const existingBottleId = 9301;
 export const createdBottleId = 9302;
 export const existingReleaseId = 9303;
-export const createdReleaseId = 9304;
 export const legacyPromotedBottleId = 9305;
 export const legacyIncompleteReleaseId = 9306;
 export const createdTastingId = 9401;
@@ -140,6 +139,45 @@ export function buildBottle({
 }
 
 export const existingBottle = buildBottle();
+
+export const anotherReleaseSourceBottle = {
+  ...existingBottle,
+  fullName: `${existingBottle.fullName} Distillers Edition`,
+  statedAge: 16,
+  edition: "Distillers Edition",
+  abv: 43,
+  releaseYear: 2024,
+};
+
+export const unifiedBottleEditContext = {
+  bottleId: existingBottleId,
+  totalBottles: 3,
+  shared: {
+    name: "18-year-old",
+    statedAge: 18,
+    brand: { id: testBrand.id, name: testBrand.name },
+    distillers: [{ id: testBrand.id, name: testBrand.name }],
+    bottler: null,
+    series: { id: 9601, name: "Distillers Edition" },
+    category: "single_malt",
+    flavorProfile: "peated",
+  },
+  exact: {
+    edition: "Cask 42",
+    statedAge: 21,
+    abv: 55.1,
+    singleCask: true,
+    caskStrength: true,
+    vintageYear: 2004,
+    releaseYear: 2023,
+    caskSize: "hogshead",
+    caskType: "oloroso",
+    caskFill: "1st_fill",
+    description: "A fixture exact Bottle description.",
+    descriptionSrc: null,
+    imageUrl: null,
+  },
+};
 
 /**
  * Builds the bottle-release RPC fixture used by bottling-specific E2E flows.

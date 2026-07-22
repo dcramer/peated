@@ -1,0 +1,318 @@
+import { expect, type Request, test, type TestInfo } from "@playwright/test";
+
+import { expectNoHorizontalOverflow } from "./assertions";
+import {
+  anotherReleaseSourceBottle,
+  createdBottleId,
+  createdBottleName,
+  existingBottleId,
+  existingReleaseId,
+  legacyPromotedBottleId,
+  testAccessToken,
+  testBrand,
+  testUser,
+  unifiedBottleEditContext,
+} from "./rpc-fixtures.mjs";
+import { signIn } from "./session";
+
+test.describe("unified Bottle workflows", () => {
+  test("applies a release-only queue draft as one independent Bottle", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "queue-release-only"),
+      user: { ...testUser, admin: true, mod: true },
+    });
+
+    await page.goto("/admin/queue");
+
+    await expect(
+      page.getByRole("heading", { name: "Incoming Listings" }),
+    ).toBeVisible();
+    await expect(page.getByText("Bottle Draft", { exact: true })).toHaveCount(
+      1,
+    );
+    await expect(page.getByText("Bottling Draft", { exact: true })).toHaveCount(
+      0,
+    );
+    await expect(page.getByText("16 years", { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Apply Bottle Draft" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Apply Bottling Draft/ }),
+    ).toHaveCount(0);
+
+    const createRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/prices/matchQueue/createBottle"),
+    );
+    await page.getByRole("button", { name: "Apply Bottle Draft" }).click();
+    const input = getRpcInput(await createRequestPromise);
+
+    expect(Object.keys(input).sort()).toEqual([
+      "independentBottle",
+      "proposal",
+    ]);
+    const independentBottle = getRecord(input, "independentBottle");
+    expect(independentBottle.name).toBe(anotherReleaseSourceBottle.name);
+    expect(independentBottle.statedAge).toBe(
+      anotherReleaseSourceBottle.statedAge,
+    );
+    expect(independentBottle.edition).toBe("Cask 17");
+    expect(independentBottle.abv).toBe(52.3);
+    expect(independentBottle.singleCask).toBe(true);
+    expect(independentBottle.caskStrength).toBe(true);
+    expect(independentBottle.vintageYear).toBe(2008);
+    expect(independentBottle.releaseYear).toBe(2025);
+    expect(independentBottle.caskType).toBe("oloroso");
+    expect(independentBottle.caskFill).toBe("1st_fill");
+    expect(independentBottle.caskSize).toBe("hogshead");
+    expect(independentBottle.description).toBe("Retailer release description.");
+    expect(independentBottle.descriptionSrc).toBeNull();
+    expect(independentBottle.tastingNotes).toBeNull();
+    for (const legacyField of [
+      "bottle",
+      "release",
+      "sourceBottle",
+      "sourceBottleId",
+      "group",
+      "groupId",
+    ]) {
+      expect(input).not.toHaveProperty(legacyField);
+      expect(independentBottle).not.toHaveProperty(legacyField);
+    }
+
+    const createdFullName = `${anotherReleaseSourceBottle.brand.name} ${anotherReleaseSourceBottle.name} Cask 17`;
+    await expect(
+      page.getByRole("link", { name: createdFullName }),
+    ).toHaveAttribute("href", `/bottles/${createdBottleId}`);
+    await expect(
+      page.getByText("No actionable queue items match", { exact: false }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("creates an independent Bottle from a source-backed proposal", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "add-another-release-proposal"),
+      user: { ...testUser, mod: true },
+    });
+    const returnTo = `/bottles/${existingBottleId}`;
+
+    await page.goto(
+      `/bottles/${existingBottleId}/addRelease?proposal=9901&returnTo=${encodeURIComponent(returnTo)}`,
+    );
+
+    await expect(
+      page.getByRole("heading", { name: "Add another release" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Bottle", { exact: true })).toHaveValue(
+      createdBottleName,
+    );
+    await expect(
+      page.getByText(testBrand.name, { exact: true }).first(),
+    ).toBeVisible();
+    await expect(page.getByLabel("Stated Age")).toHaveValue(
+      String(anotherReleaseSourceBottle.statedAge),
+    );
+    await expect(page.getByLabel("Edition / Label")).toHaveValue(
+      "First Fill Oloroso",
+    );
+    await expect(page.getByLabel("Release Year")).toHaveValue("2026");
+    await expectNoHorizontalOverflow(page);
+
+    const createRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/prices/matchQueue/createBottle"),
+    );
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+    const input = getRpcInput(await createRequestPromise);
+
+    expect(Object.keys(input).sort()).toEqual([
+      "independentBottle",
+      "proposal",
+    ]);
+    expect(input.proposal).toBe(9901);
+    const independentBottle = getRecord(input, "independentBottle");
+    expect(independentBottle).toMatchObject({
+      name: createdBottleName,
+      brand: testBrand.id,
+      statedAge: anotherReleaseSourceBottle.statedAge,
+      edition: "First Fill Oloroso",
+      releaseYear: 2026,
+    });
+    for (const legacyField of [
+      "bottle",
+      "release",
+      "sourceBottle",
+      "sourceBottleId",
+      "group",
+      "groupId",
+    ]) {
+      expect(input).not.toHaveProperty(legacyField);
+      expect(independentBottle).not.toHaveProperty(legacyField);
+    }
+    await expect(page).toHaveURL(new RegExp(`${returnTo}$`));
+  });
+
+  test("renders shared and exact Bottle edit ownership", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "unified-edit"),
+      user: { ...testUser, mod: true },
+    });
+
+    await page.goto(`/bottles/${existingBottleId}/edit`);
+
+    await expect(
+      page.getByRole("heading", { name: "Edit Bottle" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Bottle", { exact: true })).toHaveValue(
+      unifiedBottleEditContext.shared.name,
+    );
+    await expect(page.getByLabel("Shared Stated Age")).toHaveValue(
+      String(unifiedBottleEditContext.shared.statedAge),
+    );
+    await expect(page.getByLabel("Bottle-specific Stated Age")).toHaveValue(
+      String(unifiedBottleEditContext.exact.statedAge),
+    );
+    const showsPreviewMetadata = (page.viewportSize()?.width ?? 0) >= 640;
+    const initialPreviewAge = page.getByText(
+      `Aged ${unifiedBottleEditContext.exact.statedAge} years`,
+      { exact: true },
+    );
+    await expect(initialPreviewAge).toHaveText(
+      `Aged ${unifiedBottleEditContext.exact.statedAge} years`,
+    );
+    if (showsPreviewMetadata) {
+      await expect(initialPreviewAge).toBeVisible();
+    } else {
+      await expect(initialPreviewAge).toBeHidden();
+    }
+    await expect(page.getByLabel("Edition / Label")).toHaveValue(
+      unifiedBottleEditContext.exact.edition,
+    );
+    await expect(page.getByLabel("ABV")).toHaveValue(
+      String(unifiedBottleEditContext.exact.abv),
+    );
+    await expect(page.getByLabel("Vintage Year")).toHaveValue(
+      String(unifiedBottleEditContext.exact.vintageYear),
+    );
+    await expect(page.getByLabel("Release Year")).toHaveValue(
+      String(unifiedBottleEditContext.exact.releaseYear),
+    );
+    await expect(
+      page
+        .getByText("Core identity edits update all 3 Bottle identities", {
+          exact: false,
+        })
+        .first(),
+    ).toBeVisible();
+    await expect(page.getByText("Edit Bottling", { exact: true })).toHaveCount(
+      0,
+    );
+
+    await page.getByLabel("Shared Stated Age").fill("19");
+    await page.getByLabel("Bottle-specific Stated Age").fill("22");
+    const updatedPreviewAge = page.getByText("Aged 22 years", { exact: true });
+    await expect(updatedPreviewAge).toHaveText("Aged 22 years");
+    if (showsPreviewMetadata) {
+      await expect(updatedPreviewAge).toBeVisible();
+    } else {
+      await expect(updatedPreviewAge).toBeHidden();
+    }
+
+    const updateRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/bottles/update"),
+    );
+    await page.getByRole("button", { name: "Save" }).click();
+    const updateInput = getRpcInput(await updateRequestPromise);
+    expect(updateInput).toEqual({
+      bottle: existingBottleId,
+      shared: { statedAge: 19 },
+      exact: { statedAge: 22 },
+    });
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("permanently preserves the query when redirecting legacy creation", async ({
+    baseURL,
+  }) => {
+    const legacyPath = `/bottles/${existingBottleId}/bottlings/new?returnAction=view&tag=one&tag=two`;
+    const destination = `/bottles/${existingBottleId}/addRelease?returnAction=view&tag=one&tag=two`;
+
+    const response = await fetch(new URL(legacyPath, requireBaseURL(baseURL)), {
+      redirect: "manual",
+    });
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(destination);
+  });
+
+  test("permanently redirects legacy Bottling edits to the promoted Bottle", async ({
+    baseURL,
+  }) => {
+    const response = await fetch(
+      new URL(
+        `/bottles/${existingBottleId}/bottlings/${existingReleaseId}/edit`,
+        requireBaseURL(baseURL),
+      ),
+      { redirect: "manual" },
+    );
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(
+      `/bottles/${legacyPromotedBottleId}/edit`,
+    );
+  });
+});
+
+function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
+  return [
+    testAccessToken,
+    suffix,
+    testInfo.project.name,
+    `w${testInfo.workerIndex}`,
+    `r${testInfo.retry}`,
+  ].join("-");
+}
+
+function requireBaseURL(baseURL: string | undefined): string {
+  if (!baseURL) {
+    throw new Error("Expected Playwright to configure a base URL.");
+  }
+  return baseURL;
+}
+
+function getRpcInput(request: Request): Record<string, unknown> {
+  const postData = request.postData();
+  if (!postData) {
+    throw new Error("Expected the RPC request to contain JSON input.");
+  }
+
+  const envelope: unknown = JSON.parse(postData);
+  if (!isRecord(envelope) || !isRecord(envelope.json)) {
+    throw new Error("Expected the RPC request to use the JSON envelope.");
+  }
+  return envelope.json;
+}
+
+function getRecord(
+  input: Record<string, unknown>,
+  field: string,
+): Record<string, unknown> {
+  const value = input[field];
+  if (!isRecord(value)) {
+    throw new Error(`Expected ${field} to be an object.`);
+  }
+  return value;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}

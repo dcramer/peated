@@ -210,10 +210,12 @@ Exact Bottle serializers must not require BottleGroup hydration.
   targets for the same concrete Bottle. Approval locks and revalidates that
   exact target identity before composing the canonical Bottle update and
   proposal approval; retained pairs cannot choose or substitute identity.
-  Create-new approval translates its retained payload into canonical concrete
-  Bottle creation and reuses the resulting exact target for the StorePrice,
-  alias, observation, proposal, and latest attempt. Proposal and attempt current
-  and suggested identity store that target with the matching
+  Create-new approval accepts canonical `independentBottle` input or translates
+  retained compatibility input into concrete Bottle creation, then reuses the
+  resulting exact target for the StorePrice, alias, observation, proposal, and
+  latest attempt. Canonical independent input creates a singleton regardless of
+  retained parent context. Proposal and attempt current and suggested identity
+  store that target with the matching
   `(createdBottleId, null)` compatibility projection. The path never inserts a
   BottleRelease or enters targetless alias/observation compatibility.
 - Bottle-only create-new input supplies stable ownership, including shared
@@ -249,12 +251,12 @@ Exact Bottle serializers must not require BottleGroup hydration.
   immutable and approval of a previously assigned price does not rewrite or
   add one. Historical release-creation decisions remain readable until the
   remaining classifier, caller, and cleanup tasks remove them.
-- An authorized schema-valid call reaching the retained create-new
+- An authorized schema-valid legacy call reaching the retained create-new
   compatibility handler emits structured telemetry with caller, operation,
   payload discriminator, and handler outcome; a success also records replacement
-  Bottle and exact target ids without the raw payload. Section 8 removes
-  release-shaped callers and task 9.7 removes the route adapter only after
-  observed compatibility-handler traffic is zero.
+  Bottle and exact target ids without the raw payload. Section 8 UI callers use
+  `independentBottle`; task 9.7 removes the legacy adapter only after observed
+  compatibility-handler traffic is zero.
 - Tasks 5.6c-5.6f own direct review, collection, flight, and price mutations;
   task 5.8 owns classifier application, task 5.9 owns the remaining caller and
   worker consumer cutover, task 7.3 owns target-backed reads, section 6 owns
@@ -399,6 +401,34 @@ Exact Bottle serializers must not require BottleGroup hydration.
   explicit editorial content and its own generic target.
 - Observation and unit-level data do not create a Bottle or BottleGroup split
   without an explicit catalog decision.
+
+## Section 8 canonical creation-proposal composition
+
+The unified UI composes retained create-proposal evidence into one standard
+independent Bottle draft. This is not the sparse correction mapping below and
+does not use the server's legacy Bottle/Release compatibility contract.
+
+- For stable fields, a non-null value on `proposedBottle` is authoritative.
+  Serialized null, an omitted property, an absent `proposedBottle`, and
+  release-only evidence mean no stable proposal evidence and inherit from the
+  independently complete source Bottle. An explicit empty distiller list is
+  non-null evidence and remains authoritative.
+- A non-null `proposedRelease.statedAge` supplies the singleton Bottle's
+  effective age. Otherwise age follows the proposed-Bottle/source stable
+  selection. Required name and brand are still enforced by the standard
+  independent-create schema rather than invented by the composer.
+- Exact fields keep release/Bottle/source precedence. When both proposal layers
+  exist, the first non-nullish release, Bottle, or source value wins. With only
+  one proposal layer, a present value including explicit null wins; omission
+  falls back to the source.
+- Description uses the same selected-layer intent while keeping provenance
+  coupled to the selected description: release evidence has null
+  `descriptionSrc`, a proposed Bottle description carries its supplied source,
+  and a source fallback carries the source Bottle's provenance.
+
+The result contains no source Bottle or BottleGroup authority. Queue approval
+parses it as the standard flat `independentBottle` input, and edited proposal
+forms cross that same schema on submit before independent singleton creation.
 
 ## Legacy correction proposal mapping
 

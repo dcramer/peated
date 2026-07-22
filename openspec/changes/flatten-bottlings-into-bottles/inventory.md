@@ -742,8 +742,9 @@ Catalog identity, aliases, search, creation, and updates:
 - `apps/server/src/lib/legacyConcreteBottleInput.ts` is the retained translation
   boundary for price-proposal Bottle/BottleRelease-shaped evidence. It emits one
   canonical concrete-Bottle input, rejects untranslatable image URLs, and never
-  writes BottleRelease. Section 8 removes release-shaped callers and task 9.7
-  removes this translator after measured compatibility traffic reaches zero.
+  writes BottleRelease. Section 8 UI callers bypass it with canonical
+  `independentBottle` input; task 9.7 removes this translator after measured
+  compatibility traffic reaches zero.
 - `apps/server/src/lib/bottleFinder.ts` owns target-aware exact alias resolution
   and the task 5.6f StorePrice-ingestion alias projection. Existing exact-only
   readers still receive a Bottle only from an exact target. Direct ingestion
@@ -853,12 +854,15 @@ Classifier decisions and price matching:
   pair while persisting current/suggested proposal and latest-attempt targets.
   A finalized attempt stores the same target and matching current/suggested
   retained pair, including `(bottleId, null)` for concrete create-new approval.
-  Create-new approval now infers the actual retained payload shape and delegates
-  exclusively to `createConcreteBottleInTransaction`; the translator rejects
-  images that cannot cross the canonical upload boundary. Bottle-only and
-  combined input create an independent concrete Bottle, while release-only input
-  requires the proposal's trusted source Bottle. No BottleRelease writer or
-  finalizer remains in this path.
+  Create-new approval accepts canonical `independentBottle` input using the
+  standard flat Bottle create contract and creates a singleton regardless of
+  retained proposal parent context. The measured compatibility branch still
+  infers the actual retained payload shape and delegates exclusively to
+  `createConcreteBottleInTransaction`; its translator rejects images that
+  cannot cross the canonical upload boundary. Legacy Bottle-only and combined
+  input create an independent concrete Bottle, while release-only input requires
+  the proposal's trusted source Bottle. No BottleRelease writer or finalizer
+  remains in this path.
   The operation preflights proposal identity before canonical group-first locks,
   then locks and revalidates the proposal. The concrete creation attempt runs in
   a nested savepoint so a duplicate first rolls back all preparatory writes. It
@@ -884,15 +888,14 @@ Classifier decisions and price matching:
   commit a different or partial target projection. Cross-volume sibling
   proposals are not retargeted. Historical
   release-create enum values remain for untouched classifier/caller records and
-  require no migration. The route preserves `{ bottle, release }` output with
-  `release: null` for a successful translatable request; post-commit concrete
-  and alias finalizers remain the only finalizers. Every authorized schema-valid
-  call reaching the compatibility handler emits structured usage with caller,
-  operation, legacy payload discriminator, and handler outcome; successful
-  usage also records replacement Bottle and exact target ids without the raw
-  payload. Section 8 removes callers' release-shaped inputs and outputs, and
-  task 9.7 removes the adapter after observed compatibility-handler traffic
-  reaches zero. Task 5.6b owns StorePrice and Review
+  require no migration. The route accepts canonical `independentBottle` input
+  and preserves `{ bottle, release }` output with `release: null`; post-commit
+  concrete and alias finalizers remain the only finalizers. Every authorized
+  schema-valid legacy call reaching the compatibility branch emits structured
+  usage with caller, operation, payload discriminator, and handler outcome;
+  successful usage also records replacement Bottle and exact target ids without
+  the raw payload. Task 9.7 removes the legacy adapter after observed
+  compatibility traffic reaches zero. Task 5.6b owns StorePrice and Review
   propagation reached through canonical alias assignment; task 5.6f owns direct
   price-row identity writers, including automated assignment clears that
   previously cleared only the retained pair.
@@ -1165,9 +1168,10 @@ Routes:
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
 - `apps/web/src/app/(layout-free)/addBottle/addBottleFlow.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/addTasting/page.tsx`
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/addRelease/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/[bottlingId]/route.ts`
-- `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/[bottlingId]/edit/page.tsx`
-- `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/new/page.tsx`
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/[bottlingId]/edit/route.ts`
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/new/route.ts`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/[releaseId]/edit/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/new/page.tsx`
@@ -1178,8 +1182,10 @@ the retained parent/release ids, calls the anonymous measured
 `bottleReleases.target` adapter, preserves query parameters, and permanently
 redirects only to the returned exact Bottle URL. The superseded roughly
 940-line BottleRelease detail renderer is removed rather than retained as a
-second read system. The nested list and edit routes remain measured
-compatibility owned by task 8.9; task 8.3 owns replacing the nested new route.
+second read system. The nested list remains measured compatibility owned by
+task 8.9. The nested new and edit URLs are permanent redirect routes: new
+points to the independent "Add another release" workflow, while edit resolves
+the retained release mapping and points to the promoted concrete Bottle editor.
 
 Task 7.9 remains deferred until a BottleGroup page and a durable retired-parent
 to BottleGroup destination exist. That redirect must preserve generic group
@@ -1209,8 +1215,6 @@ Shared UI and client helpers:
 - `apps/web/src/components/bottleReviews.tsx`
 - `apps/web/src/components/bottleTable.tsx`
 - `apps/web/src/components/collectionAction.tsx`
-- `apps/web/src/components/releaseField.tsx`
-- `apps/web/src/components/releaseForm.tsx`
 - `apps/web/src/components/tastingForm.tsx`
 - `apps/web/src/components/notifications/entry.tsx` narrows the strict
   notification union and renders toast/comment activity with the referenced
@@ -1218,6 +1222,21 @@ Shared UI and client helpers:
   its BottleGroup, states that the exact Bottle was not specified, and never
   links or labels a representative Bottle.
 - `apps/web/src/lib/addBottle.ts`
+- `apps/web/src/lib/independentBottleProposal.ts` owns canonical UI composition
+  for retained price-proposal evidence and durable “Add another release”
+  prefills. This Section 8 creation composer is distinct from sparse correction
+  mapping and the legacy server translator. A non-null `proposedBottle` value
+  is authoritative for stable fields, while serialized null, omission, an
+  absent proposed Bottle, or release-only evidence inherits the independently
+  complete source stable value. An explicit empty distiller list remains
+  authoritative. A non-null proposed-release age may supply the
+  singleton's effective age. Exact fields retain release/Bottle/source
+  precedence, and description provenance follows the description layer that
+  wins. The helper parses queue approval as one standard independent flat
+  Bottle input, so required name/brand and field constraints remain schema
+  owned. It never carries source Bottle or BottleGroup authority into creation;
+  release-shaped proposal fields are staged input evidence only, and later
+  grouping remains automatic outside the manual workflow.
 - Collection tables, activity previews, image/status actions, and the
   post-scan Library confirmation now render one CatalogTarget. Exact entries
   link their independently complete Bottle; generic entries show the group

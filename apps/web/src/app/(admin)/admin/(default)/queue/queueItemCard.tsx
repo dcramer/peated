@@ -6,9 +6,10 @@ import Button from "@peated/web/components/button";
 import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
-import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
+import { getAddAnotherReleasePath } from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
+import { buildIndependentBottleProposalDraft } from "@peated/web/lib/independentBottleProposal";
 import { type ReactNode, useState } from "react";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
@@ -48,23 +49,6 @@ type TargetBottle = Extract<
   NonNullable<QueueItem["currentTarget"]>,
   { kind: "bottle" }
 >["bottle"];
-type RecommendationRelease = {
-  id?: number;
-  bottleId?: number;
-  fullName?: string;
-  name?: string;
-  edition: string | null;
-  statedAge: number | null;
-  abv: number | null;
-  caskStrength: boolean | null;
-  singleCask: boolean | null;
-  vintageYear: number | null;
-  releaseYear: number | null;
-  caskType: string | null;
-  caskFill: string | null;
-  caskSize: string | null;
-};
-
 type QueueItemCardProps = {
   isBusy: boolean;
   item: QueueItem;
@@ -298,73 +282,38 @@ export function canApproveSuggestedTarget(
   );
 }
 
-function getBottleTitle(bottle: RecommendationBottle): string {
-  return bottle.fullName ?? `${bottle.brand.name} ${bottle.name}`.trim();
+function getChoiceName(
+  choice: number | { name?: string | null } | null | undefined,
+): string | null {
+  return typeof choice === "object" && choice?.name ? choice.name : null;
 }
 
-function getBottlingTitle(release: RecommendationRelease): string {
-  if (release.name) {
-    return release.name;
-  }
-
-  if (release.edition) {
-    return release.edition;
-  }
-
-  if (release.releaseYear !== null && release.vintageYear !== null) {
-    return `${release.releaseYear} Bottling (${release.vintageYear} Vintage)`;
-  }
-
-  if (release.releaseYear !== null) {
-    return `${release.releaseYear} Bottling`;
-  }
-
-  if (release.vintageYear !== null) {
-    return `${release.vintageYear} Vintage`;
-  }
-
-  if (release.statedAge !== null) {
-    return `${release.statedAge}-year-old bottling`;
-  }
-
-  if (release.singleCask) {
-    return "Single cask bottling";
-  }
-
-  if (release.caskStrength) {
-    return "Cask strength bottling";
-  }
-
-  return "Specific bottling";
-}
-
-function getBottleFields(bottle: RecommendationBottle): RecommendationField[] {
+function getConcreteBottleDraftFields(item: QueueItem): RecommendationField[] {
+  const bottle = buildIndependentBottleProposalDraft({
+    sourceBottle: item.parentBottle,
+    proposedBottle: item.proposedBottle,
+    proposedRelease: item.proposedRelease,
+  });
   const fields: RecommendationField[] = [
     {
       label: "Brand",
-      value: bottle.brand.name,
+      value: getChoiceName(bottle.brand) ?? "Selected brand",
     },
     {
       label: "Bottle Name",
-      value: bottle.name,
+      value: bottle.name ?? "Not specified",
     },
   ];
 
-  if (bottle.series) {
+  const seriesName = getChoiceName(bottle.series);
+  if (seriesName) {
     fields.push({
       label: "Series",
-      value: bottle.series.name,
+      value: seriesName,
     });
   }
 
-  if (bottle.edition) {
-    fields.push({
-      label: "Edition",
-      value: bottle.edition,
-    });
-  }
-
-  if (bottle.statedAge !== null) {
+  if (bottle.statedAge !== null && bottle.statedAge !== undefined) {
     fields.push({
       label: "Age",
       value: formatAge(bottle.statedAge),
@@ -378,78 +327,66 @@ function getBottleFields(bottle: RecommendationBottle): RecommendationField[] {
     });
   }
 
-  if (bottle.distillers.length > 0) {
+  const distillerNames =
+    bottle.distillers?.map(getChoiceName).filter((name) => name !== null) ?? [];
+  if (distillerNames.length > 0) {
     fields.push({
       label: "Distillery",
-      value: bottle.distillers.map((distiller) => distiller.name).join(", "),
+      value: distillerNames.join(", "),
       fullWidth: true,
     });
   }
 
-  if (bottle.bottler) {
+  const bottlerName = getChoiceName(bottle.bottler);
+  if (bottlerName) {
     fields.push({
       label: "Bottler",
-      value: bottle.bottler.name,
+      value: bottlerName,
       fullWidth: true,
     });
   }
-
-  return fields;
-}
-
-function getBottlingFields(
-  release: RecommendationRelease,
-): RecommendationField[] {
-  const fields: RecommendationField[] = [];
   const caskDetails = [
-    release.caskType,
-    release.caskFill,
-    release.caskSize,
+    bottle.caskType,
+    bottle.caskFill,
+    bottle.caskSize,
   ].filter(Boolean);
 
-  if (release.edition) {
+  if (bottle.edition) {
     fields.push({
       label: "Edition",
-      value: release.edition,
+      value: bottle.edition,
     });
   }
 
-  if (release.statedAge !== null) {
-    fields.push({
-      label: "Age",
-      value: formatAge(release.statedAge),
-    });
-  }
-
-  if (release.abv !== null) {
+  if (bottle.abv !== null && bottle.abv !== undefined) {
     fields.push({
       label: "ABV",
-      value: formatAbv(release.abv),
+      value: formatAbv(bottle.abv),
     });
   }
 
-  if (release.releaseYear !== null) {
+  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
     fields.push({
       label: "Release Year",
-      value: release.releaseYear,
+      value: bottle.releaseYear,
     });
   }
 
-  if (release.vintageYear !== null) {
+  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
     fields.push({
       label: "Vintage Year",
-      value: release.vintageYear,
+      value: bottle.vintageYear,
     });
   }
 
-  if (release.caskStrength) {
+  if (bottle.caskStrength) {
     fields.push({
       label: "Strength",
       value: "Cask strength",
     });
   }
 
-  if (release.singleCask) {
+  if (bottle.singleCask) {
     fields.push({
       label: "Cask Source",
       value: "Single cask",
@@ -762,10 +699,7 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     );
   }
 
-  const bottle = item.proposedBottle ?? item.parentBottle;
-  const release = item.proposedRelease;
-
-  if (!bottle && !release) {
+  if (!item.proposedBottle && !item.proposedRelease) {
     return (
       <div className="mt-2 text-sm text-slate-300">
         No safe existing target suggested.
@@ -776,22 +710,9 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
   return (
     <div className="mt-3 space-y-3">
       <RecommendationSection
-        label={item.proposedBottle ? "Bottle Draft" : "Parent Bottle Context"}
-        title={bottle ? getBottleTitle(bottle) : null}
-        href={
-          !item.proposedBottle && item.parentBottle
-            ? `/bottles/${item.parentBottle.id}`
-            : undefined
-        }
-        fields={bottle ? getBottleFields(bottle) : []}
-        placeholder="No bottle identified"
-      />
-
-      <RecommendationSection
-        label="Bottling Draft"
-        title={release ? getBottlingTitle(release) : null}
-        fields={release ? getBottlingFields(release) : []}
-        placeholder="No specific bottling identified"
+        label="Bottle Draft"
+        title={item.price.name}
+        fields={getConcreteBottleDraftFields(item)}
       />
     </div>
   );
@@ -851,28 +772,14 @@ function getCreateProposalActions(
 
   const queryString = `proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`;
 
-  switch (item.creationTarget) {
-    case "release":
-      return {
-        applyLabel: "Apply Bottling Draft",
-        editLabel: "Edit Bottling Draft",
-        editHref: item.parentBottle
-          ? `${getNewBottleBottlingPath(item.parentBottle.id)}?${queryString}`
-          : `/bottles/new?${queryString}`,
-      };
-    case "bottle_and_release":
-      return {
-        applyLabel: "Apply Create Draft",
-        editLabel: "Edit Create Draft",
-        editHref: `/bottles/new?${queryString}`,
-      };
-    default:
-      return {
-        applyLabel: "Apply Bottle Draft",
-        editLabel: "Edit Bottle Draft",
-        editHref: `/bottles/new?${queryString}`,
-      };
-  }
+  return {
+    applyLabel: "Apply Bottle Draft",
+    editLabel: "Edit Bottle Draft",
+    editHref:
+      item.creationTarget === "release" && item.parentBottle
+        ? `${getAddAnotherReleasePath(item.parentBottle.id)}?${queryString}`
+        : `/bottles/new?${queryString}`,
+  };
 }
 
 export default function QueueItemCard({

@@ -2532,6 +2532,166 @@ describe("price match queue", () => {
     expect(releasesAfter).toHaveLength(releasesBefore.length);
   });
 
+  test("approves a release proposal as an independent singleton Bottle", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const sourceBrand = await fixtures.Entity({ name: "Source Brand" });
+    const independentBrand = await fixtures.Entity({
+      name: "Independent Brand",
+    });
+    const sourceBottle = await fixtures.Bottle({
+      name: "Source Expression",
+      brandId: sourceBrand.id,
+    });
+    const price = await fixtures.StorePrice({
+      name: "Independent Release Listing",
+      bottleId: null,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "create_new",
+        parentBottleId: sourceBottle.id,
+        creationTarget: "release",
+      })
+      .returning();
+    const releasesBefore = await db
+      .select({ id: bottleReleases.id })
+      .from(bottleReleases);
+
+    const result = await routerClient.prices.matchQueue.createBottle(
+      {
+        proposal: proposal.id,
+        independentBottle: {
+          name: "Independent Expression",
+          brand: independentBrand.id,
+          edition: "Batch 12",
+          statedAge: 12,
+          abv: 51.2,
+          releaseYear: 2026,
+        },
+      },
+      { context: { user } },
+    );
+
+    const [createdBottle, exactTarget, updatedProposal, updatedPrice] =
+      await Promise.all([
+        db.query.bottles.findFirst({
+          where: eq(bottles.id, result.bottle.id),
+        }),
+        db.query.catalogTargets.findFirst({
+          where: eq(catalogTargets.bottleId, result.bottle.id),
+        }),
+        db.query.storePriceMatchProposals.findFirst({
+          where: eq(storePriceMatchProposals.id, proposal.id),
+        }),
+        db.query.storePrices.findFirst({
+          where: eq(storePrices.id, price.id),
+        }),
+      ]);
+    if (!createdBottle?.groupId) {
+      throw new Error("Expected proposal approval to create a grouped Bottle.");
+    }
+    const groupMembers = await db
+      .select({ id: bottles.id })
+      .from(bottles)
+      .where(eq(bottles.groupId, createdBottle.groupId));
+    const releasesAfter = await db
+      .select({ id: bottleReleases.id })
+      .from(bottleReleases);
+
+    expect(result.release).toBeNull();
+    expect(createdBottle).toMatchObject({
+      edition: "Batch 12",
+      statedAge: 12,
+      abv: 51.2,
+      releaseYear: 2026,
+    });
+    expect(createdBottle?.name).toContain("Independent Expression");
+    expect(createdBottle?.groupId).not.toBe(sourceBottle.groupId);
+    expect(groupMembers).toEqual([{ id: result.bottle.id }]);
+    expect(exactTarget).toMatchObject({
+      bottleId: result.bottle.id,
+      groupId: createdBottle?.groupId,
+    });
+    expect(updatedProposal).toMatchObject({
+      status: "approved",
+      currentBottleId: result.bottle.id,
+      currentReleaseId: null,
+      currentTargetId: exactTarget?.id,
+      suggestedBottleId: result.bottle.id,
+      suggestedReleaseId: null,
+      suggestedTargetId: exactTarget?.id,
+      reviewedById: user.id,
+    });
+    expect(updatedPrice).toMatchObject({
+      bottleId: result.bottle.id,
+      releaseId: null,
+      targetId: exactTarget?.id,
+    });
+    expect(releasesAfter).toHaveLength(releasesBefore.length);
+  });
+
+  test("rejects mixed canonical and legacy create inputs without writes", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Exclusive Input Brand" });
+    const price = await fixtures.StorePrice({
+      name: "Exclusive Input Listing",
+      bottleId: null,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "create_new",
+      })
+      .returning();
+    const [bottlesBefore, groupsBefore, targetsBefore] = await Promise.all([
+      db.select({ id: bottles.id }).from(bottles),
+      db.select({ id: bottleGroups.id }).from(bottleGroups),
+      db.select({ id: catalogTargets.id }).from(catalogTargets),
+    ]);
+
+    const error = await waitError(
+      routerClient.prices.matchQueue.createBottle(
+        {
+          proposal: proposal.id,
+          independentBottle: {
+            name: "Canonical Candidate",
+            brand: brand.id,
+          },
+          bottle: {
+            name: "Legacy Candidate",
+            brand: brand.id,
+          },
+        },
+        { context: { user } },
+      ),
+    );
+
+    const [updatedProposal, bottlesAfter, groupsAfter, targetsAfter] =
+      await Promise.all([
+        db.query.storePriceMatchProposals.findFirst({
+          where: eq(storePriceMatchProposals.id, proposal.id),
+        }),
+        db.select({ id: bottles.id }).from(bottles),
+        db.select({ id: bottleGroups.id }).from(bottleGroups),
+        db.select({ id: catalogTargets.id }).from(catalogTargets),
+      ]);
+
+    expect(error.message).toBe("Input validation failed");
+    expect(updatedProposal).toMatchObject({ status: "pending_review" });
+    expect(bottlesAfter).toEqual(bottlesBefore);
+    expect(groupsAfter).toEqual(groupsBefore);
+    expect(targetsAfter).toEqual(targetsBefore);
+  });
+
   test("reuses a same-group duplicate as an exact match", async ({
     fixtures,
   }) => {

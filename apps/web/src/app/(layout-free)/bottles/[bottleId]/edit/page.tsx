@@ -73,7 +73,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
         ...context.exact,
         statedAge: context.shared.statedAge,
       }}
-      showBottleReleaseDetails
+      exactStatedAge={context.exact.statedAge}
       sharedIdentityBottleCount={context.totalBottles}
       title="Edit Bottle"
     />

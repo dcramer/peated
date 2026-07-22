@@ -6,6 +6,16 @@ Bottle saves should complete after Peated persists the bottle. Slow duplicate
 review, catalog verification, indexing, and similar work should run after the
 save unless it is required for deterministic correctness.
 
+Manual entry uses one concrete Bottle form for add and edit. The form combines
+shared expression fields with exact Bottle fields such as edition, ABV, release
+year, vintage year, and cask details. Independent creation always creates a
+complete Bottle in an automatic singleton BottleGroup; ordinary users never
+select a source Bottle or BottleGroup.
+
+“Add another release” pre-fills the selected Bottle's durable fields and submits
+the same independent Bottle creation operation. It also creates a singleton;
+later grouping is automatic and outside manual intervention.
+
 Image uploads may still be part of the visible save flow, but the server remains
 authoritative for final image dimensions, encoding, and quality. Client-side
 resizing should reduce upload latency without replacing server processing.
@@ -14,6 +24,13 @@ resizing should reduce upload latency without replacing server processing.
 
 - Manual bottle creation relies on deterministic alias duplicate checks in the
   request path and queues catalog verification after creation.
+- Add and edit share one concrete Bottle form with explicit shared-versus-exact
+  field ownership. Shared moderator edits rematerialize the affected group,
+  while exact edits affect only the selected Bottle.
+- Add Bottle accepts exact release details without changing entity type or
+  creating a BottleRelease.
+- “Add another release” uses durable Bottle values only and never carries source
+  Bottle or group authority into creation.
 - Bottle and tasting image uploads avoid GCS resumable-session startup for small
   processed images.
 - Browser-side image blobs keep a high-quality intermediate image capped at a
@@ -22,11 +39,6 @@ resizing should reduce upload latency without replacing server processing.
 
 ## Improvement Plan
 
-- Align add and edit bottle fields. Decide which legacy bottle-level release
-  fields stay visible, which move to child bottlings, and which need moderator
-  warnings.
-- Separate parent bottle creation from exact bottling creation more clearly when
-  a user enters batch, vintage, cask, ABV, or release-year details.
 - Improve partial-success UX so the page can say when the bottle was saved but
   image upload failed, timed out, or can be retried.
 - Track save latency separately for bottle create, image processing, storage

@@ -139,6 +139,24 @@ The existing Add Bottle and Add Bottling field components become one add/edit Bo
 
 The ordinary workflow never asks “Bottle or Bottling?” and never exposes a standalone Create BottleGroup form.
 
+Section 8 composes retained create-proposal evidence into that same independent
+Bottle draft before form validation. This is a creation-only UI contract,
+distinct from both the sparse correction mapper and the measured legacy
+Bottle/Release compatibility translator. Serialized proposal objects use null
+for missing nullable stable evidence, so a non-null `proposedBottle` value is
+authoritative while null, omission, or release-only evidence inherits the
+independently complete source value. An explicit empty distiller list remains
+authoritative. A non-null `proposedRelease.statedAge`
+becomes the singleton Bottle's effective age; otherwise age follows the same
+stable fallback. Exact fields preserve the staged release/Bottle/source
+precedence: with both proposal layers, the first non-nullish value wins; with
+one proposal layer, an owned value including null wins and only omission falls
+back to the source. Description provenance follows the layer whose description
+is selected: release evidence has no retained Bottle provenance, while a
+selected proposed or source Bottle description keeps that Bottle value's
+`descriptionSrc`. The standard independent-create schema remains authoritative
+for required name, brand, and all field validation.
+
 ### Shared edits atomically regenerate complete Bottles
 
 Moderator updates distinguish shared group edits from exact-only Bottle edits.
@@ -764,12 +782,15 @@ retained pairs are evidence rather than selection authority.
 
 ### Create-new price approval creates one complete Bottle
 
-Create-new approval infers the retained `bottle`, `release`, or
-`bottle_and_release` payload shape and translates it into the canonical
-concrete-Bottle input. Bottle-only and combined payloads create an independent
-Bottle with its singleton group; release-only payloads require the proposal's
-trusted source Bottle and create another Bottle in that source's group. The
-transaction never inserts or finalizes a BottleRelease.
+Create-new approval accepts an `independentBottle` carrying the standard flat
+Bottle create contract and maps it directly to canonical independent creation.
+It creates a singleton even when historical proposal context retains a parent
+Bottle or release creation target. The measured adapter separately infers the
+retained `bottle`, `release`, or `bottle_and_release` payload shape: Bottle-only
+and combined payloads create an independent Bottle with its singleton group,
+while release-only payloads require the proposal's trusted source Bottle and
+create another Bottle in that source's group. Neither path inserts or finalizes
+a BottleRelease.
 
 The translation preserves the supported legacy fields without introducing
 group inheritance at read time. Bottle-only input supplies the independent Bottle's
@@ -828,18 +849,18 @@ finalizers run only after commit; duplicate reuse skips the creation finalizer.
 The compatibility route keeps its `{ bottle, release }` shape but always
 returns `release: null` after a successful translatable request.
 
-Every authorized schema-valid call that reaches the retained compatibility
-handler emits structured usage with caller, operation, legacy payload
+Every authorized schema-valid legacy call that reaches the retained
+compatibility branch emits structured usage with caller, operation, payload
 discriminator, and handler success or rejection outcome. A successful event
 includes the replacement Bottle and exact target ids without copying the raw
-payload into telemetry. Section 8 migrates callers off the release-shaped
-input/output, and task 9.7 explicitly removes this route adapter only after
-observed compatibility-handler traffic reaches zero.
+payload into telemetry. Section 8 callers use `independentBottle`; task 9.7
+explicitly removes the legacy input and response adapter only after observed
+compatibility-handler traffic reaches zero.
 
 Target-backed reads remain task 7.3. Task 5.8 owns the adjacent classifier
 application cutover, other supported legacy writers remain task 5.9, the
-Section 8 UI still needs to stop constructing release-shaped create payloads,
-task 5.11 owns generated OpenAPI/client dependencies, and task 9.7 removes the
+Section 8 UI constructs canonical `independentBottle` create payloads, task 5.11
+owns generated OpenAPI/client dependencies, and task 9.7 removes the legacy
 route adapter and historical compatibility branches after their gates pass.
 This code-review slice makes no deployment, production backfill, or activation
 claim.

@@ -154,10 +154,10 @@ it must not preserve a parallel business-logic path.
 
 ## 8. Unified Web Workflow
 
-- [ ] 8.1 Merge the existing BottleForm and ReleaseForm field ownership into one reusable concrete Bottle add/edit form.
-- [ ] 8.2 Make `/bottles/new` accept all exact fields and always submit one Bottle creation mutation.
-- [ ] 8.3 Replace Add Bottling with “Add another release,” prefilled from the selected Bottle's independently complete durable fields and submitted through the standard independent Bottle creation mutation; it creates a singleton group and does not select or reuse the source BottleGroup.
-- [ ] 8.4 Remove the Bottle-versus-Bottling choice, hidden release-detail mode, and any query-prefill behavior that changes entity type.
+- [x] 8.1 Merge the existing BottleForm and ReleaseForm field ownership into one reusable concrete Bottle add/edit form.
+- [x] 8.2 Make `/bottles/new` accept all exact fields and always submit one Bottle creation mutation.
+- [x] 8.3 Replace Add Bottling with “Add another release,” prefilled from the selected Bottle's independently complete durable fields and submitted through the standard independent Bottle creation mutation; it creates a singleton group and does not select or reuse the source BottleGroup.
+- [x] 8.4 Remove the Bottle-versus-Bottling choice, hidden release-detail mode, and any query-prefill behavior that changes entity type.
 - [ ] 8.5 Update search results and Bottle pages to show exact Bottle details with an unobtrusive related-releases/group link.
 - [ ] 8.6 Add a BottleGroup page for generic activity, aggregates, related Bottles, and moderator merge/split controls.
 - [ ] 8.7 Update tasting, Library, collection, flight, price, review, and photo-identification flows to carry one `targetId` and display whether exactness is known.

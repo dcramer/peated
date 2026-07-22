@@ -144,6 +144,7 @@ describe("GET /bottles/{bottle}/edit-context", () => {
       },
       exact: {
         edition: "Batch 1",
+        statedAge: 15,
         abv: 46,
         releaseYear: 2025,
         description: "Selected Bottle content",
@@ -151,7 +152,6 @@ describe("GET /bottles/{bottle}/edit-context", () => {
     });
     expect(result).not.toHaveProperty("groupId");
     expect(result).not.toHaveProperty("targetId");
-    expect(result).not.toHaveProperty("exact.statedAge");
     expect(result).not.toHaveProperty("exact.tastingNotes");
     expect(Object.keys(result.shared.brand)).toEqual(["id", "name"]);
     expect(Object.keys(result.shared.distillers[0]!)).toEqual(["id", "name"]);
@@ -167,7 +167,7 @@ describe("GET /bottles/{bottle}/edit-context", () => {
     );
   });
 
-  test("exposes only the group-owned age to the current form", async ({
+  test("exposes a differing non-null Bottle age as an exact override", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -184,7 +184,27 @@ describe("GET /bottles/{bottle}/edit-context", () => {
     );
 
     expect(result.shared.statedAge).toBe(18);
-    expect(result).not.toHaveProperty("exact.statedAge");
+    expect(result.exact.statedAge).toBe(21);
+  });
+
+  test("normalizes an inherited Bottle age to a null exact override", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Shared Age Brand" });
+    const { first } = await createGroup(
+      mod,
+      { name: "Shared Age", statedAge: 18, brand: brand.id },
+      [{ edition: "Standard", statedAge: 18 }],
+    );
+
+    const result = await routerClient.bottles.editContext(
+      { bottle: first.bottle.id },
+      { context: { user: mod } },
+    );
+
+    expect(result.shared.statedAge).toBe(18);
+    expect(result.exact.statedAge).toBeNull();
   });
 
   test("maps missing Bottles to not found and inactive graphs to conflict", async ({

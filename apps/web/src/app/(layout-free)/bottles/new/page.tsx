@@ -11,10 +11,6 @@ import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
-import {
-  getBottleBottlingPath,
-  getNewBottleBottlingPath,
-} from "@peated/web/lib/bottlings";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -74,9 +70,6 @@ function CreateBottleForm() {
   const vintageYear = prefill.vintageYear ?? null;
   const releaseYear = prefill.releaseYear ?? null;
   const category = prefill.category ?? null;
-  const showBottleReleaseDetails = Boolean(
-    edition || abv !== null || vintageYear !== null || releaseYear !== null,
-  );
   const canReviewProposal = !!(user?.mod || user?.admin);
 
   if (proposalId && user && !canReviewProposal) {
@@ -146,6 +139,7 @@ function CreateBottleForm() {
         mergeCreateBottleInitialData({
           initialData,
           proposalData,
+          proposalExactData: proposalQuery.data?.proposedRelease,
           proposalImageUrl: proposalQuery.data?.price.imageUrl,
           distiller: distillerQuery.data,
           brand: brandQuery.data,
@@ -184,16 +178,6 @@ function CreateBottleForm() {
   );
   const { flash } = useFlashMessages();
 
-  if (
-    proposalId &&
-    proposalQuery.data?.creationTarget === "release" &&
-    proposalQuery.data.parentBottle
-  ) {
-    redirect(
-      `${getNewBottleBottlingPath(proposalQuery.data.parentBottle.id)}?proposal=${proposalId}&returnTo=${encodeURIComponent(returnTo || "/admin/queue")}`,
-    );
-  }
-
   if (loading) {
     return <Spinner />;
   }
@@ -201,18 +185,14 @@ function CreateBottleForm() {
   return (
     <BottleForm
       onSubmit={async ({ image, ...data }) => {
-        const created = proposalId
-          ? await proposalBottleCreateMutation.mutateAsync({
-              proposal: Number(proposalId),
-              bottle: data,
-              release:
-                proposalQuery.data?.creationTarget === "bottle_and_release"
-                  ? proposalQuery.data.proposedRelease || undefined
-                  : undefined,
-            })
-          : await bottleCreateMutation.mutateAsync(data);
-        const createdBottle = "bottle" in created ? created.bottle : created;
-        const createdRelease = "release" in created ? created.release : null;
+        const createdBottle = proposalId
+          ? (
+              await proposalBottleCreateMutation.mutateAsync({
+                proposal: Number(proposalId),
+                independentBottle: data,
+              })
+            ).bottle
+          : (await bottleCreateMutation.mutateAsync(data)).bottle;
         const nextPendingImageId = image === undefined ? pendingImageId : null;
         const nextPendingImageUrl =
           image === undefined ? pendingImageUrl : null;
@@ -236,7 +216,7 @@ function CreateBottleForm() {
         if (returnAction === "library") {
           await libraryCreateMutation.mutateAsync({
             bottle: createdBottle.id,
-            release: createdRelease?.id ?? null,
+            release: null,
             user: "me",
             collection: "library",
             pendingImageId: nextPendingImageId ?? undefined,
@@ -244,23 +224,19 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: createdRelease?.id ?? null,
+              releaseId: null,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
               intent: "library",
             }),
           );
         } else if (returnAction === "view") {
-          router.replace(
-            createdRelease
-              ? getBottleBottlingPath(createdBottle.id, createdRelease.id)
-              : `/bottles/${createdBottle.id}`,
-          );
+          router.replace(`/bottles/${createdBottle.id}`);
         } else if (returnAction === "addBottle") {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: createdRelease?.id ?? null,
+              releaseId: null,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
             }),
@@ -269,7 +245,7 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: createdRelease?.id ?? null,
+              releaseId: null,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
               intent: "tasting",
@@ -281,7 +257,7 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: createdRelease?.id ?? null,
+              releaseId: null,
               intent: "tasting",
             }),
           );
@@ -291,7 +267,6 @@ function CreateBottleForm() {
       title="Create Bottle"
       saveLabel="Create Bottle"
       returnTo={returnTo}
-      showBottleReleaseDetails={showBottleReleaseDetails}
     />
   );
 }

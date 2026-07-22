@@ -1,11 +1,11 @@
 import http from "node:http";
 
 import {
+  anotherReleaseSourceBottle,
   bottleImageBottleId,
   bottleImageUrl,
   buildActivity,
   buildBottle,
-  buildBottleRelease,
   buildCollectionBottle,
   buildExactCatalogTarget,
   buildFavoriteActivity,
@@ -13,7 +13,6 @@ import {
   buildTasting,
   createdBottleId,
   createdBottleName,
-  createdReleaseId,
   createdTastingId,
   emptyLibraryStats,
   emptyList,
@@ -32,6 +31,7 @@ import {
   tastingNotes,
   testBrand,
   testUser,
+  unifiedBottleEditContext,
 } from "./rpc-fixtures.mjs";
 
 const host = "127.0.0.1";
@@ -53,6 +53,7 @@ const mockUploadImage = Buffer.from(
 
 const collectionStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
+const appliedQueueProposalTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
 
@@ -135,6 +136,20 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcError(response, "Unexpected entity details payload");
       return true;
+    case "bottles/editContext":
+      if (input?.bottle !== unifiedBottleEditContext.bottleId) {
+        sendRpcError(response, "Unexpected Bottle edit context payload");
+        return true;
+      }
+      sendRpcResponse(response, unifiedBottleEditContext);
+      return true;
+    case "bottles/update":
+      if (input?.bottle !== unifiedBottleEditContext.bottleId) {
+        sendRpcError(response, "Unexpected Bottle update payload");
+        return true;
+      }
+      sendRpcResponse(response, buildExactCatalogTarget());
+      return true;
     case "search":
       if (
         !Array.isArray(input?.include) ||
@@ -156,6 +171,53 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     case "bottles/create": {
+      if (getAccessToken(request).includes("ordinary-exact-create")) {
+        if (!isExpectedOrdinaryExactBottleCreateInput(input)) {
+          sendRpcError(response, "Unexpected exact Bottle create payload");
+          return true;
+        }
+
+        const bottle = {
+          ...buildBottle({
+            id: createdBottleId,
+            name: createdBottleName,
+            brand: testBrand,
+          }),
+          edition: "Founder's Cask",
+          abv: 58.7,
+          releaseYear: 2025,
+          vintageYear: 2009,
+          singleCask: true,
+          caskStrength: true,
+          caskFill: "1st_fill",
+          caskType: "oloroso",
+          caskSize: "hogshead",
+        };
+        sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
+        return true;
+      }
+
+      if (getAccessToken(request).includes("add-another-release")) {
+        if (
+          input?.name !== anotherReleaseSourceBottle.name ||
+          input?.brand !== anotherReleaseSourceBottle.brand.id ||
+          input?.statedAge !== anotherReleaseSourceBottle.statedAge ||
+          input?.edition !== anotherReleaseSourceBottle.edition ||
+          input?.abv !== anotherReleaseSourceBottle.abv ||
+          input?.releaseYear !== anotherReleaseSourceBottle.releaseYear
+        ) {
+          sendRpcError(response, "Unexpected add another release payload");
+          return true;
+        }
+
+        const bottle = {
+          ...anotherReleaseSourceBottle,
+          id: createdBottleId,
+        };
+        sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
+        return true;
+      }
+
       const expectedBrand =
         input?.brand === testBrand.id ||
         (input?.brand &&
@@ -171,9 +233,32 @@ async function handleRpcRequest({ request, response, url }) {
         name: createdBottleName,
         brand: testBrand,
       });
-      sendRpcResponse(response, bottle);
+      sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
       return true;
     }
+    case "prices/matchQueue/list": {
+      const token = getAccessToken(request);
+      if (!token.includes("queue-release-only")) {
+        return false;
+      }
+
+      const applied = appliedQueueProposalTokens.has(token);
+      sendRpcResponse(response, {
+        results: applied ? [] : [buildReleaseOnlyQueueProposal()],
+        rel: { nextCursor: null, prevCursor: null },
+        stats: {
+          actionableCount: applied ? 0 : 1,
+          processingCount: 0,
+        },
+      });
+      return true;
+    }
+    case "prices/matchQueue/activeRetryRun":
+      if (!getAccessToken(request).includes("queue-release-only")) {
+        return false;
+      }
+      sendRpcResponse(response, { run: null });
+      return true;
     case "prices/matchQueue/details":
       if (input?.proposal !== 9901) {
         sendRpcError(
@@ -186,16 +271,36 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, buildBottleAndReleaseProposal());
       return true;
     case "prices/matchQueue/createBottle": {
+      const token = getAccessToken(request);
+      if (token.includes("queue-release-only")) {
+        if (!isExpectedReleaseOnlyQueueCreateInput(input)) {
+          sendRpcError(
+            response,
+            "Unexpected release-only queue create Bottle payload",
+          );
+          return true;
+        }
+
+        appliedQueueProposalTokens.add(token);
+        sendRpcResponse(response, {
+          bottle: buildReleaseOnlyQueueBottle(),
+          release: null,
+        });
+        return true;
+      }
+
       const expectedBrand =
-        input?.bottle?.brand === testBrand.id ||
-        (input?.bottle?.brand &&
-          typeof input.bottle.brand === "object" &&
-          input.bottle.brand.name === testBrand.name);
+        input?.independentBottle?.brand === testBrand.id ||
+        (input?.independentBottle?.brand &&
+          typeof input.independentBottle.brand === "object" &&
+          input.independentBottle.brand.name === testBrand.name);
       if (
         input?.proposal !== 9901 ||
-        input?.bottle?.name !== createdBottleName ||
+        input?.independentBottle?.name !== createdBottleName ||
         !expectedBrand ||
-        input?.release?.edition !== "First Fill Oloroso"
+        input?.independentBottle?.edition !== "First Fill Oloroso" ||
+        input?.bottle !== undefined ||
+        input?.release !== undefined
       ) {
         sendRpcError(response, "Unexpected price match create bottle payload");
         return true;
@@ -203,7 +308,7 @@ async function handleRpcRequest({ request, response, url }) {
 
       sendRpcResponse(response, {
         bottle: buildBottleForId(createdBottleId),
-        release: buildCreatedRelease(),
+        release: null,
       });
       return true;
     }
@@ -248,7 +353,9 @@ async function handleRpcRequest({ request, response, url }) {
         withCollectionStatus(
           request,
           input.bottle === existingBottleId
-            ? existingBottle
+            ? getAccessToken(request).includes("add-another-release")
+              ? anotherReleaseSourceBottle
+              : existingBottle
             : buildBottleForId(input.bottle),
         ),
       );
@@ -257,11 +364,6 @@ async function handleRpcRequest({ request, response, url }) {
     case "bottleReleases/details": {
       if (input?.release === existingReleaseId) {
         sendRpcResponse(response, existingRelease);
-        return true;
-      }
-
-      if (input?.release === createdReleaseId) {
-        sendRpcResponse(response, buildCreatedRelease());
         return true;
       }
 
@@ -751,10 +853,6 @@ function getLegacyCollectionRelease(input) {
   ) {
     return existingRelease;
   }
-  if (input.release === createdReleaseId && input.bottle === createdBottleId) {
-    return buildCreatedRelease();
-  }
-
   throw new Error("Unexpected collection release payload");
 }
 
@@ -1120,7 +1218,8 @@ function isExactBottlePhotoScenario(request) {
   const token = getAccessToken(request);
   return (
     token.includes("photo-create-complete-bottle") ||
-    token.includes("photo-create-prefilled-bottle")
+    token.includes("photo-create-prefilled-bottle") ||
+    token.includes("proposal-release-library")
   );
 }
 
@@ -1141,17 +1240,115 @@ function buildCreatedBottle({ includeExactBottleDetails = false } = {}) {
   };
 }
 
-function buildCreatedRelease() {
-  const bottle = buildBottleForId(createdBottleId);
+const releaseOnlyQueueProposalId = 9911;
+const releaseOnlyQueueEdition = "Cask 17";
 
-  return buildBottleRelease({
-    id: createdReleaseId,
-    bottleId: createdBottleId,
-    fullName: `${bottle.fullName} First Fill Oloroso`,
-    name: "First Fill Oloroso",
-    edition: "First Fill Oloroso",
-    releaseYear: 2026,
-  });
+function buildReleaseOnlyQueueBottle() {
+  return {
+    ...anotherReleaseSourceBottle,
+    id: createdBottleId,
+    fullName: `${anotherReleaseSourceBottle.brand.name} ${anotherReleaseSourceBottle.name} ${releaseOnlyQueueEdition}`,
+    edition: releaseOnlyQueueEdition,
+    abv: 52.3,
+    releaseYear: 2025,
+  };
+}
+
+function buildReleaseOnlyQueueProposal() {
+  return {
+    ...buildBottleAndReleaseProposal(),
+    id: releaseOnlyQueueProposalId,
+    creationTarget: "release",
+    parentBottleId: anotherReleaseSourceBottle.id,
+    proposedBottle: null,
+    proposedRelease: {
+      edition: releaseOnlyQueueEdition,
+      statedAge: null,
+      abv: 52.3,
+      caskStrength: true,
+      singleCask: true,
+      vintageYear: 2008,
+      releaseYear: 2025,
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
+      description: "Retailer release description.",
+      tastingNotes: null,
+    },
+    price: {
+      ...buildBottleAndReleaseProposal().price,
+      id: 9912,
+      name: `${anotherReleaseSourceBottle.fullName} ${releaseOnlyQueueEdition}`,
+    },
+    currentTarget: null,
+    suggestedTarget: null,
+    parentBottle: anotherReleaseSourceBottle,
+  };
+}
+
+function isExpectedReleaseOnlyQueueCreateInput(input) {
+  if (
+    !input ||
+    Object.keys(input).sort().join(",") !== "independentBottle,proposal" ||
+    input.proposal !== releaseOnlyQueueProposalId
+  ) {
+    return false;
+  }
+
+  const bottle = input.independentBottle;
+  const brandIsCanonical =
+    bottle?.brand === testBrand.id ||
+    (typeof bottle?.brand === "object" &&
+      bottle.brand?.id === testBrand.id &&
+      bottle.brand?.name === testBrand.name);
+
+  return (
+    brandIsCanonical &&
+    bottle?.name === anotherReleaseSourceBottle.name &&
+    bottle?.statedAge === anotherReleaseSourceBottle.statedAge &&
+    bottle?.edition === releaseOnlyQueueEdition &&
+    bottle?.abv === 52.3 &&
+    bottle?.singleCask === true &&
+    bottle?.caskStrength === true &&
+    bottle?.vintageYear === 2008 &&
+    bottle?.releaseYear === 2025 &&
+    bottle?.caskType === "oloroso" &&
+    bottle?.caskFill === "1st_fill" &&
+    bottle?.caskSize === "hogshead" &&
+    bottle?.description === "Retailer release description." &&
+    bottle?.descriptionSrc === null &&
+    bottle?.tastingNotes === null &&
+    ![
+      "bottle",
+      "release",
+      "sourceBottle",
+      "sourceBottleId",
+      "group",
+      "groupId",
+    ].some((field) => Object.hasOwn(bottle, field))
+  );
+}
+
+function isExpectedOrdinaryExactBottleCreateInput(input) {
+  const brandIsCanonical =
+    input?.brand === testBrand.id ||
+    (typeof input?.brand === "object" &&
+      input.brand?.id === testBrand.id &&
+      input.brand?.name === testBrand.name);
+
+  return (
+    input?.name === createdBottleName &&
+    brandIsCanonical &&
+    input?.edition === "Founder's Cask" &&
+    input?.abv === 58.7 &&
+    input?.releaseYear === 2025 &&
+    input?.vintageYear === 2009 &&
+    input?.singleCask === true &&
+    input?.caskStrength === true &&
+    input?.caskFill === "1st_fill" &&
+    input?.caskType === "oloroso" &&
+    input?.caskSize === "hogshead"
+  );
 }
 
 function buildBottleAndReleaseProposal() {

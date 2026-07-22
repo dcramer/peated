@@ -33,8 +33,8 @@ import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
 import {
+  getAddAnotherReleasePath,
   getBottleBottlingPath,
-  getNewBottleBottlingPath,
 } from "@peated/web/lib/bottlings";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
@@ -328,24 +328,30 @@ function MatchedOutcomeActions({
       View Bottle
     </OutcomeButton>
   );
-  const addBottlingButton =
+  const addAnotherReleaseButton =
     releaseId === null ? (
       <OutcomeButton
-        key="bottling"
-        href={getNewBottleBottlingPath(bottleId)}
+        key="another-release"
+        href={getAddAnotherReleasePath(bottleId)}
         icon={<Plus className="h-4 w-4" />}
       >
-        Add Bottling
+        Add another release
       </OutcomeButton>
     ) : null;
   const actionButtons =
     intent === "tasting"
-      ? [tastingButton, libraryButton, viewButton, addBottlingButton].filter(
-          Boolean,
-        )
-      : [libraryButton, tastingButton, viewButton, addBottlingButton].filter(
-          Boolean,
-        );
+      ? [
+          tastingButton,
+          libraryButton,
+          viewButton,
+          addAnotherReleaseButton,
+        ].filter(Boolean)
+      : [
+          libraryButton,
+          tastingButton,
+          viewButton,
+          addAnotherReleaseButton,
+        ].filter(Boolean);
 
   return <div className="grid gap-3 sm:grid-cols-4">{actionButtons}</div>;
 }
@@ -466,23 +472,29 @@ function OutcomeSelection({
       View Bottle
     </OutcomeButton>
   );
-  const addBottlingButton = !target.release ? (
+  const addAnotherReleaseButton = !target.release ? (
     <OutcomeButton
-      key="bottling"
-      href={getNewBottleBottlingPath(target.bottle.id)}
+      key="another-release"
+      href={getAddAnotherReleasePath(target.bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add Bottling
+      Add another release
     </OutcomeButton>
   ) : null;
   const actionButtons =
     intent === "tasting"
-      ? [tastingButton, libraryButton, viewButton, addBottlingButton].filter(
-          Boolean,
-        )
-      : [libraryButton, tastingButton, viewButton, addBottlingButton].filter(
-          Boolean,
-        );
+      ? [
+          tastingButton,
+          libraryButton,
+          viewButton,
+          addAnotherReleaseButton,
+        ].filter(Boolean)
+      : [
+          libraryButton,
+          tastingButton,
+          viewButton,
+          addAnotherReleaseButton,
+        ].filter(Boolean);
 
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>

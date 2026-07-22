@@ -29,8 +29,8 @@ export function getBottleBottlingEditPath(
   return `${getBottleBottlingPath(bottleId, bottlingId)}/edit`;
 }
 
-export function getNewBottleBottlingPath(bottleId: number | string) {
-  return `${getBottleBottlingsPath(bottleId)}/new`;
+export function getAddAnotherReleasePath(bottleId: number | string) {
+  return `/bottles/${bottleId}/addRelease`;
 }
 
 export function formatBottlingName(

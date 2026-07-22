@@ -10,7 +10,7 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import TextInput from "@peated/web/components/textInput";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
+import { buildIndependentBottleProposalInput } from "@peated/web/lib/independentBottleProposal";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
 import {
@@ -236,8 +236,11 @@ export default function Page() {
   async function handleApplyCreateProposal(item: QueueItem): Promise<void> {
     const created = await createBottleMutation.mutateAsync({
       proposal: item.id,
-      bottle: item.proposedBottle || undefined,
-      release: item.proposedRelease || undefined,
+      independentBottle: buildIndependentBottleProposalInput({
+        sourceBottle: item.parentBottle,
+        proposedBottle: item.proposedBottle,
+        proposedRelease: item.proposedRelease,
+      }),
     });
     await refreshQueueList();
     flash(
@@ -245,22 +248,7 @@ export default function Page() {
         Created{" "}
         <Link href={`/bottles/${created.bottle.id}`} className="underline">
           {created.bottle.fullName}
-        </Link>
-        {created.release ? (
-          <>
-            {" "}
-            and{" "}
-            <Link
-              href={getBottleBottlingPath(
-                created.bottle.id,
-                created.release.id,
-              )}
-              className="underline"
-            >
-              {created.release.fullName}
-            </Link>
-          </>
-        ) : null}{" "}
+        </Link>{" "}
         for <strong className="font-bold">{item.price.name}</strong>
       </div>,
     );

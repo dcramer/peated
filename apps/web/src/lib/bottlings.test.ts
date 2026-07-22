@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { formatBottleBottlingName } from "./bottlings";
+import {
+  formatBottleBottlingName,
+  getAddAnotherReleasePath,
+} from "./bottlings";
+
+it("uses the canonical add-another-release path", () => {
+  expect(getAddAnotherReleasePath(123)).toBe("/bottles/123/addRelease");
+});
 
 describe("formatBottleBottlingName", () => {
   it("uses concise bottling fields instead of canonical trait suffixes", () => {

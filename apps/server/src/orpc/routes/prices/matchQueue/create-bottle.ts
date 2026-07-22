@@ -4,11 +4,13 @@ import {
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
 import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
   TrustedSourceBottleError,
 } from "@peated/server/lib/createBottle";
+import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
 import { logInfo } from "@peated/server/lib/log";
 import { InvalidPriceMatchConcreteBottleInputError } from "@peated/server/lib/priceMatchConcreteBottleInput";
 import {
@@ -74,8 +76,8 @@ function classifyCompatibilityRejection(error: unknown): string {
 }
 
 /**
- * Measured translation-only compatibility over concrete price-match approval.
- * Task 9.7 removes this release-shaped input and response adapter.
+ * Canonical independent approval plus measured translation-only compatibility.
+ * Task 9.7 removes the legacy Bottle/Release inputs and response adapter.
  */
 export default procedure
   .use(requireMod)
@@ -91,15 +93,26 @@ export default procedure
     z
       .object({
         proposal: z.coerce.number(),
+        independentBottle:
+          IndependentConcreteBottleCreateRouteInputSchema.optional(),
         bottle: BottleInputSchema.optional(),
         release: BottleReleaseInputSchema.optional(),
       })
       .superRefine((input, ctx) => {
-        if (!input.bottle && !input.release) {
+        const hasLegacyInput = !!(input.bottle || input.release);
+        if (!input.independentBottle && !hasLegacyInput) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            path: ["bottle"],
-            message: "Bottle or release input is required.",
+            path: ["independentBottle"],
+            message: "Independent Bottle or legacy creation input is required.",
+          });
+        }
+        if (input.independentBottle && hasLegacyInput) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["independentBottle"],
+            message:
+              "Independent Bottle input cannot be combined with legacy creation input.",
           });
         }
       }),
@@ -107,14 +120,15 @@ export default procedure
   .output(
     z.object({
       bottle: BottleSchema,
-      // Retain the legacy nullable response type until the Section 8 callers
-      // stop branching on a release. This concrete writer always returns null.
+      // Retain the nullable compatibility output until task 9.7 removes the
+      // legacy route contract. Concrete creation always returns null here.
       release: BottleReleaseSchema.nullable(),
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    const payloadShape =
-      input.bottle && input.release
+    const payloadShape = input.independentBottle
+      ? null
+      : input.bottle && input.release
         ? "combined"
         : input.bottle
           ? "bottle"
@@ -123,6 +137,9 @@ export default procedure
     try {
       const result = await createBottleFromStorePriceMatchProposal({
         proposalId: input.proposal,
+        concreteInput: input.independentBottle
+          ? buildIndependentConcreteBottleCreateInput(input.independentBottle)
+          : undefined,
         input: input.bottle,
         releaseInput: input.release,
         user: context.user,
@@ -133,37 +150,41 @@ export default procedure
         result.bottle,
         context.user,
       );
-      logInfo("Legacy price match create-new compatibility write", {
-        extra: {
-          event: "price_match_create_new.compatibility",
-          access: "write",
-          caller: "prices.matchQueue.createBottle",
-          operation: "create_concrete_bottle_from_proposal",
-          proposalId: input.proposal,
-          payloadShape,
-          replacementBottleId: result.bottle.id,
-          replacementTargetId: result.targetId,
-          outcome: "success",
-        },
-      });
+      if (payloadShape) {
+        logInfo("Legacy price match create-new compatibility write", {
+          extra: {
+            event: "price_match_create_new.compatibility",
+            access: "write",
+            caller: "prices.matchQueue.createBottle",
+            operation: "create_concrete_bottle_from_proposal",
+            proposalId: input.proposal,
+            payloadShape,
+            replacementBottleId: result.bottle.id,
+            replacementTargetId: result.targetId,
+            outcome: "success",
+          },
+        });
+      }
 
       return {
         bottle,
         release: null,
       };
     } catch (err) {
-      logInfo("Legacy price match create-new compatibility write", {
-        extra: {
-          event: "price_match_create_new.compatibility",
-          access: "write",
-          caller: "prices.matchQueue.createBottle",
-          operation: "create_concrete_bottle_from_proposal",
-          proposalId: input.proposal,
-          payloadShape,
-          outcome: "rejected",
-          errorClassification: classifyCompatibilityRejection(err),
-        },
-      });
+      if (payloadShape) {
+        logInfo("Legacy price match create-new compatibility write", {
+          extra: {
+            event: "price_match_create_new.compatibility",
+            access: "write",
+            caller: "prices.matchQueue.createBottle",
+            operation: "create_concrete_bottle_from_proposal",
+            proposalId: input.proposal,
+            payloadShape,
+            outcome: "rejected",
+            errorClassification: classifyCompatibilityRejection(err),
+          },
+        });
+      }
 
       if (err instanceof UnknownStorePriceMatchProposalError) {
         throw errors.NOT_FOUND({

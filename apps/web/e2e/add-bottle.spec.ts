@@ -10,9 +10,9 @@ import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
+  anotherReleaseSourceBottle,
   createdBottleId,
   createdBottleName,
-  createdReleaseId,
   createdTastingId,
   existingBottle,
   existingBottleId,
@@ -65,8 +65,16 @@ test.describe("create bottle", () => {
   test("creates a bottle with an existing fixture brand", async ({
     context,
     page,
-  }) => {
-    await signIn(context);
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "ordinary-exact-create"),
+    });
+    const createRequests: Request[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/rpc/bottles/create")) {
+        createRequests.push(request);
+      }
+    });
 
     await page.goto(
       `/bottles/new?name=${encodeURIComponent(createdBottleName)}`,
@@ -76,13 +84,49 @@ test.describe("create bottle", () => {
       page.getByRole("heading", { name: "Create Bottle" }),
     ).toBeVisible();
     await expect(page.getByLabel("Bottle")).toHaveValue(createdBottleName);
+    await expect(page.getByLabel("Edition / Label")).toBeVisible();
+    await expect(page.getByLabel("ABV")).toBeVisible();
+    await expect(page.getByLabel("Release Year")).toBeVisible();
+    await expect(page.getByLabel("Vintage Year")).toBeVisible();
+    await expect(page.getByText("Single Cask", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Cask Strength", { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText("Cask Fill", { exact: true })).toBeVisible();
+    await expect(page.getByText("Cask Type", { exact: true })).toBeVisible();
+    await expect(page.getByText("Cask Size", { exact: true })).toBeVisible();
 
     await page.getByText("e.g. Laphroaig").click();
     await page.getByPlaceholder("Search").fill(testBrand.name);
     await page.getByRole("button", { name: testBrand.name }).click();
     await expect(page.getByPlaceholder("Search")).toBeHidden();
 
+    await page.getByLabel("Edition / Label").fill("Founder's Cask");
+    await page.getByLabel("ABV").fill("58.7");
+    await page.getByLabel("Release Year").fill("2025");
+    await page.getByLabel("Vintage Year").fill("2009");
+    await toggleBottleBoolean(page, "Single Cask");
+    await toggleBottleBoolean(page, "Cask Strength");
+    await selectSimpleBottleField(page, "Cask Fill", "1st Fill");
+    await selectSimpleBottleField(page, "Cask Type", "Oloroso");
+    await selectSimpleBottleField(page, "Cask Size", "Hogshead");
+
+    const createRequestPromise = waitForBottleCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createRequests).toHaveLength(1);
+    expect(createInput).toMatchObject({
+      edition: "Founder's Cask",
+      abv: 58.7,
+      releaseYear: 2025,
+      vintageYear: 2009,
+      singleCask: true,
+      caskStrength: true,
+      caskFill: "1st_fill",
+      caskType: "oloroso",
+      caskSize: "hogshead",
+    });
 
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=tasting$`),
@@ -188,7 +232,7 @@ test.describe("create bottle", () => {
     ).toBeVisible();
   });
 
-  test("adds the created bottling to library from a bottle-and-release proposal", async ({
+  test("adds the created concrete bottle to library from a proposal", async ({
     context,
     page,
   }, testInfo) => {
@@ -212,16 +256,74 @@ test.describe("create bottle", () => {
     const libraryInput = getRpcInput(await libraryRequestPromise);
 
     expect(libraryInput.bottle).toBe(createdBottleId);
-    expect(libraryInput.release).toBe(createdReleaseId);
+    expect(libraryInput.release).toBeNull();
     await expect(page).toHaveURL(
-      new RegExp(
-        `/addBottle\\?bottle=${createdBottleId}&release=${createdReleaseId}&intent=library$`,
-      ),
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
     );
     await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: "In Library" }),
     ).toBeVisible();
+  });
+
+  test("creates an independent Bottle from Add another release", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "add-another-release"),
+    });
+    const createRequests: Request[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/rpc/bottles/create")) {
+        createRequests.push(request);
+      }
+    });
+
+    await page.goto(`/bottles/${existingBottleId}/addRelease`);
+
+    await expect(
+      page.getByRole("heading", { name: "Add another release" }),
+    ).toBeVisible();
+    await expect(page.getByLabel("Bottle")).toHaveValue(
+      anotherReleaseSourceBottle.name,
+    );
+    await expect(page.getByLabel("Stated Age")).toHaveValue(
+      String(anotherReleaseSourceBottle.statedAge),
+    );
+    await expect(page.getByLabel("Edition / Label")).toHaveValue(
+      anotherReleaseSourceBottle.edition,
+    );
+    await expect(page.getByLabel("ABV")).toHaveValue(
+      String(anotherReleaseSourceBottle.abv),
+    );
+    await expect(page.getByLabel("Release Year")).toHaveValue(
+      String(anotherReleaseSourceBottle.releaseYear),
+    );
+    await expect(page.getByLabel("Bottle Group")).toHaveCount(0);
+    await expect(page.getByLabel("Source Bottle")).toHaveCount(0);
+
+    const createRequestPromise = waitForBottleCreate(page);
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createRequests).toHaveLength(1);
+    expect(createInput).toMatchObject({
+      name: anotherReleaseSourceBottle.name,
+      brand: anotherReleaseSourceBottle.brand.id,
+      statedAge: anotherReleaseSourceBottle.statedAge,
+      edition: anotherReleaseSourceBottle.edition,
+      abv: anotherReleaseSourceBottle.abv,
+      releaseYear: anotherReleaseSourceBottle.releaseYear,
+    });
+    expect(createInput).not.toHaveProperty("group");
+    expect(createInput).not.toHaveProperty("groupId");
+    expect(createInput).not.toHaveProperty("sourceBottle");
+    expect(createInput).not.toHaveProperty("sourceBottleId");
+    expect(createInput).not.toHaveProperty("release");
+    expect(createInput).not.toHaveProperty("releaseId");
+    await expect(page).toHaveURL(new RegExp(`/bottles/${createdBottleId}$`));
+    await expectNoHorizontalOverflow(page);
   });
 
   test("shows validation when saving without a brand", async ({
@@ -274,8 +376,8 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await expect(
-      page.getByRole("link", { name: "Add Bottling" }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/bottlings/new`);
+      page.getByRole("link", { name: "Add another release" }),
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addRelease`);
     await expect(
       page.getByRole("link", { name: "Search Bottles" }),
     ).toHaveAttribute("href", "/search?intent=addBottle");
@@ -508,7 +610,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Add Bottling" }),
+      page.getByRole("link", { name: "Add another release" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
@@ -1241,6 +1343,23 @@ function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
   ].join("-");
 }
 
+async function toggleBottleBoolean(page: Page, label: string) {
+  const field = page
+    .getByText(label, { exact: true })
+    .locator("..")
+    .locator("..");
+  await field.getByRole("switch").click();
+}
+
+async function selectSimpleBottleField(
+  page: Page,
+  label: string,
+  option: string,
+) {
+  await page.getByText(label, { exact: true }).click();
+  await page.getByRole("button", { name: option, exact: true }).last().click();
+}
+
 async function uploadLabel(page: Page) {
   await expect(
     page.getByRole("button", { name: /Take or upload a photo/ }),
@@ -1267,6 +1386,12 @@ function waitForPhotoIdentificationCreate(page: Page) {
 function waitForCollectionBottleCreate(page: Page) {
   return page.waitForRequest((request) =>
     request.url().includes("/rpc/collections/bottles/create"),
+  );
+}
+
+function waitForBottleCreate(page: Page) {
+  return page.waitForRequest((request) =>
+    request.url().includes("/rpc/bottles/create"),
   );
 }
 

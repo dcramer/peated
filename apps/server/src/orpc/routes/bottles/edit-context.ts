@@ -38,6 +38,7 @@ const BottleEditSharedContextSchema = z
 
 const BottleEditExactContextSchema = ConcreteBottleV1Schema.pick({
   edition: true,
+  statedAge: true,
   abv: true,
   singleCask: true,
   caskStrength: true,
@@ -137,6 +138,11 @@ export default procedure
         },
         exact: {
           edition: target.bottle.edition,
+          statedAge:
+            target.bottle.statedAge !== null &&
+            target.bottle.statedAge !== target.group.statedAge
+              ? target.bottle.statedAge
+              : null,
           abv: target.bottle.abv,
           singleCask: target.bottle.singleCask,
           caskStrength: target.bottle.caskStrength,

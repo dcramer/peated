@@ -12,8 +12,8 @@ import Table from "@peated/web/components/table";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import {
   formatBottlingName,
+  getAddAnotherReleasePath,
   getBottleBottlingPath,
-  getNewBottleBottlingPath,
 } from "@peated/web/lib/bottlings";
 import ModActions from "../../bottlingModActions";
 
@@ -31,8 +31,8 @@ export default function ReleaseTable({
           We&apos;re not aware of any bottlings for this bottle yet.
         </div>
         <div className="mt-4">
-          <Button href={getNewBottleBottlingPath(bottleId)} color="primary">
-            Add Bottling
+          <Button href={getAddAnotherReleasePath(bottleId)} color="primary">
+            Add another release
           </Button>
         </div>
       </EmptyActivity>

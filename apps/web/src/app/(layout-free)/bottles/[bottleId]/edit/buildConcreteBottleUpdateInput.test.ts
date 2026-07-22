@@ -12,6 +12,7 @@ function formValue(
   return {
     name: "Springbank 12 Cask Strength",
     statedAge: 12,
+    exactStatedAge: null,
     series: null,
     category: "single_malt",
     brand: 1,
@@ -29,7 +30,6 @@ function formValue(
     caskFill: null,
     description: "A batch release.",
     descriptionSrc: "user",
-    imageUrl: null,
     tastingNotes: null,
     image: undefined,
     ...overrides,
@@ -43,7 +43,7 @@ function submitMeta(
 }
 
 describe("buildConcreteBottleUpdateInput", () => {
-  test("omits both scopes and the untouched exact age override", () => {
+  test("omits both scopes when neither stated-age control is dirty", () => {
     expect(
       buildConcreteBottleUpdateInput(
         formValue({ statedAge: 18 }),
@@ -58,6 +58,24 @@ describe("buildConcreteBottleUpdateInput", () => {
     ).toEqual({ exact: { edition: "Batch 24", abv: 57.2 } });
   });
 
+  test("routes the Bottle-specific age to the exact patch", () => {
+    expect(
+      buildConcreteBottleUpdateInput(
+        formValue({ exactStatedAge: 15 }),
+        submitMeta("exactStatedAge"),
+      ),
+    ).toEqual({ exact: { statedAge: 15 } });
+  });
+
+  test("clears the Bottle-specific override without changing shared age", () => {
+    expect(
+      buildConcreteBottleUpdateInput(
+        formValue({ statedAge: 12, exactStatedAge: null }),
+        submitMeta("exactStatedAge"),
+      ),
+    ).toEqual({ exact: { statedAge: null } });
+  });
+
   test("builds a shared-only patch without exact values", () => {
     expect(
       buildConcreteBottleUpdateInput(
@@ -69,7 +87,7 @@ describe("buildConcreteBottleUpdateInput", () => {
     });
   });
 
-  test("maps the complete shared and exact form contract without an exact age", () => {
+  test("maps the complete shared and exact form contract", () => {
     expect(
       buildConcreteBottleUpdateInput(
         formValue({
@@ -79,6 +97,7 @@ describe("buildConcreteBottleUpdateInput", () => {
           bottler: 7,
           flavorProfile: "deep_rich_dried_fruit",
           singleCask: true,
+          exactStatedAge: 15,
           vintageYear: 2012,
           caskSize: "hogshead",
           caskType: "oloroso",
@@ -94,6 +113,7 @@ describe("buildConcreteBottleUpdateInput", () => {
           "bottler",
           "flavorProfile",
           "edition",
+          "exactStatedAge",
           "abv",
           "singleCask",
           "caskStrength",
@@ -119,6 +139,7 @@ describe("buildConcreteBottleUpdateInput", () => {
       },
       exact: {
         edition: "Batch 24",
+        statedAge: 15,
         abv: 57.2,
         singleCask: true,
         caskStrength: true,

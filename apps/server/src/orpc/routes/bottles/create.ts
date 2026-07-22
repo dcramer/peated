@@ -4,6 +4,7 @@ import {
   BottleCreateBadRequestError,
 } from "@peated/server/lib/createBottle";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
 import { procedure } from "@peated/server/orpc";
 import {
   requireTosAccepted,
@@ -32,34 +33,7 @@ export default procedure
     try {
       const result = await createConcreteBottle({
         context,
-        input: {
-          kind: "independent",
-          stable: {
-            name: input.name,
-            statedAge: input.statedAge,
-            series: input.series,
-            category: input.category,
-            brand: input.brand,
-            distillers: input.distillers,
-            bottler: input.bottler,
-            flavorProfile: input.flavorProfile,
-          },
-          exact: {
-            edition: input.edition,
-            statedAge: null,
-            abv: input.abv,
-            singleCask: input.singleCask,
-            caskStrength: input.caskStrength,
-            vintageYear: input.vintageYear,
-            releaseYear: input.releaseYear,
-            caskSize: input.caskSize,
-            caskType: input.caskType,
-            caskFill: input.caskFill,
-            description: input.description,
-            descriptionSrc: input.descriptionSrc,
-            tastingNotes: input.tastingNotes,
-          },
-        },
+        input: buildIndependentConcreteBottleCreateInput(input),
       });
       return await loadExactTarget(
         {
