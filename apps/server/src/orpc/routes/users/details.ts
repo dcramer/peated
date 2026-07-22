@@ -3,7 +3,6 @@ import {
   changes,
   collectionBottles,
   collections,
-  tastings,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
@@ -15,59 +14,22 @@ import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
+import { scanUserTastingTargets } from "./tasting-target-scan";
 
 const USER_STATS_BATCH_SIZE = 200;
 
 async function aggregateTastingStats(userId: number) {
   const targetIds = new Set<number>();
   let total = 0;
-  let afterId: number | null = null;
 
-  while (true) {
-    const rows = await db
-      .select({
-        id: tastings.id,
-        targetId: tastings.targetId,
-        bottleId: tastings.bottleId,
-        releaseId: tastings.releaseId,
-      })
-      .from(tastings)
-      .where(
-        and(
-          eq(tastings.createdById, userId),
-          afterId === null ? undefined : gt(tastings.id, afterId),
-        ),
-      )
-      .orderBy(tastings.id)
-      .limit(USER_STATS_BATCH_SIZE);
-
-    if (rows.length === 0) break;
-
-    const { targets } = await loadCatalogTargetReadsWithParity(
-      rows.map((row) => ({
-        consumerTable: "tasting" as const,
-        rowLocator: { id: row.id },
-        targetId: row.targetId,
-        legacy: {
-          bottleId: row.bottleId,
-          releaseId: row.releaseId,
-        },
-      })),
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "users.details",
-        operation: "aggregate_tastings",
-      },
-    );
-
+  for await (const rows of scanUserTastingTargets(userId, {
+    caller: "users.details",
+    operation: "aggregate_tastings",
+  })) {
     total += rows.length;
-    for (const target of targets) {
-      if (target) targetIds.add(target.targetId);
+    for (const { identity } of rows) {
+      if (identity) targetIds.add(identity.targetId);
     }
-
-    afterId = rows.at(-1)!.id;
-    if (rows.length < USER_STATS_BATCH_SIZE) break;
   }
 
   return { bottles: targetIds.size, tastings: total };

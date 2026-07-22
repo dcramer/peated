@@ -254,14 +254,35 @@ contracts remain unchanged. In particular, this slice performs no migration or
 rewrite of a “Release” badge or any other badge configuration. Tasks 7.2f and
 7.11h own row-correlated mismatch evidence and integration coverage.
 
-Remaining known analytics consumers still inventoried under parent tasks
-7.1-7.3 and 7.11 include retained Bottle-id joins in
 `apps/server/src/orpc/routes/users/flavor-list.ts` and
-`apps/server/src/orpc/routes/users/region-list.ts`. The Library, country,
-entity, global, user-profile, and badge sub-slices do not implicitly cut over
-these consumers or any other Bottle/BottleRelease-derived reporting. This list
-is non-exhaustive, and the cleanup inventory remains open for additional legacy
-analytics discovered during later cutovers.
+`apps/server/src/orpc/routes/users/region-list.ts` are the tasks 7.1g-7.3j
+target-backed user analytics readers. They share the bounded ascending-id
+Tasting scanner in
+`apps/server/src/orpc/routes/users/tasting-target-scan.ts`, also used by
+`apps/server/src/orpc/routes/users/details.ts`. The scanner owns row-correlated
+target-versus-retained parity and returns authoritative
+exact Bottle or generic BottleGroup identity. Exact results use independently
+complete Bottle-owned flavor and brand identity; generic results use
+BottleGroup-owned values without representative substitution. Promoted legacy
+releases remain exact target identity, while targetless rows contribute only to
+the routes' existing totals. Invalid nonnull targets fail closed, and retained
+pairs are evidence only and are never fallback or repair authority.
+
+Region analytics deliberately attribute location through the target owner's
+brand only. They aggregate equal country/region locations across brands,
+preserve the country-with-null-region bucket, omit brand identities without a
+country from classified results, and apply deterministic top-25 ordering.
+Flavor analytics preserve total rating score and classified flavor counts and
+scores with the same bounded scanner and deterministic limit. Both routes keep
+their existing profile privacy and response contracts and perform no GET-side
+mutation. Task 7.11i retains their exact/generic, promotion, targetless, drift,
+invalid-target, batching, ordering, null-field, aggregation, and privacy
+validation; it makes no production backfill, schema, deployment, or activation
+claim.
+
+No known retained Bottle-id user flavor or region analytics reader remains
+after this cutover. The cleanup inventory remains open for other legacy
+analytics discovered under parent tasks 7.1-7.3 and 7.11.
 
 ## API routes
 

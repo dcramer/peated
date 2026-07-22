@@ -1545,6 +1545,49 @@ evidence, shared live/rescan results, keyset batching, XP idempotency, formulas,
 levels, and region semantics. The slice changes no GET behavior, begins no
 production backfill, and authorizes no deployment or activation.
 
+### User flavor and region analytics share target-backed Tasting scans
+
+Tasks 7.1g-7.3j cut the user flavor and region routes over from direct retained
+Bottle joins to the same bounded ascending-id Tasting scanner used by
+user-details Tasting statistics. The scanner at
+`apps/server/src/orpc/routes/users/tasting-target-scan.ts` owns row-correlated CatalogTarget
+parity for each stable Tasting id and returns the authoritative exact Bottle or
+generic BottleGroup identity together with the Tasting's aggregate inputs.
+Callers supply their own operation context, while the shared scan owns batching,
+target hydration, retained-pair evidence, and invalid-target failure. Retained
+Bottle/Release identity cannot select aggregate data, repair a Tasting, or
+mutate state during any GET request.
+
+An exact target contributes flavor profile and brand location from its
+independently complete Bottle. A generic target contributes the corresponding
+BottleGroup-owned values without hydrating or selecting its representative.
+A promoted legacy release therefore contributes through its promoted exact
+Bottle even while its retained parent/release pair remains parity evidence.
+Region aggregation follows only the target owner's brand country and region;
+bottler and distiller locations do not contribute. Different brands at the same
+country/region location aggregate into one bucket, a brand with a country and
+no region contributes to that country's null-region bucket, and a brand without
+a country contributes to no location bucket.
+
+Every selected user Tasting still contributes to each route's existing total
+row count, and its rating still contributes to the flavor route's total score.
+A targetless compatibility row contributes only to those totals, not to a
+flavor or location bucket, even when its retained pair is resolvable. A missing,
+retired, or inconsistent nonnull target fails the route closed as a conflict
+without retained-pair fallback. Classified results preserve their existing
+response shapes and are ordered deterministically by the established aggregate
+rank before applying the top-25 limit.
+
+The cutover preserves user lookup and profile-visibility behavior and performs
+no target, Tasting, parity repair, or other durable mutation. Task 7.11i covers
+exact and generic ownership, promoted exact identity, targetless totals,
+retained drift, invalid targets, batching, deterministic limits, null fields,
+location aggregation, response contracts, and privacy. Existing-row backfill,
+retained-pair removal, and production activation remain owned by section 6,
+tasks 9.6/9.7, and the retained parity/audit gates. This slice adds no schema
+migration, performs no production backfill, and authorizes no deployment or
+activation.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit
