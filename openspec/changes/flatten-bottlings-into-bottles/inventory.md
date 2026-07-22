@@ -188,13 +188,30 @@ production activation claim. Because this catalog-wide aggregate has no
 durable target/retained-pair consumer row, it does not invent task 7.1/7.2
 row-parity evidence; task 7.11d owns its integration coverage.
 
-Remaining analytics consumers still inventoried under parent tasks 7.1-7.3 and
-7.11 include badge hydration and checks in `apps/server/src/lib/badges/` and
-entity category aggregation in
-`apps/server/src/orpc/routes/entities/categories/list.ts`. The Library and
-country statistics sub-slices do not implicitly cut over these consumers or
-any other Bottle/BottleRelease-derived reporting discovered by the cleanup
-inventory.
+`apps/server/src/orpc/routes/entities/categories/list.ts` is the task 7.3f
+target-backed entity category aggregate. It counts only active exact
+CatalogTargets with valid Bottle/group membership, excluding generic,
+targetless, Bottle-tombstoned, and BottleGroup-tombstoned identity. Category
+and brand, bottler, or distiller association come from the independently
+complete Bottle; BottleGroup fields and representatives do not participate.
+An exact Bottle counts once even when the requested entity fills multiple
+roles. `totalCount` is derived from the same category population, including
+null category, rather than materialized `entity.totalBottles`; results use the
+shared nullable category schema with deterministic ordering. The route
+preserves public entity lookup, not-found and empty behavior, performs no
+GET-side mutation, and makes no production activation claim. Because this
+catalog-wide aggregate has no durable target/retained-pair consumer row, it
+does not invent task 7.1/7.2 row-parity evidence; task 7.11e owns its
+integration coverage.
+
+Remaining analytics consumers still inventoried under parent tasks 7.1-7.3
+and 7.11 include badge hydration and checks in `apps/server/src/lib/badges/`,
+retained tasting and collection Bottle-id analytics in
+`apps/server/src/orpc/routes/users/details.ts`, and the Bottle-wide total in
+`apps/server/src/orpc/routes/stats.ts`. The Library, country, and entity
+statistics sub-slices do not implicitly cut over these consumers or any other
+Bottle/BottleRelease-derived reporting. The cleanup inventory remains open for
+additional legacy analytics discovered during later cutovers.
 
 ## API routes
 
