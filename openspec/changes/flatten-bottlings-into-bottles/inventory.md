@@ -215,14 +215,34 @@ catalog-wide aggregate has no durable target/retained-pair consumer row, it
 does not invent task 7.1/7.2 row-parity evidence; task 7.11f owns its integration
 coverage.
 
+`apps/server/src/orpc/routes/users/details.ts` is the tasks 7.1e-7.3h
+user-profile statistics cutover boundary. Before this slice, its
+`stats.bottles` and `stats.collected` values count distinct retained Bottle ids.
+The cutover reads the user's Tastings and collection entries in bounded
+ascending-id batches, records target-versus-retained parity by stable Tasting
+or collection-entry id, and derives both identity-distinct metrics only from
+nonnull authoritative target ids. Exact and generic targets are separate
+identities, while targetless rows never use their retained pair as aggregate
+identity. Invalid nonnull targets fail closed as conflicts.
+
+The same route preserves the underlying row scopes: every user Tasting
+contributes to `stats.tastings`; every collection entry remains eligible for
+`stats.collected` regardless of collection or status; and the case-insensitive
+reserved Library keeps its non-empty total plus open and sealed row counts.
+Targetless rows may contribute to the applicable Tasting and Library-status
+totals but not to distinct target counts. User lookup, actor-aware serialization
+and privacy, friend status, contribution counts, public response shape, and
+read-only behavior remain unchanged. Retained Bottle/Release identity is
+bounded parity telemetry only, never fallback or repair authority. Tasks 7.2e
+and 7.11g own mismatch evidence and integration coverage.
+
 Remaining known analytics consumers still inventoried under parent tasks
 7.1-7.3 and 7.11 include badge hydration and checks in
-`apps/server/src/lib/badges/` and retained tasting and collection Bottle-id
-analytics in `apps/server/src/orpc/routes/users/details.ts`. The Library,
-country, entity, and global statistics sub-slices do not implicitly cut over
-these consumers or any other Bottle/BottleRelease-derived reporting. This list
-is non-exhaustive, and the cleanup inventory remains open for additional legacy
-analytics discovered during later cutovers.
+`apps/server/src/lib/badges/`. The Library, country, entity, global, and user
+profile statistics sub-slices do not implicitly cut over these consumers or
+any other Bottle/BottleRelease-derived reporting. This list is non-exhaustive,
+and the cleanup inventory remains open for additional legacy analytics
+discovered during later cutovers.
 
 ## API routes
 

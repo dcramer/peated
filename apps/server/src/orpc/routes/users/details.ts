@@ -6,13 +6,139 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
+import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
+import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { RESERVED_COLLECTIONS } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import { UserSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
+
+const USER_STATS_BATCH_SIZE = 200;
+
+async function aggregateTastingStats(userId: number) {
+  const targetIds = new Set<number>();
+  let total = 0;
+  let afterId: number | null = null;
+
+  while (true) {
+    const rows = await db
+      .select({
+        id: tastings.id,
+        targetId: tastings.targetId,
+        bottleId: tastings.bottleId,
+        releaseId: tastings.releaseId,
+      })
+      .from(tastings)
+      .where(
+        and(
+          eq(tastings.createdById, userId),
+          afterId === null ? undefined : gt(tastings.id, afterId),
+        ),
+      )
+      .orderBy(tastings.id)
+      .limit(USER_STATS_BATCH_SIZE);
+
+    if (rows.length === 0) break;
+
+    const { targets } = await loadCatalogTargetReadsWithParity(
+      rows.map((row) => ({
+        consumerTable: "tasting" as const,
+        rowLocator: { id: row.id },
+        targetId: row.targetId,
+        legacy: {
+          bottleId: row.bottleId,
+          releaseId: row.releaseId,
+        },
+      })),
+      {
+        actor: null,
+        permissions: { canReadCatalogIdentity: true },
+        caller: "users.details",
+        operation: "aggregate_tastings",
+      },
+    );
+
+    total += rows.length;
+    for (const target of targets) {
+      if (target) targetIds.add(target.targetId);
+    }
+
+    afterId = rows.at(-1)!.id;
+    if (rows.length < USER_STATS_BATCH_SIZE) break;
+  }
+
+  return { bottles: targetIds.size, tastings: total };
+}
+
+async function aggregateCollectionStats(userId: number) {
+  const targetIds = new Set<number>();
+  const libraryName = RESERVED_COLLECTIONS.library.name.toLowerCase();
+  const library = { total: 0, open: 0, sealed: 0 };
+  let afterId: number | null = null;
+
+  while (true) {
+    const rows = await db
+      .select({
+        id: collectionBottles.id,
+        targetId: collectionBottles.targetId,
+        bottleId: collectionBottles.bottleId,
+        releaseId: collectionBottles.releaseId,
+        status: collectionBottles.status,
+        collectionName: collections.name,
+      })
+      .from(collectionBottles)
+      .innerJoin(
+        collections,
+        eq(collections.id, collectionBottles.collectionId),
+      )
+      .where(
+        and(
+          eq(collections.createdById, userId),
+          afterId === null ? undefined : gt(collectionBottles.id, afterId),
+        ),
+      )
+      .orderBy(collectionBottles.id)
+      .limit(USER_STATS_BATCH_SIZE);
+
+    if (rows.length === 0) break;
+
+    const { targets } = await loadCatalogTargetReadsWithParity(
+      rows.map((row) => ({
+        consumerTable: "collection_bottle" as const,
+        rowLocator: { id: row.id },
+        targetId: row.targetId,
+        legacy: {
+          bottleId: row.bottleId,
+          releaseId: row.releaseId,
+        },
+      })),
+      {
+        actor: null,
+        permissions: { canReadCatalogIdentity: true },
+        caller: "users.details",
+        operation: "aggregate_collections",
+      },
+    );
+
+    for (const [index, row] of rows.entries()) {
+      const target = targets[index];
+      if (target) targetIds.add(target.targetId);
+
+      if (row.collectionName.toLowerCase() !== libraryName) continue;
+      if (row.status !== "empty") library.total += 1;
+      if (row.status === "open") library.open += 1;
+      if (row.status === "sealed") library.sealed += 1;
+    }
+
+    afterId = rows.at(-1)!.id;
+    if (rows.length < USER_STATS_BATCH_SIZE) break;
+  }
+
+  return { collected: targetIds.size, library };
+}
 
 export default procedure
   .route({
@@ -58,36 +184,17 @@ export default procedure
       });
     }
 
-    const [{ totalBottles, totalTastings }] = await db
-      .select({
-        totalBottles: sql<string>`COUNT(DISTINCT ${tastings.bottleId})`,
-        totalTastings: sql<string>`COUNT(${tastings.bottleId})`,
-      })
-      .from(tastings)
-      .where(eq(tastings.createdById, user.id))
-      .limit(1);
-
-    const [
-      {
-        collectedBottles,
-        totalLibraryBottles,
-        openLibraryBottles,
-        sealedLibraryBottles,
-      },
-    ] = await db
-      .select({
-        collectedBottles: sql<string>`COUNT(DISTINCT ${collectionBottles.bottleId})`,
-        totalLibraryBottles: sql<string>`COUNT(${collectionBottles.id}) FILTER (WHERE LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.library.name.toLowerCase()} AND ${collectionBottles.status} IS DISTINCT FROM 'empty')`,
-        openLibraryBottles: sql<string>`COUNT(${collectionBottles.id}) FILTER (WHERE LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.library.name.toLowerCase()} AND ${collectionBottles.status} = 'open')`,
-        sealedLibraryBottles: sql<string>`COUNT(${collectionBottles.id}) FILTER (WHERE LOWER(${collections.name}) = ${RESERVED_COLLECTIONS.library.name.toLowerCase()} AND ${collectionBottles.status} = 'sealed')`,
-      })
-      .from(collections)
-      .innerJoin(
-        collectionBottles,
-        eq(collections.id, collectionBottles.collectionId),
-      )
-      .where(eq(collections.createdById, user.id))
-      .limit(1);
+    let tastingStats: Awaited<ReturnType<typeof aggregateTastingStats>>;
+    let collectionStats: Awaited<ReturnType<typeof aggregateCollectionStats>>;
+    try {
+      tastingStats = await aggregateTastingStats(user.id);
+      collectionStats = await aggregateCollectionStats(user.id);
+    } catch (error) {
+      if (error instanceof CatalogTargetResolutionError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
+    }
 
     const userActor = await db.query.actors.findFirst({
       where: (table, { and, eq }) =>
@@ -107,14 +214,10 @@ export default procedure
     return {
       ...(await serialize(UserSerializer, user, context.user)),
       stats: {
-        tastings: Number(totalTastings),
-        bottles: Number(totalBottles),
-        collected: Number(collectedBottles),
-        library: {
-          total: Number(totalLibraryBottles),
-          open: Number(openLibraryBottles),
-          sealed: Number(sealedLibraryBottles),
-        },
+        tastings: tastingStats.tastings,
+        bottles: tastingStats.bottles,
+        collected: collectionStats.collected,
+        library: collectionStats.library,
         contributions: Number(totalContributions),
       },
     };

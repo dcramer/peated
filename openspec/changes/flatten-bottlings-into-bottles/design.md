@@ -1456,6 +1456,46 @@ and Entity totals, public access, and the unchanged response contract. This
 slice performs no production backfill and authorizes no deployment or
 activation.
 
+### User profile statistics use authoritative CatalogTargets
+
+Tasks 7.1e-7.3h cut the user-details statistics over from distinct retained
+Bottle ids to each Tasting and collection entry's nullable authoritative
+`targetId`. The route reads the selected user's Tastings and collection entries
+in bounded ascending-id batches. Tasting primary ids and collection-entry
+primary ids are the stable parity locators. For every row, parity measurement
+independently resolves the durable target and retained Bottle/Release pair and
+records the consumer table, row id, retained ids, target id, caller, operation,
+and both resolved identities. Retained identity is telemetry only; it cannot
+select aggregate identity, repair a row, or mutate state during the GET.
+
+`stats.tastings` counts every Tasting row created by the user, while
+`stats.bottles` counts distinct nonnull authoritative target ids across those
+rows. `stats.collected` counts distinct nonnull authoritative target ids across
+every collection entry in every collection owned by the user, regardless of
+collection name or status. Exact and generic CatalogTargets are separate
+identities, and repeated rows for the same target count once in each distinct
+metric. A targetless Tasting still contributes to `stats.tastings`, and a
+targetless collection entry may still contribute to the existing Library
+status row counts, but neither contributes to an identity-distinct count.
+
+The Library status metrics remain row counts over the case-insensitive reserved
+Library: `total` includes every status except `empty`, while `open` and `sealed`
+include only their respective statuses. A missing, retired, or inconsistent
+nonnull target on any row in the aggregate fails the route closed as a
+conflict. The route never falls back to the retained pair for statistics
+identity and never substitutes a representative Bottle for a generic target.
+
+The cutover preserves the existing public numeric-id, username, and `me`
+lookup behavior, missing-user and unauthenticated-`me` errors, actor-aware
+`UserSerializer` visibility, friend status, response shape, and actor-backed
+contribution count. The GET writes no target, Tasting, collection, parity
+repair, or other durable state. Task 7.11g covers exact, generic, repeated,
+targetless, retained-drift, invalid-target, collection-scope, Library-status,
+lookup, serialization, contribution, and response behavior. Existing-row
+target backfill, retained-pair removal, and production activation remain owned
+by section 6, tasks 9.6/9.7, and the retained parity/audit gates. This slice
+performs no production backfill and authorizes no deployment or activation.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit
