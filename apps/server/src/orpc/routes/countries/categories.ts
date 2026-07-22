@@ -1,12 +1,16 @@
 import { db } from "@peated/server/db";
 import {
+  bottleGroupTombstones,
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
+  catalogTargets,
   countries,
   entities,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { and, eq, sql } from "drizzle-orm";
+import { CategoryEnum } from "@peated/server/schemas";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -28,7 +32,7 @@ export default procedure
       results: z.array(
         z.object({
           count: z.number(),
-          category: z.string().nullable(),
+          category: CategoryEnum.nullable(),
         }),
       ),
       totalCount: z.number(),
@@ -53,40 +57,42 @@ export default procedure
       countryId = result.id;
     }
 
-    // TODO: denormalize this into (num)tastings or similar in the tags table
-    const results = (
-      await db.execute<{
-        count: string;
-        category: string | null;
-      }>(
-        sql`SELECT COUNT(*) as count, category
-              FROM ${bottles}
-              WHERE EXISTS(
-                  SELECT FROM ${bottlesToDistillers}
-                  JOIN ${entities}
-                    ON ${bottlesToDistillers.distillerId} = ${entities.id}
-                  WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                    AND ${entities.countryId} = ${countryId}
-                 )
-              GROUP BY ${bottles.category}`,
-      )
-    ).rows;
-
-    const [{ totalBottles }] = await db
-      .select({ totalBottles: sql<string>`COUNT(*)` })
+    const rows = await db
+      .select({
+        category: bottles.category,
+        count: sql<string>`COUNT(*)`,
+      })
       .from(bottles)
       .innerJoin(
-        bottlesToDistillers,
-        eq(bottlesToDistillers.bottleId, bottles.id),
+        catalogTargets,
+        and(
+          eq(catalogTargets.bottleId, bottles.id),
+          eq(catalogTargets.groupId, bottles.groupId),
+        ),
       )
-      .innerJoin(entities, eq(bottlesToDistillers.distillerId, entities.id))
-      .where(and(eq(entities.countryId, countryId)));
+      .where(
+        and(
+          sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+          sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
+          sql`EXISTS(
+            SELECT FROM ${bottlesToDistillers}
+            INNER JOIN ${entities}
+              ON ${bottlesToDistillers.distillerId} = ${entities.id}
+            WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${entities.countryId} = ${countryId}
+          )`,
+        ),
+      )
+      .groupBy(bottles.category)
+      .orderBy(asc(bottles.category));
+
+    const results = rows.map(({ count, category }) => ({
+      count: Number(count),
+      category,
+    }));
 
     return {
-      results: results.map(({ count, category }) => ({
-        count: Number(count),
-        category,
-      })),
-      totalCount: Number(totalBottles),
+      results,
+      totalCount: results.reduce((total, { count }) => total + count, 0),
     };
   });

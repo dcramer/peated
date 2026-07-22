@@ -1370,6 +1370,36 @@ and production activation remain owned by section 6, tasks 9.6/9.7, and the
 retained parity/audit gates. This slice performs no production backfill and
 authorizes no deployment or activation.
 
+### Country category analytics read active exact CatalogTargets
+
+Task 7.3e cuts the public country category aggregate over to the active exact
+catalog population. A Bottle contributes only when it has an exact
+CatalogTarget whose Bottle and BottleGroup membership agree, neither the Bottle
+nor its BottleGroup is tombstoned, and at least one of the Bottle's own
+distillers belongs to the requested country. Category and distiller membership
+come from the independently complete Bottle. The aggregate does not read
+BottleGroup category or distillers, include a generic or targetless identity,
+or select a representative Bottle.
+
+One exact Bottle contributes once to one category bucket for a country even
+when more than one of its distillers belongs to that country. `totalCount` is
+the sum of those same buckets, including the null-category bucket, rather than
+a second join with different duplicate semantics. Results use the shared
+nullable category schema and deterministic category ordering. Existing public
+numeric-id and case-insensitive slug lookup, invalid-slug behavior, empty
+results, and response shape remain unchanged.
+
+This catalog-wide aggregate has no durable consumer row containing a target id
+and retained Bottle/Release pair. It therefore is not assigned a fabricated
+task 7.1 or 7.2 row-parity adapter; the active exact CatalogTarget population is
+the read boundary, while production aggregate comparison and activation remain
+owned by the existing audit and deployment gates. The GET performs no target,
+catalog, statistics, or other durable mutation. Task 7.11d covers exact
+membership, tombstones, generic/targetless exclusion, Bottle-owned fields,
+same-country multi-distiller de-duplication, nullable ordering, totals, lookup,
+and error behavior. This slice performs no production backfill and authorizes
+no deployment or activation.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit
