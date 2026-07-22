@@ -204,14 +204,25 @@ catalog-wide aggregate has no durable target/retained-pair consumer row, it
 does not invent task 7.1/7.2 row-parity evidence; task 7.11e owns its
 integration coverage.
 
-Remaining analytics consumers still inventoried under parent tasks 7.1-7.3
-and 7.11 include badge hydration and checks in `apps/server/src/lib/badges/`,
-retained tasting and collection Bottle-id analytics in
-`apps/server/src/orpc/routes/users/details.ts`, and the Bottle-wide total in
-`apps/server/src/orpc/routes/stats.ts`. The Library, country, and entity
-statistics sub-slices do not implicitly cut over these consumers or any other
-Bottle/BottleRelease-derived reporting. The cleanup inventory remains open for
-additional legacy analytics discovered during later cutovers.
+`apps/server/src/orpc/routes/stats.ts` is the task 7.3g target-backed global
+Bottle aggregate. Its `totalBottles` value counts each active exact
+CatalogTarget once through valid Bottle/group membership, excluding generic
+targets, targetless Bottles, Bottle tombstones, and BottleGroup tombstones. It
+does not substitute a representative Bottle or use BottleGroup-owned identity
+as exact Bottle identity. The route preserves its raw Tasting and Entity row
+totals, public response shape, and read-only behavior. Because this
+catalog-wide aggregate has no durable target/retained-pair consumer row, it
+does not invent task 7.1/7.2 row-parity evidence; task 7.11f owns its integration
+coverage.
+
+Remaining known analytics consumers still inventoried under parent tasks
+7.1-7.3 and 7.11 include badge hydration and checks in
+`apps/server/src/lib/badges/` and retained tasting and collection Bottle-id
+analytics in `apps/server/src/orpc/routes/users/details.ts`. The Library,
+country, entity, and global statistics sub-slices do not implicitly cut over
+these consumers or any other Bottle/BottleRelease-derived reporting. This list
+is non-exhaustive, and the cleanup inventory remains open for additional legacy
+analytics discovered during later cutovers.
 
 ## API routes
 

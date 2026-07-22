@@ -1430,6 +1430,32 @@ generic/targetless exclusion, Bottle-owned roles, multi-role de-duplication,
 nullable ordering, live totals, lookup, and error behavior. This slice performs
 no production backfill and authorizes no deployment or activation.
 
+### Global statistics count active exact CatalogTargets
+
+Task 7.3g cuts the public global `totalBottles` statistic over to the active
+exact catalog population. A Bottle contributes only through its one exact
+CatalogTarget when the target's Bottle and BottleGroup membership agree and
+neither the Bottle nor its BottleGroup is tombstoned. Generic targets and
+targetless Bottles do not contribute. The aggregate counts each qualifying
+exact target once and never substitutes a representative Bottle or reads
+BottleGroup-owned identity as exact Bottle identity.
+
+The route's `totalTastings` and `totalEntities` values remain raw Tasting and
+Entity row counts. Public access, the response shape, and the meaning of those
+two fields remain unchanged. This GET performs no target, catalog, statistics,
+or other durable mutation.
+
+Like the country and entity aggregates, this catalog-wide read has no durable
+consumer row containing a target id and retained Bottle/Release pair. It
+therefore is not assigned a fabricated task 7.1 or 7.2 row-parity adapter. The
+active exact CatalogTarget population is authoritative, while production
+aggregate comparison and activation remain owned by the existing audit and
+deployment gates. Task 7.11f covers exact membership, tombstones,
+generic/targetless exclusion, one-count-per-exact-target behavior, raw Tasting
+and Entity totals, public access, and the unchanged response contract. This
+slice performs no production backfill and authorizes no deployment or
+activation.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit
