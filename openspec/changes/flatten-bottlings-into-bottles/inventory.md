@@ -23,10 +23,10 @@ updated with the production surface they exercise.
 | `bottle_release`               | Concrete release table, owned by `apps/server/src/db/schema/bottles.ts`                |
 | `bottle_observation`           | `bottle_id`, nullable `release_id`                                                     |
 | `bottle_alias`                 | nullable `bottle_id`, nullable `release_id`                                            |
-| `tasting`                      | `bottle_id`, nullable `release_id`                                                     |
+| `tasting`                      | nullable retained compatibility `bottle_id`, nullable `release_id`                     |
 | `review`                       | nullable `bottle_id`, nullable `release_id`                                            |
-| `collection_bottle`            | `bottle_id`, nullable `release_id`                                                     |
-| `flight_bottle`                | `bottle_id`, nullable `release_id`                                                     |
+| `collection_bottle`            | nullable retained compatibility `bottle_id`, nullable `release_id`                     |
+| `flight_bottle`                | nullable retained compatibility `bottle_id`, nullable `release_id`                     |
 | `store_price`                  | nullable `bottle_id`, nullable `release_id`                                            |
 | `incoming_bottle_decision_log` | `target_id`, `bottle_id`, nullable `release_id`; historical release-shaped decisions   |
 | `store_price_match_proposal`   | current/suggested targets and retained pairs, parent Bottle, release-shaped JSON draft |
@@ -420,11 +420,11 @@ Target-bearing consumer routes:
   generated contract and runtime validator expose target-native and retained
   identity as two strict complete alternatives, so clients cannot combine or
   omit the identity discriminant.
-  Target-native generic creation remains unavailable while the retained
-  `collection_bottle.bottleId` column is non-null; it never invents the
-  representative Bottle. Existing generic rows support target-native read,
-  filter, delete, status, and image actions. The remaining generic-create
-  storage/input cutover stays mapped to tasks 8.7 and 9.6.
+  Task 8.7 makes retained `collection_bottle.bottleId` nullable and enables
+  generic target-native creation with `(null, null)` retained identity. It
+  never invents the representative Bottle. Target uniqueness is authoritative,
+  while retained-pair uniqueness applies only when a retained Bottle exists.
+  Pair removal remains task 9.6.
 - `apps/server/src/orpc/routes/collections/bottles/delete.ts` is the task 5.6d
   target-aware removal boundary for release-specific and `baseOnly` requests.
   Target input locks and deletes only its authoritative membership. A specific
@@ -481,36 +481,46 @@ Target-bearing consumer routes:
   staged legacy row remains targetless. Review serialization is now part of the
   partial task 7.1-7.3 cutover; other named consumers still keep those tasks
   open.
-- `apps/server/src/orpc/routes/flights/targetAssignments.ts` is the task 5.6e
-  shared assignment boundary for staged Flight Bottle-id input. It resolves
-  every submitted `(bottleId, null)` intent through deterministic legacy
-  cardinality, preserves generic targets without representative substitution,
-  and canonicalizes duplicate target selections with the lowest retained Bottle
-  id.
+- `apps/server/src/orpc/routes/flights/targetAssignments.ts` remains the task
+  5.6e shared assignment boundary, extended by task 8.7 for the strict
+  target-native `targets` input alongside the retained `bottles` adapter. Target
+  input resolves each durable id directly and stores its exact Bottle id or a
+  null retained projection for a generic target. Retained input still resolves
+  each submitted `(bottleId, null)` through deterministic cardinality and keeps
+  the lowest retained Bottle id when multiple inputs select one target.
 - `apps/server/src/orpc/routes/flights/create.ts` is the task 5.6e direct Flight
-  creation writer. It locks the canonical requested target set before creating
-  the Flight or membership, writes the validated `targetId` with the submitted
-  retained Bottle id and null release id, and rolls back rather than creating a
-  targetless row for an invalid or staged selection.
+  creation writer. Task 8.7 gives it mutually exclusive target-native `targets`
+  and retained `bottles` request shapes; an omitted target-native list creates
+  an empty Flight. It locks the canonical requested target set before creating
+  the Flight or membership, then writes each validated `targetId` with its exact
+  Bottle id or null generic retained projection and a null release id. Invalid
+  selections roll back instead of creating targetless rows. The retained input
+  adapter and pair columns remain for tasks 9.7 and 9.6 respectively.
 - `apps/server/src/orpc/routes/flights/update.ts` is the task 5.6e direct Flight
-  replacement writer. An omitted Bottle list preserves membership, an explicit
-  empty list clears it, and any supplied list fully replaces it. Before
-  deletion, it snapshot-compares membership while locking the requested and
-  existing durable target union ahead of the Flight and membership rows; a
-  change retries from a fresh snapshot. A stable replacement removes existing
-  durable and targetless rows and inserts only the canonical requested target
-  set. Reads, existing-row backfill, target-native input, and pair cleanup remain
-  tasks 7.3, section 6, 8.7, and 9.6/9.7 respectively; this slice makes no
-  deployment claim.
+  replacement writer, extended by task 8.7 with mutually exclusive `targets`
+  and retained `bottles` membership fields. Omitting both fields preserves
+  membership during a metadata-only update, an explicit empty array clears it,
+  and either supplied field fully replaces it. Before deletion, the route
+  snapshot-compares membership while locking the requested and existing durable
+  target union ahead of the Flight and membership rows; a change retries from a
+  fresh snapshot. A stable replacement removes existing durable and targetless
+  rows and inserts only the canonical requested set, using null retained Bottle
+  identity for generic targets. Pair-column cleanup and removal of the retained
+  adapter remain tasks 9.6 and 9.7; this slice makes no deployment claim.
 - `apps/server/src/orpc/routes/flights/details.ts` now returns the Flight's
   authoritative ordered CatalogTargets with target-owned distillers and
   target-keyed viewer state. Generic members remain group identity without
   representative substitution. The superseded `flight` filter on the ordinary
   Bottle list was removed because it could expose a retained Bottle as exact
   identity for a generic membership. Flight list/create/update keep their
-  bounded target-free response; target-native membership input remains task
-  8.7.
-- `apps/server/src/orpc/routes/tastings/create.ts`
+  bounded target-free response, while task 8.7 now supplies target-native
+  membership input. Retained request compatibility and pair storage remain only
+  for the staged task 9.7 and 9.6 cleanup.
+- `apps/server/src/orpc/routes/tastings/create.ts` accepts strict, disjoint
+  target-native and retained compatibility inputs. The authoritative target is
+  locked before Flight membership and Tasting mutation. Exact targets retain
+  `(bottleId, null)` while generic targets retain `(null, null)` without tag or
+  representative-Bottle side effects.
 - `apps/server/src/orpc/routes/tastings/delete.ts`
 - `apps/server/src/orpc/routes/tastings/list.ts` now filters and returns
   target-backed Tasting identity. Its retained Bottle/Release list input is a
@@ -523,13 +533,15 @@ Target-bearing consumer routes:
   backfill and parity.
 - `apps/server/src/orpc/routes/tastings/photo-identification-create.ts` applies
   an approved create-shaped classifier decision through the same task 5.8
-  concrete creation owner. Success returns one independently complete Bottle
-  backed by its active exact target, always returns `release: null`, and does not
+  concrete creation owner. Success returns the active exact target containing
+  its independently complete Bottle and does not
   insert a BottleRelease or write a photo/reference ingestion alias. Canonical
   concrete creation still reserves the Bottle's required canonical exact alias.
   The reviewed decision remains the caller's structured evidence; optional
   catalog-image promotion is a separate post-creation side effect.
-- `apps/server/src/orpc/routes/tastings/photo-identification.ts`
+- `apps/server/src/orpc/routes/tastings/photo-identification.ts` keeps raw
+  classifier match pairs internal and serializes a validated exact target for
+  browser continuation.
 - `apps/server/src/orpc/routes/prices/create-batch.ts` is the second task 5.6f
   sub-slice and now resolves accepted aliases to one validated exact, generic,
   or measured staged-targetless assignment. It tries the normalized alias key
@@ -1273,21 +1285,19 @@ Shared UI and client helpers:
 - Collection tables, activity previews, image/status actions, and the
   post-scan Library confirmation now render one CatalogTarget. Exact entries
   link their independently complete Bottle; generic entries show the group
-  label and scope without a Bottle link or representative. Existing generic
-  Library entries mutate by target id, while generic creation remains disabled
-  at the non-null retained-Bottle storage boundary described above. Library
-  cache updates use the typed collection-list query prefix and globally unique
-  collection-entry ids rather than serialized query-key substring matching.
+  label and scope without a Bottle link or representative. Exact and generic
+  Library entries are created and mutated by target id; the BottleGroup page
+  exposes the same generic-target Library action. Library cache updates use the
+  typed collection-list query prefix and globally unique collection-entry ids
+  rather than serialized query-key substring matching.
 - Flight detail, overlay, and edit routes consume the details response's target
   list directly. Exact entries retain their quick panel, Flight-scoped tasting
-  action, target-keyed status indicators, and distiller display. Generic
-  memberships cannot start an exact tasting or be rewritten through the staged
-  Bottle-id form; metadata edits preserve them. Exact-only membership editing
-  remains the measured task 8.7 compatibility input until every target-bearing
-  flow is target-native.
+  action, target-keyed status indicators, and distiller display. Generic entries
+  can start a generic target tasting without opening an exact-Bottle panel or
+  substituting the representative Bottle. Membership editing submits target ids
+  for both exact and generic entries.
 - `apps/web/src/lib/tastingForm.ts` shapes the validated form submission. Create
-  still carries the staged Bottle/Release identity until task 8.7 moves tasting
-  creation to one `targetId`; edit is content-only and cannot mutate identity.
+  carries one `targetId`; edit is content-only and cannot mutate identity.
 - `apps/web/src/lib/bottlings.ts`
 
 Admin exports and test protocol fixtures that encode release fields:

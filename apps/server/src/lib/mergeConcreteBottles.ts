@@ -944,7 +944,11 @@ export async function mergeConcreteBottlesInTransaction(
   try {
     await repointLegacyBottleConsumers(tx, sourceBottleId, destinationBottleId);
   } catch (error) {
-    if (postgresConstraint(error) === "tasting_unq") {
+    if (
+      ["tasting_unq", "tasting_legacy_unq"].includes(
+        postgresConstraint(error) ?? "",
+      )
+    ) {
       throw new ConcreteBottleMergeConflictError("consumer_conflict", {
         cause: error,
       });

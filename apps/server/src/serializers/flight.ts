@@ -61,6 +61,7 @@ export const FlightDetailsSerializer = serializer({
           flightId: membership.flightId,
           bottleId: membership.bottleId,
           releaseId: membership.releaseId,
+          targetId: membership.targetId,
         },
         targetId: membership.targetId,
         legacy: {
@@ -151,8 +152,15 @@ export const FlightDetailsSerializer = serializer({
     memberships.forEach((membership, index) => {
       const target = targets[index];
       if (!target) {
+        if (membership.targetId === null && membership.bottleId === null) {
+          throw new Error(
+            `flight membership ${membership.flightId} has no catalog identity`,
+          );
+        }
         throw new CatalogTargetIntegrityMismatchError(
-          { bottleId: membership.bottleId },
+          membership.targetId !== null
+            ? { targetId: membership.targetId }
+            : { bottleId: membership.bottleId! },
           `flight membership (${membership.flightId}, ${membership.bottleId}, ${membership.releaseId ?? "null"}) has no durable CatalogTarget`,
         );
       }

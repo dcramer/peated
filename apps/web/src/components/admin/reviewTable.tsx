@@ -34,10 +34,7 @@ export default function ReviewTable({
         <tbody>
           {reviewList.map((review) => {
             return (
-              <tr
-                key={review.name}
-                className="border-b border-slate-800 text-sm"
-              >
+              <tr key={review.id} className="border-b border-slate-800 text-sm">
                 <td className="max-w-0 px-3 py-3">
                   <Link
                     href={review.url}

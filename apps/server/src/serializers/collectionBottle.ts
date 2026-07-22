@@ -57,8 +57,15 @@ export const CollectionBottleSerializer = serializer({
       itemList.map((item, index) => {
         const target = targets[index];
         if (!target) {
+          if (item.targetId === null && item.bottleId === null) {
+            throw new Error(
+              `collection membership ${item.id} has no catalog identity`,
+            );
+          }
           throw new CatalogTargetIntegrityMismatchError(
-            { bottleId: item.bottleId },
+            item.targetId !== null
+              ? { targetId: item.targetId }
+              : { bottleId: item.bottleId! },
             `collection membership ${item.id} has no durable CatalogTarget`,
           );
         }

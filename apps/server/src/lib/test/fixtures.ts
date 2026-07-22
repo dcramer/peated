@@ -659,11 +659,11 @@ export const Tasting = async (
 
     if (!result) throw new Error("Unable to create Tasting fixture");
 
-    for (const tag of result.tags) {
+    for (const tag of result.bottleId === null ? [] : result.tags) {
       await tx
         .insert(bottleTags)
         .values({
-          bottleId: result.bottleId,
+          bottleId: result.bottleId!,
           tag,
           count: 1,
         })

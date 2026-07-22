@@ -639,7 +639,9 @@ async function lockAndValidateDirectRows(
         .where(
           and(
             eq(flightBottles.flightId, plan.row.flightId),
-            eq(flightBottles.bottleId, plan.row.bottleId),
+            plan.row.bottleId === null
+              ? isNull(flightBottles.bottleId)
+              : eq(flightBottles.bottleId, plan.row.bottleId),
             plan.row.releaseId === null
               ? isNull(flightBottles.releaseId)
               : eq(flightBottles.releaseId, plan.row.releaseId),
@@ -972,7 +974,9 @@ async function applyDirectPlans(
         .where(
           and(
             eq(flightBottles.flightId, row.flightId),
-            eq(flightBottles.bottleId, row.bottleId),
+            row.bottleId === null
+              ? isNull(flightBottles.bottleId)
+              : eq(flightBottles.bottleId, row.bottleId),
             row.releaseId === null
               ? isNull(flightBottles.releaseId)
               : eq(flightBottles.releaseId, row.releaseId),

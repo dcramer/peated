@@ -9,6 +9,7 @@ import {
   catalogTargets,
   entities,
   flightBottles,
+  flights,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
@@ -17,7 +18,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 vi.mock("@peated/server/worker/client", async (importOriginal) => ({
@@ -107,6 +108,94 @@ describe("POST /tastings", () => {
       { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
+  });
+
+  test("creates exact and generic target-native tastings without retained drift", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const exactBottle = await fixtures.Bottle();
+    const genericBottle = await fixtures.Bottle();
+    const [exactTarget, genericTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, exactBottle.id),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, genericBottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+    ]);
+    if (!exactTarget || !genericTarget) throw new Error("Missing targets");
+
+    const exact = await routerClient.tastings.create(
+      { target: exactTarget.id, rating: 1 },
+      { context: { user: defaults.user } },
+    );
+    const generic = await routerClient.tastings.create(
+      { target: genericTarget.id, rating: 2 },
+      { context: { user: defaults.user } },
+    );
+    const rows = await db.query.tastings.findMany({
+      where: (table, { inArray }) =>
+        inArray(table.id, [exact.tasting.id, generic.tasting.id]),
+    });
+
+    expect(rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: exact.tasting.id,
+          targetId: exactTarget.id,
+          bottleId: exactBottle.id,
+          releaseId: null,
+        }),
+        expect.objectContaining({
+          id: generic.tasting.id,
+          targetId: genericTarget.id,
+          bottleId: null,
+          releaseId: null,
+        }),
+      ]),
+    );
+  });
+
+  test("rejects invalid and mixed target-native identity", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing target");
+
+    const beforeTastings = await db.query.tastings.findMany({
+      where: eq(tastings.createdById, defaults.user.id),
+    });
+    const invalidTargetError = await waitError(() =>
+      routerClient.tastings.create(
+        { target: Number.MAX_SAFE_INTEGER },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(invalidTargetError).toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Cannot identify catalog target.",
+    });
+    expect(
+      await db.query.tastings.findMany({
+        where: eq(tastings.createdById, defaults.user.id),
+      }),
+    ).toEqual(beforeTastings);
+    await expect(
+      waitError(() =>
+        routerClient.tastings.create(
+          { target: target.id, bottle: bottle.id } as never,
+          { context: { user: defaults.user } },
+        ),
+      ),
+    ).resolves.toMatchObject({ message: "Input validation failed" });
   });
 
   test("keeps the tasting and target when stats publication fails", async ({
@@ -207,6 +296,14 @@ describe("POST /tastings", () => {
       targetBottle.id,
       targetBottle.createdByActorId,
     );
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, targetBottle.id),
+    });
+    if (!target) throw new Error("Missing promoted exact target");
+    await db
+      .update(flightBottles)
+      .set({ targetId: target.id })
+      .where(eq(flightBottles.flightId, flight.id));
 
     const data = await routerClient.tastings.create(
       {
@@ -334,7 +431,7 @@ describe("POST /tastings", () => {
     expect(tasting.tags).toEqual([tags[0].name, tags[1].name]);
 
     const bTags = await db.query.bottleTags.findMany({
-      where: (bottleTags, { eq }) => eq(bottleTags.bottleId, tasting.bottleId),
+      where: (bottleTags, { eq }) => eq(bottleTags.bottleId, tasting.bottleId!),
       orderBy: (bottleTags, { asc }) => asc(bottleTags.tag),
     });
     expect(bTags.length).toBe(2);
@@ -481,6 +578,78 @@ describe("POST /tastings", () => {
     expect(tasting.bottleId).toEqual(bottle.id);
     expect(tasting.createdById).toEqual(defaults.user.id);
     expect(tasting.flightId).toEqual(flight.id);
+  });
+
+  test("creates a generic target tasting for a matching target-native flight", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const memberBottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
+    const [memberTarget, otherTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, memberBottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, otherBottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+    ]);
+    if (!memberTarget || !otherTarget) throw new Error("Missing targets");
+
+    const flight = await routerClient.flights.create(
+      {
+        name: "Generic target flight",
+        targets: [memberTarget.id],
+      },
+      { context: { user: defaults.user } },
+    );
+
+    const data = await routerClient.tastings.create(
+      {
+        target: memberTarget.id,
+        flight: flight.id,
+      },
+      { context: { user: defaults.user } },
+    );
+    const tasting = await db.query.tastings.findFirst({
+      where: eq(tastings.id, data.tasting.id),
+    });
+    const persistedFlight = await db.query.flights.findFirst({
+      where: eq(flights.publicId, flight.id),
+    });
+    if (!persistedFlight) throw new Error("Missing flight");
+
+    expect(tasting).toMatchObject({
+      targetId: memberTarget.id,
+      bottleId: null,
+      releaseId: null,
+      flightId: persistedFlight.id,
+    });
+
+    const error = await waitError(() =>
+      routerClient.tastings.create(
+        {
+          target: otherTarget.id,
+          flight: flight.id,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(error).toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Cannot identify flight.",
+    });
+    expect(
+      await db.query.tastings.findMany({
+        where: eq(tastings.targetId, otherTarget.id),
+      }),
+    ).toHaveLength(0);
   });
 
   test("creates a new tasting with badge award", async ({

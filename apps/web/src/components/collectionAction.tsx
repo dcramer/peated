@@ -8,37 +8,57 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useORPC } from "../lib/orpc/context";
 import Button from "./button";
 
-type CollectionActionProps = {
-  bottleId: number;
-  releaseId?: number | null;
+type CollectionActionCommonProps = {
   size?: "small" | "base";
   title?: string;
 };
 
-function getTitle({ baseOnly, title }: { baseOnly: boolean; title?: string }) {
+type TargetCollectionActionProps = CollectionActionCommonProps & {
+  targetId: number;
+  bottleId?: never;
+  releaseId?: never;
+};
+
+type LegacyReleaseCollectionActionProps = CollectionActionCommonProps & {
+  targetId?: never;
+  bottleId: number;
+  releaseId: number;
+};
+
+type CollectionActionProps =
+  | TargetCollectionActionProps
+  | LegacyReleaseCollectionActionProps;
+
+function getTitle({
+  specificBottle,
+  title,
+}: {
+  specificBottle: boolean;
+  title?: string;
+}) {
   return (
     title ??
-    (baseOnly ? "Save Bottle to Library" : "Save Specific Bottling to Library")
+    (specificBottle
+      ? "Save Specific Bottling to Library"
+      : "Save Bottle to Library")
   );
 }
 
 function SavedCollectionActionAuthenticated({
-  bottleId,
-  releaseId,
+  targetId,
   size,
   title,
-}: CollectionActionProps) {
+}: TargetCollectionActionProps) {
   const { user } = useAuth();
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const [isMounted, setIsMounted] = useState(false);
-  const baseOnly = releaseId == null;
-  const resolvedTitle = getTitle({ baseOnly, title });
+  const resolvedTitle = getTitle({ specificBottle: false, title });
   const addToLibraryMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
   );
@@ -56,9 +76,7 @@ function SavedCollectionActionAuthenticated({
     input: {
       user: "me",
       collection: "library",
-      bottle: bottleId,
-      release: releaseId ?? undefined,
-      baseOnly,
+      target: targetId,
     },
     select: (data) => data.results.length > 0,
   });
@@ -70,7 +88,7 @@ function SavedCollectionActionAuthenticated({
     if (isORPCClientError(err) && err.name === "UNAUTHORIZED") {
       return (
         <SavedCollectionActionUnauthenticated
-          releaseId={releaseId}
+          specificBottle={false}
           size={size}
           title={title}
         />
@@ -90,15 +108,12 @@ function SavedCollectionActionAuthenticated({
       onClick={async () => {
         await (isCollected
           ? removeFromLibraryMutation.mutateAsync({
-              bottle: bottleId,
-              release: releaseId,
-              baseOnly,
+              target: targetId,
               user: "me",
               collection: "library",
             })
           : addToLibraryMutation.mutateAsync({
-              bottle: bottleId,
-              release: releaseId,
+              target: targetId,
               user: "me",
               collection: "library",
             }));
@@ -146,11 +161,11 @@ function SavedCollectionActionAuthenticated({
 }
 
 function SavedCollectionActionUnauthenticated({
-  releaseId,
+  specificBottle,
   size,
   title,
-}: Pick<CollectionActionProps, "releaseId" | "size" | "title">) {
-  const resolvedTitle = getTitle({ baseOnly: releaseId == null, title });
+}: CollectionActionCommonProps & { specificBottle: boolean }) {
+  const resolvedTitle = getTitle({ specificBottle, title });
 
   return (
     <Button
@@ -165,20 +180,96 @@ function SavedCollectionActionUnauthenticated({
   );
 }
 
-function SavedCollectionAction(props: CollectionActionProps) {
+function SavedCollectionAction(props: TargetCollectionActionProps) {
   const { user } = useAuth();
 
   if (!user) {
-    return <SavedCollectionActionUnauthenticated {...props} />;
+    return (
+      <SavedCollectionActionUnauthenticated
+        specificBottle={false}
+        size={props.size}
+        title={props.title}
+      />
+    );
   }
 
   return <SavedCollectionActionAuthenticated {...props} />;
 }
 
-export function LibraryAction(props: CollectionActionProps) {
+function LegacyReleaseCollectionAction({
+  bottleId,
+  releaseId,
+  size,
+  title,
+}: LegacyReleaseCollectionActionProps) {
+  const { user } = useAuth();
+  if (!user) {
+    return (
+      <SavedCollectionActionUnauthenticated
+        specificBottle
+        size={size}
+        title={title}
+      />
+    );
+  }
+
+  return (
+    <LegacyReleaseCollectionActionAuthenticated
+      bottleId={bottleId}
+      releaseId={releaseId}
+      size={size}
+      title={title}
+    />
+  );
+}
+
+function LegacyReleaseCollectionActionAuthenticated({
+  bottleId,
+  releaseId,
+  size,
+  title,
+}: LegacyReleaseCollectionActionProps) {
+  const orpc = useORPC();
+  const { data: promoted } = useSuspenseQuery(
+    orpc.bottleReleases.target.queryOptions({
+      input: { bottle: bottleId, release: releaseId },
+    }),
+  );
+  const { data: target } = useSuspenseQuery(
+    orpc.bottles.target.queryOptions({
+      input: { bottle: promoted.bottleId },
+    }),
+  );
+
+  return (
+    <SavedCollectionAction
+      targetId={target.targetId}
+      size={size}
+      title={title}
+    />
+  );
+}
+
+export function LibraryAction(props: TargetCollectionActionProps) {
   return <SavedCollectionAction {...props} />;
 }
 
 export default function SavedCollectionActions(props: CollectionActionProps) {
-  return <LibraryAction {...props} />;
+  if (props.targetId !== undefined) {
+    return (
+      <LibraryAction
+        targetId={props.targetId}
+        size={props.size}
+        title={props.title}
+      />
+    );
+  }
+  return (
+    <LegacyReleaseCollectionAction
+      bottleId={props.bottleId}
+      releaseId={props.releaseId}
+      size={props.size}
+      title={props.title}
+    />
+  );
 }

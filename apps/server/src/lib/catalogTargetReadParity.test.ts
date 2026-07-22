@@ -218,6 +218,89 @@ describe("CatalogTarget read parity", () => {
     ]);
   });
 
+  test("accepts target-native generic consumers without masking incomplete exact consumers", async ({
+    fixtures,
+  }) => {
+    const firstGenericBottle = await fixtures.Bottle();
+    const secondGenericBottle = await fixtures.Bottle();
+    const exactBottle = await fixtures.Bottle();
+    const firstGenericTargetId = await genericTargetId(
+      firstGenericBottle.groupId as number,
+    );
+    const secondGenericTargetId = await genericTargetId(
+      secondGenericBottle.groupId as number,
+    );
+    const exactBottleTargetId = await exactTargetId(exactBottle.id);
+
+    const result = await loadCatalogTargetReadsWithParity(
+      [
+        {
+          consumerTable: "tasting",
+          rowLocator: { id: 11 },
+          targetId: firstGenericTargetId,
+          legacy: { bottleId: null, releaseId: null },
+        },
+        {
+          consumerTable: "collection_bottle",
+          rowLocator: { id: 12 },
+          targetId: firstGenericTargetId,
+          legacy: { bottleId: null, releaseId: null },
+        },
+        {
+          consumerTable: "flight_bottle",
+          rowLocator: {
+            flightId: 13,
+            bottleId: null,
+            releaseId: null,
+            targetId: firstGenericTargetId,
+          },
+          targetId: firstGenericTargetId,
+          legacy: { bottleId: null, releaseId: null },
+        },
+        {
+          consumerTable: "flight_bottle",
+          rowLocator: {
+            flightId: 13,
+            bottleId: null,
+            releaseId: null,
+            targetId: secondGenericTargetId,
+          },
+          targetId: secondGenericTargetId,
+          legacy: { bottleId: null, releaseId: null },
+        },
+        {
+          consumerTable: "review",
+          rowLocator: { id: 14 },
+          targetId: exactBottleTargetId,
+          legacy: { bottleId: null, releaseId: null },
+        },
+      ],
+      readContext,
+    );
+
+    expect(result.targets).toMatchObject([
+      { kind: "group", targetId: firstGenericTargetId },
+      { kind: "group", targetId: firstGenericTargetId },
+      { kind: "group", targetId: firstGenericTargetId },
+      { kind: "group", targetId: secondGenericTargetId },
+      { kind: "bottle", targetId: exactBottleTargetId },
+    ]);
+    expect(result.legacyTargets).toEqual([null, null, null, null, null]);
+    expect(result.mismatches).toEqual([
+      expect.objectContaining({
+        consumerTable: "review",
+        rowLocator: { id: 14 },
+        targetId: exactBottleTargetId,
+        targetResolution: expect.objectContaining({
+          status: "resolved",
+          kind: "bottle",
+          bottleId: exactBottle.id,
+        }),
+        legacyResolution: { status: "missing" },
+      }),
+    ]);
+  });
+
   test("correlates collection membership drift by stable entry id", async ({
     fixtures,
   }) => {

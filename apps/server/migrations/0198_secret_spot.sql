@@ -1,0 +1,12 @@
+ALTER TABLE "collection_bottle" DROP CONSTRAINT "collection_bottle_collection_id_bottle_id_release_id_unique";
+ALTER TABLE "flight_bottle" DROP CONSTRAINT "flight_bottle_flight_id_bottle_id_release_id_unique";
+ALTER TABLE "tasting" DROP CONSTRAINT "tasting_unq";
+ALTER TABLE "collection_bottle" ALTER COLUMN "bottle_id" DROP NOT NULL;
+ALTER TABLE "flight_bottle" ALTER COLUMN "bottle_id" DROP NOT NULL;
+ALTER TABLE "tasting" ALTER COLUMN "bottle_id" DROP NOT NULL;
+CREATE UNIQUE INDEX "collection_bottle_legacy_unq" ON "collection_bottle" USING btree ("collection_id","bottle_id",COALESCE("release_id", 0)) WHERE "collection_bottle"."bottle_id" IS NOT NULL;
+CREATE UNIQUE INDEX "flight_bottle_legacy_unq" ON "flight_bottle" USING btree ("flight_id","bottle_id",COALESCE("release_id", 0)) WHERE "flight_bottle"."bottle_id" IS NOT NULL;
+CREATE UNIQUE INDEX "tasting_legacy_unq" ON "tasting" USING btree ("bottle_id",COALESCE("release_id", 0),"created_by_id","created_at") WHERE "tasting"."bottle_id" IS NOT NULL;
+ALTER TABLE "collection_bottle" ADD CONSTRAINT "collection_bottle_identity_check" CHECK ("collection_bottle"."bottle_id" IS NOT NULL OR ("collection_bottle"."target_id" IS NOT NULL AND "collection_bottle"."release_id" IS NULL));
+ALTER TABLE "flight_bottle" ADD CONSTRAINT "flight_bottle_identity_check" CHECK ("flight_bottle"."bottle_id" IS NOT NULL OR ("flight_bottle"."target_id" IS NOT NULL AND "flight_bottle"."release_id" IS NULL));
+ALTER TABLE "tasting" ADD CONSTRAINT "tasting_identity_check" CHECK ("tasting"."bottle_id" IS NOT NULL OR ("tasting"."target_id" IS NOT NULL AND "tasting"."release_id" IS NULL));

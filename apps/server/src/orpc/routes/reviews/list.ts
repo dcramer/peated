@@ -1,7 +1,11 @@
 import { db } from "@peated/server/db";
 import { externalSites, reviews } from "@peated/server/db/schema";
 import { recordCatalogTargetReadFilterParity } from "@peated/server/lib/catalogTargetReadParity";
-import { resolveLegacyCatalogTargetFilterForRead } from "@peated/server/lib/catalogTargets";
+import {
+  CatalogTargetResolutionError,
+  resolveCatalogTargetForAssignment,
+  resolveLegacyCatalogTargetFilterForRead,
+} from "@peated/server/lib/catalogTargets";
 import { logWarn } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -18,12 +22,26 @@ import { z } from "zod";
 const InputSchema = z
   .object({
     site: ExternalSiteTypeEnum.optional(),
+    target: z.coerce.number().int().positive().optional(),
     bottle: z.coerce.number().gte(1).optional(),
     release: z.coerce.number().gte(1).optional(),
     query: z.string().default(""),
     onlyUnknown: z.coerce.boolean().optional(),
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().gte(1).lte(100).default(100),
+  })
+  .strict()
+  .superRefine((input, ctx) => {
+    if (
+      input.target !== undefined &&
+      (input.bottle !== undefined || input.release !== undefined)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Target cannot be combined with retained Bottle input.",
+        path: ["target"],
+      });
+    }
   })
   .default({
     query: "",
@@ -70,7 +88,9 @@ export default procedure
     }
 
     const hasPublicScope =
-      input.bottle !== undefined || input.release !== undefined;
+      input.target !== undefined ||
+      input.bottle !== undefined ||
+      input.release !== undefined;
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
 
     if (requiresModerator && !context.user?.admin && !context.user?.mod) {
@@ -93,6 +113,24 @@ export default procedure
         targetWhere: authoritativeWhere,
         legacyWhere,
       });
+    }
+
+    if (input.target !== undefined) {
+      try {
+        const target = await resolveCatalogTargetForAssignment({
+          kind: "target",
+          targetId: input.target,
+        });
+        targetWhere.push(eq(reviews.targetId, target.targetId));
+      } catch (error) {
+        if (error instanceof CatalogTargetResolutionError) {
+          throw errors.BAD_REQUEST({
+            message: "Cannot identify catalog target.",
+            cause: error,
+          });
+        }
+        throw error;
+      }
     }
 
     if (input.bottle || input.release) {
@@ -180,7 +218,10 @@ export default procedure
         ReviewSerializer,
         results.slice(0, limit),
         context.user,
-        [...(input.site ? ["site"] : []), ...(input.bottle ? ["bottle"] : [])],
+        [
+          ...(input.site ? ["site"] : []),
+          ...(input.bottle || input.target ? ["bottle"] : []),
+        ],
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

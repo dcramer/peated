@@ -9,6 +9,7 @@ import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/
 import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
+import { loadCatalogTargetByLegacyReference } from "@peated/server/lib/catalogTargets";
 import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
@@ -138,13 +139,11 @@ function summarizeExtraction(
  * Strips server-owned classifier internals from the browser response while
  * preserving the fields the photo tasting flow needs to continue.
  */
-function serializePhotoIdentificationClassification(
+async function serializePhotoIdentificationClassification(
   classification: PhotoIdentificationClassification,
-): z.infer<typeof PhotoIdentificationSchema>["classification"] {
+): Promise<z.infer<typeof PhotoIdentificationSchema>["classification"]> {
   const artifacts = {
     candidates: classification.artifacts.candidates.map((candidate) => ({
-      bottleId: candidate.bottleId,
-      releaseId: candidate.releaseId,
       bottleFullName: candidate.bottleFullName,
       fullName: candidate.fullName,
     })),
@@ -166,13 +165,28 @@ function serializePhotoIdentificationClassification(
   let serializedDecision: SerializedDecision;
 
   switch (decision.action) {
-    case "match":
+    case "match": {
+      const matchedTarget = await loadCatalogTargetByLegacyReference(
+        {
+          bottleId: decision.matchedBottleId,
+          releaseId: decision.matchedReleaseId,
+        },
+        {
+          caller: "tastings.photo-identification",
+          operation: "serialize-match",
+          actor: null,
+          permissions: { canReadCatalogIdentity: true },
+        },
+      );
+      if (matchedTarget.kind !== "bottle") {
+        throw new Error("Photo identification match did not resolve exactly.");
+      }
       serializedDecision = {
         action: "match",
-        matchedBottleId: decision.matchedBottleId,
-        matchedReleaseId: decision.matchedReleaseId,
+        matchedTarget,
       };
       break;
+    }
     case "create_bottle":
       serializedDecision = {
         action: "create_bottle",
@@ -752,7 +766,7 @@ export default procedure
       },
       imageEvidence,
       classification:
-        serializePhotoIdentificationClassification(classification),
+        await serializePhotoIdentificationClassification(classification),
       suggestedNextStep,
       diagnostics,
       createToken,

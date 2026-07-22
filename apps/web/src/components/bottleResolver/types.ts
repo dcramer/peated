@@ -1,4 +1,4 @@
-import type { Bottle, BottleRelease } from "@peated/server/types";
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import type { ReactNode } from "react";
 
@@ -10,8 +10,7 @@ export type PendingImageRef = Pick<
 >;
 
 export type BottleResolverTarget = {
-  bottle: Bottle;
-  release: BottleRelease | null;
+  target: ExactCatalogTargetV1;
   hasExactLibraryEntry: boolean;
   exactLibraryEntryImageUrl?: string | null;
   pendingImage: PendingImageRef | null;
@@ -32,8 +31,7 @@ export type BottleResolverMatchedAction = Exclude<
 >;
 
 export type BottleResolverMatchedActionsProps = {
-  bottleId: number;
-  releaseId: number | null;
+  target: ExactCatalogTargetV1;
   hasExactLibraryEntry: boolean;
   exactLibraryEntryImageUrl?: string | null;
   pendingImage: PendingImageRef | null;

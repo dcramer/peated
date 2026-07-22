@@ -145,52 +145,16 @@ function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
   );
 }
 
-export function getMatchedBottleId(result: PhotoIdentification | null) {
+export function getMatchedTarget(result: PhotoIdentification | null) {
   if (
     result &&
-    result?.suggestedNextStep !== "needs_review" &&
+    result.suggestedNextStep !== "needs_review" &&
     result.classification.status === "classified" &&
     result.classification.decision.action === "match"
   ) {
-    return result.classification.decision.matchedBottleId;
+    return result.classification.decision.matchedTarget;
   }
   return null;
-}
-
-export function getMatchedReleaseId(result: PhotoIdentification | null) {
-  if (
-    result?.classification.status === "classified" &&
-    result.classification.decision.action === "match"
-  ) {
-    return result.classification.decision.matchedReleaseId;
-  }
-  return null;
-}
-
-/**
- * Returns the classifier candidate for the matched release, falling back to the
- * matched bottle candidate when the decision did not target a specific release.
- */
-export function getMatchedCandidate(result: PhotoIdentification | null) {
-  if (
-    result?.classification.status !== "classified" ||
-    result.classification.decision.action !== "match"
-  ) {
-    return null;
-  }
-
-  const { matchedBottleId, matchedReleaseId } = result.classification.decision;
-  return (
-    result.classification.artifacts.candidates.find(
-      (candidate) =>
-        candidate.bottleId === matchedBottleId &&
-        (candidate.releaseId ?? null) === (matchedReleaseId ?? null),
-    ) ??
-    result.classification.artifacts.candidates.find(
-      (candidate) => candidate.bottleId === matchedBottleId,
-    ) ??
-    null
-  );
 }
 
 export function getCreateDecision(result: PhotoIdentification | null) {

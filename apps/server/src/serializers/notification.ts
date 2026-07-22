@@ -143,8 +143,15 @@ export const NotificationSerializer = serializer({
     tastingReferenceList.forEach((reference, index) => {
       const target = targets[index];
       if (!target) {
+        if (reference.targetId === null && reference.bottleId === null) {
+          throw new Error(
+            `notification referenced tasting ${reference.tastingId} with no catalog identity`,
+          );
+        }
         throw new CatalogTargetIntegrityMismatchError(
-          { bottleId: reference.bottleId },
+          reference.targetId !== null
+            ? { targetId: reference.targetId }
+            : { bottleId: reference.bottleId! },
           `notification referenced tasting ${reference.tastingId} has no durable CatalogTarget`,
         );
       }

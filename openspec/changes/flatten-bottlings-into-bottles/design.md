@@ -1122,6 +1122,31 @@ and tasks 9.6 and 9.7 remove retained pair storage and compatibility. The
 partial consumer slice is a code-review boundary and makes no deployment or
 activation claim.
 
+### Target-native consumer entry uses one durable identity
+
+Task 8.7 gives new tasting, collection, Flight, review-filter, and
+photo-identification continuations one CatalogTarget id. Target-native schemas
+are strict alternatives to retained Bottle/Release compatibility schemas, so a
+request cannot combine the two identities. Each writer resolves and locks that
+target as its semantic authority. Exact writes retain `(bottleId, null)` and
+generic writes retain `(null, null)` until task 9.6 removes those columns; no
+generic path chooses the BottleGroup representative.
+
+The retained Bottle column becomes nullable on Tasting, collection membership,
+and Flight membership. Canonical target uniqueness remains authoritative.
+Legacy-pair uniqueness is a partial index that applies only when a retained
+Bottle exists, allowing different generic targets without permitting duplicate
+retained compatibility rows. Existing `targetId` nullability and production
+backfill gates are unchanged.
+
+Bottle list and details results expose their already-joined exact target id for
+selection without per-row lookups. Review list accepts a direct target filter,
+photo match decisions serialize an exact target rather than a public legacy
+pair, and approved photo creation returns that exact target. Raw classifier
+Bottle/Release evidence remains internal. Retained adapters remain measured and
+mapped to task 9.7; this slice performs no production mutation, backfill,
+deployment, or activation.
+
 ### Automated ignored StorePrice clears preserve one identity tuple
 
 The first task 5.6f sub-slice changes only the automated assignment clear that

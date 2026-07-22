@@ -2,12 +2,12 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  check,
   index,
   pgEnum,
   pgTable,
   text,
   timestamp,
-  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -54,6 +54,10 @@ export const collectionBottleStatusEnum = pgEnum("collection_bottle_status", [
   "empty",
 ]);
 
+/**
+ * Target identity is authoritative. The nullable Bottle/Release pair remains
+ * compatibility storage until task 9.6 removes it.
+ */
 export const collectionBottles = pgTable(
   "collection_bottle",
   {
@@ -61,9 +65,9 @@ export const collectionBottles = pgTable(
     collectionId: bigint("collection_id", { mode: "number" })
       .references(() => collections.id)
       .notNull(),
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+    ),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
@@ -75,9 +79,18 @@ export const collectionBottles = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    unique()
-      .on(table.collectionId, table.bottleId, table.releaseId)
-      .nullsNotDistinct(),
+    check(
+      "collection_bottle_identity_check",
+      sql`${table.bottleId} IS NOT NULL OR (${table.targetId} IS NOT NULL AND ${table.releaseId} IS NULL)`,
+    ),
+    uniqueIndex("collection_bottle_legacy_unq")
+      .using(
+        "btree",
+        table.collectionId,
+        table.bottleId,
+        sql`COALESCE(${table.releaseId}, 0)`,
+      )
+      .where(sql`${table.bottleId} IS NOT NULL`),
     uniqueIndex("collection_bottle_target_unq")
       .on(table.collectionId, table.targetId)
       .where(sql`${table.targetId} IS NOT NULL`),

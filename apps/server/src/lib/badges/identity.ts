@@ -47,8 +47,13 @@ export async function loadBadgeTastings(
       throw new Error(`Missing persisted badge Tasting at index ${index}`);
     }
     if (!target) {
+      if (tasting.targetId === null && tasting.bottleId === null) {
+        throw new Error(`Tasting ${tasting.id} has no catalog identity`);
+      }
       throw new CatalogTargetIntegrityMismatchError(
-        { bottleId: tasting.bottleId },
+        tasting.targetId !== null
+          ? { targetId: tasting.targetId }
+          : { bottleId: tasting.bottleId! },
         `Tasting ${tasting.id} has no authoritative CatalogTarget`,
       );
     }

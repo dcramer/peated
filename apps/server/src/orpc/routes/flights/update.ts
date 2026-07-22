@@ -16,16 +16,31 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { FlightInputSchema, FlightSchema } from "@peated/server/schemas";
+import {
+  FlightLegacyInputSchema,
+  FlightSchema,
+  FlightTargetInputSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { resolveFlightTargetAssignments } from "./targetAssignments";
 
-const InputSchema = FlightInputSchema.partial().extend({
+const FlightUpdateCommonSchema = z.object({
   flight: z.string(),
+  name: z.string().trim().min(1, "Required").optional(),
+  description: z.string().nullable().optional(),
+  public: z.boolean().optional(),
 });
+const InputSchema = z.union([
+  FlightUpdateCommonSchema.extend({
+    targets: FlightTargetInputSchema.shape.targets,
+  }).strict(),
+  FlightUpdateCommonSchema.extend({
+    bottles: FlightLegacyInputSchema.shape.bottles,
+  }).strict(),
+]);
 
 const MAX_MEMBERSHIP_REPLACEMENT_ATTEMPTS = 3;
 
@@ -57,7 +72,7 @@ export default procedure
     path: "/flights/{flight}",
     summary: "Update flight",
     description:
-      "Update flight information including name, description, and bottle list. Only the flight creator or moderator can update",
+      "Update flight information including name, description, and catalog target membership. Only the flight creator or moderator can update",
     operationId: "updateFlight",
   })
   .use(requireAuth)
@@ -65,7 +80,22 @@ export default procedure
   .input(InputSchema)
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {
-    const { flight: flightId, bottles: bottleIds, ...data } = input;
+    const { flight: flightId, ...inputData } = input;
+    const selection =
+      "bottles" in inputData
+        ? { kind: "bottles" as const, ids: inputData.bottles }
+        : "targets" in inputData && inputData.targets !== undefined
+          ? { kind: "targets" as const, ids: inputData.targets }
+          : null;
+    const {
+      bottles: _bottles,
+      targets: _targets,
+      ...data
+    } = {
+      bottles: undefined,
+      targets: undefined,
+      ...inputData,
+    };
 
     const [flight] = await db
       .select()
@@ -84,15 +114,15 @@ export default procedure
       });
     }
 
-    const replacesBottles = bottleIds !== undefined;
-    if (Object.values(data).length === 0 && !replacesBottles) {
+    const replacesMembership = selection !== null;
+    if (Object.values(data).length === 0 && !replacesMembership) {
       return await serialize(FlightSerializer, flight, context.user);
     }
 
     let newFlight: Flight | undefined;
     // Preflight authorization can become stale: metadata writes recheck it in
     // the predicate, while membership replacements recheck after locking.
-    if (!replacesBottles) {
+    if (!replacesMembership) {
       [newFlight] = await db
         .update(flights)
         .set(data)
@@ -126,7 +156,7 @@ export default procedure
             try {
               assignments = await resolveFlightTargetAssignments(
                 tx,
-                bottleIds,
+                selection,
                 { caller: "flights.update", operation: "replace" },
               );
               const existingTargets: CatalogTargetAssignmentDescriptor[] = [];
@@ -224,6 +254,9 @@ export default procedure
           });
           break;
         } catch (error) {
+          if (error instanceof CatalogTargetResolutionError) {
+            throw errors.CONFLICT({ message: error.message, cause: error });
+          }
           if (
             !(error instanceof FlightMembershipSnapshotChangedError) ||
             attempt === MAX_MEMBERSHIP_REPLACEMENT_ATTEMPTS

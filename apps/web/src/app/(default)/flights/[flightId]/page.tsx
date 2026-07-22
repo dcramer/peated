@@ -56,6 +56,13 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
             const { target } = flightTarget;
             const owner =
               target.kind === "bottle" ? target.bottle : target.group;
+            const tastingHref = getAddBottleHref({
+              ...(target.kind === "bottle"
+                ? { bottleId: target.bottle.id }
+                : { groupId: target.group.id }),
+              flightId: flight.id,
+              intent: "tasting",
+            });
             return (
               <tr key={target.targetId} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
@@ -72,21 +79,24 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
                   <div className="text-muted text-sm">
                     {formatCategoryName(owner.category)}
                   </div>
-                </td>
-                <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
-                  {target.kind === "bottle" && (
+                  <div className="mt-3 sm:hidden">
                     <Button
                       color={flightTarget.hasTasted ? "default" : "highlight"}
                       size="small"
-                      href={getAddBottleHref({
-                        bottleId: target.bottle.id,
-                        flightId: flight.id,
-                        intent: "tasting",
-                      })}
+                      href={tastingHref}
                     >
                       Log Tasting
                     </Button>
-                  )}
+                  </div>
+                </td>
+                <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
+                  <Button
+                    color={flightTarget.hasTasted ? "default" : "highlight"}
+                    size="small"
+                    href={tastingHref}
+                  >
+                    Log Tasting
+                  </Button>
                 </td>
               </tr>
             );

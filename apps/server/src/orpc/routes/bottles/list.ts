@@ -72,7 +72,11 @@ export default procedure
   )
   // TODO(response-envelope): switch to { data, meta } by changing
   // listResponse() implementation once we migrate envelopes globally.
-  .output(listResponse(BottleSchema))
+  .output(
+    listResponse(
+      BottleSchema.and(z.object({ targetId: z.number().int().positive() })),
+    ),
+  )
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
@@ -215,7 +219,7 @@ export default procedure
     }
 
     const results = await db
-      .select({ bottles })
+      .select({ bottles, targetId: catalogTargets.id })
       .from(bottles)
       .innerJoin(
         catalogTargets,
@@ -241,13 +245,18 @@ export default procedure
       );
 
     return {
-      results: await serialize(
-        BottleSerializer,
-        results.slice(0, limit).map((r) => r.bottles),
-        context.user,
-        ["description", "tastingNotes"],
-        { includeGroupSummary: true },
-      ),
+      results: (
+        await serialize(
+          BottleSerializer,
+          results.slice(0, limit).map((r) => r.bottles),
+          context.user,
+          ["description", "tastingNotes"],
+          { includeGroupSummary: true },
+        )
+      ).map((bottle, index) => ({
+        ...bottle,
+        targetId: results[index]!.targetId,
+      })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
         prevCursor: cursor > 1 ? cursor - 1 : null,

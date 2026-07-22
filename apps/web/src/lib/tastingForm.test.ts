@@ -17,29 +17,28 @@ const fields: TastingFormFields = {
 };
 
 describe("tasting form submissions", () => {
-  it("builds create payloads with staged identity and image intent", () => {
+  it("builds create payloads with one target and image intent", () => {
     const image = { name: "label.jpg" } as File;
     expect(
       buildTastingCreateFormSubmission({
         fields,
         image,
-        bottleId: 12,
-        releaseId: 4,
+        targetId: 12,
       }),
-    ).toEqual({ ...fields, bottle: 12, release: 4, image });
+    ).toEqual({ ...fields, target: 12, image });
     expect(
       buildTastingCreateFormSubmission({
         fields,
         image: undefined,
-        bottleId: 12,
-        releaseId: null,
+        targetId: 12,
       }),
-    ).toEqual({ ...fields, bottle: 12, release: null, image: undefined });
+    ).toEqual({ ...fields, target: 12, image: undefined });
   });
 
   it("builds content-only edit payloads and preserves image intent", () => {
     const cleared = buildTastingEditFormSubmission({ fields, image: null });
     expect(cleared).toEqual({ ...fields, image: null });
+    expect(cleared).not.toHaveProperty("target");
     expect(cleared).not.toHaveProperty("bottle");
     expect(cleared).not.toHaveProperty("release");
 

@@ -950,7 +950,9 @@ describe("legacy catalog consumer backfill", () => {
               .where(eq(flightBottles.flightId, flight.id))
               .orderBy(asc(flightBottles.bottleId)),
           ).toEqual(
-            before.sort((left, right) => left.bottleId - right.bottleId),
+            before.sort(
+              (left, right) => (left.bottleId ?? 0) - (right.bottleId ?? 0),
+            ),
           );
           return;
         }

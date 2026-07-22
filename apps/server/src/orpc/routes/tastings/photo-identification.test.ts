@@ -315,7 +315,8 @@ describe("POST /tastings/photo-identification", () => {
     fixtures,
     defaults,
   }) => {
-    const matchedBottleId = 44175;
+    const matchedBottle = await fixtures.Bottle({ name: "Uigeadail" });
+    const matchedBottleId = matchedBottle.id;
 
     extractPhotoBottleEvidenceMock.mockImplementation(
       async ({ pendingUpload }) => ({
@@ -384,14 +385,14 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification).toMatchObject({
       decision: {
         action: "match",
-        matchedBottleId,
-        matchedReleaseId: null,
+        matchedTarget: {
+          kind: "bottle",
+          bottle: { id: matchedBottleId },
+        },
       },
       artifacts: {
         candidates: [
           {
-            bottleId: matchedBottleId,
-            releaseId: null,
             bottleFullName: "Ardbeg Uigeadail",
             fullName: "Ardbeg Uigeadail",
           },
@@ -401,13 +402,17 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification.artifacts).toEqual({
       candidates: [
         {
-          bottleId: matchedBottleId,
-          releaseId: null,
           bottleFullName: "Ardbeg Uigeadail",
           fullName: "Ardbeg Uigeadail",
         },
       ],
     });
+    expect(response.classification.artifacts.candidates[0]).not.toHaveProperty(
+      "bottleId",
+    );
+    expect(response.classification.artifacts.candidates[0]).not.toHaveProperty(
+      "releaseId",
+    );
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
@@ -576,8 +581,10 @@ describe("POST /tastings/photo-identification", () => {
       status: "classified",
       decision: {
         action: "match",
-        matchedBottleId: bottle.id,
-        matchedReleaseId: null,
+        matchedTarget: {
+          kind: "bottle",
+          bottle: { id: bottle.id },
+        },
       },
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
@@ -907,17 +914,16 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.release).toBeNull();
-    expect(response.bottle.imageUrl).toContain(
-      `/uploads/bottles/bottle-${response.bottle.id}-pending-upload-`,
+    expect(response.target.bottle.imageUrl).toContain(
+      `/uploads/bottles/bottle-${response.target.bottle.id}-pending-upload-`,
     );
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.bottle.id),
+      where: eq(bottles.id, response.target.bottle.id),
     });
     expect(bottle?.imageUrl).toMatch(
       new RegExp(
-        `^/uploads/bottles/bottle-${response.bottle.id}-pending-upload-.+\\.webp$`,
+        `^/uploads/bottles/bottle-${response.target.bottle.id}-pending-upload-.+\\.webp$`,
       ),
     );
   });
@@ -974,18 +980,20 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response).toMatchObject({
-      bottle: {
-        id: existingBottle.id,
-        imageUrl: null,
+      target: {
+        kind: "bottle",
+        bottle: {
+          id: existingBottle.id,
+          imageUrl: null,
+        },
       },
-      release: null,
     });
     expect(response.warnings).toBeUndefined();
     expect(copyPendingImageToBottleMock).not.toHaveBeenCalled();
     await expect(countCatalogRows()).resolves.toEqual(before);
     await expect(
       db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, response.bottle.id),
+        where: eq(catalogTargets.bottleId, response.target.bottle.id),
       }),
     ).resolves.toMatchObject({
       id: exactTarget?.id,
@@ -1029,7 +1037,7 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.bottle.fullName).toBe(
+    expect(response.target.bottle.fullName).toBe(
       "Photo No Rerun Brand No Rerun Public Image",
     );
   });
@@ -1059,10 +1067,10 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.bottle.imageUrl).toBeNull();
+    expect(response.target.bottle.imageUrl).toBeNull();
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.bottle.id),
+      where: eq(bottles.id, response.target.bottle.id),
     });
     expect(bottle?.imageUrl).toBeNull();
   });
@@ -1099,11 +1107,11 @@ describe("POST /tastings/photo-identification", () => {
         message: "The bottle was created, but the public image was not saved.",
       },
     ]);
-    expect(response.bottle.id).toBeTruthy();
-    expect(response.bottle.imageUrl).toBeNull();
+    expect(response.target.bottle.id).toBeTruthy();
+    expect(response.target.bottle.imageUrl).toBeNull();
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.bottle.id),
+      where: eq(bottles.id, response.target.bottle.id),
     });
     expect(bottle).toBeDefined();
     expect(bottle?.imageUrl).toBeNull();
@@ -1153,13 +1161,13 @@ describe("POST /tastings/photo-identification", () => {
         message: "The bottle was created, but the public image was not saved.",
       },
     ]);
-    expect(response.bottle.id).toBeTruthy();
-    expect(response.bottle.imageUrl).toContain(
+    expect(response.target.bottle.id).toBeTruthy();
+    expect(response.target.bottle.imageUrl).toContain(
       "/uploads/bottles/existing-race-image.webp",
     );
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.bottle.id),
+      where: eq(bottles.id, response.target.bottle.id),
     });
     expect(bottle?.imageUrl).toBe("/uploads/bottles/existing-race-image.webp");
   });

@@ -32,9 +32,10 @@ type CorrelatedConsumerLocator =
   | {
       consumerTable: "flight_bottle";
       rowLocator: {
-        bottleId: number;
+        bottleId: number | null;
         flightId: number;
         releaseId: number | null;
+        targetId: number | null;
       };
     }
   | {
@@ -381,7 +382,13 @@ export async function loadCatalogTargetReadsWithParity(
 
     if (durableError) authoritativeError ??= durableError;
 
+    const isTargetNativeGenericProjection =
+      targetResolution.status === "resolved" &&
+      targetResolution.kind === "group" &&
+      item.legacy.bottleId === null &&
+      item.legacy.releaseId === null;
     const matches =
+      isTargetNativeGenericProjection ||
       (targetResolution.status === "missing" &&
         legacyResolution.status === "missing") ||
       (targetResolution.status === "resolved" &&

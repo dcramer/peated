@@ -2,14 +2,8 @@
 
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { TastingSchema } from "@peated/server/schemas";
-import type {
-  Bottle,
-  BottleRelease,
-  ServingStyle,
-  User,
-} from "@peated/server/types";
-import BottleCard from "@peated/web/components/bottleCard";
+import type { CatalogTargetV1, TastingSchema } from "@peated/server/schemas";
+import type { ServingStyle, User } from "@peated/server/types";
 import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -38,8 +32,6 @@ import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import { formatBottlingName } from "../lib/bottlings";
-import Button from "./button";
 import ColorField from "./colorField";
 import Form from "./form";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
@@ -54,17 +46,14 @@ type TastingCreateFormProps = {
   mode?: "create";
   onSubmit: SubmitHandler<TastingCreateFormSubmitData>;
   initialData: Partial<z.infer<typeof TastingSchema>> & {
-    bottle: Bottle;
-    release?: BottleRelease | null;
+    target: CatalogTargetV1;
   };
-  showReleasePickerDefault?: boolean;
 };
 
 type TastingEditFormProps = {
   mode: "edit";
   onSubmit: SubmitHandler<TastingEditFormSubmitData>;
   initialData: z.infer<typeof TastingSchema>;
-  showReleasePickerDefault?: never;
 };
 
 function formatServingStyle(style: ServingStyle) {
@@ -83,22 +72,6 @@ const userToOption = (user: User): Option => {
   };
 };
 
-type ReleaseOption = BottleRelease & Option;
-
-function toReleaseOption(
-  release: BottleRelease | null | undefined,
-): ReleaseOption | undefined {
-  if (!release) {
-    return undefined;
-  }
-
-  return {
-    ...release,
-    id: release.id,
-    name: formatBottlingName(release) || release.fullName,
-  };
-}
-
 export default function TastingForm(
   props: {
     errorMessage?: string;
@@ -108,10 +81,6 @@ export default function TastingForm(
 ) {
   const { errorMessage, title, suggestedTags } = props;
   const initialData = props.initialData;
-  const showReleasePickerDefault =
-    props.mode === "edit" ? false : (props.showReleasePickerDefault ?? false);
-  const initialRelease =
-    props.mode === "edit" ? undefined : props.initialData.release;
   const {
     control,
     register,
@@ -134,16 +103,7 @@ export default function TastingForm(
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
-  const [showReleasePicker, setShowReleasePicker] = useState(
-    props.mode !== "edit" &&
-      (showReleasePickerDefault || Boolean(initialRelease)),
-  );
-  const [releaseValue, setReleaseValue] = useState<ReleaseOption | undefined>(
-    toReleaseOption(initialRelease),
-  );
-
   const orpc = useORPC();
-
   const onSubmitHandler: SubmitHandler<TastingFormFields> = async (data) => {
     try {
       if (props.mode === "edit") {
@@ -155,8 +115,7 @@ export default function TastingForm(
           buildTastingCreateFormSubmission({
             fields: data,
             image,
-            bottleId: props.initialData.bottle.id,
-            releaseId: releaseValue?.id ?? null,
+            targetId: props.initialData.target.targetId,
           }),
         );
       }
@@ -183,15 +142,7 @@ export default function TastingForm(
       saveDisabled={isSubmitting}
     >
       <div className="lg:mb-8 lg:p-0">
-        {props.mode === "edit" ? (
-          <CatalogTargetIdentity target={props.initialData.target} />
-        ) : (
-          <BottleCard
-            bottle={props.initialData.bottle}
-            release={props.initialData.release}
-            color="highlight"
-          />
-        )}
+        <CatalogTargetIdentity target={props.initialData.target} />
       </div>
 
       {(error || errorMessage) && (
@@ -203,70 +154,6 @@ export default function TastingForm(
         isSubmitting={isSubmitting}
       >
         <Fieldset>
-          {props.mode !== "edit" && (
-            <div>
-              {showReleasePicker ? (
-                <div className="space-y-3">
-                  <SelectField<ReleaseOption>
-                    label="Specific Bottling"
-                    helpText="Optional. Use this only when you're tasting an exact batch, pick, single cask, or other known bottling."
-                    placeholder="e.g. Batch 24, store pick, single cask"
-                    onQuery={async (query) => {
-                      const { results } = await orpc.bottleReleases.list.call({
-                        bottle: props.initialData.bottle.id,
-                        query,
-                        limit: 25,
-                        sort: "name",
-                      });
-
-                      return results
-                        .map((release) => ({
-                          ...release,
-                          id: release.id,
-                          name: formatBottlingName(release) || release.fullName,
-                        }))
-                        .sort((a, b) => a.name.localeCompare(b.name));
-                    }}
-                    onChange={(value) => {
-                      setReleaseValue(value);
-                    }}
-                    value={releaseValue}
-                  />
-                  {(!showReleasePickerDefault || releaseValue) && (
-                    <Button
-                      size="small"
-                      type="button"
-                      onClick={() => {
-                        setReleaseValue(undefined);
-                        if (!showReleasePickerDefault) {
-                          setShowReleasePicker(false);
-                        }
-                      }}
-                    >
-                      Use main bottle
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="rounded border border-slate-800 bg-slate-950/40 p-4">
-                  <div className="text-sm font-medium">Specific Bottling</div>
-                  <div className="text-muted mt-1 text-sm">
-                    Default to the main bottle unless you care about an exact
-                    batch, pick, or single cask.
-                  </div>
-                  <div className="mt-3">
-                    <Button
-                      size="small"
-                      onClick={() => setShowReleasePicker(true)}
-                    >
-                      Choose Specific Bottling
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
           <Controller
             name="rating"
             control={control}
@@ -312,7 +199,7 @@ export default function TastingForm(
                     </div>
                   );
                 }}
-                onChange={(value) => onChange(value.map((t: any) => t.id))}
+                onChange={(value) => onChange(value.map((tag) => tag.id))}
                 value={
                   value ? tagOptions.filter((o) => value?.includes(o.id)) : []
                 }
@@ -390,7 +277,7 @@ export default function TastingForm(
             name="friends"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
+              <SelectField<Option>
                 {...field}
                 onQuery={async (query) => {
                   const { results } = await orpc.friends.list.call({
@@ -408,7 +295,7 @@ export default function TastingForm(
                 helpText="The people you're enjoying this tasting with."
                 placeholder="e.g. Bob Dylan"
                 onChange={(value) => {
-                  onChange(value.map((t: any) => t.id || t));
+                  onChange(value.map((friend) => friend.id));
                   setFriendsValue(value);
                 }}
                 emptyListItem={(query) => {

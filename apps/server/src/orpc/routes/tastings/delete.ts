@@ -70,20 +70,25 @@ export default procedure
         });
       }
 
-      const target = await resolveCatalogTargetForAssignment(
+      const targetInput =
         lockedTasting.targetId !== null
-          ? { kind: "target", targetId: lockedTasting.targetId }
-          : {
-              kind: "legacy",
-              bottleId: lockedTasting.bottleId,
-              releaseId: lockedTasting.releaseId,
-              context: {
-                caller: "tastings.delete",
-                operation: "delete",
-              },
-            },
-        tx,
-      );
+          ? { kind: "target" as const, targetId: lockedTasting.targetId }
+          : lockedTasting.bottleId !== null
+            ? {
+                kind: "legacy" as const,
+                bottleId: lockedTasting.bottleId,
+                releaseId: lockedTasting.releaseId,
+                context: {
+                  caller: "tastings.delete",
+                  operation: "delete",
+                },
+              }
+            : null;
+      if (!targetInput) {
+        throw errors.CONFLICT({ message: "Tasting has no catalog identity." });
+      }
+      const target = await resolveCatalogTargetForAssignment(targetInput, tx);
+      const targetBottleId = target.bottleId;
 
       await Promise.all([
         tx
@@ -104,20 +109,22 @@ export default procedure
           .delete(tastingBadgeAwards)
           .where(eq(tastingBadgeAwards.tastingId, lockedTasting.id)),
 
-        ...lockedTasting.tags.map((tag) =>
-          tx
-            .update(bottleTags)
-            .set({
-              count: sql`${bottleTags.count} - 1`,
-            })
-            .where(
-              and(
-                eq(bottleTags.bottleId, lockedTasting.bottleId),
-                eq(bottleTags.tag, tag),
-                gt(bottleTags.count, 0),
-              ),
-            ),
-        ),
+        ...(targetBottleId === null
+          ? []
+          : lockedTasting.tags.map((tag) =>
+              tx
+                .update(bottleTags)
+                .set({
+                  count: sql`${bottleTags.count} - 1`,
+                })
+                .where(
+                  and(
+                    eq(bottleTags.bottleId, targetBottleId),
+                    eq(bottleTags.tag, tag),
+                    gt(bottleTags.count, 0),
+                  ),
+                ),
+            )),
 
         lockedTasting.releaseId
           ? tx

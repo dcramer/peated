@@ -154,7 +154,10 @@ async function consolidateFlightRows(
         .where(
           and(
             eq(flightBottles.flightId, source.flightId),
-            eq(flightBottles.bottleId, source.bottleId),
+            eq(flightBottles.targetId, sourceTargetId),
+            source.bottleId === null
+              ? sql`${flightBottles.bottleId} IS NULL`
+              : eq(flightBottles.bottleId, source.bottleId),
             source.releaseId === null
               ? sql`${flightBottles.releaseId} IS NULL`
               : eq(flightBottles.releaseId, source.releaseId),
@@ -168,7 +171,10 @@ async function consolidateFlightRows(
       .where(
         and(
           eq(flightBottles.flightId, source.flightId),
-          eq(flightBottles.bottleId, source.bottleId),
+          eq(flightBottles.targetId, sourceTargetId),
+          source.bottleId === null
+            ? sql`${flightBottles.bottleId} IS NULL`
+            : eq(flightBottles.bottleId, source.bottleId),
           source.releaseId === null
             ? sql`${flightBottles.releaseId} IS NULL`
             : eq(flightBottles.releaseId, source.releaseId),

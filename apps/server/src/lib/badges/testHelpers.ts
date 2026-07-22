@@ -72,6 +72,9 @@ export async function useGenericBadgeTarget(tastingId: number) {
     where: eq(tastings.id, tastingId),
   });
   if (!row) throw new Error(`Missing Tasting fixture ${tastingId}`);
+  if (row.bottleId === null) {
+    throw new Error(`Tasting fixture ${tastingId} has no retained Bottle`);
+  }
 
   const bottle = await db.query.bottles.findFirst({
     where: eq(bottles.id, row.bottleId),

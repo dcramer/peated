@@ -2,9 +2,10 @@ import type { CatalogTargetV1 } from "@peated/server/schemas";
 import { describe, expect, it } from "vitest";
 
 import {
-  canEditFlightMembership,
   flightMembershipChanged,
-  getFlightExactBottleIds,
+  getFlightTargetIds,
+  getFlightTargetScopeLabel,
+  targetToFlightOption,
 } from "./flightForm";
 
 const exact = {
@@ -20,19 +21,30 @@ const generic = {
 } as CatalogTargetV1;
 
 describe("flight form membership", () => {
-  it("uses independently complete exact Bottles for staged editing", () => {
-    expect(getFlightExactBottleIds([exact])).toEqual([7]);
-    expect(canEditFlightMembership([exact])).toBe(true);
+  it("carries exact and generic identity by target id", () => {
+    expect(getFlightTargetIds([exact, generic])).toEqual([21, 22]);
+    expect(targetToFlightOption(exact)).toEqual({
+      id: 21,
+      kind: "bottle",
+      name: "Springbank 12 Batch 24",
+    });
+    expect(targetToFlightOption(generic)).toEqual({
+      id: 22,
+      kind: "group",
+      name: "Springbank 12",
+    });
   });
 
-  it("does not reinterpret generic identity as a representative Bottle", () => {
-    expect(getFlightExactBottleIds([generic, exact])).toEqual([7]);
-    expect(canEditFlightMembership([generic, exact])).toBe(false);
+  it("labels exactness without reinterpreting generic identity", () => {
+    expect(getFlightTargetScopeLabel("bottle")).toBe("Exact bottle");
+    expect(getFlightTargetScopeLabel("group")).toBe(
+      "Exact bottle not specified",
+    );
   });
 
-  it("preserves membership when only ordering changes", () => {
-    expect(flightMembershipChanged([7, 8], [8, 7])).toBe(false);
-    expect(flightMembershipChanged([7, 8], [7])).toBe(true);
-    expect(flightMembershipChanged([], [7])).toBe(true);
+  it("compares authoritative target membership independent of ordering", () => {
+    expect(flightMembershipChanged([21, 22], [22, 21])).toBe(false);
+    expect(flightMembershipChanged([21, 22], [21])).toBe(true);
+    expect(flightMembershipChanged([], [21])).toBe(true);
   });
 });

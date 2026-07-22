@@ -12,21 +12,14 @@ function RatingIcon({ rating }: { rating: number }) {
   return null;
 }
 
-export default function BottleReviews({
-  bottleId,
-  releaseId,
-}: {
-  bottleId: number;
-  releaseId?: number;
-}) {
+export default function BottleReviews({ targetId }: { targetId: number }) {
   const orpc = useORPC();
   const {
     data: { results },
   } = useSuspenseQuery(
     orpc.reviews.list.queryOptions({
       input: {
-        bottle: bottleId,
-        ...(releaseId ? { release: releaseId } : {}),
+        target: targetId,
       },
     }),
   );

@@ -232,6 +232,109 @@ describe("PATCH /flights/:flight", () => {
     );
   });
 
+  test("replaces memberships with exact and generic targets", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const existingBottle = await fixtures.Bottle();
+    const brand = await fixtures.Entity({ name: "Flight Order" });
+    const exactBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Alpha Exact",
+    });
+    const genericBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Zulu Generic",
+    });
+    const flight = await fixtures.Flight({ bottles: [existingBottle.id] });
+    if (genericBottle.groupId === null) {
+      throw new Error("Bottle group fixture not found");
+    }
+    const [exactTarget, genericTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, exactBottle.id),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, genericBottle.groupId),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+    ]);
+    if (!exactTarget || !genericTarget) {
+      throw new Error("Catalog target fixtures not found");
+    }
+
+    const data = await routerClient.flights.update(
+      {
+        flight: flight.publicId,
+        name: "Target-native flight",
+        description: "One exact release and one unspecified release",
+        public: true,
+        targets: [genericTarget.id, exactTarget.id],
+      },
+      { context: { user } },
+    );
+
+    expect(data).toMatchObject({
+      id: flight.publicId,
+      name: "Target-native flight",
+      description: "One exact release and one unspecified release",
+      public: true,
+    });
+    const persistedFlight = await db.query.flights.findFirst({
+      where: eq(flights.id, flight.id),
+    });
+    expect(persistedFlight).toMatchObject({
+      name: "Target-native flight",
+      description: "One exact release and one unspecified release",
+      public: true,
+    });
+
+    const memberships = await db.query.flightBottles.findMany({
+      where: eq(flightBottles.flightId, flight.id),
+    });
+    expect(memberships).toHaveLength(2);
+    expect(
+      memberships
+        .map(({ flightId, targetId, bottleId, releaseId }) => ({
+          flightId,
+          targetId,
+          bottleId,
+          releaseId,
+        }))
+        .sort((left, right) => (left.targetId ?? 0) - (right.targetId ?? 0)),
+    ).toEqual(
+      [
+        {
+          flightId: flight.id,
+          targetId: exactTarget.id,
+          bottleId: exactBottle.id,
+          releaseId: null,
+        },
+        {
+          flightId: flight.id,
+          targetId: genericTarget.id,
+          bottleId: null,
+          releaseId: null,
+        },
+      ].sort((left, right) => left.targetId - right.targetId),
+    );
+
+    const details = await routerClient.flights.details({
+      flight: flight.publicId,
+    });
+    expect(
+      details.targets.map(({ target }) => ({
+        kind: target.kind,
+        targetId: target.targetId,
+      })),
+    ).toEqual([
+      { kind: "bottle", targetId: exactTarget.id },
+      { kind: "group", targetId: genericTarget.id },
+    ]);
+  });
+
   test("stores a generic target for submitted parents with releases", async ({
     fixtures,
   }) => {
@@ -396,13 +499,13 @@ describe("PATCH /flights/:flight", () => {
     expect(memberships.every(({ targetId }) => targetId !== null)).toBe(true);
   });
 
-  test("an empty bottle list clears every membership", async ({ fixtures }) => {
+  test("an empty target list clears every membership", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
     const flight = await fixtures.Flight({ bottles: [bottle.id] });
 
     await routerClient.flights.update(
-      { flight: flight.publicId, bottles: [] },
+      { flight: flight.publicId, targets: [] },
       { context: { user } },
     );
 
@@ -420,16 +523,20 @@ describe("PATCH /flights/:flight", () => {
     const bottle = await fixtures.Bottle();
     const flight = await fixtures.Flight({ bottles: [bottle.id] });
 
-    await waitError(() =>
+    const error = await waitError(() =>
       routerClient.flights.update(
         {
           flight: flight.publicId,
           name: "Should not persist",
-          bottles: [Number.MAX_SAFE_INTEGER],
+          targets: [Number.MAX_SAFE_INTEGER],
         },
         { context: { user } },
       ),
     );
+    expect(error).toMatchObject({
+      code: "CONFLICT",
+      message: expect.stringContaining("Catalog target not found"),
+    });
 
     const persistedFlight = await db.query.flights.findFirst({
       where: eq(flights.id, flight.id),

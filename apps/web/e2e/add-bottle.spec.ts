@@ -17,8 +17,9 @@ import {
   exactSearchBottle,
   existingBottle,
   existingBottleId,
-  existingRelease,
   existingReleaseId,
+  legacyPromotedBottle,
+  legacyPromotedBottleId,
   photoTastingNotes,
   testAccessToken,
   testBrand,
@@ -28,6 +29,7 @@ import { signIn } from "./session";
 
 const pendingScanImageUrl =
   "http://127.0.0.1:4999/uploads/playwright-photo.webp";
+const createdBottleTargetId = 10_000_000 + createdBottleId;
 
 test.describe("create bottle", () => {
   test("renders the Add Bottle resolver at the plain route", async ({
@@ -392,7 +394,7 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("shows release-specific actions for a resolved bottling query", async ({
+  test("shows exact actions for a resolved legacy release query", async ({
     context,
     page,
   }, testInfo) => {
@@ -404,27 +406,23 @@ test.describe("add bottle flow", () => {
       `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
     );
 
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
-    await expect(page.getByText("Distillers Edition (2024)")).toBeVisible();
+    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
     await expect(
       page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
-    ).toHaveAttribute(
-      "href",
-      `/bottles/${existingBottle.id}/bottlings/${existingReleaseId}`,
-    );
+    ).toHaveAttribute("href", `/bottles/${legacyPromotedBottleId}`);
 
     await page.getByRole("button", { name: "Add to Library" }).click();
 
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
-    await expect(page.getByText(existingRelease.edition)).toBeVisible();
+    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
   });
 
-  test("keeps bottling Library action available when the base bottle is saved", async ({
+  test("keeps the promoted Bottle Library action available when the base bottle is saved", async ({
     context,
     page,
   }, testInfo) => {
@@ -441,7 +439,7 @@ test.describe("add bottle flow", () => {
     await page.goto(
       `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}`,
     );
-    await expect(page.getByText(existingRelease.edition)).toBeVisible();
+    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
     const addReleaseButton = page.getByRole("button", {
       name: "Add to Library",
     });
@@ -452,7 +450,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
-    await expect(page.getByText(existingRelease.edition)).toBeVisible();
+    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
   });
 
   test("routes Add Bottle search results into the resolver outcome", async ({
@@ -962,6 +960,9 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
+    expect(libraryInput.target).toBe(createdBottleTargetId);
+    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput).not.toHaveProperty("release");
     expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
@@ -998,8 +999,9 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    expect(libraryInput.bottle).toBe(createdBottleId);
-    expect(libraryInput.release).toBeNull();
+    expect(libraryInput.target).toBe(createdBottleTargetId);
+    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput).not.toHaveProperty("release");
     expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
@@ -1254,7 +1256,7 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(page.getByText(existingRelease.fullName)).toBeVisible();
+    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
     await expect(
       page.getByText("Matched to existing bottle in Peated"),
     ).toBeVisible();

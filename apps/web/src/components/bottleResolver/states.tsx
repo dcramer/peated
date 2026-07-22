@@ -1,8 +1,10 @@
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import Button from "@peated/web/components/button";
+import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import { Camera, Check, Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { getMatchedCandidate, type PhotoIdentification } from "./helpers";
+import type { PhotoIdentification } from "./helpers";
 import {
   EvidencePills,
   FallbackActions,
@@ -185,8 +187,7 @@ export function PhotoNoMatchState({
 export function PhotoMatchCreateState({
   result,
   previewUrl,
-  matchedBottleId,
-  matchedReleaseId,
+  matchedTarget,
   renderMatchedResultActions,
   renderCreateProposalActions,
   createProposalLabel,
@@ -204,8 +205,7 @@ export function PhotoMatchCreateState({
 }: {
   result: PhotoIdentification;
   previewUrl: string | null;
-  matchedBottleId: number | null;
-  matchedReleaseId: number | null;
+  matchedTarget: ExactCatalogTargetV1 | null;
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
@@ -223,8 +223,7 @@ export function PhotoMatchCreateState({
   pendingImage: PhotoIdentification["pendingImage"] | null;
   loadingExactLibraryStatus: boolean;
   onLoadTarget: (
-    bottleId: number,
-    releaseId: number | null,
+    target: ExactCatalogTargetV1,
     action?: BottleResolverMatchedAction,
   ) => void;
   onAcceptCreateProposal: (
@@ -232,29 +231,24 @@ export function PhotoMatchCreateState({
     action: BottleResolverAction,
   ) => void;
 }) {
-  const matchedCandidate = getMatchedCandidate(result);
-
-  if (matchedBottleId) {
-    const matchedName =
-      matchedCandidate?.fullName ??
-      matchedCandidate?.bottleFullName ??
-      "Matched bottle";
-
+  if (matchedTarget) {
     return (
       <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
         <div className="space-y-5">
           <PhotoResultCard
             previewUrl={previewUrl}
-            title={matchedName}
+            title="Matched bottle"
             subtitle="Matched to existing bottle in Peated"
             fallbackIcon={<Check className="text-highlight h-6 w-6" />}
           >
-            <EvidencePills result={result} compact />
+            <div className="space-y-2">
+              <CatalogTargetIdentity target={matchedTarget} compact />
+              <EvidencePills result={result} compact />
+            </div>
           </PhotoResultCard>
           {renderMatchedResultActions ? (
             renderMatchedResultActions({
-              bottleId: matchedBottleId,
-              releaseId: matchedReleaseId,
+              target: matchedTarget,
               hasExactLibraryEntry,
               exactLibraryEntryImageUrl,
               pendingImage,
@@ -262,7 +256,7 @@ export function PhotoMatchCreateState({
               resolvingAction:
                 resolvingAction === "create" ? null : resolvingAction,
               onResolve: (action) => {
-                onLoadTarget(matchedBottleId, matchedReleaseId, action);
+                onLoadTarget(matchedTarget, action);
               },
             })
           ) : (
@@ -271,7 +265,7 @@ export function PhotoMatchCreateState({
                 color="highlight"
                 fullWidth
                 disabled={Boolean(resolvingAction)}
-                onClick={() => onLoadTarget(matchedBottleId, matchedReleaseId)}
+                onClick={() => onLoadTarget(matchedTarget)}
               >
                 Continue
               </Button>

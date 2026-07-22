@@ -47,8 +47,13 @@ export const TastingSerializer = serializer({
       itemList.map((item, index) => {
         const target = targets[index];
         if (!target) {
+          if (item.targetId === null && item.bottleId === null) {
+            throw new Error(`tasting ${item.id} has no catalog identity`);
+          }
           throw new CatalogTargetIntegrityMismatchError(
-            { bottleId: item.bottleId },
+            item.targetId !== null
+              ? { targetId: item.targetId }
+              : { bottleId: item.bottleId! },
             `tasting ${item.id} has no durable CatalogTarget`,
           );
         }

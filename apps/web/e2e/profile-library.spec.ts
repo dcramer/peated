@@ -11,9 +11,11 @@ import {
   bottleImageBottleId,
   bottleImageUrl,
   existingBottle,
-  existingRelease,
   existingReleaseId,
+  genericCollectionTargetGroupId,
   genericCollectionTargetLabel,
+  legacyPromotedBottle,
+  legacyPromotedBottleId,
   testAccessToken,
   testUser,
 } from "./rpc-fixtures.mjs";
@@ -163,7 +165,7 @@ test.describe("profile library", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("renders concise bottling names in Library", async ({
+  test("renders promoted Bottle names in Library", async ({
     context,
     page,
   }, testInfo) => {
@@ -189,17 +191,15 @@ test.describe("profile library", () => {
       waitUntil: "commit",
     });
 
-    const conciseName = `${existingBottle.fullName} - ${existingRelease.edition} (${existingRelease.releaseYear})`;
-    const bottlingLink = page.getByRole("link", { name: conciseName });
+    const promotedBottleLink = page.getByRole("link", {
+      name: legacyPromotedBottle.fullName,
+    });
 
-    await expect(bottlingLink).toBeVisible();
-    await expect(bottlingLink).toHaveAttribute(
+    await expect(promotedBottleLink).toBeVisible();
+    await expect(promotedBottleLink).toHaveAttribute(
       "href",
-      `/bottles/${existingReleaseId}`,
+      `/bottles/${legacyPromotedBottleId}`,
     );
-    await expect(
-      page.getByRole("link", { name: existingRelease.fullName, exact: true }),
-    ).toHaveCount(0);
   });
 
   test("keeps generic Library targets independent from representative bottles", async ({
@@ -229,7 +229,10 @@ test.describe("profile library", () => {
     ).toBeVisible();
     await expect(
       genericRow.getByRole("link", { name: genericCollectionTargetLabel }),
-    ).toHaveCount(0);
+    ).toHaveAttribute(
+      "href",
+      `/bottle-groups/${genericCollectionTargetGroupId}`,
+    );
     await expect(
       genericRow.locator(`a[href="/bottles/${existingBottle.id}"]`),
     ).toHaveCount(0);

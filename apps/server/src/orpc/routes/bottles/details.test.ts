@@ -29,6 +29,7 @@ describe("GET /bottles/:bottle", () => {
       bottle: bottle.id,
     });
     expect(data.id).toEqual(bottle.id);
+    expect(data.targetId).toEqual(expect.any(Number));
     expect(data.group?.id).toEqual(bottle.groupId);
     expect("createdBy" in data).toBe(false);
   });

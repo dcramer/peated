@@ -143,6 +143,42 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     ).toHaveLength(0);
   });
 
+  test("rejects an invalid target without mutating the collection", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const collection = await fixtures.Collection({
+      createdById: defaults.user.id,
+      totalBottles: 0,
+    });
+
+    const error = await waitError(() =>
+      routerClient.collections.bottles.create(
+        {
+          user: "me",
+          collection: collection.id,
+          target: Number.MAX_SAFE_INTEGER,
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Cannot identify catalog target.",
+    });
+    await expect(
+      db.query.collectionBottles.findMany({
+        where: eq(collectionBottles.collectionId, collection.id),
+      }),
+    ).resolves.toHaveLength(0);
+    await expect(
+      db.query.collections.findFirst({
+        where: eq(collections.id, collection.id),
+      }),
+    ).resolves.toMatchObject({ totalBottles: 0 });
+  });
+
   test("adds bottle to default collection", async ({ fixtures, defaults }) => {
     const bottle = await fixtures.Bottle();
 
@@ -194,33 +230,65 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     });
   });
 
-  test("does not invent retained Bottle identity for generic target creation", async ({
+  test("stores generic target-native membership without retained identity", async ({
     fixtures,
     defaults,
   }) => {
     const bottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
     const genericTarget = await db.query.catalogTargets.findFirst({
       where: and(
         eq(catalogTargets.groupId, bottle.groupId as number),
         isNull(catalogTargets.bottleId),
       ),
     });
-    if (!genericTarget) throw new Error("Generic target fixture not found");
-
-    const error = await waitError(() =>
-      routerClient.collections.bottles.create(
-        {
-          user: "me",
-          collection: "default",
-          target: genericTarget.id,
-        },
-        { context: { user: defaults.user } },
+    const otherGenericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, otherBottle.groupId as number),
+        isNull(catalogTargets.bottleId),
       ),
+    });
+    if (!genericTarget || !otherGenericTarget) {
+      throw new Error("Generic target fixture not found");
+    }
+
+    const result = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        target: genericTarget.id,
+      },
+      { context: { user: defaults.user } },
+    );
+    const otherResult = await routerClient.collections.bottles.create(
+      {
+        user: "me",
+        collection: "default",
+        target: otherGenericTarget.id,
+      },
+      { context: { user: defaults.user } },
     );
 
-    expect(error.message).toBe(
-      "Generic collection creation requires target-native collection storage.",
-    );
+    const membership = await db.query.collectionBottles.findFirst({
+      where: eq(collectionBottles.id, result.id),
+    });
+    expect(result.target).toMatchObject({
+      kind: "group",
+      targetId: genericTarget.id,
+    });
+    expect(membership).toMatchObject({
+      targetId: genericTarget.id,
+      bottleId: null,
+      releaseId: null,
+    });
+    const otherMembership = await db.query.collectionBottles.findFirst({
+      where: eq(collectionBottles.id, otherResult.id),
+    });
+    expect(otherMembership).toMatchObject({
+      targetId: otherGenericTarget.id,
+      bottleId: null,
+      releaseId: null,
+    });
   });
 
   test("stores the generic group target for a parent-only selection with releases", async ({

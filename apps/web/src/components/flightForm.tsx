@@ -1,20 +1,17 @@
 "use client";
 
-import type {
-  CatalogTargetV1,
-  ExactCatalogTargetV1,
-} from "@peated/server/schemas";
-import { FlightInputSchema } from "@peated/server/schemas";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
+import type { CatalogTargetV1 } from "@peated/server/schemas";
+import { FlightTargetInputSchema } from "@peated/server/schemas";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
-import FormField from "@peated/web/components/formField";
 import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
 import {
-  canEditFlightMembership,
   flightMembershipChanged,
-  getFlightExactBottleIds,
+  getFlightTargetIds,
+  getFlightTargetScopeLabel,
+  targetToFlightOption,
+  type FlightTargetOption,
 } from "@peated/web/lib/flightForm";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -24,16 +21,9 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import Form from "./form";
-import SelectField, { type Option } from "./selectField";
+import SelectField from "./selectField";
 
-const targetToOption = (target: ExactCatalogTargetV1): Option => {
-  return {
-    id: target.bottle.id,
-    name: target.bottle.fullName,
-  };
-};
-
-type FormSchemaType = z.infer<typeof FlightInputSchema>;
+type FormSchemaType = z.infer<typeof FlightTargetInputSchema>;
 
 export default function FlightForm({
   onSubmit,
@@ -54,7 +44,7 @@ export default function FlightForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(FlightInputSchema),
+    resolver: zodResolver(FlightTargetInputSchema),
     defaultValues: {
       name: initialData.name,
       description: initialData.description,
@@ -64,22 +54,18 @@ export default function FlightForm({
   const [error, setError] = useState<string | undefined>();
 
   const targets = (initialData.targets ?? []).map(({ target }) => target);
-  const membershipEditable = canEditFlightMembership(targets);
-  const initialBottleIds = getFlightExactBottleIds(targets);
-  const [bottlesValue, setBottlesValue] = useState<Option[]>(
-    targets.flatMap((target) =>
-      target.kind === "bottle" ? [targetToOption(target)] : [],
-    ),
+  const initialTargetIds = getFlightTargetIds(targets);
+  const [targetsValue, setTargetsValue] = useState<FlightTargetOption[]>(
+    targets.map(targetToFlightOption),
   );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      const selectedBottleIds = bottlesValue.map(({ id }) => Number(id));
+      const selectedTargetIds = targetsValue.map(({ id }) => id);
       await onSubmit({
         ...data,
-        ...(membershipEditable &&
-        flightMembershipChanged(initialBottleIds, selectedBottleIds)
-          ? { bottles: selectedBottleIds }
+        ...(flightMembershipChanged(initialTargetIds, selectedTargetIds)
+          ? { targets: selectedTargetIds }
           : {}),
       });
     } catch (err) {
@@ -121,42 +107,56 @@ export default function FlightForm({
             placeholder="e.g. 12-year-old"
           />
 
-          {membershipEditable ? (
-            <SelectField
-              label="Bottles"
-              error={errors.bottles}
-              onQuery={async (query) => {
-                const { results } = await orpc.bottles.list.call({ query });
-                return results;
-              }}
-              onResults={(results) =>
-                results.map((result) => ({
-                  id: result.id,
-                  name: result.fullName,
-                }))
-              }
-              onChange={setBottlesValue}
-              value={bottlesValue}
-              multiple
-            />
-          ) : (
-            <FormField
-              label="Bottles"
-              helpText="Bottle membership can't be changed while this flight includes an unspecified bottle."
-            >
-              <div className="mt-1 flex flex-col items-start gap-2">
-                {targets.map((target) => (
-                  <CatalogTargetIdentity
-                    key={target.targetId}
-                    target={target}
-                    compact
-                  />
-                ))}
-              </div>
-            </FormField>
-          )}
+          <SelectField<FlightTargetOption>
+            label="Bottles"
+            helpText="Choose an exact Bottle, or a release family when the exact bottle is not known."
+            error={errors.targets}
+            onQuery={async (query) => {
+              const [bottleList, groupList] = await Promise.all([
+                orpc.bottles.list.call({
+                  query,
+                  limit: 10,
+                  sort: query ? "rank" : "-tastings",
+                }),
+                orpc.bottleGroups.list.call({
+                  query,
+                  limit: 10,
+                  sort: "-tastings",
+                }),
+              ]);
+
+              return [
+                ...bottleList.results.map((bottle) => ({
+                  id: bottle.targetId,
+                  kind: "bottle" as const,
+                  name: bottle.fullName,
+                })),
+                ...groupList.results.map(targetToFlightOption),
+              ];
+            }}
+            onRenderOption={(option) => (
+              <FlightTargetOptionLabel option={option} />
+            )}
+            onRenderChip={(option) => (
+              <FlightTargetOptionLabel option={option} />
+            )}
+            onChange={setTargetsValue}
+            value={targetsValue}
+            multiple
+          />
         </Fieldset>
       </Form>
     </FormScreen>
+  );
+}
+
+function FlightTargetOptionLabel({ option }: { option: FlightTargetOption }) {
+  return (
+    <span className="inline-flex flex-wrap items-baseline gap-x-2 text-left">
+      <span>{option.name}</span>
+      <span className="text-muted text-xs">
+        {getFlightTargetScopeLabel(option.kind)}
+      </span>
+    </span>
   );
 }

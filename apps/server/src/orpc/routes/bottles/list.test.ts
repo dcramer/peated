@@ -18,6 +18,7 @@ describe("GET /bottles", () => {
 
     expect(results.length).toBe(2);
     expect(results.every((result) => result.group?.id)).toBe(true);
+    expect(results.every((result) => result.targetId > 0)).toBe(true);
   });
 
   test("lists bottles with query", async ({ fixtures }) => {

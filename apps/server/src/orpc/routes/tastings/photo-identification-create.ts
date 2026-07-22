@@ -3,11 +3,11 @@
  * The route owns token/user validation, pending-upload ownership, durable
  * concrete Bottle creation, and API-facing conflict mapping.
  */
-import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
+import { loadCatalogTarget } from "@peated/server/lib/catalogTargets";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -17,21 +17,15 @@ import {
 } from "@peated/server/lib/pendingUploads";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { procedure } from "@peated/server/orpc";
-import type { Context } from "@peated/server/orpc/context";
 import {
   requireAuth,
   requireTosAccepted,
   requireVerified,
 } from "@peated/server/orpc/middleware";
-import { BottleSchema } from "@peated/server/schemas";
+import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import bottlesDetails from "../bottles/details";
 import { isPhotoIdentificationCreateDecisionAutoCreatable } from "./photo-identification";
-
-type AuthenticatedContext = Context & {
-  user: NonNullable<Context["user"]>;
-};
 
 const CatalogImageWarningSchema = z.object({
   code: z.literal("CATALOG_IMAGE_COPY_FAILED"),
@@ -187,8 +181,7 @@ export default procedure
   )
   .output(
     z.object({
-      bottle: BottleSchema,
-      release: z.null(),
+      target: ExactCatalogTargetV1Schema,
       warnings: z
         .array(CatalogImageWarningSchema)
         .optional()
@@ -247,10 +240,6 @@ export default procedure
           "Photo identification result needs review before creating a bottle.",
       });
     }
-    const authenticatedContext: AuthenticatedContext = {
-      ...context,
-      user,
-    };
     const actor = await getUserActor(user);
 
     let result: CreateDecisionResult;
@@ -285,14 +274,17 @@ export default procedure
       result,
     });
 
-    const bottle = await call(
-      bottlesDetails,
-      { bottle: result.bottleId },
-      { context: authenticatedContext },
-    );
+    const target = await loadCatalogTarget(result.targetId, {
+      actor,
+      permissions: { canReadCatalogIdentity: true },
+    });
+    if (target.kind !== "bottle") {
+      throw errors.INTERNAL_SERVER_ERROR({
+        message: "Created bottle did not resolve to an exact target.",
+      });
+    }
     return {
-      bottle,
-      release: null,
+      target,
       ...(warning ? { warnings: [warning] } : {}),
     };
   });

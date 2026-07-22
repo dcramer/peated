@@ -32,10 +32,13 @@ async function insertTargetBackedCollectionBottles(
   const valueList = Array.isArray(values) ? values : [values];
   await db.insert(collectionBottles).values(
     await Promise.all(
-      valueList.map(async (value) => ({
-        ...value,
-        targetId: value.targetId ?? (await exactTargetId(value.bottleId)),
-      })),
+      valueList.map(async (value) => {
+        if (value.targetId !== undefined) return value;
+        if (value.bottleId == null) {
+          throw new Error("Retained Bottle fixture missing");
+        }
+        return { ...value, targetId: await exactTargetId(value.bottleId) };
+      }),
     ),
   );
 }

@@ -22,8 +22,7 @@ import {
   getCreateNameSeed,
   getCreateProposalLabel,
   getManualResultCopy,
-  getMatchedBottleId,
-  getMatchedReleaseId,
+  getMatchedTarget,
   getProposedName,
   getSearchSeed,
   type PhotoIdentification,
@@ -98,8 +97,7 @@ export default function BottleResolver({
   const [resolvingAction, setResolvingAction] =
     useState<BottleResolverAction | null>(null);
   const [matchedBottleStatus, setMatchedBottleStatus] = useState<{
-    bottleId: number;
-    releaseId: number | null;
+    targetId: number;
     hasExactLibraryEntry: boolean;
     imageUrl: string | null;
     loading: boolean;
@@ -191,31 +189,21 @@ export default function BottleResolver({
   }
 
   async function loadTarget(
-    bottleId: number,
-    releaseId: number | null = null,
+    target: BottleResolverTarget["target"],
     action?: BottleResolverMatchedAction,
   ) {
     setError(null);
     setResolvingAction(action ?? "library");
     try {
-      const [bottle, release, collectionStatus] = await Promise.all([
-        orpc.bottles.details.call({ bottle: bottleId }),
-        releaseId
-          ? orpc.bottleReleases.details.call({ release: releaseId })
-          : Promise.resolve(null),
-        orpc.collections.bottles.list.call({
-          user: "me",
-          collection: "library",
-          bottle: bottleId,
-          release: releaseId ?? undefined,
-          baseOnly: releaseId == null,
-        }),
-      ]);
+      const collectionStatus = await orpc.collections.bottles.list.call({
+        user: "me",
+        collection: "library",
+        target: target.targetId,
+      });
       const exactLibraryEntry = collectionStatus.results[0] ?? null;
       await resolveTarget(
         {
-          bottle,
-          release,
+          target,
           hasExactLibraryEntry: Boolean(exactLibraryEntry),
           exactLibraryEntryImageUrl: exactLibraryEntry?.imageUrl ?? null,
         },
@@ -257,8 +245,7 @@ export default function BottleResolver({
         await photoIdentificationCreateMutation.mutateAsync(payload);
       await resolveTarget(
         {
-          bottle: created.bottle,
-          release: created.release,
+          target: created.target,
           hasExactLibraryEntry: false,
           resultSource: "created",
           warnings: (created.warnings ?? []).map(
@@ -351,8 +338,7 @@ export default function BottleResolver({
     replacePreviewUrl(null);
   }
 
-  const matchedBottleId = getMatchedBottleId(photoResult);
-  const matchedReleaseId = getMatchedReleaseId(photoResult);
+  const matchedTarget = getMatchedTarget(photoResult);
   const createDecision = getCreateDecision(photoResult);
   const proposedName = getProposedName(photoResult);
   const createProposalLabel = getCreateProposalLabel(photoResult);
@@ -370,28 +356,25 @@ export default function BottleResolver({
       : null;
   const manualResultCopy = getManualResultCopy(photoResult);
   const matchedBottleHasExactLibraryEntry =
-    matchedBottleStatus?.bottleId === matchedBottleId &&
-    matchedBottleStatus.releaseId === matchedReleaseId
+    matchedBottleStatus &&
+    matchedBottleStatus.targetId === matchedTarget?.targetId
       ? matchedBottleStatus.hasExactLibraryEntry
       : false;
   const matchedBottleExactLibraryStatusLoading =
-    Boolean(matchedBottleId) &&
-    (matchedBottleStatus?.bottleId !== matchedBottleId ||
-      matchedBottleStatus?.releaseId !== matchedReleaseId ||
-      matchedBottleStatus.loading);
+    Boolean(matchedTarget) &&
+    (matchedBottleStatus?.targetId !== matchedTarget?.targetId ||
+      matchedBottleStatus?.loading !== false);
 
   useEffect(() => {
-    if (!matchedBottleId) {
+    if (!matchedTarget) {
       setMatchedBottleStatus(null);
       return;
     }
 
-    const statusBottleId = matchedBottleId;
-    const statusReleaseId = matchedReleaseId;
+    const statusTargetId = matchedTarget.targetId;
     let cancelled = false;
     setMatchedBottleStatus({
-      bottleId: statusBottleId,
-      releaseId: statusReleaseId,
+      targetId: statusTargetId,
       hasExactLibraryEntry: false,
       imageUrl: null,
       loading: true,
@@ -402,15 +385,12 @@ export default function BottleResolver({
         const collectionStatus = await orpc.collections.bottles.list.call({
           user: "me",
           collection: "library",
-          bottle: statusBottleId,
-          release: statusReleaseId ?? undefined,
-          baseOnly: statusReleaseId == null,
+          target: statusTargetId,
         });
         const exactLibraryEntry = collectionStatus.results[0] ?? null;
         if (cancelled) return;
         setMatchedBottleStatus({
-          bottleId: statusBottleId,
-          releaseId: statusReleaseId,
+          targetId: statusTargetId,
           hasExactLibraryEntry: Boolean(exactLibraryEntry),
           imageUrl: exactLibraryEntry?.imageUrl ?? null,
           loading: false,
@@ -419,8 +399,7 @@ export default function BottleResolver({
         logError(err);
         if (cancelled) return;
         setMatchedBottleStatus({
-          bottleId: statusBottleId,
-          releaseId: statusReleaseId,
+          targetId: statusTargetId,
           hasExactLibraryEntry: false,
           imageUrl: null,
           loading: false,
@@ -433,7 +412,7 @@ export default function BottleResolver({
     return () => {
       cancelled = true;
     };
-  }, [matchedBottleId, matchedReleaseId, orpc]);
+  }, [matchedTarget, orpc]);
 
   return (
     <Layout
@@ -495,12 +474,11 @@ export default function BottleResolver({
 
         {!isIdentifying && photoResult && (
           <>
-            {matchedBottleId || createDecision ? (
+            {matchedTarget || createDecision ? (
               <PhotoMatchCreateState
                 result={photoResult}
                 previewUrl={previewUrl}
-                matchedBottleId={matchedBottleId}
-                matchedReleaseId={matchedReleaseId}
+                matchedTarget={matchedTarget}
                 renderMatchedResultActions={renderMatchedResultActions}
                 renderCreateProposalActions={renderCreateProposalActions}
                 createProposalLabel={createProposalLabel}
@@ -515,8 +493,8 @@ export default function BottleResolver({
                 loadingExactLibraryStatus={
                   matchedBottleExactLibraryStatusLoading
                 }
-                onLoadTarget={(bottleId, releaseId, action) => {
-                  void loadTarget(bottleId, releaseId, action);
+                onLoadTarget={(target, action) => {
+                  void loadTarget(target, action);
                 }}
                 onAcceptCreateProposal={(result, action) => {
                   void acceptCreateProposal(result, action);
@@ -538,11 +516,11 @@ export default function BottleResolver({
                 onStartOver={startOver}
               />
             )}
-            {(matchedBottleId || createDecision) && (
+            {(matchedTarget || createDecision) && (
               <FallbackActions
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
-                createBottleHref={matchedBottleId ? createBottleHref : null}
+                createBottleHref={matchedTarget ? createBottleHref : null}
                 showStartOver
                 onStartOver={startOver}
               />

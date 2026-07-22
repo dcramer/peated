@@ -14,6 +14,53 @@ The system SHALL represent the catalog subject of tastings, reviews, collection 
 - **WHEN** the expression is known but the exact Bottle is not
 - **THEN** the consumer row references the BottleGroup's generic catalog target
 
+### Requirement: Target-native consumer flows preserve exactness
+
+The system SHALL accept one authoritative CatalogTarget id for target-native
+tasting, collection, Flight, price, and review continuations. Target-native
+Tasting, collection, and Flight inputs SHALL be strict alternatives to their
+retained Bottle/Release compatibility inputs. Those three writers SHALL retain
+`(bottleId, null)` for an exact target and `(null, null)` for a generic target
+until compatibility columns are removed. Price and review continuations SHALL
+use the selected target as authority while preserving the compatibility
+behavior specified by their own mutation and read contracts.
+
+#### Scenario: Write an exact target-native consumer
+
+- **WHEN** a target-native tasting, collection, or Flight writer receives an
+  exact CatalogTarget
+- **THEN** the writer uses only that target id as selection authority
+- **AND** the staged retained projection is the target's own `(bottleId, null)`
+
+#### Scenario: Write a generic target-native consumer
+
+- **WHEN** a target-native tasting, collection, or Flight writer receives a
+  generic BottleGroup CatalogTarget
+- **THEN** the writer uses only that target id as selection authority
+- **AND** the staged retained projection is `(null, null)`
+- **AND** it does not persist the representative Bottle as selected identity
+
+#### Scenario: Display whether exactness is known
+
+- **WHEN** a user continues with an exact or generic CatalogTarget
+- **THEN** an exact continuation identifies the selected Bottle
+- **AND** a generic continuation identifies the BottleGroup and states that the
+  exact release is unspecified
+- **AND** it does not display the representative Bottle as selected identity
+
+#### Scenario: Reject mixed target-native and legacy identity
+
+- **WHEN** a tasting, collection, or Flight mutation supplies both a
+  target-native selection and retained Bottle or BottleRelease selection fields
+- **THEN** boundary validation rejects the request
+- **AND** the writer does not choose between the conflicting identities
+
+#### Scenario: Filter Reviews by target
+
+- **WHEN** a review list continuation supplies a CatalogTarget id
+- **THEN** it filters by that exact target id
+- **AND** generic and exact targets within the same BottleGroup remain distinct
+
 ### Requirement: Aliases preserve exact or generic target intent
 
 The system SHALL assign aliases through one validated CatalogTarget operation.
@@ -180,12 +227,20 @@ artifacts, candidates, search evidence, or duplicate proposed payloads.
 #### Scenario: Create a Bottle from reviewed photo identification
 
 - **WHEN** an approved photo-identification create decision succeeds
-- **THEN** it returns the complete Bottle backed by the active exact target
-- **AND** its retained compatibility response has `release: null`
+- **THEN** it returns the active exact CatalogTarget for the complete Bottle
+- **AND** any catalog-image side-effect failures are returned as non-fatal
+  warnings
 - **AND** it creates neither a BottleRelease nor a photo/reference ingestion
   alias
 - **AND** canonical concrete creation still reserves the Bottle's required
   canonical exact alias
+
+#### Scenario: Return an existing photo match
+
+- **WHEN** photo identification matches an existing concrete Bottle
+- **THEN** the public decision returns that Bottle's active exact CatalogTarget
+- **AND** raw classifier Bottle/Release evidence remains internal
+- **AND** the client does not reconstruct a Bottle/Release pair
 
 #### Scenario: Assign a resolved missing-Bottle worker consumer
 
@@ -359,11 +414,24 @@ compatibility pair.
 
 ### Requirement: Direct Flight membership has one authoritative target set
 
-The system SHALL resolve the staged Flight `bottles: number[]` input as retained
-legacy `(bottleId, null)` intent, SHALL persist one validated exact or generic
-CatalogTarget per distinct target, and SHALL lock target identity before Flight
-membership. An explicit Bottle list on update SHALL fully replace membership;
-an omitted list SHALL preserve it.
+The system SHALL accept strict alternative Flight inputs: target-native
+`targets: number[]` supplies authoritative CatalogTarget ids, while retained
+`bottles: number[]` supplies legacy `(bottleId, null)` intent. A request SHALL
+NOT combine them. The system SHALL persist one validated exact or generic
+CatalogTarget per distinct target and SHALL lock target identity before Flight
+membership. An explicit membership list on update SHALL fully replace
+membership; omitting both alternatives SHALL preserve it.
+
+#### Scenario: Create a Flight from target-native input
+
+- **WHEN** direct Flight creation receives one or more CatalogTarget ids in
+  `targets`
+- **THEN** every id is resolved and locked as authoritative identity
+- **AND** an exact membership retains that target's own `(bottleId, null)`
+- **AND** a generic membership retains `(null, null)` without selecting the
+  BottleGroup representative
+- **AND** every requested target is locked before the Flight and membership rows
+  are inserted
 
 #### Scenario: Create a Flight from staged Bottle-id input
 
@@ -392,7 +460,8 @@ an omitted list SHALL preserve it.
 
 #### Scenario: Replace a Flight membership set
 
-- **WHEN** a Flight update supplies a `bottles` list
+- **WHEN** a Flight update supplies either a `targets` list or a retained
+  `bottles` list
 - **THEN** the supplied list is the complete desired membership set
 - **AND** an empty list clears all membership
 - **AND** the operation locks the union of requested and existing durable
@@ -410,7 +479,7 @@ an omitted list SHALL preserve it.
 
 #### Scenario: Update Flight metadata without replacing membership
 
-- **WHEN** a Flight update omits the `bottles` field
+- **WHEN** a Flight update omits both `targets` and `bottles`
 - **THEN** existing membership is preserved unchanged
 
 #### Scenario: Defer adjacent Flight cutovers
@@ -418,7 +487,6 @@ an omitted list SHALL preserve it.
 - **WHEN** task 5.6e dual-writes direct Flight mutations
 - **THEN** Flight reads and existing-row backfill remain owned by task 7.3 and
   section 6
-- **AND** target-native Flight input remains owned by task 8.7
 - **AND** retained pair storage and compatibility removal remain owned by tasks
   9.6 and 9.7
 - **AND** the slice remains a code-review boundary with no deployment or

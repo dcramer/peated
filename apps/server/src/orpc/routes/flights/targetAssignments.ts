@@ -7,35 +7,50 @@ import {
 
 export type FlightTargetAssignment = {
   target: CatalogTargetAssignmentDescriptor;
-  retainedBottleId: number;
+  retainedBottleId: number | null;
 };
 
+type FlightTargetSelection =
+  | { kind: "targets"; ids: number[] }
+  | { kind: "bottles"; ids: number[] };
+
 /**
- * Resolves each submitted Bottle as a legacy null-release pair, canonicalizes
- * by durable target, and retains the lowest submitted Bottle id for that
- * target. Generic targets never substitute a representative Bottle.
+ * Resolves canonical target ids directly or translates staged Bottle ids as
+ * legacy null-release pairs, then canonicalizes by durable target. Legacy
+ * duplicates retain the lowest submitted Bottle id; target-native generic
+ * assignments retain null and never substitute a representative Bottle. Task
+ * 9.7 removes the Bottle-id compatibility adapter.
  */
 export async function resolveFlightTargetAssignments(
   tx: AnyTransaction,
-  bottleIds: number[],
+  selection: FlightTargetSelection,
   context: CatalogTargetOperationContext,
 ): Promise<FlightTargetAssignment[]> {
   const assignmentsByTarget = new Map<number, FlightTargetAssignment>();
-  for (const bottleId of new Set(bottleIds)) {
+  for (const id of new Set(selection.ids)) {
     const target = await resolveCatalogTargetForAssignment(
-      {
-        kind: "legacy",
-        bottleId,
-        releaseId: null,
-        context,
-      },
+      selection.kind === "targets"
+        ? { kind: "target", targetId: id }
+        : {
+            kind: "legacy",
+            bottleId: id,
+            releaseId: null,
+            context,
+          },
       tx,
     );
     const current = assignmentsByTarget.get(target.targetId);
-    if (!current || bottleId < current.retainedBottleId) {
+    const retainedBottleId =
+      selection.kind === "targets" ? target.bottleId : id;
+    if (
+      !current ||
+      (retainedBottleId !== null &&
+        (current.retainedBottleId === null ||
+          retainedBottleId < current.retainedBottleId))
+    ) {
       assignmentsByTarget.set(target.targetId, {
         target,
-        retainedBottleId: bottleId,
+        retainedBottleId,
       });
     }
   }

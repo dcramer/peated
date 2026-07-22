@@ -9,7 +9,7 @@ import {
 import { CatalogTargetInvalidMappingError } from "@peated/server/lib/catalogTargets";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 async function promoteRelease(parent: Bottle, releaseId: number) {
   const [promoted] = await db
@@ -123,6 +123,68 @@ describe("GET /reviews", () => {
 
     expect(results.length).toBe(1);
     expect(results[0].id).toEqual(review.id);
+  });
+
+  test("lists reviews by authoritative exact or generic target", async ({
+    fixtures,
+  }) => {
+    const exactBottle = await fixtures.Bottle();
+    const genericBottle = await fixtures.Bottle();
+    const [exactTarget, genericTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, exactBottle.id),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, genericBottle.groupId as number),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+    ]);
+    if (!exactTarget || !genericTarget) throw new Error("Missing targets");
+    const site = await fixtures.ExternalSiteOrExisting();
+    const exactReview = await fixtures.Review({
+      externalSiteId: site.id,
+      targetId: exactTarget.id,
+      bottleId: exactBottle.id,
+    });
+    const genericReview = await fixtures.Review({
+      externalSiteId: site.id,
+      targetId: genericTarget.id,
+      bottleId: null,
+      releaseId: null,
+    });
+
+    const exact = await routerClient.reviews.list({ target: exactTarget.id });
+    const generic = await routerClient.reviews.list({
+      target: genericTarget.id,
+    });
+
+    expect(exact.results.map(({ id }) => id)).toEqual([exactReview.id]);
+    expect(generic.results.map(({ id }) => id)).toEqual([genericReview.id]);
+    expect(generic.results[0]?.target).toMatchObject({ kind: "group" });
+  });
+
+  test("rejects invalid and mixed target filters", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing target");
+
+    await expect(
+      waitError(() =>
+        routerClient.reviews.list({ target: Number.MAX_SAFE_INTEGER }),
+      ),
+    ).resolves.toMatchObject({ message: "Cannot identify catalog target." });
+    await expect(
+      waitError(() =>
+        routerClient.reviews.list({
+          target: target.id,
+          bottle: bottle.id,
+        } as never),
+      ),
+    ).resolves.toMatchObject({ message: "Input validation failed" });
   });
 
   test("lists reviews by release", async ({ fixtures }) => {

@@ -25,6 +25,11 @@ async function getGenericTargetId(groupId: number): Promise<number> {
   return target.id;
 }
 
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
+
 describe("CatalogTarget set membership constraints", () => {
   test("collections enforce target membership while retaining null legacy rows", async ({
     fixtures,
@@ -210,5 +215,119 @@ describe("CatalogTarget set membership constraints", () => {
         assignedByActorId: genericBottle.createdByActorId,
       }),
     ).rejects.toThrow(/bottle_alias_name_idx/);
+  });
+});
+
+describe("CatalogTarget consumer identity constraints", () => {
+  test("collections accept staged identities and reject invalid tuples", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const genericTargetId = await getGenericTargetId(
+      requireGroupId(bottle.groupId),
+    );
+    const collection = await fixtures.Collection();
+
+    await expect(
+      db.insert(collectionBottles).values([
+        {
+          collectionId: collection.id,
+          bottleId: bottle.id,
+          releaseId: release.id,
+        },
+        {
+          collectionId: collection.id,
+          targetId: genericTargetId,
+        },
+      ]),
+    ).resolves.toBeDefined();
+
+    await expect(
+      db.insert(collectionBottles).values({ collectionId: collection.id }),
+    ).rejects.toThrow(/collection_bottle_identity_check/);
+    await expect(
+      db.insert(collectionBottles).values({
+        collectionId: collection.id,
+        releaseId: release.id,
+      }),
+    ).rejects.toThrow(/collection_bottle_identity_check/);
+  });
+
+  test("flights accept staged identities and reject invalid tuples", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const genericTargetId = await getGenericTargetId(
+      requireGroupId(bottle.groupId),
+    );
+    const flight = await fixtures.Flight();
+
+    await expect(
+      db.insert(flightBottles).values([
+        {
+          flightId: flight.id,
+          bottleId: bottle.id,
+          releaseId: release.id,
+        },
+        {
+          flightId: flight.id,
+          targetId: genericTargetId,
+        },
+      ]),
+    ).resolves.toBeDefined();
+
+    await expect(
+      db.insert(flightBottles).values({ flightId: flight.id }),
+    ).rejects.toThrow(/flight_bottle_identity_check/);
+    await expect(
+      db.insert(flightBottles).values({
+        flightId: flight.id,
+        releaseId: release.id,
+      }),
+    ).rejects.toThrow(/flight_bottle_identity_check/);
+  });
+
+  test("tastings accept staged identities and reject invalid tuples", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const genericTargetId = await getGenericTargetId(
+      requireGroupId(bottle.groupId),
+    );
+    const user = await fixtures.User();
+    const createdAt = new Date("2026-07-20T12:00:00.000Z");
+
+    await expect(
+      db.insert(tastings).values([
+        {
+          bottleId: bottle.id,
+          releaseId: release.id,
+          createdById: user.id,
+          createdAt,
+        },
+        {
+          targetId: genericTargetId,
+          createdById: user.id,
+          createdAt: new Date(createdAt.getTime() + 1_000),
+        },
+      ]),
+    ).resolves.toBeDefined();
+
+    await expect(
+      db.insert(tastings).values({
+        createdById: user.id,
+        createdAt: new Date(createdAt.getTime() + 2_000),
+      }),
+    ).rejects.toThrow(/tasting_identity_check/);
+    await expect(
+      db.insert(tastings).values({
+        releaseId: release.id,
+        createdById: user.id,
+        createdAt: new Date(createdAt.getTime() + 3_000),
+      }),
+    ).rejects.toThrow(/tasting_identity_check/);
   });
 });

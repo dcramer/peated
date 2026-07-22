@@ -3,11 +3,11 @@ import {
   bigint,
   bigserial,
   boolean,
+  check,
   index,
   pgTable,
   text,
   timestamp,
-  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -43,15 +43,19 @@ export const flightsRelations = relations(flights, ({ one, many }) => ({
 export type Flight = typeof flights.$inferSelect;
 export type NewFlight = typeof flights.$inferInsert;
 
+/**
+ * Target identity is authoritative. The nullable Bottle/Release pair remains
+ * compatibility storage until task 9.6 removes it.
+ */
 export const flightBottles = pgTable(
   "flight_bottle",
   {
     flightId: bigint("flight_id", { mode: "number" })
       .references(() => flights.id)
       .notNull(),
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+    ),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
@@ -60,9 +64,18 @@ export const flightBottles = pgTable(
     ),
   },
   (table) => [
-    unique()
-      .on(table.flightId, table.bottleId, table.releaseId)
-      .nullsNotDistinct(),
+    check(
+      "flight_bottle_identity_check",
+      sql`${table.bottleId} IS NOT NULL OR (${table.targetId} IS NOT NULL AND ${table.releaseId} IS NULL)`,
+    ),
+    uniqueIndex("flight_bottle_legacy_unq")
+      .using(
+        "btree",
+        table.flightId,
+        table.bottleId,
+        sql`COALESCE(${table.releaseId}, 0)`,
+      )
+      .where(sql`${table.bottleId} IS NOT NULL`),
     uniqueIndex("flight_bottle_target_unq")
       .on(table.flightId, table.targetId)
       .where(sql`${table.targetId} IS NOT NULL`),

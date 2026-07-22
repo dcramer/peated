@@ -4,13 +4,14 @@ import {
   bottleReleasePromotions,
   bottleTags,
   bottles,
+  catalogTargets,
   tastings,
 } from "@peated/server/db/schema";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, vi } from "vitest";
 
@@ -86,6 +87,45 @@ describe("PUT /tastings/:tasting", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
   });
 
+  test("rejects catalog identity fields instead of stripping them", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+      notes: "unchanged",
+    });
+    const identityFields = [
+      { target: 1 },
+      { bottle: 1 },
+      { release: 1 },
+      { targetId: 1 },
+      { bottleId: 1 },
+      { releaseId: 1 },
+    ];
+
+    for (const identityField of identityFields) {
+      const error = await waitError(() =>
+        routerClient.tastings.update(
+          {
+            tasting: tasting.id,
+            notes: "must not persist",
+            ...identityField,
+          } as never,
+          { context: { user: defaults.user } },
+        ),
+      );
+      expect(error).toMatchObject({ message: "Input validation failed" });
+    }
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, tasting.id),
+        columns: { notes: true },
+      }),
+    ).toEqual({ notes: "unchanged" });
+  });
+
   test("no changes", async ({ defaults, fixtures }) => {
     const tasting = await fixtures.Tasting({
       createdById: defaults.user.id,
@@ -135,7 +175,7 @@ describe("PUT /tastings/:tasting", () => {
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, newTasting.bottleId));
+      .where(eq(bottles.id, newTasting.bottleId!));
     expect(bottle.avgRating).toBeNull();
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
@@ -469,7 +509,7 @@ describe("PUT /tastings/:tasting", () => {
       .from(bottleTags)
       .where(
         and(
-          eq(bottleTags.bottleId, newTasting.bottleId),
+          eq(bottleTags.bottleId, newTasting.bottleId!),
           gt(bottleTags.count, 0),
         ),
       );
@@ -477,6 +517,145 @@ describe("PUT /tastings/:tasting", () => {
     expect(tagList.length).toEqual(1);
     expect(tagList[0].tag).toEqual(tag.name);
     expect(tagList[0].count).toEqual(1);
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("updates promoted exact tags on the target Bottle despite retained-pair drift", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const [oldTag, newTag] = await Promise.all([
+      fixtures.Tag({ name: "promoted-update-old" }),
+      fixtures.Tag({ name: "promoted-update-new" }),
+    ]);
+    const retainedBottle = await fixtures.Bottle();
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: retainedBottle.groupId,
+        brandId: retainedBottle.brandId,
+        createdByActorId: retainedBottle.createdByActorId,
+        name: `${retainedBottle.name} promoted update`,
+        fullName: `${retainedBottle.fullName} promoted update`,
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Missing promoted Bottle fixture");
+    const [target] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: retainedBottle.groupId as number,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!target) throw new Error("Missing promoted target fixture");
+    const release = await fixtures.BottleRelease({
+      bottleId: retainedBottle.id,
+    });
+    await promoteRelease(
+      release.id,
+      promotedBottle.id,
+      retainedBottle.createdByActorId,
+    );
+
+    const created = await routerClient.tastings.create(
+      {
+        bottle: retainedBottle.id,
+        release: release.id,
+        tags: [oldTag.name],
+      },
+      { context: { user: defaults.user } },
+    );
+    vi.mocked(workerClient.pushJob).mockClear();
+
+    await routerClient.tastings.update(
+      { tasting: created.tasting.id, tags: [newTag.name] },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, created.tasting.id),
+        columns: {
+          bottleId: true,
+          releaseId: true,
+          targetId: true,
+          tags: true,
+        },
+      }),
+    ).toEqual({
+      bottleId: retainedBottle.id,
+      releaseId: release.id,
+      targetId: target.id,
+      tags: [newTag.name],
+    });
+    expect(
+      await db.query.bottleTags.findMany({
+        where: and(
+          eq(bottleTags.bottleId, promotedBottle.id),
+          inArray(bottleTags.tag, [oldTag.name, newTag.name]),
+        ),
+        orderBy: (table, { asc }) => asc(table.tag),
+      }),
+    ).toEqual([
+      expect.objectContaining({ tag: newTag.name, count: 1 }),
+      expect.objectContaining({ tag: oldTag.name, count: 0 }),
+    ]);
+    expect(
+      await db.query.bottleTags.findMany({
+        where: and(
+          eq(bottleTags.bottleId, retainedBottle.id),
+          inArray(bottleTags.tag, [oldTag.name, newTag.name]),
+        ),
+      }),
+    ).toEqual([]);
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("updates generic target tags without exact Bottle attribution", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const [oldTag, newTag] = await Promise.all([
+      fixtures.Tag({ name: "generic-update-old" }),
+      fixtures.Tag({ name: "generic-update-new" }),
+    ]);
+    const memberBottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, memberBottle.groupId as number),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!target) throw new Error("Missing generic target fixture");
+    const created = await routerClient.tastings.create(
+      { target: target.id, tags: [oldTag.name] },
+      { context: { user: defaults.user } },
+    );
+    vi.mocked(workerClient.pushJob).mockClear();
+
+    await routerClient.tastings.update(
+      { tasting: created.tasting.id, tags: [newTag.name] },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, created.tasting.id),
+        columns: { bottleId: true, targetId: true, tags: true },
+      }),
+    ).toEqual({
+      bottleId: null,
+      targetId: target.id,
+      tags: [newTag.name],
+    });
+    expect(
+      await db.query.bottleTags.findMany({
+        where: and(
+          eq(bottleTags.bottleId, memberBottle.id),
+          inArray(bottleTags.tag, [oldTag.name, newTag.name]),
+        ),
+      }),
+    ).toEqual([]);
     expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 });

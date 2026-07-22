@@ -20,9 +20,9 @@ Bottle or a proposal for one independently complete new Bottle. Ideally, a
 clear label photo should drive the new-Bottle path automatically enough that
 the user reviews fields instead of starting from scratch.
 
-The uploaded photo may also become the tasting image. If the flow creates a new
-Bottle, or finds an existing Bottle without an image, the same photo may be
-promoted as that Bottle image when policy allows.
+The uploaded photo may also become the tasting image. When photo identification
+creates a new Bottle, that creation operation may also promote a suitable photo
+as the Bottle image. Normal tasting creation does not promote catalog images.
 
 ## Experience Goals
 
@@ -30,8 +30,8 @@ promoted as that Bottle image when policy allows.
 - The user should see immediate progress after selecting a photo.
 - A slow or uncertain AI result should not block the user from searching
   manually and finishing the tasting.
-- Tasting save should prioritize persisting the tasting over slow image
-  promotion or post-save verification.
+- Tasting save should prioritize persisting the tasting over its best-effort
+  image attachment or post-save verification.
 
 Target latency budgets:
 
@@ -83,9 +83,8 @@ proposal:
 7. Server creates any approved new Bottle before tasting save when the
    confirmed photo-identification result is a creation proposal.
 8. User records tasting notes, rating, tags, serving style, flight, and friends.
-9. Server creates the tasting and attaches the pending image if selected.
-10. Server may promote the image to the Bottle image under deterministic
-    policy.
+9. Server creates the tasting and attempts to attach the pending image if
+   selected.
 
 Low-confidence photo identification should fall back to seeded full search
 rather than forcing a create or match decision.
@@ -203,11 +202,10 @@ picture control, while preserving the user's ability to replace it, remove it,
 or save without a picture. Saving the tasting should attach the image only if the
 picture field still references the pending upload at submit time.
 
-If policy allows using the same photo as a Bottle image, expose that
-as a separate secondary choice from the tasting picture field. Hide or disable
-the promotion option when policy says promotion is not allowed, such as when the
-existing Bottle already has an image or the photo is unsuitable as a canonical
-Bottle image.
+The tasting form does not expose catalog-image promotion. Promotion is owned by
+photo-identification creation when that operation creates a new Bottle and the
+photo is suitable; adding such a choice to normal tasting save is deferred
+rather than part of the current contract.
 
 For the first standalone version, the form may reuse the existing tasting form
 component if it can support a bottle chosen inside the page. Avoid changing the
@@ -216,13 +214,13 @@ the existing route.
 
 ### Save Result
 
-Saving should prioritize the tasting record. If image attachment or promotion
-fails after the tasting is saved, show a partial-success message with a retry
-path where possible:
+Saving should prioritize the tasting record. Pending-image attachment is a
+best-effort side effect after the tasting commits. An attachment failure is
+logged and leaves the successfully created tasting without that image; surfaced
+retry or partial-success UI is deferred.
 
 - tasting saved
 - image attachment failed
-- bottle image promotion failed
 
 The user should not lose notes, rating, or selected bottle because image handling
 failed.
@@ -235,7 +233,7 @@ The photo path should remain usable without camera access:
 - manual search must remain available before, during, and after photo lookup
 - progress and error states should be text-readable, not only spinner-based
 - extracted fields and proposed matches should be readable by screen readers
-- image attach and promotion choices should be standard form controls
+- image attachment, removal, and replacement should use standard form controls
 
 ## Storage Model
 
@@ -364,9 +362,7 @@ Output:
 
 ```ts
 type PhotoIdentificationCandidate = {
-  bottleId: number;
-  // Staged legacy response compatibility only; live selection uses bottleId.
-  releaseId?: number | null;
+  // Display-only classifier evidence; the confirmed decision owns identity.
   bottleFullName?: string | null;
   fullName: string;
 };
@@ -374,9 +370,7 @@ type PhotoIdentificationCandidate = {
 type PhotoIdentificationDecision =
   | {
       action: "match";
-      matchedBottleId: number;
-      // Staged legacy response compatibility only; new matches are Bottles.
-      matchedReleaseId: number | null;
+      matchedTarget: ExactCatalogTargetV1;
     }
   | {
       action: "create_bottle";
@@ -465,8 +459,8 @@ result without rerunning photo extraction or classification.
 Every accepted `create_bottle` decision describes one independently complete
 marketed Bottle and creates or safely reuses that concrete Bottle and its exact
 CatalogTarget. Photo classification never chooses a parent or BottleGroup. The
-staged compatibility response returns the concrete `bottle` and
-`release: null`; no live workflow creates a BottleRelease.
+response returns that exact CatalogTarget; no live workflow creates a
+BottleRelease or reconstructs a Bottle/Release pair in the browser.
 
 When the pending scan is suitable as a catalog image and a new Bottle was
 created, creation promotes it to that Bottle. Unsuitable photos and safe reuse
@@ -478,35 +472,34 @@ alias, the create route returns `409 CONFLICT` with the conflicting bottle id in
 
 ### Create Tasting With Selected Picture
 
-For the first standalone version, keep tasting creation on the existing tasting
-create route. When the user confirms a photo result, the client should seed the
-normal tasting `Picture` field with the uploaded local file. If the user leaves
-that field selected, the client uploads it through the existing tasting image
-update route after the tasting is created. If the user removes or replaces the
-picture field value, submit that current field state instead.
+Tasting creation receives the confirmed CatalogTarget's single `targetId`; the
+browser does not independently submit Bottle and BottleRelease identity. The
+form keeps that target fixed and explicitly labels whether it is an exact Bottle
+or an unknown-exactness BottleGroup. A generic target never substitutes the
+group's representative Bottle.
 
-This means the first version should not extend tasting create with pending-image
-fields:
+When the user confirms a photo result, the client seeds the normal tasting
+`Picture` field with the pending upload. If the user leaves that field selected,
+the tasting create request attaches the pending image. If the user removes or
+replaces the picture field value, submit that current field state instead.
+
+The target-native request may carry the owned pending upload id:
 
 ```ts
 {
+  target: number;
   pendingImageId?: string;
-  attachImageToTasting?: boolean;
-  promoteImageToBottle?: "never" | "if_empty";
-  photoIdentificationId?: string;
 }
 ```
 
-Those fields remain a future option if the flow needs server-side pending-image
-reuse after leaving `/addTasting`. The current route should:
-
 - create the tasting through the existing deterministic path
-- upload the selected picture through the existing image update path when
-  selected
-- promote the image to a concrete Bottle only after the tasting and any
-  required Bottle creation are durable
-- return partial-success information if image copy or promotion fails after the
-  tasting is created
+- validate the pending image's ownership, purpose, and expiry before creating
+  the tasting
+- after the tasting commits, copy the selected pending picture into the tasting
+  namespace and persist its image URL
+- log a copy failure without rolling back the tasting; the response remains the
+  normal tasting-create response and carries no partial-success metadata
+- upload a replacement through the existing image update path after creation
 - avoid re-running image identification during final tasting save
 
 Future `photoIdentificationId` support may link the user-confirmed choice back
@@ -639,6 +632,7 @@ Attach to tasting:
 - default to selected when the image is `suitableAsTastingImage`
 - allow user to turn off attachment before save
 - never attach if the pending image is expired or owned by another user
+- copy after tasting persistence on a best-effort basis
 
 Promote to catalog Bottle:
 
@@ -646,16 +640,12 @@ Promote to catalog Bottle:
 - for photo-identification create, promote suitable scans by default when the
   concrete Bottle image slot is empty; the active exact target identifies that
   Bottle and no staged legacy BottleRelease image is created
-- for tasting create, only promote when `promoteImageToBottle = "if_empty"`
 - only promote when `photoSuitability.suitableAsBottleImage = true`
-- only a still-unconverted legacy tasting target may retain BottleRelease image
-  promotion; in that compatibility branch, prefer its release image over the
-  parent Bottle image
-- if a concrete Bottle is created in the same flow, promotion can happen only
-  after the Bottle and exact target are durable
+- catalog promotion is not part of normal tasting creation
 
-Promotion failures should not roll back a successfully created tasting. They
-should be logged and returned as partial-success metadata the UI can explain.
+Photo-identification creation returns catalog-promotion failures as non-fatal
+warnings alongside the exact target. Tasting-image copy failures are logged and
+do not roll back the successfully created tasting.
 
 ## Creation And Review Policy
 
@@ -666,6 +656,7 @@ For matched existing concrete Bottles:
 
 - a strong local candidate can be returned quickly without web evidence
 - user confirmation is enough to continue to the tasting form
+- the confirmation and tasting form identify the exact CatalogTarget explicitly
 
 For a proposed new Bottle:
 
@@ -694,9 +685,9 @@ image evidence prefilled.
 - AI providers receive only the processed image needed for extraction. Do not
   send unrelated tasting notes, friend tags, or private user context to the
   image extraction step.
-- Tasting creation validates the confirmed Bottle target independently from any
-  prior photo identification result. Retained release ids are staged
-  compatibility data, not live selection authority.
+- Tasting creation validates the confirmed CatalogTarget independently from any
+  prior photo identification result. Retained release ids are server-side staged
+  compatibility evidence, not browser selection authority.
 
 ## Background Work
 
@@ -741,7 +732,7 @@ Track outcome metrics alongside timing:
 - identification timed out
 - identification hit rate limit
 - image attachment failed after tasting save
-- image promotion failed after tasting save
+- catalog image promotion warned after photo-identification create
 
 The first implementation should log enough phase timings to decide whether OCR,
 vision, upload processing, local search, or web evidence is the real latency
@@ -864,18 +855,20 @@ classifier tests.
 
 ### Phase 4: Tasting Create With Pending Image
 
-Extend the normal tasting creation path to consume pending images.
+The normal tasting creation path consumes pending images without owning catalog
+image promotion.
 
 Scope:
 
-- extend tasting create schema with `pendingImageId`, `attachImageToTasting`,
-  `promoteImageToBottle`, and optional `photoIdentificationId`
-- attach pending image to tasting by copying it into the tasting namespace
-- promote image to the selected exact Bottle under deterministic policy; only a
-  still-unconverted legacy tasting target may use retained BottleRelease image
-  promotion compatibility
-- return partial-success metadata for image failures after tasting persistence
-- link tasting to photo-identification trace when provided
+- accept optional `pendingImageId` in the normal tasting create schema
+- validate that it is an unexpired, user-owned `photo_tasting_entry` upload
+  before creating the tasting
+- after tasting persistence, copy the pending image into the tasting namespace
+  and update the tasting image URL
+- treat copy failure as best-effort: log it, preserve the tasting, and return the
+  normal tasting-create response
+- defer photo-identification trace linkage and surfaced attachment retry state
+- keep catalog-image promotion solely in photo-identification create
 
 API integration tests:
 
@@ -883,12 +876,8 @@ API integration tests:
 - creates tasting without attaching pending image
 - rejects pending images owned by another user
 - rejects expired pending images while preserving normal tasting validation
-- does not overwrite an existing Bottle image or a retained legacy
-  BottleRelease image
-- promotes to empty target image when allowed
-- prefers a retained BottleRelease image over its parent only in the
-  still-unconverted legacy tasting compatibility branch
-- returns partial success when image copy fails after tasting creation
+- preserves the tasting without an image when the post-commit copy fails
+- does not mutate the selected Bottle or BottleGroup image
 - does not re-run extraction or classifier during tasting save
 
 This phase should continue using real route/database integration tests rather
@@ -906,7 +895,8 @@ Scope:
 - show confirmation state for match, create proposal, or manual-search fallback
 - seed the uploaded photo into the normal tasting picture field
 - allow the user to remove or replace that picture field value
-- show partial-success save messaging
+- leave surfaced attachment retry or partial-success messaging deferred until
+  the tasting-create response owns such a contract
 
 UI verification:
 
@@ -963,8 +953,8 @@ Use focused route tests for:
 - photo identification API boundary
 - tasting create with pending image
 - cleanup job
-- promotion helper
-- partial-success behavior
+- photo-identification-create catalog promotion and warning behavior
+- best-effort tasting-image copy failure
 
 Where external systems would make tests slow or flaky, isolate them at a narrow
 adapter boundary:
@@ -973,8 +963,9 @@ adapter boundary:
 - fake classifier result
 - fake storage copy failure
 
-Do not mock the tasting create transaction, ownership checks, expiration checks,
-or image promotion policy.
+Do not mock the tasting create transaction, ownership checks, or expiration
+checks. Exercise catalog-image promotion separately through
+photo-identification create.
 
 ### Classifier And Extraction Tests
 
@@ -1014,11 +1005,6 @@ Do not broaden the feature until each gate is satisfied:
   user abandons the flow?
 - Should users be able to save an unidentified tasting draft, or should manual
   search remain required before saving?
-- Should existing bottles without images default to promotion on, or should the
-  checkbox default off unless the bottle was created in this flow?
-- How long should still-unconverted legacy tasting targets preserve
-  BottleRelease-over-parent image promotion, given that photo-driven creation
-  now always promotes to the concrete Bottle selected by its exact target?
 - What TTL is appropriate for pending images in production?
 - Should the first shipped version allow photo-driven bottle creation, or only
   existing-bottle matching plus manual add-bottle fallback?

@@ -10,6 +10,30 @@ export type PendingImageRouteState = {
   imageUrl?: string | null;
 };
 
+type AddBottleRouteIdentity =
+  | {
+      bottleId?: never;
+      releaseId?: never;
+      groupId?: never;
+    }
+  | {
+      bottleId: number | string;
+      releaseId?: number | string | null;
+      groupId?: never;
+    }
+  | {
+      bottleId?: never;
+      releaseId?: never;
+      groupId: number | string;
+    };
+
+type AddBottleRouteOptions = {
+  flightId?: string | null;
+  pendingImageId?: string | null;
+  pendingImageUrl?: string | null;
+  intent?: AddBottleRouteIntent;
+} & AddBottleRouteIdentity;
+
 export function getPendingImageFromParams(
   searchParams: Pick<URLSearchParams, "get">,
 ) {
@@ -25,22 +49,26 @@ export function getPendingImageFromParams(
 export function getAddBottleHref({
   bottleId,
   releaseId,
+  groupId,
   flightId,
   pendingImageId,
   pendingImageUrl,
   intent = "addBottle",
-}: {
-  bottleId?: number | string | null;
-  releaseId?: number | string | null;
-  flightId?: string | null;
-  pendingImageId?: string | null;
-  pendingImageUrl?: string | null;
-  intent?: AddBottleRouteIntent;
-}) {
+}: AddBottleRouteOptions) {
+  if (groupId != null && (bottleId != null || releaseId != null)) {
+    throw new Error(
+      "Add Bottle links cannot select both exact and generic catalog identity.",
+    );
+  }
+  if (releaseId != null && bottleId == null) {
+    throw new Error("Add Bottle release links require a Bottle identity.");
+  }
+
   const params = new URLSearchParams();
 
   if (bottleId) params.set("bottle", String(bottleId));
   if (releaseId) params.set("release", String(releaseId));
+  if (groupId) params.set("group", String(groupId));
   if (flightId) params.set("flight", flightId);
   if (pendingImageId) params.set("pendingImageId", pendingImageId);
   if (pendingImageUrl) params.set("pendingImageUrl", pendingImageUrl);

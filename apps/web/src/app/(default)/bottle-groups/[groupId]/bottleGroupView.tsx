@@ -1,10 +1,13 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
+import Button from "@peated/web/components/button";
+import CollectionAction from "@peated/web/components/collectionAction";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
+import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { Suspense } from "react";
 import GroupModActions from "./groupModActions";
 
@@ -54,6 +57,23 @@ export default function BottleGroupView({
             {group.statedAge !== null ? (
               <span>{group.statedAge} years</span>
             ) : null}
+          </div>
+          <div className="mt-5 flex items-center gap-2">
+            <Suspense>
+              <CollectionAction
+                targetId={target.targetId}
+                title="Save release family to Library"
+              />
+            </Suspense>
+            <Button
+              href={getAddBottleHref({
+                groupId: group.id,
+                intent: "tasting",
+              })}
+              color="primary"
+            >
+              Log Tasting
+            </Button>
           </div>
         </div>
 

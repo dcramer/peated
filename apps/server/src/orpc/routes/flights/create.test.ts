@@ -99,7 +99,7 @@ describe("POST /flights", () => {
           bottleId,
           releaseId,
         }))
-        .sort((a, b) => a.bottleId - b.bottleId),
+        .sort((a, b) => (a.bottleId ?? 0) - (b.bottleId ?? 0)),
     ).toEqual(
       targets
         .map(({ id, bottleId }) => ({
@@ -109,6 +109,91 @@ describe("POST /flights", () => {
         }))
         .sort((a, b) => (a.bottleId ?? 0) - (b.bottleId ?? 0)),
     );
+  });
+
+  test("stores target-native exact and generic memberships", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const exactBottle = await fixtures.Bottle();
+    const genericBottle = await fixtures.Bottle();
+    if (genericBottle.groupId === null) {
+      throw new Error("Bottle group fixture not found");
+    }
+    const [exactTarget, genericTarget] = await Promise.all([
+      db.query.catalogTargets.findFirst({
+        where: eq(catalogTargets.bottleId, exactBottle.id),
+      }),
+      db.query.catalogTargets.findFirst({
+        where: and(
+          eq(catalogTargets.groupId, genericBottle.groupId),
+          isNull(catalogTargets.bottleId),
+        ),
+      }),
+    ]);
+    if (!exactTarget || !genericTarget) throw new Error("Missing targets");
+
+    const data = await routerClient.flights.create(
+      { name: "Target flight", targets: [genericTarget.id, exactTarget.id] },
+      { context: { user } },
+    );
+    const flight = await db.query.flights.findFirst({
+      where: eq(flights.publicId, data.id),
+    });
+    if (!flight) throw new Error("Missing flight");
+    const memberships = await db.query.flightBottles.findMany({
+      where: eq(flightBottles.flightId, flight.id),
+    });
+
+    expect(memberships).toHaveLength(2);
+    expect(
+      memberships
+        .map(({ flightId, targetId, bottleId, releaseId }) => ({
+          flightId,
+          targetId,
+          bottleId,
+          releaseId,
+        }))
+        .sort((left, right) => (left.targetId ?? 0) - (right.targetId ?? 0)),
+    ).toEqual(
+      [
+        {
+          flightId: flight.id,
+          targetId: exactTarget.id,
+          bottleId: exactBottle.id,
+          releaseId: null,
+        },
+        {
+          flightId: flight.id,
+          targetId: genericTarget.id,
+          bottleId: null,
+          releaseId: null,
+        },
+      ].sort((left, right) => left.targetId - right.targetId),
+    );
+  });
+
+  test("rejects mixed target and retained membership input", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, bottle.id),
+    });
+    if (!target) throw new Error("Missing target");
+
+    const error = await waitError(() =>
+      routerClient.flights.create(
+        {
+          name: "Invalid mixed flight",
+          targets: [target.id],
+          bottles: [bottle.id],
+        } as never,
+        { context: { user } },
+      ),
+    );
+    expect(error).toMatchObject({ message: "Input validation failed" });
   });
 
   test("locks every selected target before inserting the Flight", async ({
@@ -193,7 +278,7 @@ describe("POST /flights", () => {
             releaseId,
             targetId,
           }))
-          .sort((a, b) => a.bottleId - b.bottleId),
+          .sort((a, b) => (a.bottleId ?? 0) - (b.bottleId ?? 0)),
       ).toEqual(
         targets
           .map(({ bottleId, id }) => ({
@@ -347,5 +432,31 @@ describe("POST /flights", () => {
       where: eq(flights.name, "Missing Bottle flight"),
     });
     expect(storedFlight).toBeUndefined();
+  });
+
+  test("returns conflict and rolls back for an invalid target id", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+
+    const error = await waitError(() =>
+      routerClient.flights.create(
+        {
+          name: "Missing target flight",
+          targets: [Number.MAX_SAFE_INTEGER],
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      code: "CONFLICT",
+      message: expect.stringContaining("Catalog target not found"),
+    });
+    await expect(
+      db.query.flights.findFirst({
+        where: eq(flights.name, "Missing target flight"),
+      }),
+    ).resolves.toBeUndefined();
   });
 });

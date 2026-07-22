@@ -1,3 +1,4 @@
+import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
 import PeatedGlyph from "@peated/web/assets/glyph.svg";
 import BottleHeader from "@peated/web/components/bottleHeader";
@@ -41,7 +42,11 @@ export function BottleRelationshipLinks({
   );
 }
 
-export default function BottleFullHeader({ bottle }: { bottle: Bottle }) {
+export default function BottleFullHeader({
+  bottle,
+}: {
+  bottle: Outputs["bottles"]["details"];
+}) {
   return (
     <div className="w-full p-3 lg:py-0">
       <BottleHeader bottle={bottle} />
@@ -58,7 +63,7 @@ export default function BottleFullHeader({ bottle }: { bottle: Bottle }) {
               </>
             }
           >
-            <CollectionAction bottleId={bottle.id} />
+            <CollectionAction targetId={bottle.targetId} />
           </Suspense>
 
           <Button

@@ -95,9 +95,12 @@ describe("OpenAPI generation ($ref reuse)", () => {
       (spec.paths?.["/bottles"]?.get?.responses as any)?.["200"]; // keys may be stringified
     const listResponse = listResp200?.content?.["application/json"]
       ?.schema as any;
-    expect(listResponse?.properties?.results?.items?.$ref).toEqual(
+    expect(listResponse?.properties?.results?.items?.allOf?.[0]?.$ref).toEqual(
       "#/components/schemas/Bottle",
     );
+    expect(
+      listResponse?.properties?.results?.items?.allOf?.[1]?.required,
+    ).toContain("targetId");
     const relSchema = listResponse?.properties?.rel;
     // Cursor should be a $ref or inline resolution depending on converter depth; prefer $ref
     if (relSchema?.$ref) {
@@ -419,20 +422,17 @@ describe("OpenAPI generation ($ref reuse)", () => {
     }>();
   });
 
-  it("keeps photo creation release compatibility null-only", async () => {
+  it("returns one exact target from photo creation", async () => {
     const spec = await generateSpec();
     const photoCreateSchema = getJsonResponseSchema(
       spec.paths?.["/tastings/photo-identification-create"]?.post,
     );
-    const releaseSchema = photoCreateSchema?.properties?.release;
-
-    expect(releaseSchema?.type).toBe("null");
-    expect(releaseSchema?.anyOf).toBeUndefined();
-    expect(releaseSchema?.oneOf).toBeUndefined();
-    expect(JSON.stringify(releaseSchema)).not.toContain("BottleRelease");
+    expect(photoCreateSchema?.required).toContain("target");
+    expect(photoCreateSchema?.properties).not.toHaveProperty("release");
+    expect(photoCreateSchema?.properties).not.toHaveProperty("bottle");
     expectTypeOf<
-      Outputs["tastings"]["photoIdentificationCreate"]["release"]
-    >().toEqualTypeOf<null>();
+      Outputs["tastings"]["photoIdentificationCreate"]["target"]["kind"]
+    >().toEqualTypeOf<"bottle">();
   });
 
   it("publishes explicit target-native and retained collection input variants", async () => {

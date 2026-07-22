@@ -29,6 +29,7 @@ import { z } from "zod";
 const OutputSchema = z.intersection(
   BottleSchema,
   z.object({
+    targetId: z.number().int().positive(),
     people: z.number(),
     lastPrice: StorePriceSchema.nullable(),
   }),
@@ -136,6 +137,7 @@ export default procedure
       ...(await serialize(BottleSerializer, bottle, context.user, [], {
         includeGroupSummary: true,
       })),
+      targetId,
       people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)

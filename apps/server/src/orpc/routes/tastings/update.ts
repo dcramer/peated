@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import type { Tasting } from "@peated/server/db/schema";
+import type { NewTasting, Tasting } from "@peated/server/db/schema";
 import { bottleTags, follows, tastings } from "@peated/server/db/schema";
 import { resolveCatalogTargetForAssignment } from "@peated/server/lib/catalogTargets";
 import { arraysEqual } from "@peated/server/lib/equals";
@@ -9,25 +9,45 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
 import { validateTags } from "@peated/server/orpc/validators/tags";
-import { TastingInputSchema, TastingSchema } from "@peated/server/schemas";
+import {
+  TastingContentInputSchema,
+  TastingSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
+import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 
-const InputSchema = z.object({
-  tasting: z.coerce.number(),
-  notes: TastingInputSchema.shape.notes.removeDefault().optional(),
-  rating: TastingInputSchema.shape.rating.removeDefault().optional(),
-  servingStyle: TastingInputSchema.shape.servingStyle
-    .removeDefault()
-    .optional(),
-  color: TastingInputSchema.shape.color.removeDefault().optional(),
-  friends: TastingInputSchema.shape.friends.removeDefault().optional(),
-  tags: TastingInputSchema.shape.tags.removeDefault().optional(),
-  image: TastingInputSchema.shape.image.optional(),
-});
+const InputSchema = z
+  .object({
+    tasting: z.coerce.number(),
+    notes: TastingContentInputSchema.shape.notes.removeDefault().optional(),
+    rating: TastingContentInputSchema.shape.rating.removeDefault().optional(),
+    servingStyle: TastingContentInputSchema.shape.servingStyle
+      .removeDefault()
+      .optional(),
+    color: TastingContentInputSchema.shape.color.removeDefault().optional(),
+    friends: TastingContentInputSchema.shape.friends.removeDefault().optional(),
+    tags: TastingContentInputSchema.shape.tags.removeDefault().optional(),
+    image: TastingContentInputSchema.shape.image.optional(),
+  })
+  .strict();
+
+type TastingUpdate = Partial<
+  Pick<
+    NewTasting,
+    | "notes"
+    | "rating"
+    | "servingStyle"
+    | "color"
+    | "friends"
+    | "tags"
+    | "imageUrl"
+    | "targetId"
+  >
+>;
 
 export default procedure
   .use(requireAuth)
@@ -61,7 +81,7 @@ export default procedure
       });
     }
 
-    const tastingData: { [name: string]: any } = {};
+    const tastingData: TastingUpdate = {};
     if (input.notes !== undefined && input.notes !== tasting.notes) {
       tastingData.notes = input.notes;
     }
@@ -133,23 +153,31 @@ export default procedure
 
       const targetWasBackfilled = currentTasting.targetId === null;
       const shouldRecomputeStats = ratingChanged || targetWasBackfilled;
+      const needsTarget =
+        shouldRecomputeStats || tastingData.tags !== undefined;
       let target = null;
       let persistedData = tastingData;
-      if (shouldRecomputeStats) {
-        target = await resolveCatalogTargetForAssignment(
+      if (needsTarget) {
+        const targetInput =
           currentTasting.targetId !== null
-            ? { kind: "target", targetId: currentTasting.targetId }
-            : {
-                kind: "legacy",
-                bottleId: currentTasting.bottleId,
-                releaseId: currentTasting.releaseId,
-                context: {
-                  caller: "tastings.update",
-                  operation: "backfill",
-                },
-              },
-          tx,
-        );
+            ? { kind: "target" as const, targetId: currentTasting.targetId }
+            : currentTasting.bottleId !== null
+              ? {
+                  kind: "legacy" as const,
+                  bottleId: currentTasting.bottleId,
+                  releaseId: currentTasting.releaseId,
+                  context: {
+                    caller: "tastings.update",
+                    operation: "backfill",
+                  },
+                }
+              : null;
+        if (!targetInput) {
+          throw errors.CONFLICT({
+            message: "Tasting has no catalog identity.",
+          });
+        }
+        target = await resolveCatalogTargetForAssignment(targetInput, tx);
         if (targetWasBackfilled) {
           persistedData = { ...tastingData, targetId: target.targetId };
         }
@@ -165,54 +193,61 @@ export default procedure
                 .returning()
             )[0]
           : currentTasting;
-      } catch (err: any) {
-        if (
-          err?.code === "23505" &&
-          ["tasting_unq", "tasting_target_unq"].includes(err?.constraint)
-        ) {
+      } catch (error) {
+        if (isTastingIdentityConflict(error)) {
           throw errors.CONFLICT({
             message: "Tasting already exists.",
-            cause: err,
+            cause: error,
           });
         }
-        throw err;
+        throw error;
       }
       if (!newTasting) return;
 
       if (tastingData.tags !== undefined) {
-        // TODO: we're being lazy - db access could be optimized
-        for (const tag of currentTasting.tags) {
-          await tx
-            .update(bottleTags)
-            .set({
-              count: sql`${bottleTags.count} - 1`,
-            })
-            .where(
-              and(
-                eq(bottleTags.bottleId, currentTasting.bottleId),
-                eq(bottleTags.tag, tag),
-                gt(bottleTags.count, 0),
-              ),
-            );
+        if (!target) {
+          throw new Error(
+            "Catalog target was not resolved for tag accounting.",
+          );
         }
-        for (const tag of newTasting.tags) {
-          await tx
-            .insert(bottleTags)
-            .values({
-              bottleId: newTasting.bottleId,
-              tag,
-              count: 1,
-            })
-            .onConflictDoUpdate({
-              target: [bottleTags.bottleId, bottleTags.tag],
-              set: {
-                count: sql<string>`${bottleTags.count} + 1`,
-              },
-            });
+        const targetBottleId = target.bottleId;
+        if (targetBottleId !== null) {
+          for (const tag of currentTasting.tags) {
+            await tx
+              .update(bottleTags)
+              .set({
+                count: sql`${bottleTags.count} - 1`,
+              })
+              .where(
+                and(
+                  eq(bottleTags.bottleId, targetBottleId),
+                  eq(bottleTags.tag, tag),
+                  gt(bottleTags.count, 0),
+                ),
+              );
+          }
+          for (const tag of newTasting.tags) {
+            await tx
+              .insert(bottleTags)
+              .values({
+                bottleId: targetBottleId,
+                tag,
+                count: 1,
+              })
+              .onConflictDoUpdate({
+                target: [bottleTags.bottleId, bottleTags.tag],
+                set: {
+                  count: sql<string>`${bottleTags.count} + 1`,
+                },
+              });
+          }
         }
       }
 
-      return { tasting: newTasting, target };
+      return {
+        tasting: newTasting,
+        target: shouldRecomputeStats ? target : null,
+      };
     });
 
     if (!updated) {

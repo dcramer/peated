@@ -3,10 +3,13 @@ import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
+  bottleGroupId,
+  bottleGroupTarget,
   createdTastingId,
   existingBottle,
   existingReleaseId,
   failingTastingNotes,
+  genericTastingNotes,
   photoTastingNotes,
   tastingNotes,
   testAccessToken,
@@ -61,11 +64,47 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
+    await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("logs a generic tasting for a release family", async ({
+    context,
+    page,
+  }) => {
+    await signIn(context);
+
+    await page.goto(
+      `/addBottle?group=${bottleGroupId}&flight=flight-qa&intent=tasting`,
+    );
+
+    await expect(
+      page.getByText(bottleGroupTarget.group.fullName),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Exact bottle not specified", { exact: true }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Log Tasting" }).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Log Tasting" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(bottleGroupTarget.group.fullName),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Exact bottle not specified", { exact: true }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByLabel("Comments").fill(genericTastingNotes);
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(page).toHaveURL(/\/flights\/flight-qa$/);
     await expectNoHorizontalOverflow(page);
   });
 
@@ -90,6 +129,7 @@ test.describe("log tasting", () => {
     await expect(
       page.getByText("Matched to existing bottle in Peated"),
     ).toBeVisible();
+    await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
     await expect(
       page.getByText("Lagavulin", { exact: true }).first(),
     ).toBeVisible();
@@ -108,6 +148,7 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(photoTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();

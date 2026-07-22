@@ -37,7 +37,7 @@ export const FlightDetailsSchema = FlightSchema.extend({
     .describe("Ordered catalog targets and flight-specific viewer state"),
 });
 
-export const FlightInputSchema = z.object({
+const FlightCommonInputSchema = z.object({
   name: z.string().trim().min(1, "Required").describe("Name of the flight"),
   description: z
     .string()
@@ -49,8 +49,22 @@ export const FlightInputSchema = z.object({
     .default(false)
     .optional()
     .describe("Whether the flight is publicly visible"),
-  bottles: z
-    .array(z.number())
-    .optional()
-    .describe("Array of bottle IDs to include in the flight"),
 });
+
+export const FlightTargetInputSchema = FlightCommonInputSchema.extend({
+  targets: z
+    .array(z.number().int().positive())
+    .optional()
+    .describe("Authoritative CatalogTarget IDs to include in the flight"),
+}).strict();
+
+export const FlightLegacyInputSchema = FlightCommonInputSchema.extend({
+  bottles: z
+    .array(z.number().int().positive())
+    .describe("Retained Bottle compatibility IDs to include in the flight"),
+}).strict();
+
+export const FlightInputSchema = z.union([
+  FlightTargetInputSchema,
+  FlightLegacyInputSchema,
+]);

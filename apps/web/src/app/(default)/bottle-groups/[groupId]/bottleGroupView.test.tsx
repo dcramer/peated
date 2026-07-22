@@ -15,6 +15,12 @@ vi.mock("@peated/web/components/paginationButtons", () => ({
   }) => <nav aria-label="Pagination">Next page: {rel.nextCursor}</nav>,
 }));
 
+vi.mock("@peated/web/components/collectionAction", () => ({
+  default: ({ targetId, title }: { targetId: number; title: string }) => (
+    <button data-target-id={targetId}>{title}</button>
+  ),
+}));
+
 vi.mock("./groupModActions", () => ({
   default: ({
     groupId,
@@ -137,6 +143,10 @@ describe("BottleGroupView", () => {
     expect(html).toContain("Exact release not specified");
     expect(html).toContain('aria-label="Bottle group actions"');
     expect(html).toContain("Group 8 has 2 releases");
+    expect(html).toContain('data-target-id="100"');
+    expect(html).toContain("Save release family to Library");
+    expect(html).toContain('href="/addBottle?group=8&amp;intent=tasting"');
+    expect(html).toContain("Log Tasting");
     expect(html).toContain("Shared group description.");
     expect(html).toContain('src="https://example.com/group.webp"');
     expect(html).toContain("Related releases</dt><dd");

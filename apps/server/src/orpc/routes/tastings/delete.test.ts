@@ -1,10 +1,16 @@
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
-import { bottleTags, bottles, tastings } from "@peated/server/db/schema";
+import {
+  bottleReleasePromotions,
+  bottleTags,
+  bottles,
+  catalogTargets,
+  tastings,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -21,6 +27,20 @@ const STATS_JOB_OPTIONS = {
   removeOnComplete: true,
   removeOnFail: false,
 };
+
+async function promoteRelease(
+  releaseId: number,
+  bottleId: number,
+  createdByActorId: number,
+) {
+  await db.insert(bottleReleasePromotions).values({
+    releaseId,
+    promotedBottleId: bottleId,
+    status: "promoted",
+    completedAt: new Date(),
+    createdByActorId,
+  });
+}
 
 async function waitForSessionBlockedBy(client: NodePgClient): Promise<void> {
   const session = await client.query<{ pid: number }>(
@@ -79,7 +99,7 @@ describe("DELETE /tastings/:tasting", () => {
     const tags = await db
       .select()
       .from(bottleTags)
-      .where(eq(bottleTags.bottleId, tasting.bottleId));
+      .where(eq(bottleTags.bottleId, tasting.bottleId!));
 
     expect(tags.length).toBe(2);
     for (const tag of tags) {
@@ -87,13 +107,125 @@ describe("DELETE /tastings/:tasting", () => {
     }
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, tasting.bottleId),
+      where: eq(bottles.id, tasting.bottleId!),
     });
     expect(bottle?.totalTastings).toBe(0);
     expect(bottle?.avgRating).toBeNull();
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
       { targetId: tasting.targetId },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("deletes promoted exact tags from the target Bottle despite retained-pair drift", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const tag = await fixtures.Tag({ name: "promoted-delete" });
+    const retainedBottle = await fixtures.Bottle();
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: retainedBottle.groupId,
+        brandId: retainedBottle.brandId,
+        createdByActorId: retainedBottle.createdByActorId,
+        name: `${retainedBottle.name} promoted delete`,
+        fullName: `${retainedBottle.fullName} promoted delete`,
+      })
+      .returning();
+    if (!promotedBottle) throw new Error("Missing promoted Bottle fixture");
+    const [target] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: retainedBottle.groupId as number,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!target) throw new Error("Missing promoted target fixture");
+    const release = await fixtures.BottleRelease({
+      bottleId: retainedBottle.id,
+    });
+    await promoteRelease(
+      release.id,
+      promotedBottle.id,
+      retainedBottle.createdByActorId,
+    );
+    const created = await routerClient.tastings.create(
+      {
+        bottle: retainedBottle.id,
+        release: release.id,
+        tags: [tag.name],
+      },
+      { context: { user: defaults.user } },
+    );
+    vi.mocked(workerClient.pushJob).mockClear();
+
+    await routerClient.tastings.delete(
+      { tasting: created.tasting.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      await db.query.bottleTags.findFirst({
+        where: and(
+          eq(bottleTags.bottleId, promotedBottle.id),
+          eq(bottleTags.tag, tag.name),
+        ),
+      }),
+    ).toMatchObject({ count: 0 });
+    expect(
+      await db.query.bottleTags.findMany({
+        where: and(
+          eq(bottleTags.bottleId, retainedBottle.id),
+          eq(bottleTags.tag, tag.name),
+        ),
+      }),
+    ).toEqual([]);
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { targetId: target.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("deletes generic target tags without exact Bottle attribution", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const tag = await fixtures.Tag({ name: "generic-delete" });
+    const memberBottle = await fixtures.Bottle();
+    const target = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, memberBottle.groupId as number),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!target) throw new Error("Missing generic target fixture");
+    const created = await routerClient.tastings.create(
+      { target: target.id, tags: [tag.name] },
+      { context: { user: defaults.user } },
+    );
+    vi.mocked(workerClient.pushJob).mockClear();
+
+    await routerClient.tastings.delete(
+      { tasting: created.tasting.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      await db.query.bottleTags.findMany({
+        where: and(
+          eq(bottleTags.bottleId, memberBottle.id),
+          inArray(bottleTags.tag, [tag.name]),
+        ),
+      }),
+    ).toEqual([]);
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleGroupStats",
+      { targetId: target.id },
       STATS_JOB_OPTIONS,
     );
   });

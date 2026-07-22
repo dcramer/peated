@@ -4,6 +4,7 @@ import {
   catalogTargets,
   collectionBottles,
   collections,
+  flightBottles,
   reviews,
   tastings,
 } from "@peated/server/db/schema";
@@ -13,7 +14,7 @@ import {
   consolidateCatalogTargetConsumersInTransaction,
 } from "@peated/server/lib/consolidateCatalogTargetConsumers";
 import waitError from "@peated/server/lib/test/waitError";
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 async function exactTargetId(bottleId: number) {
@@ -22,6 +23,17 @@ async function exactTargetId(bottleId: number) {
     .from(catalogTargets)
     .where(eq(catalogTargets.bottleId, bottleId));
   if (!target) throw new Error(`Missing exact target for Bottle ${bottleId}.`);
+  return target.id;
+}
+
+async function genericTargetId(groupId: number) {
+  const [target] = await db
+    .select({ id: catalogTargets.id })
+    .from(catalogTargets)
+    .where(
+      and(eq(catalogTargets.groupId, groupId), isNull(catalogTargets.bottleId)),
+    );
+  if (!target) throw new Error(`Missing generic target for group ${groupId}.`);
   return target.id;
 }
 
@@ -201,6 +213,104 @@ describe("catalog target consumer consolidation", () => {
         { id: sourceTasting.id, targetId: sourceTargetId },
         { id: destinationTasting.id, targetId: destinationTargetId },
       ].sort((left, right) => left.id - right.id),
+    );
+  });
+
+  test("consolidates only the selected generic Flight target", async ({
+    fixtures,
+  }) => {
+    const [sourceBottle, destinationBottle, unrelatedBottle] =
+      await Promise.all([
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+        fixtures.Bottle(),
+      ]);
+    const [sourceTargetId, destinationTargetId, unrelatedTargetId] =
+      await Promise.all([
+        genericTargetId(sourceBottle.groupId as number),
+        genericTargetId(destinationBottle.groupId as number),
+        genericTargetId(unrelatedBottle.groupId as number),
+      ]);
+    const duplicateFlight = await fixtures.Flight();
+    const replacementFlight = await fixtures.Flight();
+    await db.insert(flightBottles).values([
+      {
+        flightId: duplicateFlight.id,
+        bottleId: null,
+        targetId: sourceTargetId,
+      },
+      {
+        flightId: duplicateFlight.id,
+        bottleId: null,
+        targetId: destinationTargetId,
+      },
+      {
+        flightId: duplicateFlight.id,
+        bottleId: null,
+        targetId: unrelatedTargetId,
+      },
+      {
+        flightId: replacementFlight.id,
+        bottleId: null,
+        targetId: sourceTargetId,
+      },
+      {
+        flightId: replacementFlight.id,
+        bottleId: null,
+        targetId: unrelatedTargetId,
+      },
+    ]);
+
+    await db.transaction((tx) =>
+      consolidateCatalogTargetConsumersInTransaction(tx, {
+        sourceTargetId,
+        destinationTargetId,
+      }),
+    );
+
+    const rows = await db
+      .select({
+        flightId: flightBottles.flightId,
+        bottleId: flightBottles.bottleId,
+        releaseId: flightBottles.releaseId,
+        targetId: flightBottles.targetId,
+      })
+      .from(flightBottles)
+      .where(
+        inArray(flightBottles.flightId, [
+          duplicateFlight.id,
+          replacementFlight.id,
+        ]),
+      )
+      .orderBy(asc(flightBottles.flightId), asc(flightBottles.targetId));
+    expect(rows).toHaveLength(4);
+    expect(rows).toEqual(
+      expect.arrayContaining([
+        {
+          flightId: duplicateFlight.id,
+          bottleId: null,
+          releaseId: null,
+          targetId: destinationTargetId,
+        },
+        {
+          flightId: duplicateFlight.id,
+          bottleId: null,
+          releaseId: null,
+          targetId: unrelatedTargetId,
+        },
+        {
+          flightId: replacementFlight.id,
+          bottleId: null,
+          releaseId: null,
+          targetId: destinationTargetId,
+        },
+        {
+          flightId: replacementFlight.id,
+          bottleId: null,
+          releaseId: null,
+          targetId: unrelatedTargetId,
+        },
+      ]),
     );
   });
 

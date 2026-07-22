@@ -3,6 +3,8 @@ const timestamp = "2026-06-07T12:00:00.000Z";
 export const createdBottleName = "Playwright Reserve";
 export const tastingNotes = "Smoke, lemon peel, and sea salt.";
 export const photoTastingNotes = "Photo flow: smoke, lemon peel, and sea salt.";
+export const genericTastingNotes =
+  "Release family: smoke, lemon peel, and sea salt.";
 export const failingTastingNotes = "Please make this tasting fail.";
 
 export const testUser = {
@@ -238,6 +240,33 @@ export function buildBottleRelease({
 
 export const existingRelease = buildBottleRelease();
 
+export const legacyPromotedBottle = {
+  ...existingBottle,
+  id: legacyPromotedBottleId,
+  fullName: existingRelease.fullName,
+  name: existingRelease.name,
+  edition: existingRelease.edition,
+  statedAge: existingRelease.statedAge ?? existingBottle.statedAge,
+  abv: existingRelease.abv,
+  caskStrength: existingRelease.caskStrength,
+  singleCask: existingRelease.singleCask,
+  vintageYear: existingRelease.vintageYear,
+  releaseYear: existingRelease.releaseYear,
+  caskType: existingRelease.caskType,
+  caskSize: existingRelease.caskSize,
+  caskFill: existingRelease.caskFill,
+  description: existingRelease.description ?? existingBottle.description,
+  imageUrl: existingRelease.imageUrl ?? existingBottle.imageUrl,
+  tastingNotes: existingRelease.tastingNotes ?? existingBottle.tastingNotes,
+  suggestedTags: existingRelease.suggestedTags,
+  avgRating: existingRelease.avgRating,
+  totalTastings: existingRelease.totalTastings,
+  isFavorite: existingRelease.isFavorite,
+  hasTasted: existingRelease.hasTasted,
+  createdAt: existingRelease.createdAt,
+  updatedAt: existingRelease.updatedAt,
+};
+
 /**
  * @typedef {Omit<ReturnType<typeof buildBottle>, "bottler" | "series"> & {
  *   bottler: {id: number} | null,
@@ -378,6 +407,7 @@ export function buildExactCatalogTarget({
 }
 
 export const genericCollectionTargetLabel = "Lagavulin Core Range";
+export const genericCollectionTargetGroupId = 40_000_002;
 
 /** @returns {GenericCatalogTargetV1} */
 export function buildGenericCatalogTarget() {
@@ -386,7 +416,7 @@ export function buildGenericCatalogTarget() {
     kind: "group",
     targetId: 40_000_001,
     group: buildBottleGroup({
-      id: 40_000_002,
+      id: genericCollectionTargetGroupId,
       fullName: genericCollectionTargetLabel,
       name: "Core Range",
       representativeBottleId: existingBottle.id,
@@ -508,6 +538,31 @@ export const bottleGroupTarget = {
   kind: "group",
   targetId: 50_200,
   group: bottleGroup,
+};
+
+export const flightTargetFixtureId = "flight-targets";
+export const createdFlightTargetFixtureId = "flight-targets-created";
+export const flightTargetFixture = {
+  id: flightTargetFixtureId,
+  name: "Exact and generic targets",
+  description: "A Flight that keeps target exactness explicit.",
+  public: true,
+  createdAt: timestamp,
+  createdBy: testUser,
+  targets: [
+    {
+      target: bottleGroupMemberTargets[0],
+      distillers: [testBrand],
+      hasTasted: false,
+      isLibrary: false,
+    },
+    {
+      target: bottleGroupTarget,
+      distillers: [testBrand],
+      hasTasted: false,
+      isLibrary: false,
+    },
+  ],
 };
 
 export const destinationBottleGroup = {
@@ -679,9 +734,20 @@ export function buildCollection({
   };
 }
 
+/**
+ * @param {{
+ *   id?: number,
+ *   bottle?: FixtureBottle | ConcreteFixtureBottle,
+ *   target?: CatalogTargetV1,
+ *   notes?: string,
+ *   rating?: number,
+ *   tags?: string[],
+ * }} [options]
+ */
 export function buildTasting({
   id = createdTastingId,
   bottle = existingBottle,
+  target,
   notes = tastingNotes,
   rating = 2,
   tags = /** @type {string[]} */ ([]),
@@ -690,7 +756,7 @@ export function buildTasting({
     id,
     imageUrl: null,
     notes,
-    target: buildExactCatalogTarget({ bottle }),
+    target: target ?? buildExactCatalogTarget({ bottle }),
     rating,
     tags,
     color: null,

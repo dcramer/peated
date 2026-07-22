@@ -294,8 +294,9 @@ Exact Bottle serializers must not require BottleGroup hydration.
   submitted Bottle id retained deterministically. Creation locks the canonical
   set through the BottleGroup, Bottle, then CatalogTarget hierarchy before
   Flight and membership writes and creates no targetless row.
-- An omitted Flight `bottles` update preserves membership, an explicit empty
-  list clears it, and any explicit non-empty list fully replaces it. Replacement
+- An omitted Flight membership field preserves membership. An explicit empty
+  target-native `targets` list or retained `bottles` list clears it, and any
+  explicit non-empty list fully replaces it. Replacement
   snapshots membership, locks the union of requested and existing durable
   targets through the shared BottleGroup, Bottle, then CatalogTarget hierarchy
   before the Flight and membership rows, and retries from a fresh snapshot when
@@ -303,7 +304,7 @@ Exact Bottle serializers must not require BottleGroup hydration.
   durable and targetless rows and inserts only the canonical requested target
   assignments atomically.
 - Task 7.3 owns target-backed Flight reads, section 6 owns existing-row
-  backfill, task 8.7 owns target-native Flight input, and tasks 9.6/9.7 remove
+  backfill, task 8.7 adds target-native Flight input, and tasks 9.6/9.7 remove
   retained pair storage and compatibility. Task 5.6e is not a deployment or
   activation unit.
 - A StorePrice's `{ targetId, bottleId, releaseId }` columns form one identity

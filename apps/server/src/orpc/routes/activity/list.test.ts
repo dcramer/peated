@@ -14,9 +14,13 @@ async function insertTargetBackedCollectionBottles(
     await Promise.all(
       valueList.map(async (value) => {
         if (value.targetId !== undefined) return value;
+        if (value.bottleId == null) {
+          throw new Error("Retained Bottle fixture missing");
+        }
+        const bottleId = value.bottleId;
         const target = await db.query.catalogTargets.findFirst({
           where: (catalogTargets, { eq }) =>
-            eq(catalogTargets.bottleId, value.bottleId),
+            eq(catalogTargets.bottleId, bottleId),
           columns: { id: true },
         });
         if (!target) throw new Error("Exact target fixture missing");

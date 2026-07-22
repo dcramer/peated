@@ -1,8 +1,8 @@
-import { TastingInputSchema } from "@peated/server/schemas";
+import { TastingContentInputSchema } from "@peated/server/schemas";
 import type { SuggestedTag, Tag } from "@peated/server/types";
 import type { z } from "zod";
 
-export const TastingFormFieldsSchema = TastingInputSchema.pick({
+export const TastingFormFieldsSchema = TastingContentInputSchema.pick({
   rating: true,
   notes: true,
   tags: true,
@@ -17,29 +17,21 @@ export type TastingEditFormSubmitData = TastingFormFields & {
   image: TastingFormImage;
 };
 export type TastingCreateFormSubmitData = TastingEditFormSubmitData & {
-  bottle: number;
-  release: number | null;
+  target: number;
 };
 
-/**
- * Create retains staged Bottle/release identity until task 8.7; edit payloads
- * never mutate tasting identity.
- */
 export function buildTastingCreateFormSubmission({
   fields,
   image,
-  bottleId,
-  releaseId,
+  targetId,
 }: {
   fields: TastingFormFields;
   image: TastingFormImage;
-  bottleId: number;
-  releaseId: number | null;
+  targetId: number;
 }): TastingCreateFormSubmitData {
   return {
     ...fields,
-    bottle: bottleId,
-    release: releaseId,
+    target: targetId,
     image,
   };
 }

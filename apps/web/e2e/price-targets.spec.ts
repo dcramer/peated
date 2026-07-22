@@ -72,7 +72,10 @@ test.describe("price catalog targets", () => {
         name: priceChangeGenericTarget.group.fullName,
         exact: true,
       }),
-    ).toHaveCount(0);
+    ).toHaveAttribute(
+      "href",
+      `/bottle-groups/${priceChangeGenericTarget.group.id}`,
+    );
     await expect(
       genericRow.locator(
         `a[href="/bottles/${priceChangeGenericTarget.group.representativeBottleId}"]`,
@@ -128,7 +131,10 @@ test.describe("price catalog targets", () => {
         name: priceChangeGenericTarget.group.fullName,
         exact: true,
       }),
-    ).toHaveCount(0);
+    ).toHaveAttribute(
+      "href",
+      `/bottle-groups/${priceChangeGenericTarget.group.id}`,
+    );
     await expect(
       genericRow.locator(
         `a[href="/bottles/${priceChangeGenericTarget.group.representativeBottleId}"]`,

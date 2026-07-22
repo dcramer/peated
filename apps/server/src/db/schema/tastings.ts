@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
+  check,
   doublePrecision,
   index,
   integer,
@@ -10,7 +11,6 @@ import {
   smallint,
   text,
   timestamp,
-  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -26,17 +26,17 @@ export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 /**
  * User-authored tasting records.
  *
- * A tasting always points at a bottle and may optionally point at a canonical
- * release when the user knows the exact shared variant they had.
+ * Target identity is authoritative. The retained Bottle/Release pair is
+ * nullable compatibility storage until task 9.6 removes it.
  */
 export const tastings = pgTable(
   "tasting",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
 
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id)
-      .notNull(),
+    bottleId: bigint("bottle_id", { mode: "number" }).references(
+      () => bottles.id,
+    ),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
@@ -70,9 +70,19 @@ export const tastings = pgTable(
       .notNull(),
   },
   (table) => [
-    unique("tasting_unq")
-      .on(table.bottleId, table.releaseId, table.createdById, table.createdAt)
-      .nullsNotDistinct(),
+    check(
+      "tasting_identity_check",
+      sql`${table.bottleId} IS NOT NULL OR (${table.targetId} IS NOT NULL AND ${table.releaseId} IS NULL)`,
+    ),
+    uniqueIndex("tasting_legacy_unq")
+      .using(
+        "btree",
+        table.bottleId,
+        sql`COALESCE(${table.releaseId}, 0)`,
+        table.createdById,
+        table.createdAt,
+      )
+      .where(sql`${table.bottleId} IS NOT NULL`),
     uniqueIndex("tasting_target_unq")
       .on(table.targetId, table.createdById, table.createdAt)
       .where(sql`${table.targetId} IS NOT NULL`),
