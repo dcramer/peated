@@ -1,7 +1,6 @@
-import { formatCategoryName } from "@peated/server/lib/format";
-import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import {
@@ -9,76 +8,12 @@ import {
   type AddBottleRouteIntent,
   type PendingImageRouteState,
 } from "@peated/web/lib/addBottle";
-import { type ReactNode } from "react";
 import Join from "../join";
 export type BottleResult = {
   type: "bottle";
   ref: Bottle;
 };
 export type { AddBottleRouteIntent };
-
-type BottleMetadataItem = {
-  key: string;
-  content: ReactNode;
-};
-
-function getBottleMetadata(bottle: Bottle): BottleMetadataItem[] {
-  const metadata: BottleMetadataItem[] = [];
-
-  if (bottle.distillers.length) {
-    metadata.push({
-      key: "distillers",
-      content: (
-        <Join divider=", ">
-          {bottle.distillers.map((distiller) => (
-            <span key={distiller.id}>{distiller.name}</span>
-          ))}
-        </Join>
-      ),
-    });
-  }
-
-  if (bottle.category) {
-    metadata.push({
-      key: "category",
-      content: formatCategoryName(bottle.category),
-    });
-  }
-  if (bottle.statedAge !== null) {
-    metadata.push({ key: "age", content: `${bottle.statedAge} years` });
-  }
-  if (bottle.abv !== null) {
-    metadata.push({ key: "abv", content: `${bottle.abv.toFixed(1)}% ABV` });
-  }
-  if (bottle.vintageYear !== null) {
-    metadata.push({
-      key: "vintage",
-      content: `${bottle.vintageYear} vintage`,
-    });
-  }
-  if (bottle.releaseYear !== null) {
-    metadata.push({
-      key: "release",
-      content: `${bottle.releaseYear} release`,
-    });
-  }
-  if (bottle.singleCask) {
-    metadata.push({ key: "single-cask", content: "Single cask" });
-  }
-  if (bottle.caskStrength) {
-    metadata.push({ key: "cask-strength", content: "Cask strength" });
-  }
-
-  const caskDetails = [bottle.caskFill, bottle.caskType, bottle.caskSize]
-    .filter((value): value is NonNullable<typeof value> => value !== null)
-    .map(toTitleCase)
-    .join(" ");
-  if (caskDetails) {
-    metadata.push({ key: "cask-details", content: `${caskDetails} cask` });
-  }
-
-  return metadata;
-}
 
 /**
  * Builds the bottle-row destination, with Add Bottle route intents taking
@@ -122,7 +57,13 @@ export default function BottleResultRow({
   addBottleIntent?: AddBottleRouteIntent;
   pendingImage?: PendingImageRouteState | null;
 }) {
-  const metadata = getBottleMetadata(bottle);
+  const distillerMetadata = bottle.distillers.length ? (
+    <Join divider=", ">
+      {bottle.distillers.map((distiller) => (
+        <span key={distiller.id}>{distiller.name}</span>
+      ))}
+    </Join>
+  ) : undefined;
 
   return (
     <>
@@ -143,14 +84,18 @@ export default function BottleResultRow({
           </Link>
           <BottleStatusIcons bottle={bottle} />
         </div>
-        {metadata.length ? (
-          <div className="text-muted mt-1 flex flex-wrap text-sm leading-5">
-            {metadata.map(({ key, content }, index) => (
-              <span key={key} className="inline-flex whitespace-nowrap">
-                {index ? <span className="mx-1.5">&middot;</span> : null}
-                {content}
-              </span>
-            ))}
+        <BottleExactMetadata
+          bottle={bottle}
+          leadingContent={distillerMetadata}
+        />
+        {bottle.group && bottle.group.totalBottles > 1 ? (
+          <div className="mt-1 text-xs">
+            <Link
+              href={`/bottle-groups/${bottle.group.id}`}
+              className="text-muted relative z-10 hover:underline"
+            >
+              {bottle.group.totalBottles.toLocaleString()} related releases
+            </Link>
           </div>
         ) : null}
       </div>

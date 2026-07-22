@@ -1163,6 +1163,29 @@ Routes:
 - `apps/web/src/app/(admin)/admin/(default)/incoming-decisions/page.tsx` renders
   nonnull decision identity through `CatalogTargetIdentity`, labels null as an
   unknown target, and no longer builds a nested Bottling link.
+- `apps/web/src/app/(default)/bottle-groups/[groupId]/page.tsx` is the canonical
+  generic BottleGroup page. It renders only group-owned identity, editorial
+  content, and aggregate statistics, labels the exact release as unspecified,
+  and paginates independently complete member Bottles linking to
+  `/bottles/:id`. It never substitutes `representativeBottleId` for exact
+  identity or hydrates exact fields from the group.
+- `apps/web/src/app/(default)/bottle-groups/[groupId]/bottleGroupView.tsx` owns
+  the generic group presentation, aggregate statistics, and exact member list.
+- `apps/web/src/app/(default)/bottle-groups/[groupId]/groupModActions.tsx`
+  exposes moderator-only links to the standalone merge and split forms.
+- `apps/web/src/app/(layout-free)/bottle-groups/[groupId]/merge/page.tsx`
+  requires an explicit destination group and delegates to the canonical merge
+  mutation. Its confirmation states the merge direction, destination-owned
+  shared identity, and movement of generic activity.
+- `apps/web/src/app/(layout-free)/bottle-groups/[groupId]/split/page.tsx`
+  requires all members to be loaded, an explicit nonempty proper subset, and
+  valid representative choices before delegating to the canonical split
+  mutation. It states that generic activity, stable aliases, and editorial
+  content stay on the source group.
+- `apps/web/src/app/(default)/bottles/[bottleId]/bottleFullHeader.tsx` keeps the
+  exact Bottle header primary and adds quiet links to the related-release group
+  when it has multiple members and to the independent “Add another release”
+  workflow.
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/page.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
@@ -1187,11 +1210,11 @@ task 8.9. The nested new and edit URLs are permanent redirect routes: new
 points to the independent "Add another release" workflow, while edit resolves
 the retained release mapping and points to the promoted concrete Bottle editor.
 
-Task 7.9 remains deferred until a BottleGroup page and a durable retired-parent
-to BottleGroup destination exist. That redirect must preserve generic group
-identity and must never substitute the representative or another member Bottle.
-This review slice makes no production deployment, activation, audit, or
-backfill claim.
+The canonical BottleGroup page now exists. Task 7.9 remains deferred until a
+durable retired-parent-to-group mapping and redirect are implemented and
+validated. That redirect must preserve generic group identity and must never
+substitute the representative or another member Bottle. This review slice makes
+no production deployment, activation, audit, or backfill claim.
 
 Task 8.3 replaces the nested new-bottling route with a prefilled standard
 Bottle-create flow. The selected Bottle supplies independently durable draft
@@ -1207,6 +1230,11 @@ compatibility branches after measured traffic reaches zero.
 Shared UI and client helpers:
 
 - `apps/web/src/components/bottleCard.tsx`
+- `apps/web/src/components/bottleExactMetadata.tsx` is the shared exact-field
+  rendering owner used by search and BottleGroup related-release results. It
+  reads only durable Bottle fields and does not hydrate BottleGroup identity.
+- `apps/web/src/components/bottleGroupField.tsx` owns typed BottleGroup lookup
+  and labels candidates with stable group ids and member counts.
 - `apps/web/src/components/bottleForm.tsx`
 - `apps/web/src/components/bottleResolver/helpers.ts`
 - `apps/web/src/components/bottleResolver/index.tsx`
@@ -1215,6 +1243,8 @@ Shared UI and client helpers:
 - `apps/web/src/components/bottleReviews.tsx`
 - `apps/web/src/components/bottleTable.tsx`
 - `apps/web/src/components/collectionAction.tsx`
+- `apps/web/src/components/search/bottleResult.tsx` owns exact Bottle search-row
+  navigation and the quiet relationship link to a multi-member BottleGroup.
 - `apps/web/src/components/tastingForm.tsx`
 - `apps/web/src/components/notifications/entry.tsx` narrows the strict
   notification union and renders toast/comment activity with the referenced
@@ -1222,6 +1252,9 @@ Shared UI and client helpers:
   its BottleGroup, states that the exact Bottle was not specified, and never
   links or labels a representative Bottle.
 - `apps/web/src/lib/addBottle.ts`
+- `apps/web/src/lib/catalogTarget.ts` links exact targets to `/bottles/:id` and
+  generic targets to `/bottle-groups/:groupId`; it never turns a generic target
+  into a representative Bottle link.
 - `apps/web/src/lib/independentBottleProposal.ts` owns canonical UI composition
   for retained price-proposal evidence and durable “Add another release”
   prefills. This Section 8 creation composer is distinct from sparse correction

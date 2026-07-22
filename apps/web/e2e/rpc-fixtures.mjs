@@ -244,6 +244,18 @@ export const existingRelease = buildBottleRelease();
  *   series: {id: number} | null
  * }} FixtureBottle
  */
+/** @typedef {import("@peated/server/schemas").ConcreteBottleV1} ConcreteBottleV1 */
+/**
+ * @typedef {Omit<FixtureBottle,
+ *   "edition" | "statedAge" | "abv" | "singleCask" | "caskStrength" |
+ *   "vintageYear" | "releaseYear" | "caskSize" | "caskType" | "caskFill" |
+ *   "imageUrl"
+ * > & Pick<ConcreteBottleV1,
+ *   "edition" | "statedAge" | "abv" | "singleCask" | "caskStrength" |
+ *   "vintageYear" | "releaseYear" | "caskSize" | "caskType" | "caskFill" |
+ *   "imageUrl"
+ * >} ConcreteFixtureBottle
+ */
 /** @typedef {ReturnType<typeof buildBottleRelease>} FixtureBottleRelease */
 /** @typedef {import("@peated/server/schemas").BottleGroupV1} BottleGroupV1 */
 /** @typedef {import("@peated/server/schemas").CatalogTargetV1} CatalogTargetV1 */
@@ -256,7 +268,7 @@ export const existingRelease = buildBottleRelease();
  * @property {number} [id]
  * @property {string} [fullName]
  * @property {string} [name]
- * @property {FixtureBottle} [bottle]
+ * @property {FixtureBottle | ConcreteFixtureBottle} [bottle]
  * @property {number | null} [representativeBottleId]
  */
 
@@ -301,7 +313,7 @@ function buildBottleGroup({
 
 /**
  * @typedef {object} ExactCatalogTargetFixtureOptions
- * @property {FixtureBottle} [bottle]
+ * @property {FixtureBottle | ConcreteFixtureBottle} [bottle]
  * @property {FixtureBottleRelease | null} [release]
  */
 
@@ -381,6 +393,160 @@ export function buildGenericCatalogTarget() {
     }),
   };
 }
+
+export const bottleGroupId = 50_001;
+export const destinationBottleGroupId = 50_002;
+export const splitBottleGroupId = 50_003;
+
+const bottleGroupRatingStats = {
+  pass: 2,
+  sip: 3,
+  savor: 4,
+  total: 9,
+  avg: 2.2,
+  percentage: {
+    pass: 22.2,
+    sip: 33.3,
+    savor: 44.5,
+  },
+};
+
+/** @type {ConcreteFixtureBottle} */
+export const bottleGroupRepresentative = {
+  ...buildBottle({
+    id: 50_101,
+    name: "16-year-old Cask 42 (2022)",
+    totalTastings: 12,
+  }),
+  imageUrl: bottleImageUrl,
+  fullName: "Lagavulin 16-year-old Cask 42 (2022)",
+  edition: "Cask 42",
+  statedAge: 16,
+  abv: 55.1,
+  vintageYear: 2005,
+  releaseYear: 2022,
+  singleCask: true,
+  caskStrength: true,
+  caskFill: "1st_fill",
+  caskType: "oloroso",
+  caskSize: "hogshead",
+};
+
+/** @type {ConcreteFixtureBottle} */
+export const bottleGroupMember = {
+  ...buildBottle({
+    id: 50_102,
+    name: "16-year-old Distillers Edition (2023)",
+    totalTastings: 17,
+  }),
+  fullName: "Lagavulin 16-year-old Distillers Edition (2023)",
+  edition: "Distillers Edition",
+  statedAge: 16,
+  abv: 43,
+  vintageYear: 2007,
+  releaseYear: 2023,
+};
+
+/** @type {ConcreteFixtureBottle} */
+const bottleGroupThirdMember = {
+  ...buildBottle({
+    id: 50_103,
+    name: "16-year-old Feis Ile (2024)",
+    totalTastings: 8,
+  }),
+  fullName: "Lagavulin 16-year-old Feis Ile (2024)",
+  edition: "Feis Ile",
+  statedAge: 16,
+  abv: 52.4,
+  releaseYear: 2024,
+};
+
+export const bottleGroup = {
+  ...buildBottleGroup({
+    id: bottleGroupId,
+    fullName: "Lagavulin 16-year-old release family",
+    name: "16-year-old release family",
+    bottle: bottleGroupRepresentative,
+    representativeBottleId: bottleGroupRepresentative.id,
+  }),
+  description:
+    "The shared expression context for several independently identified releases.",
+  imageUrl: bottleImageUrl,
+  ratingStats: bottleGroupRatingStats,
+  avgRating: bottleGroupRatingStats.avg,
+  totalTastings: 37,
+  totalBottles: 3,
+};
+
+/**
+ * Rebinds an independently complete exact Bottle target to the shared group fixture.
+ *
+ * @param {ConcreteFixtureBottle} bottle
+ * @param {number} targetId
+ */
+function buildBottleGroupMemberTarget(bottle, targetId) {
+  const target = buildExactCatalogTarget({ bottle });
+  return {
+    ...target,
+    targetId,
+    group: bottleGroup,
+    bottle: {
+      ...target.bottle,
+      groupId: bottleGroup.id,
+    },
+  };
+}
+
+export const bottleGroupMemberTargets = [
+  buildBottleGroupMemberTarget(bottleGroupRepresentative, 50_201),
+  buildBottleGroupMemberTarget(bottleGroupMember, 50_202),
+  buildBottleGroupMemberTarget(bottleGroupThirdMember, 50_203),
+];
+
+export const bottleGroupTarget = {
+  schemaVersion: 1,
+  kind: "group",
+  targetId: 50_200,
+  group: bottleGroup,
+};
+
+export const destinationBottleGroup = {
+  ...buildBottleGroup({
+    id: destinationBottleGroupId,
+    fullName: "Lagavulin Destination Expression",
+    name: "Destination Expression",
+    bottle: existingBottle,
+  }),
+  totalBottles: 2,
+};
+
+export const destinationBottleGroupTarget = {
+  schemaVersion: 1,
+  kind: "group",
+  targetId: 50_210,
+  group: destinationBottleGroup,
+};
+
+const splitBottleGroup = {
+  ...bottleGroup,
+  id: splitBottleGroupId,
+  fullName: "Lagavulin Split Expression",
+  name: "Split Expression",
+  representativeBottleId: bottleGroupRepresentative.id,
+  totalBottles: 1,
+};
+
+export const splitBottleGroupTarget = {
+  schemaVersion: 1,
+  kind: "group",
+  targetId: 50_220,
+  group: splitBottleGroup,
+};
+
+export const groupedBottleDetails = {
+  ...bottleGroupRepresentative,
+  group: bottleGroup,
+};
 
 export const priceChangeExactTarget = buildExactCatalogTarget();
 export const priceChangeGenericTarget = buildGenericCatalogTarget();

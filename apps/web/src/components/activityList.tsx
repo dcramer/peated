@@ -95,22 +95,13 @@ function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
     <li className="flex min-w-0 items-center gap-x-3 px-3 py-2">
       <CollectionItemImage item={item} />
       <div className="min-w-0 flex-1">
-        {href ? (
-          <Link
-            href={href}
-            className="block truncate text-sm font-semibold text-white hover:underline"
-            title={title}
-          >
-            {title}
-          </Link>
-        ) : (
-          <div
-            className="block truncate text-sm font-semibold text-white"
-            title={title}
-          >
-            {title}
-          </div>
-        )}
+        <Link
+          href={href}
+          className="block truncate text-sm font-semibold text-white hover:underline"
+          title={title}
+        >
+          {title}
+        </Link>
         {detail ? (
           <div className="text-muted truncate text-xs">{detail}</div>
         ) : null}

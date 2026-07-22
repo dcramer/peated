@@ -47,7 +47,7 @@ describe("catalog target display helpers", () => {
     } as CatalogTargetV1;
 
     expect(getCatalogTargetLabel(target)).toBe("Macallan 18");
-    expect(getCatalogTargetHref(target)).toBeNull();
+    expect(getCatalogTargetHref(target)).toBe("/bottle-groups/8");
     expect(getCatalogTargetStats(target)).toEqual({
       totalTastings: 3,
       avgRating: 1.5,

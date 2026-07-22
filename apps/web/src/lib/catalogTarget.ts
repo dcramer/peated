@@ -7,7 +7,9 @@ export function getCatalogTargetLabel(target: CatalogTargetV1) {
 }
 
 export function getCatalogTargetHref(target: CatalogTargetV1) {
-  return target.kind === "bottle" ? `/bottles/${target.bottle.id}` : null;
+  return target.kind === "bottle"
+    ? `/bottles/${target.bottle.id}`
+    : `/bottle-groups/${target.group.id}`;
 }
 
 export function getCatalogTargetScopeLabel(target: CatalogTargetV1) {

@@ -2,6 +2,10 @@ import http from "node:http";
 
 import {
   anotherReleaseSourceBottle,
+  bottleGroupId,
+  bottleGroupMemberTargets,
+  bottleGroupRepresentative,
+  bottleGroupTarget,
   bottleImageBottleId,
   bottleImageUrl,
   buildActivity,
@@ -14,6 +18,8 @@ import {
   createdBottleId,
   createdBottleName,
   createdTastingId,
+  destinationBottleGroupId,
+  destinationBottleGroupTarget,
   emptyLibraryStats,
   emptyList,
   exactSearchBottle,
@@ -22,11 +28,14 @@ import {
   existingRelease,
   existingReleaseId,
   failingTastingNotes,
+  groupedBottleDetails,
   legacyIncompleteReleaseId,
   legacyPromotedBottleId,
   photoTastingNotes,
   priceChangeList,
   priceSite,
+  splitBottleGroupId,
+  splitBottleGroupTarget,
   storePriceList,
   suggestedTags,
   tastingNotes,
@@ -151,11 +160,19 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, buildExactCatalogTarget());
       return true;
-    case "search":
+    case "search": {
+      const bottleGroupWorkflow = getAccessToken(request).includes(
+        "bottle-group-workflows",
+      );
+      const expectedIncludes = bottleGroupWorkflow
+        ? ["bottles", "users", "entities"]
+        : ["bottles"];
       if (
         !Array.isArray(input?.include) ||
-        input.include.length !== 1 ||
-        input.include[0] !== "bottles"
+        input.include.length !== expectedIncludes.length ||
+        !expectedIncludes.every(
+          (include, index) => input.include[index] === include,
+        )
       ) {
         sendRpcError(response, "Expected bottle search");
         return true;
@@ -168,14 +185,17 @@ async function handleRpcRequest({ request, response, url }) {
             type: "bottle",
             ref: withCollectionStatus(
               request,
-              getAccessToken(request).includes("search-route")
-                ? exactSearchBottle
-                : existingBottle,
+              bottleGroupWorkflow
+                ? groupedBottleDetails
+                : getAccessToken(request).includes("search-route")
+                  ? exactSearchBottle
+                  : existingBottle,
             ),
           },
         ],
       });
       return true;
+    }
     case "bottles/create": {
       if (getAccessToken(request).includes("ordinary-exact-create")) {
         if (!isExpectedOrdinaryExactBottleCreateInput(input)) {
@@ -335,6 +355,67 @@ async function handleRpcRequest({ request, response, url }) {
       }
       sendRpcResponse(response, priceSite);
       return true;
+    case "bottleGroups/details": {
+      const target = getBottleGroupTarget(input?.group);
+      if (!target) {
+        sendRpcError(response, "Unexpected BottleGroup details payload");
+        return true;
+      }
+      sendRpcResponse(response, target);
+      return true;
+    }
+    case "bottleGroups/bottles":
+      if (input?.group === bottleGroupId) {
+        sendRpcResponse(response, {
+          results: bottleGroupMemberTargets,
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
+      if (
+        input?.group === destinationBottleGroupId ||
+        input?.group === splitBottleGroupId
+      ) {
+        sendRpcResponse(response, emptyList);
+        return true;
+      }
+      sendRpcError(response, "Unexpected BottleGroup member list payload");
+      return true;
+    case "bottleGroups/list":
+      sendRpcResponse(response, {
+        results: [bottleGroupTarget, destinationBottleGroupTarget],
+        rel: { nextCursor: null, prevCursor: null },
+      });
+      return true;
+    case "bottleGroups/merge":
+      if (
+        input?.group !== bottleGroupId ||
+        input?.destinationGroupId !== destinationBottleGroupId ||
+        Object.keys(input).length !== 2
+      ) {
+        sendRpcError(response, "Unexpected BottleGroup merge payload");
+        return true;
+      }
+      sendRpcResponse(response, {
+        sourceGroupId: bottleGroupId,
+        destinationGroupId: destinationBottleGroupId,
+        changed: true,
+        movedBottleIds: bottleGroupMemberTargets.map(({ bottle }) => bottle.id),
+      });
+      return true;
+    case "bottleGroups/split":
+      if (!isExpectedBottleGroupSplitInput(input)) {
+        sendRpcError(response, "Unexpected BottleGroup split payload");
+        return true;
+      }
+      sendRpcResponse(response, {
+        sourceGroupId: bottleGroupId,
+        newGroupId: splitBottleGroupId,
+        movedBottleIds: [bottleGroupRepresentative.id],
+        sourceRepresentativeBottleId: bottleGroupMemberTargets[1].bottle.id,
+        newRepresentativeBottleId: bottleGroupRepresentative.id,
+      });
+      return true;
     case "bottles/details": {
       if (input?.bottle === createdBottleId) {
         sendRpcResponse(
@@ -351,6 +432,14 @@ async function handleRpcRequest({ request, response, url }) {
 
       if (typeof input?.bottle !== "number") {
         sendRpcError(response, "Unexpected bottle details payload");
+        return true;
+      }
+
+      if (input.bottle === groupedBottleDetails.id) {
+        sendRpcResponse(
+          response,
+          withCollectionStatus(request, groupedBottleDetails),
+        );
         return true;
       }
 
@@ -1832,6 +1921,32 @@ function listCollectionBottles(request, input) {
 
 function getCollectionTargetOwner(target) {
   return target.kind === "bottle" ? target.bottle : target.group;
+}
+
+function getBottleGroupTarget(groupId) {
+  switch (groupId) {
+    case bottleGroupId:
+      return bottleGroupTarget;
+    case destinationBottleGroupId:
+      return destinationBottleGroupTarget;
+    case splitBottleGroupId:
+      return splitBottleGroupTarget;
+    default:
+      return null;
+  }
+}
+
+function isExpectedBottleGroupSplitInput(input) {
+  return (
+    input?.group === bottleGroupId &&
+    Array.isArray(input.movedBottleIds) &&
+    input.movedBottleIds.length === 1 &&
+    input.movedBottleIds[0] === bottleGroupRepresentative.id &&
+    input.newRepresentativeBottleId === bottleGroupRepresentative.id &&
+    input.sourceRepresentativeBottleId ===
+      bottleGroupMemberTargets[1].bottle.id &&
+    Object.keys(input).length === 4
+  );
 }
 
 async function readRpcInput(request, url) {

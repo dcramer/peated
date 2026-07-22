@@ -157,6 +157,30 @@ selected proposed or source Bottle description keeps that Bottle value's
 `descriptionSrc`. The standard independent-create schema remains authoritative
 for required name, brand, and all field validation.
 
+### Exact Bottle and generic group pages keep identity scopes distinct
+
+The canonical `/bottles/:id` page renders the independently complete Bottle as
+the primary identity. It may show a quiet `/bottle-groups/:groupId` relationship
+when the group has multiple members and may offer “Add another release,” but
+neither link hydrates or replaces the Bottle's exact fields. Search results and
+related release lists reuse one exact-metadata presentation owner for
+Bottle-owned age, ABV, years, flags, and cask traits.
+
+The canonical `/bottle-groups/:groupId` page is explicitly generic. It renders
+the BottleGroup's own label, editorial content, and aggregate statistics,
+states that the exact release is unspecified, and lists independently complete
+member Bottles linking to `/bottles/:id`. Generic CatalogTarget links resolve to
+this group page; they never use `representativeBottleId` to construct an exact
+Bottle link or to fill exact Bottle details.
+
+Moderator group merge and split are standalone form workflows reached from the
+group page. Merge requires an explicit source and destination and states that
+the destination shared identity wins and generic activity moves. Split requires
+an explicit nonempty proper subset and representative choices; generic
+activity, stable aliases, and group editorial content remain on the source.
+These forms delegate to the canonical group mutation APIs and expose no manual
+Bottle-creation or group-reuse authority.
+
 ### Shared edits atomically regenerate complete Bottles
 
 Moderator updates distinguish shared group edits from exact-only Bottle edits.

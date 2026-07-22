@@ -16,6 +16,13 @@ select a source Bottle or BottleGroup.
 the same independent Bottle creation operation. It also creates a singleton;
 later grouping is automatic and outside manual intervention.
 
+Bottle pages and search results render exact fields from the independently
+complete Bottle. A Bottle page may link quietly to all related releases, while
+generic catalog-target links open `/bottle-groups/:id`. The group page clearly
+states that the exact release is unspecified, uses group-owned presentation and
+aggregate data, and lists exact member Bottles without substituting its
+representative for any Bottle.
+
 Image uploads may still be part of the visible save flow, but the server remains
 authoritative for final image dimensions, encoding, and quality. Client-side
 resizing should reduce upload latency without replacing server processing.
@@ -31,6 +38,12 @@ resizing should reduce upload latency without replacing server processing.
   creating a BottleRelease.
 - “Add another release” uses durable Bottle values only and never carries source
   Bottle or group authority into creation.
+- Exact Bottle search and related-release rows share one Bottle-owned metadata
+  renderer; BottleGroup hydration is not required for exact details.
+- Moderator group merge and split use standalone, explicit forms. Merge names
+  the destination whose shared identity wins and moves generic activity there;
+  split requires the moved subset and representatives while generic activity,
+  stable aliases, and editorial content remain on the source.
 - Bottle and tasting image uploads avoid GCS resumable-session startup for small
   processed images.
 - Browser-side image blobs keep a high-quality intermediate image capped at a

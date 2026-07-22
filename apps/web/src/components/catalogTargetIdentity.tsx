@@ -18,7 +18,7 @@ export default function CatalogTargetIdentity({
 }) {
   const href = getCatalogTargetHref(target);
   const label = getCatalogTargetLabel(target);
-  const identity = href ? (
+  const identity = (
     <Link
       href={href}
       className="font-semibold hover:underline"
@@ -26,8 +26,6 @@ export default function CatalogTargetIdentity({
     >
       {label}
     </Link>
-  ) : (
-    <span className="font-semibold">{label}</span>
   );
   if (compact) {
     return (

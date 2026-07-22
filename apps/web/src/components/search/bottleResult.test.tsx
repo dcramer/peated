@@ -27,10 +27,45 @@ const distiller = {
   updatedAt: timestamp,
 } satisfies Entity;
 
+const group = {
+  schemaVersion: 1,
+  id: 8,
+  fullName: "Lagavulin 16-year-old",
+  name: "16-year-old",
+  brandId: distiller.id,
+  bottlerId: null,
+  distillerIds: [distiller.id],
+  category: "single_malt",
+  seriesId: null,
+  statedAge: 16,
+  representativeBottleId: 42,
+  description: null,
+  descriptionSrc: null,
+  imageUrl: null,
+  flavorProfile: "peated",
+  tastingNotes: null,
+  suggestedTags: [],
+  avgRating: null,
+  ratingStats: {
+    pass: 0,
+    sip: 0,
+    savor: 0,
+    total: 0,
+    avg: null,
+    percentage: { pass: 0, sip: 0, savor: 0 },
+  },
+  totalTastings: 0,
+  totalBottles: 3,
+  createdByActorId: 4,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies NonNullable<Bottle["group"]>;
+
 const exactBottle = {
   id: 42,
   fullName: "Lagavulin 16-year-old Distillers Edition",
   name: "16-year-old",
+  group,
   series: null,
   category: "single_malt",
   edition: "Distillers Edition",
@@ -80,6 +115,9 @@ describe("BottleResultRow", () => {
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(html).toContain('href="/bottles/42"');
+    expect(html).toContain('href="/bottle-groups/8"');
+    expect(html).toContain("relative z-10");
+    expect(text).toContain("3 related releases");
     expect(text).toContain(exactBottle.fullName);
     expect(text).toContain("Lagavulin·Single Malt·16 years");
     expect(text).toContain("16 years·43.0% ABV");
@@ -109,6 +147,7 @@ describe("BottleResultRow", () => {
       caskSize: null,
       caskFill: null,
       distillers: [],
+      group: { ...group, totalBottles: 1 },
     } satisfies Bottle;
 
     const html = renderToStaticMarkup(
