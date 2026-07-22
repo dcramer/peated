@@ -42,15 +42,6 @@ import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 async function findTastingBottle(bottleId: number) {
   return await db.query.bottles.findFirst({
     where: eq(bottles.id, bottleId),
-    with: {
-      bottler: true,
-      brand: true,
-      bottlesToDistillers: {
-        with: {
-          distiller: true,
-        },
-      },
-    },
   });
 }
 
@@ -237,10 +228,7 @@ export default procedure
         ),
       );
 
-      const awards = await awardAllBadgeXp(tx, {
-        ...tasting,
-        bottle,
-      });
+      const awards = await awardAllBadgeXp(tx, tasting);
 
       for (const award of awards) {
         Object.assign(award, {

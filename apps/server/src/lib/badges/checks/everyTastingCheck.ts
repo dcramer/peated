@@ -1,16 +1,10 @@
-import type { TastingWithRelations } from "../types";
-import { Check } from "./base";
+import { z } from "zod";
+import type { BadgeTasting } from "../types";
 
-export class EveryTastingCheck extends Check {
-  buildWhereClause(config: unknown) {
-    return [];
-  }
+export const EveryTastingCheckConfigSchema = z.unknown().default({});
 
-  test(config: unknown, tasting: TastingWithRelations) {
+export class EveryTastingCheck {
+  test(_config: unknown, _tasting: BadgeTasting) {
     return true;
-  }
-
-  track(config: unknown, tasting: TastingWithRelations) {
-    return [];
   }
 }

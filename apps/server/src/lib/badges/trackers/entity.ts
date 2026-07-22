@@ -1,8 +1,8 @@
-import type { TastingWithRelations } from "../types";
+import type { BadgeTasting } from "../types";
 import { Tracker } from "./base";
 
 export class EntityTracker extends Tracker {
-  track(tasting: TastingWithRelations) {
+  track(tasting: BadgeTasting) {
     const entityList = this.getEntityList(tasting);
     const entityIds = Array.from(new Set(entityList.map((e) => e.id)));
 

@@ -1496,6 +1496,55 @@ target backfill, retained-pair removal, and production activation remain owned
 by section 6, tasks 9.6/9.7, and the retained parity/audit gates. This slice
 performs no production backfill and authorizes no deployment or activation.
 
+### Badge evaluation uses one normalized CatalogTarget path
+
+Tasks 7.1f-7.3i cut live Tasting badge awards and badge rescans over to one
+normalized authoritative CatalogTarget hydrator and the same in-memory check
+and tracker path. Each Tasting is correlated by its stable primary id while the
+hydrator independently resolves its durable target and retained Bottle/Release
+pair. Bounded parity records the `tasting` table, row id, retained ids, target
+id, caller, operation, and both resolved identities. Retained identity is
+telemetry only and cannot select badge identity, repair the Tasting, or change
+award behavior.
+
+An exact target supplies check and tracker data from its independently complete
+Bottle, including Bottle-owned brand, bottler, distillers, age, category, and
+country/region relationships. A generic target supplies the corresponding
+shared data from BottleGroup ownership without hydrating or substituting the
+representative Bottle. The existing Bottle check and Bottle tracker remain
+exact-only because their configured and tracked ids are concrete Bottle ids; a
+generic target does not match or emit a Bottle object. A targetless Tasting or
+a missing, retired, or inconsistent nonnull target fails badge evaluation
+closed instead of falling back to the retained pair or choosing a member
+Bottle.
+
+Live award and rescan both invoke the normalized hydrator and the same parsed
+in-memory checks and trackers. Rescan walks Tastings in bounded ascending-id
+keyset batches and no longer asks checks to reproduce their predicates as SQL.
+The superseded SQL `buildWhereClause` system and the unused top-level badge
+base are removed in this slice, leaving one owner for age, category, entity,
+region, Bottle, and every-Tasting evaluation. Region checks retain their
+existing brand-or-distiller country/region semantics, while entity, country,
+and region trackers retain their existing role inclusion and de-duplication
+semantics.
+
+Badge definitions and stored configuration remain unchanged. This slice adds
+no check type, tracker type, tracked-object type, schema, admin form, or Badge
+API contract, and it performs no migration or rewrite of any badge named or
+described as “Release.” Existing XP increments, tracked-object idempotency,
+formula selection, maximum levels, level-transition records, award response
+shape, and existing log message/context shapes remain unchanged. Because the
+new in-memory rescan evaluates every row in each bounded batch, it also emits
+those existing check/result logs for scanned rows that the removed SQL
+prefilter previously skipped; log volume is therefore not claimed to be
+unchanged. Task 7.11h covers exact and generic ownership, promoted-release
+exact identity, exact-only Bottle behavior, badge-local targetless and retired
+failure without fallback, retained-pair drift, row-correlated badge wiring,
+shared parity payload and CatalogTarget invalid/inconsistent integrity
+evidence, shared live/rescan results, keyset batching, XP idempotency, formulas,
+levels, and region semantics. The slice changes no GET behavior, begins no
+production backfill, and authorizes no deployment or activation.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

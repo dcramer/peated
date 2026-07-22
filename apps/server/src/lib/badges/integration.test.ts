@@ -7,7 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { asc } from "drizzle-orm";
 import { awardAllBadgeXp } from ".";
-import { createTastingForBadge } from "./testHelpers";
+import { createTastingForBadge, getPersistedBadgeTasting } from "./testHelpers";
 
 describe("badge integration test", () => {
   test("test first tasting example", async ({ fixtures }) => {
@@ -40,23 +40,7 @@ describe("badge integration test", () => {
       bottleId: bottle.id,
     });
 
-    const bottleWithRelations = await db.query.bottles.findFirst({
-      where: (bottles, { eq }) => eq(bottles.id, bottle.id),
-      with: {
-        brand: true,
-        bottler: true,
-        bottlesToDistillers: {
-          with: { distiller: true },
-        },
-      },
-    });
-
-    if (!bottleWithRelations) throw new Error();
-
-    const results = await awardAllBadgeXp(db, {
-      ...tasting,
-      bottle: bottleWithRelations,
-    });
+    const results = await awardAllBadgeXp(db, tasting);
     expect(results.length).toBe(1);
     expect(results[0].xp).toEqual(1);
     expect(results[0].level).toEqual(1);
@@ -132,7 +116,7 @@ describe("badge integration test", () => {
         user.id,
       );
 
-      await awardAllBadgeXp(db, tasting);
+      await awardAllBadgeXp(db, await getPersistedBadgeTasting(tasting.id));
     }
 
     // now record one with a country without region, to make sure
@@ -153,7 +137,7 @@ describe("badge integration test", () => {
       user.id,
     );
 
-    await awardAllBadgeXp(db, tasting);
+    await awardAllBadgeXp(db, await getPersistedBadgeTasting(tasting.id));
 
     const awardList = await db.select().from(badgeAwards);
     expect(awardList.length).toEqual(1);
@@ -165,12 +149,16 @@ describe("badge integration test", () => {
       .from(badgeAwardTrackedObjects)
       .orderBy(asc(badgeAwardTrackedObjects.id));
     expect(trackedList.length).toEqual(3);
-    expect(trackedList[0].objectType === "region");
-    expect(trackedList[0].objectId === regionKy.id);
-    expect(trackedList[1].objectType === "region");
-    expect(trackedList[1].objectId === regionTn.id);
-    expect(trackedList[2].objectType === "region");
-    expect(trackedList[2].objectId === regionTx.id);
+    expect(
+      trackedList.map(({ objectType, objectId }) => ({
+        objectType,
+        objectId,
+      })),
+    ).toEqual([
+      { objectType: "region", objectId: regionKy.id },
+      { objectType: "region", objectId: regionTn.id },
+      { objectType: "region", objectId: regionTx.id },
+    ]);
 
     expect(awardList[0].xp).toEqual(3);
     expect(awardList[0].level).toEqual(0);

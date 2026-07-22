@@ -9,6 +9,7 @@ import { AgeCheckConfigSchema } from "../lib/badges/checks/ageCheck";
 import { BottleCheckConfigSchema } from "../lib/badges/checks/bottleCheck";
 import { CategoryCheckConfigSchema } from "../lib/badges/checks/categoryCheck";
 import { EntityCheckConfigSchema } from "../lib/badges/checks/entityCheck";
+import { EveryTastingCheckConfigSchema } from "../lib/badges/checks/everyTastingCheck";
 import { RegionCheckConfigSchema } from "../lib/badges/checks/regionCheck";
 
 export const BadgeCheckTypeEnum = z.enum(BADGE_CHECK_TYPE_LIST);
@@ -56,10 +57,9 @@ export const BadgeCheckSchema = z.discriminatedUnion("type", [
     type: z
       .literal("everyTasting")
       .describe("Check that applies to every tasting"),
-    config: z
-      .any()
-      .default({})
-      .describe("Configuration for every-tasting checks"), // TODO
+    config: EveryTastingCheckConfigSchema.describe(
+      "Configuration for every-tasting checks",
+    ),
   }),
 ]);
 
@@ -86,7 +86,7 @@ export const BadgeCheckInputSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("everyTasting"),
-    config: z.any().default({}), // TODO
+    config: EveryTastingCheckConfigSchema,
   }),
 ]);
 

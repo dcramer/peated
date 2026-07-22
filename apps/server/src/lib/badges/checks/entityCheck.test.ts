@@ -1,54 +1,52 @@
 import type { z } from "zod";
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { EntityCheck } from "./entityCheck";
+import { EntityCheck, EntityCheckConfigSchema } from "./entityCheck";
 
-describe("parseConfig", () => {
+describe("config schema", () => {
   test("valid params", async () => {
-    const badgeImpl = new EntityCheck();
     const config = {
-      entityId: 1,
+      entity: 1,
       type: "distiller",
     };
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`
+    expect(await EntityCheckConfigSchema.parseAsync(config))
+      .toMatchInlineSnapshot(`
       {
-        "entityId": 1,
+        "entity": 1,
         "type": "distiller",
       }
     `);
   });
 
   test("no type", async () => {
-    const badgeImpl = new EntityCheck();
     const config = {
-      entityId: 1,
+      entity: 1,
       type: null,
     };
 
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`
+    expect(await EntityCheckConfigSchema.parseAsync(config))
+      .toMatchInlineSnapshot(`
       {
-        "entityId": 1,
+        "entity": 1,
         "type": null,
       }
     `);
   });
 
-  test("no entityId", async () => {
-    const badgeImpl = new EntityCheck();
+  test("no entity", async () => {
     const config = {
       type: null,
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(EntityCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
-          "code": "invalid_type",
           "expected": "number",
-          "received": "undefined",
+          "code": "invalid_type",
           "path": [
-            "entityId"
+            "entity"
           ],
-          "message": "Required"
+          "message": "Invalid input: expected number, received undefined"
         }
       ]]
     `);
@@ -71,7 +69,7 @@ describe("test", () => {
     const config = {
       entity: brand.id,
       type: null,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
@@ -90,7 +88,7 @@ describe("test", () => {
     const config = {
       entity: brand.id,
       type: "brand",
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
@@ -109,7 +107,7 @@ describe("test", () => {
     const config = {
       entity: brand.id,
       type: "distiller",
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(false);
   });
 
@@ -127,7 +125,7 @@ describe("test", () => {
     const config = {
       entity: distiller.id,
       type: null,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
@@ -145,7 +143,7 @@ describe("test", () => {
     const config = {
       entity: distiller.id,
       type: "distiller",
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
@@ -163,7 +161,7 @@ describe("test", () => {
     const config = {
       entity: distiller.id,
       type: "brand",
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof EntityCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(false);
   });
 });

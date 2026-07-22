@@ -236,13 +236,32 @@ read-only behavior remain unchanged. Retained Bottle/Release identity is
 bounded parity telemetry only, never fallback or repair authority. Tasks 7.2e
 and 7.11g own mismatch evidence and integration coverage.
 
+`apps/server/src/lib/badges/` is the tasks 7.1f-7.3i target-backed badge
+evaluation boundary. Before this slice, live award accepts a prehydrated Bottle
+while rescan joins `tasting.bottleId` directly and each check duplicates its
+in-memory rule with a SQL predicate. The cutover makes live award and bounded
+ascending-id keyset rescan share one target-versus-retained parity hydrator and
+one parsed in-memory check/tracker path. Exact targets use independently
+complete Bottle ownership; generic targets use BottleGroup-owned fields without
+representative substitution. The Bottle check and tracker remain exact-only,
+and targetless, missing, retired, or inconsistent target identity fails closed.
+
+The badge boundary removes the superseded per-check SQL predicate API and the
+unused `apps/server/src/lib/badges/base.ts`; it retains one in-memory owner for
+evaluation, tracking, XP, formulas, levels, and idempotency. Badge definitions,
+stored checks and trackers, tracked-object schema, admin forms, and API
+contracts remain unchanged. In particular, this slice performs no migration or
+rewrite of a “Release” badge or any other badge configuration. Tasks 7.2f and
+7.11h own row-correlated mismatch evidence and integration coverage.
+
 Remaining known analytics consumers still inventoried under parent tasks
-7.1-7.3 and 7.11 include badge hydration and checks in
-`apps/server/src/lib/badges/`. The Library, country, entity, global, and user
-profile statistics sub-slices do not implicitly cut over these consumers or
-any other Bottle/BottleRelease-derived reporting. This list is non-exhaustive,
-and the cleanup inventory remains open for additional legacy analytics
-discovered during later cutovers.
+7.1-7.3 and 7.11 include retained Bottle-id joins in
+`apps/server/src/orpc/routes/users/flavor-list.ts` and
+`apps/server/src/orpc/routes/users/region-list.ts`. The Library, country,
+entity, global, user-profile, and badge sub-slices do not implicitly cut over
+these consumers or any other Bottle/BottleRelease-derived reporting. This list
+is non-exhaustive, and the cleanup inventory remains open for additional legacy
+analytics discovered during later cutovers.
 
 ## API routes
 

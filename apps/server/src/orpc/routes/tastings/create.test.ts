@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  badgeAwardTrackedObjects,
   bottleAliases,
   bottleReleasePromotions,
   bottleReleases,
@@ -585,6 +586,79 @@ describe("POST /tastings", () => {
       { targetId: target?.id },
       STATS_JOB_OPTIONS,
     );
+  });
+
+  test("awards a promoted release from its exact Bottle identity", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle({ statedAge: 5 });
+    const [promotedBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: parent.groupId,
+        brandId: parent.brandId,
+        createdByActorId: parent.createdByActorId,
+        name: `${parent.name} promoted badge bottle`,
+        fullName: `${parent.fullName} promoted badge bottle`,
+        statedAge: 21,
+      })
+      .returning();
+    if (!promotedBottle) {
+      throw new Error("Unable to create promoted Bottle fixture");
+    }
+    const [target] = await db
+      .insert(catalogTargets)
+      .values({
+        groupId: parent.groupId as number,
+        bottleId: promotedBottle.id,
+      })
+      .returning();
+    if (!target) throw new Error("Unable to create promoted target fixture");
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    await promoteRelease(
+      release.id,
+      promotedBottle.id,
+      parent.createdByActorId,
+    );
+    const badge = await fixtures.Badge({
+      name: "Promoted exact Bottle",
+      tracker: "bottle",
+      checks: [
+        { type: "age", config: { minAge: 21, maxAge: 21 } },
+        { type: "bottle", config: { bottle: [promotedBottle.id] } },
+      ],
+    });
+
+    const data = await routerClient.tastings.create(
+      { bottle: parent.id, release: release.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.awards).toHaveLength(1);
+    expect(data.awards[0]?.badge.id).toBe(badge.id);
+    expect(
+      await db
+        .select({
+          objectType: badgeAwardTrackedObjects.objectType,
+          objectId: badgeAwardTrackedObjects.objectId,
+        })
+        .from(badgeAwardTrackedObjects),
+    ).toEqual([{ objectType: "bottle", objectId: promotedBottle.id }]);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, data.tasting.id),
+        columns: {
+          bottleId: true,
+          releaseId: true,
+          targetId: true,
+        },
+      }),
+    ).toEqual({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: target.id,
+    });
   });
 
   test("rejects an unmapped release without inserting a tasting", async ({

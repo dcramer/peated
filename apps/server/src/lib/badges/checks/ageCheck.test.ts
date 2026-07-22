@@ -1,15 +1,14 @@
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { AgeCheck } from "./ageCheck";
+import { AgeCheck, AgeCheckConfigSchema } from "./ageCheck";
 
-describe("parseConfig", () => {
+describe("config schema", () => {
   test("valid params", async () => {
-    const badgeImpl = new AgeCheck();
     const config = {
       minAge: 5,
       maxAge: 10,
     };
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(
+    expect(await AgeCheckConfigSchema.parseAsync(config)).toMatchInlineSnapshot(
       `
       {
         "maxAge": 10,
@@ -20,12 +19,11 @@ describe("parseConfig", () => {
   });
 
   test("minAge < 0", async () => {
-    const badgeImpl = new AgeCheck();
     const config = {
       minAge: -1,
       maxAge: 10,
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(AgeCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -43,11 +41,10 @@ describe("parseConfig", () => {
   });
 
   test("no minAge", async () => {
-    const badgeImpl = new AgeCheck();
     const config = {
       maxAge: 10,
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(AgeCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -63,12 +60,11 @@ describe("parseConfig", () => {
   });
 
   test("maxAge < 0", async () => {
-    const badgeImpl = new AgeCheck();
     const config = {
       minAge: 5,
       maxAge: -1,
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(AgeCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -86,11 +82,10 @@ describe("parseConfig", () => {
   });
 
   test("no maxAge", async () => {
-    const badgeImpl = new AgeCheck();
     const config = {
       minAge: 5,
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(AgeCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -138,5 +133,14 @@ describe("test", () => {
       maxAge: 10,
     };
     expect(badgeImpl.test(config, tasting)).toEqual(false);
+  });
+
+  test("does not treat an unstated zero age as an aged bottle", async ({
+    fixtures,
+  }) => {
+    const tasting = await createTastingForBadge(fixtures, { statedAge: 0 });
+
+    const badgeImpl = new AgeCheck();
+    expect(badgeImpl.test({ minAge: 0, maxAge: 0 }, tasting)).toBe(false);
   });
 });

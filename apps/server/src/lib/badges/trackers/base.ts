@@ -1,18 +1,22 @@
-import type { TastingWithRelations, TrackedObject } from "../types";
+import type {
+  BadgeIdentityEntity,
+  BadgeTasting,
+  TrackedObject,
+} from "../types";
 
 export abstract class Tracker {
-  abstract track(tasting: TastingWithRelations): TrackedObject[];
+  abstract track(tasting: BadgeTasting): TrackedObject[];
 
-  getEntityList(tasting: TastingWithRelations) {
-    const { bottle } = tasting;
-    const resultIds = new Set([bottle.brand.id]);
-    const results = [bottle.brand];
-    if (bottle.bottler && !resultIds.has(bottle.bottler.id)) {
-      results.push(bottle.bottler);
-      resultIds.add(bottle.bottler.id);
+  getEntityList(tasting: BadgeTasting): BadgeIdentityEntity[] {
+    const { brand, bottler, distillers } = tasting.identity;
+    const resultIds = new Set([brand.id]);
+    const results = [brand];
+    if (bottler && !resultIds.has(bottler.id)) {
+      results.push(bottler);
+      resultIds.add(bottler.id);
     }
 
-    for (const { distiller } of bottle.bottlesToDistillers) {
+    for (const distiller of distillers) {
       if (!resultIds.has(distiller.id)) {
         results.push(distiller);
         resultIds.add(distiller.id);

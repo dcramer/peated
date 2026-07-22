@@ -1,8 +1,10 @@
-import type { TastingWithRelations } from "../types";
+import type { BadgeTasting } from "../types";
 import { Tracker } from "./base";
 
 export class BottleTracker extends Tracker {
-  track(tasting: TastingWithRelations) {
-    return [{ type: "bottle" as const, id: tasting.bottle.id }];
+  track(tasting: BadgeTasting) {
+    return tasting.identity.kind === "bottle"
+      ? [{ type: "bottle" as const, id: tasting.identity.bottleId }]
+      : [];
   }
 }
