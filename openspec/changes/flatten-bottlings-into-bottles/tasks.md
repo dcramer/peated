@@ -26,7 +26,7 @@ it must not preserve a parallel business-logic path.
 - [x] 2.6 Add Drizzle relations and inferred types for groups, memberships, targets, mappings, and target-bearing consumers.
 - [x] 2.7 Generate the additive migration with `pnpm db:generate`; do not hand-write SQL or edit migration metadata.
 - [x] 2.8 Review the generated migration for lock duration, index creation, nullability, foreign-key order, and rollback feasibility.
-- [ ] 2.9 Add database-backed constraint tests for singleton group targets, exact Bottle targets, duplicate targets, cross-group mismatches, and last-member protection.
+- [x] 2.9 Add database-backed constraint tests for singleton group targets, exact Bottle targets, duplicate targets, cross-group mismatches, and last-member protection.
 - [x] 2.10 Update shared test fixtures to create valid group/Bottle/target graphs while retaining explicit legacy fixtures for migration tests.
 
 ## 3. Catalog Target Runtime
