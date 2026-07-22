@@ -162,7 +162,24 @@ The Drizzle owners are:
   Tasting projection or legacy Bottle-shaped fallback. Friend-request
   references are actionable only when the referenced follow's sender and
   recipient match the notification identity; corrupt references fail closed.
-- `apps/server/src/orpc/routes/users/library-stats.ts`
+- `apps/server/src/orpc/routes/users/library-stats.ts` is the task 7.1d-7.3d
+  target-backed Library analytics reader. It uses each non-empty
+  `collection_bottle.targetId` as sole identity and records retained-pair
+  parity by stable collection-entry id. Exact targets contribute Bottle-owned
+  age, category, and distillers; generic targets contribute the corresponding
+  BottleGroup-owned fields without representative substitution. Targetless
+  entries count only in the total and unstated-age bucket, while invalid
+  nonnull targets fail closed. The route preserves privacy, non-empty
+  filtering, count/order behavior, and response shape, performs no GET-side
+  mutation, and makes no production activation claim.
+
+Remaining analytics consumers still inventoried under parent tasks 7.1-7.3 and
+7.11 include badge hydration and checks in `apps/server/src/lib/badges/`, country
+category aggregation in `apps/server/src/orpc/routes/countries/categories.ts`,
+and entity category aggregation in
+`apps/server/src/orpc/routes/entities/categories/list.ts`. The Library statistics
+sub-slice does not implicitly cut over these consumers or any other
+Bottle/BottleRelease-derived reporting discovered by the cleanup inventory.
 
 ## API routes
 

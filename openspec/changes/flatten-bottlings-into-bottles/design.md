@@ -1332,6 +1332,44 @@ pair columns remain migration evidence until task 9.6, and historical
 create-draft shapes remain assigned to Section 8 and task 9.7. The slice begins
 no production backfill and authorizes no deployment or activation.
 
+### Library statistics read authoritative CatalogTargets
+
+Tasks 7.1d-7.3d cut the visible-user Library statistics route over from its
+retained Bottle/BottleRelease joins to each non-empty `collection_bottle` row's
+nullable authoritative `targetId`. The collection-entry primary id is the
+stable parity locator. For each row, bounded parity measurement independently
+resolves the durable target and retained Bottle/Release pair and records the
+`collection_bottle` table, entry id, retained ids, target id, caller,
+operation, and both resolved identities. Retained identity is telemetry only;
+it cannot select statistics identity or repair the row during the GET request.
+
+An exact target contributes age and category from its independently complete
+Bottle and distillers from that Bottle's durable distiller membership. A
+generic target contributes those same dimensions from BottleGroup-owned age,
+category, and distillers. Generic statistics never hydrate or select the
+representative or another member Bottle. A targetless compatibility entry still
+counts toward the Library total and the existing unstated-age bucket, but it
+contributes no known age, category, or distiller classification even when its
+retained pair could resolve. A missing, retired, or inconsistent nonnull target
+fails the route closed as a conflict rather than falling back to the retained
+pair or silently omitting the entry.
+
+The cutover preserves the existing user lookup and profile-visibility rules,
+reserved-Library lookup, exclusion of `empty` memberships, one-count-per-entry
+semantics, age bucket and median/oldest calculations, top-five distiller and
+category count ordering, empty result behavior, and response schema. It is a
+read-only aggregation: it writes no target, collection, parity repair, or other
+durable state. Task 7.11c covers exact, generic, targetless, retained-drift,
+invalid-target, privacy, filtering, count, and ordering behavior.
+
+This is one bounded analytics-reader cutover. Other Library, badge, country,
+entity, and catalog analytics that still derive identity through Bottle or
+BottleRelease joins remain inventoried under the parent tasks 7.1-7.3 and 7.11
+until separately cut over. Existing-row target backfill, retained-pair removal,
+and production activation remain owned by section 6, tasks 9.6/9.7, and the
+retained parity/audit gates. This slice performs no production backfill and
+authorizes no deployment or activation.
+
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target
 identity. Tasks 9.4 and 9.7 respectively disable these writes with an explicit

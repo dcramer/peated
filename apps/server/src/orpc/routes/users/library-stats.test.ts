@@ -1,11 +1,38 @@
 import { db } from "@peated/server/db";
 import {
+  bottleReleasePromotions,
+  bottleReleases,
+  bottleTombstones,
   bottlesToDistillers,
+  catalogTargets,
   collectionBottles,
 } from "@peated/server/db/schema";
+import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { and, eq, isNull } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+
+async function exactTargetId(bottleId: number): Promise<number> {
+  const target = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, bottleId),
+    columns: { id: true },
+  });
+  if (!target) throw new Error(`Missing exact target for Bottle ${bottleId}`);
+  return target.id;
+}
+
+async function genericTargetId(groupId: number): Promise<number> {
+  const target = await db.query.catalogTargets.findFirst({
+    where: and(
+      eq(catalogTargets.groupId, groupId),
+      isNull(catalogTargets.bottleId),
+    ),
+    columns: { id: true },
+  });
+  if (!target) throw new Error(`Missing generic target for group ${groupId}`);
+  return target.id;
+}
 
 describe("GET /users/:user/library/stats", () => {
   test("returns empty insights when the Library does not exist", async ({
@@ -47,13 +74,9 @@ describe("GET /users/:user/library/stats", () => {
       category: "single_malt",
       statedAge: 8,
     });
-    const releaseBottle = await fixtures.Bottle({
+    const twelveYearBottle = await fixtures.Bottle({
       category: "bourbon",
       statedAge: 12,
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: releaseBottle.id,
-      statedAge: 18,
     });
     const oldBottle = await fixtures.Bottle({
       category: "single_malt",
@@ -74,7 +97,7 @@ describe("GET /users/:user/library/stats", () => {
 
     await db.insert(bottlesToDistillers).values([
       { bottleId: youngBottle.id, distillerId: distillerA.id },
-      { bottleId: releaseBottle.id, distillerId: distillerA.id },
+      { bottleId: twelveYearBottle.id, distillerId: distillerA.id },
       { bottleId: oldBottle.id, distillerId: distillerB.id },
       { bottleId: emptyBottle.id, distillerId: distillerB.id },
       { bottleId: otherBottle.id, distillerId: distillerB.id },
@@ -83,32 +106,37 @@ describe("GET /users/:user/library/stats", () => {
       {
         collectionId: library.id,
         bottleId: youngBottle.id,
+        targetId: await exactTargetId(youngBottle.id),
         status: "open",
       },
       {
         collectionId: library.id,
-        bottleId: releaseBottle.id,
-        releaseId: release.id,
+        bottleId: twelveYearBottle.id,
+        targetId: await exactTargetId(twelveYearBottle.id),
         status: "sealed",
       },
       {
         collectionId: library.id,
         bottleId: oldBottle.id,
+        targetId: await exactTargetId(oldBottle.id),
         status: null,
       },
       {
         collectionId: library.id,
         bottleId: unstatedBottle.id,
+        targetId: await exactTargetId(unstatedBottle.id),
         status: "open",
       },
       {
         collectionId: library.id,
         bottleId: emptyBottle.id,
+        targetId: await exactTargetId(emptyBottle.id),
         status: "empty",
       },
       {
         collectionId: otherCollection.id,
         bottleId: otherBottle.id,
+        targetId: await exactTargetId(otherBottle.id),
         status: "sealed",
       },
     ]);
@@ -125,13 +153,13 @@ describe("GET /users/:user/library/stats", () => {
     ]);
     expect(data.age).toEqual({
       knownCount: 3,
-      median: 18,
+      median: 12,
       oldest: 25,
       buckets: [
         { id: "under10", label: "Under 10", count: 1 },
-        { id: "from10To12", label: "10–12", count: 0 },
+        { id: "from10To12", label: "10–12", count: 1 },
         { id: "from13To17", label: "13–17", count: 0 },
-        { id: "from18To24", label: "18–24", count: 1 },
+        { id: "from18To24", label: "18–24", count: 0 },
         { id: "atLeast25", label: "25+", count: 1 },
         { id: "unstated", label: "Unstated", count: 1 },
       ],
@@ -141,6 +169,389 @@ describe("GET /users/:user/library/stats", () => {
       { category: "bourbon", count: 1 },
       { category: "rye", count: 1 },
     ]);
+  });
+
+  test("uses exact Bottle and generic BottleGroup field ownership", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const exactDistiller = await fixtures.Entity({ name: "Exact Distillery" });
+    const groupDistiller = await fixtures.Entity({ name: "Group Distillery" });
+    const exactBottle = await fixtures.Bottle({
+      category: "rye",
+      statedAge: 8,
+      distillerIds: [exactDistiller.id],
+    });
+    const groupBottle = await fixtures.Bottle({
+      category: "bourbon",
+      statedAge: 18,
+      distillerIds: [groupDistiller.id],
+    });
+    const retainedBottle = await fixtures.Bottle({
+      category: "single_malt",
+      statedAge: 50,
+      distillerIds: [exactDistiller.id],
+    });
+
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: library.id,
+        bottleId: exactBottle.id,
+        targetId: await exactTargetId(exactBottle.id),
+        status: "open",
+      },
+      {
+        collectionId: library.id,
+        bottleId: retainedBottle.id,
+        targetId: await genericTargetId(groupBottle.groupId!),
+        status: "sealed",
+      },
+    ]);
+
+    const data = await routerClient.users.libraryStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      total: 2,
+      distillers: [
+        { id: exactDistiller.id, name: exactDistiller.name, count: 1 },
+        { id: groupDistiller.id, name: groupDistiller.name, count: 1 },
+      ],
+      age: { knownCount: 2, median: 13, oldest: 18 },
+      categories: [
+        { category: "bourbon", count: 1 },
+        { category: "rye", count: 1 },
+      ],
+    });
+  });
+
+  test("returns deterministic top-five distillers and categories", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const [alpha, bravo, charlie, delta, echo, zulu] = await Promise.all([
+      fixtures.Entity({ name: "Alpha Distillery" }),
+      fixtures.Entity({ name: "Bravo Distillery" }),
+      fixtures.Entity({ name: "Charlie Distillery" }),
+      fixtures.Entity({ name: "Delta Distillery" }),
+      fixtures.Entity({ name: "Echo Distillery" }),
+      fixtures.Entity({ name: "Zulu Distillery" }),
+    ]);
+    const bottleInputs = [
+      { category: "blend" as const, distiller: alpha },
+      { category: "blend" as const, distiller: alpha },
+      { category: "blend" as const, distiller: alpha },
+      { category: "bourbon" as const, distiller: bravo },
+      { category: "bourbon" as const, distiller: bravo },
+      { category: "rye" as const, distiller: zulu },
+      { category: "rye" as const, distiller: zulu },
+      { category: "single_grain" as const, distiller: charlie },
+      { category: "single_malt" as const, distiller: delta },
+      { category: "single_pot_still" as const, distiller: echo },
+    ];
+    const bottles = await Promise.all(
+      bottleInputs.map(({ category, distiller }) =>
+        fixtures.Bottle({ category, distillerIds: [distiller.id] }),
+      ),
+    );
+    const targetIds = await Promise.all(
+      bottles.map((bottle) => exactTargetId(bottle.id)),
+    );
+    await db.insert(collectionBottles).values(
+      bottles.map((bottle, index) => ({
+        collectionId: library.id,
+        bottleId: bottle.id,
+        targetId: targetIds[index],
+        status: "open" as const,
+      })),
+    );
+
+    const data = await routerClient.users.libraryStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.distillers).toEqual([
+      { id: alpha.id, name: alpha.name, count: 3 },
+      { id: bravo.id, name: bravo.name, count: 2 },
+      { id: zulu.id, name: zulu.name, count: 2 },
+      { id: charlie.id, name: charlie.name, count: 1 },
+      { id: delta.id, name: delta.name, count: 1 },
+    ]);
+    expect(data.distillers).not.toContainEqual(
+      expect.objectContaining({ id: echo.id }),
+    );
+    expect(data.categories).toEqual([
+      { category: "blend", count: 3 },
+      { category: "bourbon", count: 2 },
+      { category: "rye", count: 2 },
+      { category: "single_grain", count: 1 },
+      { category: "single_malt", count: 1 },
+    ]);
+    expect(data.categories).not.toContainEqual({
+      category: "single_pot_still",
+      count: 1,
+    });
+  });
+
+  test("summarizes every entry across the Library batch boundary", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const compatibilityBottle = await fixtures.Bottle();
+    const compatibilityReleases = await db
+      .insert(bottleReleases)
+      .values(
+        Array.from({ length: 198 }, (_, index) => ({
+          bottleId: compatibilityBottle.id,
+          fullName: `Library batch compatibility release ${index}`,
+          name: `Batch compatibility release ${index}`,
+          createdByActorId: compatibilityBottle.createdByActorId,
+        })),
+      )
+      .returning({ id: bottleReleases.id });
+    await db.insert(collectionBottles).values(
+      compatibilityReleases.map((release) => ({
+        collectionId: library.id,
+        bottleId: compatibilityBottle.id,
+        releaseId: release.id,
+        targetId: null,
+        status: "open" as const,
+      })),
+    );
+
+    const distillerA = await fixtures.Entity({ name: "Batch Distillery A" });
+    const distillerB = await fixtures.Entity({ name: "Batch Distillery B" });
+    const exactBottles = await Promise.all([
+      fixtures.Bottle({
+        category: "single_malt",
+        statedAge: 8,
+        distillerIds: [distillerA.id],
+      }),
+      fixtures.Bottle({
+        category: "bourbon",
+        statedAge: 12,
+        distillerIds: [distillerA.id],
+      }),
+      fixtures.Bottle({
+        category: "single_malt",
+        statedAge: 25,
+        distillerIds: [distillerB.id],
+      }),
+    ]);
+    const exactTargetIds = await Promise.all(
+      exactBottles.map((bottle) => exactTargetId(bottle.id)),
+    );
+    await db.insert(collectionBottles).values(
+      exactBottles.map((bottle, index) => ({
+        collectionId: library.id,
+        bottleId: bottle.id,
+        targetId: exactTargetIds[index],
+        status: "sealed" as const,
+      })),
+    );
+
+    const data = await routerClient.users.libraryStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toEqual({
+      total: 201,
+      distillers: [
+        { id: distillerA.id, name: distillerA.name, count: 2 },
+        { id: distillerB.id, name: distillerB.name, count: 1 },
+      ],
+      age: {
+        knownCount: 3,
+        median: 12,
+        oldest: 25,
+        buckets: [
+          { id: "under10", label: "Under 10", count: 1 },
+          { id: "from10To12", label: "10–12", count: 1 },
+          { id: "from13To17", label: "13–17", count: 0 },
+          { id: "from18To24", label: "18–24", count: 0 },
+          { id: "atLeast25", label: "25+", count: 1 },
+          { id: "unstated", label: "Unstated", count: 198 },
+        ],
+      },
+      categories: [
+        { category: "single_malt", count: 2 },
+        { category: "bourbon", count: 1 },
+      ],
+    });
+  });
+
+  test("uses the promoted exact target instead of the retained parent and release", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const parentDistiller = await fixtures.Entity({
+      name: "Parent Distillery",
+    });
+    const parent = await fixtures.Bottle({
+      category: "rye",
+      statedAge: 50,
+      distillerIds: [parentDistiller.id],
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      statedAge: 40,
+    });
+    const promoted = await createConcreteBottle({
+      context: { user: defaults.user },
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: parent.id,
+        exact: {
+          statedAge: 21,
+        },
+      },
+    });
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promoted.bottle.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+    });
+    await db.insert(collectionBottles).values({
+      collectionId: library.id,
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: promoted.exactTarget.id,
+      status: "open",
+    });
+
+    const data = await routerClient.users.libraryStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      total: 1,
+      distillers: [
+        {
+          id: parentDistiller.id,
+          name: parentDistiller.name,
+          count: 1,
+        },
+      ],
+      age: { knownCount: 1, median: 21, oldest: 21 },
+      categories: [{ category: "rye", count: 1 }],
+    });
+  });
+
+  test("counts targetless compatibility entries as unknown identity", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const retainedBottle = await fixtures.Bottle({
+      category: "single_malt",
+      statedAge: 25,
+    });
+    await db.insert(collectionBottles).values({
+      collectionId: library.id,
+      bottleId: retainedBottle.id,
+      targetId: null,
+      status: "open",
+    });
+
+    const data = await routerClient.users.libraryStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      total: 1,
+      distillers: [],
+      age: {
+        knownCount: 0,
+        median: null,
+        oldest: null,
+        buckets: expect.arrayContaining([
+          { id: "unstated", label: "Unstated", count: 1 },
+        ]),
+      },
+      categories: [],
+    });
+  });
+
+  test("fails closed when a durable target is retired", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const bottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    await db.insert(collectionBottles).values({
+      collectionId: library.id,
+      bottleId: bottle.id,
+      targetId: await exactTargetId(bottle.id),
+      status: "open",
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const error = await waitError(
+      routerClient.users.libraryStats(
+        { user: defaults.user.id },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({ status: 409 });
+  });
+
+  test("allows anonymous access to public Library insights", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ private: false });
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: user.id,
+    });
+    const bottle = await fixtures.Bottle({ statedAge: 12 });
+    await db.insert(collectionBottles).values({
+      collectionId: library.id,
+      bottleId: bottle.id,
+      targetId: await exactTargetId(bottle.id),
+      status: "sealed",
+    });
+
+    const data = await routerClient.users.libraryStats(
+      { user: user.id },
+      { context: { user: null } },
+    );
+
+    expect(data).toMatchObject({ total: 1, age: { median: 12 } });
   });
 
   test("rejects private Library insights for other users", async ({

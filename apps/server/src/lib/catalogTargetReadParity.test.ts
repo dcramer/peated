@@ -218,6 +218,55 @@ describe("CatalogTarget read parity", () => {
     ]);
   });
 
+  test("correlates collection membership drift by stable entry id", async ({
+    fixtures,
+  }) => {
+    const retainedBottle = await fixtures.Bottle();
+    const targetBottle = await fixtures.Bottle();
+    const targetId = await exactTargetId(targetBottle.id);
+
+    const result = await loadCatalogTargetReadsWithParity(
+      [
+        {
+          consumerTable: "collection_bottle",
+          rowLocator: { id: 47 },
+          targetId,
+          legacy: { bottleId: retainedBottle.id, releaseId: null },
+        },
+      ],
+      { ...readContext, operation: "library_stats_aggregate" },
+    );
+
+    expect(result.targets).toMatchObject([
+      { kind: "bottle", bottle: { id: targetBottle.id } },
+    ]);
+    expect(result.mismatches).toEqual([
+      {
+        consumerTable: "collection_bottle",
+        rowLocator: { id: 47 },
+        legacyBottleId: retainedBottle.id,
+        legacyReleaseId: null,
+        targetId,
+        caller: readContext.caller,
+        operation: "library_stats_aggregate",
+        targetResolution: {
+          status: "resolved",
+          kind: "bottle",
+          targetId,
+          groupId: targetBottle.groupId,
+          bottleId: targetBottle.id,
+        },
+        legacyResolution: {
+          status: "resolved",
+          kind: "bottle",
+          targetId: await exactTargetId(retainedBottle.id),
+          groupId: retainedBottle.groupId,
+          bottleId: retainedBottle.id,
+        },
+      },
+    ]);
+  });
+
   test("returns actionable, sanitized mismatch evidence", async ({
     fixtures,
   }) => {
