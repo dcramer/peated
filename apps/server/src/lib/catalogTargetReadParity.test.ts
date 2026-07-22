@@ -287,6 +287,42 @@ describe("CatalogTarget read parity", () => {
     expect(JSON.stringify(result.mismatches)).not.toContain("stack");
   });
 
+  test("correlates proposal parity by id and independent identity slot", async ({
+    fixtures,
+  }) => {
+    const targetBottle = await fixtures.Bottle();
+    const driftBottle = await fixtures.Bottle();
+    const targetId = await exactTargetId(targetBottle.id);
+
+    const result = await loadCatalogTargetReadsWithParity(
+      [
+        {
+          consumerTable: "store_price_match_proposal",
+          rowLocator: { id: 77, slot: "current" },
+          targetId,
+          legacy: { bottleId: targetBottle.id, releaseId: null },
+        },
+        {
+          consumerTable: "store_price_match_proposal",
+          rowLocator: { id: 77, slot: "suggested" },
+          targetId,
+          legacy: { bottleId: driftBottle.id, releaseId: null },
+        },
+      ],
+      { ...readContext, operation: "proposal_resolution" },
+    );
+
+    expect(result.mismatches).toEqual([
+      expect.objectContaining({
+        consumerTable: "store_price_match_proposal",
+        rowLocator: { id: 77, slot: "suggested" },
+        legacyBottleId: driftBottle.id,
+        legacyReleaseId: null,
+        targetId,
+      }),
+    ]);
+  });
+
   test("correlates exact alias parity and drift by stable alias name", async ({
     fixtures,
   }) => {

@@ -585,37 +585,56 @@ from two decisions.
 
 ### Requirement: Existing-match price evidence shares one target
 
-The system SHALL resolve one CatalogTarget for an approved existing-match or
-correction store-price proposal and SHALL atomically use that same target for
-its listing alias and source observation without changing the retained
-price-assignment contract.
+The system SHALL accept one selected CatalogTarget id for an approved
+existing-match store-price proposal and SHALL atomically use that same target
+for the StorePrice, listing alias, source observation, approved proposal, and
+that proposal's latest attempt. Retained Bottle/Release pairs SHALL remain
+compatibility evidence rather than approval authority.
 
-#### Scenario: Approve an exact promoted release
+#### Scenario: Approve an exact target
 
-- **WHEN** an approved existing match carries a legacy pair whose release has a completed promotion
-- **THEN** the measured legacy resolver selects the promoted Bottle's exact target once
-- **AND** the listing alias and observation both store that target
+- **WHEN** a moderator approves an existing match by supplying an active exact
+  target id
+- **THEN** the approval derives the retained `(bottleId, null)` projection from
+  that target's independently complete Bottle
+- **AND** the StorePrice, listing alias, source observation, approved proposal,
+  and that proposal's latest attempt store the exact target and projection
 
-#### Scenario: Approve a parent-only match
+#### Scenario: Approve the proposal's generic suggestion
 
-- **WHEN** an approved existing match carries a parent Bottle with no release id
-- **THEN** the measured legacy resolver follows the deterministic parent-cardinality rule
-- **AND** both writes use the generic group target when the parent has releases
-- **AND** both writes use the retained Bottle's exact target when it has no releases
-- **AND** a generic result does not substitute the representative Bottle
+- **WHEN** a moderator approves an active generic target
+- **THEN** that target must be the proposal's own suggested target
+- **AND** the approval locks and revalidates that suggested slot's retained
+  projection as compatibility evidence for the same generic target
+- **AND** the StorePrice, listing alias, source observation, approved proposal,
+  and that proposal's latest attempt store the generic target and validated
+  projection without substituting a representative or another member Bottle
+
+#### Scenario: Apply a same-Bottle correction repair
+
+- **WHEN** a moderator applies a correction proposal's sparse Bottle repair
+- **THEN** its current and suggested target ids are both non-null active exact
+  targets for the same concrete Bottle
+- **AND** the exact target identity is locked and revalidated before the
+  proposal and canonical Bottle update commit
+- **AND** retained current and suggested pairs are compatibility evidence and
+  cannot select a different Bottle or target
 
 #### Scenario: Approval cannot persist one target-backed record
 
-- **WHEN** target resolution, listing-alias assignment, or observation persistence fails
+- **WHEN** target resolution, retained-projection validation, listing-alias
+  assignment, observation persistence, proposal persistence, or latest-attempt
+  persistence fails
 - **THEN** the approval transaction rolls back
-- **AND** it does not commit different targets or only one of the two records
+- **AND** it does not commit different targets or only part of the assignment
 
 #### Scenario: Retain adjacent compatibility contracts
 
-- **WHEN** the alias and observation are assigned their shared target
-- **THEN** existing-match and correction retained Bottle/Release pair semantics remain unchanged
-- **AND** their current and suggested proposal and latest-attempt identities
-  store the approved target with the matching retained pair projection
+- **WHEN** an exact or generic approval assigns its shared target
+- **THEN** retained Bottle/Release columns remain a matching staged storage
+  projection until their explicit cleanup task
+- **AND** they are not accepted as moderator selection input or used to replace
+  the selected target
 
 #### Scenario: Approve a create-new proposal after concrete creation cutover
 

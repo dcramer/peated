@@ -3,6 +3,7 @@ import {
   DuplicateBottleAliasError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
+import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import {
   applyStorePriceBottleRepairFromProposal,
   InvalidStorePriceMatchProposalTypeError,
@@ -76,6 +77,13 @@ export default procedure
       if (err instanceof StorePriceBottleRepairBadRequestError) {
         throw errors.BAD_REQUEST({
           message: err.message,
+        });
+      }
+
+      if (err instanceof CatalogTargetResolutionError) {
+        throw errors.CONFLICT({
+          message: err.message,
+          cause: err,
         });
       }
 

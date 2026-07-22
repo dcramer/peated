@@ -324,11 +324,21 @@ Applying a correction commits its canonical shared/exact Bottle update and
 proposal approval in one database transaction. Canonical update jobs run only
 after that transaction commits. The correction path retains its Bottle response
 for the current queue UI, but it does not maintain a separate Bottle updater or
-mutate staged legacy BottleRelease rows.
+mutate staged legacy BottleRelease rows. Repair is available only when the
+proposal's current and suggested identities are non-null active exact targets
+for the same concrete Bottle; those target ids are locked and revalidated before
+the update commits.
 
-The moderation queue presents complete Bottle suggestions and the manual
-override selects a complete existing Bottle. Retained BottleRelease identity is
-staged compatibility data, not a suggestion type or picker choice.
+The moderation queue renders current and suggested identities independently as
+an exact Bottle target, a generic BottleGroup target, or an explicit unknown
+target. Approval submits one target id. Exact approval derives the complete
+Bottle's `(bottleId, null)` compatibility projection. A generic suggestion is
+approvable only as that proposal's own suggested target and reuses its validated
+retained projection without selecting a representative Bottle. The manual
+override searches complete existing Bottles, resolves the selected Bottle
+through the narrow Bottle-to-exact-target lookup, and submits that exact target.
+Retained BottleRelease identity is staged compatibility evidence, not a
+suggestion type, picker choice, or target-selection authority.
 
 ## Alias Behavior
 

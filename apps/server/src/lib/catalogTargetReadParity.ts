@@ -50,6 +50,13 @@ type CorrelatedConsumerLocator =
       rowLocator: { id: number };
     }
   | {
+      consumerTable: "store_price_match_proposal";
+      rowLocator: {
+        id: number;
+        slot: "current" | "suggested";
+      };
+    }
+  | {
       consumerTable: "tasting";
       rowLocator: { id: number };
     };
@@ -244,6 +251,11 @@ function consumerLocator(
         rowLocator: item.rowLocator,
       };
     case "store_price":
+      return {
+        consumerTable: item.consumerTable,
+        rowLocator: item.rowLocator,
+      };
+    case "store_price_match_proposal":
       return {
         consumerTable: item.consumerTable,
         rowLocator: item.rowLocator,

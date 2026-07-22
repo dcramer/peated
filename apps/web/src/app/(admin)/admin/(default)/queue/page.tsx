@@ -1,5 +1,6 @@
 "use client";
 
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -194,16 +195,15 @@ export default function Page() {
   }
 
   async function handleApproveMatch(item: QueueItem): Promise<void> {
-    const suggestedBottle = item.suggestedBottle;
-    if (!suggestedBottle) {
+    const suggestedTarget = item.suggestedTarget;
+    if (!suggestedTarget) {
       return;
     }
 
     await resolveMutation.mutateAsync({
       proposal: item.id,
       action: "match",
-      bottle: suggestedBottle.id,
-      release: item.suggestedRelease?.id ?? null,
+      target: suggestedTarget.targetId,
     });
     await refreshQueueList();
     flash(
@@ -295,10 +295,9 @@ export default function Page() {
     );
   }
 
-  async function handleBottleSelection(bottle: {
-    fullName: string;
-    id: number;
-  }): Promise<void> {
+  async function handleBottleSelection(
+    target: ExactCatalogTargetV1,
+  ): Promise<void> {
     if (!selectedProposal) {
       return;
     }
@@ -306,15 +305,15 @@ export default function Page() {
     await resolveMutation.mutateAsync({
       proposal: selectedProposal.id,
       action: "match",
-      bottle: bottle.id,
+      target: target.targetId,
     });
     await refreshQueueList();
     flash(
       <div>
         Assigned{" "}
         <strong className="font-bold">{selectedProposal.price.name}</strong> to{" "}
-        <Link href={`/bottles/${bottle.id}`} className="underline">
-          {bottle.fullName}
+        <Link href={`/bottles/${target.bottle.id}`} className="underline">
+          {target.bottle.fullName}
         </Link>
       </div>,
     );
@@ -342,10 +341,10 @@ export default function Page() {
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
           Review new or changed retailer listings here. Use this queue when the
-          listing is unmatched, misclassified, or needs a bottle or bottling
-          decision. If the underlying catalog bottle itself is wrong, switch to
-          one of the repair queues below instead of forcing the listing to carry
-          that cleanup.
+          listing is unmatched, misclassified, or needs a catalog assignment. If
+          the underlying catalog bottle itself is wrong, switch to one of the
+          repair queues below instead of forcing the listing to carry that
+          cleanup.
         </div>
 
         <Form

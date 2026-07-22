@@ -1,7 +1,9 @@
 "use client";
 
 import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { safe } from "@orpc/client";
 import { toTitleCase } from "@peated/server/lib/strings";
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import { type Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Join from "@peated/web/components/join";
@@ -13,7 +15,7 @@ import SearchHeader from "@peated/web/components/searchHeader";
 import Spinner from "@peated/web/components/spinner";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
 export default function BottleSelector({
@@ -28,22 +30,42 @@ export default function BottleSelector({
   name?: string | null;
   returnTo?: string;
   onClose: () => void;
-  onSelect?: (value: Bottle) => void;
+  onSelect?: (value: ExactCatalogTargetV1) => Promise<void>;
   source?: string;
 }) {
   const [query, setQuery] = useState(name ?? "");
   const [results, setResults] = useState<Bottle[]>([]);
   const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successfulQuery, setSuccessfulQuery] = useState<string | null>(null);
+  const requestVersion = useRef(0);
 
   const orpc = useORPC();
 
   const unsafe_onSearch = useCallback(
     async (query = "") => {
+      const version = ++requestVersion.current;
       setLoading(true);
-      const { results } = await orpc.bottles.list.call({
-        query,
-      });
-      setResults(results);
+      setError(null);
+      setResults([]);
+      setSuccessfulQuery(null);
+
+      const { data, error } = await safe(
+        orpc.bottles.list.call({
+          query,
+        }),
+      );
+
+      if (version !== requestVersion.current) {
+        return;
+      }
+
+      if (error) {
+        setError("Unable to search the bottle catalog. Try again.");
+      } else {
+        setResults(data.results);
+        setSuccessfulQuery(query);
+      }
       setLoading(false);
     },
     [orpc],
@@ -52,13 +74,69 @@ export default function BottleSelector({
   const onSearch = useDebounceCallback(unsafe_onSearch);
 
   useEffect(() => {
+    onSearch.cancel();
+    requestVersion.current += 1;
+    setLoading(false);
+    setResults([]);
+    setError(null);
+    setSuccessfulQuery(null);
+
     if (!open) return;
-    onSearch(name ?? "");
+
     setQuery(name ?? "");
-  }, [name, open]);
+    onSearch(name ?? "");
+  }, [name, onSearch, open]);
+
+  const invalidatePendingRequests = () => {
+    onSearch.cancel();
+    requestVersion.current += 1;
+    setLoading(false);
+  };
+
+  const handleClose = () => {
+    invalidatePendingRequests();
+    setError(null);
+    onClose();
+  };
 
   const selectOption = async (option: Bottle) => {
-    onSelect && onSelect(option);
+    if (!onSelect) {
+      return;
+    }
+
+    invalidatePendingRequests();
+    const version = ++requestVersion.current;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error, isDefined } = await safe(
+        orpc.bottles.target.call({ bottle: option.id }),
+      );
+
+      if (version !== requestVersion.current) {
+        return;
+      }
+
+      if (error) {
+        setError(
+          isDefined && (error.name === "CONFLICT" || error.name === "NOT_FOUND")
+            ? "This bottle is not available for assignment. Choose another bottle."
+            : "Unable to assign this bottle. Check your connection and try again.",
+        );
+        return;
+      }
+
+      await onSelect(data);
+    } catch {
+      if (version === requestVersion.current) {
+        setError("Unable to assign this bottle. Refresh and try again.");
+      }
+    } finally {
+      if (version === requestVersion.current) {
+        setLoading(false);
+      }
+    }
   };
 
   if (!name) return null;
@@ -66,14 +144,19 @@ export default function BottleSelector({
   const listItemClasses = `px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={handleClose}>
       <LayoutModal
         header={
           <SearchHeader
-            onClose={onClose}
+            onClose={handleClose}
             value={query}
             onChange={(value) => {
-              setQuery(query);
+              setQuery(value);
+              requestVersion.current += 1;
+              setLoading(false);
+              setResults([]);
+              setError(null);
+              setSuccessfulQuery(null);
               onSearch(value);
             }}
             closeIcon={<XMarkIcon className="h-8 w-8" />}
@@ -107,6 +190,14 @@ export default function BottleSelector({
               <Spinner />
             </div>
           )}
+          {error ? (
+            <div
+              role="alert"
+              className="border-b border-red-900 bg-red-950/60 px-6 py-4 text-sm text-red-200"
+            >
+              {error}
+            </div>
+          ) : null}
           <ul role="list" className="divide-y divide-slate-800">
             {results.map((bottle) => {
               return (
@@ -119,8 +210,9 @@ export default function BottleSelector({
 
                   <button
                     onClick={() => {
-                      selectOption(bottle);
+                      void selectOption(bottle);
                     }}
+                    disabled={isLoading}
                     className="flex min-w-0 flex-auto flex-col justify-center text-left font-semibold text-white"
                   >
                     <div className="flex items-center gap-x-1 font-bold">
@@ -137,38 +229,43 @@ export default function BottleSelector({
                 </ListItem>
               );
             })}
-            {(results.length < 10 || query !== "") && (
-              <ListItem as={motion.li} className={listItemClasses}>
-                <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
+            {!isLoading &&
+              !error &&
+              successfulQuery === query &&
+              (results.length < 10 || query !== "") && (
+                <ListItem as={motion.li} className={listItemClasses}>
+                  <PlusIcon className="-ml-2 h-10 w-10 flex-none rounded-full bg-slate-900 p-2 group-hover:bg-slate-800 group-hover:text-white" />
 
-                <div className="min-w-0 flex-auto">
-                  <div className="font-semibold">
-                    <a
-                      href={`/bottles/new?${new URLSearchParams({
-                        name: toTitleCase(query),
-                        ...(returnTo ? { returnTo } : {}),
-                      }).toString()}`}
-                    >
-                      <span className="absolute inset-x-0 -top-px bottom-0" />
-                      Can't find what you're looking for?
-                    </a>
+                  <div className="min-w-0 flex-auto">
+                    <div className="font-semibold">
+                      <a
+                        href={`/bottles/new?${new URLSearchParams({
+                          name: toTitleCase(query),
+                          ...(returnTo ? { returnTo } : {}),
+                        }).toString()}`}
+                      >
+                        <span className="absolute inset-x-0 -top-px bottom-0" />
+                        Can't find what you're looking for?
+                      </a>
+                    </div>
+                    <div className="mt-1 flex gap-x-1 text-sm">
+                      {query !== "" ? (
+                        <span>
+                          Tap here to add{" "}
+                          <strong className="truncate font-bold">
+                            {toTitleCase(query)}
+                          </strong>{" "}
+                          to the database.
+                        </span>
+                      ) : (
+                        <span>
+                          Tap here to add a new entry to the database.
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-1 flex gap-x-1 text-sm">
-                    {query !== "" ? (
-                      <span>
-                        Tap here to add{" "}
-                        <strong className="truncate font-bold">
-                          {toTitleCase(query)}
-                        </strong>{" "}
-                        to the database.
-                      </span>
-                    ) : (
-                      <span>Tap here to add a new entry to the database.</span>
-                    )}
-                  </div>
-                </div>
-              </ListItem>
-            )}
+                </ListItem>
+              )}
           </ul>
         </div>
       </LayoutModal>

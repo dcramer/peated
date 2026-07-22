@@ -19,7 +19,6 @@ export {
   applyStorePriceBottleRepairFromProposal,
   canClearIgnoredStorePriceAssignment,
   createBottleFromStorePriceMatchProposal,
-  getProposalTargets,
   getStorePriceMatchProposalForReviewInTransaction,
   ignoreStorePriceMatchProposal,
   resolveStorePriceMatchProposal,

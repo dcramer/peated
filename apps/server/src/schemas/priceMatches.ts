@@ -1,11 +1,9 @@
 import { DEFAULT_BOTTLE_CREATION_TARGET } from "@peated/bottle-classifier/releaseIdentity";
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
-import {
-  BottleReleaseInputSchema,
-  BottleReleaseSchema,
-} from "./bottleReleases";
+import { BottleReleaseInputSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
+import { CatalogTargetV1Schema } from "./catalogIdentity";
 import {
   CaskFillEnum,
   CaskSizeEnum,
@@ -548,12 +546,6 @@ export const StorePriceMatchProposalSchema = z.object({
     StorePriceMatchAutomationAssessmentSchema.shape.differentiatingAttributes,
   webEvidenceChecks:
     StorePriceMatchAutomationAssessmentSchema.shape.webEvidenceChecks,
-  currentBottleId: z.number().nullable(),
-  currentReleaseId: z.number().nullable(),
-  currentTargetId: z.number().nullable(),
-  suggestedBottleId: z.number().nullable(),
-  suggestedReleaseId: z.number().nullable(),
-  suggestedTargetId: z.number().nullable(),
   parentBottleId: z.number().nullable(),
   creationTarget: PriceMatchCreationTargetEnum.nullable(),
   candidateBottles: z.array(PriceMatchCandidateSchema),
@@ -578,10 +570,8 @@ export const StorePriceMatchQueueItemSchema =
     price: StorePriceSchema.extend({
       site: ExternalSiteSchema,
     }),
-    currentBottle: BottleSchema.nullable(),
-    currentRelease: BottleReleaseSchema.nullable(),
-    suggestedBottle: BottleSchema.nullable(),
-    suggestedRelease: BottleReleaseSchema.nullable(),
+    currentTarget: CatalogTargetV1Schema.nullable(),
+    suggestedTarget: CatalogTargetV1Schema.nullable(),
     parentBottle: BottleSchema.nullable(),
   });
 

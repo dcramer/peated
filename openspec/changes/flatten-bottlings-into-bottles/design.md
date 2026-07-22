@@ -745,22 +745,22 @@ slice from silently activating a second consumer or price-matching cutover.
 
 ### Existing-match price approvals share one resolved target
 
-Task 5.5b keeps existing-match and correction approvals' legacy
-`(bottleId, releaseId)` input and resolves that pair once through the measured
-CatalogTarget assignment boundary. The deterministic migration rules decide
-the result: a promoted release selects its exact Bottle target, a parent-only
-reference with releases selects the generic group target, and a parent without
-releases selects the retained Bottle's exact target. The resulting descriptor
-is the single semantic assignment decision for the operation. Low-level locked
-validation inside the alias writer may recheck target integrity, but it does not
-resolve a second intent or choose another target.
+Task 5.5b first introduced shared target ownership while the then-current
+approval request still carried a legacy `(bottleId, releaseId)` pair. At that
+staged boundary, deterministic promotion and parent-cardinality rules resolved
+one target descriptor and the alias and observation writers reused it rather
+than making independent identity decisions. This is retained design history,
+not the current moderator request contract.
 
-The existing-match or correction approval transaction supplies that same
-`targetId` to the listing-alias assignment and the source-keyed
-BottleObservation upsert. An exact result keeps the alias and observation
-exact; a generic result keeps both generic and never substitutes the group's
-representative Bottle. Failure to resolve the target or write either record
-rolls back the complete approval transaction.
+Task 7.3c removes the unreleased Bottle/Release selection request in favor of
+one selected `targetId`. Exact approval derives `(bottleId, null)` from the
+target. Generic approval accepts only the proposal's own suggested target and
+locks and revalidates that slot's retained projection for staged storage. The
+StorePrice, listing alias, source-keyed BottleObservation, proposal, and latest
+attempt share the selected target atomically, and generic intent never
+substitutes the group's representative Bottle. Correction repair likewise uses
+matching non-null exact current and suggested targets for the same Bottle; its
+retained pairs are evidence rather than selection authority.
 
 ### Create-new price approval creates one complete Bottle
 
@@ -1283,6 +1283,54 @@ slice does not invent a second observation or activity read system. Proposal
 and adjacent analytics reads, plus other remaining consumers, keep parent tasks
 7.1-7.3 and 7.11 open. This slice makes no production backfill, deployment, or
 activation claim.
+
+### Price-match proposal reads and approvals use authoritative CatalogTargets
+
+Tasks 7.1c-7.3c make the StorePrice match-proposal queue hydrate its current
+and suggested logical slots independently through their durable CatalogTargets.
+The proposal id plus `current` or `suggested` slot is the stable parity locator;
+the retained Bottle/Release pair is measurement evidence only and cannot select
+or replace the result. Exact targets expose independently complete Bottles,
+generic targets remain BottleGroup identity, targetless slots stay explicitly
+unknown, and an invalid nonnull durable target fails closed as a conflict.
+
+The proposal producer resolves and persists the suggested target for every new
+existing-match or correction decision before the target-backed reader is used,
+and the corresponding attempt copies that target. This prerequisite prevents a
+new proposal from depending on the legacy backfill merely to render its live
+recommendation. Create-new and no-match proposals keep a null suggested target
+until concrete creation or a later assignment establishes one.
+
+Moderator approval accepts the selected target id and uses one target-native
+transaction. An exact target derives the concrete `(bottleId, null)` staged
+storage projection. A generic target is approvable only when it is the
+proposal's own suggested target; the transaction validates and temporarily
+reuses that slot's retained pair so the still-present database columns remain
+consistent without choosing a representative Bottle. The target, retained
+projection, proposal, latest attempt, StorePrice, alias, observation, and any
+decision log are locked or revalidated as one assignment. The old
+Bottle/Release approval request is removed because this branch has not shipped.
+
+Correction repair remains proposal-bound rather than accepting a second
+identity input. Both current and suggested target ids must be non-null active
+exact targets for the same concrete Bottle. The transaction locks and
+revalidates that exact target identity before composing the canonical Bottle
+update with proposal approval; retained current and suggested pairs are staged
+compatibility evidence and cannot select or substitute a different identity.
+
+The queue response and UI expose `currentTarget` and `suggestedTarget`, not
+nested current/suggested BottleRelease identity. `parentBottle` remains only as
+explicit historical create-draft context until the Section 8 unified creation
+cutover; it is never a fallback for current or suggested identity. Manual
+Bottle search crosses a narrow Bottle-to-exact-target lookup before submitting
+the same target-only approval request. Missing historical automation snapshots
+may be computed for display, but queue GET requests do not persist them or
+otherwise mutate proposal state.
+
+This completes only the proposal-queue sub-slice. Retained proposal and attempt
+pair columns remain migration evidence until task 9.6, and historical
+create-draft shapes remain assigned to Section 8 and task 9.7. The slice begins
+no production backfill and authorizes no deployment or activation.
 
 Every 5.4 adapter records a structured compatibility write with caller,
 operation, legacy identity where one exists, and replacement Bottle/target

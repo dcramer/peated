@@ -193,16 +193,23 @@ Exact Bottle serializers must not require BottleGroup hydration.
 - Exact alias lookup returns the Bottle of a non-null exact target. A generic
   target returns no Bottle, and only a null-target legacy alias may use the
   measured pair fallback retained until task 9.7.
-- Existing-match and correction price approvals resolve their retained legacy
-  Bottle/Release pair once through the measured CatalogTarget assignment
-  boundary and reuse the same descriptor for both the listing alias and
-  source-keyed observation. A promoted release remains exact; a parent-only
-  reference follows deterministic cardinality to a generic group target or
-  retained exact Bottle target. Locked alias integrity validation is not a
-  second semantic resolution.
-- Those target-backed alias and observation writes commit atomically. Exact or
-  generic intent is preserved without representative substitution, while the
-  observation remains source evidence rather than a catalog grouping decision.
+- Existing-match price approval accepts one selected `targetId`; it does not
+  accept a Bottle/Release pair as selection authority. An exact target derives
+  the concrete Bottle's `(bottleId, null)` staged projection. A generic target
+  is approvable only when it is the proposal's own suggested target and its
+  retained suggested pair locks and revalidates to that target; the pair remains
+  compatibility evidence and never selects a representative or another member
+  Bottle.
+- The selected target and retained projection commit atomically across the
+  StorePrice, listing alias, source-keyed observation, proposal, and that
+  proposal's latest attempt. Exact or generic intent is preserved without
+  representative substitution, while the observation remains source evidence
+  rather than a catalog grouping decision.
+- Correction repair is proposal-bound rather than a second selection contract.
+  Its current and suggested target ids must both be non-null active exact
+  targets for the same concrete Bottle. Approval locks and revalidates that
+  exact target identity before composing the canonical Bottle update and
+  proposal approval; retained pairs cannot choose or substitute identity.
   Create-new approval translates its retained payload into canonical concrete
   Bottle creation and reuses the resulting exact target for the StorePrice,
   alias, observation, proposal, and latest attempt. Proposal and attempt current

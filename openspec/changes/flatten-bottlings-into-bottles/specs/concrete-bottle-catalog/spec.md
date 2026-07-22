@@ -123,12 +123,29 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 
 #### Scenario: Approve existing-match price evidence
 
-- **WHEN** existing-match or correction approval receives a retained legacy Bottle/Release pair
-- **THEN** it resolves one CatalogTarget using the deterministic promotion and parent-cardinality rules
-- **AND** it reuses that target for both listing alias and observation identity in the approval transaction
-- **AND** an exact result identifies its concrete Bottle while a generic result remains BottleGroup identity
-- **AND** it does not select a representative Bottle for a generic result
-- **AND** the retained price-assignment pair remains compatibility data while proposal and attempt rows also persist the target
+- **WHEN** a moderator approves an existing-match proposal using a selected
+  CatalogTarget id
+- **THEN** an exact target derives the concrete Bottle's `(bottleId, null)`
+  retained projection
+- **AND** a generic target is accepted only when it is the proposal's suggested
+  target and its retained projection still validates to that target
+- **AND** the StorePrice, listing alias, observation, proposal, and that
+  proposal's latest attempt receive the same target and retained projection in
+  one approval transaction
+- **AND** generic approval does not select a representative or another member
+  Bottle
+- **AND** retained Bottle/Release pairs remain compatibility evidence rather
+  than approval input or target-selection authority
+
+#### Scenario: Apply an exact same-Bottle correction repair
+
+- **WHEN** a moderator applies a sparse Bottle repair from a correction proposal
+- **THEN** the proposal's current and suggested target ids must both be non-null
+  active exact targets for the same concrete Bottle
+- **AND** approval locks and revalidates that exact target identity before
+  composing the canonical Bottle update with proposal approval
+- **AND** retained current and suggested pairs cannot select or substitute a
+  different concrete Bottle
 
 #### Scenario: Translate bottle-only price evidence
 

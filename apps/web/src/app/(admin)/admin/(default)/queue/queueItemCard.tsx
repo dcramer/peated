@@ -3,12 +3,10 @@
 import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import type { Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
+import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
-import {
-  getBottleBottlingPath,
-  getNewBottleBottlingPath,
-} from "@peated/web/lib/bottlings";
+import { getNewBottleBottlingPath } from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { type ReactNode, useState } from "react";
@@ -29,9 +27,9 @@ type RepairChange = {
 };
 type RecommendationBottle = {
   fullName?: string;
-  brand: { name: string };
+  brand: { id: number | null; name: string };
   name: string;
-  series: { name: string } | null;
+  series: { id: number | null; name: string } | null;
   category: string | null;
   edition: string | null;
   statedAge: number | null;
@@ -43,9 +41,13 @@ type RecommendationBottle = {
   caskType: string | null;
   caskSize: string | null;
   caskFill: string | null;
-  distillers: Array<{ name: string }>;
-  bottler: { name: string } | null;
+  distillers: Array<{ id: number | null; name: string }>;
+  bottler: { id: number | null; name: string } | null;
 };
+type TargetBottle = Extract<
+  NonNullable<QueueItem["currentTarget"]>,
+  { kind: "bottle" }
+>["bottle"];
 type RecommendationRelease = {
   id?: number;
   bottleId?: number;
@@ -148,7 +150,7 @@ function getEvidenceBadges(item: QueueItem): string[] {
 
   if (isRepairProposal(item)) {
     badges.push("repair draft");
-  } else if (item.currentBottle && item.proposalType === "correction") {
+  } else if (item.currentTarget && item.proposalType === "correction") {
     badges.push("current assignment differs");
   }
 
@@ -252,14 +254,47 @@ function formatRepairValue(value: string | null): string {
   return value ?? "unknown";
 }
 
-function isRepairProposal(item: QueueItem): boolean {
+function formatExistingCatalogValue(hasValue: boolean): string | null {
+  return hasValue ? "Existing catalog value" : null;
+}
+
+export function isRepairProposal(
+  item: Pick<
+    QueueItem,
+    | "proposalType"
+    | "currentTarget"
+    | "suggestedTarget"
+    | "proposedBottle"
+    | "proposedRelease"
+  >,
+): boolean {
   return (
     item.proposalType === "correction" &&
-    !!item.currentBottle &&
-    !!item.suggestedBottle &&
-    item.currentBottle.id === item.suggestedBottle.id &&
+    item.currentTarget?.kind === "bottle" &&
+    item.suggestedTarget?.kind === "bottle" &&
+    item.currentTarget.bottle.id === item.suggestedTarget.bottle.id &&
     !!item.proposedBottle &&
     !item.proposedRelease
+  );
+}
+
+export function canApproveSuggestedTarget(
+  item: Pick<
+    QueueItem,
+    | "status"
+    | "isProcessing"
+    | "proposalType"
+    | "currentTarget"
+    | "suggestedTarget"
+    | "proposedBottle"
+    | "proposedRelease"
+  >,
+): boolean {
+  return (
+    item.status === "pending_review" &&
+    item.suggestedTarget !== null &&
+    !isRepairProposal(item) &&
+    !item.isProcessing
   );
 }
 
@@ -432,8 +467,8 @@ function getBottlingFields(
   return fields;
 }
 
-function getBottleRepairChanges(
-  currentBottle: RecommendationBottle,
+export function getBottleRepairChanges(
+  currentBottle: TargetBottle,
   proposedBottle: RecommendationBottle,
 ): RepairChange[] {
   const changes: RepairChange[] = [];
@@ -458,34 +493,51 @@ function getBottleRepairChanges(
     });
   };
 
-  pushChange("Brand", currentBottle.brand.name, proposedBottle.brand.name);
+  if (currentBottle.brandId !== proposedBottle.brand.id) {
+    pushChange(
+      "Brand",
+      formatExistingCatalogValue(true),
+      proposedBottle.brand.name,
+    );
+  }
   pushChange("Bottle Name", currentBottle.name, proposedBottle.name);
-  pushChange(
-    "Series",
-    currentBottle.series?.name ?? null,
-    proposedBottle.series?.name ?? null,
-    proposedBottle.series !== null,
-  );
+  if (
+    proposedBottle.series !== null &&
+    currentBottle.seriesId !== proposedBottle.series.id
+  ) {
+    pushChange(
+      "Series",
+      formatExistingCatalogValue(currentBottle.seriesId !== null),
+      proposedBottle.series.name,
+    );
+  }
   pushChange(
     "Category",
     currentBottle.category,
     proposedBottle.category,
     proposedBottle.category !== null,
   );
-  pushChange(
-    "Distillery",
-    currentBottle.distillers.map((distiller) => distiller.name).join(", ") ||
-      null,
-    proposedBottle.distillers.map((distiller) => distiller.name).join(", ") ||
-      null,
-    proposedBottle.distillers.length > 0,
-  );
-  pushChange(
-    "Bottler",
-    currentBottle.bottler?.name ?? null,
-    proposedBottle.bottler?.name ?? null,
-    proposedBottle.bottler !== null,
-  );
+  if (
+    proposedBottle.distillers.length > 0 &&
+    currentBottle.distillerIds.join(",") !==
+      proposedBottle.distillers.map((distiller) => distiller.id).join(",")
+  ) {
+    pushChange(
+      "Distillery",
+      formatExistingCatalogValue(currentBottle.distillerIds.length > 0),
+      proposedBottle.distillers.map((distiller) => distiller.name).join(", "),
+    );
+  }
+  if (
+    proposedBottle.bottler !== null &&
+    currentBottle.bottlerId !== proposedBottle.bottler.id
+  ) {
+    pushChange(
+      "Bottler",
+      formatExistingCatalogValue(currentBottle.bottlerId !== null),
+      proposedBottle.bottler.name,
+    );
+  }
   pushChange(
     "Age",
     formatAge(currentBottle.statedAge),
@@ -601,6 +653,31 @@ function RecommendationSection({
   );
 }
 
+function TargetIdentitySection({
+  label,
+  target,
+  placeholder,
+}: {
+  label: string;
+  target: QueueItem["currentTarget"] | QueueItem["suggestedTarget"];
+  placeholder: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+      <div className="text-muted text-[11px] font-semibold uppercase tracking-wide">
+        {label}
+      </div>
+      {target ? (
+        <div className="mt-1 text-sm text-white">
+          <CatalogTargetIdentity target={target} compact />
+        </div>
+      ) : (
+        <div className="mt-1 text-sm text-slate-300">{placeholder}</div>
+      )}
+    </div>
+  );
+}
+
 function renderRecommendationOutcome(item: QueueItem): ReactNode {
   if (item.status === "errored") {
     return (
@@ -619,40 +696,23 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     );
   }
 
-  const bottle =
-    item.suggestedBottle ?? item.proposedBottle ?? item.parentBottle;
-  const bottleFields = bottle ? getBottleFields(bottle) : [];
-  const bottleHref =
-    item.suggestedBottle || item.parentBottle
-      ? `/bottles/${(item.suggestedBottle ?? item.parentBottle)?.id}`
-      : undefined;
-  const release = item.suggestedRelease ?? item.proposedRelease;
-  const releaseFields = release ? getBottlingFields(release) : [];
-  const releaseHref = item.suggestedRelease
-    ? getBottleBottlingPath(
-        item.suggestedRelease.bottleId,
-        item.suggestedRelease.id,
-      )
-    : undefined;
   const repairChanges =
-    isRepairProposal(item) && item.currentBottle && item.proposedBottle
-      ? getBottleRepairChanges(item.currentBottle, item.proposedBottle)
+    isRepairProposal(item) &&
+    item.currentTarget?.kind === "bottle" &&
+    item.proposedBottle
+      ? getBottleRepairChanges(item.currentTarget.bottle, item.proposedBottle)
       : [];
 
-  if (!bottle && !release) {
-    return (
-      <div className="mt-2 text-sm text-slate-300">No strong suggestion.</div>
-    );
-  }
-
-  if (isRepairProposal(item) && item.currentBottle && item.proposedBottle) {
+  if (
+    isRepairProposal(item) &&
+    item.currentTarget?.kind === "bottle" &&
+    item.proposedBottle
+  ) {
     return (
       <div className="mt-3 space-y-3">
-        <RecommendationSection
+        <TargetIdentitySection
           label="Existing Bottle"
-          title={getBottleTitle(item.currentBottle)}
-          href={`/bottles/${item.currentBottle.id}`}
-          fields={getBottleFields(item.currentBottle)}
+          target={item.currentTarget}
           placeholder="No bottle identified"
         />
 
@@ -690,21 +750,47 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     );
   }
 
+  if (item.suggestedTarget) {
+    return (
+      <div className="mt-3">
+        <TargetIdentitySection
+          label="Suggested Assignment"
+          target={item.suggestedTarget}
+          placeholder="No safe existing target suggested"
+        />
+      </div>
+    );
+  }
+
+  const bottle = item.proposedBottle ?? item.parentBottle;
+  const release = item.proposedRelease;
+
+  if (!bottle && !release) {
+    return (
+      <div className="mt-2 text-sm text-slate-300">
+        No safe existing target suggested.
+      </div>
+    );
+  }
+
   return (
     <div className="mt-3 space-y-3">
       <RecommendationSection
-        label="Main Bottle"
+        label={item.proposedBottle ? "Bottle Draft" : "Parent Bottle Context"}
         title={bottle ? getBottleTitle(bottle) : null}
-        href={bottleHref}
-        fields={bottleFields}
+        href={
+          !item.proposedBottle && item.parentBottle
+            ? `/bottles/${item.parentBottle.id}`
+            : undefined
+        }
+        fields={bottle ? getBottleFields(bottle) : []}
         placeholder="No bottle identified"
       />
 
       <RecommendationSection
-        label="Bottling"
+        label="Bottling Draft"
         title={release ? getBottlingTitle(release) : null}
-        href={releaseHref}
-        fields={releaseFields}
+        fields={release ? getBottlingFields(release) : []}
         placeholder="No specific bottling identified"
       />
     </div>
@@ -807,11 +893,7 @@ export default function QueueItemCard({
   const topCandidates = getTopCandidates(item);
   const repairProposal = isRepairProposal(item);
   const isProcessing = item.isProcessing;
-  const canApproveMatch =
-    item.status === "pending_review" &&
-    !!item.suggestedBottle &&
-    !repairProposal &&
-    !isProcessing;
+  const canApproveMatch = canApproveSuggestedTarget(item);
   const canCreateBottle =
     item.status === "pending_review" &&
     item.proposalType === "create_new" &&
@@ -820,8 +902,8 @@ export default function QueueItemCard({
   const canApplyRepair = item.status === "pending_review" && repairProposal;
   const createProposalActions = getCreateProposalActions(item, returnTo);
   const repairEditHref =
-    repairProposal && item.currentBottle
-      ? `/bottles/${item.currentBottle.id}/edit`
+    repairProposal && item.currentTarget?.kind === "bottle"
+      ? `/bottles/${item.currentTarget.bottle.id}/edit`
       : null;
   const queuedAt = formatTimestamp(item.createdAt);
   const processingQueuedAt = formatTimestamp(item.processingQueuedAt);
@@ -910,24 +992,11 @@ export default function QueueItemCard({
             </div>
           ) : null}
 
-          {item.currentBottle ? (
-            <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-sm">
-              <div className="text-muted text-xs font-semibold uppercase tracking-wide">
-                Current Bottle
-              </div>
-              <Link
-                href={`/bottles/${item.currentBottle.id}`}
-                className="mt-1 inline-block font-semibold text-white underline"
-              >
-                {item.currentBottle.fullName}
-              </Link>
-              {item.currentRelease ? (
-                <div className="mt-1 text-slate-300">
-                  Bottling: {item.currentRelease.fullName}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+          <TargetIdentitySection
+            label="Current Assignment"
+            target={item.currentTarget}
+            placeholder="No current assignment"
+          />
 
           {extractedLabelSummary.length > 0 ? (
             <div className="space-y-2">

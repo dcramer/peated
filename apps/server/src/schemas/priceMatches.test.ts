@@ -5,6 +5,8 @@ import {
   PriceMatchSearchEvidenceSchema,
   StorePriceMatchAgentResponseSchema,
   StorePriceMatchDecisionSchema,
+  StorePriceMatchProposalSchema,
+  StorePriceMatchQueueItemSchema,
 } from "./priceMatches";
 
 const baseProposedBottle = {
@@ -625,5 +627,43 @@ describe("StorePriceMatchDecisionSchema", () => {
     expect(result.data.creationTarget).toBe("bottle_and_release");
     expect(result.data.proposedBottle).toEqual(baseProposedBottle);
     expect(result.data.proposedRelease).toEqual(baseProposedRelease);
+  });
+});
+
+describe("StorePriceMatchQueueItemSchema", () => {
+  test("exposes target identities without retained current or suggested ids", () => {
+    expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
+      "currentTarget",
+    );
+    expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
+      "suggestedTarget",
+    );
+    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
+      "currentBottle",
+    );
+    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
+      "currentRelease",
+    );
+    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
+      "suggestedBottle",
+    );
+    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
+      "suggestedRelease",
+    );
+
+    for (const field of [
+      "currentBottleId",
+      "currentReleaseId",
+      "currentTargetId",
+      "suggestedBottleId",
+      "suggestedReleaseId",
+      "suggestedTargetId",
+    ]) {
+      expect(StorePriceMatchProposalSchema.shape).not.toHaveProperty(field);
+    }
+    expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty("parentBottle");
+    expect(StorePriceMatchProposalSchema.shape).toHaveProperty(
+      "parentBottleId",
+    );
   });
 });
