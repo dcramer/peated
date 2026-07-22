@@ -313,8 +313,10 @@ async function handleRpcRequest({ request, response, url }) {
         }
 
         appliedQueueProposalTokens.add(token);
+        const bottle = buildReleaseOnlyQueueBottle();
         sendRpcResponse(response, {
-          bottle: buildReleaseOnlyQueueBottle(),
+          targetId: buildExactCatalogTarget({ bottle }).targetId,
+          bottle,
           release: null,
         });
         return true;
@@ -337,8 +339,10 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
+      const bottle = buildBottleForId(createdBottleId);
       sendRpcResponse(response, {
-        bottle: buildBottleForId(createdBottleId),
+        targetId: buildExactCatalogTarget({ bottle }).targetId,
+        bottle,
         release: null,
       });
       return true;
@@ -856,6 +860,22 @@ async function handleRpcRequest({ request, response, url }) {
         response,
         mutateCollectionBottle(request, input, "create"),
       );
+      return true;
+    case "bottles/imageUpdate":
+      if (
+        input?.bottle !== createdBottleId ||
+        input.__mockHasUploadFile !== true
+      ) {
+        sendRpcError(response, "Unexpected Bottle image update payload");
+        return true;
+      }
+      if (getAccessToken(request).includes("bottle-image-upload-failure")) {
+        sendRpcError(response, "Could not upload Bottle image.");
+        return true;
+      }
+      sendRpcResponse(response, {
+        imageUrl: "http://127.0.0.1:4999/uploads/created-bottle.webp",
+      });
       return true;
     case "pendingUploads/create":
       sendRpcResponse(response, createPendingUpload(request, input));

@@ -2191,7 +2191,8 @@ describe("price match queue", () => {
     const userActor = await getUserActor(user);
 
     expect(result.bottle.fullName).toBe("Queue Brand Single Cask");
-    expect(result.release).toBeNull();
+    expect(result).toMatchObject({ release: null });
+    expect(result.targetId).toBe(exactTarget?.id);
     expect(createdBottle?.groupId).not.toBeNull();
     expect(exactTarget).toMatchObject({
       bottleId: result.bottle.id,
@@ -2300,7 +2301,8 @@ describe("price match queue", () => {
       where: eq(storePrices.id, price.id),
     });
 
-    expect(result.release).toBeNull();
+    expect(result).toMatchObject({ release: null });
+    expect(result.targetId).toBe(createdTarget?.id);
     expect(createdBottle).toMatchObject({
       edition: "Batch 7",
       releaseYear: 2024,
@@ -2509,7 +2511,8 @@ describe("price match queue", () => {
       .select({ id: bottleReleases.id })
       .from(bottleReleases);
 
-    expect(result.release).toBeNull();
+    expect(result).toMatchObject({ release: null });
+    expect(result.targetId).toBe(exactTarget?.id);
     expect(createdBottle).toMatchObject({
       groupId: sourceBottle.groupId,
       edition: "Batch 4",
@@ -2583,7 +2586,7 @@ describe("price match queue", () => {
           where: eq(bottles.id, result.bottle.id),
         }),
         db.query.catalogTargets.findFirst({
-          where: eq(catalogTargets.bottleId, result.bottle.id),
+          where: eq(catalogTargets.id, result.targetId),
         }),
         db.query.storePriceMatchProposals.findFirst({
           where: eq(storePriceMatchProposals.id, proposal.id),
@@ -2603,7 +2606,17 @@ describe("price match queue", () => {
       .select({ id: bottleReleases.id })
       .from(bottleReleases);
 
-    expect(result.release).toBeNull();
+    expect(result).toMatchObject({
+      targetId: exactTarget?.id,
+      bottle: {
+        id: createdBottle.id,
+        edition: "Batch 12",
+        statedAge: 12,
+        abv: 51.2,
+        releaseYear: 2026,
+      },
+      release: null,
+    });
     expect(createdBottle).toMatchObject({
       edition: "Batch 12",
       statedAge: 12,

@@ -901,7 +901,9 @@ Classifier decisions and price matching:
   proposals are not retargeted. Historical
   release-create enum values remain for untouched classifier/caller records and
   require no migration. The route accepts canonical `independentBottle` input
-  and preserves `{ bottle, release }` output with `release: null`; post-commit
+  and adds the canonical approval result's exact `targetId` to the retained
+  `{ bottle, release }` output with `release: null`. Section 8 callers consume
+  `targetId` and the independently complete Bottle directly; post-commit
   concrete and alias finalizers remain the only finalizers. Every authorized
   schema-valid legacy call reaching the compatibility branch emits structured
   usage with caller, operation, payload discriminator, and handler outcome;

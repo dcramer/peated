@@ -208,10 +208,29 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 
 #### Scenario: Preserve the create-new compatibility response
 
+- **WHEN** a supported caller approves canonical `independentBottle` input
+- **THEN** the route returns the canonical approval result's exact `targetId`
+  and independently complete concrete Bottle
+- **AND** the caller can continue with that target and Bottle without deriving
+  identity from a BottleRelease
+- **AND** the retained `release: null` response field remains compatibility-only
+  until task 9.7 removes it
+
 - **WHEN** a retained caller successfully approves a translatable bottle-only,
   release-only, or combined create-new legacy payload
-- **THEN** the route returns the independently complete concrete Bottle and `release: null`
+- **THEN** the route returns the canonical approval result's exact `targetId`
+  alongside the independently complete concrete Bottle and `release: null`
 - **AND** no BottleRelease writer or finalizer runs
+
+#### Scenario: Preserve creation after a continuation failure
+
+- **WHEN** concrete Bottle creation commits and a post-create image upload or
+  Library save fails during a Bottle-resolver return intent
+- **THEN** the system reports that the Bottle was created and the continuation
+  failed
+- **AND** it continues to the created Bottle resolver without reconstructing a
+  BottleRelease pair
+- **AND** it does not retry Bottle creation
 
 #### Scenario: Measure create-new compatibility-route usage
 

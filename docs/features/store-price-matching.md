@@ -316,9 +316,11 @@ Moderators can:
 
 This input creates or safely reuses one independently complete concrete Bottle
 and exact target. The staged compatibility route writes no BottleRelease and
-returns `{ bottle, release: null }` after a successful
-translatable request. A non-null legacy image URL is rejected because image
-creation must use the canonical upload boundary.
+returns the canonical exact `targetId` with `{ bottle, release: null }` after a
+successful request. Current callers continue with `targetId` and `bottle`
+directly; `release` is retained only for compatibility until its removal gate.
+A non-null legacy image URL is rejected because image creation must use the
+canonical upload boundary.
 
 Applying a correction commits its canonical shared/exact Bottle update and
 proposal approval in one database transaction. Canonical update jobs run only

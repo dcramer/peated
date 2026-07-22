@@ -870,8 +870,11 @@ keeps any prior decision immutable, and approval of a previously assigned price
 does not rewrite it. Alias or observation failure rolls back the entire
 group/Bottle/target graph and every approval write. Concrete creation and alias
 finalizers run only after commit; duplicate reuse skips the creation finalizer.
-The compatibility route keeps its `{ bottle, release }` shape but always
-returns `release: null` after a successful translatable request.
+The route adds the canonical approval result's exact `targetId` to its retained
+`{ bottle, release }` response shape and always returns `release: null` after a
+successful request. Section 8 callers use `targetId` plus the independently
+complete Bottle directly, without reconstructing identity from that
+compatibility field.
 
 Every authorized schema-valid legacy call that reaches the retained
 compatibility branch emits structured usage with caller, operation, payload

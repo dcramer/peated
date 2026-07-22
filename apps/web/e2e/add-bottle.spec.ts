@@ -213,13 +213,21 @@ test.describe("create bottle", () => {
   test("adds the created bottle to library from library intent", async ({
     context,
     page,
-  }) => {
-    await signIn(context);
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "ordinary-create-library"),
+    });
 
     await page.goto(
       `/bottles/new?name=${encodeURIComponent(createdBottleName)}&returnAction=library`,
     );
+    const libraryRequestPromise = waitForCollectionBottleCreate(page);
     await submitCreateBottle(page);
+    const libraryInput = getRpcInput(await libraryRequestPromise);
+
+    expect(libraryInput.target).toBe(createdBottleTargetId);
+    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
@@ -232,6 +240,35 @@ test.describe("create bottle", () => {
     ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "In Library" }),
+    ).toBeVisible();
+  });
+
+  test("continues after Library save fails for the created Bottle", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(
+        testInfo,
+        "bottle-create-library-create-failure",
+      ),
+    });
+
+    await page.goto(
+      `/bottles/new?name=${encodeURIComponent(createdBottleName)}&returnAction=library`,
+    );
+    await submitCreateBottle(page);
+
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
+    );
+    await expect(
+      page.getByText(
+        "The bottle was created, but it could not be added to your Library.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
     ).toBeVisible();
   });
 
@@ -258,14 +295,75 @@ test.describe("create bottle", () => {
     await page.getByRole("button", { name: "Create Bottle" }).click();
     const libraryInput = getRpcInput(await libraryRequestPromise);
 
-    expect(libraryInput.bottle).toBe(createdBottleId);
-    expect(libraryInput.release).toBeNull();
+    expect(libraryInput.target).toBe(createdBottleTargetId);
+    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput).not.toHaveProperty("release");
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
     );
     await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: "In Library" }),
+    ).toBeVisible();
+  });
+
+  test("uploads a replacement scan to the created concrete Bottle", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "bottle-image-replacement"),
+    });
+
+    await page.goto(
+      `/bottles/new?name=${encodeURIComponent(createdBottleName)}&brandName=${encodeURIComponent(testBrand.name)}&returnAction=addBottle&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingScanImageUrl)}`,
+    );
+    await expect(page.getByAltText("uploaded image")).toHaveAttribute(
+      "src",
+      pendingScanImageUrl,
+    );
+
+    await page
+      .locator('input[type="file"][name="image"]')
+      .setInputFiles(buildImageFile("replacement-label.png"));
+    const imageUpdateRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/bottles/imageUpdate"),
+    );
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+    await imageUpdateRequestPromise;
+
+    await expect(page).toHaveURL(/\/addBottle\?/);
+    const createdUrl = new URL(page.url());
+    expect(createdUrl.searchParams.get("bottle")).toBe(String(createdBottleId));
+    expect(createdUrl.searchParams.get("intent")).toBe("addBottle");
+    expect(createdUrl.searchParams.get("release")).toBeNull();
+    expect(createdUrl.searchParams.get("pendingImageId")).toBeNull();
+    expect(createdUrl.searchParams.get("pendingImageUrl")).toBeNull();
+  });
+
+  test("keeps image upload failure nonfatal after Bottle creation", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "bottle-image-upload-failure"),
+    });
+
+    await page.goto(
+      `/bottles/new?name=${encodeURIComponent(createdBottleName)}&brandName=${encodeURIComponent(testBrand.name)}&returnAction=addBottle`,
+    );
+    await page
+      .locator('input[type="file"][name="image"]')
+      .setInputFiles(buildImageFile("replacement-label.png"));
+    await page.getByRole("button", { name: "Create Bottle" }).click();
+
+    await expect(page).toHaveURL(
+      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=addBottle$`),
+    );
+    await expect(
+      page.getByText(
+        "There was an error uploading your image, but the bottle was saved.",
+      ),
     ).toBeVisible();
   });
 
@@ -1410,14 +1508,18 @@ async function uploadLabel(page: Page) {
   const fileChooserPromise = page.waitForEvent("filechooser");
   await page.getByRole("button", { name: /Take or upload a photo/ }).click();
   const fileChooser = await fileChooserPromise;
-  await fileChooser.setFiles({
-    name: "label.png",
+  await fileChooser.setFiles(buildImageFile("label.png"));
+}
+
+function buildImageFile(name: string) {
+  return {
+    name,
     mimeType: "image/png",
     buffer: Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
       "base64",
     ),
-  });
+  };
 }
 
 function waitForPhotoIdentificationCreate(page: Page) {

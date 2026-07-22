@@ -26,7 +26,6 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import {
   BottleInputSchema,
   BottleReleaseInputSchema,
-  BottleReleaseSchema,
   BottleSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -75,6 +74,36 @@ function classifyCompatibilityRejection(error: unknown): string {
   return "unexpected_error";
 }
 
+const IndependentInputSchema = z
+  .object({
+    proposal: z.coerce.number(),
+    independentBottle: IndependentConcreteBottleCreateRouteInputSchema,
+  })
+  .strict();
+
+const LegacyInputSchema = z
+  .object({
+    proposal: z.coerce.number(),
+    bottle: BottleInputSchema.optional(),
+    release: BottleReleaseInputSchema.optional(),
+  })
+  .strict()
+  .superRefine((input, ctx) => {
+    if (!input.bottle && !input.release) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["bottle"],
+        message: "Legacy Bottle or Release creation input is required.",
+      });
+    }
+  });
+
+const OutputSchema = z.object({
+  targetId: z.number().int().positive(),
+  bottle: BottleSchema,
+  release: z.null(),
+});
+
 /**
  * Canonical independent approval plus measured translation-only compatibility.
  * Task 9.7 removes the legacy Bottle/Release inputs and response adapter.
@@ -89,44 +118,11 @@ export default procedure
       "Create a new bottle from a store price match proposal and approve the proposal in a single transaction. Requires moderator privileges",
     operationId: "createBottleFromPriceMatchQueueItem",
   })
-  .input(
-    z
-      .object({
-        proposal: z.coerce.number(),
-        independentBottle:
-          IndependentConcreteBottleCreateRouteInputSchema.optional(),
-        bottle: BottleInputSchema.optional(),
-        release: BottleReleaseInputSchema.optional(),
-      })
-      .superRefine((input, ctx) => {
-        const hasLegacyInput = !!(input.bottle || input.release);
-        if (!input.independentBottle && !hasLegacyInput) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["independentBottle"],
-            message: "Independent Bottle or legacy creation input is required.",
-          });
-        }
-        if (input.independentBottle && hasLegacyInput) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["independentBottle"],
-            message:
-              "Independent Bottle input cannot be combined with legacy creation input.",
-          });
-        }
-      }),
-  )
-  .output(
-    z.object({
-      bottle: BottleSchema,
-      // Retain the nullable compatibility output until task 9.7 removes the
-      // legacy route contract. Concrete creation always returns null here.
-      release: BottleReleaseSchema.nullable(),
-    }),
-  )
+  .input(z.union([IndependentInputSchema, LegacyInputSchema]))
+  .output(OutputSchema)
   .handler(async function ({ input, context, errors }) {
-    const payloadShape = input.independentBottle
+    const isIndependent = "independentBottle" in input;
+    const payloadShape = isIndependent
       ? null
       : input.bottle && input.release
         ? "combined"
@@ -135,16 +131,18 @@ export default procedure
           : "release";
 
     try {
+      const actor = await getUserActor(context.user);
       const result = await createBottleFromStorePriceMatchProposal({
         proposalId: input.proposal,
-        concreteInput: input.independentBottle
+        concreteInput: isIndependent
           ? buildIndependentConcreteBottleCreateInput(input.independentBottle)
           : undefined,
-        input: input.bottle,
-        releaseInput: input.release,
+        input: isIndependent ? undefined : input.bottle,
+        releaseInput: isIndependent ? undefined : input.release,
         user: context.user,
-        actor: await getUserActor(context.user),
+        actor,
       });
+
       const bottle = await serialize(
         BottleSerializer,
         result.bottle,
@@ -167,6 +165,7 @@ export default procedure
       }
 
       return {
+        targetId: result.targetId,
         bottle,
         release: null,
       };

@@ -185,27 +185,36 @@ function CreateBottleForm() {
   return (
     <BottleForm
       onSubmit={async ({ image, ...data }) => {
-        const createdBottle = proposalId
-          ? (
-              await proposalBottleCreateMutation.mutateAsync({
-                proposal: Number(proposalId),
-                independentBottle: data,
-              })
-            ).bottle
-          : (await bottleCreateMutation.mutateAsync(data)).bottle;
+        const createdResult = proposalId
+          ? await proposalBottleCreateMutation.mutateAsync({
+              proposal: Number(proposalId),
+              independentBottle: data,
+            })
+          : await bottleCreateMutation.mutateAsync(data);
+        const createdTarget = {
+          targetId: createdResult.targetId,
+          bottle: createdResult.bottle,
+        };
+        const createdBottle = createdTarget.bottle;
         const nextPendingImageId = image === undefined ? pendingImageId : null;
         const nextPendingImageUrl =
           image === undefined ? pendingImageUrl : null;
 
         if (image) {
-          const blob = await toBlob(image);
           try {
+            const blob = await toBlob(image);
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
               file: blob,
             });
           } catch (err) {
-            logError(err);
+            logError(err, {
+              context: "bottle_create_image_upload",
+              extra: {
+                bottleId: createdBottle.id,
+                targetId: createdTarget.targetId,
+              },
+            });
             flash(
               "There was an error uploading your image, but the bottle was saved.",
               "error",
@@ -214,17 +223,29 @@ function CreateBottleForm() {
         }
 
         if (returnAction === "library") {
-          await libraryCreateMutation.mutateAsync({
-            bottle: createdBottle.id,
-            release: null,
-            user: "me",
-            collection: "library",
-            pendingImageId: nextPendingImageId ?? undefined,
-          });
+          try {
+            await libraryCreateMutation.mutateAsync({
+              target: createdTarget.targetId,
+              user: "me",
+              collection: "library",
+              pendingImageId: nextPendingImageId ?? undefined,
+            });
+          } catch (err) {
+            logError(err, {
+              context: "bottle_create_library_add",
+              extra: {
+                bottleId: createdBottle.id,
+                targetId: createdTarget.targetId,
+              },
+            });
+            flash(
+              "The bottle was created, but it could not be added to your Library.",
+              "error",
+            );
+          }
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: null,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
               intent: "library",
@@ -236,7 +257,6 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: null,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
             }),
@@ -245,7 +265,6 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: null,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
               intent: "tasting",
@@ -257,7 +276,6 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
-              releaseId: null,
               intent: "tasting",
             }),
           );

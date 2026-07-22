@@ -255,7 +255,9 @@ Exact Bottle serializers must not require BottleGroup hydration.
   compatibility handler emits structured telemetry with caller, operation,
   payload discriminator, and handler outcome; a success also records replacement
   Bottle and exact target ids without the raw payload. Section 8 UI callers use
-  `independentBottle`; task 9.7 removes the legacy adapter only after observed
+  `independentBottle` and continue from the canonical result `targetId` plus the
+  independently complete Bottle, while `release: null` remains response-only
+  compatibility. Task 9.7 removes the legacy adapter only after observed
   compatibility-handler traffic is zero.
 - Tasks 5.6c-5.6f own direct review, collection, flight, and price mutations;
   task 5.8 owns classifier application, task 5.9 owns the remaining caller and
