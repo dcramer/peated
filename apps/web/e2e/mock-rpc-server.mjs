@@ -15,6 +15,7 @@ import {
   buildFavoriteActivity,
   buildGenericCatalogTarget,
   buildTasting,
+  conflictingPageTargetBottleId,
   createdBottleId,
   createdBottleName,
   createdFlightTargetFixtureId,
@@ -23,6 +24,7 @@ import {
   destinationBottleGroupTarget,
   emptyLibraryStats,
   emptyList,
+  exactReplacementSourceBottleId,
   exactSearchBottle,
   existingBottle,
   existingBottleId,
@@ -36,9 +38,11 @@ import {
   legacyIncompleteReleaseId,
   legacyPromotedBottle,
   legacyPromotedBottleId,
+  missingPageTargetBottleId,
   photoTastingNotes,
   priceChangeList,
   priceSite,
+  retiredParentBottleId,
   splitBottleGroupId,
   splitBottleGroupTarget,
   storePriceList,
@@ -463,7 +467,59 @@ async function handleRpcRequest({ request, response, url }) {
         newRepresentativeBottleId: bottleGroupRepresentative.id,
       });
       return true;
+    case "bottles/pageTarget": {
+      if (input?.bottle === exactReplacementSourceBottleId) {
+        sendRpcResponse(response, {
+          kind: "bottle",
+          bottleId: legacyPromotedBottleId,
+        });
+        return true;
+      }
+
+      if (input?.bottle === retiredParentBottleId) {
+        sendRpcResponse(response, { kind: "group", groupId: bottleGroupId });
+        return true;
+      }
+
+      if (input?.bottle === missingPageTargetBottleId) {
+        sendRpcNotFound(response, "Bottle page target not found.");
+        return true;
+      }
+
+      if (input?.bottle === conflictingPageTargetBottleId) {
+        sendRpcConflict(response, "Bottle page target is ambiguous.");
+        return true;
+      }
+
+      if (typeof input?.bottle !== "number") {
+        sendRpcError(response, "Unexpected Bottle page target payload");
+        return true;
+      }
+
+      sendRpcResponse(response, {
+        kind: "bottle",
+        bottleId: getMockExactTarget(request, input.bottle).bottle.id,
+      });
+      return true;
+    }
     case "bottles/details": {
+      if (
+        input?.bottle === retiredParentBottleId ||
+        input?.bottle === missingPageTargetBottleId ||
+        input?.bottle === conflictingPageTargetBottleId
+      ) {
+        sendRpcNotFound(response, "Bottle not found.");
+        return true;
+      }
+
+      if (input?.bottle === exactReplacementSourceBottleId) {
+        sendRpcResponse(
+          response,
+          withTargetId(withCollectionStatus(request, legacyPromotedBottle)),
+        );
+        return true;
+      }
+
       if (input?.bottle === createdBottleId) {
         const bottle = buildCreatedBottle({
           includeExactBottleDetails: isExactBottlePhotoScenario(request),

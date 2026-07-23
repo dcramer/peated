@@ -86,6 +86,14 @@ The Drizzle owners are:
 - `apps/server/src/db/schema/stores.ts`
 - `apps/server/src/db/schema/tastings.ts`
 
+`apps/server/src/db/schema/bottles.ts` also owns the Bottle retirement mapping.
+`bottle_tombstone.new_bottle_id` and `new_bottle_group_id` are nullable and
+mutually exclusive. Exact merges use the Bottle destination, future task 9.8
+parent retirement uses the group destination, and the retained ungrouped legacy
+purge may use neither. The group destination is indexed and references an active
+BottleGroup; every group-deletion transaction repoints its predecessors before
+removing that group.
+
 ## Runtime schemas and exported types
 
 - `apps/server/src/schemas/bottleReleases.ts`
@@ -364,6 +372,12 @@ Bottle catalog routes:
   Bottles are rejected without mutation with an actionable merge-required
   result; their retirement requires an explicit destination through
   `mergeConcreteBottles`. Task 9.7 removes this compatibility branch.
+- `apps/server/src/orpc/routes/bottles/page-target.ts` is the anonymous Bottle
+  page identity boundary. It returns a discriminated exact Bottle or generic
+  BottleGroup destination, resolves an active migrated parent through the
+  measured parent-cardinality rule, follows either Bottle tombstone destination,
+  and fails closed on missing, destination-free, retired, or inconsistent
+  replacement graphs. It never selects a representative Bottle.
 - `apps/server/src/orpc/routes/bottles/update.ts` is the task 5.3a thin
   moderator adapter. It accepts only strict shared/exact patches, delegates all
   writes to `updateConcreteBottle`, and returns the validated exact target.
@@ -638,7 +652,9 @@ Catalog identity, aliases, search, creation, and updates:
 - Task 4.7 adds `apps/server/src/lib/mergeBottleGroups.ts` as the authoritative
   one-source-to-one-destination moderator group-merge service. It owns member
   rematerialization, generic consumer and stable-alias consolidation, tombstone
-  retirement, reversible audits, and shared group aggregate recomputation.
+  retirement, reversible audits, and shared group aggregate recomputation. It
+  also flattens every Bottle tombstone whose generic destination names the
+  retiring source group and includes those preimages in the source-group audit.
 - Task 4.9 adds `apps/server/src/lib/mergeConcreteBottles.ts` as the sole
   exact-duplicate merge and grouped exact-Bottle retirement owner. Every
   retirement requires an explicit surviving Bottle. The service owns exact
@@ -646,7 +662,10 @@ Catalog identity, aliases, search, creation, and updates:
   representative replacement, and singleton group retirement; it never infers
   a representative, sibling, or generic destination. The moderator Bottle merge
   route invokes it synchronously; entity merge composes its transaction entry
-  point and defers finalization until the entity transaction commits.
+  point and defers finalization until the entity transaction commits. An exact
+  retirement continues to write only an exact Bottle tombstone destination; if
+  the operation also retires a singleton source group, it separately flattens
+  parent tombstones naming that group.
 - Task 4.11a adds `aggregateCatalogTargetStatsInTransaction` in
   `apps/server/src/lib/recomputeCatalogTargetStats.ts` as the sole owner of
   raw-target tasting SQL and rating math.
@@ -699,6 +718,10 @@ Catalog identity, aliases, search, creation, and updates:
   `resolveLegacyCatalogTargetFilterForRead` is the measured Bottle/Release list
   input adapter used by the partial tasting and Review cutover; task 9.7 removes
   it after callers carry target identity directly.
+  `resolveBottlePageTarget` is the page-specific projection: active exact
+  Bottles and exact-merge tombstones remain exact, while an active migrated
+  parent or parent tombstone resolves to the generic group without
+  representative substitution.
   Task 5.6c uses this boundary once for direct Review exact or generic intent,
   then revalidates and locks that descriptor before locking and mutating the
   Review. Review update accepts the mutation only when its subsequently locked
@@ -1200,6 +1223,12 @@ Routes:
   exact Bottle header primary and adds quiet links to the related-release group
   when it has multiple members and to the independent “Add another release”
   workflow.
+- `apps/web/src/app/(default)/bottles/[bottleId]/layout.tsx` and its nested
+  layouts use the React-cached `apps/web/src/lib/bottlePage.server.ts` owner.
+  That owner first loads Bottle details, preserving the existing exact-tombstone
+  redirect. Only a typed not-found response calls the anonymous page-target
+  route to distinguish a migrated parent from a missing Bottle, and a generic
+  result permanently redirects to `/bottle-groups/:groupId`.
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/page.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx`
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
@@ -1224,11 +1253,13 @@ task 8.9. The nested new and edit URLs are permanent redirect routes: new
 points to the independent "Add another release" workflow, while edit resolves
 the retained release mapping and points to the promoted concrete Bottle editor.
 
-The canonical BottleGroup page now exists. Task 7.9 remains deferred until a
-durable retired-parent-to-group mapping and redirect are implemented and
-validated. That redirect must preserve generic group identity and must never
-substitute the representative or another member Bottle. This review slice makes
-no production deployment, activation, audit, or backfill claim.
+Task 7.9 establishes the durable retired-parent-to-group mapping and redirect
+owner without retiring a parent row. Active migrated parents and future task 9.8
+parent tombstones resolve to the same generic BottleGroup, while exact merge
+tombstones continue to resolve to their explicit surviving Bottle. Group merges
+atomically flatten parent tombstone destinations before source-group deletion.
+With this boundary active, task 8.9 removes the remaining nested list UI rather
+than retaining a second BottleRelease reader.
 
 Task 8.3 replaces the nested new-bottling route with a prefilled standard
 Bottle-create flow. The selected Bottle supplies independently durable draft

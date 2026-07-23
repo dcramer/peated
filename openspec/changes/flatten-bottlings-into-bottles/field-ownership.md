@@ -30,12 +30,23 @@ Exact Bottle serializers must not require BottleGroup hydration.
 ## Invariants
 
 - Every Bottle has exactly one `groupId` and one exact CatalogTarget.
+- During staged migration, the one explicit exception is a legacy parent with
+  releases: it retains `groupId` for generic compatibility but has no invented
+  exact target. Its active page identity is the group, and task 9.8 later
+  preserves that same generic destination in its Bottle tombstone before
+  removing the parent.
 - Every active BottleGroup has exactly one generic CatalogTarget and at least
   one active Bottle. A merged source is not retained as an empty group: its
   generic target and group rows are removed after references move, while its
   retired id remains in the group tombstone.
 - Activity stores only `targetId`. A generic target never resolves to the
   representative Bottle as a substitute exact identity.
+- A Bottle tombstone has nullable, mutually exclusive `newBottleId` and
+  `newGroupId` destinations. Exact merges populate only `newBottleId`; legacy
+  parent retirement populates only `newGroupId`; the measured ungrouped legacy
+  purge may leave both null. Group retirement repoints every `newGroupId`
+  predecessor to the selected destination in the same transaction, so parent
+  redirects remain one hop.
 - Every ordinary/manual/public Bottle creation creates a singleton group,
   including a prefilled “add another release” flow. A source Bottle supplies
   draft values only and never group authority. Trusted group reuse is internal
@@ -386,6 +397,10 @@ Exact Bottle serializers must not require BottleGroup hydration.
   collection rows win with blank-image fill from the source, flight duplicates
   collapse, and tasting, Bottle identity, alias, or SMWS ambiguity rolls back
   the transaction.
+- Before removing the source group, both the explicit group merge and the
+  singleton cross-group exact merge lock, audit, and repoint Bottle tombstones
+  whose generic destination is that source. They do not rewrite exact-Bottle
+  tombstone destinations.
 - A merge writes BottleGroup before/after snapshots plus one Bottle update audit
   per moved member with reversible source/destination and alias context. An
   identical retry to the tombstoned destination is unchanged; another
@@ -553,7 +568,10 @@ matching Bottle while ignoring other matches.
 
 For a parent with releases, `parent.groupId` is only the durable staging link
 used by migration and measured compatibility. It does not make the legacy
-parent a promoted exact Bottle and does not authorize manual group reuse.
+parent a promoted exact Bottle and does not authorize manual group reuse. The
+anonymous page-target read resolves that active parent to its generic group;
+after task 9.8 retires the row, the mutually exclusive group destination on its
+Bottle tombstone preserves the same result without selecting a representative.
 
 ## Versioned runtime contracts
 

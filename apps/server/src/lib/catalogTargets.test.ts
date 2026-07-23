@@ -459,10 +459,12 @@ describe("legacy catalog target resolution", () => {
       {
         bottleId: Math.min(promotedSource.id, intermediate.id),
         newBottleId: destination.id,
+        newGroupId: null,
       },
       {
         bottleId: Math.max(promotedSource.id, intermediate.id),
         newBottleId: destination.id,
+        newGroupId: null,
       },
     ]);
     expect(

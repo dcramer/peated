@@ -1069,11 +1069,36 @@ The system SHALL compare legacy and target-based resolution during a parity peri
 
 Compatibility routes SHALL return replacement target information or redirect mappings and SHALL NOT choose a member Bottle when a legacy reference was generic.
 
+#### Scenario: Store one Bottle retirement destination
+
+- **WHEN** the system records a Bottle tombstone
+- **THEN** its nullable exact-Bottle and generic-group destinations are mutually
+  exclusive
+- **AND** the measured ungrouped legacy purge may retain neither destination
+- **AND** a canonical exact merge or legacy parent retirement records its one
+  explicit destination
+
 #### Scenario: Resolve a retired generic parent
 
-- **WHEN** an old parent URL or API reference maps to a BottleGroup target
+- **WHEN** an old parent URL or API reference maps to a BottleGroup through its
+  active migration `groupId` or its future Bottle tombstone group destination
 - **THEN** the system returns or redirects to the group identity
 - **AND** it does not substitute the representative Bottle as the target
+
+#### Scenario: Preserve exact Bottle retirement
+
+- **WHEN** an exact Bottle merge tombstone identifies its selected surviving
+  Bottle
+- **THEN** the page target remains that exact Bottle
+- **AND** the system does not reinterpret the merge as generic group identity
+
+#### Scenario: Flatten a retired parent destination
+
+- **WHEN** a group merge retires a group named by one or more Bottle tombstone
+  group destinations
+- **THEN** the merge atomically repoints those destinations to its selected
+  destination group before removing the source group
+- **AND** subsequent parent resolution remains a one-hop generic group mapping
 
 #### Scenario: Resolve a merged source group
 

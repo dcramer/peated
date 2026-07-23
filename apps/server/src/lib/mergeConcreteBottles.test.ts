@@ -728,8 +728,16 @@ describe("exact concrete Bottle merges", () => {
         .where(inArray(bottleTombstones.bottleId, [predecessorId, source.id]))
         .orderBy(asc(bottleTombstones.bottleId)),
     ).toEqual([
-      { bottleId: source.id, newBottleId: destination.id },
-      { bottleId: predecessorId, newBottleId: destination.id },
+      {
+        bottleId: source.id,
+        newBottleId: destination.id,
+        newGroupId: null,
+      },
+      {
+        bottleId: predecessorId,
+        newBottleId: destination.id,
+        newGroupId: null,
+      },
     ]);
     expect(
       await db.query.bottleGroups.findFirst({
@@ -1393,6 +1401,11 @@ describe("exact concrete Bottle merges", () => {
       targetId: sourceGenericTargetId,
       assignedByActorId: source.createdByActorId,
     });
+    const retiredParentId = 9_000_004;
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredParentId,
+      newGroupId: sourceGroup.first.group.id,
+    });
     const collection = await fixtures.Collection({ totalBottles: 2 });
     const flight = await fixtures.Flight();
     await db.insert(collectionBottles).values([
@@ -1431,6 +1444,41 @@ describe("exact concrete Bottle merges", () => {
       }),
     ).toMatchObject({ newGroupId: destinationGroup.first.group.id });
     expect(
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, retiredParentId),
+      }),
+    ).toEqual({
+      bottleId: retiredParentId,
+      newBottleId: null,
+      newGroupId: destinationGroup.first.group.id,
+    });
+    expect(
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, source.id),
+      }),
+    ).toEqual({
+      bottleId: source.id,
+      newBottleId: destination.id,
+      newGroupId: null,
+    });
+    const [sourceGroupAudit] = await db
+      .select()
+      .from(changes)
+      .where(
+        and(
+          eq(changes.objectType, "bottle_group"),
+          eq(changes.objectId, sourceGroup.first.group.id),
+          eq(changes.type, "delete"),
+        ),
+      );
+    expect(sourceGroupAudit.data.predecessorBottleTombstonesBefore).toEqual([
+      {
+        bottleId: retiredParentId,
+        newBottleId: null,
+        newGroupId: sourceGroup.first.group.id,
+      },
+    ]);
+    expect(
       await db.query.tastings.findFirst({
         where: eq(tastings.id, genericTasting.id),
       }),
@@ -1466,6 +1514,18 @@ describe("exact concrete Bottle merges", () => {
     ).toEqual([
       expect.objectContaining({ bottleId: destination.id, targetId: null }),
     ]);
+    await expect(
+      mergeConcreteBottles({
+        sourceBottleId: source.id,
+        destinationBottleId: destination.id,
+        context: contextFor(mod),
+      }),
+    ).resolves.toMatchObject({ changed: false });
+    expect(
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, retiredParentId),
+      }),
+    ).toMatchObject({ newGroupId: destinationGroup.first.group.id });
   });
 
   test("rolls back target collisions and makes tombstone retries inert", async ({

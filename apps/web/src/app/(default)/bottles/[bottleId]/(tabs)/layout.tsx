@@ -1,6 +1,5 @@
+import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 import BottleFullHeader from "../bottleFullHeader";
 import BottleTabs from "../bottleTabs";
@@ -12,13 +11,7 @@ export async function generateMetadata(props: {
 
   const { bottleId } = params;
 
-  const { client } = await getAnonymousServerClient();
-
-  const bottle = await resolveOrNotFound(
-    client.bottles.details({
-      bottle: Number(bottleId),
-    }),
-  );
+  const bottle = await getBottlePage(Number(bottleId));
 
   const description = summarize(bottle.description || "", 200);
   const images = bottle.imageUrl ? [bottle.imageUrl] : [];
@@ -47,12 +40,8 @@ export default async function Layout(props: {
 
   const { children } = props;
 
-  const { client } = await getAnonymousServerClient();
-
   const bottleId = Number(params.bottleId);
-  const bottle = await resolveOrNotFound(
-    client.bottles.details({ bottle: bottleId }),
-  );
+  const bottle = await getBottlePage(bottleId);
 
   return (
     <>

@@ -346,6 +346,16 @@ are the complete active exact members. This staged legacy meaning is private to
 migration and compatibility code and does not make a parent or group id manual
 creation authority.
 
+`bottle_tombstone` preserves the destination after a Bottle row is removed. Its
+nullable `newBottleId` and `newGroupId` are mutually exclusive: an exact-Bottle
+merge records only the selected surviving Bottle, while task 9.8 records only
+the legacy parent's staged group when it eventually retires that parent. The
+temporary ungrouped compatibility purge may retain a tombstone with both
+destinations null; that history is not a destination-free canonical retirement
+operation. Any operation that retires a BottleGroup first repoints parent
+tombstones naming the source group to the selected destination group, keeping
+the redirect graph one hop.
+
 Each release promotion uses this precedence:
 
 - group identity and every durable common Bottle value come from the legacy
@@ -688,7 +698,20 @@ inventing a legacy id. New writes create only BottleGroup/Bottle/target records.
 The compatibility layer records usage so removal is gated on zero legacy write
 traffic and an agreed read deprecation window.
 
-Nested `/bottles/:oldParentId/bottlings/:releaseId` URLs permanently redirect to the promoted Bottle. A retired parent Bottle URL redirects to the BottleGroup page. APIs return explicit replacement identifiers rather than silently choosing a member Bottle for a generic target.
+Nested `/bottles/:oldParentId/bottlings/:releaseId` URLs permanently redirect to
+the promoted Bottle. The anonymous Bottle page-target route resolves an active
+migrated parent with releases through its generic target and resolves a future
+retired parent through `bottle_tombstone.newGroupId`; both return the
+BottleGroup, never its representative. Exact Bottles and exact-merge tombstones
+continue to return exact Bottle destinations. The cached web Bottle-page owner
+first loads the normal Bottle details path. An exact-merge tombstone still
+redirects from that response; only a typed not-found result invokes the
+page-target route to distinguish a generic parent from a missing Bottle.
+Generic results permanently redirect to `/bottle-groups/:groupId`. Task 9.8
+owns creation of parent-retirement tombstones, while task 8.9 may remove the
+nested list UI after this redirect boundary is active. APIs return explicit
+replacement identifiers rather than silently choosing a member Bottle for
+generic intent.
 
 Task 5.4 is split by mutation lifecycle. Task 5.4a retains the legacy
 BottleRelease create input, authentication, and terms-acceptance requirements,

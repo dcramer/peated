@@ -573,6 +573,12 @@ async function mergeBottleGroupsInTransaction(
     .where(eq(bottleGroupTombstones.newGroupId, sourceGroupId))
     .orderBy(asc(bottleGroupTombstones.groupId))
     .for("update");
+  const predecessorBottleTombstonesBefore = await tx
+    .select()
+    .from(bottleTombstones)
+    .where(eq(bottleTombstones.newGroupId, sourceGroupId))
+    .orderBy(asc(bottleTombstones.bottleId))
+    .for("update");
 
   await tx.insert(changes).values({
     objectType: "bottle_group",
@@ -593,9 +599,14 @@ async function mergeBottleGroupsInTransaction(
       stableAliasesBefore: stableAliases,
       genericConsumerPreimages,
       predecessorTombstonesBefore,
+      predecessorBottleTombstonesBefore,
     },
   });
 
+  await tx
+    .update(bottleTombstones)
+    .set({ newGroupId: destinationGroupId })
+    .where(eq(bottleTombstones.newGroupId, sourceGroupId));
   await tx
     .update(bottleGroupTombstones)
     .set({ newGroupId: destinationGroupId })

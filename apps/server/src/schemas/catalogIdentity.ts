@@ -117,6 +117,21 @@ export const CatalogTargetV1Schema = z.discriminatedUnion("kind", [
   ExactCatalogTargetV1Schema,
 ]);
 
+export const BottlePageTargetSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("bottle"),
+      bottleId: z.number().int().positive(),
+    })
+    .strict(),
+  z
+    .object({
+      kind: z.literal("group"),
+      groupId: z.number().int().positive(),
+    })
+    .strict(),
+]);
+
 export type BottleGroupV1 = z.infer<typeof BottleGroupV1Schema>;
 export type ConcreteBottleV1 = z.infer<typeof ConcreteBottleV1Schema>;
 export type GenericCatalogTargetV1 = z.infer<
@@ -124,3 +139,4 @@ export type GenericCatalogTargetV1 = z.infer<
 >;
 export type ExactCatalogTargetV1 = z.infer<typeof ExactCatalogTargetV1Schema>;
 export type CatalogTargetV1 = z.infer<typeof CatalogTargetV1Schema>;
+export type BottlePageTarget = z.infer<typeof BottlePageTargetSchema>;

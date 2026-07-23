@@ -14,7 +14,10 @@ import {
 } from "@peated/server/db/schema";
 import { readExactBottleMergePromotionHistory } from "@peated/server/lib/exactBottleMergePromotionMetadata";
 import { logInfo } from "@peated/server/lib/log";
-import type { CatalogTargetV1 } from "@peated/server/schemas/catalogIdentity";
+import type {
+  BottlePageTarget,
+  CatalogTargetV1,
+} from "@peated/server/schemas/catalogIdentity";
 import { serialize } from "@peated/server/serializers";
 import {
   assertCatalogIdentityReadContext,
@@ -573,14 +576,19 @@ function assertGroupNotRetired(
 
 function assertBottleNotRetired(
   bottleId: number,
-  bottleTombstone?: { newBottleId: number | null },
+  bottleTombstone?: {
+    newBottleId: number | null;
+    newGroupId: number | null;
+  },
 ): void {
   if (bottleTombstone) {
     throw new CatalogTargetRetiredError(
       { bottleId },
-      bottleTombstone.newBottleId === null
-        ? null
-        : { kind: "bottle", bottleId: bottleTombstone.newBottleId },
+      bottleTombstone.newBottleId !== null
+        ? { kind: "bottle", bottleId: bottleTombstone.newBottleId }
+        : bottleTombstone.newGroupId !== null
+          ? { kind: "group", groupId: bottleTombstone.newGroupId }
+          : null,
     );
   }
 }
@@ -1147,6 +1155,109 @@ export async function loadCatalogTargetByGroupId(
     await findTargetByGroupId(groupId, database),
     context,
   );
+}
+
+function projectBottlePageTarget(
+  target: Pick<CatalogTargetAssignmentDescriptor, "groupId" | "bottleId">,
+): BottlePageTarget {
+  return target.bottleId === null
+    ? { kind: "group", groupId: target.groupId }
+    : { kind: "bottle", bottleId: target.bottleId };
+}
+
+async function resolveBottlePageReplacement(
+  bottleId: number,
+  replacement: RetiredCatalogTargetReplacement | null,
+  database: AnyDatabase,
+): Promise<BottlePageTarget> {
+  if (!replacement) {
+    throw new CatalogTargetRetiredError({ bottleId }, null);
+  }
+
+  try {
+    const target =
+      replacement.kind === "bottle"
+        ? await findAssignmentTargetByBottleId(replacement.bottleId, database)
+        : await findAssignmentTargetByGroupId(replacement.groupId, database);
+    return projectBottlePageTarget(target);
+  } catch (error) {
+    if (error instanceof CatalogTargetResolutionError) {
+      throw new CatalogTargetIntegrityMismatchError(
+        { bottleId },
+        `the retired Bottle replacement is invalid: ${error.message}`,
+      );
+    }
+    throw error;
+  }
+}
+
+function recordLegacyBottlePageTargetUsage(
+  bottleId: number,
+  target: BottlePageTarget,
+  context: CatalogTargetOperationContext,
+): void {
+  if (target.kind === "group") {
+    recordLegacyCatalogTargetUsage(
+      { bottleId, releaseId: null },
+      context,
+      "read",
+    );
+  }
+}
+
+/** Resolves one Bottle page id without substituting a group representative. */
+export async function resolveBottlePageTarget(
+  bottleId: number,
+  context: CatalogTargetOperationContext,
+  database: AnyDatabase = db,
+): Promise<BottlePageTarget> {
+  try {
+    await findAssignmentTargetByBottleId(bottleId, database);
+    return { kind: "bottle", bottleId };
+  } catch (error) {
+    if (error instanceof CatalogTargetRetiredError) {
+      if (
+        !("bottleId" in error.identity) ||
+        error.identity.bottleId !== bottleId
+      ) {
+        throw error;
+      }
+
+      const target = await resolveBottlePageReplacement(
+        bottleId,
+        error.replacement,
+        database,
+      );
+      recordLegacyBottlePageTargetUsage(bottleId, target, context);
+      return target;
+    }
+    if (!(error instanceof CatalogTargetNotFoundError)) throw error;
+  }
+
+  try {
+    const reference = { bottleId, releaseId: null };
+    const target = await findAssignmentLegacyTarget(
+      reference,
+      context,
+      database,
+      "read",
+      false,
+    );
+    const pageTarget = projectBottlePageTarget(target);
+    recordLegacyBottlePageTargetUsage(bottleId, pageTarget, context);
+    return pageTarget;
+  } catch (error) {
+    if (error instanceof CatalogTargetRetiredError) {
+      const target = await resolveBottlePageReplacement(
+        bottleId,
+        error.replacement,
+        database,
+      );
+      recordLegacyBottlePageTargetUsage(bottleId, target, context);
+      return target;
+    }
+    throw error;
+  }
 }
 
 /** Resolve a measured legacy pair using promotion and parent-cardinality rules. */

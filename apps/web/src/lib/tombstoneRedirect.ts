@@ -6,21 +6,33 @@ type CanonicalRouteRedirectOptions = {
   currentId: number | string;
 };
 
-async function getRequestedPathname() {
-  // Next forwards the rendered request path to app routes via x-invoke-path.
-  const reqHeaders = await headers();
-  const pathname =
-    reqHeaders.get("x-invoke-path") ?? reqHeaders.get("next-url");
+type RequestedRoute = {
+  pathname: string;
+  search: string;
+};
 
-  if (!pathname) {
-    return null;
-  }
-
+function parseRequestedRoute(value: string): RequestedRoute {
   try {
-    return new URL(pathname, "http://n").pathname;
-  } catch {
+    if (!value.startsWith("/") || value.startsWith("//")) {
+      throw new Error("Request path must be relative to the Peated origin");
+    }
+
+    const url = new URL(value, "http://n");
+    return { pathname: url.pathname, search: url.search };
+  } catch (error) {
+    throw new Error("Invalid proxy-owned request path", { cause: error });
+  }
+}
+
+async function getRequestedRoute() {
+  const reqHeaders = await headers();
+  const requestPath = reqHeaders.get("x-peated-request-path");
+
+  if (!requestPath) {
     return null;
   }
+
+  return parseRequestedRoute(requestPath);
 }
 
 export async function getCanonicalRouteRedirectPath({
@@ -30,19 +42,27 @@ export async function getCanonicalRouteRedirectPath({
 }: CanonicalRouteRedirectOptions) {
   const currentPrefix = `${collectionPath}/${currentId}`;
   const canonicalPrefix = `${collectionPath}/${canonicalId}`;
-  const requestedPathname = await getRequestedPathname();
+  const requestedRoute = await getRequestedRoute();
 
-  if (!requestedPathname) {
+  if (!requestedRoute) {
     return `${canonicalPrefix}/`;
   }
 
+  const { pathname: requestedPathname, search } = requestedRoute;
   const suffix = requestedPathname.slice(currentPrefix.length);
   if (
     !requestedPathname.startsWith(currentPrefix) ||
     (suffix && !suffix.startsWith("/"))
   ) {
-    return `${canonicalPrefix}/`;
+    return `${canonicalPrefix}/${search}`;
   }
 
-  return `${canonicalPrefix}${suffix || "/"}`;
+  return `${canonicalPrefix}${suffix || "/"}${search}`;
+}
+
+export async function getBottleGroupRouteRedirectPath(
+  groupId: number | string,
+) {
+  const requestedRoute = await getRequestedRoute();
+  return `/bottle-groups/${groupId}${requestedRoute?.search ?? ""}`;
 }

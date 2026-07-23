@@ -833,10 +833,24 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
 export type BottleAlias = typeof bottleAliases.$inferSelect;
 export type NewBottleAlias = typeof bottleAliases.$inferInsert;
 
-export const bottleTombstones = pgTable("bottle_tombstone", {
-  bottleId: bigint("bottle_id", { mode: "number" }).primaryKey(),
-  newBottleId: bigint("new_bottle_id", { mode: "number" }),
-});
+export const bottleTombstones = pgTable(
+  "bottle_tombstone",
+  {
+    bottleId: bigint("bottle_id", { mode: "number" }).primaryKey(),
+    // A deletion has no successor; otherwise Bottle and group destinations are exclusive.
+    newBottleId: bigint("new_bottle_id", { mode: "number" }),
+    newGroupId: bigint("new_bottle_group_id", { mode: "number" }).references(
+      () => bottleGroups.id,
+    ),
+  },
+  (table) => [
+    index("bottle_tombstone_new_group_idx").on(table.newGroupId),
+    check(
+      "bottle_tombstone_destination_check",
+      sql`NOT (${table.newBottleId} IS NOT NULL AND ${table.newGroupId} IS NOT NULL)`,
+    ),
+  ],
+);
 
 export const bottleTombstonesRelations = relations(
   bottleTombstones,
@@ -848,6 +862,10 @@ export const bottleTombstonesRelations = relations(
     newBottle: one(bottles, {
       fields: [bottleTombstones.newBottleId],
       references: [bottles.id],
+    }),
+    newGroup: one(bottleGroups, {
+      fields: [bottleTombstones.newGroupId],
+      references: [bottleGroups.id],
     }),
   }),
 );

@@ -6,6 +6,7 @@ import {
   bottleGroups,
   bottleObservations,
   bottleSeries,
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   catalogTargets,
@@ -133,6 +134,23 @@ describe("BottleGroup merges", () => {
         }),
       ),
     ).toMatchObject({ code: "not_found", groupId: 999_998 });
+  });
+
+  test("allows at most one Bottle tombstone destination", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+
+    await expect(
+      db.insert(bottleTombstones).values({
+        bottleId: 9_000_001,
+        newBottleId: bottle.id,
+        newGroupId: bottle.groupId,
+      }),
+    ).rejects.toBeDefined();
+    await expect(
+      db.insert(bottleTombstones).values({ bottleId: 9_000_002 }),
+    ).resolves.toBeDefined();
   });
 
   test("moves exact members under destination shared identity and writes reversible audits", async ({
@@ -1030,6 +1048,15 @@ describe("BottleGroup merges", () => {
       destinationGroupId: second.first.group.id,
       context: contextFor(mod),
     });
+    const retiredParentId = 9_000_003;
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredParentId,
+      newGroupId: second.first.group.id,
+    });
+    const retiredParentTombstoneBefore =
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, retiredParentId),
+      });
     const [firstTombstoneBefore] = await db
       .select()
       .from(bottleGroupTombstones)
@@ -1057,6 +1084,18 @@ describe("BottleGroup merges", () => {
         createdAt: firstTombstoneBefore.createdAt.toISOString(),
       },
     ]);
+    expect(
+      secondMergeSourceAudit.data.predecessorBottleTombstonesBefore,
+    ).toEqual([retiredParentTombstoneBefore]);
+    expect(
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, retiredParentId),
+      }),
+    ).toEqual({
+      bottleId: retiredParentId,
+      newBottleId: null,
+      newGroupId: third.first.group.id,
+    });
     expect(
       await db
         .select()

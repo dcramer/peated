@@ -4,7 +4,12 @@
  * lifecycle records move from the source.
  */
 import { db, type AnyTransaction } from "@peated/server/db";
-import type { Bottle, BottleGroup, User } from "@peated/server/db/schema";
+import type {
+  Bottle,
+  BottleGroup,
+  BottleTombstone,
+  User,
+} from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottleFlavorProfiles,
@@ -887,6 +892,7 @@ export async function mergeConcreteBottlesInTransaction(
     createdAt: Date;
     createdByActorId: number;
   }> = [];
+  let predecessorBottleTombstonesBefore: BottleTombstone[] = [];
   if (crossGroup && sourceSingleton) {
     // Stable aliases keep generic intent while the legacy Bottle id follows the
     // surviving concrete destination during the dual-write window.
@@ -916,6 +922,12 @@ export async function mergeConcreteBottlesInTransaction(
       .from(bottleGroupTombstones)
       .where(eq(bottleGroupTombstones.newGroupId, sourceGroupId))
       .orderBy(asc(bottleGroupTombstones.groupId))
+      .for("update");
+    predecessorBottleTombstonesBefore = await tx
+      .select()
+      .from(bottleTombstones)
+      .where(eq(bottleTombstones.newGroupId, sourceGroupId))
+      .orderBy(asc(bottleTombstones.bottleId))
       .for("update");
   } else {
     await tx
@@ -1070,6 +1082,10 @@ export async function mergeConcreteBottlesInTransaction(
 
   if (crossGroup && sourceSingleton) {
     await tx
+      .update(bottleTombstones)
+      .set({ newGroupId: destinationGroupId })
+      .where(eq(bottleTombstones.newGroupId, sourceGroupId));
+    await tx
       .update(bottleGroupTombstones)
       .set({ newGroupId: destinationGroupId })
       .where(eq(bottleGroupTombstones.newGroupId, sourceGroupId));
@@ -1191,6 +1207,7 @@ export async function mergeConcreteBottlesInTransaction(
           stableAliasesBefore: stableAliases,
           genericConsumerPreimages,
           predecessorGroupTombstones,
+          predecessorBottleTombstonesBefore,
         },
       });
       continue;
