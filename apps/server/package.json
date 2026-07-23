@@ -19,7 +19,7 @@
     "@faker-js/faker": "^8.4.1",
     "@google-cloud/storage": "^7.19.0",
     "@googlemaps/google-maps-services-js": "^3.4.2",
-    "@hono/node-server": "^1.19.13",
+    "@hono/node-server": "^2.0.10",
     "@logtape/hono": "catalog:",
     "@logtape/logtape": "catalog:",
     "@logtape/redaction": "catalog:",
