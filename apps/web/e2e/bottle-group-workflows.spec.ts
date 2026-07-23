@@ -13,6 +13,7 @@ import {
   bottleGroupMember,
   bottleGroupMemberTargets,
   bottleGroupRepresentative,
+  bottleGroupTarget,
   destinationBottleGroup,
   destinationBottleGroupId,
   groupedBottleDetails,
@@ -94,6 +95,56 @@ test.describe("BottleGroup workflows", () => {
     await expect(
       page.getByRole("link", { name: "3 related releases" }),
     ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}`);
+    await expectNoHorizontalOverflow(page);
+  });
+
+  test("saves the generic release family to Library without substituting a Bottle", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "bottle-group-library"),
+    });
+    await page.goto(`/bottle-groups/${bottleGroupId}`);
+
+    const libraryButton = page.locator(
+      'button[data-collection-action="library"]',
+    );
+    await expect(libraryButton).toHaveAttribute(
+      "title",
+      "Save release family to Library",
+    );
+
+    const requestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/create"),
+    );
+    await libraryButton.click();
+    const createInput = getRpcInput(await requestPromise);
+
+    expect(createInput).toEqual({
+      target: bottleGroupTarget.targetId,
+      user: "me",
+      collection: "library",
+    });
+    await expect(libraryButton).toHaveAttribute("aria-pressed", "true");
+
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+
+    const genericRow = page.locator("tr").filter({
+      hasText: bottleGroup.fullName,
+    });
+    await expect(genericRow).toBeVisible();
+    await expect(
+      genericRow.getByText("Exact bottle not specified", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      genericRow.getByRole("link", { name: bottleGroup.fullName }),
+    ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}`);
+    await expect(
+      genericRow.locator(`a[href="/bottles/${bottleGroupRepresentative.id}"]`),
+    ).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
   });
 

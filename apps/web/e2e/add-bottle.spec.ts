@@ -80,7 +80,7 @@ test.describe("create bottle", () => {
     });
 
     await page.goto(
-      `/bottles/new?name=${encodeURIComponent(createdBottleName)}`,
+      `/bottles/new?name=${encodeURIComponent(createdBottleName)}&groupId=12345&sourceBottleId=67890`,
     );
 
     await expect(
@@ -98,6 +98,8 @@ test.describe("create bottle", () => {
     await expect(page.getByText("Cask Fill", { exact: true })).toBeVisible();
     await expect(page.getByText("Cask Type", { exact: true })).toBeVisible();
     await expect(page.getByText("Cask Size", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Bottle Group")).toHaveCount(0);
+    await expect(page.getByLabel("Source Bottle")).toHaveCount(0);
 
     await page.getByText("e.g. Laphroaig").click();
     await page.getByPlaceholder("Search").fill(testBrand.name);
@@ -130,6 +132,16 @@ test.describe("create bottle", () => {
       caskType: "oloroso",
       caskSize: "hogshead",
     });
+    for (const authorityField of [
+      "group",
+      "groupId",
+      "sourceBottle",
+      "sourceBottleId",
+      "release",
+      "releaseId",
+    ]) {
+      expect(createInput).not.toHaveProperty(authorityField);
+    }
 
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=tasting$`),
@@ -1540,11 +1552,21 @@ function waitForBottleCreate(page: Page) {
   );
 }
 
-function getRpcInput(request: Request) {
+function getRpcInput(request: Request): Record<string, unknown> {
   const postData = request.postData();
-  expect(postData).toBeTruthy();
+  if (!postData) {
+    throw new Error("Expected the RPC request to contain JSON input.");
+  }
 
-  return JSON.parse(postData!).json;
+  const envelope: unknown = JSON.parse(postData);
+  if (!isRecord(envelope) || !isRecord(envelope.json)) {
+    throw new Error("Expected the RPC request to use the JSON envelope.");
+  }
+  return envelope.json;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 async function expectFooterBelowAction(action: Locator, footer: Locator) {

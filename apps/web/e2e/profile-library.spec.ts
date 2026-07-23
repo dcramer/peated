@@ -10,6 +10,8 @@ import { Buffer } from "node:buffer";
 import {
   bottleImageBottleId,
   bottleImageUrl,
+  buildExactCatalogTarget,
+  buildGenericCatalogTarget,
   existingBottle,
   existingReleaseId,
   genericCollectionTargetGroupId,
@@ -102,7 +104,19 @@ test.describe("profile library", () => {
     await expect(libraryButton).toBeEnabled();
     await expect(libraryButton).toHaveAttribute("aria-pressed", "false");
 
+    const createRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/create"),
+    );
     await libraryButton.click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createInput.target).toBe(
+      buildExactCatalogTarget({
+        bottle: { ...existingBottle, id: bottleId },
+      }).targetId,
+    );
+    expect(createInput).not.toHaveProperty("bottle");
+    expect(createInput).not.toHaveProperty("release");
     await expect(libraryButton).toHaveAttribute("aria-pressed", "true");
 
     await page.goto(`/users/${testUser.username}/library`, {
@@ -113,6 +127,9 @@ test.describe("profile library", () => {
     });
     await expect(
       page.getByRole("link", { name: savedBottleName }).first(),
+    ).toHaveAttribute("href", `/bottles/${bottleId}`);
+    await expect(
+      savedBottleRow.getByText("Exact bottle", { exact: true }),
     ).toBeVisible();
     await expect(
       savedBottleRow.getByRole("img", { name: "In Library" }),
@@ -257,7 +274,7 @@ test.describe("profile library", () => {
     await page.getByRole("menuitem", { name: "Remove from Library" }).click();
     const deleteInput = getRpcInput(await deleteRequestPromise);
 
-    expect(deleteInput.target).toBeGreaterThan(0);
+    expect(deleteInput.target).toBe(buildGenericCatalogTarget().targetId);
     expect(deleteInput).not.toHaveProperty("bottle");
     expect(deleteInput).not.toHaveProperty("release");
     await expect(genericRow).toHaveCount(0);
@@ -477,9 +494,19 @@ async function expectNoHorizontalOverflow(page: Page) {
     .toBeLessThanOrEqual(1);
 }
 
-function getRpcInput(request: Request) {
+function getRpcInput(request: Request): Record<string, unknown> {
   const postData = request.postData();
-  expect(postData).toBeTruthy();
+  if (!postData) {
+    throw new Error("Expected the RPC request to contain JSON input.");
+  }
 
-  return JSON.parse(postData!).json;
+  const envelope: unknown = JSON.parse(postData);
+  if (!isRecord(envelope) || !isRecord(envelope.json)) {
+    throw new Error("Expected the RPC request to use the JSON envelope.");
+  }
+  return envelope.json;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

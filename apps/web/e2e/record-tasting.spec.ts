@@ -1,10 +1,11 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Page, type Request, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
   bottleGroupId,
   bottleGroupTarget,
+  buildExactCatalogTarget,
   createdTastingId,
   existingBottle,
   existingReleaseId,
@@ -67,7 +68,15 @@ test.describe("log tasting", () => {
     await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
+    const createRequestPromise = waitForTastingCreate(page);
     await page.getByRole("button", { name: "Save" }).click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createInput.target).toBe(
+      buildExactCatalogTarget({ bottle: existingBottle }).targetId,
+    );
+    expect(createInput).not.toHaveProperty("bottle");
+    expect(createInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
     await expectNoHorizontalOverflow(page);
@@ -102,7 +111,13 @@ test.describe("log tasting", () => {
     ).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(genericTastingNotes);
+    const createRequestPromise = waitForTastingCreate(page);
     await page.getByRole("button", { name: "Save" }).click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createInput.target).toBe(bottleGroupTarget.targetId);
+    expect(createInput).not.toHaveProperty("bottle");
+    expect(createInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(/\/flights\/flight-qa$/);
     await expectNoHorizontalOverflow(page);
@@ -221,4 +236,27 @@ async function uploadLabel(page: Page) {
   }
 
   throw new Error("Photo identification request was not sent.");
+}
+
+function waitForTastingCreate(page: Page) {
+  return page.waitForRequest((request) =>
+    request.url().includes("/rpc/tastings/create"),
+  );
+}
+
+function getRpcInput(request: Request): Record<string, unknown> {
+  const postData = request.postData();
+  if (!postData) {
+    throw new Error("Expected the RPC request to contain JSON input.");
+  }
+
+  const envelope: unknown = JSON.parse(postData);
+  if (!isRecord(envelope) || !isRecord(envelope.json)) {
+    throw new Error("Expected the RPC request to use the JSON envelope.");
+  }
+  return envelope.json;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
