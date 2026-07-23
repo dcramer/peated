@@ -158,6 +158,114 @@ describe("releaseIdentity", () => {
     });
   });
 
+  test("does not duplicate a release year already encoded by the edition", () => {
+    const release = getResolvedReleaseIdentity({
+      bottle: {
+        name: "Annual Selection",
+        fullName: "Example Annual Selection",
+        statedAge: null,
+      },
+      release: {
+        edition: "2022 Edition",
+        statedAge: null,
+        releaseYear: 2022,
+        vintageYear: null,
+        abv: null,
+        singleCask: null,
+        caskStrength: null,
+      },
+    });
+
+    expect(release).toMatchObject({
+      edition: "2022 Edition",
+      releaseYear: 2022,
+    });
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Annual Selection",
+        bottleFullName: "Example Annual Selection",
+        bottleStatedAge: null,
+        release,
+      }),
+    ).toEqual({
+      name: "Annual Selection - 2022 Edition",
+      fullName: "Example Annual Selection - 2022 Edition",
+    });
+  });
+
+  test("matches YEAR Edition case-insensitively for display deduplication", () => {
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Annual Selection",
+        bottleFullName: "Example Annual Selection",
+        bottleStatedAge: null,
+        release: {
+          edition: "2022 EDITION",
+          statedAge: null,
+          releaseYear: 2022,
+          vintageYear: null,
+          abv: null,
+          singleCask: null,
+          caskStrength: null,
+        },
+      }),
+    ).toEqual({
+      name: "Annual Selection - 2022 EDITION",
+      fullName: "Example Annual Selection - 2022 EDITION",
+    });
+  });
+
+  test.each([
+    {
+      edition: "2021 Edition",
+      releaseYear: 2022,
+      expectedEdition: "2021 Edition",
+    },
+    {
+      edition: "Limited Edition",
+      releaseYear: 2022,
+      expectedEdition: "Limited Edition",
+    },
+    {
+      edition: "2022A Edition",
+      releaseYear: 2022,
+      expectedEdition: "2022A Edition",
+    },
+    {
+      edition: "Batch 2022",
+      releaseYear: 2022,
+      expectedEdition: "Batch 2022",
+    },
+    {
+      edition: "2022 Vintage",
+      releaseYear: 2022,
+      expectedEdition: "2022 Vintage",
+    },
+  ])(
+    "keeps release year separate from $edition",
+    ({ edition, releaseYear, expectedEdition }) => {
+      expect(
+        formatCanonicalReleaseName({
+          bottleName: "Annual Selection",
+          bottleFullName: "Example Annual Selection",
+          bottleStatedAge: null,
+          release: {
+            edition,
+            statedAge: null,
+            releaseYear,
+            vintageYear: null,
+            abv: null,
+            singleCask: null,
+            caskStrength: null,
+          },
+        }),
+      ).toEqual({
+        name: `Annual Selection - ${expectedEdition} - ${releaseYear} Release`,
+        fullName: `Example Annual Selection - ${expectedEdition} - ${releaseYear} Release`,
+      });
+    },
+  );
+
   test("does not duplicate inherited stable parent traits in release naming", () => {
     expect(
       formatCanonicalReleaseName({

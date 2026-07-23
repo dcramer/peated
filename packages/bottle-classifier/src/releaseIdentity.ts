@@ -280,6 +280,23 @@ function formatReleaseTraitLabel(
   }
 }
 
+function editionIncludesReleaseYearEditionPhrase({
+  edition,
+  releaseYear,
+}: {
+  edition: string | null;
+  releaseYear: number | null;
+}) {
+  if (!edition || releaseYear === null) {
+    return false;
+  }
+
+  return new RegExp(
+    `(?:^|[^A-Za-z0-9])${releaseYear}\\s+Edition(?:[^A-Za-z0-9]|$)`,
+    "i",
+  ).test(edition);
+}
+
 /**
  * Produces the canonical release identity after accounting for bottle-level
  * stated-age carryover and dirty-parent conflicts.
@@ -341,6 +358,13 @@ export function formatCanonicalReleaseName({
   const fullNameBits = [bottleFullName];
 
   for (const field of RELEASE_IDENTITY_FIELDS) {
+    if (
+      field === "releaseYear" &&
+      editionIncludesReleaseYearEditionPhrase(resolvedRelease)
+    ) {
+      continue;
+    }
+
     if (
       field === "statedAge" &&
       resolvedRelease.statedAge !== null &&
