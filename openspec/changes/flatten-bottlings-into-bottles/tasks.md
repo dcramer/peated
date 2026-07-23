@@ -185,8 +185,8 @@ it must not preserve a parallel business-logic path.
 - [x] 10.2 Update schema conventions to remove the single-known-release rule and define shared BottleGroup editing semantics versus complete durable exact-Bottle materialization.
 - [x] 10.3 Update bottle-entry, photo-tasting, store-price-matching, and rating documentation for unified Bottle creation and generic group targets.
 - [x] 10.4 Add any new migration/runbook documentation to the root `AGENTS.md` docs index.
-- [ ] 10.5 Run targeted migration, schema, service, route, serializer, worker, classifier, and repair tests after each backend slice.
-- [ ] 10.6 Run server and web package typechecks plus file-scoped lint/format checks for every touched slice.
+- [x] 10.5 Run targeted migration, schema, service, route, serializer, worker, classifier, and repair tests after each backend slice.
+- [x] 10.6 Run server and web package typechecks plus file-scoped lint/format checks for every touched slice.
 - [ ] 10.7 Run classifier tests and evals in the default automatic recording/replay mode when identity output or decision contracts change, committing required recordings.
 - [x] 10.8 Run focused web Vitest and Playwright coverage for the changed form, route, redirect, and target workflows.
 - [ ] 10.9 Immediately before the cleanup release, run the full repository test gate and a new retained production migration audit from the exact cleanup Git and migration revisions; record its generation time and database, reconcile every count, and require explicit approval rather than reusing the task 6.13 pre-backfill audit.
