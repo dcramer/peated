@@ -6,6 +6,11 @@ Peated has implemented a new simplified rating system to replace the traditional
 
 **Important**: The 5-star rating system has been deprecated. Existing 5-star ratings are preserved in the `rating_legacy` field, and all new tastings use the simplified Pass/Sip/Savor system.
 
+Each tasting rates one authoritative CatalogTarget. An exact target rates one
+concrete Bottle; a generic target rates the BottleGroup when the expression is
+known but the exact release is not. Rating UI and aggregates preserve that
+scope and never substitute a representative Bottle for generic activity.
+
 ## The Three-Point Scale
 
 ### 🚫 Pass (-1)
@@ -53,9 +58,23 @@ Peated has implemented a new simplified rating system to replace the traditional
 
 ### For New Tastings
 
-1. When creating a tasting, users see three whisky-themed rating options
-2. Users select their choice: Pass 🚫, Sip 🥃, or Savor 🥃🥃
-3. The selection is highlighted and saved with numerical values (-1, 1, 2)
+1. The user selects an exact Bottle or a BottleGroup explicitly labeled “exact
+   release not specified”
+2. The tasting form keeps that CatalogTarget fixed and shows three
+   whisky-themed rating options
+3. Users select their choice: Pass 🚫, Sip 🥃, or Savor 🥃🥃
+4. The selection is highlighted and saved with numerical values (-1, 1, 2)
+
+### Exact And Generic Aggregates
+
+- A concrete Bottle's rating summary includes only tastings on that Bottle's
+  exact target.
+- A BottleGroup's summary includes direct generic-target tastings plus each
+  active member Bottle's exact-target tastings once.
+- Group aggregation reads the raw target activity. It does not add stored
+  Bottle totals and therefore does not double count member tastings.
+- A generic tasting appears as BottleGroup activity and does not appear on the
+  representative Bottle's exact rating summary.
 
 ### For Existing Tastings
 
@@ -81,6 +100,14 @@ Ardbeg Corryvreckan
 Lagavulin 16
 ⭐⭐⭐⭐½ 4.3 (847 ratings)
 🥃 78% would sip or savor (234 simple ratings)
+```
+
+#### BottleGroup Overview
+
+```
+Lagavulin 16 release family
+Exact release not specified
+🥃 81% would sip or savor (all exact and generic group ratings)
 ```
 
 #### Distribution Display
@@ -117,7 +144,10 @@ Savor: ▓▓▓▓░░░░░░ 40%
 ### Database Schema
 
 - **Tastings table**: `rating` column changed to smallint (-1, 1, 2), `rating_legacy` preserves original values
-- **Bottles table**: `ratingStats` JSONB field stores distribution statistics
+- **Bottles table**: `ratingStats` JSONB field stores the exact target's
+  distribution statistics
+- **BottleGroups table**: `ratingStats` JSONB stores the generic target plus
+  member exact-target distribution without double counting
 - **Automatic migration**: Existing ratings converted using defined thresholds
 
 ### Components
@@ -136,7 +166,9 @@ A: Your existing 5-star ratings will be preserved and remain visible. We'll offe
 A: During the transition period, yes. However, we're deprecating 5-star ratings in favor of the simpler system.
 
 **Q: How does this affect bottle rankings?**
-A: During transition, bottles will show both rating types. Eventually, rankings will be based solely on the new system.
+A: During transition, bottles will show both rating types. Exact Bottle rankings
+use only exact-target tastings; BottleGroup summaries aggregate their direct
+generic activity and all member exact activity once.
 
 **Q: Why are you deprecating 5-star ratings?**
 A: Our research shows simplified systems increase engagement by 200%+ and provide clearer signals for recommendations.

@@ -1,16 +1,23 @@
 # Bottle Entry Workflow
 
-## Current Direction
+## Identity Contract
 
 Bottle saves should complete after Peated persists the bottle. Slow duplicate
 review, catalog verification, indexing, and similar work should run after the
 save unless it is required for deterministic correctness.
 
+Every marketed release is one concrete Bottle. Each Bottle durably stores the
+shared expression values and exact fields needed to render, search, and
+understand it without loading its BottleGroup. The group owns the generic
+expression label, shared editing semantics, and aggregate activity; it does not
+supply missing exact Bottle data at read time.
+
 Manual entry uses one concrete Bottle form for add and edit. The form combines
 shared expression fields with exact Bottle fields such as edition, ABV, release
-year, vintage year, and cask details. Independent creation always creates a
-complete Bottle in an automatic singleton BottleGroup; ordinary users never
-select a source Bottle or BottleGroup.
+year, vintage year, and cask details. Independent creation atomically creates a
+complete Bottle, its exact CatalogTarget, an automatic singleton BottleGroup,
+and the group's generic CatalogTarget. Ordinary users never create, select, or
+name a BottleGroup.
 
 “Add another release” pre-fills the selected Bottle's durable fields and submits
 the same independent Bottle creation operation. It also creates a singleton;
@@ -23,21 +30,42 @@ states that the exact release is unspecified, uses group-owned presentation and
 aggregate data, and lists exact member Bottles without substituting its
 representative for any Bottle.
 
+Consumer workflows carry one CatalogTarget id. An exact target identifies one
+concrete Bottle. A generic target identifies the BottleGroup when the expression
+is known but the exact release is not. Library, tasting, Flight, review, and
+price flows must preserve that distinction in links, labels, writes, and
+aggregates; a generic target never becomes the group's representative Bottle.
+
+## Creation And Editing
+
+- Add Bottle accepts shared and exact fields in one submission and always
+  creates a Bottle, never a child release record.
+- “Add another release” uses the selected Bottle and its group's shared label
+  only to prefill the same independent form. Submission does not carry source
+  Bottle or group authority and starts in a new singleton group.
+- Creation returns the complete Bottle and its exact CatalogTarget. Library,
+  tasting, image, proposal, and return-intent continuations use that returned
+  identity directly rather than reconstructing a Bottle/release pair.
+- Exact-only moderator edits change only the selected Bottle and its exact
+  aliases.
+- Shared moderator edits update the BottleGroup and atomically rematerialize
+  every member Bottle's complete shared identity while preserving each
+  member's exact fields. A shared name change therefore regenerates all member
+  Bottle names.
+- Automatic grouping runs outside ordinary creation. Likely related groups may
+  be suggested, but name similarity, shared brand, or shared series is not
+  enough to merge them silently.
+
 Image uploads may still be part of the visible save flow, but the server remains
 authoritative for final image dimensions, encoding, and quality. Client-side
 resizing should reduce upload latency without replacing server processing.
 
-## Current Fixes
+## Current Workflow Details
 
 - Manual bottle creation relies on deterministic alias duplicate checks in the
   request path and queues catalog verification after creation.
 - Add and edit share one concrete Bottle form with explicit shared-versus-exact
-  field ownership. Shared moderator edits rematerialize the affected group,
-  while exact edits affect only the selected Bottle.
-- Add Bottle accepts exact release details without changing entity type or
-  creating a BottleRelease.
-- “Add another release” uses durable Bottle values only and never carries source
-  Bottle or group authority into creation.
+  field ownership.
 - Exact Bottle search and related-release rows share one Bottle-owned metadata
   renderer; BottleGroup hydration is not required for exact details.
 - Moderator group merge and split use standalone, explicit forms. Merge names

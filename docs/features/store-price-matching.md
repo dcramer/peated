@@ -36,7 +36,8 @@ that classifier boundary.
 For each `store_price`, the matcher should decide one of four outcomes:
 
 1. The current assignment is already correct.
-2. The price should match an existing concrete Bottle.
+2. The price should match an existing exact Bottle or generic BottleGroup
+   CatalogTarget.
 3. The price should create or safely reuse an independent concrete Bottle.
 4. There is no safe match.
 
@@ -75,7 +76,10 @@ approved proposal's latest attempt without overwriting older attempts.
 - does an exact alias lookup for that accepted key
 - if a target-aware alias exists, writes its authoritative `targetId` and
   retained compatibility pair together
-- enqueues `ResolveStorePriceBottle` only when no exact alias target exists
+- preserves a generic alias as BottleGroup identity without selecting a member
+  Bottle
+- enqueues `ResolveStorePriceBottle` only when no accepted exact, generic, or
+  measured staged alias assignment exists
 - optionally enqueues `CapturePriceImage`
 
 ### 2. Matching evaluation
@@ -341,6 +345,15 @@ override searches complete existing Bottles, resolves the selected Bottle
 through the narrow Bottle-to-exact-target lookup, and submits that exact target.
 Retained BottleRelease identity is staged compatibility evidence, not a
 suggestion type, picker choice, or target-selection authority.
+
+## Price Presentation
+
+Price reads and changes render the authoritative discriminated CatalogTarget.
+An exact price links to and uses fields from its independently complete Bottle.
+A generic price links to the BottleGroup, labels the exact release as
+unspecified, and uses no representative Bottle as display or activity identity.
+Bottle-specific price lists and history include only that Bottle's exact target;
+generic group prices do not appear on a representative Bottle page.
 
 ## Alias Behavior
 

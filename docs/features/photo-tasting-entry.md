@@ -12,13 +12,14 @@ photo-first flow at `/addTasting` while keeping the current
 ## Goal
 
 Let a user record a tasting by taking or uploading a bottle photo instead of
-starting with text search. The photo-assisted path should identify the bottle,
-let the user confirm or correct the match, and then create the same tasting
-record the existing search path creates. Like the existing search-based bottle
-picker, the photo path must be able to land on either an existing concrete
-Bottle or a proposal for one independently complete new Bottle. Ideally, a
-clear label photo should drive the new-Bottle path automatically enough that
-the user reviews fields instead of starting from scratch.
+starting with text search. The photo-assisted path should identify the catalog
+target, let the user confirm or correct the match, and then create the same
+tasting record the existing search path creates. Photo identification and its
+pending-photo manual fallback match or create an exact concrete Bottle target.
+Ordinary tasting entry may separately select a generic BottleGroup target when
+the expression is known but the exact release is not. Ideally, a clear label
+photo should drive the new-Bottle path automatically enough that the user
+reviews fields instead of starting from scratch.
 
 The uploaded photo may also become the tasting image. When photo identification
 creates a new Bottle, that creation operation may also promote a suitable photo
@@ -68,10 +69,10 @@ manual bottle search immediately available. This is a new experience for
 choosing a bottle before the tasting form, not a modal or minor enhancement
 inside the existing bottle detail page flow.
 
-The photo path should identify what bottle target the tasting belongs to before
-the user reaches the tasting form. The live workflow either selects an existing
-concrete Bottle target or reviews one independently complete new Bottle
-proposal:
+The photo path should identify what catalog target the tasting belongs to before
+the user reaches the tasting form. The live photo workflow either selects an
+existing concrete Bottle target or reviews one independently complete new
+Bottle proposal:
 
 1. User uploads or takes a photo.
 2. Server stores a pending processed image.
@@ -156,6 +157,10 @@ The UI should distinguish these photo-identification outcomes:
 - proposed independently complete new Bottle
 - uncertain result requiring manual search
 
+The photo classifier and pending-photo manual fallback do not return a generic
+group match. Leaving the photo flow for ordinary generic BottleGroup selection
+does not preserve the pending image.
+
 When the result proposes creation, the UI should show the proposed canonical
 name and important fields before the user continues. A strong photo result
 should prefill as much of the new Bottle proposal as possible, including
@@ -189,11 +194,10 @@ restart the tasting entry flow just to try another photo.
 
 ### Tasting Form
 
-After the user confirms, manually selects, or approves creation of a
-Bottle, continue to the normal tasting form with the resolved Bottle fixed at
-the top. The uploaded photo should appear in the normal
-tasting picture field as the default selected image, as if the user had already
-chosen it in that field.
+After the user confirms, manually selects, or approves creation of an exact
+Bottle target, continue to the normal tasting form with that Bottle fixed at the
+top. The uploaded photo should appear in the normal tasting picture field as
+the default selected image, as if the user had already chosen it in that field.
 
 Be careful implementing this default image behavior. The photo picker should not
 be a second, independent attachment system that can drift from the form state.
