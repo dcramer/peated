@@ -1,4 +1,4 @@
-import { getAddAnotherReleasePath } from "@peated/web/lib/bottlings";
+import { getAddAnotherReleasePath } from "@peated/web/lib/addBottle";
 import type { NextRequest } from "next/server";
 
 export async function GET(

@@ -30,9 +30,11 @@ import TastingForm, {
 } from "@peated/web/components/tastingForm";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
-import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
+import {
+  getAddAnotherReleasePath,
+  getPendingImageFromParams,
+} from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
-import { getAddAnotherReleasePath } from "@peated/web/lib/bottlings";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";

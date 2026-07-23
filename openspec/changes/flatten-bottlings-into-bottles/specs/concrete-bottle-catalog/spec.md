@@ -116,6 +116,27 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 - **WHEN** a request addresses a migrated `/bottles/:parentId/bottlings/:releaseId` URL
 - **THEN** the system permanently redirects to the promoted Bottle URL
 
+#### Scenario: Open a legacy nested bottling list
+
+- **WHEN** a request addresses `/bottles/:parentId/bottlings` or the retained
+  `/bottles/:parentId/releases` alias for a migrated parent
+- **THEN** the route permanently redirects to that parent's generic
+  BottleGroup while preserving the request query
+- **AND** it does not render a BottleRelease list or select the representative
+  Bottle
+
+#### Scenario: Retain route-only compatibility
+
+- **WHEN** legacy nested detail, edit, new, or list routes remain during the
+  measured compatibility period
+- **THEN** each route only validates and translates the legacy request into its
+  canonical exact Bottle, generic BottleGroup, concrete Bottle editor, or
+  independent Bottle-create destination
+- **AND** no route owns a BottleRelease page, list renderer, moderator action,
+  Library action, or second catalog read system
+- **AND** task 9.7 removes these compatibility routes only after its traffic
+  gate is satisfied
+
 #### Scenario: Resolve a legacy API reference
 
 - **WHEN** a compatibility API receives a known legacy `releaseId`

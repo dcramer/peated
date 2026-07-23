@@ -162,7 +162,7 @@ it must not preserve a parallel business-logic path.
 - [x] 8.6 Add a BottleGroup page for generic activity, aggregates, related Bottles, and moderator merge/split controls.
 - [x] 8.7 Update tasting, Library, collection, flight, price, review, and photo-identification flows to carry one `targetId` and display whether exactness is known.
 - [x] 8.8 Update return intents and post-create image uploads to use the created concrete Bottle without reconstructing a release pair.
-- [ ] 8.9 Remove nested Bottling edit/detail/list UI after redirects and compatibility coverage are active.
+- [x] 8.9 Remove nested Bottling edit/detail/list UI after redirects and compatibility coverage are active.
 - [ ] 8.10 Add focused web tests for unified form fields, singleton creation, prefilled independent “another release,” absence of manual group selection, exact/generic target selection, redirects, and return intents.
 - [ ] 8.11 Verify Add Bottle, edit Bottle, add another release, group details, Library, and tasting flows at desktop and mobile widths using the local verification playbook.
 

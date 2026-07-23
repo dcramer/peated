@@ -567,20 +567,6 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, getMockExactTarget(request, input.bottle));
       return true;
     }
-    case "bottleReleases/details": {
-      if (input?.release === existingReleaseId) {
-        sendRpcResponse(response, existingRelease);
-        return true;
-      }
-
-      if (typeof input?.release !== "number") {
-        sendRpcError(response, "Unexpected bottle release details payload");
-        return true;
-      }
-
-      sendRpcError(response, "Unexpected bottle release details payload");
-      return true;
-    }
     case "bottleReleases/target": {
       if (
         input?.bottle === existingBottleId &&

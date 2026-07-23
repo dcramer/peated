@@ -8,8 +8,10 @@ import FlavorProfile from "@peated/web/components/flavorProfile";
 import Link from "@peated/web/components/link";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
-import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { getAddAnotherReleasePath } from "@peated/web/lib/bottlings";
+import {
+  getAddAnotherReleasePath,
+  getAddBottleHref,
+} from "@peated/web/lib/addBottle";
 import { Suspense } from "react";
 import ModActions from "./modActions";
 

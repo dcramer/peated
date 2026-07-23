@@ -708,10 +708,17 @@ first loads the normal Bottle details path. An exact-merge tombstone still
 redirects from that response; only a typed not-found result invokes the
 page-target route to distinguish a generic parent from a missing Bottle.
 Generic results permanently redirect to `/bottle-groups/:groupId`. Task 9.8
-owns creation of parent-retirement tombstones, while task 8.9 may remove the
-nested list UI after this redirect boundary is active. APIs return explicit
-replacement identifiers rather than silently choosing a member Bottle for
-generic intent.
+owns creation of parent-retirement tombstones. Task 8.9 makes both legacy
+parent-list aliases, `/bottles/:oldParentId/bottlings` and
+`/bottles/:oldParentId/releases`, route-only permanent redirects to that
+generic BottleGroup. The aliases preserve the query string, discard the
+Bottle-only suffix, and never choose a representative Bottle. The same slice
+removes the nested BottleRelease list loaders and renderers, release-shaped
+moderator and Library actions, and their obsolete presentation/path helpers
+rather than retaining a second read system. The measured detail, edit, and new
+redirect routes remain translation-only compatibility until task 9.7 removes
+them after the traffic gate. APIs return explicit replacement identifiers
+rather than silently choosing a member Bottle for generic intent.
 
 Task 5.4 is split by mutation lifecycle. Task 5.4a retains the legacy
 BottleRelease create input, authentication, and terms-acceptance requirements,

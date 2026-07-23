@@ -19,12 +19,12 @@ import {
 } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity, FlavorProfile } from "@peated/server/types";
-import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
 import ImageField from "@peated/web/components/imageField";
+import { PreviewBottleCard } from "@peated/web/components/previewBottleCard";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import SeriesField from "@peated/web/components/seriesField";

@@ -76,3 +76,7 @@ export function getAddBottleHref({
 
   return `/addBottle?${params.toString()}`;
 }
+
+export function getAddAnotherReleasePath(bottleId: number | string) {
+  return `/bottles/${bottleId}/addRelease`;
+}

@@ -6,7 +6,7 @@ import Button from "@peated/web/components/button";
 import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
-import { getAddAnotherReleasePath } from "@peated/web/lib/bottlings";
+import { getAddAnotherReleasePath } from "@peated/web/lib/addBottle";
 import classNames from "@peated/web/lib/classNames";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { buildIndependentBottleProposalDraft } from "@peated/web/lib/independentBottleProposal";

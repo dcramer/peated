@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { getAddBottleHref } from "./addBottle";
+import { getAddAnotherReleasePath, getAddBottleHref } from "./addBottle";
+
+describe("getAddAnotherReleasePath", () => {
+  it("builds the canonical independent-release path", () => {
+    expect(getAddAnotherReleasePath(123)).toBe("/bottles/123/addRelease");
+  });
+});
 
 describe("getAddBottleHref", () => {
   it("builds a route without catalog identity", () => {

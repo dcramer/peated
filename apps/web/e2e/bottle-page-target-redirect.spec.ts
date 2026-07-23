@@ -5,6 +5,7 @@ import {
   conflictingPageTargetBottleId,
   exactReplacementSourceBottleId,
   existingBottleId,
+  groupedBottleDetails,
   legacyPromotedBottleId,
   missingPageTargetBottleId,
   retiredParentBottleId,
@@ -46,6 +47,60 @@ test.describe("Bottle page target redirects", () => {
       }),
     ).toBeVisible();
     await expect(page.getByText("Exact release not specified")).toBeVisible();
+  });
+
+  test("permanently redirects an exact Bottle's nested Bottlings list to its group", async ({
+    page,
+    request,
+  }) => {
+    const sourcePath = `/bottles/${groupedBottleDetails.id}/bottlings?source=legacy&tag=one&tag=two`;
+    const groupPath = `/bottle-groups/${bottleGroupId}?source=legacy&tag=one&tag=two`;
+
+    const response = await request.get(sourcePath, { maxRedirects: 0 });
+
+    expect(response.status()).toBe(308);
+    expect(response.headers().location).toBe(groupPath);
+
+    await page.goto(sourcePath);
+    await expect(page).toHaveURL(groupPath);
+    await expect(
+      page.getByRole("heading", {
+        name: "Lagavulin 16-year-old release family",
+      }),
+    ).toBeVisible();
+    await expect(page.getByText("Exact release not specified")).toBeVisible();
+  });
+
+  test("uses the same group redirect for a retired parent's releases alias", async ({
+    page,
+    request,
+  }) => {
+    const sourcePath = `/bottles/${retiredParentBottleId}/releases?source=legacy&tag=one&tag=two`;
+    const groupPath = `/bottle-groups/${bottleGroupId}?source=legacy&tag=one&tag=two`;
+
+    const response = await request.get(sourcePath, { maxRedirects: 0 });
+
+    expect(response.status()).toBe(308);
+    expect(response.headers().location).toBe(groupPath);
+
+    await page.goto(sourcePath);
+    await expect(page).toHaveURL(groupPath);
+    await expect(
+      page.getByRole("heading", {
+        name: "Lagavulin 16-year-old release family",
+      }),
+    ).toBeVisible();
+    await expect(page.getByText("Exact release not specified")).toBeVisible();
+  });
+
+  test("rejects invalid nested-list Bottle ids", async ({ request }) => {
+    for (const bottleId of ["0", "not-an-id"]) {
+      const response = await request.get(`/bottles/${bottleId}/bottlings`, {
+        maxRedirects: 0,
+      });
+
+      expect(response.status()).toBe(404);
+    }
   });
 
   test("does not redirect missing or conflicting page targets", async ({

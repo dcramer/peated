@@ -1,4 +1,3 @@
-import { getBottleBottlingEditPath } from "@peated/web/lib/bottlings";
 import { permanentRedirect } from "next/navigation";
 
 export default async function Page(props: {
@@ -8,5 +7,5 @@ export default async function Page(props: {
 
   const { bottleId, releaseId } = params;
 
-  permanentRedirect(getBottleBottlingEditPath(bottleId, releaseId));
+  permanentRedirect(`/bottles/${bottleId}/bottlings/${releaseId}/edit`);
 }

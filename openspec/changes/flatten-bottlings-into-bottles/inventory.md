@@ -1229,9 +1229,12 @@ Routes:
   redirect. Only a typed not-found response calls the anonymous page-target
   route to distinguish a migrated parent from a missing Bottle, and a generic
   result permanently redirects to `/bottle-groups/:groupId`.
-- `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/page.tsx`
-- `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/releaseTable.tsx`
-- `apps/web/src/app/(default)/bottles/[bottleId]/bottlingModActions.tsx`
+- `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/route.ts` and
+  `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/route.ts` are
+  route-only aliases without BottleRelease-specific layouts or loaders. They
+  permanently redirect an exact Bottle through its required group summary and a
+  migrated legacy parent through the cached page-target owner to the canonical
+  BottleGroup, preserving the query string without selecting a member Bottle.
 - `apps/web/src/app/(layout-free)/addBottle/addBottleFlow.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/addTasting/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/addRelease/page.tsx`
@@ -1248,18 +1251,25 @@ the retained parent/release ids, calls the anonymous measured
 `bottleReleases.target` adapter, preserves query parameters, and permanently
 redirects only to the returned exact Bottle URL. The superseded roughly
 940-line BottleRelease detail renderer is removed rather than retained as a
-second read system. The nested list remains measured compatibility owned by
-task 8.9. The nested new and edit URLs are permanent redirect routes: new
-points to the independent "Add another release" workflow, while edit resolves
-the retained release mapping and points to the promoted concrete Bottle editor.
+second read system. The nested new and edit URLs are permanent redirect routes:
+new points to the independent "Add another release" workflow, while edit
+resolves the retained release mapping and points to the promoted concrete
+Bottle editor.
 
 Task 7.9 establishes the durable retired-parent-to-group mapping and redirect
 owner without retiring a parent row. Active migrated parents and future task 9.8
 parent tombstones resolve to the same generic BottleGroup, while exact merge
 tombstones continue to resolve to their explicit surviving Bottle. Group merges
 atomically flatten parent tombstone destinations before source-group deletion.
-With this boundary active, task 8.9 removes the remaining nested list UI rather
-than retaining a second BottleRelease reader.
+With this boundary active, task 8.9 replaces the remaining nested `bottlings`
+and `releases` list pages with route-only BottleGroup redirect aliases. It
+removes their nested layouts, the release loading state and query/table renderer,
+release-shaped moderator and Library actions, the unused release-aware
+Bottle-card renderer, and the obsolete Bottling formatting/path helper module.
+The surviving Bottle card is the create-form preview only, the collection
+action accepts one `targetId`, and the independent "Add another release" path
+is owned by the neutral add-Bottle helper. No nested alias reads or renders a
+BottleRelease list.
 
 Task 8.3 replaces the nested new-bottling route with a prefilled standard
 Bottle-create flow. The selected Bottle supplies independently durable draft
@@ -1269,12 +1279,15 @@ and outside this manual workflow.
 
 Task 5.4c removes or hides Bottle/BottleRelease delete actions that can only
 produce the merge-required compatibility response. Task 8.9 removes the nested
-Bottling UI after redirects are active, and task 9.7 removes the remaining
-compatibility branches after measured traffic reaches zero.
+Bottling UI after redirects are active. The route-only detail, edit, new, and
+list aliases remain compatibility translators; task 9.7 owns their eventual
+removal together with the BottleRelease API adapters after measured traffic
+reaches zero.
 
 Shared UI and client helpers:
 
-- `apps/web/src/components/bottleCard.tsx`
+- `apps/web/src/components/previewBottleCard.tsx` owns only the standard Bottle-form
+  preview scaffold; its unused release-aware default renderer is removed.
 - `apps/web/src/components/bottleExactMetadata.tsx` is the shared exact-field
   rendering owner used by search and BottleGroup related-release results. It
   reads only durable Bottle fields and does not hydrate BottleGroup identity.
@@ -1287,7 +1300,8 @@ Shared UI and client helpers:
 - `apps/web/src/components/bottleResolver/types.ts`
 - `apps/web/src/components/bottleReviews.tsx`
 - `apps/web/src/components/bottleTable.tsx`
-- `apps/web/src/components/collectionAction.tsx`
+- `apps/web/src/components/collectionAction.tsx` accepts one target id and no
+  longer resolves a legacy Bottle/release pair for the removed list UI.
 - `apps/web/src/components/search/bottleResult.tsx` owns exact Bottle search-row
   navigation and the quiet relationship link to a multi-member BottleGroup.
 - `apps/web/src/components/tastingForm.tsx`
@@ -1296,7 +1310,8 @@ Shared UI and client helpers:
   CatalogTarget label. Exact activity names its Bottle; generic activity names
   its BottleGroup, states that the exact Bottle was not specified, and never
   links or labels a representative Bottle.
-- `apps/web/src/lib/addBottle.ts`
+- `apps/web/src/lib/addBottle.ts` owns both standard add-Bottle return intent
+  helpers and the independently prefilled "Add another release" path.
 - `apps/web/src/lib/catalogTarget.ts` links exact targets to `/bottles/:id` and
   generic targets to `/bottle-groups/:groupId`; it never turns a generic target
   into a representative Bottle link.
@@ -1331,7 +1346,6 @@ Shared UI and client helpers:
   for both exact and generic entries.
 - `apps/web/src/lib/tastingForm.ts` shapes the validated form submission. Create
   carries one `targetId`; edit is content-only and cannot mutate identity.
-- `apps/web/src/lib/bottlings.ts`
 
 Admin exports and test protocol fixtures that encode release fields:
 
