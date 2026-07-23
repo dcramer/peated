@@ -1,8 +1,99 @@
 import { db } from "@peated/server/db";
-import { bottles, tastings } from "@peated/server/db/schema";
+import {
+  bottleReleasePromotions,
+  bottleReleases,
+  bottles,
+  tastings,
+} from "@peated/server/db/schema";
+import {
+  loadCatalogTargetReadsWithParity,
+  recordCatalogTargetReadFilterParity,
+} from "@peated/server/lib/catalogTargetReadParity";
+import {
+  CatalogTargetResolutionError,
+  loadCatalogTargetByBottleId,
+} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
-import { eq, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
+
+const TAGGED_TASTING_PARITY_LIMIT = 200;
+
+function legacyTastingBottleMembership(bottleId: number): SQL<unknown> {
+  return or(
+    and(eq(tastings.bottleId, bottleId), isNull(tastings.releaseId)),
+    sql<boolean>`exists(${db
+      .select({ value: sql`1` })
+      .from(bottleReleases)
+      .innerJoin(
+        bottleReleasePromotions,
+        eq(bottleReleasePromotions.releaseId, bottleReleases.id),
+      )
+      .where(
+        and(
+          eq(bottleReleases.id, tastings.releaseId),
+          eq(bottleReleases.bottleId, tastings.bottleId),
+          eq(bottleReleasePromotions.status, "promoted"),
+          eq(bottleReleasePromotions.promotedBottleId, bottleId),
+        ),
+      )})`,
+  )!;
+}
+
+async function countTaggedTastings(
+  bottleId: number,
+  targetId: number,
+): Promise<number> {
+  const targetWhere = eq(tastings.targetId, targetId);
+  const legacyWhere = legacyTastingBottleMembership(bottleId);
+  const hasTags = sql<boolean>`array_length(${tastings.tags}, 1) > 0`;
+  const [{ count }] = await db
+    .select({ count: sql<string>`COUNT(*)` })
+    .from(tastings)
+    .where(and(hasTags, targetWhere));
+
+  const rows = await db
+    .select({
+      id: tastings.id,
+      targetId: tastings.targetId,
+      bottleId: tastings.bottleId,
+      releaseId: tastings.releaseId,
+      targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
+      legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
+    })
+    .from(tastings)
+    .where(and(hasTags, or(targetWhere, legacyWhere)))
+    .orderBy(asc(tastings.id))
+    .limit(TAGGED_TASTING_PARITY_LIMIT);
+
+  const parityItems = rows.map((row) => ({
+    consumerTable: "tasting" as const,
+    rowLocator: { id: row.id },
+    targetId: row.targetId,
+    legacy: {
+      bottleId: row.bottleId,
+      releaseId: row.releaseId,
+    },
+  }));
+  const parityContext = {
+    actor: null,
+    permissions: { canReadCatalogIdentity: true as const },
+    caller: "bottles.tags",
+    operation: "total_count",
+  };
+  await loadCatalogTargetReadsWithParity(parityItems, parityContext);
+  recordCatalogTargetReadFilterParity(
+    rows.map((row, index) => ({
+      ...parityItems[index]!,
+      filter: "catalog_reference" as const,
+      targetMatches: row.targetMatches,
+      legacyMatches: row.legacyMatches,
+    })),
+    parityContext,
+  );
+
+  return Number(count);
+}
 
 export default procedure
   .route({
@@ -52,19 +143,19 @@ export default procedure
       limit,
     });
 
-    // TODO: denormalize this into (num)tastings or similar in the tags table
-    const totalCount = (
-      await db.execute<{ count: string }>(
-        sql`SELECT COUNT(*) as count
-        FROM ${tastings}
-        WHERE ${tastings.bottleId} = ${bottle.id}
-        AND array_length(${tastings.tags}, 1) > 0
-      `,
-      )
-    ).rows[0].count;
-
-    return {
-      results: results.map(({ tag, count }) => ({ tag, count })),
-      totalCount: Number(totalCount),
-    };
+    try {
+      const target = await loadCatalogTargetByBottleId(bottle.id, {
+        actor: null,
+        permissions: { canReadCatalogIdentity: true },
+      });
+      return {
+        results: results.map(({ tag, count }) => ({ tag, count })),
+        totalCount: await countTaggedTastings(bottle.id, target.targetId),
+      };
+    } catch (error) {
+      if (error instanceof CatalogTargetResolutionError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
+    }
   });

@@ -1102,7 +1102,7 @@ supplies `targetId` directly; `baseOnly` remains only retained compatibility.
 Task 9.7 removes the broad family-delete adapter after compatibility traffic
 reaches zero.
 
-The current partial task 7.3 collection read cutover now requires and hydrates
+The task 7.3 collection read cutover requires and hydrates
 the membership's authoritative CatalogTarget, records retained-pair parity, and
 uses target identity for serialization, ordering, filtering, and Library
 actions. A targetless membership is an integrity error rather than permission
@@ -1110,9 +1110,8 @@ to fall back to the retained pair. This read cutover does not satisfy the
 section 6 existing-row backfill gate, enable generic target-native creation
 while retained `bottleId` storage is non-null, or remove the retained input and
 family-delete adapters; those remain tasks 8.7, 9.6, and 9.7. Unit image,
-status, and ownership behavior outside identity selection is unchanged. The
-partial consumer slice is a code-review boundary and makes no deployment or
-activation claim.
+status, and ownership behavior outside identity selection is unchanged. This
+consumer slice makes no deployment or activation claim.
 
 ### Direct Flight mutations replace one target-authoritative membership set
 
@@ -1145,15 +1144,14 @@ inserts the canonical requested target assignments atomically; explicit
 replacement also removes targetless compatibility rows instead of carrying
 them forward.
 
-The current partial task 7.3 Flight read cutover keeps the bounded base Flight
+The task 7.3 Flight read cutover keeps the bounded base Flight
 response target-free while the Flight details response hydrates its ordered
 authoritative CatalogTargets, records retained-pair parity, and carries
 target-keyed viewer state. A generic member remains group identity without
 representative substitution. Existing-row backfill remains section 6, the
 public Bottle-id membership input remains staged compatibility until task 8.7,
-and tasks 9.6 and 9.7 remove retained pair storage and compatibility. The
-partial consumer slice is a code-review boundary and makes no deployment or
-activation claim.
+and tasks 9.6 and 9.7 remove retained pair storage and compatibility. This
+consumer slice makes no deployment or activation claim.
 
 ### Target-native consumer entry uses one durable identity
 
@@ -1275,7 +1273,7 @@ or activation unit.
 
 ### StorePrice reads use authoritative CatalogTargets
 
-The current partial tasks 7.1-7.3 StorePrice read cutover adds the listing's
+The tasks 7.1-7.3 StorePrice read cutover adds the listing's
 nullable authoritative CatalogTarget to every StorePrice response and records
 row-correlated retained-pair parity during batch hydration. A non-null target
 is never replaced by retained-pair identity, including when the pair drifts;
@@ -1311,11 +1309,11 @@ thousand rows total. It therefore cannot observe legacy-only rows that fall
 outside the authoritative page. Serializer parity still validates every
 returned StorePrice response independently.
 
-This is another partial consumer review boundary. Existing-row backfill and
+This was a bounded consumer review boundary. Existing-row backfill and
 production activation remain gated by section 6 and the retained parity/audit
 sequence; retained StorePrice pair storage and measured compatibility remain
-tasks 9.6/9.7. Proposals, adjacent analytics, specialized alias readers, and
-other actual consumers keep tasks 7.1-7.3 open.
+tasks 9.6/9.7. The proposal, analytics, alias, and other consumer slices below
+complete the remaining tasks 7.1-7.3 read surfaces.
 
 ### BottleAlias reads use authoritative CatalogTargets
 
@@ -1347,10 +1345,10 @@ legacy drift without influencing ranking or membership, and route boundaries
 translate invalid durable targets to conflicts. The labels `dump-unmatched`
 command now selects null `targetId`, matching the same unknown definition.
 
-This completes only the alias-read sub-slice. Other specialized alias readers,
-proposals, adjacent analytics, and other actual consumers keep parent tasks
-7.1-7.3 open; retained pairs and parity adapters remain until tasks 9.6/9.7.
-The slice makes no production activation or backfill claim.
+This completes the alias-read sub-slice. The specialized alias, proposal,
+analytics, and other consumer slices together complete parent tasks 7.1-7.3;
+retained pairs and parity adapters remain until tasks 9.6/9.7. The slice makes
+no production activation or backfill claim.
 
 ### Incoming decision reads use authoritative CatalogTargets
 
@@ -1382,9 +1380,9 @@ focused UI rendering behavior.
 internal source evidence owned by target-aware price-matching writes, migration,
 and merge/consolidation operations. The activity routes likewise compose the
 already target-backed Tasting and collection-membership serializers, so this
-slice does not invent a second observation or activity read system. Proposal
-and adjacent analytics reads, plus other remaining consumers, keep parent tasks
-7.1-7.3 and 7.11 open. This slice makes no production backfill, deployment, or
+slice does not invent a second observation or activity read system. The
+proposal, analytics, and remaining consumer slices below complete parent tasks
+7.1-7.3 and 7.11. This slice makes no production backfill, deployment, or
 activation claim.
 
 ### Price-match proposal reads and approvals use authoritative CatalogTargets
@@ -1465,13 +1463,12 @@ read-only aggregation: it writes no target, collection, parity repair, or other
 durable state. Task 7.11c covers exact, generic, targetless, retained-drift,
 invalid-target, privacy, filtering, count, and ordering behavior.
 
-This is one bounded analytics-reader cutover. Other Library, badge, country,
-entity, and catalog analytics that still derive identity through Bottle or
-BottleRelease joins remain inventoried under the parent tasks 7.1-7.3 and 7.11
-until separately cut over. Existing-row target backfill, retained-pair removal,
-and production activation remain owned by section 6, tasks 9.6/9.7, and the
-retained parity/audit gates. This slice performs no production backfill and
-authorizes no deployment or activation.
+This was one bounded analytics-reader cutover. The Library, badge, country,
+entity, and catalog analytics slices below complete the remaining parent tasks
+7.1-7.3 and 7.11 read and integration-test surfaces. Existing-row target
+backfill, retained-pair removal, and production activation remain owned by
+section 6, tasks 9.6/9.7, and the retained parity/audit gates. This slice
+performs no production backfill and authorizes no deployment or activation.
 
 ### Country category analytics read active exact CatalogTargets
 

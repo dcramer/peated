@@ -104,7 +104,7 @@ it must not preserve a parallel business-logic path.
 
 ## 7. Read Parity And Backend Cutover
 
-- [ ] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
+- [x] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
 - [x] 7.1a Add bounded dual-read resolution and filter-membership parity to BottleAlias list and brand-repair alias reads, including semantic promoted-release resolution, without allowing parity to select authoritative results.
 - [x] 7.1b Add row-correlated target-versus-retained resolution parity to the incoming Bottle decision-log read, keyed by the stable decision-log id and including semantic promoted-release resolution, without allowing parity to select the authoritative result.
 - [x] 7.1c Add independently correlated current/suggested target-versus-retained resolution parity to StorePrice match-proposal queue reads, keyed by proposal id and logical slot, without allowing parity to select authoritative results.
@@ -112,7 +112,7 @@ it must not preserve a parallel business-logic path.
 - [x] 7.1e Add bounded row-correlated target-versus-retained resolution parity to user-details statistics for every selected user Tasting and collection entry, keyed by the stable Tasting or collection-entry id, without allowing parity to select aggregate identity, repair a row, or mutate state.
 - [x] 7.1f Add bounded row-correlated target-versus-retained resolution parity to live badge award and badge rescan hydration, keyed by the stable Tasting id, without allowing retained identity to select badge data, repair a Tasting, or change award behavior.
 - [x] 7.1g Add bounded row-correlated target-versus-retained resolution parity to user flavor and region analytics, keyed by the stable Tasting id through the shared user-Tasting scanner, without allowing retained identity to select aggregate fields, repair a Tasting, or mutate state.
-- [ ] 7.2 Record actionable parity mismatches with consumer table, stable row locator, legacy ids, target id, and resolved identities.
+- [x] 7.2 Record actionable parity mismatches with consumer table, stable row locator, legacy ids, target id, and resolved identities.
 - [x] 7.2a Add strict `bottle_alias` parity correlation by unique alias name for both resolution and filter-membership drift, retaining target, legacy, caller, and operation evidence.
 - [x] 7.2b Record incoming Bottle decision-log parity mismatches with the `incoming_bottle_decision_log` table, stable row id, retained Bottle/Release ids, target id, caller, operation, and resolved identities.
 - [x] 7.2c Record StorePrice match-proposal parity mismatches with the `store_price_match_proposal` table, stable proposal id and current/suggested slot, retained Bottle/Release ids, target id, caller, operation, and resolved identities.
@@ -120,7 +120,7 @@ it must not preserve a parallel business-logic path.
 - [x] 7.2e Record user-details statistics parity mismatches with the `tasting` or `collection_bottle` consumer table, stable row id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
 - [x] 7.2f Record badge evaluation parity mismatches with the `tasting` consumer table, stable row id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
 - [x] 7.2g Record user flavor and region analytics parity mismatches with the `tasting` consumer table, stable row id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
-- [ ] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
+- [x] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
 - [x] 7.3a Switch BottleAlias list filtering and hydration, brand-repair candidate/supporting-alias membership, and the labels unmatched dump to authoritative CatalogTarget identity; return nullable exact/generic targets without representative substitution and fail closed on invalid durable targets.
 - [x] 7.3b Switch the admin incoming Bottle decision-log route and UI to a nullable authoritative CatalogTarget, remove Bottle/BottleRelease joins and nested release output, preserve historical decision vocabulary and creation flags as audit evidence, render generic and unknown identity without representative substitution, and return conflict for an invalid nonnull durable target.
 - [x] 7.3c Switch StorePrice match-proposal queue list/details and moderator UI to independently authoritative current/suggested CatalogTargets; persist targets on new suggested-match proposals; approve through one target-native transaction; remove retained BottleRelease read/approval shapes and GET-side assessment writes; retain only the explicit historical create-draft parent context; and provide a narrow Bottle-to-exact-target lookup for manual target selection.
@@ -141,7 +141,7 @@ it must not preserve a parallel business-logic path.
 - [x] 7.10a Move activity notifications and notification delivery to authoritative CatalogTarget identity, rendering exact Bottle or generic BottleGroup labels without representative fallback.
 - [x] 7.10b Move local cache/revalidation, alias search indexing, statistics queue payloads, and entity aggregation to exact Bottle or CatalogTarget identity; remove the superseded Bottle-based entity helper and cover exact/generic ownership plus producer fan-out.
 - [ ] 7.10c Before deployment activation, retain evidence that old Bottle-id statistics and legacy-parent `OnBottleChange` producers are stopped or upgraded and their queued legacy payloads are drained or expired.
-- [ ] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
+- [x] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
 - [x] 7.11a Add incoming Bottle decision-log integration coverage for exact, generic, promoted-release, targetless, invalid-target, authorization, filter, deterministic ordering, and pagination behavior, plus focused admin rendering coverage for exact, generic, and unknown targets.
 - [x] 7.11b Add StorePrice match-proposal integration coverage for independent exact, generic, promoted-release, targetless, invalid-target, authorization, deterministic ordering, pagination, target-native approval, manual exact-target lookup, and focused moderator rendering behavior.
 - [x] 7.11c Add Library statistics integration coverage for exact Bottle, generic BottleGroup, targetless, retained-pair drift, and invalid-target entries while preserving privacy, non-empty membership filtering, totals, unknown/unclassified accounting, top-five count/order behavior, and the existing response contract.

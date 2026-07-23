@@ -6,15 +6,19 @@ import {
   bottleTombstones,
   bottles,
   catalogTargets,
-  type BottleRelease,
 } from "@peated/server/db/schema";
+import {
+  CatalogTargetResolutionError,
+  loadCatalogTargetByLegacyReference,
+} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { BottleReleaseSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { and, asc, desc, eq, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
+import { projectLegacyBottleRelease } from "./project-legacy-release";
 
 const SORT_OPTIONS = [
   "name",
@@ -35,46 +39,6 @@ const SORT_OPTIONS = [
 
 const DEFAULT_SORT = "releaseYear";
 const promotedBottles = alias(bottles, "promoted_bottles");
-
-// Task 9.7 retains only the legacy ids required by this response shape. Every
-// identity, content, and aggregate field must come from the promoted Bottle.
-function projectLegacyRelease({
-  releaseId,
-  legacyBottleId,
-  bottle,
-}: {
-  releaseId: number;
-  legacyBottleId: number;
-  bottle: typeof promotedBottles.$inferSelect;
-}): BottleRelease {
-  return {
-    id: releaseId,
-    bottleId: legacyBottleId,
-    fullName: bottle.fullName,
-    name: bottle.name,
-    searchVector: bottle.searchVector,
-    edition: bottle.edition,
-    vintageYear: bottle.vintageYear,
-    releaseYear: bottle.releaseYear,
-    abv: bottle.abv,
-    singleCask: bottle.singleCask,
-    caskStrength: bottle.caskStrength,
-    statedAge: bottle.statedAge,
-    caskSize: bottle.caskSize,
-    caskType: bottle.caskType,
-    caskFill: bottle.caskFill,
-    description: bottle.description,
-    descriptionSrc: bottle.descriptionSrc,
-    imageUrl: bottle.imageUrl,
-    tastingNotes: bottle.tastingNotes,
-    suggestedTags: bottle.suggestedTags,
-    avgRating: bottle.avgRating,
-    totalTastings: bottle.totalTastings,
-    createdAt: bottle.createdAt,
-    updatedAt: bottle.updatedAt,
-    createdByActorId: bottle.createdByActorId,
-  };
-}
 
 export default procedure
   .route({
@@ -178,6 +142,7 @@ export default procedure
       .select({
         releaseId: bottleReleases.id,
         legacyBottleId: bottleReleases.bottleId,
+        targetId: catalogTargets.id,
         bottle: promotedBottles,
       })
       .from(bottleReleases)
@@ -204,11 +169,58 @@ export default procedure
       .limit(limit + 1)
       .offset(offset);
 
+    const page = results.slice(0, limit);
+    await Promise.all(
+      page.map(async (result) => {
+        let target;
+        try {
+          target = await loadCatalogTargetByLegacyReference(
+            {
+              bottleId: result.legacyBottleId,
+              releaseId: result.releaseId,
+            },
+            {
+              actor: null,
+              permissions: { canReadCatalogIdentity: true },
+              caller: "bottleReleases.list",
+              operation: "read_promoted_bottle",
+            },
+          );
+        } catch (error) {
+          if (error instanceof CatalogTargetResolutionError) {
+            throw errors.CONFLICT({ message: error.message, cause: error });
+          }
+          throw error;
+        }
+
+        if (
+          target.kind !== "bottle" ||
+          target.targetId !== result.targetId ||
+          target.bottle.id !== result.bottle.id
+        ) {
+          throw errors.CONFLICT({
+            message:
+              "BottleRelease promotion does not match its active exact Bottle target.",
+          });
+        }
+      }),
+    );
+
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      page.map(({ bottle }) => bottle),
+      context.user,
+    );
+
     return {
-      results: await serialize(
-        BottleReleaseSerializer,
-        results.slice(0, limit).map(projectLegacyRelease),
-        context.user ?? undefined,
+      results: page.map((result, index) =>
+        projectLegacyBottleRelease(
+          {
+            id: result.releaseId,
+            bottleId: result.legacyBottleId,
+          },
+          serializedBottles[index]!,
+        ),
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

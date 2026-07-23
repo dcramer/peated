@@ -1,7 +1,7 @@
 # Legacy BottleRelease Inventory
 
 This is the source inventory for the compatibility and cleanup gates. It was
-recaptured on 2026-07-20 from production source files with:
+recaptured on 2026-07-22 from production source files with:
 
 ```sh
 rg -l -S 'releaseId|release_id|bottle_release|bottleReleases|BottleRelease' \
@@ -11,6 +11,17 @@ rg -l -S 'releaseId|release_id|bottle_release|bottleReleases|BottleRelease' \
   --glob '!**/eval-fixtures/**' \
   --glob '!**/__fixtures__/**'
 ```
+
+The initial verifier classified all 205 paths returned before the resulting
+reader fixes. The post-fix rerun returned 207 because target-backed parity and
+projection code retains explicit legacy-reference vocabulary; every added hit
+is classified below. Generated migration history is retained evidence; staged
+schema, migration, and compatibility references have explicit section 6 or
+section 9 owners; canonical readers and writers use CatalogTarget identity. The
+initial pass found three exact-read gaps: the Bottle tags total, the top-level
+collection Bottle filter, and the BottleRelease details/list compatibility
+projection. Those gaps are now closed. No classified hit is an unowned
+exact-read dependency.
 
 Generated migration SQL and snapshots are historical evidence, not runtime
 readers or writers. Tests and eval fixtures are migration coverage and must be
@@ -127,7 +138,10 @@ removing that group.
   Library, and tasted state only through each concrete Bottle's exact
   CatalogTarget. Generic targets and drifted retained Bottle ids cannot mark a
   representative or unrelated Bottle.
-- `apps/server/src/serializers/bottleRelease.ts`
+- The former `apps/server/src/serializers/bottleRelease.ts` is removed. The
+  retained BottleRelease details/list compatibility routes serialize the
+  promoted exact Bottle through `BottleSerializer`, then use one route-local
+  projection helper to restore only the legacy release and parent locators.
 - `apps/server/src/serializers/collectionBottle.ts` now batch-hydrates the
   membership's authoritative CatalogTarget through the shared read-parity
   owner. Its response contains one required discriminated target and no
@@ -161,8 +175,8 @@ removing that group.
   limited to target-aware price-matching evidence writes, migration, and
   merge/consolidation operations, so task 7.3 does not require inventing an
   observation read surface. Activity routes already compose the target-backed
-  Tasting and collection serializers. Parent tasks 7.1-7.3 remain open for
-  proposals, adjacent analytics, and other actual readers.
+  Tasting and collection serializers. The proposal, analytics, and other
+  consumer entries below complete the remaining parent tasks 7.1-7.3 surfaces.
 - `apps/server/src/serializers/notification.ts` matches the discriminated
   notification contract at serialization time. Toast and comment references
   hydrate that narrow projection through the shared CatalogTarget parity reader,
@@ -289,8 +303,9 @@ validation; it makes no production backfill, schema, deployment, or activation
 claim.
 
 No known retained Bottle-id user flavor or region analytics reader remains
-after this cutover. The cleanup inventory remains open for other legacy
-analytics discovered under parent tasks 7.1-7.3 and 7.11.
+after this cutover. Together with the other inventoried consumer readers and
+their integration coverage, this completes parent tasks 7.1-7.3 and 7.11.
+Intentional measured compatibility remains assigned to tasks 9.6/9.7.
 
 ## API routes
 
@@ -309,13 +324,21 @@ BottleRelease CRUD and registration:
   inconsistent mapping conflicts. It never guesses a representative, sibling,
   or generic target and never deletes the retained BottleRelease row. Tasks 9.4
   and 9.7 disable and remove the adapter.
-- `apps/server/src/orpc/routes/bottleReleases/details.ts`
+- `apps/server/src/orpc/routes/bottleReleases/details.ts` resolves the retained
+  parent/release pair through the measured legacy-reference loader, requires
+  its promoted exact Bottle target, serializes that Bottle through
+  `BottleSerializer`, and restores the legacy response shape through
+  `project-legacy-release.ts`. Missing, incomplete, cross-group, or retired
+  promotion graphs fail closed instead of reading BottleRelease-owned content.
 - `apps/server/src/orpc/routes/bottleReleases/index.ts`
 - `apps/server/src/orpc/routes/bottleReleases/list.ts` retains its legacy
   parent/release ids and BottleRelease response only as a task 9.7 compatibility
   projection. It lists completed promotion mappings, renders fields from the
   promoted ordinary Bottle, and applies query/sort/pagination through that
-  Bottle's active exact search identity. It does not read
+  Bottle's active exact search identity. It serializes each promoted Bottle
+  through `BottleSerializer` and shares the details route's route-local
+  `project-legacy-release.ts` translation; the superseded global
+  `BottleReleaseSerializer` is removed. It does not read
   `bottle_release.search_vector`, expose incomplete promotions, or return a
   Bottle/BottleGroup tombstoned identity.
 - `apps/server/src/orpc/routes/bottleReleases/target.ts` is the task 7.8
@@ -378,6 +401,12 @@ Bottle catalog routes:
   measured parent-cardinality rule, follows either Bottle tombstone destination,
   and fails closed on missing, destination-free, retired, or inconsistent
   replacement graphs. It never selects a representative Bottle.
+- `apps/server/src/orpc/routes/bottles/tags.ts` retains the existing tag buckets
+  while deriving `totalCount` only from tagged Tastings whose authoritative
+  target is the selected Bottle's active exact target. A bounded union sample
+  records row-resolution and filter-membership parity, including semantic
+  promoted-release evidence, without letting retained identity select the
+  count. Missing, retired, or inconsistent durable targets fail closed.
 - `apps/server/src/orpc/routes/bottles/update.ts` is the task 5.3a thin
   moderator adapter. It accepts only strict shared/exact patches, delegates all
   writes to `updateConcreteBottle`, and returns the validated exact target.
@@ -464,6 +493,13 @@ Target-bearing consumer routes:
   membership parity; the retained Bottle/Release filter is a measured adapter
   removed under task 9.7. Existing-row target backfill remains section 6, and
   pair storage/removal remains tasks 9.6/9.7.
+- `apps/server/src/orpc/routes/collections/list.ts` resolves its optional Bottle
+  filter to that Bottle's active exact CatalogTarget and selects collections
+  only through `collection_bottle.targetId`. Generic, targetless, and
+  retained-only membership cannot satisfy exact Bottle intent. A bounded,
+  stable collection-entry sample records resolution and filter-membership
+  parity, including semantic promoted-release evidence, without changing the
+  authoritative page; malformed durable targets fail closed.
 - `apps/server/src/orpc/routes/reviews/create.ts` is a direct user/API Review
   writer assigned to task 5.6c. For known exact or generic intent it resolves
   one descriptor, locks/revalidates it before Review mutation, writes the
@@ -492,9 +528,8 @@ Target-bearing consumer routes:
   clear, validates and writes a complete tuple for identity correction, and
   preserves a durable target for non-identity updates. Only a currently null
   target may be measured-repaired from its retained pair; an unresolvable
-  staged legacy row remains targetless. Review serialization is now part of the
-  partial task 7.1-7.3 cutover; other named consumers still keep those tasks
-  open.
+  staged legacy row remains targetless. Review serialization participates in
+  the completed task 7.1-7.3 consumer read cutover.
 - `apps/server/src/orpc/routes/flights/targetAssignments.ts` remains the task
   5.6e shared assignment boundary, extended by task 8.7 for the strict
   target-native `targets` input alongside the retained `bottles` adapter. Target
@@ -741,7 +776,7 @@ Catalog identity, aliases, search, creation, and updates:
   the table's unique alias name as its stable locator because the table has no
   numeric row id. It never falls back when a durable target is invalid. Its
   legacy comparison is removed with runtime compatibility under task 9.7 after
-  the remaining task 7.1-7.3 consumers and parity gates complete.
+  the production parity and cleanup gates approve compatibility removal.
 - `apps/server/src/lib/brandRepairCandidates.ts` uses only live exact
   CatalogTargets for Bottle candidate scans and for query/supporting alias
   membership. Generic, targetless, tombstoned, and retired identities cannot
