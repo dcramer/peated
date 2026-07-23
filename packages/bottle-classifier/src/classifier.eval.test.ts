@@ -25,7 +25,10 @@ import {
   createDecidedBottleClassification,
   type BottleClassificationResult,
 } from "./contract";
-import { createEvalClassifierOptions } from "./evalSupport";
+import {
+  createEvalClassifierOptions,
+  hasEvalOpenAICredentials,
+} from "./evalSupport";
 import { createLocalCatalogDataSource } from "./localCatalog";
 import {
   agentActionRiskClass,
@@ -894,7 +897,7 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
   describeEval(
     label,
     {
-      skipIf: () => !process.env.OPENAI_API_KEY,
+      skipIf: () => !hasEvalOpenAICredentials,
       harness: classifierHarness,
       judges: [ClassifierExpectationJudge],
       judgeThreshold: threshold,

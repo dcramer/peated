@@ -193,10 +193,12 @@ to the package runner and uses the `vitest-evals` reporter configured in
 [`vitest.evals.config.mts`](./vitest.evals.config.mts).
 The eval config loads the repo-root `.env` and then `.env.local`, with later
 files overriding earlier ones. Shell-provided env vars still take precedence.
-`OPENAI_API_KEY` is required. `OPENAI_MODEL` defaults to `gpt-5.4` for the
-classifier pass. `OPENAI_EVAL_MODEL` defaults to `gpt-5-mini` for judging so
-routine evals stay cheaper by default; override either if you want a different
-cost or quality tradeoff. `FIRECRAWL_API_KEY` enables live web evidence search;
+`AI_GATEWAY_API_KEY` or `OPENAI_API_KEY` is required. The gateway key takes
+precedence when both are set. With the gateway, `OPENAI_MODEL` defaults to
+`openai/gpt-5.4` and `OPENAI_EVAL_MODEL` defaults to
+`openai/gpt-5-mini`; direct OpenAI defaults omit the provider prefix. Override
+either if you want a different cost or quality tradeoff. `FIRECRAWL_API_KEY`
+enables live web evidence search;
 `FIRECRAWL_API_URL` can override the default Firecrawl API host.
 
 The live evals use `vitest-evals` harness-style `run(...)` tests with

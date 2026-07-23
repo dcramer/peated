@@ -1,4 +1,7 @@
+import { resolveOpenAICompatibleConfig } from "@peated/bottle-classifier/openaiCompatibleConfig";
 import { tmpdir } from "node:os";
+
+const openAIConfig = resolveOpenAICompatibleConfig(process.env);
 
 export default {
   ENV:
@@ -51,12 +54,16 @@ export default {
 
   GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
 
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-  OPENAI_HOST: process.env.OPENAI_HOST || "https://api.openai.com/v1",
-  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-5.4",
+  OPENAI_API_KEY: openAIConfig.apiKey,
+  OPENAI_EMBEDDING_MODEL: openAIConfig.embeddingModel,
+  OPENAI_HOST: openAIConfig.baseURL,
+  OPENAI_MODEL: openAIConfig.model,
   OPENAI_ORGANIZATION:
-    process.env.OPENAI_ORGANIZATION || "org-c11AVkF35wixZcGri1YBH9Pq",
-  OPENAI_PROJECT: process.env.OPENAI_PROJECT || null,
+    openAIConfig.organization ||
+    (openAIConfig.provider === "openai"
+      ? "org-c11AVkF35wixZcGri1YBH9Pq"
+      : null),
+  OPENAI_PROJECT: openAIConfig.project || null,
   FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY || null,
   FIRECRAWL_API_URL: process.env.FIRECRAWL_API_URL || null,
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(

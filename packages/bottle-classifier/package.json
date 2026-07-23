@@ -55,6 +55,10 @@
       "types": "./src/bottleSchemaGuidance.ts",
       "default": "./src/bottleSchemaGuidance.ts"
     },
+    "./openaiCompatibleConfig": {
+      "types": "./src/openaiCompatibleConfig.ts",
+      "default": "./src/openaiCompatibleConfig.ts"
+    },
     "./smws": {
       "types": "./src/smws.ts",
       "default": "./src/smws.ts"
