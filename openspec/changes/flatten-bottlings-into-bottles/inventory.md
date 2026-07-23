@@ -381,6 +381,15 @@ Bottle catalog routes:
   input cannot change shared Bottle identity. Ordinary/manual Bottle creation
   still cannot select or reuse a group, and no route derives exact identity
   from a representative.
+- `apps/server/src/orpc/routes/bottleSeries/delete.ts` clears grouped series
+  ownership through one ordered, transactional canonical shared-update fan-out
+  per affected BottleGroup. It locks the complete ordered affected-group set
+  before fan-out so a concurrent series move cannot be overwritten. Every
+  active member is rematerialized and audited before the series is deleted, and
+  canonical exact-target finalizers run only after the outer transaction
+  commits. Its only direct Bottle update is the explicit `groupId IS NULL`
+  pre-migration compatibility clear assigned to task 9.7 removal; it does not
+  maintain a second grouped-series mutation path.
 - `apps/server/src/openapi/spec.test.ts` locks the seven BottleGroup operations,
   their generic/exact/alias response boundaries, and their bounded moderator
   request shapes. This additive API surface is review slicing only: it makes no
@@ -415,6 +424,13 @@ Bottle catalog routes:
   shared choices from BottleGroup-owned ids and joins, and reads exact values
   from the selected Bottle so the live form never treats materialized Bottle
   drift as shared authority.
+- `apps/server/src/orpc/routes/bottles/similar.ts` admits only an active exact
+  CatalogTarget for both the selected Bottle and every candidate, with exact
+  target group membership matching the Bottle's own `groupId`. Bottle and
+  BottleGroup tombstones are excluded. Similarity, ordering, and serialization
+  use the independently complete Bottle columns and Bottle distiller joins;
+  the route does not hydrate group identity, substitute a representative, or
+  admit an ungrouped legacy Bottle as exact identity.
 - `apps/server/src/orpc/routes/bottles/upsert.ts` is a translation-only
   compatibility route with no supported in-repository caller after task 5.9. A
   successful concrete create or update is reloaded as the retained legacy
@@ -683,7 +699,10 @@ Catalog identity, aliases, search, creation, and updates:
   transaction and removes the proposal-specific updater. Task 5.4b maps a
   completed legacy promotion to a sparse exact patch over the same operation;
   none of these adapters may duplicate its business logic or issue parallel
-  alias, audit, or job writes.
+  alias, audit, or job writes. Its separately runtime-validated internal input
+  permits system-owned exact generated tags without widening the public
+  moderator schema; shared choices that may create or resolve catalog entities
+  still require an authenticated user.
 - `apps/server/src/orpc/routes/entities/update.ts` composes brand name and short
   name changes with that same transaction owner once per affected BottleGroup,
   in stable group-id order. Every member is rematerialized as an independently
@@ -1017,6 +1036,20 @@ Classifier decisions and price matching:
   over stale classifier work. `no_match` and failed/unresolved reviews stay
   targetless, and the worker never selects a representative or arbitrary exact
   Bottle.
+- `apps/server/src/worker/jobs/generateBottleDetails.ts` applies generated
+  Bottle-specific description, tasting notes, and suggested tags as an exact
+  patch and generated shared flavor profile as a canonical shared patch in one
+  `updateConcreteBottleInTransaction` call. Before external model work, the
+  worker requires matching active exact-target membership and rejects Bottle or
+  BottleGroup tombstones. It carries the selected Bottle content/membership and
+  full BottleGroup, distiller, and series authority preimages through external
+  model work; the canonical transaction rejects stale exact edits, shared
+  edits, and group moves under lock. The shared patch therefore rematerializes
+  and audits every active member while exact generated content remains on the
+  selected Bottle; all exact-target finalizers run after commit. The canonical
+  service revalidates active exact/group identity and rolls back the complete
+  generated update on graph failure. It has no direct Bottle, BottleGroup,
+  alias, audit, or queue-write business path.
 - `apps/server/src/worker/jobs/index.ts` registers only the ordinary Bottle and
   alias search-index jobs. Task 7.5 removes the release-only index and
   change-handler registrations rather than retaining dormant compatibility
@@ -1139,12 +1172,16 @@ Classifier decisions and price matching:
 - `apps/cli/src/commands/labels.ts`: `labels dump-unmatched` is a thin adapter
   over `listUnmatchedBottleAliasNames`; it paginates the server-owned query in
   1,000-row batches and writes each returned name to stdout.
-- `apps/cli/src/commands/bottles.ts`: `bottles fix-stats` selects exact-target
-  rows and directly dispatches their target ids to the strict exact statistics
-  worker. Strict recomputation validates the active graph and target integrity
-  and stops on an invalid row rather than silently skipping it. This explicit
-  maintenance scope cannot select a generic target. Its brand/distillery repair
-  command delegates grouped work to the canonical shared-update fan-out.
+- `apps/cli/src/commands/bottles.ts`: `bottles generate-descriptions` selects
+  only Bottles with a matching exact CatalogTarget and active Bottle and
+  BottleGroup lifecycle, then dispatches Bottle ids to the canonical
+  `GenerateBottleDetails` worker; an explicit id cannot bypass that producer
+  gate. `bottles fix-stats` selects exact-target rows and directly dispatches
+  their target ids to the strict exact statistics worker. Strict recomputation
+  validates the active graph and target integrity and stops on an invalid row
+  rather than silently skipping it. Neither maintenance scope can select a
+  generic or ungrouped legacy target. The brand/distillery repair command
+  delegates grouped work to the canonical shared-update fan-out.
 - `apps/cli/src/commands/prices.ts` and
   `apps/cli/src/commands/reviews.ts` retain name-normalization maintenance but
   no longer expose raw Bottle-alias backfill writers.

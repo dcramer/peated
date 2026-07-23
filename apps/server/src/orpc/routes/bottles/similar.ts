@@ -1,5 +1,11 @@
 import { db } from "@peated/server/db";
-import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
+import {
+  bottleGroupTombstones,
+  bottles,
+  bottlesToDistillers,
+  bottleTombstones,
+  catalogTargets,
+} from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -18,6 +24,15 @@ import {
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
+
+const activeExactTargetJoin = and(
+  eq(catalogTargets.bottleId, bottles.id),
+  eq(catalogTargets.groupId, bottles.groupId),
+);
+const activeExactBottleConditions = and(
+  sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+  sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
+);
 
 export default procedure
   .route({
@@ -42,34 +57,38 @@ export default procedure
   .handler(async function ({ input: { limit, ...input }, context, errors }) {
     // maxAge caching for 5 minutes would be handled by oRPC server settings
 
-    const [bottle] = await db
-      .select()
+    const [source] = await db
+      .select({ bottle: bottles })
       .from(bottles)
-      .where(eq(bottles.id, input.bottle));
+      .innerJoin(catalogTargets, activeExactTargetJoin)
+      .where(and(eq(bottles.id, input.bottle), activeExactBottleConditions));
 
-    if (!bottle) {
+    if (!source) {
       throw errors.NOT_FOUND({
         message: "Bottle not found.",
       });
     }
+    const bottle = source.bottle;
 
-    // we're just finding vintages right now
-    const results = await db
-      .select()
-      .from(bottles)
-      .where(
-        and(
-          eq(bottles.brandId, bottle.brandId),
-          eq(bottles.name, bottle.name),
-          ne(bottles.id, bottle.id),
-        ),
-      )
-      .limit(limit)
-      .orderBy(asc(bottles.fullName));
-
-    // find similar bottles from the brand
+    const results = (
+      await db
+        .select({ bottle: bottles })
+        .from(bottles)
+        .innerJoin(catalogTargets, activeExactTargetJoin)
+        .where(
+          and(
+            activeExactBottleConditions,
+            eq(bottles.brandId, bottle.brandId),
+            eq(bottles.name, bottle.name),
+            ne(bottles.id, bottle.id),
+          ),
+        )
+        .limit(limit)
+        .orderBy(asc(bottles.fullName))
+    ).map((row) => row.bottle);
 
     const where: (SQL<unknown> | undefined)[] = [
+      activeExactBottleConditions,
       eq(bottles.brandId, bottle.brandId),
       notInArray(bottles.id, [bottle.id, ...results.map((r) => r.id)]),
     ];
@@ -94,12 +113,15 @@ export default procedure
     );
 
     results.push(
-      ...(await db
-        .select()
-        .from(bottles)
-        .where(and(...where))
-        .limit(limit - results.length)
-        .orderBy(asc(bottles.fullName))),
+      ...(
+        await db
+          .select({ bottle: bottles })
+          .from(bottles)
+          .innerJoin(catalogTargets, activeExactTargetJoin)
+          .where(and(...where))
+          .limit(limit - results.length)
+          .orderBy(asc(bottles.fullName))
+      ).map((row) => row.bottle),
     );
 
     return {

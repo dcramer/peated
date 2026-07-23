@@ -1,6 +1,18 @@
+import { db } from "@peated/server/db";
+import {
+  bottleGroups,
+  bottleGroupTombstones,
+  bottleTombstones,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
+
+function requireGroupId(groupId: number | null): number {
+  if (groupId === null) throw new Error("Missing BottleGroup fixture");
+  return groupId;
+}
 
 describe("GET /bottles/:bottle/similar", () => {
   test("lists similar bottles", async ({ fixtures }) => {
@@ -64,6 +76,170 @@ describe("GET /bottles/:bottle/similar", () => {
     });
 
     expect(results.length).toBe(0);
+  });
+
+  test("requires exact targets for the source and results", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Target Brand" });
+    const distiller = await fixtures.Entity({ name: "Target Distiller" });
+    const source = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Targeted Bottle",
+    });
+    const legacySource = await fixtures.LegacyBottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Legacy Source",
+    });
+    await fixtures.LegacyBottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Legacy Similar Result",
+    });
+
+    const sourceError = await waitError(
+      routerClient.bottles.similar({ bottle: legacySource.id }),
+    );
+    const { results } = await routerClient.bottles.similar({
+      bottle: source.id,
+    });
+
+    expect(sourceError).toMatchObject({
+      status: 404,
+      message: "Bottle not found.",
+    });
+    expect(results).toHaveLength(0);
+  });
+
+  test("excludes Bottle tombstones as sources and results", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Bottle Tombstone Brand" });
+    const distiller = await fixtures.Entity({
+      name: "Bottle Tombstone Distiller",
+    });
+    const source = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Retired Exact Bottle",
+    });
+    const retiredResult = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: source.name,
+      edition: "Retired Result",
+    });
+    await db.insert(bottleTombstones).values({ bottleId: retiredResult.id });
+
+    const { results } = await routerClient.bottles.similar({
+      bottle: source.id,
+    });
+    await db.insert(bottleTombstones).values({ bottleId: source.id });
+    const sourceError = await waitError(
+      routerClient.bottles.similar({ bottle: source.id }),
+    );
+
+    expect(results).toHaveLength(0);
+    expect(sourceError).toMatchObject({
+      status: 404,
+      message: "Bottle not found.",
+    });
+  });
+
+  test("excludes retired BottleGroups as sources and results", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Group Tombstone Brand" });
+    const distiller = await fixtures.Entity({
+      name: "Group Tombstone Distiller",
+    });
+    const source = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Retired Group Bottle",
+    });
+    const retiredResult = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: source.name,
+      edition: "Retired Group Result",
+    });
+    const destination = await fixtures.Bottle({
+      name: "Active Group Destination",
+    });
+    const destinationGroupId = requireGroupId(destination.groupId);
+    await db.insert(bottleGroupTombstones).values({
+      groupId: requireGroupId(retiredResult.groupId),
+      newGroupId: destinationGroupId,
+      createdByActorId: retiredResult.createdByActorId,
+    });
+
+    const { results } = await routerClient.bottles.similar({
+      bottle: source.id,
+    });
+    await db.insert(bottleGroupTombstones).values({
+      groupId: requireGroupId(source.groupId),
+      newGroupId: destinationGroupId,
+      createdByActorId: source.createdByActorId,
+    });
+    const sourceError = await waitError(
+      routerClient.bottles.similar({ bottle: source.id }),
+    );
+
+    expect(results).toHaveLength(0);
+    expect(sourceError).toMatchObject({
+      status: 404,
+      message: "Bottle not found.",
+    });
+  });
+
+  test("returns independently complete Bottle fields without group substitution", async ({
+    fixtures,
+  }) => {
+    const bottleBrand = await fixtures.Entity({ name: "Exact Bottle Brand" });
+    const groupBrand = await fixtures.Entity({ name: "Divergent Group Brand" });
+    const distiller = await fixtures.Entity({ name: "Exact Distiller" });
+    const source = await fixtures.Bottle({
+      brandId: bottleBrand.id,
+      distillerIds: [distiller.id],
+      name: "Independent Identity",
+      statedAge: 12,
+      category: "bourbon",
+    });
+    const candidate = await fixtures.Bottle({
+      brandId: bottleBrand.id,
+      distillerIds: [distiller.id],
+      name: source.name,
+      edition: "Exact Edition",
+      statedAge: 12,
+      category: "bourbon",
+    });
+    await db
+      .update(bottleGroups)
+      .set({
+        brandId: groupBrand.id,
+        name: "Group-Owned Divergence",
+        fullName: "Divergent Group Brand Group-Owned Divergence",
+        category: "rye",
+      })
+      .where(eq(bottleGroups.id, requireGroupId(candidate.groupId)));
+
+    const { results } = await routerClient.bottles.similar({
+      bottle: source.id,
+    });
+
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({
+      id: candidate.id,
+      fullName: candidate.fullName,
+      name: candidate.name,
+      edition: "Exact Edition",
+      category: "bourbon",
+      brand: { id: bottleBrand.id, name: bottleBrand.name },
+    });
+    expect(results[0]).not.toHaveProperty("group");
   });
 
   test("throws error for non-existent bottle", async () => {

@@ -1,6 +1,14 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { bottleAliases, bottles, entities } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleGroups,
+  bottleGroupTombstones,
+  bottles,
+  bottleTombstones,
+  catalogTargets,
+  entities,
+} from "@peated/server/db/schema";
 import { getExactCatalogTargetStatsRepairPage } from "@peated/server/lib/catalogTargetStatsRepair";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
@@ -8,7 +16,7 @@ import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repai
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -50,13 +58,31 @@ subcommand
     const step = 1000;
     const baseQuery = db
       .select({ id: bottles.id })
-      .from(bottles)
+      .from(catalogTargets)
+      .innerJoin(
+        bottles,
+        and(
+          eq(catalogTargets.bottleId, bottles.id),
+          eq(catalogTargets.groupId, bottles.groupId),
+        ),
+      )
+      .innerJoin(bottleGroups, eq(bottleGroups.id, catalogTargets.groupId))
+      .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
+      .leftJoin(
+        bottleGroupTombstones,
+        eq(bottleGroupTombstones.groupId, bottleGroups.id),
+      )
       .where(
-        bottleIds.length
-          ? inArray(bottles.id, bottleIds)
-          : options.onlyMissing
-            ? isNull(bottles.description)
-            : undefined,
+        and(
+          isNotNull(catalogTargets.bottleId),
+          isNull(bottleTombstones.bottleId),
+          isNull(bottleGroupTombstones.groupId),
+          bottleIds.length
+            ? inArray(bottles.id, bottleIds)
+            : options.onlyMissing
+              ? isNull(bottles.description)
+              : undefined,
+        ),
       )
       .orderBy(asc(bottles.id));
 

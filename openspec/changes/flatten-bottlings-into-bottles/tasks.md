@@ -176,7 +176,7 @@ it must not preserve a parallel business-logic path.
 - [ ] 9.6 Remove obsolete consumer `bottleId` columns wherever `targetId` replaces the legacy pair, plus `releaseId` columns, release foreign keys/indexes, `bottle_release`, and the now-workflow-less `legacy_release_repair_review` table and `legacy_release_repair_review_resolution` enum, using a generated Drizzle migration only after backup approval.
 - [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, enums, and compatibility branches, including any remaining legacy release-repair schema exports, the measured legacy Bottle upsert response adapter after scraper/caller cutover and zero observed traffic, and the correction-draft `statedAgeScope` marker plus unmarked shared-age fallback after pending historical correction proposals are drained or migrated.
 - [ ] 9.8 Remove retired legacy parent Bottle rows only after every reference and URL has a durable group or Bottle mapping.
-- [ ] 9.9 Remove runtime dependence on BottleGroup hydration for exact Bottle rendering and verify all creation, shared-update, merge, split, and repair writers preserve complete durable Bottle materialization and atomic fan-out.
+- [x] 9.9 Remove runtime dependence on BottleGroup hydration for exact Bottle rendering and verify all creation, shared-update, merge, split, and repair writers preserve complete durable Bottle materialization and atomic fan-out.
 - [ ] 9.10 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings, plus zero incomplete Bottle materializations or group/member synchronization defects.
 
 ## 10. Documentation And Final Verification

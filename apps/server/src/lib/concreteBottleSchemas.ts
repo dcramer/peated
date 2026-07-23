@@ -173,18 +173,39 @@ const ConcreteBottleExactPatchSchema = z
       .optional(),
     image: BottleInputSchema.shape.image.optional(),
     tastingNotes: BottleInputSchema.shape.tastingNotes.optional(),
+    suggestedTags: z.array(z.string().max(64)).max(5).optional(),
   })
   .strict();
 
+const ModeratorConcreteBottleExactPatchSchema =
+  ConcreteBottleExactPatchSchema.omit({
+    suggestedTags: true,
+  });
+
 export const ConcreteBottleUpdateInputSchema = z
+  .object({
+    shared: ConcreteBottleSharedPatchSchema.optional(),
+    exact: ModeratorConcreteBottleExactPatchSchema.optional(),
+  })
+  .strict();
+
+export type ConcreteBottleUpdateInput = z.infer<
+  typeof ConcreteBottleUpdateInputSchema
+>;
+
+/**
+ * Internal update contract for system-owned exact content such as generated
+ * tags. Public moderator input remains limited to user-editable fields.
+ */
+export const SystemConcreteBottleUpdateInputSchema = z
   .object({
     shared: ConcreteBottleSharedPatchSchema.optional(),
     exact: ConcreteBottleExactPatchSchema.optional(),
   })
   .strict();
 
-export type ConcreteBottleUpdateInput = z.infer<
-  typeof ConcreteBottleUpdateInputSchema
+export type SystemConcreteBottleUpdateInput = z.infer<
+  typeof SystemConcreteBottleUpdateInputSchema
 >;
 
 /**

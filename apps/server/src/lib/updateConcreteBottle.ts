@@ -44,6 +44,7 @@ import {
 import {
   ConcreteBottleUpdateInputSchema,
   type ConcreteBottleUpdateInput,
+  type SystemConcreteBottleUpdateInput,
 } from "@peated/server/lib/concreteBottleSchemas";
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
@@ -56,7 +57,7 @@ export { ConcreteBottleUpdateInputSchema } from "@peated/server/lib/concreteBott
 export type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
 
 type SharedPatch = NonNullable<ConcreteBottleUpdateInput["shared"]>;
-type ExactPatch = NonNullable<ConcreteBottleUpdateInput["exact"]>;
+type ExactPatch = NonNullable<SystemConcreteBottleUpdateInput["exact"]>;
 
 export class ConcreteBottleUpdateAuthorizationError extends Error {
   constructor() {
@@ -103,6 +104,15 @@ export class ConcreteBottleUpdateExpectedStateError extends Error {
   }
 }
 
+export class ConcreteBottleUpdateExpectedBottleStateError extends Error {
+  constructor(readonly bottleId: number) {
+    super(
+      `Bottle ${bottleId} exact content or membership changed before update.`,
+    );
+    this.name = "ConcreteBottleUpdateExpectedBottleStateError";
+  }
+}
+
 export type ConcreteBottleUpdateResult = {
   bottle: Bottle;
   group: BottleGroup;
@@ -143,6 +153,7 @@ type DesiredBottle = Pick<
   | "descriptionSrc"
   | "imageUrl"
   | "tastingNotes"
+  | "suggestedTags"
 >;
 
 type StableState = Pick<
@@ -185,6 +196,32 @@ export type ConcreteBottleUpdateExpectedSharedState = {
   series: ExpectedSeries | null;
   referencedSeries: ExpectedSeries[];
 };
+
+const expectedSelectedBottleKeys = [
+  "groupId",
+  "fullName",
+  "statedAge",
+  "category",
+  "flavorProfile",
+  "description",
+  "descriptionSrc",
+  "tastingNotes",
+  "suggestedTags",
+] as const satisfies ReadonlyArray<keyof Bottle>;
+
+export type ConcreteBottleUpdateExpectedSelectedBottleState = Pick<
+  Bottle,
+  (typeof expectedSelectedBottleKeys)[number]
+>;
+
+/** Captures selected-Bottle state used to plan an exact-content edit. */
+export function concreteBottleUpdateExpectedSelectedBottleState(
+  bottle: Bottle,
+): ConcreteBottleUpdateExpectedSelectedBottleState {
+  return Object.fromEntries(
+    expectedSelectedBottleKeys.map((key) => [key, bottle[key]]),
+  ) as ConcreteBottleUpdateExpectedSelectedBottleState;
+}
 
 /** Captures the shared authority a maintenance caller used to plan an edit. */
 export function concreteBottleUpdateExpectedSharedState({
@@ -340,6 +377,10 @@ function desiredBottleFor({
     descriptionSrc,
     imageUrl: exactPatch?.image === null ? null : bottle.imageUrl,
     tastingNotes: valueOrCurrent(exactPatch?.tastingNotes, bottle.tastingNotes),
+    suggestedTags: valueOrCurrent(
+      exactPatch?.suggestedTags,
+      bottle.suggestedTags,
+    ),
   };
 }
 
@@ -365,6 +406,7 @@ const desiredBottleKeys: ReadonlyArray<keyof DesiredBottle> = [
   "descriptionSrc",
   "imageUrl",
   "tastingNotes",
+  "suggestedTags",
 ];
 
 function bottleDiff(bottle: DesiredBottle, desired: DesiredBottle) {
@@ -403,6 +445,15 @@ function requireEntityRole(
   }
 }
 
+function requireUpdateUser(user: User | undefined): User {
+  if (!user) {
+    throw new ConcreteBottleUpdateInputError(
+      "A user is required to create or resolve shared catalog choices.",
+    );
+  }
+  return user;
+}
+
 /**
  * Resolves shared state inside the caller's transaction. Object choices may
  * create entities or a series and collect ids needed for post-commit work.
@@ -423,7 +474,7 @@ async function resolveStableState(
     patch?: SharedPatch;
     currentDistillerIds: number[];
     actorId: number;
-    user: User;
+    user?: User;
     creationSource: CatalogVerificationCreationSource;
     changedEntityIds: Set<number>;
     newEntityIds: Set<number>;
@@ -455,7 +506,7 @@ async function resolveStableState(
       db: tx,
       data: coerceToUpsert(patch.brand),
       creationSource,
-      userId: user.id,
+      userId: requireUpdateUser(user).id,
       createdByActorId: actorId,
       type: "brand",
     });
@@ -482,7 +533,7 @@ async function resolveStableState(
       db: tx,
       data: coerceToUpsert(patch.bottler),
       creationSource,
-      userId: user.id,
+      userId: requireUpdateUser(user).id,
       createdByActorId: actorId,
       type: "bottler",
     });
@@ -512,7 +563,7 @@ async function resolveStableState(
         db: tx,
         data: coerceToUpsert(choice),
         creationSource,
-        userId: user.id,
+        userId: requireUpdateUser(user).id,
         createdByActorId: actorId,
         type: "distiller",
       });
@@ -554,7 +605,7 @@ async function resolveStableState(
         tx,
         series: patch.series,
         brand,
-        userId: user.id,
+        userId: requireUpdateUser(user).id,
         createdByActorId: actorId,
       });
     } catch (error) {
@@ -647,15 +698,17 @@ export async function updateConcreteBottleInTransaction(
   {
     bottleId,
     input,
+    expectedSelectedBottleState,
     expectedSharedState,
     user,
     actorId,
     creationSource,
   }: {
     bottleId: number;
-    input: ConcreteBottleUpdateInput;
+    input: SystemConcreteBottleUpdateInput;
+    expectedSelectedBottleState?: ConcreteBottleUpdateExpectedSelectedBottleState;
     expectedSharedState?: ConcreteBottleUpdateExpectedSharedState;
-    user: User;
+    user?: User;
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
   },
@@ -701,6 +754,16 @@ export async function updateConcreteBottleInTransaction(
       bottleId,
       groupId,
     );
+  }
+  if (
+    expectedSelectedBottleState &&
+    expectedSelectedBottleKeys.some(
+      (key) =>
+        JSON.stringify(lockedBottle[key]) !==
+        JSON.stringify(expectedSelectedBottleState[key]),
+    )
+  ) {
+    throw new ConcreteBottleUpdateExpectedBottleStateError(bottleId);
   }
 
   const [groupTombstone] = await tx

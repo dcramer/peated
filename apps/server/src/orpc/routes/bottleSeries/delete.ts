@@ -1,9 +1,19 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleSeries, changes } from "@peated/server/db/schema";
+import {
+  bottleGroups,
+  bottles,
+  bottleSeries,
+  changes,
+} from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import {
+  finalizeConcreteBottleUpdate,
+  updateConcreteBottleInTransaction,
+  type ConcreteBottleUpdateFinalizationManifest,
+} from "@peated/server/lib/updateConcreteBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -19,41 +29,75 @@ export default procedure
   .input(z.object({ series: z.coerce.number() }))
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
-    const [series] = await db
-      .select()
-      .from(bottleSeries)
-      .where(eq(bottleSeries.id, input.series))
-      .limit(1);
-    if (!series) {
-      throw errors.NOT_FOUND({
-        message: "Series not found.",
+    const manifests = await db.transaction(async (tx) => {
+      const [series] = await tx
+        .select()
+        .from(bottleSeries)
+        .where(eq(bottleSeries.id, input.series))
+        .limit(1);
+      if (!series) {
+        throw errors.NOT_FOUND({
+          message: "Series not found.",
+        });
+      }
+
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+      const groups = await tx
+        .select({
+          id: bottleGroups.id,
+          representativeBottleId: bottleGroups.representativeBottleId,
+        })
+        .from(bottleGroups)
+        .where(eq(bottleGroups.seriesId, series.id))
+        .orderBy(asc(bottleGroups.id))
+        .for("update");
+      const manifests: ConcreteBottleUpdateFinalizationManifest[] = [];
+
+      for (const group of groups) {
+        if (group.representativeBottleId === null) {
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} has no representative Bottle.`,
+          });
+        }
+        manifests.push(
+          await updateConcreteBottleInTransaction(tx, {
+            bottleId: group.representativeBottleId,
+            input: { shared: { series: null } },
+            user: context.user,
+            actorId,
+            creationSource: "manual_entry",
+          }),
+        );
+      }
+
+      await tx
+        .update(bottles)
+        .set({ seriesId: null })
+        .where(and(eq(bottles.seriesId, series.id), isNull(bottles.groupId)));
+
+      await tx.insert(changes).values({
+        objectType: "bottle_series",
+        objectId: series.id,
+        actorId,
+        displayName: series.name,
+        type: "delete",
+        data: series,
+      });
+
+      await tx.delete(bottleSeries).where(eq(bottleSeries.id, series.id));
+
+      return manifests;
+    });
+
+    for (const manifest of manifests) {
+      // The deleted series has no search vector to rebuild.
+      await finalizeConcreteBottleUpdate({
+        ...manifest,
+        affectedSeriesIds: manifest.affectedSeriesIds.filter(
+          (seriesId) => seriesId !== input.series,
+        ),
       });
     }
-
-    await db.transaction(async (tx) => {
-      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
-
-      await Promise.all([
-        // Log the deletion in changes table
-        tx.insert(changes).values({
-          objectType: "bottle_series",
-          objectId: series.id,
-          actorId,
-          displayName: series.name,
-          type: "delete",
-          data: series,
-        }),
-
-        // Update bottles to remove series reference
-        tx
-          .update(bottles)
-          .set({ seriesId: null })
-          .where(eq(bottles.seriesId, series.id)),
-      ]);
-
-      // Delete the series
-      await tx.delete(bottleSeries).where(eq(bottleSeries.id, series.id));
-    });
 
     return {};
   });

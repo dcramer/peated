@@ -2,16 +2,34 @@ import config from "@peated/server/config";
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
-import { bottles, changes } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import {
+  bottleGroupDistillers,
+  bottleGroups,
+  bottleGroupTombstones,
+  bottles,
+  bottleSeries,
+  bottleTombstones,
+  catalogTargets,
+} from "@peated/server/db/schema";
+import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
+import {
+  SystemConcreteBottleUpdateInputSchema,
+  type SystemConcreteBottleUpdateInput,
+} from "@peated/server/lib/concreteBottleSchemas";
 import { arraysEqual, objectsShallowEqual } from "@peated/server/lib/equals";
 import { notesForProfile } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
+import {
+  concreteBottleUpdateExpectedSelectedBottleState,
+  concreteBottleUpdateExpectedSharedState,
+  finalizeConcreteBottleUpdate,
+  updateConcreteBottleInTransaction,
+} from "@peated/server/lib/updateConcreteBottle";
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
 import { startSpan } from "@sentry/node";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 if (!config.OPENAI_API_KEY) {
@@ -86,7 +104,9 @@ export const OpenAIBottleDetailsValidationSchema =
     // suggestedTags: z.array(DefaultTagEnum).default([]),
   });
 
-export type GeneratedBottleDetails = z.infer<typeof OpenAIBottleDetailsSchema>;
+export type GeneratedBottleDetails = z.infer<
+  typeof OpenAIBottleDetailsValidationSchema
+>;
 
 export async function getGeneratedBottleDetails(
   bottle: Partial<Bottle>,
@@ -124,15 +144,58 @@ export async function getGeneratedBottleDetails(
 }
 
 export default async function ({ bottleId }: { bottleId: number }) {
+  const [owned] = await db
+    .select({
+      bottle: bottles,
+      group: bottleGroups,
+      series: bottleSeries,
+    })
+    .from(bottles)
+    .innerJoin(
+      catalogTargets,
+      and(
+        eq(catalogTargets.bottleId, bottles.id),
+        eq(catalogTargets.groupId, bottles.groupId),
+      ),
+    )
+    .innerJoin(bottleGroups, eq(bottleGroups.id, catalogTargets.groupId))
+    .leftJoin(bottleSeries, eq(bottleSeries.id, bottleGroups.seriesId))
+    .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
+    .leftJoin(
+      bottleGroupTombstones,
+      eq(bottleGroupTombstones.groupId, catalogTargets.groupId),
+    )
+    .where(
+      and(
+        eq(bottles.id, bottleId),
+        isNull(bottleTombstones.bottleId),
+        isNull(bottleGroupTombstones.groupId),
+      ),
+    )
+    .limit(1);
+  if (!owned) {
+    throw new Error(
+      `Bottle ${bottleId} does not have an active exact CatalogTarget.`,
+    );
+  }
+  const bottle = owned.bottle;
+  if (owned.group.seriesId !== null && !owned.series) {
+    throw new Error(`Bottle ${bottleId} has invalid shared authority.`);
+  }
+  const groupDistillers = await db
+    .select({ distillerId: bottleGroupDistillers.distillerId })
+    .from(bottleGroupDistillers)
+    .where(eq(bottleGroupDistillers.groupId, owned.group.id));
+  const expectedSelectedBottleState =
+    concreteBottleUpdateExpectedSelectedBottleState(bottle);
+  const expectedSharedState = concreteBottleUpdateExpectedSharedState({
+    group: owned.group,
+    distillerIds: groupDistillers.map(({ distillerId }) => distillerId),
+    series: owned.series,
+  });
+
   if (!config.OPENAI_API_KEY) {
     return;
-  }
-
-  const bottle = await db.query.bottles.findFirst({
-    where: (bottles, { eq }) => eq(bottles.id, bottleId),
-  });
-  if (!bottle) {
-    throw new Error(`Unknown bottle: ${bottleId}`);
   }
 
   const generateDesc =
@@ -156,15 +219,15 @@ export default async function ({ bottleId }: { bottleId: number }) {
     throw new Error(`Failed to generate details for bottle: ${bottleId}`);
   }
 
-  const data: Record<string, any> = {};
+  const exact: NonNullable<SystemConcreteBottleUpdateInput["exact"]> = {};
 
   if (
     generateDesc &&
     result.description &&
     result.description !== bottle.description
   ) {
-    data.description = result.description;
-    data.descriptionSrc = "generated";
+    exact.description = result.description;
+    exact.descriptionSrc = "generated";
   }
 
   if (
@@ -172,7 +235,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
     (!bottle.tastingNotes ||
       !objectsShallowEqual(result.tastingNotes, bottle.tastingNotes))
   ) {
-    data.tastingNotes = result.tastingNotes;
+    exact.tastingNotes = result.tastingNotes;
   }
 
   if (
@@ -180,7 +243,7 @@ export default async function ({ bottleId }: { bottleId: number }) {
     !arraysEqual(result.suggestedTags, bottle.suggestedTags)
   ) {
     if (!result.suggestedTags.find((t) => !tagList.includes(t))) {
-      data.suggestedTags = result.suggestedTags;
+      exact.suggestedTags = result.suggestedTags;
     } else {
       logError(`Invalid value for suggestedTags`, {
         tag: {
@@ -194,29 +257,29 @@ export default async function ({ bottleId }: { bottleId: number }) {
     }
   }
 
-  if (
-    !bottle.flavorProfile &&
-    result.flavorProfile &&
-    result.flavorProfile !== bottle.flavorProfile
-  ) {
-    data.flavorProfile = result.flavorProfile;
+  let shared: SystemConcreteBottleUpdateInput["shared"];
+  if (!bottle.flavorProfile) {
+    const flavorProfile = owned.group.flavorProfile ?? result.flavorProfile;
+    if (flavorProfile) {
+      shared = { flavorProfile };
+    }
   }
 
-  if (Object.keys(data).length === 0) return;
-  const actor = await getPeatedSystemActor();
-
-  await db.transaction(async (tx) => {
-    await tx.update(bottles).set(data).where(eq(bottles.id, bottle.id));
-
-    await tx.insert(changes).values({
-      objectType: "bottle",
-      objectId: bottle.id,
-      displayName: bottle.fullName,
+  if (!shared && Object.keys(exact).length === 0) return;
+  const input = SystemConcreteBottleUpdateInputSchema.parse({
+    shared,
+    exact: Object.keys(exact).length ? exact : undefined,
+  });
+  const update = await db.transaction(async (tx) => {
+    const actor = await getPeatedSystemActorForDatabase(tx);
+    return await updateConcreteBottleInTransaction(tx, {
+      bottleId: bottle.id,
+      input,
+      expectedSelectedBottleState,
+      expectedSharedState,
       actorId: actor.id,
-      type: "update",
-      data: {
-        ...data,
-      },
+      creationSource: "repair_workflow",
     });
   });
+  await finalizeConcreteBottleUpdate(update);
 }
