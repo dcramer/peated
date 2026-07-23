@@ -13,6 +13,36 @@ const sourceBottle = {
 };
 
 describe("buildIndependentBottleProposalDraft", () => {
+  test("uses the shared source name with exact source fields", () => {
+    const draft = buildIndependentBottleProposalDraft({
+      sourceBottle: {
+        ...sourceBottle,
+        name: "16-year-old - Distillers Edition",
+      },
+      sourceSharedName: "16-year-old",
+    });
+
+    expect(draft).toMatchObject({
+      name: "16-year-old",
+      edition: "Core Release",
+      abv: 43,
+      releaseYear: 2020,
+    });
+  });
+
+  test("keeps a proposed Bottle name ahead of the shared source name", () => {
+    const draft = buildIndependentBottleProposalDraft({
+      sourceBottle: {
+        ...sourceBottle,
+        name: "16-year-old - Distillers Edition",
+      },
+      sourceSharedName: "16-year-old",
+      proposedBottle: { name: "Proposed Expression" },
+    });
+
+    expect(draft.name).toBe("Proposed Expression");
+  });
+
   test("inherits serialized null stable evidence but preserves non-null and empty-list values", () => {
     const draft = buildIndependentBottleProposalDraft({
       sourceBottle: {

@@ -173,6 +173,15 @@ export const anotherReleaseSourceBottle = {
   releaseYear: 2024,
 };
 
+export const addAnotherReleaseSourceBottle = {
+  ...anotherReleaseSourceBottle,
+  name: `${existingBottle.name} - Distillers Edition - 2024 Release - 43% ABV`,
+  fullName: `${existingBottle.fullName} - Distillers Edition - 2024 Release - 43% ABV`,
+  group: buildBottleGroup({
+    bottle: { ...existingBottle, statedAge: 16 },
+  }),
+};
+
 export const unifiedBottleEditContext = {
   bottleId: existingBottleId,
   totalBottles: 3,

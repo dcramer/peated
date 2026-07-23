@@ -10,7 +10,7 @@ import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
-  anotherReleaseSourceBottle,
+  addAnotherReleaseSourceBottle,
   createdBottleId,
   createdBottleName,
   createdTastingId,
@@ -399,19 +399,19 @@ test.describe("create bottle", () => {
       page.getByRole("heading", { name: "Add another release" }),
     ).toBeVisible();
     await expect(page.getByLabel("Bottle")).toHaveValue(
-      anotherReleaseSourceBottle.name,
+      addAnotherReleaseSourceBottle.group.name,
     );
     await expect(page.getByLabel("Stated Age")).toHaveValue(
-      String(anotherReleaseSourceBottle.statedAge),
+      String(addAnotherReleaseSourceBottle.statedAge),
     );
     await expect(page.getByLabel("Edition / Label")).toHaveValue(
-      anotherReleaseSourceBottle.edition,
+      addAnotherReleaseSourceBottle.edition,
     );
     await expect(page.getByLabel("ABV")).toHaveValue(
-      String(anotherReleaseSourceBottle.abv),
+      String(addAnotherReleaseSourceBottle.abv),
     );
     await expect(page.getByLabel("Release Year")).toHaveValue(
-      String(anotherReleaseSourceBottle.releaseYear),
+      String(addAnotherReleaseSourceBottle.releaseYear),
     );
     await expect(page.getByLabel("Bottle Group")).toHaveCount(0);
     await expect(page.getByLabel("Source Bottle")).toHaveCount(0);
@@ -422,12 +422,12 @@ test.describe("create bottle", () => {
 
     expect(createRequests).toHaveLength(1);
     expect(createInput).toMatchObject({
-      name: anotherReleaseSourceBottle.name,
-      brand: anotherReleaseSourceBottle.brand.id,
-      statedAge: anotherReleaseSourceBottle.statedAge,
-      edition: anotherReleaseSourceBottle.edition,
-      abv: anotherReleaseSourceBottle.abv,
-      releaseYear: anotherReleaseSourceBottle.releaseYear,
+      name: addAnotherReleaseSourceBottle.group.name,
+      brand: addAnotherReleaseSourceBottle.brand.id,
+      statedAge: addAnotherReleaseSourceBottle.statedAge,
+      edition: addAnotherReleaseSourceBottle.edition,
+      abv: addAnotherReleaseSourceBottle.abv,
+      releaseYear: addAnotherReleaseSourceBottle.releaseYear,
     });
     expect(createInput).not.toHaveProperty("group");
     expect(createInput).not.toHaveProperty("groupId");

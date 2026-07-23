@@ -3,6 +3,7 @@ import type { BottleFormInitialData } from "@peated/web/components/bottleForm";
 
 type ProposalDraftInput = {
   sourceBottle?: BottleFormInitialData | null;
+  sourceSharedName?: BottleFormInitialData["name"];
   proposedBottle?: BottleFormInitialData | null;
   proposedRelease?: BottleFormInitialData | null;
 };
@@ -20,7 +21,6 @@ type ExactField =
   | "tastingNotes";
 
 type StableField =
-  | "name"
   | "statedAge"
   | "series"
   | "category"
@@ -39,6 +39,19 @@ function selectStableField<Field extends StableField>(
     proposedValue != null
     ? proposedValue
     : sourceBottle?.[field];
+}
+
+function selectStableName({
+  sourceBottle,
+  sourceSharedName,
+  proposedBottle,
+}: ProposalDraftInput): BottleFormInitialData["name"] {
+  const proposedName = proposedBottle?.name;
+  return proposedBottle &&
+    Object.hasOwn(proposedBottle, "name") &&
+    proposedName != null
+    ? proposedName
+    : (sourceSharedName ?? sourceBottle?.name);
 }
 
 function mergeExactField<Field extends ExactField>(
@@ -114,6 +127,7 @@ function selectDescription({
 /** Composes legacy proposal evidence into one independently complete Bottle draft. */
 export function buildIndependentBottleProposalDraft({
   sourceBottle,
+  sourceSharedName,
   proposedBottle,
   proposedRelease,
 }: ProposalDraftInput): BottleFormInitialData {
@@ -129,7 +143,11 @@ export function buildIndependentBottleProposalDraft({
   });
 
   return {
-    name: selectStableField("name", { sourceBottle, proposedBottle }),
+    name: selectStableName({
+      sourceBottle,
+      sourceSharedName,
+      proposedBottle,
+    }),
     statedAge:
       proposedRelease?.statedAge ??
       selectStableField("statedAge", { sourceBottle, proposedBottle }),

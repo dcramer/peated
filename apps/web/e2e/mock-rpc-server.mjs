@@ -1,6 +1,7 @@
 import http from "node:http";
 
 import {
+  addAnotherReleaseSourceBottle,
   anotherReleaseSourceBottle,
   bottleGroupId,
   bottleGroupMemberTargets,
@@ -234,19 +235,19 @@ async function handleRpcRequest({ request, response, url }) {
 
       if (getAccessToken(request).includes("add-another-release")) {
         if (
-          input?.name !== anotherReleaseSourceBottle.name ||
-          input?.brand !== anotherReleaseSourceBottle.brand.id ||
-          input?.statedAge !== anotherReleaseSourceBottle.statedAge ||
-          input?.edition !== anotherReleaseSourceBottle.edition ||
-          input?.abv !== anotherReleaseSourceBottle.abv ||
-          input?.releaseYear !== anotherReleaseSourceBottle.releaseYear
+          input?.name !== addAnotherReleaseSourceBottle.group.name ||
+          input?.brand !== addAnotherReleaseSourceBottle.brand.id ||
+          input?.statedAge !== addAnotherReleaseSourceBottle.statedAge ||
+          input?.edition !== addAnotherReleaseSourceBottle.edition ||
+          input?.abv !== addAnotherReleaseSourceBottle.abv ||
+          input?.releaseYear !== addAnotherReleaseSourceBottle.releaseYear
         ) {
           sendRpcError(response, "Unexpected add another release payload");
           return true;
         }
 
         const bottle = {
-          ...anotherReleaseSourceBottle,
+          ...addAnotherReleaseSourceBottle,
           id: createdBottleId,
         };
         sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
@@ -1941,7 +1942,7 @@ function withCollectionStatus(request, bottle) {
 function getMockBottle(request, bottleId) {
   if (bottleId === existingBottleId) {
     return getAccessToken(request).includes("add-another-release")
-      ? anotherReleaseSourceBottle
+      ? addAnotherReleaseSourceBottle
       : existingBottle;
   }
   if (bottleId === createdBottleId) {

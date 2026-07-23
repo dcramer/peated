@@ -60,10 +60,14 @@ function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
   const { flash } = useFlashMessages();
 
   if (proposalId && proposalQuery.isLoading) return <Spinner />;
+  if (!sourceBottle.group) {
+    throw new Error("Add another release requires a BottleGroup summary.");
+  }
 
   const initialData = {
     ...buildIndependentBottleProposalDraft({
       sourceBottle,
+      sourceSharedName: sourceBottle.group.name,
       proposedBottle: proposalQuery.data?.proposedBottle,
       proposedRelease: proposalQuery.data?.proposedRelease,
     }),
