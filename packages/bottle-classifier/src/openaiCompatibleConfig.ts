@@ -7,21 +7,15 @@ const OPENAI_BASE_URL = "https://api.openai.com/v1";
 const VERCEL_AI_GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
 const DEFAULT_OPENAI_EMBEDDING_MODEL = "text-embedding-3-large";
 
-type OpenAICompatibleEnv = Readonly<
-  Partial<
-    Record<
-      | "AI_GATEWAY_API_KEY"
-      | "OPENAI_API_KEY"
-      | "OPENAI_EVAL_MODEL"
-      | "OPENAI_EMBEDDING_MODEL"
-      | "OPENAI_HOST"
-      | "OPENAI_MODEL"
-      | "OPENAI_ORGANIZATION"
-      | "OPENAI_PROJECT",
-      string | undefined
-    >
-  >
->;
+type OpenAICompatibleEnvKey =
+  | "AI_GATEWAY_API_KEY"
+  | "OPENAI_API_KEY"
+  | "OPENAI_EVAL_MODEL"
+  | "OPENAI_EMBEDDING_MODEL"
+  | "OPENAI_HOST"
+  | "OPENAI_MODEL"
+  | "OPENAI_ORGANIZATION"
+  | "OPENAI_PROJECT";
 
 export type OpenAICompatibleConfig = {
   apiKey: string | undefined;
@@ -43,27 +37,40 @@ function nonEmpty(value: string | undefined): string | undefined {
   return normalized ? normalized : undefined;
 }
 
+function envValue(
+  env: object,
+  key: OpenAICompatibleEnvKey,
+): string | undefined {
+  const value = Reflect.get(env, key);
+  return typeof value === "string" ? value : undefined;
+}
+
 export function resolveOpenAICompatibleConfig(
-  env: OpenAICompatibleEnv,
+  env: object,
 ): OpenAICompatibleConfig {
-  const gatewayApiKey = nonEmpty(env.AI_GATEWAY_API_KEY);
+  const gatewayApiKey = nonEmpty(envValue(env, "AI_GATEWAY_API_KEY"));
   const usesGateway = Boolean(gatewayApiKey);
-  const model = nonEmpty(env.OPENAI_MODEL) ?? DEFAULT_OPENAI_MODEL;
+  const model = nonEmpty(envValue(env, "OPENAI_MODEL")) ?? DEFAULT_OPENAI_MODEL;
   const evalModel =
-    nonEmpty(env.OPENAI_EVAL_MODEL) ?? DEFAULT_OPENAI_EVAL_MODEL;
+    nonEmpty(envValue(env, "OPENAI_EVAL_MODEL")) ?? DEFAULT_OPENAI_EVAL_MODEL;
   const embeddingModel =
-    nonEmpty(env.OPENAI_EMBEDDING_MODEL) ?? DEFAULT_OPENAI_EMBEDDING_MODEL;
+    nonEmpty(envValue(env, "OPENAI_EMBEDDING_MODEL")) ??
+    DEFAULT_OPENAI_EMBEDDING_MODEL;
 
   return {
-    apiKey: gatewayApiKey ?? nonEmpty(env.OPENAI_API_KEY),
+    apiKey: gatewayApiKey ?? nonEmpty(envValue(env, "OPENAI_API_KEY")),
     baseURL: usesGateway
       ? VERCEL_AI_GATEWAY_BASE_URL
-      : (nonEmpty(env.OPENAI_HOST) ?? OPENAI_BASE_URL),
+      : (nonEmpty(envValue(env, "OPENAI_HOST")) ?? OPENAI_BASE_URL),
     embeddingModel: usesGateway ? gatewayModel(embeddingModel) : embeddingModel,
     evalModel: usesGateway ? gatewayModel(evalModel) : evalModel,
     model: usesGateway ? gatewayModel(model) : model,
-    organization: usesGateway ? undefined : nonEmpty(env.OPENAI_ORGANIZATION),
-    project: usesGateway ? undefined : nonEmpty(env.OPENAI_PROJECT),
+    organization: usesGateway
+      ? undefined
+      : nonEmpty(envValue(env, "OPENAI_ORGANIZATION")),
+    project: usesGateway
+      ? undefined
+      : nonEmpty(envValue(env, "OPENAI_PROJECT")),
     provider: usesGateway ? "vercel-ai-gateway" : "openai",
   };
 }

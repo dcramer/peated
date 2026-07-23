@@ -3,6 +3,17 @@ import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 
 describe("resolveOpenAICompatibleConfig", () => {
+  it("accepts typed environment objects without declared OpenAI keys", () => {
+    const env: Readonly<{ NODE_ENV: "test" }> = {
+      NODE_ENV: "test",
+    };
+
+    expect(resolveOpenAICompatibleConfig(env)).toMatchObject({
+      baseURL: "https://api.openai.com/v1",
+      provider: "openai",
+    });
+  });
+
   it("uses direct OpenAI defaults", () => {
     expect(
       resolveOpenAICompatibleConfig({
