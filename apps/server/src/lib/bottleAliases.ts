@@ -71,6 +71,18 @@ export class FailedToSaveBottleAliasError extends Error {
   }
 }
 
+export class ReleaseOwnedBottleAliasError extends Error {
+  constructor(
+    readonly aliasName: string,
+    readonly releaseId: number,
+  ) {
+    super(
+      `Cannot claim release-owned Bottle alias "${aliasName}" (release ${releaseId}).`,
+    );
+    this.name = "ReleaseOwnedBottleAliasError";
+  }
+}
+
 export class StaleBottleAliasReviewIdentityError extends Error {
   constructor(readonly reviewId: number) {
     super(`Review ${reviewId} changed while its Bottle alias was resolving.`);
@@ -168,6 +180,7 @@ type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
         targetId?: never;
         context?: never;
         stagedTargetless?: never;
+        rejectReleaseOwnedAlias?: never;
       }
     | {
         kind?: never;
@@ -179,6 +192,7 @@ type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
         targetId: number;
         context?: never;
         stagedTargetless?: never;
+        rejectReleaseOwnedAlias?: never;
       }
     | {
         kind: "staged_targetless";
@@ -193,6 +207,7 @@ type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
         targetId?: never;
         context: CatalogTargetOperationContext;
         stagedTargetless: StagedTargetlessCatalogAssignment;
+        rejectReleaseOwnedAlias?: boolean;
       }
     | {
         kind?: never;
@@ -204,6 +219,7 @@ type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
         targetId?: null;
         context: CatalogTargetOperationContext;
         stagedTargetless?: never;
+        rejectReleaseOwnedAlias?: boolean;
       }
   );
 
@@ -1145,6 +1161,16 @@ export async function assignBottleAliasInTransaction(
         .for("update");
       if (sourceAliasIdentity && sourceIsCanonicalName) {
         assertBottleAliasIdentitySnapshot(existingAlias, sourceAliasIdentity);
+      }
+      if (
+        input.rejectReleaseOwnedAlias &&
+        existingAlias?.releaseId !== null &&
+        existingAlias?.releaseId !== undefined
+      ) {
+        throw new ReleaseOwnedBottleAliasError(
+          existingAlias.name,
+          existingAlias.releaseId,
+        );
       }
       nextAliasReleaseId = getNextTargetlessAliasReleaseId(
         existingAlias,

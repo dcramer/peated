@@ -15,6 +15,7 @@ import {
   finalizeBottleAliasAssignment,
   InvalidExactBottleAliasTargetError,
   listUnmatchedBottleAliasNames,
+  ReleaseOwnedBottleAliasError,
   reserveExactBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
 import { CatalogTargetRetiredError } from "@peated/server/lib/catalogTargets";
@@ -343,6 +344,57 @@ describe("reserveExactBottleAliasInTransaction", () => {
 });
 
 describe("assignBottleAliasInTransaction", () => {
+  test("rejects a release-owned targetless alias under the locked compatibility precondition", async ({
+    fixtures,
+  }) => {
+    const destination = await fixtures.LegacyBottle();
+    const releaseOwner = await fixtures.LegacyBottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: releaseOwner.id,
+    });
+    const alias = await fixtures.BottleAlias({
+      name: "Release-Owned Compatibility Alias",
+      bottleId: null,
+      releaseId: release.id,
+      targetId: null,
+    });
+    const review = await fixtures.Review({
+      name: alias.name,
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+    });
+
+    await expect(
+      db.transaction(async (tx) =>
+        assignBottleAliasInTransaction(tx, {
+          bottleId: destination.id,
+          releaseId: null,
+          aliasReleaseId: null,
+          name: alias.name,
+          assignedByActorId: destination.createdByActorId,
+          rejectReleaseOwnedAlias: true,
+          context: compatibilityContext,
+        }),
+      ),
+    ).rejects.toBeInstanceOf(ReleaseOwnedBottleAliasError);
+
+    expect(await getAlias(alias.name)).toMatchObject({
+      bottleId: null,
+      releaseId: release.id,
+      targetId: null,
+    });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+    });
+  });
+
   test("rejects a null consumer identity for an exact target before mutation", async ({
     fixtures,
   }) => {

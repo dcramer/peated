@@ -13,15 +13,15 @@ rg -l -S 'releaseId|release_id|bottle_release|bottleReleases|BottleRelease' \
 ```
 
 The initial verifier classified all 205 paths returned before the resulting
-reader fixes. The post-fix rerun returned 207 because target-backed parity and
-projection code retains explicit legacy-reference vocabulary; every added hit
-is classified below. Generated migration history is retained evidence; staged
-schema, migration, and compatibility references have explicit section 6 or
-section 9 owners; canonical readers and writers use CatalogTarget identity. The
-initial pass found three exact-read gaps: the Bottle tags total, the top-level
-collection Bottle filter, and the BottleRelease details/list compatibility
-projection. Those gaps are now closed. No classified hit is an unowned
-exact-read dependency.
+reader fixes. The current rerun returns 208 because target-backed parity,
+projection, and isolated compatibility code retains explicit legacy-reference
+vocabulary; every added hit is classified below. Generated migration history
+is retained evidence; staged schema, migration, and compatibility references
+have explicit section 6 or section 9 owners; canonical readers and writers use
+CatalogTarget identity. The initial pass found three exact-read gaps: the
+Bottle tags total, the top-level collection Bottle filter, and the
+BottleRelease details/list compatibility projection. Those gaps are now
+closed. No classified hit is an unowned exact-read dependency.
 
 Generated migration SQL and snapshots are historical evidence, not runtime
 readers or writers. Tests and eval fixtures are migration coverage and must be
@@ -684,6 +684,14 @@ Catalog identity, aliases, search, creation, and updates:
   completed legacy promotion to a sparse exact patch over the same operation;
   none of these adapters may duplicate its business logic or issue parallel
   alias, audit, or job writes.
+- `apps/server/src/orpc/routes/entities/update.ts` composes brand name and short
+  name changes with that same transaction owner once per affected BottleGroup,
+  in stable group-id order. Every member is rematerialized as an independently
+  complete Bottle while exact target ids and previous exact aliases remain
+  stable; finalizers run only after the entity transaction commits. Direct
+  Bottle and targetless-alias maintenance is isolated to `groupId IS NULL`
+  compatibility for task 9.7 removal and rejects durable target or
+  release-owned alias collisions instead of taking them over.
 - Task 4.7 adds `apps/server/src/lib/mergeBottleGroups.ts` as the authoritative
   one-source-to-one-destination moderator group-merge service. It owns member
   rematerialization, generic consumer and stable-alias consolidation, tombstone
