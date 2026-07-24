@@ -69,7 +69,7 @@
     "drizzle-orm": "catalog:",
     "error-cause": "^1.0.9",
     "google-auth-library": "^10.6.1",
-    "hono": "^4.12.25",
+    "hono": "^4.12.27",
     "ioredis": "^5.5.0",
     "jsonwebtoken": "^9.0.3",
     "jsx-email": "catalog:",
