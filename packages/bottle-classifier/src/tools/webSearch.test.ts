@@ -116,6 +116,115 @@ describe("bottleClassifier web search tools", () => {
     ]);
   });
 
+  test("recovers and dedupes gateway Markdown citations before summary truncation", () => {
+    const independentUrl =
+      "https://www.whiskyadvocate.com/ratings-reviews/wild-turkey-rare-breed-rye/";
+    const evidence = extractOpenAISearchEvidence("wild turkey rare breed rye", {
+      output: [
+        {
+          type: "web_search_call",
+          action: {
+            type: "search",
+            query: "wild turkey rare breed rye",
+            sources: [
+              {
+                type: "url",
+                url: "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+              },
+            ],
+          },
+        },
+        {
+          type: "message",
+          content: [
+            {
+              type: "output_text",
+              text: [
+                "Wild Turkey confirms Rare Breed Rye is barrel proof.",
+                "x".repeat(650),
+                "[Rare Breed Rye](https://www.wildturkeybourbon.com/products/rare-breed-rye/)",
+                `[Whisky Advocate review](${independentUrl})`,
+              ].join(" "),
+              annotations: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(evidence.summary).toHaveLength(320);
+    expect(evidence.results).toEqual([
+      expect.objectContaining({
+        title: "Rare Breed Rye",
+        domain: "wildturkeybourbon.com",
+        url: "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+      }),
+      expect.objectContaining({
+        title: "Whisky Advocate review",
+        domain: "whiskyadvocate.com",
+        url: independentUrl,
+      }),
+    ]);
+  });
+
+  test.each(["Markdown", "structured"] as const)(
+    "prioritizes %s citations over uncited search sources",
+    (citationFormat) => {
+      const citedUrl =
+        "https://www.whiskyadvocate.com/ratings-reviews/wild-turkey-rare-breed-rye/";
+      const uncitedUrls = Array.from(
+        { length: 7 },
+        (_, index) => `https://search-source-${index + 1}.example/product`,
+      );
+      const content =
+        citationFormat === "Markdown"
+          ? {
+              type: "output_text",
+              text: `An independent [Whisky Advocate review](${citedUrl}) confirms the release.`,
+              annotations: [],
+            }
+          : {
+              type: "output_text",
+              text: "An independent review confirms the release.",
+              annotations: [
+                {
+                  type: "url_citation",
+                  title: "Whisky Advocate review",
+                  url: citedUrl,
+                },
+              ],
+            };
+      const evidence = extractOpenAISearchEvidence(
+        "wild turkey rare breed rye",
+        {
+          output: [
+            {
+              type: "web_search_call",
+              action: {
+                type: "search",
+                query: "wild turkey rare breed rye",
+                sources: uncitedUrls.map((url) => ({ type: "url", url })),
+              },
+            },
+            {
+              type: "message",
+              content: [content],
+            },
+          ],
+        },
+      );
+
+      expect(evidence.results).toHaveLength(6);
+      expect(evidence.results[0]).toMatchObject({
+        title: "Whisky Advocate review",
+        url: citedUrl,
+      });
+      expect(evidence.results.map(({ url }) => url)).not.toContain(
+        uncitedUrls.at(-1),
+      );
+    },
+  );
+
   test("does not duplicate the top-level summary into each OpenAI result description", () => {
     const evidence = extractOpenAISearchEvidence("jura 12 official", {
       output_text: "Jura confirms the 12-year-old core single malt bottling.",
@@ -156,45 +265,14 @@ describe("bottleClassifier web search tools", () => {
     const create = vi
       .fn()
       .mockResolvedValueOnce({
-        output_text: "Four Roses confirms Single Barrel Barrel Strength.",
-        output: [
-          {
-            type: "message",
-            content: [
-              {
-                type: "output_text",
-                annotations: [
-                  {
-                    type: "url_citation",
-                    url: "https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/",
-                    title: "Four Roses Single Barrel Barrel Strength",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+        output_text:
+          "Four Roses confirms [Single Barrel Barrel Strength](https://www.fourrosesbourbon.com/bourbon/single-barrel-barrel-strength/).",
+        output: [],
       })
       .mockResolvedValueOnce({
         output_text:
-          "Breaking Bourbon covers Four Roses barrel strength private selections.",
-        output: [
-          {
-            type: "message",
-            content: [
-              {
-                type: "output_text",
-                annotations: [
-                  {
-                    type: "url_citation",
-                    url: "https://www.breakingbourbon.com/review/four-roses-single-barrel-barrel-strength-private-selection",
-                    title: "Four Roses Single Barrel Barrel Strength Review",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+          "Breaking Bourbon covers [Four Roses barrel strength private selections](https://www.breakingbourbon.com/review/four-roses-single-barrel-barrel-strength-private-selection).",
+        output: [],
       });
     const client = {
       responses: {
@@ -216,6 +294,42 @@ describe("bottleClassifier web search tools", () => {
     expect(isThinBottleSearchEvidence(evidence)).toBe(false);
     expect(evidence.summary).toContain("Four Roses confirms");
     expect(evidence.summary).toContain("Breaking Bourbon covers");
+  });
+
+  test("does not supplement gateway Markdown evidence from two domains", async () => {
+    const primaryUrls = [
+      "https://example-distillery.com/bottles/private-cask",
+      "https://whisky.example/reviews/private-cask",
+    ];
+    const supplementalUrl =
+      "https://another-review.example/bottles/private-cask";
+    const create = vi
+      .fn()
+      .mockResolvedValueOnce({
+        output_text: `Official [product details](${primaryUrls[0]}) agree with an [independent review](${primaryUrls[1]}).`,
+        output: [],
+      })
+      .mockResolvedValueOnce({
+        output_text: `Another [independent review](${supplementalUrl}) confirms the bottle.`,
+        output: [],
+      });
+    const client = {
+      responses: {
+        create,
+      },
+    } as unknown as OpenAI;
+
+    const evidence = await runBottleWebEvidenceSearch({
+      client,
+      model: "gpt-5.4",
+      query: "example distillery private cask",
+      budget: createBottleWebSearchBudget(2),
+    });
+
+    expect("error" in evidence).toBe(false);
+    if ("error" in evidence) return;
+    expect(evidence.results.map(({ url }) => url)).toEqual(primaryUrls);
+    expect(isThinBottleSearchEvidence(evidence)).toBe(false);
   });
 
   test("extracts Firecrawl search evidence with scraped page markdown", () => {
