@@ -1,0 +1,24 @@
+{
+  "id": "macallan-classic-cut-2021-edition",
+  "referenceName": "The Macallan Classic Cut 2021 Edition",
+  "expectedBottleName": "The Macallan Classic Cut",
+  "expectedBottleNames": ["The Macallan Classic Cut", "Macallan Classic Cut"],
+  "summary": "Treat The Macallan Classic Cut 2021 Edition as one complete Bottle with the literal edition 2021 Edition and releaseYear 2021, not as a generic Limited Edition series or a bare-year-only result.",
+  "peatedBottleIds": [1832],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2021-edition",
+      "https://api.peated.com/v1/bottles/1832"
+    ],
+    "notes": "The official Macallan archive markets the literal 2021 Edition. Peated Bottle 1832 provides catalog traceability, not authority for the expected identity."
+  },
+  "expected": {
+    "handlingStrategy": "classifier_required",
+    "classifierExpectation": "bottle",
+    "exactBottleIdentity": {
+      "edition": "2021 Edition",
+      "releaseYear": 2021
+    }
+  }
+}

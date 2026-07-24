@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-07-24T23:23:33.449Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "The Macallan Classic Cut 2021 Edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "The Macallan Classic Cut 2021 Edition",
+    "summary": "**The Macallan Classic Cut 2021 Edition** — confirmed bottle details:\n\n- **Producer / bottler:** The Macallan, **distillery bottling**. ([themacallan.com](https://www.themacallan.com/en/single-malt-scotch-whisky/classic-cut-2021-edition))\n- **Category:** Speyside single malt Scotch whisky, part of The Macallan’s **annu",
+    "results": [
+      {
+        "title": "themacallan.com",
+        "url": "https://www.themacallan.com/en/single-malt-scotch-whisky/classic-cut-2021-edition",
+        "domain": "themacallan.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/187442/macallan-classic-cut",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e23ebb95888c16ee8c23963c6867808c8b4cab978682dfe761e3493b1906d635",
+    "mode": "auto"
+  }
+}
