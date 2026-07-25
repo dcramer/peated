@@ -12,7 +12,10 @@ import {
 
 type PromotionMappingRow = {
   releaseId: number;
-  promotedBottleId: number;
+  promotedBottleId: number | null;
+  status: string;
+  completedAt: Date | null;
+  error: string | null;
   legacyReleaseExists: boolean;
   promotedBottleExists: boolean;
 };
@@ -34,19 +37,52 @@ export function summarizePromotionMappings({
   rows: PromotionMappingRow[];
 }): CatalogMigrationMappingSummary {
   const releaseCounts = new Map<number, number>();
+  const completedReleaseIds = new Set<number>();
+  let completedMappings = 0;
+  let pendingMappings = 0;
+  let failedMappings = 0;
+  let partialMappings = 0;
+  let invalidStatusMappings = 0;
+
   for (const row of rows) {
     releaseCounts.set(
       row.releaseId,
       (releaseCounts.get(row.releaseId) ?? 0) + 1,
     );
+
+    const isComplete =
+      row.status === "promoted" &&
+      row.promotedBottleId !== null &&
+      row.completedAt !== null &&
+      row.error === null &&
+      row.legacyReleaseExists &&
+      row.promotedBottleExists;
+    if (isComplete) {
+      completedMappings += 1;
+      completedReleaseIds.add(row.releaseId);
+    } else if (row.status === "pending") {
+      pendingMappings += 1;
+    } else if (row.status === "failed") {
+      failedMappings += 1;
+    } else if (row.status === "promoted") {
+      partialMappings += 1;
+    } else {
+      invalidStatusMappings += 1;
+    }
   }
 
-  const mappedReleases = Array.from(releaseCounts.keys()).length;
+  const mappedReleases = completedReleaseIds.size;
   return {
     tablePresent,
     totalLegacyReleases,
+    totalMappings: rows.length,
     mappedReleases,
     unmappedReleases: Math.max(totalLegacyReleases - mappedReleases, 0),
+    completedMappings,
+    pendingMappings,
+    failedMappings,
+    partialMappings,
+    invalidStatusMappings,
     duplicateReleaseMappings: Array.from(releaseCounts.values()).filter(
       (count) => count > 1,
     ).length,
@@ -205,8 +241,24 @@ async function loadReferenceSummaries(
 
 async function loadCollisions(
   database: AnyDatabase,
+  promotionTablePresent: boolean,
 ): Promise<CatalogMigrationCollision[]> {
+  const validPromotions = promotionTablePresent
+    ? sql`
+        SELECT mapping.release_id, mapping.promoted_bottle_id
+        FROM bottle_release_promotion mapping
+        INNER JOIN bottle_release release ON release.id = mapping.release_id
+        INNER JOIN bottle promoted ON promoted.id = mapping.promoted_bottle_id
+        WHERE mapping.status = 'promoted'
+          AND mapping.completed_at IS NOT NULL
+          AND mapping.error IS NULL
+      `
+    : sql`
+        SELECT NULL::bigint AS release_id, NULL::bigint AS promoted_bottle_id
+        WHERE FALSE
+      `;
   const result = await database.execute<CatalogMigrationCollision>(sql`
+    WITH valid_promotions AS (${validPromotions})
     SELECT
       collision_type AS "type",
       collision_name AS "name",
@@ -222,6 +274,10 @@ async function loadCollisions(
         b.id AS bottle_id
       FROM bottle_release r
       INNER JOIN bottle b ON LOWER(b.full_name) = LOWER(r.full_name)
+      LEFT JOIN valid_promotions promotion
+        ON promotion.release_id = r.id
+        AND promotion.promoted_bottle_id = b.id
+      WHERE promotion.release_id IS NULL
 
       UNION ALL
 
@@ -233,8 +289,12 @@ async function loadCollisions(
         a.bottle_id
       FROM bottle_release r
       INNER JOIN bottle_alias a ON LOWER(a.name) = LOWER(r.full_name)
+      LEFT JOIN valid_promotions promotion
+        ON promotion.release_id = r.id
+        AND promotion.promoted_bottle_id = a.bottle_id
       WHERE a.release_id IS DISTINCT FROM r.id
         AND NOT COALESCE(a.ignored, false)
+        AND promotion.release_id IS NULL
 
       UNION ALL
 
@@ -294,6 +354,9 @@ async function loadPromotionMappingSummary({
     SELECT
       mapping.release_id::int AS "releaseId",
       mapping.promoted_bottle_id::int AS "promotedBottleId",
+      mapping.status::text AS "status",
+      mapping.completed_at AS "completedAt",
+      mapping.error AS "error",
       release.id IS NOT NULL AS "legacyReleaseExists",
       promoted.id IS NOT NULL AS "promotedBottleExists"
     FROM bottle_release_promotion mapping
@@ -320,11 +383,11 @@ export async function runCatalogMigrationAudit(
     `);
     const legacyCatalog = await loadLegacyCatalogSummary(tx);
     const references = await loadReferenceSummaries(tx);
-    const collisions = await loadCollisions(tx);
     const promotionMappings = await loadPromotionMappingSummary({
       database: tx,
       totalLegacyReleases: legacyCatalog.totalReleases,
     });
+    const collisions = await loadCollisions(tx, promotionMappings.tablePresent);
 
     const invalidReferenceCount = references.reduce(
       (total, reference) => total + reference.invalidRows,
@@ -339,8 +402,10 @@ export async function runCatalogMigrationAudit(
       invalidReferenceCount +
       collisions.length +
       promotionMappings.duplicateReleaseMappings +
-      promotionMappings.missingLegacyReleases +
-      promotionMappings.missingPromotedBottles;
+      promotionMappings.pendingMappings +
+      promotionMappings.failedMappings +
+      promotionMappings.partialMappings +
+      promotionMappings.invalidStatusMappings;
     const warningCount =
       legacyCatalog.missingParentAliases +
       legacyCatalog.missingReleaseAliases +
@@ -395,7 +460,7 @@ export function formatCatalogMigrationAudit(
         `  ${collision.type}: release ${collision.releaseId} (${collision.name})${collision.bottleId ? ` vs bottle ${collision.bottleId}` : ""}${collision.otherReleaseId ? ` vs release ${collision.otherReleaseId}` : ""}`,
     ),
     "",
-    `Promotion mappings: ${report.promotionMappings.tablePresent ? "present" : "not created"} (${report.promotionMappings.mappedReleases}/${report.promotionMappings.totalLegacyReleases} mapped)`,
+    `Promotion mappings: ${report.promotionMappings.tablePresent ? "present" : "not created"} (${report.promotionMappings.mappedReleases}/${report.promotionMappings.totalLegacyReleases} completed; ${report.promotionMappings.pendingMappings} pending / ${report.promotionMappings.failedMappings} failed / ${report.promotionMappings.partialMappings} partial / ${report.promotionMappings.invalidStatusMappings} invalid status)`,
     `Blocking issues: ${report.blockingIssueCount}`,
     `Warnings: ${report.warningCount}`,
   ];

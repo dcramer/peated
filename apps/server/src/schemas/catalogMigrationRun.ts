@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CatalogMigrationAuditSchema } from "./catalogMigrationAudit";
 
-export const CATALOG_MIGRATION_RUN_SCHEMA_VERSION = 1 as const;
+export const CATALOG_MIGRATION_RUN_SCHEMA_VERSION = 2 as const;
 
 const CATALOG_MIGRATION_ALIAS_OBSERVATION_TABLES = [
   "bottle_alias",

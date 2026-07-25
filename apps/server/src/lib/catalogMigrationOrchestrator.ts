@@ -331,6 +331,9 @@ export async function runCatalogMigrationWriteBatch(
   ) {
     throw new TypeError("A completed dry-run report is required for writes.");
   }
+  if (approvedDryRun.dryRunAudit.blockingIssueCount > 0) {
+    throw new TypeError("The approved dry-run audit contains blocking issues.");
+  }
   if (
     Date.parse(approvalInput.approvedAt) <=
     Date.parse(approvedDryRun.evidence.generatedAt)

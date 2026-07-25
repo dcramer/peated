@@ -26,7 +26,7 @@ function makeReport(
   overrides: Partial<CatalogMigrationRunReport> = {},
 ): CatalogMigrationRunReport {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     mode: "dry_run",
     status: "complete",
     evidence: {
@@ -67,7 +67,7 @@ function makeReport(
       },
     },
     dryRunAudit: {
-      schemaVersion: 1,
+      schemaVersion: 2,
       generatedAt: "2026-07-18T12:00:00.000Z",
       databaseName: "peated_test",
       legacyCatalog: {
@@ -91,8 +91,14 @@ function makeReport(
       promotionMappings: {
         tablePresent: true,
         totalLegacyReleases: 0,
+        totalMappings: 0,
         mappedReleases: 0,
         unmappedReleases: 0,
+        completedMappings: 0,
+        pendingMappings: 0,
+        failedMappings: 0,
+        partialMappings: 0,
+        invalidStatusMappings: 0,
         duplicateReleaseMappings: 0,
         missingLegacyReleases: 0,
         missingPromotedBottles: 0,

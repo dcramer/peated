@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 1 as const;
+export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 2 as const;
 
 export const CatalogMigrationLegacySummarySchema = z.object({
   totalParents: z.number().int().gte(0),
@@ -47,8 +47,14 @@ export const CatalogMigrationCollisionSchema = z.object({
 export const CatalogMigrationMappingSummarySchema = z.object({
   tablePresent: z.boolean(),
   totalLegacyReleases: z.number().int().gte(0),
+  totalMappings: z.number().int().gte(0),
   mappedReleases: z.number().int().gte(0),
   unmappedReleases: z.number().int().gte(0),
+  completedMappings: z.number().int().gte(0),
+  pendingMappings: z.number().int().gte(0),
+  failedMappings: z.number().int().gte(0),
+  partialMappings: z.number().int().gte(0),
+  invalidStatusMappings: z.number().int().gte(0),
   duplicateReleaseMappings: z.number().int().gte(0),
   missingLegacyReleases: z.number().int().gte(0),
   missingPromotedBottles: z.number().int().gte(0),

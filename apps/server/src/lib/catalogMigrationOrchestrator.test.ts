@@ -225,7 +225,7 @@ describe("catalog migration orchestrator", () => {
     );
 
     expect(report).toMatchObject({
-      schemaVersion: 1,
+      schemaVersion: 2,
       mode: "dry_run",
       status: "complete",
       checkpoint: {
@@ -255,6 +255,7 @@ describe("catalog migration orchestrator", () => {
       promotionMappings: {
         tablePresent: true,
         totalLegacyReleases: 1,
+        totalMappings: 0,
         mappedReleases: 0,
       },
     });
@@ -750,6 +751,85 @@ describe("catalog migration orchestrator", () => {
     expect(
       await catalogSnapshot({
         parentId: parent.id,
+        aliasNames: [parent.fullName],
+      }),
+    ).toEqual(before);
+  });
+
+  test("rejects blocking dry-run audits for new and resumed writes before checkpointing", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.LegacyBottle({
+      name: "Blocked parent",
+      fullName: "Migration Brand Blocked parent",
+      edition: "Ambiguous parent edition",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Blocked release",
+      fullName: "Migration Brand Blocked release",
+    });
+    const dryRun = await runCatalogMigrationDryRun(
+      { gitRevision: GIT_REVISION },
+      db,
+      MIGRATIONS_FOLDER,
+    );
+    expect(dryRun.dryRunAudit.blockingIssueCount).toBeGreaterThan(0);
+
+    const approval = approvalFor(dryRun);
+    const retainedReport: CatalogMigrationRunReport = {
+      schemaVersion: 2,
+      mode: "write",
+      status: "pending",
+      evidence: {
+        ...dryRun.evidence,
+        generatedAt: new Date(
+          Date.parse(dryRun.evidence.generatedAt) + 2_000,
+        ).toISOString(),
+      },
+      checkpoint: dryRun.checkpoint,
+      metrics: dryRun.metrics,
+      dryRunAudit: dryRun.dryRunAudit,
+      failure: null,
+      writeApproval: {
+        ...approval,
+        dryRunGeneratedAt: dryRun.evidence.generatedAt,
+        gitRevision: dryRun.evidence.gitRevision,
+        databaseName: dryRun.evidence.databaseName,
+        databaseMigration: dryRun.evidence.databaseMigration,
+      },
+    };
+    const before = await catalogSnapshot({
+      parentId: parent.id,
+      releaseId: release.id,
+      aliasNames: [parent.fullName],
+    });
+    let checkpointCalls = 0;
+
+    for (const report of [undefined, retainedReport]) {
+      await expect(
+        runCatalogMigrationWriteBatch(
+          {
+            gitRevision: GIT_REVISION,
+            approvedDryRun: dryRun,
+            approval,
+            report,
+            limit: 1,
+          },
+          async () => {
+            checkpointCalls += 1;
+          },
+          db,
+          MIGRATIONS_FOLDER,
+        ),
+      ).rejects.toThrow("The approved dry-run audit contains blocking issues.");
+    }
+
+    expect(checkpointCalls).toBe(0);
+    expect(
+      await catalogSnapshot({
+        parentId: parent.id,
+        releaseId: release.id,
         aliasNames: [parent.fullName],
       }),
     ).toEqual(before);

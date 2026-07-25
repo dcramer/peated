@@ -34,7 +34,7 @@ function emptyMetrics() {
 
 function dryRunAudit() {
   return {
-    schemaVersion: 1 as const,
+    schemaVersion: 2 as const,
     generatedAt: DRY_RUN_GENERATED_AT,
     databaseName: "peated_test",
     legacyCatalog: {
@@ -58,8 +58,14 @@ function dryRunAudit() {
     promotionMappings: {
       tablePresent: true,
       totalLegacyReleases: 0,
+      totalMappings: 0,
       mappedReleases: 0,
       unmappedReleases: 0,
+      completedMappings: 0,
+      pendingMappings: 0,
+      failedMappings: 0,
+      partialMappings: 0,
+      invalidStatusMappings: 0,
       duplicateReleaseMappings: 0,
       missingLegacyReleases: 0,
       missingPromotedBottles: 0,
