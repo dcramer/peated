@@ -13,14 +13,14 @@ rg -l -S 'releaseId|release_id|bottle_release|bottleReleases|BottleRelease' \
 ```
 
 The initial verifier classified all 205 paths returned before the resulting
-reader fixes. The current rerun returns 208 because target-backed parity,
-projection, and isolated compatibility code retains explicit legacy-reference
-vocabulary; every added hit is classified below. Generated migration history
-is retained evidence; staged schema, migration, and compatibility references
-have explicit section 6 or section 9 owners; canonical readers and writers use
-CatalogTarget identity. The initial pass found three exact-read gaps: the
-Bottle tags total, the top-level collection Bottle filter, and the
-BottleRelease details/list compatibility projection. Those gaps are now
+reader fixes. The current rerun returns 199 after the reader cutovers and dead
+legacy helpers were removed; target-backed parity, projection, and isolated
+compatibility code still retain explicit legacy-reference vocabulary. Generated
+migration history is retained evidence; staged schema, migration, and
+compatibility references have explicit section 6 or section 9 owners; canonical
+readers and writers use CatalogTarget identity. The initial pass found three
+exact-read gaps: the Bottle tags total, the top-level collection Bottle filter,
+and the BottleRelease details/list compatibility projection. Those gaps are now
 closed. No classified hit is an unowned exact-read dependency.
 
 Generated migration SQL and snapshots are historical evidence, not runtime
@@ -873,7 +873,8 @@ Catalog identity, aliases, search, creation, and updates:
   classifier failures carry no classifier evidence, and `no_match`/unresolved
   results remain targetless. This service no longer owns a raw alias or
   BottleRelease writer.
-- `apps/server/src/lib/bottleReleaseIdentity.ts`
+- The former `apps/server/src/lib/bottleReleaseIdentity.ts` is removed; exact
+  duplicate detection now has no BottleRelease-owned runtime implementation.
 - `apps/server/src/lib/bottleSchemaRules.ts`
 - `apps/server/src/lib/db.ts` still owns the raw legacy-pair
   `upsertBottleAlias` primitive. Canonical creation uses it only to reserve a

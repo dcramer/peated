@@ -107,7 +107,7 @@ export default function ReviewWorkbenchStats({
             <SnapshotMetric
               label="Matched"
               value={isError ? null : today?.matchedSuccessfully}
-              detail="Listings currently approved to a bottle or bottling."
+              detail="Listings currently approved to an exact Bottle or release family."
             />
             <SnapshotMetric
               label="Auto Cleared"

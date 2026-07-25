@@ -463,7 +463,7 @@ function recordLegacyCatalogTargetUsage(
   access: LegacyCatalogTargetAccess,
 ): void {
   assertOperationContext(context);
-  logInfo("Legacy catalog target compatibility {access}", {
+  logInfo(`Legacy catalog target compatibility ${access}`, {
     extra: {
       event: "catalog_target.compatibility",
       access,
