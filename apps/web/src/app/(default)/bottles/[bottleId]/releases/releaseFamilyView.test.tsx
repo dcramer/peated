@@ -1,8 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import type {
-  ExactCatalogTargetV1,
-  GenericCatalogTargetV1,
-} from "@peated/server/schemas";
+import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -21,48 +18,6 @@ vi.mock("@peated/web/components/paginationButtons", () => ({
     <nav aria-label={ariaLabel}>
       {cursorParam ?? "cursor"} next page: {rel.nextCursor}
     </nav>
-  ),
-}));
-
-vi.mock("@peated/web/components/collectionAction", () => ({
-  default: ({ targetId, title }: { targetId: number; title: string }) => (
-    <button data-target-id={targetId}>{title}</button>
-  ),
-}));
-
-vi.mock("@peated/web/components/tastingList", () => ({
-  default: ({
-    values,
-  }: {
-    values: Array<{
-      id: number;
-      notes: string | null;
-      target: GenericCatalogTargetV1;
-    }>;
-  }) => (
-    <ul aria-label="Direct release family tastings">
-      {values.map((tasting) => (
-        <li key={tasting.id}>
-          {tasting.notes}
-          <span>{tasting.target.group.fullName}</span>
-          <span>Exact bottle not specified</span>
-        </li>
-      ))}
-    </ul>
-  ),
-}));
-
-vi.mock("./releaseFamilyModActions", () => ({
-  default: ({
-    anchorBottleId,
-    totalBottles,
-  }: {
-    anchorBottleId: number;
-    totalBottles: number;
-  }) => (
-    <button aria-label="Release family actions">
-      Anchor {anchorBottleId} has {totalBottles} releases
-    </button>
   ),
 }));
 
@@ -101,14 +56,7 @@ const group = {
   createdByActorId: 4,
   createdAt: timestamp,
   updatedAt: timestamp,
-} satisfies GenericCatalogTargetV1["group"];
-
-const target = {
-  schemaVersion: 1,
-  kind: "group",
-  targetId: 100,
-  group,
-} satisfies GenericCatalogTargetV1;
+} satisfies Outputs["bottleGroups"]["details"]["group"];
 
 const exactTarget = {
   schemaVersion: 1,
@@ -158,64 +106,34 @@ const exactTarget = {
   },
 } satisfies ExactCatalogTargetV1;
 
-const directGenericTasting = {
-  id: 700,
-  imageUrl: null,
-  notes: "Smoky family tasting.",
-  target,
-  rating: 2,
-  tags: [],
-  color: null,
-  servingStyle: null,
-  friends: [],
-  awards: [],
-  comments: 0,
-  toasts: 0,
-  hasToasted: false,
-  createdAt: timestamp,
-  createdBy: {
-    id: 5,
-    username: "familytaster",
-    pictureUrl: null,
-    private: false,
-  },
-} satisfies Outputs["tastings"]["list"]["results"][number];
-
 describe("ReleaseFamilyView", () => {
-  it("keeps generic identity separate from independently complete Bottles", () => {
+  it("presents similar bottles without group activity or management actions", () => {
     const html = renderToStaticMarkup(
       <ReleaseFamilyView
-        anchorBottleId={999}
-        target={target}
+        group={group}
         bottleList={{
           results: [exactTarget],
           rel: { prevCursor: null, nextCursor: 2 },
-        }}
-        directTastingList={{
-          results: [directGenericTasting],
-          rel: { prevCursor: null, nextCursor: 3 },
         }}
       />,
     );
 
     expect(html).toContain("Lagavulin 18");
-    expect(html).toContain("Exact release not specified");
-    expect(html).toContain('aria-label="Release family actions"');
-    expect(html).toContain("Anchor 999 has 2 releases");
-    expect(html).toContain('data-target-id="100"');
-    expect(html).toContain("Save release family to Library");
-    expect(html).toContain('href="/addBottle?group=8&amp;intent=tasting"');
-    expect(html).toContain("Log Tasting");
+    expect(html).toContain("Similar bottles");
+    expect(html).toContain("Other releases");
     expect(html).toContain("Shared group description.");
     expect(html).toContain('src="https://example.com/group.webp"');
-    expect(html).toContain("Related releases</dt><dd");
+    expect(html).toContain("Similar bottles</dt><dd");
     expect(html).toContain(">2</dd>");
-    expect(html).toContain("Tastings logged to this release family");
-    expect(html).toContain("Smoky family tasting.");
-    expect(html).toContain("Exact bottle not specified");
+    expect(html).not.toContain("Exact release not specified");
+    expect(html).not.toContain("Release family");
+    expect(html).not.toContain("Save");
+    expect(html).not.toContain("Log Tasting");
+    expect(html).not.toContain("/releases/merge");
+    expect(html).not.toContain("/releases/split");
+    expect(html).not.toContain("/addBottle?group=");
 
     expect(html).toContain('href="/bottles/42"');
-    expect(html).not.toContain('href="/bottles/999"');
     expect(html).toContain("Lagavulin 21 Cask 42");
     expect(html).toContain("21 years");
     expect(html).toContain("55.1% ABV");
@@ -225,9 +143,7 @@ describe("ReleaseFamilyView", () => {
     expect(html).toContain("Cask strength");
     expect(html).toContain("1st Fill Oloroso Hogshead cask");
     expect(html).toContain('src="https://example.com/exact.webp"');
-    expect(html).toContain('aria-label="Release family tasting pagination"');
-    expect(html).toContain("tastingCursor next page: 3");
-    expect(html).toContain('aria-label="Related release pagination"');
+    expect(html).toContain('aria-label="Other release pagination"');
     expect(html).toContain("cursor next page: 2");
   });
 });

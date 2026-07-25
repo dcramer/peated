@@ -14,27 +14,10 @@ beforeEach(() => {
   vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
 });
 
-test("builds exact and generic recomputation payloads", () => {
-  expect(
-    buildTastingStatsRecomputeJob({
-      targetId: 20,
-      groupId: 30,
-      bottleId: 40,
-    }),
-  ).toEqual({
+test("builds a direct Bottle recomputation payload", () => {
+  expect(buildTastingStatsRecomputeJob(40)).toEqual({
     name: "UpdateBottleStats",
-    args: { targetId: 20 },
-  });
-
-  expect(
-    buildTastingStatsRecomputeJob({
-      targetId: 21,
-      groupId: 31,
-      bottleId: null,
-    }),
-  ).toEqual({
-    name: "UpdateBottleGroupStats",
-    args: { targetId: 21 },
+    args: { bottleId: 40 },
   });
 });
 
@@ -43,17 +26,11 @@ test("queues independent delayed work and does not fail the committed request", 
     new Error("queue unavailable"),
   );
 
-  await expect(
-    dispatchTastingStatsRecompute(10, {
-      targetId: 20,
-      groupId: 30,
-      bottleId: 40,
-    }),
-  ).resolves.toBeUndefined();
+  await expect(dispatchTastingStatsRecompute(10, 40)).resolves.toBeUndefined();
 
   expect(workerClient.pushJob).toHaveBeenCalledWith(
     "UpdateBottleStats",
-    { targetId: 20 },
+    { bottleId: 40 },
     {
       delay: 5000,
       removeOnComplete: true,

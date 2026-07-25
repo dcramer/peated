@@ -29,8 +29,6 @@ import { signIn } from "./session";
 
 const pendingScanImageUrl =
   "http://127.0.0.1:4999/uploads/playwright-photo.webp";
-const createdBottleTargetId = 10_000_000 + createdBottleId;
-
 test.describe("create bottle", () => {
   test("renders the Add Bottle resolver at the plain route", async ({
     context,
@@ -239,8 +237,8 @@ test.describe("create bottle", () => {
     await submitCreateBottle(page);
     const libraryInput = getRpcInput(await libraryRequestPromise);
 
-    expect(libraryInput.target).toBe(createdBottleTargetId);
-    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput.bottle).toBe(createdBottleId);
+    expect(libraryInput).not.toHaveProperty("target");
     expect(libraryInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(
@@ -311,8 +309,8 @@ test.describe("create bottle", () => {
     await page.getByRole("button", { name: "Create Bottle" }).click();
     const libraryInput = getRpcInput(await libraryRequestPromise);
 
-    expect(libraryInput.target).toBe(createdBottleTargetId);
-    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput.bottle).toBe(createdBottleId);
+    expect(libraryInput).not.toHaveProperty("target");
     expect(libraryInput).not.toHaveProperty("release");
     await expect(page).toHaveURL(
       new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
@@ -1024,7 +1022,7 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("shows catalog image warning without blocking created target resolution", async ({
+  test("shows catalog image warning without blocking created Bottle resolution", async ({
     context,
     page,
   }, testInfo) => {
@@ -1074,8 +1072,8 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    expect(libraryInput.target).toBe(createdBottleTargetId);
-    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput.bottle).toBe(createdBottleId);
+    expect(libraryInput).not.toHaveProperty("target");
     expect(libraryInput).not.toHaveProperty("release");
     expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
     await expect(
@@ -1113,8 +1111,8 @@ test.describe("add bottle flow", () => {
     expect(input.createToken).toBe(
       "playwright-create-token:create_bottle:suitable",
     );
-    expect(libraryInput.target).toBe(createdBottleTargetId);
-    expect(libraryInput).not.toHaveProperty("bottle");
+    expect(libraryInput.bottle).toBe(createdBottleId);
+    expect(libraryInput).not.toHaveProperty("target");
     expect(libraryInput).not.toHaveProperty("release");
     expect(libraryInput.pendingImageId).toBe("playwright-photo-upload");
     await expect(
@@ -1162,7 +1160,7 @@ test.describe("add bottle flow", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("routes to an existing bottle when action-time create reuses a target", async ({
+  test("routes to an existing bottle when action-time create reuses it", async ({
     context,
     page,
   }, testInfo) => {

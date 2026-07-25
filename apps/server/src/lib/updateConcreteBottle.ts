@@ -1190,11 +1190,11 @@ export async function updateConcreteBottleInTransaction(
 export async function finalizeConcreteBottleUpdate(
   result: ConcreteBottleUpdateFinalizationManifest,
 ) {
-  for (const targetId of result.changedTargetIds) {
+  for (const bottleId of result.changedBottleIds) {
     try {
-      await pushUniqueJob("OnBottleChange", { targetId });
+      await pushUniqueJob("OnBottleChange", { bottleId });
     } catch (error) {
-      logError(error, { extra: { targetId } });
+      logError(error, { extra: { bottleId } });
     }
   }
   for (const name of result.changedAliasNames) {

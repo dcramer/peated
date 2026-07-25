@@ -9,7 +9,7 @@ import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/
 import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
-import { loadCatalogTargetByLegacyReference } from "@peated/server/lib/catalogTargets";
+import { db } from "@peated/server/db";
 import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
@@ -34,6 +34,8 @@ import {
   type PhotoIdentificationDiagnosticsSchema,
   type PhotoIdentificationSuggestedNextStepEnum,
 } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import * as Sentry from "@sentry/node";
 import type { z } from "zod";
 
@@ -166,24 +168,38 @@ async function serializePhotoIdentificationClassification(
 
   switch (decision.action) {
     case "match": {
-      const matchedTarget = await loadCatalogTargetByLegacyReference(
-        {
-          bottleId: decision.matchedBottleId,
-          releaseId: decision.matchedReleaseId,
-        },
-        {
-          caller: "tastings.photo-identification",
-          operation: "serialize-match",
-          actor: null,
-          permissions: { canReadCatalogIdentity: true },
-        },
-      );
-      if (matchedTarget.kind !== "bottle") {
-        throw new Error("Photo identification match did not resolve exactly.");
+      const bottleId =
+        decision.matchedReleaseId === null
+          ? decision.matchedBottleId
+          : (
+              await db.query.bottleReleasePromotions.findFirst({
+                columns: { promotedBottleId: true },
+                where: (promotions, { and, eq, isNotNull }) =>
+                  and(
+                    eq(promotions.releaseId, decision.matchedReleaseId!),
+                    eq(promotions.status, "promoted"),
+                    isNotNull(promotions.promotedBottleId),
+                  ),
+              })
+            )?.promotedBottleId;
+      if (bottleId === null || bottleId === undefined) {
+        throw new Error("Photo identification match has no promoted Bottle.");
       }
+
+      const matchedBottle = await db.query.bottles.findFirst({
+        where: (bottles, { eq }) => eq(bottles.id, bottleId),
+      });
+      const tombstone = await db.query.bottleTombstones.findFirst({
+        columns: { bottleId: true },
+        where: (tombstones, { eq }) => eq(tombstones.bottleId, bottleId),
+      });
+      if (!matchedBottle || tombstone) {
+        throw new Error("Photo identification match is not an active Bottle.");
+      }
+
       serializedDecision = {
         action: "match",
-        matchedTarget,
+        matchedBottle: await serialize(BottleSerializer, matchedBottle),
       };
       break;
     }

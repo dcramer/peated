@@ -1,31 +1,51 @@
 ## Why
 
-Peated currently models a marketed release as a parent `bottle` plus an optional `bottle_release`, so every creator and consumer must decide which layer owns the record and carry a potentially invalid `(bottleId, releaseId)` pair. As the catalog gains detail, valid parent bottles must be split into releases, creating exactly the accidental identity changes and repair work that the model should prevent.
+Peated currently models a marketed release as a parent `bottle` plus an optional
+`bottle_release`. Creators and consumers must choose which layer owns a record
+and carry a potentially invalid `(bottleId, releaseId)` pair. A previously valid
+Bottle can also change meaning when a more specific release is discovered.
+
+The catalog should have one independently correct entity: Bottle. Related
+versions may be organized by an automatic BottleGroup, but user activity and
+catalog integrations should never need a second polymorphic target identity.
 
 ## What Changes
 
-- Make every concrete catalog entry a Bottle, including records currently represented as Bottle+Bottling pairs.
-- Add an automatically managed BottleGroup for the shared expression identity across related Bottles; every Bottle belongs to exactly one group, and ordinary creation never asks the user to create or select a group.
-- Create a singleton group automatically for every ordinary Bottle creation,
-  including “add another release”; that action only prefills a complete Bottle
-  draft from an existing Bottle. Grouping happens outside the manual creation
-  workflow, while trusted group reuse remains internal to migration,
-  compatibility, and explicitly system-controlled operations.
-- Replace paired bottle/release references with one catalog-target reference that points to either an exact Bottle or its BottleGroup when exact release identity is unknown.
-- Collapse Add Bottle and Add Bottling into one Bottle form with all concrete identity fields.
-- Add explicit, reversible BottleGroup merge and split operations; name-based identity logic may suggest grouping but must not silently merge uncertain expressions.
-- Migrate current bottlings into Bottles, preserve generic parent-level activity on group targets, and preserve old URLs/API references through audited mappings and redirects.
-- Recompute exact Bottle and aggregate BottleGroup statistics after migration.
-- **BREAKING**: retire `BottleRelease`, nested bottling routes, `releaseId`, and create-release APIs after a compatibility window.
-- Supersede the unimplemented `add-target-aware-catalog-creation` proposal, which would deepen the paired-target model this change removes.
+- Make every concrete catalog entry a Bottle, including every current
+  BottleRelease.
+- Keep each legacy parent as a valid general or unversioned Bottle. Parent-only
+  activity remains on that Bottle; release-specific activity moves to the
+  Bottle promoted from the referenced BottleRelease.
+- Add automatically managed BottleGroups for related versions. Every Bottle
+  belongs to one group, ordinary creation always starts in a singleton group,
+  and grouping occurs outside manual Bottle creation.
+- Keep every Bottle independently complete and renderable. Shared BottleGroup
+  edits transactionally rematerialize affected member Bottles.
+- Point tastings, reviews, collection entries, flights, prices, aliases,
+  observations, classifier decisions, proposals, activity, statistics, and
+  other catalog consumers directly to Bottle.
+- Do not create a generic group activity target. BottleGroup is relationship,
+  shared-presentation, and aggregate scope only.
+- Collapse Add Bottle and Add Bottling into one Bottle form with all concrete
+  identity fields.
+- Migrate legacy releases and consumer references in one audited, fail-fast
+  transaction after a retained production preflight. Preserve old URLs and API
+  references through durable release-to-Bottle mappings and redirects.
+- **BREAKING**: retire `BottleRelease`, nested bottling APIs, `releaseId`, and
+  the unreleased `CatalogTarget` system after validation and backup approval.
+- Supersede `add-target-aware-catalog-creation`, which would deepen the paired
+  identity model this change removes.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `concrete-bottle-catalog`: A single concrete Bottle entity and unified add/edit/search/detail behavior for all marketed releases.
-- `automatic-bottle-groups`: Automatic expression grouping, group membership, aggregation, and curated merge/split behavior.
-- `catalog-target-identity`: One validated target reference for exact-Bottle and unknown-exactness BottleGroup activity, including compatibility resolution during migration.
+- `concrete-bottle-catalog`: One independently correct Bottle entity and one
+  add/edit/search/detail workflow for all marketed releases.
+- `automatic-bottle-groups`: Automatic relationship grouping, shared
+  materialization, related-release presentation, and member-derived aggregates.
+- `direct-bottle-identity`: One direct Bottle reference for all activity and
+  integrations, including deterministic legacy migration.
 
 ### Modified Capabilities
 
@@ -33,10 +53,15 @@ None.
 
 ## Impact
 
-- Database schema and generated migrations for BottleGroup, Bottle membership, catalog targets, migration mappings, and removal of `bottle_release` references.
-- Bottle, bottling, alias, observation, tasting, review, collection, flight, price, proposal, classifier, repair, activity, search, statistics, and indexing services.
-- oRPC/OpenAPI inputs and results, CLI/classifier contracts, compatibility adapters, and nested bottling URL redirects.
-- Add/edit Bottle forms, exact Bottle and Bottle-anchored release-family pages,
-  search results, Library, tasting, price, review, and flight workflows.
-- Architecture, schema, bottle-entry, photo-tasting, and store-price-matching documentation.
-- A staged production backfill and cutover with dry-run audits, parity checks, rollback boundaries, and removal only after legacy traffic reaches zero.
+- Database schema and generated migrations for BottleGroup, Bottle membership,
+  durable release promotion mappings, direct consumer Bottle references, and
+  removal of unreleased CatalogTarget additions.
+- Bottle, legacy release, alias, observation, tasting, review, collection,
+  flight, price, proposal, classifier, activity, search, statistics, and
+  indexing services.
+- oRPC/OpenAPI inputs and results, CLI/classifier contracts, compatibility
+  adapters, and nested bottling redirects.
+- Add/edit Bottle forms, Bottle pages, related-release pages, search, Library,
+  tasting, price, review, and flight workflows.
+- A retained production preflight, one fail-fast data transaction, postflight
+  validation, and separately approved destructive cleanup.

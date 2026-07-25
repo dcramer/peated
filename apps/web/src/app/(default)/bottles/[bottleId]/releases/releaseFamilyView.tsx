@@ -1,60 +1,35 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
-import Button from "@peated/web/components/button";
-import CollectionAction from "@peated/web/components/collectionAction";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
-import TastingList from "@peated/web/components/tastingList";
-import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { Suspense } from "react";
-import ReleaseFamilyModActions from "./releaseFamilyModActions";
 
-type BottleGroupTarget = Outputs["bottleGroups"]["details"];
+type BottleGroupPresentation = Outputs["bottleGroups"]["details"]["group"];
 type BottleGroupBottleList = Outputs["bottleGroups"]["bottles"];
-type TastingListResult = Outputs["tastings"]["list"];
 
 export default function ReleaseFamilyView({
-  anchorBottleId,
-  target,
+  group,
   bottleList,
-  directTastingList,
 }: {
-  anchorBottleId: number;
-  target: BottleGroupTarget;
+  group: BottleGroupPresentation;
   bottleList: BottleGroupBottleList;
-  directTastingList: TastingListResult;
 }) {
-  const { group } = target;
-
   return (
     <div className="px-3 lg:px-0">
       <header className="my-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
         <div className="min-w-0">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-highlight text-sm font-semibold uppercase tracking-wide">
-                Release family
-              </p>
-              <h1 className="mt-1 break-words text-3xl font-semibold leading-tight sm:text-4xl">
-                {group.fullName}
-              </h1>
-              <p className="text-muted mt-2 text-sm font-medium">
-                Exact release not specified
-              </p>
-            </div>
-            <div className="flex-none">
-              <ReleaseFamilyModActions
-                anchorBottleId={anchorBottleId}
-                totalBottles={group.totalBottles}
-              />
-            </div>
-          </div>
+          <p className="text-highlight text-sm font-semibold uppercase tracking-wide">
+            Similar bottles
+          </p>
+          <h1 className="mt-1 break-words text-3xl font-semibold leading-tight sm:text-4xl">
+            {group.fullName}
+          </h1>
           <p className="text-muted mt-3 max-w-2xl">
-            This page represents shared identity and activity across related
-            releases. Choose a release below for its exact Bottle details.
+            Explore related releases of this bottle. Each has its own details,
+            tastings, and Library entry.
           </p>
           <div className="text-muted mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             {group.category ? (
@@ -63,23 +38,6 @@ export default function ReleaseFamilyView({
             {group.statedAge !== null ? (
               <span>{group.statedAge} years</span>
             ) : null}
-          </div>
-          <div className="mt-5 flex items-center gap-2">
-            <Suspense>
-              <CollectionAction
-                targetId={target.targetId}
-                title="Save release family to Library"
-              />
-            </Suspense>
-            <Button
-              href={getAddBottleHref({
-                groupId: group.id,
-                intent: "tasting",
-              })}
-              color="primary"
-            >
-              Log Tasting
-            </Button>
           </div>
         </div>
 
@@ -96,7 +54,7 @@ export default function ReleaseFamilyView({
 
       <section aria-labelledby="group-statistics-heading" className="my-8">
         <h2 id="group-statistics-heading" className="sr-only">
-          Release family statistics
+          Similar bottle statistics
         </h2>
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div>
@@ -106,7 +64,7 @@ export default function ReleaseFamilyView({
             </dd>
           </div>
           <div>
-            <dt className="text-muted text-sm">Related releases</dt>
+            <dt className="text-muted text-sm">Similar bottles</dt>
             <dd className="mt-1 text-3xl font-semibold">
               {group.totalBottles.toLocaleString()}
             </dd>
@@ -134,7 +92,7 @@ export default function ReleaseFamilyView({
                 id="about-release-family-heading"
                 className="text-highlight mb-3 text-lg font-bold"
               >
-                About this release family
+                About these bottles
               </h2>
               <div className="prose prose-invert max-w-none">
                 <Markdown content={group.description} />
@@ -147,7 +105,7 @@ export default function ReleaseFamilyView({
                 id="aggregate-ratings-heading"
                 className="text-highlight mb-3 text-lg font-bold"
               >
-                Aggregate ratings
+                Combined ratings
               </h2>
               <SimpleRatingStats stats={group.ratingStats} />
             </section>
@@ -155,47 +113,16 @@ export default function ReleaseFamilyView({
         </div>
       )}
 
-      <section aria-labelledby="family-tastings-heading" className="my-8">
-        <div className="mb-4">
-          <h2
-            id="family-tastings-heading"
-            className="text-highlight text-lg font-bold"
-          >
-            Tastings logged to this release family
-          </h2>
-          <p className="text-muted mt-1 text-sm">
-            These tastings identify the shared expression, but no exact Bottle
-            was selected.
-          </p>
-        </div>
-
-        {directTastingList.results.length ? (
-          <TastingList values={directTastingList.results} />
-        ) : (
-          <p className="text-muted border-y border-slate-800 py-6">
-            No tastings have been logged directly to this release family.
-          </p>
-        )}
-        <Suspense>
-          <PaginationButtons
-            rel={directTastingList.rel}
-            cursorParam="tastingCursor"
-            ariaLabel="Release family tasting pagination"
-          />
-        </Suspense>
-      </section>
-
       <section aria-labelledby="related-releases-heading" className="my-8">
         <div className="mb-4">
           <h2
             id="related-releases-heading"
             className="text-highlight text-lg font-bold"
           >
-            Related releases
+            Other releases
           </h2>
           <p className="text-muted mt-1 text-sm">
-            Each result is an independently complete Bottle with its own exact
-            identity.
+            Choose a bottle to see its details, tastings, and prices.
           </p>
         </div>
 
@@ -233,14 +160,14 @@ export default function ReleaseFamilyView({
           </ul>
         ) : (
           <p className="text-muted border-y border-slate-800 py-6">
-            No related releases on this page.
+            No other releases found.
           </p>
         )}
 
         <Suspense>
           <PaginationButtons
             rel={bottleList.rel}
-            ariaLabel="Related release pagination"
+            ariaLabel="Other release pagination"
           />
         </Suspense>
       </section>

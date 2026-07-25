@@ -1,29 +1,23 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
-  bottleReleases,
-  bottles,
   bottleTags,
-  bottleTombstones,
   flightBottles,
   flights,
   follows,
   tastings,
 } from "@peated/server/db/schema";
 import { awardAllBadgeXp } from "@peated/server/lib/badges";
-import {
-  type CatalogTargetAssignmentDescriptor,
-  CatalogTargetResolutionError,
-  lockCatalogTargetAssignmentDescriptorInTransaction,
-  resolveCatalogTargetForAssignment,
-} from "@peated/server/lib/catalogTargets";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToTasting,
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -45,16 +39,6 @@ import { z } from "zod";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 
-async function findTastingBottle(bottleId: number) {
-  return await db.query.bottles.findFirst({
-    where: eq(bottles.id, bottleId),
-  });
-}
-
-type ResolvedTastingIdentityInput =
-  | { kind: "target"; targetId: number }
-  | { kind: "legacy"; bottleId: number; releaseId: number | null };
-
 export default procedure
   .use(requireAuth)
   .use(requireTosAccepted)
@@ -74,46 +58,6 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    let resolvedIdentityInput: ResolvedTastingIdentityInput;
-    if ("bottle" in input) {
-      let legacyBottle = await findTastingBottle(input.bottle);
-      if (!legacyBottle) {
-        const tombstone = await db.query.bottleTombstones.findFirst({
-          where: eq(bottleTombstones.bottleId, input.bottle),
-        });
-        if (tombstone?.newBottleId) {
-          legacyBottle = await findTastingBottle(tombstone.newBottleId);
-        }
-      }
-      if (!legacyBottle) {
-        throw errors.BAD_REQUEST({
-          message: "Cannot identify bottle.",
-        });
-      }
-
-      const releaseId = input.release ?? null;
-      if (releaseId) {
-        const release = await db.query.bottleReleases.findFirst({
-          where: and(
-            eq(bottleReleases.id, releaseId),
-            eq(bottleReleases.bottleId, legacyBottle.id),
-          ),
-        });
-        if (!release) {
-          throw errors.BAD_REQUEST({
-            message: "Cannot identify release.",
-          });
-        }
-      }
-      resolvedIdentityInput = {
-        kind: "legacy",
-        bottleId: legacyBottle.id,
-        releaseId,
-      };
-    } else {
-      resolvedIdentityInput = { kind: "target", targetId: input.target };
-    }
-
     if (input.pendingImageId) {
       try {
         const pendingUpload = await getUsablePendingUpload({
@@ -166,33 +110,17 @@ export default procedure
     }
 
     const created = await db.transaction(async (tx) => {
-      let target: CatalogTargetAssignmentDescriptor;
+      let bottleId: number;
       try {
-        target = await resolveCatalogTargetForAssignment(
-          resolvedIdentityInput.kind === "legacy"
-            ? {
-                ...resolvedIdentityInput,
-                context: {
-                  caller: "tastings.create",
-                  operation: "create",
-                },
-              }
-            : resolvedIdentityInput,
-          tx,
-        );
-        await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
+        [bottleId] = await resolveActiveBottleIds(tx, [input.bottle]);
       } catch (error) {
-        if (
-          resolvedIdentityInput.kind === "target" &&
-          error instanceof CatalogTargetResolutionError
-        ) {
-          throw errors.BAD_REQUEST({
-            message: "Cannot identify catalog target.",
-            cause: error,
-          });
-        }
-        throw error;
+        if (!(error instanceof ActiveBottleSelectionError)) throw error;
+        throw errors.BAD_REQUEST({
+          message: "Cannot identify bottle.",
+          cause: error,
+        });
       }
+
       let flight: Flight | null = null;
       if (input.flight) {
         const flightResults = await tx
@@ -202,7 +130,7 @@ export default procedure
           .where(
             and(
               eq(flights.publicId, input.flight),
-              eq(flightBottles.targetId, target.targetId),
+              eq(flightBottles.bottleId, bottleId),
             ),
           )
           .limit(1);
@@ -214,22 +142,16 @@ export default procedure
         flight = flightResults[0].flight;
       }
 
-      const identity =
-        resolvedIdentityInput.kind === "legacy"
-          ? {
-              bottleId: resolvedIdentityInput.bottleId,
-              releaseId: resolvedIdentityInput.releaseId,
-            }
-          : { bottleId: target.bottleId, releaseId: null };
       let tasting: Tasting | undefined;
       try {
         [tasting] = await tx
           .insert(tastings)
           .values({
             ...data,
-            ...identity,
+            bottleId,
+            releaseId: null,
+            targetId: null,
             flightId: flight?.id ?? null,
-            targetId: target.targetId,
           })
           .returning();
       } catch (error) {
@@ -243,35 +165,23 @@ export default procedure
       }
       if (!tasting) return null;
 
-      if (tasting.releaseId) {
-        await tx
-          .update(bottleReleases)
-          .set({
-            totalTastings: sql`${bottleReleases.totalTastings} + 1`,
-          })
-          .where(eq(bottleReleases.id, tasting.releaseId));
-      }
-
-      const targetBottleId = target.bottleId;
-      if (targetBottleId !== null) {
-        await Promise.all(
-          tasting.tags.map((tag) =>
-            tx
-              .insert(bottleTags)
-              .values({
-                bottleId: targetBottleId,
-                tag,
-                count: 1,
-              })
-              .onConflictDoUpdate({
-                target: [bottleTags.bottleId, bottleTags.tag],
-                set: {
-                  count: sql<string>`${bottleTags.count} + 1`,
-                },
-              }),
-          ),
-        );
-      }
+      await Promise.all(
+        tasting.tags.map((tag) =>
+          tx
+            .insert(bottleTags)
+            .values({
+              bottleId,
+              tag,
+              count: 1,
+            })
+            .onConflictDoUpdate({
+              target: [bottleTags.bottleId, bottleTags.tag],
+              set: {
+                count: sql<string>`${bottleTags.count} + 1`,
+              },
+            }),
+        ),
+      );
 
       const awards = await awardAllBadgeXp(tx, tasting);
 
@@ -281,7 +191,7 @@ export default procedure
         });
       }
 
-      return { tasting, awards, target };
+      return { tasting, awards, bottleId };
     });
 
     if (!created) {
@@ -290,7 +200,7 @@ export default procedure
       });
     }
     let { tasting } = created;
-    const { awards, target } = created;
+    const { awards, bottleId } = created;
 
     if (input.pendingImageId) {
       try {
@@ -329,7 +239,7 @@ export default procedure
       }
     }
 
-    await dispatchTastingStatsRecompute(tasting.id, target);
+    await dispatchTastingStatsRecompute(tasting.id, bottleId);
 
     return {
       tasting: await serialize(TastingSerializer, tasting, context.user),

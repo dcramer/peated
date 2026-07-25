@@ -7,9 +7,6 @@ export const BottleCheckConfigSchema = z.object({
 
 export class BottleCheck {
   test(config: z.infer<typeof BottleCheckConfigSchema>, tasting: BadgeTasting) {
-    return (
-      tasting.identity.kind === "bottle" &&
-      config.bottle.includes(tasting.identity.bottleId)
-    );
+    return config.bottle.includes(tasting.identity.bottleId);
   }
 }

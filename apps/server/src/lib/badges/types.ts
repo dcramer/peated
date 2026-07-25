@@ -3,7 +3,7 @@ import type { Category } from "@peated/server/types";
 
 export type PersistedBadgeTasting = Pick<
   Tasting,
-  "id" | "createdById" | "targetId" | "bottleId" | "releaseId"
+  "id" | "createdById" | "bottleId"
 >;
 
 export type BadgeIdentityEntity = Pick<Entity, "id" | "countryId" | "regionId">;
@@ -16,12 +16,10 @@ type BadgeIdentityBase = {
   distillers: BadgeIdentityEntity[];
 };
 
-export type BadgeIdentity =
-  | (BadgeIdentityBase & {
-      kind: "bottle";
-      bottleId: number;
-    })
-  | (BadgeIdentityBase & { kind: "group" });
+export type BadgeIdentity = BadgeIdentityBase & {
+  kind: "bottle";
+  bottleId: number;
+};
 
 export type BadgeTasting = Pick<Tasting, "id" | "createdById"> & {
   identity: BadgeIdentity;

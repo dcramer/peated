@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CatalogTargetV1Schema } from "./catalogIdentity";
+import { BottleSchema } from "./bottles";
 import { UserSchema } from "./users";
 
 export const CollectionSchema = z.object({
@@ -33,12 +33,10 @@ export const CollectionBottleSchema = z.object({
   status: CollectionBottleStatusSchema.nullable()
     .default(null)
     .describe("Bottle status for Library entries"),
-  target: CatalogTargetV1Schema.describe(
-    "Exact Bottle or generic BottleGroup referenced by this collection entry",
-  ),
+  bottle: BottleSchema.describe("Bottle referenced by this collection entry"),
   hasTasted: z
     .boolean()
-    .describe("Whether the current user has tasted this CatalogTarget"),
+    .describe("Whether the current user has tasted this Bottle"),
 });
 
 const collectionBottleStatusInputShape = {
@@ -47,24 +45,13 @@ const collectionBottleStatusInputShape = {
   ),
 };
 
-export const CollectionBottleTargetInputSchema = z
+export const CollectionBottleInputSchema = z
   .object({
-    target: z
+    bottle: z
       .number()
       .int()
       .positive()
-      .describe("Authoritative CatalogTarget for this collection action"),
-    ...collectionBottleStatusInputShape,
-  })
-  .strict();
-
-export const CollectionBottleLegacyInputSchema = z
-  .object({
-    bottle: z.number().describe("Retained Bottle compatibility input"),
-    release: z
-      .number()
-      .nullish()
-      .describe("Retained BottleRelease compatibility input"),
+      .describe("Bottle selected for this collection action"),
     ...collectionBottleStatusInputShape,
   })
   .strict();

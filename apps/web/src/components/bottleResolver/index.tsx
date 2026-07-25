@@ -22,7 +22,7 @@ import {
   getCreateNameSeed,
   getCreateProposalLabel,
   getManualResultCopy,
-  getMatchedTarget,
+  getMatchedBottle,
   getProposedName,
   getSearchSeed,
   type PhotoIdentification,
@@ -45,7 +45,7 @@ import type {
   BottleResolverAction,
   BottleResolverMatchedAction,
   BottleResolverProps,
-  BottleResolverTarget,
+  BottleResolverResult,
 } from "./types";
 
 export type {
@@ -54,7 +54,7 @@ export type {
   BottleResolverMatchedAction,
   BottleResolverMatchedActionsProps,
   BottleResolverProps,
-  BottleResolverTarget,
+  BottleResolverResult,
   PendingImageRef,
 } from "./types";
 
@@ -97,8 +97,8 @@ export default function BottleResolver({
   const [resolvingAction, setResolvingAction] =
     useState<BottleResolverAction | null>(null);
   const [matchedBottleStatus, setMatchedBottleStatus] = useState<{
-    targetId: number;
-    hasExactLibraryEntry: boolean;
+    bottleId: number;
+    hasLibraryEntry: boolean;
     imageUrl: string | null;
     loading: boolean;
   } | null>(null);
@@ -161,8 +161,8 @@ export default function BottleResolver({
     });
   }
 
-  async function resolveTarget(
-    target: Omit<BottleResolverTarget, "pendingImage" | "previewUrl">,
+  async function resolveBottle(
+    bottle: Omit<BottleResolverResult, "pendingImage" | "previewUrl">,
     action?: BottleResolverAction,
   ) {
     const currentPreviewUrl = previewUrl;
@@ -178,7 +178,7 @@ export default function BottleResolver({
         : undefined;
     await onResolve(
       {
-        ...target,
+        ...bottle,
         pendingImage: photoResult?.pendingImage ?? null,
         previewUrl: currentPreviewUrl,
         photoTrace,
@@ -188,8 +188,8 @@ export default function BottleResolver({
     transferredPreviewUrlRef.current = currentPreviewUrl;
   }
 
-  async function loadTarget(
-    target: BottleResolverTarget["target"],
+  async function loadBottle(
+    bottle: BottleResolverResult["bottle"],
     action?: BottleResolverMatchedAction,
   ) {
     setError(null);
@@ -198,14 +198,14 @@ export default function BottleResolver({
       const collectionStatus = await orpc.collections.bottles.list.call({
         user: "me",
         collection: "library",
-        target: target.targetId,
+        bottle: bottle.id,
       });
-      const exactLibraryEntry = collectionStatus.results[0] ?? null;
-      await resolveTarget(
+      const libraryEntry = collectionStatus.results[0] ?? null;
+      await resolveBottle(
         {
-          target,
-          hasExactLibraryEntry: Boolean(exactLibraryEntry),
-          exactLibraryEntryImageUrl: exactLibraryEntry?.imageUrl ?? null,
+          bottle,
+          hasLibraryEntry: Boolean(libraryEntry),
+          libraryEntryImageUrl: libraryEntry?.imageUrl ?? null,
         },
         action,
       );
@@ -243,10 +243,10 @@ export default function BottleResolver({
       };
       const created =
         await photoIdentificationCreateMutation.mutateAsync(payload);
-      await resolveTarget(
+      await resolveBottle(
         {
-          target: created.target,
-          hasExactLibraryEntry: false,
+          bottle: created.bottle,
+          hasLibraryEntry: false,
           resultSource: "created",
           warnings: (created.warnings ?? []).map(
             (warning) =>
@@ -338,7 +338,7 @@ export default function BottleResolver({
     replacePreviewUrl(null);
   }
 
-  const matchedTarget = getMatchedTarget(photoResult);
+  const matchedBottle = getMatchedBottle(photoResult);
   const createDecision = getCreateDecision(photoResult);
   const proposedName = getProposedName(photoResult);
   const createProposalLabel = getCreateProposalLabel(photoResult);
@@ -355,27 +355,26 @@ export default function BottleResolver({
         )
       : null;
   const manualResultCopy = getManualResultCopy(photoResult);
-  const matchedBottleHasExactLibraryEntry =
-    matchedBottleStatus &&
-    matchedBottleStatus.targetId === matchedTarget?.targetId
-      ? matchedBottleStatus.hasExactLibraryEntry
+  const matchedBottleHasLibraryEntry =
+    matchedBottleStatus && matchedBottleStatus.bottleId === matchedBottle?.id
+      ? matchedBottleStatus.hasLibraryEntry
       : false;
-  const matchedBottleExactLibraryStatusLoading =
-    Boolean(matchedTarget) &&
-    (matchedBottleStatus?.targetId !== matchedTarget?.targetId ||
+  const matchedBottleLibraryStatusLoading =
+    Boolean(matchedBottle) &&
+    (matchedBottleStatus?.bottleId !== matchedBottle?.id ||
       matchedBottleStatus?.loading !== false);
 
   useEffect(() => {
-    if (!matchedTarget) {
+    if (!matchedBottle) {
       setMatchedBottleStatus(null);
       return;
     }
 
-    const statusTargetId = matchedTarget.targetId;
+    const statusBottleId = matchedBottle.id;
     let cancelled = false;
     setMatchedBottleStatus({
-      targetId: statusTargetId,
-      hasExactLibraryEntry: false,
+      bottleId: statusBottleId,
+      hasLibraryEntry: false,
       imageUrl: null,
       loading: true,
     });
@@ -385,22 +384,22 @@ export default function BottleResolver({
         const collectionStatus = await orpc.collections.bottles.list.call({
           user: "me",
           collection: "library",
-          target: statusTargetId,
+          bottle: statusBottleId,
         });
-        const exactLibraryEntry = collectionStatus.results[0] ?? null;
+        const libraryEntry = collectionStatus.results[0] ?? null;
         if (cancelled) return;
         setMatchedBottleStatus({
-          targetId: statusTargetId,
-          hasExactLibraryEntry: Boolean(exactLibraryEntry),
-          imageUrl: exactLibraryEntry?.imageUrl ?? null,
+          bottleId: statusBottleId,
+          hasLibraryEntry: Boolean(libraryEntry),
+          imageUrl: libraryEntry?.imageUrl ?? null,
           loading: false,
         });
       } catch (err) {
         logError(err);
         if (cancelled) return;
         setMatchedBottleStatus({
-          targetId: statusTargetId,
-          hasExactLibraryEntry: false,
+          bottleId: statusBottleId,
+          hasLibraryEntry: false,
           imageUrl: null,
           loading: false,
         });
@@ -412,7 +411,7 @@ export default function BottleResolver({
     return () => {
       cancelled = true;
     };
-  }, [matchedTarget, orpc]);
+  }, [matchedBottle, orpc]);
 
   return (
     <Layout
@@ -474,11 +473,11 @@ export default function BottleResolver({
 
         {!isIdentifying && photoResult && (
           <>
-            {matchedTarget || createDecision ? (
+            {matchedBottle || createDecision ? (
               <PhotoMatchCreateState
                 result={photoResult}
                 previewUrl={previewUrl}
-                matchedTarget={matchedTarget}
+                matchedBottle={matchedBottle}
                 renderMatchedResultActions={renderMatchedResultActions}
                 renderCreateProposalActions={renderCreateProposalActions}
                 createProposalLabel={createProposalLabel}
@@ -487,14 +486,12 @@ export default function BottleResolver({
                 createPending={photoIdentificationCreateMutation.isPending}
                 createActionLabel={createProposalActionLabel}
                 resolvingAction={resolvingAction}
-                hasExactLibraryEntry={matchedBottleHasExactLibraryEntry}
-                exactLibraryEntryImageUrl={matchedBottleStatus?.imageUrl}
+                hasLibraryEntry={matchedBottleHasLibraryEntry}
+                libraryEntryImageUrl={matchedBottleStatus?.imageUrl}
                 pendingImage={photoResult.pendingImage}
-                loadingExactLibraryStatus={
-                  matchedBottleExactLibraryStatusLoading
-                }
-                onLoadTarget={(target, action) => {
-                  void loadTarget(target, action);
+                loadingExactLibraryStatus={matchedBottleLibraryStatusLoading}
+                onLoadBottle={(bottle, action) => {
+                  void loadBottle(bottle, action);
                 }}
                 onAcceptCreateProposal={(result, action) => {
                   void acceptCreateProposal(result, action);
@@ -516,11 +513,11 @@ export default function BottleResolver({
                 onStartOver={startOver}
               />
             )}
-            {(matchedTarget || createDecision) && (
+            {(matchedBottle || createDecision) && (
               <FallbackActions
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
-                createBottleHref={matchedTarget ? createBottleHref : null}
+                createBottleHref={matchedBottle ? createBottleHref : null}
                 showStartOver
                 onStartOver={startOver}
               />

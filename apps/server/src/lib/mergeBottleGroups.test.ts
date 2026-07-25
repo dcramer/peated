@@ -463,9 +463,7 @@ describe("BottleGroup merges", () => {
         .mocked(workerClient.pushUniqueJob)
         .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
         .map(([, payload]) => payload),
-    ).toEqual(
-      source.members.map(({ exactTarget }) => ({ targetId: exactTarget.id })),
-    );
+    ).toEqual(source.members.map(({ bottle }) => ({ bottleId: bottle.id })));
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: sourceBrand.id,
     });

@@ -5,10 +5,7 @@ import {
 import { z } from "zod";
 import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
-import {
-  CatalogTargetV1Schema,
-  ExactCatalogTargetV1Schema,
-} from "./catalogIdentity";
+import { BottleSchema } from "./bottles";
 import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
@@ -26,9 +23,7 @@ export const TastingSchema = z.object({
     .nullable()
     .default(null)
     .describe("User's tasting notes and observations"),
-  target: CatalogTargetV1Schema.describe(
-    "Exact Bottle or generic BottleGroup that was tasted",
-  ),
+  bottle: BottleSchema.describe("Bottle that was tasted"),
   rating: z
     .union([
       z.literal(SIMPLE_RATING_VALUES.PASS),
@@ -87,7 +82,7 @@ export const TastingSchema = z.object({
 
 export const TastingContentInputSchema = TastingSchema.omit({
   id: true,
-  target: true,
+  bottle: true,
   awards: true,
   comments: true,
   toasts: true,
@@ -114,32 +109,9 @@ export const TastingContentInputSchema = TastingSchema.omit({
     .describe("Array of friend user IDs who were present"),
 });
 
-export const TastingTargetInputSchema = TastingContentInputSchema.extend({
-  target: z
-    .number()
-    .int()
-    .positive()
-    .describe("Authoritative CatalogTarget being tasted"),
+export const TastingInputSchema = TastingContentInputSchema.extend({
+  bottle: z.number().int().positive().describe("Bottle being tasted"),
 }).strict();
-
-export const TastingLegacyInputSchema = TastingContentInputSchema.extend({
-  bottle: z
-    .number()
-    .int()
-    .positive()
-    .describe("Retained Bottle compatibility input"),
-  release: z
-    .number()
-    .int()
-    .positive()
-    .nullish()
-    .describe("Retained BottleRelease compatibility input"),
-}).strict();
-
-export const TastingInputSchema = z.union([
-  TastingTargetInputSchema,
-  TastingLegacyInputSchema,
-]);
 
 export const PhotoIdentificationSuggestedNextStepEnum = z.enum([
   "confirm_match",
@@ -206,7 +178,7 @@ export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
   [
     z.object({
       action: z.literal("match"),
-      matchedTarget: ExactCatalogTargetV1Schema,
+      matchedBottle: BottleSchema,
     }),
     z.object({
       action: z.literal("create_bottle"),

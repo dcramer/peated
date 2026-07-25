@@ -1,40 +1,29 @@
-import type { CatalogTargetV1 } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 
-export type FlightTargetOption = {
+export type FlightBottleOption = {
   id: number;
-  kind: CatalogTargetV1["kind"];
   name: string;
 };
 
-export function getFlightTargetIds(targets: CatalogTargetV1[]): number[] {
-  return targets.map((target) => target.targetId);
+export function getFlightBottleIds(bottles: Bottle[]): number[] {
+  return bottles.map((bottle) => bottle.id);
 }
 
-export function targetToFlightOption(
-  target: CatalogTargetV1,
-): FlightTargetOption {
+export function bottleToFlightOption(bottle: Bottle): FlightBottleOption {
   return {
-    id: target.targetId,
-    kind: target.kind,
-    name:
-      target.kind === "bottle" ? target.bottle.fullName : target.group.fullName,
+    id: bottle.id,
+    name: bottle.fullName,
   };
 }
 
-export function getFlightTargetScopeLabel(
-  kind: FlightTargetOption["kind"],
-): string {
-  return kind === "bottle" ? "Exact bottle" : "Exact bottle not specified";
-}
-
 export function flightMembershipChanged(
-  initialTargetIds: number[],
-  selectedTargetIds: number[],
+  initialBottleIds: number[],
+  selectedBottleIds: number[],
 ): boolean {
-  const initial = [...initialTargetIds].sort((left, right) => left - right);
-  const selected = [...selectedTargetIds].sort((left, right) => left - right);
+  const initial = [...initialBottleIds].sort((left, right) => left - right);
+  const selected = [...selectedBottleIds].sort((left, right) => left - right);
   return (
     initial.length !== selected.length ||
-    initial.some((targetId, index) => targetId !== selected[index])
+    initial.some((bottleId, index) => bottleId !== selected[index])
   );
 }

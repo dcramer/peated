@@ -1,50 +1,33 @@
-import type { CatalogTargetV1 } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import { describe, expect, it } from "vitest";
 
 import {
+  bottleToFlightOption,
   flightMembershipChanged,
-  getFlightTargetIds,
-  getFlightTargetScopeLabel,
-  targetToFlightOption,
+  getFlightBottleIds,
 } from "./flightForm";
 
-const exact = {
-  kind: "bottle",
-  targetId: 21,
-  bottle: { id: 7, fullName: "Springbank 12 Batch 24" },
-  group: { id: 3, fullName: "Springbank 12" },
-} as CatalogTargetV1;
-const generic = {
-  kind: "group",
-  targetId: 22,
-  group: { id: 3, fullName: "Springbank 12" },
-} as CatalogTargetV1;
+const bottle = {
+  id: 7,
+  fullName: "Springbank 12 Batch 24",
+} as Bottle;
+const relatedBottle = {
+  id: 8,
+  fullName: "Springbank 12 Batch 25",
+} as Bottle;
 
 describe("flight form membership", () => {
-  it("carries exact and generic identity by target id", () => {
-    expect(getFlightTargetIds([exact, generic])).toEqual([21, 22]);
-    expect(targetToFlightOption(exact)).toEqual({
-      id: 21,
-      kind: "bottle",
+  it("carries independently complete Bottle identity by Bottle id", () => {
+    expect(getFlightBottleIds([bottle, relatedBottle])).toEqual([7, 8]);
+    expect(bottleToFlightOption(bottle)).toEqual({
+      id: 7,
       name: "Springbank 12 Batch 24",
     });
-    expect(targetToFlightOption(generic)).toEqual({
-      id: 22,
-      kind: "group",
-      name: "Springbank 12",
-    });
   });
 
-  it("labels exactness without reinterpreting generic identity", () => {
-    expect(getFlightTargetScopeLabel("bottle")).toBe("Exact bottle");
-    expect(getFlightTargetScopeLabel("group")).toBe(
-      "Exact bottle not specified",
-    );
-  });
-
-  it("compares authoritative target membership independent of ordering", () => {
-    expect(flightMembershipChanged([21, 22], [22, 21])).toBe(false);
-    expect(flightMembershipChanged([21, 22], [21])).toBe(true);
-    expect(flightMembershipChanged([], [21])).toBe(true);
+  it("compares Bottle membership independent of ordering", () => {
+    expect(flightMembershipChanged([7, 8], [8, 7])).toBe(false);
+    expect(flightMembershipChanged([7, 8], [7])).toBe(true);
+    expect(flightMembershipChanged([], [7])).toBe(true);
   });
 });

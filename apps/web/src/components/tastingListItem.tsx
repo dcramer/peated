@@ -11,7 +11,6 @@ import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
-import { getCatalogTargetLabel } from "@peated/web/lib/catalogTarget";
 import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
@@ -19,7 +18,6 @@ import { getAuthRedirect } from "../lib/auth";
 import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
 import Button from "./button";
-import CatalogTargetIdentity from "./catalogTargetIdentity";
 import Counter from "./counter";
 import DefinitionList from "./definitionList";
 import { ImageModal } from "./imageModal";
@@ -28,6 +26,7 @@ import ServingStyleIcon from "./servingStyleIcon";
 import ShareButton from "./shareButton";
 import SimpleRatingDisplay from "./simpleRatingDisplay";
 import Tags from "./tags";
+import TastingBottleIdentity from "./tastingBottleIdentity";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -126,7 +125,7 @@ export default function TastingListItem({
 
       {!noBottle && (
         <div className="px-3 sm:px-5">
-          <CatalogTargetIdentity target={tasting.target} />
+          <TastingBottleIdentity bottle={tasting.bottle} />
         </div>
       )}
 
@@ -275,7 +274,7 @@ export default function TastingListItem({
           </Button>
         )}
         <ShareButton
-          title={`${getCatalogTargetLabel(tasting.target)} - Tasting Notes by ${tasting.createdBy.username}`}
+          title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
           url={`/tastings/${tasting.id}`}
         />
         {(user?.admin || isTaster) && (

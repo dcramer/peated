@@ -66,7 +66,7 @@ export default function BottleFullHeader({
               </>
             }
           >
-            <CollectionAction targetId={bottle.targetId} />
+            <CollectionAction bottleId={bottle.id} />
           </Suspense>
 
           <Button

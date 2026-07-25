@@ -958,7 +958,6 @@ export async function createOrReuseConcreteBottleInTransaction(
 export async function finalizeCreatedBottle(
   {
     bottle,
-    exactTarget,
     seriesCreated,
     newAliases,
     newEntityIds,
@@ -970,7 +969,7 @@ export async function finalizeCreatedBottle(
   } = {},
 ) {
   try {
-    await pushUniqueJob("OnBottleChange", { targetId: exactTarget.id });
+    await pushUniqueJob("OnBottleChange", { bottleId: bottle.id });
   } catch (err) {
     logError(err, {
       bottle: {

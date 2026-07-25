@@ -1,17 +1,16 @@
 "use client";
 
-import type { CatalogTargetV1 } from "@peated/server/schemas";
-import { FlightTargetInputSchema } from "@peated/server/schemas";
+import { FlightInputSchema } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
 import {
+  bottleToFlightOption,
   flightMembershipChanged,
-  getFlightTargetIds,
-  getFlightTargetScopeLabel,
-  targetToFlightOption,
-  type FlightTargetOption,
+  getFlightBottleIds,
+  type FlightBottleOption,
 } from "@peated/web/lib/flightForm";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -23,7 +22,7 @@ import type { z } from "zod";
 import Form from "./form";
 import SelectField from "./selectField";
 
-type FormSchemaType = z.infer<typeof FlightTargetInputSchema>;
+type FormSchemaType = z.infer<typeof FlightInputSchema>;
 
 export default function FlightForm({
   onSubmit,
@@ -35,7 +34,7 @@ export default function FlightForm({
     name?: string;
     description?: string | null;
     public?: boolean;
-    targets?: { target: CatalogTargetV1 }[];
+    bottles?: { bottle: Bottle }[];
   };
   title: string;
 }) {
@@ -44,7 +43,7 @@ export default function FlightForm({
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(FlightTargetInputSchema),
+    resolver: zodResolver(FlightInputSchema),
     defaultValues: {
       name: initialData.name,
       description: initialData.description,
@@ -53,19 +52,19 @@ export default function FlightForm({
 
   const [error, setError] = useState<string | undefined>();
 
-  const targets = (initialData.targets ?? []).map(({ target }) => target);
-  const initialTargetIds = getFlightTargetIds(targets);
-  const [targetsValue, setTargetsValue] = useState<FlightTargetOption[]>(
-    targets.map(targetToFlightOption),
+  const bottles = (initialData.bottles ?? []).map(({ bottle }) => bottle);
+  const initialBottleIds = getFlightBottleIds(bottles);
+  const [bottlesValue, setBottlesValue] = useState<FlightBottleOption[]>(
+    bottles.map(bottleToFlightOption),
   );
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      const selectedTargetIds = targetsValue.map(({ id }) => id);
+      const selectedBottleIds = bottlesValue.map(({ id }) => id);
       await onSubmit({
         ...data,
-        ...(flightMembershipChanged(initialTargetIds, selectedTargetIds)
-          ? { targets: selectedTargetIds }
+        ...(flightMembershipChanged(initialBottleIds, selectedBottleIds)
+          ? { bottles: selectedBottleIds }
           : {}),
       });
     } catch (err) {
@@ -107,56 +106,27 @@ export default function FlightForm({
             placeholder="e.g. 12-year-old"
           />
 
-          <SelectField<FlightTargetOption>
+          <SelectField<FlightBottleOption>
             label="Bottles"
-            helpText="Choose an exact Bottle, or a release family when the exact bottle is not known."
-            error={errors.targets}
+            helpText="Choose the specific Bottles included in this flight."
+            error={errors.bottles}
             onQuery={async (query) => {
-              const [bottleList, groupList] = await Promise.all([
-                orpc.bottles.list.call({
-                  query,
-                  limit: 10,
-                  sort: query ? "rank" : "-tastings",
-                }),
-                orpc.bottleGroups.list.call({
-                  query,
-                  limit: 10,
-                  sort: "-tastings",
-                }),
-              ]);
+              const bottleList = await orpc.bottles.list.call({
+                query,
+                limit: 10,
+                sort: query ? "rank" : "-tastings",
+              });
 
-              return [
-                ...bottleList.results.map((bottle) => ({
-                  id: bottle.targetId,
-                  kind: "bottle" as const,
-                  name: bottle.fullName,
-                })),
-                ...groupList.results.map(targetToFlightOption),
-              ];
+              return bottleList.results.map(bottleToFlightOption);
             }}
-            onRenderOption={(option) => (
-              <FlightTargetOptionLabel option={option} />
-            )}
-            onRenderChip={(option) => (
-              <FlightTargetOptionLabel option={option} />
-            )}
-            onChange={setTargetsValue}
-            value={targetsValue}
+            onRenderOption={(option) => <span>{option.name}</span>}
+            onRenderChip={(option) => <span>{option.name}</span>}
+            onChange={setBottlesValue}
+            value={bottlesValue}
             multiple
           />
         </Fieldset>
       </Form>
     </FormScreen>
-  );
-}
-
-function FlightTargetOptionLabel({ option }: { option: FlightTargetOption }) {
-  return (
-    <span className="inline-flex flex-wrap items-baseline gap-x-2 text-left">
-      <span>{option.name}</span>
-      <span className="text-muted text-xs">
-        {getFlightTargetScopeLabel(option.kind)}
-      </span>
-    </span>
   );
 }

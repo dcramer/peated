@@ -5,7 +5,6 @@ import {
   bottleSeries,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import type { getUserActor } from "@peated/server/lib/actors";
@@ -276,23 +275,11 @@ describe("repairBottleBrandDistilleryAssignments", () => {
         creationSource: "repair_workflow",
       }),
     ]);
-    const memberTargets = await db
-      .select({ bottleId: catalogTargets.bottleId, id: catalogTargets.id })
-      .from(catalogTargets)
-      .where(inArray(catalogTargets.bottleId, [first.id, second.bottle.id]));
-    const targetIdFor = (bottleId: number) => {
-      const target = memberTargets.find(
-        (candidate) => candidate.bottleId === bottleId,
-      );
-      if (!target)
-        throw new Error(`Missing exact target for Bottle ${bottleId}`);
-      return target.id;
-    };
     expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
-      targetId: targetIdFor(first.id),
+      bottleId: first.id,
     });
     expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
-      targetId: targetIdFor(second.bottle.id),
+      bottleId: second.bottle.id,
     });
   });
 

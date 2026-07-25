@@ -1364,7 +1364,7 @@ export async function finalizeConcreteBottleMerge(
       Record<string, number | string>,
     ]
   > = [
-    ["OnBottleChange", { targetId: manifest.destinationTargetId }],
+    ["OnBottleChange", { bottleId: manifest.destinationBottleId }],
     ...manifest.aliasNames.map(
       (name) => ["OnBottleAliasChange", { name }] as const,
     ),

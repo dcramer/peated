@@ -1,5 +1,5 @@
 import waitError from "../../test/waitError";
-import { createTastingForBadge, useGenericBadgeTarget } from "../testHelpers";
+import { createTastingForBadge } from "../testHelpers";
 import { BottleCheck, BottleCheckConfigSchema } from "./bottleCheck";
 
 describe("config schema", () => {
@@ -64,21 +64,5 @@ describe("test", () => {
       bottle: [tasting.identity.bottleId + 1],
     };
     expect(badgeImpl.test(config, tasting)).toEqual(false);
-  });
-
-  test("does not substitute a bottle for a generic target", async ({
-    fixtures,
-  }) => {
-    const exact = await createTastingForBadge(fixtures);
-    const tasting = await useGenericBadgeTarget(exact.id);
-    const badgeImpl = new BottleCheck();
-    if (exact.identity.kind !== "bottle") {
-      throw new Error("Expected an exact Bottle fixture");
-    }
-
-    expect(tasting.identity.kind).toBe("group");
-    expect(badgeImpl.test({ bottle: [exact.identity.bottleId] }, tasting)).toBe(
-      false,
-    );
   });
 });

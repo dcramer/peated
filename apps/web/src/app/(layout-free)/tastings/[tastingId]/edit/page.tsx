@@ -83,29 +83,11 @@ function TastingEditFields({
   tasting: Tasting;
   onSubmit: (data: TastingEditFormSubmitData) => Promise<void>;
 }) {
-  return tasting.target.kind === "bottle" ? (
-    <ExactTastingEditFields
-      tasting={tasting}
-      bottleId={tasting.target.bottle.id}
-      onSubmit={onSubmit}
-    />
-  ) : (
-    <GenericTastingEditFields tasting={tasting} onSubmit={onSubmit} />
-  );
-}
-
-function ExactTastingEditFields({
-  tasting,
-  bottleId,
-  onSubmit,
-}: {
-  tasting: Tasting;
-  bottleId: number;
-  onSubmit: (data: TastingEditFormSubmitData) => Promise<void>;
-}) {
   const orpc = useORPC();
   const { data: suggestedTags } = useSuspenseQuery(
-    orpc.bottles.suggestedTags.queryOptions({ input: { bottle: bottleId } }),
+    orpc.bottles.suggestedTags.queryOptions({
+      input: { bottle: tasting.bottle.id },
+    }),
   );
 
   return (
@@ -114,24 +96,6 @@ function ExactTastingEditFields({
       title="Edit Tasting"
       initialData={tasting}
       suggestedTags={suggestedTags}
-      onSubmit={onSubmit}
-    />
-  );
-}
-
-function GenericTastingEditFields({
-  tasting,
-  onSubmit,
-}: {
-  tasting: Tasting;
-  onSubmit: (data: TastingEditFormSubmitData) => Promise<void>;
-}) {
-  return (
-    <TastingForm
-      mode="edit"
-      title="Edit Tasting"
-      initialData={tasting}
-      suggestedTags={{ results: tasting.target.group.suggestedTags }}
       onSubmit={onSubmit}
     />
   );

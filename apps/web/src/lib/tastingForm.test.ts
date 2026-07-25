@@ -17,22 +17,22 @@ const fields: TastingFormFields = {
 };
 
 describe("tasting form submissions", () => {
-  it("builds create payloads with one target and image intent", () => {
+  it("builds create payloads with one Bottle and image intent", () => {
     const image = { name: "label.jpg" } as File;
     expect(
       buildTastingCreateFormSubmission({
         fields,
         image,
-        targetId: 12,
+        bottleId: 12,
       }),
-    ).toEqual({ ...fields, target: 12, image });
+    ).toEqual({ ...fields, bottle: 12, image });
     expect(
       buildTastingCreateFormSubmission({
         fields,
         image: undefined,
-        targetId: 12,
+        bottleId: 12,
       }),
-    ).toEqual({ ...fields, target: 12, image: undefined });
+    ).toEqual({ ...fields, bottle: 12, image: undefined });
   });
 
   it("builds content-only edit payloads and preserves image intent", () => {

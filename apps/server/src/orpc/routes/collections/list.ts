@@ -1,54 +1,17 @@
 import { db } from "@peated/server/db";
 import {
-  bottleReleasePromotions,
-  bottleReleases,
   bottles,
   collectionBottles,
   collections,
 } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
-import {
-  loadCatalogTargetReadsWithParity,
-  recordCatalogTargetReadFilterParity,
-} from "@peated/server/lib/catalogTargetReadParity";
-import {
-  CatalogTargetResolutionError,
-  loadCatalogTargetByBottleId,
-} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import { CollectionSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
-import { and, asc, eq, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
-
-function legacyCollectionBottleFilterCandidates(
-  bottleId: number,
-): SQL<unknown> {
-  const predicate = or(
-    eq(collectionBottles.bottleId, bottleId),
-    sql`exists(${db
-      .select({ value: sql`1` })
-      .from(bottleReleases)
-      .innerJoin(
-        bottleReleasePromotions,
-        eq(bottleReleasePromotions.releaseId, bottleReleases.id),
-      )
-      .where(
-        and(
-          eq(bottleReleases.id, collectionBottles.releaseId),
-          eq(bottleReleases.bottleId, collectionBottles.bottleId),
-          eq(bottleReleasePromotions.status, "promoted"),
-          eq(bottleReleasePromotions.promotedBottleId, bottleId),
-        ),
-      )})`,
-  );
-  if (!predicate) {
-    throw new TypeError("Missing legacy collection Bottle filter predicate");
-  }
-  return predicate;
-}
 
 export default procedure
   .use(requireAuth)
@@ -91,13 +54,6 @@ export default procedure
     const offset = (cursor - 1) * limit;
 
     const where = [sql`${collections.createdById} = ${user.id}`];
-    let bottleFilter:
-      | {
-          bottleId: number;
-          targetWhere: SQL<unknown>;
-          legacyCandidateWhere: SQL<unknown>;
-        }
-      | undefined;
     if (input.bottle !== undefined) {
       const bottle = await db.query.bottles.findFirst({
         where: eq(bottles.id, input.bottle),
@@ -109,34 +65,14 @@ export default procedure
         });
       }
 
-      try {
-        const target = await loadCatalogTargetByBottleId(bottle.id, {
-          actor: null,
-          permissions: { canReadCatalogIdentity: true },
-        });
-        const targetWhere = eq(collectionBottles.targetId, target.targetId);
-        const legacyCandidateWhere = legacyCollectionBottleFilterCandidates(
-          bottle.id,
-        );
-        where.push(
-          sql`EXISTS(
-            SELECT 1
-            FROM ${collectionBottles}
-            WHERE ${collectionBottles.collectionId} = ${collections.id}
-              AND ${targetWhere}
-          )`,
-        );
-        bottleFilter = {
-          bottleId: bottle.id,
-          targetWhere,
-          legacyCandidateWhere,
-        };
-      } catch (error) {
-        if (error instanceof CatalogTargetResolutionError) {
-          throw errors.CONFLICT({ message: error.message, cause: error });
-        }
-        throw error;
-      }
+      where.push(
+        sql`EXISTS(
+          SELECT 1
+          FROM ${collectionBottles}
+          WHERE ${collectionBottles.collectionId} = ${collections.id}
+            AND ${collectionBottles.bottleId} = ${bottle.id}
+        )`,
+      );
     }
 
     const results = await db
@@ -146,83 +82,6 @@ export default procedure
       .limit(limit + 1)
       .offset(offset)
       .orderBy(asc(collections.name), asc(collections.id));
-
-    if (bottleFilter) {
-      const candidates = await db
-        .select({
-          id: collectionBottles.id,
-          targetId: collectionBottles.targetId,
-          bottleId: collectionBottles.bottleId,
-          releaseId: collectionBottles.releaseId,
-          targetMatches: sql<boolean>`COALESCE(${bottleFilter.targetWhere}, false)`,
-        })
-        .from(collectionBottles)
-        .innerJoin(
-          collections,
-          eq(collections.id, collectionBottles.collectionId),
-        )
-        .where(
-          and(
-            eq(collections.createdById, user.id),
-            or(bottleFilter.targetWhere, bottleFilter.legacyCandidateWhere),
-          ),
-        )
-        .limit(limit + 1)
-        // Collection pagination cannot be applied to row-correlated evidence.
-        // Keep a stable bounded sample without changing authoritative results.
-        .orderBy(
-          asc(collections.name),
-          asc(collections.id),
-          asc(collectionBottles.id),
-        );
-      let legacyTargets: Awaited<
-        ReturnType<typeof loadCatalogTargetReadsWithParity>
-      >["legacyTargets"];
-      try {
-        ({ legacyTargets } = await loadCatalogTargetReadsWithParity(
-          candidates.map((candidate) => ({
-            consumerTable: "collection_bottle",
-            rowLocator: { id: candidate.id },
-            targetId: candidate.targetId,
-            legacy: {
-              bottleId: candidate.bottleId,
-              releaseId: candidate.releaseId,
-            },
-          })),
-          {
-            actor: null,
-            permissions: { canReadCatalogIdentity: true },
-            caller: "collections.list",
-            operation: "filterResolution",
-          },
-        ));
-      } catch (error) {
-        if (error instanceof CatalogTargetResolutionError) {
-          throw errors.CONFLICT({ message: error.message, cause: error });
-        }
-        throw error;
-      }
-      recordCatalogTargetReadFilterParity(
-        candidates.map((candidate, index) => {
-          const legacyTarget = legacyTargets[index] ?? null;
-          return {
-            consumerTable: "collection_bottle" as const,
-            rowLocator: { id: candidate.id },
-            targetId: candidate.targetId,
-            legacy: {
-              bottleId: candidate.bottleId,
-              releaseId: candidate.releaseId,
-            },
-            filter: "catalog_reference" as const,
-            targetMatches: candidate.targetMatches,
-            legacyMatches:
-              legacyTarget?.kind === "bottle" &&
-              legacyTarget.bottle.id === bottleFilter.bottleId,
-          };
-        }),
-        { caller: "collections.list", operation: "filter" },
-      );
-    }
 
     return {
       results: await serialize(

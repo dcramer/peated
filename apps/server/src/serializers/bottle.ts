@@ -5,25 +5,22 @@ import config from "../config";
 import { db } from "../db";
 import type { Bottle, User } from "../db/schema";
 import {
+  bottleGroupDistillers,
+  bottleGroups,
+  bottleGroupTombstones,
   bottleSeries,
   bottlesToDistillers,
-  catalogTargets,
   collectionBottles,
-  collections,
   entities,
   tastings,
 } from "../db/schema";
-import {
-  CatalogTargetIntegrityMismatchError,
-  CatalogTargetNotFoundError,
-  loadCatalogTargetBatch,
-} from "../lib/catalogTargets";
 import { getReservedCollection, type ReservedCollectionSlug } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
 import type { BottleGroupV1 } from "../schemas/catalogIdentity";
 import { BottleSeriesSerializer } from "./bottleSeries";
+import { BottleGroupSummarySerializer } from "./catalogIdentity";
 import { EntitySerializer } from "./entity";
 
 type Attrs = {
@@ -49,52 +46,67 @@ export const BottleSerializer = serializer({
     context?: BottleSerializerContext,
   ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
-    // Actor state belongs to exact targets; retained consumer pairs are compatibility only.
-    const exactTargets =
-      itemIds.length && (currentUser || context?.includeGroupSummary)
-        ? await db
-            .select({
-              id: catalogTargets.id,
-              bottleId: catalogTargets.bottleId,
-            })
-            .from(catalogTargets)
-            .where(inArray(catalogTargets.bottleId, itemIds))
-        : [];
-    const targetIdByBottleId = new Map<number, number>(
-      exactTargets.flatMap((target) =>
-        target.bottleId === null ? [] : [[target.bottleId, target.id] as const],
-      ),
-    );
-    const exactTargetIds = exactTargets.map((target) => target.id);
     const groupByBottleId = new Map<number, BottleGroupV1>();
     if (context?.includeGroupSummary) {
-      const targetResolutions = await loadCatalogTargetBatch(exactTargetIds, {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-      });
+      const groupIds = Array.from(
+        new Set(itemList.map(({ groupId }) => groupId).filter(notEmpty)),
+      );
+      const [groupList, groupDistillerList, groupTombstoneList] =
+        groupIds.length
+          ? await Promise.all([
+              db
+                .select()
+                .from(bottleGroups)
+                .where(inArray(bottleGroups.id, groupIds)),
+              db
+                .select()
+                .from(bottleGroupDistillers)
+                .where(inArray(bottleGroupDistillers.groupId, groupIds)),
+              db
+                .select({ groupId: bottleGroupTombstones.groupId })
+                .from(bottleGroupTombstones)
+                .where(inArray(bottleGroupTombstones.groupId, groupIds)),
+            ])
+          : [[], [], []];
+      const retiredGroupIds = new Set(
+        groupTombstoneList.map(({ groupId }) => groupId),
+      );
+      const distillerIdsByGroupId = new Map<number, number[]>();
+      for (const { groupId, distillerId } of groupDistillerList) {
+        const distillerIds = distillerIdsByGroupId.get(groupId) ?? [];
+        distillerIds.push(distillerId);
+        distillerIdsByGroupId.set(groupId, distillerIds);
+      }
+      const groupSummaries = await serialize(
+        BottleGroupSummarySerializer,
+        groupList.map((group) => ({
+          ...group,
+          distillerIds: distillerIdsByGroupId.get(group.id) ?? [],
+        })),
+        undefined,
+        [],
+        {
+          actor: null,
+          permissions: { canReadCatalogIdentity: true },
+        },
+      );
+      const groupById = new Map(
+        groupList.flatMap((group, index) =>
+          retiredGroupIds.has(group.id)
+            ? []
+            : [[group.id, groupSummaries[index]] as const],
+        ),
+      );
+
       for (const item of itemList) {
-        const targetId = targetIdByBottleId.get(item.id);
-        if (!targetId) {
-          throw new CatalogTargetNotFoundError({ bottleId: item.id });
-        }
-        const resolution = targetResolutions.get(targetId);
-        if (!resolution) {
-          throw new CatalogTargetIntegrityMismatchError(
-            { bottleId: item.id },
-            `exact CatalogTarget ${targetId} was not resolved`,
+        const group =
+          item.groupId === null ? undefined : groupById.get(item.groupId);
+        if (!group) {
+          throw new Error(
+            `Bottle ${item.id} does not belong to an active BottleGroup.`,
           );
         }
-        if (!resolution.ok) throw resolution.error;
-        if (
-          resolution.target.kind !== "bottle" ||
-          resolution.target.bottle.id !== item.id
-        ) {
-          throw new CatalogTargetIntegrityMismatchError(
-            { bottleId: item.id },
-            `CatalogTarget ${targetId} is not the Bottle's exact target`,
-          );
-        }
-        groupByBottleId.set(item.id, resolution.target.group);
+        groupByBottleId.set(item.id, group);
       }
     }
 
@@ -147,10 +159,10 @@ export const BottleSerializer = serializer({
       else distillersByBottleId[d.bottleId].push(entitiesById[d.distillerId]);
     });
 
-    const getReservedCollectionTargetSet = async (
+    const getReservedCollectionBottleSet = async (
       collectionSlug: ReservedCollectionSlug,
     ) => {
-      if (!currentUser || !exactTargetIds.length) {
+      if (!currentUser || !itemIds.length) {
         return new Set<number>();
       }
 
@@ -166,49 +178,48 @@ export const BottleSerializer = serializer({
       return new Set(
         (
           await db
-            .selectDistinct({ targetId: collectionBottles.targetId })
+            .selectDistinct({ bottleId: collectionBottles.bottleId })
             .from(collectionBottles)
             .where(
               and(
-                inArray(collectionBottles.targetId, exactTargetIds),
+                inArray(collectionBottles.bottleId, itemIds),
                 eq(collectionBottles.collectionId, collection.id),
               ),
             )
-        ).flatMap((row) => (row.targetId === null ? [] : [row.targetId])),
+        ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
       );
     };
 
     const [favoriteSet, librarySet] = await Promise.all([
-      getReservedCollectionTargetSet("default"),
-      getReservedCollectionTargetSet("library"),
+      getReservedCollectionBottleSet("default"),
+      getReservedCollectionBottleSet("library"),
     ]);
 
     const tastedSet =
-      currentUser && exactTargetIds.length
+      currentUser && itemIds.length
         ? new Set(
             (
               await db
-                .selectDistinct({ targetId: tastings.targetId })
+                .selectDistinct({ bottleId: tastings.bottleId })
                 .from(tastings)
                 .where(
                   and(
-                    inArray(tastings.targetId, exactTargetIds),
+                    inArray(tastings.bottleId, itemIds),
                     eq(tastings.createdById, currentUser.id),
                   ),
                 )
-            ).flatMap((row) => (row.targetId === null ? [] : [row.targetId])),
+            ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
           )
         : new Set();
 
     return Object.fromEntries(
       itemList.map((item) => {
-        const targetId = targetIdByBottleId.get(item.id);
         return [
           item.id,
           {
-            isFavorite: targetId ? favoriteSet.has(targetId) : false,
-            isLibrary: targetId ? librarySet.has(targetId) : false,
-            hasTasted: targetId ? tastedSet.has(targetId) : false,
+            isFavorite: favoriteSet.has(item.id),
+            isLibrary: librarySet.has(item.id),
+            hasTasted: tastedSet.has(item.id),
             group: groupByBottleId.get(item.id),
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],

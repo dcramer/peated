@@ -10,11 +10,8 @@ import { Buffer } from "node:buffer";
 import {
   bottleImageBottleId,
   bottleImageUrl,
-  buildExactCatalogTarget,
-  buildGenericCatalogTarget,
   existingBottle,
   existingReleaseId,
-  genericCollectionTargetLabel,
   legacyPromotedBottle,
   legacyPromotedBottleId,
   testAccessToken,
@@ -109,12 +106,8 @@ test.describe("profile library", () => {
     await libraryButton.click();
     const createInput = getRpcInput(await createRequestPromise);
 
-    expect(createInput.target).toBe(
-      buildExactCatalogTarget({
-        bottle: { ...existingBottle, id: bottleId },
-      }).targetId,
-    );
-    expect(createInput).not.toHaveProperty("bottle");
+    expect(createInput.bottle).toBe(bottleId);
+    expect(createInput).not.toHaveProperty("target");
     expect(createInput).not.toHaveProperty("release");
     await expect(libraryButton).toHaveAttribute("aria-pressed", "true");
 
@@ -127,9 +120,6 @@ test.describe("profile library", () => {
     await expect(
       page.getByRole("link", { name: savedBottleName }).first(),
     ).toHaveAttribute("href", `/bottles/${bottleId}`);
-    await expect(
-      savedBottleRow.getByText("Exact bottle", { exact: true }),
-    ).toBeVisible();
     await expect(
       savedBottleRow.getByRole("img", { name: "In Library" }),
     ).toHaveCount(0);
@@ -198,7 +188,15 @@ test.describe("profile library", () => {
     await page.goto(
       `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
     );
+    const createRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/create"),
+    );
     await page.getByRole("button", { name: "Add to Library" }).click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createInput.bottle).toBe(legacyPromotedBottleId);
+    expect(createInput).not.toHaveProperty("target");
+    expect(createInput).not.toHaveProperty("release");
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
@@ -216,64 +214,6 @@ test.describe("profile library", () => {
       "href",
       `/bottles/${legacyPromotedBottleId}`,
     );
-  });
-
-  test("keeps generic Library targets independent from representative bottles", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: [
-        testAccessToken,
-        "library-generic",
-        testInfo.project.name,
-        testInfo.workerIndex,
-        testInfo.retry,
-      ].join("-"),
-    });
-
-    await page.goto(`/users/${testUser.username}/library`, {
-      waitUntil: "commit",
-    });
-
-    const genericRow = page.locator("tr").filter({
-      hasText: genericCollectionTargetLabel,
-    });
-    await expect(genericRow).toBeVisible();
-    await expect(
-      genericRow.getByText("Exact bottle not specified"),
-    ).toBeVisible();
-    await expect(
-      genericRow.getByRole("link", { name: genericCollectionTargetLabel }),
-    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/releases`);
-    await expect(
-      genericRow.locator(`a[href="/bottles/${existingBottle.id}"]`),
-    ).toHaveCount(0);
-    await expect(genericRow.getByRole("img", { name: "Tasted" })).toBeVisible();
-
-    await genericRow
-      .getByRole("button", {
-        name: "Change bottle status, current status Not set",
-      })
-      .click();
-    await page.getByRole("menuitem", { name: "Open" }).click();
-    await expect(
-      genericRow.getByRole("button", {
-        name: "Change bottle status, current status Open",
-      }),
-    ).toBeVisible();
-
-    const deleteRequestPromise = page.waitForRequest((request) =>
-      request.url().includes("/rpc/collections/bottles/delete"),
-    );
-    await genericRow.getByRole("button", { name: "Bottle options" }).click();
-    await page.getByRole("menuitem", { name: "Remove from Library" }).click();
-    const deleteInput = getRpcInput(await deleteRequestPromise);
-
-    expect(deleteInput.target).toBe(buildGenericCatalogTarget().targetId);
-    expect(deleteInput).not.toHaveProperty("bottle");
-    expect(deleteInput).not.toHaveProperty("release");
-    await expect(genericRow).toHaveCount(0);
   });
 
   test("filters Library entries from the profile tab", async ({
@@ -452,7 +392,15 @@ test.describe("profile library", () => {
     await expect(
       page.getByRole("menuitem", { name: "Remove from Library" }),
     ).toBeVisible();
+    const deleteRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/delete"),
+    );
     await page.getByRole("menuitem", { name: "Remove from Library" }).click();
+    const deleteInput = getRpcInput(await deleteRequestPromise);
+
+    expect(deleteInput.bottle).toBe(bottleId);
+    expect(deleteInput).not.toHaveProperty("target");
+    expect(deleteInput).not.toHaveProperty("release");
 
     await expect(savedBottleRow).toHaveCount(0);
     await expect(

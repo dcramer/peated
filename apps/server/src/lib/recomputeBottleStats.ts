@@ -4,9 +4,8 @@ import {
   bottleGroupTombstones,
   bottleTombstones,
   bottles,
-  catalogTargets,
 } from "@peated/server/db/schema";
-import { aggregateCatalogTargetStatsInTransaction } from "@peated/server/lib/recomputeCatalogTargetStats";
+import { aggregateBottleActivityStatsInTransaction } from "@peated/server/lib/recomputeBottleActivityStats";
 import { eq } from "drizzle-orm";
 
 export type BottleStatsIntegrityErrorCode =
@@ -48,7 +47,7 @@ async function bottleRetired(tx: AnyTransaction, bottleId: number) {
   return tombstone !== undefined;
 }
 
-/** Recomputes one active Bottle from only its exact target activity. */
+/** Recomputes one active Bottle from activity assigned directly to it. */
 export async function recomputeBottleStatsInTransaction(
   tx: AnyTransaction,
   bottleId: number,
@@ -79,21 +78,7 @@ export async function recomputeBottleStatsInTransaction(
     throw new BottleStatsIntegrityError("invalid_catalog_graph", bottleId);
   }
 
-  const exactTargets = await tx
-    .select({ id: catalogTargets.id, groupId: catalogTargets.groupId })
-    .from(catalogTargets)
-    .where(eq(catalogTargets.bottleId, bottleId))
-    .for("share");
-  if (
-    exactTargets.length !== 1 ||
-    exactTargets[0]!.groupId !== bottle.groupId
-  ) {
-    throw new BottleStatsIntegrityError("invalid_catalog_graph", bottleId);
-  }
-
-  const stats = await aggregateCatalogTargetStatsInTransaction(tx, [
-    exactTargets[0]!.id,
-  ]);
+  const stats = await aggregateBottleActivityStatsInTransaction(tx, [bottleId]);
   const [persisted] = await tx
     .update(bottles)
     .set({ ...stats, updatedAt: new Date() })

@@ -268,7 +268,7 @@ describe("POST /bottle-releases", () => {
     ).toHaveLength(0);
 
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      targetId: result.targetId,
+      bottleId: result.bottle.id,
     });
   });
 

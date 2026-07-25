@@ -1,32 +1,20 @@
-import type { CatalogTargetAssignmentDescriptor } from "@peated/server/lib/catalogTargets";
 import { logError } from "@peated/server/lib/log";
 import { pushJob } from "@peated/server/worker/client";
-import type { UpdateBottleGroupStatsJobArgs } from "@peated/server/worker/jobs/updateBottleGroupStats";
 import type { UpdateBottleStatsJobArgs } from "@peated/server/worker/jobs/updateBottleStats";
 
-type TastingStatsRecomputeJob =
-  | {
-      name: "UpdateBottleStats";
-      args: UpdateBottleStatsJobArgs;
-    }
-  | {
-      name: "UpdateBottleGroupStats";
-      args: UpdateBottleGroupStatsJobArgs;
-    };
+type TastingStatsRecomputeJob = {
+  name: "UpdateBottleStats";
+  args: UpdateBottleStatsJobArgs;
+};
 
-/** Route exact and generic target identities to their dedicated workers. */
+/** Builds direct-Bottle aggregate work for a persisted Tasting change. */
 export function buildTastingStatsRecomputeJob(
-  target: CatalogTargetAssignmentDescriptor,
+  bottleId: number,
 ): TastingStatsRecomputeJob {
-  return target.bottleId !== null
-    ? {
-        name: "UpdateBottleStats",
-        args: { targetId: target.targetId },
-      }
-    : {
-        name: "UpdateBottleGroupStats",
-        args: { targetId: target.targetId },
-      };
+  return {
+    name: "UpdateBottleStats",
+    args: { bottleId },
+  };
 }
 
 /**
@@ -35,9 +23,9 @@ export function buildTastingStatsRecomputeJob(
  */
 export async function dispatchTastingStatsRecompute(
   tastingId: number,
-  target: CatalogTargetAssignmentDescriptor,
+  bottleId: number,
 ): Promise<void> {
-  const job = buildTastingStatsRecomputeJob(target);
+  const job = buildTastingStatsRecomputeJob(bottleId);
 
   try {
     await pushJob(job.name, job.args, {
@@ -50,9 +38,7 @@ export async function dispatchTastingStatsRecompute(
       extra: {
         job: job.name,
         tastingId,
-        targetId: target.targetId,
-        groupId: target.groupId,
-        targetBottleId: target.bottleId,
+        bottleId,
       },
     });
   }

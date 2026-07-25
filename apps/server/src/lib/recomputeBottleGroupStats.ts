@@ -5,9 +5,8 @@ import {
   bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
-import { aggregateCatalogTargetStatsInTransaction } from "@peated/server/lib/recomputeCatalogTargetStats";
+import { aggregateBottleActivityStatsInTransaction } from "@peated/server/lib/recomputeBottleActivityStats";
 import { asc, eq, inArray } from "drizzle-orm";
 
 export type BottleGroupStatsIntegrityErrorCode =
@@ -35,7 +34,7 @@ export type BottleGroupStatsResult = Pick<
   | "updatedAt"
 >;
 
-/** Recomputes one active group from canonical target activity inside the caller's transaction. */
+/** Recomputes one active group from direct activity on its member Bottles. */
 export async function recomputeBottleGroupStatsInTransaction(
   tx: AnyTransaction,
   groupId: number,
@@ -84,38 +83,10 @@ export async function recomputeBottleGroupStatsInTransaction(
     throw new BottleGroupStatsIntegrityError("invalid_catalog_graph", groupId);
   }
 
-  const targets = await tx
-    .select({
-      id: catalogTargets.id,
-      bottleId: catalogTargets.bottleId,
-    })
-    .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, groupId))
-    .orderBy(asc(catalogTargets.id))
-    .for("share");
-  const genericTargets = targets.filter(({ bottleId }) => bottleId === null);
-  const exactTargets = targets.filter(
-    (target): target is typeof target & { bottleId: number } =>
-      target.bottleId !== null,
+  const stats = await aggregateBottleActivityStatsInTransaction(
+    tx,
+    activeMembers.map(({ id }) => id),
   );
-  const activeBottleIds = new Set(activeMembers.map(({ id }) => id));
-  const exactTargetByBottleId = new Map(
-    exactTargets.map((target) => [target.bottleId, target]),
-  );
-  if (
-    genericTargets.length !== 1 ||
-    exactTargets.length !== activeMembers.length ||
-    exactTargets.some(({ bottleId }) => !activeBottleIds.has(bottleId)) ||
-    activeMembers.some(({ id }) => !exactTargetByBottleId.has(id))
-  ) {
-    throw new BottleGroupStatsIntegrityError("invalid_catalog_graph", groupId);
-  }
-
-  const targetIds = [
-    genericTargets[0]!.id,
-    ...activeMembers.map(({ id }) => exactTargetByBottleId.get(id)!.id),
-  ];
-  const stats = await aggregateCatalogTargetStatsInTransaction(tx, targetIds);
 
   const [persisted] = await tx
     .update(bottleGroups)

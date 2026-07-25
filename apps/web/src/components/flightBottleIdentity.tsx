@@ -1,42 +1,40 @@
 "use client";
 
-import type { CatalogTargetV1 } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useState } from "react";
 import BottlePanel from "./bottlePanel";
-import CatalogTargetIdentity from "./catalogTargetIdentity";
 import { ClientOnly } from "./clientOnly";
+import Link from "./link";
 
-export default function FlightTargetIdentity({
-  target,
+export default function FlightBottleIdentity({
+  bottle,
   flightId,
 }: {
-  target: CatalogTargetV1;
+  bottle: Bottle;
   flightId: string;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <CatalogTargetIdentity
-        target={target}
-        compact
-        onClick={
-          target.kind === "bottle"
-            ? (event) => {
-                event.preventDefault();
-                setOpen(true);
-              }
-            : undefined
-        }
-      />
-      {target.kind === "bottle" && open && (
+      <Link
+        href={`/bottles/${bottle.id}`}
+        className="font-semibold hover:underline"
+        onClick={(event) => {
+          event.preventDefault();
+          setOpen(true);
+        }}
+      >
+        {bottle.fullName}
+      </Link>
+      {open && (
         <ClientOnly>
           {() => (
             <BottlePanel
-              bottleId={target.bottle.id}
+              bottleId={bottle.id}
               tastingPath={getAddBottleHref({
-                bottleId: target.bottle.id,
+                bottleId: bottle.id,
                 flightId,
                 intent: "tasting",
               })}

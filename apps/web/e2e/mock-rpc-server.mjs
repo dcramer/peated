@@ -3,7 +3,6 @@ import http from "node:http";
 import {
   addAnotherReleaseSourceBottle,
   anotherReleaseSourceBottle,
-  bottleGroupDirectTasting,
   bottleGroupId,
   bottleGroupMemberTargets,
   bottleGroupRepresentative,
@@ -15,12 +14,11 @@ import {
   buildCollectionBottle,
   buildExactCatalogTarget,
   buildFavoriteActivity,
-  buildGenericCatalogTarget,
   buildTasting,
   conflictingPageTargetBottleId,
   createdBottleId,
   createdBottleName,
-  createdFlightTargetFixtureId,
+  createdFlightBottleFixtureId,
   createdTastingId,
   destinationBottleGroupId,
   destinationBottleGroupTarget,
@@ -35,9 +33,8 @@ import {
   existingRelease,
   existingReleaseId,
   failingTastingNotes,
-  flightTargetFixture,
-  flightTargetFixtureId,
-  genericTastingNotes,
+  flightBottleFixture,
+  flightBottleFixtureId,
   groupedBottleDetails,
   legacyIncompleteReleaseId,
   legacyPromotedBottle,
@@ -419,39 +416,46 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     case "flights/details":
       if (
-        input?.flight !== flightTargetFixtureId &&
-        input?.flight !== createdFlightTargetFixtureId
+        input?.flight !== flightBottleFixtureId &&
+        input?.flight !== createdFlightBottleFixtureId
       ) {
         sendRpcError(response, "Unexpected Flight details payload");
         return true;
       }
       sendRpcResponse(response, {
-        ...flightTargetFixture,
+        ...flightBottleFixture,
         id: input.flight,
+        bottles: [existingBottle, exactSearchBottle].map((bottle) => ({
+          bottle,
+          hasTasted: false,
+          isLibrary: false,
+        })),
       });
       return true;
     case "flights/create": {
-      const expectedTargetIds = [
-        buildExactCatalogTarget().targetId,
-        bottleGroupTarget.targetId,
-      ];
+      const expectedBottleIds = [existingBottle.id, exactSearchBottle.id];
       if (
-        input?.name !== "Target-aware Flight" ||
-        input?.bottles !== undefined ||
-        !Array.isArray(input?.targets) ||
-        input.targets.length !== expectedTargetIds.length ||
-        !expectedTargetIds.every((targetId) => input.targets.includes(targetId))
+        input?.name !== "Bottle Flight" ||
+        input?.targets !== undefined ||
+        !Array.isArray(input?.bottles) ||
+        input.bottles.length !== expectedBottleIds.length ||
+        !expectedBottleIds.every((bottleId) => input.bottles.includes(bottleId))
       ) {
-        sendRpcError(response, "Unexpected target-native Flight payload");
+        sendRpcError(response, "Unexpected direct-Bottle Flight payload");
         return true;
       }
       sendRpcResponse(response, {
-        id: createdFlightTargetFixtureId,
+        id: createdFlightBottleFixtureId,
         name: input.name,
         description: input.description ?? null,
         public: input.public ?? false,
-        createdAt: flightTargetFixture.createdAt,
+        createdAt: flightBottleFixture.createdAt,
         createdBy: testUser,
+        bottles: [existingBottle, exactSearchBottle].map((bottle) => ({
+          bottle,
+          hasTasted: false,
+          isLibrary: false,
+        })),
       });
       return true;
     }
@@ -580,9 +584,9 @@ async function handleRpcRequest({ request, response, url }) {
         });
         return true;
       }
-      if (!getAccessToken(request).includes("flight-targets")) return false;
+      if (!getAccessToken(request).includes("flight-bottles")) return false;
       sendRpcResponse(response, {
-        results: [withTargetId(existingBottle)],
+        results: [existingBottle, exactSearchBottle],
         rel: { nextCursor: null, prevCursor: null },
       });
       return true;
@@ -626,28 +630,16 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, suggestedTags);
       return true;
     case "tastings/create": {
-      const target = getMockTarget(request, input?.target);
       if (
-        !target ||
-        input?.bottle !== undefined ||
+        typeof input?.bottle !== "number" ||
+        input?.target !== undefined ||
         input?.release !== undefined ||
         input?.rating !== 2 ||
-        ![
-          tastingNotes,
-          photoTastingNotes,
-          genericTastingNotes,
-          failingTastingNotes,
-        ].includes(input?.notes)
+        ![tastingNotes, photoTastingNotes, failingTastingNotes].includes(
+          input?.notes,
+        )
       ) {
         sendRpcError(response, "Unexpected tasting create payload");
-        return true;
-      }
-
-      if (
-        input?.notes === genericTastingNotes &&
-        input?.flight !== "flight-qa"
-      ) {
-        sendRpcError(response, "Expected Flight for generic tasting");
         return true;
       }
 
@@ -667,7 +659,7 @@ async function handleRpcRequest({ request, response, url }) {
 
       sendRpcResponse(response, {
         tasting: buildTasting({
-          target,
+          bottle: getMockBottle(request, input.bottle),
           notes: input?.notes,
           rating: input?.rating,
           tags: input?.tags ?? [],
@@ -678,28 +670,14 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "tastings/list":
       if (
-        input?.cursor !== 1 ||
-        input?.limit !== 25 ||
-        Object.keys(input).length !== 3
+        input?.target !== undefined ||
+        input?.release !== undefined ||
+        (input?.bottle !== undefined && typeof input.bottle !== "number")
       ) {
-        sendRpcError(response, "Unexpected direct Tasting list payload");
+        sendRpcError(response, "Unexpected direct-Bottle Tasting list payload");
         return true;
       }
-      if (input.target === bottleGroupTarget.targetId) {
-        sendRpcResponse(response, {
-          results: [bottleGroupDirectTasting],
-          rel: { nextCursor: null, prevCursor: null },
-        });
-        return true;
-      }
-      if (
-        input.target === destinationBottleGroupTarget.targetId ||
-        input.target === splitBottleGroupTarget.targetId
-      ) {
-        sendRpcResponse(response, emptyList);
-        return true;
-      }
-      sendRpcError(response, "Unexpected direct Tasting target");
+      sendRpcResponse(response, emptyList);
       return true;
     case "tastings/photoIdentification":
       // E2E access-token suffixes select alternate mock photo-identification scenarios.
@@ -848,7 +826,7 @@ async function handleRpcRequest({ request, response, url }) {
             status: "classified",
             decision: {
               action: "match",
-              matchedTarget: buildExactCatalogTarget(),
+              matchedBottle: existingBottle,
             },
             artifacts: {
               candidates: [
@@ -884,7 +862,7 @@ async function handleRpcRequest({ request, response, url }) {
     case "tastings/photoIdentificationCreate":
       sendRpcResponse(
         response,
-        createPhotoIdentificationTarget(request, input),
+        createPhotoIdentificationBottle(request, input),
       );
       return true;
     case "tastings/imageUpdate":
@@ -1019,18 +997,9 @@ function getCollectionState(request) {
   const token = getAccessToken(request);
 
   if (!collectionStateByToken.has(token)) {
-    const library = new Map();
-    if (token.includes("library-generic")) {
-      const genericEntry = buildCollectionBottle({
-        id: collectionBottleId++,
-        target: buildGenericCatalogTarget(),
-        hasTasted: true,
-      });
-      library.set(genericEntry.target.targetId, genericEntry);
-    }
     collectionStateByToken.set(token, {
       default: new Map(),
-      library,
+      library: new Map(),
     });
   }
 
@@ -1103,57 +1072,6 @@ function getCollection(input) {
   return input.collection;
 }
 
-function getLegacyCollectionRelease(input) {
-  if (input?.release === undefined || input.release === null) return null;
-
-  if (
-    input.release === existingReleaseId &&
-    input.bottle === existingRelease.bottleId
-  ) {
-    return existingRelease;
-  }
-  throw new Error("Unexpected collection release payload");
-}
-
-function buildLegacyCollectionTarget(request, input) {
-  if (typeof input?.bottle !== "number") {
-    throw new Error("Expected target or retained bottle collection identity");
-  }
-
-  const bottle =
-    input.bottle === existingBottleId
-      ? existingBottle
-      : input.bottle === createdBottleId
-        ? buildCreatedBottle({
-            includeExactBottleDetails: isExactBottlePhotoScenario(request),
-          })
-        : buildBottleForId(input.bottle);
-
-  return buildExactCatalogTarget({
-    bottle,
-    release: getLegacyCollectionRelease(input),
-  });
-}
-
-function resolveCollectionMutationTarget(request, entries, input) {
-  if (input?.target !== undefined) {
-    if (typeof input.target !== "number" || input?.bottle !== undefined) {
-      throw new Error("Unexpected target collection mutation payload");
-    }
-
-    const target =
-      Array.from(entries.values()).find(
-        (entry) => entry.target.targetId === input.target,
-      )?.target ?? getMockTarget(request, input.target);
-    if (!target) {
-      throw new Error("Unknown CatalogTarget collection mutation payload");
-    }
-    return target;
-  }
-
-  return buildLegacyCollectionTarget(request, input);
-}
-
 function mutateCollectionBottle(request, input, action) {
   if (input?.user !== "me") {
     throw new Error("Unexpected collection mutation payload");
@@ -1164,12 +1082,19 @@ function mutateCollectionBottle(request, input, action) {
   ) {
     throw new Error("Unexpected collection pending image payload");
   }
+  if (
+    typeof input?.bottle !== "number" ||
+    input?.target !== undefined ||
+    input?.release !== undefined
+  ) {
+    throw new Error("Expected direct Bottle collection identity");
+  }
 
   const state = getCollectionState(request);
   const collection = getCollection(input);
   const entries = state[collection];
-  const target = resolveCollectionMutationTarget(request, entries, input);
-  const key = target.targetId;
+  const bottle = getMockBottle(request, input.bottle);
+  const key = bottle.id;
 
   if (action === "delete") {
     entries.delete(key);
@@ -1181,7 +1106,7 @@ function mutateCollectionBottle(request, input, action) {
       key,
       buildCollectionBottle({
         id: collectionBottleId++,
-        target,
+        bottle,
         imageUrl: input.pendingImageId
           ? "http://127.0.0.1:4999/uploads/library.webp"
           : null,
@@ -1402,7 +1327,7 @@ function buildCreateProposalPhotoIdentification({
   };
 }
 
-function createPhotoIdentificationTarget(request, input) {
+function createPhotoIdentificationBottle(request, input) {
   const expectedCreateToken = getExpectedPhotoCreateToken(request);
   if (input?.createToken !== expectedCreateToken) {
     throw new Error("Unexpected photo identification create token");
@@ -1415,7 +1340,7 @@ function createPhotoIdentificationTarget(request, input) {
 
   if (token.includes("photo-create-warning")) {
     return {
-      target: buildExactCatalogTarget({ bottle }),
+      bottle,
       warnings: [
         {
           code: "CATALOG_IMAGE_COPY_FAILED",
@@ -1428,13 +1353,13 @@ function createPhotoIdentificationTarget(request, input) {
 
   if (token.includes("photo-create-existing")) {
     return {
-      target: buildExactCatalogTarget(),
+      bottle: existingBottle,
     };
   }
 
   if (token.includes("photo-create-unsuitable")) {
     return {
-      target: buildExactCatalogTarget({ bottle }),
+      bottle,
     };
   }
 
@@ -1444,7 +1369,7 @@ function createPhotoIdentificationTarget(request, input) {
     token.includes("photo-create-prefilled-bottle")
   ) {
     return {
-      target: buildExactCatalogTarget({ bottle }),
+      bottle,
     };
   }
 
@@ -1855,9 +1780,7 @@ function buildManualSearchMatchPhotoIdentification() {
       status: "classified",
       decision: {
         action: "match",
-        matchedTarget: buildExactCatalogTarget({
-          bottle: legacyPromotedBottle,
-        }),
+        matchedBottle: legacyPromotedBottle,
       },
       artifacts: {
         candidates: [
@@ -1945,7 +1868,7 @@ function buildNeedsReviewPhotoIdentification() {
       status: "classified",
       decision: {
         action: "match",
-        matchedTarget: buildExactCatalogTarget(),
+        matchedBottle: existingBottle,
       },
       artifacts: {
         candidates: [
@@ -2037,38 +1960,9 @@ function getMockExactTarget(request, bottleId) {
   );
 }
 
-function getMockTarget(request, targetId) {
-  if (typeof targetId !== "number") return null;
-
-  const exactTargets = [
-    existingBottleId,
-    createdBottleId,
-    exactSearchBottle.id,
-    legacyPromotedBottleId,
-  ].map((bottleId) => getMockExactTarget(request, bottleId));
-  const targets = [
-    ...exactTargets,
-    ...bottleGroupMemberTargets,
-    bottleGroupTarget,
-    destinationBottleGroupTarget,
-    splitBottleGroupTarget,
-    buildGenericCatalogTarget(),
-  ];
-  const knownTarget = targets.find((target) => target.targetId === targetId);
-  if (knownTarget) return knownTarget;
-
-  const bottleId = targetId - 10_000_000;
-  if (bottleId > 0 && bottleId < 10_000_000 && Number.isSafeInteger(bottleId)) {
-    return getMockExactTarget(request, bottleId);
-  }
-
-  return null;
-}
-
 function hasBottleInCollection(collection, bottleId) {
   return Array.from(collection.values()).some(
-    (entry) =>
-      entry.target.kind === "bottle" && entry.target.bottle.id === bottleId,
+    (entry) => entry.bottle.id === bottleId,
   );
 }
 
@@ -2101,37 +1995,32 @@ function listCollectionBottles(request, input) {
   const entries = Array.from(state[collection].entries());
   let results = entries.map(([, entry]) => entry);
 
-  if (input?.target !== undefined) {
+  if (input?.target !== undefined || input?.release !== undefined) {
+    throw new Error("Unexpected target-shaped collection list payload");
+  }
+  if (input?.bottle !== undefined) {
     results = results.filter(
-      (entry) => entry.target.targetId === Number(input.target),
-    );
-  } else if (input?.bottle !== undefined) {
-    const target = buildLegacyCollectionTarget(request, input);
-    results = results.filter(
-      (entry) => entry.target.targetId === target.targetId,
+      (entry) => entry.bottle.id === Number(input.bottle),
     );
   }
 
   if (collection === "library" && input?.query) {
     const query = String(input.query).toLowerCase();
     results = results.filter((entry) =>
-      getCollectionTargetOwner(entry.target)
-        .fullName.toLowerCase()
-        .includes(query),
+      entry.bottle.fullName.toLowerCase().includes(query),
     );
   }
 
   if (collection === "library" && input?.brand) {
     results = results.filter(
-      (entry) =>
-        getCollectionTargetOwner(entry.target).brandId === Number(input.brand),
+      (entry) => entry.bottle.brand.id === Number(input.brand),
     );
   }
 
   if (collection === "library" && input?.distiller) {
     results = results.filter((entry) =>
-      getCollectionTargetOwner(entry.target).distillerIds.includes(
-        Number(input.distiller),
+      entry.bottle.distillers.some(
+        (distiller) => distiller.id === Number(input.distiller),
       ),
     );
   }
@@ -2151,10 +2040,6 @@ function listCollectionBottles(request, input) {
       prevCursor: null,
     },
   };
-}
-
-function getCollectionTargetOwner(target) {
-  return target.kind === "bottle" ? target.bottle : target.group;
 }
 
 function getBottleGroupTarget(groupId) {

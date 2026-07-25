@@ -3,11 +3,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
-import {
-  getCatalogTargetHref,
-  getCatalogTargetLabel,
-  getCatalogTargetScopeLabel,
-} from "@peated/web/lib/catalogTarget";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";
@@ -49,26 +44,19 @@ function CollectionLink({ activity }: { activity: CollectionAddActivity }) {
 }
 
 function getCollectionItemHref(item: CollectionAddItem) {
-  return getCatalogTargetHref(item.target);
+  return `/bottles/${item.bottle.id}`;
 }
 
 function getCollectionItemTitle(item: CollectionAddItem) {
-  return getCatalogTargetLabel(item.target);
+  return item.bottle.fullName;
 }
 
 function getCollectionItemDetail(item: CollectionAddItem) {
-  const owner =
-    item.target.kind === "bottle" ? item.target.bottle : item.target.group;
-  const category = owner.category ? formatCategoryName(owner.category) : null;
-  return [getCatalogTargetScopeLabel(item.target), category]
-    .filter(Boolean)
-    .join(" · ");
+  return item.bottle.category ? formatCategoryName(item.bottle.category) : null;
 }
 
 function CollectionItemImage({ item }: { item: CollectionAddItem }) {
-  const owner =
-    item.target.kind === "bottle" ? item.target.bottle : item.target.group;
-  const imageUrl = item.imageUrl ?? owner.imageUrl;
+  const imageUrl = item.imageUrl ?? item.bottle.imageUrl;
 
   if (!imageUrl) {
     return null;

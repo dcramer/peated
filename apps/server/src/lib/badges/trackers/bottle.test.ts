@@ -1,4 +1,4 @@
-import { createTastingForBadge, useGenericBadgeTarget } from "../testHelpers";
+import { createTastingForBadge } from "../testHelpers";
 import { BottleTracker } from "./bottle";
 
 describe("track", () => {
@@ -17,15 +17,5 @@ describe("track", () => {
           },
         ]
       `);
-  });
-
-  test("does not track a representative for a generic target", async ({
-    fixtures,
-  }) => {
-    const exact = await createTastingForBadge(fixtures);
-    const tasting = await useGenericBadgeTarget(exact.id);
-    const impl = new BottleTracker();
-
-    expect(impl.track(tasting)).toEqual([]);
   });
 });

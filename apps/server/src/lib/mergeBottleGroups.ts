@@ -676,11 +676,11 @@ async function mergeBottleGroupsInTransaction(
 async function finalizeBottleGroupMerge(
   result: BottleGroupMergeTransactionResult,
 ) {
-  for (const targetId of result.movedTargetIds) {
+  for (const bottleId of result.movedBottleIds) {
     try {
-      await pushUniqueJob("OnBottleChange", { targetId });
+      await pushUniqueJob("OnBottleChange", { bottleId });
     } catch (error) {
-      logError(error, { extra: { targetId } });
+      logError(error, { extra: { bottleId } });
     }
   }
   for (const name of result.changedAliasNames) {

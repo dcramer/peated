@@ -16,7 +16,6 @@ import {
   CollectionBottleStatusLabel,
   type CollectionBottleStatus,
 } from "@peated/web/components/libraryBottleStatus";
-import { getCatalogTargetLabel } from "@peated/web/lib/catalogTarget";
 import classNames from "@peated/web/lib/classNames";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
@@ -101,7 +100,7 @@ function useLibraryEntryMutations({
     input: {
       user: "me",
       collection: "library",
-      target: entry.target.targetId,
+      bottle: entry.bottle.id,
     },
   });
   const collectionBottleListQueryKey = orpc.collections.bottles.list.key({
@@ -196,7 +195,7 @@ function useLibraryEntryMutations({
     setError(null);
     try {
       await entryDeleteMutation.mutateAsync({
-        target: entry.target.targetId,
+        bottle: entry.bottle.id,
         user: "me",
         collection: "library",
       });
@@ -231,26 +230,26 @@ function useLibraryEntryMutations({
 
 export function LibraryEntryThumbnail({ entry }: { entry: CollectionBottle }) {
   const [imageOpen, setImageOpen] = useState(false);
-  const targetLabel = getCatalogTargetLabel(entry.target);
+  const bottleLabel = entry.bottle.fullName;
 
   return entry.imageUrl ? (
     <div className="h-12 w-12 shrink-0">
       <button
         type="button"
         className="h-12 w-12 overflow-hidden rounded border border-slate-800 bg-slate-900"
-        aria-label={`View image for ${targetLabel}`}
+        aria-label={`View image for ${bottleLabel}`}
         onClick={() => setImageOpen(true)}
       >
         <img
           src={entry.imageUrl}
-          alt={`Photo of ${targetLabel}`}
+          alt={`Photo of ${bottleLabel}`}
           className="h-full w-full object-cover"
         />
       </button>
       <ImageModal
         image={entry.imageUrl}
-        alt={`Photo of ${targetLabel}`}
-        title={`Photo of ${targetLabel}`}
+        alt={`Photo of ${bottleLabel}`}
+        title={`Photo of ${bottleLabel}`}
         open={imageOpen}
         setOpen={setImageOpen}
       />
@@ -271,8 +270,8 @@ export function LibraryEntryImage({
       username,
     });
   const [imageOpen, setImageOpen] = useState(false);
-  const targetLabel = getCatalogTargetLabel(entry.target);
-  const imageAlt = `Photo of ${targetLabel}`;
+  const bottleLabel = entry.bottle.fullName;
+  const imageAlt = `Photo of ${bottleLabel}`;
 
   return (
     <div className="min-w-0 shrink-0">
@@ -281,8 +280,8 @@ export function LibraryEntryImage({
         className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900 disabled:opacity-60"
         aria-label={
           entry.imageUrl
-            ? `View image for ${targetLabel}`
-            : `Add image for ${targetLabel}`
+            ? `View image for ${bottleLabel}`
+            : `Add image for ${bottleLabel}`
         }
         disabled={isBusy}
         onClick={() => {
@@ -328,7 +327,7 @@ export function LibraryEntryImage({
         type="file"
         accept="image/*"
         className="hidden"
-        aria-label={`Edit image for ${targetLabel}`}
+        aria-label={`Edit image for ${bottleLabel}`}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (file) {
@@ -424,7 +423,7 @@ export default function LibraryEntryActions({
     entry,
     username,
   });
-  const targetLabel = getCatalogTargetLabel(entry.target);
+  const bottleLabel = entry.bottle.fullName;
 
   return (
     <div className="min-w-0 shrink-0">
@@ -482,7 +481,7 @@ export default function LibraryEntryActions({
         type="file"
         accept="image/*"
         className="hidden"
-        aria-label={`Edit image for ${targetLabel}`}
+        aria-label={`Edit image for ${bottleLabel}`}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (file) void replaceImage(file);

@@ -52,7 +52,7 @@ export default function BottlePanel({
                 </>
               }
             >
-              <CollectionAction targetId={data.targetId} />
+              <CollectionAction bottleId={data.id} />
             </Suspense>
 
             <Button href={tastingHref} color="primary">

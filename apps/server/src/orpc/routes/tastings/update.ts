@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { NewTasting, Tasting } from "@peated/server/db/schema";
 import { bottleTags, follows, tastings } from "@peated/server/db/schema";
-import { resolveCatalogTargetForAssignment } from "@peated/server/lib/catalogTargets";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -45,7 +44,6 @@ type TastingUpdate = Partial<
     | "friends"
     | "tags"
     | "imageUrl"
-    | "targetId"
   >
 >;
 
@@ -71,9 +69,6 @@ export default procedure
           eq(tastings.id, input.tasting),
           eq(tastings.createdById, context.user.id),
         ),
-      with: {
-        bottle: true,
-      },
     });
     if (!tasting) {
       throw errors.NOT_FOUND({
@@ -137,7 +132,7 @@ export default procedure
 
     const ratingChanged = tastingData.rating !== undefined;
     const updated = await db.transaction(async (tx) => {
-      // Mutation and dispatch must use the target current after any concurrent backfill.
+      // Mutation and dispatch use the Bottle reference current after locking.
       const [currentTasting] = await tx
         .select()
         .from(tastings)
@@ -151,44 +146,19 @@ export default procedure
         .for("update");
       if (!currentTasting) return;
 
-      const targetWasBackfilled = currentTasting.targetId === null;
-      const shouldRecomputeStats = ratingChanged || targetWasBackfilled;
-      const needsTarget =
-        shouldRecomputeStats || tastingData.tags !== undefined;
-      let target = null;
-      let persistedData = tastingData;
-      if (needsTarget) {
-        const targetInput =
-          currentTasting.targetId !== null
-            ? { kind: "target" as const, targetId: currentTasting.targetId }
-            : currentTasting.bottleId !== null
-              ? {
-                  kind: "legacy" as const,
-                  bottleId: currentTasting.bottleId,
-                  releaseId: currentTasting.releaseId,
-                  context: {
-                    caller: "tastings.update",
-                    operation: "backfill",
-                  },
-                }
-              : null;
-        if (!targetInput) {
-          throw errors.CONFLICT({
-            message: "Tasting has no catalog identity.",
-          });
-        }
-        target = await resolveCatalogTargetForAssignment(targetInput, tx);
-        if (targetWasBackfilled) {
-          persistedData = { ...tastingData, targetId: target.targetId };
-        }
+      const needsBottle = ratingChanged || tastingData.tags !== undefined;
+      if (needsBottle && currentTasting.bottleId === null) {
+        throw errors.CONFLICT({
+          message: `Tasting ${currentTasting.id} has no Bottle.`,
+        });
       }
       let newTasting: Tasting | undefined;
       try {
-        newTasting = Object.values(persistedData).length
+        newTasting = Object.values(tastingData).length
           ? (
               await tx
                 .update(tastings)
-                .set(persistedData)
+                .set(tastingData)
                 .where(eq(tastings.id, currentTasting.id))
                 .returning()
             )[0]
@@ -205,48 +175,41 @@ export default procedure
       if (!newTasting) return;
 
       if (tastingData.tags !== undefined) {
-        if (!target) {
-          throw new Error(
-            "Catalog target was not resolved for tag accounting.",
-          );
+        const bottleId = currentTasting.bottleId!;
+        for (const tag of currentTasting.tags) {
+          await tx
+            .update(bottleTags)
+            .set({
+              count: sql`${bottleTags.count} - 1`,
+            })
+            .where(
+              and(
+                eq(bottleTags.bottleId, bottleId),
+                eq(bottleTags.tag, tag),
+                gt(bottleTags.count, 0),
+              ),
+            );
         }
-        const targetBottleId = target.bottleId;
-        if (targetBottleId !== null) {
-          for (const tag of currentTasting.tags) {
-            await tx
-              .update(bottleTags)
-              .set({
-                count: sql`${bottleTags.count} - 1`,
-              })
-              .where(
-                and(
-                  eq(bottleTags.bottleId, targetBottleId),
-                  eq(bottleTags.tag, tag),
-                  gt(bottleTags.count, 0),
-                ),
-              );
-          }
-          for (const tag of newTasting.tags) {
-            await tx
-              .insert(bottleTags)
-              .values({
-                bottleId: targetBottleId,
-                tag,
-                count: 1,
-              })
-              .onConflictDoUpdate({
-                target: [bottleTags.bottleId, bottleTags.tag],
-                set: {
-                  count: sql<string>`${bottleTags.count} + 1`,
-                },
-              });
-          }
+        for (const tag of newTasting.tags) {
+          await tx
+            .insert(bottleTags)
+            .values({
+              bottleId,
+              tag,
+              count: 1,
+            })
+            .onConflictDoUpdate({
+              target: [bottleTags.bottleId, bottleTags.tag],
+              set: {
+                count: sql<string>`${bottleTags.count} + 1`,
+              },
+            });
         }
       }
 
       return {
         tasting: newTasting,
-        target: shouldRecomputeStats ? target : null,
+        statsBottleId: ratingChanged ? currentTasting.bottleId : null,
       };
     });
 
@@ -255,10 +218,10 @@ export default procedure
         message: "Unable to update tasting.",
       });
     }
-    const { tasting: newTasting, target } = updated;
+    const { tasting: newTasting, statsBottleId } = updated;
 
-    if (target) {
-      await dispatchTastingStatsRecompute(newTasting.id, target);
+    if (statsBottleId !== null) {
+      await dispatchTastingStatsRecompute(newTasting.id, statsBottleId);
     }
 
     return await serialize(TastingSerializer, newTasting, context.user);

@@ -901,7 +901,7 @@ describe("concrete Bottle updates", () => {
         .mocked(workerClient.pushUniqueJob)
         .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
         .map(([, payload]) => payload),
-    ).toEqual(members.map(({ exactTarget }) => ({ targetId: exactTarget.id })));
+    ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
     expect(result.group).toMatchObject({
       id: first.group.id,
       name: "New Label",
@@ -1661,7 +1661,7 @@ describe("concrete Bottle updates", () => {
       expect(new Set(payloads).size).toBe(payloads.length);
     }
     expect(payloadsFor("OnBottleChange")).toEqual([
-      JSON.stringify({ targetId: first.exactTarget.id }),
+      JSON.stringify({ bottleId: first.bottle.id }),
     ]);
     const entityPayloads = createdEntities
       .map(({ id }) => JSON.stringify({ entityId: id }))

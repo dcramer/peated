@@ -2,15 +2,14 @@
 
 import type { Inputs } from "@peated/server/orpc/router";
 import Glyph from "@peated/web/assets/glyph.svg";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import EmbeddedLogin from "@peated/web/components/embeddedLogin";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import SimpleRatingIndicator from "@peated/web/components/simpleRatingIndicator";
 import Table from "@peated/web/components/table";
+import TastingBottleIdentity from "@peated/web/components/tastingBottleIdentity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
-import { getCatalogTargetStats } from "@peated/web/lib/catalogTarget";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -69,23 +68,18 @@ function TastingList() {
               title: "Bottle",
               className: "min-w-full sm:w-1/2",
               value: (tasting) => (
-                <CatalogTargetIdentity target={tasting.target} compact />
+                <TastingBottleIdentity bottle={tasting.bottle} compact />
               ),
             },
             {
               name: "tastings",
-              value: (tasting) =>
-                getCatalogTargetStats(
-                  tasting.target,
-                ).totalTastings.toLocaleString(),
+              value: (tasting) => tasting.bottle.totalTastings.toLocaleString(),
               className: "sm:w-24",
             },
             {
               name: "rating",
               value: (tasting) => (
-                <SimpleRatingIndicator
-                  avgRating={getCatalogTargetStats(tasting.target).avgRating}
-                />
+                <SimpleRatingIndicator avgRating={tasting.bottle.avgRating} />
               ),
               className: "sm:w-20",
               align: "center",
@@ -93,7 +87,7 @@ function TastingList() {
             {
               name: "age",
               value: (tasting) => {
-                const age = getCatalogTargetStats(tasting.target).statedAge;
+                const age = tasting.bottle.statedAge;
                 return age ? `${age} years` : null;
               },
               className: "sm:w-24",

@@ -5,7 +5,7 @@ import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
 import Button from "@peated/web/components/button";
-import FlightTargetIdentity from "@peated/web/components/flightTargetIdentity";
+import FlightBottleIdentity from "@peated/web/components/flightBottleIdentity";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -52,36 +52,32 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
           <col className="hidden sm:w-2/6" />
         </colgroup>
         <tbody>
-          {flight.targets.map((flightTarget) => {
-            const { target } = flightTarget;
-            const owner =
-              target.kind === "bottle" ? target.bottle : target.group;
+          {flight.bottles.map((flightBottle) => {
+            const { bottle } = flightBottle;
             const tastingHref = getAddBottleHref({
-              ...(target.kind === "bottle"
-                ? { bottleId: target.bottle.id }
-                : { groupId: target.group.id }),
+              bottleId: bottle.id,
               flightId: flight.id,
               intent: "tasting",
             });
             return (
-              <tr key={target.targetId} className="border-b border-slate-800">
+              <tr key={bottle.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
                   <div className="flex items-center gap-x-1">
-                    <FlightTargetIdentity
-                      target={target}
+                    <FlightBottleIdentity
+                      bottle={bottle}
                       flightId={flight.id}
                     />
                     <BottleStatusIndicators
-                      hasTasted={flightTarget.hasTasted}
-                      isLibrary={flightTarget.isLibrary}
+                      hasTasted={flightBottle.hasTasted}
+                      isLibrary={flightBottle.isLibrary}
                     />
                   </div>
                   <div className="text-muted text-sm">
-                    {formatCategoryName(owner.category)}
+                    {formatCategoryName(bottle.category)}
                   </div>
                   <div className="mt-3 sm:hidden">
                     <Button
-                      color={flightTarget.hasTasted ? "default" : "highlight"}
+                      color={flightBottle.hasTasted ? "default" : "highlight"}
                       size="small"
                       href={tastingHref}
                     >
@@ -91,7 +87,7 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
                 </td>
                 <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
                   <Button
-                    color={flightTarget.hasTasted ? "default" : "highlight"}
+                    color={flightBottle.hasTasted ? "default" : "highlight"}
                     size="small"
                     href={tastingHref}
                   >

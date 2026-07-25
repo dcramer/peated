@@ -1,17 +1,21 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
-import { serializer } from ".";
+import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import { type CollectionBottle, tastings, type User } from "../db/schema";
-import { loadCatalogTargetReadsWithParity } from "../lib/catalogTargetReadParity";
-import { CatalogTargetIntegrityMismatchError } from "../lib/catalogTargets";
+import {
+  bottles,
+  type CollectionBottle,
+  tastings,
+  type User,
+} from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
 import { type CollectionBottleSchema } from "../schemas";
-import type { CatalogTargetV1 } from "../schemas/catalogIdentity";
+import type { BottleSchema } from "../schemas/bottles";
+import { BottleSerializer } from "./bottle";
 
 type CollectionBottleAttrs = {
-  target: CatalogTargetV1;
+  bottle: z.infer<typeof BottleSchema>;
   hasTasted: boolean;
 };
 
@@ -21,59 +25,58 @@ export const CollectionBottleSerializer = serializer({
     itemList: CollectionBottle[],
     currentUser?: User,
   ): Promise<Record<number, CollectionBottleAttrs>> => {
-    const { targets } = await loadCatalogTargetReadsWithParity(
-      itemList.map((item) => ({
-        consumerTable: "collection_bottle",
-        rowLocator: { id: item.id },
-        targetId: item.targetId,
-        legacy: { bottleId: item.bottleId, releaseId: item.releaseId },
-      })),
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "CollectionBottleSerializer",
-        operation: "serialize",
-      },
+    const bottleIds = [
+      ...new Set(
+        itemList.map((item) => {
+          if (item.bottleId === null) {
+            throw new Error(
+              `collection membership ${item.id} has no Bottle identity`,
+            );
+          }
+          return item.bottleId;
+        }),
+      ),
+    ];
+    const bottleRows = await db
+      .select()
+      .from(bottles)
+      .where(inArray(bottles.id, bottleIds));
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      bottleRows,
+      currentUser,
     );
-    const targetIds = targets.flatMap((target) =>
-      target ? [target.targetId] : [],
+    const bottleById = new Map(
+      serializedBottles.map((bottle) => [bottle.id, bottle]),
     );
-    const tastedTargetIds = new Set(
-      currentUser && targetIds.length
+    const tastedBottleIds = new Set(
+      currentUser && bottleIds.length
         ? (
             await db
-              .selectDistinct({ targetId: tastings.targetId })
+              .selectDistinct({ bottleId: tastings.bottleId })
               .from(tastings)
               .where(
                 and(
                   eq(tastings.createdById, currentUser.id),
-                  inArray(tastings.targetId, targetIds),
+                  inArray(tastings.bottleId, bottleIds),
                 ),
               )
-          ).flatMap(({ targetId }) => (targetId === null ? [] : [targetId]))
+          ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId]))
         : [],
     );
     return Object.fromEntries(
-      itemList.map((item, index) => {
-        const target = targets[index];
-        if (!target) {
-          if (item.targetId === null && item.bottleId === null) {
-            throw new Error(
-              `collection membership ${item.id} has no catalog identity`,
-            );
-          }
-          throw new CatalogTargetIntegrityMismatchError(
-            item.targetId !== null
-              ? { targetId: item.targetId }
-              : { bottleId: item.bottleId! },
-            `collection membership ${item.id} has no durable CatalogTarget`,
+      itemList.map((item) => {
+        const bottle = bottleById.get(item.bottleId!);
+        if (!bottle) {
+          throw new Error(
+            `collection membership ${item.id} references missing Bottle ${item.bottleId}`,
           );
         }
         return [
           item.id,
           {
-            target,
-            hasTasted: tastedTargetIds.has(target.targetId),
+            bottle,
+            hasTasted: tastedBottleIds.has(bottle.id),
           },
         ];
       }),
@@ -90,7 +93,7 @@ export const CollectionBottleSerializer = serializer({
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
       status: item.status,
-      target: attrs.target,
+      bottle: attrs.bottle,
       hasTasted: attrs.hasTasted,
     };
   },

@@ -14,13 +14,13 @@ import { useORPC } from "../lib/orpc/context";
 import Button from "./button";
 
 type CollectionActionProps = {
-  targetId: number;
+  bottleId: number;
   size?: "small" | "base";
   title?: string;
 };
 
 function SavedCollectionActionAuthenticated({
-  targetId,
+  bottleId,
   size,
   title,
 }: CollectionActionProps) {
@@ -46,7 +46,7 @@ function SavedCollectionActionAuthenticated({
     input: {
       user: "me",
       collection: "library",
-      target: targetId,
+      bottle: bottleId,
     },
     select: (data) => data.results.length > 0,
   });
@@ -72,12 +72,12 @@ function SavedCollectionActionAuthenticated({
       onClick={async () => {
         await (isCollected
           ? removeFromLibraryMutation.mutateAsync({
-              target: targetId,
+              bottle: bottleId,
               user: "me",
               collection: "library",
             })
           : addToLibraryMutation.mutateAsync({
-              target: targetId,
+              bottle: bottleId,
               user: "me",
               collection: "library",
             }));

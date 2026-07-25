@@ -11,7 +11,7 @@ export function isLibraryCollection(collection: { name: string }) {
   return collection.name === RESERVED_COLLECTIONS.library.name;
 }
 
-/** Loads a collection entry; its serializer owns authoritative target hydration. */
+/** Loads a collection entry; its serializer owns authoritative Bottle hydration. */
 export async function findCollectionBottleEntry({
   collectionBottleId,
   collectionId,

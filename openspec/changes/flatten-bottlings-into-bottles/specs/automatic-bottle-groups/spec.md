@@ -2,183 +2,130 @@
 
 ### Requirement: Every Bottle belongs to one automatic group
 
-The system SHALL assign every Bottle to exactly one BottleGroup and SHALL create the necessary group automatically when an independent Bottle is created.
+The system SHALL assign every Bottle to exactly one BottleGroup and SHALL
+create a singleton group automatically for every ordinary Bottle creation.
 
-#### Scenario: Create a singleton Bottle
+#### Scenario: Create a Bottle
 
-- **WHEN** a Bottle is created through an ordinary manual or public/API workflow
-- **THEN** the system atomically creates a singleton BottleGroup and assigns the Bottle to it
-- **AND** the user is not asked to create or name a separate group
-- **AND** no source Bottle or group identifier is accepted as grouping authority
+- **WHEN** a Bottle is created through a manual, public API, classifier, import,
+  or price-approval workflow
+- **THEN** the system atomically creates a singleton BottleGroup and assigns the
+  Bottle to it
+- **AND** the caller cannot supply group authority
 
 #### Scenario: Atomic creation fails
 
-- **WHEN** creation of the group, Bottle, or required targets fails
+- **WHEN** creation of the group, Bottle, aliases, or audit records fails
 - **THEN** none of those records are committed
 
-### Requirement: Trusted group reuse is internal
+### Requirement: Grouping runs outside Bottle creation
 
-The system SHALL expose trusted group reuse only to deterministic migration,
-measured legacy compatibility adapters, and explicitly system-controlled
-grouping operations, never as an ordinary/manual Bottle creation choice.
+The system SHALL keep semantic grouping outside ordinary Bottle creation and
+SHALL NOT ask users to select, create, merge, or split BottleGroups.
 
-#### Scenario: Prefill another release from a Bottle
+#### Scenario: Add another release
 
 - **WHEN** a user starts “add another release” from an existing Bottle
-- **THEN** the form may prefill a complete Bottle draft from that Bottle
-- **AND** submission uses ordinary independent creation and receives a new
-  singleton BottleGroup
-- **AND** the source Bottle's `groupId` is not creation authority
+- **THEN** the source pre-fills an independently complete Bottle draft
+- **AND** submission creates a new Bottle in a singleton group
+- **AND** a later system-controlled process may group it
 
-#### Scenario: Migrate parent releases
+#### Scenario: Migrate a legacy family
 
-- **WHEN** multiple BottleReleases under one legacy parent are promoted
-- **THEN** every promoted Bottle belongs to the BottleGroup created from that parent
-- **AND** the Bottle promoted from the lowest legacy release id is selected as
-  representative deterministically
-- **AND** every promoted Bottle claims its required canonical exact alias for
-  its exact target before its release mapping is completed
-- **AND** this migration grouping is internal automation, not a manual parent,
-  release, or group-selection workflow
+- **WHEN** a legacy parent and its BottleReleases are migrated
+- **THEN** the retained parent and all promoted Bottles belong to one group
+- **AND** this deterministic grouping is internal migration behavior
 
-#### Scenario: Preserve generic intent for a split legacy parent alias
+### Requirement: Group membership means related releases
 
-- **WHEN** the post-promotion alias phase encounters a parent-only alias under a
-  legacy parent with releases
-- **THEN** the measured legacy resolver assigns the alias to that parent's
-  generic BottleGroup target
-- **AND** it does not substitute the representative or another member Bottle
-- **AND** it preserves the retained legacy pair, ignored state, and assignment
-  provenance
-
-#### Scenario: Translate a legacy source-bound create
-
-- **WHEN** a retained measured compatibility adapter receives a legacy contract
-  whose source Bottle defines deterministic group context
-- **THEN** the adapter may invoke internal trusted-source creation
-- **AND** no ordinary client gains that capability
-
-### Requirement: Semantic grouping runs outside ordinary creation
-
-The system SHALL keep automatic semantic grouping separate from the ordinary
-Bottle creation request and SHALL NOT require a user to choose a BottleGroup.
-
-#### Scenario: Group a newly created singleton
-
-- **WHEN** a later system-controlled grouping process establishes that two
-  singleton groups represent the same expression
-- **THEN** it may consolidate them through the audited group operation
-- **AND** the original Bottle creation remains an independently valid operation
-
-### Requirement: Uncertain grouping is not automatic
-
-The system MUST NOT merge independently created BottleGroups solely because their names are similar, their brands match, or their Bottles share a series.
-
-#### Scenario: Likely name match
-
-- **WHEN** an independently created Bottle resembles a Bottle in another group
-  but the automatic grouping policy lacks sufficient evidence
-- **THEN** the system keeps the new Bottle in its singleton group
-- **AND** may present the other group as a reviewable suggestion
-
-#### Scenario: Same series
-
-- **WHEN** two Bottles belong to the same BottleSeries but represent different marketed expressions
-- **THEN** they remain in separate BottleGroups
-
-### Requirement: Groups represent same-expression releases
-
-BottleGroup membership SHALL mean that member Bottles are marketed versions, batches, years, or editions of the same expression; BottleSeries SHALL remain a broader relationship across potentially distinct expressions.
+BottleGroup membership SHALL indicate that its Bottles are versions, batches,
+years, editions, or a general/unversioned form of the same expression.
+BottleSeries SHALL remain a broader merchandising relationship.
 
 #### Scenario: Batch variants
 
-- **WHEN** Springbank 12 Cask Strength Batch 23 and Batch 24 are curated as versions of the same expression
-- **THEN** they belong to one BottleGroup as two Bottles
+- **WHEN** two batches are established as versions of one expression
+- **THEN** they may belong to one BottleGroup as separate Bottles
 
-#### Scenario: Distinct expressions in a range
+#### Scenario: Uncertain similarity
 
-- **WHEN** two Octomore numbered expressions are related by range but marketed as distinct products
-- **THEN** they remain in separate BottleGroups even if they share a BottleSeries
+- **WHEN** evidence is insufficient to establish the same expression
+- **THEN** the Bottles remain in separate singleton groups
+- **AND** name, brand, or series similarity alone does not silently merge them
 
-### Requirement: Group merge is explicit and reversible
+### Requirement: BottleGroup is relational, not targetable
 
-The system SHALL provide an audited moderator user operation that merges one
-source BottleGroup into one explicitly selected destination without changing
-member Bottle ids or exact target ids.
+BottleGroup SHALL provide relationship, shared-presentation, and aggregation
+scope, but SHALL NOT be selectable as activity or catalog-consumer identity.
 
-#### Scenario: Merge two groups
+#### Scenario: Render related releases
 
-- **WHEN** a moderator confirms that two groups describe the same expression
-- **THEN** all member Bottles move to the selected destination group
-- **AND** the destination shared identity atomically rematerializes every moved
-  Bottle while preserving its exact fields
-- **AND** every previous canonical exact name remains an exact alias for the same
-  Bottle
-- **AND** generic activity and stable aliases repoint to the destination generic
-  target
-- **AND** the source generic target and group are removed after their references
-  move
-- **AND** the retired source group id resolves through a durable tombstone
+- **WHEN** a user opens `/bottles/:memberBottleId/releases`
+- **THEN** the member locates its group
+- **AND** the page lists the group's independently complete member Bottles
+- **AND** user-facing copy describes related or other releases without exposing
+  BottleGroup ids
 
-#### Scenario: Consolidate duplicate set membership
+#### Scenario: Start an activity workflow
 
-- **WHEN** source and destination generic targets both occur in the same
-  collection or flight during a merge
-- **THEN** duplicate flight membership collapses to one destination row
-- **AND** the destination collection row wins
-- **AND** a blank destination collection image may be filled from the source row
+- **WHEN** a user starts a tasting, review, collection, Flight, or price action
+  from the relationship page
+- **THEN** the action requires a member Bottle
 
-#### Scenario: Ambiguous merge conflict
+### Requirement: Shared changes rematerialize member Bottles
 
-- **WHEN** a merge encounters a tasting uniqueness collision or unresolved
-  Bottle identity, alias, or SMWS conflict
-- **THEN** the complete merge rolls back
-- **AND** the system does not choose, discard, or suffix an ambiguous record
+A trusted shared BottleGroup update SHALL transactionally regenerate the
+shared materialized fields and complete names of every affected member Bottle.
 
-#### Scenario: Retry a completed merge
+#### Scenario: Change the shared name
 
-- **WHEN** the same source-to-destination merge is submitted after the source
-  tombstone already points to that destination
-- **THEN** the operation succeeds without adding audits or dispatching work
-- **AND** a retry naming a different destination fails with a conflict
+- **WHEN** an internal grouping process changes the shared Bottle name prefix
+- **THEN** every member Bottle receives a newly materialized complete name
+- **AND** each previous canonical name remains an alias for the same Bottle
+- **AND** any collision rolls back the entire change
 
-#### Scenario: Retain a reversible audit
+#### Scenario: Read a Bottle
 
-- **WHEN** a group merge commits
-- **THEN** the system stores BottleGroup before/after audit snapshots and one
-  update audit per moved Bottle
-- **AND** the audit records the actor, source, destination, moved identity, and
-  alias context needed for an explicit reversal
-- **AND** destination group aggregates are recomputed from raw exact and generic
-  target activity without double counting
+- **WHEN** any API, page, search result, worker, or serializer loads a Bottle
+- **THEN** the Bottle is independently correct without BottleGroup hydration
 
-### Requirement: Group split preserves exact identity
+### Requirement: Automatic regrouping preserves Bottle identity
 
-The system SHALL provide an audited moderator operation to move selected Bottles into a new BottleGroup without changing their exact identities.
+System-controlled regrouping SHALL move Bottles without changing Bottle ids or
+consumer references and SHALL retain an auditable before/after record.
 
-#### Scenario: Split incorrectly grouped Bottles
+#### Scenario: Consolidate two groups
 
-- **WHEN** a moderator selects member Bottles and splits them from a group
-- **THEN** the system creates a new group and moves those Bottles
-- **AND** their `bottleId` and exact `targetId` values remain unchanged
-- **AND** ambiguous generic activity remains on the source group unless explicitly reassigned
+- **WHEN** automatic grouping establishes that two groups are the same
+  expression
+- **THEN** member Bottles move to the selected group
+- **AND** shared fields are rematerialized
+- **AND** Bottle ids and all consumer Bottle references remain unchanged
 
-### Requirement: Group aggregation is deterministic
+#### Scenario: Correct an incorrect group
 
-The system SHALL calculate BottleGroup statistics from all member Bottle targets plus direct generic-group activity without double-counting exact activity.
+- **WHEN** automatic grouping separates selected Bottles
+- **THEN** it creates a new group and moves those Bottles
+- **AND** their Bottle ids and activity remain unchanged
 
-#### Scenario: Aggregate exact and generic tastings
+### Requirement: Group aggregation is member-derived
 
-- **WHEN** a group has tastings on two exact Bottles and one tasting directly on the group target
-- **THEN** the group aggregate includes all three sets once
-- **AND** each Bottle aggregate includes only its own exact tastings
+The system SHALL calculate BottleGroup statistics from raw activity assigned to
+its member Bottles without double counting.
 
-### Requirement: Group presentation has an explicit source
+#### Scenario: Aggregate member activity
 
-The system SHALL use a designated representative Bottle or group-owned editorial content for group presentation rather than opportunistically copying a child during reads.
+- **WHEN** a group contains two Bottles with activity
+- **THEN** the group aggregate includes each member's raw activity once
+- **AND** no direct BottleGroup activity exists
 
-#### Scenario: Representative Bottle changes
+### Requirement: Group presentation is deterministic
 
-- **WHEN** a moderator changes the group's representative Bottle
-- **THEN** group presentation uses the new representative deterministically
-- **AND** member Bottle content is not rewritten
+The system SHALL use group-owned shared presentation data and a valid
+representative Bottle only as a deterministic route or image source.
+
+#### Scenario: Representative changes
+
+- **WHEN** the representative Bottle changes
+- **THEN** relationship routes and presentation use the new representative
+- **AND** no activity identity changes

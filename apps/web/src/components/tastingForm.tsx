@@ -2,9 +2,8 @@
 
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { CatalogTargetV1, TastingSchema } from "@peated/server/schemas";
+import type { TastingSchema } from "@peated/server/schemas";
 import type { ServingStyle, User } from "@peated/server/types";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
@@ -36,6 +35,7 @@ import ColorField from "./colorField";
 import Form from "./form";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
+import TastingBottleIdentity from "./tastingBottleIdentity";
 
 export type {
   TastingCreateFormSubmitData,
@@ -45,9 +45,8 @@ export type {
 type TastingCreateFormProps = {
   mode?: "create";
   onSubmit: SubmitHandler<TastingCreateFormSubmitData>;
-  initialData: Partial<z.infer<typeof TastingSchema>> & {
-    target: CatalogTargetV1;
-  };
+  initialData: Partial<z.infer<typeof TastingSchema>> &
+    Pick<z.infer<typeof TastingSchema>, "bottle">;
 };
 
 type TastingEditFormProps = {
@@ -115,7 +114,7 @@ export default function TastingForm(
           buildTastingCreateFormSubmission({
             fields: data,
             image,
-            targetId: props.initialData.target.targetId,
+            bottleId: props.initialData.bottle.id,
           }),
         );
       }
@@ -142,7 +141,7 @@ export default function TastingForm(
       saveDisabled={isSubmitting}
     >
       <div className="lg:mb-8 lg:p-0">
-        <CatalogTargetIdentity target={props.initialData.target} />
+        <TastingBottleIdentity bottle={props.initialData.bottle} />
       </div>
 
       {(error || errorMessage) && (

@@ -3,21 +3,19 @@ import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import type { Tasting, User } from "../db/schema";
-import { tastingBadgeAwards, toasts, users } from "../db/schema";
-import { loadCatalogTargetReadsWithParity } from "../lib/catalogTargetReadParity";
-import { CatalogTargetIntegrityMismatchError } from "../lib/catalogTargets";
+import type { Bottle, Tasting, User } from "../db/schema";
+import { bottles, tastingBadgeAwards, toasts, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type TastingSchema } from "../schemas";
-import type { CatalogTargetV1 } from "../schemas/catalogIdentity";
 import { BadgeAwardSerializer } from "./badgeAward";
+import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
 type TastingAttrs = {
   hasToasted: boolean;
   createdBy: ReturnType<(typeof UserSerializer)["item"]>;
-  target: CatalogTargetV1;
+  bottle: ReturnType<(typeof BottleSerializer)["item"]>;
   friends: ReturnType<(typeof UserSerializer)["item"]>[];
   awards: ReturnType<(typeof BadgeAwardSerializer)["item"]>[];
 };
@@ -29,36 +27,34 @@ export const TastingSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
-    const { targets } = await loadCatalogTargetReadsWithParity(
-      itemList.map((item) => ({
-        consumerTable: "tasting",
-        rowLocator: { id: item.id },
-        targetId: item.targetId,
-        legacy: { bottleId: item.bottleId, releaseId: item.releaseId },
-      })),
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "TastingSerializer",
-        operation: "serialize",
-      },
-    );
-    const targetByTastingId = Object.fromEntries(
-      itemList.map((item, index) => {
-        const target = targets[index];
-        if (!target) {
-          if (item.targetId === null && item.bottleId === null) {
-            throw new Error(`tasting ${item.id} has no catalog identity`);
+    const bottleIds = [
+      ...new Set(
+        itemList.map(({ bottleId, id }) => {
+          if (bottleId === null) {
+            throw new Error(`Tasting ${id} has no Bottle.`);
           }
-          throw new CatalogTargetIntegrityMismatchError(
-            item.targetId !== null
-              ? { targetId: item.targetId }
-              : { bottleId: item.bottleId! },
-            `tasting ${item.id} has no durable CatalogTarget`,
-          );
-        }
-        return [item.id, target];
-      }),
+          return bottleId;
+        }),
+      ),
+    ];
+    const bottleList = bottleIds.length
+      ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
+      : [];
+    const bottlesById = new Map<number, Bottle>(
+      bottleList.map((bottle) => [bottle.id, bottle]),
+    );
+    for (const bottleId of bottleIds) {
+      if (!bottlesById.has(bottleId)) {
+        throw new Error(`Tasting references missing Bottle ${bottleId}.`);
+      }
+    }
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      bottleList,
+      currentUser,
+    );
+    const serializedBottleById = new Map(
+      bottleList.map((bottle, index) => [bottle.id, serializedBottles[index]!]),
     );
 
     const userToastsList: number[] = currentUser
@@ -142,7 +138,7 @@ export const TastingSerializer = serializer({
           {
             hasToasted: userToastsList.includes(item.id),
             createdBy: creatorsById[item.createdById],
-            target: targetByTastingId[item.id],
+            bottle: serializedBottleById.get(item.bottleId!)!,
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
           },
@@ -175,7 +171,7 @@ export const TastingSerializer = serializer({
 
       awards: attrs.awards,
 
-      target: attrs.target,
+      bottle: attrs.bottle,
       createdBy: attrs.createdBy,
       hasToasted: attrs.hasToasted,
     };

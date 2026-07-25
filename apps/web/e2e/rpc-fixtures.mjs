@@ -565,29 +565,27 @@ export const bottleGroupTarget = {
 
 export const bottleGroupDirectTasting = buildTasting({
   id: 9402,
-  target: bottleGroupTarget,
+  bottle: bottleGroupRepresentative,
   notes: "A direct release-family tasting.",
 });
 
-export const flightTargetFixtureId = "flight-targets";
-export const createdFlightTargetFixtureId = "flight-targets-created";
-export const flightTargetFixture = {
-  id: flightTargetFixtureId,
-  name: "Exact and generic targets",
-  description: "A Flight that keeps target exactness explicit.",
+export const flightBottleFixtureId = "flight-bottles";
+export const createdFlightBottleFixtureId = "flight-bottles-created";
+export const flightBottleFixture = {
+  id: flightBottleFixtureId,
+  name: "Related Bottle flight",
+  description: "A Flight containing independently complete Bottles.",
   public: true,
   createdAt: timestamp,
   createdBy: testUser,
-  targets: [
+  bottles: [
     {
-      target: bottleGroupMemberTargets[0],
-      distillers: [testBrand],
+      bottle: bottleGroupMemberTargets[0].bottle,
       hasTasted: false,
       isLibrary: false,
     },
     {
-      target: bottleGroupTarget,
-      distillers: [testBrand],
+      bottle: bottleGroupMemberTargets[1].bottle,
       hasTasted: false,
       isLibrary: false,
     },
@@ -723,7 +721,7 @@ export const storePriceList = {
 /**
  * @typedef {object} CollectionBottleFixtureOptions
  * @property {number} [id]
- * @property {CatalogTargetV1} [target]
+ * @property {CollectionBottle["bottle"]} [bottle]
  * @property {string | null} [imageUrl]
  * @property {CollectionBottle["status"]} [status]
  * @property {boolean} [hasTasted]
@@ -735,7 +733,7 @@ export const storePriceList = {
  */
 export function buildCollectionBottle({
   id = 1,
-  target = buildExactCatalogTarget(),
+  bottle = /** @type {CollectionBottle["bottle"]} */ (buildBottle()),
   imageUrl = null,
   status = null,
   hasTasted = false,
@@ -744,7 +742,7 @@ export function buildCollectionBottle({
     id,
     imageUrl,
     status,
-    target,
+    bottle,
     hasTasted,
   };
 }
@@ -767,7 +765,6 @@ export function buildCollection({
  * @param {{
  *   id?: number,
  *   bottle?: FixtureBottle | ConcreteFixtureBottle,
- *   target?: CatalogTargetV1,
  *   notes?: string,
  *   rating?: number,
  *   tags?: string[],
@@ -776,7 +773,6 @@ export function buildCollection({
 export function buildTasting({
   id = createdTastingId,
   bottle = existingBottle,
-  target,
   notes = tastingNotes,
   rating = 2,
   tags = /** @type {string[]} */ ([]),
@@ -785,7 +781,7 @@ export function buildTasting({
     id,
     imageUrl: null,
     notes,
-    target: target ?? buildExactCatalogTarget({ bottle }),
+    bottle,
     rating,
     tags,
     color: null,

@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
-import { catalogTargets, collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle", () => {
@@ -28,20 +28,11 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       name: "Library",
       createdById: defaults.user.id,
     });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, bottle.groupId as number),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) throw new Error("Generic target fixture missing");
     const [entry] = await db
       .insert(collectionBottles)
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
-        targetId: genericTarget.id,
       })
       .returning();
 
@@ -70,7 +61,8 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .where(eq(collectionBottles.id, entry.id));
 
     expect(updated.id).toBe(entry.id);
-    expect(updated.target.kind).toBe("group");
+    expect(updated.bottle.id).toBe(bottle.id);
+    expect(updated).not.toHaveProperty("target");
     expect(updated.status).toBe("empty");
     expect(cleared.id).toBe(entry.id);
     expect(cleared.status).toBeNull();
@@ -89,7 +81,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 
@@ -124,7 +115,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: collection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 
@@ -163,7 +153,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: otherCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 

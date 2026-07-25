@@ -1,18 +1,17 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import type { CatalogTargetV1 } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import BadgeImage from "@peated/web/components/badgeImage";
 import BottleResolver, {
   type BottleResolverAction,
   type BottleResolverCreateProposalActionsProps,
   type BottleResolverMatchedActionsProps,
-  type BottleResolverTarget,
+  type BottleResolverResult,
   type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import Button from "@peated/web/components/button";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import { useFlashMessages } from "@peated/web/components/flash";
 import FormError from "@peated/web/components/formError";
 import Header from "@peated/web/components/header";
@@ -35,7 +34,6 @@ import {
   getPendingImageFromParams,
 } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
-import { getCatalogTargetHref } from "@peated/web/lib/catalogTarget";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -56,12 +54,10 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 type AddBottleIntent = "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
-type FlowTarget = Omit<BottleResolverTarget, "target"> & {
-  target: CatalogTargetV1;
-};
+type FlowBottle = BottleResolverResult;
 type SuggestedTags = { results: TastingTagSuggestion[] };
 type TastingSubmitData = TastingCreateFormSubmitData;
-type TastingDraft = FlowTarget & {
+type TastingDraft = FlowBottle & {
   suggestedTags: SuggestedTags;
   createdAt: string;
 };
@@ -99,23 +95,23 @@ function getSearchHref(
   return `/search?${params.toString()}`;
 }
 
-function getViewTargetHref(target: CatalogTargetV1) {
-  return getCatalogTargetHref(target);
+function getViewBottleHref(bottle: Bottle) {
+  return `/bottles/${bottle.id}`;
 }
 
-function canSaveTargetToLibrary(target: FlowTarget) {
+function canSaveBottleToLibrary(selection: FlowBottle) {
   return (
-    !target.hasExactLibraryEntry ||
-    Boolean(target.pendingImage && target.exactLibraryEntryImageUrl === null)
+    !selection.hasLibraryEntry ||
+    Boolean(selection.pendingImage && selection.libraryEntryImageUrl === null)
   );
 }
 
-function getLibraryActionLabel(target: {
-  hasExactLibraryEntry: boolean;
+function getLibraryActionLabel(state: {
+  hasLibraryEntry: boolean;
   canSaveLibraryPhoto?: boolean;
 }) {
-  if (!target.hasExactLibraryEntry) return "Add to Library";
-  return target.canSaveLibraryPhoto ? "Save Photo" : "In Library";
+  if (!state.hasLibraryEntry) return "Add to Library";
+  return state.canSaveLibraryPhoto ? "Save Photo" : "In Library";
 }
 
 function FlowHeader({ children }: { children: ReactNode }) {
@@ -129,11 +125,11 @@ function FlowHeader({ children }: { children: ReactNode }) {
   );
 }
 
-function TargetPanel({
-  target,
+function BottlePanel({
+  bottle,
   previewUrl,
 }: {
-  target: CatalogTargetV1;
+  bottle: Bottle;
   previewUrl?: string | null;
 }) {
   return (
@@ -147,14 +143,19 @@ function TargetPanel({
           />
         )}
         <div className="min-w-0 flex-1">
-          <CatalogTargetIdentity target={target} compact />
+          <Link
+            href={getViewBottleHref(bottle)}
+            className="font-semibold text-white hover:underline"
+          >
+            {bottle.fullName}
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-function CollectionTargetPanel({ entry }: { entry: CollectionBottle }) {
+function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
   return (
     <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -166,14 +167,19 @@ function CollectionTargetPanel({ entry }: { entry: CollectionBottle }) {
           />
         )}
         <div className="min-w-0 flex-1">
-          <CatalogTargetIdentity target={entry.target} compact />
+          <Link
+            href={getViewBottleHref(entry.bottle)}
+            className="font-semibold text-white hover:underline"
+          >
+            {entry.bottle.fullName}
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-function LoadingTargetPanel() {
+function LoadingBottlePanel() {
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
       <div className="mx-auto mt-5 max-w-3xl">
@@ -183,13 +189,13 @@ function LoadingTargetPanel() {
   );
 }
 
-function revokeBlobPreviewUrl(target: FlowTarget) {
-  if (target.previewUrl?.startsWith("blob:")) {
-    URL.revokeObjectURL(target.previewUrl);
+function revokeBlobPreviewUrl(selection: FlowBottle) {
+  if (selection.previewUrl?.startsWith("blob:")) {
+    URL.revokeObjectURL(selection.previewUrl);
   }
 }
 
-function TargetLoadErrorPanel({
+function BottleLoadErrorPanel({
   message,
   onStartOver,
 }: {
@@ -266,9 +272,9 @@ function OutcomeButton({
 }
 
 function MatchedOutcomeActions({
-  target,
-  hasExactLibraryEntry,
-  exactLibraryEntryImageUrl,
+  bottle,
+  hasLibraryEntry,
+  libraryEntryImageUrl,
   pendingImage,
   loadingExactLibraryStatus,
   resolvingAction,
@@ -276,7 +282,7 @@ function MatchedOutcomeActions({
   onResolve,
 }: BottleResolverMatchedActionsProps & { intent: AddBottleIntent }) {
   const canSaveLibraryPhoto = Boolean(
-    pendingImage && hasExactLibraryEntry && exactLibraryEntryImageUrl === null,
+    pendingImage && hasLibraryEntry && libraryEntryImageUrl === null,
   );
   const libraryButton = (
     <OutcomeButton
@@ -287,11 +293,11 @@ function MatchedOutcomeActions({
       disabled={
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
-        (hasExactLibraryEntry && !canSaveLibraryPhoto)
+        (hasLibraryEntry && !canSaveLibraryPhoto)
       }
       loading={resolvingAction === "library" || loadingExactLibraryStatus}
     >
-      {getLibraryActionLabel({ hasExactLibraryEntry, canSaveLibraryPhoto })}
+      {getLibraryActionLabel({ hasLibraryEntry, canSaveLibraryPhoto })}
     </OutcomeButton>
   );
   const tastingButton = (
@@ -309,7 +315,7 @@ function MatchedOutcomeActions({
   const viewButton = (
     <OutcomeButton
       key="view"
-      href={getViewTargetHref(target)}
+      href={getViewBottleHref(bottle)}
       icon={<Eye className="h-4 w-4" />}
     >
       View Bottle
@@ -318,7 +324,7 @@ function MatchedOutcomeActions({
   const addAnotherReleaseButton = (
     <OutcomeButton
       key="another-release"
-      href={getAddAnotherReleasePath(target.bottle.id)}
+      href={getAddAnotherReleasePath(bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
       Add another release
@@ -395,7 +401,7 @@ function CreateProposalOutcomeActions({
 }
 
 function OutcomeSelection({
-  target,
+  selection,
   intent,
   onAddToLibrary,
   onLogTasting,
@@ -404,7 +410,7 @@ function OutcomeSelection({
   loggingTasting,
   error,
 }: {
-  target: FlowTarget;
+  selection: FlowBottle;
   intent: AddBottleIntent;
   onAddToLibrary: () => void;
   onLogTasting: () => void;
@@ -413,16 +419,11 @@ function OutcomeSelection({
   loggingTasting: boolean;
   error?: string;
 }) {
-  const wasCreated = target.resultSource === "created";
-  const isExactBottle = target.target.kind === "bottle";
-  const title = wasCreated
-    ? "Bottle created"
-    : isExactBottle
-      ? "Bottle found"
-      : "Release family found";
+  const wasCreated = selection.resultSource === "created";
+  const title = wasCreated ? "Bottle created" : "Bottle found";
   const description = wasCreated
     ? "Choose what you want to do next."
-    : `Choose what you want to do with this ${isExactBottle ? "bottle" : "release family"}.`;
+    : "Choose what you want to do with this bottle.";
   const libraryButton = (
     <OutcomeButton
       key="library"
@@ -430,14 +431,14 @@ function OutcomeSelection({
       icon={<BookOpen className="h-4 w-4" />}
       emphasized
       disabled={
-        !canSaveTargetToLibrary(target) || addingToLibrary || loggingTasting
+        !canSaveBottleToLibrary(selection) || addingToLibrary || loggingTasting
       }
       loading={addingToLibrary}
     >
       {getLibraryActionLabel({
-        hasExactLibraryEntry: target.hasExactLibraryEntry,
+        hasLibraryEntry: selection.hasLibraryEntry,
         canSaveLibraryPhoto: Boolean(
-          target.pendingImage && target.exactLibraryEntryImageUrl === null,
+          selection.pendingImage && selection.libraryEntryImageUrl === null,
         ),
       })}
     </OutcomeButton>
@@ -457,22 +458,21 @@ function OutcomeSelection({
   const viewButton = (
     <OutcomeButton
       key="view"
-      href={getViewTargetHref(target.target)}
+      href={getViewBottleHref(selection.bottle)}
       icon={<Eye className="h-4 w-4" />}
     >
-      {target.target.kind === "bottle" ? "View Bottle" : "View Release Family"}
+      View Bottle
     </OutcomeButton>
   );
-  const addAnotherReleaseButton =
-    target.target.kind === "bottle" ? (
-      <OutcomeButton
-        key="another-release"
-        href={getAddAnotherReleasePath(target.target.bottle.id)}
-        icon={<Plus className="h-4 w-4" />}
-      >
-        Add another release
-      </OutcomeButton>
-    ) : null;
+  const addAnotherReleaseButton = (
+    <OutcomeButton
+      key="another-release"
+      href={getAddAnotherReleasePath(selection.bottle.id)}
+      icon={<Plus className="h-4 w-4" />}
+    >
+      Add another release
+    </OutcomeButton>
+  );
   const actionButtons =
     intent === "tasting"
       ? [
@@ -491,13 +491,16 @@ function OutcomeSelection({
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
       <div className="mx-auto mt-5 max-w-3xl space-y-5">
-        <TargetPanel target={target.target} previewUrl={target.previewUrl} />
-        {target.warnings?.length ? (
+        <BottlePanel
+          bottle={selection.bottle}
+          previewUrl={selection.previewUrl}
+        />
+        {selection.warnings?.length ? (
           <section className="rounded border border-amber-900/70 bg-amber-950/30 p-4 text-sm text-amber-100">
             <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <div className="space-y-1">
-                {target.warnings.map((warning) => (
+                {selection.warnings.map((warning) => (
                   <p key={warning}>{warning}</p>
                 ))}
               </div>
@@ -516,7 +519,7 @@ function OutcomeSelection({
         </section>
         <div className="grid gap-3 sm:grid-cols-2">
           <Button
-            href={getSearchHref("", intent, target.pendingImage)}
+            href={getSearchHref("", intent, selection.pendingImage)}
             fullWidth
             icon={<Search className="h-4 w-4" />}
           >
@@ -530,10 +533,10 @@ function OutcomeSelection({
             Start Over
           </Button>
         </div>
-        {target.photoTrace && (
+        {selection.photoTrace && (
           <PhotoIdentificationTraceFootnote
-            traceId={target.photoTrace.traceId}
-            copyPayload={target.photoTrace.copyPayload}
+            traceId={selection.photoTrace.traceId}
+            copyPayload={selection.photoTrace.copyPayload}
           />
         )}
       </div>
@@ -552,7 +555,7 @@ function AddedToLibrary({
 }: {
   entry: CollectionBottle;
   userLibraryHref: string;
-  photoTrace?: FlowTarget["photoTrace"] | null;
+  photoTrace?: FlowBottle["photoTrace"] | null;
   onAddAnother: () => void;
   onStatusChange: (status: NonNullable<CollectionBottleStatusValue>) => void;
   statusError?: string;
@@ -570,13 +573,11 @@ function AddedToLibrary({
               <div>
                 <h2 className="font-semibold text-white">Added to Library</h2>
                 <p className="text-muted mt-1 text-sm">
-                  This{" "}
-                  {entry.target.kind === "bottle" ? "bottle" : "release family"}{" "}
-                  is now saved in your Library.
+                  This bottle is now saved in your Library.
                 </p>
               </div>
             </div>
-            <CollectionTargetPanel entry={entry} />
+            <CollectionBottlePanel entry={entry} />
             {statusError && <FormError values={[statusError]} />}
             <div className="border-t border-slate-800 pt-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -635,21 +636,15 @@ function AddBottleFlowContent() {
     searchParams.get("release") ?? searchParams.get("bottling"),
   );
   const requestedGroupId = parseId(searchParams.get("group"));
-  const requestedIdentityConflict = Boolean(
-    requestedGroupId && (requestedBottleId || requestedReleaseId),
-  );
   const requestedFlightId = searchParams.get("flight") || null;
   const requestedPendingImage = useMemo(
     () => getPendingImageFromParams(new URLSearchParams(searchParams)),
     [searchParams],
   );
-  const requestedTargetKey = useMemo(() => {
+  const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
-    if (requestedIdentityConflict) {
-      return `conflict:${requestedBottleId ?? "none"}:${requestedReleaseId ?? "none"}:${requestedGroupId}`;
-    }
     if (requestedGroupId) {
-      return `group:${requestedGroupId}:${pendingImageKey}`;
+      return `unsupported-group:${requestedGroupId}:${pendingImageKey}`;
     }
     if (requestedBottleId) {
       return `bottle:${requestedBottleId}:${requestedReleaseId ?? "base"}:${pendingImageKey}`;
@@ -658,19 +653,18 @@ function AddBottleFlowContent() {
   }, [
     requestedBottleId,
     requestedGroupId,
-    requestedIdentityConflict,
     requestedPendingImage?.id,
     requestedReleaseId,
   ]);
 
-  const [loadedTargetKey, setLoadedTargetKey] = useState<string | null>(null);
-  const [loadingTarget, setLoadingTarget] = useState(false);
-  const [targetLoadError, setTargetLoadError] = useState<string | null>(null);
-  const [selectedTarget, setSelectedTarget] = useState<FlowTarget | null>(null);
+  const [loadedBottleKey, setLoadedBottleKey] = useState<string | null>(null);
+  const [loadingBottle, setLoadingBottle] = useState(false);
+  const [bottleLoadError, setBottleLoadError] = useState<string | null>(null);
+  const [selectedBottle, setSelectedBottle] = useState<FlowBottle | null>(null);
   const [libraryError, setLibraryError] = useState<string | undefined>();
   const [addedEntry, setAddedEntry] = useState<CollectionBottle | null>(null);
   const [addedEntryPhotoTrace, setAddedEntryPhotoTrace] = useState<
-    FlowTarget["photoTrace"] | null
+    FlowBottle["photoTrace"] | null
   >(null);
   const [tastingDraft, setTastingDraft] = useState<TastingDraft | null>(null);
   const [tastingLoadError, setTastingLoadError] = useState<
@@ -694,147 +688,135 @@ function AddBottleFlowContent() {
 
   useEffect(() => {
     return () => {
-      if (selectedTarget?.previewUrl?.startsWith("blob:")) {
-        URL.revokeObjectURL(selectedTarget.previewUrl);
+      if (selectedBottle?.previewUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(selectedBottle.previewUrl);
       }
     };
-  }, [selectedTarget?.previewUrl]);
+  }, [selectedBottle?.previewUrl]);
 
   useEffect(() => {
-    if (requestedIdentityConflict) {
-      setSelectedTarget(null);
-      setLoadedTargetKey(requestedTargetKey);
-      setLoadingTarget(false);
-      setTargetLoadError(
-        "This link selects both an exact bottle and a release family. Start over and choose one.",
+    if (requestedGroupId) {
+      setSelectedBottle(null);
+      setLoadedBottleKey(requestedBottleKey);
+      setLoadingBottle(false);
+      setBottleLoadError(
+        "This release-family link is no longer supported. Search for the exact bottle instead.",
       );
       return;
     }
-    if (!requestedTargetKey || (!requestedBottleId && !requestedGroupId)) {
-      setLoadedTargetKey(null);
+    if (!requestedBottleKey || !requestedBottleId) {
+      setLoadedBottleKey(null);
       return;
     }
 
     const bottleId = requestedBottleId;
-    const groupId = requestedGroupId;
     let cancelled = false;
 
-    async function loadRequestedTarget() {
-      setLoadingTarget(true);
-      setTargetLoadError(null);
+    async function loadRequestedBottle() {
+      setLoadingBottle(true);
+      setBottleLoadError(null);
       setAddedEntry(null);
       setAddedEntryPhotoTrace(null);
       setTastingDraft(null);
       setTastingLoadError(undefined);
 
       try {
-        let target: CatalogTargetV1;
-        if (groupId) {
-          target = await orpc.bottleGroups.details.call({ group: groupId });
-        } else if (bottleId) {
-          const promotedBottleId = requestedReleaseId
-            ? (
-                await orpc.bottleReleases.target.call({
-                  bottle: bottleId,
-                  release: requestedReleaseId,
-                })
-              ).bottleId
-            : bottleId;
-          target = await orpc.bottles.target.call({
-            bottle: promotedBottleId,
-          });
-        } else {
-          throw new Error("Catalog identity is missing from this link.");
-        }
+        const promotedBottleId = requestedReleaseId
+          ? (
+              await orpc.bottleReleases.target.call({
+                bottle: bottleId,
+                release: requestedReleaseId,
+              })
+            ).bottleId
+          : bottleId;
+        const bottle = await orpc.bottles.details.call({
+          bottle: promotedBottleId,
+        });
         const collectionStatus = await orpc.collections.bottles.list.call({
           user: "me",
           collection: "library",
-          target: target.targetId,
+          bottle: bottle.id,
         });
 
         if (cancelled) return;
-        const exactLibraryEntry = collectionStatus.results[0] ?? null;
-        setSelectedTarget({
-          target,
-          hasExactLibraryEntry: Boolean(exactLibraryEntry),
-          exactLibraryEntryImageUrl: exactLibraryEntry?.imageUrl ?? null,
+        const libraryEntry = collectionStatus.results[0] ?? null;
+        setSelectedBottle({
+          bottle,
+          hasLibraryEntry: Boolean(libraryEntry),
+          libraryEntryImageUrl: libraryEntry?.imageUrl ?? null,
           pendingImage: requestedPendingImage,
           previewUrl: requestedPendingImage?.imageUrl || null,
         });
-        setLoadedTargetKey(requestedTargetKey);
+        setLoadedBottleKey(requestedBottleKey);
       } catch (err) {
         logError(err);
         if (cancelled) return;
-        setSelectedTarget(null);
-        setLoadedTargetKey(null);
-        setTargetLoadError(
-          "We couldn't load that bottle or release family. Search again or start over.",
+        setSelectedBottle(null);
+        setLoadedBottleKey(null);
+        setBottleLoadError(
+          "We couldn't load that bottle. Search again or start over.",
         );
       } finally {
-        if (!cancelled) setLoadingTarget(false);
+        if (!cancelled) setLoadingBottle(false);
       }
     }
 
-    if (loadedTargetKey !== requestedTargetKey) {
-      void loadRequestedTarget();
+    if (loadedBottleKey !== requestedBottleKey) {
+      void loadRequestedBottle();
     }
 
     return () => {
       cancelled = true;
     };
   }, [
-    loadedTargetKey,
+    loadedBottleKey,
     orpc,
     requestedBottleId,
     requestedGroupId,
-    requestedIdentityConflict,
     requestedPendingImage,
     requestedReleaseId,
-    requestedTargetKey,
+    requestedBottleKey,
   ]);
 
   function startOver() {
-    setSelectedTarget(null);
+    setSelectedBottle(null);
     setLibraryError(undefined);
     setAddedEntry(null);
     setAddedEntryPhotoTrace(null);
     setTastingDraft(null);
     setTastingLoadError(undefined);
-    setTargetLoadError(null);
-    setLoadedTargetKey(requestedTargetKey);
+    setBottleLoadError(null);
+    setLoadedBottleKey(requestedBottleKey);
     router.replace("/addBottle");
   }
 
-  async function startLogTasting(target: FlowTarget) {
+  async function startLogTasting(selection: FlowBottle) {
     setTastingLoadError(undefined);
     setLoadingTastingDraft(true);
     try {
-      const suggestedTags =
-        target.target.kind === "bottle"
-          ? await orpc.bottles.suggestedTags.call({
-              bottle: target.target.bottle.id,
-            })
-          : { results: target.target.group.suggestedTags };
+      const suggestedTags = await orpc.bottles.suggestedTags.call({
+        bottle: selection.bottle.id,
+      });
       setLibraryError(undefined);
       setTastingDraft({
-        ...target,
+        ...selection,
         suggestedTags,
         createdAt: new Date().toISOString(),
       });
-      revokeBlobPreviewUrl(target);
+      revokeBlobPreviewUrl(selection);
     } catch (err) {
       logError(err);
-      setSelectedTarget(target);
+      setSelectedBottle(selection);
       setTastingLoadError(
-        "We couldn't load the tasting form. Try again or search for the bottle or release family.",
+        "We couldn't load the tasting form. Try again or search for the bottle.",
       );
     } finally {
       setLoadingTastingDraft(false);
     }
   }
 
-  async function handleResolvedTarget(
-    target: FlowTarget,
+  async function handleResolvedBottle(
+    selection: FlowBottle,
     action?: BottleResolverAction,
   ) {
     setLibraryError(undefined);
@@ -844,52 +826,52 @@ function AddBottleFlowContent() {
     setTastingLoadError(undefined);
 
     if (action) {
-      target.warnings?.forEach((warning) => flash(warning, "error"));
+      selection.warnings?.forEach((warning) => flash(warning, "error"));
     }
 
     if (action === "library") {
-      await addToLibrary(target, { showOutcomeWhileSaving: false });
+      await addToLibrary(selection, { showOutcomeWhileSaving: false });
     } else if (action === "tasting") {
-      await startLogTasting(target);
+      await startLogTasting(selection);
     } else if (action === "create") {
-      router.push(getViewTargetHref(target.target));
-      revokeBlobPreviewUrl(target);
+      router.push(getViewBottleHref(selection.bottle));
+      revokeBlobPreviewUrl(selection);
     } else {
-      setSelectedTarget(target);
+      setSelectedBottle(selection);
     }
   }
 
   async function addToLibrary(
-    target = selectedTarget,
+    selection = selectedBottle,
     {
       showOutcomeWhileSaving = true,
     }: {
       showOutcomeWhileSaving?: boolean;
     } = {},
   ) {
-    if (!target) return;
+    if (!selection) return;
 
     if (showOutcomeWhileSaving) {
-      setSelectedTarget(target);
+      setSelectedBottle(selection);
     }
     setLibraryError(undefined);
     setTastingDraft(null);
-    if (!canSaveTargetToLibrary(target)) return;
+    if (!canSaveBottleToLibrary(selection)) return;
 
     try {
       const entry = await libraryCreateMutation.mutateAsync({
-        target: target.target.targetId,
+        bottle: selection.bottle.id,
         user: "me",
         collection: "library",
-        pendingImageId: target.pendingImage?.id,
+        pendingImageId: selection.pendingImage?.id,
       });
       setAddedEntry(entry);
-      setAddedEntryPhotoTrace(target.photoTrace ?? null);
-      setSelectedTarget(null);
-      revokeBlobPreviewUrl(target);
+      setAddedEntryPhotoTrace(selection.photoTrace ?? null);
+      setSelectedBottle(null);
+      revokeBlobPreviewUrl(selection);
     } catch (err) {
       logError(err);
-      setSelectedTarget(target);
+      setSelectedBottle(selection);
       setLibraryError(
         getFormErrorMessage(err, {
           expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
@@ -936,7 +918,7 @@ function AddBottleFlowContent() {
           input: {
             user: "me",
             collection: "library",
-            target: updatedEntry.target.targetId,
+            bottle: updatedEntry.bottle.id,
           },
         }),
       });
@@ -1012,13 +994,13 @@ function AddBottleFlowContent() {
     );
   }
 
-  if (loadingTarget) {
-    return <LoadingTargetPanel />;
+  if (loadingBottle) {
+    return <LoadingBottlePanel />;
   }
 
-  if (targetLoadError) {
+  if (bottleLoadError) {
     return (
-      <TargetLoadErrorPanel message={targetLoadError} onStartOver={startOver} />
+      <BottleLoadErrorPanel message={bottleLoadError} onStartOver={startOver} />
     );
   }
 
@@ -1041,7 +1023,7 @@ function AddBottleFlowContent() {
       <TastingForm
         title="Log Tasting"
         initialData={{
-          target: tastingDraft.target,
+          bottle: tastingDraft.bottle,
           imageUrl: tastingDraft.pendingImage?.imageUrl,
         }}
         suggestedTags={tastingDraft.suggestedTags}
@@ -1050,19 +1032,19 @@ function AddBottleFlowContent() {
     );
   }
 
-  if (selectedTarget) {
+  if (selectedBottle) {
     return (
       <OutcomeSelection
-        target={selectedTarget}
+        selection={selectedBottle}
         intent={intent}
         error={libraryError ?? tastingLoadError}
         onAddToLibrary={() => {
           setLibraryError(undefined);
           setTastingDraft(null);
           setTastingLoadError(undefined);
-          void addToLibrary(selectedTarget);
+          void addToLibrary(selectedBottle);
         }}
-        onLogTasting={() => void startLogTasting(selectedTarget)}
+        onLogTasting={() => void startLogTasting(selectedBottle)}
         onStartOver={startOver}
         addingToLibrary={libraryCreateMutation.isPending}
         loggingTasting={loadingTastingDraft}
@@ -1096,14 +1078,14 @@ function AddBottleFlowContent() {
       renderCreateProposalActions={(props) => (
         <CreateProposalOutcomeActions {...props} intent={intent} />
       )}
-      onResolve={handleResolvedTarget}
+      onResolve={handleResolvedBottle}
     />
   );
 }
 
 /**
  * Owns the standalone Add Bottle route: auth-gated resolution, direct
- * bottle/release query targets, direct Library saves, and tasting continuation
+ * Bottle and legacy-release query parameters, direct Library saves, and tasting continuation
  * stay in this flow so scan image reuse remains attached to the user's action.
  */
 export default function AddBottleFlow() {

@@ -1,105 +1,61 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupDistillers,
   bottleGroups,
   bottleTombstones,
   tastings,
 } from "@peated/server/db/schema";
-import { CatalogTargetIntegrityMismatchError } from "@peated/server/lib/catalogTargets";
 import { eq } from "drizzle-orm";
 import { loadBadgeTastings } from "./identity";
-import { useGenericBadgeTarget } from "./testHelpers";
 
 describe("loadBadgeTastings", () => {
-  test("uses Bottle-owned exact identity and BottleGroup-owned generic identity", async ({
+  test("uses independently complete Bottle-owned identity", async ({
     fixtures,
   }) => {
-    const exactBrand = await fixtures.Entity();
-    const exactBottler = await fixtures.Entity();
-    const exactDistiller = await fixtures.Entity();
+    const bottleBrand = await fixtures.Entity();
+    const bottleBottler = await fixtures.Entity();
+    const bottleDistiller = await fixtures.Entity();
     const groupBrand = await fixtures.Entity();
-    const groupBottler = await fixtures.Entity();
-    const groupDistiller = await fixtures.Entity();
     const bottle = await fixtures.Bottle({
-      brandId: exactBrand.id,
-      bottlerId: exactBottler.id,
-      distillerIds: [exactDistiller.id],
+      brandId: bottleBrand.id,
+      bottlerId: bottleBottler.id,
+      distillerIds: [bottleDistiller.id],
       statedAge: 12,
       category: "single_malt",
     });
-    if (!bottle.groupId) throw new Error("Expected a BottleGroup fixture");
-
-    const exactTasting = await fixtures.Tasting({ bottleId: bottle.id });
-    const genericTasting = await fixtures.Tasting({
-      bottleId: bottle.id,
-      createdAt: new Date(exactTasting.createdAt.getTime() + 1),
-    });
+    const tasting = await fixtures.Tasting({ bottleId: bottle.id });
 
     await db
       .update(bottleGroups)
-      .set({
-        brandId: groupBrand.id,
-        bottlerId: groupBottler.id,
-        statedAge: 18,
-        category: "blend",
-      })
-      .where(eq(bottleGroups.id, bottle.groupId));
-    await db
-      .delete(bottleGroupDistillers)
-      .where(eq(bottleGroupDistillers.groupId, bottle.groupId));
-    await db.insert(bottleGroupDistillers).values({
-      groupId: bottle.groupId,
-      distillerId: groupDistiller.id,
-    });
+      .set({ brandId: groupBrand.id, statedAge: 18, category: "blend" })
+      .where(eq(bottleGroups.id, bottle.groupId!));
 
-    const [exact] = await loadBadgeTastings(db, [exactTasting], {
-      caller: "badges.identity.test",
-      operation: "exact",
-    });
-    const generic = await useGenericBadgeTarget(genericTasting.id);
+    const [result] = await loadBadgeTastings(db, [tasting]);
 
-    expect(exact?.identity).toMatchObject({
+    expect(result?.identity).toMatchObject({
       kind: "bottle",
       bottleId: bottle.id,
       statedAge: 12,
       category: "single_malt",
-      brand: { id: exactBrand.id },
-      bottler: { id: exactBottler.id },
-      distillers: [{ id: exactDistiller.id }],
-    });
-    expect(generic.identity).toMatchObject({
-      kind: "group",
-      statedAge: 18,
-      category: "blend",
-      brand: { id: groupBrand.id },
-      bottler: { id: groupBottler.id },
-      distillers: [{ id: groupDistiller.id }],
-    });
-    expect(generic).toEqual({
-      id: genericTasting.id,
-      createdById: genericTasting.createdById,
-      identity: generic.identity,
+      brand: { id: bottleBrand.id },
+      bottler: { id: bottleBottler.id },
+      distillers: [{ id: bottleDistiller.id }],
     });
   });
 
-  test("fails closed for a targetless Tasting", async ({ fixtures }) => {
+  test("fails closed when a Tasting has no Bottle", async ({ fixtures }) => {
     const tasting = await fixtures.Tasting();
-    const [targetless] = await db
+    const [withoutBottle] = await db
       .update(tastings)
-      .set({ targetId: null })
+      .set({ bottleId: null })
       .where(eq(tastings.id, tasting.id))
       .returning();
-    if (!targetless) throw new Error("Unable to make Tasting targetless");
 
-    await expect(
-      loadBadgeTastings(db, [targetless], {
-        caller: "badges.identity.test",
-        operation: "targetless",
-      }),
-    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
+    await expect(loadBadgeTastings(db, [withoutBottle!])).rejects.toThrow(
+      `Tasting ${tasting.id} has no Bottle.`,
+    );
   });
 
-  test("fails closed for a retired exact target", async ({ fixtures }) => {
+  test("fails closed for a retired Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
@@ -108,11 +64,8 @@ describe("loadBadgeTastings", () => {
       newBottleId: replacement.id,
     });
 
-    await expect(
-      loadBadgeTastings(db, [tasting], {
-        caller: "badges.identity.test",
-        operation: "retired",
-      }),
-    ).rejects.toMatchObject({ code: "CATALOG_TARGET_RETIRED" });
+    await expect(loadBadgeTastings(db, [tasting])).rejects.toThrow(
+      `references inactive Bottle ${bottle.id}`,
+    );
   });
 });

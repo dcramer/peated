@@ -1,195 +1,175 @@
-## 1. Contract And Production Inventory
+## 1. Contract And Inventory
 
-Implementation rule: a cutover task removes the superseded internal
-implementation in the same slice. A retained compatibility route must delegate
-to the new service, be instrumented, and map to an explicit task in section 9;
-it must not preserve a parallel business-logic path.
+Implementation rule: every cutover removes its superseded internal
+implementation in the same slice. A retained compatibility route may only
+translate legacy input/output, delegate to Bottle logic, emit bounded telemetry,
+and map to an explicit removal task.
 
-- [x] 1.1 Mark `add-target-aware-catalog-creation` as superseded so it cannot be implemented alongside this change.
-- [x] 1.2 Enumerate every database column, runtime schema, serializer, route, worker, CLI command, classifier contract, web route, and document that reads or writes `releaseId` or `bottle_release`.
-- [x] 1.3 Define the field-ownership matrix for BottleGroup stable identity, concrete Bottle identity, observations, and unit-level collection data.
-- [x] 1.4 Define versioned runtime schemas for BottleGroup, concrete Bottle, and discriminated CatalogTarget results, deriving exported TypeScript types from those schemas.
-- [x] 1.5 Add a read-only catalog migration audit command with JSON and human-readable output.
-- [x] 1.6 Report legacy parent counts by zero/one/multiple releases, parent release-like fields, child/parent age conflicts, invalid parent-release pairs, missing creators, and missing aliases/images.
-- [x] 1.7 Report full-name and alias collisions that would occur when BottleReleases are promoted into the Bottle namespace.
-- [x] 1.8 Report paired-reference counts and invalid references for tastings, reviews, collections, flights, prices, aliases, observations, decision logs, and proposals.
-- [x] 1.9 Add deterministic audit tests covering clean, conflicting, missing, and already-mapped fixtures.
-- [x] 1.10 Define the fresh retained production audit as a deployment-phase gate immediately before production backfill, tracked by tasks 6.11, 6.13, 9.1, and 10.9, rather than a prerequisite for additive local implementation or a reason to deploy dormant application behavior.
+- [x] 1.1 Supersede `add-target-aware-catalog-creation`.
+- [x] 1.2 Inventory every `bottle_release`, `releaseId`, BottleGroup,
+      CatalogTarget, target id, consumer, route, worker, CLI, web, and documentation
+      dependency.
+- [x] 1.3 Define stable BottleGroup fields, independently complete Bottle
+      fields, observations, and unit-level collection ownership.
+- [x] 1.4 Define the unified Bottle creation and edit workflow.
+- [x] 1.5 Add read-only migration audit tooling and deterministic local tests.
+- [x] 1.6 Report legacy cardinality, invalid pairs, required materialization,
+      aliases, images, and promotion collisions.
+- [x] 1.7 Establish the direct-Bottle decision: retain legacy parents as
+      general/unversioned Bottles, promote releases to Bottles, and make
+      BottleGroup non-targetable.
+- [x] 1.8 Replace the CatalogTarget proposal, design, and delta specification
+      with direct Bottle identity.
+- [x] 1.9 Rerun the code inventory and record the exact target-system removal
+      map and independently verifiable implementation slices.
+- [x] 1.10 Define a fresh retained production audit as a deployment-phase gate
+      immediately before migration, not a prerequisite for additive local work.
 
-## 2. Additive Group And Target Schema
+## 2. Direct Bottle And Group Schema
 
-- [x] 2.1 Add `bottle_group` with stable identity, representative Bottle, aggregate fields, creator, timestamps, and group-tombstone support.
-- [x] 2.2 Add nullable `groupId` membership to Bottle plus the uniqueness needed to enforce a target's `(bottleId, groupId)` relationship.
-- [x] 2.3 Add `catalog_target` with one generic target per group, one exact target per Bottle, and database-enforced membership consistency.
-- [x] 2.4 Add a durable, unique legacy BottleRelease-to-Bottle promotion mapping with migration status and audit metadata.
-- [x] 2.5 Add nullable `targetId` foreign keys and indexes to every activity-bearing table while retaining legacy `bottleId`/`releaseId` columns.
-- [x] 2.6 Add Drizzle relations and inferred types for groups, memberships, targets, mappings, and target-bearing consumers.
-- [x] 2.7 Generate the additive migration with `pnpm db:generate`; do not hand-write SQL or edit migration metadata.
-- [x] 2.8 Review the generated migration for lock duration, index creation, nullability, foreign-key order, and rollback feasibility.
-- [ ] 2.8a Before production application, either restructure the generated additive migration so write-blocking table scans and index builds are operationally isolated, or retain production table-size/timing evidence plus an explicit maintenance-window approval for the single-transaction `0193` lock profile; record that target-native generic writes are a forward-only application rollback boundary.
-- [x] 2.9 Add database-backed constraint tests for singleton group targets, exact Bottle targets, duplicate targets, cross-group mismatches, and last-member protection.
-- [x] 2.10 Update shared test fixtures to create valid group/Bottle/target graphs while retaining explicit legacy fixtures for migration tests.
+- [x] 2.1 Add `bottle_group`, representative membership, aggregate fields,
+      creator/timestamps, and required tombstone support.
+- [x] 2.2 Add Bottle `groupId` and group membership relations.
+- [x] 2.3 Add durable BottleRelease-to-Bottle promotion mappings.
+- [ ] 2.4 Remove `catalog_target` schema, relations, inferred types, indexes,
+      constraints, and generated migration state.
+- [ ] 2.5 Remove consumer `targetId`, `currentTargetId`, and
+      `suggestedTargetId` schema additions while preserving direct Bottle foreign
+      keys and supported nullable unresolved states.
+- [ ] 2.6 Define direct-Bottle uniqueness and foreign-key constraints for
+      tastings, collections, Flights, aliases, and other membership surfaces.
+- [ ] 2.7 Generate the revised additive migration with `pnpm db:generate`;
+      never hand-write SQL or migration metadata.
+- [ ] 2.8 Review generated DDL, table locks, indexes, foreign-key order,
+      nullability, and rollback feasibility.
+- [ ] 2.9 Add database-backed tests for Bottle membership, direct consumer
+      references, duplicate membership, invalid Bottle ids, and last-member group
+      protection.
+- [ ] 2.10 Update shared fixtures to create Bottle/group graphs without targets.
 
-## 3. Catalog Target Runtime
+## 3. Bottle And Group Domain
 
-- [x] 3.1 Implement a target loader that fetches a generic group target or exact Bottle target and returns the discriminated runtime-owned schema.
-- [x] 3.2 Implement target lookup by exact `bottleId`, generic `groupId`, and legacy `(bottleId, releaseId)` during compatibility.
-- [x] 3.3 Return distinct not-found, retired-target, invalid-mapping, and integrity-mismatch errors without substituting a representative Bottle.
-- [x] 3.4 Add serializers for BottleGroup summaries, exact Bottle results, and CatalogTarget results with explicit actor/permission context.
-- [x] 3.5 Add integration tests for exact, generic, retired, missing, mismatched, and legacy-mapped target loading.
-- [x] 3.6 Add a deterministic target-assignment helper used by all dual-write consumers instead of rebuilding target logic per route.
-- [x] 3.7 Instrument legacy target resolution and writes with operation and caller context so compatibility removal can be measured.
-- [x] 3.8 Add target-aware unique constraints or conflict handling for collections, flights, aliases, and other set-membership tables.
+- [ ] 3.1 Simplify canonical independent Bottle creation to atomically create
+      only the singleton group, independently complete Bottle, aliases, and audits.
+- [x] 3.2 Keep ordinary creation and “add another release” independent; callers
+      cannot supply a source group as authority.
+- [ ] 3.3 Remove public and moderator group selection, merge, and split
+      workflows; retain only audited system-controlled regrouping.
+- [ ] 3.4 Preserve atomic shared-field fan-out so a group change rematerializes
+      complete member Bottles and retains old canonical names as aliases.
+- [ ] 3.5 Simplify exact Bottle merge so all consumers and promotion mappings
+      converge directly on the selected surviving Bottle.
+- [x] 3.6 Recompute Bottle statistics from direct Bottle activity and
+      BottleGroup statistics from raw member-Bottle activity.
+- [ ] 3.7 Keep indexing, verification, grouping, and other slow post-save work
+      idempotent and post-commit.
+- [ ] 3.8 Add database-backed tests for creation rollback, duplicate conflicts,
+      shared fan-out, regrouping, Bottle merge, representatives, and direct
+      aggregates.
 
-## 4. Automatic Bottle And Group Domain Services
+## 4. One-Shot Legacy Migration
 
-- [x] 4.1 Implement transactional independent Bottle creation that creates a singleton group, generic target, Bottle, exact target, aliases, and change records atomically.
-- [x] 4.2 Implement trusted-source group reuse as an internal concrete-creation capability limited to deterministic migration, measured compatibility adapters, and explicitly system-controlled grouping operations; it is not an ordinary/manual creation contract.
-- [x] 4.3 Prevent arbitrary client-supplied group or source-Bottle authority from reaching internal trusted group reuse; every ordinary creation uses the independent singleton path.
-- [x] 4.4 Apply exact duplicate detection to Bottle identity while returning likely group matches as non-blocking suggestions.
-- [x] 4.5 Keep catalog verification, indexing, and other slow post-save work idempotent and outside the committed request path.
-- [x] 4.6 Implement moderator-authorized Bottle updates: exact-only edits affect only the selected Bottle; shared edits atomically update the BottleGroup and every member's complete durable identity; effective-age normalization preserves only non-null exact overrides differing from the pre-update current group age, with exact null materializing the resulting group age; old canonical exact names remain exact aliases; collisions roll back all changes; one existing `bottle` update audit row is written per affected member with a combined row for the selected member in a mixed edit; no `bottle_group` audit enum is added; ids, targets, representative selection, activity, and Bottle/BottleGroup activity and rating aggregates remain unchanged; and shared series fan-out or drift repair recomputes only affected old and new BottleSeries `numReleases` membership counts.
-- [x] 4.7 Implement an explicit moderator one-source-to-one-destination group merge: destination shared identity atomically rematerializes moved Bottles while preserving exact Bottle/target ids and old canonical exact aliases; source-generic consumers and stable aliases repoint before source target/group retirement behind the existing tombstone support; destination collection rows win with blank-image fill, flight duplicates collapse, and tasting/identity/alias/SMWS ambiguity rolls back; identical retries are unchanged while other destinations conflict; generated audit and membership-constraint changes support `bottle_group` snapshots plus reversible per-Bottle audits and source-row removal; and the shared raw-target BottleGroup aggregate helper is brought forward without completing task 4.11.
-- [x] 4.8 Implement an audited group split transaction that moves selected Bottles and keeps ambiguous generic activity on the source group by default.
-- [x] 4.9 Implement exact Bottle merge independently from group merge and handle cross-group exact duplicates deliberately.
-- [x] 4.10 Implement representative-Bottle selection and group editorial-content ownership without mutating member Bottle content.
-- [x] 4.11 Complete idempotent exact Bottle recomputation plus the remaining reusable BottleGroup statistics job/service entry points, reusing the raw-target group aggregate helper introduced by task 4.7 without double counting.
-- [x] 4.11a Add the canonical raw-target statistics core, reusable exact Bottle and BottleGroup service entry points, and focused database tests as a paired review boundary that is not deployable alone; do not activate it with a silent legacy `bottleId` fallback.
-- [x] 4.11b Implement the post-backfill/parity-gated canonical exact and group statistics cutover: tasting create persists CatalogTargets and update repairs null targets; remove the superseded worker SQL and every inline Bottle statistics formula; independently queue one delayed idempotent exact-or-group recomputation per create, delete, rating change, or null-target repair with successful-job cleanup, failed-job retention, and nonfatal publication; have both exact and generic jobs carry the retained tasting `bottleId` as `entityStatsBottleId` solely for the shared legacy entity-refresh compatibility helper while exact `bottleId` is the validated Bottle scope for the durable `targetId`; independently queue every idempotent downstream entity event without stable-key coalescing, removing successful jobs and retaining failures; reject the old `{ bottleId }` worker payload because it cannot infer promoted exact identity; remove the entity bridge through target-aware queue work in task 7.10, obsolete consumer `bottleId`/`releaseId` storage removal in task 9.6, and runtime compatibility-branch removal in task 9.7; and do not deploy or serve this path before promotion and consumer target backfill, a zero-null valid target graph, retained parity evidence, explicit approval, stopped or upgraded old producers, and drained or expired legacy queue payloads.
-- [x] 4.12 Add database-backed service tests for creation rollback, retries, duplicate conflicts, trusted reuse, exact-only update isolation, effective-age normalization, shared-update fan-out, per-member audit cardinality, collision rollback, merge, split, representative selection, deletion, and aggregate counts.
+- [ ] 4.1 Replace target/checkpoint migration writers with one transaction
+      owner and one retained read-only pre/post audit boundary.
+- [ ] 4.2 Lock affected tables in a documented fixed order and rerun collision
+      and integrity preflight before the first mutation.
+- [ ] 4.3 Assign every legacy parent Bottle to one migration-created group and
+      retain it as the general/unversioned member.
+- [ ] 4.4 Promote every BottleRelease into an independently complete Bottle in
+      its parent's group and persist a completed durable mapping.
+- [ ] 4.5 Repoint every release-specific consumer Bottle reference to the
+      promoted Bottle while retaining its release id as historical evidence until
+      separately approved cleanup.
+- [ ] 4.6 Preserve every parent-only consumer reference on the retained parent
+      Bottle.
+- [ ] 4.7 Migrate aliases, observations, reviews, collections, Flights, prices,
+      decisions, proposals, and attempts using the same direct-Bottle rule without
+      invoking runtime side effects.
+- [ ] 4.8 Assert counts, mappings, Bottle materialization, group membership,
+      direct foreign keys, and membership uniqueness before commit.
+- [ ] 4.9 Remove the external checkpoint state machine, filesystem report lock,
+      resumable three-phase orchestrator, target parity runtime, and their tests.
+- [ ] 4.10 Add integration tests for clean, collision, invalid-pair,
+      concurrent-drift, rollback, complete migration, and postflight cases.
+- [ ] 4.11 Keep the first migration non-destructive: do not drop BottleRelease,
+      legacy columns, or permanent redirect evidence.
 
-## 5. New-Write API Cutover
+## 5. Server And API Cutover
 
-- [x] 5.1 Change the standard Bottle create route to accept stable and exact fields and return the created concrete Bottle plus its target/group summary.
-- [x] 5.2 Remove the public trusted-source `/bottles/from/{bottle}` creation operation and its generated contract; the standard Bottle create operation is the only ordinary creation API and always creates an independent Bottle with a singleton group.
-- [x] 5.3 Change Bottle update and moderator proposal flows so exact edits persist only on the selected Bottle and shared edits use the atomic BottleGroup-to-member materialization service.
-- [x] 5.3a Cut the standard moderator Bottle update route and live edit workflow over to strict shared/exact patches, the canonical concrete update service, an exact-target response, and a group-owned edit-context projection.
-- [x] 5.3b Compose moderator price-match correction proposals with the canonical concrete update transaction, then remove the superseded proposal-specific Bottle updater without leaving a second update business system.
-- [x] 5.4 Convert BottleRelease create/update routes into instrumented adapters over concrete Bottle operations and make BottleRelease delete an instrumented refusal boundary that requires explicit exact-Bottle merge.
-- [x] 5.4a Convert BottleRelease create into an instrumented adapter that preserves its legacy input and authorization contract, requires an active trusted source Bottle, creates a concrete Bottle in that source's group without inserting BottleRelease, rejects non-null legacy `imageUrl`, and returns the exact CatalogTarget replacement without inventing a release id.
-- [x] 5.4b Convert BottleRelease update into an instrumented adapter that requires a completed promotion mapping, applies an exact-only canonical Bottle patch without mirroring the legacy release row, and returns the exact CatalogTarget replacement.
-- [x] 5.4c Make `mergeConcreteBottles` the only grouped exact-Bottle retirement operation and require an explicit destination; restrict standard Bottle DELETE to a measured ungrouped pre-migration compatibility purge that rejects grouped Bottles with merge-required; convert BottleRelease DELETE into an instrumented, completed-promotion resolver that preserves its external admin/path/input/output contract, makes no mutation, returns actionable merge-required for the mapped Bottle and exact target, and conflicts on invalid mappings; remove or hide unusable delete UI actions; and keep promotion mappings live for repointing through explicit merge without new retired-promotion schema.
-- [x] 5.5 Update aliases and observations so new writes reference one target and exact aliases resolve directly to a Bottle.
-- [x] 5.5a Make target-aware `assignBottleAlias` and `assignBottleAliasInTransaction` canonical for the exact/moderator path: moderator PUT resolves its Bottle input to the active exact target; alias DELETE clears the alias row's target and retained legacy pair together; exact alias lookup resolves through the target's Bottle while a generic alias never substitutes a representative; only a null-target legacy alias may use the measured pair fallback; and targetless compatibility may persist a null target but never overwrite durable target identity. Retain the raw `lib/db.ts` pair primitive only for canonical transactional name reservation and explicitly isolated pre-migration compatibility, with grouped maintenance caller cutover in task 5.9 and final removal in task 9.7.
-- [x] 5.5b In existing-match and correction price-approval transactions, resolve the retained legacy pair once through the measured deterministic CatalogTarget assignment boundary; reuse that descriptor atomically for the listing-alias assignment and source-keyed observation, preserving exact/generic intent without representative substitution; treat low-level locked integrity checks as validation rather than a second semantic resolution; preserve existing price, proposal, and decision-log pair semantics; leave create-new on measured targetless compatibility, consumer-wide dual writes to task 5.6, and proposal creation/decision vocabulary to task 5.7.
-- [x] 5.5c After task 5.7 replaces create-new legacy Bottle/BottleRelease creation and decision vocabulary, cut create-new price approval alias and observation writes over to the newly created concrete CatalogTarget in the same transaction; remove that measured targetless branch without changing price-assignment semantics.
-- [x] 5.6 Update tasting, review, collection, flight, and price mutations to dual-write `targetId` from exact or generic intent.
-- [x] 5.6a Persist `targetId` for tasting create and update, and resolve a null-target tasting update/delete from the measured legacy pair only when needed; retain the parent task for review, collection, flight, and price mutations.
-- [x] 5.6b Make alias-driven StorePrice and Review propagation one canonical operation: target-aware assignment atomically writes the supplied `targetId` and retained legacy pair to matching consumers without substituting a representative for a generic target; targetless compatibility cannot downgrade durable target identity; alias DELETE clears all three consumer identity fields when a target-aware consumer's authoritative `targetId` matches the alias snapshot regardless of retained-pair drift, or when a targetless consumer's retained pair matches, while preserving independently retargeted and different targetless-pair consumers; and `OnBottleAliasChange` delegates to that owner or remains measured targetless-only compatibility assigned to task 9.7, without duplicate business logic. Keep unresolved classifier-created reviews targetless until tasks 5.8/5.9 can produce valid targets.
-- [x] 5.6c Update direct user/API Review creation and mutation paths that have exact or generic intent to dual-write a validated `targetId`; exclude shared alias propagation owned by task 5.6b and unresolved classifier-created reviews deferred to tasks 5.8/5.9.
-- [x] 5.6d Update direct collection mutations to dual-write a validated exact or generic `targetId`, preserving target-aware set-membership conflict handling and leaving reads and legacy backfill to tasks 7.3 and 6.
-- [x] 5.6e Update direct flight mutations to dual-write a validated exact or generic `targetId`, preserving target-aware set-membership conflict handling and leaving reads and legacy backfill to tasks 7.3 and 6.
-- [x] 5.6f Update direct StorePrice ingestion, matching, assignment-clear, and other price-row identity writers to write or conditionally clear a validated exact or generic `targetId`; exclude alias-driven propagation owned by task 5.6b, and keep create-new price approval work in tasks 5.7/5.5c and target-backed reads/backfill in tasks 7.3/6.
-- [x] 5.7 Replace the create-new price-approval legacy Bottle/BottleRelease writer with canonical concrete Bottle plus CatalogTarget creation in the same approval transaction, and update store-price matching, match proposals, and decision logs to emit `create_bottle` or group-aware match decisions instead of create-release decisions; expose the newly created target for task 5.5c without retaining a second creation business system.
-- [x] 5.8 Collapse classifier application to one `create_bottle` action carrying an independently complete concrete Bottle plus its exact target; create a singleton group automatically without classifier-selected parent/source-group context, never write/finalize BottleRelease, and retain bounded structured source evidence while emitting `create_bottle` or `match_existing` decisions.
-- [x] 5.9 Update worker jobs, importers, CLI mutations, scraper/upsert callers, and classifier-driven Review/price/photo consumers so no supported new-write path inserts `bottle_release` directly, every caller consumes concrete target responses instead of the legacy Bottle upsert response, and stale consumer identity cannot override a concurrent retarget; route grouped entity and brand/distillery maintenance through canonical shared-update fan-out, isolate direct Bottle/BottleRelease/raw-alias entity-merge compatibility to `groupId IS NULL` for task 9.7 removal, and remove obsolete CLI alias/repair commands plus the age/release repair services, routes, pages, verifier workstreams, and finding kinds in the same cutover.
-- [x] 5.10 Add route and service integration tests for authentication, exact creation, singleton grouping for every ordinary create including prefilled “another release,” absence of public trusted-source grouping, conflicts, generic targets, and internal compatibility-adapter behavior.
-- [x] 5.11 Regenerate and inspect OpenAPI/client types, remove the public trusted-source creation operation, and remove new `BottleRelease`, `createdRelease`, and release-shaped compile-time dependencies from cut-over callers while preserving explicitly staged legacy adapter contracts.
+- [ ] 5.1 Remove CatalogTarget runtime schemas, loaders, resolvers, serializers,
+      assignment descriptors, parity readers, and error types.
+- [ ] 5.2 Make Bottle the response and input identity for creation, aliases,
+      observations, tastings, reviews, collections, Flights, prices, proposals,
+      decisions, activity, and photo flows.
+- [ ] 5.3 Update alias propagation and direct consumer writers to validate and
+      write one Bottle id atomically without a second resolver.
+- [ ] 5.4 Update StorePrice ingestion, matching, proposals, attempts, approvals,
+      and assignment clearing to one direct Bottle identity tuple.
+- [ ] 5.5 Update classifier, importers, scraper, CLI mutations, and background
+      workers to create or consume independently complete Bottles.
+- [ ] 5.6 Update cache, revalidation, notification, indexing, and queue payloads
+      to Bottle ids; remove generic-target branches.
+- [ ] 5.7 Update statistics, badges, Library, country/entity/user analytics, and
+      activity feeds to Bottle-owned data and member-derived group aggregates.
+- [ ] 5.8 Keep BottleRelease compatibility routes translation-only over the
+      promotion mapping and canonical Bottle services.
+- [ ] 5.9 Regenerate OpenAPI/client types and remove target-shaped contracts.
+- [ ] 5.10 Add focused API integration tests for every direct-Bottle consumer,
+      nullable unresolved state, promotion mapping, authorization, pagination, and
+      conflict behavior.
 
-## 6. Resumable Legacy Backfill
+## 6. Unified Web Workflow
 
-- [x] 6.1 Implement an idempotent keyset-batched service that processes one locked legacy parent family per bounded transaction, creates or validates exactly one BottleGroup and generic target, and records the group's id on the staged legacy parent without exposing grouping as manual authority.
-- [x] 6.2 Within that parent-family transaction, retain a parent with no releases as the independently complete Bottle, assign it to its singleton group, create or validate its exact target, select it as representative, and preserve its Bottle id.
-- [x] 6.3 Within that parent-family transaction, promote every legacy BottleRelease into an independently complete concrete Bottle using the deterministic parent/release precedence contract, assign all promoted Bottles to the parent's migration-created group, and select the Bottle promoted from the lowest legacy release id as representative.
-- [x] 6.4 Persist a completed release-to-Bottle mapping only after its promoted Bottle, durable exact fields, joins, exact target, and required canonical exact alias are complete; claim that alias atomically for the exact target before mapping completion; on rerun, validate and reuse a structurally identical completed promotion and stop on a missing or inconsistent mapped graph before any dependent migration.
-- [x] 6.5a Materialize every promoted Bottle's stable and exact fields, creator/timestamps, distillers, series, tags, flavor profile, descriptions, images, tasting notes, suggested tags, and required canonical exact alias according to the ownership and precedence matrix so exact reads never require BottleGroup hydration.
-- [x] 6.5b In a separate locked parent-family phase after promotion, resolve each alias/observation retained pair optimistically only through the measured legacy assignment resolver, acquire canonical group/Bottle/target and migration-evidence locks, re-resolve and revalidate the pair, and set or validate only `targetId`; preserve every legacy pair and all alias/observation evidence, content, provenance, ignored state, and timestamps; exclude the canonical exact alias already claimed by task 6.5a from selection and mutation and cover its unchanged state with integration evidence; roll back on a conflicting nonnull target or drift without healing, consumer synchronization, indexing, renaming, other-consumer backfill, command work, or production access.
-- [x] 6.6 Add the core parent-family preflight and concurrency-safe canonical alias claim: enumerate every canonical Bottle and alias row matching each planned promoted identity, stop and report rather than selecting an arbitrary match, inventing, suffixing, overwriting, or partially promoting when identity collides or parent release-like fields remain ambiguous, and allow only the Bottle proven by the same structurally identical completed mapping on rerun; the earlier read-only audit alone does not complete this task.
-- [x] 6.7 In one atomic remaining-consumer parent-family phase shared with tasks 6.8/6.9, backfill non-null legacy release references to the promoted Bottle's exact target across ten logical slots in eight physical tables: tastings, reviews, collections, flights, prices, decision logs, and the independent current/suggested proposal and attempt slots; select by either family Bottle or release so invalid inverse pairs are rejected, and preserve every retained pair and non-target field.
-- [x] 6.8 Through the same shared family resolution/lock helper and transaction, backfill null-release references under parents with releases to the locked BottleGroup generic target without representative substitution; exclude optional null/null slots from selection and preserve them entirely, including any existing target, validate proposal/attempt slots independently, and invoke no runtime business logic, consolidation, statistics, indexing, queues, command, production, or read-cutover behavior.
-- [x] 6.9 Through the same shared family resolution/lock helper and transaction, backfill null-release references under parents without releases to the retained Bottle exact target; lock fixed row locators after target and migration-evidence preflight, reuse matching nonnull targets, and roll back the full parent family on pair/row drift, conflicting targets, or tasting/collection/Flight membership collisions without healing, choosing winners, deleting rows, or changing counts.
-- [x] 6.10 Include ignored aliases while target-backing every remaining parent-only alias under a parent with releases to its locked generic target and every remaining release alias to its promoted Bottle's locked exact target; preserve retained pairs and alias provenance/content, validate matching nonnull targets idempotently, and reject conflicting targets without invoking canonical alias assignment, consumer propagation, indexing, or renaming.
-- [x] 6.11 Add a versioned retained external JSON report/checkpoint, with no database checkpoint table, and a dry-run mode that invokes only read-only revision evidence, the existing audit, and parent selection without simulating mutation services; record the exact full candidate Git commit, database, generated time, and latest applied Drizzle id/hash/timestamp, require that applied revision to equal the latest candidate migration, use configured `VERSION` only in production while every nonproduction run requires clean current `HEAD`, and bind every write to explicit approval strictly after that exact completed dry run. For each one-bounded-batch write, atomically persist `activeParentId` before core promotion, then run the separate 6.5b/6.10 alias-observation and 6.7-6.9 remaining-consumer owners in order as three distinct transactions; advance retained cursor and cumulative metrics only after every phase and the advanced checkpoint succeed, replay active parents directly including zero-release families no longer selected after core, and stop at the first failure with phase-discriminated sanitized retry-safe locators or an observable checkpoint failure preserving the original operation failure. Have the runtime schema enforce mode/status/checkpoint/cursor, rows-equals-updated-plus-reused, trimmed nonblank approval, and coherent operation/composite/checkpoint failure-parent invariants against active, pre-core next, or final no-work state; remove the superseded core-only batch wrapper; and have the CLI atomically create reports, hold an exclusive fail-closed report lock for the entire write sequence, require confirmed operational removal rather than automatic takeover of a stale lock, refuse to open an existing write report without explicit resume, atomically replace each checkpoint after it owns that report, and fsync the containing directory after report publication or replacement before returning success. This task makes no production execution or deployment claim.
-- [ ] 6.11a Define and enforce a bounded freshness rule for the initial production write so an arbitrarily old retained dry run cannot authorize a new backfill merely because Git and Drizzle revisions remain unchanged; preserve approved retained-report resume semantics after the first write has begun.
-- [x] 6.12 Add migration integration tests proving row counts and count invariants, idempotency, field ownership, mappings, exact/generic target rules, canonical-alias exclusion, three-transaction ordering, dry-run non-mutation, clean-HEAD/configured-production revision and strictly-later approval gates, report state/cursor and failure-parent/composite-locator validation, exclusive lock ownership, atomic and directory-durable checkpoint progression, discriminated/composite sanitized stop-first failures, canonical-orchestrator-only batching, and active-parent interruption recovery including a zero-release parent that no longer matches selection after core.
-- [ ] 6.13 During the controlled production migration, after the additive schema and backfill tooling are available but immediately before any live backfill writes, run and retain a fresh production dry-run from that exact Git and migration revision, reconcile every audit count, and require explicit approval; do not use the audit requirement to justify an earlier dormant application deployment.
+- [x] 6.1 Use one Bottle form for stable and exact fields.
+- [x] 6.2 Make `/bottles/new` and “add another release” create independent
+      Bottles without manual group selection.
+- [ ] 6.3 Replace target selectors and exact/generic discriminated rendering
+      with Bottle selection and Bottle summaries.
+- [x] 6.4 Keep `/bottles/:id/releases` as a related-release page and remove
+      group activity actions plus manual group merge/split controls.
+- [ ] 6.5 Update tasting, Library, collection, Flight, price, review, photo, and
+      return-intent flows to carry Bottle ids.
+- [x] 6.6 Keep nested BottleRelease pages removed and permanent redirects
+      active.
+- [ ] 6.7 Remove obsolete target components, helpers, tests, and copy.
+- [ ] 6.8 Add focused web tests for Add Bottle, edit Bottle, add another
+      release, direct Bottle selection, related releases, redirects, and return
+      intents.
+- [x] 6.9 Run constrained desktop/mobile visual QA using the local playbook.
 
-## 7. Read Parity And Backend Cutover
+## 7. Cleanup, Documentation, And Local Verification
 
-- [x] 7.1 Add dual-read parity assertions comparing legacy resolution with CatalogTarget resolution for every target-bearing serializer and route.
-- [x] 7.1a Add bounded dual-read resolution and filter-membership parity to BottleAlias list and brand-repair alias reads, including semantic promoted-release resolution, without allowing parity to select authoritative results.
-- [x] 7.1b Add row-correlated target-versus-retained resolution parity to the incoming Bottle decision-log read, keyed by the stable decision-log id and including semantic promoted-release resolution, without allowing parity to select the authoritative result.
-- [x] 7.1c Add independently correlated current/suggested target-versus-retained resolution parity to StorePrice match-proposal queue reads, keyed by proposal id and logical slot, without allowing parity to select authoritative results.
-- [x] 7.1d Add row-correlated target-versus-retained resolution parity to Library statistics reads, keyed by the stable collection-entry id, without allowing parity to select identity or mutate state.
-- [x] 7.1e Add bounded row-correlated target-versus-retained resolution parity to user-details statistics for every selected user Tasting and collection entry, keyed by the stable Tasting or collection-entry id, without allowing parity to select aggregate identity, repair a row, or mutate state.
-- [x] 7.1f Add bounded row-correlated target-versus-retained resolution parity to live badge award and badge rescan hydration, keyed by the stable Tasting id, without allowing retained identity to select badge data, repair a Tasting, or change award behavior.
-- [x] 7.1g Add bounded row-correlated target-versus-retained resolution parity to user flavor and region analytics, keyed by the stable Tasting id through the shared user-Tasting scanner, without allowing retained identity to select aggregate fields, repair a Tasting, or mutate state.
-- [x] 7.2 Record actionable parity mismatches with consumer table, stable row locator, legacy ids, target id, and resolved identities.
-- [x] 7.2a Add strict `bottle_alias` parity correlation by unique alias name for both resolution and filter-membership drift, retaining target, legacy, caller, and operation evidence.
-- [x] 7.2b Record incoming Bottle decision-log parity mismatches with the `incoming_bottle_decision_log` table, stable row id, retained Bottle/Release ids, target id, caller, operation, and resolved identities.
-- [x] 7.2c Record StorePrice match-proposal parity mismatches with the `store_price_match_proposal` table, stable proposal id and current/suggested slot, retained Bottle/Release ids, target id, caller, operation, and resolved identities.
-- [x] 7.2d Record Library statistics parity mismatches with the `collection_bottle` table, stable collection-entry id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
-- [x] 7.2e Record user-details statistics parity mismatches with the `tasting` or `collection_bottle` consumer table, stable row id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
-- [x] 7.2f Record badge evaluation parity mismatches with the `tasting` consumer table, stable row id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
-- [x] 7.2g Record user flavor and region analytics parity mismatches with the `tasting` consumer table, stable row id, retained Bottle/Release ids, target id, caller, operation, and independently resolved target and legacy identities.
-- [x] 7.3 Switch tastings, reviews, collections, flights, prices, aliases, observations, decisions, proposals, and activity feeds to target-backed reads.
-- [x] 7.3a Switch BottleAlias list filtering and hydration, brand-repair candidate/supporting-alias membership, and the labels unmatched dump to authoritative CatalogTarget identity; return nullable exact/generic targets without representative substitution and fail closed on invalid durable targets.
-- [x] 7.3b Switch the admin incoming Bottle decision-log route and UI to a nullable authoritative CatalogTarget, remove Bottle/BottleRelease joins and nested release output, preserve historical decision vocabulary and creation flags as audit evidence, render generic and unknown identity without representative substitution, and return conflict for an invalid nonnull durable target.
-- [x] 7.3c Switch StorePrice match-proposal queue list/details and moderator UI to independently authoritative current/suggested CatalogTargets; persist targets on new suggested-match proposals; approve through one target-native transaction; remove retained BottleRelease read/approval shapes and GET-side assessment writes; retain only the explicit historical create-draft parent context; and provide a narrow Bottle-to-exact-target lookup for manual target selection.
-- [x] 7.3d Switch Library age, category, and distiller statistics to each collection entry's authoritative `targetId`: exact targets read the independently complete Bottle, generic targets read BottleGroup-owned fields, targetless entries remain counted as unknown/unclassified without retained-pair fallback, invalid nonnull targets fail closed, and existing privacy, non-empty filtering, count/order semantics, and response shape remain unchanged with no representative selection or GET-side mutation.
-- [x] 7.3e Switch country category aggregation to active exact CatalogTargets with valid Bottle/group membership: exclude generic and targetless identity plus Bottle and BottleGroup tombstones; derive category and distillery-country membership only from the independently complete Bottle; count each exact Bottle once per country even when multiple Bottle distillers belong to that country; derive `totalCount` from the same population including the null-category bucket; preserve public country id/slug lookup and response behavior with the shared nullable category schema and deterministic category ordering; and perform no representative selection, BottleGroup-field substitution, GET-side mutation, production backfill, deployment, or activation.
-- [x] 7.3f Switch entity category aggregation to active exact CatalogTargets with valid Bottle/group membership: exclude generic and targetless identity plus Bottle and BottleGroup tombstones; derive category and brand, bottler, or distiller association only from the independently complete Bottle; count each exact Bottle once when the entity occupies multiple roles; derive `totalCount` from the same category buckets including null instead of the materialized `entity.totalBottles`; preserve public entity lookup, not-found and empty behavior, response shape, the shared nullable category schema, and deterministic category ordering; and perform no representative selection, BottleGroup-field substitution, GET-side mutation, production backfill, deployment, or activation.
-- [x] 7.3g Switch the public global `totalBottles` statistic to count each active exact CatalogTarget once through valid Bottle/group membership, excluding generic targets, targetless Bottles, Bottle tombstones, and BottleGroup tombstones; do not substitute a representative Bottle or use BottleGroup-owned identity as exact Bottle identity; preserve raw Tasting and Entity row totals, public access, and response shape; and perform no GET-side mutation, production backfill, deployment, or activation.
-- [x] 7.3h Switch user-details statistics to authoritative CatalogTargets: count every user Tasting row while counting distinct nonnull exact or generic target ids for tasted `bottles`; count distinct nonnull target ids across all statuses and all user-owned collections for `collected`; preserve reserved-Library non-empty, open, and sealed row counts; allow targetless rows to contribute only to the applicable Tasting and Library-status row totals; fail closed on an invalid nonnull target without retained-pair fallback or representative substitution; preserve existing user lookup, serializer/privacy, friend-status, contribution, public response-shape, and GET read-only behavior; and perform no production backfill, deployment, or activation.
-- [x] 7.3i Switch live badge award and bounded ascending-id keyset rescan to one authoritative CatalogTarget hydrator plus one parsed in-memory check/tracker path: exact targets use independently complete Bottle-owned fields, generic targets use BottleGroup-owned fields without representative substitution, Bottle checks and trackers remain exact-only, and targetless, missing, retired, or inconsistent targets fail closed without retained-pair fallback; remove the superseded per-check SQL predicate system and unused top-level badge base while preserving existing badge definitions/configuration with no “Release” badge migration, XP and formula math, tracked-object idempotency, levels and transitions, role de-duplication, region semantics, existing log message/context shapes while accepting per-scanned-row rescan volume, and response contracts; and perform no GET mutation, production backfill, schema migration, deployment, or activation.
-- [x] 7.3j Switch user flavor and region analytics plus user-details Tasting statistics to one shared bounded ascending-id CatalogTarget scanner: exact targets use independently complete Bottle-owned flavor and brand identity, generic targets use BottleGroup-owned fields without representative substitution, promoted releases remain exact Bottle identity, region attribution follows the target owner's brand only, targetless rows contribute to route totals but not classified buckets, and invalid nonnull targets fail closed without retained-pair fallback; preserve existing profile visibility, response shapes, rating sums, same-location aggregation, deterministic top-25 ordering, and GET read-only behavior; and perform no production backfill, schema migration, deployment, or activation.
-- [x] 7.4 Switch Bottle list/details/search serializers to independently complete concrete Bottles without group hydration and include optional group summaries without release-shaped nesting.
-- [x] 7.5 Index promoted and new Bottles in the ordinary Bottle search index and remove release-only search indexing.
-- [x] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
-- [ ] 7.7 After production target backfill, run and retain exact-Bottle and BottleGroup raw-target aggregate comparisons against legacy totals, resolve every mismatch, and record explicit approval before deploying or enabling the task 4.11b statistics cutover; job implementation remains owned by task 4.11b.
-- [x] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
-- [x] 7.9 Add retired-parent redirects to Bottle-anchored release-family pages, using the active representative only as a route locator and never as the activity target.
-- [ ] 7.10 Update cache keys, revalidation, queue payloads, and activity payloads to use exact Bottle or CatalogTarget identity consistently; before enabling the strict target-backed `UpdateBottleStats` worker, verify every old `{ bottleId }` producer is stopped or upgraded and every queued legacy payload is drained or expired because that payload cannot infer promoted exact identity and has no compatibility fallback; also stop or upgrade producers of legacy-parent `OnBottleChange` jobs and drain or expire those queued jobs before activation because a retired parent has no active exact target.
-- [x] 7.10a Move activity notifications and notification delivery to authoritative CatalogTarget identity, rendering exact Bottle or generic BottleGroup labels without representative fallback.
-- [x] 7.10b Move local cache/revalidation, alias search indexing, statistics queue payloads, and entity aggregation to exact Bottle or CatalogTarget identity; remove the superseded Bottle-based entity helper and cover exact/generic ownership plus producer fan-out.
-- [ ] 7.10c Before deployment activation, retain evidence that old Bottle-id statistics and legacy-parent `OnBottleChange` producers are stopped or upgraded and their queued legacy payloads are drained or expired.
-- [x] 7.11 Add backend integration tests covering every consumer's exact target, generic target, promoted release, redirect, pagination, and authorization behavior.
-- [x] 7.11a Add incoming Bottle decision-log integration coverage for exact, generic, promoted-release, targetless, invalid-target, authorization, filter, deterministic ordering, and pagination behavior, plus focused admin rendering coverage for exact, generic, and unknown targets.
-- [x] 7.11b Add StorePrice match-proposal integration coverage for independent exact, generic, promoted-release, targetless, invalid-target, authorization, deterministic ordering, pagination, target-native approval, manual exact-target lookup, and focused moderator rendering behavior.
-- [x] 7.11c Add Library statistics integration coverage for exact Bottle, generic BottleGroup, targetless, retained-pair drift, and invalid-target entries while preserving privacy, non-empty membership filtering, totals, unknown/unclassified accounting, top-five count/order behavior, and the existing response contract.
-- [x] 7.11d Add country category integration coverage for public numeric-id and slug lookup, active exact Bottle-owned category and distiller-country identity, exclusion of generic-only, targetless, Bottle-tombstoned, and BottleGroup-tombstoned identities, one-count-per-Bottle behavior across multiple same-country distillers, nullable deterministic category buckets, totals from the same exact population, empty results, and invalid slug behavior.
-- [x] 7.11e Add entity category integration coverage for public entity lookup, Bottle-owned brand, bottler, and distiller association, active exact identity, exclusion of generic-only, targetless, Bottle-tombstoned, and BottleGroup-tombstoned identities, one-count-per-Bottle behavior when one entity occupies multiple roles, nullable deterministic category buckets, totals from the same exact population rather than materialized entity statistics, empty results, and not-found behavior.
-- [x] 7.11f Add global statistics integration coverage for public access, active exact Bottle/target membership, exclusion of generic targets, targetless Bottles, Bottle-tombstoned Bottles, and BottleGroup-tombstoned Bottles, one-count-per-exact-target behavior, unchanged raw Tasting and Entity totals, and the existing response shape.
-- [x] 7.11g Add user-details statistics integration coverage for bounded Tasting and collection-entry parity, exact and generic distinct-target de-duplication, repeated and targetless rows, retained-pair drift, invalid nonnull targets, all-collection/all-status `collected` scope, reserved-Library status row counts, numeric-id/username/`me` lookup and errors, actor-aware serialization/privacy, friend status, contributions, public response shape, and GET-side non-mutation.
-- [x] 7.11h Add badge integration coverage for exact Bottle-owned, promoted-release exact Bottle-owned, and generic BottleGroup-owned checks/trackers, exact-only Bottle checks and tracking, badge-local targetless and retired failure without retained-pair fallback, retained-pair drift without fallback, row-correlated live-award and rescan parity wiring, shared parity payload and CatalogTarget invalid/inconsistent integrity evidence, shared live/rescan results, ascending-id keyset batch boundaries, unchanged badge definitions/configuration including no “Release” badge migration, XP/formula/idempotency/level behavior, role de-duplication, and existing region semantics.
-- [x] 7.11i Add user flavor and region analytics integration coverage for exact Bottle versus divergent BottleGroup ownership, generic BottleGroup versus retained-Bottle drift, promoted-release exact identity, shared-scanner bounded batching beyond one page, targetless totals-only behavior, retained-pair non-mutation, invalid and retired target conflicts, null flavor and location fields, brand-only same-location aggregation, deterministic top-25 ordering, existing score/count response contracts, and profile privacy.
+- [ ] 7.1 Rerun the legacy and target inventory; remove obsolete helpers,
+      schemas, types, routes, workers, forms, comments, tests, and abstractions.
+- [ ] 7.2 Rewrite identity, schema, Bottle entry, photo tasting, price matching,
+      rating, and migration docs for direct Bottle references and non-targetable
+      groups.
+- [ ] 7.3 Validate OpenSpec and generated migration history.
+- [ ] 7.4 Run focused schema, migration, service, route, serializer, worker,
+      classifier, and repair tests.
+- [ ] 7.5 Run server/web typechecks and file-scoped lint/format checks.
+- [ ] 7.6 Run classifier tests and evals in automatic recording/replay mode
+      only when classifier identity contracts change.
+- [ ] 7.7 Run focused web Vitest and constrained end-to-end coverage.
+- [ ] 7.8 Manually review the full diff for UX, architecture, type safety,
+      duplicate business logic, and unexpected file-tree growth.
 
-## 8. Unified Web Workflow
+## 8. Production Migration And Later Destructive Cleanup
 
-- [x] 8.1 Merge the existing BottleForm and ReleaseForm field ownership into one reusable concrete Bottle add/edit form.
-- [x] 8.2 Make `/bottles/new` accept all exact fields and always submit one Bottle creation mutation.
-- [x] 8.3 Replace Add Bottling with “Add another release,” prefilled from the selected Bottle's independently complete durable fields and submitted through the standard independent Bottle creation mutation; it creates a singleton group and does not select or reuse the source BottleGroup.
-- [x] 8.4 Remove the Bottle-versus-Bottling choice, hidden release-detail mode, and any query-prefill behavior that changes entity type.
-- [x] 8.5 Update search results and Bottle pages to show exact Bottle details with an unobtrusive `/bottles/:currentBottleId/releases` relationship link.
-- [x] 8.6 Add a Bottle-anchored release-family page for generic activity, aggregates, related Bottles, and moderator merge/split controls; exclude BottleGroup ids from canonical paths and user-facing terminology, and do not render the anchor as exact selected identity.
-- [x] 8.7 Update tasting, Library, collection, flight, price, review, and photo-identification flows to carry one `targetId` and display whether exactness is known.
-- [x] 8.8 Update return intents and post-create image uploads to use the created concrete Bottle without reconstructing a release pair.
-- [x] 8.9 Remove nested Bottling edit/detail/list UI after redirects and compatibility coverage are active.
-- [x] 8.10 Add focused web tests for unified form fields, singleton creation, prefilled independent “another release,” absence of manual group selection, exact/generic target selection, Bottle-anchored release-family routes and redirects, and return intents.
-- [x] 8.11 Verify Add Bottle, edit Bottle, add another release, release-family details, Library, and tasting flows at desktop and mobile widths using the local verification playbook.
-
-## 9. Constraint Cutover And Legacy Removal
-
-- [ ] 9.1 Immediately before constraint cutover, run and retain a new production audit from the exact candidate Git and migration revisions, recording its generation time and database; reconcile every count, require explicit approval, and verify zero target nulls/mismatches, complete release mappings, rebuilt indexes, and zero supported legacy write traffic. The task 6.13 immediately-pre-backfill audit does not satisfy this later freshness gate.
-- [ ] 9.2 Generate a migration making Bottle `groupId` and consumer `targetId` references non-null where the domain requires them, and resolve the active-group final-state invariant so clearing a representative cannot leave a committed BottleGroup/generic target with no exact member.
-- [ ] 9.3 Deploy the constraint migration separately and verify write latency, foreign-key failures, queue health, and target parity.
-- [ ] 9.4 Disable BottleRelease writes with an explicit gone/replacement response while retaining measured read compatibility.
-- [ ] 9.5 Observe the agreed legacy read window and verify old nested URLs and API references resolve only through mappings.
-- [ ] 9.6 Remove obsolete consumer `bottleId` columns wherever `targetId` replaces the legacy pair, plus `releaseId` columns, release foreign keys/indexes, `bottle_release`, and the now-workflow-less `legacy_release_repair_review` table and `legacy_release_repair_review_resolution` enum, using a generated Drizzle migration only after backup approval; first preserve every permanent promotion/redirect locator outside `bottle_release` and evolve the retained audit so tasks 9.10 and 10.9 can run after the legacy table and columns are absent.
-- [ ] 9.7 Remove BottleRelease routes, schemas, serializers, workers, forms, enums, and compatibility branches, including any remaining legacy release-repair schema exports, the measured legacy Bottle upsert response adapter after scraper/caller cutover and zero observed traffic, and the correction-draft `statedAgeScope` marker plus unmarked shared-age fallback after pending historical correction proposals are drained or migrated.
-- [ ] 9.8 Remove retired legacy parent Bottle rows only after every reference and URL has a durable group or Bottle mapping.
-- [x] 9.9 Remove runtime dependence on BottleGroup hydration for exact Bottle rendering and verify all creation, shared-update, merge, split, and repair writers preserve complete durable Bottle materialization and atomic fan-out.
-- [ ] 9.10 Run the final audit and assert zero legacy tables/columns/runtime references except intentional permanent redirect mappings, plus zero incomplete Bottle materializations or group/member synchronization defects.
-
-## 10. Documentation And Final Verification
-
-- [x] 10.1 Rewrite `docs/architecture/whisky-identity-model.md` around concrete Bottle, automatic BottleGroup, BottleSeries, CatalogTarget, and Observation identities.
-- [x] 10.2 Update schema conventions to remove the single-known-release rule and define shared BottleGroup editing semantics versus complete durable exact-Bottle materialization.
-- [x] 10.3 Update bottle-entry, photo-tasting, store-price-matching, and rating documentation for unified Bottle creation and generic group targets.
-- [x] 10.4 Add any new migration/runbook documentation to the root `AGENTS.md` docs index.
-- [x] 10.5 Run targeted migration, schema, service, route, serializer, worker, classifier, and repair tests after each backend slice.
-- [x] 10.6 Run server and web package typechecks plus file-scoped lint/format checks for every touched slice.
-- [x] 10.7 Run classifier tests and evals in the default automatic recording/replay mode when identity output or decision contracts change, committing required recordings.
-- [x] 10.8 Run focused web Vitest and Playwright coverage for the changed form, route, redirect, and target workflows.
-- [ ] 10.9 Immediately before the cleanup release, run the full repository test gate and a new retained production migration audit from the exact cleanup Git and migration revisions; record its generation time and database, reconcile every count, and require explicit approval rather than reusing the task 6.13 pre-backfill audit.
-- [ ] 10.10 Record post-deploy counts for Bottles, groups, exact/generic targets, legacy redirects, unmapped references, and aggregate parity. Only after every required backfill, constraint, cleanup-audit, and post-deploy artifact is retained, remove the migration-only backfill CLI operation/runtime and its tests, `apps/cli/vitest.config.mts`, the CLI test script, the migration-added CLI `esbuild`/`vite`/`vitest` development dependencies and matching lockfile entries, `catalogMigrationRun` schema, orchestrator, revision helper, parent selector/core backfill, alias/observation backfill, remaining-consumer backfill, and their integration tests. Retain the read-only catalog migration audit CLI operation, schema, and service through tasks 9.1, 9.10, and 10.9 rather than removing audit evidence tooling with the writers.
+- [ ] 8.1 Immediately before production migration, run and retain a fresh
+      read-only audit from the exact candidate Git and database revisions,
+      reconcile every count, and obtain explicit approval.
+- [ ] 8.2 Take and verify a production database backup.
+- [ ] 8.3 Ensure old application and worker processes cannot write legacy-only
+      release references after the transaction commits.
+- [ ] 8.4 Run the approved one-shot transaction and retain the postflight audit.
+- [ ] 8.5 Validate counts, mappings, direct Bottle references, aggregates,
+      redirects, queue health, latency, and major user workflows.
+- [ ] 8.6 Observe compatibility traffic and disable BottleRelease writes with
+      explicit replacement responses.
+- [ ] 8.7 Only after separate backup and explicit approval, generate and apply
+      cleanup that removes BottleRelease tables/columns, release-specific runtime,
+      migration-only writers, and compatibility branches while retaining permanent
+      redirect mappings and read-only audit support.
+- [ ] 8.8 Run and retain the final zero-legacy audit and full repository test
+      gate before cleanup release.

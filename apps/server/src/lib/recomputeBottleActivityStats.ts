@@ -4,12 +4,12 @@ import type { Bottle } from "@peated/server/db/schema";
 import { tastings } from "@peated/server/db/schema";
 import { inArray, sql } from "drizzle-orm";
 
-export type CatalogTargetStats = Pick<
+export type BottleActivityStats = Pick<
   Bottle,
   "totalTastings" | "avgRating" | "ratingStats"
 >;
 
-type RawCatalogTargetStats = {
+type RawBottleActivityStats = {
   pass: number | string;
   sip: number | string;
   savor: number | string;
@@ -18,17 +18,17 @@ type RawCatalogTargetStats = {
   avg: number | string | null;
 };
 
-export class CatalogTargetStatsAggregationError extends Error {
+export class BottleActivityStatsAggregationError extends Error {
   constructor() {
-    super("Unable to aggregate catalog target statistics.");
-    this.name = "CatalogTargetStatsAggregationError";
+    super("Unable to aggregate Bottle activity statistics.");
+    this.name = "BottleActivityStatsAggregationError";
   }
 }
 
 function requiredCount(value: number | string): number {
   const count = Number(value);
   if (!Number.isFinite(count)) {
-    throw new CatalogTargetStatsAggregationError();
+    throw new BottleActivityStatsAggregationError();
   }
   return count;
 }
@@ -37,20 +37,20 @@ function requiredAverage(value: number | string | null): number | null {
   if (value === null) return null;
   const average = Number(value);
   if (!Number.isFinite(average)) {
-    throw new CatalogTargetStatsAggregationError();
+    throw new BottleActivityStatsAggregationError();
   }
   return average;
 }
 
 /**
- * Aggregates raw activity once for a caller-supplied validated canonical target
- * set. Callers own all catalog graph validation before invoking this helper.
+ * Aggregates raw activity once for a caller-supplied validated Bottle set.
+ * Callers own Bottle and group integrity validation before invoking this helper.
  */
-export async function aggregateCatalogTargetStatsInTransaction(
+export async function aggregateBottleActivityStatsInTransaction(
   tx: AnyTransaction,
-  targetIds: number[],
-): Promise<CatalogTargetStats> {
-  const result = await tx.execute<RawCatalogTargetStats>(sql`
+  bottleIds: number[],
+): Promise<BottleActivityStats> {
+  const result = await tx.execute<RawBottleActivityStats>(sql`
     SELECT
       COUNT(*) AS "totalTastings",
       COUNT(*) FILTER (WHERE ${tastings.rating} = ${SIMPLE_RATING_VALUES.PASS}) AS "pass",
@@ -59,7 +59,7 @@ export async function aggregateCatalogTargetStatsInTransaction(
       COUNT(${tastings.rating}) AS "total",
       AVG(${tastings.rating}) AS "avg"
     FROM ${tastings}
-    WHERE ${inArray(tastings.targetId, targetIds)}
+    WHERE ${inArray(tastings.bottleId, bottleIds)}
   `);
   const raw = result.rows[0]!;
 

@@ -17,21 +17,21 @@ export type TastingEditFormSubmitData = TastingFormFields & {
   image: TastingFormImage;
 };
 export type TastingCreateFormSubmitData = TastingEditFormSubmitData & {
-  target: number;
+  bottle: number;
 };
 
 export function buildTastingCreateFormSubmission({
   fields,
   image,
-  targetId,
+  bottleId,
 }: {
   fields: TastingFormFields;
   image: TastingFormImage;
-  targetId: number;
+  bottleId: number;
 }): TastingCreateFormSubmitData {
   return {
     ...fields,
-    target: targetId,
+    bottle: bottleId,
     image,
   };
 }

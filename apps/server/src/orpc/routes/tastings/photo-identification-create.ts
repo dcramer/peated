@@ -7,7 +7,6 @@ import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
-import { loadCatalogTarget } from "@peated/server/lib/catalogTargets";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import { logError } from "@peated/server/lib/log";
 import {
@@ -22,7 +21,9 @@ import {
   requireTosAccepted,
   requireVerified,
 } from "@peated/server/orpc/middleware";
-import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
+import { BottleSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { isPhotoIdentificationCreateDecisionAutoCreatable } from "./photo-identification";
@@ -85,8 +86,6 @@ function logCatalogImageApprovalError(
 ) {
   logError(err, {
     catalogImagePromotion: {
-      target: "bottle",
-      targetId: result.targetId,
       pendingImageId,
       userId,
       action: decision.action,
@@ -171,7 +170,7 @@ export default procedure
     path: "/tastings/photo-identification-create",
     summary: "Create bottle target from photo identification",
     description:
-      "Create a concrete Bottle target from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
+      "Create a Bottle from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
     operationId: "createTastingBottleTargetFromPhotoIdentification",
   })
   .input(
@@ -181,7 +180,7 @@ export default procedure
   )
   .output(
     z.object({
-      target: ExactCatalogTargetV1Schema,
+      bottle: BottleSchema,
       warnings: z
         .array(CatalogImageWarningSchema)
         .optional()
@@ -274,17 +273,16 @@ export default procedure
       result,
     });
 
-    const target = await loadCatalogTarget(result.targetId, {
-      actor,
-      permissions: { canReadCatalogIdentity: true },
+    const bottle = await db.query.bottles.findFirst({
+      where: (bottles, { eq }) => eq(bottles.id, result.bottleId),
     });
-    if (target.kind !== "bottle") {
+    if (!bottle) {
       throw errors.INTERNAL_SERVER_ERROR({
-        message: "Created bottle did not resolve to an exact target.",
+        message: "Created Bottle could not be loaded.",
       });
     }
     return {
-      target,
+      bottle: await serialize(BottleSerializer, bottle, user),
       ...(warning ? { warnings: [warning] } : {}),
     };
   });

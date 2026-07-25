@@ -1,33 +1,9 @@
 import { db } from "@peated/server/db";
-import {
-  bottleReleases,
-  bottles,
-  catalogTargets,
-  collectionBottles,
-} from "@peated/server/db/schema";
+import { bottles, collectionBottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-
-async function exactTargetId(bottleId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Exact target fixture missing");
-  return target.id;
-}
-
-async function genericTargetId(groupId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: and(
-      eq(catalogTargets.groupId, groupId),
-      isNull(catalogTargets.bottleId),
-    ),
-  });
-  if (!target) throw new Error("Generic target fixture missing");
-  return target.id;
-}
 
 describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/image", () => {
   test("requires authentication", async () => {
@@ -45,10 +21,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
     const bottle = await fixtures.Bottle({
       imageUrl: "/uploads/bottles/canonical.webp",
     });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      imageUrl: "/uploads/bottle-releases/canonical-release.webp",
-    });
     const libraryCollection = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
@@ -58,8 +30,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: release.id,
-        targetId: await exactTargetId(bottle.id),
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();
@@ -83,34 +53,26 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
     const canonicalBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
     });
-    const canonicalRelease = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, release.id),
-    });
 
     expect(updatedEntry.imageUrl).toBeNull();
     expect(canonicalBottle?.imageUrl).toBe("/uploads/bottles/canonical.webp");
-    expect(canonicalRelease?.imageUrl).toBe(
-      "/uploads/bottle-releases/canonical-release.webp",
-    );
   });
 
-  test("returns the generic target after removing its entry image", async ({
+  test("returns the Bottle after removing its entry image", async ({
     fixtures,
     defaults,
   }) => {
-    const retainedBottle = await fixtures.Bottle();
+    const bottle = await fixtures.Bottle();
     const libraryCollection = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
     });
-    const targetId = await genericTargetId(retainedBottle.groupId as number);
     const [entry] = await db
       .insert(collectionBottles)
       .values({
         collectionId: libraryCollection.id,
-        bottleId: retainedBottle.id,
-        targetId,
-        imageUrl: "/uploads/collection-bottles/generic.webp",
+        bottleId: bottle.id,
+        imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();
 
@@ -126,9 +88,9 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
     expect(result).toMatchObject({
       id: entry.id,
       imageUrl: null,
-      target: { kind: "group", targetId },
+      bottle: { id: bottle.id },
     });
-    expect(result.target).not.toHaveProperty("bottle");
+    expect(result).not.toHaveProperty("target");
   });
 
   test("rejects removing another user's library entry image", async ({
@@ -146,7 +108,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
       .values({
         collectionId: otherLibraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();
@@ -189,7 +150,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
       .values({
         collectionId: defaultCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();

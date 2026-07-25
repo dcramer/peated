@@ -33,10 +33,7 @@ export async function awardAllBadgeXp(
     prevLevel: number;
     badge: Badge;
   })[] = [];
-  const [hydratedTasting] = await loadBadgeTastings(database, [tasting], {
-    caller: "badges.awardAllBadgeXp",
-    operation: "award",
-  });
+  const [hydratedTasting] = await loadBadgeTastings(database, [tasting]);
   if (!hydratedTasting) throw new Error("Missing hydrated badge Tasting");
 
   const badgeList = await database.query.badges.findMany();
@@ -64,9 +61,7 @@ export async function rescanBadge(
       .select({
         id: tastings.id,
         createdById: tastings.createdById,
-        targetId: tastings.targetId,
         bottleId: tastings.bottleId,
-        releaseId: tastings.releaseId,
       })
       .from(tastings)
       .where(afterId === null ? undefined : gt(tastings.id, afterId))
@@ -74,10 +69,7 @@ export async function rescanBadge(
       .limit(BADGE_RESCAN_BATCH_SIZE);
     if (tastingRows.length === 0) break;
 
-    const hydratedTastings = await loadBadgeTastings(database, tastingRows, {
-      caller: "badges.rescanBadge",
-      operation: "rescan",
-    });
+    const hydratedTastings = await loadBadgeTastings(database, tastingRows);
     for (const tasting of hydratedTastings) {
       logInfo("Backfilling badge XP for tasting {tastingId}", {
         extra: {

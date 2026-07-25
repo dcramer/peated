@@ -252,13 +252,14 @@ describe("DELETE /bottle-series/:series", () => {
       brandId: series.brandId,
     });
 
-    const expectedTargetIds = targetsBefore.map(({ id }) => id);
-    const changedTargetIds = vi
+    const changedBottleIds = vi
       .mocked(workerClient.pushUniqueJob)
       .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
-      .map(([, payload]) => (payload as { targetId: number }).targetId)
+      .map(([, payload]) => (payload as { bottleId: number }).bottleId)
       .sort((left, right) => left - right);
-    expect(changedTargetIds).toEqual(expectedTargetIds);
+    expect(changedBottleIds).toEqual(
+      groupedBottleIds.sort((left, right) => left - right),
+    );
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "IndexBottleSeriesSearchVectors",
       { seriesId: series.id },

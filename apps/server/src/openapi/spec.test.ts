@@ -422,20 +422,20 @@ describe("OpenAPI generation ($ref reuse)", () => {
     }>();
   });
 
-  it("returns one exact target from photo creation", async () => {
+  it("returns the created Bottle from photo creation", async () => {
     const spec = await generateSpec();
     const photoCreateSchema = getJsonResponseSchema(
       spec.paths?.["/tastings/photo-identification-create"]?.post,
     );
-    expect(photoCreateSchema?.required).toContain("target");
+    expect(photoCreateSchema?.required).toContain("bottle");
     expect(photoCreateSchema?.properties).not.toHaveProperty("release");
-    expect(photoCreateSchema?.properties).not.toHaveProperty("bottle");
+    expect(photoCreateSchema?.properties).not.toHaveProperty("target");
     expectTypeOf<
-      Outputs["tastings"]["photoIdentificationCreate"]["target"]["kind"]
-    >().toEqualTypeOf<"bottle">();
+      Outputs["tastings"]["photoIdentificationCreate"]["bottle"]["id"]
+    >().toEqualTypeOf<number>();
   });
 
-  it("publishes explicit target-native and retained collection input variants", async () => {
+  it("publishes direct Bottle collection contracts", async () => {
     const spec = await generateSpec();
     const createSchema = getJsonRequestSchema(
       spec.paths?.["/users/{user}/collections/{collection}/bottles"]?.post,
@@ -443,96 +443,46 @@ describe("OpenAPI generation ($ref reuse)", () => {
     const deleteSchema = getJsonRequestSchema(
       spec.paths?.["/users/{user}/collections/{collection}/bottles"]?.delete,
     );
-    const createAlternatives = createSchema?.oneOf;
-    const deleteAlternatives = deleteSchema?.oneOf;
-
-    expect(createAlternatives).toHaveLength(2);
-    expect(deleteAlternatives).toHaveLength(2);
-
-    const targetCreate = createAlternatives?.find(
-      (schema: any) => schema.properties?.target,
+    const createResponseSchema = getJsonResponseSchema(
+      spec.paths?.["/users/{user}/collections/{collection}/bottles"]?.post,
     );
-    const legacyCreate = createAlternatives?.find(
-      (schema: any) => schema.properties?.bottle,
-    );
-    expect(targetCreate).toMatchObject({
+
+    expect(createSchema).toMatchObject({
       type: "object",
-      required: ["target"],
+      required: expect.arrayContaining(["bottle"]),
       additionalProperties: false,
       properties: {
-        target: { type: "integer", exclusiveMinimum: 0 },
+        bottle: { type: "integer" },
         pendingImageId: { type: "string", minLength: 1 },
       },
     });
-    expect(targetCreate?.properties?.bottle).toBeUndefined();
-    expect(targetCreate?.properties?.release).toBeUndefined();
-    expect(legacyCreate).toMatchObject({
-      type: "object",
-      required: ["bottle"],
-      additionalProperties: false,
-      properties: {
-        bottle: { type: "number" },
-        pendingImageId: { type: "string", minLength: 1 },
-      },
-    });
-    expect(legacyCreate?.properties?.target).toBeUndefined();
-    expect(JSON.stringify(legacyCreate?.properties?.release)).toContain(
-      "number",
-    );
+    expect(createSchema?.properties?.target).toBeUndefined();
+    expect(createSchema?.properties?.release).toBeUndefined();
 
-    const targetDelete = deleteAlternatives?.find(
-      (schema: any) => schema.properties?.target,
-    );
-    const legacyDelete = deleteAlternatives?.find(
-      (schema: any) => schema.properties?.bottle,
-    );
-    expect(targetDelete).toMatchObject({
+    expect(deleteSchema).toMatchObject({
       type: "object",
-      required: ["target"],
+      required: expect.arrayContaining(["bottle"]),
       additionalProperties: false,
+      properties: { bottle: { type: "integer" } },
     });
-    expect(targetDelete?.properties?.baseOnly).toBeUndefined();
-    expect(targetDelete?.properties?.bottle).toBeUndefined();
-    expect(targetDelete?.properties?.release).toBeUndefined();
-    expect(legacyDelete).toMatchObject({
-      type: "object",
-      required: ["bottle"],
-      additionalProperties: false,
-      properties: { bottle: { type: "number" } },
-    });
-    expect(legacyDelete?.properties?.target).toBeUndefined();
-    expect(legacyDelete?.properties?.baseOnly).toBeDefined();
+    expect(deleteSchema?.properties?.target).toBeUndefined();
+    expect(deleteSchema?.properties?.release).toBeUndefined();
+    expect(deleteSchema?.properties?.baseOnly).toBeUndefined();
+    expect(createResponseSchema?.properties).toHaveProperty("bottle");
+    expect(createResponseSchema?.properties).not.toHaveProperty("target");
 
-    type TargetCreateInput = Extract<
-      Inputs["collections"]["bottles"]["create"],
-      { target: number }
-    >;
-    type LegacyCreateInput = Extract<
-      Inputs["collections"]["bottles"]["create"],
-      { bottle: number }
-    >;
-    type TargetDeleteInput = Extract<
-      Inputs["collections"]["bottles"]["delete"],
-      { target: number }
-    >;
-    type LegacyDeleteInput = Extract<
-      Inputs["collections"]["bottles"]["delete"],
-      { bottle: number }
-    >;
-    expectTypeOf<TargetCreateInput["target"]>().toEqualTypeOf<number>();
-    expectTypeOf<LegacyCreateInput["bottle"]>().toEqualTypeOf<number>();
-    expectTypeOf<LegacyCreateInput["release"]>().toEqualTypeOf<
-      number | null | undefined
-    >();
-    expectTypeOf<LegacyDeleteInput["baseOnly"]>().toEqualTypeOf<unknown>();
+    type CreateInput = Inputs["collections"]["bottles"]["create"];
+    type DeleteInput = Inputs["collections"]["bottles"]["delete"];
+    expectTypeOf<CreateInput["bottle"]>().toEqualTypeOf<number>();
+    expectTypeOf<DeleteInput["bottle"]>().toEqualTypeOf<number>();
     expectTypeOf<
-      "release" extends keyof TargetCreateInput ? true : false
+      "release" extends keyof CreateInput ? true : false
     >().toEqualTypeOf<false>();
     expectTypeOf<
-      "target" extends keyof LegacyCreateInput ? true : false
+      "target" extends keyof CreateInput ? true : false
     >().toEqualTypeOf<false>();
     expectTypeOf<
-      "baseOnly" extends keyof TargetDeleteInput ? true : false
+      "baseOnly" extends keyof DeleteInput ? true : false
     >().toEqualTypeOf<false>();
   });
 });

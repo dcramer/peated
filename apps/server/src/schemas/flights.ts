@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { CatalogTargetV1Schema } from "./catalogIdentity";
-import { EntitySchema } from "./entities";
+import { BottleSchema } from "./bottles";
 import { UserSchema } from "./users";
 
 export const FlightSchema = z.object({
@@ -16,25 +15,20 @@ export const FlightSchema = z.object({
   createdBy: UserSchema.optional().describe("User who created this flight"),
 });
 
-export const FlightTargetSchema = z.object({
-  target: CatalogTargetV1Schema.describe(
-    "Exact Bottle or generic BottleGroup identity",
-  ),
-  distillers: z
-    .array(EntitySchema)
-    .describe("Distillers owned by the target's exact Bottle or BottleGroup"),
+export const FlightBottleSchema = z.object({
+  bottle: BottleSchema.describe("Bottle included in the flight"),
   hasTasted: z
     .boolean()
-    .describe("Whether the current user has tasted this target in the flight"),
+    .describe("Whether the current user has tasted this Bottle in the flight"),
   isLibrary: z
     .boolean()
-    .describe("Whether the current user has this target in their Library"),
+    .describe("Whether the current user has this Bottle in their Library"),
 });
 
 export const FlightDetailsSchema = FlightSchema.extend({
-  targets: z
-    .array(FlightTargetSchema)
-    .describe("Ordered catalog targets and flight-specific viewer state"),
+  bottles: z
+    .array(FlightBottleSchema)
+    .describe("Ordered Bottles and flight-specific viewer state"),
 });
 
 const FlightCommonInputSchema = z.object({
@@ -51,20 +45,9 @@ const FlightCommonInputSchema = z.object({
     .describe("Whether the flight is publicly visible"),
 });
 
-export const FlightTargetInputSchema = FlightCommonInputSchema.extend({
-  targets: z
-    .array(z.number().int().positive())
-    .optional()
-    .describe("Authoritative CatalogTarget IDs to include in the flight"),
-}).strict();
-
-export const FlightLegacyInputSchema = FlightCommonInputSchema.extend({
+export const FlightInputSchema = FlightCommonInputSchema.extend({
   bottles: z
     .array(z.number().int().positive())
-    .describe("Retained Bottle compatibility IDs to include in the flight"),
+    .optional()
+    .describe("Bottle IDs to include in the flight"),
 }).strict();
-
-export const FlightInputSchema = z.union([
-  FlightTargetInputSchema,
-  FlightLegacyInputSchema,
-]);

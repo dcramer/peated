@@ -7,7 +7,6 @@ import {
   bottleGroups,
   bottleReleases,
   bottles,
-  catalogTargets,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
@@ -260,19 +259,16 @@ async function countRows() {
 }
 
 async function countCatalogRows() {
-  const [bottleRows, groupRows, targetRows, aliasRows, releaseRows] =
-    await Promise.all([
-      db.select({ id: bottles.id }).from(bottles),
-      db.select({ id: bottleGroups.id }).from(bottleGroups),
-      db.select({ id: catalogTargets.id }).from(catalogTargets),
-      db.select({ name: bottleAliases.name }).from(bottleAliases),
-      db.select({ id: bottleReleases.id }).from(bottleReleases),
-    ]);
+  const [bottleRows, groupRows, aliasRows, releaseRows] = await Promise.all([
+    db.select({ id: bottles.id }).from(bottles),
+    db.select({ id: bottleGroups.id }).from(bottleGroups),
+    db.select({ name: bottleAliases.name }).from(bottleAliases),
+    db.select({ id: bottleReleases.id }).from(bottleReleases),
+  ]);
 
   return {
     bottles: bottleRows.length,
     groups: groupRows.length,
-    targets: targetRows.length,
     aliases: aliasRows.length,
     releases: releaseRows.length,
   };
@@ -385,10 +381,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification).toMatchObject({
       decision: {
         action: "match",
-        matchedTarget: {
-          kind: "bottle",
-          bottle: { id: matchedBottleId },
-        },
+        matchedBottle: { id: matchedBottleId },
       },
       artifacts: {
         candidates: [
@@ -581,10 +574,7 @@ describe("POST /tastings/photo-identification", () => {
       status: "classified",
       decision: {
         action: "match",
-        matchedTarget: {
-          kind: "bottle",
-          bottle: { id: bottle.id },
-        },
+        matchedBottle: { id: bottle.id },
       },
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
@@ -914,16 +904,16 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.target.bottle.imageUrl).toContain(
-      `/uploads/bottles/bottle-${response.target.bottle.id}-pending-upload-`,
+    expect(response.bottle.imageUrl).toContain(
+      `/uploads/bottles/bottle-${response.bottle.id}-pending-upload-`,
     );
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.target.bottle.id),
+      where: eq(bottles.id, response.bottle.id),
     });
     expect(bottle?.imageUrl).toMatch(
       new RegExp(
-        `^/uploads/bottles/bottle-${response.target.bottle.id}-pending-upload-.+\\.webp$`,
+        `^/uploads/bottles/bottle-${response.bottle.id}-pending-upload-.+\\.webp$`,
       ),
     );
   });
@@ -948,18 +938,10 @@ describe("POST /tastings/photo-identification", () => {
       .set({ assignmentSource: "canonical" })
       .where(eq(bottleAliases.bottleId, existingBottle.id))
       .returning();
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, existingBottle.id),
-    });
     expect(canonicalAlias).toMatchObject({
       bottleId: existingBottle.id,
-      targetId: exactTarget?.id,
       name: existingBottle.fullName,
       assignmentSource: "canonical",
-    });
-    expect(exactTarget).toMatchObject({
-      bottleId: existingBottle.id,
-      groupId: existingBottle.groupId,
     });
 
     const identification = await identifyCreateProposal({
@@ -980,26 +962,14 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response).toMatchObject({
-      target: {
-        kind: "bottle",
-        bottle: {
-          id: existingBottle.id,
-          imageUrl: null,
-        },
+      bottle: {
+        id: existingBottle.id,
+        imageUrl: null,
       },
     });
     expect(response.warnings).toBeUndefined();
     expect(copyPendingImageToBottleMock).not.toHaveBeenCalled();
     await expect(countCatalogRows()).resolves.toEqual(before);
-    await expect(
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, response.target.bottle.id),
-      }),
-    ).resolves.toMatchObject({
-      id: exactTarget?.id,
-      bottleId: existingBottle.id,
-      groupId: existingBottle.groupId,
-    });
     await expect(
       db.query.bottles.findFirst({
         where: eq(bottles.id, existingBottle.id),
@@ -1037,7 +1007,7 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.target.bottle.fullName).toBe(
+    expect(response.bottle.fullName).toBe(
       "Photo No Rerun Brand No Rerun Public Image",
     );
   });
@@ -1067,10 +1037,10 @@ describe("POST /tastings/photo-identification", () => {
     );
 
     expect(response.warnings).toBeUndefined();
-    expect(response.target.bottle.imageUrl).toBeNull();
+    expect(response.bottle.imageUrl).toBeNull();
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.target.bottle.id),
+      where: eq(bottles.id, response.bottle.id),
     });
     expect(bottle?.imageUrl).toBeNull();
   });
@@ -1107,11 +1077,11 @@ describe("POST /tastings/photo-identification", () => {
         message: "The bottle was created, but the public image was not saved.",
       },
     ]);
-    expect(response.target.bottle.id).toBeTruthy();
-    expect(response.target.bottle.imageUrl).toBeNull();
+    expect(response.bottle.id).toBeTruthy();
+    expect(response.bottle.imageUrl).toBeNull();
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.target.bottle.id),
+      where: eq(bottles.id, response.bottle.id),
     });
     expect(bottle).toBeDefined();
     expect(bottle?.imageUrl).toBeNull();
@@ -1161,13 +1131,13 @@ describe("POST /tastings/photo-identification", () => {
         message: "The bottle was created, but the public image was not saved.",
       },
     ]);
-    expect(response.target.bottle.id).toBeTruthy();
-    expect(response.target.bottle.imageUrl).toContain(
+    expect(response.bottle.id).toBeTruthy();
+    expect(response.bottle.imageUrl).toContain(
       "/uploads/bottles/existing-race-image.webp",
     );
 
     const bottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, response.target.bottle.id),
+      where: eq(bottles.id, response.bottle.id),
     });
     expect(bottle?.imageUrl).toBe("/uploads/bottles/existing-race-image.webp");
   });

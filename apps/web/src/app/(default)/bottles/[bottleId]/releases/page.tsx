@@ -30,7 +30,7 @@ const getReleaseFamilyTarget = cache(async (anchorBottleId: number) => {
   );
   requireReleaseFamilyAnchor(target.group);
 
-  return { anchorBottle, client, target };
+  return { client, target };
 });
 
 export async function generateMetadata(props: {
@@ -44,11 +44,11 @@ export async function generateMetadata(props: {
   const images = target.group.imageUrl ? [target.group.imageUrl] : [];
 
   return {
-    title: `${target.group.fullName} releases`,
+    title: `${target.group.fullName} similar bottles`,
     description,
     images,
     openGraph: {
-      title: `${target.group.fullName} releases`,
+      title: `${target.group.fullName} similar bottles`,
       description,
       images,
     },
@@ -67,34 +67,18 @@ export default async function ReleaseFamilyPage(props: {
     props.params,
     props.searchParams,
   ]);
-  const { anchorBottle, client, target } = await getReleaseFamilyTarget(
+  const { client, target } = await getReleaseFamilyTarget(
     parseReleaseFamilyRouteId(bottleId),
   );
-  const [bottleList, directTastingList] = await Promise.all([
-    resolveOrNotFound(
-      client.bottleGroups.bottles({
-        group: target.group.id,
-        cursor: getCursor(searchParams, "cursor"),
-        limit: 25,
-        query: "",
-        sort: "-tastings",
-      }),
-    ),
-    resolveOrNotFound(
-      client.tastings.list({
-        target: target.targetId,
-        cursor: getCursor(searchParams, "tastingCursor"),
-        limit: 25,
-      }),
-    ),
-  ]);
-
-  return (
-    <ReleaseFamilyView
-      anchorBottleId={anchorBottle.id}
-      target={target}
-      bottleList={bottleList}
-      directTastingList={directTastingList}
-    />
+  const bottleList = await resolveOrNotFound(
+    client.bottleGroups.bottles({
+      group: target.group.id,
+      cursor: getCursor(searchParams, "cursor"),
+      limit: 25,
+      query: "",
+      sort: "-tastings",
+    }),
   );
+
+  return <ReleaseFamilyView group={target.group} bottleList={bottleList} />;
 }

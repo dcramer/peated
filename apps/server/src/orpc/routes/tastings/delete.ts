@@ -1,13 +1,11 @@
 import { db } from "@peated/server/db";
 import {
-  bottleReleases,
   bottleTags,
   notifications,
   tastingBadgeAwards,
   tastings,
   toasts,
 } from "@peated/server/db/schema";
-import { resolveCatalogTargetForAssignment } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -49,7 +47,7 @@ export default procedure
     }
 
     const deleted = await db.transaction(async (tx) => {
-      // Cleanup and dispatch must use the target current after any concurrent backfill.
+      // Cleanup and dispatch use the Bottle reference current after locking.
       const [lockedTasting] = await tx
         .select()
         .from(tastings)
@@ -70,25 +68,12 @@ export default procedure
         });
       }
 
-      const targetInput =
-        lockedTasting.targetId !== null
-          ? { kind: "target" as const, targetId: lockedTasting.targetId }
-          : lockedTasting.bottleId !== null
-            ? {
-                kind: "legacy" as const,
-                bottleId: lockedTasting.bottleId,
-                releaseId: lockedTasting.releaseId,
-                context: {
-                  caller: "tastings.delete",
-                  operation: "delete",
-                },
-              }
-            : null;
-      if (!targetInput) {
-        throw errors.CONFLICT({ message: "Tasting has no catalog identity." });
+      if (lockedTasting.bottleId === null) {
+        throw errors.CONFLICT({
+          message: `Tasting ${lockedTasting.id} has no Bottle.`,
+        });
       }
-      const target = await resolveCatalogTargetForAssignment(targetInput, tx);
-      const targetBottleId = target.bottleId;
+      const bottleId = lockedTasting.bottleId;
 
       await Promise.all([
         tx
@@ -109,40 +94,29 @@ export default procedure
           .delete(tastingBadgeAwards)
           .where(eq(tastingBadgeAwards.tastingId, lockedTasting.id)),
 
-        ...(targetBottleId === null
-          ? []
-          : lockedTasting.tags.map((tag) =>
-              tx
-                .update(bottleTags)
-                .set({
-                  count: sql`${bottleTags.count} - 1`,
-                })
-                .where(
-                  and(
-                    eq(bottleTags.bottleId, targetBottleId),
-                    eq(bottleTags.tag, tag),
-                    gt(bottleTags.count, 0),
-                  ),
-                ),
-            )),
-
-        lockedTasting.releaseId
-          ? tx
-              .update(bottleReleases)
-              .set({
-                totalTastings: sql`${bottleReleases.totalTastings} - 1`,
-              })
-              .where(eq(bottleReleases.id, lockedTasting.releaseId))
-          : undefined,
+        ...lockedTasting.tags.map((tag) =>
+          tx
+            .update(bottleTags)
+            .set({
+              count: sql`${bottleTags.count} - 1`,
+            })
+            .where(
+              and(
+                eq(bottleTags.bottleId, bottleId),
+                eq(bottleTags.tag, tag),
+                gt(bottleTags.count, 0),
+              ),
+            ),
+        ),
       ]);
 
       // TODO: delete the image from storage
       // TODO: update badge qualifiers
       await tx.delete(tastings).where(eq(tastings.id, lockedTasting.id));
-      return { tasting: lockedTasting, target };
+      return { tasting: lockedTasting, bottleId };
     });
 
-    await dispatchTastingStatsRecompute(deleted.tasting.id, deleted.target);
+    await dispatchTastingStatsRecompute(deleted.tasting.id, deleted.bottleId);
 
     return {};
   });

@@ -191,11 +191,7 @@ function CreateBottleForm() {
               independentBottle: data,
             })
           : await bottleCreateMutation.mutateAsync(data);
-        const createdTarget = {
-          targetId: createdResult.targetId,
-          bottle: createdResult.bottle,
-        };
-        const createdBottle = createdTarget.bottle;
+        const createdBottle = createdResult.bottle;
         const nextPendingImageId = image === undefined ? pendingImageId : null;
         const nextPendingImageUrl =
           image === undefined ? pendingImageUrl : null;
@@ -212,7 +208,6 @@ function CreateBottleForm() {
               context: "bottle_create_image_upload",
               extra: {
                 bottleId: createdBottle.id,
-                targetId: createdTarget.targetId,
               },
             });
             flash(
@@ -225,7 +220,7 @@ function CreateBottleForm() {
         if (returnAction === "library") {
           try {
             await libraryCreateMutation.mutateAsync({
-              target: createdTarget.targetId,
+              bottle: createdBottle.id,
               user: "me",
               collection: "library",
               pendingImageId: nextPendingImageId ?? undefined,
@@ -235,7 +230,6 @@ function CreateBottleForm() {
               context: "bottle_create_library_add",
               extra: {
                 bottleId: createdBottle.id,
-                targetId: createdTarget.targetId,
               },
             });
             flash(

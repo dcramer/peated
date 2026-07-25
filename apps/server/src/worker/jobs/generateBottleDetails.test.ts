@@ -244,9 +244,9 @@ test("fans out generated shared details and keeps exact content selected-only", 
   expect(updateAudits[1]?.data).not.toHaveProperty("suggestedTags");
 
   expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(2);
-  for (const targetId of [source.exactTarget.id, sibling.exactTarget.id]) {
+  for (const bottleId of [source.bottle.id, sibling.bottle.id]) {
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      targetId,
+      bottleId,
     });
   }
 });

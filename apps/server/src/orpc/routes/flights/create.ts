@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import type { Flight, NewFlight } from "@peated/server/db/schema";
 import { flightBottles, flights } from "@peated/server/db/schema";
-import {
-  CatalogTargetResolutionError,
-  lockCatalogTargetAssignmentDescriptorsInTransaction,
-} from "@peated/server/lib/catalogTargets";
 import { generatePublicId } from "@peated/server/lib/publicId";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -14,7 +14,6 @@ import {
 import { FlightInputSchema, FlightSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { FlightSerializer } from "@peated/server/serializers/flight";
-import { resolveFlightTargetAssignments } from "./targetAssignments";
 
 export default procedure
   .route({
@@ -22,7 +21,7 @@ export default procedure
     path: "/flights",
     summary: "Create flight",
     description:
-      "Create a new tasting flight with catalog targets and visibility settings",
+      "Create a new tasting flight with Bottles and visibility settings",
     operationId: "createFlight",
   })
   .use(requireAuth)
@@ -30,10 +29,6 @@ export default procedure
   .input(FlightInputSchema)
   .output(FlightSchema)
   .handler(async function ({ input, context, errors }) {
-    const selection =
-      "bottles" in input
-        ? { kind: "bottles" as const, ids: input.bottles }
-        : { kind: "targets" as const, ids: input.targets ?? [] };
     const data: NewFlight = {
       name: input.name,
       description: input.description,
@@ -45,32 +40,29 @@ export default procedure
     let flight: Flight | undefined;
     try {
       flight = await db.transaction(async (tx) => {
-        const assignments = await resolveFlightTargetAssignments(
-          tx,
-          selection,
-          { caller: "flights.create", operation: "create" },
-        );
-        await lockCatalogTargetAssignmentDescriptorsInTransaction(
-          tx,
-          assignments.map(({ target }) => target),
-        );
+        const bottleIds = await resolveActiveBottleIds(tx, input.bottles ?? []);
 
         const [flight] = await tx.insert(flights).values(data).returning();
 
-        for (const { target, retainedBottleId } of assignments) {
-          await tx.insert(flightBottles).values({
-            flightId: flight.id,
-            targetId: target.targetId,
-            bottleId: retainedBottleId,
-            releaseId: null,
-          });
+        if (bottleIds.length) {
+          await tx.insert(flightBottles).values(
+            bottleIds.map((bottleId) => ({
+              flightId: flight.id,
+              bottleId,
+              releaseId: null,
+            })),
+          );
         }
 
         return flight;
       });
     } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
+      if (error instanceof ActiveBottleSelectionError) {
+        throw errors.BAD_REQUEST({
+          message:
+            "One or more Bottles are missing or not ready for Flight activity.",
+          cause: error,
+        });
       }
       throw error;
     }

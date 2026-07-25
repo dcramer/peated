@@ -145,14 +145,14 @@ function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
   );
 }
 
-export function getMatchedTarget(result: PhotoIdentification | null) {
+export function getMatchedBottle(result: PhotoIdentification | null) {
   if (
     result &&
     result.suggestedNextStep !== "needs_review" &&
     result.classification.status === "classified" &&
     result.classification.decision.action === "match"
   ) {
-    return result.classification.decision.matchedTarget;
+    return result.classification.decision.matchedBottle;
   }
   return null;
 }

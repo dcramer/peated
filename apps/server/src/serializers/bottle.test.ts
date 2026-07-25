@@ -4,27 +4,19 @@ import { serialize } from ".";
 import { db } from "../db";
 import {
   bottleGroups,
+  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottlesToDistillers,
-  catalogTargets,
   collectionBottles,
   collections,
   entities,
   users,
 } from "../db/schema";
+import { getUserActor } from "../lib/actors";
 import { RESERVED_COLLECTIONS } from "../lib/db";
 import { BottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
-
-async function getExactTargetId(bottleId: number): Promise<number> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottleId),
-    columns: { id: true },
-  });
-  if (!target) throw new Error("Missing exact CatalogTarget fixture");
-  return target.id;
-}
 
 describe("BottleSerializer", () => {
   beforeEach(async () => {
@@ -43,7 +35,6 @@ describe("BottleSerializer", () => {
       const favoriter = await fixtures.User();
       const viewer = await fixtures.User();
       const bottle = await fixtures.Bottle();
-      const targetId = await getExactTargetId(bottle.id);
 
       const [collection] = await db
         .insert(collections)
@@ -56,7 +47,6 @@ describe("BottleSerializer", () => {
       // Add bottle to favoriter's collection
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
-        targetId,
         collectionId: collection.id,
       });
 
@@ -70,7 +60,6 @@ describe("BottleSerializer", () => {
     }) => {
       const viewer = await fixtures.User();
       const bottle = await fixtures.Bottle({ name: "Legacy Bottle" });
-      const targetId = await getExactTargetId(bottle.id);
 
       const [legacyCollection] = await db
         .insert(collections)
@@ -82,7 +71,6 @@ describe("BottleSerializer", () => {
 
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
-        targetId,
         collectionId: legacyCollection.id,
       });
 
@@ -100,7 +88,6 @@ describe("BottleSerializer", () => {
       const owner = await fixtures.User();
       const viewer = await fixtures.User();
       const bottle = await fixtures.Bottle({ name: "Library Bottle" });
-      const targetId = await getExactTargetId(bottle.id);
 
       const [ownerLibrary] = await db
         .insert(collections)
@@ -112,7 +99,6 @@ describe("BottleSerializer", () => {
 
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
-        targetId,
         collectionId: ownerLibrary.id,
       });
 
@@ -134,7 +120,6 @@ describe("BottleSerializer", () => {
 
       await db.insert(collectionBottles).values({
         bottleId: bottle.id,
-        targetId,
         collectionId: viewerLibrary.id,
       });
 
@@ -145,22 +130,12 @@ describe("BottleSerializer", () => {
     });
   });
 
-  it("derives actor state only from exact CatalogTarget identity", async ({
+  it("derives actor state directly from Bottle identity", async ({
     fixtures,
   }) => {
     const viewer = await fixtures.User();
-    const exactBottle = await fixtures.Bottle({ name: "Exact Target" });
-    const otherBottle = await fixtures.Bottle({ name: "Other Target" });
-    const exactTargetId = await getExactTargetId(exactBottle.id);
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: (catalogTargets, { and, eq, isNull }) =>
-        and(
-          eq(catalogTargets.groupId, otherBottle.groupId as number),
-          isNull(catalogTargets.bottleId),
-        ),
-    });
-    if (!genericTarget)
-      throw new Error("Missing generic CatalogTarget fixture");
+    const selectedBottle = await fixtures.Bottle({ name: "Selected Bottle" });
+    const otherBottle = await fixtures.Bottle({ name: "Other Bottle" });
 
     const [favorites, library] = await db
       .insert(collections)
@@ -179,31 +154,29 @@ describe("BottleSerializer", () => {
     await db.insert(collectionBottles).values([
       {
         collectionId: favorites.id,
-        bottleId: otherBottle.id,
-        targetId: exactTargetId,
+        bottleId: selectedBottle.id,
       },
       {
         collectionId: library.id,
         bottleId: otherBottle.id,
-        targetId: genericTarget.id,
       },
     ]);
     await fixtures.Tasting({
-      bottleId: otherBottle.id,
-      targetId: exactTargetId,
+      bottleId: selectedBottle.id,
+      targetId: null,
       createdById: viewer.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
     });
     await fixtures.Tasting({
       bottleId: otherBottle.id,
-      targetId: genericTarget.id,
+      targetId: null,
       createdById: viewer.id,
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
     });
 
     const [exactResult, otherResult] = await serialize(
       BottleSerializer,
-      [exactBottle, otherBottle],
+      [selectedBottle, otherBottle],
       viewer,
     );
     expect(exactResult).toMatchObject({
@@ -213,11 +186,13 @@ describe("BottleSerializer", () => {
     });
     expect(otherResult).toMatchObject({
       isFavorite: false,
-      isLibrary: false,
-      hasTasted: false,
+      isLibrary: true,
+      hasTasted: true,
     });
 
-    const anonymousResults = await serialize(BottleSerializer, [exactBottle]);
+    const anonymousResults = await serialize(BottleSerializer, [
+      selectedBottle,
+    ]);
     expect(anonymousResults[0]).toMatchObject({
       isFavorite: false,
       isLibrary: false,
@@ -306,10 +281,6 @@ describe("BottleSerializer", () => {
       .update(bottles)
       .set({ groupId: first.groupId })
       .where(eq(bottles.id, second.id));
-    await db.insert(catalogTargets).values({
-      groupId: first.groupId as number,
-      bottleId: second.id,
-    });
     await db
       .update(bottleGroups)
       .set({ totalBottles: 2 })
@@ -354,16 +325,16 @@ describe("BottleSerializer", () => {
     expect(result).not.toHaveProperty("numReleases");
   });
 
-  it("serializes independently without a target unless group enrichment is requested", async ({
+  it("serializes independently without a group unless enrichment is requested", async ({
     fixtures,
   }) => {
-    const bottle = await fixtures.LegacyBottle({ name: "Missing Target" });
+    const bottle = await fixtures.LegacyBottle({ name: "Missing Group" });
 
     const [result] = await serialize(BottleSerializer, [bottle]);
 
     expect(result).toMatchObject({
       id: bottle.id,
-      name: "Missing Target",
+      name: "Missing Group",
       imageUrl: null,
     });
     expect(BottleSchema.safeParse(result).success).toBe(true);
@@ -373,6 +344,28 @@ describe("BottleSerializer", () => {
       serialize(BottleSerializer, [bottle], undefined, [], {
         includeGroupSummary: true,
       }),
-    ).rejects.toThrow(`Catalog target not found (bottleId=${bottle.id}).`);
+    ).rejects.toThrow(
+      `Bottle ${bottle.id} does not belong to an active BottleGroup.`,
+    );
+  });
+
+  it("rejects retired BottleGroup enrichment", async ({ fixtures }) => {
+    const user = await fixtures.User();
+    const bottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const actor = await getUserActor(user);
+    await db.insert(bottleGroupTombstones).values({
+      groupId: bottle.groupId!,
+      newGroupId: replacement.groupId!,
+      createdByActorId: actor.id,
+    });
+
+    await expect(
+      serialize(BottleSerializer, [bottle], undefined, [], {
+        includeGroupSummary: true,
+      }),
+    ).rejects.toThrow(
+      `Bottle ${bottle.id} does not belong to an active BottleGroup.`,
+    );
   });
 });

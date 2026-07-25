@@ -3,7 +3,7 @@ import { use } from "react";
 
 import { Distillers } from "@peated/web/components/bottleMetadata";
 import { ClientOnly } from "@peated/web/components/clientOnly";
-import FlightTargetIdentity from "@peated/web/components/flightTargetIdentity";
+import FlightBottleIdentity from "@peated/web/components/flightBottleIdentity";
 import LayoutEmpty from "@peated/web/components/layoutEmpty";
 import QRCodeClient from "@peated/web/components/qrcode.client";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -42,26 +42,21 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
           <div className="w-full lg:w-8/12">
             <table className="min-w-full">
               <tbody>
-                {flight.targets.map((flightTarget) => {
-                  const { target } = flightTarget;
-                  const owner =
-                    target.kind === "bottle" ? target.bottle : target.group;
+                {flight.bottles.map((flightBottle) => {
+                  const { bottle } = flightBottle;
                   return (
-                    <tr
-                      key={target.targetId}
-                      className="border-b border-slate-800"
-                    >
+                    <tr key={bottle.id} className="border-b border-slate-800">
                       <td className="max-w-0 py-4 pl-4 pr-3 sm:pl-3">
                         <div className="text-2xl">
-                          <FlightTargetIdentity
-                            target={target}
+                          <FlightBottleIdentity
+                            bottle={bottle}
                             flightId={flight.id}
                           />
                         </div>
                         <div className="text-muted flex flex-row items-start space-x-1 truncate">
-                          <Distillers distillers={flightTarget.distillers} />
+                          <Distillers distillers={bottle.distillers} />
                         </div>
-                        {owner.description}
+                        {bottle.description}
                       </td>
                     </tr>
                   );

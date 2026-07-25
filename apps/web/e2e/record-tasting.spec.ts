@@ -3,14 +3,10 @@ import { Buffer } from "node:buffer";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
-  bottleGroupId,
-  bottleGroupTarget,
-  buildExactCatalogTarget,
   createdTastingId,
   existingBottle,
   existingReleaseId,
   failingTastingNotes,
-  genericTastingNotes,
   photoTastingNotes,
   tastingNotes,
   testAccessToken,
@@ -65,61 +61,18 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
+    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     const createRequestPromise = waitForTastingCreate(page);
     await page.getByRole("button", { name: "Save" }).click();
     const createInput = getRpcInput(await createRequestPromise);
 
-    expect(createInput.target).toBe(
-      buildExactCatalogTarget({ bottle: existingBottle }).targetId,
-    );
-    expect(createInput).not.toHaveProperty("bottle");
+    expect(createInput.bottle).toBe(existingBottle.id);
+    expect(createInput).not.toHaveProperty("target");
     expect(createInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
-    await expectNoHorizontalOverflow(page);
-  });
-
-  test("logs a generic tasting for a release family", async ({
-    context,
-    page,
-  }) => {
-    await signIn(context);
-
-    await page.goto(
-      `/addBottle?group=${bottleGroupId}&flight=flight-qa&intent=tasting`,
-    );
-
-    await expect(
-      page.getByText(bottleGroupTarget.group.fullName),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Exact bottle not specified", { exact: true }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Log Tasting" }).click();
-
-    await expect(
-      page.getByRole("heading", { name: "Log Tasting" }),
-    ).toBeVisible();
-    await expect(
-      page.getByText(bottleGroupTarget.group.fullName),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Exact bottle not specified", { exact: true }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Savor" }).click();
-    await page.getByLabel("Comments").fill(genericTastingNotes);
-    const createRequestPromise = waitForTastingCreate(page);
-    await page.getByRole("button", { name: "Save" }).click();
-    const createInput = getRpcInput(await createRequestPromise);
-
-    expect(createInput.target).toBe(bottleGroupTarget.targetId);
-    expect(createInput).not.toHaveProperty("bottle");
-    expect(createInput).not.toHaveProperty("release");
-
-    await expect(page).toHaveURL(/\/flights\/flight-qa$/);
     await expectNoHorizontalOverflow(page);
   });
 
@@ -144,7 +97,6 @@ test.describe("log tasting", () => {
     await expect(
       page.getByText("Matched to existing bottle in Peated"),
     ).toBeVisible();
-    await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
     await expect(
       page.getByText("Lagavulin", { exact: true }).first(),
     ).toBeVisible();
@@ -163,7 +115,6 @@ test.describe("log tasting", () => {
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
-    await expect(page.getByText("Exact bottle", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(photoTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
