@@ -4,7 +4,9 @@ import type { AnyPgTable } from "drizzle-orm/pg-core";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import pg from "pg";
 import { db } from "../db";
+import { getPostgresConnectionConfig } from "../db/connection";
 import {
   bottleAliases,
   bottleGroups,
@@ -20,6 +22,7 @@ import type {
   CatalogMigrationRunReport,
   CatalogMigrationWriteApprovalInput,
 } from "../schemas/catalogMigrationRun";
+import { backfillLegacyCatalogParent } from "./catalogMigrationBackfill";
 import {
   runCatalogMigrationDryRun,
   runCatalogMigrationWriteBatch,
@@ -28,6 +31,24 @@ import {
 const GIT_REVISION = "a".repeat(40);
 const OTHER_GIT_REVISION = "b".repeat(40);
 const MIGRATIONS_FOLDER = __dirname + "/../../migrations";
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  observer: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2_000;
+  while (Date.now() < deadline) {
+    const result = await observer.query<{ blocked: boolean }>(
+      "SELECT EXISTS (SELECT 1 FROM pg_stat_activity WHERE $1 = ANY(pg_blocking_pids(pid))) AS blocked",
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for catalog migration backfill lock.");
+}
 
 function approvalFor(
   report: CatalogMigrationRunReport,
@@ -112,19 +133,21 @@ async function insertObservation({
   sourceKey,
   sourceName,
   rawText,
+  targetId = null,
 }: {
   bottleId: number;
   releaseId?: number | null;
   sourceKey: string;
   sourceName: string;
   rawText: string;
+  targetId?: number | null;
 }) {
   const [row] = await db
     .insert(bottleObservations)
     .values({
       bottleId,
       releaseId,
-      targetId: null,
+      targetId,
       sourceType: "store_price",
       sourceKey,
       sourceName,
@@ -1034,6 +1057,136 @@ describe("catalog migration orchestrator", () => {
     expect(
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toEqual({ ...review, targetId });
+  });
+
+  test("retains observation row drift as retryable and resumes the active family", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.LegacyBottle({
+      name: "Retryable row-drift parent",
+      fullName: "Migration Brand Retryable row-drift parent",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: "Retryable row-drift release",
+      fullName: "Migration Brand Retryable row-drift release",
+    });
+    const promotion = await backfillLegacyCatalogParent(parent.id);
+    const exactTarget = promotion.promoted[0]!;
+    const observation = await insertObservation({
+      bottleId: parent.id,
+      releaseId: release.id,
+      targetId: exactTarget.targetId,
+      sourceKey: "retryable-row-drift",
+      sourceName: "Retryable row drift observation",
+      rawText: "retained retryable observation evidence",
+    });
+    const dryRun = await runCatalogMigrationDryRun(
+      { gitRevision: GIT_REVISION },
+      db,
+      MIGRATIONS_FOLDER,
+    );
+    const approval = approvalFor(dryRun);
+    const blocker = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    let write: ReturnType<typeof runCatalogMigrationWriteBatch> | null = null;
+    let blockerCommitted = false;
+
+    await blocker.connect();
+    await observer.connect();
+    try {
+      await blocker.query("BEGIN");
+      const blockerPid = (
+        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]?.pid;
+      if (!blockerPid)
+        throw new Error("Unable to load observation blocker pid.");
+      await blocker.query(
+        "SELECT id FROM bottle_observation WHERE id = $1 FOR UPDATE",
+        [observation.id],
+      );
+      await blocker.query(
+        "UPDATE bottle_observation SET target_id = NULL WHERE id = $1",
+        [observation.id],
+      );
+
+      write = runCatalogMigrationWriteBatch(
+        {
+          gitRevision: GIT_REVISION,
+          approvedDryRun: dryRun,
+          approval,
+          limit: 1,
+        },
+        async () => undefined,
+        db,
+        MIGRATIONS_FOLDER,
+      );
+      void write.catch(() => undefined);
+      await waitForSessionBlockedBy(observer, blockerPid);
+
+      await blocker.query("COMMIT");
+      blockerCommitted = true;
+    } finally {
+      if (!blockerCommitted) {
+        await blocker.query("ROLLBACK").catch(() => undefined);
+      }
+      if (write) await write.catch(() => undefined);
+      await blocker.end();
+      await observer.end();
+    }
+
+    if (!write) throw new Error("Catalog migration write did not start.");
+    const failed = await write;
+    expect(failed).toMatchObject({
+      status: "failed",
+      checkpoint: {
+        afterParentId: 0,
+        activeParentId: parent.id,
+        nextParentId: null,
+      },
+      failure: {
+        phase: "alias_observation",
+        parentId: parent.id,
+        code: "row_changed",
+        retryable: true,
+        releaseId: null,
+        table: "bottle_observation",
+        rowId: observation.id,
+      },
+    });
+    expect(
+      await db.query.bottleObservations.findFirst({
+        where: eq(bottleObservations.id, observation.id),
+      }),
+    ).toEqual({ ...observation, targetId: null });
+
+    const resumed = await runCatalogMigrationWriteBatch(
+      {
+        gitRevision: GIT_REVISION,
+        approvedDryRun: dryRun,
+        approval,
+        report: failed,
+        limit: 1,
+      },
+      async () => undefined,
+      db,
+      MIGRATIONS_FOLDER,
+    );
+
+    expect(resumed).toMatchObject({
+      status: "complete",
+      checkpoint: {
+        afterParentId: parent.id,
+        activeParentId: null,
+        nextParentId: null,
+      },
+      failure: null,
+    });
+    expect(
+      await db.query.bottleObservations.findFirst({
+        where: eq(bottleObservations.id, observation.id),
+      }),
+    ).toEqual(observation);
   });
 
   test("preserves the operation failure when its checkpoint also fails", async ({

@@ -1770,7 +1770,15 @@ the implementation they covered.
 8. **Constraint cutover:** make required group/target columns non-null, reject new release writes, and remove paired-reference use from runtime code.
 9. **Cleanup:** after compatibility traffic reaches zero, generate migrations removing obsolete consumer `bottleId` columns wherever `targetId` replaces the full legacy pair, plus `releaseId` columns and `bottle_release`, as specified by task 9.6; remove release routes, serializers, jobs, form pages, and remaining compatibility code; remove runtime dependence on BottleGroup hydration for exact Bottle rendering while retaining complete Bottle materialization; then run the final zero-legacy and materialization-invariant audit and update architecture documentation.
 
-Rollback remains straightforward through the parity period: disable new-write cutover, read legacy columns, and retain additive records. After destructive cleanup, rollback requires restoring the pre-cleanup database snapshot or applying a forward repair, so cleanup ships separately with an explicit backup and verification checkpoint.
+Before target-native generic writes are enabled, rollback remains straightforward:
+disable the new-write cutover, read legacy columns, and retain additive records.
+The first committed generic consumer row has no non-arbitrary legacy Bottle
+projection, so that activation is an explicit forward-only application rollback
+boundary even though the schema is still additive. After that boundary, recovery
+uses a forward repair or a pre-activation database snapshot rather than serving
+the pre-flattening application against the new rows. Destructive cleanup remains
+a later, separately approved boundary with its own backup and verification
+checkpoint.
 
 ## Open Questions
 

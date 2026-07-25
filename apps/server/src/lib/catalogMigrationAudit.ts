@@ -376,7 +376,9 @@ export async function runCatalogMigrationAudit(
   database: AnyConnection = db,
 ): Promise<CatalogMigrationAudit> {
   return await database.transaction(async (tx) => {
-    await tx.execute(sql`SET TRANSACTION READ ONLY`);
+    await tx.execute(
+      sql`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`,
+    );
 
     const databaseResult = await tx.execute<{ databaseName: string }>(sql`
       SELECT current_database() AS "databaseName"
