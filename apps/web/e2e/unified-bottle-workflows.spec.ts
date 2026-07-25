@@ -207,16 +207,25 @@ test.describe("unified Bottle workflows", () => {
       String(unifiedBottleEditContext.exact.releaseYear),
     );
     await expect(
-      page
-        .getByText("Core identity edits update all 3 Bottle identities", {
-          exact: false,
-        })
-        .first(),
+      page.getByRole("group", { name: "Release family details" }),
+    ).toContainText(
+      "Changes here update all 3 Bottles in this release family.",
+    );
+    await expect(
+      page.getByRole("group", { name: "Exact Bottle details" }),
     ).toBeVisible();
+    const preview = page.getByRole("region", { name: "Bottle preview" });
+    await expect(preview).toContainText("Cask 42");
+    await expect(preview).toContainText("55.1% ABV");
+    await expect(preview).toContainText("2023 Release");
+    await expect(preview).toContainText("2004 Vintage");
     await expect(page.getByText("Edit Bottling", { exact: true })).toHaveCount(
       0,
     );
 
+    await page.getByLabel("Edition / Label").fill("Cask 43");
+    await expect(preview).toContainText("Cask 43");
+    await expect(preview).not.toContainText("Cask 42");
     await page.getByLabel("Shared Stated Age").fill("19");
     await page.getByLabel("Bottle-specific Stated Age").fill("22");
     const updatedPreviewAge = page.getByText("Aged 22 years", { exact: true });
@@ -235,7 +244,7 @@ test.describe("unified Bottle workflows", () => {
     expect(updateInput).toEqual({
       bottle: existingBottleId,
       shared: { statedAge: 19 },
-      exact: { statedAge: 22 },
+      exact: { edition: "Cask 43", statedAge: 22 },
     });
     await expectNoHorizontalOverflow(page);
   });

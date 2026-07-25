@@ -195,13 +195,13 @@ test.describe("Release family workflows", () => {
     await page.getByText("Destination family", { exact: true }).click();
     await page
       .getByRole("button", {
-        name: `${destinationBottleGroup.fullName} (2 releases)`,
+        name: `${destinationBottleGroup.fullName} · representative Bottle ${destinationBottleGroup.representativeBottleId} (2 releases)`,
       })
       .click();
     await expect(
       page.getByText(
         new RegExp(
-          `Combine every Bottle from “${escapeRegex(bottleGroup.fullName)}” with “${escapeRegex(destinationBottleGroup.fullName)}`,
+          `Combine every Bottle from “${escapeRegex(bottleGroup.fullName)}” with “${escapeRegex(destinationBottleGroup.fullName)}” \\(representative Bottle ${destinationBottleGroup.representativeBottleId}\\)`,
         ),
       ),
     ).toBeVisible();

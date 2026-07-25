@@ -14,7 +14,7 @@ export const ADMIN_WORKSTREAMS: AdminWorkstream[] = [
     pageTitle: "Incoming Listings",
     sidebarLabel: "Incoming Listings",
     summary:
-      "Review new or changed retailer listings and approve the bottle or bottling assignment.",
+      "Review new or changed retailer listings and approve the exact Bottle or release-family assignment.",
     whenToUse:
       "Use this when a listing is wrong or unmatched, but the catalog bottle itself may still be correct.",
   },

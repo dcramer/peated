@@ -138,9 +138,11 @@ function MergeReleaseFamilyForm({
             {destination ? (
               <>
                 Combine every Bottle from “{sourceTarget.group.fullName}” with “
-                {destination.fullName}”. The source family is retired, generic
-                activity moves to the destination, and the destination
-                family&apos;s shared identity regenerates the moved Bottles.
+                {destination.fullName}” (representative Bottle{" "}
+                {destination.representativeBottleId}). The source family is
+                retired, generic activity moves to the destination, and the
+                destination family&apos;s shared identity regenerates the moved
+                Bottles.
               </>
             ) : (
               "Select a destination to review the exact merge direction."

@@ -13,6 +13,18 @@ export type BottleGroupOption = Option & {
   representativeBottleId: number;
 };
 
+export function formatBottleGroupOptionName({
+  fullName,
+  representativeBottleId,
+  totalBottles,
+}: {
+  fullName: string;
+  representativeBottleId: number;
+  totalBottles: number;
+}) {
+  return `${fullName} · representative Bottle ${representativeBottleId} (${totalBottles} ${totalBottles === 1 ? "release" : "releases"})`;
+}
+
 type Props = Omit<
   ComponentProps<typeof SelectField<BottleGroupOption>>,
   "multiple" | "onChange" | "onQuery" | "value"
@@ -31,12 +43,19 @@ export default function BottleGroupField(props: Props) {
           query,
           sort: "name",
         });
-        return results.map(({ group }) => ({
-          id: group.id,
-          fullName: group.fullName,
-          representativeBottleId: requireReleaseFamilyAnchor(group),
-          name: `${group.fullName} (${group.totalBottles} ${group.totalBottles === 1 ? "release" : "releases"})`,
-        }));
+        return results.map(({ group }) => {
+          const representativeBottleId = requireReleaseFamilyAnchor(group);
+          return {
+            id: group.id,
+            fullName: group.fullName,
+            representativeBottleId,
+            name: formatBottleGroupOptionName({
+              fullName: group.fullName,
+              representativeBottleId,
+              totalBottles: group.totalBottles,
+            }),
+          };
+        });
       }}
       {...props}
     />

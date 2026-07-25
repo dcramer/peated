@@ -220,10 +220,18 @@ export default function BottleForm({
   const previewData = {
     name: watch("name"),
     category: watch("category"),
-    statedAge:
-      exactStatedAge !== undefined && watch("exactStatedAge") != null
-        ? watch("exactStatedAge")
-        : watch("statedAge"),
+    sharedStatedAge: watch("statedAge"),
+    exactStatedAge:
+      exactStatedAge !== undefined ? watch("exactStatedAge") : null,
+    edition: watch("edition"),
+    releaseYear: watch("releaseYear"),
+    vintageYear: watch("vintageYear"),
+    abv: watch("abv"),
+    singleCask: watch("singleCask"),
+    caskStrength: watch("caskStrength"),
+    caskFill: watch("caskFill"),
+    caskType: watch("caskType"),
+    caskSize: watch("caskSize"),
     distillers: distillersValue,
     brand: brandValue,
   };
@@ -234,7 +242,10 @@ export default function BottleForm({
       previewData.brand ||
       previewData.distillers.length,
     ) ||
-    (previewData.statedAge !== null && previewData.statedAge !== undefined);
+    (previewData.sharedStatedAge !== null &&
+      previewData.sharedStatedAge !== undefined) ||
+    (previewData.exactStatedAge !== null &&
+      previewData.exactStatedAge !== undefined);
 
   return (
     <FormScreen
@@ -256,8 +267,8 @@ export default function BottleForm({
           {sharedIdentityBottleCount !== undefined ? (
             <p>
               {sharedIdentityBottleCount === 1
-                ? "This group has 1 Bottle, so core identity edits update only this Bottle's identity."
-                : `Core identity edits update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this group.`}{" "}
+                ? "This release family has 1 Bottle, so shared edits update only this Bottle's identity."
+                : `Shared edits update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this release family.`}{" "}
               Exact Bottle details below affect only this Bottle.
             </p>
           ) : (
@@ -288,6 +299,16 @@ export default function BottleForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
+          <legend className="text-highlight px-1 pt-4 text-lg font-bold">
+            Release family details
+          </legend>
+          <p className="text-muted pb-2 text-sm leading-6">
+            {sharedIdentityBottleCount === undefined
+              ? "These details describe the expression shared by related releases."
+              : sharedIdentityBottleCount === 1
+                ? "Changes here update this Bottle's shared release-family identity."
+                : `Changes here update all ${sharedIdentityBottleCount.toLocaleString()} Bottles in this release family.`}
+          </p>
           <Controller
             name="brand"
             control={control}
@@ -378,8 +399,6 @@ export default function BottleForm({
               />
             )}
           />
-        </Fieldset>
-        <Fieldset>
           <TextField
             {...register("statedAge", {
               setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
@@ -520,15 +539,18 @@ export default function BottleForm({
         </Fieldset>
 
         <Fieldset>
-          <div className="text-muted text-sm leading-6">
+          <legend className="text-highlight px-1 pt-4 text-lg font-bold">
+            Exact Bottle details
+          </legend>
+          <div className="text-muted pb-2 text-sm leading-6">
             <p>
               These details belong only to this exact Bottle.
               {sharedIdentityBottleCount !== undefined && (
                 <>
                   {" "}
                   {sharedIdentityBottleCount === 1
-                    ? "This group has 1 Bottle; core identity edits above update its identity."
-                    : `Core identity edits above update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this group.`}
+                    ? "This release family has 1 Bottle; shared edits above update its identity."
+                    : `Shared edits above update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this release family.`}
                 </>
               )}
             </p>
@@ -703,7 +725,7 @@ export default function BottleForm({
                 disabled={generateDataMutation.isPending}
                 icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
               >
-                Help me fill this in [Beta]
+                Suggest description &amp; family flavor [Beta]
               </Button>
             )}
           </div>
