@@ -9,8 +9,8 @@ vi.mock("next/headers", () => ({
 }));
 
 import {
-  getBottleGroupRouteRedirectPath,
   getCanonicalRouteRedirectPath,
+  getReleaseFamilyRouteRedirectPath,
 } from "./tombstoneRedirect";
 
 describe("tombstone redirects", () => {
@@ -52,7 +52,7 @@ describe("tombstone redirects", () => {
     ).rejects.toThrow("Invalid proxy-owned request path");
   });
 
-  it("drops Bottle suffixes when redirecting to a generic BottleGroup", async () => {
+  it("drops Bottle suffixes while preserving query for a release family", async () => {
     mocks.headers.mockResolvedValue(
       new Headers({
         "x-peated-request-path":
@@ -60,8 +60,8 @@ describe("tombstone redirects", () => {
       }),
     );
 
-    await expect(getBottleGroupRouteRedirectPath(56)).resolves.toBe(
-      "/bottle-groups/56?source=legacy&tag=one&tag=two",
+    await expect(getReleaseFamilyRouteRedirectPath(56)).resolves.toBe(
+      "/bottles/56/releases?source=legacy&tag=one&tag=two",
     );
   });
 
@@ -73,8 +73,8 @@ describe("tombstone redirects", () => {
         currentId: 12,
       }),
     ).resolves.toBe("/bottles/34/");
-    await expect(getBottleGroupRouteRedirectPath(56)).resolves.toBe(
-      "/bottle-groups/56",
+    await expect(getReleaseFamilyRouteRedirectPath(56)).resolves.toBe(
+      "/bottles/56/releases",
     );
   });
 });

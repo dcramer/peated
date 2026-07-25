@@ -10,6 +10,7 @@ const groupTarget = {
   group: {
     id: 7,
     fullName: "Springbank 12 Cask Strength",
+    representativeBottleId: 19,
   },
 } as CatalogTargetV1;
 
@@ -32,11 +33,11 @@ describe("DecisionTarget", () => {
     expect(html).toContain("Exact bottle");
   });
 
-  it("links a generic target to its group without inventing a Bottle link", () => {
+  it("links a generic target through its representative route anchor", () => {
     const html = renderToStaticMarkup(<DecisionTarget target={groupTarget} />);
 
-    expect(html).toContain('href="/bottle-groups/7"');
-    expect(html).not.toContain('href="/bottles/');
+    expect(html).toContain('href="/bottles/19/releases"');
+    expect(html).not.toContain('href="/bottles/19"');
     expect(html).toContain("Springbank 12 Cask Strength");
     expect(html).toContain("Exact bottle not specified");
   });

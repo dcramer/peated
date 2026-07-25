@@ -10,6 +10,11 @@ import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
+  getReleaseFamilyHref,
+  parseReleaseFamilyRouteId,
+  requireReleaseFamilyGroup,
+} from "@peated/web/lib/releaseFamily";
+import {
   useMutation,
   useQueryClient,
   useSuspenseInfiniteQuery,
@@ -30,22 +35,32 @@ const SplitBottleGroupFormSchema = z
 export default function Page({
   params,
 }: {
-  params: Promise<{ groupId: string }>;
+  params: Promise<{ bottleId: string }>;
 }) {
-  const { groupId } = use(params);
+  const { bottleId } = use(params);
 
   return (
     <ModRequired>
-      <SplitBottleGroupForm groupId={Number(groupId)} />
+      <SplitReleaseFamilyForm
+        anchorBottleId={parseReleaseFamilyRouteId(bottleId)}
+      />
     </ModRequired>
   );
 }
 
-function SplitBottleGroupForm({ groupId }: { groupId: number }) {
+function SplitReleaseFamilyForm({
+  anchorBottleId,
+}: {
+  anchorBottleId: number;
+}) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const router = useRouter();
   const { flash } = useFlashMessages();
+  const { data: anchorBottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: anchorBottleId } }),
+  );
+  const groupId = requireReleaseFamilyGroup(anchorBottle).id;
   const { data: sourceTarget } = useSuspenseQuery(
     orpc.bottleGroups.details.queryOptions({ input: { group: groupId } }),
   );
@@ -112,11 +127,13 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
       return;
     }
     if (currentRepresentativeId === null) {
-      setValidationError("This group has no valid representative to split.");
+      setValidationError(
+        "This release family has no valid representative to split.",
+      );
       return;
     }
     if (movedBottleIds.length === members.length) {
-      setValidationError("Leave at least one Bottle in the source expression.");
+      setValidationError("Leave at least one Bottle in the source family.");
       return;
     }
 
@@ -130,7 +147,7 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
     if (!parsed.success) {
       setValidationError(
         currentRepresentativeMoves && sourceRepresentativeBottleId === null
-          ? "Choose representatives for both resulting expressions."
+          ? "Choose representatives for both resulting release families."
           : "Select at least one Bottle and its new representative.",
       );
       return;
@@ -142,14 +159,14 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
         ...parsed.data,
       },
       {
-        onSuccess: ({ newGroupId }) => {
+        onSuccess: ({ newRepresentativeBottleId }) => {
           queryClient.invalidateQueries({
             queryKey: orpc.bottleGroups.details.key({
               input: { group: sourceTarget.group.id },
             }),
           });
-          flash(<div>Selected releases moved into a new expression.</div>);
-          router.push(`/bottle-groups/${newGroupId}`);
+          flash(<div>Selected releases moved into a new family.</div>);
+          router.push(getReleaseFamilyHref(newRepresentativeBottleId));
         },
       },
     );
@@ -164,7 +181,7 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
   return (
     <FormScreen
       title="Split releases"
-      saveLabel="Create new expression"
+      saveLabel="Create new family"
       saveDisabled={splitMutation.isPending || hasNextPage}
       onSave={onSubmit}
     >
@@ -174,8 +191,7 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
           <h2 className="font-semibold">{sourceTarget.group.fullName}</h2>
           <p className="text-muted mt-2 text-sm">
             Select a nonempty subset of exact Bottles to move. Generic activity,
-            stable aliases, and editorial content remain on this source
-            expression.
+            stable aliases, and editorial content remain on this source family.
           </p>
         </div>
 
@@ -214,11 +230,11 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
         {currentRepresentativeMoves ? (
           <fieldset className="border-x border-b border-slate-800 p-4 lg:p-5">
             <legend className="font-semibold">
-              Source expression representative
+              Source family representative
             </legend>
             <p className="text-muted mt-1 text-sm">
               The current representative is moving. Choose a Bottle that will
-              remain as the source representative.
+              remain as the source family representative.
             </p>
             <div className="mt-3 space-y-2">
               {survivingMembers.map(({ bottle }) => (
@@ -244,7 +260,7 @@ function SplitBottleGroupForm({ groupId }: { groupId: number }) {
           </fieldset>
         ) : currentRepresentativeId !== null ? (
           <div className="border-x border-b border-slate-800 p-4 text-sm lg:p-5">
-            The current representative remains with the source expression.
+            The current representative remains with the source family.
           </div>
         ) : null}
       </Form>
@@ -303,7 +319,7 @@ function BottleSplitChoice({
             checked={newRepresentative}
             onChange={onChooseRepresentative}
           />
-          Representative for the new expression
+          Representative for the new family
         </label>
       )}
     </div>

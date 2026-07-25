@@ -115,7 +115,7 @@ describe("BottleResultRow", () => {
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(html).toContain('href="/bottles/42"');
-    expect(html).toContain('href="/bottle-groups/8"');
+    expect(html).toContain('href="/bottles/42/releases"');
     expect(html).toContain("relative z-10");
     expect(text).toContain("3 related releases");
     expect(text).toContain(exactBottle.fullName);

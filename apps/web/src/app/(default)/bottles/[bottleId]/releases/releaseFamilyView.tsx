@@ -9,15 +9,17 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { Suspense } from "react";
-import GroupModActions from "./groupModActions";
+import ReleaseFamilyModActions from "./releaseFamilyModActions";
 
 type BottleGroupTarget = Outputs["bottleGroups"]["details"];
 type BottleGroupBottleList = Outputs["bottleGroups"]["bottles"];
 
-export default function BottleGroupView({
+export default function ReleaseFamilyView({
+  anchorBottleId,
   target,
   bottleList,
 }: {
+  anchorBottleId: number;
   target: BottleGroupTarget;
   bottleList: BottleGroupBottleList;
 }) {
@@ -40,8 +42,8 @@ export default function BottleGroupView({
               </p>
             </div>
             <div className="flex-none">
-              <GroupModActions
-                groupId={group.id}
+              <ReleaseFamilyModActions
+                anchorBottleId={anchorBottleId}
                 totalBottles={group.totalBottles}
               />
             </div>
@@ -90,7 +92,7 @@ export default function BottleGroupView({
 
       <section aria-labelledby="group-statistics-heading" className="my-8">
         <h2 id="group-statistics-heading" className="sr-only">
-          Group statistics
+          Release family statistics
         </h2>
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div>

@@ -157,29 +157,39 @@ selected proposed or source Bottle description keeps that Bottle value's
 `descriptionSrc`. The standard independent-create schema remains authoritative
 for required name, brand, and all field validation.
 
-### Exact Bottle and generic group pages keep identity scopes distinct
+### Exact Bottle and release-family pages keep identity scopes distinct
 
 The canonical `/bottles/:id` page renders the independently complete Bottle as
-the primary identity. It may show a quiet `/bottle-groups/:groupId` relationship
-when the group has multiple members and may offer “Add another release,” but
-neither link hydrates or replaces the Bottle's exact fields. Search results and
-related release lists reuse one exact-metadata presentation owner for
-Bottle-owned age, ABV, years, flags, and cask traits.
+the primary identity. It may show a quiet
+`/bottles/:currentBottleId/releases` relationship when the group has multiple
+members and may offer “Add another release,” but neither link hydrates or
+replaces the Bottle's exact fields. Search results and related release lists
+reuse one exact-metadata presentation owner for Bottle-owned age, ABV, years,
+flags, and cask traits.
 
-The canonical `/bottle-groups/:groupId` page is explicitly generic. It renders
-the BottleGroup's own label, editorial content, and aggregate statistics,
-states that the exact release is unspecified, and lists independently complete
-member Bottles linking to `/bottles/:id`. Generic CatalogTarget links resolve to
-this group page; they never use `representativeBottleId` to construct an exact
-Bottle link or to fill exact Bottle details.
+The canonical public release-family page is
+`/bottles/:anchorBottleId/releases`. Its anchor is a real active member used
+only to locate the member's BottleGroup. Exact Bottle and search relationship
+links keep that current Bottle as the anchor; generic CatalogTarget links use
+the active group's `representativeBottleId` only as a route locator and fail
+closed when no representative exists. The page renders the BottleGroup's own
+label, editorial content, and aggregate statistics, states that the exact
+release is unspecified, and lists independently complete member Bottles
+linking to `/bottles/:id`. It does not render the anchor's exact header or
+Product structured data and never presents the anchor as selected identity.
+Canonical paths and user-facing terminology do not expose BottleGroup ids;
+there is no public `/bottle-groups` web route. The existing generic-tasting
+handoff may still carry its group locator as a query parameter.
 
 Moderator group merge and split are standalone form workflows reached from the
-group page. Merge requires an explicit source and destination and states that
-the destination shared identity wins and generic activity moves. Split requires
-an explicit nonempty proper subset and representative choices; generic
-activity, stable aliases, and group editorial content remain on the source.
-These forms delegate to the canonical group mutation APIs and expose no manual
-Bottle-creation or group-reuse authority.
+release-family page at
+`/bottles/:anchorBottleId/releases/merge|split`. Merge requires an explicit
+source and destination and states that the destination shared identity wins and
+generic activity moves. Split requires an explicit nonempty proper subset and
+representative choices; generic activity, stable aliases, and group editorial
+content remain on the source. These forms delegate to the canonical group
+mutation APIs, navigate to the resulting family's representative-anchored
+route, and expose no manual Bottle-creation or group-reuse authority.
 
 ### Shared edits atomically regenerate complete Bottles
 
@@ -707,12 +717,16 @@ continue to return exact Bottle destinations. The cached web Bottle-page owner
 first loads the normal Bottle details path. An exact-merge tombstone still
 redirects from that response; only a typed not-found result invokes the
 page-target route to distinguish a generic parent from a missing Bottle.
-Generic results permanently redirect to `/bottle-groups/:groupId`. Task 9.8
-owns creation of parent-retirement tombstones. Task 8.9 makes both legacy
-parent-list aliases, `/bottles/:oldParentId/bottlings` and
-`/bottles/:oldParentId/releases`, route-only permanent redirects to that
-generic BottleGroup. The aliases preserve the query string, discard the
-Bottle-only suffix, and never choose a representative Bottle. The same slice
+Generic results permanently redirect to
+`/bottles/:representativeBottleId/releases`; the representative is only a route
+locator and the resolved page remains generic group identity. Resolution fails
+closed if an active group has no valid representative. Task 9.8 owns creation
+of parent-retirement tombstones. Task 8.9 keeps
+`/bottles/:oldParentId/bottlings` as a route-only permanent redirect to the
+release-family path; `/bottles/:oldParentId/releases` resolves through the same
+page-target owner when the parent has retired. Both paths preserve the query
+string, discard Bottle-only suffixes, and never select the representative as
+activity identity. The same slice
 removes the nested BottleRelease list loaders and renderers, release-shaped
 moderator and Library actions, and their obsolete presentation/path helpers
 rather than retaining a second read system. The measured detail, edit, and new

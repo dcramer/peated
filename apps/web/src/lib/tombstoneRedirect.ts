@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { getReleaseFamilyHref } from "./releaseFamily";
 
 type CanonicalRouteRedirectOptions = {
   canonicalId: number | string;
@@ -60,9 +61,12 @@ export async function getCanonicalRouteRedirectPath({
   return `${canonicalPrefix}${suffix || "/"}${search}`;
 }
 
-export async function getBottleGroupRouteRedirectPath(
-  groupId: number | string,
+export async function getReleaseFamilyRouteRedirectPath(
+  representativeBottleId: number,
 ) {
   const requestedRoute = await getRequestedRoute();
-  return `/bottle-groups/${groupId}${requestedRoute?.search ?? ""}`;
+  return getReleaseFamilyHref(
+    representativeBottleId,
+    requestedRoute?.search ?? "",
+  );
 }

@@ -1280,41 +1280,50 @@ Routes:
 - `apps/web/src/app/(admin)/admin/(default)/incoming-decisions/page.tsx` renders
   nonnull decision identity through `CatalogTargetIdentity`, labels null as an
   unknown target, and no longer builds a nested Bottling link.
-- `apps/web/src/app/(default)/bottle-groups/[groupId]/page.tsx` is the canonical
-  generic BottleGroup page. It renders only group-owned identity, editorial
-  content, and aggregate statistics, labels the exact release as unspecified,
-  and paginates independently complete member Bottles linking to
-  `/bottles/:id`. It never substitutes `representativeBottleId` for exact
-  identity or hydrates exact fields from the group.
-- `apps/web/src/app/(default)/bottle-groups/[groupId]/bottleGroupView.tsx` owns
-  the generic group presentation, aggregate statistics, and exact member list.
-- `apps/web/src/app/(default)/bottle-groups/[groupId]/groupModActions.tsx`
+- `apps/web/src/app/(default)/bottles/[bottleId]/releases/page.tsx` is the
+  canonical public release-family page. The Bottle id identifies a real active
+  member used only to locate its BottleGroup; the page renders group-owned
+  identity, editorial content, and aggregate statistics, labels the exact
+  release as unspecified, and paginates independently complete member Bottles
+  linking to `/bottles/:id`. It does not render the anchor's exact header or
+  Product structured data.
+- `apps/web/src/app/(default)/bottles/[bottleId]/releases/releaseFamilyView.tsx`
+  owns the generic family presentation, aggregate statistics, and exact member
+  list.
+- `apps/web/src/app/(default)/bottles/[bottleId]/releases/releaseFamilyModActions.tsx`
   exposes moderator-only links to the standalone merge and split forms.
-- `apps/web/src/app/(layout-free)/bottle-groups/[groupId]/merge/page.tsx`
-  requires an explicit destination group and delegates to the canonical merge
-  mutation. Its confirmation states the merge direction, destination-owned
-  shared identity, and movement of generic activity.
-- `apps/web/src/app/(layout-free)/bottle-groups/[groupId]/split/page.tsx`
-  requires all members to be loaded, an explicit nonempty proper subset, and
-  valid representative choices before delegating to the canonical split
-  mutation. It states that generic activity, stable aliases, and editorial
-  content stay on the source group.
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/merge/page.tsx`
+  resolves the source family through its member Bottle, requires an explicit
+  destination, and delegates to the canonical merge mutation. Its confirmation
+  states the merge direction, destination-owned shared identity, and movement
+  of generic activity.
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/split/page.tsx`
+  resolves the source family through its member Bottle, requires all members to
+  be loaded, an explicit nonempty proper subset, and valid representative
+  choices before delegating to the canonical split mutation. It states that
+  generic activity, stable aliases, and editorial content stay on the source.
 - `apps/web/src/app/(default)/bottles/[bottleId]/bottleFullHeader.tsx` keeps the
   exact Bottle header primary and adds quiet links to the related-release group
   when it has multiple members and to the independent “Add another release”
   workflow.
-- `apps/web/src/app/(default)/bottles/[bottleId]/layout.tsx` and its nested
-  layouts use the React-cached `apps/web/src/lib/bottlePage.server.ts` owner.
+- `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/layout.tsx` owns the
+  exact Bottle metadata, Product structured data, header, and tabs so the
+  sibling release-family route cannot inherit exact presentation. Exact routes
+  use the React-cached `apps/web/src/lib/bottlePage.server.ts` owner.
   That owner first loads Bottle details, preserving the existing exact-tombstone
   redirect. Only a typed not-found response calls the anonymous page-target
   route to distinguish a migrated parent from a missing Bottle, and a generic
-  result permanently redirects to `/bottle-groups/:groupId`.
-- `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/route.ts` and
-  `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/releases/route.ts` are
-  route-only aliases without BottleRelease-specific layouts or loaders. They
-  permanently redirect an exact Bottle through its required group summary and a
-  migrated legacy parent through the cached page-target owner to the canonical
-  BottleGroup, preserving the query string without selecting a member Bottle.
+  result resolves the active group and permanently redirects to its
+  representative-anchored release-family route. The representative remains a
+  route locator rather than selected identity, and a missing representative
+  fails closed.
+- `apps/web/src/app/(default)/bottles/[bottleId]/(tabs)/bottlings/route.ts` is a
+  route-only legacy alias without BottleRelease-specific layouts or loaders. It
+  permanently redirects an exact Bottle to its Bottle-anchored release-family
+  path and preserves the query string. A retired parent entering either this
+  alias or the canonical `/releases` path resolves through the cached
+  page-target owner to the active group's representative-anchored family page
+  without selecting that representative as activity identity.
 - `apps/web/src/app/(layout-free)/addBottle/addBottleFlow.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/addTasting/page.tsx`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/addRelease/page.tsx`
@@ -1342,7 +1351,7 @@ parent tombstones resolve to the same generic BottleGroup, while exact merge
 tombstones continue to resolve to their explicit surviving Bottle. Group merges
 atomically flatten parent tombstone destinations before source-group deletion.
 With this boundary active, task 8.9 replaces the remaining nested `bottlings`
-and `releases` list pages with route-only BottleGroup redirect aliases. It
+and `releases` list pages with route-only release-family redirects. It
 removes their nested layouts, the release loading state and query/table renderer,
 release-shaped moderator and Library actions, the unused release-aware
 Bottle-card renderer, and the obsolete Bottling formatting/path helper module.
@@ -1372,7 +1381,8 @@ Shared UI and client helpers:
   rendering owner used by search and BottleGroup related-release results. It
   reads only durable Bottle fields and does not hydrate BottleGroup identity.
 - `apps/web/src/components/bottleGroupField.tsx` owns typed BottleGroup lookup
-  and labels candidates with stable group ids and member counts.
+  and labels moderator-only candidates with their family names and member
+  counts.
 - `apps/web/src/components/bottleForm.tsx`
 - `apps/web/src/components/bottleResolver/helpers.ts`
 - `apps/web/src/components/bottleResolver/index.tsx`
@@ -1383,7 +1393,8 @@ Shared UI and client helpers:
 - `apps/web/src/components/collectionAction.tsx` accepts one target id and no
   longer resolves a legacy Bottle/release pair for the removed list UI.
 - `apps/web/src/components/search/bottleResult.tsx` owns exact Bottle search-row
-  navigation and the quiet relationship link to a multi-member BottleGroup.
+  navigation and the quiet current-Bottle-anchored relationship link to a
+  multi-member release family.
 - `apps/web/src/components/tastingForm.tsx`
 - `apps/web/src/components/notifications/entry.tsx` narrows the strict
   notification union and renders toast/comment activity with the referenced
@@ -1393,8 +1404,9 @@ Shared UI and client helpers:
 - `apps/web/src/lib/addBottle.ts` owns both standard add-Bottle return intent
   helpers and the independently prefilled "Add another release" path.
 - `apps/web/src/lib/catalogTarget.ts` links exact targets to `/bottles/:id` and
-  generic targets to `/bottle-groups/:groupId`; it never turns a generic target
-  into a representative Bottle link.
+  generic targets to `/bottles/:representativeBottleId/releases`; the
+  representative is only a route locator, never selected exact identity, and
+  an active group without one fails closed.
 - `apps/web/src/lib/independentBottleProposal.ts` owns canonical UI composition
   for retained price-proposal evidence and durable “Add another release”
   prefills. This Section 8 creation composer is distinct from sparse correction
@@ -1413,8 +1425,9 @@ Shared UI and client helpers:
 - Collection tables, activity previews, image/status actions, and the
   post-scan Library confirmation now render one CatalogTarget. Exact entries
   link their independently complete Bottle; generic entries show the group
-  label and scope without a Bottle link or representative. Exact and generic
-  Library entries are created and mutated by target id; the BottleGroup page
+  label and scope through a representative-anchored family route without
+  presenting the representative as an exact selection. Exact and generic
+  Library entries are created and mutated by target id; the release-family page
   exposes the same generic-target Library action. Library cache updates use the
   typed collection-list query prefix and globally unique collection-entry ids
   rather than serialized query-key substring matching.

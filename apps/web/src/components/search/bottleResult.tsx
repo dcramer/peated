@@ -8,6 +8,7 @@ import {
   type AddBottleRouteIntent,
   type PendingImageRouteState,
 } from "@peated/web/lib/addBottle";
+import { getReleaseFamilyHref } from "@peated/web/lib/releaseFamily";
 import Join from "../join";
 export type BottleResult = {
   type: "bottle";
@@ -91,7 +92,7 @@ export default function BottleResultRow({
         {bottle.group && bottle.group.totalBottles > 1 ? (
           <div className="mt-1 text-xs">
             <Link
-              href={`/bottle-groups/${bottle.group.id}`}
+              href={getReleaseFamilyHref(bottle.id)}
               className="text-muted relative z-10 hover:underline"
             >
               {bottle.group.totalBottles.toLocaleString()} related releases

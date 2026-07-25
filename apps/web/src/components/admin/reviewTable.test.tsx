@@ -15,6 +15,7 @@ const groupTarget = {
   group: {
     id: 7,
     fullName: "Springbank 12 Cask Strength",
+    representativeBottleId: 19,
   },
 } as CatalogTargetV1;
 
@@ -51,14 +52,14 @@ describe("ReviewTable", () => {
     expect(html).toContain("Exact bottle");
   });
 
-  it("renders generic review identity without a representative Bottle", () => {
+  it("uses the representative only as a generic route anchor", () => {
     const html = renderToStaticMarkup(
       <ReviewTable reviewList={[makeReview(2, groupTarget)]} />,
     );
 
-    expect(html).toContain('href="/bottle-groups/7"');
+    expect(html).toContain('href="/bottles/19/releases"');
     expect(html).toContain("Exact bottle not specified");
-    expect(html).not.toContain('href="/bottles/');
+    expect(html).not.toContain('href="/bottles/19"');
   });
 
   it("renders unresolved review identity without a catalog link", () => {
@@ -68,6 +69,6 @@ describe("ReviewTable", () => {
 
     expect(html).toContain("No Bottle");
     expect(html).not.toContain('href="/bottles/');
-    expect(html).not.toContain('href="/bottle-groups/');
+    expect(html).not.toContain("/releases");
   });
 });

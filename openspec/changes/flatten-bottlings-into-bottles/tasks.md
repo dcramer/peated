@@ -136,7 +136,7 @@ it must not preserve a parallel business-logic path.
 - [x] 7.6 Add BottleGroup details/list APIs for generic targets, related releases, aggregate stats, aliases, and moderator actions.
 - [ ] 7.7 After production target backfill, run and retain exact-Bottle and BottleGroup raw-target aggregate comparisons against legacy totals, resolve every mismatch, and record explicit approval before deploying or enabling the task 4.11b statistics cutover; job implementation remains owned by task 4.11b.
 - [x] 7.8 Add permanent legacy nested-bottling redirects to promoted Bottle URLs.
-- [x] 7.9 Add retired-parent redirects to BottleGroup pages without choosing the representative Bottle as the activity target.
+- [x] 7.9 Add retired-parent redirects to Bottle-anchored release-family pages, using the active representative only as a route locator and never as the activity target.
 - [ ] 7.10 Update cache keys, revalidation, queue payloads, and activity payloads to use exact Bottle or CatalogTarget identity consistently; before enabling the strict target-backed `UpdateBottleStats` worker, verify every old `{ bottleId }` producer is stopped or upgraded and every queued legacy payload is drained or expired because that payload cannot infer promoted exact identity and has no compatibility fallback; also stop or upgrade producers of legacy-parent `OnBottleChange` jobs and drain or expire those queued jobs before activation because a retired parent has no active exact target.
 - [x] 7.10a Move activity notifications and notification delivery to authoritative CatalogTarget identity, rendering exact Bottle or generic BottleGroup labels without representative fallback.
 - [x] 7.10b Move local cache/revalidation, alias search indexing, statistics queue payloads, and entity aggregation to exact Bottle or CatalogTarget identity; remove the superseded Bottle-based entity helper and cover exact/generic ownership plus producer fan-out.
@@ -158,13 +158,13 @@ it must not preserve a parallel business-logic path.
 - [x] 8.2 Make `/bottles/new` accept all exact fields and always submit one Bottle creation mutation.
 - [x] 8.3 Replace Add Bottling with “Add another release,” prefilled from the selected Bottle's independently complete durable fields and submitted through the standard independent Bottle creation mutation; it creates a singleton group and does not select or reuse the source BottleGroup.
 - [x] 8.4 Remove the Bottle-versus-Bottling choice, hidden release-detail mode, and any query-prefill behavior that changes entity type.
-- [x] 8.5 Update search results and Bottle pages to show exact Bottle details with an unobtrusive related-releases/group link.
-- [x] 8.6 Add a BottleGroup page for generic activity, aggregates, related Bottles, and moderator merge/split controls.
+- [x] 8.5 Update search results and Bottle pages to show exact Bottle details with an unobtrusive `/bottles/:currentBottleId/releases` relationship link.
+- [x] 8.6 Add a Bottle-anchored release-family page for generic activity, aggregates, related Bottles, and moderator merge/split controls; exclude BottleGroup ids from canonical paths and user-facing terminology, and do not render the anchor as exact selected identity.
 - [x] 8.7 Update tasting, Library, collection, flight, price, review, and photo-identification flows to carry one `targetId` and display whether exactness is known.
 - [x] 8.8 Update return intents and post-create image uploads to use the created concrete Bottle without reconstructing a release pair.
 - [x] 8.9 Remove nested Bottling edit/detail/list UI after redirects and compatibility coverage are active.
-- [x] 8.10 Add focused web tests for unified form fields, singleton creation, prefilled independent “another release,” absence of manual group selection, exact/generic target selection, redirects, and return intents.
-- [x] 8.11 Verify Add Bottle, edit Bottle, add another release, group details, Library, and tasting flows at desktop and mobile widths using the local verification playbook.
+- [x] 8.10 Add focused web tests for unified form fields, singleton creation, prefilled independent “another release,” absence of manual group selection, exact/generic target selection, Bottle-anchored release-family routes and redirects, and return intents.
+- [x] 8.11 Verify Add Bottle, edit Bottle, add another release, release-family details, Library, and tasting flows at desktop and mobile widths using the local verification playbook.
 
 ## 9. Constraint Cutover And Legacy Removal
 

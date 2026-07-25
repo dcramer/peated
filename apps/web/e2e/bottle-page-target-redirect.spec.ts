@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import {
-  bottleGroupId,
+  bottleGroupRepresentative,
   conflictingPageTargetBottleId,
   exactReplacementSourceBottleId,
   existingBottleId,
@@ -33,14 +33,14 @@ test.describe("Bottle page target redirects", () => {
     await expect(page).toHaveURL(replacementPath);
   });
 
-  test("redirects a retired parent directly to its generic group", async ({
+  test("redirects a retired parent to its generic release family", async ({
     page,
   }) => {
     const sourcePath = `/bottles/${retiredParentBottleId}/tastings?source=legacy&tag=one&tag=two`;
-    const groupPath = `/bottle-groups/${bottleGroupId}?source=legacy&tag=one&tag=two`;
+    const familyPath = `/bottles/${bottleGroupRepresentative.id}/releases?source=legacy&tag=one&tag=two`;
 
     await page.goto(sourcePath);
-    await expect(page).toHaveURL(groupPath);
+    await expect(page).toHaveURL(familyPath);
     await expect(
       page.getByRole("heading", {
         name: "Lagavulin 16-year-old release family",
@@ -49,20 +49,20 @@ test.describe("Bottle page target redirects", () => {
     await expect(page.getByText("Exact release not specified")).toBeVisible();
   });
 
-  test("permanently redirects an exact Bottle's nested Bottlings list to its group", async ({
+  test("redirects an exact Bottle's legacy Bottlings list to its release family", async ({
     page,
     request,
   }) => {
     const sourcePath = `/bottles/${groupedBottleDetails.id}/bottlings?source=legacy&tag=one&tag=two`;
-    const groupPath = `/bottle-groups/${bottleGroupId}?source=legacy&tag=one&tag=two`;
+    const familyPath = `/bottles/${groupedBottleDetails.id}/releases?source=legacy&tag=one&tag=two`;
 
     const response = await request.get(sourcePath, { maxRedirects: 0 });
 
     expect(response.status()).toBe(308);
-    expect(response.headers().location).toBe(groupPath);
+    expect(response.headers().location).toBe(familyPath);
 
     await page.goto(sourcePath);
-    await expect(page).toHaveURL(groupPath);
+    await expect(page).toHaveURL(familyPath);
     await expect(
       page.getByRole("heading", {
         name: "Lagavulin 16-year-old release family",
@@ -71,20 +71,14 @@ test.describe("Bottle page target redirects", () => {
     await expect(page.getByText("Exact release not specified")).toBeVisible();
   });
 
-  test("uses the same group redirect for a retired parent's releases alias", async ({
+  test("uses the representative anchor for a retired parent's releases path", async ({
     page,
-    request,
   }) => {
     const sourcePath = `/bottles/${retiredParentBottleId}/releases?source=legacy&tag=one&tag=two`;
-    const groupPath = `/bottle-groups/${bottleGroupId}?source=legacy&tag=one&tag=two`;
-
-    const response = await request.get(sourcePath, { maxRedirects: 0 });
-
-    expect(response.status()).toBe(308);
-    expect(response.headers().location).toBe(groupPath);
+    const familyPath = `/bottles/${bottleGroupRepresentative.id}/releases?source=legacy&tag=one&tag=two`;
 
     await page.goto(sourcePath);
-    await expect(page).toHaveURL(groupPath);
+    await expect(page).toHaveURL(familyPath);
     await expect(
       page.getByRole("heading", {
         name: "Lagavulin 16-year-old release family",
@@ -100,6 +94,21 @@ test.describe("Bottle page target redirects", () => {
       });
 
       expect(response.status()).toBe(404);
+    }
+  });
+
+  test("rejects noncanonical release-family Bottle ids", async ({ page }) => {
+    for (const bottleId of [
+      "0",
+      "1.5",
+      "1e2",
+      "9007199254740992",
+      "not-an-id",
+    ]) {
+      await page.goto(`/bottles/${bottleId}/releases`);
+      await expect(
+        page.getByRole("heading", { name: "Not Found" }),
+      ).toBeVisible();
     }
   });
 

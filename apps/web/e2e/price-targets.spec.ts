@@ -74,7 +74,7 @@ test.describe("price catalog targets", () => {
       }),
     ).toHaveAttribute(
       "href",
-      `/bottle-groups/${priceChangeGenericTarget.group.id}`,
+      `/bottles/${priceChangeGenericTarget.group.representativeBottleId}/releases`,
     );
     await expect(
       genericRow.locator(
@@ -133,7 +133,7 @@ test.describe("price catalog targets", () => {
       }),
     ).toHaveAttribute(
       "href",
-      `/bottle-groups/${priceChangeGenericTarget.group.id}`,
+      `/bottles/${priceChangeGenericTarget.group.representativeBottleId}/releases`,
     );
     await expect(
       genericRow.locator(

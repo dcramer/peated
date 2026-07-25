@@ -10,6 +10,7 @@ import {
 const group = {
   id: 8,
   fullName: "Macallan 18",
+  representativeBottleId: 9,
   totalTastings: 3,
   avgRating: 1.5,
   statedAge: 18,
@@ -47,11 +48,23 @@ describe("catalog target display helpers", () => {
     } as CatalogTargetV1;
 
     expect(getCatalogTargetLabel(target)).toBe("Macallan 18");
-    expect(getCatalogTargetHref(target)).toBe("/bottle-groups/8");
+    expect(getCatalogTargetHref(target)).toBe("/bottles/9/releases");
     expect(getCatalogTargetStats(target)).toEqual({
       totalTastings: 3,
       avgRating: 1.5,
       statedAge: 18,
     });
+  });
+
+  it("fails closed when a generic target has no active route anchor", () => {
+    const target = {
+      kind: "group",
+      targetId: 21,
+      group: { ...group, representativeBottleId: null },
+    } as CatalogTargetV1;
+
+    expect(() => getCatalogTargetHref(target)).toThrow(
+      "Active release family 8 has no valid representative Bottle",
+    );
   });
 });

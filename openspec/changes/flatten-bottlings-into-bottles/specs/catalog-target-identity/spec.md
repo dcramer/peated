@@ -48,6 +48,23 @@ behavior specified by their own mutation and read contracts.
   exact release is unspecified
 - **AND** it does not display the representative Bottle as selected identity
 
+#### Scenario: Link a generic target to its release family
+
+- **WHEN** the web renders a navigable generic CatalogTarget
+- **THEN** it links to `/bottles/:representativeBottleId/releases`
+- **AND** the representative is used only as a route locator for the generic
+  BottleGroup identity
+- **AND** the release-family page does not render that Bottle's exact header or
+  Product structured data
+- **AND** an active group without a valid representative fails closed
+
+#### Scenario: Link an exact Bottle to its release family
+
+- **WHEN** an exact Bottle page or search result links to related releases
+- **THEN** it uses `/bottles/:currentBottleId/releases`
+- **AND** the release-family page remains generic identity without presenting
+  that current Bottle as the selected target
+
 #### Scenario: Reject mixed target-native and legacy identity
 
 - **WHEN** a tasting, collection, or Flight mutation supplies both a
@@ -1082,8 +1099,12 @@ Compatibility routes SHALL return replacement target information or redirect map
 
 - **WHEN** an old parent URL or API reference maps to a BottleGroup through its
   active migration `groupId` or its future Bottle tombstone group destination
-- **THEN** the system returns or redirects to the group identity
-- **AND** it does not substitute the representative Bottle as the target
+- **THEN** the system returns the group identity or redirects to
+  `/bottles/:representativeBottleId/releases`
+- **AND** the representative is only the web route locator and is not
+  substituted as the selected target
+- **AND** resolution fails closed when the active group has no valid
+  representative
 
 #### Scenario: Preserve exact Bottle retirement
 

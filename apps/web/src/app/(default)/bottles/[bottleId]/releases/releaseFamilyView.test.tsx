@@ -5,7 +5,7 @@ import type {
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-import BottleGroupView from "./bottleGroupView";
+import ReleaseFamilyView from "./releaseFamilyView";
 
 vi.mock("@peated/web/components/paginationButtons", () => ({
   default: ({
@@ -21,16 +21,16 @@ vi.mock("@peated/web/components/collectionAction", () => ({
   ),
 }));
 
-vi.mock("./groupModActions", () => ({
+vi.mock("./releaseFamilyModActions", () => ({
   default: ({
-    groupId,
+    anchorBottleId,
     totalBottles,
   }: {
-    groupId: number;
+    anchorBottleId: number;
     totalBottles: number;
   }) => (
-    <button aria-label="Bottle group actions">
-      Group {groupId} has {totalBottles} releases
+    <button aria-label="Release family actions">
+      Anchor {anchorBottleId} has {totalBottles} releases
     </button>
   ),
 }));
@@ -127,10 +127,11 @@ const exactTarget = {
   },
 } satisfies ExactCatalogTargetV1;
 
-describe("BottleGroupView", () => {
+describe("ReleaseFamilyView", () => {
   it("keeps generic identity separate from independently complete Bottles", () => {
     const html = renderToStaticMarkup(
-      <BottleGroupView
+      <ReleaseFamilyView
+        anchorBottleId={999}
         target={target}
         bottleList={{
           results: [exactTarget],
@@ -141,8 +142,8 @@ describe("BottleGroupView", () => {
 
     expect(html).toContain("Lagavulin 18");
     expect(html).toContain("Exact release not specified");
-    expect(html).toContain('aria-label="Bottle group actions"');
-    expect(html).toContain("Group 8 has 2 releases");
+    expect(html).toContain('aria-label="Release family actions"');
+    expect(html).toContain("Anchor 999 has 2 releases");
     expect(html).toContain('data-target-id="100"');
     expect(html).toContain("Save release family to Library");
     expect(html).toContain('href="/addBottle?group=8&amp;intent=tasting"');

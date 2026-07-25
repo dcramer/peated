@@ -39,12 +39,13 @@ describe("PriceChangeIdentity", () => {
     expect(html).not.toContain('aria-label="Tasted"');
   });
 
-  it("renders a generic change as a label without a Bottle link", () => {
+  it("renders a generic change through a release-family route", () => {
     const html = renderToStaticMarkup(
       <PriceChangeIdentity target={groupTarget} hasTasted isLibrary />,
     );
 
-    expect(html).not.toMatch(/href="\/bottles\/\d+/);
+    expect(html).toContain('href="/bottles/99/releases"');
+    expect(html).not.toContain('href="/bottles/99"');
     expect(html).toContain("Springbank 12 Cask Strength");
     expect(html).toContain("Exact bottle not specified");
     expect(html).toContain("Single Malt");

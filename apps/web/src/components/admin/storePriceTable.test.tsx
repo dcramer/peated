@@ -52,7 +52,7 @@ describe("StorePriceTable", () => {
     expect(html).toContain("Exact bottle");
   });
 
-  it("renders generic and unresolved identities without a Bottle link", () => {
+  it("renders generic and unresolved identities without exact Bottle links", () => {
     const html = renderToStaticMarkup(
       <StorePriceTable
         priceList={[
@@ -62,7 +62,8 @@ describe("StorePriceTable", () => {
       />,
     );
 
-    expect(html).not.toMatch(/href="\/bottles\/\d+/);
+    expect(html).toContain('href="/bottles/99/releases"');
+    expect(html).not.toContain('href="/bottles/99"');
     expect(html).toContain("Springbank 12 Cask Strength");
     expect(html).toContain("Exact bottle not specified");
     expect(html).toContain("No Bottle");

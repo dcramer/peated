@@ -25,10 +25,15 @@ later grouping is automatic and outside manual intervention.
 
 Bottle pages and search results render exact fields from the independently
 complete Bottle. A Bottle page may link quietly to all related releases, while
-generic catalog-target links open `/bottle-groups/:id`. The group page clearly
+generic catalog-target links open `/bottles/:anchorBottleId/releases`. The
+anchor is a real active member used only to locate the release family: exact
+Bottle contexts use that Bottle, while a generic target uses the group's
+representative and fails closed if none exists. The release-family page clearly
 states that the exact release is unspecified, uses group-owned presentation and
-aggregate data, and lists exact member Bottles without substituting its
-representative for any Bottle.
+aggregate data, and lists exact member Bottles without presenting its anchor as
+the selected Bottle. Canonical paths and user-facing terminology do not expose
+BottleGroup ids, and there is no public `/bottle-groups` route; the existing
+generic-tasting handoff may still carry its group locator as a query parameter.
 
 Consumer workflows carry one CatalogTarget id. An exact target identifies one
 concrete Bottle. A generic target identifies the BottleGroup when the expression
@@ -68,7 +73,8 @@ resizing should reduce upload latency without replacing server processing.
   field ownership.
 - Exact Bottle search and related-release rows share one Bottle-owned metadata
   renderer; BottleGroup hydration is not required for exact details.
-- Moderator group merge and split use standalone, explicit forms. Merge names
+- Moderator release-family merge and split use standalone, explicit forms
+  anchored by a current member Bottle. Merge names
   the destination whose shared identity wins and moves generic activity there;
   split requires the moved subset and representatives while generic activity,
   stable aliases, and editorial content remain on the source.

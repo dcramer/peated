@@ -118,17 +118,25 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
 
 #### Scenario: Open a legacy nested bottling list
 
-- **WHEN** a request addresses `/bottles/:parentId/bottlings` or the retained
-  `/bottles/:parentId/releases` alias for a migrated parent
-- **THEN** the route permanently redirects to that parent's generic
-  BottleGroup while preserving the request query
+- **WHEN** a request addresses `/bottles/:parentId/bottlings` for a migrated
+  parent
+- **THEN** the route permanently redirects to that parent's Bottle-anchored
+  release-family page while preserving the request query
 - **AND** it does not render a BottleRelease list or select the representative
   Bottle
 
+#### Scenario: Open the canonical release family
+
+- **WHEN** a request addresses `/bottles/:memberBottleId/releases`
+- **THEN** the route renders the member's generic BottleGroup identity and
+  related independently complete Bottles
+- **AND** the member Bottle is only the route locator and is not presented as
+  selected exact identity
+
 #### Scenario: Retain route-only compatibility
 
-- **WHEN** legacy nested detail, edit, new, or list routes remain during the
-  measured compatibility period
+- **WHEN** legacy nested detail, edit, new, or `bottlings` list routes remain
+  during the measured compatibility period
 - **THEN** each route only validates and translates the legacy request into its
   canonical exact Bottle, generic BottleGroup, concrete Bottle editor, or
   independent Bottle-create destination
@@ -136,6 +144,8 @@ The system SHALL retain an auditable mapping from every migrated BottleRelease t
   Library action, or second catalog read system
 - **AND** task 9.7 removes these compatibility routes only after its traffic
   gate is satisfied
+- **AND** task 9.7 does not remove the canonical Bottle-anchored
+  `/releases` family page
 
 #### Scenario: Resolve a legacy API reference
 

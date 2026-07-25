@@ -1,5 +1,8 @@
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
-import { getBottleGroupRouteRedirectPath } from "@peated/web/lib/tombstoneRedirect";
+import {
+  getReleaseFamilyHref,
+  requireReleaseFamilyAnchor,
+} from "@peated/web/lib/releaseFamily";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { NextRequest } from "next/server";
 
@@ -14,7 +17,7 @@ function parseRouteId(value: string) {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ bottleId: string }> },
 ) {
   const { bottleId } = await context.params;
@@ -24,5 +27,10 @@ export async function GET(
     throw new Error("Bottle details are missing their required group summary.");
   }
 
-  permanentRedirect(await getBottleGroupRouteRedirectPath(bottle.group.id));
+  permanentRedirect(
+    getReleaseFamilyHref(
+      requireReleaseFamilyAnchor(bottle.group),
+      request.nextUrl.search,
+    ),
+  );
 }

@@ -36,6 +36,7 @@ None.
 - Database schema and generated migrations for BottleGroup, Bottle membership, catalog targets, migration mappings, and removal of `bottle_release` references.
 - Bottle, bottling, alias, observation, tasting, review, collection, flight, price, proposal, classifier, repair, activity, search, statistics, and indexing services.
 - oRPC/OpenAPI inputs and results, CLI/classifier contracts, compatibility adapters, and nested bottling URL redirects.
-- Add/edit Bottle forms, Bottle and group pages, search results, Library, tasting, price, review, and flight workflows.
+- Add/edit Bottle forms, exact Bottle and Bottle-anchored release-family pages,
+  search results, Library, tasting, price, review, and flight workflows.
 - Architecture, schema, bottle-entry, photo-tasting, and store-price-matching documentation.
 - A staged production backfill and cutover with dry-run audits, parity checks, rollback boundaries, and removal only after legacy traffic reaches zero.

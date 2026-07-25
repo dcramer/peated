@@ -17,17 +17,16 @@ import {
   destinationBottleGroup,
   destinationBottleGroupId,
   groupedBottleDetails,
-  splitBottleGroupId,
   testAccessToken,
   testUser,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test.describe("BottleGroup workflows", () => {
+test.describe("Release family workflows", () => {
   test("renders generic identity, aggregates, and exact related Bottles", async ({
     page,
   }) => {
-    await page.goto(`/bottle-groups/${bottleGroupId}`);
+    await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
 
     const groupHeading = page.getByRole("heading", {
       level: 1,
@@ -36,7 +35,7 @@ test.describe("BottleGroup workflows", () => {
     await expect(groupHeading).toBeVisible();
     await expect(groupHeading.locator("a")).toHaveCount(0);
     await expect(
-      page.getByRole("button", { name: "Bottle group actions" }),
+      page.getByRole("button", { name: "Release family actions" }),
     ).toHaveCount(0);
     await expect(
       page.getByRole("heading", {
@@ -46,6 +45,9 @@ test.describe("BottleGroup workflows", () => {
     await expect(
       page.getByText("Exact release not specified", { exact: true }),
     ).toBeVisible();
+    await expect(
+      page.locator('script[type="application/ld+json"]'),
+    ).toHaveCount(0);
     await expect(
       page.getByText(bottleGroup.description ?? "", { exact: true }),
     ).toBeVisible();
@@ -73,6 +75,17 @@ test.describe("BottleGroup workflows", () => {
     await expect(representativeItem.getByText("Single cask")).toBeVisible();
     await expect(representativeItem.getByText("Cask strength")).toBeVisible();
     await expectNoHorizontalOverflow(page);
+
+    await page.goto(`/bottles/${bottleGroupMember.id}/releases`);
+    await expect(groupHeading).toBeVisible();
+    await expect(
+      page.locator('script[type="application/ld+json"]'),
+    ).toHaveCount(0);
+    for (const { bottle } of bottleGroupMemberTargets) {
+      await expect(
+        page.getByRole("link", { name: bottle.fullName }),
+      ).toHaveAttribute("href", `/bottles/${bottle.id}`);
+    }
   });
 
   test("links exact Bottle and search views to the related release family", async ({
@@ -86,7 +99,7 @@ test.describe("BottleGroup workflows", () => {
     await page.goto(`/bottles/${groupedBottleDetails.id}`);
     await expect(
       page.getByRole("link", { name: "View all 3 releases" }),
-    ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}`);
+    ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/releases`);
     await expect(
       page.getByRole("link", { name: "Add another release" }),
     ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/addRelease`);
@@ -94,7 +107,7 @@ test.describe("BottleGroup workflows", () => {
     await page.goto("/search?q=Lagavulin");
     await expect(
       page.getByRole("link", { name: "3 related releases" }),
-    ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}`);
+    ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/releases`);
     await expectNoHorizontalOverflow(page);
   });
 
@@ -105,7 +118,7 @@ test.describe("BottleGroup workflows", () => {
     await signIn(context, {
       accessToken: uniqueAccessToken(testInfo, "bottle-group-library"),
     });
-    await page.goto(`/bottle-groups/${bottleGroupId}`);
+    await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
 
     const libraryButton = page.locator(
       'button[data-collection-action="library"]',
@@ -141,7 +154,10 @@ test.describe("BottleGroup workflows", () => {
     ).toBeVisible();
     await expect(
       genericRow.getByRole("link", { name: bottleGroup.fullName }),
-    ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}`);
+    ).toHaveAttribute(
+      "href",
+      `/bottles/${bottleGroupRepresentative.id}/releases`,
+    );
     await expect(
       genericRow.locator(`a[href="/bottles/${bottleGroupRepresentative.id}"]`),
     ).toHaveCount(0);
@@ -156,30 +172,36 @@ test.describe("BottleGroup workflows", () => {
       accessToken: uniqueAccessToken(testInfo, "bottle-group-merge"),
       user: { ...testUser, mod: true },
     });
-    await page.goto(`/bottle-groups/${bottleGroupId}`);
+    await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
 
-    await page.getByRole("button", { name: "Bottle group actions" }).click();
+    await page.getByRole("button", { name: "Release family actions" }).click();
     await expect(
-      page.getByRole("menuitem", { name: "Merge expression" }),
-    ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}/merge`);
+      page.getByRole("menuitem", { name: "Merge families" }),
+    ).toHaveAttribute(
+      "href",
+      `/bottles/${bottleGroupRepresentative.id}/releases/merge`,
+    );
     await expect(
       page.getByRole("menuitem", { name: "Split releases" }),
-    ).toHaveAttribute("href", `/bottle-groups/${bottleGroupId}/split`);
-    await page.getByRole("menuitem", { name: "Merge expression" }).click();
+    ).toHaveAttribute(
+      "href",
+      `/bottles/${bottleGroupRepresentative.id}/releases/split`,
+    );
+    await page.getByRole("menuitem", { name: "Merge families" }).click();
 
     await expect(
-      page.getByRole("heading", { name: "Merge expression groups" }),
+      page.getByRole("heading", { name: "Merge release families" }),
     ).toBeVisible();
-    await page.getByText("Destination expression", { exact: true }).click();
+    await page.getByText("Destination family", { exact: true }).click();
     await page
       .getByRole("button", {
-        name: `${destinationBottleGroup.fullName} (group ${destinationBottleGroupId}, 2 releases)`,
+        name: `${destinationBottleGroup.fullName} (2 releases)`,
       })
       .click();
     await expect(
       page.getByText(
         new RegExp(
-          `Move every Bottle from “${escapeRegex(bottleGroup.fullName)}” into “${escapeRegex(destinationBottleGroup.fullName)}`,
+          `Combine every Bottle from “${escapeRegex(bottleGroup.fullName)}” with “${escapeRegex(destinationBottleGroup.fullName)}`,
         ),
       ),
     ).toBeVisible();
@@ -187,24 +209,19 @@ test.describe("BottleGroup workflows", () => {
     const requestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottleGroups/merge"),
     );
-    await page.getByRole("button", { name: "Merge groups" }).click();
+    await page.getByRole("button", { name: "Merge families" }).click();
     expect(getRpcInput(await requestPromise)).toEqual({
       group: bottleGroupId,
       destinationGroupId: destinationBottleGroupId,
     });
     await expect(page).toHaveURL(
-      new RegExp(`/bottle-groups/${destinationBottleGroupId}$`),
+      new RegExp(
+        `/bottles/${destinationBottleGroup.representativeBottleId}/releases$`,
+      ),
     );
-    await expect(
-      page.getByRole("heading", {
-        level: 1,
-        name: destinationBottleGroup.fullName,
-      }),
-    ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 
-  test("splits a subset with explicit representatives and navigates to the new group", async ({
+  test("splits a subset with explicit representatives and navigates to the new family", async ({
     context,
     page,
   }, testInfo) => {
@@ -212,8 +229,8 @@ test.describe("BottleGroup workflows", () => {
       accessToken: uniqueAccessToken(testInfo, "bottle-group-split"),
       user: { ...testUser, mod: true },
     });
-    await page.goto(`/bottle-groups/${bottleGroupId}`);
-    await page.getByRole("button", { name: "Bottle group actions" }).click();
+    await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
+    await page.getByRole("button", { name: "Release family actions" }).click();
     await page.getByRole("menuitem", { name: "Split releases" }).click();
 
     await expect(
@@ -221,7 +238,7 @@ test.describe("BottleGroup workflows", () => {
     ).toBeVisible();
     await expect(
       page.getByText(
-        "Generic activity, stable aliases, and editorial content remain on this source expression.",
+        "Generic activity, stable aliases, and editorial content remain on this source family.",
       ),
     ).toBeVisible();
 
@@ -230,17 +247,17 @@ test.describe("BottleGroup workflows", () => {
     });
     await representativeChoice.check();
     await page
-      .getByRole("radio", { name: "Representative for the new expression" })
+      .getByRole("radio", { name: "Representative for the new family" })
       .check();
     await page
-      .getByRole("group", { name: "Source expression representative" })
+      .getByRole("group", { name: "Source family representative" })
       .getByRole("radio", { name: bottleGroupMember.fullName })
       .check();
 
     const requestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottleGroups/split"),
     );
-    await page.getByRole("button", { name: "Create new expression" }).click();
+    await page.getByRole("button", { name: "Create new family" }).click();
     expect(getRpcInput(await requestPromise)).toEqual({
       group: bottleGroupId,
       movedBottleIds: [bottleGroupRepresentative.id],
@@ -248,15 +265,8 @@ test.describe("BottleGroup workflows", () => {
       sourceRepresentativeBottleId: bottleGroupMember.id,
     });
     await expect(page).toHaveURL(
-      new RegExp(`/bottle-groups/${splitBottleGroupId}$`),
+      new RegExp(`/bottles/${bottleGroupRepresentative.id}/releases$`),
     );
-    await expect(
-      page.getByRole("heading", {
-        level: 1,
-        name: "Lagavulin Split Expression",
-      }),
-    ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 });
 

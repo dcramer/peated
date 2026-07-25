@@ -83,7 +83,7 @@ function makeCollectionBottle(id: number): CollectionBottle {
       group: {
         schemaVersion: 1,
         id: id + 200,
-        fullName: `Bottle group ${id}`,
+        fullName: `Release family ${id}`,
         name: `Group ${id}`,
         brandId: 1,
         bottlerId: null,

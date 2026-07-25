@@ -1951,6 +1951,12 @@ function getMockBottle(request, bottleId) {
     });
   }
   if (bottleId === groupedBottleDetails.id) return groupedBottleDetails;
+  const groupMember = bottleGroupMemberTargets.find(
+    (target) => target.bottle.id === bottleId,
+  );
+  if (groupMember) {
+    return { ...groupMember.bottle, group: groupMember.group };
+  }
   if (bottleId === exactSearchBottle.id) return exactSearchBottle;
   if (bottleId === legacyPromotedBottleId) return legacyPromotedBottle;
   return buildBottleForId(bottleId);

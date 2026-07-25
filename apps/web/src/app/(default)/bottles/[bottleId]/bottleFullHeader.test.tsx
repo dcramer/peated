@@ -14,12 +14,12 @@ function bottleWithGroup(totalBottles: number) {
 }
 
 describe("BottleRelationshipLinks", () => {
-  it("links a multi-Bottle group without using it as the Bottle label", () => {
+  it("links a multi-Bottle release family from the current Bottle", () => {
     const html = renderToStaticMarkup(
       <BottleRelationshipLinks bottle={bottleWithGroup(3)} />,
     );
 
-    expect(html).toContain('href="/bottle-groups/7"');
+    expect(html).toContain('href="/bottles/42/releases"');
     expect(html).toContain("View all 3 releases");
     expect(html).toContain('href="/bottles/42/addRelease"');
     expect(html).toContain("Add another release");
@@ -31,7 +31,7 @@ describe("BottleRelationshipLinks", () => {
     );
 
     expect(html).not.toContain("View all");
-    expect(html).not.toContain("/bottle-groups/");
+    expect(html).not.toContain("/releases");
     expect(html).toContain('href="/bottles/42/addRelease"');
   });
 });

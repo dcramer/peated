@@ -14,7 +14,6 @@ import {
   buildGenericCatalogTarget,
   existingBottle,
   existingReleaseId,
-  genericCollectionTargetGroupId,
   genericCollectionTargetLabel,
   legacyPromotedBottle,
   legacyPromotedBottleId,
@@ -246,10 +245,7 @@ test.describe("profile library", () => {
     ).toBeVisible();
     await expect(
       genericRow.getByRole("link", { name: genericCollectionTargetLabel }),
-    ).toHaveAttribute(
-      "href",
-      `/bottle-groups/${genericCollectionTargetGroupId}`,
-    );
+    ).toHaveAttribute("href", `/bottles/${existingBottle.id}/releases`);
     await expect(
       genericRow.locator(`a[href="/bottles/${existingBottle.id}"]`),
     ).toHaveCount(0);

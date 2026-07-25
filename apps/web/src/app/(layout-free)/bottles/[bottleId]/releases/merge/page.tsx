@@ -12,6 +12,11 @@ import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
+  getReleaseFamilyHref,
+  parseReleaseFamilyRouteId,
+  requireReleaseFamilyGroup,
+} from "@peated/web/lib/releaseFamily";
+import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
@@ -22,24 +27,36 @@ import { use, useState, type FormEvent } from "react";
 export default function Page({
   params,
 }: {
-  params: Promise<{ groupId: string }>;
+  params: Promise<{ bottleId: string }>;
 }) {
-  const { groupId } = use(params);
+  const { bottleId } = use(params);
 
   return (
     <ModRequired>
-      <MergeBottleGroupForm groupId={Number(groupId)} />
+      <MergeReleaseFamilyForm
+        anchorBottleId={parseReleaseFamilyRouteId(bottleId)}
+      />
     </ModRequired>
   );
 }
 
-function MergeBottleGroupForm({ groupId }: { groupId: number }) {
+function MergeReleaseFamilyForm({
+  anchorBottleId,
+}: {
+  anchorBottleId: number;
+}) {
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const router = useRouter();
   const { flash } = useFlashMessages();
+  const { data: anchorBottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: anchorBottleId } }),
+  );
+  const sourceGroup = requireReleaseFamilyGroup(anchorBottle);
   const { data: sourceTarget } = useSuspenseQuery(
-    orpc.bottleGroups.details.queryOptions({ input: { group: groupId } }),
+    orpc.bottleGroups.details.queryOptions({
+      input: { group: sourceGroup.id },
+    }),
   );
   const [destination, setDestination] = useState<BottleGroupOption | null>(
     null,
@@ -50,7 +67,7 @@ function MergeBottleGroupForm({ groupId }: { groupId: number }) {
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     if (!destination) {
-      setValidationError("Select the destination expression for this merge.");
+      setValidationError("Select the destination family for this merge.");
       return;
     }
 
@@ -67,8 +84,8 @@ function MergeBottleGroupForm({ groupId }: { groupId: number }) {
               input: { group: destinationGroupId },
             }),
           });
-          flash(<div>Expression groups merged successfully.</div>);
-          router.push(`/bottle-groups/${destinationGroupId}`);
+          flash(<div>Release families merged successfully.</div>);
+          router.push(getReleaseFamilyHref(destination.representativeBottleId));
         },
       },
     );
@@ -82,28 +99,28 @@ function MergeBottleGroupForm({ groupId }: { groupId: number }) {
 
   return (
     <FormScreen
-      title="Merge expression groups"
-      saveLabel="Merge groups"
+      title="Merge release families"
+      saveLabel="Merge families"
       saveDisabled={mergeMutation.isPending}
       onSave={onSubmit}
     >
       <Form onSubmit={onSubmit} isSubmitting={mergeMutation.isPending}>
         {error && <FormError values={[error]} />}
         <div className="border-y border-slate-800 p-4 lg:border-x lg:p-5">
-          <h2 className="font-semibold">Source expression</h2>
+          <h2 className="font-semibold">Source family</h2>
           <p className="mt-1 break-words text-lg">
             {sourceTarget.group.fullName}
           </p>
           <p className="text-muted mt-1 text-sm">
-            Group {sourceTarget.group.id} · {sourceTarget.group.totalBottles}{" "}
+            {sourceTarget.group.totalBottles}{" "}
             {sourceTarget.group.totalBottles === 1 ? "release" : "releases"}
           </p>
         </div>
         <Fieldset>
           <BottleGroupField
             name="destinationGroupId"
-            label="Destination expression"
-            helpText="Choose the existing expression whose shared identity should win."
+            label="Destination family"
+            helpText="Choose the release family whose shared identity should win."
             required
             value={destination}
             onChange={(option) => {
@@ -120,10 +137,10 @@ function MergeBottleGroupForm({ groupId }: { groupId: number }) {
           <p className="text-muted mt-2">
             {destination ? (
               <>
-                Move every Bottle from “{sourceTarget.group.fullName}” into “
-                {destination.fullName}”. The source group is retired, generic
-                activity moves to the destination, and the destination&apos;s
-                shared identity regenerates the moved Bottles.
+                Combine every Bottle from “{sourceTarget.group.fullName}” with “
+                {destination.fullName}”. The source family is retired, generic
+                activity moves to the destination, and the destination
+                family&apos;s shared identity regenerates the moved Bottles.
               </>
             ) : (
               "Select a destination to review the exact merge direction."

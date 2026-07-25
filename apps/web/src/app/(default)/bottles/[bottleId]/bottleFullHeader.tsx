@@ -12,11 +12,12 @@ import {
   getAddAnotherReleasePath,
   getAddBottleHref,
 } from "@peated/web/lib/addBottle";
+import { getReleaseFamilyHref } from "@peated/web/lib/releaseFamily";
 import { Suspense } from "react";
 import ModActions from "./modActions";
 
 type BottleRelationship = Pick<Bottle, "id"> & {
-  group?: Pick<NonNullable<Bottle["group"]>, "id" | "totalBottles">;
+  group?: Pick<NonNullable<Bottle["group"]>, "totalBottles">;
 };
 
 export function BottleRelationshipLinks({
@@ -28,7 +29,7 @@ export function BottleRelationshipLinks({
     <div className="text-muted mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm lg:justify-start">
       {bottle.group && bottle.group.totalBottles > 1 ? (
         <Link
-          href={`/bottle-groups/${bottle.group.id}`}
+          href={getReleaseFamilyHref(bottle.id)}
           className="hover:text-white hover:underline"
         >
           View all {bottle.group.totalBottles.toLocaleString()} releases

@@ -1,4 +1,8 @@
 import type { CatalogTargetV1 } from "@peated/server/schemas";
+import {
+  getReleaseFamilyHref,
+  requireReleaseFamilyAnchor,
+} from "./releaseFamily";
 
 export function getCatalogTargetLabel(target: CatalogTargetV1) {
   return target.kind === "bottle"
@@ -9,7 +13,7 @@ export function getCatalogTargetLabel(target: CatalogTargetV1) {
 export function getCatalogTargetHref(target: CatalogTargetV1) {
   return target.kind === "bottle"
     ? `/bottles/${target.bottle.id}`
-    : `/bottle-groups/${target.group.id}`;
+    : getReleaseFamilyHref(requireReleaseFamilyAnchor(target.group));
 }
 
 export function getCatalogTargetScopeLabel(target: CatalogTargetV1) {

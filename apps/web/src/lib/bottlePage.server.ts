@@ -5,9 +5,10 @@ import { permanentRedirect } from "next/navigation";
 import { cache } from "react";
 import { getAnonymousServerClient } from "./orpc/client.server";
 import { resolveOrNotFound } from "./orpc/notFound.server";
+import { requireReleaseFamilyAnchor } from "./releaseFamily";
 import {
-  getBottleGroupRouteRedirectPath,
   getCanonicalRouteRedirectPath,
+  getReleaseFamilyRouteRedirectPath,
 } from "./tombstoneRedirect";
 
 /**
@@ -42,8 +43,13 @@ export const getBottlePage = cache(async (bottleId: number) => {
   );
 
   if (pageTarget.kind === "group") {
+    const target = await resolveOrNotFound(
+      client.bottleGroups.details({ group: pageTarget.groupId }),
+    );
     permanentRedirect(
-      await getBottleGroupRouteRedirectPath(pageTarget.groupId),
+      await getReleaseFamilyRouteRedirectPath(
+        requireReleaseFamilyAnchor(target.group),
+      ),
     );
   }
 

@@ -35,6 +35,7 @@ import {
   getPendingImageFromParams,
 } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
+import { getCatalogTargetHref } from "@peated/web/lib/catalogTarget";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -99,9 +100,7 @@ function getSearchHref(
 }
 
 function getViewTargetHref(target: CatalogTargetV1) {
-  return target.kind === "bottle"
-    ? `/bottles/${target.bottle.id}`
-    : `/bottle-groups/${target.group.id}`;
+  return getCatalogTargetHref(target);
 }
 
 function canSaveTargetToLibrary(target: FlowTarget) {
