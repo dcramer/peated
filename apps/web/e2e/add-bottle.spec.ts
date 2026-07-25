@@ -86,7 +86,9 @@ test.describe("create bottle", () => {
     await expect(
       page.getByRole("heading", { name: "Create Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle")).toHaveValue(createdBottleName);
+    await expect(
+      page.getByRole("textbox", { name: "Bottle", exact: true }),
+    ).toHaveValue(createdBottleName);
     await expect(page.getByLabel("Edition / Label")).toBeVisible();
     await expect(page.getByLabel("ABV")).toBeVisible();
     await expect(page.getByLabel("Release Year")).toBeVisible();
@@ -301,7 +303,9 @@ test.describe("create bottle", () => {
     await expect(
       page.getByRole("heading", { name: "Create Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle")).toHaveValue(createdBottleName);
+    await expect(
+      page.getByRole("textbox", { name: "Bottle", exact: true }),
+    ).toHaveValue(createdBottleName);
 
     const libraryRequestPromise = waitForCollectionBottleCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();
@@ -398,9 +402,9 @@ test.describe("create bottle", () => {
     await expect(
       page.getByRole("heading", { name: "Add another release" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle")).toHaveValue(
-      addAnotherReleaseSourceBottle.group.name,
-    );
+    await expect(
+      page.getByRole("textbox", { name: "Bottle", exact: true }),
+    ).toHaveValue(addAnotherReleaseSourceBottle.group.name);
     await expect(page.getByLabel("Stated Age")).toHaveValue(
       String(addAnotherReleaseSourceBottle.statedAge),
     );
@@ -1410,7 +1414,9 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Create Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle")).toHaveValue(createdBottleName);
+    await expect(
+      page.getByRole("textbox", { name: "Bottle", exact: true }),
+    ).toHaveValue(createdBottleName);
     await expect(
       page.getByRole("button", { name: testBrand.name }).first(),
     ).toBeVisible();
@@ -1584,7 +1590,9 @@ async function submitCreateBottle(page: Page) {
   await expect(
     page.getByRole("heading", { name: "Create Bottle" }),
   ).toBeVisible();
-  await expect(page.getByLabel("Bottle")).toHaveValue(createdBottleName);
+  await expect(
+    page.getByRole("textbox", { name: "Bottle", exact: true }),
+  ).toHaveValue(createdBottleName);
 
   await page.getByText("e.g. Laphroaig").click();
   await page.getByPlaceholder("Search").fill(testBrand.name);
