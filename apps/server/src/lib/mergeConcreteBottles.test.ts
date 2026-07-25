@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import type { User } from "@peated/server/db/schema";
 import {
   bottleAliases,
@@ -34,7 +35,46 @@ import {
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import * as dbSchema from "../db/schema";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForGroupLockWaiters(
+  observer: NodePgClient,
+  mergePids: number[],
+) {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await observer.query<{
+      pid: number;
+      query: string;
+      waitEventType: string | null;
+    }>(
+      `SELECT
+         pid,
+         query,
+         wait_event_type AS "waitEventType"
+       FROM pg_stat_activity
+       WHERE pid = ANY($1::int[])`,
+      [mergePids],
+    );
+    if (
+      result.rows.length === mergePids.length &&
+      result.rows.every(
+        ({ query, waitEventType }) =>
+          waitEventType === "Lock" && query.includes('"bottle_group"'),
+      )
+    ) {
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for exact Bottle merge group locks.");
+}
 
 function contextFor(user: User | null) {
   return { user } as Parameters<typeof mergeConcreteBottles>[0]["context"];
@@ -1637,6 +1677,133 @@ describe("exact concrete Bottle merges", () => {
         context: contextFor(mod),
       }),
     ).rejects.toMatchObject({ code: "invalid_catalog_graph" });
+  });
+
+  test("serializes concurrent identical merges through BottleGroups before Bottles", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const source = await createGroup(mod, "Concurrent Merge Source", [
+      { edition: "Source" },
+    ]);
+    const destination = await createGroup(mod, "Concurrent Merge Destination", [
+      { edition: "Destination" },
+    ]);
+    const groupIds = [source.first.group.id, destination.first.group.id].sort(
+      (left, right) => left - right,
+    );
+    const bottleIds = [
+      source.first.bottle.id,
+      destination.first.bottle.id,
+    ].sort((left, right) => left - right);
+    const blocker = new Client(getPostgresConnectionConfig());
+    const observer = new Client(getPostgresConnectionConfig());
+    const firstMergeClient = new Client(getPostgresConnectionConfig());
+    const secondMergeClient = new Client(getPostgresConnectionConfig());
+    let merges: Promise<
+      [
+        Awaited<ReturnType<typeof mergeConcreteBottlesInTransaction>>,
+        Awaited<ReturnType<typeof mergeConcreteBottlesInTransaction>>,
+      ]
+    > | null = null;
+
+    await blocker.connect();
+    await observer.connect();
+    await firstMergeClient.connect();
+    await secondMergeClient.connect();
+    try {
+      const actor = await getUserActor(mod);
+      const firstMergeDb = drizzle(firstMergeClient, { schema: dbSchema });
+      const secondMergeDb = drizzle(secondMergeClient, { schema: dbSchema });
+      const mergePids = await Promise.all(
+        [firstMergeClient, secondMergeClient].map(async (client) => {
+          const pid = (
+            await client.query<{ pid: number }>(
+              "SELECT pg_backend_pid() AS pid",
+            )
+          ).rows[0]?.pid;
+          if (!pid) throw new Error("Unable to load merge client pid.");
+          return pid;
+        }),
+      );
+      await blocker.query("BEGIN");
+      await blocker.query(
+        `SELECT id
+         FROM bottle_group
+         WHERE id = ANY($1::bigint[])
+         ORDER BY id
+         FOR UPDATE`,
+        [groupIds],
+      );
+
+      merges = Promise.all([
+        firstMergeDb.transaction((tx) =>
+          mergeConcreteBottlesInTransaction(tx, {
+            sourceBottleId: source.first.bottle.id,
+            destinationBottleId: destination.first.bottle.id,
+            actorId: actor.id,
+          }),
+        ),
+        secondMergeDb.transaction((tx) =>
+          mergeConcreteBottlesInTransaction(tx, {
+            sourceBottleId: source.first.bottle.id,
+            destinationBottleId: destination.first.bottle.id,
+            actorId: actor.id,
+          }),
+        ),
+      ]);
+      void merges.catch(() => undefined);
+      await waitForGroupLockWaiters(observer, mergePids);
+
+      await observer.query("BEGIN");
+      await expect(
+        observer.query(
+          `SELECT id
+           FROM bottle
+           WHERE id = ANY($1::bigint[])
+           ORDER BY id
+           FOR UPDATE NOWAIT`,
+          [bottleIds],
+        ),
+      ).resolves.toBeDefined();
+      await observer.query("ROLLBACK");
+
+      await blocker.query("COMMIT");
+      const results = await merges;
+      expect(results.map(({ changed }) => changed).sort()).toEqual([
+        false,
+        true,
+      ]);
+      expect(
+        await db.query.bottles.findFirst({
+          where: eq(bottles.id, source.first.bottle.id),
+        }),
+      ).toBeUndefined();
+      expect(
+        await db.query.bottleTombstones.findFirst({
+          where: eq(bottleTombstones.bottleId, source.first.bottle.id),
+        }),
+      ).toMatchObject({ newBottleId: destination.first.bottle.id });
+      expect(
+        await db.query.bottleGroups.findFirst({
+          where: eq(bottleGroups.id, source.first.group.id),
+        }),
+      ).toBeUndefined();
+      expect(
+        await db.query.bottleGroupTombstones.findFirst({
+          where: eq(bottleGroupTombstones.groupId, source.first.group.id),
+        }),
+      ).toMatchObject({ newGroupId: destination.first.group.id });
+    } finally {
+      await blocker.query("ROLLBACK").catch(() => undefined);
+      await observer.query("ROLLBACK").catch(() => undefined);
+      await firstMergeClient.query("ROLLBACK").catch(() => undefined);
+      await secondMergeClient.query("ROLLBACK").catch(() => undefined);
+      await blocker.end();
+      await observer.end();
+      await firstMergeClient.end();
+      await secondMergeClient.end();
+    }
   });
 
   test("returns a post-commit manifest to a trusted outer transaction", async ({

@@ -455,64 +455,43 @@ function bottleSnapshot(
   return { ...bottle, exactTargetId, distillerIds };
 }
 
-/** Loads the live destination graph required for an inert tombstone retry. */
+/** Validates the already-locked live destination graph for an inert retry. */
 async function loadRetryDestinationSnapshot(
   tx: AnyTransaction,
-  destinationBottleId: number,
+  destination: Bottle,
+  destinationGroup: BottleGroup,
+  lockedMembers: Bottle[],
 ): Promise<{ bottle: Bottle; targetId: number }> {
-  const [destination] = await tx
-    .select()
-    .from(bottles)
-    .where(eq(bottles.id, destinationBottleId))
-    .limit(1)
-    .for("update");
-  if (!destination) {
-    throw new ConcreteBottleMergeGraphError("not_found", destinationBottleId);
-  }
-  if (destination.groupId === null) {
-    throw new ConcreteBottleMergeGraphError("unmigrated", destinationBottleId);
-  }
-
-  const [group] = await tx
-    .select()
-    .from(bottleGroups)
-    .where(eq(bottleGroups.id, destination.groupId))
-    .limit(1)
-    .for("update");
-  if (!group?.representativeBottleId) {
+  if (
+    destination.groupId !== destinationGroup.id ||
+    destinationGroup.representativeBottleId === null
+  ) {
     throw new ConcreteBottleMergeGraphError(
       "invalid_catalog_graph",
-      destinationBottleId,
+      destination.id,
     );
   }
-  const [representative] = await tx
-    .select({ groupId: bottles.groupId })
-    .from(bottles)
-    .where(eq(bottles.id, group.representativeBottleId))
-    .limit(1)
-    .for("update");
   const targets = await tx
     .select({ id: catalogTargets.id, bottleId: catalogTargets.bottleId })
     .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, destination.groupId))
+    .where(eq(catalogTargets.groupId, destinationGroup.id))
+    .orderBy(asc(catalogTargets.id))
     .for("update");
-  const [retiredGroup] = await tx
-    .select({ groupId: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(eq(bottleGroupTombstones.groupId, destination.groupId))
-    .limit(1);
   const exactTarget = targets.find(
-    ({ bottleId }) => bottleId === destinationBottleId,
+    ({ bottleId }) => bottleId === destination.id,
   );
   if (
-    retiredGroup ||
-    representative?.groupId !== destination.groupId ||
+    !lockedMembers.some(
+      ({ id, groupId }) =>
+        id === destinationGroup.representativeBottleId &&
+        groupId === destinationGroup.id,
+    ) ||
     !targets.some(({ bottleId }) => bottleId === null) ||
     !exactTarget
   ) {
     throw new ConcreteBottleMergeGraphError(
       "invalid_catalog_graph",
-      destinationBottleId,
+      destination.id,
     );
   }
   return { bottle: destination, targetId: exactTarget.id };
@@ -544,6 +523,77 @@ export async function mergeConcreteBottlesInTransaction(
   const requestedBottleIds = [sourceBottleId, destinationBottleId].sort(
     (left, right) => left - right,
   );
+  const discoveredBottles = await tx
+    .select({ id: bottles.id, groupId: bottles.groupId })
+    .from(bottles)
+    .where(inArray(bottles.id, requestedBottleIds))
+    .orderBy(asc(bottles.id));
+  const discoveredById = new Map(
+    discoveredBottles.map((bottle) => [bottle.id, bottle]),
+  );
+  const discoveredSource = discoveredById.get(sourceBottleId);
+  const discoveredDestination = discoveredById.get(destinationBottleId);
+  if (discoveredSource?.groupId === null) {
+    throw new ConcreteBottleMergeGraphError("unmigrated", sourceBottleId);
+  }
+  if (discoveredDestination?.groupId === null) {
+    throw new ConcreteBottleMergeGraphError("unmigrated", destinationBottleId);
+  }
+  const groupIds = uniqueSorted([
+    discoveredSource?.groupId ?? null,
+    discoveredDestination?.groupId ?? null,
+  ]);
+
+  // Discovery is intentionally unlocked. All graph writers serialize through
+  // BottleGroup, then Bottle, then CatalogTarget locks and revalidate below.
+  const groups = groupIds.length
+    ? await tx
+        .select()
+        .from(bottleGroups)
+        .where(inArray(bottleGroups.id, groupIds))
+        .orderBy(asc(bottleGroups.id))
+        .for("update")
+    : [];
+  const groupById = new Map(groups.map((group) => [group.id, group]));
+  const retiredGroups = groupIds.length
+    ? await tx
+        .select({
+          groupId: bottleGroupTombstones.groupId,
+          newGroupId: bottleGroupTombstones.newGroupId,
+        })
+        .from(bottleGroupTombstones)
+        .where(inArray(bottleGroupTombstones.groupId, groupIds))
+    : [];
+  const retiredDestinationGroup = retiredGroups.find(
+    ({ groupId }) => groupId === discoveredDestination?.groupId,
+  );
+  const retiredSourceGroup = retiredGroups.find(
+    ({ groupId }) => groupId === discoveredSource?.groupId,
+  );
+  if (
+    retiredDestinationGroup ||
+    (retiredSourceGroup &&
+      retiredSourceGroup.newGroupId !== discoveredDestination?.groupId)
+  ) {
+    throw new ConcreteBottleMergeGraphError(
+      "invalid_catalog_graph",
+      retiredDestinationGroup ? destinationBottleId : sourceBottleId,
+    );
+  }
+
+  const lockedMembers = groupIds.length
+    ? await tx
+        .select()
+        .from(bottles)
+        .where(inArray(bottles.groupId, groupIds))
+        .orderBy(asc(bottles.id))
+        .for("update")
+    : [];
+  const bottleById = new Map(
+    lockedMembers.map((bottle) => [bottle.id, bottle]),
+  );
+  const source = bottleById.get(sourceBottleId);
+  const destination = bottleById.get(destinationBottleId);
   const tombstones = await tx
     .select()
     .from(bottleTombstones)
@@ -558,36 +608,52 @@ export async function mergeConcreteBottlesInTransaction(
     throw new ConcreteBottleMergeGraphError("retired", destinationBottleId);
   }
   if (sourceTombstone?.newBottleId === destinationBottleId) {
-    const destination = await loadRetryDestinationSnapshot(
+    if (!destination || destination.groupId === null) {
+      throw new ConcreteBottleMergeGraphError(
+        "invalid_catalog_graph",
+        destinationBottleId,
+      );
+    }
+    const destinationGroup = groupById.get(destination.groupId);
+    if (!destinationGroup) {
+      throw new ConcreteBottleMergeGraphError(
+        "invalid_catalog_graph",
+        destinationBottleId,
+      );
+    }
+    const retryDestination = await loadRetryDestinationSnapshot(
       tx,
-      destinationBottleId,
+      destination,
+      destinationGroup,
+      lockedMembers,
     );
     return inertManifest(
       sourceBottleId,
       destinationBottleId,
-      destination.bottle,
-      destination.targetId,
+      retryDestination.bottle,
+      retryDestination.targetId,
     );
   }
   if (sourceTombstone) {
     throw new ConcreteBottleMergeConflictError("retired_to_other_destination");
   }
-
-  const lockedBottles = await tx
-    .select()
-    .from(bottles)
-    .where(inArray(bottles.id, requestedBottleIds))
-    .orderBy(asc(bottles.id))
-    .for("update");
-  const bottleById = new Map(
-    lockedBottles.map((bottle) => [bottle.id, bottle]),
-  );
-  const source = bottleById.get(sourceBottleId);
-  const destination = bottleById.get(destinationBottleId);
-  if (!source)
-    throw new ConcreteBottleMergeGraphError("not_found", sourceBottleId);
+  if (retiredSourceGroup) {
+    throw new ConcreteBottleMergeGraphError(
+      "invalid_catalog_graph",
+      sourceBottleId,
+    );
+  }
+  if (!source) {
+    throw new ConcreteBottleMergeGraphError(
+      discoveredSource ? "invalid_catalog_graph" : "not_found",
+      sourceBottleId,
+    );
+  }
   if (!destination) {
-    throw new ConcreteBottleMergeGraphError("not_found", destinationBottleId);
+    throw new ConcreteBottleMergeGraphError(
+      discoveredDestination ? "invalid_catalog_graph" : "not_found",
+      destinationBottleId,
+    );
   }
   if (source.groupId === null) {
     throw new ConcreteBottleMergeGraphError("unmigrated", sourceBottleId);
@@ -595,17 +661,19 @@ export async function mergeConcreteBottlesInTransaction(
   if (destination.groupId === null) {
     throw new ConcreteBottleMergeGraphError("unmigrated", destinationBottleId);
   }
+  if (
+    source.groupId !== discoveredSource?.groupId ||
+    destination.groupId !== discoveredDestination?.groupId
+  ) {
+    throw new ConcreteBottleMergeGraphError(
+      "invalid_catalog_graph",
+      source.groupId !== discoveredSource?.groupId
+        ? sourceBottleId
+        : destinationBottleId,
+    );
+  }
   const sourceGroupId = source.groupId;
   const destinationGroupId = destination.groupId;
-  const groupIds = uniqueSorted([sourceGroupId, destinationGroupId]);
-
-  const groups = await tx
-    .select()
-    .from(bottleGroups)
-    .where(inArray(bottleGroups.id, groupIds))
-    .orderBy(asc(bottleGroups.id))
-    .for("update");
-  const groupById = new Map(groups.map((group) => [group.id, group]));
   const sourceGroup = groupById.get(sourceGroupId);
   const destinationGroup = groupById.get(destinationGroupId);
   if (!sourceGroup || !destinationGroup) {
@@ -614,25 +682,10 @@ export async function mergeConcreteBottlesInTransaction(
       !sourceGroup ? sourceBottleId : destinationBottleId,
     );
   }
-  const retiredGroups = await tx
-    .select({ groupId: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(inArray(bottleGroupTombstones.groupId, groupIds));
-  if (retiredGroups.length) {
-    throw new ConcreteBottleMergeGraphError(
-      "invalid_catalog_graph",
-      retiredGroups[0]!.groupId === sourceGroupId
-        ? sourceBottleId
-        : destinationBottleId,
-    );
-  }
 
-  const sourceMembers = await tx
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(eq(bottles.groupId, sourceGroupId))
-    .orderBy(asc(bottles.id))
-    .for("update");
+  const sourceMembers = lockedMembers
+    .filter(({ groupId }) => groupId === sourceGroupId)
+    .map(({ id }) => ({ id }));
   const sourceMemberIds = sourceMembers.map(({ id }) => id);
   if (
     !sourceMemberIds.includes(sourceBottleId) ||
@@ -645,12 +698,9 @@ export async function mergeConcreteBottlesInTransaction(
       sourceBottleId,
     );
   }
-  const [destinationRepresentative] = await tx
-    .select({ id: bottles.id, groupId: bottles.groupId })
-    .from(bottles)
-    .where(eq(bottles.id, destinationGroup.representativeBottleId))
-    .limit(1)
-    .for("update");
+  const destinationRepresentative = lockedMembers.find(
+    ({ id }) => id === destinationGroup.representativeBottleId,
+  );
   if (destinationRepresentative?.groupId !== destinationGroupId) {
     throw new ConcreteBottleMergeGraphError(
       "invalid_catalog_graph",
