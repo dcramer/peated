@@ -8,6 +8,8 @@ import {
   bottleTombstones,
   catalogTargets,
   entities,
+  flightBottles,
+  flights,
   tastings,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -61,6 +63,7 @@ export default procedure
       series: z.coerce.number().nullish(),
       tag: z.string().nullish(),
       flavorProfile: z.enum(FLAVOR_PROFILES).nullish(),
+      flight: z.string().nullish(),
       category: z.enum(CATEGORY_LIST).nullish(),
       age: z.coerce.number().nullish(),
       caskType: CaskTypeEnum.nullish(),
@@ -166,6 +169,25 @@ export default procedure
           sql`${bottles.avgRating} IS NOT NULL`,
           sql`${bottles.avgRating} >= ${rest.minRating}`,
         ),
+      );
+    }
+
+    if (rest.flight) {
+      const [flight] = await db
+        .select({ id: flights.id })
+        .from(flights)
+        .where(eq(flights.publicId, rest.flight));
+      if (!flight) {
+        return {
+          results: [],
+          rel: {
+            nextCursor: null,
+            prevCursor: null,
+          },
+        };
+      }
+      where.push(
+        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.targetId} = ${catalogTargets.id})`,
       );
     }
 

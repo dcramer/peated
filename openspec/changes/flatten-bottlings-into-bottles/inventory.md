@@ -575,12 +575,13 @@ Target-bearing consumer routes:
 - `apps/server/src/orpc/routes/flights/details.ts` now returns the Flight's
   authoritative ordered CatalogTargets with target-owned distillers and
   target-keyed viewer state. Generic members remain group identity without
-  representative substitution. The superseded `flight` filter on the ordinary
-  Bottle list was removed because it could expose a retained Bottle as exact
-  identity for a generic membership. Flight list/create/update keep their
-  bounded target-free response, while task 8.7 now supplies target-native
-  membership input. Retained request compatibility and pair storage remain only
-  for the staged task 9.7 and 9.6 cleanup.
+  representative substitution. The optional `flight` filter on the ordinary
+  Bottle list matches `flight_bottle.target_id` directly to the outer exact
+  CatalogTarget, so retained-pair drift cannot select a Bottle and generic-only
+  membership does not substitute the representative. Flight list/create/update
+  keep their bounded target-free response, while task 8.7 now supplies
+  target-native membership input. Retained request compatibility and pair
+  storage remain only for the staged task 9.7 and 9.6 cleanup.
 - `apps/server/src/orpc/routes/tastings/create.ts` accepts strict, disjoint
   target-native and retained compatibility inputs. The authoritative target is
   locked before Flight membership and Tasting mutation. Exact targets retain

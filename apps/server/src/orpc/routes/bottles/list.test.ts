@@ -3,6 +3,7 @@ import {
   bottleAliases,
   bottleTombstones,
   catalogTargets,
+  flightBottles,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
@@ -385,6 +386,137 @@ describe("GET /bottles", () => {
     expect(retainedMatch.results.map((result) => result.id)).toEqual([
       bottle2.id,
     ]);
+  });
+
+  test("filters flights by exact target despite retained-pair drift", async ({
+    fixtures,
+  }) => {
+    const flight = await fixtures.Flight({ name: "Exact target flight" });
+    const exactBottle = await fixtures.Bottle({
+      name: "Exact flight member",
+    });
+    const retainedBottle = await fixtures.Bottle({
+      name: "Drifted retained member",
+    });
+    await fixtures.Bottle({
+      name: "Unrelated Bottle",
+    });
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, exactBottle.id),
+    });
+    if (!exactTarget) throw new Error("Missing exact target fixture");
+
+    await db.insert(flightBottles).values({
+      flightId: flight.id,
+      bottleId: retainedBottle.id,
+      targetId: exactTarget.id,
+    });
+
+    const { results } = await routerClient.bottles.list({
+      flight: flight.publicId,
+      sort: "name",
+    });
+
+    expect(results.map((result) => result.id)).toEqual([exactBottle.id]);
+  });
+
+  test("does not substitute a representative for generic-only flight membership", async ({
+    fixtures,
+  }) => {
+    const flight = await fixtures.Flight({ name: "Generic target flight" });
+    const representative = await fixtures.Bottle({
+      name: "Generic group representative",
+    });
+    if (!representative.groupId) throw new Error("Missing BottleGroup fixture");
+    const genericTarget = await db.query.catalogTargets.findFirst({
+      where: and(
+        eq(catalogTargets.groupId, representative.groupId),
+        isNull(catalogTargets.bottleId),
+      ),
+    });
+    if (!genericTarget) throw new Error("Missing generic target fixture");
+
+    await db.insert(flightBottles).values({
+      flightId: flight.id,
+      bottleId: representative.id,
+      targetId: genericTarget.id,
+    });
+
+    const { results } = await routerClient.bottles.list({
+      flight: flight.publicId,
+    });
+
+    expect(results).toHaveLength(0);
+  });
+
+  test("returns empty results for an unknown flight", async ({ fixtures }) => {
+    await fixtures.Bottle({ name: "Some Bottle" });
+
+    const result = await routerClient.bottles.list({
+      flight: "unknown-flight",
+      cursor: 2,
+    });
+
+    expect(result).toEqual({
+      results: [],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+  });
+
+  test("paginates exact flight members using Bottle list ordering", async ({
+    fixtures,
+  }) => {
+    const members = await Promise.all(
+      Array.from({ length: 5 }, (_, index) =>
+        fixtures.Bottle({
+          name: `Flight Bottle ${index + 1}`,
+          totalTastings: index + 1,
+        }),
+      ),
+    );
+    await fixtures.Bottle({
+      name: "Outside flight",
+      totalTastings: 100,
+    });
+    const flight = await fixtures.Flight({
+      name: "Paginated flight",
+      bottles: members.map((bottle) => bottle.id),
+    });
+
+    const page1 = await routerClient.bottles.list({
+      flight: flight.publicId,
+      limit: 2,
+      cursor: 1,
+      sort: "-tastings",
+    });
+    const page2 = await routerClient.bottles.list({
+      flight: flight.publicId,
+      limit: 2,
+      cursor: 2,
+      sort: "-tastings",
+    });
+    const page3 = await routerClient.bottles.list({
+      flight: flight.publicId,
+      limit: 2,
+      cursor: 3,
+      sort: "-tastings",
+    });
+
+    expect(page1.results.map((result) => result.id)).toEqual([
+      members[4]!.id,
+      members[3]!.id,
+    ]);
+    expect(page1.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(page2.results.map((result) => result.id)).toEqual([
+      members[2]!.id,
+      members[1]!.id,
+    ]);
+    expect(page2.rel).toEqual({ nextCursor: 3, prevCursor: 1 });
+    expect(page3.results.map((result) => result.id)).toEqual([members[0]!.id]);
+    expect(page3.rel).toEqual({ nextCursor: null, prevCursor: 2 });
   });
 
   test("lists bottles with query matching brand and name", async ({
