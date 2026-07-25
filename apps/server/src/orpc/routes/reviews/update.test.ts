@@ -152,6 +152,7 @@ describe("PATCH /reviews/:review", () => {
     });
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
+      targetId: target!.id,
       bottleId: bottle.id,
       releaseId: release.id,
       createdBottle: false,

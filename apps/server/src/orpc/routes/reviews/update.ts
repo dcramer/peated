@@ -280,6 +280,7 @@ export default procedure
                 actor,
                 bottleId: updatedReview.bottleId!,
                 releaseId: updatedReview.releaseId,
+                targetId: updatedReview.targetId,
               });
             }
 
