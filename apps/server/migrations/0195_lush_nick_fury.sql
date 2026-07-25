@@ -1,3 +1,0 @@
-CREATE UNIQUE INDEX "collection_bottle_target_unq" ON "collection_bottle" USING btree ("collection_id","target_id") WHERE "collection_bottle"."target_id" IS NOT NULL;
-CREATE UNIQUE INDEX "flight_bottle_target_unq" ON "flight_bottle" USING btree ("flight_id","target_id") WHERE "flight_bottle"."target_id" IS NOT NULL;
-CREATE UNIQUE INDEX "tasting_target_unq" ON "tasting" USING btree ("target_id","created_by_id","created_at") WHERE "tasting"."target_id" IS NOT NULL;

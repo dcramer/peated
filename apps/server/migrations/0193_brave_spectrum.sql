@@ -1,4 +1,5 @@
 CREATE TYPE "public"."bottle_release_promotion_status" AS ENUM('pending', 'promoted', 'failed');
+ALTER TYPE "public"."object_type" ADD VALUE 'bottle_group' BEFORE 'bottle_release';
 CREATE TABLE "bottle_group_distiller" (
 	"group_id" bigint NOT NULL,
 	"distiller_id" bigint NOT NULL,
@@ -58,8 +59,15 @@ CREATE TABLE "catalog_target" (
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 
+ALTER TABLE "collection_bottle" DROP CONSTRAINT "collection_bottle_collection_id_bottle_id_release_id_unique";
+ALTER TABLE "flight_bottle" DROP CONSTRAINT "flight_bottle_flight_id_bottle_id_release_id_unique";
+ALTER TABLE "tasting" DROP CONSTRAINT "tasting_unq";
+ALTER TABLE "collection_bottle" ALTER COLUMN "bottle_id" DROP NOT NULL;
+ALTER TABLE "flight_bottle" ALTER COLUMN "bottle_id" DROP NOT NULL;
+ALTER TABLE "tasting" ALTER COLUMN "bottle_id" DROP NOT NULL;
 ALTER TABLE "bottle_alias" ADD COLUMN "target_id" bigint;
 ALTER TABLE "bottle_observation" ADD COLUMN "target_id" bigint;
+ALTER TABLE "bottle_tombstone" ADD COLUMN "new_bottle_group_id" bigint;
 ALTER TABLE "bottle" ADD COLUMN "group_id" bigint;
 ALTER TABLE "collection_bottle" ADD COLUMN "target_id" bigint;
 ALTER TABLE "flight_bottle" ADD COLUMN "target_id" bigint;
@@ -91,7 +99,7 @@ CREATE INDEX "bottle_group_series_idx" ON "bottle_group" USING btree ("series_id
 CREATE INDEX "bottle_group_category_idx" ON "bottle_group" USING btree ("category");
 CREATE INDEX "bottle_group_representative_bottle_idx" ON "bottle_group" USING btree ("representative_bottle_id");
 CREATE INDEX "bottle_group_created_by_actor_idx" ON "bottle_group" USING btree ("created_by_actor_id");
-CREATE UNIQUE INDEX "bottle_release_promotion_bottle_unq" ON "bottle_release_promotion" USING btree ("promoted_bottle_id");
+CREATE INDEX "bottle_release_promotion_bottle_idx" ON "bottle_release_promotion" USING btree ("promoted_bottle_id");
 CREATE INDEX "bottle_release_promotion_status_idx" ON "bottle_release_promotion" USING btree ("status");
 CREATE INDEX "bottle_release_promotion_created_by_actor_idx" ON "bottle_release_promotion" USING btree ("created_by_actor_id");
 CREATE UNIQUE INDEX "catalog_target_generic_group_unq" ON "catalog_target" USING btree ("bottle_group_id") WHERE "catalog_target"."bottle_id" IS NULL;
@@ -99,6 +107,7 @@ CREATE UNIQUE INDEX "catalog_target_bottle_unq" ON "catalog_target" USING btree 
 CREATE INDEX "catalog_target_group_idx" ON "catalog_target" USING btree ("bottle_group_id");
 ALTER TABLE "bottle_alias" ADD CONSTRAINT "bottle_alias_target_id_catalog_target_id_fk" FOREIGN KEY ("target_id") REFERENCES "public"."catalog_target"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "bottle_observation" ADD CONSTRAINT "bottle_observation_target_id_catalog_target_id_fk" FOREIGN KEY ("target_id") REFERENCES "public"."catalog_target"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "bottle_tombstone" ADD CONSTRAINT "bottle_tombstone_new_bottle_group_id_bottle_group_id_fk" FOREIGN KEY ("new_bottle_group_id") REFERENCES "public"."bottle_group"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "bottle" ADD CONSTRAINT "bottle_group_id_bottle_group_id_fk" FOREIGN KEY ("group_id") REFERENCES "public"."bottle_group"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "collection_bottle" ADD CONSTRAINT "collection_bottle_target_id_catalog_target_id_fk" FOREIGN KEY ("target_id") REFERENCES "public"."catalog_target"("id") ON DELETE no action ON UPDATE no action;
 ALTER TABLE "flight_bottle" ADD CONSTRAINT "flight_bottle_target_id_catalog_target_id_fk" FOREIGN KEY ("target_id") REFERENCES "public"."catalog_target"("id") ON DELETE no action ON UPDATE no action;
@@ -112,8 +121,13 @@ ALTER TABLE "store_price" ADD CONSTRAINT "store_price_target_id_catalog_target_i
 ALTER TABLE "tasting" ADD CONSTRAINT "tasting_target_id_catalog_target_id_fk" FOREIGN KEY ("target_id") REFERENCES "public"."catalog_target"("id") ON DELETE no action ON UPDATE no action;
 CREATE INDEX "bottle_alias_target_idx" ON "bottle_alias" USING btree ("target_id");
 CREATE INDEX "bottle_observation_target_idx" ON "bottle_observation" USING btree ("target_id");
+CREATE INDEX "bottle_tombstone_new_group_idx" ON "bottle_tombstone" USING btree ("new_bottle_group_id");
 CREATE INDEX "bottle_group_idx" ON "bottle" USING btree ("group_id");
+CREATE UNIQUE INDEX "collection_bottle_legacy_unq" ON "collection_bottle" USING btree ("collection_id","bottle_id",COALESCE("release_id", 0)) WHERE "collection_bottle"."bottle_id" IS NOT NULL;
+CREATE UNIQUE INDEX "collection_bottle_target_unq" ON "collection_bottle" USING btree ("collection_id","target_id") WHERE "collection_bottle"."target_id" IS NOT NULL;
 CREATE INDEX "collection_bottle_target_idx" ON "collection_bottle" USING btree ("target_id");
+CREATE UNIQUE INDEX "flight_bottle_legacy_unq" ON "flight_bottle" USING btree ("flight_id","bottle_id",COALESCE("release_id", 0)) WHERE "flight_bottle"."bottle_id" IS NOT NULL;
+CREATE UNIQUE INDEX "flight_bottle_target_unq" ON "flight_bottle" USING btree ("flight_id","target_id") WHERE "flight_bottle"."target_id" IS NOT NULL;
 CREATE INDEX "flight_bottle_target_idx" ON "flight_bottle" USING btree ("target_id");
 CREATE INDEX "incoming_bottle_decision_target_idx" ON "incoming_bottle_decision_log" USING btree ("target_id");
 CREATE INDEX "review_target_idx" ON "review" USING btree ("target_id");
@@ -122,5 +136,11 @@ CREATE INDEX "store_price_match_attempt_suggested_target_idx" ON "store_price_ma
 CREATE INDEX "store_price_match_proposal_current_target_idx" ON "store_price_match_proposal" USING btree ("current_target_id");
 CREATE INDEX "store_price_match_proposal_suggested_target_idx" ON "store_price_match_proposal" USING btree ("suggested_target_id");
 CREATE INDEX "store_price_target_idx" ON "store_price" USING btree ("target_id");
+CREATE UNIQUE INDEX "tasting_legacy_unq" ON "tasting" USING btree ("bottle_id",COALESCE("release_id", 0),"created_by_id","created_at") WHERE "tasting"."bottle_id" IS NOT NULL;
+CREATE UNIQUE INDEX "tasting_target_unq" ON "tasting" USING btree ("target_id","created_by_id","created_at") WHERE "tasting"."target_id" IS NOT NULL;
 CREATE INDEX "tasting_target_idx" ON "tasting" USING btree ("target_id");
 ALTER TABLE "bottle" ADD CONSTRAINT "bottle_id_group_id_unq" UNIQUE("id","group_id");
+ALTER TABLE "bottle_tombstone" ADD CONSTRAINT "bottle_tombstone_destination_check" CHECK (NOT ("bottle_tombstone"."new_bottle_id" IS NOT NULL AND "bottle_tombstone"."new_bottle_group_id" IS NOT NULL));
+ALTER TABLE "collection_bottle" ADD CONSTRAINT "collection_bottle_identity_check" CHECK ("collection_bottle"."bottle_id" IS NOT NULL OR ("collection_bottle"."target_id" IS NOT NULL AND "collection_bottle"."release_id" IS NULL));
+ALTER TABLE "flight_bottle" ADD CONSTRAINT "flight_bottle_identity_check" CHECK ("flight_bottle"."bottle_id" IS NOT NULL OR ("flight_bottle"."target_id" IS NOT NULL AND "flight_bottle"."release_id" IS NULL));
+ALTER TABLE "tasting" ADD CONSTRAINT "tasting_identity_check" CHECK ("tasting"."bottle_id" IS NOT NULL OR ("tasting"."target_id" IS NOT NULL AND "tasting"."release_id" IS NULL));
