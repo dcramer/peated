@@ -9,6 +9,7 @@ import {
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
   bottleGroup,
+  bottleGroupDirectTasting,
   bottleGroupId,
   bottleGroupMember,
   bottleGroupMemberTargets,
@@ -58,6 +59,27 @@ test.describe("Release family workflows", () => {
     await expect(groupStatistic(page, "Tastings")).toHaveText("37");
     await expect(groupStatistic(page, "Related releases")).toHaveText("3");
     await expect(groupStatistic(page, "Ratings")).toHaveText("9");
+
+    const directTastings = page.getByRole("region", {
+      name: "Tastings logged to this release family",
+    });
+    await expect(
+      directTastings.getByText(bottleGroupDirectTasting.notes, { exact: true }),
+    ).toBeVisible();
+    await expect(
+      directTastings.getByText("Exact bottle not specified", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      directTastings.getByRole("link", { name: bottleGroup.fullName }),
+    ).toHaveAttribute(
+      "href",
+      `/bottles/${bottleGroupRepresentative.id}/releases`,
+    );
+    for (const { bottle } of bottleGroupMemberTargets) {
+      await expect(
+        directTastings.getByRole("link", { name: bottle.fullName }),
+      ).toHaveCount(0);
+    }
 
     for (const { bottle } of bottleGroupMemberTargets) {
       await expect(

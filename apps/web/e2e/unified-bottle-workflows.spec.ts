@@ -5,6 +5,8 @@ import {
   anotherReleaseSourceBottle,
   createdBottleId,
   createdBottleName,
+  exactMergeOtherBottle,
+  exactMergeOtherBottleId,
   existingBottleId,
   existingReleaseId,
   legacyPromotedBottleId,
@@ -249,6 +251,48 @@ test.describe("unified Bottle workflows", () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test("merges same-name Bottles with explicit retire and keep identities", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "exact-bottle-merge"),
+      user: { ...testUser, mod: true },
+    });
+
+    await page.goto(`/bottles/${existingBottleId}/merge`);
+    await expect(
+      page.getByRole("heading", { name: "Merge Bottle" }),
+    ).toBeVisible();
+
+    await page.getByText("Other Bottle", { exact: true }).click();
+    await page
+      .getByRole("button", {
+        name: `${exactMergeOtherBottle.fullName} · Bottle ${exactMergeOtherBottleId}`,
+      })
+      .click();
+
+    const retireCurrent = `Retire “${exactMergeOtherBottle.fullName}” (Bottle ${existingBottleId}); keep “${exactMergeOtherBottle.fullName}” (Bottle ${exactMergeOtherBottleId})`;
+    const retireOther = `Retire “${exactMergeOtherBottle.fullName}” (Bottle ${exactMergeOtherBottleId}); keep “${exactMergeOtherBottle.fullName}” (Bottle ${existingBottleId})`;
+    await expect(
+      page.getByRole("radio", { name: retireCurrent }),
+    ).toBeChecked();
+    await expect(page.getByRole("radio", { name: retireOther })).toBeVisible();
+
+    const mergeRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/bottles/merge"),
+    );
+    await page.getByRole("button", { name: "Merge Bottles" }).click();
+    expect(getRpcInput(await mergeRequestPromise)).toEqual({
+      bottle: existingBottleId,
+      other: exactMergeOtherBottleId,
+      direction: "mergeInto",
+    });
+    await expect(page).toHaveURL(
+      new RegExp(`/bottles/${exactMergeOtherBottleId}$`),
+    );
+  });
+
   test("permanently preserves the query when redirecting legacy creation", async ({
     baseURL,
   }) => {
@@ -266,9 +310,10 @@ test.describe("unified Bottle workflows", () => {
   test("permanently redirects legacy Bottling edits to the promoted Bottle", async ({
     baseURL,
   }) => {
+    const query = "?returnAction=view&tag=one&tag=two";
     const response = await fetch(
       new URL(
-        `/bottles/${existingBottleId}/bottlings/${existingReleaseId}/edit`,
+        `/bottles/${existingBottleId}/bottlings/${existingReleaseId}/edit${query}`,
         requireBaseURL(baseURL),
       ),
       { redirect: "manual" },
@@ -276,7 +321,25 @@ test.describe("unified Bottle workflows", () => {
 
     expect(response.status).toBe(308);
     expect(response.headers.get("location")).toBe(
-      `/bottles/${legacyPromotedBottleId}/edit`,
+      `/bottles/${legacyPromotedBottleId}/edit${query}`,
+    );
+  });
+
+  test("preserves repeated query values through the releases edit adapter", async ({
+    baseURL,
+  }) => {
+    const query = "?returnAction=view&tag=one&tag=two";
+    const response = await fetch(
+      new URL(
+        `/bottles/${existingBottleId}/releases/${existingReleaseId}/edit${query}`,
+        requireBaseURL(baseURL),
+      ),
+      { redirect: "manual" },
+    );
+
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(
+      `/bottles/${legacyPromotedBottleId}/edit${query}`,
     );
   });
 });

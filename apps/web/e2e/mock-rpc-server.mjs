@@ -3,6 +3,7 @@ import http from "node:http";
 import {
   addAnotherReleaseSourceBottle,
   anotherReleaseSourceBottle,
+  bottleGroupDirectTasting,
   bottleGroupId,
   bottleGroupMemberTargets,
   bottleGroupRepresentative,
@@ -25,6 +26,8 @@ import {
   destinationBottleGroupTarget,
   emptyLibraryStats,
   emptyList,
+  exactMergeOtherBottle,
+  exactMergeOtherBottleId,
   exactReplacementSourceBottleId,
   exactSearchBottle,
   existingBottle,
@@ -169,6 +172,19 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
       sendRpcResponse(response, buildExactCatalogTarget());
+      return true;
+    case "bottles/merge":
+      if (
+        !getAccessToken(request).includes("exact-bottle-merge") ||
+        input?.bottle !== existingBottleId ||
+        input?.other !== exactMergeOtherBottleId ||
+        input?.direction !== "mergeInto" ||
+        Object.keys(input).length !== 3
+      ) {
+        sendRpcError(response, "Unexpected exact Bottle merge payload");
+        return true;
+      }
+      sendRpcResponse(response, exactMergeOtherBottle);
       return true;
     case "search": {
       const bottleGroupWorkflow = getAccessToken(request).includes(
@@ -554,6 +570,16 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "bottles/list":
+      if (getAccessToken(request).includes("exact-bottle-merge")) {
+        sendRpcResponse(response, {
+          results: [
+            withTargetId(existingBottle),
+            withTargetId(exactMergeOtherBottle),
+          ],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
       if (!getAccessToken(request).includes("flight-targets")) return false;
       sendRpcResponse(response, {
         results: [withTargetId(existingBottle)],
@@ -650,6 +676,31 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     }
+    case "tastings/list":
+      if (
+        input?.cursor !== 1 ||
+        input?.limit !== 25 ||
+        Object.keys(input).length !== 3
+      ) {
+        sendRpcError(response, "Unexpected direct Tasting list payload");
+        return true;
+      }
+      if (input.target === bottleGroupTarget.targetId) {
+        sendRpcResponse(response, {
+          results: [bottleGroupDirectTasting],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
+      if (
+        input.target === destinationBottleGroupTarget.targetId ||
+        input.target === splitBottleGroupTarget.targetId
+      ) {
+        sendRpcResponse(response, emptyList);
+        return true;
+      }
+      sendRpcError(response, "Unexpected direct Tasting target");
+      return true;
     case "tastings/photoIdentification":
       // E2E access-token suffixes select alternate mock photo-identification scenarios.
       if (getAccessToken(request).includes("photo-unauthorized")) {
@@ -1941,10 +1992,16 @@ function withCollectionStatus(request, bottle) {
 
 function getMockBottle(request, bottleId) {
   if (bottleId === existingBottleId) {
-    return getAccessToken(request).includes("add-another-release")
-      ? addAnotherReleaseSourceBottle
-      : existingBottle;
+    if (getAccessToken(request).includes("add-another-release")) {
+      return addAnotherReleaseSourceBottle;
+    }
+    return {
+      ...existingBottle,
+      groupId: destinationBottleGroupTarget.group.id,
+      group: destinationBottleGroupTarget.group,
+    };
   }
+  if (bottleId === exactMergeOtherBottleId) return exactMergeOtherBottle;
   if (bottleId === createdBottleId) {
     return buildCreatedBottle({
       includeExactBottleDetails: isExactBottlePhotoScenario(request),

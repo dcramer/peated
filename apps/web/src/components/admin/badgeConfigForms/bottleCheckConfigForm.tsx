@@ -1,8 +1,9 @@
 import { BottleCheckConfigSchema } from "@peated/server/lib/badges/checks/bottleCheck";
-import BottleField from "@peated/web/components/bottleField";
+import BottleField, {
+  type BottleOption,
+} from "@peated/web/components/bottleField";
 import Fieldset from "@peated/web/components/fieldset";
 import Form from "@peated/web/components/form";
-import type { Option } from "@peated/web/components/selectField";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -32,11 +33,12 @@ export default function BottleCheckConfigForm({
   }, [watch]);
 
   // TODO:
-  const [bottleValue, setBottleValue] = useState<Option[] | undefined>(
+  const [bottleValue, setBottleValue] = useState<BottleOption[] | undefined>(
     initialData.bottle
       ? initialData.bottle.map((i) => ({
           id: i,
           name: `(Bottle ID: ${i})`,
+          fullName: `(Bottle ID: ${i})`,
         }))
       : undefined,
   );

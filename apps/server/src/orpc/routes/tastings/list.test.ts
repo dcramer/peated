@@ -162,6 +162,104 @@ describe("GET /tastings", () => {
     expect(thirdPage.results).toEqual([]);
   });
 
+  test("filters exact and generic target identity independently", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
+    const { exact, generic } = await targetIds(
+      bottle.id,
+      bottle.groupId as number,
+    );
+    const { exact: otherExact } = await targetIds(
+      otherBottle.id,
+      otherBottle.groupId as number,
+    );
+    const exactTasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      targetId: exact,
+    });
+    const genericTasting = await fixtures.Tasting({
+      bottleId: null,
+      releaseId: null,
+      targetId: generic,
+    });
+    await fixtures.Tasting({
+      bottleId: otherBottle.id,
+      targetId: otherExact,
+    });
+
+    const [exactResults, genericResults] = await Promise.all([
+      routerClient.tastings.list({ target: exact }),
+      routerClient.tastings.list({ target: generic }),
+    ]);
+
+    expect(exactResults.results.map(({ id }) => id)).toEqual([exactTasting.id]);
+    expect(genericResults.results.map(({ id }) => id)).toEqual([
+      genericTasting.id,
+    ]);
+    expect(exactResults.results[0]?.target).toMatchObject({
+      kind: "bottle",
+      targetId: exact,
+      bottle: { id: bottle.id },
+    });
+    expect(genericResults.results[0]?.target).toMatchObject({
+      kind: "group",
+      targetId: generic,
+      group: { id: bottle.groupId },
+    });
+  });
+
+  test("rejects mixed target and retained Bottle filters", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
+    const { exact } = await targetIds(bottle.id, bottle.groupId as number);
+
+    const [bottleError, releaseError] = await Promise.all([
+      waitError(
+        routerClient.tastings.list({
+          target: exact,
+          bottle: bottle.id,
+        } as never),
+      ),
+      waitError(
+        routerClient.tastings.list({
+          target: exact,
+          release: release.id,
+        } as never),
+      ),
+    ]);
+
+    for (const error of [bottleError, releaseError]) {
+      expect(error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Input validation failed",
+        data: {
+          issues: [
+            {
+              code: "custom",
+              message: "Target cannot be combined with retained Bottle input.",
+              path: ["target"],
+            },
+          ],
+        },
+      });
+    }
+  });
+
+  test("rejects an invalid direct target filter", async () => {
+    const error = await waitError(
+      routerClient.tastings.list({ target: 999_999 }),
+    );
+
+    expect(error).toMatchObject({
+      code: "BAD_REQUEST",
+      message: "Cannot identify catalog target.",
+    });
+  });
+
   test("lists tastings with release", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });

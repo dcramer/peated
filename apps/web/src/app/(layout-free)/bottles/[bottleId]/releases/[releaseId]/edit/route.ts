@@ -2,7 +2,7 @@ import { resolveLegacyBottleReleaseRedirect } from "@peated/web/lib/legacyBottle
 import { notFound } from "next/navigation";
 import type { NextRequest } from "next/server";
 
-function parseRouteId(value: string) {
+function parseRouteId(value: string): number {
   const id = Number(value);
 
   if (!Number.isSafeInteger(id) || id < 1) {
@@ -15,12 +15,13 @@ function parseRouteId(value: string) {
 export async function GET(
   request: NextRequest,
   context: {
-    params: Promise<{ bottleId: string; bottlingId: string }>;
+    params: Promise<{ bottleId: string; releaseId: string }>;
   },
 ) {
-  const params = await context.params;
-  const bottleId = parseRouteId(params.bottleId);
-  const releaseId = parseRouteId(params.bottlingId);
+  const { bottleId: bottleParam, releaseId: releaseParam } =
+    await context.params;
+  const bottleId = parseRouteId(bottleParam);
+  const releaseId = parseRouteId(releaseParam);
   const target = await resolveLegacyBottleReleaseRedirect(bottleId, releaseId);
   if ("conflict" in target) {
     return new Response(null, { status: 409 });

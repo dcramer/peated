@@ -12,8 +12,8 @@ import ReleaseFamilyView from "./releaseFamilyView";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-function getCursor(searchParams: SearchParams): number {
-  const value = searchParams.cursor;
+function getCursor(searchParams: SearchParams, key: string): number {
+  const value = searchParams[key];
   const cursor = Number(Array.isArray(value) ? value[0] : value);
   return Number.isInteger(cursor) && cursor > 0 ? cursor : 1;
 }
@@ -70,21 +70,31 @@ export default async function ReleaseFamilyPage(props: {
   const { anchorBottle, client, target } = await getReleaseFamilyTarget(
     parseReleaseFamilyRouteId(bottleId),
   );
-  const bottleList = await resolveOrNotFound(
-    client.bottleGroups.bottles({
-      group: target.group.id,
-      cursor: getCursor(searchParams),
-      limit: 25,
-      query: "",
-      sort: "-tastings",
-    }),
-  );
+  const [bottleList, directTastingList] = await Promise.all([
+    resolveOrNotFound(
+      client.bottleGroups.bottles({
+        group: target.group.id,
+        cursor: getCursor(searchParams, "cursor"),
+        limit: 25,
+        query: "",
+        sort: "-tastings",
+      }),
+    ),
+    resolveOrNotFound(
+      client.tastings.list({
+        target: target.targetId,
+        cursor: getCursor(searchParams, "tastingCursor"),
+        limit: 25,
+      }),
+    ),
+  ]);
 
   return (
     <ReleaseFamilyView
       anchorBottleId={anchorBottle.id}
       target={target}
       bottleList={bottleList}
+      directTastingList={directTastingList}
     />
   );
 }

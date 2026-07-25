@@ -1,3 +1,4 @@
+import type { Outputs } from "@peated/server/orpc/router";
 import type {
   ExactCatalogTargetV1,
   GenericCatalogTargetV1,
@@ -10,14 +11,44 @@ import ReleaseFamilyView from "./releaseFamilyView";
 vi.mock("@peated/web/components/paginationButtons", () => ({
   default: ({
     rel,
+    cursorParam,
+    ariaLabel = "Pagination",
   }: {
     rel: { nextCursor: number | null; prevCursor: number | null };
-  }) => <nav aria-label="Pagination">Next page: {rel.nextCursor}</nav>,
+    cursorParam?: string;
+    ariaLabel?: string;
+  }) => (
+    <nav aria-label={ariaLabel}>
+      {cursorParam ?? "cursor"} next page: {rel.nextCursor}
+    </nav>
+  ),
 }));
 
 vi.mock("@peated/web/components/collectionAction", () => ({
   default: ({ targetId, title }: { targetId: number; title: string }) => (
     <button data-target-id={targetId}>{title}</button>
+  ),
+}));
+
+vi.mock("@peated/web/components/tastingList", () => ({
+  default: ({
+    values,
+  }: {
+    values: Array<{
+      id: number;
+      notes: string | null;
+      target: GenericCatalogTargetV1;
+    }>;
+  }) => (
+    <ul aria-label="Direct release family tastings">
+      {values.map((tasting) => (
+        <li key={tasting.id}>
+          {tasting.notes}
+          <span>{tasting.target.group.fullName}</span>
+          <span>Exact bottle not specified</span>
+        </li>
+      ))}
+    </ul>
   ),
 }));
 
@@ -127,6 +158,29 @@ const exactTarget = {
   },
 } satisfies ExactCatalogTargetV1;
 
+const directGenericTasting = {
+  id: 700,
+  imageUrl: null,
+  notes: "Smoky family tasting.",
+  target,
+  rating: 2,
+  tags: [],
+  color: null,
+  servingStyle: null,
+  friends: [],
+  awards: [],
+  comments: 0,
+  toasts: 0,
+  hasToasted: false,
+  createdAt: timestamp,
+  createdBy: {
+    id: 5,
+    username: "familytaster",
+    pictureUrl: null,
+    private: false,
+  },
+} satisfies Outputs["tastings"]["list"]["results"][number];
+
 describe("ReleaseFamilyView", () => {
   it("keeps generic identity separate from independently complete Bottles", () => {
     const html = renderToStaticMarkup(
@@ -136,6 +190,10 @@ describe("ReleaseFamilyView", () => {
         bottleList={{
           results: [exactTarget],
           rel: { prevCursor: null, nextCursor: 2 },
+        }}
+        directTastingList={{
+          results: [directGenericTasting],
+          rel: { prevCursor: null, nextCursor: 3 },
         }}
       />,
     );
@@ -152,6 +210,9 @@ describe("ReleaseFamilyView", () => {
     expect(html).toContain('src="https://example.com/group.webp"');
     expect(html).toContain("Related releases</dt><dd");
     expect(html).toContain(">2</dd>");
+    expect(html).toContain("Tastings logged to this release family");
+    expect(html).toContain("Smoky family tasting.");
+    expect(html).toContain("Exact bottle not specified");
 
     expect(html).toContain('href="/bottles/42"');
     expect(html).not.toContain('href="/bottles/999"');
@@ -164,7 +225,9 @@ describe("ReleaseFamilyView", () => {
     expect(html).toContain("Cask strength");
     expect(html).toContain("1st Fill Oloroso Hogshead cask");
     expect(html).toContain('src="https://example.com/exact.webp"');
-    expect(html).toContain('aria-label="Pagination"');
-    expect(html).toContain("Next page: 2");
+    expect(html).toContain('aria-label="Release family tasting pagination"');
+    expect(html).toContain("tastingCursor next page: 3");
+    expect(html).toContain('aria-label="Related release pagination"');
+    expect(html).toContain("cursor next page: 2");
   });
 });

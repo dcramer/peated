@@ -11,7 +11,11 @@ import {
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { recordCatalogTargetReadFilterParity } from "@peated/server/lib/catalogTargetReadParity";
-import { resolveLegacyCatalogTargetFilterForRead } from "@peated/server/lib/catalogTargets";
+import {
+  CatalogTargetResolutionError,
+  resolveCatalogTargetForAssignment,
+  resolveLegacyCatalogTargetFilterForRead,
+} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { TastingSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -19,6 +23,36 @@ import { TastingSerializer } from "@peated/server/serializers/tasting";
 import type { SQL } from "drizzle-orm";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+
+const InputSchema = z
+  .object({
+    target: z.coerce.number().int().positive().optional(),
+    bottle: z.coerce.number().gte(1).optional(),
+    release: z.coerce.number().gte(1).optional(),
+    entity: z.coerce.number().optional(),
+    user: z.union([z.coerce.number(), z.literal("me"), z.string()]).optional(),
+    filter: z.enum(["global", "friends", "local"]).default("global"),
+    cursor: z.coerce.number().gte(1).default(1),
+    limit: z.coerce.number().gte(1).lte(100).default(25),
+  })
+  .strict()
+  .superRefine((input, ctx) => {
+    if (
+      input.target !== undefined &&
+      (input.bottle !== undefined || input.release !== undefined)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Target cannot be combined with retained Bottle input.",
+        path: ["target"],
+      });
+    }
+  })
+  .default({
+    filter: "global",
+    cursor: 1,
+    limit: 25,
+  });
 
 export default procedure
   .route({
@@ -29,25 +63,7 @@ export default procedure
       "Retrieve tastings with filtering by bottle, entity, user, and privacy settings. Supports pagination",
     operationId: "listTastings",
   })
-  .input(
-    z
-      .object({
-        bottle: z.coerce.number().gte(1).optional(),
-        release: z.coerce.number().gte(1).optional(),
-        entity: z.coerce.number().optional(),
-        user: z
-          .union([z.coerce.number(), z.literal("me"), z.string()])
-          .optional(),
-        filter: z.enum(["global", "friends", "local"]).default("global"),
-        cursor: z.coerce.number().gte(1).default(1),
-        limit: z.coerce.number().gte(1).lte(100).default(25),
-      })
-      .default({
-        filter: "global",
-        cursor: 1,
-        limit: 25,
-      }),
-  )
+  .input(InputSchema)
   // TODO(response-envelope): helper enables later switch to { data, meta }
   .output(listResponse(TastingSchema))
   .handler(async function ({
@@ -64,6 +80,25 @@ export default procedure
       targetWhere: SQL<unknown>;
       legacyWhere: SQL<unknown>;
     }[] = [];
+
+    if (input.target !== undefined) {
+      try {
+        const target = await resolveCatalogTargetForAssignment({
+          kind: "target",
+          targetId: input.target,
+        });
+        targetWhere.push(eq(tastings.targetId, target.targetId));
+      } catch (error) {
+        if (error instanceof CatalogTargetResolutionError) {
+          throw errors.BAD_REQUEST({
+            message: "Cannot identify catalog target.",
+            cause: error,
+          });
+        }
+        throw error;
+      }
+    }
+
     if (input.bottle || input.release) {
       const target = await resolveLegacyCatalogTargetFilterForRead(
         {

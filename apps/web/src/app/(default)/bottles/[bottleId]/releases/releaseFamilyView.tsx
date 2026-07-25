@@ -7,21 +7,25 @@ import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
+import TastingList from "@peated/web/components/tastingList";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { Suspense } from "react";
 import ReleaseFamilyModActions from "./releaseFamilyModActions";
 
 type BottleGroupTarget = Outputs["bottleGroups"]["details"];
 type BottleGroupBottleList = Outputs["bottleGroups"]["bottles"];
+type TastingListResult = Outputs["tastings"]["list"];
 
 export default function ReleaseFamilyView({
   anchorBottleId,
   target,
   bottleList,
+  directTastingList,
 }: {
   anchorBottleId: number;
   target: BottleGroupTarget;
   bottleList: BottleGroupBottleList;
+  directTastingList: TastingListResult;
 }) {
   const { group } = target;
 
@@ -151,6 +155,36 @@ export default function ReleaseFamilyView({
         </div>
       )}
 
+      <section aria-labelledby="family-tastings-heading" className="my-8">
+        <div className="mb-4">
+          <h2
+            id="family-tastings-heading"
+            className="text-highlight text-lg font-bold"
+          >
+            Tastings logged to this release family
+          </h2>
+          <p className="text-muted mt-1 text-sm">
+            These tastings identify the shared expression, but no exact Bottle
+            was selected.
+          </p>
+        </div>
+
+        {directTastingList.results.length ? (
+          <TastingList values={directTastingList.results} />
+        ) : (
+          <p className="text-muted border-y border-slate-800 py-6">
+            No tastings have been logged directly to this release family.
+          </p>
+        )}
+        <Suspense>
+          <PaginationButtons
+            rel={directTastingList.rel}
+            cursorParam="tastingCursor"
+            ariaLabel="Release family tasting pagination"
+          />
+        </Suspense>
+      </section>
+
       <section aria-labelledby="related-releases-heading" className="my-8">
         <div className="mb-4">
           <h2
@@ -204,7 +238,10 @@ export default function ReleaseFamilyView({
         )}
 
         <Suspense>
-          <PaginationButtons rel={bottleList.rel} />
+          <PaginationButtons
+            rel={bottleList.rel}
+            ariaLabel="Related release pagination"
+          />
         </Suspense>
       </section>
     </div>

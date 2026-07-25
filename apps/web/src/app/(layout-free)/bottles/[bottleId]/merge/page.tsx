@@ -1,7 +1,10 @@
 "use client";
 
 import { BottleMergeSchema } from "@peated/server/schemas";
-import BottleField from "@peated/web/components/bottleField";
+import BottleField, {
+  type BottleOption,
+  formatBottleOptionWithId,
+} from "@peated/web/components/bottleField";
 import ChoiceField from "@peated/web/components/choiceField";
 import Fieldset from "@peated/web/components/fieldset";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -10,7 +13,6 @@ import FormError from "@peated/web/components/formError";
 import FormHeader from "@peated/web/components/formHeader";
 import Header from "@peated/web/components/header";
 import Layout from "@peated/web/components/layout";
-import type { Option } from "@peated/web/components/selectField";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
@@ -27,6 +29,16 @@ import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
 
 type FormSchemaType = z.infer<typeof BottleMergeSchema>;
+
+function formatMergeBottleIdentity({
+  id,
+  fullName,
+}: {
+  id: number;
+  fullName: string;
+}): string {
+  return `“${fullName}” (Bottle ${id})`;
+}
 
 export default function MergeBottle(props: {
   params: Promise<{ bottleId: string }>;
@@ -60,9 +72,8 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
     : null;
 
   const [otherBottleName, setOtherBottleName] = useState<string>("Other");
-  const [selectedOtherBottle, setSelectedOtherBottle] = useState<Option | null>(
-    null,
-  );
+  const [selectedOtherBottle, setSelectedOtherBottle] =
+    useState<BottleOption | null>(null);
   const [appliedPrefillKey, setAppliedPrefillKey] = useState<null | string>(
     null,
   );
@@ -110,7 +121,8 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
 
     const nextBottle = {
       id: prefilledOtherBottle.id,
-      name: prefilledOtherBottle.fullName,
+      name: formatBottleOptionWithId(prefilledOtherBottle),
+      fullName: prefilledOtherBottle.fullName,
     };
 
     setSelectedOtherBottle(nextBottle);
@@ -152,7 +164,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
             title="Merge Bottle"
             saveDisabled={isSubmitting}
             onSave={handleSubmit(onSubmit)}
-            saveLabel="Continue"
+            saveLabel="Merge Bottles"
           />
         </Header>
       }
@@ -172,11 +184,12 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
                 error={errors.bottleId}
                 label="Other Bottle"
                 required
+                formatOptionName={formatBottleOptionWithId}
                 value={selectedOtherBottle}
                 onChange={(value) => {
                   onChange(value?.id);
                   setSelectedOtherBottle(value ?? null);
-                  setOtherBottleName(value?.name || "Other");
+                  setOtherBottleName(value?.fullName || "Other");
                 }}
                 onResults={(results) => {
                   return results.filter((r) => r.id !== bottle.id);
@@ -192,11 +205,25 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
             choices={[
               {
                 id: "mergeFrom",
-                name: `Merge "${otherBottleName}" into "${bottle.fullName}"`,
+                name: `Retire ${
+                  selectedOtherBottle
+                    ? formatMergeBottleIdentity({
+                        id: selectedOtherBottle.id,
+                        fullName: otherBottleName,
+                      })
+                    : "the selected Bottle"
+                }; keep ${formatMergeBottleIdentity(bottle)}`,
               },
               {
                 id: "mergeInto",
-                name: `Merge "${bottle.fullName}" into "${otherBottleName}"`,
+                name: `Retire ${formatMergeBottleIdentity(bottle)}; keep ${
+                  selectedOtherBottle
+                    ? formatMergeBottleIdentity({
+                        id: selectedOtherBottle.id,
+                        fullName: otherBottleName,
+                      })
+                    : "the selected Bottle"
+                }`,
               },
             ]}
             error={errors.direction}

@@ -81,6 +81,7 @@ export const exactReplacementSourceBottleId = 9307;
 export const retiredParentBottleId = 9308;
 export const missingPageTargetBottleId = 9309;
 export const conflictingPageTargetBottleId = 9310;
+export const exactMergeOtherBottleId = 9311;
 export const createdTastingId = 9401;
 export const bottleImageBottleId = 9501;
 export const bottleImageUrl = "http://127.0.0.1:4999/uploads/bottle-image.webp";
@@ -145,6 +146,14 @@ export function buildBottle({
 }
 
 export const existingBottle = buildBottle();
+
+export const exactMergeOtherBottle = {
+  ...buildBottle({
+    id: exactMergeOtherBottleId,
+    name: existingBottle.name,
+  }),
+  fullName: existingBottle.fullName,
+};
 
 export const exactSearchBottle = {
   ...buildBottle({
@@ -546,12 +555,19 @@ export const bottleGroupMemberTargets = [
   buildBottleGroupMemberTarget(bottleGroupThirdMember, 50_203),
 ];
 
+/** @type {GenericCatalogTargetV1} */
 export const bottleGroupTarget = {
   schemaVersion: 1,
   kind: "group",
   targetId: 50_200,
   group: bottleGroup,
 };
+
+export const bottleGroupDirectTasting = buildTasting({
+  id: 9402,
+  target: bottleGroupTarget,
+  notes: "A direct release-family tasting.",
+});
 
 export const flightTargetFixtureId = "flight-targets";
 export const createdFlightTargetFixtureId = "flight-targets-created";

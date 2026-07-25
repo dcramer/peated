@@ -1285,10 +1285,11 @@ Routes:
 - `apps/web/src/app/(default)/bottles/[bottleId]/releases/page.tsx` is the
   canonical public release-family page. The Bottle id identifies a real active
   member used only to locate its BottleGroup; the page renders group-owned
-  identity, editorial content, and aggregate statistics, labels the exact
-  release as unspecified, and paginates independently complete member Bottles
-  linking to `/bottles/:id`. It does not render the anchor's exact header or
-  Product structured data.
+  identity, editorial content, aggregate statistics, and direct generic-target
+  Tastings, labels the exact release as unspecified, and independently
+  paginates those Tastings and complete member Bottles linking to
+  `/bottles/:id`. It does not render the anchor's exact header or Product
+  structured data.
 - `apps/web/src/app/(default)/bottles/[bottleId]/releases/releaseFamilyView.tsx`
   owns the generic family presentation, aggregate statistics, and exact member
   list.
@@ -1333,7 +1334,7 @@ Routes:
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/[bottlingId]/edit/route.ts`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/bottlings/new/route.ts`
 - `apps/web/src/app/(layout-free)/bottles/[bottleId]/edit/page.tsx`
-- `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/[releaseId]/edit/page.tsx`
+- `apps/web/src/app/(layout-free)/bottles/[bottleId]/releases/[releaseId]/edit/route.ts`
 - `apps/web/src/app/(layout-free)/bottles/new/page.tsx`
 
 Task 7.8 moves the legacy nested-Bottling detail URL out of the exact-Bottle
@@ -1346,6 +1347,12 @@ second read system. The nested new and edit URLs are permanent redirect routes:
 new points to the independent "Add another release" workflow, while edit
 resolves the retained release mapping and points to the promoted concrete
 Bottle editor.
+
+`apps/web/src/lib/legacyBottleReleaseRedirect.server.ts` is the shared
+translation-only owner for the retained edit aliases. Both routes resolve the
+measured parent/release mapping directly and issue one permanent redirect to
+the promoted Bottle editor; neither redirects through another compatibility
+route.
 
 Task 7.9 establishes the durable retired-parent-to-group mapping and redirect
 owner without retiring a parent row. Active migrated parents and future task 9.8
