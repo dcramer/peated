@@ -166,7 +166,7 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcError(response, "Unexpected Bottle update payload");
         return true;
       }
-      sendRpcResponse(response, buildExactCatalogTarget());
+      sendRpcResponse(response, existingBottle);
       return true;
     case "bottles/merge":
       if (
@@ -240,7 +240,7 @@ async function handleRpcRequest({ request, response, url }) {
           caskType: "oloroso",
           caskSize: "hogshead",
         };
-        sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
+        sendRpcResponse(response, bottle);
         return true;
       }
 
@@ -261,7 +261,7 @@ async function handleRpcRequest({ request, response, url }) {
           ...addAnotherReleaseSourceBottle,
           id: createdBottleId,
         };
-        sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
+        sendRpcResponse(response, bottle);
         return true;
       }
 
@@ -280,7 +280,7 @@ async function handleRpcRequest({ request, response, url }) {
         name: createdBottleName,
         brand: testBrand,
       });
-      sendRpcResponse(response, buildExactCatalogTarget({ bottle }));
+      sendRpcResponse(response, bottle);
       return true;
     }
     case "prices/matchQueue/list": {

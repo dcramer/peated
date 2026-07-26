@@ -166,11 +166,11 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.tastingNotes).toEqual(tastingNotes);
+    expect(data.tastingNotes).toEqual(tastingNotes);
     const [bottle] = await db
       .select({ tastingNotes: bottles.tastingNotes })
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle.tastingNotes).toEqual(tastingNotes);
   });
 
@@ -188,9 +188,8 @@ describe("POST /bottles", () => {
     );
 
     expect(data).toMatchObject({
-      schemaVersion: 1,
-      kind: "bottle",
-      targetId: expect.any(Number),
+      id: expect.any(Number),
+      name: "Delicious Wood",
       group: {
         id: expect.any(Number),
         name: "Delicious Wood",
@@ -198,22 +197,18 @@ describe("POST /bottles", () => {
         representativeBottleId: expect.any(Number),
         totalBottles: 1,
       },
-      bottle: {
-        id: expect.any(Number),
-        groupId: expect.any(Number),
-        name: "Delicious Wood",
-      },
     });
-    expect(data.bottle.groupId).toBe(data.group.id);
-    expect(data.group.representativeBottleId).toBe(data.bottle.id);
+    expect(data.group!.representativeBottleId).toBe(data.id);
+    expect(data).not.toHaveProperty("targetId");
+    expect(data).not.toHaveProperty("kind");
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle).toMatchObject({
-      id: data.bottle.id,
-      groupId: data.group.id,
+      id: data.id,
+      groupId: data.group!.id,
       name: "Delicious Wood",
       fullName: `${brand.name} Delicious Wood`,
       brandId: brand.id,
@@ -231,7 +226,7 @@ describe("POST /bottles", () => {
     const [group] = await db
       .select()
       .from(bottleGroups)
-      .where(eq(bottleGroups.id, data.group.id));
+      .where(eq(bottleGroups.id, data.group!.id));
     expect(group).toMatchObject({
       id: bottle.groupId,
       name: bottle.name,
@@ -256,7 +251,6 @@ describe("POST /bottles", () => {
     );
     expect(targets).toContainEqual(
       expect.objectContaining({
-        id: data.targetId,
         groupId: group.id,
         bottleId: bottle.id,
       }),
@@ -333,7 +327,7 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
     expect(data.group).toMatchObject({
       name: "Delicious Wood",
       brandId: brand.id,
@@ -342,16 +336,16 @@ describe("POST /bottles", () => {
       category: "single_malt",
       statedAge: 12,
       flavorProfile: FLAVOR_PROFILES[0],
-      representativeBottleId: data.bottle.id,
+      representativeBottleId: data.id,
       totalBottles: 1,
     });
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle).toMatchObject({
-      groupId: data.group.id,
+      groupId: data.group!.id,
       name: "Delicious Wood - Batch 7 - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength - Bourbon Cask - Hogshead - 1st Fill",
       brandId: brand.id,
       bottlerId: distiller.id,
@@ -370,15 +364,14 @@ describe("POST /bottles", () => {
       description: "A complete concrete release.",
       descriptionSrc: "user",
     });
-    expect(data.bottle).toMatchObject({
+    expect(data).toMatchObject({
       id: bottle.id,
-      groupId: bottle.groupId,
       name: bottle.name,
-      brandId: bottle.brandId,
-      bottlerId: bottle.bottlerId,
-      distillerIds: [distiller.id],
+      brand: { id: bottle.brandId },
+      bottler: { id: bottle.bottlerId },
+      distillers: [{ id: distiller.id }],
       category: bottle.category,
-      seriesId: bottle.seriesId,
+      series: null,
       flavorProfile: bottle.flavorProfile,
       edition: bottle.edition,
       statedAge: bottle.statedAge,
@@ -391,7 +384,6 @@ describe("POST /bottles", () => {
       caskType: bottle.caskType,
       caskFill: bottle.caskFill,
       description: bottle.description,
-      descriptionSrc: bottle.descriptionSrc,
     });
     expect(bottle.createdByActorId).toBe(
       (await getUserActor(defaults.user)).id,
@@ -444,13 +436,13 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [{ bottle, brand }] = await db
       .select({ bottle: bottles, brand: entities })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
 
     expect(bottle.name).toEqual("Delicious Wood");
     expect(bottle.brandId).toEqual(existingBrand.id);
@@ -491,13 +483,13 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [{ bottle, brand }] = await db
       .select({ bottle: bottles, brand: entities })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
 
     expect(bottle.name).toEqual("Delicious Wood");
     expect(bottle.brandId).toBeDefined();
@@ -566,12 +558,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle.name).toEqual("Delicious Wood");
 
     const distillers = await db
@@ -619,12 +611,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle.name).toEqual("Delicious Wood");
 
     const distillers = await db
@@ -675,12 +667,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle.name).toEqual("Delicious Wood");
 
     const distillers = await db
@@ -737,12 +729,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle.name).toEqual("Delicious Wood");
 
     const distillers = await db
@@ -795,10 +787,10 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
-      bottleId: data.bottle.id,
+      bottleId: data.id,
       creationSource: "manual_entry",
     });
   });
@@ -888,7 +880,7 @@ describe("POST /bottles", () => {
       },
       { context: { user: defaults.user } },
     );
-    expect(data.bottle).toMatchObject({
+    expect(data).toMatchObject({
       name: "Delicious Wood 12-year-old",
       fullName: `${brand.name} Delicious Wood 12-year-old`,
       statedAge: null,
@@ -897,7 +889,7 @@ describe("POST /bottles", () => {
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle).toMatchObject({
       name: "Delicious Wood 12-year-old",
       fullName: `${brand.name} Delicious Wood 12-year-old`,
@@ -915,12 +907,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [bottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
     expect(bottle.name).toEqual("Yum Yum");
     expect(bottle.fullName).toEqual("Delicious Wood Yum Yum");
   });
@@ -940,12 +932,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const dList = await db
       .select()
       .from(bottlesToDistillers)
-      .where(eq(bottlesToDistillers.bottleId, data.bottle.id));
+      .where(eq(bottlesToDistillers.bottleId, data.id));
     expect(dList.length).toEqual(1);
     expect(dList[0].distillerId).toEqual(distiller.id);
   });
@@ -966,12 +958,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [newBottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
 
     expect(newBottle.seriesId).toEqual(series.id);
 
@@ -999,12 +991,12 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.bottle.id).toBeDefined();
+    expect(data.id).toBeDefined();
 
     const [newBottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, data.bottle.id));
+      .where(eq(bottles.id, data.id));
 
     expect(newBottle.seriesId).toBeDefined();
 

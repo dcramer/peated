@@ -7,9 +7,10 @@ import {
 } from "@peated/server/lib/updateConcreteBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
-import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
+import { BottleSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { z } from "zod";
-import loadExactTarget from "./load-exact-target";
 
 const InputSchema = ConcreteBottleUpdateInputSchema.extend({
   bottle: z.coerce.number().int().positive(),
@@ -17,7 +18,7 @@ const InputSchema = ConcreteBottleUpdateInputSchema.extend({
 
 /**
  * Strict moderator HTTP adapter that delegates every shared or exact mutation
- * to the canonical concrete-Bottle service and returns its validated target.
+ * to the canonical concrete-Bottle service and returns the updated Bottle.
  */
 export default procedure
   .use(requireMod)
@@ -33,7 +34,7 @@ export default procedure
     }),
   })
   .input(InputSchema)
-  .output(ExactCatalogTargetV1Schema)
+  .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
       const result = await updateConcreteBottle({
@@ -42,9 +43,12 @@ export default procedure
         context,
       });
 
-      return await loadExactTarget(
-        { bottleId: result.bottle.id, groupId: result.group.id },
-        context,
+      return await serialize(
+        BottleSerializer,
+        result.bottle,
+        context.user,
+        [],
+        { includeGroupSummary: true },
       );
     } catch (error) {
       if (error instanceof ConcreteBottleUpdateInputError) {

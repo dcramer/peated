@@ -9,10 +9,7 @@ import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import updateBottle from "@peated/server/orpc/routes/bottles/update";
-import {
-  BottleReleaseInputSchema,
-  ExactCatalogTargetV1Schema,
-} from "@peated/server/schemas";
+import { BottleReleaseInputSchema, BottleSchema } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -50,7 +47,8 @@ const InputSchema = z.object({
 
 /**
  * Measured compatibility over the promoted Bottle's canonical exact update.
- * Tasks 9.4 and 9.7 disable and then remove this legacy write surface.
+ * Task 5.8 keeps this translation-only; tasks 8.6 and 8.7 disable and then
+ * remove the legacy write surface after compatibility traffic is reviewed.
  */
 export default procedure
   .use(requireMod)
@@ -66,7 +64,7 @@ export default procedure
     }),
   })
   .input(InputSchema)
-  .output(ExactCatalogTargetV1Schema)
+  .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     const [release] = await db
       .select({ id: bottleReleases.id, bottleId: bottleReleases.bottleId })
@@ -148,8 +146,7 @@ export default procedure
         operation: "update_concrete_bottle",
         legacyBottleId: release.bottleId,
         releaseId: release.id,
-        replacementBottleId: updated.bottle.id,
-        replacementTargetId: updated.targetId,
+        replacementBottleId: updated.id,
       },
     });
 

@@ -1,7 +1,8 @@
 import { ORPCError } from "@orpc/client";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
-import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
+import type { BottleSchema } from "@peated/server/schemas";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { z } from "zod";
 import scrapePrices, {
   handleBottle,
   type ScrapePricesCallback,
@@ -22,23 +23,17 @@ vi.mock("@peated/server/lib/orpc-client/server", () => ({
   },
 }));
 
-function exactTarget({
+function bottleResult({
   bottleId,
   imageUrl = null,
 }: {
   bottleId: number;
   imageUrl?: string | null;
-}): ExactCatalogTargetV1 {
+}): z.infer<typeof BottleSchema> {
   return {
-    schemaVersion: 1,
-    kind: "bottle",
-    targetId: bottleId + 1000,
-    group: { id: bottleId + 2000 },
-    bottle: {
-      id: bottleId,
-      imageUrl,
-    },
-  } as ExactCatalogTargetV1;
+    id: bottleId,
+    imageUrl,
+  } as z.infer<typeof BottleSchema>;
 }
 
 describe("handleBottle", () => {
@@ -75,10 +70,10 @@ describe("handleBottle", () => {
     vi.unstubAllGlobals();
   });
 
-  it("creates a concrete Bottle and consumes its exact target for image upload", async () => {
-    const target = exactTarget({ bottleId: 41 });
+  it("creates a concrete Bottle and consumes it directly for image upload", async () => {
+    const bottle = bottleResult({ bottleId: 41 });
     const imageBlob = new Blob(["image"]);
-    vi.mocked(orpcClient.bottles.create).mockResolvedValue(target);
+    vi.mocked(orpcClient.bottles.create).mockResolvedValue(bottle);
     vi.mocked(orpcClient.bottles.imageUpdate).mockResolvedValue({
       imageUrl: "https://api.example.com/uploads/bottles/1.webp",
     });
@@ -109,7 +104,7 @@ describe("handleBottle", () => {
     expect(createInput).not.toHaveProperty("image");
     expect(orpcClient.bottles.update).not.toHaveBeenCalled();
     expect(orpcClient.bottles.imageUpdate).toHaveBeenCalledWith({
-      bottle: target.bottle.id,
+      bottle: bottle.id,
       file: imageBlob,
     });
     expect(orpcClient.prices.createBatch).toHaveBeenCalledWith({
@@ -120,14 +115,14 @@ describe("handleBottle", () => {
 
   it("directs a canonical create conflict to the strict concrete update", async () => {
     const conflictBottleId = 52;
-    const target = exactTarget({ bottleId: conflictBottleId });
+    const bottle = bottleResult({ bottleId: conflictBottleId });
     vi.mocked(orpcClient.bottles.create).mockRejectedValue(
       new ORPCError("CONFLICT", {
         defined: true,
         data: { bottle: conflictBottleId },
       }),
     );
-    vi.mocked(orpcClient.bottles.update).mockResolvedValue(target);
+    vi.mocked(orpcClient.bottles.update).mockResolvedValue(bottle);
 
     await handleBottle(bottleInput);
 
@@ -190,7 +185,7 @@ describe("handleBottle", () => {
 
   it("continues price ingestion when image transfer fails", async () => {
     vi.mocked(orpcClient.bottles.create).mockResolvedValue(
-      exactTarget({ bottleId: 74 }),
+      bottleResult({ bottleId: 74 }),
     );
     vi.mocked(orpcClient.prices.createBatch).mockResolvedValue({} as never);
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("image down")));

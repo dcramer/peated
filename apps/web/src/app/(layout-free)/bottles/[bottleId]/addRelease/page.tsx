@@ -88,7 +88,7 @@ function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
                 independentBottle: data,
               })
             ).bottle
-          : (await bottleCreateMutation.mutateAsync(data)).bottle;
+          : await bottleCreateMutation.mutateAsync(data);
 
         if (image) {
           try {

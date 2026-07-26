@@ -125,27 +125,23 @@ describe("PATCH /bottle-releases/{release}", () => {
     );
 
     expect(result).toMatchObject({
-      schemaVersion: 1,
-      kind: "bottle",
-      targetId: promotedTarget.id,
       group: { id: parent.groupId },
-      bottle: {
-        id: promoted.id,
-        groupId: parent.groupId,
-        edition: "Mapped Batch Updated",
-        statedAge: 12,
-        abv: 0,
-        singleCask: false,
-        caskStrength: false,
-        vintageYear: 2008,
-        releaseYear: 2020,
-        caskType: "bourbon",
-        caskSize: "hogshead",
-        caskFill: "refill",
-        description: null,
-        tastingNotes: null,
-      },
+      id: promoted.id,
+      edition: "Mapped Batch Updated",
+      statedAge: 12,
+      abv: 0,
+      singleCask: false,
+      caskStrength: false,
+      vintageYear: 2008,
+      releaseYear: 2020,
+      caskType: "bourbon",
+      caskSize: "hogshead",
+      caskFill: "refill",
+      description: null,
+      tastingNotes: null,
     });
+    expect(result).not.toHaveProperty("targetId");
+    expect(result).not.toHaveProperty("kind");
 
     const [updatedBottle] = await db
       .select()
@@ -170,7 +166,7 @@ describe("PATCH /bottle-releases/{release}", () => {
       await db
         .select()
         .from(bottleAliases)
-        .where(eq(bottleAliases.name, result.bottle.fullName)),
+        .where(eq(bottleAliases.name, result.fullName)),
     ).toEqual([
       expect.objectContaining({
         bottleId: promoted.id,
@@ -244,7 +240,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "OnBottleAliasChange",
-      { name: result.bottle.fullName },
+      { name: result.fullName },
     );
   });
 
@@ -286,13 +282,13 @@ describe("PATCH /bottle-releases/{release}", () => {
       { release: release.id, description: "Image remains" },
       { context: { user: mod } },
     );
-    expect(omitted.bottle.imageUrl).toBe("https://example.com/original.jpg");
+    expect(omitted.imageUrl).toBe("https://example.com/original.jpg");
 
     const cleared = await routerClient.bottleReleases.update(
       { release: release.id, imageUrl: null },
       { context: { user: mod } },
     );
-    expect(cleared.bottle.imageUrl).toBeNull();
+    expect(cleared.imageUrl).toBeNull();
     expect(
       await db
         .select({ imageUrl: bottles.imageUrl })

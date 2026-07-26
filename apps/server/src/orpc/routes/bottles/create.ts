@@ -10,8 +10,9 @@ import {
   requireTosAccepted,
   requireVerified,
 } from "@peated/server/orpc/middleware/auth";
-import { ExactCatalogTargetV1Schema } from "@peated/server/schemas";
-import loadExactTarget from "./load-exact-target";
+import { BottleSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 
 export default procedure
   .use(requireVerified)
@@ -28,20 +29,19 @@ export default procedure
     }),
   })
   .input(IndependentConcreteBottleCreateRouteInputSchema)
-  .output(ExactCatalogTargetV1Schema)
+  .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
       const result = await createConcreteBottle({
         context,
         input: buildIndependentConcreteBottleCreateInput(input),
       });
-      return await loadExactTarget(
-        {
-          bottleId: result.bottle.id,
-          groupId: result.group.id,
-          targetId: result.exactTarget.id,
-        },
-        context,
+      return await serialize(
+        BottleSerializer,
+        result.bottle,
+        context.user,
+        [],
+        { includeGroupSummary: true },
       );
     } catch (err) {
       if (err instanceof BottleAlreadyExistsError) {

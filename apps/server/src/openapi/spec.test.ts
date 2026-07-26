@@ -71,6 +71,16 @@ function expectExactTargetResponse(schema: any) {
   expect(JSON.stringify(schema)).not.toContain("BottleRelease");
 }
 
+function expectBottleResponse(schema: any) {
+  const refs = [
+    schema?.$ref,
+    ...(schema?.allOf ?? []).map((part: any) => part?.$ref),
+  ];
+  expect(refs).toContain("#/components/schemas/Bottle");
+  expect(JSON.stringify(schema)).not.toContain("targetId");
+  expect(JSON.stringify(schema)).not.toContain('"kind"');
+}
+
 function expectGenericTargetResponse(schema: any) {
   expect(Object.keys(schema?.properties ?? {})).toEqual(
     expect.arrayContaining(["schemaVersion", "kind", "targetId", "group"]),
@@ -136,12 +146,14 @@ describe("OpenAPI generation ($ref reuse)", () => {
       spec.paths?.["/bottles/{bottle}/edit-context"]?.get?.operationId,
     ).toBe("getBottleEditContext");
 
-    expectExactTargetResponse(
-      getJsonResponseSchema(spec.paths?.["/bottles"]?.post),
-    );
-    expectExactTargetResponse(
+    expectBottleResponse(getJsonResponseSchema(spec.paths?.["/bottles"]?.post));
+    expectBottleResponse(
       getJsonResponseSchema(spec.paths?.["/bottles/{bottle}"]?.patch),
     );
+    const bottleSchema = spec.components?.schemas?.Bottle as any;
+    expect(bottleSchema?.properties?.group).toBeDefined();
+    expect(bottleSchema?.properties?.targetId).toBeUndefined();
+    expect(bottleSchema?.properties?.kind).toBeUndefined();
 
     const editContextSchema = getJsonResponseSchema(
       spec.paths?.["/bottles/{bottle}/edit-context"]?.get,
@@ -159,12 +171,12 @@ describe("OpenAPI generation ($ref reuse)", () => {
       operationIds.filter((id) => id === "getBottleEditContext"),
     ).toHaveLength(1);
 
-    expectTypeOf<
-      Outputs["bottles"]["create"]
-    >().toEqualTypeOf<ExactCatalogTargetV1>();
-    expectTypeOf<
-      Outputs["bottles"]["update"]
-    >().toEqualTypeOf<ExactCatalogTargetV1>();
+    expectTypeOf<Outputs["bottles"]["create"]>().toEqualTypeOf<
+      z.infer<typeof BottleSchema>
+    >();
+    expectTypeOf<Outputs["bottles"]["update"]>().toEqualTypeOf<
+      z.infer<typeof BottleSchema>
+    >();
     expectTypeOf<
       "createFromSource" extends keyof Outputs["bottles"] ? true : false
     >().toEqualTypeOf<false>();
@@ -206,6 +218,12 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<Outputs["bottleReleases"]["target"]>().toEqualTypeOf<{
       bottleId: number;
     }>();
+    expectBottleResponse(
+      getJsonResponseSchema(spec.paths?.["/bottle-releases/{release}"]?.patch),
+    );
+    expectTypeOf<Outputs["bottleReleases"]["update"]>().toEqualTypeOf<
+      z.infer<typeof BottleSchema>
+    >();
   });
 
   it("publishes member-anchored BottleGroup reads and presentation without management operations", async () => {

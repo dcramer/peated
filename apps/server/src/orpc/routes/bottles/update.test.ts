@@ -100,15 +100,9 @@ describe("PATCH /bottles/{bottle}", () => {
     ).toEqual(bottle);
   });
 
-  test("returns the existing exact target for a no-op", async ({
-    fixtures,
-  }) => {
+  test("returns the existing Bottle for a no-op", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({ name: "No-op Update" });
-    const [target] = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.bottleId, bottle.id));
     const [groupBefore] = await db
       .select()
       .from(bottleGroups)
@@ -120,11 +114,11 @@ describe("PATCH /bottles/{bottle}", () => {
     );
 
     expect(result).toMatchObject({
-      kind: "bottle",
-      targetId: target.id,
+      id: bottle.id,
       group: { id: bottle.groupId },
-      bottle: { id: bottle.id },
     });
+    expect(result).not.toHaveProperty("targetId");
+    expect(result).not.toHaveProperty("kind");
     expect(
       await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
     ).toEqual(bottle);
@@ -179,17 +173,13 @@ describe("PATCH /bottles/{bottle}", () => {
     );
 
     expect(result).toMatchObject({
-      kind: "bottle",
       group: { id: groupBefore.id, name: groupBefore.name, statedAge: 12 },
-      bottle: {
-        id: first.bottle.id,
-        groupId: groupBefore.id,
-        edition: "Batch 3",
-        statedAge: 14,
-        releaseYear: 2026,
-        abv: 52,
-        description: "Selected content",
-      },
+      id: first.bottle.id,
+      edition: "Batch 3",
+      statedAge: 14,
+      releaseYear: 2026,
+      abv: 52,
+      description: "Selected content",
     });
     expect((await loadMembers(groupBefore.id))[1]).toEqual(siblingBefore);
     expect(await loadTargets(groupBefore.id)).toEqual(targetsBefore);
@@ -249,7 +239,6 @@ describe("PATCH /bottles/{bottle}", () => {
     );
 
     expect(result).toMatchObject({
-      kind: "bottle",
       group: {
         id: first.group.id,
         name: "New Route Label",
@@ -261,18 +250,15 @@ describe("PATCH /bottles/{bottle}", () => {
         category: "single_malt",
         flavorProfile: "peated",
       },
-      bottle: {
-        id: first.bottle.id,
-        groupId: first.group.id,
-        brandId: newBrand.id,
-        bottlerId: newBottler.id,
-        seriesId: newSeries.id,
-        category: "single_malt",
-        flavorProfile: "peated",
-        edition: "Batch 3",
-        statedAge: 13,
-        abv: 50,
-      },
+      id: first.bottle.id,
+      brand: { id: newBrand.id },
+      bottler: { id: newBottler.id },
+      series: { id: newSeries.id },
+      category: "single_malt",
+      flavorProfile: "peated",
+      edition: "Batch 3",
+      statedAge: 13,
+      abv: 50,
     });
 
     const updatedMembers = await loadMembers(first.group.id);

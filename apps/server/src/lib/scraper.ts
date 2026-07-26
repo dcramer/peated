@@ -5,7 +5,6 @@ import {
 } from "@peated/server/constants";
 import { logError, logInfo } from "@peated/server/lib/log";
 import { orpcClient } from "@peated/server/lib/orpc-client/server";
-import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import type { ExternalSiteType } from "@peated/server/types";
 import { type Category } from "@peated/server/types";
 import axios from "axios";
@@ -13,7 +12,11 @@ import { existsSync, mkdirSync, statSync } from "fs";
 import { open } from "fs/promises";
 import { z } from "zod";
 import config from "../config";
-import type { BottleInputSchema, StorePriceInputSchema } from "../schemas";
+import type {
+  BottleInputSchema,
+  BottleSchema,
+  StorePriceInputSchema,
+} from "../schemas";
 import BatchQueue from "./batchQueue";
 import {
   buildConcreteBottleUpdatePatch,
@@ -151,6 +154,7 @@ export async function chunked<T>(
 }
 
 export type StorePrice = z.infer<typeof StorePriceInputSchema>;
+type BottleResult = z.infer<typeof BottleSchema>;
 
 export type BottleReview = {
   name: string;
@@ -188,7 +192,7 @@ export async function handleBottle(
     }
     const createResult = await safe(orpcClient.bottles.create(createInput));
 
-    let target: ExactCatalogTargetV1 | undefined = createResult.data;
+    let resultBottle: BottleResult | undefined = createResult.data;
     if (createResult.error) {
       if (!createResult.isDefined || createResult.error.code !== "CONFLICT") {
         logError(createResult.error, {
@@ -225,11 +229,11 @@ export async function handleBottle(
         });
         return;
       }
-      target = updateResult.data;
+      resultBottle = updateResult.data;
     }
 
-    if (!target) {
-      const error = new Error("Bottle create/update returned no exact target.");
+    if (!resultBottle) {
+      const error = new Error("Bottle create/update returned no Bottle.");
       logError(error, {
         extra: {
           bottle,
@@ -238,11 +242,11 @@ export async function handleBottle(
       return;
     }
 
-    if (!target.bottle.imageUrl && imageUrl) {
+    if (!resultBottle.imageUrl && imageUrl) {
       try {
         const blob = await downloadFileAsBlob(imageUrl);
         await orpcClient.bottles.imageUpdate({
-          bottle: target.bottle.id,
+          bottle: resultBottle.id,
           file: blob,
         });
       } catch (err) {

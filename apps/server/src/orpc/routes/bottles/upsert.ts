@@ -7,13 +7,12 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleSchema } from "@peated/server/schemas";
 
 import create from "./create";
-import details from "./details";
 import update from "./update";
 
 /**
  * Translation-only, measured legacy compatibility. All writes delegate to the
- * concrete Bottle routes. Task 5.9 removes supported callers; task 9.7 removes
- * this measured adapter after observed traffic reaches zero.
+ * concrete Bottle routes. Task 7.1 removes this adapter after supported callers
+ * use the canonical create and update operations.
  */
 export default procedure
   .use(requireMod)
@@ -33,21 +32,16 @@ export default procedure
   .handler(async function ({ input, context }) {
     try {
       const created = await call(create, input, { context });
-      const bottle = await call(
-        details,
-        { bottle: created.bottle.id },
-        { context },
-      );
-      logInfo("Legacy Bottle upsert response compatibility read", {
+      logInfo("Legacy Bottle upsert compatibility write", {
         extra: {
           event: "bottle_upsert.compatibility",
-          access: "read",
+          access: "write",
           caller: "bottles.upsert",
-          operation: "translate_concrete_create_response",
-          bottleId: created.bottle.id,
+          operation: "delegate_create",
+          bottleId: created.id,
         },
       });
-      return bottle;
+      return created;
     } catch (err) {
       if (err instanceof ORPCError && err.status === 409) {
         const updated = await call(
@@ -58,21 +52,16 @@ export default procedure
           },
           { context },
         );
-        const bottle = await call(
-          details,
-          { bottle: updated.bottle.id },
-          { context },
-        );
-        logInfo("Legacy Bottle upsert response compatibility read", {
+        logInfo("Legacy Bottle upsert compatibility write", {
           extra: {
             event: "bottle_upsert.compatibility",
-            access: "read",
+            access: "write",
             caller: "bottles.upsert",
-            operation: "translate_concrete_update_response",
-            bottleId: updated.bottle.id,
+            operation: "delegate_update",
+            bottleId: updated.id,
           },
         });
-        return bottle;
+        return updated;
       }
       throw err;
     }

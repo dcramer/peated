@@ -82,6 +82,7 @@ export const retiredParentBottleId = 9308;
 export const missingPageTargetBottleId = 9309;
 export const conflictingPageTargetBottleId = 9310;
 export const exactMergeOtherBottleId = 9311;
+export const exactSearchBottleId = 9312;
 export const createdTastingId = 9401;
 export const bottleImageBottleId = 9501;
 export const bottleImageUrl = "http://127.0.0.1:4999/uploads/bottle-image.webp";
@@ -157,7 +158,7 @@ export const exactMergeOtherBottle = {
 
 export const exactSearchBottle = {
   ...buildBottle({
-    id: 9307,
+    id: exactSearchBottleId,
     name: "21-year-old",
   }),
   fullName: `${testBrand.name} 21-year-old - Cask 42`,
