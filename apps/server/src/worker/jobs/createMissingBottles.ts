@@ -139,8 +139,6 @@ export default async function createMissingBottles() {
               decision,
               actor: systemActor,
               bottleId,
-              releaseId: null,
-              targetId: null,
               createdBottle: resolution.createdBottle,
               confidence: resolution.confidence,
               model: resolution.model,

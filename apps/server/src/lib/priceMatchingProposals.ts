@@ -1269,7 +1269,6 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
         actor: writeActor,
         decision: createResult ? "create_bottle" : "match_existing",
         createdBottle: !!createResult,
-        createdRelease: false,
         metadata: {
           creationTarget: "bottle",
           creationSource,
@@ -1791,7 +1790,6 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
       actor: IncomingBottleDecisionActor;
       decision: IncomingBottleDecisionType;
       createdBottle?: boolean;
-      createdRelease?: boolean;
       metadata?: Record<string, unknown>;
     };
     bottleId: number;
@@ -1867,10 +1865,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
       decision: decisionLog.decision,
       actor,
       bottleId,
-      releaseId: null,
-      targetId: null,
       createdBottle: decisionLog.createdBottle ?? false,
-      createdRelease: decisionLog.createdRelease ?? false,
       confidence: proposal.confidence,
       model: proposal.model,
       rationale: proposal.rationale,

@@ -1,17 +1,12 @@
 import { db } from "@peated/server/db";
 import {
   actors,
+  bottles,
   externalSites,
   incomingBottleDecisionLogs,
 } from "@peated/server/db/schema";
-import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import {
-  CatalogTargetV1Schema,
-  type CatalogTargetV1,
-} from "@peated/server/schemas";
 import { and, desc, eq, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
@@ -60,7 +55,10 @@ const IncomingBottleDecisionListResponseSchema = z.object({
         key: z.string(),
         displayName: z.string(),
       }),
-      target: CatalogTargetV1Schema.nullable(),
+      bottle: z.object({
+        id: z.number(),
+        fullName: z.string(),
+      }),
       createdBottle: z.boolean(),
       createdRelease: z.boolean(),
       confidence: z.number().nullable(),
@@ -88,7 +86,7 @@ export default procedure
   })
   .input(IncomingBottleDecisionListInputSchema)
   .output(IncomingBottleDecisionListResponseSchema)
-  .handler(async function ({ input, errors }) {
+  .handler(async function ({ input }) {
     const offset = (input.cursor - 1) * input.limit;
     const where: SQL<unknown>[] = [];
 
@@ -109,6 +107,10 @@ export default procedure
           key: actors.key,
           displayName: actors.displayName,
         },
+        bottle: {
+          id: bottles.id,
+          fullName: bottles.fullName,
+        },
       })
       .from(incomingBottleDecisionLogs)
       .innerJoin(
@@ -116,6 +118,7 @@ export default procedure
         eq(externalSites.id, incomingBottleDecisionLogs.externalSiteId),
       )
       .innerJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
+      .innerJoin(bottles, eq(bottles.id, incomingBottleDecisionLogs.bottleId))
       .where(where.length ? and(...where) : undefined)
       .orderBy(
         desc(incomingBottleDecisionLogs.createdAt),
@@ -126,40 +129,9 @@ export default procedure
 
     const hasNextPage = rows.length > input.limit;
     const page = rows.slice(0, input.limit);
-    let targets: (CatalogTargetV1 | null)[];
-    try {
-      ({ targets } = await loadCatalogTargetReadsWithParity(
-        page.map(({ log }) => ({
-          consumerTable: "incoming_bottle_decision_log",
-          rowLocator: { id: log.id },
-          targetId: log.targetId,
-          legacy: {
-            bottleId: log.bottleId,
-            releaseId: log.releaseId,
-          },
-        })),
-        {
-          actor: null,
-          permissions: { canReadCatalogIdentity: true },
-          caller: "admin.incomingBottleDecisions",
-          operation: "hydrate",
-        },
-      ));
-    } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      throw error;
-    }
 
     return {
-      results: page.map((row, index) => {
-        const target = targets[index];
-        if (target === undefined) {
-          throw new Error(
-            `Missing incoming Bottle decision target result: ${row.log.id}`,
-          );
-        }
+      results: page.map((row) => {
         return {
           id: row.log.id,
           sourceKind: row.log.sourceKind,
@@ -174,7 +146,7 @@ export default procedure
           url: row.log.url,
           decision: row.log.decision,
           actor: row.actor,
-          target,
+          bottle: row.bottle,
           createdBottle: row.log.createdBottle,
           createdRelease: row.log.createdRelease,
           confidence: row.log.confidence,

@@ -1,5 +1,4 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Link from "@peated/web/components/link";
 
 type DecisionLogItem =
@@ -18,16 +17,16 @@ export function formatDecision(value: DecisionLogItem["decision"]): string {
   }
 }
 
-export function DecisionTarget({
-  target,
+export function DecisionBottle({
+  bottle,
 }: {
-  target: DecisionLogItem["target"];
+  bottle: Pick<DecisionLogItem["bottle"], "id" | "fullName">;
 }) {
-  if (!target) {
-    return <span className="text-sm text-slate-400">Unknown target</span>;
-  }
-
-  return <CatalogTargetIdentity target={target} compact />;
+  return (
+    <Link href={`/bottles/${bottle.id}`} className="text-sm underline">
+      {bottle.fullName}
+    </Link>
+  );
 }
 
 function formatDate(value: string): string {
@@ -76,7 +75,7 @@ export default function DecisionRow({ item }: { item: DecisionLogItem }) {
         {getActorLabel(item)}
       </td>
       <td className="px-4 py-3">
-        <DecisionTarget target={item.target} />
+        <DecisionBottle bottle={item.bottle} />
       </td>
       <td className="px-4 py-3 text-sm text-slate-300">
         {item.url ? (

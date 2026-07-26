@@ -1,52 +1,18 @@
-import type { CatalogTargetV1 } from "@peated/server/schemas";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { DecisionTarget, formatDecision } from "./decisionRow";
+import { DecisionBottle, formatDecision } from "./decisionRow";
 
-const groupTarget = {
-  kind: "group",
-  targetId: 41,
-  group: {
-    id: 7,
-    fullName: "Springbank 12 Cask Strength",
-    representativeBottleId: 19,
-  },
-} as CatalogTargetV1;
-
-const bottleTarget = {
-  kind: "bottle",
-  targetId: 42,
-  group: groupTarget.group,
-  bottle: {
-    id: 19,
-    fullName: "Springbank 12 Cask Strength Batch 24",
-  },
-} as CatalogTargetV1;
-
-describe("DecisionTarget", () => {
-  it("links an exact target to its independently complete Bottle", () => {
-    const html = renderToStaticMarkup(<DecisionTarget target={bottleTarget} />);
+describe("DecisionBottle", () => {
+  it("links the independently complete Bottle", () => {
+    const bottle = {
+      id: 19,
+      fullName: "Springbank 12 Cask Strength Batch 24",
+    };
+    const html = renderToStaticMarkup(<DecisionBottle bottle={bottle} />);
 
     expect(html).toContain('href="/bottles/19"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
-    expect(html).toContain("Exact bottle");
-  });
-
-  it("links a generic target through its representative route anchor", () => {
-    const html = renderToStaticMarkup(<DecisionTarget target={groupTarget} />);
-
-    expect(html).toContain('href="/bottles/19/releases"');
-    expect(html).not.toContain('href="/bottles/19"');
-    expect(html).toContain("Springbank 12 Cask Strength");
-    expect(html).toContain("Exact bottle not specified");
-  });
-
-  it("renders a user-readable state when no target was retained", () => {
-    const html = renderToStaticMarkup(<DecisionTarget target={null} />);
-
-    expect(html).toContain("Unknown target");
-    expect(html).not.toContain("<a");
   });
 });
 

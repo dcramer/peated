@@ -127,7 +127,7 @@ export default function Page() {
                     Actor
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    Target
+                    Bottle
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
                     URL

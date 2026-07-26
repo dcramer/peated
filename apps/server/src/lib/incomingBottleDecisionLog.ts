@@ -49,10 +49,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     decision,
     actor,
     bottleId,
-    releaseId = null,
-    targetId,
     createdBottle = false,
-    createdRelease = false,
     confidence = null,
     model = null,
     rationale = null,
@@ -67,10 +64,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     decision: IncomingBottleDecisionType;
     actor: IncomingBottleDecisionActor;
     bottleId: number;
-    releaseId?: number | null;
-    targetId: number | null;
     createdBottle?: boolean;
-    createdRelease?: boolean;
     confidence?: number | null;
     model?: string | null;
     rationale?: string | null;
@@ -93,10 +87,10 @@ export async function recordIncomingBottleDecisionInTransaction(
       decision,
       actorId: actor.id,
       bottleId,
-      releaseId,
-      targetId,
+      releaseId: null,
+      targetId: null,
       createdBottle,
-      createdRelease,
+      createdRelease: false,
       confidence,
       model,
       rationale,

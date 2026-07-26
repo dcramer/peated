@@ -1,8 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleReleasePromotions,
-  bottleTombstones,
-  bottles,
   catalogTargets,
   incomingBottleDecisionLogs,
 } from "@peated/server/db/schema";
@@ -11,23 +8,6 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-
-async function exactTargetId(bottleId: number): Promise<number> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Missing exact CatalogTarget fixture");
-  return target.id;
-}
-
-async function genericTargetId(groupId: number): Promise<number> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: (targets, { and, eq, isNull }) =>
-      and(eq(targets.groupId, groupId), isNull(targets.bottleId)),
-  });
-  if (!target) throw new Error("Missing generic CatalogTarget fixture");
-  return target.id;
-}
 
 describe("GET /admin/incoming-bottle-decisions", () => {
   test("requires authentication", async () => {
@@ -56,7 +36,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     const systemActor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(bottle.id);
     const price = await fixtures.StorePrice({
       bottleId: null,
       externalSiteId: site.id,
@@ -80,7 +59,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         decision: "match_existing",
         actorId: userActor.id,
         bottleId: bottle.id,
-        targetId,
         confidence: 87,
         model: "decision-model",
         rationale: "Matched by exact identity.",
@@ -96,7 +74,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         decision: "create_bottle",
         actorId: systemActor.id,
         bottleId: bottle.id,
-        targetId,
         createdBottle: true,
         confidence: 92,
         createdAt: new Date("2026-03-09T11:00:00.000Z"),
@@ -110,6 +87,10 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     expect(result.results).toHaveLength(2);
     expect("actorType" in result.results[0]).toBe(false);
     expect("actorUser" in result.results[0]).toBe(false);
+    expect(result.results[0].bottle).toEqual({
+      id: bottle.id,
+      fullName: bottle.fullName,
+    });
     expect(result.results[0]).toMatchObject({
       sourceKind: "store_price",
       sourceId: price.id,
@@ -120,13 +101,9 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         key: "peated",
         displayName: "Peated",
       },
-      target: {
-        kind: "bottle",
-        targetId,
-        bottle: {
-          id: bottle.id,
-          fullName: bottle.fullName,
-        },
+      bottle: {
+        id: bottle.id,
+        fullName: bottle.fullName,
       },
       createdBottle: true,
       confidence: 92,
@@ -141,141 +118,42 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         key: String(actorUser.id),
         displayName: actorUser.username,
       },
-      target: {
-        kind: "bottle",
-        targetId,
-        bottle: {
-          id: bottle.id,
-        },
+      bottle: {
+        id: bottle.id,
       },
       confidence: 87,
       model: "decision-model",
       rationale: "Matched by exact identity.",
       metadata: { evidence: "review" },
     });
-    expect("bottle" in result.results[0]).toBe(false);
+    expect("target" in result.results[0]).toBe(false);
     expect("release" in result.results[0]).toBe(false);
   });
 
-  test("uses the durable exact target when the retained Bottle drifts", async ({
+  test("uses Bottle identity while retaining legacy decision evidence", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
     const actor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting();
-    const authoritativeBottle = await fixtures.Bottle();
-    const retainedBottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(authoritativeBottle.id);
-
-    await db.insert(incomingBottleDecisionLogs).values({
-      sourceKind: "review",
-      sourceId: 101,
-      externalSiteId: site.id,
-      name: "Drifted decision",
-      decision: "match_existing",
-      actorId: actor.id,
-      bottleId: retainedBottle.id,
-      targetId,
+    const bottle = await fixtures.Bottle();
+    const evidenceBottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: evidenceBottle.id,
     });
-
-    const result = await routerClient.admin.incomingBottleDecisions(undefined, {
-      context: { user: admin },
+    const target = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, evidenceBottle.id),
     });
+    if (!target) throw new Error("Missing historical target fixture");
 
-    expect(result.results).toEqual([
-      expect.objectContaining({
-        name: "Drifted decision",
-        target: expect.objectContaining({
-          kind: "bottle",
-          targetId,
-          bottle: expect.objectContaining({ id: authoritativeBottle.id }),
-        }),
-      }),
-    ]);
-  });
-
-  test("returns a generic target without presenting a representative Bottle", async ({
-    fixtures,
-  }) => {
-    const admin = await fixtures.User({ admin: true });
-    const actor = await getPeatedSystemActor();
-    const site = await fixtures.ExternalSiteOrExisting();
-    const retainedBottle = await fixtures.Bottle();
-    if (retainedBottle.groupId === null) {
-      throw new Error("Missing BottleGroup fixture");
-    }
-    await fixtures.BottleRelease({ bottleId: retainedBottle.id });
-    const targetId = await genericTargetId(retainedBottle.groupId);
-
-    await db.insert(incomingBottleDecisionLogs).values({
-      sourceKind: "review",
-      sourceId: 102,
-      externalSiteId: site.id,
-      name: "Generic decision",
-      decision: "match_existing",
-      actorId: actor.id,
-      bottleId: retainedBottle.id,
-      targetId,
-    });
-
-    const result = await routerClient.admin.incomingBottleDecisions(undefined, {
-      context: { user: admin },
-    });
-
-    expect(result.results).toEqual([
-      expect.objectContaining({
-        name: "Generic decision",
-        target: expect.objectContaining({
-          kind: "group",
-          targetId,
-          group: expect.objectContaining({ id: retainedBottle.groupId }),
-        }),
-      }),
-    ]);
-    expect("bottle" in result.results[0]).toBe(false);
-    expect("release" in result.results[0]).toBe(false);
-  });
-
-  test("resolves a promoted retained release as parity evidence for its exact target", async ({
-    fixtures,
-  }) => {
-    const admin = await fixtures.User({ admin: true });
-    const actor = await getPeatedSystemActor();
-    const site = await fixtures.ExternalSiteOrExisting();
-    const parent = await fixtures.Bottle();
-    if (parent.groupId === null) throw new Error("Missing BottleGroup fixture");
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const [promotedBottle] = await db
-      .insert(bottles)
-      .values({
-        groupId: parent.groupId,
-        brandId: parent.brandId,
-        name: `${parent.name} promoted`,
-        fullName: `${parent.fullName} promoted`,
-        createdByActorId: parent.createdByActorId,
-      })
-      .returning();
-    if (!promotedBottle) throw new Error("Missing promoted Bottle fixture");
-    const [target] = await db
-      .insert(catalogTargets)
-      .values({ groupId: parent.groupId, bottleId: promotedBottle.id })
-      .returning();
-    if (!target) throw new Error("Missing promoted CatalogTarget fixture");
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
-    });
     await db.insert(incomingBottleDecisionLogs).values({
       sourceKind: "store_price",
-      sourceId: 103,
+      sourceId: 105,
       externalSiteId: site.id,
       name: "Historical release decision",
       decision: "create_release",
       actorId: actor.id,
-      bottleId: parent.id,
+      bottleId: bottle.id,
       releaseId: release.id,
       targetId: target.id,
       createdRelease: true,
@@ -289,80 +167,13 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       expect.objectContaining({
         decision: "create_release",
         createdRelease: true,
-        target: expect.objectContaining({
-          kind: "bottle",
-          targetId: target.id,
-          bottle: expect.objectContaining({ id: promotedBottle.id }),
-        }),
+        bottle: expect.objectContaining({ id: bottle.id }),
       }),
     ]);
-  });
-
-  test("keeps a targetless historical decision explicitly unknown", async ({
-    fixtures,
-  }) => {
-    const admin = await fixtures.User({ admin: true });
-    const actor = await getPeatedSystemActor();
-    const site = await fixtures.ExternalSiteOrExisting();
-    const retainedBottle = await fixtures.Bottle();
-
-    await db.insert(incomingBottleDecisionLogs).values({
-      sourceKind: "review",
-      sourceId: 104,
-      externalSiteId: site.id,
-      name: "Targetless decision",
-      decision: "match_existing",
-      actorId: actor.id,
-      bottleId: retainedBottle.id,
-      targetId: null,
-    });
-
-    const result = await routerClient.admin.incomingBottleDecisions(undefined, {
-      context: { user: admin },
-    });
-
-    expect(result.results).toEqual([
-      expect.objectContaining({
-        name: "Targetless decision",
-        target: null,
-      }),
-    ]);
-  });
-
-  test("fails closed when a durable target is retired", async ({
-    fixtures,
-  }) => {
-    const admin = await fixtures.User({ admin: true });
-    const actor = await getPeatedSystemActor();
-    const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(bottle.id);
-
-    await db.insert(incomingBottleDecisionLogs).values({
-      sourceKind: "review",
-      sourceId: 105,
-      externalSiteId: site.id,
-      name: "Retired target decision",
-      decision: "match_existing",
-      actorId: actor.id,
-      bottleId: bottle.id,
-      targetId,
-    });
-    await db.insert(bottleTombstones).values({
-      bottleId: bottle.id,
-      newBottleId: null,
-    });
-
-    const error = await waitError(
-      routerClient.admin.incomingBottleDecisions(undefined, {
-        context: { user: admin },
-      }),
+    expect(JSON.stringify(result.results[0])).not.toContain(
+      evidenceBottle.fullName,
     );
-
-    expect(error).toMatchObject({
-      status: 409,
-      message: `Catalog target is retired (bottleId=${bottle.id}).`,
-    });
+    expect("target" in result.results[0]).toBe(false);
   });
 
   test("filters by actor type", async ({ fixtures }) => {
@@ -371,7 +182,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     const systemActor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting();
     const bottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(bottle.id);
 
     await db.insert(incomingBottleDecisionLogs).values([
       {
@@ -382,7 +192,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         decision: "match_existing",
         actorId: userActor.id,
         bottleId: bottle.id,
-        targetId,
       },
       {
         sourceKind: "store_price",
@@ -392,7 +201,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         decision: "create_bottle",
         actorId: systemActor.id,
         bottleId: bottle.id,
-        targetId,
       },
     ]);
 
@@ -420,7 +228,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     const actor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting();
     const bottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(bottle.id);
     const [olderReview, newerReview] = await db
       .insert(incomingBottleDecisionLogs)
       .values([
@@ -432,7 +239,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
           decision: "match_existing",
           actorId: actor.id,
           bottleId: bottle.id,
-          targetId,
           createdAt: new Date("2026-03-09T10:00:00.000Z"),
         },
         {
@@ -443,7 +249,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
           decision: "match_existing",
           actorId: actor.id,
           bottleId: bottle.id,
-          targetId,
           createdAt: new Date("2026-03-09T11:00:00.000Z"),
         },
       ])
@@ -456,7 +261,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       decision: "match_existing",
       actorId: actor.id,
       bottleId: bottle.id,
-      targetId,
       createdAt: new Date("2026-03-09T12:00:00.000Z"),
     });
     if (!olderReview || !newerReview) {

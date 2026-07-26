@@ -110,8 +110,6 @@ export default procedure
           decision: "match_existing",
           actor,
           bottleId: nextBottleId,
-          releaseId: null,
-          targetId: null,
         });
       }
 
