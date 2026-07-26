@@ -4,7 +4,7 @@ import {
   bottles,
   catalogTargets,
 } from "@peated/server/db/schema";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
 
@@ -24,7 +24,7 @@ async function searchVectorMatches(bottleId: number, query: string) {
 }
 
 describe("indexBottleSearchVectors", () => {
-  test("indexes durable Bottle identity and only authoritative accepted exact aliases", async ({
+  test("indexes durable Bottle identity and directly owned accepted aliases", async ({
     fixtures,
   }) => {
     const brand = await fixtures.Entity({
@@ -55,41 +55,38 @@ describe("indexBottleSearchVectors", () => {
       edition: "Legacy Child Eclipse",
     });
 
-    const exactTarget = await db.query.catalogTargets.findFirst({
+    const bottleTarget = await db.query.catalogTargets.findFirst({
       where: eq(catalogTargets.bottleId, bottle.id),
     });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, bottle.groupId!),
-        isNull(catalogTargets.bottleId),
-      ),
+    const unrelatedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
     });
-    if (!exactTarget || !genericTarget) {
+    if (!bottleTarget || !unrelatedTarget) {
       throw new Error("CatalogTarget fixtures not found.");
     }
 
     await fixtures.BottleAlias({
       name: "Authoritative Alias Aurora",
-      bottleId: unrelatedBottle.id,
-      targetId: exactTarget.id,
+      bottleId: bottle.id,
+      targetId: unrelatedTarget.id,
       ignored: false,
     });
     await fixtures.BottleAlias({
-      name: "Excluded Generic Quasar",
+      name: "Direct Targetless Quasar",
       bottleId: bottle.id,
-      targetId: genericTarget.id,
+      targetId: null,
       ignored: false,
     });
     await fixtures.BottleAlias({
       name: "Ignored Exact Nebula",
       bottleId: bottle.id,
-      targetId: exactTarget.id,
+      targetId: bottleTarget.id,
       ignored: true,
     });
     await fixtures.BottleAlias({
-      name: "Targetless Legacy Pulsar",
-      bottleId: bottle.id,
-      targetId: null,
+      name: "Foreign Direct Pulsar",
+      bottleId: unrelatedBottle.id,
+      targetId: bottleTarget.id,
       ignored: false,
     });
 
@@ -113,14 +110,14 @@ describe("indexBottleSearchVectors", () => {
       await searchVectorMatches(bottle.id, "Authoritative Alias Aurora"),
     ).toBe(true);
     expect(
-      await searchVectorMatches(bottle.id, "Excluded Generic Quasar"),
-    ).toBe(false);
+      await searchVectorMatches(bottle.id, "Direct Targetless Quasar"),
+    ).toBe(true);
     expect(await searchVectorMatches(bottle.id, "Ignored Exact Nebula")).toBe(
       false,
     );
-    expect(
-      await searchVectorMatches(bottle.id, "Targetless Legacy Pulsar"),
-    ).toBe(false);
+    expect(await searchVectorMatches(bottle.id, "Foreign Direct Pulsar")).toBe(
+      false,
+    );
     expect(await searchVectorMatches(bottle.id, "Legacy Child Eclipse")).toBe(
       false,
     );
@@ -129,10 +126,11 @@ describe("indexBottleSearchVectors", () => {
       await db
         .select({ name: bottleAliases.name })
         .from(bottleAliases)
-        .where(eq(bottleAliases.targetId, exactTarget.id)),
+        .where(eq(bottleAliases.bottleId, bottle.id)),
     ).toEqual(
       expect.arrayContaining([
         { name: "Authoritative Alias Aurora" },
+        { name: "Direct Targetless Quasar" },
         { name: "Ignored Exact Nebula" },
       ]),
     );

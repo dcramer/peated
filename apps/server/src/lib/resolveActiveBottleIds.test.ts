@@ -23,6 +23,18 @@ test("canonicalizes active Bottle ids", async ({ fixtures }) => {
   );
 });
 
+test("supports exclusive Bottle locks for direct consumer writers", async ({
+  fixtures,
+}) => {
+  const bottle = await fixtures.Bottle();
+
+  await expect(
+    db.transaction((tx) =>
+      resolveActiveBottleIds(tx, [bottle.id], { lock: "update" }),
+    ),
+  ).resolves.toEqual([bottle.id]);
+});
+
 test("rejects every inactive Bottle state", async ({ fixtures }) => {
   const unassigned = await fixtures.LegacyBottle();
 
@@ -60,6 +72,9 @@ test("rejects every inactive Bottle state", async ({ fixtures }) => {
     );
 
     expect(error).toBeInstanceOf(ActiveBottleSelectionError);
-    expect(error).toMatchObject({ reason: scenario.reason });
+    expect(error).toMatchObject({
+      reason: scenario.reason,
+      bottleId: scenario.bottleId,
+    });
   }
 });

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CatalogTargetV1Schema } from "./catalogIdentity";
+import { BottleSchema } from "./bottles";
 import { CategoryEnum } from "./common";
 import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
 
@@ -11,9 +11,9 @@ export const ReviewSchema = z.object({
   site: ExternalSiteSchema.optional().describe(
     "External site where the review was published",
   ),
-  target: CatalogTargetV1Schema.nullish()
-    .default(null)
-    .describe("Exact Bottle or generic BottleGroup associated with the review"),
+  bottle: BottleSchema.nullable().describe(
+    "Bottle associated with the review, or null when unresolved",
+  ),
   createdAt: z
     .string()
     .datetime()

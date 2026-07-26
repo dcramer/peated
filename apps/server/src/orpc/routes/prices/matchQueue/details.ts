@@ -4,7 +4,6 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -58,30 +57,23 @@ export default procedure
       });
     }
 
-    try {
-      const [result] = await serializeQueueItems(
-        [
-          {
-            isProcessing: row.isProcessing,
-            proposal: row.proposal,
-            price: {
-              ...row.price,
-              externalSite: row.site,
-            },
-          },
-        ],
-        context,
+    const [result] = await serializeQueueItems(
+      [
         {
-          caller: "prices.matchQueue.details",
-          operation: "hydrate",
+          isProcessing: row.isProcessing,
+          proposal: row.proposal,
+          price: {
+            ...row.price,
+            externalSite: row.site,
+          },
         },
-      );
+      ],
+      context,
+      {
+        caller: "prices.matchQueue.details",
+        operation: "hydrate",
+      },
+    );
 
-      return result;
-    } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      throw error;
-    }
+    return result;
   });

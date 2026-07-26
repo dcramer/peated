@@ -88,7 +88,7 @@ describe("reconcileStorePriceMatchProposals", () => {
     expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
-  test("uses targetId rather than the retained Bottle pair to identify unmatched rows", async ({
+  test("uses direct Bottle identity to identify unmatched rows", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -96,29 +96,29 @@ describe("reconcileStorePriceMatchProposals", () => {
       where: eq(catalogTargets.bottleId, bottle.id),
     });
     if (!target) throw new Error("Missing exact target fixture");
-    const targetBacked = await fixtures.StorePrice({
+    const unresolvedWithTargetEvidence = await fixtures.StorePrice({
       bottleId: null,
       targetId: target.id,
-      name: "Target-backed drifted listing",
+      name: "Unresolved listing with target evidence",
     });
-    const targetless = await fixtures.StorePrice({
+    const directWithoutTarget = await fixtures.StorePrice({
       bottleId: bottle.id,
       targetId: null,
-      name: "Targetless retained listing",
+      name: "Direct Bottle listing without target evidence",
     });
-    await agePrice(targetBacked.id, 60);
-    await agePrice(targetless.id, 60);
+    await agePrice(unresolvedWithTargetEvidence.id, 60);
+    await agePrice(directWithoutTarget.id, 60);
 
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 1 });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      { priceId: targetless.id },
+      { priceId: unresolvedWithTargetEvidence.id },
     );
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      { priceId: targetBacked.id },
+      { priceId: directWithoutTarget.id },
     );
   });
 

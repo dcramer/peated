@@ -1,14 +1,20 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroupTombstones,
   bottleGroups,
   bottleReleasePromotions,
   bottleReleases,
+  bottleTombstones,
   bottles,
   catalogTargets,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  lockBottleReferenceResolutionAssignmentInTransaction,
+  resolveBottleReferenceTarget,
+  type BottleReferenceResolution,
+} from "@peated/server/lib/bottleReferenceResolution";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -92,6 +98,80 @@ async function getCatalogRowCounts() {
   };
 }
 
+function directResolution(bottleId: number): BottleReferenceResolution {
+  return {
+    assignment: {
+      kind: "direct_bottle",
+      bottleId,
+    },
+    source: "exact_alias",
+    error: null,
+    confidence: null,
+    model: null,
+    rationale: null,
+    classifierEvidence: null,
+    createdBottle: false,
+  };
+}
+
+test("rejects every inactive Bottle before persisting a resolution", async ({
+  fixtures,
+}) => {
+  const unassigned = await fixtures.LegacyBottle();
+  const retired = await fixtures.Bottle();
+  const retiredGroupMember = await fixtures.Bottle();
+  const replacement = await fixtures.Bottle();
+  await db.insert(bottleTombstones).values({
+    bottleId: retired.id,
+    newBottleId: replacement.id,
+  });
+  await db.insert(bottleGroupTombstones).values({
+    groupId: retiredGroupMember.groupId!,
+    newGroupId: replacement.groupId!,
+    createdByActorId: retiredGroupMember.createdByActorId,
+  });
+
+  const context = { caller: "test", operation: "persist" };
+  await expect(
+    db.transaction((tx) =>
+      lockBottleReferenceResolutionAssignmentInTransaction(
+        tx,
+        directResolution(Number.MAX_SAFE_INTEGER),
+        context,
+      ),
+    ),
+  ).rejects.toThrow(
+    `Bottle ${Number.MAX_SAFE_INTEGER} does not exist while test.persist is persisting its assignment.`,
+  );
+  await expect(
+    db.transaction((tx) =>
+      lockBottleReferenceResolutionAssignmentInTransaction(
+        tx,
+        directResolution(unassigned.id),
+        context,
+      ),
+    ),
+  ).rejects.toThrow(`Bottle ${unassigned.id} is not active`);
+  await expect(
+    db.transaction((tx) =>
+      lockBottleReferenceResolutionAssignmentInTransaction(
+        tx,
+        directResolution(retired.id),
+        context,
+      ),
+    ),
+  ).rejects.toThrow(`Bottle ${retired.id} is retired.`);
+  await expect(
+    db.transaction((tx) =>
+      lockBottleReferenceResolutionAssignmentInTransaction(
+        tx,
+        directResolution(retiredGroupMember.id),
+        context,
+      ),
+    ),
+  ).rejects.toThrow(`Bottle ${retiredGroupMember.id} is not active`);
+});
+
 describe("resolveBottleReferenceTarget", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
@@ -109,10 +189,6 @@ describe("resolveBottleReferenceTarget", () => {
       name: "10-year-old",
       brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
     });
-    const target = await db.query.catalogTargets.findFirst({
-      where: (catalogTargets, { eq }) => eq(catalogTargets.bottleId, bottle.id),
-    });
-
     const result = await resolveBottleReferenceTarget({
       reference: {
         name: bottle.fullName,
@@ -128,13 +204,8 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "target",
-        target: {
-          targetId: target?.id,
-          groupId: bottle.groupId,
-          bottleId: bottle.id,
-        },
-        consumerIdentity: { bottleId: bottle.id, releaseId: null },
+        kind: "direct_bottle",
+        bottleId: bottle.id,
       },
       source: "exact_alias",
       createdBottle: false,
@@ -144,7 +215,7 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("keeps a measured parent pair when a targetless alias resolves to its generic target", async ({
+  test("uses the alias Bottle without reconstructing a catalog target", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -156,11 +227,6 @@ describe("resolveBottleReferenceTarget", () => {
       targetId: null,
       name: "Grouped Parent Alias",
     });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: (targets, { and, eq, isNull }) =>
-        and(eq(targets.groupId, parent.groupId!), isNull(targets.bottleId)),
-    });
-
     const result = await resolveBottleReferenceTarget({
       reference: {
         name: alias.name,
@@ -176,20 +242,15 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "target",
-        target: {
-          targetId: genericTarget?.id,
-          groupId: parent.groupId,
-          bottleId: null,
-        },
-        consumerIdentity: { bottleId: parent.id, releaseId: null },
+        kind: "direct_bottle",
+        bottleId: parent.id,
       },
       source: "exact_alias",
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("keeps a promoted release pair while resolving its exact target", async ({
+  test("uses the Bottle directly assigned to a promoted release alias", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -213,10 +274,6 @@ describe("resolveBottleReferenceTarget", () => {
       targetId: null,
       name: "Promoted Release Alias",
     });
-    const promotedTarget = await db.query.catalogTargets.findFirst({
-      where: (targets, { eq }) => eq(targets.bottleId, promotedBottle.id),
-    });
-
     const result = await resolveBottleReferenceTarget({
       reference: {
         name: alias.name,
@@ -232,23 +289,15 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "target",
-        target: {
-          targetId: promotedTarget?.id,
-          groupId: promotedBottle.groupId,
-          bottleId: promotedBottle.id,
-        },
-        consumerIdentity: {
-          bottleId: parent.id,
-          releaseId: release.id,
-        },
+        kind: "direct_bottle",
+        bottleId: parent.id,
       },
       source: "exact_alias",
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("preserves targetless staged aliases without inventing a target", async ({
+  test("resolves a direct alias when the Bottle has no catalog target", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -277,13 +326,8 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "staged_targetless",
-        consumerIdentity: { bottleId: bottle.id, releaseId: null },
-        stagedTargetless: {
-          bottleId: bottle.id,
-          releaseId: null,
-          stagedReason: "LEGACY_PARENT_WITHOUT_GROUP",
-        },
+        kind: "direct_bottle",
+        bottleId: bottle.id,
       },
       source: "exact_alias",
       createdBottle: false,
@@ -297,7 +341,7 @@ describe("resolveBottleReferenceTarget", () => {
     ).toBeUndefined();
   });
 
-  test("preserves an unpromoted classifier match as explicit staged identity", async ({
+  test("assigns the matched Bottle without retaining release identity", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -332,23 +376,16 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "staged_targetless",
-        consumerIdentity: {
-          bottleId: parent.id,
-          releaseId: release.id,
-        },
-        stagedTargetless: {
-          bottleId: parent.id,
-          releaseId: release.id,
-          stagedReason: "RELEASE_WITHOUT_COMPLETED_PROMOTION",
-        },
+        kind: "direct_bottle",
+        bottleId: parent.id,
       },
       source: "classifier_match",
       error: null,
     });
+    expect(result).not.toHaveProperty("matchedReleaseIdEvidence");
   });
 
-  test("surfaces non-staged classifier target mapping errors", async ({
+  test("does not use mismatched release evidence as resolver authority", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -372,21 +409,23 @@ describe("resolveBottleReferenceTarget", () => {
       ),
     );
 
-    await expect(
-      resolveBottleReferenceTarget({
-        reference: {
-          name: "Invalid Cross-parent Match",
-          url: null,
-          imageUrl: null,
-          currentBottleId: null,
-          currentReleaseId: null,
-        },
-        createdByActorId: actor.id,
-        user,
-      }),
-    ).rejects.toMatchObject({
-      code: "CATALOG_TARGET_INVALID_MAPPING",
-      reason: "the release does not belong to the supplied parent Bottle",
+    const result = await resolveBottleReferenceTarget({
+      reference: {
+        name: "Cross-parent release evidence",
+        url: null,
+        imageUrl: null,
+        currentBottleId: null,
+        currentReleaseId: null,
+      },
+      createdByActorId: actor.id,
+      user,
+    });
+
+    expect(result).toMatchObject({
+      assignment: {
+        kind: "direct_bottle",
+        bottleId: selectedParent.id,
+      },
     });
   });
 
@@ -466,7 +505,7 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
   });
 
-  test("creates a bottle-shaped decision with a singleton group and exact target", async ({
+  test("creates a direct Bottle decision with a singleton group", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
@@ -516,12 +555,8 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "target",
-        target: { targetId: expect.any(Number) },
-        consumerIdentity: {
-          bottleId: expect.any(Number),
-          releaseId: null,
-        },
+        kind: "direct_bottle",
+        bottleId: expect.any(Number),
       },
       source: "classifier_create_bottle",
       error: null,
@@ -530,12 +565,10 @@ describe("resolveBottleReferenceTarget", () => {
     expect(result).not.toHaveProperty("createdRelease");
     expect(result).not.toHaveProperty("groupId");
     const assignment = result.assignment;
-    if (!assignment || assignment.kind !== "target") {
-      throw new Error(
-        "Expected classifier creation to return an exact target.",
-      );
+    if (!assignment) {
+      throw new Error("Expected classifier creation to return a Bottle.");
     }
-    const createdBottleId = assignment.consumerIdentity.bottleId;
+    const createdBottleId = assignment.bottleId;
     if (createdBottleId === null) {
       throw new Error(
         "Expected classifier creation to retain Bottle identity.",
@@ -559,8 +592,7 @@ describe("resolveBottleReferenceTarget", () => {
       expect.arrayContaining([
         expect.objectContaining({ bottleId: null }),
         expect.objectContaining({
-          id: assignment.target.targetId,
-          bottleId: assignment.consumerIdentity.bottleId,
+          bottleId: assignment.bottleId,
           groupId: created!.groupId,
         }),
       ]),
@@ -630,21 +662,20 @@ describe("resolveBottleReferenceTarget", () => {
 
     expect(result).toMatchObject({
       assignment: {
-        kind: "target",
-        target: { targetId: expect.any(Number) },
-        consumerIdentity: { bottleId: bottle.id, releaseId: null },
+        kind: "direct_bottle",
+        bottleId: bottle.id,
       },
       source: "classifier_create_bottle",
       error: null,
       createdBottle: false,
     });
     const assignment = result.assignment;
-    if (!assignment || assignment.kind !== "target") {
-      throw new Error("Expected classifier reuse to return an exact target.");
+    if (!assignment) {
+      throw new Error("Expected classifier reuse to return a Bottle.");
     }
     expect(
       await db.query.catalogTargets.findFirst({
-        where: (targets, { eq }) => eq(targets.id, assignment.target.targetId),
+        where: (targets, { eq }) => eq(targets.bottleId, assignment.bottleId),
       }),
     ).toMatchObject({ bottleId: bottle.id, groupId: bottle.groupId });
 

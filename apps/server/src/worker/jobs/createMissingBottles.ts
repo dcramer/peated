@@ -29,13 +29,7 @@ export default async function createMissingBottles() {
     const missingInReviews = await db
       .select()
       .from(reviews)
-      .where(
-        and(
-          isNull(reviews.bottleId),
-          isNull(reviews.targetId),
-          gt(reviews.id, cursor),
-        ),
-      )
+      .where(and(isNull(reviews.bottleId), gt(reviews.id, cursor)))
       .orderBy(asc(reviews.id))
       .limit(100);
 
@@ -63,13 +57,14 @@ export default async function createMissingBottles() {
         createdByActorId: systemActor.id,
       });
 
-      const resolvedIdentity = resolution.assignment?.consumerIdentity ?? null;
-      if (resolvedIdentity?.bottleId) {
+      const resolvedAssignment = resolution.assignment;
+      const bottleId = resolvedAssignment?.bottleId ?? null;
+      if (bottleId) {
         logInfo("Resolved bottle for review {reviewId}", {
           extra: {
             reviewId: review.id,
-            bottleId: resolvedIdentity.bottleId,
-            releaseId: resolvedIdentity.releaseId,
+            bottleId,
+            releaseId: null,
             source: resolution.source,
           },
         });
@@ -90,7 +85,6 @@ export default async function createMissingBottles() {
         continue;
       }
 
-      const bottleId = resolvedIdentity!.bottleId!;
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
         { createdBottle: resolution.createdBottle },
@@ -105,11 +99,10 @@ export default async function createMissingBottles() {
           }
           if (
             resolution.source === "classifier_create_bottle" &&
-            (assignment.kind !== "target" ||
-              assignment.target.bottleId !== bottleId)
+            assignment.bottleId !== bottleId
           ) {
             throw new Error(
-              "Classifier Bottle creation returned an incomplete exact target.",
+              "Classifier Bottle creation returned an incomplete Bottle assignment.",
             );
           }
 
@@ -123,23 +116,11 @@ export default async function createMissingBottles() {
             assignedByActorId: systemActor.id,
             expectedReview: review,
           };
-          const aliasAssignment =
-            assignment.kind === "target"
-              ? await assignBottleAliasInTransaction(tx, {
-                  ...assignment,
-                  ...aliasInput,
-                })
-              : await assignBottleAliasInTransaction(tx, {
-                  ...assignment,
-                  context: {
-                    caller: "createMissingBottles",
-                    operation:
-                      resolution.source === "exact_alias"
-                        ? "reuseExactReviewAlias"
-                        : "assignResolvedReviewAlias",
-                  },
-                  ...aliasInput,
-                });
+          const aliasAssignment = await assignBottleAliasInTransaction(tx, {
+            bottleId,
+            sourceAliasIdentity: resolution.sourceAliasIdentity,
+            ...aliasInput,
+          });
 
           if (
             decision !== null &&
@@ -158,11 +139,8 @@ export default async function createMissingBottles() {
               decision,
               actor: systemActor,
               bottleId,
-              releaseId: assignment.consumerIdentity.releaseId,
-              targetId:
-                assignment.kind === "target"
-                  ? assignment.target.targetId
-                  : null,
+              releaseId: null,
+              targetId: null,
               createdBottle: resolution.createdBottle,
               confidence: resolution.confidence,
               model: resolution.model,

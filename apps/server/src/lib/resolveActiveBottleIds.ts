@@ -13,8 +13,12 @@ export type ActiveBottleRejectionReason =
   | "group_retired";
 
 export class ActiveBottleSelectionError extends Error {
-  constructor(public readonly reason: ActiveBottleRejectionReason) {
-    super(`Bottle selection is not active: ${reason}.`);
+  constructor(
+    public readonly reason: ActiveBottleRejectionReason,
+    public readonly bottleId: number,
+    public readonly replacementBottleId: number | null = null,
+  ) {
+    super(`Bottle ${bottleId} is not active: ${reason}.`);
     this.name = "ActiveBottleSelectionError";
   }
 }
@@ -26,6 +30,7 @@ export class ActiveBottleSelectionError extends Error {
 export async function resolveActiveBottleIds(
   tx: AnyTransaction,
   inputIds: number[],
+  { lock = "share" }: { lock?: "share" | "update" } = {},
 ): Promise<number[]> {
   const ids = [...new Set(inputIds)].sort((left, right) => left - right);
   if (!ids.length) return [];
@@ -35,25 +40,37 @@ export async function resolveActiveBottleIds(
     .from(bottles)
     .where(inArray(bottles.id, ids))
     .orderBy(asc(bottles.id))
-    .for("share");
+    .for(lock);
   if (selectedBottles.length !== ids.length) {
-    throw new ActiveBottleSelectionError("missing");
+    const selectedIds = new Set(selectedBottles.map(({ id }) => id));
+    throw new ActiveBottleSelectionError(
+      "missing",
+      ids.find((id) => !selectedIds.has(id))!,
+    );
   }
   const groupIds = new Set<number>();
-  for (const { groupId } of selectedBottles) {
+  for (const { id, groupId } of selectedBottles) {
     if (groupId === null) {
-      throw new ActiveBottleSelectionError("unassigned");
+      throw new ActiveBottleSelectionError("unassigned", id);
     }
     groupIds.add(groupId);
   }
 
   const retiredBottles = await tx
-    .select({ bottleId: bottleTombstones.bottleId })
+    .select({
+      bottleId: bottleTombstones.bottleId,
+      replacementBottleId: bottleTombstones.newBottleId,
+    })
     .from(bottleTombstones)
     .where(inArray(bottleTombstones.bottleId, ids))
     .limit(1);
-  if (retiredBottles.length) {
-    throw new ActiveBottleSelectionError("bottle_retired");
+  const retiredBottle = retiredBottles[0];
+  if (retiredBottle) {
+    throw new ActiveBottleSelectionError(
+      "bottle_retired",
+      retiredBottle.bottleId,
+      retiredBottle.replacementBottleId,
+    );
   }
 
   const retiredGroups = await tx
@@ -61,8 +78,13 @@ export async function resolveActiveBottleIds(
     .from(bottleGroupTombstones)
     .where(inArray(bottleGroupTombstones.groupId, [...groupIds]))
     .limit(1);
-  if (retiredGroups.length) {
-    throw new ActiveBottleSelectionError("group_retired");
+  const retiredGroup = retiredGroups[0];
+  if (retiredGroup) {
+    throw new ActiveBottleSelectionError(
+      "group_retired",
+      selectedBottles.find(({ groupId }) => groupId === retiredGroup.groupId)!
+        .id,
+    );
   }
 
   return selectedBottles.map(({ id }) => id);

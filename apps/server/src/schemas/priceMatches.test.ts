@@ -631,21 +631,21 @@ describe("StorePriceMatchDecisionSchema", () => {
 });
 
 describe("StorePriceMatchQueueItemSchema", () => {
-  test("exposes target identities without retained current or suggested ids", () => {
+  test("exposes bottle identities without retained current or suggested ids", () => {
     expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
-      "currentTarget",
+      "currentBottle",
     );
     expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
-      "suggestedTarget",
+      "suggestedBottle",
     );
     expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
-      "currentBottle",
+      "currentTarget",
     );
     expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
       "currentRelease",
     );
     expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
-      "suggestedBottle",
+      "suggestedTarget",
     );
     expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
       "suggestedRelease",

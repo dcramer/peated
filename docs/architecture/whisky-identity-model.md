@@ -10,16 +10,13 @@ Deterministic name cleanup is governed by the
 - **Bottle** is one concrete marketed release. It has its own stable identity
   and durably stores every field needed to search, render, and understand that
   release without loading its BottleGroup.
-- **BottleGroup** is the generic identity shared by releases of the same
-  expression. It owns the shared editing scope, stable aliases, generic
-  activity, and aggregate statistics. Groups are created and maintained by the
-  system; ordinary Bottle creation never asks a user to choose one.
+- **BottleGroup** relates releases of the same expression. It owns the shared
+  editing scope, relationship presentation, and member-derived aggregate
+  statistics. Groups are created and maintained by the system; ordinary Bottle
+  creation never asks a user to choose one.
 - **BottleSeries** is a broader named range that can contain distinct
   expressions. Series membership is organizational context, not evidence that
   two Bottles belong to the same BottleGroup.
-- **CatalogTarget** is the identity stored by activity-bearing records. An
-  exact target identifies one Bottle; a generic target identifies a
-  BottleGroup when the expression is known but the exact release is not.
 - **BottleObservation** is source evidence from a listing, label, or other
   observation. It may preserve facts more specific or less certain than the
   canonical Bottle identity.
@@ -33,13 +30,13 @@ does not create another catalog identity layer.
   vintage, or single-cask product.
 - Every Bottle is independently complete and belongs to exactly one
   BottleGroup.
-- Every Bottle has one exact CatalogTarget. Every active BottleGroup has one
-  generic CatalogTarget and at least one Bottle.
-- A generic target never resolves to the group's representative Bottle as a
-  substitute exact identity.
-- Ordinary creation atomically creates a complete Bottle, a singleton
-  BottleGroup, and both required targets. “Add another release” only prefills a
-  new Bottle draft; it does not reuse the source Bottle's group.
+- Every assigned alias and activity-bearing record references one Bottle id.
+  BottleGroup is never a fallback consumer identity.
+- A general expression alias points to the retained general Bottle, not the
+  group's representative Bottle.
+- Ordinary creation atomically creates a complete Bottle and a singleton
+  BottleGroup. “Add another release” only prefills a new Bottle draft; it does
+  not reuse the source Bottle's group.
 - Semantic grouping happens outside ordinary creation. Similar names, a shared
   brand, or a shared BottleSeries may suggest a relationship but do not prove
   same-expression identity.
@@ -55,8 +52,8 @@ BottleGroup owns shared editing semantics for:
 - the generic expression name;
 - brand, bottler, distillers, category, series, and flavor profile;
 - stated age when it is invariant across the expression's releases;
-- stable aliases, generic editorial content, representative presentation, and
-  aggregate statistics.
+- shared editorial content, representative presentation, and aggregate
+  statistics.
 
 Every Bottle durably materializes those shared values as part of its complete
 exact identity and additionally owns:
@@ -94,11 +91,11 @@ the group's current age is an exact override; null or an equal value inherits
 the group age. Shared-age edits preserve differing exact overrides and
 materialize the new shared age on every other member.
 
-Group merge and split are audited catalog operations. A merge applies the
-destination group's shared identity to all moved Bottles without changing their
-Bottle or exact-target ids. A split moves selected Bottles without changing
-their exact identities. Generic activity remains generic unless explicitly
-reassigned by the operation.
+Automatic group merge and split operations are audited catalog operations. A
+merge applies the destination group's shared identity to all moved Bottles
+without changing their Bottle ids. A split moves selected Bottles without
+changing their exact identities. Neither operation retargets Bottle-owned
+activity or aliases to the group.
 
 ## BottleGroup Versus BottleSeries
 
@@ -160,12 +157,12 @@ label. A code must not invent a missing component or subtitle.
 ## Activity Identity
 
 Tastings, reviews, collection entries, flights, prices, aliases, observations,
-and similar consumers reference one CatalogTarget:
+and similar consumers reference one Bottle id. Assigned aliases resolve
+directly to that Bottle with no CatalogTarget or BottleGroup alias identity and
+no second resolver. A general expression alias may reference the retained
+general Bottle; otherwise an uncertain source remains unresolved.
 
-- use the Bottle's exact target when the concrete release is known;
-- use the BottleGroup's generic target when only the expression is known.
-
-Exact Bottle statistics include only exact-target activity. BottleGroup
-statistics include direct generic activity plus every member's exact activity,
-counted once. Presentation may use a representative Bottle, but representation
-never changes the target or its exactness.
+Bottle statistics include only activity assigned to that Bottle. BottleGroup
+statistics derive from raw activity on current member Bottle ids, counted once;
+the group owns no direct activity. Presentation may use a representative
+Bottle, but representation never changes consumer identity.

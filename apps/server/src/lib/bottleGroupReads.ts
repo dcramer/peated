@@ -8,21 +8,9 @@ import {
   bottleTombstones,
   type User,
 } from "@peated/server/db/schema";
-import {
-  CatalogTargetIntegrityMismatchError,
-  CatalogTargetNotFoundError,
-  loadCatalogTargetByGroupId,
-} from "@peated/server/lib/catalogTargets";
-import {
-  BottleGroupAliasV1Schema,
-  BottleSchema,
-  type BottleGroupAliasV1,
-  type BottleGroupV1,
-  type GenericCatalogTargetV1,
-} from "@peated/server/schemas";
+import { BottleSchema, type BottleGroupV1 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import type { CatalogIdentitySerializerContext } from "@peated/server/serializers/catalogIdentity";
 import { BottleGroupSummarySerializer } from "@peated/server/serializers/catalogIdentity";
 import { and, asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import type { z } from "zod";
@@ -52,11 +40,6 @@ export type BottleGroupBottleListInput = {
   sort: BottleGroupBottleSort;
 };
 
-export type BottleGroupAliasListInput = {
-  cursor: number;
-  limit: number;
-};
-
 type CursorRel = {
   nextCursor: number | null;
   prevCursor: number | null;
@@ -64,11 +47,6 @@ type CursorRel = {
 
 export type BottleGroupBottleListResult = {
   results: z.infer<typeof BottleSchema>[];
-  rel: CursorRel;
-};
-
-export type BottleGroupAliasListResult = {
-  results: BottleGroupAliasV1[];
   rel: CursorRel;
 };
 
@@ -176,39 +154,6 @@ export async function loadBottleGroup(
   );
 }
 
-/** Loads the transitional generic target used only by the legacy alias list. */
-async function loadBottleGroupTarget(
-  groupId: number,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase,
-): Promise<GenericCatalogTargetV1> {
-  let target;
-  try {
-    target = await loadCatalogTargetByGroupId(groupId, context, database);
-  } catch (error) {
-    if (error instanceof CatalogTargetNotFoundError) {
-      const group = await database.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, groupId),
-        columns: { id: true },
-      });
-      if (group) {
-        throw new CatalogTargetIntegrityMismatchError(
-          { groupId },
-          "the BottleGroup has no generic target",
-        );
-      }
-    }
-    throw error;
-  }
-  if (target.kind !== "group" || target.group.id !== groupId) {
-    throw new CatalogTargetIntegrityMismatchError(
-      { groupId },
-      "the BottleGroup did not resolve to its generic target",
-    );
-  }
-  return target;
-}
-
 /** Lists active, independently complete member Bottles with stable pagination. */
 export async function listBottleGroupBottles(
   groupId: number,
@@ -250,44 +195,6 @@ export async function listBottleGroupBottles(
   return {
     results: serialized.map((bottle) =>
       BottleSchema.parse({ ...bottle, group }),
-    ),
-    rel: cursorRel(input.cursor, input.limit, rows.length),
-  };
-}
-
-/** Lists only accepted aliases that directly own the group's generic target. */
-export async function listBottleGroupAliases(
-  groupId: number,
-  input: BottleGroupAliasListInput,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
-): Promise<BottleGroupAliasListResult> {
-  const group = await loadBottleGroupTarget(groupId, context, database);
-  const offset = (input.cursor - 1) * input.limit;
-  const rows = await database
-    .select({
-      name: bottleAliases.name,
-      assignmentSource: bottleAliases.assignmentSource,
-      createdAt: bottleAliases.createdAt,
-    })
-    .from(bottleAliases)
-    .where(
-      and(
-        eq(bottleAliases.targetId, group.targetId),
-        sql`${bottleAliases.ignored} IS NOT TRUE`,
-      ),
-    )
-    .orderBy(asc(sql`LOWER(${bottleAliases.name})`), asc(bottleAliases.name))
-    .limit(input.limit + 1)
-    .offset(offset);
-
-  return {
-    results: rows.slice(0, input.limit).map((row) =>
-      BottleGroupAliasV1Schema.parse({
-        name: row.name,
-        assignmentSource: row.assignmentSource,
-        createdAt: row.createdAt.toISOString(),
-      }),
     ),
     rel: cursorRel(input.cursor, input.limit, rows.length),
   };

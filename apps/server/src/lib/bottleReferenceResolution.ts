@@ -13,24 +13,18 @@ import type {
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
-import type { User } from "@peated/server/db/schema";
+import { type User } from "@peated/server/db/schema";
+import type { BottleAliasIdentitySnapshot } from "@peated/server/lib/bottleAliases";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
-import {
-  CatalogTargetResolutionError,
-  getStagedTargetlessCatalogMappingReason,
-  lockCatalogTargetConsumerAssignmentInTransaction,
-  lockStagedTargetlessCatalogAssignmentInTransaction,
-  resolveCatalogTargetForAssignment,
-  type CatalogTargetAssignmentDescriptor,
-  type CatalogTargetConsumerAssignment,
-  type CatalogTargetOperationContext,
-  type StagedTargetlessCatalogAssignment,
-} from "@peated/server/lib/catalogTargets";
 import {
   createOrReuseConcreteBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import { buildClassifierConcreteBottleInput } from "./classifierDecisionCreateInputs";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "./resolveActiveBottleIds";
 
 export type BottleReferenceResolutionSource =
   | "exact_alias"
@@ -47,15 +41,13 @@ export type BottleReferenceClassifierEvidence = {
   confidenceBasis: BottleConfidenceBasis | null;
 };
 
+export type BottleReferenceAssignment = {
+  kind: "direct_bottle";
+  bottleId: number;
+};
+
 export type BottleReferenceResolution = {
-  assignment:
-    | ({ kind: "target" } & CatalogTargetConsumerAssignment)
-    | {
-        kind: "staged_targetless";
-        stagedTargetless: StagedTargetlessCatalogAssignment;
-        consumerIdentity: { bottleId: number; releaseId: number | null };
-      }
-    | null;
+  assignment: BottleReferenceAssignment | null;
   source: BottleReferenceResolutionSource;
   error: Error | null;
   confidence: number | null;
@@ -63,40 +55,32 @@ export type BottleReferenceResolution = {
   rationale: string | null;
   classifierEvidence: BottleReferenceClassifierEvidence | null;
   createdBottle: boolean;
+  sourceAliasIdentity?: BottleAliasIdentitySnapshot;
 };
 
-/** Locks the complete target/projection decision before a consumer persists it. */
+/** Locks the resolved Bottle before any alias or consumer row is locked. */
 export async function lockBottleReferenceResolutionAssignmentInTransaction(
   tx: AnyTransaction,
   resolution: BottleReferenceResolution,
-  context: CatalogTargetOperationContext,
+  context: { caller: string; operation: string },
 ) {
   const assignment = resolution.assignment;
   if (!assignment) return null;
 
-  if (assignment.kind === "target") {
-    await lockCatalogTargetConsumerAssignmentInTransaction(
-      tx,
-      assignment,
-      context,
-    );
-    return assignment;
-  }
-
-  if (
-    assignment.consumerIdentity.bottleId !==
-      assignment.stagedTargetless.bottleId ||
-    assignment.consumerIdentity.releaseId !==
-      assignment.stagedTargetless.releaseId
-  ) {
+  const { bottleId } = assignment;
+  try {
+    await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+  } catch (error) {
+    if (!(error instanceof ActiveBottleSelectionError)) throw error;
     throw new Error(
-      "Staged Bottle resolution projection does not match its compatibility decision.",
+      error.reason === "missing"
+        ? `Bottle ${bottleId} does not exist while ${context.caller}.${context.operation} is persisting its assignment.`
+        : error.reason === "bottle_retired"
+          ? `Bottle ${bottleId} is retired.`
+          : `Bottle ${bottleId} is not active while ${context.caller}.${context.operation} is persisting its assignment (${error.reason}).`,
+      { cause: error },
     );
   }
-  await lockStagedTargetlessCatalogAssignmentInTransaction(
-    tx,
-    assignment.stagedTargetless,
-  );
   return assignment;
 }
 
@@ -126,23 +110,12 @@ function getKnownCandidateBottleIds(
   );
 }
 
-function getKnownCandidateReleaseIds(
-  classification: BottleClassificationResult,
-): Set<number> {
-  return new Set(
-    classification.artifacts.candidates
-      .map((candidate) => candidate.releaseId ?? null)
-      .filter((releaseId): releaseId is number => releaseId !== null),
-  );
-}
-
-/** The reviewed classifier may match or reuse only candidates it was shown. */
+/** The reviewed classifier may assign only a Bottle candidate it was shown. */
 function assertKnownClassifierTarget(
   decision: BottleClassificationDecision,
   classification: BottleClassificationResult,
 ) {
   const candidateBottleIds = getKnownCandidateBottleIds(classification);
-  const candidateReleaseIds = getKnownCandidateReleaseIds(classification);
 
   if (
     (decision.action === "match" || decision.action === "repair_bottle") &&
@@ -152,21 +125,11 @@ function assertKnownClassifierTarget(
       `Classifier returned unknown matched bottle id (${decision.matchedBottleId}).`,
     );
   }
-
-  if (
-    decision.action === "match" &&
-    decision.matchedReleaseId !== null &&
-    !candidateReleaseIds.has(decision.matchedReleaseId)
-  ) {
-    throw new Error(
-      `Classifier returned unknown matched release id (${decision.matchedReleaseId}).`,
-    );
-  }
 }
 
 /**
  * Creates one complete concrete Bottle in a singleton group. A verified exact
- * duplicate reuses its existing Bottle and target instead of creating a group.
+ * duplicate reuses its existing Bottle instead of creating a group.
  */
 export async function applyClassifierCreateDecision({
   decision,
@@ -179,9 +142,8 @@ export async function applyClassifierCreateDecision({
 }): Promise<{
   bottleId: number;
   releaseId: null;
-  targetId: number;
   createdBottle: boolean;
-  assignment: { kind: "target" } & CatalogTargetConsumerAssignment;
+  assignment: BottleReferenceAssignment;
 }> {
   const input = buildClassifierConcreteBottleInput(decision.proposedBottle);
   const result = await db.transaction(async (tx) =>
@@ -202,25 +164,21 @@ export async function applyClassifierCreateDecision({
   return {
     bottleId: result.bottle.id,
     releaseId: null,
-    targetId: result.target.targetId,
     assignment: {
-      kind: "target",
-      target: result.target,
-      consumerIdentity: { bottleId: result.bottle.id, releaseId: null },
+      kind: "direct_bottle",
+      bottleId: result.bottle.id,
     },
     createdBottle: result.createResult !== null,
   };
 }
 
 /**
- * Resolve a raw external bottle reference into catalog identity. Exact aliases
+ * Resolve a raw external bottle reference into Bottle identity. Exact aliases
  * retain their accepted fast path; ambiguous references use the reviewed
- * classifier. `create_bottle` returns its canonical exact target and the
- * concrete creation source.
+ * classifier. `create_bottle` returns the created or reused concrete Bottle.
  *
  * Classifier and creation failures return unresolved results so ingestion can
- * preserve its raw source record. CatalogTarget boundary failures remain
- * visible; only the two explicit staged-migration states may stay targetless.
+ * preserve its raw source record.
  */
 export async function resolveBottleReferenceTarget({
   reference,
@@ -240,16 +198,12 @@ export async function resolveBottleReferenceTarget({
   );
 
   for (const aliasName of uniqueAliasLookupNames) {
-    const match = await findBottleAliasAssignment(aliasName, {
-      caller: "bottleReferenceResolution",
-      operation: "resolveBottleReferenceTarget",
-    });
-    if (match?.kind === "target" && match.consumerIdentity.bottleId !== null) {
+    const match = await findBottleAliasAssignment(aliasName);
+    if (match) {
       return {
         assignment: {
-          kind: "target",
-          target: match.target,
-          consumerIdentity: match.consumerIdentity,
+          kind: "direct_bottle",
+          bottleId: match.bottleId,
         },
         source: "exact_alias",
         error: null,
@@ -258,22 +212,7 @@ export async function resolveBottleReferenceTarget({
         rationale: null,
         classifierEvidence: null,
         createdBottle: false,
-      };
-    }
-    if (match?.kind === "staged_targetless") {
-      return {
-        assignment: {
-          kind: "staged_targetless",
-          stagedTargetless: match.stagedTargetless,
-          consumerIdentity: match.consumerIdentity,
-        },
-        source: "exact_alias",
-        error: null,
-        confidence: null,
-        model: null,
-        rationale: null,
-        classifierEvidence: null,
-        createdBottle: false,
+        sourceAliasIdentity: match.alias,
       };
     }
   }
@@ -340,39 +279,11 @@ export async function resolveBottleReferenceTarget({
       classification.decision.action === "repair_bottle"
     ) {
       const bottleId = classification.decision.matchedBottleId;
-      const releaseId =
-        classification.decision.action === "match"
-          ? classification.decision.matchedReleaseId
-          : null;
-      let target: CatalogTargetAssignmentDescriptor | null = null;
-      let stagedTargetless: StagedTargetlessCatalogAssignment | null = null;
-      try {
-        target = await resolveCatalogTargetForAssignment({
-          kind: "legacy",
-          bottleId,
-          releaseId,
-          context: {
-            caller: "bottleReferenceResolution",
-            operation: "applyClassifierMatch",
-          },
-        });
-      } catch (error) {
-        const stagedReason = getStagedTargetlessCatalogMappingReason(error);
-        if (!stagedReason) throw error;
-        stagedTargetless = { bottleId, releaseId, stagedReason };
-      }
       return {
-        assignment: target
-          ? {
-              kind: "target",
-              target,
-              consumerIdentity: { bottleId, releaseId },
-            }
-          : {
-              kind: "staged_targetless",
-              stagedTargetless: stagedTargetless!,
-              consumerIdentity: { bottleId, releaseId },
-            },
+        assignment: {
+          kind: "direct_bottle",
+          bottleId,
+        },
         source: "classifier_match",
         error: null,
         confidence: decisionConfidence,
@@ -412,7 +323,6 @@ export async function resolveBottleReferenceTarget({
       createdBottle: result.createdBottle,
     };
   } catch (error) {
-    if (error instanceof CatalogTargetResolutionError) throw error;
     return {
       assignment: null,
       source: "unresolved",

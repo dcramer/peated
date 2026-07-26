@@ -5,15 +5,7 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
-import {
-  CatalogTargetNotFoundError,
-  CatalogTargetRetiredError,
-} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
-import loadBottlePriceTargetId, {
-  legacyStorePriceBottleMembership,
-} from "@peated/server/orpc/routes/bottles/prices/load-target";
-import { recordStorePriceReadParity } from "@peated/server/orpc/routes/prices/read-parity";
 import {
   BottleSchema,
   StorePriceSchema,
@@ -29,7 +21,6 @@ import { z } from "zod";
 const OutputSchema = z.intersection(
   BottleSchema,
   z.object({
-    targetId: z.number().int().positive(),
     people: z.number(),
     lastPrice: StorePriceSchema.nullable(),
   }),
@@ -75,69 +66,24 @@ export default procedure
       }
     }
 
-    let targetId: number;
-    try {
-      targetId = await loadBottlePriceTargetId(bottle.id);
-    } catch (error) {
-      if (
-        error instanceof CatalogTargetNotFoundError ||
-        error instanceof CatalogTargetRetiredError
-      ) {
-        throw errors.NOT_FOUND({ message: "Bottle not found." });
-      }
-      throw error;
-    }
-    const targetWhere = eq(storePrices.targetId, targetId);
-    const legacyWhere = legacyStorePriceBottleMembership(bottle.id);
-
     const [lastPrice] = await db
-      .select({
-        ...getTableColumns(storePrices),
-        targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
-        legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
-      })
+      .select()
       .from(storePrices)
-      .where(targetWhere)
+      .where(eq(storePrices.bottleId, bottle.id))
       .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
       .limit(1);
-    const [legacyTopPrice] = await db
-      .select({
-        id: storePrices.id,
-        targetId: storePrices.targetId,
-        bottleId: storePrices.bottleId,
-        releaseId: storePrices.releaseId,
-        targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
-        legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
-      })
-      .from(storePrices)
-      .where(legacyWhere)
-      .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
-      .limit(1);
-    const priceParityCandidates = [
-      ...new Map(
-        [lastPrice, legacyTopPrice].flatMap((price) =>
-          price ? [[price.id, price] as const] : [],
-        ),
-      ).values(),
-    ];
-    await recordStorePriceReadParity(
-      priceParityCandidates,
-      { caller: "bottles.details", operation: "lastPriceFilter" },
-      "catalog_reference",
-    );
 
     const [{ count: totalPeople }] = await db
       .select({
         count: sql<string>`COUNT(DISTINCT ${tastings.createdById})`,
       })
       .from(tastings)
-      .where(eq(tastings.targetId, targetId));
+      .where(eq(tastings.bottleId, bottle.id));
 
     return {
       ...(await serialize(BottleSerializer, bottle, context.user, [], {
         includeGroupSummary: true,
       })),
-      targetId,
       people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)

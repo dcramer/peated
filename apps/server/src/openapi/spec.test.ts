@@ -4,7 +4,6 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import type { z } from "zod";
 import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
-  type BottleGroupAliasV1,
   type BottleGroupV1,
   BottleSchema,
   type CatalogTargetV1,
@@ -104,12 +103,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
       (spec.paths?.["/bottles"]?.get?.responses as any)?.["200"]; // keys may be stringified
     const listResponse = listResp200?.content?.["application/json"]
       ?.schema as any;
-    expect(listResponse?.properties?.results?.items?.allOf?.[0]?.$ref).toEqual(
-      "#/components/schemas/Bottle",
-    );
-    expect(
-      listResponse?.properties?.results?.items?.allOf?.[1]?.required,
-    ).toContain("targetId");
+    expectBottleResponse(listResponse?.properties?.results?.items);
     const relSchema = listResponse?.properties?.rel;
     // Cursor should be a $ref or inline resolution depending on converter depth; prefer $ref
     if (relSchema?.$ref) {
@@ -225,12 +219,66 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >();
   });
 
+  it("publishes Bottle aliases with one direct Bottle identity", async () => {
+    const spec = await generateSpec();
+    const listItem = getJsonResponseSchema(spec.paths?.["/bottle-aliases"]?.get)
+      ?.properties?.results?.items;
+    const upsertRequest = getJsonRequestSchema(
+      spec.paths?.["/bottle-aliases"]?.put,
+    );
+
+    expect(Object.keys(listItem?.properties ?? {})).toEqual([
+      "name",
+      "createdAt",
+      "bottleId",
+      "isCanonical",
+    ]);
+    expect(listItem?.required).toEqual(["name", "createdAt", "bottleId"]);
+    expect(JSON.stringify(listItem)).not.toContain("target");
+    expect(Object.keys(upsertRequest?.properties ?? {})).toEqual([
+      "bottle",
+      "name",
+    ]);
+    expect(upsertRequest?.required).toEqual(["bottle", "name"]);
+    expect(JSON.stringify(upsertRequest)).not.toContain("target");
+  });
+
+  it("publishes direct nullable Bottle identity for reviews and prices", async () => {
+    const spec = await generateSpec();
+    const reviewItem = getJsonResponseSchema(spec.paths?.["/reviews"]?.get)
+      ?.properties?.results?.items;
+    const storePrice = spec.components?.schemas?.StorePrice as any;
+    const reviewParameters = spec.paths?.["/reviews"]?.get?.parameters ?? [];
+    const reviewParameterNames = reviewParameters.map(
+      (parameter: any) => parameter.name,
+    );
+
+    for (const schema of [reviewItem, storePrice]) {
+      expect(schema?.properties?.bottle).toBeDefined();
+      expect(JSON.stringify(schema?.properties?.bottle)).toContain(
+        "#/components/schemas/Bottle",
+      );
+      expect(schema?.properties?.target).toBeUndefined();
+      expect(JSON.stringify(schema)).not.toContain("CatalogTarget");
+      expect(JSON.stringify(schema)).not.toContain("releaseId");
+    }
+    expect(reviewParameterNames).toContain("bottle");
+    expect(reviewParameterNames).not.toContain("target");
+    expect(reviewParameterNames).not.toContain("release");
+
+    expectTypeOf<
+      Outputs["reviews"]["list"]["results"][number]["bottle"]
+    >().toEqualTypeOf<z.infer<typeof BottleSchema> | null>();
+    expectTypeOf<
+      Outputs["bottles"]["prices"]["list"]["results"][number]["bottle"]
+    >().toEqualTypeOf<z.infer<typeof BottleSchema> | null>();
+  });
+
   it("publishes member-anchored BottleGroup reads and presentation without management operations", async () => {
     const spec = await generateSpec();
     const operations = [
       ["/bottle-groups/{group}", "get", "getBottleGroup"],
       ["/bottle-groups/{group}/bottles", "get", "listBottleGroupBottles"],
-      ["/bottle-groups/{group}/aliases", "get", "listBottleGroupAliases"],
       [
         "/bottle-groups/{group}/presentation",
         "patch",
@@ -256,7 +304,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
             )
           : [],
       ),
-    ).toHaveLength(4);
+    ).toHaveLength(3);
     expect(spec.paths?.["/bottle-groups"]).toBeUndefined();
     expect(
       spec.paths?.["/bottle-groups/{group}/merge-targets"],
@@ -268,9 +316,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
     );
     const relatedBottleItem = getJsonResponseSchema(
       spec.paths?.["/bottle-groups/{group}/bottles"]?.get,
-    )?.properties?.results?.items;
-    const aliasItem = getJsonResponseSchema(
-      spec.paths?.["/bottle-groups/{group}/aliases"]?.get,
     )?.properties?.results?.items;
 
     expect(Object.keys(groupDetails?.properties ?? {})).toEqual(
@@ -284,16 +329,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(JSON.stringify(groupDetails)).not.toContain("targetId");
     expect(JSON.stringify(groupDetails)).not.toContain('"kind"');
     expectBottleResponse(relatedBottleItem);
-    expect(Object.keys(aliasItem?.properties ?? {})).toEqual([
-      "name",
-      "assignmentSource",
-      "createdAt",
-    ]);
-    expect(aliasItem?.properties?.targetId).toBeUndefined();
-    expect(aliasItem?.properties?.bottle).toBeUndefined();
-    expect(aliasItem?.properties?.release).toBeUndefined();
-    expect(aliasItem?.properties?.releaseId).toBeUndefined();
-    expect(JSON.stringify(aliasItem)).not.toContain("BottleRelease");
 
     const presentationRequest = getJsonRequestSchema(
       spec.paths?.["/bottle-groups/{group}/presentation"]?.patch,
@@ -332,9 +367,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<BottleGroupV1>();
     expectTypeOf<Outputs["bottleGroups"]["bottles"]>().toEqualTypeOf<
       CursorResult<z.infer<typeof BottleSchema>>
-    >();
-    expectTypeOf<Outputs["bottleGroups"]["aliases"]>().toEqualTypeOf<
-      CursorResult<BottleGroupAliasV1>
     >();
     expectTypeOf<
       "name" extends keyof Inputs["bottleGroups"]["updatePresentation"]

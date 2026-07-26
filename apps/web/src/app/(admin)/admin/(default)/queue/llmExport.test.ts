@@ -1,26 +1,72 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import type { CatalogTargetV1 } from "@peated/server/schemas";
 import { describe, expect, it } from "vitest";
 
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
 type QueueItem = Outputs["prices"]["matchQueue"]["list"]["results"][number];
+type QueueBottle = NonNullable<QueueItem["suggestedBottle"]>;
 
-const genericTarget = {
-  kind: "group",
-  targetId: 41,
-  group: { id: 7, fullName: "Springbank 12 Cask Strength" },
-} as CatalogTargetV1;
+const timestamp = "2026-07-21T00:00:00.000Z";
+const brand = {
+  id: 1,
+  name: "Springbank",
+  shortName: null,
+  type: ["brand"],
+  description: null,
+  descriptionSrc: null,
+  yearEstablished: null,
+  website: null,
+  country: null,
+  region: null,
+  address: null,
+  location: null,
+  totalTastings: 0,
+  totalBottles: 1,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies QueueBottle["brand"];
 
-const exactTarget = {
-  kind: "bottle",
-  targetId: 42,
-  group: genericTarget.group,
-  bottle: {
-    id: 19,
-    fullName: "Springbank 12 Cask Strength Batch 24",
+const suggestedBottle = {
+  id: 19,
+  fullName: "Springbank 12 Cask Strength Batch 24",
+  name: "12 Cask Strength Batch 24",
+  brand,
+  series: null,
+  category: "single_malt",
+  distillers: [],
+  bottler: null,
+  edition: "Batch 24",
+  statedAge: 12,
+  abv: 57.8,
+  caskStrength: true,
+  singleCask: false,
+  vintageYear: null,
+  releaseYear: 2024,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  description: null,
+  descriptionSrc: null,
+  flavorProfile: null,
+  tastingNotes: null,
+  suggestedTags: [],
+  avgRating: null,
+  ratingStats: {
+    pass: 0,
+    sip: 0,
+    savor: 0,
+    total: 0,
+    avg: null,
+    percentage: { pass: 0, sip: 0, savor: 0 },
   },
-} as CatalogTargetV1;
+  totalTastings: 0,
+  imageUrl: null,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+  isFavorite: false,
+  isLibrary: false,
+  hasTasted: false,
+} satisfies QueueBottle;
 
 function queueItem(): QueueItem {
   const item = {
@@ -40,8 +86,8 @@ function queueItem(): QueueItem {
     decisiveMatchAttributes: [],
     plainAgeBottleAutoVerifyEligible: false,
     differentiatingAttributes: [],
-    createdAt: "2026-07-21T00:00:00.000Z",
-    updatedAt: "2026-07-21T00:00:00.000Z",
+    createdAt: timestamp,
+    updatedAt: timestamp,
     lastEvaluatedAt: null,
     reviewedAt: null,
     processingQueuedAt: null,
@@ -55,7 +101,7 @@ function queueItem(): QueueItem {
       url: "https://example.com/bottle",
       imageUrl: null,
       isValid: true,
-      target: genericTarget,
+      bottle: null,
       updatedAt: "2026-07-21T00:00:00.000Z",
       site: {
         id: 3,
@@ -67,8 +113,8 @@ function queueItem(): QueueItem {
       },
     },
     extractedLabel: null,
-    currentTarget: genericTarget,
-    suggestedTarget: exactTarget,
+    currentBottle: null,
+    suggestedBottle,
     parentBottleId: null,
     parentBottle: null,
     proposedBottle: null,
@@ -82,12 +128,17 @@ function queueItem(): QueueItem {
 }
 
 describe("formatPriceMatchQueueLlmExport", () => {
-  it("exports authoritative target identities without legacy pair authority", () => {
+  it("exports direct Bottle identities without target authority", () => {
     const payload = JSON.parse(formatPriceMatchQueueLlmExport(queueItem()));
 
-    expect(payload.schemaVersion).toBe(2);
-    expect(payload.currentAssignment).toEqual(genericTarget);
-    expect(payload.recommendation.suggestedTarget).toEqual(exactTarget);
+    expect(payload.schemaVersion).toBe(3);
+    expect(payload.currentAssignment).toBeNull();
+    expect(payload.recommendation.suggestedBottle).toMatchObject({
+      id: 19,
+      fullName: "Springbank 12 Cask Strength Batch 24",
+      edition: "Batch 24",
+    });
+    expect(payload.recommendation).not.toHaveProperty("suggestedTarget");
     expect(payload.proposal).not.toHaveProperty("currentBottleId");
     expect(payload.proposal).not.toHaveProperty("currentReleaseId");
     expect(payload.proposal).not.toHaveProperty("suggestedBottleId");

@@ -1,7 +1,7 @@
 # Store Price Matching
 
 This document describes how store prices are resolved to independently complete
-Bottles or generic BottleGroup targets.
+Bottles.
 
 Authoritative policy lives in:
 
@@ -16,28 +16,26 @@ that classifier boundary.
 
 ## Local Contract
 
-- A non-null `store_price.targetId` is the authoritative catalog identity. The
-  retained `bottleId` / `releaseId` pair is migration compatibility and is
-  written atomically with that target.
-- Exact intent uses a concrete Bottle target. Known expression identity whose
-  exact Bottle is uncertain uses the generic BottleGroup target rather than a
-  representative Bottle.
-- A durable target is never downgraded or reconstructed from a conflicting
-  retained pair. Targetless rows are limited to explicit staged or unresolved
-  compatibility states.
+- A non-null `store_price.bottleId` is the authoritative catalog identity.
+  Historical `targetId` and `releaseId` columns are migration evidence only
+  until their schema-removal gate.
+- Known expression identity whose exact Bottle is uncertain may use the retained
+  general Bottle. It never uses BottleGroup or substitutes a representative.
+- A durable Bottle assignment is never downgraded or reconstructed from
+  conflicting historical fields. Null `bottleId` is the explicit unresolved
+  state.
 - Preserve exact source facts as `bottle_observation` before promoting them into
-  canonical Bottle identity, using the same target selected by approval.
-- Target-aware listing aliases assign the same target and retained projection
-  to StorePrices with the same site, listing name, and volume. They do not
-  retarget cross-volume proposals.
+  canonical Bottle identity, using the same Bottle selected by approval.
+- Assigned listing aliases propagate the same Bottle id to StorePrices with the
+  same site, listing name, and volume. They do not retarget cross-volume
+  proposals.
 
 ## Goal
 
 For each `store_price`, the matcher should decide one of four outcomes:
 
 1. The current assignment is already correct.
-2. The price should match an existing exact Bottle or generic BottleGroup
-   CatalogTarget.
+2. The price should match an existing Bottle.
 3. The price should create or safely reuse an independent concrete Bottle.
 4. There is no safe match.
 
@@ -74,12 +72,10 @@ approved proposal's latest attempt without overwriting older attempts.
 - normalizes the incoming listing name
 - builds the deterministic alias key from the listing name
 - does an exact alias lookup for that accepted key
-- if a target-aware alias exists, writes its authoritative `targetId` and
-  retained compatibility pair together
-- preserves a generic alias as BottleGroup identity without selecting a member
-  Bottle
-- enqueues `ResolveStorePriceBottle` only when no accepted exact, generic, or
-  measured staged alias assignment exists
+- if an assigned alias exists, writes its authoritative `bottleId`
+- allows a general alias to resolve only to the retained general Bottle
+- enqueues `ResolveStorePriceBottle` only when no accepted direct Bottle alias
+  assignment exists
 - optionally enqueues `CapturePriceImage`
 
 ### 2. Matching evaluation
@@ -104,7 +100,7 @@ Every approved bottle-reference match writes one `bottle_observation` keyed by `
 
 That observation stores:
 
-- the exact or generic CatalogTarget selected by approval
+- the Bottle selected by approval
 - the store title and source URL
 - the parsed extracted identity
 - the proposal type and creation target
@@ -116,12 +112,10 @@ Bottle entry flow.
 ## Candidate Generation
 
 Candidate search presents independently complete Bottles, keyed by `bottleId`.
-Text and brand retrieval require an exact CatalogTarget for the ordinary
-Bottle. Accepted exact aliases resolve through their authoritative target;
-generic, targetless, and ignored aliases do not produce Bottle candidates. An
-explicit historical release id can contribute only by resolving through its
-completed promotion mapping to the promoted Bottle, never through retained
-BottleRelease metadata.
+Accepted aliases resolve directly to their Bottle; unassigned and ignored
+aliases do not produce Bottle candidates. An explicit historical release id can
+contribute only through its completed promotion mapping to the promoted Bottle,
+never through retained BottleRelease metadata.
 
 Sources:
 
@@ -133,7 +127,7 @@ Sources:
 
 Important behavior:
 
-- exact alias matches select a concrete Bottle target
+- exact alias matches select a concrete Bottle
 - sibling concrete Bottles can surface independently
 - exact Bottle metadata is used in scoring and automation, not just the
   candidate name
@@ -170,7 +164,7 @@ only as compatibility shims around the canonical bottle-classifier modules.
 The classifier receives:
 
 - generic bottle reference metadata
-- the current exact Bottle or generic BottleGroup target, if present
+- the current Bottle, if present
 - extracted identity
 - initial local candidates
 
@@ -207,9 +201,8 @@ Additional rules:
 - `identityScope` is reviewed as `product | exact_cask`
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
 - When re-evaluation auto-ignores a bundle or damaged-condition listing, price
-  matching clears the complete stale `store_price` identity tuple
-  (`targetId`, `bottleId`, and `releaseId`) together rather than leaving a
-  partial old match attached
+  matching clears the stale `store_price.bottleId` while preserving historical
+  `releaseId` and `targetId` evidence until their schema-removal gate
 
 ## Proposal Types
 
@@ -270,7 +263,7 @@ that assignment.
 Automation is schema-first and code-derived:
 
 - every unresolved model risk forces `review`
-- an existing match requires a concrete target, must not replace a different
+- an existing match requires a concrete Bottle, must not replace a different
   current assignment, and needs an explicit anchor such as reaffirmed current
   identity, deterministic exact identity, an accepted exact alias, primary
   label/image evidence, or supportive reviewed evidence
@@ -297,14 +290,13 @@ SMWS remains a deterministic path:
 ### Auto-create
 
 Auto-create receives one complete `proposedBottle`. It creates an independently
-complete Bottle in an automatic singleton group and one exact CatalogTarget,
-writes the retained `(bottleId, null)` projection, and creates no BottleRelease.
+complete Bottle in an automatic singleton group and creates no BottleRelease.
 A safe duplicate may be reused only when its canonical `fullName` exactly
-matches and its exact target is active.
+matches and the Bottle is active.
 
 Auto-create only proceeds when:
 
-- the proposed target is schema-valid
+- the proposed Bottle is schema-valid
 - decisive Bottle identity traits are internally consistent
 - high-trust or acceptable medium-trust evidence validates the differentiating traits
 - unsupported or unvalidated identity traits do not remain
@@ -318,56 +310,49 @@ Moderators can:
 - ignore a proposal
 - approve complete Bottle create-new input
 
-This input creates or safely reuses one independently complete concrete Bottle
-and exact target. The staged compatibility route writes no BottleRelease and
-returns the canonical exact `targetId` with `{ bottle, release: null }` after a
-successful request. Current callers continue with `targetId` and `bottle`
-directly; `release` is retained only for compatibility until its removal gate.
-A non-null legacy image URL is rejected because image creation must use the
-canonical upload boundary.
+The route accepts one complete Bottle input, creates or safely reuses one
+independently complete Bottle, and returns that Bottle directly. It has no
+staged response wrapper and writes no BottleRelease. A non-null legacy image URL
+is rejected because image creation must use the canonical upload boundary.
 
 Applying a correction commits its canonical shared/exact Bottle update and
 proposal approval in one database transaction. Canonical update jobs run only
 after that transaction commits. The correction path retains its Bottle response
 for the current queue UI, but it does not maintain a separate Bottle updater or
 mutate staged legacy BottleRelease rows. Repair is available only when the
-proposal's current and suggested identities are non-null active exact targets
-for the same concrete Bottle; those target ids are locked and revalidated before
-the update commits.
+proposal's current and suggested identities are the same non-null active
+concrete Bottle; that Bottle id is locked and revalidated before the update
+commits.
 
-The moderation queue renders current and suggested identities independently as
-an exact Bottle target, a generic BottleGroup target, or an explicit unknown
-target. Approval submits one target id. Exact approval derives the complete
-Bottle's `(bottleId, null)` compatibility projection. A generic suggestion is
-approvable only as that proposal's own suggested target and reuses its validated
-retained projection without selecting a representative Bottle. The manual
-override searches complete existing Bottles, resolves the selected Bottle
-through the narrow Bottle-to-exact-target lookup, and submits that exact target.
-Retained BottleRelease identity is staged compatibility evidence, not a
-suggestion type, picker choice, or target-selection authority.
+The moderation queue renders current and suggested Bottles independently or an
+explicit unknown state. Approval submits one Bottle id. A general-expression
+suggestion is approvable only when it identifies the retained general Bottle;
+it never selects a representative. The manual override searches complete
+existing Bottles and submits the selected Bottle id without a second resolver.
+Retained BottleRelease identity is staged compatibility evidence, not a picker
+choice or assignment authority.
 
 ## Price Presentation
 
-Price reads and changes render the authoritative discriminated CatalogTarget.
-An exact price links to and uses fields from its independently complete Bottle.
-A generic price links to the BottleGroup, labels the exact release as
-unspecified, and uses no representative Bottle as display or activity identity.
-Bottle-specific price lists and history include only that Bottle's exact target;
-generic group prices do not appear on a representative Bottle page.
+Price reads and changes render the assigned independently complete Bottle.
+Bottle-specific price lists and history include only rows assigned to that
+Bottle. Unresolved prices remain unresolved; BottleGroup is not a display or
+activity identity.
 
 ## Alias Behavior
 
 Approving a price proposal does two separate things:
 
-1. assigns the authoritative target and retained pair to matching `store_price`
-   rows for the same site / listing name / volume
-2. stores a reusable target-aware alias for the accepted listing key
+1. assigns the authoritative Bottle id to matching `store_price` rows for the
+   same site / listing name / volume
+2. stores a reusable Bottle alias for the accepted listing key
 
 Schema-first alias rule:
 
-- an exact Bottle alias resolves directly to that Bottle's exact target
-- a generic expression alias remains a BottleGroup target and never selects the
-  representative Bottle
+- every assigned alias resolves directly to one Bottle id
+- a general expression alias resolves to the retained general Bottle and never
+  selects the representative Bottle
+- no BottleGroup or CatalogTarget alias identity and no second resolver remain
 - matching propagation preserves the same site / listing name / volume scope
   and does not retarget cross-volume proposals
 

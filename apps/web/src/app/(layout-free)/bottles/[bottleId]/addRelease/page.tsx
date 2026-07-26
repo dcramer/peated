@@ -82,12 +82,10 @@ function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
       initialData={initialData}
       onSubmit={async ({ image, ...data }) => {
         const createdBottle = proposalId
-          ? (
-              await proposalBottleCreateMutation.mutateAsync({
-                proposal: Number(proposalId),
-                independentBottle: data,
-              })
-            ).bottle
+          ? await proposalBottleCreateMutation.mutateAsync({
+              proposal: Number(proposalId),
+              independentBottle: data,
+            })
           : await bottleCreateMutation.mutateAsync(data);
 
         if (image) {

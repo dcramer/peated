@@ -1,42 +1,8 @@
 import { db } from "@peated/server/db";
-import {
-  actors,
-  bottleReleasePromotions,
-  bottles,
-  catalogTargets,
-  type Bottle,
-} from "@peated/server/db/schema";
-import { CatalogTargetInvalidMappingError } from "@peated/server/lib/catalogTargets";
+import { actors, catalogTargets } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull, sql } from "drizzle-orm";
-
-async function promoteRelease(parent: Bottle, releaseId: number) {
-  const [promoted] = await db
-    .insert(bottles)
-    .values({
-      groupId: parent.groupId,
-      brandId: parent.brandId,
-      name: `${parent.name} promoted`,
-      fullName: `${parent.fullName} promoted`,
-      createdByActorId: parent.createdByActorId,
-    })
-    .returning();
-  if (!promoted) throw new Error("Missing promoted Bottle fixture");
-  const [target] = await db
-    .insert(catalogTargets)
-    .values({ groupId: parent.groupId as number, bottleId: promoted.id })
-    .returning();
-  if (!target) throw new Error("Missing promoted target fixture");
-  await db.insert(bottleReleasePromotions).values({
-    releaseId,
-    promotedBottleId: promoted.id,
-    status: "promoted",
-    completedAt: new Date(),
-    createdByActorId: parent.createdByActorId,
-  });
-  return { promoted, target };
-}
+import { eq, sql } from "drizzle-orm";
 
 describe("GET /reviews", () => {
   test("lists reviews", async ({ fixtures }) => {
@@ -52,11 +18,8 @@ describe("GET /reviews", () => {
 
     expect(results.length).toBe(2);
     const result = results.find(({ id }) => id === review.id)!;
-    expect(result.target).toMatchObject({
-      kind: "bottle",
-      bottle: { id: review.bottleId },
-    });
-    expect(result).not.toHaveProperty("bottle");
+    expect(result.bottle?.id).toBe(review.bottleId);
+    expect(result).not.toHaveProperty("target");
     expect(result).not.toHaveProperty("release");
   });
 
@@ -125,189 +88,119 @@ describe("GET /reviews", () => {
     expect(results[0].id).toEqual(review.id);
   });
 
-  test("lists reviews by authoritative exact or generic target", async ({
+  test("lists reviews by direct Bottle identity despite target evidence", async ({
     fixtures,
   }) => {
-    const exactBottle = await fixtures.Bottle();
-    const genericBottle = await fixtures.Bottle();
-    const [exactTarget, genericTarget] = await Promise.all([
+    const bottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
+    const [target, otherTarget] = await Promise.all([
       db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, exactBottle.id),
+        where: eq(catalogTargets.bottleId, bottle.id),
       }),
       db.query.catalogTargets.findFirst({
-        where: and(
-          eq(catalogTargets.groupId, genericBottle.groupId as number),
-          isNull(catalogTargets.bottleId),
-        ),
+        where: eq(catalogTargets.bottleId, otherBottle.id),
       }),
     ]);
-    if (!exactTarget || !genericTarget) throw new Error("Missing targets");
+    if (!target || !otherTarget) throw new Error("Missing targets");
     const site = await fixtures.ExternalSiteOrExisting();
-    const exactReview = await fixtures.Review({
+    const directWithStaleEvidence = await fixtures.Review({
       externalSiteId: site.id,
-      targetId: exactTarget.id,
-      bottleId: exactBottle.id,
+      targetId: otherTarget.id,
+      bottleId: bottle.id,
+      issue: "Direct with stale evidence",
     });
-    const genericReview = await fixtures.Review({
+    const directWithoutTarget = await fixtures.Review({
       externalSiteId: site.id,
-      targetId: genericTarget.id,
-      bottleId: null,
-      releaseId: null,
+      targetId: null,
+      bottleId: bottle.id,
+      issue: "Direct without target evidence",
+    });
+    const staleTargetOnly = await fixtures.Review({
+      externalSiteId: site.id,
+      targetId: target.id,
+      bottleId: otherBottle.id,
+      issue: "Stale target only",
     });
 
-    const exact = await routerClient.reviews.list({ target: exactTarget.id });
-    const generic = await routerClient.reviews.list({
-      target: genericTarget.id,
-    });
+    const { results } = await routerClient.reviews.list({ bottle: bottle.id });
 
-    expect(exact.results.map(({ id }) => id)).toEqual([exactReview.id]);
-    expect(generic.results.map(({ id }) => id)).toEqual([genericReview.id]);
-    expect(generic.results[0]?.target).toMatchObject({ kind: "group" });
+    expect(results.map(({ id }) => id)).toEqual(
+      expect.arrayContaining([
+        directWithStaleEvidence.id,
+        directWithoutTarget.id,
+      ]),
+    );
+    expect(results.map(({ id }) => id)).not.toContain(staleTargetOnly.id);
+    expect(
+      results.every(
+        ({ bottle: resultBottle }) => resultBottle?.id === bottle.id,
+      ),
+    ).toBe(true);
+    expect(results.every((review) => !("target" in review))).toBe(true);
   });
 
-  test("rejects invalid and mixed target filters", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    if (!target) throw new Error("Missing target");
-
+  test("rejects removed target and release filters", async () => {
     await expect(
-      waitError(() =>
-        routerClient.reviews.list({ target: Number.MAX_SAFE_INTEGER }),
-      ),
-    ).resolves.toMatchObject({ message: "Cannot identify catalog target." });
+      waitError(() => routerClient.reviews.list({ target: 1 } as never)),
+    ).resolves.toMatchObject({ message: "Input validation failed" });
     await expect(
-      waitError(() =>
-        routerClient.reviews.list({
-          target: target.id,
-          bottle: bottle.id,
-        } as never),
-      ),
+      waitError(() => routerClient.reviews.list({ release: 1 } as never)),
     ).resolves.toMatchObject({ message: "Input validation failed" });
   });
 
-  test("lists reviews by release", async ({ fixtures }) => {
+  test("paginates reviews by direct Bottle identity", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const { promoted, target } = await promoteRelease(bottle, release.id);
     const otherBottle = await fixtures.Bottle();
-    const otherTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, otherBottle.id),
-    });
-    if (!otherTarget) throw new Error("Missing other target fixture");
     const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const firstReview = await fixtures.Review({
       bottleId: bottle.id,
-      releaseId: release.id,
-      targetId: target.id,
       externalSiteId: site.id,
+      name: "A direct Bottle review",
     });
-    const targetOnly = await fixtures.Review({
+    const secondReview = await fixtures.Review({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      name: "B direct Bottle review",
+    });
+    const otherReview = await fixtures.Review({
       bottleId: otherBottle.id,
-      targetId: target.id,
       externalSiteId: site.id,
-      issue: "Target only",
-    });
-    const legacyOnly = await fixtures.Review({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      targetId: otherTarget.id,
-      externalSiteId: site.id,
-      issue: "Legacy only",
+      name: "C other Bottle review",
     });
 
     const firstPage = await routerClient.reviews.list({
-      release: release.id,
+      bottle: bottle.id,
       limit: 1,
     });
     const secondPage = await routerClient.reviews.list({
-      release: release.id,
+      bottle: bottle.id,
       cursor: 2,
       limit: 1,
     });
     const thirdPage = await routerClient.reviews.list({
-      release: release.id,
+      bottle: bottle.id,
       cursor: 3,
       limit: 1,
     });
     const results = [...firstPage.results, ...secondPage.results];
 
-    expect(results.map(({ id }) => id)).toEqual(
-      expect.arrayContaining([review.id, targetOnly.id]),
-    );
-    expect(results.map(({ id }) => id)).not.toContain(legacyOnly.id);
+    expect(results.map(({ id }) => id)).toEqual([
+      firstReview.id,
+      secondReview.id,
+    ]);
+    expect(results.map(({ id }) => id)).not.toContain(otherReview.id);
     expect(firstPage.rel.nextCursor).toBe(2);
     expect(secondPage.rel.nextCursor).toBeNull();
     expect(thirdPage.results).toEqual([]);
-    expect(results.find(({ id }) => id === review.id)?.target).toMatchObject({
-      kind: "bottle",
-      targetId: target.id,
-      bottle: { id: promoted.id },
-    });
   });
 
-  test("lists a parent-scoped review through its generic target", async ({
-    fixtures,
-  }) => {
-    const parent = await fixtures.Bottle();
-    await fixtures.BottleRelease({ bottleId: parent.id });
-    const site = await fixtures.ExternalSiteOrExisting();
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: (table, { and, eq, isNull }) =>
-        and(
-          eq(table.groupId, parent.groupId as number),
-          isNull(table.bottleId),
-        ),
-    });
-    if (!genericTarget) throw new Error("Missing generic target fixture");
-    const review = await fixtures.Review({
-      bottleId: parent.id,
-      releaseId: null,
-      targetId: genericTarget.id,
-      externalSiteId: site.id,
-    });
-
-    const { results } = await routerClient.reviews.list({ bottle: parent.id });
-
-    expect(results).toHaveLength(1);
-    expect(results[0]).toMatchObject({
-      id: review.id,
-      target: {
-        kind: "group",
-        targetId: genericTarget.id,
-        group: { id: parent.groupId },
-      },
-    });
-  });
-
-  test("preserves empty legacy-filter misses and surfaces graph failures", async ({
-    fixtures,
-  }) => {
-    const parent = await fixtures.Bottle();
-    const otherBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-
+  test("preserves empty Bottle-filter misses", async () => {
     await expect(
       routerClient.reviews.list({ bottle: 999_999 }),
     ).resolves.toMatchObject({ results: [] });
-    await expect(
-      routerClient.reviews.list({ release: 999_999 }),
-    ).resolves.toMatchObject({ results: [] });
-    await expect(
-      routerClient.reviews.list({
-        bottle: otherBottle.id,
-        release: release.id,
-      }),
-    ).resolves.toMatchObject({ results: [] });
-
-    const error = await waitError(
-      routerClient.reviews.list({ release: release.id }),
-    );
-    expect(error).toBeInstanceOf(CatalogTargetInvalidMappingError);
   });
 
-  test("uses target identity for unknown and retained-pair mismatch reads", async ({
+  test("uses direct Bottle identity for unresolved filtering", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -324,23 +217,23 @@ describe("GET /reviews", () => {
       where: eq(catalogTargets.bottleId, targetBottle.id),
     });
     if (!target) throw new Error("Missing exact target fixture");
-    const mismatched = await fixtures.Review({
-      bottleId: retainedBottle.id,
-      targetId: target.id,
-      externalSiteId: site.id,
-      issue: "Mismatch",
-    });
-    const targetOnlyUnknown = await fixtures.Review({
+    const bottleAssignedWithoutTarget = await fixtures.Review({
       bottleId: retainedBottle.id,
       targetId: null,
       externalSiteId: site.id,
-      issue: "Target unknown only",
+      issue: "Bottle assigned without target",
     });
-    const legacyOnlyUnknown = await fixtures.Review({
+    const bottleAssignedWithTarget = await fixtures.Review({
+      bottleId: retainedBottle.id,
+      targetId: target.id,
+      externalSiteId: site.id,
+      issue: "Bottle assigned with target",
+    });
+    const unresolvedWithTargetEvidence = await fixtures.Review({
       bottleId: null,
       targetId: target.id,
       externalSiteId: site.id,
-      issue: "Legacy unknown only",
+      issue: "Unresolved with target evidence",
     });
 
     const unknownResults = await routerClient.reviews.list(
@@ -354,36 +247,35 @@ describe("GET /reviews", () => {
 
     expect(unknownResults.results.map(({ id }) => id)).toContain(unresolved.id);
     expect(unknownResults.results.map(({ id }) => id)).toContain(
-      targetOnlyUnknown.id,
-    );
-    expect(
-      unknownResults.results.find(({ id }) => id === targetOnlyUnknown.id)
-        ?.target,
-    ).toBeNull();
-    expect(unknownResults.results.map(({ id }) => id)).not.toContain(
-      mismatched.id,
+      unresolvedWithTargetEvidence.id,
     );
     expect(unknownResults.results.map(({ id }) => id)).not.toContain(
-      legacyOnlyUnknown.id,
+      bottleAssignedWithoutTarget.id,
     );
-    expect(
-      allResults.results.find(({ id }) => id === mismatched.id)?.target,
-    ).toMatchObject({
-      kind: "bottle",
-      targetId: target.id,
-      bottle: { id: targetBottle.id },
-    });
+    expect(unknownResults.results.map(({ id }) => id)).not.toContain(
+      bottleAssignedWithTarget.id,
+    );
+    expect(allResults.results.map(({ id }) => id)).toEqual(
+      expect.arrayContaining([
+        unresolved.id,
+        unresolvedWithTargetEvidence.id,
+        bottleAssignedWithoutTarget.id,
+        bottleAssignedWithTarget.id,
+      ]),
+    );
+    expect(unknownResults.results.every(({ bottle }) => bottle === null)).toBe(
+      true,
+    );
   });
 
-  test("errors on unknown release reviews without mod", async ({
+  test("requires a moderator for unknown reviews even with a Bottle filter", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
 
     const err = await waitError(
       routerClient.reviews.list({
-        release: release.id,
+        bottle: bottle.id,
         onlyUnknown: true,
       }),
     );

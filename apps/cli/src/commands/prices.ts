@@ -5,10 +5,25 @@ import {
   bottles,
   storePriceHistories,
   storePrices,
+  type StorePrice,
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
+import { DatabaseError } from "pg";
+
+type StorePriceNormalizationUpdate = Pick<StorePrice, "name"> &
+  Partial<Pick<StorePrice, "bottleId">>;
+
+export function buildStorePriceNormalizationUpdate(
+  name: string,
+  bottleId: number | null,
+): StorePriceNormalizationUpdate {
+  return {
+    name,
+    ...(bottleId === null ? {} : { bottleId }),
+  };
+}
 
 const subcommand = program.command("prices");
 
@@ -33,16 +48,12 @@ subcommand
           isFullName: true,
         });
         if (price.name !== name) {
-          const values: Record<string, any> = {};
-          if (price.name !== name) values.name = name;
-
-          if (!price.bottleId) {
-            const bottleId = await findBottleId(price.name, {
-              caller: "cli.prices",
-              operation: "normalizeNames",
-            });
-            if (bottleId) price.bottleId = bottleId;
-          }
+          const discoveredBottleId =
+            price.bottleId === null ? await findBottleId(price.name) : null;
+          const values = buildStorePriceNormalizationUpdate(
+            name,
+            discoveredBottleId,
+          );
 
           console.log(`M: ${price.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
@@ -54,10 +65,17 @@ subcommand
                   .set(values)
                   .where(eq(storePrices.id, price.id));
               });
-            } catch (err: any) {
+            } catch (error) {
+              const databaseError =
+                error instanceof DatabaseError
+                  ? error
+                  : error instanceof Error &&
+                      error.cause instanceof DatabaseError
+                    ? error.cause
+                    : null;
               if (
-                err?.code === "23505" &&
-                err?.constraint === "store_price_unq_name"
+                databaseError?.code === "23505" &&
+                databaseError.constraint === "store_price_unq_name"
               ) {
                 await db.transaction(async (tx) => {
                   const [match] = await db
@@ -97,6 +115,8 @@ subcommand
                     .delete(storePrices)
                     .where(eq(storePrices.id, price.id));
                 });
+              } else {
+                throw error;
               }
             }
           }

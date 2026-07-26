@@ -1,5 +1,4 @@
 import type { PagingRel, StorePrice } from "@peated/server/types";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import PaginationButtons from "../paginationButtons";
@@ -51,8 +50,13 @@ export default function StorePriceTable({
                     {price.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
-                    {price.target ? (
-                      <CatalogTargetIdentity target={price.target} compact />
+                    {price.bottle ? (
+                      <Link
+                        href={`/bottles/${price.bottle.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {price.bottle.fullName}
+                      </Link>
                     ) : (
                       <em>No Bottle</em>
                     )}

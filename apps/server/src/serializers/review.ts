@@ -1,15 +1,21 @@
-import { inArray } from "drizzle-orm";
+import { and, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import { externalSites, type Review, type User } from "../db/schema";
-import { loadCatalogTargetReadsWithParity } from "../lib/catalogTargetReadParity";
-import { type ReviewSchema } from "../schemas";
-import type { CatalogTargetV1 } from "../schemas/catalogIdentity";
+import {
+  bottleGroupTombstones,
+  bottles,
+  bottleTombstones,
+  externalSites,
+  type Review,
+  type User,
+} from "../db/schema";
+import { type BottleSchema, type ReviewSchema } from "../schemas";
+import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
 type ReviewAttrs = {
-  target: CatalogTargetV1 | null;
+  bottle: z.infer<typeof BottleSchema> | null;
   site: ReturnType<(typeof ExternalSiteSerializer)["item"]>;
 };
 
@@ -19,30 +25,32 @@ export const ReviewSerializer = serializer({
     itemList: Review[],
     currentUser?: User,
   ): Promise<Record<string, ReviewAttrs>> => {
-    const { targets } = await loadCatalogTargetReadsWithParity(
-      itemList.map((item) => ({
-        consumerTable: "review",
-        rowLocator: { id: item.id },
-        targetId: item.targetId,
-        legacy: { bottleId: item.bottleId, releaseId: item.releaseId },
-      })),
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "ReviewSerializer",
-        operation: "serialize",
-      },
+    const bottleIds = Array.from(
+      new Set(
+        itemList.flatMap(({ bottleId }) =>
+          bottleId === null ? [] : [bottleId],
+        ),
+      ),
     );
-    const targetByReviewId = Object.fromEntries(
-      itemList.map((item, index) => {
-        const target = targets[index];
-        if (target === undefined) {
-          throw new Error(
-            `ReviewSerializer target loader omitted review ${item.id}.`,
-          );
-        }
-        return [item.id, target];
-      }),
+    const bottleList = bottleIds.length
+      ? await db
+          .select()
+          .from(bottles)
+          .where(
+            and(
+              inArray(bottles.id, bottleIds),
+              sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+              sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
+            ),
+          )
+      : [];
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      bottleList,
+      currentUser,
+    );
+    const bottlesById = new Map(
+      serializedBottles.map((bottle) => [bottle.id, bottle]),
     );
 
     const siteIds = Array.from(new Set(itemList.map((i) => i.externalSiteId)));
@@ -60,10 +68,19 @@ export const ReviewSerializer = serializer({
 
     return Object.fromEntries(
       itemList.map((item) => {
+        const bottle =
+          item.bottleId === null
+            ? null
+            : (bottlesById.get(item.bottleId) ?? null);
+        if (item.bottleId !== null && bottle === null) {
+          throw new Error(
+            `Review ${item.id} references missing Bottle ${item.bottleId}.`,
+          );
+        }
         return [
           item.id,
           {
-            target: targetByReviewId[item.id],
+            bottle,
             site: sitesByRef[item.externalSiteId],
           },
         ];
@@ -81,7 +98,7 @@ export const ReviewSerializer = serializer({
       name: item.name,
       rating: item.rating,
       url: item.url,
-      target: attrs.target,
+      bottle: attrs.bottle,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

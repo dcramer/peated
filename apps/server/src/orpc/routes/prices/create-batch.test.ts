@@ -46,20 +46,21 @@ async function getGenericTargetId(groupId: number) {
 async function waitForSessionBlockedBy(
   client: NodePgClient,
   blockerPid: number,
-): Promise<number> {
-  const deadline = Date.now() + 2_000;
+): Promise<void> {
+  const deadline = Date.now() + 2000;
   while (Date.now() < deadline) {
-    const result = await client.query<{ pid: number }>(
-      `SELECT pid
-       FROM pg_stat_activity
-       WHERE $1 = ANY(pg_blocking_pids(pid))`,
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1
+        FROM pg_stat_activity
+        WHERE $1 = ANY(pg_blocking_pids(pid))
+      ) AS blocked`,
       [blockerPid],
     );
-    const pid = result.rows[0]?.pid;
-    if (pid) return pid;
+    if (result.rows[0]?.blocked) return;
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
-  throw new Error("Timed out waiting for StorePrice ingestion target lock.");
+  throw new Error("Timed out waiting for Bottle assignment lock.");
 }
 
 vi.mock("@peated/server/worker/client", () => ({
@@ -147,7 +148,7 @@ describe("POST /external-sites/:site/prices", () => {
       targetId: expect.any(Number),
       assignmentSource: "source_approved",
     });
-    expect(prices[0].targetId).toBe(alias?.targetId);
+    expect(prices[0].targetId).toBeNull();
     expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
       priceId: prices[0].id,
       imageUrl: "http://example.com/foo.jpg",
@@ -158,7 +159,7 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("persists a generic alias target without choosing a representative", async ({
+  test("ignores target-only alias evidence and preserves existing Bottle identity", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -209,13 +210,13 @@ describe("POST /external-sites/:site/prices", () => {
     });
     expect(price).toMatchObject({
       id: existing.id,
-      targetId: genericTargetId,
-      bottleId: null,
-      releaseId: null,
+      targetId: staleTargetId,
+      bottleId: staleBottle.id,
+      releaseId: staleRelease.id,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      expect.anything(),
+      { priceId: existing.id },
     );
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
@@ -223,7 +224,7 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("atomically replaces a stale complete tuple from an exact alias", async ({
+  test("preserves a different existing Bottle and queues resolution", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -275,10 +276,14 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(storePrices.id, existing.id),
       }),
     ).toMatchObject({
-      targetId: expectedTargetId,
-      bottleId: expectedBottle.id,
-      releaseId: null,
+      targetId: staleTargetId,
+      bottleId: staleBottle.id,
+      releaseId: staleRelease.id,
     });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: existing.id },
+    );
   });
 
   test("rolls back price and history writes for a retired alias target", async ({
@@ -308,7 +313,7 @@ describe("POST /external-sites/:site/prices", () => {
         },
         { context: { user } },
       ),
-    ).rejects.toThrow("Catalog target is retired");
+    ).rejects.toThrow(`Bottle ${bottle.id} is retired`);
 
     expect(
       await db.query.storePrices.findMany({
@@ -317,615 +322,6 @@ describe("POST /external-sites/:site/prices", () => {
     ).toHaveLength(0);
     expect(await db.select().from(storePriceHistories)).toHaveLength(0);
   });
-
-  test("locks target identity before price, history, or alias mutation", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle();
-    const targetId = await getExactTargetId(bottle.id);
-    const user = await fixtures.User({ admin: true });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
-      await blocker.query(
-        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
-        [targetId],
-      );
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name: bottle.fullName,
-              price: 11_999,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/target-lock",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      const ingestionPid = await waitForSessionBlockedBy(observer, blockerPid);
-      const prematureMutationLocks = await observer.query<{ relname: string }>(
-        `SELECT relation.relname
-         FROM pg_locks AS lock
-         INNER JOIN pg_class AS relation ON relation.oid = lock.relation
-         WHERE lock.pid = $1
-           AND lock.mode = 'RowExclusiveLock'
-           AND relation.relname = ANY($2::text[])`,
-        [ingestionPid, ["store_price", "store_price_history", "bottle_alias"]],
-      );
-      expect(prematureMutationLocks.rows).toHaveLength(0);
-
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await ingestion;
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toMatchObject({
-      targetId,
-      bottleId: bottle.id,
-      releaseId: null,
-    });
-  });
-
-  test("rolls back when an alias is retargeted while target locking waits", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const originalBottle = await fixtures.Bottle();
-    const replacementBottle = await fixtures.Bottle();
-    const originalTargetId = await getExactTargetId(originalBottle.id);
-    const replacementTargetId = await getExactTargetId(replacementBottle.id);
-    const user = await fixtures.User({ admin: true });
-    const name = "Ardbeg 10 years old";
-    expect(normalizeBottleAliasKey(name)).not.toBe(name);
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: originalBottle.id,
-      targetId: originalTargetId,
-      assignedByActorId: originalBottle.createdByActorId,
-    });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
-      await blocker.query(
-        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
-        [originalTargetId],
-      );
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name,
-              price: 12_999,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/concurrent-retarget",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await observer.query(
-        `UPDATE bottle_alias
-         SET bottle_id = $1, target_id = $2
-         WHERE name = $3`,
-        [replacementBottle.id, replacementTargetId, name],
-      );
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await expect(ingestion).rejects.toThrow("Bottle alias identity changed");
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      bottleId: replacementBottle.id,
-      targetId: replacementTargetId,
-    });
-  }, 15_000);
-
-  test("does not resurrect a normalized alias deleted while target locking waits", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle();
-    const targetId = await getExactTargetId(bottle.id);
-    const user = await fixtures.User({ admin: true });
-    const name = normalizeBottleAliasKey("Ardbeg 12 years old");
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: bottle.id,
-      targetId,
-      assignedByActorId: bottle.createdByActorId,
-    });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
-      await blocker.query(
-        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
-        [targetId],
-      );
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name,
-              price: 13_249,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/deleted-normalized-alias",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await observer.query("DELETE FROM bottle_alias WHERE name = $1", [name]);
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await expect(ingestion).rejects.toThrow("Bottle alias identity changed");
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toBeUndefined();
-  }, 15_000);
-
-  test("rolls back when only the matched alias ignored state changes", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle();
-    const targetId = await getExactTargetId(bottle.id);
-    const user = await fixtures.User({ admin: true });
-    const name = normalizeBottleAliasKey("Ardbeg 14 years old");
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: bottle.id,
-      targetId,
-      ignored: false,
-      assignedByActorId: bottle.createdByActorId,
-    });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
-      await blocker.query(
-        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
-        [targetId],
-      );
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name,
-              price: 13_349,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/ignored-alias-race",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await observer.query(
-        "UPDATE bottle_alias SET ignored = true WHERE name = $1",
-        [name],
-      );
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await expect(ingestion).rejects.toThrow("Bottle alias identity changed");
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({ ignored: true, targetId });
-  }, 15_000);
-
-  test("rolls back when staged release promotion completes before serialization", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const parent = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    if (parent.groupId === null)
-      throw new Error("Parent group fixture missing.");
-    const [promotedBottle] = await db
-      .insert(bottles)
-      .values({
-        groupId: parent.groupId,
-        brandId: parent.brandId,
-        createdByActorId: parent.createdByActorId,
-        name: "Concurrent promoted Bottle",
-        fullName: "Concurrent promoted Bottle",
-      })
-      .returning();
-    if (!promotedBottle) throw new Error("Promoted Bottle fixture missing.");
-    await db.insert(catalogTargets).values({
-      groupId: parent.groupId,
-      bottleId: promotedBottle.id,
-    });
-    const name = "Concurrent Staged Release Alias";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: parent.id,
-      releaseId: release.id,
-      targetId: null,
-      assignedByActorId: parent.createdByActorId,
-    });
-    const user = await fixtures.User({ admin: true });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load parent blocker pid.");
-      await blocker.query("SELECT id FROM bottle WHERE id = $1 FOR UPDATE", [
-        parent.id,
-      ]);
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name,
-              price: 13_449,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/staged-promotion-race",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await observer.query(
-        `INSERT INTO bottle_release_promotion
-           (release_id, promoted_bottle_id, status, completed_at, created_by_actor_id)
-         VALUES ($1, $2, 'promoted', NOW(), $3)`,
-        [release.id, promotedBottle.id, parent.createdByActorId],
-      );
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await expect(ingestion).rejects.toThrow(
-        "assignment changed before targetless use",
-      );
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: release.id,
-    });
-  }, 15_000);
-
-  test("rolls back when a staged ungrouped parent gains its target before serialization", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const parent = await fixtures.LegacyBottle();
-    expect(parent.groupId).toBeNull();
-    expect(
-      await db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, parent.id),
-      }),
-    ).toBeUndefined();
-    const name = "Concurrent Staged Parent Alias";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: parent.id,
-      releaseId: null,
-      targetId: null,
-      assignedByActorId: parent.createdByActorId,
-    });
-    const user = await fixtures.User({ admin: true });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load parent blocker pid.");
-      await blocker.query("SELECT id FROM bottle WHERE id = $1 FOR UPDATE", [
-        parent.id,
-      ]);
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name,
-              price: 13_549,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/staged-parent-race",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      const groupId = (
-        await blocker.query<{ id: string }>(
-          `INSERT INTO bottle_group
-             (full_name, name, brand_id, created_by_actor_id)
-           SELECT full_name, name, brand_id, created_by_actor_id
-           FROM bottle
-           WHERE id = $1
-           RETURNING id`,
-          [parent.id],
-        )
-      ).rows[0]?.id;
-      if (!groupId) throw new Error("Unable to create parent group.");
-      await blocker.query("UPDATE bottle SET group_id = $1 WHERE id = $2", [
-        groupId,
-        parent.id,
-      ]);
-      await blocker.query(
-        `INSERT INTO catalog_target (bottle_group_id, bottle_id)
-         VALUES ($1, NULL), ($1, $2)`,
-        [groupId, parent.id],
-      );
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await expect(ingestion).rejects.toThrow(
-        "assignment changed before targetless use",
-      );
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: null,
-    });
-    expect(
-      await db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, parent.id),
-      }),
-    ).toMatchObject({ bottleId: parent.id });
-  }, 15_000);
-
-  test("rolls back when a target retires while hierarchy locking waits", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle();
-    const user = await fixtures.User({ admin: true });
-    const blocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let ingestion: ReturnType<typeof routerClient.prices.createBatch> | null =
-      null;
-    let blockerReleased = false;
-
-    await blocker.connect();
-    await observer.connect();
-    try {
-      await blocker.query("BEGIN");
-      const blockerPid = (
-        await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load group blocker pid.");
-      await blocker.query(
-        "SELECT id FROM bottle_group WHERE id = $1 FOR UPDATE",
-        [bottle.groupId],
-      );
-
-      ingestion = routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name: bottle.fullName,
-              price: 13_499,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/concurrent-retirement",
-            },
-          ],
-        },
-        { context: { user } },
-      );
-      void ingestion.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await observer.query(
-        `INSERT INTO bottle_tombstone (bottle_id, new_bottle_id)
-         VALUES ($1, NULL)`,
-        [bottle.id],
-      );
-      await blocker.query("COMMIT");
-      blockerReleased = true;
-      await expect(ingestion).rejects.toThrow("Catalog target is retired");
-    } finally {
-      if (!blockerReleased) {
-        await blocker.query("ROLLBACK").catch(() => undefined);
-      }
-      await blocker.end();
-      await observer.end();
-      if (ingestion) await ingestion.catch(() => undefined);
-    }
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-  }, 15_000);
 
   test("finalizes a matched price image onto an empty Bottle image", async ({
     fixtures,
@@ -937,7 +333,7 @@ describe("POST /external-sites/:site/prices", () => {
       imageUrl: null,
     });
     const imageUrl = "http://example.com/retailer-bottle.jpg";
-    await fixtures.StorePrice({
+    const existingPrice = await fixtures.StorePrice({
       bottleId: bottle.id,
       externalSiteId: site.id,
       name: bottle.fullName,
@@ -980,7 +376,7 @@ describe("POST /external-sites/:site/prices", () => {
     expect(updatedPrice).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: exactAlias?.targetId,
+      targetId: existingPrice.targetId,
       imageUrl,
     });
     expect(exactAlias?.targetId).toEqual(expect.any(Number));
@@ -1038,7 +434,76 @@ describe("POST /external-sites/:site/prices", () => {
     expect(prices[0].url).toBe("http://example.com");
   });
 
-  test("retains a promotion-incomplete release alias as targetless", async ({
+  test("locks the Bottle before an existing StorePrice", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const bottle = await fixtures.Bottle({ name: "Lock Order Bottle" });
+    const existingPrice = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      externalSiteId: site.id,
+      name: bottle.fullName,
+      volume: 750,
+    });
+    const user = await fixtures.User({ admin: true });
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation:
+      | ReturnType<typeof routerClient.prices.createBatch>
+      | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `UPDATE "bottle" SET "updated_at" = "updated_at" WHERE "id" = $1`,
+        [bottle.id],
+      );
+
+      creation = routerClient.prices.createBatch(
+        {
+          site: site.type,
+          prices: [
+            {
+              name: bottle.fullName,
+              price: 12_345,
+              currency: "usd",
+              volume: 750,
+              url: "https://example.com/lock-order",
+            },
+          ],
+        },
+        { context: { user } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+
+      await client.query(
+        `UPDATE "store_price" SET "price" = "price" WHERE "id" = $1`,
+        [existingPrice.id],
+      );
+      await client.query("COMMIT");
+      committed = true;
+      await creation;
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      price: 12_345,
+    });
+  });
+
+  test("uses the retained Bottle for a promotion-incomplete release alias", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -1085,7 +550,7 @@ describe("POST /external-sites/:site/prices", () => {
 
     expect(price).toMatchObject({
       bottleId: bottle.id,
-      releaseId: release.id,
+      releaseId: null,
       targetId: null,
       name: normalizedReleaseName,
     });
@@ -1095,7 +560,7 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("upgrades a promoted legacy release alias to its exact target", async ({
+  test("uses the direct Bottle retained on a promoted legacy release alias", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -1113,16 +578,6 @@ describe("POST /external-sites/:site/prices", () => {
       .returning();
     if (!promotedBottle || parent.groupId === null) {
       throw new Error("Unable to create promoted Bottle fixture.");
-    }
-    const [promotedTarget] = await db
-      .insert(catalogTargets)
-      .values({
-        groupId: parent.groupId,
-        bottleId: promotedBottle.id,
-      })
-      .returning();
-    if (!promotedTarget) {
-      throw new Error("Unable to create promoted target fixture.");
     }
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
@@ -1162,28 +617,27 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(storePrices.externalSiteId, site.id),
       }),
     ).toMatchObject({
-      targetId: promotedTarget.id,
+      targetId: null,
       bottleId: parent.id,
-      releaseId: release.id,
+      releaseId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, name),
       }),
     ).toMatchObject({
-      targetId: promotedTarget.id,
-      bottleId: promotedBottle.id,
-      releaseId: null,
+      targetId: null,
+      bottleId: parent.id,
+      releaseId: release.id,
     });
   });
 
-  test("upgrades a legacy parent alias to its generic target", async ({
+  test("uses the direct Bottle from a legacy parent alias", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const parent = await fixtures.Bottle();
     await fixtures.BottleRelease({ bottleId: parent.id });
-    const genericTargetId = await getGenericTargetId(parent.groupId!);
     const name = "Legacy Generic Price Alias";
     await db.insert(bottleAliases).values({
       name,
@@ -1215,7 +669,7 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(storePrices.externalSiteId, site.id),
       }),
     ).toMatchObject({
-      targetId: genericTargetId,
+      targetId: null,
       bottleId: parent.id,
       releaseId: null,
     });
@@ -1224,8 +678,8 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(bottleAliases.name, name),
       }),
     ).toMatchObject({
-      targetId: genericTargetId,
-      bottleId: null,
+      targetId: null,
+      bottleId: parent.id,
       releaseId: null,
     });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
@@ -1272,7 +726,7 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(storePrices.externalSiteId, site.id),
       }),
     ).toMatchObject({
-      targetId: genericTargetId,
+      targetId: null,
       bottleId: parent.id,
       releaseId: null,
     });
@@ -1282,12 +736,12 @@ describe("POST /external-sites/:site/prices", () => {
       }),
     ).toMatchObject({
       targetId: genericTargetId,
-      bottleId: null,
+      bottleId: parent.id,
       releaseId: null,
     });
   });
 
-  test("rejects a generic alias retained pair that resolves elsewhere", async ({
+  test("uses the direct alias Bottle when retained target evidence disagrees", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -1306,30 +760,32 @@ describe("POST /external-sites/:site/prices", () => {
     });
     const user = await fixtures.User({ admin: true });
 
-    await expect(
-      routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name,
-              price: 10_999,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/invalid-generic-retained-pair",
-            },
-          ],
-        },
-        { context: { user } },
-      ),
-    ).rejects.toThrow("retained pair resolves to another target");
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name,
+            price: 10_999,
+            currency: "usd",
+            volume: 750,
+            url: "http://example.com/invalid-generic-retained-pair",
+          },
+        ],
+      },
+      { context: { user } },
+    );
 
     expect(
-      await db.query.storePrices.findMany({
+      await db.query.storePrices.findFirst({
         where: eq(storePrices.externalSiteId, site.id),
       }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
+    ).toMatchObject({
+      targetId: null,
+      bottleId: retainedParent.id,
+      releaseId: null,
+    });
+    expect(await db.select().from(storePriceHistories)).toHaveLength(1);
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, name),
@@ -1340,15 +796,15 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
-  test("targetless legacy aliases replace only targetless price identity", async ({
+  test("legacy aliases do not overwrite a different existing Bottle", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const legacyBottle = await fixtures.LegacyBottle();
+    const legacyBottle = await fixtures.Bottle();
     const legacyRelease = await fixtures.BottleRelease({
       bottleId: legacyBottle.id,
     });
-    const previousBottle = await fixtures.LegacyBottle();
+    const previousBottle = await fixtures.Bottle();
     const previousRelease = await fixtures.BottleRelease({
       bottleId: previousBottle.id,
     });
@@ -1395,12 +851,12 @@ describe("POST /external-sites/:site/prices", () => {
       }),
     ).toMatchObject({
       targetId: null,
-      bottleId: legacyBottle.id,
-      releaseId: legacyRelease.id,
+      bottleId: previousBottle.id,
+      releaseId: previousRelease.id,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      expect.anything(),
+      { priceId: existing.id },
     );
   });
 
@@ -1408,7 +864,7 @@ describe("POST /external-sites/:site/prices", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const legacyBottle = await fixtures.LegacyBottle();
+    const legacyBottle = await fixtures.Bottle();
     const durableBottle = await fixtures.Bottle();
     const durableTargetId = await getExactTargetId(durableBottle.id);
     const name = "Durable Price Listing";
@@ -1451,6 +907,10 @@ describe("POST /external-sites/:site/prices", () => {
       bottleId: durableBottle.id,
       releaseId: null,
     });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: existing.id },
+    );
   });
 
   test("processes new price without bottle", async ({ fixtures }) => {
@@ -1588,11 +1048,11 @@ describe("POST /external-sites/:site/prices", () => {
     });
 
     expect(price.bottleId).toBe(bottle.id);
-    expect(price.targetId).toBe(alias?.targetId);
+    expect(price.targetId).toBeNull();
     expect(updatedRawReview).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: alias?.targetId,
+      targetId: null,
     });
     expect(alias).toMatchObject({
       bottleId: bottle.id,

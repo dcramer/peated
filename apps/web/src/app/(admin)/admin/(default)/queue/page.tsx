@@ -1,6 +1,6 @@
 "use client";
 
-import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -195,15 +195,15 @@ export default function Page() {
   }
 
   async function handleApproveMatch(item: QueueItem): Promise<void> {
-    const suggestedTarget = item.suggestedTarget;
-    if (!suggestedTarget) {
+    const suggestedBottle = item.suggestedBottle;
+    if (!suggestedBottle) {
       return;
     }
 
     await resolveMutation.mutateAsync({
       proposal: item.id,
       action: "match",
-      target: suggestedTarget.targetId,
+      bottle: suggestedBottle.id,
     });
     await refreshQueueList();
     flash(
@@ -246,8 +246,8 @@ export default function Page() {
     flash(
       <div>
         Created{" "}
-        <Link href={`/bottles/${created.bottle.id}`} className="underline">
-          {created.bottle.fullName}
+        <Link href={`/bottles/${created.id}`} className="underline">
+          {created.fullName}
         </Link>{" "}
         for <strong className="font-bold">{item.price.name}</strong>
       </div>,
@@ -283,9 +283,7 @@ export default function Page() {
     );
   }
 
-  async function handleBottleSelection(
-    target: ExactCatalogTargetV1,
-  ): Promise<void> {
+  async function handleBottleSelection(bottle: Bottle): Promise<void> {
     if (!selectedProposal) {
       return;
     }
@@ -293,15 +291,15 @@ export default function Page() {
     await resolveMutation.mutateAsync({
       proposal: selectedProposal.id,
       action: "match",
-      target: target.targetId,
+      bottle: bottle.id,
     });
     await refreshQueueList();
     flash(
       <div>
         Assigned{" "}
         <strong className="font-bold">{selectedProposal.price.name}</strong> to{" "}
-        <Link href={`/bottles/${target.bottle.id}`} className="underline">
-          {target.bottle.fullName}
+        <Link href={`/bottles/${bottle.id}`} className="underline">
+          {bottle.fullName}
         </Link>
       </div>,
     );
@@ -329,7 +327,7 @@ export default function Page() {
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
           Review new or changed retailer listings here. Use this queue when the
-          listing is unmatched, misclassified, or needs a catalog assignment. If
+          listing is unmatched, misclassified, or needs a Bottle assignment. If
           the underlying catalog bottle itself is wrong, switch to one of the
           repair queues below instead of forcing the listing to carry that
           cleanup.

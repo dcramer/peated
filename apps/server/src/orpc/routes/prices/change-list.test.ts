@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { catalogTargets, collectionBottles } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+
+const ONE_WEEK_AGO = () =>
+  new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
 async function exactTargetId(bottleId: number): Promise<number> {
   const target = await db.query.catalogTargets.findFirst({
@@ -12,69 +15,70 @@ async function exactTargetId(bottleId: number): Promise<number> {
 }
 
 describe("GET /price-changes", () => {
-  test("lists price changes", async ({ fixtures }) => {
+  test("lists price changes by direct Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: bottle.id,
-      price: 10000, // $100
+      targetId: null,
+      price: 10_000,
       updatedAt: new Date(),
     });
     await fixtures.StorePriceHistory({
       priceId: price.id,
-      price: 5000, // $50
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week ago
+      price: 5_000,
+      date: ONE_WEEK_AGO(),
     });
 
     const { results } = await routerClient.prices.changeList({});
-    const targetId = await exactTargetId(bottle.id);
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(targetId);
-    expect(results[0].price).toEqual(10000);
-    expect(results[0].previousPrice).toEqual(5000);
-    expect(results[0].target).toMatchObject({
-      kind: "bottle",
-      targetId,
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({
+      id: bottle.id,
       bottle: { id: bottle.id },
+      price: 10_000,
+      previousPrice: 5_000,
+      isLibrary: false,
+      hasTasted: false,
     });
+    expect(results[0]).not.toHaveProperty("target");
   });
 
-  test("filters by query", async ({ fixtures }) => {
+  test("filters by listing name", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Test Bottle 1" });
     const bottle2 = await fixtures.Bottle({ name: "Another Bottle" });
 
     const price1 = await fixtures.StorePrice({
       bottleId: bottle1.id,
       name: "Test Bottle 1",
-      price: 10000,
+      price: 10_000,
       updatedAt: new Date(),
     });
     const price2 = await fixtures.StorePrice({
       bottleId: bottle2.id,
       name: "Another Bottle",
-      price: 10000,
+      price: 10_000,
       updatedAt: new Date(),
     });
 
     await fixtures.StorePriceHistory({
       priceId: price1.id,
-      price: 5000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      price: 5_000,
+      date: ONE_WEEK_AGO(),
     });
     await fixtures.StorePriceHistory({
       priceId: price2.id,
-      price: 5000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      price: 5_000,
+      date: ONE_WEEK_AGO(),
     });
 
     const { results } = await routerClient.prices.changeList({
       query: "Test",
     });
 
-    expect(results.length).toBe(1);
-    expect(results[0].target).toMatchObject({
-      kind: "bottle",
-      bottle: { name: "Test Bottle 1" },
+    expect(results).toHaveLength(1);
+    expect(results[0].bottle).toMatchObject({
+      id: bottle1.id,
+      name: "Test Bottle 1",
     });
   });
 
@@ -91,13 +95,13 @@ describe("GET /price-changes", () => {
         const price = await fixtures.StorePrice({
           externalSiteId: site.id,
           bottleId: bottle.id,
-          price: 10000,
+          price: 10_000,
           updatedAt: new Date(),
         });
         await fixtures.StorePriceHistory({
           priceId: price.id,
-          price: 5000,
-          date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          price: 5_000,
+          date: ONE_WEEK_AGO(),
         });
       }),
     );
@@ -106,177 +110,187 @@ describe("GET /price-changes", () => {
       limit: 2,
     });
 
-    expect(results.length).toBe(2);
+    expect(results).toHaveLength(2);
     expect(rel.nextCursor).toBe(2);
     expect(rel.prevCursor).toBeNull();
   });
 
-  test("groups by authoritative exact or generic target and currency", async ({
+  test("groups by direct Bottle and currency regardless of target evidence", async ({
     fixtures,
   }) => {
-    const exactBottle = await fixtures.Bottle({ name: "Exact change" });
-    const retainedOther = await fixtures.Bottle({ name: "Retained drift" });
-    const retainedSecond = await fixtures.Bottle({ name: "Retained drift 2" });
-    const genericParent = await fixtures.Bottle({ name: "Generic change" });
-    await fixtures.BottleRelease({ bottleId: genericParent.id });
-    const exactTarget = await exactTargetId(exactBottle.id);
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, genericParent.groupId as number),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) throw new Error("Missing generic target fixture");
-    const exactPrice = await fixtures.StorePrice({
-      bottleId: retainedOther.id,
-      targetId: exactTarget,
-      name: "Exact target price change",
+    const evidenceBottle = await fixtures.Bottle({ name: "Target evidence" });
+    const firstBottle = await fixtures.Bottle({ name: "First change" });
+    const secondBottle = await fixtures.Bottle({ name: "Second change" });
+    const staleTargetId = await exactTargetId(evidenceBottle.id);
+
+    const firstUsd = await fixtures.StorePrice({
+      bottleId: firstBottle.id,
+      targetId: staleTargetId,
+      name: "First USD price",
       price: 10_000,
       updatedAt: new Date(),
     });
-    const exactEuroPrice = await fixtures.StorePrice({
-      bottleId: retainedOther.id,
-      targetId: exactTarget,
-      name: "Exact target euro price change",
+    const firstUsdSecond = await fixtures.StorePrice({
+      bottleId: firstBottle.id,
+      targetId: staleTargetId,
+      name: "First USD second price",
+      price: 14_000,
+      updatedAt: new Date(),
+    });
+    const firstEuro = await fixtures.StorePrice({
+      bottleId: firstBottle.id,
+      targetId: staleTargetId,
+      name: "First EUR price",
       price: 15_000,
       currency: "eur",
       updatedAt: new Date(),
     });
-    const exactSecondPrice = await fixtures.StorePrice({
-      bottleId: retainedSecond.id,
-      targetId: exactTarget,
-      name: "Exact target second price change",
-      price: 14_000,
-      updatedAt: new Date(),
-    });
-    const genericPrice = await fixtures.StorePrice({
-      bottleId: genericParent.id,
-      targetId: genericTarget.id,
-      name: "Generic target price change",
+    const secondUsd = await fixtures.StorePrice({
+      bottleId: secondBottle.id,
+      targetId: staleTargetId,
+      name: "Second USD price",
       price: 20_000,
       updatedAt: new Date(),
     });
-    await fixtures.StorePriceHistory({
-      priceId: exactPrice.id,
-      price: 5_000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    await fixtures.StorePriceHistory({
-      priceId: exactEuroPrice.id,
-      price: 7_000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    await fixtures.StorePriceHistory({
-      priceId: exactSecondPrice.id,
-      price: 9_000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    await fixtures.StorePriceHistory({
-      priceId: genericPrice.id,
-      price: 10_000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    });
+    await Promise.all([
+      fixtures.StorePriceHistory({
+        priceId: firstUsd.id,
+        price: 5_000,
+        date: ONE_WEEK_AGO(),
+      }),
+      fixtures.StorePriceHistory({
+        priceId: firstUsdSecond.id,
+        price: 9_000,
+        date: ONE_WEEK_AGO(),
+      }),
+      fixtures.StorePriceHistory({
+        priceId: firstEuro.id,
+        price: 7_000,
+        date: ONE_WEEK_AGO(),
+      }),
+      fixtures.StorePriceHistory({
+        priceId: secondUsd.id,
+        price: 10_000,
+        date: ONE_WEEK_AGO(),
+      }),
+    ]);
 
     const { results } = await routerClient.prices.changeList({});
-    const byTargetAndCurrency = Object.fromEntries(
+    const byBottleAndCurrency = Object.fromEntries(
       results.map((change) => [`${change.id}:${change.currency}`, change]),
     );
+
     expect(
       results.map((change) => `${change.id}:${change.currency}`).sort(),
     ).toEqual(
       [
-        `${exactTarget}:usd`,
-        `${exactTarget}:eur`,
-        `${genericTarget.id}:usd`,
+        `${firstBottle.id}:usd`,
+        `${firstBottle.id}:eur`,
+        `${secondBottle.id}:usd`,
       ].sort(),
     );
-
-    expect(byTargetAndCurrency[`${exactTarget}:usd`]).toMatchObject({
+    expect(byBottleAndCurrency[`${firstBottle.id}:usd`]).toMatchObject({
+      bottle: { id: firstBottle.id },
       price: 12_000,
       previousPrice: 7_000,
-      currency: "usd",
-      target: {
-        kind: "bottle",
-        bottle: { id: exactBottle.id },
-      },
     });
-    expect(byTargetAndCurrency[`${exactTarget}:eur`]).toMatchObject({
+    expect(byBottleAndCurrency[`${firstBottle.id}:eur`]).toMatchObject({
+      bottle: { id: firstBottle.id },
       price: 15_000,
       previousPrice: 7_000,
-      currency: "eur",
-      target: {
-        kind: "bottle",
-        bottle: { id: exactBottle.id },
-      },
     });
-    expect(byTargetAndCurrency[`${exactTarget}:usd`]).toMatchObject({
-      isLibrary: false,
-      hasTasted: false,
-    });
-    expect(byTargetAndCurrency[`${genericTarget.id}:usd`]).toMatchObject({
+    expect(byBottleAndCurrency[`${secondBottle.id}:usd`]).toMatchObject({
+      bottle: { id: secondBottle.id },
       price: 20_000,
       previousPrice: 10_000,
-      currency: "usd",
-      target: {
-        kind: "group",
-        group: { id: genericParent.groupId },
-      },
-      isLibrary: false,
-      hasTasted: false,
     });
   });
 
-  test("returns target-keyed Library and tasted state for the current user", async ({
+  test("excludes unresolved listings even when target evidence exists", async ({
     fixtures,
   }) => {
-    const user = await fixtures.User();
-    const exactBottle = await fixtures.Bottle({ name: "Library change" });
-    const genericParent = await fixtures.Bottle({ name: "Tasted change" });
-    await fixtures.BottleRelease({ bottleId: genericParent.id });
-    const exactTarget = await exactTargetId(exactBottle.id);
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, genericParent.groupId as number),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) throw new Error("Missing generic target fixture");
-    const exactPrice = await fixtures.StorePrice({
-      bottleId: genericParent.id,
-      targetId: exactTarget,
-      name: "Library target price change",
+    const evidenceBottle = await fixtures.Bottle();
+    const resolvedBottle = await fixtures.Bottle();
+    const targetId = await exactTargetId(evidenceBottle.id);
+    const unresolved = await fixtures.StorePrice({
+      bottleId: null,
+      targetId,
+      name: "Unresolved target evidence",
       price: 10_000,
       updatedAt: new Date(),
     });
-    const genericPrice = await fixtures.StorePrice({
-      bottleId: exactBottle.id,
-      targetId: genericTarget.id,
-      name: "Tasted target price change",
+    const resolved = await fixtures.StorePrice({
+      bottleId: resolvedBottle.id,
+      targetId: null,
+      name: "Resolved without target evidence",
       price: 20_000,
       updatedAt: new Date(),
     });
-    await fixtures.StorePriceHistory({
-      priceId: exactPrice.id,
-      price: 5_000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    await fixtures.StorePriceHistory({
-      priceId: genericPrice.id,
+    await Promise.all([
+      fixtures.StorePriceHistory({
+        priceId: unresolved.id,
+        price: 5_000,
+        date: ONE_WEEK_AGO(),
+      }),
+      fixtures.StorePriceHistory({
+        priceId: resolved.id,
+        price: 10_000,
+        date: ONE_WEEK_AGO(),
+      }),
+    ]);
+
+    const { results } = await routerClient.prices.changeList({});
+
+    expect(results).toHaveLength(1);
+    expect(results[0].bottle.id).toBe(resolvedBottle.id);
+  });
+
+  test("returns Bottle-keyed Library and tasted state", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const evidenceBottle = await fixtures.Bottle();
+    const libraryBottle = await fixtures.Bottle({ name: "Library change" });
+    const tastedBottle = await fixtures.Bottle({ name: "Tasted change" });
+    const staleTargetId = await exactTargetId(evidenceBottle.id);
+    const libraryPrice = await fixtures.StorePrice({
+      bottleId: libraryBottle.id,
+      targetId: staleTargetId,
+      name: "Library Bottle price change",
       price: 10_000,
-      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(),
     });
+    const tastedPrice = await fixtures.StorePrice({
+      bottleId: tastedBottle.id,
+      targetId: staleTargetId,
+      name: "Tasted Bottle price change",
+      price: 20_000,
+      updatedAt: new Date(),
+    });
+    await Promise.all([
+      fixtures.StorePriceHistory({
+        priceId: libraryPrice.id,
+        price: 5_000,
+        date: ONE_WEEK_AGO(),
+      }),
+      fixtures.StorePriceHistory({
+        priceId: tastedPrice.id,
+        price: 10_000,
+        date: ONE_WEEK_AGO(),
+      }),
+    ]);
     const library = await fixtures.Collection({
       createdById: user.id,
       name: "Library",
     });
     await db.insert(collectionBottles).values({
       collectionId: library.id,
-      bottleId: genericParent.id,
-      targetId: exactTarget,
+      bottleId: libraryBottle.id,
+      targetId: staleTargetId,
     });
     await fixtures.Tasting({
-      bottleId: exactBottle.id,
-      targetId: genericTarget.id,
+      bottleId: tastedBottle.id,
+      targetId: staleTargetId,
       createdById: user.id,
     });
 
@@ -288,11 +302,13 @@ describe("GET /price-changes", () => {
       results.map((change) => [change.id, change]),
     );
 
-    expect(byId[exactTarget]).toMatchObject({
+    expect(byId[libraryBottle.id]).toMatchObject({
+      bottle: { id: libraryBottle.id },
       isLibrary: true,
       hasTasted: false,
     });
-    expect(byId[genericTarget.id]).toMatchObject({
+    expect(byId[tastedBottle.id]).toMatchObject({
+      bottle: { id: tastedBottle.id },
       isLibrary: false,
       hasTasted: true,
     });

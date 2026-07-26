@@ -151,14 +151,14 @@ describe("fixBadReviewEntities", () => {
     });
     expect(updatedReview?.bottleId).toEqual(correctBottle.id);
     expect(updatedReview?.releaseId).toBeNull();
-    expect(updatedReview?.targetId).not.toBeNull();
+    expect(updatedReview?.targetId).toBeNull();
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, review.name),
     });
     expect(alias).toMatchObject({
       bottleId: correctBottle.id,
-      targetId: updatedReview?.targetId,
+      targetId: expect.any(Number),
     });
 
     const siblingReview = await db.query.reviews.findFirst({
@@ -177,14 +177,14 @@ describe("fixBadReviewEntities", () => {
     });
   });
 
-  test("reassigns through an explicitly staged targetless exact alias", async ({
+  test("reassigns through an exact alias to an active Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
     const wrongBottle = await fixtures.Bottle({
       name: "Wrong Staged Alias Bottle",
     });
-    const stagedBottle = await fixtures.LegacyBottle({
+    const stagedBottle = await fixtures.Bottle({
       name: "Staged Exact Alias Bottle",
     });
     const site = await fixtures.ExternalSiteOrExisting();
@@ -227,14 +227,14 @@ describe("fixBadReviewEntities", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("reassigns through an explicitly staged unpromoted classifier match", async ({
+  test("reassigns a classifier match to its direct active Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
     const wrongBottle = await fixtures.Bottle({
       name: "Wrong Unpromoted Match Bottle",
     });
-    const stagedParent = await fixtures.LegacyBottle({
+    const stagedParent = await fixtures.Bottle({
       name: "Unpromoted Match Parent",
     });
     const stagedRelease = await fixtures.BottleRelease({
@@ -288,7 +288,7 @@ describe("fixBadReviewEntities", () => {
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({
       bottleId: stagedParent.id,
-      releaseId: stagedRelease.id,
+      releaseId: null,
       targetId: null,
     });
     expect(
@@ -297,7 +297,7 @@ describe("fixBadReviewEntities", () => {
       }),
     ).toMatchObject({
       bottleId: stagedParent.id,
-      releaseId: stagedRelease.id,
+      releaseId: null,
       targetId: null,
       assignmentSource: "classifier_approved",
     });

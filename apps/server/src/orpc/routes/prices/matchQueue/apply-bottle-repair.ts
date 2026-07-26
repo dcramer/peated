@@ -1,9 +1,8 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  DuplicateBottleAliasError,
+  ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import {
   applyStorePriceBottleRepairFromProposal,
   InvalidStorePriceMatchProposalTypeError,
@@ -80,13 +79,6 @@ export default procedure
         });
       }
 
-      if (err instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({
-          message: err.message,
-          cause: err,
-        });
-      }
-
       if (err instanceof ConcreteBottleUpdateInputError) {
         throw errors.BAD_REQUEST({
           message: err.message,
@@ -118,7 +110,7 @@ export default procedure
         });
       }
 
-      if (err instanceof DuplicateBottleAliasError) {
+      if (err instanceof ExactBottleAliasConflictError) {
         throw errors.CONFLICT({
           message: err.message,
         });

@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottles, externalSites, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { recordStorePriceReadParity } from "@peated/server/orpc/routes/prices/read-parity";
 import { ExternalSiteSchema, StorePriceSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
@@ -11,14 +10,10 @@ import {
   desc,
   eq,
   getTableColumns,
-  or,
   type SQL,
   sql,
 } from "drizzle-orm";
 import { z } from "zod";
-import loadBottlePriceTargetId, {
-  legacyStorePriceBottleMembership,
-} from "./load-target";
 
 export default procedure
   .route({
@@ -59,13 +54,10 @@ export default procedure
       });
     }
 
-    const targetId = await loadBottlePriceTargetId(bottle.id);
-
     const baseWhere: (SQL<unknown> | undefined)[] = [
       eq(storePrices.hidden, false),
+      eq(storePrices.bottleId, bottle.id),
     ];
-    const targetWhere = eq(storePrices.targetId, targetId);
-    const legacyWhere = legacyStorePriceBottleMembership(bottle.id);
 
     if (input.onlyValid) {
       baseWhere.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
@@ -81,32 +73,11 @@ export default procedure
         externalSites,
         eq(storePrices.externalSiteId, externalSites.id),
       )
-      .where(and(...baseWhere, targetWhere))
+      .where(and(...baseWhere))
       .orderBy(
         desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
         asc(storePrices.name),
       );
-
-    const parityCandidates = await db
-      .select({
-        id: storePrices.id,
-        targetId: storePrices.targetId,
-        bottleId: storePrices.bottleId,
-        releaseId: storePrices.releaseId,
-        targetMatches: sql<boolean>`COALESCE(${targetWhere}, false)`,
-        legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
-      })
-      .from(storePrices)
-      .where(and(...baseWhere, or(targetWhere, legacyWhere)))
-      .orderBy(
-        desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
-        asc(storePrices.name),
-      );
-    await recordStorePriceReadParity(
-      parityCandidates,
-      { caller: "bottles.prices.list", operation: "filter" },
-      "catalog_reference",
-    );
 
     return {
       results: await serialize(

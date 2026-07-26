@@ -4,13 +4,12 @@ import {
   bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
   entities,
 } from "@peated/server/db/schema";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { logInfo } from "@peated/server/lib/log";
 import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
-import { and, eq, getTableColumns, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, isNull, sql } from "drizzle-orm";
 
 const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
@@ -34,29 +33,25 @@ function formatSearchEnum(value: string | null | undefined) {
 
 function aliasSnapshotWhere(alias: {
   name: string;
-  targetId: number | null;
+  bottleId: number | null;
   ignored: boolean | null;
 }) {
   return and(
     eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()),
-    sql`${bottleAliases.targetId} IS NOT DISTINCT FROM ${alias.targetId}`,
+    sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
     sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
   );
 }
 
-function activeExactTargetWhere(targetId: number) {
+function activeBottleWhere(bottleId: number) {
   return sql`EXISTS (
     SELECT 1
-    FROM ${catalogTargets}
-    INNER JOIN ${bottles}
-      ON ${bottles.id} = ${catalogTargets.bottleId}
-      AND ${bottles.groupId} = ${catalogTargets.groupId}
+    FROM ${bottles}
     LEFT JOIN ${bottleTombstones}
       ON ${bottleTombstones.bottleId} = ${bottles.id}
     LEFT JOIN ${bottleGroupTombstones}
-      ON ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId}
-    WHERE ${catalogTargets.id} = ${targetId}
-      AND ${catalogTargets.bottleId} IS NOT NULL
+      ON ${bottleGroupTombstones.groupId} = ${bottles.groupId}
+    WHERE ${bottles.id} = ${bottleId}
       AND ${bottleTombstones.bottleId} IS NULL
       AND ${bottleGroupTombstones.groupId} IS NULL
   )`;
@@ -64,7 +59,7 @@ function activeExactTargetWhere(targetId: number) {
 
 async function clearAliasEmbedding(alias: {
   name: string;
-  targetId: number | null;
+  bottleId: number | null;
   ignored: boolean | null;
 }) {
   await db
@@ -88,7 +83,7 @@ export default async ({ name }: { name: string }) => {
     },
   });
 
-  if (alias.ignored || alias.targetId === null) {
+  if (alias.ignored || alias.bottleId === null) {
     await clearAliasEmbedding(alias);
     return;
   }
@@ -98,24 +93,16 @@ export default async ({ name }: { name: string }) => {
       bottle: getTableColumns(bottles),
       brand: getTableColumns(entities),
     })
-    .from(catalogTargets)
-    .innerJoin(
-      bottles,
-      and(
-        eq(bottles.id, catalogTargets.bottleId),
-        eq(bottles.groupId, catalogTargets.groupId),
-      ),
-    )
+    .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
     .leftJoin(
       bottleGroupTombstones,
-      eq(bottleGroupTombstones.groupId, catalogTargets.groupId),
+      eq(bottleGroupTombstones.groupId, bottles.groupId),
     )
     .where(
       and(
-        eq(catalogTargets.id, alias.targetId),
-        isNotNull(catalogTargets.bottleId),
+        eq(bottles.id, alias.bottleId),
         isNull(bottleTombstones.bottleId),
         isNull(bottleGroupTombstones.groupId),
       ),
@@ -142,15 +129,13 @@ export default async ({ name }: { name: string }) => {
   if (brand.name !== brand.shortName) bits.unshift(brand.name);
   const embedding = await getOpenAIEmbedding(bits.join(" "));
 
-  // Revalidate the alias snapshot and active target after the external call so stale queued work cannot write.
+  // Revalidate direct ownership after the external call so stale queued work cannot write.
   const updated = await db
     .update(bottleAliases)
     .set({
       embedding,
     })
-    .where(
-      and(aliasSnapshotWhere(alias), activeExactTargetWhere(alias.targetId)),
-    )
+    .where(and(aliasSnapshotWhere(alias), activeBottleWhere(alias.bottleId)))
     .returning({ name: bottleAliases.name });
 
   if (!updated.length) {

@@ -234,7 +234,7 @@ describe("POST /reviews", () => {
     expect(bottle?.category).toEqual("single_malt");
     expect(bottle?.brandId).toEqual(brand.id);
     expect(review).toMatchObject({
-      targetId: target!.id,
+      targetId: null,
       bottleId: bottle!.id,
       releaseId: null,
     });
@@ -245,7 +245,7 @@ describe("POST /reviews", () => {
     expect(alias).toMatchObject({
       bottleId: bottle!.id,
       releaseId: null,
-      targetId: target!.id,
+      targetId: null,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -264,7 +264,7 @@ describe("POST /reviews", () => {
       actorId: systemActor.id,
       bottleId: bottle!.id,
       releaseId: null,
-      targetId: target!.id,
+      targetId: null,
       createdBottle: true,
       createdRelease: false,
       confidence: null,
@@ -344,12 +344,12 @@ describe("POST /reviews", () => {
     });
 
     expect(review).toMatchObject({
-      targetId: target!.id,
+      targetId: null,
       bottleId: bottle.id,
       releaseId: null,
     });
     expect(alias).toMatchObject({
-      targetId: target!.id,
+      targetId: null,
       bottleId: bottle.id,
       releaseId: null,
       assignmentSource: "classifier_approved",
@@ -358,7 +358,7 @@ describe("POST /reviews", () => {
       decision: "match_existing",
       bottleId: bottle.id,
       releaseId: null,
-      targetId: target!.id,
+      targetId: null,
       createdBottle: false,
       createdRelease: false,
       metadata: expect.objectContaining({
@@ -451,7 +451,7 @@ describe("POST /reviews", () => {
     expect(review).toBeDefined();
     expect(review?.bottleId).toEqual(bottle.id);
     expect(review?.releaseId).toBeNull();
-    expect(review?.targetId).toEqual(target?.id);
+    expect(review?.targetId).toBeNull();
     expect(review?.name).toEqual(bottle.fullName);
     expect(review?.issue).toEqual("Default");
     expect(review?.rating).toEqual(89);
@@ -466,7 +466,7 @@ describe("POST /reviews", () => {
     expect(decisionLog).toBeUndefined();
   });
 
-  test("new review keeps generic intent on the group target", async ({
+  test("new review stores the matched Bottle directly", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -552,17 +552,17 @@ describe("POST /reviews", () => {
     expect(review).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: genericTarget?.id,
+      targetId: null,
     });
     expect(alias).toMatchObject({
-      bottleId: null,
+      bottleId: bottle.id,
       releaseId: null,
-      targetId: review?.targetId,
+      targetId: null,
     });
     expect(review?.targetId).not.toEqual(exactTarget?.id);
   });
 
-  test("known classifier matches preserve explicitly staged unpromoted identity", async ({
+  test("known unpromoted classifier matches store the direct Bottle", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -603,7 +603,7 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       targetId: null,
       bottleId: bottle.id,
-      releaseId: release.id,
+      releaseId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -612,11 +612,11 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       targetId: null,
       bottleId: bottle.id,
-      releaseId: release.id,
+      releaseId: null,
     });
   });
 
-  test("grouping drift invalidates a staged targetless match before Review mutation", async ({
+  test("grouping drift does not invalidate an independently valid Bottle match", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -675,18 +675,16 @@ describe("POST /reviews", () => {
       await client.query("COMMIT");
       committed = true;
 
-      const error = await waitError(creation);
-      expect(String(error)).toContain("changed before targetless use");
+      const data = await creation;
       expect(
         await db.query.reviews.findFirst({
-          where: eq(reviews.url, reviewUrl),
+          where: eq(reviews.id, data.id),
         }),
-      ).toBeUndefined();
-      expect(
-        await db.query.bottleAliases.findFirst({
-          where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
-        }),
-      ).toBeUndefined();
+      ).toMatchObject({
+        bottleId: parent.id,
+        releaseId: null,
+        targetId: null,
+      });
     } finally {
       if (!committed) await client.query("ROLLBACK");
       await client.end();
@@ -916,7 +914,7 @@ describe("POST /reviews", () => {
     }
   });
 
-  test("concurrent resolved conflict atomically replaces the complete identity tuple", async ({
+  test("concurrent resolved conflict preserves the committed Bottle identity", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -1010,25 +1008,14 @@ describe("POST /reviews", () => {
       });
 
       expect(review).toMatchObject({
-        targetId: incomingTarget!.id,
-        bottleId: incomingBottle.id,
+        targetId: heldTarget!.id,
+        bottleId: heldBottle.id,
         releaseId: null,
         rating: 96,
         url: reviewUrl,
       });
-      expect(alias).toMatchObject({
-        targetId: incomingTarget!.id,
-        bottleId: incomingBottle.id,
-        releaseId: null,
-        assignmentSource: "classifier_approved",
-      });
-      expect(decisionLog).toMatchObject({
-        decision: "match_existing",
-        bottleId: incomingBottle.id,
-        releaseId: null,
-        createdBottle: false,
-        createdRelease: false,
-      });
+      expect(alias).toBeUndefined();
+      expect(decisionLog).toBeUndefined();
     } finally {
       if (!committed) await client.query("ROLLBACK");
       await client.end();
@@ -1205,7 +1192,7 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       bottleId: expect.any(Number),
       releaseId: null,
-      targetId: expect.any(Number),
+      targetId: null,
     });
     expect(
       await db.query.incomingBottleDecisionLogs.findFirst({
@@ -1217,7 +1204,7 @@ describe("POST /reviews", () => {
     ).toBeUndefined();
   });
 
-  test("resolved conflict replaces the complete durable identity tuple", async ({
+  test("resolved conflict preserves a different durable Bottle identity", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -1251,8 +1238,8 @@ describe("POST /reviews", () => {
     });
     expect(review).toMatchObject({
       id: existingReview.id,
-      targetId: resolvedTarget?.id,
-      bottleId: resolvedBottle.id,
+      targetId: existingReview.targetId,
+      bottleId: previousBottle.id,
       releaseId: null,
       url: "https://example.com/resolved-review-updated",
     });
@@ -1291,7 +1278,7 @@ describe("POST /reviews", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("durable exact aliases stay exact when the Bottle has legacy child releases", async ({
+  test("direct aliases stay on their Bottle when it has legacy child releases", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -1333,7 +1320,7 @@ describe("POST /reviews", () => {
       where: eq(reviews.id, data.id),
     });
     expect(review).toMatchObject({
-      targetId: exactTarget!.id,
+      targetId: null,
       bottleId: bottle.id,
       releaseId: null,
     });
@@ -1341,7 +1328,7 @@ describe("POST /reviews", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("targetless exact aliases upgrade to the measured exact target", async ({
+  test("targetless exact aliases resolve to their direct Bottle", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -1376,7 +1363,7 @@ describe("POST /reviews", () => {
         where: eq(reviews.id, data.id),
       }),
     ).toMatchObject({
-      targetId: target!.id,
+      targetId: null,
       bottleId: bottle.id,
       releaseId: null,
     });
@@ -1385,14 +1372,14 @@ describe("POST /reviews", () => {
         where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
       }),
     ).toMatchObject({
-      targetId: target!.id,
+      targetId: null,
       bottleId: bottle.id,
       releaseId: null,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("targetless exact aliases upgrade to the measured generic target", async ({
+  test("target-only evidence does not replace the alias Bottle", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -1434,7 +1421,7 @@ describe("POST /reviews", () => {
         where: eq(reviews.id, data.id),
       }),
     ).toMatchObject({
-      targetId: genericTarget!.id,
+      targetId: null,
       bottleId: bottle.id,
       releaseId: null,
     });
@@ -1443,18 +1430,18 @@ describe("POST /reviews", () => {
         where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
       }),
     ).toMatchObject({
-      targetId: genericTarget!.id,
-      bottleId: null,
+      targetId: null,
+      bottleId: bottle.id,
       releaseId: null,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("targetless exact aliases retain staged legacy identity", async ({
+  test("targetless exact aliases assign their active Bottle directly", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Staged Legacy Alias Bottle",
     });
     const aliasName = "Staged Legacy Exact Review Alias";
@@ -1488,11 +1475,11 @@ describe("POST /reviews", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("targetless release aliases retain staged unpromoted identity", async ({
+  test("retained release evidence does not change an alias Bottle assignment", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Staged Unpromoted Alias Bottle",
     });
     const release = await fixtures.BottleRelease({
@@ -1527,16 +1514,16 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       targetId: null,
       bottleId: bottle.id,
-      releaseId: release.id,
+      releaseId: null,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("invalid targetless exact alias mappings fail without review writes", async ({
+  test("legacy release evidence cannot override a direct alias Bottle", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Invalid Targetless Alias Parent",
     });
     const otherBottle = await fixtures.LegacyBottle({
@@ -1556,28 +1543,27 @@ describe("POST /reviews", () => {
     const adminUser = await fixtures.User({ admin: true });
     const reviewUrl = "https://example.com/invalid-targetless-review-alias";
 
-    const error = await waitError(() =>
-      routerClient.reviews.create(
-        {
-          site: site.type,
-          name: aliasName,
-          issue: "Default",
-          rating: 89,
-          url: reviewUrl,
-          category: bottle.category,
-        },
-        { context: { user: adminUser } },
-      ),
+    const data = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 89,
+        url: reviewUrl,
+        category: bottle.category,
+      },
+      { context: { user: adminUser } },
     );
 
-    expect(String(error)).toContain(
-      "release does not belong to the supplied parent Bottle",
-    );
     expect(
       await db.query.reviews.findFirst({
-        where: eq(reviews.url, reviewUrl),
+        where: eq(reviews.id, data.id),
       }),
-    ).toBeUndefined();
+    ).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: null,
+    });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
@@ -1799,9 +1785,11 @@ describe("POST /reviews", () => {
     });
   });
 
-  test("new review with existing release", async ({ fixtures }) => {
+  test("new review with a promoted release alias uses the promoted Bottle", async ({
+    fixtures,
+  }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Cadboll Estate",
       vintageYear: null,
       releaseYear: null,
@@ -1838,25 +1826,18 @@ describe("POST /reviews", () => {
     const review = await db.query.reviews.findFirst({
       where: (table, { eq }) => eq(table.id, data.id),
     });
-    const promotedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, promotedBottle.id),
-    });
     expect(review).toBeDefined();
     expect(review?.bottleId).toEqual(bottle.id);
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.targetId).toEqual(promotedTarget?.id);
-    expect(data.target).toMatchObject({
-      kind: "bottle",
-      targetId: promotedTarget?.id,
-      bottle: { id: promotedBottle.id },
-    });
+    expect(review?.releaseId).toBeNull();
+    expect(review?.targetId).toBeNull();
+    expect(data.bottle?.id).toEqual(bottle.id);
   });
 
-  test("preserves raw release alias text when normalization would strip release identity", async ({
+  test("normalizes review names independently of retained alias release evidence", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Calvados Cask Finished",
       vintageYear: null,
       releaseYear: null,
@@ -1894,8 +1875,9 @@ describe("POST /reviews", () => {
       where: (table, { eq }) => eq(table.id, data.id),
     });
     expect(review).toBeDefined();
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.name).toEqual(release.fullName);
+    expect(review?.bottleId).toEqual(bottle.id);
+    expect(review?.releaseId).toBeNull();
+    expect(review?.name).toEqual(bottle.fullName);
 
     const normalizedReleaseAlias = await db.query.bottleAliases.findFirst({
       where: and(
@@ -1906,11 +1888,11 @@ describe("POST /reviews", () => {
     expect(normalizedReleaseAlias).toBeUndefined();
   });
 
-  test("preserves raw review name for classifier-resolved releases when normalization strips release identity", async ({
+  test("normalizes review names independently of classifier release evidence", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Calvados Cask Finished",
       vintageYear: null,
       releaseYear: null,
@@ -1979,8 +1961,9 @@ describe("POST /reviews", () => {
     const review = await db.query.reviews.findFirst({
       where: (table, { eq }) => eq(table.id, data.id),
     });
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.name).toEqual(release.fullName);
+    expect(review?.bottleId).toEqual(bottle.id);
+    expect(review?.releaseId).toBeNull();
+    expect(review?.name).toEqual(bottle.fullName);
 
     const normalizedReleaseAlias = await db.query.bottleAliases.findFirst({
       where: and(
@@ -1995,7 +1978,7 @@ describe("POST /reviews", () => {
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.LegacyBottle({
+    const bottle = await fixtures.Bottle({
       name: "Calvados Cask Finished",
       vintageYear: null,
       releaseYear: null,
@@ -2043,8 +2026,8 @@ describe("POST /reviews", () => {
     });
     expect(review).toBeDefined();
     expect(review?.id).toEqual(existingReview.id);
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.name).toEqual(release.fullName);
+    expect(review?.releaseId).toBeNull();
+    expect(review?.name).toEqual(bottle.fullName);
     expect(review?.url).toEqual("https://example.com/2024-release");
     expect(data.id).toEqual(existingReview.id);
 

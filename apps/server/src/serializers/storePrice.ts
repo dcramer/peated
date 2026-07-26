@@ -1,9 +1,12 @@
-import { collectionBottles, tastings } from "@peated/server/db/schema";
-import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
-import { loadCatalogTargetBatch } from "@peated/server/lib/catalogTargets";
+import {
+  bottleGroupTombstones,
+  bottles,
+  bottleTombstones,
+  collectionBottles,
+  tastings,
+} from "@peated/server/db/schema";
 import { getReservedCollection } from "@peated/server/lib/db";
-import type { CatalogTargetV1 } from "@peated/server/schemas/catalogIdentity";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
@@ -11,11 +14,13 @@ import { db } from "../db";
 import type { ExternalSite, StorePrice, User } from "../db/schema";
 import { absoluteUrl } from "../lib/urls";
 import type {
+  BottleSchema,
   ExternalSiteSchema,
   PriceChangeSchema,
   StorePriceSchema,
 } from "../schemas";
 import type { Currency } from "../types";
+import { BottleSerializer } from "./bottle";
 import { ExternalSiteSerializer } from "./externalSite";
 
 const ONE_DAY_MS = 1000 * 60 * 60 * 24;
@@ -25,43 +30,58 @@ function priceIsValid(price: StorePrice) {
 }
 
 type StorePriceAttrs = {
-  target: CatalogTargetV1 | null;
+  bottle: z.infer<typeof BottleSchema> | null;
 };
 
-async function loadStorePriceTargetAttrs(
+async function loadStorePriceBottleAttrs(
   itemList: StorePrice[],
+  currentUser?: User,
 ): Promise<Record<number, StorePriceAttrs>> {
-  const { targets } = await loadCatalogTargetReadsWithParity(
-    itemList.map((item) => ({
-      consumerTable: "store_price",
-      rowLocator: { id: item.id },
-      targetId: item.targetId,
-      legacy: { bottleId: item.bottleId, releaseId: item.releaseId },
-    })),
-    {
-      actor: null,
-      permissions: { canReadCatalogIdentity: true },
-      caller: "StorePriceSerializer",
-      operation: "serialize",
-    },
+  const bottleIds = Array.from(
+    new Set(
+      itemList.flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
+    ),
+  );
+  const bottleList = bottleIds.length
+    ? await db
+        .select()
+        .from(bottles)
+        .where(
+          and(
+            inArray(bottles.id, bottleIds),
+            sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+            sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
+          ),
+        )
+    : [];
+  const serializedBottles = await serialize(
+    BottleSerializer,
+    bottleList,
+    currentUser,
+  );
+  const bottlesById = new Map(
+    serializedBottles.map((bottle) => [bottle.id, bottle]),
   );
 
   return Object.fromEntries(
-    itemList.map((item, index) => {
-      const target = targets[index];
-      if (target === undefined) {
+    itemList.map((item) => {
+      const bottle =
+        item.bottleId === null
+          ? null
+          : (bottlesById.get(item.bottleId) ?? null);
+      if (item.bottleId !== null && bottle === null) {
         throw new Error(
-          `StorePriceSerializer target loader omitted store price ${item.id}.`,
+          `Store price ${item.id} references missing Bottle ${item.bottleId}.`,
         );
       }
-      return [item.id, { target }];
+      return [item.id, { bottle }];
     }),
   );
 }
 
 export const StorePriceSerializer = serializer({
   name: "storePrice",
-  attrs: loadStorePriceTargetAttrs,
+  attrs: loadStorePriceBottleAttrs,
   item: (
     item: StorePrice,
     attrs: StorePriceAttrs,
@@ -79,7 +99,7 @@ export const StorePriceSerializer = serializer({
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
       updatedAt: item.updatedAt.toISOString(),
-      target: attrs.target,
+      bottle: attrs.bottle,
     };
   },
 });
@@ -90,8 +110,8 @@ export const StorePriceWithSiteSerializer = serializer({
     itemList: (StorePrice & { externalSite: ExternalSite })[],
     currentUser?: User,
   ) => {
-    const [targetAttrs, serializedSites] = await Promise.all([
-      loadStorePriceTargetAttrs(itemList),
+    const [bottleAttrs, serializedSites] = await Promise.all([
+      loadStorePriceBottleAttrs(itemList, currentUser),
       serialize(
         ExternalSiteSerializer,
         itemList.map((r) => r.externalSite),
@@ -107,7 +127,7 @@ export const StorePriceWithSiteSerializer = serializer({
         item.id,
         {
           site: sitesByRef[item.id] || null,
-          target: targetAttrs[item.id].target,
+          bottle: bottleAttrs[item.id].bottle,
         },
       ]),
     );
@@ -142,13 +162,13 @@ export const StorePriceWithSiteSerializer = serializer({
         : null,
       site: attrs.site,
       updatedAt: item.updatedAt.toISOString(),
-      target: attrs.target,
+      bottle: attrs.bottle,
     };
   },
 });
 
 export type PriceChange = {
-  // CatalogTarget ID. Serializer keys require an `id` field.
+  // Bottle ID. Serializer keys require an `id` field.
   id: string | number;
   price: string | number;
   previousPrice: string | number;
@@ -156,7 +176,7 @@ export type PriceChange = {
 };
 
 type PriceChangeAttrs = {
-  target: CatalogTargetV1;
+  bottle: z.infer<typeof BottleSchema>;
   isLibrary: boolean;
   hasTasted: boolean;
 };
@@ -164,65 +184,81 @@ type PriceChangeAttrs = {
 export const PriceChangeSerializer = serializer({
   name: "priceChange",
   attrs: async (itemList: PriceChange[], currentUser?: User) => {
-    const targetIds = itemList.map((item) => Number(item.id));
-    const targets = await loadCatalogTargetBatch(targetIds, {
-      actor: null,
-      permissions: { canReadCatalogIdentity: true },
-    });
-    const targetsById = Object.fromEntries(
-      targetIds.map((targetId) => {
-        const resolution = targets.get(targetId)!;
-        if (!resolution.ok) throw resolution.error;
-        return [targetId, resolution.target];
-      }),
+    const bottleIds = itemList.map((item) => Number(item.id));
+    const bottleList = bottleIds.length
+      ? await db
+          .select()
+          .from(bottles)
+          .where(
+            and(
+              inArray(bottles.id, bottleIds),
+              sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+              sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
+            ),
+          )
+      : [];
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      bottleList,
+      currentUser,
+    );
+    const bottlesById = new Map(
+      serializedBottles.map((bottle) => [bottle.id, bottle]),
     );
     const library = currentUser
       ? await getReservedCollection(db, currentUser.id, "library")
       : null;
     const [libraryRows, tastingRows] =
-      currentUser && targetIds.length
+      currentUser && bottleIds.length
         ? await Promise.all([
             library
               ? db
-                  .selectDistinct({ targetId: collectionBottles.targetId })
+                  .selectDistinct({ bottleId: collectionBottles.bottleId })
                   .from(collectionBottles)
                   .where(
                     and(
                       eq(collectionBottles.collectionId, library.id),
-                      inArray(collectionBottles.targetId, targetIds),
+                      inArray(collectionBottles.bottleId, bottleIds),
                     ),
                   )
               : [],
             db
-              .selectDistinct({ targetId: tastings.targetId })
+              .selectDistinct({ bottleId: tastings.bottleId })
               .from(tastings)
               .where(
                 and(
                   eq(tastings.createdById, currentUser.id),
-                  inArray(tastings.targetId, targetIds),
+                  inArray(tastings.bottleId, bottleIds),
                 ),
               ),
           ])
         : [[], []];
-    const libraryTargetIds = new Set(
-      libraryRows.flatMap(({ targetId }) =>
-        targetId === null ? [] : [targetId],
+    const libraryBottleIds = new Set(
+      libraryRows.flatMap(({ bottleId }) =>
+        bottleId === null ? [] : [bottleId],
       ),
     );
-    const tastedTargetIds = new Set(
-      tastingRows.flatMap(({ targetId }) =>
-        targetId === null ? [] : [targetId],
+    const tastedBottleIds = new Set(
+      tastingRows.flatMap(({ bottleId }) =>
+        bottleId === null ? [] : [bottleId],
       ),
     );
 
     return Object.fromEntries(
       itemList.map((item) => {
+        const bottleId = Number(item.id);
+        const bottle = bottlesById.get(bottleId);
+        if (!bottle) {
+          throw new Error(
+            `Price change references missing Bottle ${bottleId}.`,
+          );
+        }
         return [
-          Number(item.id),
+          bottleId,
           {
-            target: targetsById[Number(item.id)],
-            isLibrary: libraryTargetIds.has(Number(item.id)),
-            hasTasted: tastedTargetIds.has(Number(item.id)),
+            bottle,
+            isLibrary: libraryBottleIds.has(bottleId),
+            hasTasted: tastedBottleIds.has(bottleId),
           },
         ];
       }),
@@ -239,7 +275,7 @@ export const PriceChangeSerializer = serializer({
       price: Number(item.price),
       currency: item.currency,
       previousPrice: Number(item.previousPrice),
-      target: attrs.target,
+      bottle: attrs.bottle,
       isLibrary: attrs.isLibrary,
       hasTasted: attrs.hasTasted,
     };

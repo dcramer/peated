@@ -4,7 +4,6 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { StorePriceMatchQueueListResponse } from "@peated/server/schemas";
@@ -97,18 +96,10 @@ export default procedure
       },
     }));
 
-    let results;
-    try {
-      results = await serializeQueueItems(queueRows, context, {
-        caller: "prices.matchQueue.list",
-        operation: "hydrate",
-      });
-    } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      throw error;
-    }
+    const results = await serializeQueueItems(queueRows, context, {
+      caller: "prices.matchQueue.list",
+      operation: "hydrate",
+    });
 
     return {
       results,

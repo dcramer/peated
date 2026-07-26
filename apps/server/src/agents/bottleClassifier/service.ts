@@ -14,7 +14,7 @@ import {
   type SearchEntitiesArgs,
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
-import { findBottleTarget } from "@peated/server/lib/bottleFinder";
+import { findBottleId } from "@peated/server/lib/bottleFinder";
 import {
   findBottleReferenceCandidates,
   getBottleCandidateById,
@@ -236,18 +236,12 @@ async function identifyExactAliasReference({
 }: {
   input: ClassifyBottleReferenceInput;
 }): Promise<BottleClassificationResult | null> {
-  const target = await findBottleTarget(input.reference.name, {
-    caller: "bottleClassifier",
-    operation: "identifyExactAliasReference",
-  });
-  if (!target) {
+  const bottleId = await findBottleId(input.reference.name);
+  if (bottleId === null) {
     return null;
   }
 
-  const candidate = await getBottleCandidateById(
-    target.bottleId,
-    target.releaseId,
-  );
+  const candidate = await getBottleCandidateById(bottleId, null);
   if (!candidate) {
     return null;
   }
@@ -257,13 +251,12 @@ async function identifyExactAliasReference({
       action: "match",
       rationale:
         "Stored bottle alias exactly matched the extracted label reference.",
-      candidateBottleIds: [target.bottleId],
+      candidateBottleIds: [bottleId],
       identityScope: "product",
       observation: null,
       identityBasis: {
         bottleTraits: ["literal stored alias"],
-        releaseTraits:
-          target.releaseId === null ? [] : ["literal stored alias"],
+        releaseTraits: [],
         observationTraits: [],
         yearInterpretation: "none",
         siblingEvidence: "none",
@@ -277,8 +270,8 @@ async function identifyExactAliasReference({
         toolsUsed: ["initial_local_candidates"],
         webEvidence: "not_needed",
       },
-      matchedBottleId: target.bottleId,
-      matchedReleaseId: target.releaseId,
+      matchedBottleId: bottleId,
+      matchedReleaseId: null,
       parentBottleId: null,
       proposedBottle: null,
       proposedRelease: null,

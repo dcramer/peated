@@ -5,7 +5,7 @@ import {
   catalogTargets,
 } from "@peated/server/db/schema";
 import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import indexBottleAlias from "./indexBottleAlias";
 
@@ -20,7 +20,7 @@ describe("indexBottleAlias", () => {
     vi.resetAllMocks();
   });
 
-  test("builds an exact alias embedding only from its authoritative target Bottle", async ({
+  test("builds an alias embedding from its directly owned Bottle", async ({
     fixtures,
   }) => {
     const brand = await fixtures.Entity({
@@ -49,16 +49,11 @@ describe("indexBottleAlias", () => {
       statedAge: 40,
       vintageYear: 1970,
     });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, targetBottle.id),
-    });
-    if (!exactTarget) throw new Error("Exact CatalogTarget fixture not found.");
-
     const alias = await fixtures.BottleAlias({
       name: "Authoritative Alias Aurora",
-      bottleId: retainedBottle.id,
+      bottleId: targetBottle.id,
       releaseId: retainedRelease.id,
-      targetId: exactTarget.id,
+      targetId: null,
       ignored: false,
     });
     vi.mocked(getOpenAIEmbedding).mockResolvedValue(EMBEDDING);
@@ -79,64 +74,40 @@ describe("indexBottleAlias", () => {
     ).toMatchObject({ embedding: expect.anything() });
   });
 
-  test("clears embeddings for generic, ignored, targetless, and inactive aliases", async ({
+  test("clears embeddings for ignored, unresolved, and inactive aliases", async ({
     fixtures,
   }) => {
-    const genericBottle = await fixtures.Bottle({ name: "Generic Source" });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, genericBottle.groupId!),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) {
-      throw new Error("Generic CatalogTarget fixture not found.");
-    }
-    const genericAlias = await fixtures.BottleAlias({
-      name: "Generic Alias",
-      bottleId: genericBottle.id,
-      targetId: genericTarget.id,
-      ignored: false,
-      embedding: EMBEDDING,
-    });
-
     const ignoredBottle = await fixtures.Bottle({ name: "Ignored Source" });
-    const ignoredTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, ignoredBottle.id),
-    });
-    if (!ignoredTarget) {
-      throw new Error("Ignored exact CatalogTarget fixture not found.");
-    }
     const ignoredAlias = await fixtures.BottleAlias({
       name: "Ignored Alias",
       bottleId: ignoredBottle.id,
-      targetId: ignoredTarget.id,
+      targetId: null,
       ignored: true,
       embedding: EMBEDDING,
     });
 
-    const targetlessBottle = await fixtures.Bottle({
-      name: "Targetless Source",
+    const retainedEvidenceBottle = await fixtures.Bottle({
+      name: "Retained Evidence Source",
     });
-    const targetlessAlias = await fixtures.BottleAlias({
-      name: "Targetless Alias",
-      bottleId: targetlessBottle.id,
-      targetId: null,
+    const retainedEvidenceTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, retainedEvidenceBottle.id),
+    });
+    if (!retainedEvidenceTarget) {
+      throw new Error("Retained CatalogTarget fixture not found.");
+    }
+    const unresolvedAlias = await fixtures.BottleAlias({
+      name: "Unresolved Alias",
+      bottleId: null,
+      targetId: retainedEvidenceTarget.id,
       ignored: false,
       embedding: EMBEDDING,
     });
 
     const inactiveBottle = await fixtures.Bottle({ name: "Inactive Source" });
-    const inactiveTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, inactiveBottle.id),
-    });
-    if (!inactiveTarget) {
-      throw new Error("Inactive exact CatalogTarget fixture not found.");
-    }
     const inactiveAlias = await fixtures.BottleAlias({
       name: "Inactive Alias",
       bottleId: inactiveBottle.id,
-      targetId: inactiveTarget.id,
+      targetId: null,
       ignored: false,
       embedding: EMBEDDING,
     });
@@ -146,12 +117,7 @@ describe("indexBottleAlias", () => {
       newBottleId: replacement.id,
     });
 
-    const aliases = [
-      genericAlias,
-      ignoredAlias,
-      targetlessAlias,
-      inactiveAlias,
-    ];
+    const aliases = [ignoredAlias, unresolvedAlias, inactiveAlias];
     for (const alias of aliases) {
       await indexBottleAlias({ name: alias.name });
     }

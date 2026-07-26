@@ -7,7 +7,6 @@ import {
   type StorePriceMatchProposal,
   bottles,
 } from "@peated/server/db/schema";
-import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
 import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
 import { type Context } from "@peated/server/orpc/context";
@@ -143,16 +142,21 @@ export async function serializeQueueItems(
     operation: string;
   },
 ) {
-  const parentBottleIds = Array.from(
+  void readContext;
+  const bottleIds = Array.from(
     new Set(
       rows.flatMap(({ proposal }) =>
-        proposal.parentBottleId === null ? [] : [proposal.parentBottleId],
+        [
+          proposal.currentBottleId,
+          proposal.suggestedBottleId,
+          proposal.parentBottleId,
+        ].filter((id): id is number => id !== null),
       ),
     ),
   );
-  const parentBottleList: Bottle[] = parentBottleIds.length
+  const bottleList: Bottle[] = bottleIds.length
     ? await db.query.bottles.findMany({
-        where: inArray(bottles.id, parentBottleIds),
+        where: inArray(bottles.id, bottleIds),
         with: {
           brand: true,
           bottler: true,
@@ -162,37 +166,12 @@ export async function serializeQueueItems(
     : [];
   const bottlesById = Object.fromEntries(
     (
-      await serialize(BottleSerializer, parentBottleList, context.user, [
+      await serialize(BottleSerializer, bottleList, context.user, [
         "description",
         "tastingNotes",
       ])
-    ).map((item, index) => [parentBottleList[index].id, item]),
+    ).map((item, index) => [bottleList[index].id, item]),
   );
-  const targetSlots = rows.flatMap(({ proposal }) => [
-    {
-      consumerTable: "store_price_match_proposal" as const,
-      rowLocator: { id: proposal.id, slot: "current" as const },
-      targetId: proposal.currentTargetId,
-      legacy: {
-        bottleId: proposal.currentBottleId,
-        releaseId: proposal.currentReleaseId,
-      },
-    },
-    {
-      consumerTable: "store_price_match_proposal" as const,
-      rowLocator: { id: proposal.id, slot: "suggested" as const },
-      targetId: proposal.suggestedTargetId,
-      legacy: {
-        bottleId: proposal.suggestedBottleId,
-        releaseId: proposal.suggestedReleaseId,
-      },
-    },
-  ]);
-  const { targets } = await loadCatalogTargetReadsWithParity(targetSlots, {
-    actor: null,
-    permissions: { canReadCatalogIdentity: true },
-    ...readContext,
-  });
 
   const prices = await serialize(
     StorePriceWithSiteSerializer,
@@ -201,22 +180,18 @@ export async function serializeQueueItems(
   );
 
   return rows.map((row, index) => {
-    const currentTarget = targets[index * 2];
-    const suggestedTarget = targets[index * 2 + 1];
-    if (currentTarget === undefined || suggestedTarget === undefined) {
-      throw new Error(
-        `Missing price match proposal target result: ${row.proposal.id}`,
-      );
-    }
-
     return StorePriceMatchQueueItemSchema.parse({
       ...serializeProposal(row.proposal, {
         isProcessing: row.isProcessing,
         price: row.price,
       }),
       price: prices[index],
-      currentTarget,
-      suggestedTarget,
+      currentBottle: row.proposal.currentBottleId
+        ? (bottlesById[row.proposal.currentBottleId] ?? null)
+        : null,
+      suggestedBottle: row.proposal.suggestedBottleId
+        ? (bottlesById[row.proposal.suggestedBottleId] ?? null)
+        : null,
       parentBottle: row.proposal.parentBottleId
         ? (bottlesById[row.proposal.parentBottleId] ?? null)
         : null,

@@ -3,7 +3,6 @@ import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
 import { BottleReleaseInputSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
-import { CatalogTargetV1Schema } from "./catalogIdentity";
 import {
   CaskFillEnum,
   CaskSizeEnum,
@@ -570,8 +569,8 @@ export const StorePriceMatchQueueItemSchema =
     price: StorePriceSchema.extend({
       site: ExternalSiteSchema,
     }),
-    currentTarget: CatalogTargetV1Schema.nullable(),
-    suggestedTarget: CatalogTargetV1Schema.nullable(),
+    currentBottle: BottleSchema.nullable(),
+    suggestedBottle: BottleSchema.nullable(),
     parentBottle: BottleSchema.nullable(),
   });
 

@@ -23,7 +23,7 @@ export default function BottleOverview({
         <div className="flex space-x-4">
           <div className="flex-1">
             <Suspense>
-              <BottleReviews targetId={bottle.targetId} />
+              <BottleReviews bottleId={bottle.id} />
             </Suspense>
             {bottle.description && (
               <>

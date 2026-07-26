@@ -385,7 +385,8 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
   ) => {
     try {
       const result = await reserve(tx, {
-        ...reservation,
+        name: reservation.name,
+        bottleId: reservation.bottleId,
         assignmentSource: "canonical",
         assignedByActorId,
       });

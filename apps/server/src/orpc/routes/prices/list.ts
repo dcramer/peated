@@ -10,9 +10,8 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
-import { recordStorePriceReadParity } from "./read-parity";
 
 export default procedure
   .use(requireAdmin)
@@ -50,7 +49,7 @@ export default procedure
     const baseWhere: (SQL<unknown> | undefined)[] = [
       eq(storePrices.hidden, false),
     ];
-    const targetWhere: SQL<unknown>[] = [];
+    const identityWhere: SQL<unknown>[] = [];
 
     if (input.site) {
       const site = await db.query.externalSites.findFirst({
@@ -70,7 +69,7 @@ export default procedure
     }
 
     if (input.onlyUnknown) {
-      targetWhere.push(isNull(storePrices.targetId));
+      identityWhere.push(isNull(storePrices.bottleId));
     }
 
     if (query) {
@@ -82,41 +81,13 @@ export default procedure
     const results = await db
       .select()
       .from(storePrices)
-      .where(and(...baseWhere, ...targetWhere))
+      .where(and(...baseWhere, ...identityWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(
         desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
         asc(storePrices.name),
       );
-
-    if (input.onlyUnknown) {
-      const authoritativeWhere = isNull(storePrices.targetId);
-      const legacyWhere = isNull(storePrices.bottleId);
-      const candidates = await db
-        .select({
-          id: storePrices.id,
-          targetId: storePrices.targetId,
-          bottleId: storePrices.bottleId,
-          releaseId: storePrices.releaseId,
-          targetMatches: sql<boolean>`COALESCE(${authoritativeWhere}, false)`,
-          legacyMatches: sql<boolean>`COALESCE(${legacyWhere}, false)`,
-        })
-        .from(storePrices)
-        .where(and(...baseWhere, or(authoritativeWhere, legacyWhere)))
-        .limit(limit + 1)
-        .offset(offset)
-        .orderBy(
-          desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
-          asc(storePrices.name),
-        );
-
-      await recordStorePriceReadParity(
-        candidates,
-        { caller: "prices.list", operation: "filter" },
-        "only_unknown",
-      );
-    }
 
     return {
       results: await serialize(

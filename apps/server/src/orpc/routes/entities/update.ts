@@ -12,10 +12,8 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
-  DuplicateBottleAliasError,
   ExactBottleAliasConflictError,
   finalizeBottleAliasAssignment,
-  ReleaseOwnedBottleAliasError,
   type BottleAliasAssignmentResult,
 } from "@peated/server/lib/bottleAliases";
 import {
@@ -289,16 +287,9 @@ export default procedure
               legacyAliasAssignments.push(
                 await assignBottleAliasInTransaction(tx, {
                   bottleId: bottle.id,
-                  releaseId: null,
-                  aliasReleaseId: null,
                   name: aliasName,
                   assignmentSource: "legacy",
                   assignedByActorId: actorId,
-                  rejectReleaseOwnedAlias: true,
-                  context: {
-                    caller: "entities.update",
-                    operation: "renameUngroupedBrandBottle",
-                  },
                 }),
               );
             }
@@ -336,8 +327,6 @@ export default procedure
         error instanceof ConcreteBottleUpdateGraphError ||
         error instanceof ConcreteBottleUpdateInputError ||
         error instanceof ExactBottleAliasConflictError ||
-        error instanceof DuplicateBottleAliasError ||
-        error instanceof ReleaseOwnedBottleAliasError ||
         error instanceof BottleGroupRepresentativeMissingError
       ) {
         throw errors.CONFLICT({ message: error.message, cause: error });

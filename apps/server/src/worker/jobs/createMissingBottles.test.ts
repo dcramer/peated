@@ -131,17 +131,14 @@ describe("createMissingBottles", () => {
       where: (table, { eq }) => eq(table.id, updatedReview!.bottleId as number),
     });
     expect(bottle?.fullName).toEqual("Springbank Bottle Name");
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle!.id),
-    });
-    expect(updatedReview?.targetId).toEqual(target!.id);
+    expect(updatedReview?.targetId).toBeNull();
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
     });
     expect(alias).toMatchObject({
       bottleId: updatedReview?.bottleId,
-      targetId: target!.id,
+      targetId: null,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -150,7 +147,7 @@ describe("createMissingBottles", () => {
       where: eq(storePrices.id, price.id),
     });
     expect(updatedPrice?.bottleId).toEqual(updatedReview?.bottleId);
-    expect(updatedPrice?.targetId).toEqual(target!.id);
+    expect(updatedPrice?.targetId).toBeNull();
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -165,7 +162,7 @@ describe("createMissingBottles", () => {
       actorId: systemActor.id,
       bottleId: updatedReview?.bottleId,
       releaseId: null,
-      targetId: target!.id,
+      targetId: null,
       createdBottle: true,
       createdRelease: false,
       confidence: null,
@@ -265,7 +262,7 @@ describe("createMissingBottles", () => {
       decision: "match_existing",
       bottleId: bottle.id,
       releaseId: null,
-      targetId: target!.id,
+      targetId: null,
       createdBottle: false,
       createdRelease: false,
       metadata: expect.objectContaining({
@@ -311,12 +308,12 @@ describe("createMissingBottles", () => {
     expect(unchangedReview?.releaseId).toBeNull();
   });
 
-  test("assigns an explicitly staged unpromoted classifier match", async ({
+  test("assigns a classifier match to its direct active Bottle", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const systemUser = await fixtures.User({ admin: true });
-    const parent = await fixtures.LegacyBottle({
+    const parent = await fixtures.Bottle({
       name: "Worker Unpromoted Parent",
     });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
@@ -348,7 +345,7 @@ describe("createMissingBottles", () => {
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({
       bottleId: parent.id,
-      releaseId: release.id,
+      releaseId: null,
       targetId: null,
     });
     expect(
@@ -357,7 +354,7 @@ describe("createMissingBottles", () => {
       }),
     ).toMatchObject({
       bottleId: parent.id,
-      releaseId: release.id,
+      releaseId: null,
       targetId: null,
       assignmentSource: "classifier_approved",
     });
@@ -371,12 +368,12 @@ describe("createMissingBottles", () => {
     ).toMatchObject({
       decision: "match_existing",
       bottleId: parent.id,
-      releaseId: release.id,
+      releaseId: null,
       targetId: null,
     });
   });
 
-  test("skips target-aware generic Reviews whose retained Bottle is null", async ({
+  test("attempts unresolved Reviews even when legacy target evidence remains", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -401,7 +398,7 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles();
 
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({

@@ -186,12 +186,10 @@ function CreateBottleForm() {
     <BottleForm
       onSubmit={async ({ image, ...data }) => {
         const createdBottle = proposalId
-          ? (
-              await proposalBottleCreateMutation.mutateAsync({
-                proposal: Number(proposalId),
-                independentBottle: data,
-              })
-            ).bottle
+          ? await proposalBottleCreateMutation.mutateAsync({
+              proposal: Number(proposalId),
+              independentBottle: data,
+            })
           : await bottleCreateMutation.mutateAsync(data);
         const nextPendingImageId = image === undefined ? pendingImageId : null;
         const nextPendingImageUrl =

@@ -1,12 +1,11 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, catalogTargets } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleReleasePromotions,
+  catalogTargets,
+} from "@peated/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
-import { findBottleId, findBottleTarget } from "./bottleFinder";
-
-const compatibilityContext = {
-  caller: "bottleFinder.test",
-  operation: "resolveAlias",
-};
+import { findBottleAliasAssignment, findBottleId } from "./bottleFinder";
 
 async function getExactTargetId(bottleId: number) {
   const target = await db.query.catalogTargets.findFirst({
@@ -23,7 +22,7 @@ describe("findBottleId", () => {
       vintageYear: null,
       releaseYear: null,
     });
-    const result = await findBottleId(bottle.fullName, compatibilityContext);
+    const result = await findBottleId(bottle.fullName);
     expect(result).toMatchInlineSnapshot(`1`);
   });
 
@@ -39,16 +38,13 @@ describe("findBottleId", () => {
       brandId: brand.id,
       name: "12-year-old Double Cask",
     });
-    const result = await findBottleId(
-      "The Macallan 12-year-old",
-      compatibilityContext,
-    );
+    const result = await findBottleId("The Macallan 12-year-old");
     expect(result).toMatchInlineSnapshot(`null`);
   });
 
   test("doesnt match random junk", async ({ fixtures }) => {
     await fixtures.Bottle();
-    const result = await findBottleId("No Chance", compatibilityContext);
+    const result = await findBottleId("No Chance");
     expect(result).toMatchInlineSnapshot(`null`);
   });
 
@@ -58,11 +54,11 @@ describe("findBottleId", () => {
       bottleId: bottle.id,
       name: "Something Silly",
     });
-    const result = await findBottleId("Something Silly", compatibilityContext);
+    const result = await findBottleId("Something Silly");
     expect(result).toMatchInlineSnapshot(`1`);
   });
 
-  test("resolves a target-backed exact alias directly through its target", async ({
+  test("uses the alias Bottle instead of retained exact-target drift", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -75,15 +71,17 @@ describe("findBottleId", () => {
     });
 
     await expect(
-      findBottleTarget("Target-backed Exact Alias", compatibilityContext),
-    ).resolves.toEqual({
-      bottleId: bottle.id,
-      releaseId: null,
-      targetId,
+      findBottleAliasAssignment("Target-backed Exact Alias"),
+    ).resolves.toMatchObject({
+      alias: {
+        bottleId: staleBottle.id,
+        targetId,
+      },
+      bottleId: staleBottle.id,
     });
   });
 
-  test("does not resolve a generic alias through its legacy Bottle", async ({
+  test("resolves a general alias to its retained Bottle", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -101,13 +99,17 @@ describe("findBottleId", () => {
     });
 
     await expect(
-      findBottleTarget("Generic Alias", compatibilityContext),
-    ).resolves.toBeNull();
+      findBottleAliasAssignment("Generic Alias"),
+    ).resolves.toMatchObject({
+      alias: {
+        bottleId: bottle.id,
+        targetId: genericTarget.id,
+      },
+      bottleId: bottle.id,
+    });
   });
 
-  test("falls back to the legacy pair only when targetId is null", async ({
-    fixtures,
-  }) => {
+  test("projects a legacy alias as one direct Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     await db.insert(bottleAliases).values({
@@ -119,11 +121,47 @@ describe("findBottleId", () => {
     });
 
     await expect(
-      findBottleTarget("Legacy Release Alias", compatibilityContext),
-    ).resolves.toEqual({
+      findBottleAliasAssignment("Legacy Release Alias"),
+    ).resolves.toMatchObject({
+      alias: {
+        bottleId: bottle.id,
+        releaseId: release.id,
+        targetId: null,
+      },
       bottleId: bottle.id,
+    });
+  });
+
+  test("retained release promotion evidence cannot override the alias Bottle", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await fixtures.Bottle();
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: release.id,
+      promotedBottleId: promoted.id,
+      status: "promoted",
+      completedAt: new Date(),
+      createdByActorId: parent.createdByActorId,
+    });
+    await db.insert(bottleAliases).values({
+      bottleId: parent.id,
       releaseId: release.id,
       targetId: null,
+      name: "Promoted Direct Alias",
+      assignedByActorId: parent.createdByActorId,
+    });
+
+    await expect(
+      findBottleAliasAssignment("Promoted Direct Alias"),
+    ).resolves.toMatchObject({
+      alias: {
+        bottleId: parent.id,
+        releaseId: release.id,
+        targetId: null,
+      },
+      bottleId: parent.id,
     });
   });
 
@@ -137,16 +175,10 @@ describe("findBottleId", () => {
       brandId: entity.id,
       name: "18-year-old Port Cask",
     });
-    const result = await findBottleId(
-      "Aberfeldy 18-year-old Port Cask",
-      compatibilityContext,
-    );
+    const result = await findBottleId("Aberfeldy 18-year-old Port Cask");
     expect(result).toMatchInlineSnapshot(`2`);
 
-    const result2 = await findBottleId(
-      "Aberfeldy 18-year-old",
-      compatibilityContext,
-    );
+    const result2 = await findBottleId("Aberfeldy 18-year-old");
     expect(result2).toMatchInlineSnapshot(`1`);
   });
 });

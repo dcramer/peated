@@ -3,7 +3,6 @@
 import { PlusIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { safe } from "@orpc/client";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
 import { type Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import Join from "@peated/web/components/join";
@@ -30,7 +29,7 @@ export default function BottleSelector({
   name?: string | null;
   returnTo?: string;
   onClose: () => void;
-  onSelect?: (value: ExactCatalogTargetV1) => Promise<void>;
+  onSelect?: (value: Bottle) => Promise<void>;
   source?: string;
 }) {
   const [query, setQuery] = useState(name ?? "");
@@ -110,27 +109,12 @@ export default function BottleSelector({
     setError(null);
 
     try {
-      const { data, error, isDefined } = await safe(
-        orpc.bottles.target.call({ bottle: option.id }),
-      );
-
-      if (version !== requestVersion.current) {
-        return;
-      }
-
-      if (error) {
-        setError(
-          isDefined && (error.name === "CONFLICT" || error.name === "NOT_FOUND")
-            ? "This bottle is not available for assignment. Choose another bottle."
-            : "Unable to assign this bottle. Check your connection and try again.",
-        );
-        return;
-      }
-
-      await onSelect(data);
+      await onSelect(option);
     } catch {
       if (version === requestVersion.current) {
-        setError("Unable to assign this bottle. Refresh and try again.");
+        setError(
+          "Unable to assign this bottle. Check your connection and try again.",
+        );
       }
     } finally {
       if (version === requestVersion.current) {

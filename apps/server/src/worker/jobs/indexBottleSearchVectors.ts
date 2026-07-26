@@ -3,7 +3,6 @@ import {
   bottleAliases,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   entities,
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
@@ -23,10 +22,9 @@ export default async ({ bottleId }: { bottleId: number }) => {
       name: bottleAliases.name,
     })
     .from(bottleAliases)
-    .innerJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
     .where(
       and(
-        eq(catalogTargets.bottleId, bottle.id),
+        eq(bottleAliases.bottleId, bottle.id),
         sql`${bottleAliases.ignored} IS NOT TRUE`,
       ),
     );

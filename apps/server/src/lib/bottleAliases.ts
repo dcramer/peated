@@ -1,6 +1,6 @@
 /**
  * Owns Bottle alias reservation and assignment. Exact reservation claims only
- * the alias row; full assignment also migrates matching stored references.
+ * the alias row; full assignment also migrates matching unresolved consumers.
  */
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type {
@@ -9,31 +9,22 @@ import type {
 } from "@peated/server/db/schema";
 import {
   bottleAliases,
-  bottleReleases,
   bottleTombstones,
   bottles,
-  catalogTargets,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
-import {
-  CatalogTargetIntegrityMismatchError,
-  CatalogTargetInvalidMappingError,
-  lockCatalogTargetAssignmentDescriptorInTransaction,
-  lockCatalogTargetConsumerAssignmentInTransaction,
-  lockStagedTargetlessCatalogAssignmentInTransaction,
-  resolveCatalogTargetForAssignment,
-  type CatalogTargetAssignmentDescriptor,
-  type CatalogTargetConsumerIdentity,
-  type CatalogTargetOperationContext,
-  type StagedTargetlessCatalogAssignment,
-} from "@peated/server/lib/catalogTargets";
 import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+  type ActiveBottleRejectionReason,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
 
-/** Lists targetless, non-ignored aliases for bounded maintenance output. */
+/** Lists unresolved, non-ignored aliases for bounded maintenance output. */
 export async function listUnmatchedBottleAliasNames(
   {
     limit,
@@ -48,20 +39,13 @@ export async function listUnmatchedBottleAliasNames(
     .select({ name: bottleAliases.name })
     .from(bottleAliases)
     .where(
-      and(eq(bottleAliases.ignored, false), isNull(bottleAliases.targetId)),
+      and(eq(bottleAliases.ignored, false), isNull(bottleAliases.bottleId)),
     )
     .orderBy(asc(bottleAliases.name))
     .offset(offset)
     .limit(limit);
 
   return rows.map(({ name }) => name);
-}
-
-export class DuplicateBottleAliasError extends Error {
-  constructor(readonly bottleId: number) {
-    super(`Duplicate alias found (${bottleId}). Not implemented.`);
-    this.name = "DuplicateBottleAliasError";
-  }
 }
 
 export class FailedToSaveBottleAliasError extends Error {
@@ -71,15 +55,43 @@ export class FailedToSaveBottleAliasError extends Error {
   }
 }
 
-export class ReleaseOwnedBottleAliasError extends Error {
+export class BottleAliasBottleNotFoundError extends Error {
+  constructor(readonly bottleId: number) {
+    super(`Bottle ${bottleId} was not found.`);
+    this.name = "BottleAliasBottleNotFoundError";
+  }
+}
+
+export class BottleAliasBottleRetiredError extends Error {
   constructor(
-    readonly aliasName: string,
-    readonly releaseId: number,
+    readonly bottleId: number,
+    readonly replacementBottleId: number | null,
   ) {
     super(
-      `Cannot claim release-owned Bottle alias "${aliasName}" (release ${releaseId}).`,
+      replacementBottleId === null
+        ? `Bottle ${bottleId} is retired.`
+        : `Bottle ${bottleId} is retired in favor of Bottle ${replacementBottleId}.`,
     );
-    this.name = "ReleaseOwnedBottleAliasError";
+    this.name = "BottleAliasBottleRetiredError";
+  }
+}
+
+export type BottleAliasBottleInactiveReason = Extract<
+  ActiveBottleRejectionReason,
+  "unassigned" | "group_retired"
+>;
+
+export class BottleAliasBottleInactiveError extends Error {
+  constructor(
+    readonly bottleId: number,
+    readonly reason: BottleAliasBottleInactiveReason,
+  ) {
+    super(
+      reason === "unassigned"
+        ? `Bottle ${bottleId} is not assigned to a BottleGroup.`
+        : `Bottle ${bottleId} belongs to a retired BottleGroup.`,
+    );
+    this.name = "BottleAliasBottleInactiveError";
   }
 }
 
@@ -90,29 +102,9 @@ export class StaleBottleAliasReviewIdentityError extends Error {
   }
 }
 
-export type InvalidExactBottleAliasTargetCode =
-  | "generic_target"
-  | "bottle_mismatch"
-  | "legacy_release";
-
-export class InvalidExactBottleAliasTargetError extends Error {
-  constructor(
-    readonly code: InvalidExactBottleAliasTargetCode,
-    readonly targetId: number,
-    readonly bottleId: number,
-  ) {
-    super(
-      `Invalid exact Bottle alias target (${targetId}, ${bottleId}): ${code}.`,
-    );
-    this.name = "InvalidExactBottleAliasTargetError";
-  }
-}
-
 export type ExactBottleAliasConflictCode =
   | "another_bottle"
-  | "another_exact_target"
   | "canonical_metadata"
-  | "generic_target"
   | "legacy_release";
 
 export class ExactBottleAliasConflictError extends Error {
@@ -135,21 +127,6 @@ export class ExactBottleAliasConflictError extends Error {
   }
 }
 
-export type BottleAliasAssignmentOptions = {
-  assignmentSource?: BottleAliasAssignmentSource;
-  assignedByActorId: number;
-};
-
-type BottleAliasAssignmentCommonInput = {
-  externalSiteId?: number;
-  name: string;
-  backfillNames?: string[];
-  volume?: number;
-  ignored?: boolean;
-  sourceAliasIdentity?: BottleAliasIdentitySnapshot;
-  expectedReview?: BottleAliasReviewIdentitySnapshot;
-};
-
 export type BottleAliasIdentitySnapshot = Pick<
   BottleAlias,
   "name" | "bottleId" | "releaseId" | "targetId" | "ignored"
@@ -167,87 +144,41 @@ export type BottleAliasReviewIdentitySnapshot = Pick<
   "id" | "name" | "bottleId" | "releaseId" | "targetId"
 >;
 
-type BottleAliasAssignmentInput = BottleAliasAssignmentCommonInput &
-  BottleAliasAssignmentOptions &
-  (
-    | {
-        kind?: "target";
-        target: CatalogTargetAssignmentDescriptor;
-        consumerIdentity: CatalogTargetConsumerIdentity;
-        bottleId?: never;
-        releaseId?: never;
-        aliasReleaseId?: never;
-        targetId?: never;
-        context?: never;
-        stagedTargetless?: never;
-        rejectReleaseOwnedAlias?: never;
-      }
-    | {
-        kind?: never;
-        target?: never;
-        consumerIdentity?: never;
-        bottleId: number;
-        releaseId?: null;
-        aliasReleaseId?: null;
-        targetId: number;
-        context?: never;
-        stagedTargetless?: never;
-        rejectReleaseOwnedAlias?: never;
-      }
-    | {
-        kind: "staged_targetless";
-        target?: never;
-        consumerIdentity: {
-          bottleId: number;
-          releaseId: number | null;
-        };
-        bottleId?: never;
-        releaseId?: never;
-        aliasReleaseId?: never;
-        targetId?: never;
-        context: CatalogTargetOperationContext;
-        stagedTargetless: StagedTargetlessCatalogAssignment;
-        rejectReleaseOwnedAlias?: boolean;
-      }
-    | {
-        kind?: never;
-        target?: never;
-        consumerIdentity?: never;
-        bottleId: number;
-        releaseId?: number | null;
-        aliasReleaseId?: number | null;
-        targetId?: null;
-        context: CatalogTargetOperationContext;
-        stagedTargetless?: never;
-        rejectReleaseOwnedAlias?: boolean;
-      }
-  );
-
-export type BottleAliasAssignmentResult = {
-  alias: BottleAlias;
-  isNew: boolean;
-  bottleImageCandidate: BottleImageCandidate | null;
-  exactTargetBottleId: number | null;
+export type BottleAliasAssignmentInput = {
+  bottleId: number;
+  externalSiteId?: number;
+  name: string;
+  backfillNames?: string[];
+  volume?: number;
+  ignored?: boolean;
+  assignmentSource?: BottleAliasAssignmentSource;
+  assignedByActorId: number;
+  sourceAliasIdentity?: BottleAliasIdentitySnapshot;
+  expectedReview?: BottleAliasReviewIdentitySnapshot;
 };
+
+export type BottleAliasAssignmentOptions = Pick<
+  BottleAliasAssignmentInput,
+  "assignmentSource" | "assignedByActorId"
+>;
 
 type BottleImageCandidate = {
   bottleId: number;
   imageUrl: string;
 };
 
-type BottleAliasConsumerBackfillResult = {
+export type BottleAliasAssignmentResult = {
+  alias: BottleAlias;
+  aliasChanged: boolean;
+  isNew: boolean;
   bottleImageCandidate: BottleImageCandidate | null;
-  reviewIds: number[];
+  bottleId: number;
 };
 
 type BottleAliasAssignmentValues = {
   assignmentSource?: BottleAliasAssignmentSource;
   assignedByActorId: number;
 };
-
-function hasExplicitAssignmentOptions(options: BottleAliasAssignmentValues) {
-  return options.assignmentSource !== undefined;
-}
 
 function getAssignmentInsertValues({
   assignmentSource = "legacy",
@@ -305,7 +236,10 @@ async function lockBottleAliasIdentitySnapshotInTransaction(
   assertBottleAliasIdentitySnapshot(lockedAlias, snapshot);
 }
 
-/** Backfills only targetId after locking the complete retained alias identity. */
+/**
+ * Retains the migration-only target evidence writer until the legacy columns
+ * and migration audit are removed.
+ */
 export async function backfillLegacyBottleAliasTargetInTransaction(
   tx: AnyTransaction,
   snapshot: BottleAliasIdentitySnapshot,
@@ -326,152 +260,25 @@ export async function backfillLegacyBottleAliasTargetInTransaction(
   return "updated";
 }
 
-async function validateExactBottleAliasTarget(
+async function lockActiveBottleInTransaction(
   tx: AnyTransaction,
-  { bottleId, targetId }: { bottleId: number; targetId: number },
+  bottleId: number,
 ) {
-  // Match concrete merge ordering so active/integrity resolution occurs at a
-  // serialization point where a later merge must repoint this alias.
-  await tx
-    .select({ id: bottles.id })
-    .from(bottles)
-    .where(eq(bottles.id, bottleId))
-    .limit(1)
-    .for("update");
-  await tx
-    .select({ id: catalogTargets.id })
-    .from(catalogTargets)
-    .where(eq(catalogTargets.id, targetId))
-    .limit(1)
-    .for("update");
-
-  const target = await resolveCatalogTargetForAssignment(
-    { kind: "target", targetId },
-    tx,
-  );
-  if (target.bottleId === null) {
-    throw new InvalidExactBottleAliasTargetError(
-      "generic_target",
-      targetId,
-      bottleId,
-    );
+  try {
+    await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+  } catch (error) {
+    if (!(error instanceof ActiveBottleSelectionError)) throw error;
+    if (error.reason === "missing") {
+      throw new BottleAliasBottleNotFoundError(error.bottleId);
+    }
+    if (error.reason === "bottle_retired") {
+      throw new BottleAliasBottleRetiredError(
+        error.bottleId,
+        error.replacementBottleId,
+      );
+    }
+    throw new BottleAliasBottleInactiveError(error.bottleId, error.reason);
   }
-  if (target.bottleId !== bottleId) {
-    throw new InvalidExactBottleAliasTargetError(
-      "bottle_mismatch",
-      targetId,
-      bottleId,
-    );
-  }
-}
-
-function recordTargetlessBottleAliasCompatibility({
-  bottleId,
-  context,
-  releaseId,
-  name,
-}: {
-  bottleId: number;
-  context: CatalogTargetOperationContext;
-  releaseId: number | null;
-  name: string;
-}) {
-  logInfo("Legacy targetless Bottle alias assignment", {
-    extra: {
-      event: "bottle_alias.compatibility",
-      access: "write",
-      caller: context.caller,
-      operation: context.operation,
-      bottleId,
-      releaseId,
-      name,
-    },
-  });
-}
-
-function recordUnresolvedBottleImageCandidate(
-  candidate: BottleImageCandidate,
-  reason:
-    | "missing_tombstone"
-    | "missing_replacement_mapping"
-    | "missing_replacement_bottle",
-) {
-  logInfo("Unable to apply Bottle alias image candidate", {
-    extra: {
-      event: "bottle_alias.image_candidate_unresolved",
-      reason,
-      bottleId: candidate.bottleId,
-      imageUrl: candidate.imageUrl,
-    },
-  });
-}
-
-function requireBottleAliasCompatibilityContext(
-  context: CatalogTargetOperationContext | undefined,
-): CatalogTargetOperationContext {
-  if (!context?.caller.trim() || !context.operation.trim()) {
-    throw new TypeError(
-      "Bottle alias compatibility context requires caller and operation.",
-    );
-  }
-  return context;
-}
-
-async function getExactBottleAliasConflict(
-  tx: AnyDatabase,
-  alias: BottleAlias,
-  {
-    bottleId,
-    targetId,
-    legacyIdentity,
-  }: {
-    bottleId: number | null;
-    targetId: number;
-    legacyIdentity?: { bottleId: number; releaseId: number | null };
-  },
-): Promise<{
-  code: ExactBottleAliasConflictCode;
-  conflictingBottleId: number | null;
-} | null> {
-  const matchesLegacyIdentity =
-    legacyIdentity !== undefined &&
-    alias.bottleId === legacyIdentity.bottleId &&
-    alias.releaseId === legacyIdentity.releaseId;
-
-  if (alias.releaseId !== null && !matchesLegacyIdentity) {
-    return {
-      code: "legacy_release",
-      conflictingBottleId: alias.bottleId,
-    };
-  }
-
-  if (alias.targetId !== null && alias.targetId !== targetId) {
-    const [existingTarget] = await tx
-      .select({ bottleId: catalogTargets.bottleId })
-      .from(catalogTargets)
-      .where(eq(catalogTargets.id, alias.targetId))
-      .limit(1);
-
-    return existingTarget?.bottleId === null
-      ? { code: "generic_target", conflictingBottleId: null }
-      : {
-          code: "another_exact_target",
-          conflictingBottleId: existingTarget?.bottleId ?? null,
-        };
-  }
-
-  if (
-    alias.bottleId !== null &&
-    alias.bottleId !== bottleId &&
-    !matchesLegacyIdentity
-  ) {
-    return {
-      code: "another_bottle",
-      conflictingBottleId: alias.bottleId,
-    };
-  }
-
-  return null;
 }
 
 export type ExactBottleAliasBeforeSnapshot = Pick<
@@ -494,34 +301,12 @@ export type ExactBottleAliasReservationWithPreimage =
       before: ExactBottleAliasBeforeSnapshot | null;
     };
 
-type ExactBottleAliasReservationInput = {
+export type ExactBottleAliasReservationInput = {
   name: string;
   bottleId: number;
-  targetId: number;
   assignmentSource: BottleAliasAssignmentSource;
   assignedByActorId: number;
 };
-
-type CatalogTargetAliasClaimInput = {
-  name: string;
-  bottleId: number | null;
-  targetId: number;
-  legacyIdentity?: { bottleId: number; releaseId: number | null };
-  expectedIdentity?: BottleAliasIdentitySnapshot;
-};
-
-type ExactBottleAliasClaimIntent =
-  | {
-      kind: "reservation";
-      assignmentSource: BottleAliasAssignmentSource;
-      assignedByActorId: number;
-    }
-  | {
-      kind: "assignment";
-      assignmentSource?: BottleAliasAssignmentSource;
-      assignedByActorId: number;
-      ignored?: boolean;
-    };
 
 type ExactBottleAliasClaimResult = {
   alias: BottleAlias;
@@ -545,29 +330,39 @@ function exactBottleAliasBeforeSnapshot(
   };
 }
 
-/** Locks and claims one CatalogTarget alias for reservation or full assignment. */
-async function claimCatalogTargetAliasNameInTransaction(
+/**
+ * Claims one alias for a Bottle. Legacy release and target columns are retained
+ * as migration evidence but never participate in runtime identity decisions.
+ */
+async function claimBottleAliasNameInTransaction(
   tx: AnyTransaction,
   {
-    name: aliasName,
+    name,
     bottleId,
-    targetId,
-    legacyIdentity,
     expectedIdentity,
-  }: CatalogTargetAliasClaimInput,
-  intent: ExactBottleAliasClaimIntent,
+    ignored,
+    assignmentSource,
+    assignedByActorId,
+    reservation,
+  }: {
+    name: string;
+    bottleId: number;
+    expectedIdentity?: BottleAliasIdentitySnapshot;
+    ignored?: boolean;
+    assignmentSource?: BottleAliasAssignmentSource;
+    assignedByActorId: number;
+    reservation: boolean;
+  },
 ): Promise<ExactBottleAliasClaimResult> {
-  if (!aliasName) {
+  if (!name.trim()) {
     throw new FailedToSaveBottleAliasError();
   }
 
-  // `ignored` applies only to inserts/unbound claims; existing assigned aliases
-  // preserve moderator active/ignored state.
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const [existingAlias] = await tx
       .select()
       .from(bottleAliases)
-      .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
+      .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
       .limit(1)
       .for("update");
 
@@ -576,26 +371,22 @@ async function claimCatalogTargetAliasNameInTransaction(
     }
 
     if (!existingAlias) {
-      const assignmentValues =
-        intent.kind === "reservation"
-          ? {
-              assignmentSource: intent.assignmentSource,
-              assignedByActorId: intent.assignedByActorId,
-            }
-          : getAssignmentInsertValues(intent);
       const [insertedAlias] = await tx
         .insert(bottleAliases)
         .values({
-          name: aliasName,
+          name,
           bottleId,
           releaseId: null,
-          targetId,
-          ...(intent.kind === "reservation"
+          targetId: null,
+          ...(reservation
             ? { ignored: false }
-            : intent.ignored !== undefined
-              ? { ignored: intent.ignored }
+            : ignored !== undefined
+              ? { ignored }
               : {}),
-          ...assignmentValues,
+          ...getAssignmentInsertValues({
+            assignmentSource,
+            assignedByActorId,
+          }),
         })
         .onConflictDoNothing()
         .returning();
@@ -607,94 +398,58 @@ async function claimCatalogTargetAliasNameInTransaction(
           before: null,
         };
       }
-      // A concurrent insert may win the unique name; re-read it once.
       continue;
     }
 
-    const conflict = await getExactBottleAliasConflict(tx, existingAlias, {
-      bottleId,
-      targetId,
-      legacyIdentity,
-    });
-    if (conflict) {
+    if (
+      existingAlias.bottleId !== null &&
+      existingAlias.bottleId !== bottleId
+    ) {
       throw new ExactBottleAliasConflictError(
-        conflict.code,
+        "another_bottle",
         existingAlias,
-        conflict.conflictingBottleId,
+        existingAlias.bottleId,
       );
     }
 
-    if (existingAlias.targetId === targetId) {
-      if (intent.kind === "reservation") {
-        return {
-          alias: existingAlias,
-          inserted: false,
-          changed: false,
-          before: null,
-        };
-      }
-
-      const assignmentUpdateValues = getAssignmentUpdateValues(intent);
-      if (
-        existingAlias.name === aliasName &&
-        existingAlias.bottleId === bottleId &&
-        existingAlias.releaseId === null &&
-        !hasExplicitAssignmentOptions(intent) &&
-        existingAlias.assignedByActorId === intent.assignedByActorId
-      ) {
-        return {
-          alias: existingAlias,
-          inserted: false,
-          changed: false,
-          before: null,
-        };
-      }
-
-      const [updatedAlias] = await tx
-        .update(bottleAliases)
-        .set({
-          name: aliasName,
-          bottleId,
-          releaseId: null,
-          ...assignmentUpdateValues,
-        })
-        .where(eq(bottleAliases.name, existingAlias.name))
-        .returning();
-      if (!updatedAlias) break;
+    const assignmentValues = getAssignmentUpdateValues({
+      assignmentSource,
+      assignedByActorId,
+    });
+    const nextIgnored =
+      reservation || existingAlias.bottleId === null
+        ? (ignored ?? false)
+        : existingAlias.ignored;
+    const nextAssignmentSource =
+      assignmentSource ?? existingAlias.assignmentSource;
+    const unchanged =
+      existingAlias.name === name &&
+      existingAlias.bottleId === bottleId &&
+      existingAlias.ignored === nextIgnored &&
+      existingAlias.assignmentSource === nextAssignmentSource &&
+      existingAlias.assignedByActorId === assignedByActorId;
+    if (unchanged) {
       return {
-        alias: updatedAlias,
+        alias: existingAlias,
         inserted: false,
-        changed: true,
-        before: exactBottleAliasBeforeSnapshot(existingAlias),
+        changed: false,
+        before: null,
       };
     }
 
-    const assignmentValues =
-      intent.kind === "reservation"
-        ? {
-            assignmentSource: intent.assignmentSource,
-            assignedByActorId: intent.assignedByActorId,
-          }
-        : getAssignmentUpdateValues(intent);
-    const [claimedAlias] = await tx
+    const [updatedAlias] = await tx
       .update(bottleAliases)
       .set({
-        name: aliasName,
+        name,
         bottleId,
-        releaseId: null,
-        targetId,
-        ...(intent.kind === "reservation"
-          ? { ignored: false }
-          : existingAlias.bottleId === null && intent.ignored !== undefined
-            ? { ignored: intent.ignored }
-            : {}),
+        ignored: nextIgnored,
         ...assignmentValues,
       })
-      .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
+      .where(eq(bottleAliases.name, existingAlias.name))
       .returning();
-    if (claimedAlias) {
+    if (updatedAlias) {
       return {
-        alias: claimedAlias,
+        alias: updatedAlias,
         inserted: false,
         changed: true,
         before: exactBottleAliasBeforeSnapshot(existingAlias),
@@ -705,18 +460,14 @@ async function claimCatalogTargetAliasNameInTransaction(
   throw new FailedToSaveBottleAliasError();
 }
 
-/**
- * Owns durable exact-alias reservation, returns its reversal preimage, and
- * retries once when a concurrent unique-name insert wins.
- */
 async function reserveExactBottleAliasNameInTransaction(
   tx: AnyTransaction,
   input: ExactBottleAliasReservationInput,
 ): Promise<ExactBottleAliasReservationWithPreimage> {
-  const result = await claimCatalogTargetAliasNameInTransaction(tx, input, {
-    kind: "reservation",
-    assignmentSource: input.assignmentSource,
-    assignedByActorId: input.assignedByActorId,
+  await lockActiveBottleInTransaction(tx, input.bottleId);
+  const result = await claimBottleAliasNameInTransaction(tx, {
+    ...input,
+    reservation: true,
   });
   return result.changed
     ? { name: result.alias.name, changed: true, before: result.before }
@@ -754,45 +505,91 @@ export type LegacyPromotionCanonicalAliasInput = {
   assignedByActorId: number;
 };
 
-/** Claims one promoted legacy release's canonical exact alias without consumers. */
+/**
+ * Claims one promoted release's canonical alias. This is migration-only: it
+ * preserves the exact target id as retained audit evidence while Bottle owns
+ * the runtime identity.
+ */
 export async function reserveLegacyPromotionCanonicalAliasInTransaction(
   tx: AnyTransaction,
   input: LegacyPromotionCanonicalAliasInput,
 ): Promise<{ changed: boolean }> {
-  const literalName = input.name.trim();
-  const result = await claimCatalogTargetAliasNameInTransaction(
-    tx,
-    {
-      name: literalName,
-      bottleId: input.promotedBottleId,
-      targetId: input.targetId,
-      legacyIdentity: {
-        bottleId: input.legacyBottleId,
-        releaseId: input.legacyReleaseId,
-      },
-    },
-    {
-      kind: "reservation",
-      assignmentSource: "canonical",
-      assignedByActorId: input.assignedByActorId,
-    },
-  );
+  await lockActiveBottleInTransaction(tx, input.promotedBottleId);
+  const name = input.name.trim();
+  const [existingAlias] = await tx
+    .select()
+    .from(bottleAliases)
+    .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
+    .limit(1)
+    .for("update");
+
+  const matchesLegacyIdentity =
+    existingAlias?.bottleId === input.legacyBottleId &&
+    existingAlias.releaseId === input.legacyReleaseId;
+  const matchesPromotedIdentity =
+    existingAlias?.bottleId === input.promotedBottleId &&
+    existingAlias.releaseId === null;
+  const isUnresolved =
+    existingAlias?.bottleId === null && existingAlias.releaseId === null;
   if (
-    result.alias.name !== literalName ||
-    result.alias.bottleId !== input.promotedBottleId ||
-    result.alias.releaseId !== null ||
-    result.alias.targetId !== input.targetId ||
-    result.alias.ignored !== false ||
-    result.alias.assignmentSource !== "canonical" ||
-    result.alias.assignedByActorId !== input.assignedByActorId
+    existingAlias &&
+    ((!matchesLegacyIdentity && !matchesPromotedIdentity && !isUnresolved) ||
+      (existingAlias.targetId !== null &&
+        existingAlias.targetId !== input.targetId))
   ) {
     throw new ExactBottleAliasConflictError(
-      "canonical_metadata",
-      result.alias,
-      result.alias.bottleId,
+      existingAlias.releaseId !== null && !matchesLegacyIdentity
+        ? "legacy_release"
+        : existingAlias.bottleId !== input.promotedBottleId
+          ? "another_bottle"
+          : "canonical_metadata",
+      existingAlias,
+      existingAlias.bottleId,
     );
   }
-  return { changed: result.changed };
+
+  if (!existingAlias) {
+    const [insertedAlias] = await tx
+      .insert(bottleAliases)
+      .values({
+        name,
+        bottleId: input.promotedBottleId,
+        releaseId: null,
+        targetId: input.targetId,
+        ignored: false,
+        assignmentSource: "canonical",
+        assignedByActorId: input.assignedByActorId,
+      })
+      .returning();
+    if (!insertedAlias) throw new FailedToSaveBottleAliasError();
+    return { changed: true };
+  }
+
+  const isCanonical =
+    existingAlias.name === name &&
+    existingAlias.bottleId === input.promotedBottleId &&
+    existingAlias.releaseId === null &&
+    existingAlias.targetId === input.targetId &&
+    existingAlias.ignored === false &&
+    existingAlias.assignmentSource === "canonical" &&
+    existingAlias.assignedByActorId === input.assignedByActorId;
+  if (isCanonical) return { changed: false };
+
+  const [updatedAlias] = await tx
+    .update(bottleAliases)
+    .set({
+      name,
+      bottleId: input.promotedBottleId,
+      releaseId: null,
+      targetId: input.targetId,
+      ignored: false,
+      assignmentSource: "canonical",
+      assignedByActorId: input.assignedByActorId,
+    })
+    .where(eq(bottleAliases.name, existingAlias.name))
+    .returning();
+  if (!updatedAlias) throw new FailedToSaveBottleAliasError();
+  return { changed: true };
 }
 
 /** Reserves a normalized canonical alias without migrating other references. */
@@ -807,38 +604,65 @@ export async function reserveExactBottleAliasInTransaction(
   return { name: result.name, changed: result.changed };
 }
 
+async function assertExpectedReviewIdentity(
+  tx: AnyTransaction,
+  expectedReview: BottleAliasReviewIdentitySnapshot,
+) {
+  const [lockedReview] = await tx
+    .select({
+      id: reviews.id,
+      name: reviews.name,
+      bottleId: reviews.bottleId,
+      releaseId: reviews.releaseId,
+      targetId: reviews.targetId,
+    })
+    .from(reviews)
+    .where(eq(reviews.id, expectedReview.id))
+    .limit(1)
+    .for("update");
+  if (
+    !lockedReview ||
+    lockedReview.name !== expectedReview.name ||
+    lockedReview.bottleId !== expectedReview.bottleId ||
+    lockedReview.releaseId !== expectedReview.releaseId ||
+    lockedReview.targetId !== expectedReview.targetId
+  ) {
+    throw new StaleBottleAliasReviewIdentityError(expectedReview.id);
+  }
+}
+
 /**
- * Retargets matching StorePrice and Review rows when `targetId` is non-null;
- * null targets update only targetless consumers. Returns an image candidate
- * and Review IDs used by post-lock compatibility correction.
+ * Applies one Bottle id to matching unresolved consumers. Already-resolved rows
+ * are changed only when they still match the selected Bottle or an explicit
+ * review snapshot proves the caller observed the identity being replaced.
  */
 async function syncBottleAliasConsumersInTransaction(
   tx: AnyTransaction,
   {
     bottleId,
-    releaseId,
-    reviewReleaseId,
-    targetId,
     externalSiteId,
     lookupNames,
     volume,
-    imageBottleId,
     expectedReview,
   }: {
-    bottleId: number | null;
-    releaseId: number | null;
-    reviewReleaseId: number | null;
-    targetId: number | null;
+    bottleId: number;
     externalSiteId?: number;
     lookupNames: string[];
     volume?: number;
-    imageBottleId: number | null;
     expectedReview?: BottleAliasReviewIdentitySnapshot;
   },
-): Promise<BottleAliasConsumerBackfillResult> {
+) {
+  if (expectedReview) {
+    await assertExpectedReviewIdentity(tx, expectedReview);
+  }
+
+  const priceIdentity = or(
+    isNull(storePrices.bottleId),
+    eq(storePrices.bottleId, bottleId),
+  );
   const matchingPrices = await tx
     .update(storePrices)
-    .set({ bottleId, releaseId, targetId })
+    .set({ bottleId })
     .where(
       and(
         or(
@@ -850,75 +674,19 @@ async function syncBottleAliasConsumersInTransaction(
           ? eq(storePrices.externalSiteId, externalSiteId)
           : undefined,
         volume !== undefined ? eq(storePrices.volume, volume) : undefined,
-        targetId === null ? isNull(storePrices.targetId) : undefined,
+        priceIdentity,
       ),
     )
     .returning({ imageUrl: storePrices.imageUrl });
 
-  const reviewIds = await updateBottleAliasReviewsInTransaction(tx, {
-    bottleId,
-    releaseId: reviewReleaseId,
-    targetId,
-    externalSiteId,
-    lookupNames,
-    expectedReview,
-  });
-
-  const priceWithImage = matchingPrices.find((price) => !!price.imageUrl);
-  return {
-    bottleImageCandidate:
-      priceWithImage?.imageUrl && imageBottleId !== null
-        ? { bottleId: imageBottleId, imageUrl: priceWithImage.imageUrl }
-        : null,
-    reviewIds,
-  };
-}
-
-async function updateBottleAliasReviewsInTransaction(
-  tx: AnyTransaction,
-  {
-    bottleId,
-    releaseId,
-    targetId,
-    externalSiteId,
-    lookupNames,
-    expectedReview,
-  }: {
-    bottleId: number | null;
-    releaseId: number | null;
-    targetId: number | null;
-    externalSiteId?: number;
-    lookupNames: string[];
-    expectedReview?: BottleAliasReviewIdentitySnapshot;
-  },
-) {
-  if (expectedReview) {
-    const [lockedReview] = await tx
-      .select({
-        id: reviews.id,
-        name: reviews.name,
-        bottleId: reviews.bottleId,
-        releaseId: reviews.releaseId,
-        targetId: reviews.targetId,
-      })
-      .from(reviews)
-      .where(eq(reviews.id, expectedReview.id))
-      .limit(1)
-      .for("update");
-    if (
-      !lockedReview ||
-      lockedReview.name !== expectedReview.name ||
-      lockedReview.bottleId !== expectedReview.bottleId ||
-      lockedReview.releaseId !== expectedReview.releaseId ||
-      lockedReview.targetId !== expectedReview.targetId
-    ) {
-      throw new StaleBottleAliasReviewIdentityError(expectedReview.id);
-    }
-  }
-
-  const matchingReviews = await tx
+  const reviewIdentity = or(
+    isNull(reviews.bottleId),
+    eq(reviews.bottleId, bottleId),
+    expectedReview ? eq(reviews.id, expectedReview.id) : undefined,
+  );
+  await tx
     .update(reviews)
-    .set({ bottleId, releaseId, targetId })
+    .set({ bottleId })
     .where(
       and(
         or(
@@ -927,46 +695,26 @@ async function updateBottleAliasReviewsInTransaction(
         externalSiteId !== undefined
           ? eq(reviews.externalSiteId, externalSiteId)
           : undefined,
-        targetId === null ? isNull(reviews.targetId) : undefined,
+        reviewIdentity,
       ),
-    )
-    .returning({ id: reviews.id });
-  return matchingReviews.map(({ id }) => id);
-}
+    );
 
-function getNextTargetlessAliasReleaseId(
-  alias: BottleAlias | undefined,
-  aliasReleaseId: number | null,
-) {
-  return alias?.targetId !== null && alias?.targetId !== undefined
-    ? alias.releaseId
-    : aliasReleaseId === null
-      ? (alias?.releaseId ?? null)
-      : aliasReleaseId;
+  const priceWithImage = matchingPrices.find((price) => !!price.imageUrl);
+  return {
+    bottleImageCandidate: priceWithImage?.imageUrl
+      ? { bottleId, imageUrl: priceWithImage.imageUrl }
+      : null,
+  };
 }
 
 /**
- * Assigns an alias inside an existing transaction and records its provenance.
- * A target-backed exact assignment uses its authoritative Bottle with a null
- * release. A generic assignment never substitutes a representative and may
- * carry either a separately validated retained pair or a null/null consumer
- * identity. A target resolved from a targetless legacy alias may keep that
- * measured pair for compatibility. Legacy `targetId` mode accepts exact targets
- * only. Omitted targets retain measured targetless compatibility without
- * downgrading a target-aware alias. `stagedTargetless` binds that compatibility
- * write to its measured retained pair and revalidates the staged state under
- * lock. `backfillNames` identify stored references to repair. A same-name source
- * snapshot is checked against the alias row already locked by the claim; a
- * distinct raw source is locked after the normalized canonical claim.
- * `expectedReview` locks and compares the selected Review's complete identity
- * before name-wide propagation so a stale resolution cannot overwrite a
- * concurrent retarget.
+ * Assigns an alias and matching consumers to one independently complete Bottle.
+ * Legacy release and target columns remain untouched as migration evidence.
  */
 export async function assignBottleAliasInTransaction(
   tx: AnyTransaction,
-  input: BottleAliasAssignmentInput,
-): Promise<BottleAliasAssignmentResult> {
-  const {
+  {
+    bottleId,
     externalSiteId,
     name,
     backfillNames = [],
@@ -976,361 +724,58 @@ export async function assignBottleAliasInTransaction(
     assignedByActorId,
     sourceAliasIdentity,
     expectedReview,
-  } = input;
-  const suppliedTarget = input.target;
-  const consumerIdentity = input.consumerIdentity;
-  const targetId = input.targetId ?? null;
-  const stagedTargetless = input.stagedTargetless;
-  const bottleId = consumerIdentity
-    ? consumerIdentity.bottleId
-    : input.bottleId;
-  const releaseId = consumerIdentity
-    ? consumerIdentity.releaseId
-    : (input.releaseId ?? null);
-  const aliasReleaseId = suppliedTarget
-    ? null
-    : consumerIdentity
-      ? consumerIdentity.releaseId
-      : targetId !== null
-        ? null
-        : input.aliasReleaseId === undefined
-          ? releaseId
-          : input.aliasReleaseId;
+  }: BottleAliasAssignmentInput,
+): Promise<BottleAliasAssignmentResult> {
   if (!name.trim()) {
     throw new FailedToSaveBottleAliasError();
   }
 
-  const isTargetAware = suppliedTarget !== undefined || targetId !== null;
-  const compatibilityContext = !isTargetAware
-    ? requireBottleAliasCompatibilityContext(input.context)
-    : null;
-
-  if (!isTargetAware && stagedTargetless) {
-    if (
-      stagedTargetless.bottleId !== bottleId ||
-      stagedTargetless.releaseId !== releaseId
-    ) {
-      throw new TypeError(
-        "Staged targetless alias identity must match its retained Bottle pair.",
-      );
-    }
-    await lockStagedTargetlessCatalogAssignmentInTransaction(
-      tx,
-      stagedTargetless,
-    );
-  }
-
-  if (
-    suppliedTarget !== undefined &&
-    suppliedTarget.bottleId !== null &&
-    consumerIdentity?.bottleId === null
-  ) {
-    throw new TypeError(
-      "Exact target alias assignment requires retained Bottle identity.",
-    );
-  }
-
-  if (suppliedTarget) {
-    await lockCatalogTargetConsumerAssignmentInTransaction(
-      tx,
-      { target: suppliedTarget, consumerIdentity: consumerIdentity! },
-      {
-        caller: "bottleAliases",
-        operation: "assignBottleAliasInTransaction",
-      },
-    );
-  }
-
-  if (targetId !== null) {
-    if (bottleId === null) {
-      throw new TypeError(
-        "Legacy exact target assignment requires retained Bottle identity.",
-      );
-    }
-    await validateExactBottleAliasTarget(tx, { bottleId, targetId });
-    if (aliasReleaseId !== null) {
-      throw new InvalidExactBottleAliasTargetError(
-        "legacy_release",
-        targetId,
-        bottleId,
-      );
-    }
-  }
-
-  const assignmentTargetId = suppliedTarget?.targetId ?? targetId;
-  const aliasBottleId = suppliedTarget ? suppliedTarget.bottleId : bottleId;
-
-  const assignmentOptions: BottleAliasAssignmentValues = {
-    assignmentSource,
-    assignedByActorId,
-  };
-  const consumerLookupNames = Array.from(
+  await lockActiveBottleInTransaction(tx, bottleId);
+  const lookupNames = Array.from(
     new Set(
       [name, ...backfillNames].map((value) => value.trim().toLowerCase()),
     ),
   ).filter(Boolean);
+  const { bottleImageCandidate } = await syncBottleAliasConsumersInTransaction(
+    tx,
+    {
+      bottleId,
+      externalSiteId,
+      lookupNames,
+      volume,
+      expectedReview,
+    },
+  );
 
-  let alias: BottleAlias | undefined;
-  let isNew = false;
-  let nextAliasReleaseId: number | null = null;
-  let bottleImageCandidate: BottleImageCandidate | null = null;
   const sourceIsCanonicalName =
     sourceAliasIdentity?.name.toLowerCase() === name.toLowerCase();
-
-  if (assignmentTargetId !== null) {
-    // Target-aware mode holds merge-compatible identity locks, then consumers,
-    // and only then the alias so ingestion never waits on an alias already held.
-    nextAliasReleaseId = null;
-    ({ bottleImageCandidate } = await syncBottleAliasConsumersInTransaction(
-      tx,
-      {
-        bottleId,
-        releaseId,
-        reviewReleaseId: releaseId,
-        targetId: assignmentTargetId,
-        externalSiteId,
-        lookupNames: consumerLookupNames,
-        volume,
-        imageBottleId: aliasBottleId,
-        expectedReview,
-      },
-    ));
-    const claim = await claimCatalogTargetAliasNameInTransaction(
-      tx,
-      {
-        name,
-        bottleId: aliasBottleId,
-        targetId: assignmentTargetId,
-        ...(suppliedTarget && bottleId !== null
-          ? { legacyIdentity: { bottleId, releaseId } }
-          : {}),
-        ...(sourceAliasIdentity && sourceIsCanonicalName
-          ? { expectedIdentity: sourceAliasIdentity }
-          : {}),
-      },
-      {
-        kind: "assignment",
-        assignmentSource,
-        assignedByActorId,
-        ignored,
-      },
-    );
-    alias = claim.alias;
-    isNew = claim.inserted;
-    if (sourceAliasIdentity && !sourceIsCanonicalName) {
-      await lockBottleAliasIdentitySnapshotInTransaction(
-        tx,
-        sourceAliasIdentity,
-      );
-    }
-  } else {
-    if (bottleId === null) {
-      throw new TypeError(
-        "Targetless Bottle alias assignment requires retained Bottle identity.",
-      );
-    }
-    // Compatibility mode updates consumers first. The unlocked pre-read only
-    // chooses a provisional Review release; the locked re-read is authoritative.
-    const [provisionalAlias] = await tx
-      .select()
-      .from(bottleAliases)
-      .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
-      .limit(1);
-    const provisionalReviewReleaseId =
-      releaseId ??
-      getNextTargetlessAliasReleaseId(provisionalAlias, aliasReleaseId);
-    const consumerBackfill = await syncBottleAliasConsumersInTransaction(tx, {
-      bottleId,
-      releaseId,
-      reviewReleaseId: provisionalReviewReleaseId,
-      targetId: null,
-      externalSiteId,
-      lookupNames: consumerLookupNames,
-      volume,
-      imageBottleId: bottleId,
-      expectedReview,
-    });
-    bottleImageCandidate = consumerBackfill.bottleImageCandidate;
-
-    for (let attempt = 0; attempt < 2 && !alias; attempt += 1) {
-      const [existingAlias] = await tx
-        .select()
-        .from(bottleAliases)
-        .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
-        .limit(1)
-        .for("update");
-      if (sourceAliasIdentity && sourceIsCanonicalName) {
-        assertBottleAliasIdentitySnapshot(existingAlias, sourceAliasIdentity);
-      }
-      if (
-        input.rejectReleaseOwnedAlias &&
-        existingAlias?.releaseId !== null &&
-        existingAlias?.releaseId !== undefined
-      ) {
-        throw new ReleaseOwnedBottleAliasError(
-          existingAlias.name,
-          existingAlias.releaseId,
-        );
-      }
-      nextAliasReleaseId = getNextTargetlessAliasReleaseId(
-        existingAlias,
-        aliasReleaseId,
-      );
-
-      if (
-        existingAlias?.targetId !== null &&
-        existingAlias?.targetId !== undefined
-      ) {
-        const [existingTarget] = await tx
-          .select({ bottleId: catalogTargets.bottleId })
-          .from(catalogTargets)
-          .where(eq(catalogTargets.id, existingAlias.targetId))
-          .limit(1);
-        if (existingTarget?.bottleId !== bottleId) {
-          throw new ExactBottleAliasConflictError(
-            existingTarget?.bottleId === null
-              ? "generic_target"
-              : "another_exact_target",
-            existingAlias,
-            existingTarget?.bottleId ?? existingAlias.bottleId,
-          );
-        }
-
-        // Compatibility callers may fill the legacy Bottle projection, but the
-        // target-aware writer retains the durable assignment metadata.
-        if (existingAlias.bottleId === null) {
-          [alias] = await tx
-            .update(bottleAliases)
-            .set({ bottleId })
-            .where(eq(bottleAliases.name, existingAlias.name))
-            .returning();
-        } else if (existingAlias.bottleId === bottleId) {
-          alias = existingAlias;
-        } else {
-          throw new DuplicateBottleAliasError(existingAlias.bottleId);
-        }
-        continue;
-      }
-
-      const hasMatchingBottle = existingAlias?.bottleId === bottleId;
-      const hasMatchingRelease =
-        existingAlias?.releaseId === aliasReleaseId ||
-        existingAlias?.releaseId === null ||
-        aliasReleaseId === null;
-      const ignoredSet = ignored !== undefined ? { ignored } : {};
-
-      if (hasMatchingBottle && hasMatchingRelease) {
-        const assignmentUpdateValues =
-          getAssignmentUpdateValues(assignmentOptions);
-        if (
-          existingAlias.name !== name ||
-          (existingAlias.releaseId ?? null) !== nextAliasReleaseId ||
-          hasExplicitAssignmentOptions(assignmentOptions) ||
-          existingAlias.assignedByActorId !==
-            assignmentOptions.assignedByActorId
-        ) {
-          [alias] = await tx
-            .update(bottleAliases)
-            .set({
-              name,
-              releaseId: nextAliasReleaseId,
-              ...assignmentUpdateValues,
-            })
-            .where(eq(bottleAliases.name, existingAlias.name))
-            .returning();
-        } else {
-          alias = existingAlias;
-        }
-      } else if (!existingAlias) {
-        [alias] = await tx
-          .insert(bottleAliases)
-          .values({
-            name,
-            bottleId,
-            releaseId: aliasReleaseId,
-            targetId: null,
-            ...ignoredSet,
-            ...getAssignmentInsertValues(assignmentOptions),
-          })
-          .onConflictDoNothing()
-          .returning();
-        isNew = !!alias;
-      } else if (!existingAlias.bottleId) {
-        [alias] = await tx
-          .update(bottleAliases)
-          .set({
-            bottleId,
-            releaseId: aliasReleaseId,
-            ...ignoredSet,
-            ...getAssignmentInsertValues(assignmentOptions),
-          })
-          .where(eq(bottleAliases.name, existingAlias.name))
-          .returning();
-      } else {
-        throw new DuplicateBottleAliasError(existingAlias.bottleId);
-      }
-    }
-
-    if (!alias) {
-      throw new FailedToSaveBottleAliasError();
-    }
-    if (sourceAliasIdentity && !sourceIsCanonicalName) {
-      await lockBottleAliasIdentitySnapshotInTransaction(
-        tx,
-        sourceAliasIdentity,
-      );
-    }
-    const actualReviewReleaseId = releaseId ?? nextAliasReleaseId;
-    if (
-      actualReviewReleaseId !== provisionalReviewReleaseId &&
-      consumerBackfill.reviewIds.length
-    ) {
-      await tx
-        .update(reviews)
-        .set({ bottleId, releaseId: actualReviewReleaseId })
-        .where(
-          and(
-            inArray(reviews.id, consumerBackfill.reviewIds),
-            isNull(reviews.targetId),
-          ),
-        );
-    }
-  }
-
-  if (!alias) {
-    throw new FailedToSaveBottleAliasError();
-  }
-
-  if (compatibilityContext) {
-    if (bottleId === null) {
-      throw new TypeError(
-        "Targetless Bottle alias assignment requires retained Bottle identity.",
-      );
-    }
-    recordTargetlessBottleAliasCompatibility({
-      bottleId,
-      context: compatibilityContext,
-      releaseId: alias.releaseId,
-      name: alias.name,
-    });
+  const claim = await claimBottleAliasNameInTransaction(tx, {
+    name,
+    bottleId,
+    ignored,
+    assignmentSource,
+    assignedByActorId,
+    reservation: false,
+    ...(sourceAliasIdentity && sourceIsCanonicalName
+      ? { expectedIdentity: sourceAliasIdentity }
+      : {}),
+  });
+  if (sourceAliasIdentity && !sourceIsCanonicalName) {
+    await lockBottleAliasIdentitySnapshotInTransaction(tx, sourceAliasIdentity);
   }
 
   return {
-    alias,
-    isNew,
+    alias: claim.alias,
+    aliasChanged: claim.changed,
+    isNew: claim.inserted,
     bottleImageCandidate,
-    exactTargetBottleId: assignmentTargetId === null ? null : aliasBottleId,
+    bottleId,
   };
 }
 
-/**
- * Keeps raw alias producers working until their task 9.7 removal. Canonical
- * exact reservations and generic aliases with a retained legacy pair are safe
- * to replay; other target-aware assignments already synchronized a measured
- * consumer identity that cannot be reconstructed from the alias row.
- */
+/** Replays a raw alias producer without resolving a group or release. */
 export async function syncBottleAliasConsumersForAliasChange(name: string) {
-  const syncResult = await db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     const [alias] = await tx
       .select()
       .from(bottleAliases)
@@ -1339,106 +784,12 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
     if (!alias) {
       throw new Error(`Unknown bottle alias: ${name}`);
     }
-    if (alias.bottleId === null) {
-      return null;
-    }
+    if (alias.bottleId === null) return;
 
-    let target: CatalogTargetAssignmentDescriptor | null = null;
-    if (alias.targetId !== null) {
-      target = await resolveCatalogTargetForAssignment(
-        { kind: "target", targetId: alias.targetId },
-        tx,
-      );
-      const isCanonicalExactReservation =
-        target.bottleId === alias.bottleId &&
-        alias.releaseId === null &&
-        alias.assignmentSource === "canonical";
-      const hasRetainedGenericIdentity = target.bottleId === null;
-      if (!isCanonicalExactReservation && !hasRetainedGenericIdentity) {
-        return null;
-      }
-
-      if (hasRetainedGenericIdentity) {
-        const resolveRetainedGenericIdentity = () =>
-          resolveCatalogTargetForAssignment(
-            {
-              kind: "legacy",
-              bottleId: alias.bottleId!,
-              releaseId: alias.releaseId,
-              context: {
-                caller: "OnBottleAliasChange",
-                operation: "resolveRetainedGenericIdentity",
-              },
-            },
-            tx,
-          );
-        const measuredTarget = await resolveRetainedGenericIdentity();
-        if (
-          measuredTarget.targetId !== target.targetId ||
-          measuredTarget.groupId !== target.groupId ||
-          measuredTarget.bottleId !== null
-        ) {
-          throw new CatalogTargetIntegrityMismatchError(
-            { targetId: alias.targetId },
-            "the retained alias pair does not resolve to its generic target",
-          );
-        }
-        target = measuredTarget;
-        await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
-
-        const lockedMeasuredTarget = await resolveRetainedGenericIdentity();
-        if (
-          lockedMeasuredTarget.targetId !== target.targetId ||
-          lockedMeasuredTarget.groupId !== target.groupId ||
-          lockedMeasuredTarget.bottleId !== null
-        ) {
-          throw new CatalogTargetIntegrityMismatchError(
-            { targetId: alias.targetId },
-            "the retained alias pair changed while locking its generic target",
-          );
-        }
-        target = lockedMeasuredTarget;
-      } else {
-        await lockCatalogTargetAssignmentDescriptorInTransaction(tx, target);
-      }
-    } else {
-      // Targetless replay locks Bottle, then its optional Release, before
-      // consumers; the conditional alias snapshot remains last.
-      const [retainedBottle] = await tx
-        .select({ id: bottles.id })
-        .from(bottles)
-        .where(eq(bottles.id, alias.bottleId))
-        .limit(1)
-        .for("update");
-      if (!retainedBottle) {
-        throw new Error(
-          `Bottle alias retained Bottle is missing: ${alias.name}`,
-        );
-      }
-      if (alias.releaseId !== null) {
-        const [retainedRelease] = await tx
-          .select({ bottleId: bottleReleases.bottleId })
-          .from(bottleReleases)
-          .where(eq(bottleReleases.id, alias.releaseId))
-          .limit(1)
-          .for("update");
-        if (!retainedRelease || retainedRelease.bottleId !== alias.bottleId) {
-          throw new CatalogTargetInvalidMappingError(
-            alias.bottleId,
-            alias.releaseId,
-            "the release does not belong to the supplied parent Bottle",
-          );
-        }
-      }
-    }
-
+    await lockActiveBottleInTransaction(tx, alias.bottleId);
     await syncBottleAliasConsumersInTransaction(tx, {
       bottleId: alias.bottleId,
-      releaseId: alias.releaseId,
-      reviewReleaseId: alias.releaseId,
-      targetId: target?.targetId ?? null,
       lookupNames: [alias.name.toLowerCase()],
-      imageBottleId: null,
     });
 
     const [unchangedAlias] = await tx
@@ -1459,24 +810,26 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
       .limit(1)
       .for("update");
     if (!unchangedAlias) {
-      throw new Error(
-        `Bottle alias changed while syncing consumers: ${alias.name}`,
-      );
+      throw new BottleAliasIdentityChangedError(alias.name);
     }
-    return { alias, targetless: target === null };
   });
+}
 
-  if (syncResult?.targetless) {
-    recordTargetlessBottleAliasCompatibility({
-      bottleId: syncResult.alias.bottleId!,
-      context: {
-        caller: "OnBottleAliasChange",
-        operation: "syncTargetlessConsumers",
-      },
-      releaseId: syncResult.alias.releaseId,
-      name: syncResult.alias.name,
-    });
-  }
+function recordUnresolvedBottleImageCandidate(
+  candidate: BottleImageCandidate,
+  reason:
+    | "missing_tombstone"
+    | "missing_replacement_mapping"
+    | "missing_replacement_bottle",
+) {
+  logInfo("Unable to apply Bottle alias image candidate", {
+    extra: {
+      event: "bottle_alias.image_candidate_unresolved",
+      reason,
+      bottleId: candidate.bottleId,
+      imageUrl: candidate.imageUrl,
+    },
+  });
 }
 
 /**
@@ -1487,9 +840,9 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
 export async function finalizeBottleAliasAssignment(
   {
     alias,
-    isNew,
+    aliasChanged,
     bottleImageCandidate,
-    exactTargetBottleId,
+    bottleId,
   }: BottleAliasAssignmentResult,
   contexts?: Record<string, Record<string, any>>,
 ) {
@@ -1559,7 +912,7 @@ export async function finalizeBottleAliasAssignment(
     }
   }
 
-  if (isNew) {
+  if (aliasChanged) {
     try {
       await pushJob("IndexBottleAlias", { name: alias.name });
     } catch (err) {
@@ -1567,21 +920,14 @@ export async function finalizeBottleAliasAssignment(
     }
   }
 
-  if (exactTargetBottleId !== null) {
-    try {
-      await pushUniqueJob("IndexBottleSearchVectors", {
-        bottleId: exactTargetBottleId,
-      });
-    } catch (err) {
-      logError(err, contexts);
-    }
+  try {
+    await pushUniqueJob("IndexBottleSearchVectors", { bottleId });
+  } catch (err) {
+    logError(err, contexts);
   }
 }
 
-/**
- * Assigns an exact or generic descriptor target, a legacy exact `targetId`, or
- * a measured targetless compatibility alias, then runs post-commit effects.
- */
+/** Assigns one direct Bottle identity, then runs post-commit effects. */
 export async function assignBottleAlias(
   params: BottleAliasAssignmentInput,
   contexts?: Record<string, Record<string, any>>,

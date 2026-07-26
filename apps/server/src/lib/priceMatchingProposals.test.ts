@@ -6,7 +6,6 @@ describe("toStorePriceMatchDecision", () => {
     const decision = toStorePriceMatchDecision({
       price: {
         bottleId: null,
-        releaseId: null,
       },
       candidates: [],
       decision: {

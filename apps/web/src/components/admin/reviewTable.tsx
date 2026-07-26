@@ -1,4 +1,3 @@
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Link from "@peated/web/components/link";
 
 import type { PagingRel, Review } from "@peated/server/types";
@@ -43,8 +42,13 @@ export default function ReviewTable({
                     {review.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
-                    {review.target ? (
-                      <CatalogTargetIdentity target={review.target} compact />
+                    {review.bottle ? (
+                      <Link
+                        href={`/bottles/${review.bottle.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {review.bottle.fullName}
+                      </Link>
                     ) : (
                       <em>No Bottle</em>
                     )}

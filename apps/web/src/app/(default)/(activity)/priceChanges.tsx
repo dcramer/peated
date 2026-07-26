@@ -1,11 +1,10 @@
 "use client";
 
 import { formatCategoryName } from "@peated/server/lib/format";
-import type { CatalogTargetV1 } from "@peated/server/schemas";
+import type { Bottle } from "@peated/server/types";
 import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
 import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
-import CatalogTargetIdentity from "@peated/web/components/catalogTargetIdentity";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
@@ -37,29 +36,32 @@ export function PriceChangesSkeleton() {
 }
 
 export function PriceChangeIdentity({
-  target,
+  bottle,
   hasTasted,
   isLibrary,
 }: {
-  target: CatalogTargetV1;
+  bottle: Pick<Bottle, "id" | "fullName" | "category">;
   hasTasted: boolean;
   isLibrary: boolean;
 }) {
-  const identity = target.kind === "bottle" ? target.bottle : target.group;
-
   return (
     <>
       <div className="flex items-center space-x-1">
-        <CatalogTargetIdentity target={target} compact />
+        <Link
+          href={`/bottles/${bottle.id}`}
+          className="truncate hover:underline"
+        >
+          {bottle.fullName}
+        </Link>
         <BottleStatusIndicators hasTasted={hasTasted} isLibrary={isLibrary} />
       </div>
-      {!!identity.category && (
+      {!!bottle.category && (
         <div className="text-muted text-sm">
           <Link
-            href={`/bottles/?category=${identity.category}`}
+            href={`/bottles/?category=${bottle.category}`}
             className="hover:underline"
           >
-            {formatCategoryName(identity.category)}
+            {formatCategoryName(bottle.category)}
           </Link>
         </div>
       )}
@@ -91,7 +93,7 @@ export default function PriceChanges() {
                 >
                   <td className="max-w-0 py-2 pl-4 pr-3 text-sm sm:pl-3">
                     <PriceChangeIdentity
-                      target={price.target}
+                      bottle={price.bottle}
                       hasTasted={price.hasTasted}
                       isLibrary={price.isLibrary}
                     />

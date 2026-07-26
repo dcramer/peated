@@ -25,11 +25,17 @@ import type * as catalogVerificationModule from "@peated/server/lib/catalogVerif
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { ProposedBottleSchema } from "@peated/server/schemas/priceMatches";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { z } from "zod";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
+
+function completeProposedBottle(input: z.input<typeof ProposedBottleSchema>) {
+  return ProposedBottleSchema.parse(input);
+}
 
 vi.mock("@peated/server/worker/client", () => ({
   pushJob: vi.fn(),
@@ -97,7 +103,10 @@ describe("price match queue", () => {
       routerClient.prices.matchQueue.createBottle(
         {
           proposal: 1,
-          bottle: { name: "Unauthorized Queue Create", brand: 1 },
+          independentBottle: {
+            name: "Unauthorized Queue Create",
+            brand: 1,
+          },
         },
         { context: { user } },
       ),
@@ -217,21 +226,13 @@ describe("price match queue", () => {
           name: site.name,
         },
       },
-      currentTarget: {
-        kind: "bottle",
-        targetId: currentTarget!.id,
-        bottle: {
-          id: currentBottle.id,
-          fullName: currentBottle.fullName,
-        },
+      currentBottle: {
+        id: currentBottle.id,
+        fullName: currentBottle.fullName,
       },
-      suggestedTarget: {
-        kind: "bottle",
-        targetId: suggestedTarget!.id,
-        bottle: {
-          id: suggestedBottle.id,
-          fullName: suggestedBottle.fullName,
-        },
+      suggestedBottle: {
+        id: suggestedBottle.id,
+        fullName: suggestedBottle.fullName,
       },
     });
     expect(queueItem).not.toHaveProperty("currentBottleId");
@@ -243,7 +244,7 @@ describe("price match queue", () => {
     expect(currentTarget!.id).not.toBe(suggestedTarget!.id);
   });
 
-  test("keeps a targetless retained suggestion explicitly unknown", async ({
+  test("hydrates a direct Bottle suggestion without target evidence", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -266,11 +267,11 @@ describe("price match queue", () => {
     );
 
     expect(
-      result.results.find((item) => item.id === proposal.id)?.suggestedTarget,
-    ).toBeNull();
+      result.results.find((item) => item.id === proposal.id)?.suggestedBottle,
+    ).toMatchObject({ id: bottle.id });
   });
 
-  test("hydrates a promoted retained-release slot as its exact Bottle", async ({
+  test("hydrates the authoritative current Bottle despite stale release evidence", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -312,15 +313,13 @@ describe("price match queue", () => {
     );
 
     expect(
-      result.results.find((item) => item.id === proposal.id)?.currentTarget,
+      result.results.find((item) => item.id === proposal.id)?.currentBottle,
     ).toMatchObject({
-      kind: "bottle",
-      targetId: promotedTarget!.id,
-      bottle: { id: promoted.id },
+      id: parent.id,
     });
   });
 
-  test("fails list and details closed for a retired durable target", async ({
+  test("hydrates direct Bottle evidence without resolving a retired target", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -347,18 +346,20 @@ describe("price match queue", () => {
       newBottleId: replacement.id,
     });
 
-    const [listError, detailsError] = await Promise.all([
-      waitError(routerClient.prices.matchQueue.list({}, { context: { user } })),
-      waitError(
-        routerClient.prices.matchQueue.details(
-          { proposal: proposal.id },
-          { context: { user } },
-        ),
+    const [listResult, detailsResult] = await Promise.all([
+      routerClient.prices.matchQueue.list({}, { context: { user } }),
+      routerClient.prices.matchQueue.details(
+        { proposal: proposal.id },
+        { context: { user } },
       ),
     ]);
 
-    expect(listError).toMatchObject({ status: 409 });
-    expect(detailsError).toMatchObject({ status: 409 });
+    expect(
+      listResult.results.find((item) => item.id === proposal.id),
+    ).toMatchObject({ currentBottle: { id: bottle.id } });
+    expect(detailsResult).toMatchObject({
+      currentBottle: { id: bottle.id },
+    });
   });
 
   test("renders a persisted automation assessment snapshot when present", async ({
@@ -711,15 +712,11 @@ describe("price match queue", () => {
 
     expect(queueItem).toMatchObject({
       proposalType: "correction",
-      currentTarget: {
-        kind: "bottle",
-        targetId: currentTarget!.id,
-        bottle: { id: currentBottle.id },
+      currentBottle: {
+        id: currentBottle.id,
       },
-      suggestedTarget: {
-        kind: "bottle",
-        targetId: currentTarget!.id,
-        bottle: { id: currentBottle.id },
+      suggestedBottle: {
+        id: currentBottle.id,
       },
       proposedBottle: {
         name: "Bodega Cask",
@@ -1022,9 +1019,11 @@ describe("price match queue", () => {
       status: "approved",
       proposalType: "correction",
       currentBottleId: currentBottle.id,
-      currentTargetId: price.targetId,
+      currentReleaseId: proposal.currentReleaseId,
+      currentTargetId: proposal.currentTargetId,
       suggestedBottleId: currentBottle.id,
-      suggestedTargetId: price.targetId,
+      suggestedReleaseId: proposal.suggestedReleaseId,
+      suggestedTargetId: proposal.suggestedTargetId,
       reviewedById: user.id,
     });
     expect(memberDistillerRows).toEqual([
@@ -1077,13 +1076,10 @@ describe("price match queue", () => {
     const listingAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(price.name)),
     });
-    const exactTargetId = targetsBefore.find(
-      ({ bottleId }) => bottleId === currentBottle.id,
-    )!.id;
     expect(observation).toMatchObject({
       bottleId: currentBottle.id,
       releaseId: null,
-      targetId: exactTargetId,
+      targetId: null,
       facts: expect.objectContaining({
         proposalType: "correction",
         proposedBottle: expect.objectContaining({
@@ -1094,53 +1090,21 @@ describe("price match queue", () => {
     expect(listingAlias).toMatchObject({
       bottleId: currentBottle.id,
       releaseId: null,
-      targetId: exactTargetId,
+      targetId: null,
     });
   });
 
-  test("rejects repair approval without one matching exact target identity", async ({
+  test("rejects repair approval when the suggested Bottle changed", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
     const selected = await fixtures.Bottle({ name: "Repair Target Owner" });
     const other = await fixtures.Bottle({ name: "Repair Target Drift" });
-    const [selectedTarget, otherTarget, genericTarget] = await Promise.all([
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, selected.id),
-      }),
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, other.id),
-      }),
-      db.query.catalogTargets.findFirst({
-        where: and(
-          eq(catalogTargets.groupId, selected.groupId!),
-          isNull(catalogTargets.bottleId),
-        ),
-      }),
-    ]);
     const cases = [
       {
-        name: "targetless",
+        name: "retained projection drift",
         currentTargetId: null,
         suggestedTargetId: null,
-        suggestedBottleId: selected.id,
-      },
-      {
-        name: "generic",
-        currentTargetId: genericTarget!.id,
-        suggestedTargetId: genericTarget!.id,
-        suggestedBottleId: selected.id,
-      },
-      {
-        name: "mismatched targets",
-        currentTargetId: selectedTarget!.id,
-        suggestedTargetId: otherTarget!.id,
-        suggestedBottleId: selected.id,
-      },
-      {
-        name: "retained projection drift",
-        currentTargetId: selectedTarget!.id,
-        suggestedTargetId: selectedTarget!.id,
         suggestedBottleId: other.id,
       },
     ];
@@ -1177,7 +1141,7 @@ describe("price match queue", () => {
         ),
       );
 
-      expect(error, testCase.name).toMatchObject({ status: 409 });
+      expect(error, testCase.name).toMatchObject({ status: 400 });
       expect(
         await db.query.storePriceMatchProposals.findFirst({
           where: eq(storePriceMatchProposals.id, proposal.id),
@@ -1789,7 +1753,7 @@ describe("price match queue", () => {
       {
         proposal: proposal.id,
         action: "match",
-        target: exactTarget!.id,
+        bottle: bottle.id,
       },
       { context: { user } },
     );
@@ -1833,18 +1797,18 @@ describe("price match queue", () => {
 
     expect(alias).toMatchObject({
       bottleId: bottle.id,
-      targetId: exactTarget?.id,
+      targetId: null,
     });
     expect(alias?.assignedByActorId).toBe(userActor.id);
     expect(decisionLog).toMatchObject({
       actorId: userActor.id,
       decision: "match_existing",
       bottleId: bottle.id,
-      targetId: exactTarget?.id,
+      targetId: null,
     });
     expect(updatedPrice).toMatchObject({
       bottleId: bottle.id,
-      targetId: exactTarget?.id,
+      targetId: null,
     });
     expect(updatedSiblingPrice?.bottleId).toBeNull();
     expect(updatedReview?.bottleId).toBe(bottle.id);
@@ -1852,19 +1816,21 @@ describe("price match queue", () => {
     expect(updatedProposal).toMatchObject({
       status: "approved",
       currentBottleId: bottle.id,
-      currentTargetId: exactTarget?.id,
+      currentReleaseId: proposal.currentReleaseId,
+      currentTargetId: proposal.currentTargetId,
       suggestedBottleId: bottle.id,
-      suggestedTargetId: exactTarget?.id,
+      suggestedReleaseId: proposal.suggestedReleaseId,
+      suggestedTargetId: proposal.suggestedTargetId,
       reviewedById: user.id,
     });
     expect(updatedAttempt).toMatchObject({
       finalStatus: "approved",
       currentBottleId: bottle.id,
       currentReleaseId: null,
-      currentTargetId: exactTarget?.id,
+      currentTargetId: null,
       suggestedBottleId: bottle.id,
       suggestedReleaseId: null,
-      suggestedTargetId: exactTarget?.id,
+      suggestedTargetId: null,
     });
     expect(updatedSiblingProposal).toMatchObject({
       status: "errored",
@@ -1945,18 +1911,15 @@ describe("price match queue", () => {
       { context: { user } },
     );
     const queueItem = queue.results.find((item) => item.id === proposal.id);
-    expect(queueItem?.suggestedTarget).toMatchObject({
-      kind: "group",
-      targetId: genericTarget!.id,
-      group: { id: sourceBottle.groupId },
+    expect(queueItem?.suggestedBottle).toMatchObject({
+      id: sourceBottle.id,
     });
-    expect(queueItem?.suggestedTarget).not.toHaveProperty("bottle");
 
     await routerClient.prices.matchQueue.resolve(
       {
         proposal: proposal.id,
         action: "match",
-        target: genericTarget!.id,
+        bottle: sourceBottle.id,
       },
       { context: { user } },
     );
@@ -1985,30 +1948,34 @@ describe("price match queue", () => {
 
     expect(genericTarget?.bottleId).toBeNull();
     expect(updatedPrice).toMatchObject({
-      targetId: genericTarget?.id,
+      targetId: null,
       bottleId: sourceBottle.id,
       releaseId: null,
     });
     expect(alias).toMatchObject({
-      targetId: genericTarget?.id,
-      bottleId: null,
+      targetId: null,
+      bottleId: sourceBottle.id,
       releaseId: null,
     });
     expect(updatedProposal).toMatchObject({
-      currentTargetId: genericTarget?.id,
-      suggestedTargetId: genericTarget?.id,
+      currentBottleId: sourceBottle.id,
+      currentReleaseId: proposal.currentReleaseId,
+      currentTargetId: proposal.currentTargetId,
+      suggestedBottleId: sourceBottle.id,
+      suggestedReleaseId: proposal.suggestedReleaseId,
+      suggestedTargetId: proposal.suggestedTargetId,
     });
     expect(updatedAttempt).toMatchObject({
       currentBottleId: sourceBottle.id,
       currentReleaseId: null,
-      currentTargetId: genericTarget?.id,
+      currentTargetId: null,
       suggestedBottleId: sourceBottle.id,
       suggestedReleaseId: null,
-      suggestedTargetId: genericTarget?.id,
+      suggestedTargetId: null,
     });
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
-      targetId: genericTarget?.id,
+      targetId: null,
       bottleId: sourceBottle.id,
       releaseId: null,
     });
@@ -2016,7 +1983,7 @@ describe("price match queue", () => {
     expect(decisionLog?.bottleId).not.toBe(representative.id);
   });
 
-  test("rejects a generic target that is not the proposal suggestion", async ({
+  test("accepts an explicit active Bottle despite stale target suggestion evidence", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2054,18 +2021,23 @@ describe("price match queue", () => {
       })
       .returning();
 
-    const error = await waitError(
-      routerClient.prices.matchQueue.resolve(
-        {
-          proposal: proposal.id,
-          action: "match",
-          target: otherTarget!.id,
-        },
-        { context: { user } },
-      ),
+    await routerClient.prices.matchQueue.resolve(
+      {
+        proposal: proposal.id,
+        action: "match",
+        bottle: otherBottle.id,
+      },
+      { context: { user } },
     );
 
-    expect(error).toMatchObject({ status: 409 });
+    await expect(
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: otherBottle.id,
+      targetId: price.targetId,
+    });
   });
 
   test("creates a bottle from a proposal and approves it atomically", async ({
@@ -2086,6 +2058,12 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Single Cask",
+          brand: { id: brand.id, name: brand.name },
+        }),
+        proposedRelease: null,
       })
       .returning();
     const priorReviewer = await fixtures.User({ mod: true });
@@ -2129,7 +2107,7 @@ describe("price match queue", () => {
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
-        bottle: {
+        independentBottle: {
           name: "Single Cask",
           brand: brand.id,
         },
@@ -2153,10 +2131,10 @@ describe("price match queue", () => {
       ),
     });
     const createdBottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, result.bottle.id),
+      where: eq(bottles.id, result.id),
     });
     const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, result.bottle.id),
+      where: eq(catalogTargets.bottleId, result.id),
     });
     const observation = await db.query.bottleObservations.findFirst({
       where: eq(bottleObservations.sourceKey, `store_price:${price.id}`),
@@ -2175,68 +2153,67 @@ describe("price match queue", () => {
 
     const userActor = await getUserActor(user);
 
-    expect(result.bottle.fullName).toBe("Queue Brand Single Cask");
-    expect(result).toMatchObject({ release: null });
-    expect(result.targetId).toBe(exactTarget?.id);
+    expect(result.fullName).toBe("Queue Brand Single Cask");
+    expect(result).not.toHaveProperty("targetId");
     expect(createdBottle?.groupId).not.toBeNull();
     expect(exactTarget).toMatchObject({
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       groupId: createdBottle?.groupId,
     });
     expect(decisionLog).toMatchObject({
       actorId: userActor.id,
       decision: "create_bottle",
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: exactTarget?.id,
+      targetId: null,
       createdBottle: true,
       createdRelease: false,
     });
     expect(updatedPrice).toMatchObject({
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: exactTarget?.id,
+      targetId: null,
     });
     expect(updatedProposal).toMatchObject({
       status: "approved",
-      currentBottleId: result.bottle.id,
+      currentBottleId: result.id,
       currentReleaseId: null,
-      currentTargetId: exactTarget?.id,
-      suggestedBottleId: result.bottle.id,
+      currentTargetId: null,
+      suggestedBottleId: result.id,
       suggestedReleaseId: null,
-      suggestedTargetId: exactTarget?.id,
+      suggestedTargetId: null,
       reviewedById: user.id,
     });
     expect(updatedLatestAttempt).toMatchObject({
       finalStatus: "approved",
-      currentBottleId: result.bottle.id,
+      currentBottleId: result.id,
       currentReleaseId: null,
-      currentTargetId: exactTarget?.id,
-      suggestedBottleId: result.bottle.id,
+      currentTargetId: null,
+      suggestedBottleId: result.id,
       suggestedReleaseId: null,
-      suggestedTargetId: exactTarget?.id,
+      suggestedTargetId: null,
       reviewedById: user.id,
     });
     expect(unchangedOlderAttempt).toEqual(olderAttempt);
     expect(listingAlias).toMatchObject({
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: exactTarget?.id,
+      targetId: null,
       assignedByActorId: userActor.id,
     });
     expect(observation).toMatchObject({
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: exactTarget?.id,
+      targetId: null,
     });
     expect(releasesAfter).toHaveLength(releasesBefore.length);
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       creationSource: "price_match_review",
     });
   });
 
-  test("combines legacy bottle and release inputs into one concrete Bottle", async ({
+  test("creates one concrete Bottle with release-owned fields", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2255,17 +2232,22 @@ describe("price match queue", () => {
         status: "pending_review",
         proposalType: "create_new",
         creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Private Selection",
+          brand: { id: brand.id, name: brand.name },
+          edition: "Batch 7",
+          releaseYear: 2024,
+        }),
+        proposedRelease: null,
       })
       .returning();
 
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
-        bottle: {
+        independentBottle: {
           name: "Private Selection",
           brand: brand.id,
-        },
-        release: {
           edition: "Batch 7",
           releaseYear: 2024,
         },
@@ -2274,10 +2256,10 @@ describe("price match queue", () => {
     );
 
     const createdBottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, result.bottle.id),
+      where: eq(bottles.id, result.id),
     });
     const createdTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, result.bottle.id),
+      where: eq(catalogTargets.bottleId, result.id),
     });
     const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
       where: eq(storePriceMatchProposals.id, proposal.id),
@@ -2286,25 +2268,24 @@ describe("price match queue", () => {
       where: eq(storePrices.id, price.id),
     });
 
-    expect(result).toMatchObject({ release: null });
-    expect(result.targetId).toBe(createdTarget?.id);
+    expect(result).not.toHaveProperty("targetId");
     expect(createdBottle).toMatchObject({
       edition: "Batch 7",
       releaseYear: 2024,
     });
     expect(updatedProposal).toMatchObject({
       status: "approved",
-      currentBottleId: result.bottle.id,
-      currentTargetId: createdTarget?.id,
-      suggestedBottleId: result.bottle.id,
+      currentBottleId: result.id,
+      currentTargetId: null,
+      suggestedBottleId: result.id,
       suggestedReleaseId: null,
-      suggestedTargetId: createdTarget?.id,
+      suggestedTargetId: null,
       reviewedById: user.id,
     });
     expect(updatedPrice).toMatchObject({
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: createdTarget?.id,
+      targetId: null,
     });
   });
 
@@ -2335,6 +2316,12 @@ describe("price match queue", () => {
         currentBottleId: previousBottle.id,
         currentReleaseId: null,
         currentTargetId: previousTarget!.id,
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Replacement Decision",
+          brand: { id: brand.id, name: brand.name },
+        }),
+        proposedRelease: null,
       })
       .returning();
     const [attempt] = await db
@@ -2372,7 +2359,7 @@ describe("price match queue", () => {
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
-        bottle: {
+        independentBottle: {
           name: "Replacement Decision",
           brand: brand.id,
         },
@@ -2381,7 +2368,7 @@ describe("price match queue", () => {
     );
 
     const createdTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, result.bottle.id),
+      where: eq(catalogTargets.bottleId, result.id),
     });
     const [
       updatedPrice,
@@ -2416,35 +2403,40 @@ describe("price match queue", () => {
           ),
         ),
     ]);
-    const expectedIdentity = {
-      bottleId: result.bottle.id,
+    const expectedPriceIdentity = {
+      bottleId: result.id,
+      releaseId: price.releaseId,
+      targetId: price.targetId,
+    };
+    const expectedNewRuntimeIdentity = {
+      bottleId: result.id,
       releaseId: null,
-      targetId: createdTarget!.id,
+      targetId: null,
     };
 
-    expect(updatedPrice).toMatchObject(expectedIdentity);
+    expect(updatedPrice).toMatchObject(expectedPriceIdentity);
     expect(updatedProposal).toMatchObject({
-      currentBottleId: expectedIdentity.bottleId,
-      currentReleaseId: expectedIdentity.releaseId,
-      currentTargetId: expectedIdentity.targetId,
-      suggestedBottleId: expectedIdentity.bottleId,
-      suggestedReleaseId: expectedIdentity.releaseId,
-      suggestedTargetId: expectedIdentity.targetId,
+      currentBottleId: result.id,
+      currentReleaseId: proposal.currentReleaseId,
+      currentTargetId: proposal.currentTargetId,
+      suggestedBottleId: result.id,
+      suggestedReleaseId: proposal.suggestedReleaseId,
+      suggestedTargetId: proposal.suggestedTargetId,
     });
     expect(updatedAttempt).toMatchObject({
-      currentBottleId: expectedIdentity.bottleId,
-      currentReleaseId: expectedIdentity.releaseId,
-      currentTargetId: expectedIdentity.targetId,
-      suggestedBottleId: expectedIdentity.bottleId,
-      suggestedReleaseId: expectedIdentity.releaseId,
-      suggestedTargetId: expectedIdentity.targetId,
+      currentBottleId: result.id,
+      currentReleaseId: attempt.currentReleaseId,
+      currentTargetId: attempt.currentTargetId,
+      suggestedBottleId: result.id,
+      suggestedReleaseId: attempt.suggestedReleaseId,
+      suggestedTargetId: attempt.suggestedTargetId,
     });
-    expect(alias).toMatchObject(expectedIdentity);
-    expect(observation).toMatchObject(expectedIdentity);
+    expect(alias).toMatchObject(expectedNewRuntimeIdentity);
+    expect(observation).toMatchObject(expectedNewRuntimeIdentity);
     expect(decisionLogs).toEqual([priorDecision]);
   });
 
-  test("copies source prefill into an independent singleton from release input", async ({
+  test("creates an independent Bottle from a complete concrete input", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2507,7 +2499,22 @@ describe("price match queue", () => {
         status: "pending_review",
         proposalType: "create_new",
         parentBottleId: sourceBottle.id,
-        creationTarget: "release",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Trusted Expression",
+          brand: { id: durableBrand.id, name: durableBrand.name },
+          series: { id: durableSeries.id, name: durableSeries.name },
+          category: "bourbon",
+          bottler: { id: durableBottler.id, name: durableBottler.name },
+          distillers: [
+            { id: durableDistiller.id, name: durableDistiller.name },
+          ],
+          edition: "Batch 4",
+          statedAge: 14,
+          abv: 55.2,
+          releaseYear: 2025,
+        }),
+        proposedRelease: null,
       })
       .returning();
     const releasesBefore = await db.select().from(bottleReleases);
@@ -2515,7 +2522,14 @@ describe("price match queue", () => {
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
-        release: {
+        independentBottle: {
+          name: "Trusted Expression",
+          brand: durableBrand.id,
+          series: durableSeries.id,
+          category: "bourbon",
+          bottler: durableBottler.id,
+          distillers: [durableDistiller.id],
+          flavorProfile: "light_delicate",
           edition: "Batch 4",
           statedAge: 14,
           abv: 55.2,
@@ -2526,10 +2540,10 @@ describe("price match queue", () => {
     );
 
     const createdBottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, result.bottle.id),
+      where: eq(bottles.id, result.id),
     });
     const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, result.bottle.id),
+      where: eq(catalogTargets.bottleId, result.id),
     });
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -2568,8 +2582,7 @@ describe("price match queue", () => {
       db.select().from(bottleReleases),
     ]);
 
-    expect(result).toMatchObject({ release: null });
-    expect(result.targetId).toBe(exactTarget?.id);
+    expect(result).not.toHaveProperty("targetId");
     expect(createdBottle).toMatchObject({
       edition: "Batch 4",
       statedAge: 14,
@@ -2585,7 +2598,7 @@ describe("price match queue", () => {
     expect(createdBottle?.groupId).not.toBe(sourceBottle.groupId);
     expect(createdGroup).toMatchObject({
       name: "Trusted Expression",
-      statedAge: 15,
+      statedAge: 14,
       seriesId: durableSeries.id,
       category: "bourbon",
       brandId: durableBrand.id,
@@ -2602,16 +2615,16 @@ describe("price match queue", () => {
       flavorProfile: "peated",
     });
     expect(createdDistillers).toEqual([{ distillerId: durableDistiller.id }]);
-    expect(createdGroupMembers).toEqual([{ id: result.bottle.id }]);
+    expect(createdGroupMembers).toEqual([{ id: result.id }]);
     expect(exactTarget).toMatchObject({
       groupId: createdBottle?.groupId,
-      bottleId: result.bottle.id,
+      bottleId: result.id,
     });
     expect(decisionLog).toMatchObject({
       decision: "create_bottle",
-      bottleId: result.bottle.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: exactTarget?.id,
+      targetId: null,
       createdBottle: true,
       createdRelease: false,
     });
@@ -2620,7 +2633,7 @@ describe("price match queue", () => {
     expect(releasesAfter).toEqual(releasesBefore);
   });
 
-  test("approves a release proposal as an independent singleton Bottle", async ({
+  test("rejects a release-shaped proposal without creating a Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2644,93 +2657,70 @@ describe("price match queue", () => {
         proposalType: "create_new",
         parentBottleId: sourceBottle.id,
         creationTarget: "release",
-      })
-      .returning();
-    const releasesBefore = await db
-      .select({ id: bottleReleases.id })
-      .from(bottleReleases);
-
-    const result = await routerClient.prices.matchQueue.createBottle(
-      {
-        proposal: proposal.id,
-        independentBottle: {
-          name: "Independent Expression",
-          brand: independentBrand.id,
+        proposedBottle: null,
+        proposedRelease: {
           edition: "Batch 12",
           statedAge: 12,
           abv: 51.2,
           releaseYear: 2026,
         },
-      },
-      { context: { user } },
+      })
+      .returning();
+    const before = await Promise.all([
+      db.select({ id: bottles.id }).from(bottles),
+      db.select({ id: bottleGroups.id }).from(bottleGroups),
+      db.select({ id: catalogTargets.id }).from(catalogTargets),
+      db.select({ id: bottleReleases.id }).from(bottleReleases),
+    ]);
+
+    const error = await waitError(
+      routerClient.prices.matchQueue.createBottle(
+        {
+          proposal: proposal.id,
+          independentBottle: {
+            name: "Independent Expression",
+            brand: independentBrand.id,
+            edition: "Batch 12",
+            statedAge: 12,
+            abv: 51.2,
+            releaseYear: 2026,
+          },
+        },
+        { context: { user } },
+      ),
     );
 
-    const [createdBottle, exactTarget, updatedProposal, updatedPrice] =
+    const [updatedProposal, updatedPrice, createdBottle, ...after] =
       await Promise.all([
-        db.query.bottles.findFirst({
-          where: eq(bottles.id, result.bottle.id),
-        }),
-        db.query.catalogTargets.findFirst({
-          where: eq(catalogTargets.id, result.targetId),
-        }),
         db.query.storePriceMatchProposals.findFirst({
           where: eq(storePriceMatchProposals.id, proposal.id),
         }),
         db.query.storePrices.findFirst({
           where: eq(storePrices.id, price.id),
         }),
+        db.query.bottles.findFirst({
+          where: eq(
+            bottles.fullName,
+            "Independent Brand Independent Expression",
+          ),
+        }),
+        db.select({ id: bottles.id }).from(bottles),
+        db.select({ id: bottleGroups.id }).from(bottleGroups),
+        db.select({ id: catalogTargets.id }).from(catalogTargets),
+        db.select({ id: bottleReleases.id }).from(bottleReleases),
       ]);
-    if (!createdBottle?.groupId) {
-      throw new Error("Expected proposal approval to create a grouped Bottle.");
-    }
-    const groupMembers = await db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(eq(bottles.groupId, createdBottle.groupId));
-    const releasesAfter = await db
-      .select({ id: bottleReleases.id })
-      .from(bottleReleases);
 
-    expect(result).toMatchObject({
-      targetId: exactTarget?.id,
-      bottle: {
-        id: createdBottle.id,
-        edition: "Batch 12",
-        statedAge: 12,
-        abv: 51.2,
-        releaseYear: 2026,
-      },
-      release: null,
-    });
-    expect(createdBottle).toMatchObject({
-      edition: "Batch 12",
-      statedAge: 12,
-      abv: 51.2,
-      releaseYear: 2026,
-    });
-    expect(createdBottle?.name).toContain("Independent Expression");
-    expect(createdBottle?.groupId).not.toBe(sourceBottle.groupId);
-    expect(groupMembers).toEqual([{ id: result.bottle.id }]);
-    expect(exactTarget).toMatchObject({
-      bottleId: result.bottle.id,
-      groupId: createdBottle?.groupId,
-    });
-    expect(updatedProposal).toMatchObject({
-      status: "approved",
-      currentBottleId: result.bottle.id,
-      currentReleaseId: null,
-      currentTargetId: exactTarget?.id,
-      suggestedBottleId: result.bottle.id,
-      suggestedReleaseId: null,
-      suggestedTargetId: exactTarget?.id,
-      reviewedById: user.id,
-    });
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Price match proposal identity changed during approval (${proposal.id}).]`,
+    );
+    expect(updatedProposal).toEqual(proposal);
     expect(updatedPrice).toMatchObject({
-      bottleId: result.bottle.id,
+      bottleId: null,
       releaseId: null,
-      targetId: exactTarget?.id,
+      targetId: null,
     });
-    expect(releasesAfter).toHaveLength(releasesBefore.length);
+    expect(createdBottle).toBeUndefined();
+    expect(after).toEqual(before);
   });
 
   test("rejects mixed canonical and legacy create inputs without writes", async ({
@@ -2757,7 +2747,7 @@ describe("price match queue", () => {
     ]);
 
     const error = await waitError(
-      routerClient.prices.matchQueue.createBottle(
+      (routerClient.prices.matchQueue.createBottle as any)(
         {
           proposal: proposal.id,
           independentBottle: {
@@ -2790,7 +2780,7 @@ describe("price match queue", () => {
     expect(targetsAfter).toEqual(targetsBefore);
   });
 
-  test("reuses a same-group duplicate as an exact match", async ({
+  test("creates independently instead of inferring the proposal parent group", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2821,7 +2811,16 @@ describe("price match queue", () => {
         status: "pending_review",
         proposalType: "create_new",
         parentBottleId: sourceBottle.id,
-        creationTarget: "release",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Retry Expression",
+          brand: { id: brand.id, name: brand.name },
+          series: { id: series.id, name: series.name },
+          edition: "Batch 9",
+          statedAge: 15,
+          abv: 54,
+        }),
+        proposedRelease: null,
       })
       .returning();
     const [
@@ -2844,7 +2843,10 @@ describe("price match queue", () => {
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
-        release: {
+        independentBottle: {
+          name: "Retry Expression",
+          brand: brand.id,
+          series: series.id,
           edition: "Batch 9",
           statedAge: 15,
           abv: 54,
@@ -2881,28 +2883,33 @@ describe("price match queue", () => {
     ]);
 
     expect(result).toMatchObject({
-      bottle: { id: existing.id },
-      release: null,
+      id: expect.any(Number),
     });
+    expect(result.id).not.toBe(existing.id);
     expect(updatedPrice).toMatchObject({
-      bottleId: existing.id,
+      bottleId: result.id,
       releaseId: null,
-      targetId: existingTarget!.id,
+      targetId: price.targetId,
     });
     expect(decisionLog).toMatchObject({
-      decision: "match_existing",
-      bottleId: existing.id,
+      decision: "create_bottle",
+      bottleId: result.id,
       releaseId: null,
-      targetId: existingTarget!.id,
-      createdBottle: false,
+      targetId: null,
+      createdBottle: true,
       createdRelease: false,
     });
-    expect(seriesAfter?.numReleases).toBe(seriesBefore?.numReleases);
-    expect(bottlesAfter).toHaveLength(bottlesBefore.length);
-    expect(groupsAfter).toHaveLength(groupsBefore.length);
-    expect(targetsAfter).toHaveLength(targetsBefore.length);
+    expect(seriesAfter?.numReleases).toBeGreaterThan(
+      seriesBefore?.numReleases ?? 0,
+    );
+    expect(bottlesAfter).toHaveLength(bottlesBefore.length + 1);
+    expect(groupsAfter).toHaveLength(groupsBefore.length + 1);
+    expect(targetsAfter).toHaveLength(targetsBefore.length + 2);
     expect(releasesAfter).toHaveLength(releasesBefore.length);
-    expect(queueBottleCreationVerificationMock).not.toHaveBeenCalled();
+    expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
+      bottleId: result.id,
+      creationSource: "price_match_review",
+    });
   });
 
   test("reuses an exact duplicate without inheriting its source group", async ({
@@ -2933,14 +2940,24 @@ describe("price match queue", () => {
         status: "pending_review",
         proposalType: "create_new",
         parentBottleId: sourceBottle.id,
-        creationTarget: "release",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Cross Group Expression",
+          brand: { id: brand.id, name: brand.name },
+          edition: "Batch 8",
+        }),
+        proposedRelease: null,
       })
       .returning();
 
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
-        release: { edition: "Batch 8" },
+        independentBottle: {
+          name: "Cross Group Expression",
+          brand: brand.id,
+          edition: "Batch 8",
+        },
       },
       { context: { user } },
     );
@@ -2961,13 +2978,11 @@ describe("price match queue", () => {
     ]);
 
     expect(result).toMatchObject({
-      bottle: { id: existing.id },
-      targetId: existingTarget!.id,
-      release: null,
+      id: existing.id,
     });
     expect(sourceBottle.groupId).not.toBe(existing.groupId);
     expect(updatedPrice).toMatchObject({
-      targetId: existingTarget!.id,
+      targetId: price.targetId,
       bottleId: existing.id,
       releaseId: null,
     });
@@ -2975,13 +2990,13 @@ describe("price match queue", () => {
       status: "approved",
       currentBottleId: existing.id,
       currentReleaseId: null,
-      currentTargetId: existingTarget!.id,
+      currentTargetId: null,
     });
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
       bottleId: existing.id,
       releaseId: null,
-      targetId: existingTarget!.id,
+      targetId: null,
       createdBottle: false,
       createdRelease: false,
     });
@@ -2999,7 +3014,7 @@ describe("price match queue", () => {
       routerClient.prices.matchQueue.createBottle(
         {
           proposal: 999999,
-          bottle: {
+          independentBottle: {
             name: "Rollback Candidate",
             brand: brand.id,
           },
@@ -3046,7 +3061,7 @@ describe("price match queue", () => {
     ]);
 
     const error = await waitError(
-      routerClient.prices.matchQueue.createBottle(
+      (routerClient.prices.matchQueue.createBottle as any)(
         {
           proposal: proposal.id,
           release: { edition: "Fractional", statedAge: 12.5 },
@@ -3109,7 +3124,7 @@ describe("price match queue", () => {
       .returning();
 
     const error = await waitError(
-      routerClient.prices.matchQueue.createBottle(
+      (routerClient.prices.matchQueue.createBottle as any)(
         {
           proposal: proposal.id,
           release: { edition: "Retired" },
@@ -3140,6 +3155,12 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Should Not Exist",
+          brand: { id: brand.id, name: brand.name },
+        }),
+        proposedRelease: null,
       })
       .returning();
 
@@ -3147,7 +3168,7 @@ describe("price match queue", () => {
       routerClient.prices.matchQueue.createBottle(
         {
           proposal: proposal.id,
-          bottle: {
+          independentBottle: {
             name: "Should Not Exist",
             brand: brand.id,
           },
@@ -3181,13 +3202,19 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "approved",
         proposalType: "create_new",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Already Reviewed",
+          brand: { id: brand.id, name: brand.name },
+        }),
+        proposedRelease: null,
       })
       .returning();
     const err = await waitError(
       routerClient.prices.matchQueue.createBottle(
         {
           proposal: proposal.id,
-          bottle: {
+          independentBottle: {
             name: "Already Reviewed",
             brand: brand.id,
           },
@@ -3241,14 +3268,14 @@ describe("price match queue", () => {
         {
           proposal: proposal.id,
           action: "match",
-          target: target!.id,
+          bottle: targetBottle.id,
         },
         { context: { user } },
       ),
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[ExactBottleAliasConflictError: Cannot reserve exact Bottle alias "Conflicting Alias": another_exact_target.]`,
+      `[Error: Cannot reserve exact Bottle alias "Conflicting Alias": another_bottle.]`,
     );
   });
 
@@ -3278,6 +3305,12 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
+        creationTarget: "bottle",
+        proposedBottle: completeProposedBottle({
+          name: "Fresh Release",
+          brand: { id: brand.id, name: brand.name },
+        }),
+        proposedRelease: null,
       })
       .returning();
 
@@ -3285,7 +3318,7 @@ describe("price match queue", () => {
       routerClient.prices.matchQueue.createBottle(
         {
           proposal: proposal.id,
-          bottle: {
+          independentBottle: {
             name: "Fresh Release",
             brand: brand.id,
           },
@@ -3302,7 +3335,7 @@ describe("price match queue", () => {
     ]);
 
     expect(err).toMatchInlineSnapshot(
-      `[ExactBottleAliasConflictError: Cannot reserve exact Bottle alias "Create Alias Collision": another_exact_target.]`,
+      `[Error: Cannot reserve exact Bottle alias "Create Alias Collision": another_bottle.]`,
     );
     expect(createdBottle).toBeUndefined();
     expect(groupsAfter).toHaveLength(groupsBefore.length);
@@ -3366,7 +3399,7 @@ describe("price match queue", () => {
         {
           proposal: proposal.id,
           action: "match",
-          target: target!.id,
+          bottle: bottle.id,
         },
         { context: { user } },
       ),
@@ -3407,7 +3440,7 @@ describe("price match queue", () => {
         {
           proposal: proposal.id,
           action: "match",
-          target: target!.id,
+          bottle: bottle.id,
         },
         { context: { user } },
       ),

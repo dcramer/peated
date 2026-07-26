@@ -3,26 +3,9 @@ import { bottleAliases, catalogTargets } from "@peated/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import {
   BottleGroupNotFoundError,
-  listBottleGroupAliases,
   listBottleGroupBottles,
   loadBottleGroup,
 } from "./bottleGroupReads";
-
-const readContext = {
-  actor: null,
-  permissions: { canReadCatalogIdentity: true },
-} as const;
-
-async function getGenericTargetId(groupId: number): Promise<number> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: and(
-      eq(catalogTargets.groupId, groupId),
-      isNull(catalogTargets.bottleId),
-    ),
-  });
-  if (!target) throw new Error("Missing generic target fixture");
-  return target.id;
-}
 
 async function getExactTargetId(bottleId: number): Promise<number> {
   const target = await db.query.catalogTargets.findFirst({
@@ -33,7 +16,7 @@ async function getExactTargetId(bottleId: number): Promise<number> {
 }
 
 describe("BottleGroup reads", () => {
-  test("lists independently complete Bottles and retains transitional generic aliases", async ({
+  test("lists independently complete Bottles by their direct aliases", async ({
     fixtures,
   }) => {
     const source = await fixtures.Bottle({
@@ -46,35 +29,14 @@ describe("BottleGroup reads", () => {
       releaseYear: 2024,
     });
     const relatedTargetId = await getExactTargetId(related.id);
-    const genericTargetId = await getGenericTargetId(source.groupId as number);
-    await db.insert(bottleAliases).values([
-      {
-        bottleId: related.id,
-        releaseId: null,
-        targetId: relatedTargetId,
-        name: "Alternate exact member",
-        assignmentSource: "source_approved",
-        assignedByActorId: source.createdByActorId,
-      },
-      {
-        bottleId: null,
-        releaseId: null,
-        targetId: genericTargetId,
-        name: "Expression stable alias",
-        assignmentSource: "source_approved",
-        assignedByActorId: source.createdByActorId,
-        createdAt: new Date("2026-01-02T00:00:00.000Z"),
-      },
-      {
-        bottleId: null,
-        releaseId: null,
-        targetId: genericTargetId,
-        name: "Ignored stable alias",
-        ignored: true,
-        assignmentSource: "source_approved",
-        assignedByActorId: source.createdByActorId,
-      },
-    ]);
+    await db.insert(bottleAliases).values({
+      bottleId: related.id,
+      releaseId: null,
+      targetId: relatedTargetId,
+      name: "Alternate exact member",
+      assignmentSource: "source_approved",
+      assignedByActorId: source.createdByActorId,
+    });
 
     const members = await listBottleGroupBottles(source.groupId as number, {
       query: "Alternate exact",
@@ -90,22 +52,6 @@ describe("BottleGroup reads", () => {
     });
     expect(members.results[0]).not.toHaveProperty("targetId");
     expect(members.results[0]).not.toHaveProperty("kind");
-
-    const aliases = await listBottleGroupAliases(
-      source.groupId as number,
-      { cursor: 1, limit: 25 },
-      readContext,
-    );
-    expect(aliases).toEqual({
-      results: [
-        {
-          name: "Expression stable alias",
-          assignmentSource: "source_approved",
-          createdAt: "2026-01-02T00:00:00.000Z",
-        },
-      ],
-      rel: { nextCursor: null, prevCursor: null },
-    });
   });
 
   test("loads direct group data without requiring a generic target", async ({

@@ -39,25 +39,26 @@ Related architecture:
 - Do not store generated, normalized, scraped, or unresolved candidate strings
   as aliases unless they have been accepted as assignments.
 - Do not make every write path synchronous on the classifier when an exact
-  accepted alias or closed-form identifier already proves the target.
+  accepted alias or closed-form identifier already proves Bottle identity.
 
 ## Canonical Model
 
-Peated has four relevant identity layers:
+Peated has three relevant identity layers:
 
 - `Bottle`: one concrete marketed version with a stable expression plus every
   supported structured exact field.
 - `BottleGroup`: the automatically managed same-expression aggregate across
-  related Bottles. It owns shared editing semantics and a generic target, but a
-  Bottle remains complete and renderable without group hydration.
-- `CatalogTarget`: the authoritative subject id for an exact Bottle or a generic
-  BottleGroup when exactness is unknown.
+  related Bottles. It owns shared editing semantics, relationship presentation,
+  and member-derived aggregates, but a Bottle remains complete and renderable
+  without group hydration.
 - `BottleObservation`: source facts useful as evidence but outside canonical
   catalog identity.
 
-Every Bottle has one exact CatalogTarget. Every BottleGroup has one generic
-CatalogTarget. Consumers store one validated `targetId`; they do not construct
-an independent Bottle/group pair or a Bottle/Release pair.
+Assigned aliases and other resolved consumers store one validated `bottleId`.
+They do not store BottleGroup identity or invoke a second resolver after
+selecting a Bottle. When a source identifies only a general expression, it may
+resolve to the retained general Bottle in that group; otherwise it remains
+unresolved.
 
 ### Stable And Exact Bottle Fields
 
@@ -79,42 +80,42 @@ establishes that it identifies the marketed Bottle.
 
 ### Automatic Group Assignment
 
-Independent Bottle creation atomically creates a singleton BottleGroup, its
-generic target, the Bottle, and its exact target. Trusted group reuse is limited
-to deterministic migration, measured compatibility adapters, and explicitly
-system-controlled grouping. Classifier output never contains a parent or group
-selection, and manual or ordinary API clients cannot supply a source Bottle or
-group id to bypass that boundary.
+Independent Bottle creation atomically creates a singleton BottleGroup and its
+complete Bottle. Trusted group reuse is limited to deterministic migration,
+measured compatibility adapters, and explicitly system-controlled grouping.
+Classifier output never contains a parent or group selection, and manual or
+ordinary API clients cannot supply a source Bottle or group id to bypass that
+boundary.
 
 Likely same-expression matches may be suggestions. Similar names, shared brand,
-or shared series do not silently merge independently created groups. Curated
-group merge and split operations are separate audited catalog operations.
+or shared series do not silently merge independently created groups. Automatic
+group merge and split operations are system-controlled, audited catalog
+operations.
 
 ## Alias Model
 
 An alias is a durable assertion:
 
-> This accepted reference string resolves to this CatalogTarget.
+> This accepted reference string resolves to this Bottle.
 
 An exact accepted alias can bypass the classifier because the system is reusing
 a prior decision, not guessing from text. Candidate evidence, generated
 normalization output, and unresolved source text are not aliases.
 
-- An exact marketed alias references an exact Bottle target.
-- A stable expression alias references a generic BottleGroup target.
-- A generic alias never substitutes the representative or another member
-  Bottle during exact lookup.
+- Every assigned alias stores one Bottle id.
+- A general expression alias points to the retained general Bottle for that
+  expression; it does not point to BottleGroup or select a representative.
 - An ignored alias does not participate in exact matching.
 - Assignment provenance records whether the assertion came from canonical
   creation, an accepted source, classifier review, or human review.
 
 Alias lookup and alias writes use the same identity-preserving key for a
 workflow. Lossy or semantic normalization may retrieve evidence but cannot
-assign a target unless that exact key was already accepted.
+assign a Bottle unless that exact key was already accepted.
 
 Canonical Bottle creation reserves the Bottle's exact canonical alias in the
 same transaction. Alias conflicts block creation or require an explicit merge;
-code does not overwrite, suffix, or reinterpret another target's assertion.
+code does not overwrite, suffix, or reinterpret another Bottle's assertion.
 
 ## Resolution Pipeline
 
@@ -122,19 +123,19 @@ All source-reference workflows follow the same conceptual pipeline:
 
 1. Preserve raw source facts.
 2. Build the workflow's identity-preserving alias key.
-3. Reuse an exact accepted alias when it resolves one valid target.
+3. Reuse an exact accepted alias when it resolves one valid Bottle.
 4. Apply a closed-form deterministic resolver when one exists, such as an exact
    SMWS code.
 5. Retrieve local Bottle and entity candidates.
 6. Run reviewed classification when semantic identity remains unresolved.
-7. Validate candidate ids, resolved entities, canonical fields, and target
+7. Validate candidate ids, resolved entities, canonical fields, and Bottle
    integrity.
 8. Derive the automation tier from action risk and structured evidence.
-9. Persist the exact target, queue review, or leave the source unresolved.
+9. Persist the Bottle id, queue review, or leave the source unresolved.
 
 Candidate retrieval is evidence, not a decision. Text rank, fuzzy aliases,
 similar names, sibling rows, and web results cannot independently select a
-target or BottleGroup.
+Bottle or BottleGroup.
 
 ## Classifier Ownership
 
@@ -156,7 +157,7 @@ no live create-release, create-bottle-and-release, repair-parent, or group
 selection action.
 
 Deterministic validation may reject unknown ids, direct source-field conflicts,
-invalid targets, or impossible states. It must not promote `no_match`, infer
+invalid Bottles, or impossible states. It must not promote `no_match`, infer
 whisky-family semantics, or replace the classifier decision with prefix or
 similarity rules.
 
@@ -177,13 +178,13 @@ Automation may create or assign only when:
 
 - the raw source is retained;
 - the selected Bottle or create draft is independently complete;
-- duplicate Bottle, target, and alias checks are safe;
+- duplicate Bottle and alias checks are safe;
 - required entities resolve or can be safely created;
 - observation-only detail remains outside canonical identity; and
 - the decision and evidence provenance are retained.
 
 Conflicting identity, unsafe alias collisions, unresolved canonical fields, or
-an invalid target leave the source unresolved or route it to review.
+an invalid Bottle leave the source unresolved or route it to review.
 
 ## Workflow Boundaries
 
@@ -198,20 +199,20 @@ a singleton group. Automatic grouping happens outside the manual workflow.
 ### Store Prices And Reviews
 
 Store-price and review ingestion preserve the raw reference first. An accepted
-alias supplies its validated exact or generic CatalogTarget. Otherwise the row
-remains targetless until reviewed resolution succeeds.
+alias supplies its validated Bottle id. Otherwise the row remains unresolved
+until reviewed resolution succeeds.
 
-A successful classifier match or create supplies one exact Bottle target. A
-generic target is used only when the workflow genuinely knows the expression
-but not the exact Bottle; it never selects a representative Bottle. Unresolved
-source text does not create an unbound alias as candidate storage.
+A successful classifier match or create supplies one Bottle id. When the
+workflow genuinely knows only the general expression, it may select the
+retained general Bottle; it never substitutes a group representative.
+Unresolved source text does not create an unbound alias as candidate storage.
 
 ### Observations
 
 Observations preserve exact source facts that remain outside canonical identity,
 including source URL, raw title, retailer image, price/volume context, selector,
 bottle number, outturn, and unreviewed maturation fragments. They attach through
-the same validated exact or generic CatalogTarget when identity is known.
+the same validated Bottle id when identity is known.
 
 ## Staged BottleRelease Compatibility
 
@@ -222,9 +223,10 @@ rows are promoted:
 - classifier search may expose a retained legacy release candidate only to
   match an existing historical identity;
 - a completed promotion mapping resolves a legacy `releaseId` to its promoted
-  Bottle and exact target;
-- retained `(bottleId, releaseId)` projections support dual-write/parity and
-  historical responses, but a non-null `targetId` is authoritative;
+  Bottle;
+- retained `releaseId` and `targetId` columns may remain as historical migration
+  evidence until their schema-removal gate, but live alias reads and writes use
+  only `bottleId`;
 - compatibility adapters translate legacy input/output and delegate to the
   canonical concrete-Bottle services; they do not insert or update
   `bottle_release`; and
@@ -240,15 +242,16 @@ second release business system while those adapters remain.
 
 Deterministic coverage should prove:
 
-- exact accepted aliases resolve one exact or generic target;
-- generic aliases do not select a representative Bottle;
+- exact accepted aliases resolve one Bottle;
+- general aliases resolve the retained general Bottle without selecting a
+  representative;
 - ignored and ambiguous aliases do not resolve;
 - alias lookup and write keys are identical for each workflow;
 - semantic or lossy normalization does not auto-assign;
-- duplicate Bottle, target, and alias conflicts roll back creation;
-- independent creation produces a singleton group and exact target atomically;
-- target-backed consumer identity cannot be downgraded by a retained legacy
-  pair; and
+- duplicate Bottle and alias conflicts roll back creation;
+- independent creation produces a singleton group and complete Bottle
+  atomically;
+- direct Bottle identity cannot be downgraded by retained legacy fields; and
 - compatibility resolution is measured and delegates to canonical services.
 
 Classifier and eval coverage should prove:

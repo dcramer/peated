@@ -1,12 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottleReleasePromotions,
-  bottles,
-  catalogTargets,
-  reviews,
-  storePrices,
-} from "@peated/server/db/schema";
+import { bottleAliases, reviews, storePrices } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -18,57 +11,213 @@ describe("DELETE /bottle-aliases/:name", () => {
     vi.resetAllMocks();
   });
 
-  test("deletes alias", async ({ fixtures }) => {
+  test("atomically unassigns one direct Bottle and its matching consumers", async ({
+    fixtures,
+  }) => {
     const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
-
-    const site = await fixtures.ExternalSiteOrExisting();
-    const review = await fixtures.Review({
+    const bottle = await fixtures.Bottle({ name: "Alias Owner" });
+    const otherBottle = await fixtures.Bottle({ name: "Other Alias Owner" });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Direct Bottle Alias",
+    });
+    const matchingReview = await fixtures.Review({
       bottleId: bottle.id,
       name: alias.name,
-      externalSiteId: site.id,
+      issue: "direct-owner",
     });
-    const storePrice = await fixtures.StorePrice({
+    const matchingPrice = await fixtures.StorePrice({
       bottleId: bottle.id,
-      externalSiteId: site.id,
       name: alias.name,
+      volume: 750,
+    });
+    const otherReview = await fixtures.Review({
+      bottleId: otherBottle.id,
+      name: alias.name,
+      issue: "other-owner",
+    });
+    const otherPrice = await fixtures.StorePrice({
+      bottleId: otherBottle.id,
+      name: alias.name,
+      volume: 700,
     });
 
-    const data = await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      {
-        context: { user },
-      },
+    await expect(
+      routerClient.bottleAliases.delete(
+        { alias: alias.name.toUpperCase() },
+        { context: { user } },
+      ),
+    ).resolves.toEqual({});
+
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, alias.name),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: null,
+      releaseId: alias.releaseId,
+      targetId: alias.targetId,
+    });
+    await expect(
+      db.query.reviews.findFirst({
+        where: eq(reviews.id, matchingReview.id),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: null,
+      releaseId: matchingReview.releaseId,
+      targetId: matchingReview.targetId,
+    });
+    await expect(
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, matchingPrice.id),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: null,
+      releaseId: matchingPrice.releaseId,
+      targetId: matchingPrice.targetId,
+    });
+    await expect(
+      db.query.reviews.findFirst({ where: eq(reviews.id, otherReview.id) }),
+    ).resolves.toMatchObject({ bottleId: otherBottle.id });
+    await expect(
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, otherPrice.id),
+      }),
+    ).resolves.toMatchObject({ bottleId: otherBottle.id });
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(2);
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
+      name: alias.name,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
     );
-    expect(data).toEqual({});
-
-    const [newAlias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.name, alias.name));
-    expect(newAlias).toBeDefined();
-    expect(newAlias.bottleId).toBeNull();
-    expect(newAlias.targetId).toBeNull();
-
-    const [newReview] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.id, review.id));
-    expect(newReview.bottleId).toBeNull();
-    expect(newReview.releaseId).toBeNull();
-    expect(newReview.targetId).toBeNull();
-
-    const [newStorePrice] = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.id, storePrice.id));
-    expect(newStorePrice.bottleId).toBeNull();
-    expect(newStorePrice.releaseId).toBeNull();
-    expect(newStorePrice.targetId).toBeNull();
   });
 
-  test("succeeds after commit when search indexing enqueue fails", async ({
+  test("uses the direct Bottle id even when retained legacy identities disagree", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Direct Alias Bottle" });
+    const staleBottle = await fixtures.Bottle({ name: "Stale Target Bottle" });
+    const staleRelease = await fixtures.BottleRelease({
+      bottleId: staleBottle.id,
+    });
+    const staleTarget = await db.query.catalogTargets.findFirst({
+      where: (targets, { eq }) => eq(targets.bottleId, staleBottle.id),
+    });
+    if (!staleTarget) throw new Error("Missing stale target fixture");
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Legacy Drift Alias",
+    });
+    await db
+      .update(bottleAliases)
+      .set({ releaseId: staleRelease.id, targetId: staleTarget.id })
+      .where(eq(bottleAliases.name, alias.name));
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      releaseId: staleRelease.id,
+      targetId: staleTarget.id,
+      name: alias.name,
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      targetId: staleTarget.id,
+      name: alias.name,
+    });
+    await db
+      .update(storePrices)
+      .set({ releaseId: staleRelease.id })
+      .where(eq(storePrices.id, price.id));
+
+    await routerClient.bottleAliases.delete(
+      { alias: alias.name },
+      { context: { user } },
+    );
+
+    await expect(
+      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).resolves.toMatchObject({
+      bottleId: null,
+      releaseId: staleRelease.id,
+      targetId: staleTarget.id,
+    });
+    await expect(
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+    ).resolves.toMatchObject({
+      bottleId: null,
+      releaseId: staleRelease.id,
+      targetId: staleTarget.id,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
+      name: alias.name,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(2);
+  });
+
+  test("protects the direct Bottle canonical name", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Canonical Alias Bottle" });
+
+    const error = await waitError(
+      routerClient.bottleAliases.delete(
+        { alias: bottle.fullName },
+        { context: { user } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Cannot delete canonical name]`,
+    );
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, bottle.fullName),
+      }),
+    ).resolves.toMatchObject({ bottleId: bottle.id });
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("fails closed for a retained target-only alias", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Target Only Alias Bottle" });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "Target Only Alias",
+    });
+    await db
+      .update(bottleAliases)
+      .set({ bottleId: null })
+      .where(eq(bottleAliases.name, alias.name));
+
+    const error = await waitError(
+      routerClient.bottleAliases.delete(
+        { alias: alias.name },
+        { context: { user } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Bottle Alias is not assigned to a Bottle.]`,
+    );
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, alias.name),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: null,
+      targetId: expect.any(Number),
+    });
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("commits the unassignment when search indexing enqueue fails", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -81,421 +230,55 @@ describe("DELETE /bottle-aliases/:name", () => {
       new Error("Queue unavailable"),
     );
 
-    const result = await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      { context: { user } },
-    );
-
-    expect(result).toEqual({});
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
-  });
-
-  test("cannot delete without mod", async ({ fixtures }) => {
-    const user = await fixtures.User();
-    const bottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
-
-    const err = await waitError(
+    await expect(
       routerClient.bottleAliases.delete(
         { alias: alias.name },
-        {
-          context: { user },
-        },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-  });
-
-  test("protects the exact target Bottle canonical name without legacy identity", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const authoritativeBottle = await fixtures.Bottle({
-      name: "Authoritative Canonical Bottle",
-    });
-    const review = await fixtures.Review({
-      bottleId: authoritativeBottle.id,
-      name: authoritativeBottle.fullName,
-    });
-    const storePrice = await fixtures.StorePrice({
-      bottleId: authoritativeBottle.id,
-      name: authoritativeBottle.fullName,
-    });
-    await db
-      .update(bottleAliases)
-      .set({ bottleId: null })
-      .where(eq(bottleAliases.name, authoritativeBottle.fullName));
-
-    const err = await waitError(
-      routerClient.bottleAliases.delete(
-        { alias: authoritativeBottle.fullName },
         { context: { user } },
       ),
-    );
-
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot delete canonical name]`);
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, authoritativeBottle.fullName),
-    });
-    expect(alias).toMatchObject({
-      bottleId: null,
-      targetId: expect.any(Number),
-    });
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({ bottleId: authoritativeBottle.id });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, storePrice.id),
-      }),
-    ).toMatchObject({ bottleId: authoritativeBottle.id });
-  });
-
-  test("reindexes the exact target Bottle and clears stale legacy identity", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const authoritativeBottle = await fixtures.Bottle({
-      name: "Authoritative Alias Bottle",
-    });
-    const staleBottle = await fixtures.Bottle({ name: "Stale Match Bottle" });
-    const alias = await fixtures.BottleAlias({
-      bottleId: authoritativeBottle.id,
-      name: "Authoritative Noncanonical Alias",
-    });
-    await db
-      .update(bottleAliases)
-      .set({ bottleId: staleBottle.id })
-      .where(eq(bottleAliases.name, alias.name));
-
-    await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.bottleAliases.findFirst({
+    ).resolves.toEqual({});
+    await expect(
+      db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, alias.name),
       }),
-    ).toMatchObject({
+    ).resolves.toMatchObject({
       bottleId: null,
-      releaseId: null,
-      targetId: null,
+      releaseId: alias.releaseId,
+      targetId: alias.targetId,
     });
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      { bottleId: authoritativeBottle.id },
-    );
-    expect(workerClient.pushJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      { bottleId: staleBottle.id },
-    );
-    expect(workerClient.pushJob).toHaveBeenCalledTimes(2);
-  });
-
-  test("clears a generic alias without selecting a representative Bottle", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({ name: "Generic Alias Bottle" });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: (targets, { and, eq, isNull }) =>
-        and(eq(targets.groupId, bottle.groupId!), isNull(targets.bottleId)),
-    });
-    if (!genericTarget)
-      throw new Error("Missing generic CatalogTarget fixture");
-    const alias = await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      targetId: genericTarget.id,
-      name: "Generic Group Alias",
-    });
-    const review = await fixtures.Review({
-      bottleId: bottle.id,
-      releaseId: null,
-      targetId: genericTarget.id,
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
       name: alias.name,
     });
-    const storePrice = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      releaseId: null,
-      targetId: genericTarget.id,
-      name: alias.name,
-    });
-
-    await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, storePrice.id),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
       { bottleId: bottle.id },
     );
-    expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
   });
 
-  test("clears promoted-release consumers through their shared exact target", async ({
-    fixtures,
-  }) => {
+  test("returns not found for an unknown alias", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
-    const parent = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const [promotedBottle] = await db
-      .insert(bottles)
-      .values({
-        groupId: parent.groupId,
-        brandId: parent.brandId,
-        createdByActorId: parent.createdByActorId,
-        name: "Delete promoted Bottle",
-        fullName: "Delete promoted Bottle",
-      })
-      .returning();
-    if (!promotedBottle) throw new Error("Unable to create promoted Bottle");
-    const [promotedTarget] = await db
-      .insert(catalogTargets)
-      .values({
-        groupId: parent.groupId!,
-        bottleId: promotedBottle.id,
-      })
-      .returning();
-    if (!promotedTarget) throw new Error("Unable to create promoted target");
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
-    });
-    const alias = await fixtures.BottleAlias({
-      bottleId: promotedBottle.id,
-      releaseId: null,
-      targetId: promotedTarget.id,
-      name: "Delete promoted release alias",
-      assignmentSource: "source_approved",
-    });
-    const review = await fixtures.Review({
-      bottleId: parent.id,
-      releaseId: release.id,
-      targetId: promotedTarget.id,
-      name: alias.name,
-    });
-    const storePrice = await fixtures.StorePrice({
-      bottleId: parent.id,
-      targetId: promotedTarget.id,
-      name: alias.name,
-    });
-    await db
-      .update(storePrices)
-      .set({ releaseId: release.id })
-      .where(eq(storePrices.id, storePrice.id));
 
-    await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      { context: { user } },
+    const error = await waitError(
+      routerClient.bottleAliases.delete(
+        { alias: "Missing Bottle Alias" },
+        { context: { user } },
+      ),
     );
 
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, storePrice.id),
-      }),
-    ).toMatchObject({ bottleId: null, releaseId: null, targetId: null });
+    expect(error).toMatchInlineSnapshot(`[Error: Bottle Alias not found.]`);
   });
 
-  test("clears release matches for release aliases", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
+  test("requires moderator access", async ({ fixtures }) => {
+    const user = await fixtures.User();
     const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 4",
-    });
-    const alias = await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-    });
+    const alias = await fixtures.BottleAlias({ bottleId: bottle.id });
 
-    const review = await fixtures.Review({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: alias.name,
-    });
-    const storePrice = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: alias.name,
-    });
-    await db
-      .update(storePrices)
-      .set({ releaseId: release.id })
-      .where(eq(storePrices.id, storePrice.id));
-
-    const data = await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      {
-        context: { user },
-      },
-    );
-    expect(data).toEqual({});
-
-    const [newAlias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.name, alias.name));
-    expect(newAlias).toBeDefined();
-    expect(newAlias.bottleId).toBeNull();
-    expect(newAlias.releaseId).toBeNull();
-    expect(newAlias.targetId).toBeNull();
-
-    const [newReview] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.id, review.id));
-    expect(newReview.bottleId).toBeNull();
-    expect(newReview.releaseId).toBeNull();
-    expect(newReview.targetId).toBeNull();
-
-    const [newStorePrice] = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.id, storePrice.id));
-    expect(newStorePrice.bottleId).toBeNull();
-    expect(newStorePrice.releaseId).toBeNull();
-    expect(newStorePrice.targetId).toBeNull();
-  });
-
-  test("preserves consumers independently retargeted from a target-aware alias", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const aliasBottle = await fixtures.Bottle();
-    const correctedBottle = await fixtures.Bottle();
-    const correctedTarget = await db.query.catalogTargets.findFirst({
-      where: (targets, { eq }) => eq(targets.bottleId, correctedBottle.id),
-    });
-    if (!correctedTarget) throw new Error("Missing corrected target fixture");
-    const alias = await fixtures.BottleAlias({
-      bottleId: aliasBottle.id,
-      name: "Retargeted consumer alias",
-    });
-    const review = await fixtures.Review({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: correctedTarget.id,
-      name: alias.name,
-    });
-    const storePrice = await fixtures.StorePrice({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: correctedTarget.id,
-      name: alias.name,
-    });
-
-    await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      { context: { user } },
+    const error = await waitError(
+      routerClient.bottleAliases.delete(
+        { alias: alias.name },
+        { context: { user } },
+      ),
     );
 
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: correctedTarget.id,
-    });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, storePrice.id),
-      }),
-    ).toMatchObject({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: correctedTarget.id,
-    });
-  });
-
-  test("preserves a different targetless consumer pair", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const aliasBottle = await fixtures.Bottle();
-    const aliasRelease = await fixtures.BottleRelease({
-      bottleId: aliasBottle.id,
-    });
-    const correctedBottle = await fixtures.Bottle();
-    const alias = await fixtures.BottleAlias({
-      bottleId: aliasBottle.id,
-      releaseId: aliasRelease.id,
-      targetId: null,
-      name: "Corrected legacy consumer alias",
-    });
-    const review = await fixtures.Review({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: null,
-      name: alias.name,
-    });
-    const storePrice = await fixtures.StorePrice({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: null,
-      name: alias.name,
-    });
-
-    await routerClient.bottleAliases.delete(
-      { alias: alias.name },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: null,
-    });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, storePrice.id),
-      }),
-    ).toMatchObject({
-      bottleId: correctedBottle.id,
-      releaseId: null,
-      targetId: null,
-    });
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

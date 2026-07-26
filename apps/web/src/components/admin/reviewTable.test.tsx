@@ -1,5 +1,4 @@
-import type { CatalogTargetV1 } from "@peated/server/schemas";
-import type { Review } from "@peated/server/types";
+import type { Bottle, Entity, Review } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -9,57 +8,89 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-const groupTarget = {
-  kind: "group",
-  targetId: 41,
-  group: {
-    id: 7,
-    fullName: "Springbank 12 Cask Strength",
-    representativeBottleId: 19,
-  },
-} as CatalogTargetV1;
+const timestamp = "2026-07-22T12:00:00.000Z";
 
-const bottleTarget = {
-  kind: "bottle",
-  targetId: 42,
-  group: groupTarget.group,
-  bottle: {
-    id: 19,
-    fullName: "Springbank 12 Cask Strength Batch 24",
-  },
-} as CatalogTargetV1;
+const brand = {
+  id: 7,
+  name: "Springbank",
+  shortName: null,
+  type: ["brand"],
+  description: null,
+  descriptionSrc: null,
+  yearEstablished: null,
+  website: null,
+  country: null,
+  region: null,
+  address: null,
+  location: null,
+  totalTastings: 0,
+  totalBottles: 1,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies Entity;
 
-function makeReview(id: number, target: CatalogTargetV1 | null): Review {
+const bottle = {
+  id: 19,
+  fullName: "Springbank 12 Cask Strength Batch 24",
+  name: "12 Cask Strength Batch 24",
+  series: null,
+  category: "single_malt",
+  edition: "Batch 24",
+  statedAge: 12,
+  caskStrength: true,
+  singleCask: false,
+  abv: 56.2,
+  vintageYear: null,
+  releaseYear: 2024,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  brand,
+  distillers: [],
+  bottler: null,
+  description: null,
+  descriptionSrc: null,
+  imageUrl: null,
+  flavorProfile: null,
+  tastingNotes: null,
+  suggestedTags: [],
+  avgRating: null,
+  ratingStats: {
+    pass: 0,
+    sip: 0,
+    savor: 0,
+    total: 0,
+    avg: null,
+    percentage: { pass: 0, sip: 0, savor: 0 },
+  },
+  totalTastings: 0,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+  isFavorite: false,
+  isLibrary: false,
+  hasTasted: false,
+} satisfies Bottle;
+
+function makeReview(id: number, reviewBottle: Bottle | null): Review {
   return {
     id,
     name: "Springbank review",
     rating: 91,
     url: `https://example.com/reviews/${id}`,
-    target,
-    createdAt: "2026-07-22T12:00:00.000Z",
-    updatedAt: "2026-07-22T12:00:00.000Z",
+    bottle: reviewBottle,
+    createdAt: timestamp,
+    updatedAt: timestamp,
   };
 }
 
 describe("ReviewTable", () => {
-  it("renders exact review identity", () => {
+  it("renders the direct Bottle identity", () => {
     const html = renderToStaticMarkup(
-      <ReviewTable reviewList={[makeReview(1, bottleTarget)]} />,
+      <ReviewTable reviewList={[makeReview(1, bottle)]} />,
     );
 
     expect(html).toContain('href="/bottles/19"');
     expect(html).toContain("Springbank 12 Cask Strength Batch 24");
-    expect(html).toContain("Exact bottle");
-  });
-
-  it("uses the representative only as a generic route anchor", () => {
-    const html = renderToStaticMarkup(
-      <ReviewTable reviewList={[makeReview(2, groupTarget)]} />,
-    );
-
-    expect(html).toContain('href="/bottles/19/releases"');
-    expect(html).toContain("Exact bottle not specified");
-    expect(html).not.toContain('href="/bottles/19"');
   });
 
   it("renders unresolved review identity without a catalog link", () => {

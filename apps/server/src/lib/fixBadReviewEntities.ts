@@ -23,8 +23,7 @@ export type FixBadReviewEntitiesResult = {
  *
  * This stays intentionally conservative: it never rewrites or deletes the
  * current bottle record. It only reassigns the review when an exact alias or
- * reviewed classifier result returns replacement identity, including the
- * explicit staged targetless states retained for migration.
+ * reviewed classifier result returns a replacement Bottle.
  */
 export async function fixBadReviewEntities({
   user,
@@ -72,8 +71,9 @@ export async function fixBadReviewEntities({
       user,
     });
 
-    const resolvedIdentity = resolution.assignment?.consumerIdentity ?? null;
-    if (!resolvedIdentity?.bottleId) {
+    const resolvedAssignment = resolution.assignment;
+    const targetBottleId = resolvedAssignment?.bottleId ?? null;
+    if (!targetBottleId) {
       if (resolution.error) {
         summary.errored += 1;
         continue;
@@ -83,14 +83,7 @@ export async function fixBadReviewEntities({
       continue;
     }
 
-    const targetBottleId = resolvedIdentity.bottleId;
-    const targetReleaseId = resolvedIdentity.releaseId;
-    const isSameTarget =
-      targetBottleId === review.bottleId &&
-      targetReleaseId === review.releaseId &&
-      (resolution.assignment?.kind === "target"
-        ? resolution.assignment.target.targetId
-        : null) === review.targetId;
+    const isSameTarget = targetBottleId === review.bottleId;
 
     try {
       const aliasAssignment = await db.transaction(async (tx) => {
@@ -107,19 +100,11 @@ export async function fixBadReviewEntities({
           assignedByActorId: actor.id,
           expectedReview: review,
         };
-        return assignment.kind === "target"
-          ? await assignBottleAliasInTransaction(tx, {
-              ...assignment,
-              ...aliasInput,
-            })
-          : await assignBottleAliasInTransaction(tx, {
-              ...assignment,
-              context: {
-                caller: "fixBadReviewEntities",
-                operation: "assignReviewAlias",
-              },
-              ...aliasInput,
-            });
+        return assignBottleAliasInTransaction(tx, {
+          bottleId: targetBottleId,
+          sourceAliasIdentity: resolution.sourceAliasIdentity,
+          ...aliasInput,
+        });
       });
       await finalizeBottleAliasAssignment(aliasAssignment);
     } catch (error) {

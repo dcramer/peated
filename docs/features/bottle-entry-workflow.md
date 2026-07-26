@@ -9,37 +9,32 @@ save unless it is required for deterministic correctness.
 Every marketed release is one concrete Bottle. Each Bottle durably stores the
 shared expression values and exact fields needed to render, search, and
 understand it without loading its BottleGroup. The group owns the generic
-expression label, shared editing semantics, and aggregate activity; it does not
-supply missing exact Bottle data at read time.
+expression label, shared editing semantics, relationship presentation, and
+member-derived aggregates; it does not supply missing exact Bottle data at read
+time.
 
 Manual entry uses one concrete Bottle form for add and edit. The form combines
 shared expression fields with exact Bottle fields such as edition, ABV, release
 year, vintage year, and cask details. Independent creation atomically creates a
-complete Bottle, its exact CatalogTarget, an automatic singleton BottleGroup,
-and the group's generic CatalogTarget. Ordinary users never create, select, or
-name a BottleGroup.
+complete Bottle and an automatic singleton BottleGroup. Ordinary users never
+create, select, or name a BottleGroup.
 
 “Add another release” pre-fills the selected Bottle's durable fields and submits
 the same independent Bottle creation operation. It also creates a singleton;
 later grouping is automatic and outside manual intervention.
 
 Bottle pages and search results render exact fields from the independently
-complete Bottle. A Bottle page may link quietly to all related releases, while
-generic catalog-target links open `/bottles/:anchorBottleId/releases`. The
-anchor is a real active member used only to locate the release family: exact
-Bottle contexts use that Bottle, while a generic target uses the group's
-representative and fails closed if none exists. The release-family page clearly
-states that the exact release is unspecified, uses group-owned presentation and
-aggregate data, and lists exact member Bottles without presenting its anchor as
-the selected Bottle. Canonical paths and user-facing terminology do not expose
-BottleGroup ids, and there is no public `/bottle-groups` route; the existing
-generic-tasting handoff may still carry its group locator as a query parameter.
+complete Bottle. A Bottle page may link quietly to all related releases using
+that active member as the route anchor. The release-family page uses group-owned
+presentation and aggregate data and lists independently complete member
+Bottles. Canonical paths and user-facing terminology do not expose BottleGroup
+ids, and there is no public `/bottle-groups` route.
 
-Consumer workflows carry one CatalogTarget id. An exact target identifies one
-concrete Bottle. A generic target identifies the BottleGroup when the expression
-is known but the exact release is not. Library, tasting, Flight, review, and
-price flows must preserve that distinction in links, labels, writes, and
-aggregates; a generic target never becomes the group's representative Bottle.
+Consumer workflows carry one Bottle id. Assigned aliases also point directly to
+one Bottle; a general expression alias points to the retained general Bottle,
+not BottleGroup or its representative. Library, tasting, Flight, review, and
+price flows use that same Bottle identity without a CatalogTarget or second
+resolver. Uncertain identity remains unresolved.
 
 ## Creation And Editing
 
@@ -48,9 +43,9 @@ aggregates; a generic target never becomes the group's representative Bottle.
 - “Add another release” uses the selected Bottle and its group's shared label
   only to prefill the same independent form. Submission does not carry source
   Bottle or group authority and starts in a new singleton group.
-- Creation returns the complete Bottle and its exact CatalogTarget. Library,
-  tasting, image, proposal, and return-intent continuations use that returned
-  identity directly rather than reconstructing a Bottle/release pair.
+- Creation returns the complete Bottle. Library, tasting, image, proposal, and
+  return-intent continuations use its Bottle id directly rather than
+  reconstructing a Bottle/release pair.
 - Exact-only moderator edits change only the selected Bottle and its exact
   aliases.
 - Shared moderator edits update the BottleGroup and atomically rematerialize
@@ -73,11 +68,9 @@ resizing should reduce upload latency without replacing server processing.
   field ownership.
 - Exact Bottle search and related-release rows share one Bottle-owned metadata
   renderer; BottleGroup hydration is not required for exact details.
-- Moderator release-family merge and split use standalone, explicit forms
-  anchored by a current member Bottle. Merge names
-  the destination whose shared identity wins and moves generic activity there;
-  split requires the moved subset and representatives while generic activity,
-  stable aliases, and editorial content remain on the source.
+- Automatic grouping changes are audited catalog operations outside the manual
+  entry workflow. They never move Bottle-owned activity or aliases onto a
+  BottleGroup.
 - Bottle and tasting image uploads avoid GCS resumable-session startup for small
   processed images.
 - Browser-side image blobs keep a high-quality intermediate image capped at a

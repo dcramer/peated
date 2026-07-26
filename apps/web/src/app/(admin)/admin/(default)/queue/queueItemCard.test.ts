@@ -1,29 +1,16 @@
-import type { CatalogTargetV1 } from "@peated/server/schemas";
 import { describe, expect, it } from "vitest";
 
 import {
-  canApproveSuggestedTarget,
+  canApproveSuggestedBottle,
   getBottleRepairChanges,
   isRepairProposal,
 } from "./queueItemCard";
 
-type DecisionItem = Parameters<typeof canApproveSuggestedTarget>[0];
+type DecisionItem = Parameters<typeof canApproveSuggestedBottle>[0];
+type DecisionBottle = NonNullable<DecisionItem["suggestedBottle"]>;
 
-function exactTarget(bottleId: number, targetId = bottleId) {
-  return {
-    kind: "bottle",
-    targetId,
-    bottle: { id: bottleId, fullName: `Bottle ${bottleId}` },
-    group: { id: 1, fullName: "Bottle Group" },
-  } as CatalogTargetV1;
-}
-
-function genericTarget(targetId: number) {
-  return {
-    kind: "group",
-    targetId,
-    group: { id: 1, fullName: "Bottle Group" },
-  } as CatalogTargetV1;
+function bottle(id: number): DecisionBottle {
+  return { id };
 }
 
 function decisionItem(overrides: Partial<DecisionItem> = {}): DecisionItem {
@@ -31,53 +18,54 @@ function decisionItem(overrides: Partial<DecisionItem> = {}): DecisionItem {
     status: "pending_review",
     isProcessing: false,
     proposalType: "match_existing",
-    currentTarget: null,
-    suggestedTarget: exactTarget(10),
+    currentBottle: null,
+    suggestedBottle: bottle(10),
     proposedBottle: null,
     proposedRelease: null,
     ...overrides,
   };
 }
 
-describe("queue item target actions", () => {
-  it("allows exact and generic suggested targets to be approved", () => {
-    expect(canApproveSuggestedTarget(decisionItem())).toBe(true);
-    expect(
-      canApproveSuggestedTarget(
-        decisionItem({ suggestedTarget: genericTarget(20) }),
-      ),
-    ).toBe(true);
+describe("queue item Bottle actions", () => {
+  it("allows a direct suggested Bottle to be approved", () => {
+    expect(canApproveSuggestedBottle(decisionItem())).toBe(true);
   });
 
-  it("does not offer approval without a suggested target", () => {
+  it("does not offer approval without a suggested Bottle", () => {
     expect(
-      canApproveSuggestedTarget(decisionItem({ suggestedTarget: null })),
+      canApproveSuggestedBottle(decisionItem({ suggestedBottle: null })),
     ).toBe(false);
   });
 
-  it("recognizes repairs only for exact targets on the same Bottle", () => {
+  it("recognizes repairs only when both assignments are the same Bottle", () => {
     const proposedBottle = {} as NonNullable<DecisionItem["proposedBottle"]>;
 
     const repair = decisionItem({
       proposalType: "correction",
-      currentTarget: exactTarget(10, 100),
-      suggestedTarget: exactTarget(10, 101),
+      currentBottle: bottle(10),
+      suggestedBottle: bottle(10),
       proposedBottle,
     });
     expect(isRepairProposal(repair)).toBe(true);
-    expect(canApproveSuggestedTarget(repair)).toBe(false);
+    expect(canApproveSuggestedBottle(repair)).toBe(false);
 
     expect(
       isRepairProposal({
         ...repair,
-        suggestedTarget: exactTarget(11, 102),
+        suggestedBottle: bottle(11),
       }),
     ).toBe(false);
     expect(
       isRepairProposal({
         ...repair,
-        currentTarget: genericTarget(103),
-        suggestedTarget: genericTarget(104),
+        currentBottle: null,
+        suggestedBottle: null,
+      }),
+    ).toBe(false);
+    expect(
+      isRepairProposal({
+        ...repair,
+        proposedRelease: {} as NonNullable<DecisionItem["proposedRelease"]>,
       }),
     ).toBe(false);
   });
@@ -86,12 +74,12 @@ describe("queue item target actions", () => {
     type CurrentBottle = Parameters<typeof getBottleRepairChanges>[0];
     type ProposedBottle = Parameters<typeof getBottleRepairChanges>[1];
     const currentBottle = {
-      brandId: 1,
+      brand: { id: 1 },
       name: "12 Cask Strength",
-      seriesId: 2,
+      series: { id: 2 },
       category: null,
-      distillerIds: [3],
-      bottlerId: 4,
+      distillers: [{ id: 3 }],
+      bottler: { id: 4 },
       statedAge: null,
       edition: null,
       abv: null,
@@ -131,7 +119,7 @@ describe("queue item target actions", () => {
       "Bottler",
     ]);
     expect(
-      changes.every(({ current }) => current === "Existing catalog value"),
+      changes.every(({ current }) => current === "Existing Bottle value"),
     ).toBe(true);
     expect(JSON.stringify(changes)).not.toContain("#");
 

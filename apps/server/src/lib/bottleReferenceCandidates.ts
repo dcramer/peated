@@ -14,12 +14,10 @@ import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottleSeries,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   entities,
   type StorePrice,
 } from "@peated/server/db/schema";
@@ -27,10 +25,6 @@ import {
   normalizePotentialProofLikeAbvFields,
   normalizePotentialProofToAbv,
 } from "@peated/server/lib/abv";
-import {
-  CatalogTargetResolutionError,
-  loadCatalogTargetByLegacyReference,
-} from "@peated/server/lib/catalogTargets";
 import { logError } from "@peated/server/lib/log";
 import {
   BottleCandidateSchema,
@@ -1068,7 +1062,7 @@ async function getVectorCandidates(
     score: number | null;
   }>(sql`
     SELECT
-      ${catalogTargets.bottleId} AS "bottleId",
+      ${bottleAliases.bottleId} AS "bottleId",
       ${bottleAliases.name} AS alias,
       ${bottles.fullName} AS "fullName",
       ${bottles.fullName} AS "bottleFullName",
@@ -1086,21 +1080,14 @@ async function getVectorCandidates(
       ${bottles.caskFill} AS "caskFill",
       1 - (${bottleAliases.embedding} <=> ${vector}) AS score
     FROM ${bottleAliases}
-    INNER JOIN ${catalogTargets}
-      ON ${catalogTargets.id} = ${bottleAliases.targetId}
     INNER JOIN ${bottles}
-      ON ${bottles.id} = ${catalogTargets.bottleId}
-      AND ${bottles.groupId} = ${catalogTargets.groupId}
+      ON ${bottles.id} = ${bottleAliases.bottleId}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE ${bottleAliases.embedding} IS NOT NULL
       AND ${bottleAliases.ignored} = false
       AND NOT EXISTS(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
-      AND NOT EXISTS(
-        SELECT FROM ${bottleGroupTombstones}
-        WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId}
       )
     ORDER BY ${bottleAliases.embedding} <=> ${vector}
     LIMIT ${VECTOR_CANDIDATE_LIMIT}
@@ -1148,19 +1135,12 @@ async function getTextCandidates(
       ${bottles.caskType} AS "caskType",
       ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${queryText})) AS score
     FROM ${bottles}
-    INNER JOIN ${catalogTargets}
-      ON ${catalogTargets.bottleId} = ${bottles.id}
-      AND ${catalogTargets.groupId} = ${bottles.groupId}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE ${bottles.searchVector} IS NOT NULL
       AND ${bottles.searchVector} @@ websearch_to_tsquery('english', ${queryText})
       AND NOT EXISTS(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
-      AND NOT EXISTS(
-        SELECT FROM ${bottleGroupTombstones}
-        WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId}
       )
     ORDER BY score DESC, ${bottles.fullName} ASC
     LIMIT ${TEXT_CANDIDATE_LIMIT}
@@ -1230,9 +1210,6 @@ async function getBrandCandidates(
       , ${bottles.releaseYear} AS "releaseYear"
       , ${bottles.caskType} AS "caskType"
     FROM ${bottles}
-    INNER JOIN ${catalogTargets}
-      ON ${catalogTargets.bottleId} = ${bottles.id}
-      AND ${catalogTargets.groupId} = ${bottles.groupId}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE (
       LOWER(${entities.name}) = LOWER(${brandName})
@@ -1242,10 +1219,6 @@ async function getBrandCandidates(
       AND NOT EXISTS(
         SELECT FROM ${bottleTombstones}
         WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
-      AND NOT EXISTS(
-        SELECT FROM ${bottleGroupTombstones}
-        WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId}
       )
     ORDER BY ${bottles.fullName} ASC
     LIMIT ${BRAND_CANDIDATE_LIMIT}
@@ -1276,19 +1249,11 @@ async function getOrdinaryBottleCandidateById(
       caskFill: bottles.caskFill,
     })
     .from(bottles)
-    .innerJoin(
-      catalogTargets,
-      and(
-        eq(catalogTargets.bottleId, bottles.id),
-        eq(catalogTargets.groupId, bottles.groupId),
-      ),
-    )
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(
       and(
         eq(bottles.id, bottleId),
         sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-        sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
       ),
     )
     .limit(1);
@@ -1324,33 +1289,9 @@ async function getOrdinaryBottleCandidateById(
 
 export async function getBottleCandidateById(
   bottleId: number,
-  releaseId: number | null = null,
+  _releaseId: number | null = null,
 ): Promise<BottleCandidate | null> {
-  if (releaseId === null) {
-    return await getOrdinaryBottleCandidateById(bottleId);
-  }
-
-  try {
-    const target = await loadCatalogTargetByLegacyReference(
-      { bottleId, releaseId },
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "bottleReferenceCandidates",
-        operation: "resolveHistoricalReleaseCandidate",
-      },
-    );
-    if (target.kind !== "bottle") {
-      return null;
-    }
-
-    return await getOrdinaryBottleCandidateById(target.bottle.id);
-  } catch (error) {
-    if (error instanceof CatalogTargetResolutionError) {
-      return null;
-    }
-    throw error;
-  }
+  return await getOrdinaryBottleCandidateById(bottleId);
 }
 
 async function getExactBottleCandidate(
@@ -1378,21 +1319,13 @@ async function getExactBottleCandidate(
       caskFill: bottles.caskFill,
     })
     .from(bottleAliases)
-    .innerJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
-    .innerJoin(
-      bottles,
-      and(
-        eq(bottles.id, catalogTargets.bottleId),
-        eq(bottles.groupId, catalogTargets.groupId),
-      ),
-    )
+    .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(
       and(
         sql`LOWER(${bottleAliases.name}) = ${normalizedLowerName}`,
         eq(bottleAliases.ignored, false),
         sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-        sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
       ),
     )
     .limit(1);
@@ -1447,21 +1380,13 @@ async function getExactBottleCandidate(
       caskFill: bottles.caskFill,
     })
     .from(bottleAliases)
-    .innerJoin(catalogTargets, eq(catalogTargets.id, bottleAliases.targetId))
-    .innerJoin(
-      bottles,
-      and(
-        eq(bottles.id, catalogTargets.bottleId),
-        eq(bottles.groupId, catalogTargets.groupId),
-      ),
-    )
+    .innerJoin(bottles, eq(bottles.id, bottleAliases.bottleId))
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .where(
       and(
         sql`LOWER(REPLACE(${bottleAliases.name}, ${"'"}, '')) = ${comparableName}`,
         eq(bottleAliases.ignored, false),
         sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-        sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
       ),
     )
     .limit(2);

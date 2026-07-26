@@ -598,7 +598,6 @@ export async function createConcreteBottleInTransaction(
   await reserveExactBottleAliasInTransaction(tx, {
     name: prepared.aliasName,
     bottleId: bottleResult.bottle.id,
-    targetId: exactTarget.id,
     assignmentSource: "canonical",
     assignedByActorId: createdByActorId,
   });

@@ -6,7 +6,6 @@ import {
   bottles,
   bottlesToDistillers,
   bottleTombstones,
-  catalogTargets,
   entities,
   flightBottles,
   flights,
@@ -21,7 +20,17 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  getTableColumns,
+  inArray,
+  isNotNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import { z } from "zod";
 
 const DEFAULT_SORT = "-tastings";
@@ -75,28 +84,20 @@ export default procedure
   )
   // TODO(response-envelope): switch to { data, meta } by changing
   // listResponse() implementation once we migrate envelopes globally.
-  .output(
-    listResponse(
-      BottleSchema.and(z.object({ targetId: z.number().int().positive() })),
-    ),
-  )
+  .output(listResponse(BottleSchema))
   .handler(async function ({ input, context, errors }) {
     const { query, cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
     const exactAliasBottleIds = query
       ? (
           await db
-            .selectDistinct({ bottleId: catalogTargets.bottleId })
+            .selectDistinct({ bottleId: bottleAliases.bottleId })
             .from(bottleAliases)
-            .innerJoin(
-              catalogTargets,
-              eq(catalogTargets.id, bottleAliases.targetId),
-            )
             .where(
               and(
                 eq(sql`LOWER(${bottleAliases.name})`, query.toLowerCase()),
                 sql`${bottleAliases.ignored} IS NOT TRUE`,
-                isNotNull(catalogTargets.bottleId),
+                isNotNull(bottleAliases.bottleId),
               ),
             )
         )
@@ -108,7 +109,7 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [];
     where.push(
       sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
+      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
     );
 
     if (query) {
@@ -158,7 +159,7 @@ export default procedure
     }
     if (rest.tag) {
       where.push(
-        sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.targetId} = ${catalogTargets.id})`,
+        sql`EXISTS(SELECT FROM ${tastings} WHERE ${rest.tag} = ANY(${tastings.tags}) AND ${tastings.bottleId} = ${bottles.id})`,
       );
     }
     if (rest.minRating !== null && rest.minRating !== undefined) {
@@ -187,7 +188,7 @@ export default procedure
         };
       }
       where.push(
-        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.targetId} = ${catalogTargets.id})`,
+        sql`EXISTS(SELECT FROM ${flightBottles} WHERE ${flightBottles.flightId} = ${flight.id} AND ${flightBottles.bottleId} = ${bottles.id})`,
       );
     }
 
@@ -241,15 +242,8 @@ export default procedure
     }
 
     const results = await db
-      .select({ bottles, targetId: catalogTargets.id })
+      .select({ ...getTableColumns(bottles) })
       .from(bottles)
-      .innerJoin(
-        catalogTargets,
-        and(
-          eq(catalogTargets.bottleId, bottles.id),
-          eq(catalogTargets.groupId, bottles.groupId),
-        ),
-      )
       .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(where ? and(...where) : undefined)
       .limit(limit + 1)
@@ -267,18 +261,13 @@ export default procedure
       );
 
     return {
-      results: (
-        await serialize(
-          BottleSerializer,
-          results.slice(0, limit).map((r) => r.bottles),
-          context.user,
-          ["description", "tastingNotes"],
-          { includeGroupSummary: true },
-        )
-      ).map((bottle, index) => ({
-        ...bottle,
-        targetId: results[index]!.targetId,
-      })),
+      results: await serialize(
+        BottleSerializer,
+        results.slice(0, limit),
+        context.user,
+        ["description", "tastingNotes"],
+        { includeGroupSummary: true },
+      ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,
         prevCursor: cursor > 1 ? cursor - 1 : null,

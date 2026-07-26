@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ALLOWED_VOLUMES } from "../constants";
-import { CatalogTargetV1Schema } from "./catalogIdentity";
+import { BottleSchema } from "./bottles";
 import { CurrencyEnum } from "./common";
 import { ExternalSiteSchema } from "./externalSites";
 
@@ -32,8 +32,8 @@ export const StorePriceSchema = z.object({
     .boolean()
     .readonly()
     .describe("Whether this price listing is still valid"),
-  target: CatalogTargetV1Schema.nullable().describe(
-    "Authoritative catalog identity for this listing, when resolved",
+  bottle: BottleSchema.nullable().describe(
+    "Bottle associated with this listing, or null when unresolved",
   ),
 });
 
@@ -68,19 +68,15 @@ export const StorePriceInputSchema = z.object({
 });
 
 export const PriceChangeSchema = z.object({
-  id: z.number().describe("Catalog target identifier for the price change"),
-  price: z.number().describe("New average price for the catalog target"),
-  previousPrice: z
-    .number()
-    .describe("Previous average price for the catalog target"),
-  currency: CurrencyEnum.describe("Currency of the catalog target prices"),
-  target: CatalogTargetV1Schema.describe(
-    "Authoritative exact Bottle or generic BottleGroup whose price changed",
-  ),
+  id: z.number().describe("Bottle identifier for the price change"),
+  price: z.number().describe("New average price for the Bottle"),
+  previousPrice: z.number().describe("Previous average price for the Bottle"),
+  currency: CurrencyEnum.describe("Currency of the Bottle prices"),
+  bottle: BottleSchema.describe("Bottle whose price changed"),
   isLibrary: z
     .boolean()
-    .describe("Whether the current user has this target in their Library"),
+    .describe("Whether the current user has this Bottle in their Library"),
   hasTasted: z
     .boolean()
-    .describe("Whether the current user has tasted this target"),
+    .describe("Whether the current user has tasted this Bottle"),
 });

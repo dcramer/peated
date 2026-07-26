@@ -59,7 +59,7 @@ describe("GET /prices", () => {
     expect(result.results[0].id).toBe(price1.id);
   });
 
-  test("treats targetId as authoritative for unknown filtering", async ({
+  test("treats bottleId as authoritative for unknown filtering", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
@@ -69,17 +69,17 @@ describe("GET /prices", () => {
     });
     if (!exactTarget) throw new Error("Missing exact target fixture");
     const site = await fixtures.ExternalSiteOrExisting();
-    const targetlessWithLegacyPair = await fixtures.StorePrice({
+    await fixtures.StorePrice({
       bottleId: bottle.id,
       targetId: null,
       externalSiteId: site.id,
-      name: "Targetless legacy listing",
+      name: "Direct listing without target evidence",
     });
-    await fixtures.StorePrice({
+    const unresolvedWithTargetEvidence = await fixtures.StorePrice({
       bottleId: null,
       targetId: exactTarget.id,
       externalSiteId: site.id,
-      name: "Target-backed drifted listing",
+      name: "Unresolved listing with target evidence",
     });
 
     const result = await routerClient.prices.list(
@@ -88,12 +88,12 @@ describe("GET /prices", () => {
     );
 
     expect(result.results.map(({ id }) => id)).toEqual([
-      targetlessWithLegacyPair.id,
+      unresolvedWithTargetEvidence.id,
     ]);
-    expect(result.results[0]?.target).toBeNull();
+    expect(result.results[0]?.bottle).toBeNull();
   });
 
-  test("returns exact, generic, null, and authoritative mismatched targets", async ({
+  test("returns direct Bottle identity and ignores retained target evidence", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
@@ -147,19 +147,11 @@ describe("GET /prices", () => {
       result.results.map((price) => [price.id, price]),
     );
 
-    expect(byId[exact.id]?.target).toMatchObject({
-      kind: "bottle",
-      bottle: { id: exactBottle.id },
-    });
-    expect(byId[generic.id]?.target).toMatchObject({
-      kind: "group",
-      group: { id: genericParent.groupId },
-    });
-    expect(byId[targetless.id]?.target).toBeNull();
-    expect(byId[mismatch.id]?.target).toMatchObject({
-      kind: "bottle",
-      bottle: { id: exactBottle.id },
-    });
+    expect(byId[exact.id]?.bottle?.id).toBe(exactBottle.id);
+    expect(byId[generic.id]?.bottle?.id).toBe(genericParent.id);
+    expect(byId[targetless.id]?.bottle).toBeNull();
+    expect(byId[mismatch.id]?.bottle?.id).toBe(mismatchBottle.id);
+    expect(result.results.every((price) => !("target" in price))).toBe(true);
   });
 
   test("fails closed for a retired authoritative target", async ({
@@ -168,7 +160,7 @@ describe("GET /prices", () => {
     const admin = await fixtures.User({ admin: true });
     const retired = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    await fixtures.StorePrice({ bottleId: retired.id });
+    const price = await fixtures.StorePrice({ bottleId: retired.id });
     await db.insert(bottleTombstones).values({
       bottleId: retired.id,
       newBottleId: replacement.id,
@@ -176,7 +168,9 @@ describe("GET /prices", () => {
 
     await expect(
       routerClient.prices.list({}, { context: { user: admin } }),
-    ).rejects.toMatchObject({ code: "CATALOG_TARGET_RETIRED" });
+    ).rejects.toThrow(
+      `Store price ${price.id} references missing Bottle ${retired.id}.`,
+    );
   });
 
   test("filters prices by query", async ({ fixtures }) => {
