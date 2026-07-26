@@ -555,13 +555,12 @@ export const bottleGroupMemberTargets = [
   buildBottleGroupMemberTarget(bottleGroupThirdMember, 50_203),
 ];
 
-/** @type {GenericCatalogTargetV1} */
-export const bottleGroupTarget = {
-  schemaVersion: 1,
-  kind: "group",
-  targetId: 50_200,
-  group: bottleGroup,
-};
+/** @type {(ConcreteFixtureBottle & {group: BottleGroupV1})[]} */
+export const bottleGroupMembers = [
+  bottleGroupRepresentative,
+  bottleGroupMember,
+  bottleGroupThirdMember,
+].map((bottle) => ({ ...bottle, group: bottleGroup }));
 
 export const flightBottleFixtureId = "flight-bottles";
 export const createdFlightBottleFixtureId = "flight-bottles-created";
@@ -586,7 +585,7 @@ export const flightBottleFixture = {
   ],
 };
 
-const destinationBottleGroup = {
+export const destinationBottleGroup = {
   ...buildBottleGroup({
     id: destinationBottleGroupId,
     fullName: "Lagavulin Destination Expression",
@@ -594,13 +593,6 @@ const destinationBottleGroup = {
     bottle: existingBottle,
   }),
   totalBottles: 2,
-};
-
-export const destinationBottleGroupTarget = {
-  schemaVersion: 1,
-  kind: "group",
-  targetId: 50_210,
-  group: destinationBottleGroup,
 };
 
 export const groupedBottleDetails = {

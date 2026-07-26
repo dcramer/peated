@@ -7,7 +7,7 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
 import { Suspense } from "react";
 
-type BottleGroupPresentation = Outputs["bottleGroups"]["details"]["group"];
+type BottleGroupPresentation = Outputs["bottleGroups"]["details"];
 type BottleGroupBottleList = Outputs["bottleGroups"]["bottles"];
 
 export default function ReleaseFamilyView({
@@ -131,8 +131,8 @@ export default function ReleaseFamilyView({
             role="list"
             className="divide-y divide-slate-800 border-y border-slate-800"
           >
-            {bottleList.results.map(({ targetId, bottle }) => (
-              <li key={targetId} className="py-4">
+            {bottleList.results.map((bottle) => (
+              <li key={bottle.id} className="py-4">
                 <div className="flex min-w-0 items-start gap-4">
                   {bottle.imageUrl ? (
                     <img

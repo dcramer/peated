@@ -100,7 +100,8 @@ describe("getBottlePage", () => {
     mocks.details.mockRejectedValue(typedNotFound);
     mocks.pageTarget.mockResolvedValue({ kind: "group", groupId: 33 });
     mocks.bottleGroupDetails.mockResolvedValue({
-      group: { id: 33, representativeBottleId: 44 },
+      id: 33,
+      representativeBottleId: 44,
     });
     mocks.headers.mockResolvedValue(
       new Headers({
@@ -125,7 +126,8 @@ describe("getBottlePage", () => {
     mocks.details.mockRejectedValue(typedNotFound);
     mocks.pageTarget.mockResolvedValue({ kind: "group", groupId: 33 });
     mocks.bottleGroupDetails.mockResolvedValue({
-      group: { id: 33, representativeBottleId: null },
+      id: 33,
+      representativeBottleId: null,
     });
 
     await expect(getBottlePage(11)).rejects.toThrow(

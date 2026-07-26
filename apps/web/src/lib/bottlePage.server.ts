@@ -43,12 +43,12 @@ export const getBottlePage = cache(async (bottleId: number) => {
   );
 
   if (pageTarget.kind === "group") {
-    const target = await resolveOrNotFound(
+    const group = await resolveOrNotFound(
       client.bottleGroups.details({ group: pageTarget.groupId }),
     );
     permanentRedirect(
       await getReleaseFamilyRouteRedirectPath(
-        requireReleaseFamilyAnchor(target.group),
+        requireReleaseFamilyAnchor(group),
       ),
     );
   }

@@ -5,11 +5,10 @@ import type { z } from "zod";
 import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
   type BottleGroupAliasV1,
+  type BottleGroupV1,
   BottleSchema,
   type CatalogTargetV1,
   CursorSchema,
-  type ExactCatalogTargetV1,
-  type GenericCatalogTargetV1,
   type NotificationSchema,
   StorePriceSchema,
   UserSchema,
@@ -274,8 +273,17 @@ describe("OpenAPI generation ($ref reuse)", () => {
       spec.paths?.["/bottle-groups/{group}/aliases"]?.get,
     )?.properties?.results?.items;
 
-    expectGenericTargetResponse(groupDetails);
-    expectExactTargetResponse(relatedBottleItem);
+    expect(Object.keys(groupDetails?.properties ?? {})).toEqual(
+      expect.arrayContaining([
+        "id",
+        "name",
+        "representativeBottleId",
+        "totalBottles",
+      ]),
+    );
+    expect(JSON.stringify(groupDetails)).not.toContain("targetId");
+    expect(JSON.stringify(groupDetails)).not.toContain('"kind"');
+    expectBottleResponse(relatedBottleItem);
     expect(Object.keys(aliasItem?.properties ?? {})).toEqual([
       "name",
       "assignmentSource",
@@ -321,9 +329,9 @@ describe("OpenAPI generation ($ref reuse)", () => {
     };
     expectTypeOf<
       Outputs["bottleGroups"]["details"]
-    >().toEqualTypeOf<GenericCatalogTargetV1>();
+    >().toEqualTypeOf<BottleGroupV1>();
     expectTypeOf<Outputs["bottleGroups"]["bottles"]>().toEqualTypeOf<
-      CursorResult<ExactCatalogTargetV1>
+      CursorResult<z.infer<typeof BottleSchema>>
     >();
     expectTypeOf<Outputs["bottleGroups"]["aliases"]>().toEqualTypeOf<
       CursorResult<BottleGroupAliasV1>

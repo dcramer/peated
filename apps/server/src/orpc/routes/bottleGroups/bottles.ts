@@ -1,17 +1,11 @@
 import {
   BOTTLE_GROUP_BOTTLE_SORT_OPTIONS,
+  BottleGroupNotFoundError,
+  BottleGroupRetiredError,
   listBottleGroupBottles,
 } from "@peated/server/lib/bottleGroupReads";
-import {
-  CatalogTargetNotFoundError,
-  CatalogTargetResolutionError,
-  CatalogTargetRetiredError,
-} from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
-import {
-  ExactCatalogTargetV1Schema,
-  listResponse,
-} from "@peated/server/schemas";
+import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { z } from "zod";
 import { serializeBottleGroupRetiredTargetData } from "./retired-target";
 
@@ -38,26 +32,27 @@ export default procedure
       })
       .strict(),
   )
-  .output(listResponse(ExactCatalogTargetV1Schema))
-  .handler(async ({ input: { group, ...input }, errors }) => {
+  .output(listResponse(BottleSchema))
+  .handler(async ({ input: { group, ...input }, context, errors }) => {
     try {
-      return await listBottleGroupBottles(group, input, {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-      });
+      return await listBottleGroupBottles(
+        group,
+        input,
+        context.user ?? undefined,
+      );
     } catch (error) {
-      if (error instanceof CatalogTargetNotFoundError) {
+      if (error instanceof BottleGroupNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
       }
-      if (error instanceof CatalogTargetRetiredError) {
+      if (error instanceof BottleGroupRetiredError) {
         throw errors.CONFLICT({
           message: error.message,
           cause: error,
-          data: serializeBottleGroupRetiredTargetData(error.replacement),
+          data: serializeBottleGroupRetiredTargetData({
+            kind: "group",
+            groupId: error.newGroupId,
+          }),
         });
-      }
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;
     }

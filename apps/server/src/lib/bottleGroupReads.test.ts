@@ -1,16 +1,8 @@
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottleGroups,
-  bottles,
-  catalogTargets,
-} from "@peated/server/db/schema";
-import {
-  CatalogTargetIntegrityMismatchError,
-  CatalogTargetNotFoundError,
-} from "@peated/server/lib/catalogTargets";
+import { bottleAliases, catalogTargets } from "@peated/server/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 import {
+  BottleGroupNotFoundError,
   listBottleGroupAliases,
   listBottleGroupBottles,
   loadBottleGroup,
@@ -40,62 +32,30 @@ async function getExactTargetId(bottleId: number): Promise<number> {
   return target.id;
 }
 
-async function createBottleInGroup(
-  source: {
-    groupId: number | null;
-    brandId: number;
-    createdByActorId: number;
-  },
-  data: { fullName: string; name: string; releaseYear?: number },
-) {
-  if (source.groupId === null) throw new Error("Missing source group fixture");
-  const groupId = source.groupId;
-  return await db.transaction(async (tx) => {
-    const [bottle] = await tx
-      .insert(bottles)
-      .values({
-        ...data,
-        groupId,
-        brandId: source.brandId,
-        createdByActorId: source.createdByActorId,
-      })
-      .returning();
-    if (!bottle) throw new Error("Unable to create related Bottle fixture");
-
-    const [target] = await tx
-      .insert(catalogTargets)
-      .values({ groupId, bottleId: bottle.id })
-      .returning();
-    if (!target) throw new Error("Unable to create exact target fixture");
-
-    await tx.insert(bottleAliases).values({
-      bottleId: bottle.id,
-      targetId: target.id,
-      name: bottle.fullName,
-      assignmentSource: "canonical",
-      assignedByActorId: source.createdByActorId,
-    });
-    await tx
-      .update(bottleGroups)
-      .set({ totalBottles: 2 })
-      .where(eq(bottleGroups.id, groupId));
-
-    return { bottle, target };
-  });
-}
-
 describe("BottleGroup reads", () => {
-  test("lists independently complete exact Bottle targets and direct generic aliases", async ({
+  test("lists independently complete Bottles and retains transitional generic aliases", async ({
     fixtures,
   }) => {
-    const source = await fixtures.Bottle({ releaseYear: 2020 });
-    const related = await createBottleInGroup(source, {
-      name: "Batch Two",
-      fullName: "Independent Batch Two",
+    const source = await fixtures.Bottle({
+      name: "Independent Batch",
+      releaseYear: 2020,
+    });
+    const related = await fixtures.BottleGroupMember({
+      groupId: source.groupId as number,
+      edition: "Batch Two",
       releaseYear: 2024,
     });
+    const relatedTargetId = await getExactTargetId(related.id);
     const genericTargetId = await getGenericTargetId(source.groupId as number);
     await db.insert(bottleAliases).values([
+      {
+        bottleId: related.id,
+        releaseId: null,
+        targetId: relatedTargetId,
+        name: "Alternate exact member",
+        assignmentSource: "source_approved",
+        assignedByActorId: source.createdByActorId,
+      },
       {
         bottleId: null,
         releaseId: null,
@@ -116,22 +76,20 @@ describe("BottleGroup reads", () => {
       },
     ]);
 
-    const members = await listBottleGroupBottles(
-      source.groupId as number,
-      { query: "Independent Batch", cursor: 1, limit: 25, sort: "name" },
-      readContext,
-    );
+    const members = await listBottleGroupBottles(source.groupId as number, {
+      query: "Alternate exact",
+      cursor: 1,
+      limit: 25,
+      sort: "name",
+    });
     expect(members.results).toHaveLength(1);
     expect(members.results[0]).toMatchObject({
-      kind: "bottle",
-      targetId: related.target.id,
-      bottle: {
-        id: related.bottle.id,
-        fullName: "Independent Batch Two",
-        releaseYear: 2024,
-      },
+      id: related.id,
+      releaseYear: 2024,
       group: { id: source.groupId },
     });
+    expect(members.results[0]).not.toHaveProperty("targetId");
+    expect(members.results[0]).not.toHaveProperty("kind");
 
     const aliases = await listBottleGroupAliases(
       source.groupId as number,
@@ -150,11 +108,11 @@ describe("BottleGroup reads", () => {
     });
   });
 
-  test("distinguishes an absent group from a malformed group without a generic target", async ({
+  test("loads direct group data without requiring a generic target", async ({
     fixtures,
   }) => {
-    await expect(loadBottleGroup(999_999, readContext)).rejects.toBeInstanceOf(
-      CatalogTargetNotFoundError,
+    await expect(loadBottleGroup(999_999)).rejects.toBeInstanceOf(
+      BottleGroupNotFoundError,
     );
 
     const bottle = await fixtures.Bottle();
@@ -168,11 +126,14 @@ describe("BottleGroup reads", () => {
       );
 
     await expect(
-      loadBottleGroup(bottle.groupId as number, readContext),
-    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
+      loadBottleGroup(bottle.groupId as number),
+    ).resolves.toMatchObject({
+      id: bottle.groupId,
+      representativeBottleId: bottle.id,
+    });
   });
 
-  test("fails a related Bottle list when an active member has no exact target", async ({
+  test("lists an active member without requiring an exact target", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -181,11 +142,14 @@ describe("BottleGroup reads", () => {
     await db.delete(catalogTargets).where(eq(catalogTargets.id, targetId));
 
     await expect(
-      listBottleGroupBottles(
-        bottle.groupId as number,
-        { query: "", cursor: 1, limit: 25, sort: "name" },
-        readContext,
-      ),
-    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
+      listBottleGroupBottles(bottle.groupId as number, {
+        query: "",
+        cursor: 1,
+        limit: 25,
+        sort: "name",
+      }),
+    ).resolves.toMatchObject({
+      results: [{ id: bottle.id, group: { id: bottle.groupId } }],
+    });
   });
 });

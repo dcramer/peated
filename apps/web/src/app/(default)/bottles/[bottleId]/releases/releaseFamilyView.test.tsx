@@ -1,5 +1,5 @@
-import type { Outputs } from "@peated/server/orpc/router";
-import type { ExactCatalogTargetV1 } from "@peated/server/schemas";
+import type { BottleGroupV1 } from "@peated/server/schemas";
+import type { Bottle, Entity } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
@@ -56,55 +56,69 @@ const group = {
   createdByActorId: 4,
   createdAt: timestamp,
   updatedAt: timestamp,
-} satisfies Outputs["bottleGroups"]["details"]["group"];
+} satisfies BottleGroupV1;
 
-const exactTarget = {
-  schemaVersion: 1,
-  kind: "bottle",
-  targetId: 101,
+const brand = {
+  id: group.brandId,
+  name: "Lagavulin",
+  shortName: null,
+  type: ["brand", "distiller"],
+  description: null,
+  descriptionSrc: null,
+  yearEstablished: null,
+  website: null,
+  country: null,
+  region: null,
+  address: null,
+  location: null,
+  totalTastings: 12,
+  totalBottles: 2,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies Entity;
+
+const bottle = {
+  id: 42,
+  fullName: "Lagavulin 21 Cask 42",
+  name: "21-year-old",
   group,
-  bottle: {
-    schemaVersion: 1,
-    id: 42,
-    groupId: group.id,
-    fullName: "Lagavulin 21 Cask 42",
-    name: "21-year-old",
-    brandId: group.brandId,
-    bottlerId: null,
-    distillerIds: group.distillerIds,
-    category: "single_malt",
-    seriesId: null,
-    flavorProfile: "peated",
-    edition: "Cask 42",
-    statedAge: 21,
-    abv: 55.1,
-    singleCask: true,
-    caskStrength: true,
-    vintageYear: 2004,
-    releaseYear: 2025,
-    caskSize: "hogshead",
-    caskType: "oloroso",
-    caskFill: "1st_fill",
-    description: "Exact Bottle description.",
-    descriptionSrc: "user",
-    imageUrl: "https://example.com/exact.webp",
-    tastingNotes: null,
-    suggestedTags: [],
-    avgRating: 2,
-    ratingStats: {
-      pass: 0,
-      sip: 0,
-      savor: 1,
-      total: 1,
-      avg: 2,
-      percentage: { pass: 0, sip: 0, savor: 100 },
-    },
-    totalTastings: 1,
-    createdByActorId: 4,
-    createdAt: timestamp,
-    updatedAt: timestamp,
+  series: null,
+  category: "single_malt",
+  flavorProfile: "peated",
+  edition: "Cask 42",
+  statedAge: 21,
+  abv: 55.1,
+  singleCask: true,
+  caskStrength: true,
+  vintageYear: 2004,
+  releaseYear: 2025,
+  caskSize: "hogshead",
+  caskType: "oloroso",
+  caskFill: "1st_fill",
+  brand,
+  distillers: [brand],
+  bottler: null,
+  description: "Exact Bottle description.",
+  descriptionSrc: "user",
+  imageUrl: "https://example.com/exact.webp",
+  tastingNotes: null,
+  suggestedTags: [],
+  avgRating: 2,
+  ratingStats: {
+    pass: 0,
+    sip: 0,
+    savor: 1,
+    total: 1,
+    avg: 2,
+    percentage: { pass: 0, sip: 0, savor: 100 },
   },
-} satisfies ExactCatalogTargetV1;
+  totalTastings: 1,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+  isFavorite: false,
+  isLibrary: false,
+  hasTasted: false,
+} satisfies Bottle;
 
 describe("ReleaseFamilyView", () => {
   it("presents similar bottles without group activity or management actions", () => {
@@ -112,7 +126,7 @@ describe("ReleaseFamilyView", () => {
       <ReleaseFamilyView
         group={group}
         bottleList={{
-          results: [exactTarget],
+          results: [bottle],
           rel: { prevCursor: null, nextCursor: 2 },
         }}
       />,

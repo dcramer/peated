@@ -1,25 +1,31 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroupDistillers,
   bottleGroups,
+  bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
+  type User,
 } from "@peated/server/db/schema";
 import {
   CatalogTargetIntegrityMismatchError,
   CatalogTargetNotFoundError,
-  loadCatalogTargetBatch,
   loadCatalogTargetByGroupId,
 } from "@peated/server/lib/catalogTargets";
 import {
   BottleGroupAliasV1Schema,
+  BottleSchema,
   type BottleGroupAliasV1,
-  type ExactCatalogTargetV1,
+  type BottleGroupV1,
   type GenericCatalogTargetV1,
 } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { CatalogIdentitySerializerContext } from "@peated/server/serializers/catalogIdentity";
+import { BottleGroupSummarySerializer } from "@peated/server/serializers/catalogIdentity";
 import { and, asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import type { z } from "zod";
 
 export const BOTTLE_GROUP_BOTTLE_SORT_OPTIONS = [
   "name",
@@ -57,7 +63,7 @@ type CursorRel = {
 };
 
 export type BottleGroupBottleListResult = {
-  results: ExactCatalogTargetV1[];
+  results: z.infer<typeof BottleSchema>[];
   rel: CursorRel;
 };
 
@@ -106,64 +112,75 @@ function bottleOrderBy(sort: BottleGroupBottleSort): SQL<unknown>[] {
   }
 }
 
-async function hydrateBottleTargets(
-  rows: {
-    bottleId: number;
-    groupId: number | null;
-    targetId: number | null;
-  }[],
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase,
-): Promise<ExactCatalogTargetV1[]> {
-  const targetIds = rows.flatMap(({ targetId }) =>
-    targetId === null ? [] : [targetId],
-  );
-  const targetResults = await loadCatalogTargetBatch(
-    targetIds,
-    context,
-    database,
-  );
-
-  return rows.map(({ bottleId, groupId, targetId }) => {
-    if (groupId === null) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { bottleId },
-        "the related Bottle has no BottleGroup",
-      );
-    }
-    if (targetId === null) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { bottleId },
-        "the related Bottle has no exact target",
-      );
-    }
-    const resolution = targetResults.get(targetId);
-    if (!resolution) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { bottleId },
-        "the related Bottle target could not be hydrated",
-      );
-    }
-    if (!resolution.ok) throw resolution.error;
-    if (
-      resolution.target.kind !== "bottle" ||
-      resolution.target.bottle.id !== bottleId ||
-      resolution.target.group.id !== groupId
-    ) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { bottleId },
-        "the related Bottle row did not resolve to its exact target",
-      );
-    }
-    return resolution.target;
-  });
+export class BottleGroupNotFoundError extends Error {
+  constructor(public readonly groupId: number) {
+    super(`Bottle group not found (groupId=${groupId}).`);
+  }
 }
 
-/** Loads one BottleGroup only through its generic CatalogTarget. */
+export class BottleGroupRetiredError extends Error {
+  constructor(
+    public readonly groupId: number,
+    public readonly newGroupId: number,
+  ) {
+    super(`Bottle group is retired (groupId=${groupId}).`);
+  }
+}
+
+async function loadActiveBottleGroup(groupId: number, database: AnyDatabase) {
+  const [result] = await database
+    .select({
+      group: bottleGroups,
+      newGroupId: bottleGroupTombstones.newGroupId,
+    })
+    .from(bottleGroups)
+    .leftJoin(
+      bottleGroupTombstones,
+      eq(bottleGroupTombstones.groupId, bottleGroups.id),
+    )
+    .where(eq(bottleGroups.id, groupId))
+    .limit(1);
+
+  if (!result) {
+    throw new BottleGroupNotFoundError(groupId);
+  }
+  if (result.newGroupId !== null) {
+    throw new BottleGroupRetiredError(groupId, result.newGroupId);
+  }
+  return result.group;
+}
+
+/** Loads one active BottleGroup as relationship and aggregate context. */
 export async function loadBottleGroup(
   groupId: number,
-  context: CatalogIdentitySerializerContext,
   database: AnyDatabase = db,
+): Promise<BottleGroupV1> {
+  const group = await loadActiveBottleGroup(groupId, database);
+  const distillers = await database
+    .select({ distillerId: bottleGroupDistillers.distillerId })
+    .from(bottleGroupDistillers)
+    .where(eq(bottleGroupDistillers.groupId, groupId));
+
+  return await serialize(
+    BottleGroupSummarySerializer,
+    {
+      ...group,
+      distillerIds: distillers.map(({ distillerId }) => distillerId),
+    },
+    undefined,
+    [],
+    {
+      actor: null,
+      permissions: { canReadCatalogIdentity: true },
+    },
+  );
+}
+
+/** Loads the transitional generic target used only by the legacy alias list. */
+async function loadBottleGroupTarget(
+  groupId: number,
+  context: CatalogIdentitySerializerContext,
+  database: AnyDatabase,
 ): Promise<GenericCatalogTargetV1> {
   let target;
   try {
@@ -192,14 +209,13 @@ export async function loadBottleGroup(
   return target;
 }
 
-/** Lists active member Bottles as exact targets without deriving Bottle identity from the group. */
+/** Lists active, independently complete member Bottles with stable pagination. */
 export async function listBottleGroupBottles(
   groupId: number,
   input: BottleGroupBottleListInput,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
+  currentUser?: User,
 ): Promise<BottleGroupBottleListResult> {
-  await loadBottleGroup(groupId, context, database);
+  const group = await loadBottleGroup(groupId);
 
   const query = input.query.trim();
   const offset = (input.cursor - 1) * input.limit;
@@ -213,35 +229,27 @@ export async function listBottleGroupBottles(
       or(
         ilike(bottles.name, pattern),
         ilike(bottles.fullName, pattern),
-        sql`EXISTS(SELECT FROM ${bottleAliases} WHERE ${bottleAliases.targetId} = ${catalogTargets.id} AND ${bottleAliases.ignored} IS NOT TRUE AND ${bottleAliases.name} ILIKE ${pattern})`,
+        sql`EXISTS(SELECT FROM ${bottleAliases} WHERE ${bottleAliases.bottleId} = ${bottles.id} AND ${bottleAliases.ignored} IS NOT TRUE AND ${bottleAliases.name} ILIKE ${pattern})`,
       )!,
     );
   }
 
-  const rows = await database
-    .select({
-      bottleId: bottles.id,
-      groupId: bottles.groupId,
-      targetId: catalogTargets.id,
-    })
+  const rows = await db
+    .select()
     .from(bottles)
-    .leftJoin(
-      catalogTargets,
-      and(
-        eq(catalogTargets.bottleId, bottles.id),
-        eq(catalogTargets.groupId, bottles.groupId),
-      ),
-    )
     .where(and(...where))
     .orderBy(...bottleOrderBy(input.sort))
     .limit(input.limit + 1)
     .offset(offset);
+  const serialized = await serialize(
+    BottleSerializer,
+    rows.slice(0, input.limit),
+    currentUser,
+  );
 
   return {
-    results: await hydrateBottleTargets(
-      rows.slice(0, input.limit),
-      context,
-      database,
+    results: serialized.map((bottle) =>
+      BottleSchema.parse({ ...bottle, group }),
     ),
     rel: cursorRel(input.cursor, input.limit, rows.length),
   };
@@ -254,7 +262,7 @@ export async function listBottleGroupAliases(
   context: CatalogIdentitySerializerContext,
   database: AnyDatabase = db,
 ): Promise<BottleGroupAliasListResult> {
-  const group = await loadBottleGroup(groupId, context, database);
+  const group = await loadBottleGroupTarget(groupId, context, database);
   const offset = (input.cursor - 1) * input.limit;
   const rows = await database
     .select({

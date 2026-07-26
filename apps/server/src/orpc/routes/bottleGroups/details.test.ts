@@ -9,7 +9,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
 
 describe("GET /bottle-groups/:group", () => {
-  test("returns the generic target and group-owned aggregates", async ({
+  test("returns direct group-owned relationship and aggregate data", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Group Details" });
@@ -23,16 +23,15 @@ describe("GET /bottle-groups/:group", () => {
     });
 
     expect(result).toMatchObject({
-      kind: "group",
-      group: {
-        id: bottle.groupId,
-        name: bottle.name,
-        avgRating: 1.25,
-        totalTastings: 7,
-        totalBottles: 1,
-      },
+      id: bottle.groupId,
+      name: bottle.name,
+      representativeBottleId: bottle.id,
+      avgRating: 1.25,
+      totalTastings: 7,
+      totalBottles: 1,
     });
-    expect("bottle" in result).toBe(false);
+    expect(result).not.toHaveProperty("targetId");
+    expect(result).not.toHaveProperty("kind");
   });
 
   test("returns not found for an unknown group", async () => {
@@ -40,7 +39,7 @@ describe("GET /bottle-groups/:group", () => {
       routerClient.bottleGroups.details({ group: 999_999 }),
     );
 
-    expect(error.message).toBe("Catalog target not found (groupId=999999).");
+    expect(error.message).toBe("Bottle group not found (groupId=999999).");
   });
 
   test("returns conflict for a retired group", async ({ fixtures }) => {
@@ -58,14 +57,14 @@ describe("GET /bottle-groups/:group", () => {
 
     expect(error).toMatchObject({
       status: 409,
-      message: `Catalog target is retired (groupId=${source.groupId}).`,
+      message: `Bottle group is retired (groupId=${source.groupId}).`,
       data: {
         replacement: { kind: "group", groupId: destination.groupId },
       },
     });
   });
 
-  test("returns conflict when an existing group lacks its generic target", async ({
+  test("does not require a generic target to return an existing group", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Malformed Group" });
@@ -78,10 +77,11 @@ describe("GET /bottle-groups/:group", () => {
         ),
       );
 
-    const error = await waitError(
+    await expect(
       routerClient.bottleGroups.details({ group: bottle.groupId as number }),
-    );
-
-    expect(error.message).toContain("integrity mismatch");
+    ).resolves.toMatchObject({
+      id: bottle.groupId,
+      representativeBottleId: bottle.id,
+    });
   });
 });

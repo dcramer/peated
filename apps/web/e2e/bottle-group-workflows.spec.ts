@@ -4,7 +4,7 @@ import { expectNoHorizontalOverflow } from "./assertions";
 import {
   bottleGroup,
   bottleGroupMember,
-  bottleGroupMemberTargets,
+  bottleGroupMembers,
   bottleGroupRepresentative,
   groupedBottleDetails,
   testAccessToken,
@@ -39,7 +39,7 @@ test.describe("Similar bottles", () => {
     await expect(groupStatistic(page, "Similar bottles")).toHaveText("3");
     await expect(groupStatistic(page, "Ratings")).toHaveText("9");
 
-    for (const { bottle } of bottleGroupMemberTargets) {
+    for (const bottle of bottleGroupMembers) {
       await expect(
         page.getByRole("link", { name: bottle.fullName }),
       ).toHaveAttribute("href", `/bottles/${bottle.id}`);
@@ -58,7 +58,7 @@ test.describe("Similar bottles", () => {
 
     await page.goto(`/bottles/${bottleGroupMember.id}/releases`);
     await expect(groupHeading).toBeVisible();
-    for (const { bottle } of bottleGroupMemberTargets) {
+    for (const bottle of bottleGroupMembers) {
       await expect(
         page.getByRole("link", { name: bottle.fullName }),
       ).toHaveAttribute("href", `/bottles/${bottle.id}`);

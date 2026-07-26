@@ -18,37 +18,37 @@ function getCursor(searchParams: SearchParams, key: string): number {
   return Number.isInteger(cursor) && cursor > 0 ? cursor : 1;
 }
 
-const getReleaseFamilyTarget = cache(async (anchorBottleId: number) => {
+const getReleaseFamilyGroup = cache(async (anchorBottleId: number) => {
   const [anchorBottle, { client }] = await Promise.all([
     getBottlePage(anchorBottleId),
     getAnonymousServerClient(),
   ]);
-  const group = requireReleaseFamilyGroup(anchorBottle);
+  const groupSummary = requireReleaseFamilyGroup(anchorBottle);
 
-  const target = await resolveOrNotFound(
-    client.bottleGroups.details({ group: group.id }),
+  const group = await resolveOrNotFound(
+    client.bottleGroups.details({ group: groupSummary.id }),
   );
-  requireReleaseFamilyAnchor(target.group);
+  requireReleaseFamilyAnchor(group);
 
-  return { client, target };
+  return { client, group };
 });
 
 export async function generateMetadata(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = await props.params;
-  const { target } = await getReleaseFamilyTarget(
+  const { group } = await getReleaseFamilyGroup(
     parseReleaseFamilyRouteId(bottleId),
   );
-  const description = summarize(target.group.description || "", 200);
-  const images = target.group.imageUrl ? [target.group.imageUrl] : [];
+  const description = summarize(group.description || "", 200);
+  const images = group.imageUrl ? [group.imageUrl] : [];
 
   return {
-    title: `${target.group.fullName} similar bottles`,
+    title: `${group.fullName} similar bottles`,
     description,
     images,
     openGraph: {
-      title: `${target.group.fullName} similar bottles`,
+      title: `${group.fullName} similar bottles`,
       description,
       images,
     },
@@ -67,12 +67,12 @@ export default async function ReleaseFamilyPage(props: {
     props.params,
     props.searchParams,
   ]);
-  const { client, target } = await getReleaseFamilyTarget(
+  const { client, group } = await getReleaseFamilyGroup(
     parseReleaseFamilyRouteId(bottleId),
   );
   const bottleList = await resolveOrNotFound(
     client.bottleGroups.bottles({
-      group: target.group.id,
+      group: group.id,
       cursor: getCursor(searchParams, "cursor"),
       limit: 25,
       query: "",
@@ -80,5 +80,5 @@ export default async function ReleaseFamilyPage(props: {
     }),
   );
 
-  return <ReleaseFamilyView group={target.group} bottleList={bottleList} />;
+  return <ReleaseFamilyView group={group} bottleList={bottleList} />;
 }

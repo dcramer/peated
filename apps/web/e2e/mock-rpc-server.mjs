@@ -3,10 +3,11 @@ import http from "node:http";
 import {
   addAnotherReleaseSourceBottle,
   anotherReleaseSourceBottle,
+  bottleGroup,
   bottleGroupId,
+  bottleGroupMembers,
   bottleGroupMemberTargets,
   bottleGroupRepresentative,
-  bottleGroupTarget,
   bottleImageBottleId,
   bottleImageUrl,
   buildActivity,
@@ -20,8 +21,8 @@ import {
   createdBottleName,
   createdFlightBottleFixtureId,
   createdTastingId,
+  destinationBottleGroup,
   destinationBottleGroupId,
-  destinationBottleGroupTarget,
   emptyLibraryStats,
   emptyList,
   exactMergeOtherBottle,
@@ -381,18 +382,18 @@ async function handleRpcRequest({ request, response, url }) {
       sendRpcResponse(response, priceSite);
       return true;
     case "bottleGroups/details": {
-      const target = getBottleGroupTarget(input?.group);
-      if (!target) {
+      const group = getBottleGroup(input?.group);
+      if (!group) {
         sendRpcError(response, "Unexpected BottleGroup details payload");
         return true;
       }
-      sendRpcResponse(response, target);
+      sendRpcResponse(response, group);
       return true;
     }
     case "bottleGroups/bottles":
       if (input?.group === bottleGroupId) {
         sendRpcResponse(response, {
-          results: bottleGroupMemberTargets,
+          results: bottleGroupMembers,
           rel: { nextCursor: null, prevCursor: null },
         });
         return true;
@@ -1880,8 +1881,8 @@ function getMockBottle(request, bottleId) {
     }
     return {
       ...existingBottle,
-      groupId: destinationBottleGroupTarget.group.id,
-      group: destinationBottleGroupTarget.group,
+      groupId: destinationBottleGroup.id,
+      group: destinationBottleGroup,
     };
   }
   if (bottleId === exactMergeOtherBottleId) return exactMergeOtherBottle;
@@ -2002,12 +2003,12 @@ function listCollectionBottles(request, input) {
   };
 }
 
-function getBottleGroupTarget(groupId) {
+function getBottleGroup(groupId) {
   switch (groupId) {
     case bottleGroupId:
-      return bottleGroupTarget;
+      return bottleGroup;
     case destinationBottleGroupId:
-      return destinationBottleGroupTarget;
+      return destinationBottleGroup;
     default:
       return null;
   }

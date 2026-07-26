@@ -1,11 +1,10 @@
-import { loadBottleGroup } from "@peated/server/lib/bottleGroupReads";
 import {
-  CatalogTargetNotFoundError,
-  CatalogTargetResolutionError,
-  CatalogTargetRetiredError,
-} from "@peated/server/lib/catalogTargets";
+  BottleGroupNotFoundError,
+  BottleGroupRetiredError,
+  loadBottleGroup,
+} from "@peated/server/lib/bottleGroupReads";
 import { procedure } from "@peated/server/orpc";
-import { GenericCatalogTargetV1Schema } from "@peated/server/schemas";
+import { BottleGroupV1Schema } from "@peated/server/schemas";
 import { z } from "zod";
 import { serializeBottleGroupRetiredTargetData } from "./retired-target";
 
@@ -22,26 +21,23 @@ export default procedure
     }),
   })
   .input(z.object({ group: z.coerce.number().int().positive() }).strict())
-  .output(GenericCatalogTargetV1Schema)
+  .output(BottleGroupV1Schema)
   .handler(async ({ input, errors }) => {
     try {
-      return await loadBottleGroup(input.group, {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-      });
+      return await loadBottleGroup(input.group);
     } catch (error) {
-      if (error instanceof CatalogTargetNotFoundError) {
+      if (error instanceof BottleGroupNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
       }
-      if (error instanceof CatalogTargetRetiredError) {
+      if (error instanceof BottleGroupRetiredError) {
         throw errors.CONFLICT({
           message: error.message,
           cause: error,
-          data: serializeBottleGroupRetiredTargetData(error.replacement),
+          data: serializeBottleGroupRetiredTargetData({
+            kind: "group",
+            groupId: error.newGroupId,
+          }),
         });
-      }
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;
     }
