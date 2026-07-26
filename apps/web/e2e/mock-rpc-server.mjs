@@ -44,8 +44,6 @@ import {
   priceChangeList,
   priceSite,
   retiredParentBottleId,
-  splitBottleGroupId,
-  splitBottleGroupTarget,
   storePriceList,
   suggestedTags,
   tastingNotes,
@@ -399,20 +397,11 @@ async function handleRpcRequest({ request, response, url }) {
         });
         return true;
       }
-      if (
-        input?.group === destinationBottleGroupId ||
-        input?.group === splitBottleGroupId
-      ) {
+      if (input?.group === destinationBottleGroupId) {
         sendRpcResponse(response, emptyList);
         return true;
       }
       sendRpcError(response, "Unexpected BottleGroup member list payload");
-      return true;
-    case "bottleGroups/list":
-      sendRpcResponse(response, {
-        results: [bottleGroupTarget, destinationBottleGroupTarget],
-        rel: { nextCursor: null, prevCursor: null },
-      });
       return true;
     case "flights/details":
       if (
@@ -459,35 +448,6 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     }
-    case "bottleGroups/merge":
-      if (
-        input?.group !== bottleGroupId ||
-        input?.destinationGroupId !== destinationBottleGroupId ||
-        Object.keys(input).length !== 2
-      ) {
-        sendRpcError(response, "Unexpected BottleGroup merge payload");
-        return true;
-      }
-      sendRpcResponse(response, {
-        sourceGroupId: bottleGroupId,
-        destinationGroupId: destinationBottleGroupId,
-        changed: true,
-        movedBottleIds: bottleGroupMemberTargets.map(({ bottle }) => bottle.id),
-      });
-      return true;
-    case "bottleGroups/split":
-      if (!isExpectedBottleGroupSplitInput(input)) {
-        sendRpcError(response, "Unexpected BottleGroup split payload");
-        return true;
-      }
-      sendRpcResponse(response, {
-        sourceGroupId: bottleGroupId,
-        newGroupId: splitBottleGroupId,
-        movedBottleIds: [bottleGroupRepresentative.id],
-        sourceRepresentativeBottleId: bottleGroupMemberTargets[1].bottle.id,
-        newRepresentativeBottleId: bottleGroupRepresentative.id,
-      });
-      return true;
     case "bottles/pageTarget": {
       if (input?.bottle === exactReplacementSourceBottleId) {
         sendRpcResponse(response, {
@@ -2048,24 +2008,9 @@ function getBottleGroupTarget(groupId) {
       return bottleGroupTarget;
     case destinationBottleGroupId:
       return destinationBottleGroupTarget;
-    case splitBottleGroupId:
-      return splitBottleGroupTarget;
     default:
       return null;
   }
-}
-
-function isExpectedBottleGroupSplitInput(input) {
-  return (
-    input?.group === bottleGroupId &&
-    Array.isArray(input.movedBottleIds) &&
-    input.movedBottleIds.length === 1 &&
-    input.movedBottleIds[0] === bottleGroupRepresentative.id &&
-    input.newRepresentativeBottleId === bottleGroupRepresentative.id &&
-    input.sourceRepresentativeBottleId ===
-      bottleGroupMemberTargets[1].bottle.id &&
-    Object.keys(input).length === 4
-  );
 }
 
 async function readRpcInput(request, url) {

@@ -13,7 +13,6 @@ import { and, eq, isNull } from "drizzle-orm";
 import {
   listBottleGroupAliases,
   listBottleGroupBottles,
-  listBottleGroups,
   loadBottleGroup,
 } from "./bottleGroupReads";
 
@@ -86,69 +85,6 @@ async function createBottleInGroup(
 }
 
 describe("BottleGroup reads", () => {
-  test("lists active generic targets with deterministic pagination and stable alias search", async ({
-    fixtures,
-  }) => {
-    const first = await fixtures.Bottle();
-    const second = await fixtures.Bottle();
-    await db
-      .update(bottleGroups)
-      .set({ name: "Alpha expression", fullName: "Alpha expression" })
-      .where(eq(bottleGroups.id, first.groupId as number));
-    await db
-      .update(bottleGroups)
-      .set({ name: "Beta expression", fullName: "Beta expression" })
-      .where(eq(bottleGroups.id, second.groupId as number));
-
-    const genericTargetId = await getGenericTargetId(second.groupId as number);
-    await db.insert(bottleAliases).values([
-      {
-        bottleId: null,
-        releaseId: null,
-        targetId: genericTargetId,
-        name: "Stable group wording",
-        assignmentSource: "human_approved",
-        assignedByActorId: second.createdByActorId,
-      },
-      {
-        bottleId: null,
-        releaseId: null,
-        targetId: genericTargetId,
-        name: "Ignored group wording",
-        ignored: true,
-        assignmentSource: "human_approved",
-        assignedByActorId: second.createdByActorId,
-      },
-    ]);
-
-    const firstPage = await listBottleGroups(
-      { query: "", cursor: 1, limit: 1, sort: "name" },
-      readContext,
-    );
-    expect(firstPage.results).toHaveLength(1);
-    expect(firstPage.results[0]).toMatchObject({
-      kind: "group",
-      group: { id: first.groupId, fullName: "Alpha expression" },
-    });
-    expect(firstPage.results[0]).not.toHaveProperty("bottle");
-    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
-
-    await expect(
-      listBottleGroups(
-        { query: "stable group", cursor: 1, limit: 25, sort: "name" },
-        readContext,
-      ),
-    ).resolves.toMatchObject({
-      results: [{ kind: "group", group: { id: second.groupId } }],
-    });
-    await expect(
-      listBottleGroups(
-        { query: "ignored group", cursor: 1, limit: 25, sort: "name" },
-        readContext,
-      ),
-    ).resolves.toMatchObject({ results: [] });
-  });
-
   test("lists independently complete exact Bottle targets and direct generic aliases", async ({
     fixtures,
   }) => {
@@ -233,27 +169,6 @@ describe("BottleGroup reads", () => {
 
     await expect(
       loadBottleGroup(bottle.groupId as number, readContext),
-    ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
-  });
-
-  test("fails a group list when an active group has no generic target", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    await db
-      .delete(catalogTargets)
-      .where(
-        and(
-          eq(catalogTargets.groupId, bottle.groupId as number),
-          isNull(catalogTargets.bottleId),
-        ),
-      );
-
-    await expect(
-      listBottleGroups(
-        { query: "", cursor: 1, limit: 25, sort: "name" },
-        readContext,
-      ),
     ).rejects.toBeInstanceOf(CatalogTargetIntegrityMismatchError);
   });
 

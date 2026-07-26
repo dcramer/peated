@@ -448,7 +448,6 @@ export function buildGenericCatalogTarget() {
 
 export const bottleGroupId = 50_001;
 export const destinationBottleGroupId = 50_002;
-export const splitBottleGroupId = 50_003;
 
 const bottleGroupRatingStats = {
   pass: 2,
@@ -563,12 +562,6 @@ export const bottleGroupTarget = {
   group: bottleGroup,
 };
 
-export const bottleGroupDirectTasting = buildTasting({
-  id: 9402,
-  bottle: bottleGroupRepresentative,
-  notes: "A direct release-family tasting.",
-});
-
 export const flightBottleFixtureId = "flight-bottles";
 export const createdFlightBottleFixtureId = "flight-bottles-created";
 export const flightBottleFixture = {
@@ -592,7 +585,7 @@ export const flightBottleFixture = {
   ],
 };
 
-export const destinationBottleGroup = {
+const destinationBottleGroup = {
   ...buildBottleGroup({
     id: destinationBottleGroupId,
     fullName: "Lagavulin Destination Expression",
@@ -607,22 +600,6 @@ export const destinationBottleGroupTarget = {
   kind: "group",
   targetId: 50_210,
   group: destinationBottleGroup,
-};
-
-const splitBottleGroup = {
-  ...bottleGroup,
-  id: splitBottleGroupId,
-  fullName: "Lagavulin Split Expression",
-  name: "Split Expression",
-  representativeBottleId: bottleGroupRepresentative.id,
-  totalBottles: 1,
-};
-
-export const splitBottleGroupTarget = {
-  schemaVersion: 1,
-  kind: "group",
-  targetId: 50_220,
-  group: splitBottleGroup,
 };
 
 export const groupedBottleDetails = {

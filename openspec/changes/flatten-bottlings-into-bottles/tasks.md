@@ -53,7 +53,7 @@ and map to an explicit removal task.
       only the singleton group, independently complete Bottle, aliases, and audits.
 - [x] 3.2 Keep ordinary creation and “add another release” independent; callers
       cannot supply a source group as authority.
-- [ ] 3.3 Remove public and moderator group selection, merge, and split
+- [x] 3.3 Remove public and moderator group selection, merge, and split
       workflows; retain only audited system-controlled regrouping.
 - [ ] 3.4 Preserve atomic shared-field fan-out so a group change rematerializes
       complete member Bottles and retains old canonical names as aliases.

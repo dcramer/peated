@@ -203,15 +203,12 @@ describe("OpenAPI generation ($ref reuse)", () => {
     }>();
   });
 
-  it("publishes BottleGroup reads and bounded moderator operations", async () => {
+  it("publishes member-anchored BottleGroup reads and presentation without management operations", async () => {
     const spec = await generateSpec();
     const operations = [
-      ["/bottle-groups", "get", "listBottleGroups"],
       ["/bottle-groups/{group}", "get", "getBottleGroup"],
       ["/bottle-groups/{group}/bottles", "get", "listBottleGroupBottles"],
       ["/bottle-groups/{group}/aliases", "get", "listBottleGroupAliases"],
-      ["/bottle-groups/{group}/merge-targets", "post", "mergeBottleGroup"],
-      ["/bottle-groups/{group}/split", "post", "splitBottleGroup"],
       [
         "/bottle-groups/{group}/presentation",
         "patch",
@@ -237,11 +234,13 @@ describe("OpenAPI generation ($ref reuse)", () => {
             )
           : [],
       ),
-    ).toHaveLength(7);
+    ).toHaveLength(4);
+    expect(spec.paths?.["/bottle-groups"]).toBeUndefined();
+    expect(
+      spec.paths?.["/bottle-groups/{group}/merge-targets"],
+    ).toBeUndefined();
+    expect(spec.paths?.["/bottle-groups/{group}/split"]).toBeUndefined();
 
-    const groupListItem = getJsonResponseSchema(
-      spec.paths?.["/bottle-groups"]?.get,
-    )?.properties?.results?.items;
     const groupDetails = getJsonResponseSchema(
       spec.paths?.["/bottle-groups/{group}"]?.get,
     );
@@ -252,7 +251,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
       spec.paths?.["/bottle-groups/{group}/aliases"]?.get,
     )?.properties?.results?.items;
 
-    expectGenericTargetResponse(groupListItem);
     expectGenericTargetResponse(groupDetails);
     expectExactTargetResponse(relatedBottleItem);
     expect(Object.keys(aliasItem?.properties ?? {})).toEqual([
@@ -266,23 +264,9 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(aliasItem?.properties?.releaseId).toBeUndefined();
     expect(JSON.stringify(aliasItem)).not.toContain("BottleRelease");
 
-    const mergeRequest = getJsonRequestSchema(
-      spec.paths?.["/bottle-groups/{group}/merge-targets"]?.post,
-    );
-    const splitRequest = getJsonRequestSchema(
-      spec.paths?.["/bottle-groups/{group}/split"]?.post,
-    );
     const presentationRequest = getJsonRequestSchema(
       spec.paths?.["/bottle-groups/{group}/presentation"]?.patch,
     );
-    expect(Object.keys(mergeRequest?.properties ?? {})).toEqual([
-      "destinationGroupId",
-    ]);
-    expect(Object.keys(splitRequest?.properties ?? {})).toEqual([
-      "movedBottleIds",
-      "newRepresentativeBottleId",
-      "sourceRepresentativeBottleId",
-    ]);
     expect(Object.keys(presentationRequest?.properties ?? {})).toEqual([
       "representativeBottleId",
       "description",
@@ -312,9 +296,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
       results: T[];
       rel: { nextCursor: number | null; prevCursor: number | null };
     };
-    expectTypeOf<Outputs["bottleGroups"]["list"]>().toEqualTypeOf<
-      CursorResult<GenericCatalogTargetV1>
-    >();
     expectTypeOf<
       Outputs["bottleGroups"]["details"]
     >().toEqualTypeOf<GenericCatalogTargetV1>();
@@ -330,7 +311,13 @@ describe("OpenAPI generation ($ref reuse)", () => {
         : false
     >().toEqualTypeOf<false>();
     expectTypeOf<
-      "groupId" extends keyof Inputs["bottleGroups"]["merge"] ? true : false
+      "list" extends keyof Inputs["bottleGroups"] ? true : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "merge" extends keyof Inputs["bottleGroups"] ? true : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "split" extends keyof Inputs["bottleGroups"] ? true : false
     >().toEqualTypeOf<false>();
   });
 

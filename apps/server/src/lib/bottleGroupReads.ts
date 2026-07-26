@@ -2,7 +2,6 @@ import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   catalogTargets,
@@ -20,32 +19,7 @@ import {
   type GenericCatalogTargetV1,
 } from "@peated/server/schemas";
 import type { CatalogIdentitySerializerContext } from "@peated/server/serializers/catalogIdentity";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  ilike,
-  isNull,
-  or,
-  sql,
-  type SQL,
-} from "drizzle-orm";
-
-export const BOTTLE_GROUP_SORT_OPTIONS = [
-  "name",
-  "-name",
-  "created",
-  "-created",
-  "rating",
-  "-rating",
-  "tastings",
-  "-tastings",
-  "bottles",
-  "-bottles",
-] as const;
-
-export type BottleGroupSort = (typeof BOTTLE_GROUP_SORT_OPTIONS)[number];
+import { and, asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 
 export const BOTTLE_GROUP_BOTTLE_SORT_OPTIONS = [
   "name",
@@ -65,13 +39,6 @@ export const BOTTLE_GROUP_BOTTLE_SORT_OPTIONS = [
 export type BottleGroupBottleSort =
   (typeof BOTTLE_GROUP_BOTTLE_SORT_OPTIONS)[number];
 
-export type BottleGroupListInput = {
-  query: string;
-  cursor: number;
-  limit: number;
-  sort: BottleGroupSort;
-};
-
 export type BottleGroupBottleListInput = {
   query: string;
   cursor: number;
@@ -87,11 +54,6 @@ export type BottleGroupAliasListInput = {
 type CursorRel = {
   nextCursor: number | null;
   prevCursor: number | null;
-};
-
-export type BottleGroupListResult = {
-  results: GenericCatalogTargetV1[];
-  rel: CursorRel;
 };
 
 export type BottleGroupBottleListResult = {
@@ -113,37 +75,6 @@ function cursorRel(
     nextCursor: returnedRows > limit ? cursor + 1 : null,
     prevCursor: cursor > 1 ? cursor - 1 : null,
   };
-}
-
-function groupOrderBy(sort: BottleGroupSort): SQL<unknown>[] {
-  switch (sort) {
-    case "name":
-      return [asc(bottleGroups.fullName), asc(bottleGroups.id)];
-    case "-name":
-      return [desc(bottleGroups.fullName), desc(bottleGroups.id)];
-    case "created":
-      return [asc(bottleGroups.createdAt), asc(bottleGroups.id)];
-    case "-created":
-      return [desc(bottleGroups.createdAt), desc(bottleGroups.id)];
-    case "rating":
-      return [
-        sql`${bottleGroups.avgRating} ASC NULLS LAST`,
-        asc(bottleGroups.id),
-      ];
-    case "-rating":
-      return [
-        sql`${bottleGroups.avgRating} DESC NULLS LAST`,
-        asc(bottleGroups.id),
-      ];
-    case "tastings":
-      return [asc(bottleGroups.totalTastings), asc(bottleGroups.id)];
-    case "-tastings":
-      return [desc(bottleGroups.totalTastings), asc(bottleGroups.id)];
-    case "bottles":
-      return [asc(bottleGroups.totalBottles), asc(bottleGroups.id)];
-    case "-bottles":
-      return [desc(bottleGroups.totalBottles), asc(bottleGroups.id)];
-  }
 }
 
 function bottleOrderBy(sort: BottleGroupBottleSort): SQL<unknown>[] {
@@ -173,48 +104,6 @@ function bottleOrderBy(sort: BottleGroupBottleSort): SQL<unknown>[] {
     case "-releaseYear":
       return [sql`${bottles.releaseYear} DESC NULLS LAST`, asc(bottles.id)];
   }
-}
-
-async function hydrateGroupTargets(
-  rows: { groupId: number; targetId: number | null }[],
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase,
-): Promise<GenericCatalogTargetV1[]> {
-  const targetIds = rows.flatMap(({ targetId }) =>
-    targetId === null ? [] : [targetId],
-  );
-  const targetResults = await loadCatalogTargetBatch(
-    targetIds,
-    context,
-    database,
-  );
-
-  return rows.map(({ groupId, targetId }) => {
-    if (targetId === null) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { groupId },
-        "the BottleGroup has no generic target",
-      );
-    }
-    const resolution = targetResults.get(targetId);
-    if (!resolution) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { groupId },
-        "the BottleGroup generic target could not be hydrated",
-      );
-    }
-    if (!resolution.ok) throw resolution.error;
-    if (
-      resolution.target.kind !== "group" ||
-      resolution.target.group.id !== groupId
-    ) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { groupId },
-        "the BottleGroup list row did not resolve to its generic target",
-      );
-    }
-    return resolution.target;
-  });
 }
 
 async function hydrateBottleTargets(
@@ -268,54 +157,6 @@ async function hydrateBottleTargets(
     }
     return resolution.target;
   });
-}
-
-/** Lists active BottleGroups as their generic CatalogTargets. */
-export async function listBottleGroups(
-  input: BottleGroupListInput,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
-): Promise<BottleGroupListResult> {
-  const query = input.query.trim();
-  const offset = (input.cursor - 1) * input.limit;
-  const where = [
-    isNull(catalogTargets.bottleId),
-    sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottleGroups.id})`,
-  ];
-  if (query) {
-    const pattern = `%${query}%`;
-    where.push(
-      or(
-        ilike(bottleGroups.name, pattern),
-        ilike(bottleGroups.fullName, pattern),
-        sql`EXISTS(SELECT FROM ${bottleAliases} WHERE ${bottleAliases.targetId} = ${catalogTargets.id} AND ${bottleAliases.ignored} IS NOT TRUE AND ${bottleAliases.name} ILIKE ${pattern})`,
-      )!,
-    );
-  }
-
-  const rows = await database
-    .select({ groupId: bottleGroups.id, targetId: catalogTargets.id })
-    .from(bottleGroups)
-    .leftJoin(
-      catalogTargets,
-      and(
-        eq(catalogTargets.groupId, bottleGroups.id),
-        isNull(catalogTargets.bottleId),
-      ),
-    )
-    .where(and(...where))
-    .orderBy(...groupOrderBy(input.sort))
-    .limit(input.limit + 1)
-    .offset(offset);
-
-  return {
-    results: await hydrateGroupTargets(
-      rows.slice(0, input.limit),
-      context,
-      database,
-    ),
-    rel: cursorRel(input.cursor, input.limit, rows.length),
-  };
 }
 
 /** Loads one BottleGroup only through its generic CatalogTarget. */
