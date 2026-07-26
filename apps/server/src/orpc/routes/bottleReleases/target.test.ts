@@ -6,8 +6,8 @@ import {
   bottleTombstones,
   catalogTargets,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { mergeConcreteBottles } from "@peated/server/lib/mergeConcreteBottles";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -16,7 +16,7 @@ import { describe, expect, test } from "vitest";
 async function promoteRelease({
   parent,
   release,
-  user,
+  user: _user,
   edition,
 }: {
   parent: Bottle;
@@ -24,22 +24,22 @@ async function promoteRelease({
   user: User;
   edition: string;
 }) {
-  const promoted = await createConcreteBottle({
-    context: { user },
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: parent.id,
-      exact: { edition },
-    },
+  const bottle = await testFixtures.BottleGroupMember({
+    groupId: parent.groupId as number,
+    edition,
   });
+  const exactTarget = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, bottle.id),
+  });
+  if (!exactTarget) throw new Error("Missing exact target fixture.");
   await db.insert(bottleReleasePromotions).values({
     releaseId: release.id,
-    promotedBottleId: promoted.bottle.id,
+    promotedBottleId: bottle.id,
     status: "promoted",
     completedAt: new Date(),
     createdByActorId: parent.createdByActorId,
   });
-  return promoted;
+  return { bottle, exactTarget };
 }
 
 describe("GET /bottle-releases/{release}/target", () => {

@@ -8,7 +8,6 @@ import {
   catalogTargets,
   changes,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -56,39 +55,34 @@ describe("PATCH /bottle-releases/{release}", () => {
       statedAge: 12,
       abv: 55,
     });
-    const promoted = await createConcreteBottle({
-      context: { user: mod },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: {
-          edition: "Mapped Batch",
-          abv: 55,
-          singleCask: true,
-          caskStrength: true,
-          vintageYear: 2008,
-          releaseYear: 2020,
-          caskType: "bourbon",
-          caskSize: "hogshead",
-          caskFill: "refill",
-          description: "Original promoted description",
-          tastingNotes: {
-            nose: "Old nose",
-            palate: "Old palate",
-            finish: "Old finish",
-          },
-        },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Mapped Batch",
+      abv: 55,
+      singleCask: true,
+      caskStrength: true,
+      vintageYear: 2008,
+      releaseYear: 2020,
+      caskType: "bourbon",
+      caskSize: "hogshead",
+      caskFill: "refill",
+      description: "Original promoted description",
+      tastingNotes: {
+        nose: "Old nose",
+        palate: "Old palate",
+        finish: "Old finish",
       },
     });
-    const sibling = await createConcreteBottle({
-      context: { user: mod },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "Untouched Sibling", abv: 46 },
-      },
+    const sibling = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Untouched Sibling",
+      abv: 46,
     });
-    await promoteRelease(release.id, promoted.bottle.id);
+    const promotedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, promoted.id),
+    });
+    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
+    await promoteRelease(release.id, promoted.id);
 
     const [releaseBefore] = await db
       .select()
@@ -114,7 +108,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     const [siblingBefore] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, sibling.bottle.id));
+      .where(eq(bottles.id, sibling.id));
     vi.clearAllMocks();
 
     const result = await routerClient.bottleReleases.update(
@@ -133,10 +127,10 @@ describe("PATCH /bottle-releases/{release}", () => {
     expect(result).toMatchObject({
       schemaVersion: 1,
       kind: "bottle",
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
       group: { id: parent.groupId },
       bottle: {
-        id: promoted.bottle.id,
+        id: promoted.id,
         groupId: parent.groupId,
         edition: "Mapped Batch Updated",
         statedAge: 12,
@@ -156,9 +150,9 @@ describe("PATCH /bottle-releases/{release}", () => {
     const [updatedBottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, promoted.bottle.id));
+      .where(eq(bottles.id, promoted.id));
     expect(updatedBottle).toMatchObject({
-      id: promoted.bottle.id,
+      id: promoted.id,
       edition: "Mapped Batch Updated",
       statedAge: 12,
       abv: 0,
@@ -179,9 +173,9 @@ describe("PATCH /bottle-releases/{release}", () => {
         .where(eq(bottleAliases.name, result.bottle.fullName)),
     ).toEqual([
       expect.objectContaining({
-        bottleId: promoted.bottle.id,
+        bottleId: promoted.id,
         releaseId: null,
-        targetId: promoted.exactTarget.id,
+        targetId: promotedTarget.id,
         assignmentSource: "canonical",
       }),
     ]);
@@ -192,7 +186,7 @@ describe("PATCH /bottle-releases/{release}", () => {
         .where(
           and(
             eq(changes.objectType, "bottle"),
-            eq(changes.objectId, promoted.bottle.id),
+            eq(changes.objectId, promoted.id),
             eq(changes.type, "update"),
           ),
         ),
@@ -242,11 +236,11 @@ describe("PATCH /bottle-releases/{release}", () => {
       await db.select().from(bottles).where(eq(bottles.id, parent.id)),
     ).toEqual([parentBefore]);
     expect(
-      await db.select().from(bottles).where(eq(bottles.id, sibling.bottle.id)),
+      await db.select().from(bottles).where(eq(bottles.id, sibling.id)),
     ).toEqual([siblingBefore]);
 
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
-      bottleId: promoted.bottle.id,
+      bottleId: promoted.id,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "OnBottleAliasChange",
@@ -260,19 +254,15 @@ describe("PATCH /bottle-releases/{release}", () => {
     const mod = await fixtures.User({ mod: true });
     const parent = await fixtures.Bottle({ name: "Image Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await createConcreteBottle({
-      context: { user: mod },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "Image Mapped" },
-      },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Image Mapped",
     });
-    await promoteRelease(release.id, promoted.bottle.id);
+    await promoteRelease(release.id, promoted.id);
     await db
       .update(bottles)
       .set({ imageUrl: "https://example.com/original.jpg" })
-      .where(eq(bottles.id, promoted.bottle.id));
+      .where(eq(bottles.id, promoted.id));
     vi.clearAllMocks();
 
     const unsupported = await waitError(
@@ -289,7 +279,7 @@ describe("PATCH /bottle-releases/{release}", () => {
       await db
         .select({ imageUrl: bottles.imageUrl })
         .from(bottles)
-        .where(eq(bottles.id, promoted.bottle.id)),
+        .where(eq(bottles.id, promoted.id)),
     ).toEqual([{ imageUrl: "https://example.com/original.jpg" }]);
 
     const omitted = await routerClient.bottleReleases.update(
@@ -307,7 +297,7 @@ describe("PATCH /bottle-releases/{release}", () => {
       await db
         .select({ imageUrl: bottles.imageUrl })
         .from(bottles)
-        .where(eq(bottles.id, promoted.bottle.id)),
+        .where(eq(bottles.id, promoted.id)),
     ).toEqual([{ imageUrl: null }]);
     expect(
       await db
@@ -392,23 +382,15 @@ describe("PATCH /bottle-releases/{release}", () => {
     const mod = await fixtures.User({ mod: true });
     const parent = await fixtures.Bottle({ name: "Collision Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await createConcreteBottle({
-      context: { user: mod },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "First Identity" },
-      },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "First Identity",
     });
-    const conflicting = await createConcreteBottle({
-      context: { user: mod },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "Second Identity" },
-      },
+    const conflicting = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Second Identity",
     });
-    await promoteRelease(release.id, promoted.bottle.id);
+    await promoteRelease(release.id, promoted.id);
 
     const bottlesBefore = await db
       .select()
@@ -448,7 +430,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     );
     expect(conflict).toMatchObject({
       status: 409,
-      data: { bottle: conflicting.bottle.id },
+      data: { bottle: conflicting.id },
     });
 
     expect(await db.select().from(bottles).orderBy(asc(bottles.id))).toEqual(

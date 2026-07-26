@@ -49,7 +49,7 @@ and map to an explicit removal task.
 
 ## 3. Bottle And Group Domain
 
-- [ ] 3.1 Simplify canonical independent Bottle creation to atomically create
+- [x] 3.1 Simplify canonical independent Bottle creation to atomically create
       only the singleton group, independently complete Bottle, aliases, and audits.
 - [x] 3.2 Keep ordinary creation and “add another release” independent; callers
       cannot supply a source group as authority.

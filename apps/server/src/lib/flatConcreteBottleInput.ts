@@ -43,9 +43,8 @@ export function buildIndependentConcreteBottleRouteInput(
 /** Maps the public flat create contract to canonical independent creation. */
 export function buildIndependentConcreteBottleCreateInput(
   input: ReturnType<typeof buildIndependentConcreteBottleRouteInput>,
-): Extract<ConcreteBottleCreateInput, { kind: "independent" }> {
+): ConcreteBottleCreateInput {
   return {
-    kind: "independent",
     stable: {
       name: input.name,
       statedAge: input.statedAge,

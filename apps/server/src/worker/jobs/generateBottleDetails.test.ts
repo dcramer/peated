@@ -12,6 +12,7 @@ import {
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { getStructuredResponse } from "@peated/server/lib/openai";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import {
   ConcreteBottleUpdateExpectedBottleStateError,
   updateConcreteBottle,
@@ -69,7 +70,6 @@ async function createTwoMemberGroup(user: User, brandId: number) {
   const source = await createConcreteBottle({
     context: contextFor(user),
     input: {
-      kind: "independent",
       stable: {
         name: "Generated Details",
         brand: brandId,
@@ -80,22 +80,26 @@ async function createTwoMemberGroup(user: User, brandId: number) {
       },
     },
   });
-  const sibling = await createConcreteBottle({
-    context: contextFor(user),
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: source.bottle.id,
-      exact: {
-        edition: "Batch 2",
-        description: "Sibling description",
-        tastingNotes: {
-          nose: "Sibling nose",
-          palate: "Sibling palate",
-          finish: "Sibling finish",
-        },
-      },
+  const siblingBottle = await testFixtures.BottleGroupMember({
+    groupId: source.group.id,
+    edition: "Batch 2",
+    description: "Sibling description",
+    tastingNotes: {
+      nose: "Sibling nose",
+      palate: "Sibling palate",
+      finish: "Sibling finish",
     },
   });
+  const siblingExactTarget = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, siblingBottle.id),
+  });
+  if (!siblingExactTarget) {
+    throw new Error("Missing sibling exact target fixture.");
+  }
+  const sibling = {
+    bottle: siblingBottle,
+    exactTarget: siblingExactTarget,
+  };
   await db
     .update(bottles)
     .set({ suggestedTags: ["sibling-tag"] })
@@ -428,7 +432,6 @@ test("does not fan out after the selected Bottle moves groups", async ({
   const destination = await createConcreteBottle({
     context: contextFor(defaults.user),
     input: {
-      kind: "independent",
       stable: {
         name: "Generated Membership Destination",
         brand: brand.id,

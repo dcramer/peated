@@ -7,8 +7,6 @@ import {
   bottlesToDistillers,
   changes,
 } from "@peated/server/db/schema";
-import type { getUserActor } from "@peated/server/lib/actors";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -18,10 +16,6 @@ const pushUniqueJobMock = vi.hoisted(() => vi.fn());
 vi.mock("@peated/server/worker/client", () => ({
   pushUniqueJob: pushUniqueJobMock,
 }));
-
-function contextFor(user: Parameters<typeof getUserActor>[0]) {
-  return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
-}
 
 describe("repairBottleBrandDistilleryAssignments", () => {
   beforeEach(() => {
@@ -81,7 +75,6 @@ describe("repairBottleBrandDistilleryAssignments", () => {
   });
 
   test("previews exact batch identity from BottleGroup authority despite member drift", async ({
-    defaults,
     fixtures,
   }) => {
     const fromBrand = await fixtures.Entity({
@@ -99,19 +92,15 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       name: "Annual",
       seriesId: sourceSeries.id,
     });
-    const second = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: first.id,
-        exact: { edition: "Batch 2" },
-      },
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch 2",
     });
     await db
       .update(bottles)
       .set({ name: "Drifted Member", fullName: "Source Brand Drifted Member" })
-      .where(eq(bottles.id, second.bottle.id));
-    const memberIds = [first.id, second.bottle.id];
+      .where(eq(bottles.id, second.id));
+    const memberIds = [first.id, second.id];
     const [
       membersBefore,
       groupBefore,
@@ -138,7 +127,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     pushUniqueJobMock.mockReset();
 
     const result = await repairBottleBrandDistilleryAssignments({
-      bottleIds: [second.bottle.id],
+      bottleIds: [second.id],
       dryRun: true,
       fromBrand,
       toBrand,
@@ -146,7 +135,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
 
     expect(result.items).toEqual([
       expect.objectContaining({
-        bottleId: second.bottle.id,
+        bottleId: second.id,
         bottleFullName: "Target Brand Annual - Batch 2",
         groupId: first.groupId,
         status: "planned",
@@ -184,7 +173,6 @@ describe("repairBottleBrandDistilleryAssignments", () => {
   });
 
   test("fans shared brand, distillery, name, and series changes to every concrete Bottle", async ({
-    defaults,
     fixtures,
   }) => {
     const systemUser = await fixtures.User({ admin: true });
@@ -202,13 +190,9 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       name: "Annual",
       seriesId: sourceSeries.id,
     });
-    const second = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: first.id,
-        exact: { edition: "Batch 2" },
-      },
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch 2",
     });
 
     const result = await repairBottleBrandDistilleryAssignments({
@@ -255,8 +239,8 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       await db
         .select()
         .from(bottlesToDistillers)
-        .where(eq(bottlesToDistillers.bottleId, second.bottle.id)),
-    ).toEqual([{ bottleId: second.bottle.id, distillerId: fromBrand.id }]);
+        .where(eq(bottlesToDistillers.bottleId, second.id)),
+    ).toEqual([{ bottleId: second.id, distillerId: fromBrand.id }]);
 
     const updateChanges = await db
       .select()
@@ -279,7 +263,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       bottleId: first.id,
     });
     expect(pushUniqueJobMock).toHaveBeenCalledWith("OnBottleChange", {
-      bottleId: second.bottle.id,
+      bottleId: second.id,
     });
   });
 

@@ -125,6 +125,8 @@ describe("OpenAPI generation ($ref reuse)", () => {
 
     expect(spec.paths?.["/bottles/from/{bottle}"]).toBeUndefined();
     expect(getOperationIds(spec)).not.toContain("createBottleFromSource");
+    expect(spec.paths?.["/bottle-releases"]?.post).toBeUndefined();
+    expect(getOperationIds(spec)).not.toContain("createBottleRelease");
 
     expect(spec.paths?.["/bottles"]?.post?.operationId).toBe("createBottle");
     expect(spec.paths?.["/bottles/{bottle}"]?.patch?.operationId).toBe(
@@ -165,6 +167,9 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<ExactCatalogTargetV1>();
     expectTypeOf<
       "createFromSource" extends keyof Outputs["bottles"] ? true : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "create" extends keyof Outputs["bottleReleases"] ? true : false
     >().toEqualTypeOf<false>();
   });
 

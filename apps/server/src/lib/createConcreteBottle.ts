@@ -1,7 +1,6 @@
 /**
  * Owns parsed input, transaction, and post-commit dispatch for concrete Bottle
- * creation. Independent creates are singletons; reuse requires a trusted source
- * Bottle.
+ * creation. Every successful create starts in a fresh singleton group.
  */
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db } from "@peated/server/db";
@@ -21,19 +20,12 @@ import type { Context } from "@peated/server/orpc/context";
 export { ConcreteBottleCreateInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 export type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottleSchemas";
 
-export {
-  createConcreteBottleInTransaction,
-  TrustedSourceBottleError,
-} from "@peated/server/lib/createBottle";
-export type {
-  ConcreteBottleCreateResult,
-  LikelyBottleGroupSuggestion,
-  TrustedSourceBottleErrorCode,
-} from "@peated/server/lib/createBottle";
+export { createConcreteBottleInTransaction } from "@peated/server/lib/createBottle";
+export type { ConcreteBottleCreateResult } from "@peated/server/lib/createBottle";
 
 export type CreateConcreteBottleResult = Pick<
   ConcreteBottleCreateResult,
-  "bottle" | "group" | "genericTarget" | "exactTarget" | "likelyGroups"
+  "bottle" | "group" | "genericTarget" | "exactTarget"
 >;
 
 /** Parses untrusted input once and owns transaction plus post-commit dispatch. */
@@ -63,6 +55,5 @@ export async function createConcreteBottle({
     group: result.group,
     genericTarget: result.genericTarget,
     exactTarget: result.exactTarget,
-    likelyGroups: result.likelyGroups,
   };
 }

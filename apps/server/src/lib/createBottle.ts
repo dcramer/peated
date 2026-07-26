@@ -24,11 +24,9 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottlesToDistillers,
-  bottleTombstones,
   catalogTargets,
   changes,
 } from "@peated/server/db/schema";
@@ -36,7 +34,6 @@ import { reserveExactBottleAliasInTransaction } from "@peated/server/lib/bottleA
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   lockCatalogTargetAssignmentDescriptorInTransaction,
-  lockCatalogTargetAssignmentDescriptorsInTransaction,
   resolveCatalogTargetForAssignment,
   type CatalogTargetAssignmentDescriptor,
 } from "@peated/server/lib/catalogTargets";
@@ -57,7 +54,7 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, isNull, or, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
   findConflictingSmwsBottleId,
@@ -111,44 +108,17 @@ type ConcreteIdentityPreparation = {
     ConcreteBottleCreateInput["exact"],
     "statedAge" | "vintageYear" | "releaseYear" | "singleCask" | "caskStrength"
   >;
-  stableBase:
-    | { kind: "independent"; name: string }
-    | { kind: "trusted"; fullName: string; name: string };
+  stableName: string;
   stableStatedAge: number | null;
 };
 
-type IndependentConcreteBottleCreateInput = Extract<
-  ConcreteBottleCreateInput,
-  { kind: "independent" }
->;
-type StableBottleGroupInput = IndependentConcreteBottleCreateInput["stable"];
-
-export type LikelyBottleGroupSuggestion = Pick<
-  BottleGroup,
-  "id" | "name" | "fullName"
->;
+type StableBottleGroupInput = ConcreteBottleCreateInput["stable"];
 
 export type ConcreteBottleCreateResult = CreateBottleResult & {
   group: BottleGroup;
   genericTarget: CatalogTarget;
   exactTarget: CatalogTarget;
-  likelyGroups: LikelyBottleGroupSuggestion[];
 };
-
-export type TrustedSourceBottleErrorCode =
-  | "not_found"
-  | "retired"
-  | "invalid_catalog_graph";
-
-export class TrustedSourceBottleError extends Error {
-  constructor(
-    readonly code: TrustedSourceBottleErrorCode,
-    readonly sourceBottleId: number,
-  ) {
-    super(`Cannot reuse Bottle ${sourceBottleId}: ${code}.`);
-    this.name = "TrustedSourceBottleError";
-  }
-}
 
 async function getExistingBottleForAlias(
   tx: AnyTransaction,
@@ -204,13 +174,10 @@ async function prepareBottleCreateInTransaction(
       (input.description && input.description !== null ? "user" : null);
   }
 
-  const stableName =
-    concreteIdentity?.stableBase.kind === "trusted"
-      ? concreteIdentity.stableBase.name
-      : stripDuplicateBrandPrefixFromBottleName(
-          concreteIdentity?.stableBase.name ?? bottleData.name,
-          bottleData.brand.name,
-        );
+  const stableName = stripDuplicateBrandPrefixFromBottleName(
+    concreteIdentity?.stableName ?? bottleData.name,
+    bottleData.brand.name,
+  );
 
   if (!stableName) {
     throw new BottleCreateBadRequestError("Invalid bottle name.");
@@ -319,13 +286,9 @@ async function prepareBottleCreateInTransaction(
     }
   }
 
-  const stableFullName =
-    (concreteIdentity?.stableBase.kind === "trusted"
-      ? concreteIdentity.stableBase.fullName
-      : null) ??
-    formatBottleName({
-      name: `${brand.shortName || brand.name} ${stableName}`,
-    });
+  const stableFullName = formatBottleName({
+    name: `${brand.shortName || brand.name} ${stableName}`,
+  });
   const concreteName = concreteIdentity
     ? materializeConcreteBottleIdentity({
         stable: {
@@ -491,129 +454,6 @@ async function insertPreparedBottleInTransaction(
   };
 }
 
-type TrustedGroupContext = {
-  group: BottleGroup;
-  genericTarget: CatalogTarget;
-  distillerIds: number[];
-};
-
-/** Locks the trusted graph in Group -> Bottle -> CatalogTarget order. */
-async function loadTrustedGroupContext(
-  tx: AnyTransaction,
-  sourceBottleId: number,
-): Promise<TrustedGroupContext> {
-  const [discoveredSource] = await tx
-    .select({ groupId: bottles.groupId })
-    .from(bottles)
-    .where(eq(bottles.id, sourceBottleId))
-    .limit(1);
-
-  if (!discoveredSource) {
-    throw new TrustedSourceBottleError("not_found", sourceBottleId);
-  }
-  if (!discoveredSource.groupId) {
-    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
-  }
-
-  const [group] = await tx
-    .select()
-    .from(bottleGroups)
-    .where(eq(bottleGroups.id, discoveredSource.groupId))
-    .for("update");
-  if (!group) {
-    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
-  }
-
-  const [sourceBottle] = await tx
-    .select()
-    .from(bottles)
-    .where(eq(bottles.id, sourceBottleId))
-    .for("update");
-  if (!sourceBottle) {
-    throw new TrustedSourceBottleError("not_found", sourceBottleId);
-  }
-
-  const retiredBottle = await tx.query.bottleTombstones.findFirst({
-    where: eq(bottleTombstones.bottleId, sourceBottleId),
-    columns: { bottleId: true },
-  });
-  if (retiredBottle) {
-    throw new TrustedSourceBottleError("retired", sourceBottleId);
-  }
-  if (sourceBottle.groupId !== group.id) {
-    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
-  }
-
-  const retiredGroup = await tx.query.bottleGroupTombstones.findFirst({
-    where: eq(bottleGroupTombstones.groupId, group.id),
-    columns: { groupId: true },
-  });
-  if (retiredGroup) {
-    throw new TrustedSourceBottleError("retired", sourceBottleId);
-  }
-
-  const targets = await tx
-    .select()
-    .from(catalogTargets)
-    .where(
-      and(
-        eq(catalogTargets.groupId, group.id),
-        or(
-          isNull(catalogTargets.bottleId),
-          eq(catalogTargets.bottleId, sourceBottleId),
-        ),
-      ),
-    )
-    .orderBy(asc(catalogTargets.id))
-    .for("update");
-  const genericTarget = targets.find((target) => target.bottleId === null);
-  const sourceExactTarget = targets.find(
-    (target) => target.bottleId === sourceBottleId,
-  );
-
-  if (!genericTarget || !sourceExactTarget) {
-    throw new TrustedSourceBottleError("invalid_catalog_graph", sourceBottleId);
-  }
-
-  const distillers = await tx
-    .select({ distillerId: bottleGroupDistillers.distillerId })
-    .from(bottleGroupDistillers)
-    .where(eq(bottleGroupDistillers.groupId, group.id))
-    .orderBy(asc(bottleGroupDistillers.distillerId));
-
-  return {
-    group,
-    genericTarget,
-    distillerIds: distillers.map(({ distillerId }) => distillerId),
-  };
-}
-
-async function findLikelyGroups(
-  tx: AnyTransaction,
-  { brandId, name }: { brandId: number; name: string },
-): Promise<LikelyBottleGroupSuggestion[]> {
-  return await tx
-    .select({
-      id: bottleGroups.id,
-      name: bottleGroups.name,
-      fullName: bottleGroups.fullName,
-    })
-    .from(bottleGroups)
-    .leftJoin(
-      bottleGroupTombstones,
-      eq(bottleGroupTombstones.groupId, bottleGroups.id),
-    )
-    .where(
-      and(
-        eq(bottleGroups.brandId, brandId),
-        eq(sql`LOWER(${bottleGroups.name})`, name.toLowerCase()),
-        isNull(bottleGroupTombstones.groupId),
-      ),
-    )
-    .orderBy(asc(bottleGroups.id))
-    .limit(5);
-}
-
 function buildConcreteBottleInput(
   stable: StableBottleGroupInput,
   exact: ConcreteBottleCreateInput["exact"],
@@ -630,22 +470,6 @@ function buildConcreteBottleInput(
     ...exact,
   };
   return input;
-}
-
-function buildTrustedStableInput(
-  group: BottleGroup,
-  distillerIds: number[],
-): StableBottleGroupInput {
-  return {
-    name: group.name,
-    statedAge: group.statedAge,
-    series: group.seriesId,
-    category: group.category,
-    brand: group.brandId,
-    distillers: distillerIds,
-    bottler: group.bottlerId,
-    flavorProfile: group.flavorProfile,
-  };
 }
 
 /** Creates the group-owned rows inside the complete independent operation. */
@@ -708,10 +532,7 @@ async function createIndependentGroupPrefix(
   return { group, genericTarget };
 }
 
-/**
- * Owns the complete concrete Bottle graph transaction. Independent creation
- * always makes a singleton; trusted reuse derives authority from a source Bottle.
- */
+/** Owns the complete singleton Bottle graph transaction. */
 export async function createConcreteBottleInTransaction(
   tx: AnyTransaction,
   {
@@ -726,27 +547,15 @@ export async function createConcreteBottleInTransaction(
     context: Context & { user: User };
   },
 ): Promise<ConcreteBottleCreateResult> {
-  const trustedContext =
-    input.kind === "source_bottle"
-      ? await loadTrustedGroupContext(tx, input.sourceBottleId)
-      : null;
-  const stableInput =
-    input.kind === "source_bottle"
-      ? buildTrustedStableInput(
-          trustedContext!.group,
-          trustedContext!.distillerIds,
-        )
-      : input.stable;
   // Exact age is name-normalization context only; it cannot become group-owned state.
-  const normalizedStable = trustedContext
-    ? null
-    : normalizeBottleAge({
-        name: normalizeBottleAliasKey(stableInput.name),
-        statedAge: stableInput.statedAge ?? input.exact.statedAge,
-      });
-  const stable = normalizedStable
-    ? { ...stableInput, name: normalizedStable.name }
-    : stableInput;
+  const normalizedStable = normalizeBottleAge({
+    name: normalizeBottleAliasKey(input.stable.name),
+    statedAge: input.stable.statedAge ?? input.exact.statedAge,
+  });
+  const stable = {
+    ...input.stable,
+    name: normalizedStable.name,
+  };
   const prepared = await prepareBottleCreateInTransaction(tx, {
     creationSource,
     concreteIdentity: {
@@ -757,13 +566,7 @@ export async function createConcreteBottleInTransaction(
         singleCask: input.exact.singleCask,
         caskStrength: input.exact.caskStrength,
       },
-      stableBase: trustedContext
-        ? {
-            kind: "trusted",
-            fullName: trustedContext.group.fullName,
-            name: trustedContext.group.name,
-          }
-        : { kind: "independent", name: stable.name },
+      stableName: stable.name,
       stableStatedAge: stable.statedAge,
     },
     createdByActorId,
@@ -771,30 +574,18 @@ export async function createConcreteBottleInTransaction(
     context,
   });
 
-  const likelyGroups = trustedContext
-    ? []
-    : await findLikelyGroups(tx, {
-        brandId: prepared.bottleInsertData.brandId,
-        name: prepared.stableName,
-      });
-
-  const independentGraph = trustedContext
-    ? null
-    : await createIndependentGroupPrefix(tx, {
-        actorId: createdByActorId,
-        stable,
-        stableFullName: prepared.stableFullName,
-        stableName: prepared.stableName,
-        brandId: prepared.bottleInsertData.brandId,
-        bottlerId: prepared.bottleInsertData.bottlerId ?? null,
-        seriesId: prepared.bottleInsertData.seriesId ?? null,
-        category: prepared.bottleInsertData.category,
-        flavorProfile: prepared.bottleInsertData.flavorProfile,
-        distillerIds: prepared.distillerIds,
-      });
-  const group = trustedContext?.group ?? independentGraph!.group;
-  const genericTarget =
-    trustedContext?.genericTarget ?? independentGraph!.genericTarget;
+  const { group, genericTarget } = await createIndependentGroupPrefix(tx, {
+    actorId: createdByActorId,
+    stable,
+    stableFullName: prepared.stableFullName,
+    stableName: prepared.stableName,
+    brandId: prepared.bottleInsertData.brandId,
+    bottlerId: prepared.bottleInsertData.bottlerId ?? null,
+    seriesId: prepared.bottleInsertData.seriesId ?? null,
+    category: prepared.bottleInsertData.category,
+    flavorProfile: prepared.bottleInsertData.flavorProfile,
+    distillerIds: prepared.distillerIds,
+  });
 
   const bottleResult = await insertPreparedBottleInTransaction(tx, prepared, {
     groupId: group.id,
@@ -812,30 +603,17 @@ export async function createConcreteBottleInTransaction(
     assignedByActorId: createdByActorId,
   });
 
-  let persistedGroup: BottleGroup;
-  if (trustedContext) {
-    [persistedGroup] = await tx
-      .update(bottleGroups)
-      .set({
-        totalBottles: sql`${bottleGroups.totalBottles} + 1`,
-        updatedAt: new Date(),
-      })
-      .where(eq(bottleGroups.id, group.id))
-      .returning();
-  } else {
-    [persistedGroup] = await tx
-      .update(bottleGroups)
-      .set({ representativeBottleId: bottleResult.bottle.id })
-      .where(eq(bottleGroups.id, group.id))
-      .returning();
-  }
+  const [persistedGroup] = await tx
+    .update(bottleGroups)
+    .set({ representativeBottleId: bottleResult.bottle.id })
+    .where(eq(bottleGroups.id, group.id))
+    .returning();
 
   return {
     ...bottleResult,
     group: persistedGroup,
     genericTarget,
     exactTarget,
-    likelyGroups,
   };
 }
 
@@ -874,8 +652,7 @@ function isSafeConcreteBottleReuse(
 /**
  * Owns the savepoint-backed concrete create-or-safe-reuse decision. Reuse is
  * limited to an exact canonical-name collision or the structurally verified
- * SMWS code that caused creation to conflict. Source-Bottle input additionally
- * constrains reuse to the source's still-active group.
+ * SMWS code that caused creation to conflict.
  */
 export async function createOrReuseConcreteBottleInTransaction(
   tx: AnyTransaction,
@@ -918,23 +695,11 @@ export async function createOrReuseConcreteBottleInTransaction(
     );
     if (existingTarget.bottleId === null) throw error;
 
-    if (input.kind === "source_bottle") {
-      const sourceTarget = await resolveCatalogTargetForAssignment(
-        { kind: "bottle", bottleId: input.sourceBottleId },
-        tx,
-      );
-      await lockCatalogTargetAssignmentDescriptorsInTransaction(tx, [
-        sourceTarget,
-        existingTarget,
-      ]);
-      if (sourceTarget.groupId !== existingTarget.groupId) throw error;
-    } else {
-      await lockCatalogTargetAssignmentDescriptorInTransaction(
-        tx,
-        existingTarget,
-        { composition: "concrete_bottle_mutation" },
-      );
-    }
+    await lockCatalogTargetAssignmentDescriptorInTransaction(
+      tx,
+      existingTarget,
+      { composition: "concrete_bottle_mutation" },
+    );
 
     const existingBottle = await tx.query.bottles.findFirst({
       where: eq(bottles.id, error.bottleId),

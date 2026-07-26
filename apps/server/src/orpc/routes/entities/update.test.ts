@@ -9,7 +9,6 @@ import {
   entityAliases,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -230,7 +229,6 @@ describe("PATCH /entities/:entity", () => {
   });
 
   test("brand name change rematerializes each group once while preserving exact identity", async ({
-    defaults,
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -241,13 +239,9 @@ describe("PATCH /entities/:entity", () => {
       brandId: entity.id,
       name: "Core",
     });
-    const second = await createConcreteBottle({
-      context: { user: defaults.user },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: first.id,
-        exact: { edition: "Batch Two" },
-      },
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch Two",
     });
     const otherGroup = await fixtures.Bottle({
       brandId: entity.id,
@@ -256,7 +250,7 @@ describe("PATCH /entities/:entity", () => {
     const distillerOnlyBottle = await fixtures.Bottle({
       distillerIds: [entity.id],
     });
-    const originalBottles = [first, second.bottle, otherGroup];
+    const originalBottles = [first, second, otherGroup];
     expect(new Set(originalBottles.map(({ groupId }) => groupId))).toEqual(
       new Set([first.groupId, otherGroup.groupId]),
     );

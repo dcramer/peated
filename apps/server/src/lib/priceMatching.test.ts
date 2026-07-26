@@ -30,7 +30,6 @@ import {
   CatalogTargetRetiredError,
 } from "@peated/server/lib/catalogTargets";
 import type * as CatalogVerificationModule from "@peated/server/lib/catalogVerification";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
@@ -2730,18 +2729,10 @@ describe("priceMatching", () => {
       statedAge: 10,
       distillerIds: [distillery.id],
     });
-    const sibling = await createConcreteBottle({
-      context: { user: reviewer } as Parameters<
-        typeof createConcreteBottle
-      >[0]["context"],
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: currentBottle.id,
-        exact: {
-          edition: "Sibling Edition",
-          statedAge: 10,
-        },
-      },
+    const sibling = await fixtures.BottleGroupMember({
+      groupId: currentBottle.groupId as number,
+      edition: "Sibling Edition",
+      statedAge: 10,
     });
     const currentTargetId = await getExactTargetId(currentBottle.id);
     const price = await fixtures.StorePrice({
@@ -2905,7 +2896,7 @@ describe("priceMatching", () => {
         where: eq(bottles.id, currentBottle.id),
       }),
       db.query.bottles.findFirst({
-        where: eq(bottles.id, sibling.bottle.id),
+        where: eq(bottles.id, sibling.id),
       }),
       db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, currentBottle.groupId!),
@@ -2952,7 +2943,7 @@ describe("priceMatching", () => {
           where: eq(bottles.id, currentBottle.id),
         }),
         db.query.bottles.findFirst({
-          where: eq(bottles.id, sibling.bottle.id),
+          where: eq(bottles.id, sibling.id),
         }),
         db.query.bottleGroups.findFirst({
           where: eq(bottleGroups.id, currentBottle.groupId!),
@@ -3147,15 +3138,9 @@ describe("priceMatching", () => {
       category: "single_malt",
       statedAge: 10,
     });
-    const sibling = await createConcreteBottle({
-      context: { user: reviewer } as Parameters<
-        typeof createConcreteBottle
-      >[0]["context"],
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: selectedBottle.id,
-        exact: { edition: "Sibling Edition" },
-      },
+    const sibling = await fixtures.BottleGroupMember({
+      groupId: selectedBottle.groupId as number,
+      edition: "Sibling Edition",
     });
     const selectedTargetId = await getExactTargetId(selectedBottle.id);
     const price = await fixtures.StorePrice({
@@ -3211,7 +3196,7 @@ describe("priceMatching", () => {
         where: eq(bottles.id, selectedBottle.id),
       }),
       db.query.bottles.findFirst({
-        where: eq(bottles.id, sibling.bottle.id),
+        where: eq(bottles.id, sibling.id),
       }),
       db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, selectedBottle.groupId!),
@@ -4736,16 +4721,22 @@ describe("priceMatching", () => {
       name: "Aberfeldy Distillery",
       type: ["distiller"],
     });
+    const attemptedCanonicalName = "Aberfeldy 21-year-old";
     const bottle = await fixtures.Bottle({
       brandId: brand.id,
-      name: "21-year-old",
+      name: "Legacy Reserve",
       category: "single_malt",
       statedAge: 21,
       distillerIds: [distiller.id],
     });
+    await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: attemptedCanonicalName,
+      assignmentSource: "legacy",
+    });
     const price = await fixtures.StorePrice({
       bottleId: null,
-      name: bottle.fullName,
+      name: attemptedCanonicalName,
       imageUrl: null,
     });
 

@@ -7,7 +7,6 @@ import {
   catalogTargets,
   collectionBottles,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
@@ -416,19 +415,17 @@ describe("GET /users/:user/library/stats", () => {
       bottleId: parent.id,
       statedAge: 40,
     });
-    const promoted = await createConcreteBottle({
-      context: { user: defaults.user },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: {
-          statedAge: 21,
-        },
-      },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      statedAge: 21,
     });
+    const promotedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, promoted.id),
+    });
+    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
-      promotedBottleId: promoted.bottle.id,
+      promotedBottleId: promoted.id,
       status: "promoted",
       completedAt: new Date(),
       createdByActorId: parent.createdByActorId,
@@ -437,7 +434,7 @@ describe("GET /users/:user/library/stats", () => {
       collectionId: library.id,
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
       status: "open",
     });
 

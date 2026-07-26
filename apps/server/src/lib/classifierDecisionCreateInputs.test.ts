@@ -21,11 +21,6 @@ test("materializes a classifier draft into one independently complete Bottle", (
 
   const concreteInput = buildClassifierConcreteBottleInput(proposedBottle);
 
-  expect(concreteInput.kind).toBe("independent");
-  if (concreteInput.kind !== "independent") {
-    throw new Error("classifier drafts must create independent Bottles");
-  }
-
   expect(concreteInput.stable.name).toBe("A Midwinter Night's Dram");
   expect(concreteInput.exact).toMatchObject({
     edition: "Act 10 Scene 4",
@@ -78,11 +73,6 @@ test("keeps a marketed age exact without duplicating its name wording", () => {
   };
 
   const concreteInput = buildClassifierConcreteBottleInput(proposedBottle);
-
-  expect(concreteInput.kind).toBe("independent");
-  if (concreteInput.kind !== "independent") {
-    throw new Error("classifier drafts must create independent Bottles");
-  }
 
   expect(concreteInput.stable.statedAge).toBeNull();
   expect(concreteInput.exact.statedAge).toBe(12);

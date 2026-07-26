@@ -6,7 +6,6 @@ import {
   catalogTargets,
   storePrices,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import type * as LogModule from "@peated/server/lib/log";
 import { logTelemetryError } from "@peated/server/lib/log";
 import waitError from "@peated/server/lib/test/waitError";
@@ -109,23 +108,19 @@ describe("GET /bottles/:bottle", () => {
 
   test("counts people through the Bottle's exact target", async ({
     fixtures,
-    defaults,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Selected Bottle" });
-    const sibling = await createConcreteBottle({
-      context: { user: defaults.user },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: bottle.id,
-        exact: { edition: "Sibling Edition", releaseYear: 2026 },
-      },
+    const sibling = await fixtures.BottleGroupMember({
+      groupId: bottle.groupId as number,
+      edition: "Sibling Edition",
+      releaseYear: 2026,
     });
     const [target, siblingTarget, genericTarget] = await Promise.all([
       db.query.catalogTargets.findFirst({
         where: eq(catalogTargets.bottleId, bottle.id),
       }),
       db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, sibling.bottle.id),
+        where: eq(catalogTargets.bottleId, sibling.id),
       }),
       db.query.catalogTargets.findFirst({
         where: and(
@@ -141,7 +136,7 @@ describe("GET /bottles/:bottle", () => {
     const siblingPerson = await fixtures.User();
     const genericPerson = await fixtures.User();
     await fixtures.Tasting({
-      bottleId: sibling.bottle.id,
+      bottleId: sibling.id,
       targetId: target.id,
       createdById: exactPerson.id,
     });
@@ -158,7 +153,7 @@ describe("GET /bottles/:bottle", () => {
 
     const [selectedDetails, siblingDetails] = await Promise.all([
       routerClient.bottles.details({ bottle: bottle.id }),
-      routerClient.bottles.details({ bottle: sibling.bottle.id }),
+      routerClient.bottles.details({ bottle: sibling.id }),
     ]);
 
     expect(selectedDetails.people).toBe(1);

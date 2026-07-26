@@ -8,7 +8,6 @@ import {
   catalogTargets,
   tastings,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
@@ -411,21 +410,21 @@ describe("GET /users/:user/regions", () => {
     });
     const parent = await fixtures.Bottle({ brandId: parentBrand.id });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await createConcreteBottle({
-      context: { user: defaults.user },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "Promoted Edition" },
-      },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Promoted Edition",
     });
     await db
       .update(bottles)
       .set({ brandId: promotedBrand.id })
-      .where(eq(bottles.id, promoted.bottle.id));
+      .where(eq(bottles.id, promoted.id));
+    const promotedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, promoted.id),
+    });
+    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
-      promotedBottleId: promoted.bottle.id,
+      promotedBottleId: promoted.id,
       status: "promoted",
       completedAt: new Date(),
       createdByActorId: parent.createdByActorId,
@@ -433,7 +432,7 @@ describe("GET /users/:user/regions", () => {
     await fixtures.Tasting({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
       createdById: defaults.user.id,
     });
 

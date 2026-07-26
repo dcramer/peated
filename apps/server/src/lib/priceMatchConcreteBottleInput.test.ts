@@ -54,6 +54,17 @@ const releaseInput = BottleReleaseInputSchema.parse({
   },
 });
 
+const sourceBottleStableInput = {
+  name: "Shared Expression",
+  statedAge: 12,
+  series: 3,
+  category: "single_malt" as const,
+  brand: 1,
+  distillers: [2],
+  bottler: 4,
+  flavorProfile: "peated" as const,
+};
+
 test("maps bottle creation to an independent concrete Bottle", () => {
   const result = buildPriceMatchConcreteBottleInput({
     bottleInput,
@@ -62,7 +73,6 @@ test("maps bottle creation to an independent concrete Bottle", () => {
 
   expect(result.creationTarget).toBe("bottle");
   expect(result.input).toEqual({
-    kind: "independent",
     stable: {
       name: "Shared Expression",
       statedAge: 12,
@@ -98,16 +108,16 @@ test("maps bottle creation to an independent concrete Bottle", () => {
   );
 });
 
-test("maps release creation to a source-Bottle concrete Bottle", () => {
+test("maps release creation from copied source evidence to an independent Bottle", () => {
   const result = buildPriceMatchConcreteBottleInput({
     releaseInput,
     parentBottleId: 42,
+    sourceBottleStableInput,
   });
 
   expect(result.creationTarget).toBe("release");
   expect(result.input).toEqual({
-    kind: "source_bottle",
-    sourceBottleId: 42,
+    stable: sourceBottleStableInput,
     exact: {
       edition: "Release Edition",
       statedAge: 13,
@@ -128,6 +138,8 @@ test("maps release creation to a source-Bottle concrete Bottle", () => {
       },
     },
   });
+  expect(result.input).not.toHaveProperty("sourceBottleId");
+  expect(result.input).not.toHaveProperty("groupId");
   expect(ConcreteBottleCreateInputSchema.parse(result.input)).toEqual(
     result.input,
   );
@@ -155,9 +167,6 @@ test("maps combined creation with release precedence and Bottle fallback", () =>
   });
 
   expect(result.creationTarget).toBe("bottle_and_release");
-  expect(result.input.kind).toBe("independent");
-  if (result.input.kind !== "independent")
-    throw new Error("Expected independent.");
   expect(result.input.stable.statedAge).toBe(12);
   expect(result.input.exact).toEqual({
     edition: "Release Edition",
@@ -210,6 +219,15 @@ test("requires parent Bottle context for release creation", () => {
       parentBottleId: null,
     }),
   ).toThrow("requires a valid parent Bottle id");
+});
+
+test("requires a validated source snapshot for release creation", () => {
+  expect(() =>
+    buildPriceMatchConcreteBottleInput({
+      releaseInput,
+      parentBottleId: 42,
+    }),
+  ).toThrow("requires a validated source Bottle snapshot");
 });
 
 test.each([
@@ -265,12 +283,14 @@ test.each([
       buildPriceMatchConcreteBottleInput({
         releaseInput: legacyRelease,
         parentBottleId: 42,
+        sourceBottleStableInput,
       }),
     ).toThrow(InvalidPriceMatchConcreteBottleInputError);
     expect(() =>
       buildPriceMatchConcreteBottleInput({
         releaseInput: legacyRelease,
         parentBottleId: 42,
+        sourceBottleStableInput,
       }),
     ).toThrow(/not valid canonical Bottle data/);
   },

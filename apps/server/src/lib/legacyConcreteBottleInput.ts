@@ -11,10 +11,8 @@ import { ZodError } from "zod";
 
 export type LegacyBottleInput = z.infer<typeof BottleInputSchema>;
 export type LegacyBottleReleaseInput = z.infer<typeof BottleReleaseInputSchema>;
-type IndependentConcreteBottleInput = Extract<
-  ConcreteBottleCreateInput,
-  { kind: "independent" }
->;
+export type LegacyConcreteBottleStableInput =
+  ConcreteBottleCreateInput["stable"];
 type ConcreteBottleExactInput = ConcreteBottleCreateInput["exact"];
 
 export class InvalidLegacyConcreteBottleInputError extends Error {
@@ -58,7 +56,7 @@ function assertCanonicalImageUrl(
 
 function buildStableInput(
   input: LegacyBottleInput,
-): IndependentConcreteBottleInput["stable"] {
+): LegacyConcreteBottleStableInput {
   return {
     name: input.name,
     statedAge: input.statedAge,
@@ -148,11 +146,13 @@ export function buildLegacyConcreteBottleInput({
   bottleInput,
   releaseInput,
   parentBottleId,
+  sourceBottleStableInput,
   source,
 }: {
   bottleInput?: LegacyBottleInput;
   releaseInput?: LegacyBottleReleaseInput;
   parentBottleId: number | null;
+  sourceBottleStableInput?: LegacyConcreteBottleStableInput;
   source: string;
 }): {
   creationTarget: "bottle" | "release" | "bottle_and_release";
@@ -172,7 +172,6 @@ export function buildLegacyConcreteBottleInput({
       creationTarget: "bottle",
       input: parseCanonicalInput(
         {
-          kind: "independent",
           stable: buildStableInput(bottleInput),
           exact: buildBottleExactInput(bottleInput),
         },
@@ -191,13 +190,17 @@ export function buildLegacyConcreteBottleInput({
         "Release creation requires a valid parent Bottle id.",
       );
     }
+    if (!sourceBottleStableInput) {
+      throw new InvalidLegacyConcreteBottleInputError(
+        "Release creation requires a validated source Bottle snapshot.",
+      );
+    }
 
     return {
       creationTarget: "release",
       input: parseCanonicalInput(
         {
-          kind: "source_bottle",
-          sourceBottleId: parentBottleId,
+          stable: sourceBottleStableInput,
           exact: buildReleaseExactInput(releaseInput),
         },
         source,
@@ -221,7 +224,6 @@ export function buildLegacyConcreteBottleInput({
     creationTarget: "bottle_and_release",
     input: parseCanonicalInput(
       {
-        kind: "independent",
         stable: buildStableInput(bottleInput),
         exact: buildCombinedExactInput(bottleInput, releaseInput),
       },

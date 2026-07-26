@@ -9,9 +9,9 @@ import {
   type BottleRelease,
   type User,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { RESERVED_COLLECTIONS } from "@peated/server/lib/db";
 import { mergeConcreteBottles } from "@peated/server/lib/mergeConcreteBottles";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
@@ -28,7 +28,7 @@ async function mapPromotedRelease(release: BottleRelease, bottle: Bottle) {
 async function promoteRelease(
   parent: Bottle,
   release: BottleRelease,
-  user: User,
+  _user: User,
   {
     edition,
     releaseYear,
@@ -37,16 +37,13 @@ async function promoteRelease(
     releaseYear: number;
   },
 ): Promise<Bottle> {
-  const promoted = await createConcreteBottle({
-    context: { user },
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: parent.id,
-      exact: { edition, releaseYear },
-    },
+  const promoted = await testFixtures.BottleGroupMember({
+    groupId: parent.groupId as number,
+    edition,
+    releaseYear,
   });
-  await mapPromotedRelease(release, promoted.bottle);
-  return promoted.bottle;
+  await mapPromotedRelease(release, promoted);
+  return promoted;
 }
 
 async function getExactTargetId(bottleId: number): Promise<number> {

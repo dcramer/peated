@@ -1,7 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { bottleGroups, bottles } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -113,16 +112,10 @@ describe("PUT /bottles", () => {
       edition: "Batch 1",
       description: "Selected description before update.",
     });
-    const siblingTarget = await createConcreteBottle({
-      context: { user: modUser },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: selected.id,
-        exact: {
-          edition: "Batch 2",
-          description: "Sibling description stays exact.",
-        },
-      },
+    const siblingTarget = await fixtures.BottleGroupMember({
+      groupId: selected.groupId as number,
+      edition: "Batch 2",
+      description: "Sibling description stays exact.",
     });
 
     const data = await routerClient.bottles.upsert(
@@ -143,7 +136,7 @@ describe("PUT /bottles", () => {
     const [persistedSibling] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, siblingTarget.bottle.id));
+      .where(eq(bottles.id, siblingTarget.id));
     const [persistedGroup] = await db
       .select()
       .from(bottleGroups)

@@ -13,6 +13,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import {
   BottleGroupPresentationAuthorizationError,
@@ -51,7 +52,6 @@ async function createGroup({
       typeof createConcreteBottle
     >[0]["context"],
     input: {
-      kind: "independent",
       stable: { name: "Presentation Expression", brand: brand.id },
       exact: {
         edition: "First Edition",
@@ -59,19 +59,13 @@ async function createGroup({
       },
     },
   });
-  const second = await createConcreteBottle({
-    context: contextFor(user) as Parameters<
-      typeof createConcreteBottle
-    >[0]["context"],
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: first.bottle.id,
-      exact: {
-        edition: "Second Edition",
-        description: "Second Bottle editorial",
-      },
-    },
-  });
+  const second = {
+    bottle: await testFixtures.BottleGroupMember({
+      groupId: first.group.id,
+      edition: "Second Edition",
+      description: "Second Bottle editorial",
+    }),
+  };
   const [firstBottle] = await db
     .update(bottles)
     .set({

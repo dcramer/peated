@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import type { User } from "@peated/server/db/schema";
+import type { Bottle, User } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottleGroupDistillers,
@@ -15,6 +15,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import {
   ConcreteBottleUpdateAuthorizationError,
@@ -37,6 +38,11 @@ function contextFor(user: User | null) {
   return { user } as Parameters<typeof updateConcreteBottle>[0]["context"];
 }
 
+type GroupMemberExact = Omit<
+  Parameters<typeof testFixtures.BottleGroupMember>[0],
+  "groupId"
+>;
+
 async function createGroup({
   user,
   stable,
@@ -44,7 +50,7 @@ async function createGroup({
 }: {
   user: User;
   stable: Record<string, unknown>;
-  exacts: Array<Record<string, unknown>>;
+  exacts: GroupMemberExact[];
 }) {
   if (!exacts.length) throw new Error("At least one exact Bottle is required.");
 
@@ -53,25 +59,18 @@ async function createGroup({
       typeof createConcreteBottle
     >[0]["context"],
     input: {
-      kind: "independent",
       stable,
       exact: exacts[0],
     },
   });
-  const members = [first];
+  const members: Array<{ bottle: Bottle }> = [first];
   for (const exact of exacts.slice(1)) {
-    members.push(
-      await createConcreteBottle({
-        context: contextFor(user) as Parameters<
-          typeof createConcreteBottle
-        >[0]["context"],
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: first.bottle.id,
-          exact,
-        },
+    members.push({
+      bottle: await testFixtures.BottleGroupMember({
+        groupId: first.group.id,
+        ...exact,
       }),
-    );
+    });
   }
   return { first, members };
 }
@@ -1214,7 +1213,6 @@ describe("concrete Bottle updates", () => {
         typeof createConcreteBottle
       >[0]["context"],
       input: {
-        kind: "independent",
         stable: { name: "Collision Label", brand: brand.id },
         exact: { edition: "Two" },
       },
@@ -1262,7 +1260,6 @@ describe("concrete Bottle updates", () => {
         typeof createConcreteBottle
       >[0]["context"],
       input: {
-        kind: "independent",
         stable: { name: "Unrelated Alias Owner", brand: brand.id },
         exact: {},
       },

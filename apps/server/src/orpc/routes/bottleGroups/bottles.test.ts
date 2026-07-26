@@ -1,11 +1,9 @@
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /bottle-groups/:group/bottles", () => {
   test("lists independently complete exact Bottles with search, sort, and pagination", async ({
     fixtures,
-    defaults,
   }) => {
     const first = await fixtures.Bottle({
       name: "Batch Expression",
@@ -13,17 +11,11 @@ describe("GET /bottle-groups/:group/bottles", () => {
       releaseYear: 2020,
       abv: 46,
     });
-    const second = await createConcreteBottle({
-      context: { user: defaults.user },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: first.id,
-        exact: {
-          edition: "Batch Azure",
-          releaseYear: 2025,
-          abv: 52.4,
-        },
-      },
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch Azure",
+      releaseYear: 2025,
+      abv: 52.4,
     });
 
     const firstPage = await routerClient.bottleGroups.bottles({
@@ -48,7 +40,7 @@ describe("GET /bottle-groups/:group/bottles", () => {
       kind: "bottle",
       group: { id: first.groupId },
       bottle: {
-        id: second.bottle.id,
+        id: second.id,
         groupId: first.groupId,
         edition: "Batch Azure",
         releaseYear: 2025,
@@ -63,9 +55,7 @@ describe("GET /bottle-groups/:group/bottles", () => {
       abv: 46,
     });
     expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
-    expect(search.results.map(({ bottle }) => bottle.id)).toEqual([
-      second.bottle.id,
-    ]);
+    expect(search.results.map(({ bottle }) => bottle.id)).toEqual([second.id]);
   });
 
   test("returns not found rather than an empty page for an unknown group", async () => {

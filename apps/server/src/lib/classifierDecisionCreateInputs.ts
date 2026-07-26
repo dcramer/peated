@@ -65,14 +65,13 @@ export function buildBottleInputFromProposedBottle(
 /**
  * Maps the classifier's one create action to independent concrete Bottle
  * creation. Group assignment is automatic; classifier output never selects a
- * parent or trusted source group.
+ * parent or existing group.
  */
 export function buildClassifierConcreteBottleInput(
   proposedBottle: ProposedBottle,
 ): ConcreteBottleCreateInput {
   const input = buildBottleInputFromProposedBottle(proposedBottle);
   return {
-    kind: "independent",
     stable: {
       name: input.name,
       statedAge: null,

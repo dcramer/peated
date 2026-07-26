@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleGroups, type User } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import type * as Fixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -12,9 +13,7 @@ async function createTwoMemberGroup({
   fixtures,
 }: {
   mod: User;
-  fixtures: {
-    Entity: (data?: Record<string, unknown>) => Promise<{ id: number }>;
-  };
+  fixtures: Pick<typeof Fixtures, "BottleGroupMember" | "Entity">;
 }) {
   groupSequence += 1;
   const brand = await fixtures.Entity({
@@ -26,7 +25,6 @@ async function createTwoMemberGroup({
   const first = await createConcreteBottle({
     context,
     input: {
-      kind: "independent",
       stable: {
         name: `Route Presentation Group ${groupSequence}`,
         brand: brand.id,
@@ -34,14 +32,12 @@ async function createTwoMemberGroup({
       exact: { edition: "First" },
     },
   });
-  const second = await createConcreteBottle({
-    context,
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: first.bottle.id,
-      exact: { edition: "Second" },
-    },
-  });
+  const second = {
+    bottle: await fixtures.BottleGroupMember({
+      groupId: first.group.id,
+      edition: "Second",
+    }),
+  };
   return { first, second };
 }
 

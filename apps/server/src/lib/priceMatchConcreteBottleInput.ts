@@ -2,6 +2,7 @@ import type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottl
 import {
   buildLegacyConcreteBottleInput,
   InvalidLegacyConcreteBottleInputError,
+  type LegacyConcreteBottleStableInput,
 } from "@peated/server/lib/legacyConcreteBottleInput";
 import type {
   BottleInputSchema,
@@ -27,10 +28,12 @@ export function buildPriceMatchConcreteBottleInput({
   bottleInput,
   releaseInput,
   parentBottleId,
+  sourceBottleStableInput,
 }: {
   bottleInput?: LegacyBottleInput;
   releaseInput?: LegacyBottleReleaseInput;
   parentBottleId: number | null;
+  sourceBottleStableInput?: LegacyConcreteBottleStableInput;
 }): {
   creationTarget: "bottle" | "release" | "bottle_and_release";
   input: ConcreteBottleCreateInput;
@@ -40,6 +43,7 @@ export function buildPriceMatchConcreteBottleInput({
       bottleInput,
       releaseInput,
       parentBottleId,
+      sourceBottleStableInput,
       source: "price-match",
     });
   } catch (error) {

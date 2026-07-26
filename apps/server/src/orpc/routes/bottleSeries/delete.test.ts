@@ -9,6 +9,7 @@ import {
   changes,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -64,19 +65,16 @@ async function createGroup({
   const first = await createConcreteBottle({
     context: { user },
     input: {
-      kind: "independent",
       stable: { name, brand: brandId, series: seriesId },
       exact: { edition: "Batch One" },
     },
   });
-  const second = await createConcreteBottle({
-    context: { user },
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: first.bottle.id,
-      exact: { edition: "Batch Two" },
-    },
-  });
+  const second = {
+    bottle: await testFixtures.BottleGroupMember({
+      groupId: first.group.id,
+      edition: "Batch Two",
+    }),
+  };
   return { first, members: [first, second] };
 }
 

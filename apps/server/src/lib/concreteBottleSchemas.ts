@@ -208,27 +208,13 @@ export type SystemConcreteBottleUpdateInput = z.infer<
   typeof SystemConcreteBottleUpdateInputSchema
 >;
 
-/**
- * Runtime contract consumed by concrete Bottle creation adapters. Ordinary
- * callers use `independent`; source authority is reserved for migration,
- * measured compatibility, and system-controlled grouping.
- */
-export const ConcreteBottleCreateInputSchema = z.discriminatedUnion("kind", [
-  z
-    .object({
-      kind: z.literal("independent"),
-      stable: StableBottleGroupInputSchema,
-      exact: ExactBottleInputSchema,
-    })
-    .strict(),
-  z
-    .object({
-      kind: z.literal("source_bottle"),
-      sourceBottleId: z.number().int().positive(),
-      exact: ExactBottleInputSchema,
-    })
-    .strict(),
-]);
+/** Runtime contract for independently complete singleton Bottle creation. */
+export const ConcreteBottleCreateInputSchema = z
+  .object({
+    stable: StableBottleGroupInputSchema,
+    exact: ExactBottleInputSchema,
+  })
+  .strict();
 
 export type ConcreteBottleCreateInput = z.infer<
   typeof ConcreteBottleCreateInputSchema

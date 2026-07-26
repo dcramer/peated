@@ -15,7 +15,12 @@ import config from "@peated/server/config";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
   actors,
+  bottleGroupTombstones,
+  bottleGroups,
   bottleObservations,
+  bottleTombstones,
+  bottles,
+  bottlesToDistillers,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -54,7 +59,10 @@ import {
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { buildPriceMatchConcreteBottleInput } from "@peated/server/lib/priceMatchConcreteBottleInput";
+import {
+  InvalidPriceMatchConcreteBottleInputError,
+  buildPriceMatchConcreteBottleInput,
+} from "@peated/server/lib/priceMatchConcreteBottleInput";
 import {
   getStorePriceMatchAutomationAssessment,
   shouldVerifyStorePriceMatch,
@@ -93,7 +101,7 @@ import {
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
 import type { z } from "zod";
 
@@ -1224,6 +1232,93 @@ async function clearIgnoredStorePriceAssignmentInTransaction(
     );
 }
 
+/**
+ * Copies Bottle-owned stable data with its relationship-owned name prefix
+ * without granting the source Bottle or group creation authority.
+ */
+async function loadPriceMatchSourceBottleStableInput(
+  tx: AnyTransaction,
+  sourceBottleId: number,
+): Promise<ConcreteBottleCreateInput["stable"]> {
+  const [discoveredSource] = await tx
+    .select({ groupId: bottles.groupId })
+    .from(bottles)
+    .where(eq(bottles.id, sourceBottleId))
+    .limit(1);
+  if (!discoveredSource) {
+    throw new InvalidPriceMatchConcreteBottleInputError(
+      `Source Bottle not found (${sourceBottleId}).`,
+    );
+  }
+  if (discoveredSource.groupId === null) {
+    throw new InvalidPriceMatchConcreteBottleInputError(
+      `Source Bottle is not ready for independent release prefill (${sourceBottleId}).`,
+    );
+  }
+
+  const [group] = await tx
+    .select({ id: bottleGroups.id, name: bottleGroups.name })
+    .from(bottleGroups)
+    .where(eq(bottleGroups.id, discoveredSource.groupId))
+    .for("share");
+  if (!group) {
+    throw new InvalidPriceMatchConcreteBottleInputError(
+      `Source Bottle group not found (${sourceBottleId}).`,
+    );
+  }
+
+  const [sourceBottle] = await tx
+    .select({
+      id: bottles.id,
+      groupId: bottles.groupId,
+      statedAge: bottles.statedAge,
+      seriesId: bottles.seriesId,
+      category: bottles.category,
+      brandId: bottles.brandId,
+      bottlerId: bottles.bottlerId,
+      flavorProfile: bottles.flavorProfile,
+    })
+    .from(bottles)
+    .where(eq(bottles.id, sourceBottleId))
+    .for("share");
+  if (!sourceBottle || sourceBottle.groupId !== group.id) {
+    throw new InvalidPriceMatchConcreteBottleInputError(
+      `Source Bottle changed during independent release prefill (${sourceBottleId}).`,
+    );
+  }
+
+  const retiredBottle = await tx.query.bottleTombstones.findFirst({
+    where: eq(bottleTombstones.bottleId, sourceBottleId),
+    columns: { bottleId: true },
+  });
+  const retiredGroup = await tx.query.bottleGroupTombstones.findFirst({
+    where: eq(bottleGroupTombstones.groupId, group.id),
+    columns: { groupId: true },
+  });
+  if (retiredBottle || retiredGroup) {
+    throw new InvalidPriceMatchConcreteBottleInputError(
+      `Source Bottle is retired (${sourceBottleId}).`,
+    );
+  }
+  const distillers = await tx
+    .select({ distillerId: bottlesToDistillers.distillerId })
+    .from(bottlesToDistillers)
+    .where(eq(bottlesToDistillers.bottleId, sourceBottle.id))
+    .orderBy(asc(bottlesToDistillers.distillerId))
+    .for("share");
+
+  return {
+    name: group.name,
+    statedAge: sourceBottle.statedAge,
+    series: sourceBottle.seriesId,
+    category: sourceBottle.category,
+    brand: sourceBottle.brandId,
+    distillers: distillers.map(({ distillerId }) => distillerId),
+    bottler: sourceBottle.bottlerId,
+    flavorProfile: sourceBottle.flavorProfile,
+  };
+}
+
 async function createBottleFromStorePriceMatchProposalInTransaction(
   tx: AnyTransaction,
   {
@@ -1255,12 +1350,23 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
       "Canonical classifier input cannot be combined with legacy price-match creation input.",
     );
   }
+  const sourceBottleStableInput =
+    !concreteInput &&
+    !input &&
+    releaseInput &&
+    preflight.parentBottleId !== null
+      ? await loadPriceMatchSourceBottleStableInput(
+          tx,
+          preflight.parentBottleId,
+        )
+      : undefined;
   const resolvedCreateInput = concreteInput
     ? { creationTarget: "bottle" as const, input: concreteInput }
     : buildPriceMatchConcreteBottleInput({
         bottleInput: input,
         releaseInput,
         parentBottleId: preflight.parentBottleId,
+        sourceBottleStableInput,
       });
   const { creationTarget, input: resolvedConcreteInput } = resolvedCreateInput;
 

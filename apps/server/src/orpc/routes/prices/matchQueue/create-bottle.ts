@@ -8,7 +8,6 @@ import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
-  TrustedSourceBottleError,
 } from "@peated/server/lib/createBottle";
 import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
 import { logInfo } from "@peated/server/lib/log";
@@ -66,11 +65,6 @@ function classifyCompatibilityRejection(error: unknown): string {
   if (error instanceof InvalidPriceMatchConcreteBottleInputError) {
     return "invalid_compatibility_payload";
   }
-  if (error instanceof TrustedSourceBottleError) {
-    return error.code === "not_found"
-      ? "trusted_source_not_found"
-      : "trusted_source_invalid";
-  }
   return "unexpected_error";
 }
 
@@ -106,7 +100,7 @@ const OutputSchema = z.object({
 
 /**
  * Canonical independent approval plus measured translation-only compatibility.
- * Task 9.7 removes the legacy Bottle/Release inputs and response adapter.
+ * OpenSpec tasks 5.4 and 7.1 remove the legacy input and response adapter.
  */
 export default procedure
   .use(requireMod)
@@ -246,14 +240,6 @@ export default procedure
 
       if (err instanceof InvalidPriceMatchConcreteBottleInputError) {
         throw errors.BAD_REQUEST({ message: err.message });
-      }
-
-      if (err instanceof TrustedSourceBottleError && err.code === "not_found") {
-        throw errors.NOT_FOUND({ message: err.message });
-      }
-
-      if (err instanceof TrustedSourceBottleError) {
-        throw errors.CONFLICT({ message: err.message });
       }
 
       throw err;

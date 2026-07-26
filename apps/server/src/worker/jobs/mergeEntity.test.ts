@@ -155,18 +155,13 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
     brandId: sourceEntity.id,
     name: "Annual",
   });
-  const sourceBatch = await createConcreteBottle({
-    context: contextFor(defaults.user),
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: source.id,
-      exact: { edition: "Batch 2" },
-    },
+  const sourceBatch = await fixtures.BottleGroupMember({
+    groupId: source.groupId as number,
+    edition: "Batch 2",
   });
   const destinationBatch = await createConcreteBottle({
     context: contextFor(defaults.user),
     input: {
-      kind: "independent",
       stable: { brand: destinationEntity.id, name: "Annual" },
       exact: { edition: "Batch 2" },
     },
@@ -174,7 +169,7 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
   await db
     .update(bottles)
     .set({ name: "Drifted Member", fullName: "Batch Source Drifted Member" })
-    .where(eq(bottles.id, sourceBatch.bottle.id));
+    .where(eq(bottles.id, sourceBatch.id));
 
   await mergeEntity({
     fromEntityIds: [sourceEntity.id],
@@ -183,7 +178,7 @@ test("preflights exact batch duplicates from BottleGroup authority", async ({
 
   expect(
     await db.query.bottles.findFirst({
-      where: eq(bottles.id, sourceBatch.bottle.id),
+      where: eq(bottles.id, sourceBatch.id),
     }),
   ).toBeUndefined();
   expect(
@@ -222,13 +217,9 @@ test("fans merged shared entity roles through every BottleGroup member", async (
     name: "Expression",
     seriesId: sourceSeries.id,
   });
-  const second = await createConcreteBottle({
-    context: contextFor(defaults.user),
-    input: {
-      kind: "source_bottle",
-      sourceBottleId: first.id,
-      exact: { edition: "Batch 2" },
-    },
+  const second = await fixtures.BottleGroupMember({
+    groupId: first.groupId as number,
+    edition: "Batch 2",
   });
 
   await mergeEntity({
@@ -258,7 +249,7 @@ test("fans merged shared entity roles through every BottleGroup member", async (
       fullName: "Shared Destination Expression",
     }),
     expect.objectContaining({
-      id: second.bottle.id,
+      id: second.id,
       brandId: destinationEntity.id,
       bottlerId: destinationEntity.id,
       fullName: "Shared Destination Expression - Batch 2",

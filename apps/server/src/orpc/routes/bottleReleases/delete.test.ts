@@ -14,7 +14,6 @@ import {
   reviews,
   tastings,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -174,44 +173,44 @@ describe("DELETE /bottle-releases/{release}", () => {
     const admin = await fixtures.User({ admin: true });
     const parent = await fixtures.Bottle({ name: "Delete Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await createConcreteBottle({
-      context: { user: admin },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "Delete Exact" },
-      },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Delete Exact",
     });
-    await promoteRelease(release.id, promoted.bottle.id);
+    const promotedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, promoted.id),
+    });
+    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
+    await promoteRelease(release.id, promoted.id);
 
     await db.insert(bottleAliases).values({
       name: "Delete Retained Alias",
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
       assignedByActorId: release.createdByActorId,
     });
     await db.insert(collectionBottles).values({
       collectionId: (await fixtures.Collection()).id,
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
     });
     await db.insert(flightBottles).values({
       flightId: (await fixtures.Flight()).id,
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
     });
     await fixtures.Tasting({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
     });
     await fixtures.Review({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: promoted.exactTarget.id,
+      targetId: promotedTarget.id,
       name: release.fullName,
     });
 
@@ -227,7 +226,7 @@ describe("DELETE /bottle-releases/{release}", () => {
 
     expect(error).toMatchObject({
       status: 409,
-      message: `BottleRelease ${release.id} maps to Bottle ${promoted.bottle.id} through exact target ${promoted.exactTarget.id}; merge that Bottle into an explicit destination instead.`,
+      message: `BottleRelease ${release.id} maps to Bottle ${promoted.id} through exact target ${promotedTarget.id}; merge that Bottle into an explicit destination instead.`,
     });
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
@@ -240,20 +239,16 @@ describe("DELETE /bottle-releases/{release}", () => {
     const admin = await fixtures.User({ admin: true });
     const parent = await fixtures.Bottle({ name: "Delete Merge Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await createConcreteBottle({
-      context: { user: admin },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: parent.id,
-        exact: { edition: "Delete Merge Source" },
-      },
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Delete Merge Source",
     });
     const survivor = await fixtures.Bottle({ name: "Delete Merge Survivor" });
-    await promoteRelease(release.id, promoted.bottle.id);
+    await promoteRelease(release.id, promoted.id);
 
     await routerClient.bottles.merge(
       {
-        bottle: promoted.bottle.id,
+        bottle: promoted.id,
         other: survivor.id,
         direction: "mergeInto",
       },

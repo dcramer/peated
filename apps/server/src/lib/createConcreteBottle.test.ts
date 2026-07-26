@@ -1,11 +1,8 @@
 import { db } from "@peated/server/db";
-import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
   bottleGroupDistillers,
-  bottleGroupTombstones,
   bottleGroups,
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   catalogTargets,
@@ -16,62 +13,20 @@ import { buildClassifierConcreteBottleInput } from "@peated/server/lib/classifie
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import {
   ConcreteBottleCreateInputSchema,
-  TrustedSourceBottleError,
   createConcreteBottle,
   createConcreteBottleInTransaction,
 } from "@peated/server/lib/createConcreteBottle";
-import waitError from "@peated/server/lib/test/waitError";
 import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
-import { and, eq, isNull } from "drizzle-orm";
-import pg from "pg";
+import { and, eq } from "drizzle-orm";
 import { vi } from "vitest";
-
-const { Client } = pg;
-type NodePgClient = InstanceType<typeof Client>;
-
-async function waitForSessionBlockedBy(
-  observer: NodePgClient,
-  blockerPid: number,
-): Promise<number> {
-  const deadline = Date.now() + 2000;
-  while (Date.now() < deadline) {
-    const result = await observer.query<{ pid: number }>(
-      `SELECT pid
-       FROM pg_stat_activity
-       WHERE $1 = ANY(pg_blocking_pids(pid))
-       ORDER BY pid
-       LIMIT 1`,
-      [blockerPid],
-    );
-    const blockedPid = result.rows[0]?.pid;
-    if (blockedPid) return blockedPid;
-    await new Promise((resolve) => setTimeout(resolve, 5));
-  }
-  throw new Error("Timed out waiting for trusted Bottle graph lock.");
-}
-
-async function expectNowaitLockFailure(
-  observer: NodePgClient,
-  query: string,
-  values: unknown[],
-) {
-  await observer.query("BEGIN");
-  try {
-    await expect(observer.query(query, values)).rejects.toMatchObject({
-      code: "55P03",
-    });
-  } finally {
-    await observer.query("ROLLBACK");
-  }
-}
 
 function contextFor(user: Parameters<typeof getUserActor>[0]) {
   return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
 }
 
 describe("concrete Bottle creation", () => {
-  test("creates an independent singleton graph with stable and exact field ownership", async ({
+  test("creates an atomic singleton graph with stable and exact field ownership", async ({
     defaults,
     fixtures,
   }) => {
@@ -91,10 +46,10 @@ describe("concrete Bottle creation", () => {
       category: "single_malt" as const,
       flavorProfile: "peated" as const,
     };
+
     const result = await createConcreteBottle({
       context: contextFor(defaults.user),
       input: {
-        kind: "independent",
         stable: {
           name: "Cask Strength",
           statedAge: 12,
@@ -145,7 +100,6 @@ describe("concrete Bottle creation", () => {
       groupId: result.group.id,
       bottleId: result.bottle.id,
     });
-    expect(result.likelyGroups).toEqual([]);
 
     const [alias] = await db
       .select()
@@ -241,270 +195,6 @@ describe("concrete Bottle creation", () => {
     });
   });
 
-  test("reuses only a trusted source Bottle group and preserves its representative", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Trusted Reuse Brand" });
-    const first = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "independent",
-        stable: {
-          name: "Annual Release",
-          statedAge: 18,
-          brand: brand.id,
-        },
-        exact: { edition: "2025 Release", releaseYear: 2025 },
-      },
-    });
-    const second = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: first.bottle.id,
-        exact: {
-          edition: "2026 Release",
-          releaseYear: 2026,
-          statedAge: 19,
-        },
-      },
-    });
-
-    expect(second.bottle).toMatchObject({
-      groupId: first.group.id,
-      brandId: brand.id,
-      edition: "2026 Release",
-      releaseYear: 2026,
-      statedAge: 19,
-    });
-    expect(second.group).toMatchObject({
-      id: first.group.id,
-      statedAge: 18,
-      totalBottles: 2,
-      representativeBottleId: first.bottle.id,
-    });
-    expect(second.exactTarget).toMatchObject({
-      groupId: first.group.id,
-      bottleId: second.bottle.id,
-    });
-    expect(second.genericTarget.id).toBe(first.genericTarget.id);
-    expect(second.likelyGroups).toEqual([]);
-
-    expect(
-      await db
-        .select()
-        .from(bottleGroups)
-        .where(eq(bottleGroups.id, first.group.id)),
-    ).toHaveLength(1);
-    expect(
-      await db
-        .select()
-        .from(catalogTargets)
-        .where(
-          and(
-            eq(catalogTargets.groupId, first.group.id),
-            isNull(catalogTargets.bottleId),
-          ),
-        ),
-    ).toHaveLength(1);
-  });
-
-  test("revalidates trusted membership after waiting for the discovered group", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Membership Recheck Brand" });
-    const source = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "independent",
-        stable: { name: "Membership Recheck Source", brand: brand.id },
-        exact: { edition: "Original" },
-      },
-    });
-    const destination = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "independent",
-        stable: { name: "Membership Recheck Destination", brand: brand.id },
-        exact: { edition: "Original" },
-      },
-    });
-    const mover = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let creation: ReturnType<typeof createConcreteBottle> | null = null;
-    let moverCommitted = false;
-
-    await mover.connect();
-    await observer.connect();
-    try {
-      await mover.query("BEGIN");
-      const moverPid = (
-        await mover.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
-      ).rows[0]?.pid;
-      if (!moverPid) throw new Error("Unable to load membership mover pid.");
-
-      await mover.query(
-        `SELECT id
-         FROM bottle_group
-         WHERE id = ANY($1::bigint[])
-         ORDER BY id
-         FOR UPDATE`,
-        [[source.group.id, destination.group.id]],
-      );
-
-      creation = createConcreteBottle({
-        context: contextFor(defaults.user),
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: source.bottle.id,
-          exact: { edition: "Must Revalidate" },
-        },
-      });
-      void creation.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, moverPid);
-
-      await observer.query("BEGIN");
-      await expect(
-        observer.query(
-          "SELECT id FROM bottle WHERE id = $1 FOR UPDATE NOWAIT",
-          [source.bottle.id],
-        ),
-      ).resolves.toBeDefined();
-      await observer.query("ROLLBACK");
-
-      await mover.query("SELECT id FROM bottle WHERE id = $1 FOR UPDATE", [
-        source.bottle.id,
-      ]);
-      await mover.query(
-        `SELECT id
-         FROM catalog_target
-         WHERE bottle_group_id = $1
-           AND (bottle_id IS NULL OR bottle_id = $2)
-         ORDER BY id
-         FOR UPDATE`,
-        [source.group.id, source.bottle.id],
-      );
-      await mover.query(
-        `UPDATE bottle_group
-         SET representative_bottle_id = NULL,
-             total_bottles = total_bottles - 1
-         WHERE id = $1`,
-        [source.group.id],
-      );
-      await mover.query("UPDATE bottle SET group_id = $2 WHERE id = $1", [
-        source.bottle.id,
-        destination.group.id,
-      ]);
-      await mover.query(
-        `UPDATE bottle_group
-         SET total_bottles = total_bottles + 1
-         WHERE id = $1`,
-        [destination.group.id],
-      );
-      await mover.query("COMMIT");
-      moverCommitted = true;
-
-      const error = await waitError(creation, TrustedSourceBottleError);
-      expect(error).toMatchObject({
-        code: "invalid_catalog_graph",
-        sourceBottleId: source.bottle.id,
-      });
-    } finally {
-      if (!moverCommitted) {
-        await mover.query("ROLLBACK").catch(() => undefined);
-      }
-      if (creation) await creation.catch(() => undefined);
-      await mover.end();
-      await observer.end();
-    }
-
-    expect(
-      await db
-        .select({ id: bottles.id })
-        .from(bottles)
-        .where(eq(bottles.edition, "Must Revalidate")),
-    ).toEqual([]);
-  });
-
-  test("locks trusted Group and Bottle before required CatalogTargets", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Hierarchy Lock Brand" });
-    const source = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "independent",
-        stable: { name: "Hierarchy Lock Source", brand: brand.id },
-        exact: { edition: "Original" },
-      },
-    });
-    const targetBlocker = new Client(getPostgresConnectionConfig());
-    const observer = new Client(getPostgresConnectionConfig());
-    let creation: ReturnType<typeof createConcreteBottle> | null = null;
-    let blockerCommitted = false;
-
-    expect(source.genericTarget.id).toBeLessThan(source.exactTarget.id);
-    await targetBlocker.connect();
-    await observer.connect();
-    try {
-      await targetBlocker.query("BEGIN");
-      const blockerPid = (
-        await targetBlocker.query<{ pid: number }>(
-          "SELECT pg_backend_pid() AS pid",
-        )
-      ).rows[0]?.pid;
-      if (!blockerPid) throw new Error("Unable to load target blocker pid.");
-      await targetBlocker.query(
-        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE",
-        [source.exactTarget.id],
-      );
-
-      creation = createConcreteBottle({
-        context: contextFor(defaults.user),
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: source.bottle.id,
-          exact: { edition: "Hierarchy Child" },
-        },
-      });
-      void creation.catch(() => undefined);
-      await waitForSessionBlockedBy(observer, blockerPid);
-
-      await expectNowaitLockFailure(
-        observer,
-        "SELECT id FROM bottle_group WHERE id = $1 FOR UPDATE NOWAIT",
-        [source.group.id],
-      );
-      await expectNowaitLockFailure(
-        observer,
-        "SELECT id FROM bottle WHERE id = $1 FOR UPDATE NOWAIT",
-        [source.bottle.id],
-      );
-      await expectNowaitLockFailure(
-        observer,
-        "SELECT id FROM catalog_target WHERE id = $1 FOR UPDATE NOWAIT",
-        [source.genericTarget.id],
-      );
-
-      await targetBlocker.query("COMMIT");
-      blockerCommitted = true;
-      await expect(creation).resolves.toMatchObject({
-        group: { id: source.group.id },
-        bottle: { edition: "Hierarchy Child" },
-      });
-    } finally {
-      if (!blockerCommitted) {
-        await targetBlocker.query("ROLLBACK").catch(() => undefined);
-      }
-      if (creation) await creation.catch(() => undefined);
-      await targetBlocker.end();
-      await observer.end();
-    }
-  });
-
   test("normalizes age wording without inferring structured age ownership", async ({
     defaults,
     fixtures,
@@ -513,7 +203,6 @@ describe("concrete Bottle creation", () => {
     const result = await createConcreteBottle({
       context: contextFor(defaults.user),
       input: {
-        kind: "independent",
         stable: { name: "Old Malt 12 years old", brand: brand.id },
         exact: {},
       },
@@ -529,53 +218,6 @@ describe("concrete Bottle creation", () => {
     });
   });
 
-  test("uses curated group names verbatim for trusted reuse", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Original Group Brand" });
-    const source = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "independent",
-        stable: { name: "Original Expression", brand: brand.id },
-        exact: { edition: "First Release" },
-      },
-    });
-    const [curatedGroup] = await db
-      .update(bottleGroups)
-      .set({
-        name: "Curated Expression 12 years old",
-        fullName: "Editorial Group Heading 12 years old",
-        statedAge: null,
-      })
-      .where(eq(bottleGroups.id, source.group.id))
-      .returning();
-
-    const anotherRelease = await createConcreteBottle({
-      context: contextFor(defaults.user),
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: source.bottle.id,
-        exact: { edition: "Second Release" },
-      },
-    });
-
-    expect(anotherRelease.bottle).toMatchObject({
-      name: "Curated Expression 12 years old - Second Release",
-      fullName: "Editorial Group Heading 12 years old - Second Release",
-      statedAge: null,
-    });
-    expect(anotherRelease.group).toMatchObject({
-      id: curatedGroup.id,
-      name: curatedGroup.name,
-      fullName: curatedGroup.fullName,
-      statedAge: null,
-      representativeBottleId: source.bottle.id,
-      totalBottles: 2,
-    });
-  });
-
   test("keeps stable release-like text out of omitted exact fields", async ({
     defaults,
     fixtures,
@@ -584,7 +226,6 @@ describe("concrete Bottle creation", () => {
     const result = await createConcreteBottle({
       context: contextFor(defaults.user),
       input: {
-        kind: "independent",
         stable: {
           name: "Distillers Edition 2011 Release Cask Strength",
           brand: brand.id,
@@ -611,201 +252,12 @@ describe("concrete Bottle creation", () => {
     });
   });
 
-  test("rejects missing, retired, and incomplete trusted source graphs", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const context = contextFor(defaults.user);
-    await expect(
-      createConcreteBottle({
-        context,
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: 999_999,
-          exact: { edition: "Missing" },
-        },
-      }),
-    ).rejects.toMatchObject({ code: "not_found" });
-
-    const retired = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    await db.insert(bottleTombstones).values({
-      bottleId: retired.id,
-      newBottleId: replacement.id,
-    });
-    await expect(
-      createConcreteBottle({
-        context,
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: retired.id,
-          exact: { edition: "Retired" },
-        },
-      }),
-    ).rejects.toMatchObject({
-      code: "retired",
-      sourceBottleId: retired.id,
-    });
-
-    const legacy = await fixtures.LegacyBottle();
-    await expect(
-      createConcreteBottle({
-        context,
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: legacy.id,
-          exact: { edition: "Legacy" },
-        },
-      }),
-    ).rejects.toBeInstanceOf(TrustedSourceBottleError);
-  });
-
-  test("rejects a source whose group is retired without writing", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const context = contextFor(defaults.user);
-    const brand = await fixtures.Entity({ name: "Retired Group Brand" });
-    const source = await createConcreteBottle({
-      context,
-      input: {
-        kind: "independent",
-        stable: { name: "Retired Group Source", brand: brand.id },
-        exact: { edition: "Original" },
-      },
-    });
-    const replacement = await createConcreteBottle({
-      context,
-      input: {
-        kind: "independent",
-        stable: { name: "Replacement Group", brand: brand.id },
-        exact: { edition: "Original" },
-      },
-    });
-    const actor = await getUserActor(defaults.user);
-    await db.insert(bottleGroupTombstones).values({
-      groupId: source.group.id,
-      newGroupId: replacement.group.id,
-      createdByActorId: actor.id,
-    });
-
-    const error = await waitError(
-      createConcreteBottle({
-        context,
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: source.bottle.id,
-          exact: { edition: "Must Not Persist" },
-        },
-      }),
-      TrustedSourceBottleError,
-    );
-    expect(error).toBeInstanceOf(TrustedSourceBottleError);
-    expect(error).toMatchObject({
-      code: "retired",
-      sourceBottleId: source.bottle.id,
-    });
-
-    expect(
-      await db
-        .select({ id: bottles.id })
-        .from(bottles)
-        .where(eq(bottles.groupId, source.group.id)),
-    ).toEqual([{ id: source.bottle.id }]);
-    expect(
-      await db
-        .select({ totalBottles: bottleGroups.totalBottles })
-        .from(bottleGroups)
-        .where(eq(bottleGroups.id, source.group.id)),
-    ).toEqual([{ totalBottles: 1 }]);
-  });
-
-  for (const missingTarget of ["generic", "exact"] as const) {
-    test(`rejects a trusted source with a missing ${missingTarget} target without writing`, async ({
-      defaults,
-      fixtures,
-    }) => {
-      const context = contextFor(defaults.user);
-      const brand = await fixtures.Entity({
-        name: `Missing ${missingTarget} Target Brand`,
-      });
-      const source = await createConcreteBottle({
-        context,
-        input: {
-          kind: "independent",
-          stable: {
-            name: `Missing ${missingTarget} Target Source`,
-            brand: brand.id,
-          },
-          exact: { edition: "Original" },
-        },
-      });
-      const missingTargetId =
-        missingTarget === "generic"
-          ? source.genericTarget.id
-          : source.exactTarget.id;
-
-      if (missingTarget === "exact") {
-        await db
-          .update(bottleAliases)
-          .set({ targetId: null })
-          .where(eq(bottleAliases.targetId, missingTargetId));
-      }
-      await db
-        .delete(catalogTargets)
-        .where(eq(catalogTargets.id, missingTargetId));
-
-      const error = await waitError(
-        createConcreteBottle({
-          context,
-          input: {
-            kind: "source_bottle",
-            sourceBottleId: source.bottle.id,
-            exact: { edition: "Must Not Persist" },
-          },
-        }),
-        TrustedSourceBottleError,
-      );
-      expect(error).toBeInstanceOf(TrustedSourceBottleError);
-      expect(error).toMatchObject({
-        code: "invalid_catalog_graph",
-        sourceBottleId: source.bottle.id,
-      });
-
-      expect(
-        await db
-          .select({ id: bottles.id })
-          .from(bottles)
-          .where(eq(bottles.groupId, source.group.id)),
-      ).toEqual([{ id: source.bottle.id }]);
-      expect(
-        await db
-          .select({ totalBottles: bottleGroups.totalBottles })
-          .from(bottleGroups)
-          .where(eq(bottleGroups.id, source.group.id)),
-      ).toEqual([{ totalBottles: 1 }]);
-    });
-  }
-
-  test("accepts trusted-source variants for each exact cask identity field", async ({
+  test("materializes each exact cask identity field for an independent Bottle", async ({
     defaults,
     fixtures,
   }) => {
     const context = contextFor(defaults.user);
     const brand = await fixtures.Entity({ name: "Exact Cask Identity Brand" });
-    const source = await createConcreteBottle({
-      context,
-      input: {
-        kind: "independent",
-        stable: { name: "Exact Cask Expression", brand: brand.id },
-        exact: {
-          edition: "Cask Selection",
-          caskType: "bourbon",
-          caskSize: "hogshead",
-          caskFill: "refill",
-        },
-      },
-    });
     const variants = [
       {
         exactCask: {
@@ -837,8 +289,7 @@ describe("concrete Bottle creation", () => {
       const result = await createConcreteBottle({
         context,
         input: {
-          kind: "source_bottle",
-          sourceBottleId: source.bottle.id,
+          stable: { name: "Exact Cask Expression", brand: brand.id },
           exact: { edition: "Cask Selection", ...exactCask },
         },
       });
@@ -846,23 +297,11 @@ describe("concrete Bottle creation", () => {
         ...exactCask,
         name: `Exact Cask Expression - Cask Selection - ${nameSuffix}`,
       });
+      expect(result.group).toMatchObject({
+        representativeBottleId: result.bottle.id,
+        totalBottles: 1,
+      });
     }
-
-    await expect(
-      createConcreteBottle({
-        context,
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: source.bottle.id,
-          exact: {
-            edition: "Cask Selection",
-            caskType: "bourbon",
-            caskSize: "hogshead",
-            caskFill: "refill",
-          },
-        },
-      }),
-    ).rejects.toMatchObject({ bottleId: source.bottle.id });
   });
 
   test.each([
@@ -875,7 +314,6 @@ describe("concrete Bottle creation", () => {
     const exactOverrides = "exact" in overrides ? overrides.exact : {};
     expect(() =>
       ConcreteBottleCreateInputSchema.parse({
-        kind: "independent",
         stable: {
           name: "Integer Boundary",
           brand: 1,
@@ -901,7 +339,6 @@ describe("concrete Bottle creation", () => {
   ])("rejects an invalid %s id", (_label, stableOverrides) => {
     expect(() =>
       ConcreteBottleCreateInputSchema.parse({
-        kind: "independent",
         stable: {
           name: "Entity ID Boundary",
           brand: 1,
@@ -912,32 +349,25 @@ describe("concrete Bottle creation", () => {
     ).toThrow();
   });
 
-  test("does not expose a raw group id as creation authority", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity();
-    const existing = await fixtures.Bottle({ brandId: brand.id });
-    const invalidInput = {
-      kind: "independent",
-      groupId: existing.groupId,
-      stable: { name: "Unauthorized Group Reuse", brand: brand.id },
-      exact: {},
-    };
-
-    expect(() => ConcreteBottleCreateInputSchema.parse(invalidInput)).toThrow();
-    await expect(
-      createConcreteBottle({
-        context: contextFor(defaults.user),
-        input: invalidInput as never,
-      }),
-    ).rejects.toThrow();
-
-    const created = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.name, "Unauthorized Group Reuse"));
-    expect(created).toEqual([]);
+  test.each([
+    {
+      label: "source Bottle authority",
+      input: {
+        kind: "source_bottle",
+        sourceBottleId: 1,
+        exact: {},
+      },
+    },
+    {
+      label: "raw group authority",
+      input: {
+        groupId: 1,
+        stable: { name: "Unauthorized Group Reuse", brand: 1 },
+        exact: {},
+      },
+    },
+  ])("rejects $label at the runtime boundary", ({ input }) => {
+    expect(() => ConcreteBottleCreateInputSchema.parse(input)).toThrow();
   });
 
   test("blocks exact canonical aliases and duplicate SMWS codes", async ({
@@ -947,7 +377,6 @@ describe("concrete Bottle creation", () => {
     const context = contextFor(defaults.user);
     const brand = await fixtures.Entity({ name: "Duplicate Test Brand" });
     const input = {
-      kind: "independent" as const,
       stable: { name: "Duplicate Expression", brand: brand.id },
       exact: { edition: "Batch 1" },
     };
@@ -978,7 +407,6 @@ describe("concrete Bottle creation", () => {
       createConcreteBottle({
         context,
         input: {
-          kind: "independent",
           stable: {
             name: "35.331",
             brand: smws.id,
@@ -996,16 +424,15 @@ describe("concrete Bottle creation", () => {
     );
   });
 
-  test("returns deterministic likely groups without using them for grouping", async ({
+  test("keeps similar independent creates in distinct singleton groups", async ({
     defaults,
     fixtures,
   }) => {
     const context = contextFor(defaults.user);
-    const brand = await fixtures.Entity({ name: "Suggestion Test Brand" });
+    const brand = await fixtures.Entity({ name: "Singleton Test Brand" });
     const first = await createConcreteBottle({
       context,
       input: {
-        kind: "independent",
         stable: { name: "Shared Expression", brand: brand.id },
         exact: { edition: "Batch 1" },
       },
@@ -1013,21 +440,22 @@ describe("concrete Bottle creation", () => {
     const second = await createConcreteBottle({
       context,
       input: {
-        kind: "independent",
         stable: { name: "Shared Expression", brand: brand.id },
         exact: { edition: "Batch 2" },
       },
     });
 
-    expect(second.likelyGroups).toEqual([
-      {
-        id: first.group.id,
-        name: first.group.name,
-        fullName: first.group.fullName,
-      },
-    ]);
     expect(second.group.id).not.toBe(first.group.id);
-    expect(second.group.totalBottles).toBe(1);
+    expect(first.group).toMatchObject({
+      representativeBottleId: first.bottle.id,
+      totalBottles: 1,
+    });
+    expect(second.group).toMatchObject({
+      representativeBottleId: second.bottle.id,
+      totalBottles: 1,
+    });
+    expect(first.bottle.groupId).toBe(first.group.id);
+    expect(second.bottle.groupId).toBe(second.group.id);
   });
 
   test("rolls back the complete graph and can retry safely", async ({
@@ -1037,7 +465,6 @@ describe("concrete Bottle creation", () => {
     const brand = await fixtures.Entity({ name: "Rollback Test Brand" });
     const actor = await getUserActor(defaults.user);
     const input = {
-      kind: "independent" as const,
       stable: { name: "Rollback Expression", brand: brand.id },
       exact: { edition: "Retryable" },
     };
@@ -1124,7 +551,6 @@ describe("concrete Bottle creation", () => {
     const result = await createConcreteBottle({
       context: contextFor(defaults.user),
       input: {
-        kind: "independent",
         stable: { name: "Committed Before Queue", brand: brand.id },
         exact: {},
       },

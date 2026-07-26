@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
-import type { User } from "@peated/server/db/schema";
+import type { Bottle, User } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottleFlavorProfiles,
@@ -32,6 +32,7 @@ import {
   mergeConcreteBottles,
   mergeConcreteBottlesInTransaction,
 } from "@peated/server/lib/mergeConcreteBottles";
+import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
@@ -80,10 +81,15 @@ function contextFor(user: User | null) {
   return { user } as Parameters<typeof mergeConcreteBottles>[0]["context"];
 }
 
+type GroupMemberExact = Omit<
+  Parameters<typeof testFixtures.BottleGroupMember>[0],
+  "groupId"
+>;
+
 async function createGroup(
   user: User,
   name: string,
-  exacts: Array<Record<string, unknown>>,
+  exacts: GroupMemberExact[],
   stable: Record<string, unknown> = {},
 ) {
   const first = await createConcreteBottle({
@@ -91,25 +97,18 @@ async function createGroup(
       typeof createConcreteBottle
     >[0]["context"],
     input: {
-      kind: "independent",
       stable: { name, brand: { name: `${name} Brand` }, ...stable },
       exact: exacts[0],
     },
   });
-  const members = [first];
+  const members: Array<{ bottle: Bottle }> = [first];
   for (const exact of exacts.slice(1)) {
-    members.push(
-      await createConcreteBottle({
-        context: contextFor(user) as Parameters<
-          typeof createConcreteBottle
-        >[0]["context"],
-        input: {
-          kind: "source_bottle",
-          sourceBottleId: first.bottle.id,
-          exact,
-        },
+    members.push({
+      bottle: await testFixtures.BottleGroupMember({
+        groupId: first.group.id,
+        ...exact,
       }),
-    );
+    });
   }
   return { first, members };
 }

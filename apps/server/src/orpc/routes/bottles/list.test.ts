@@ -5,7 +5,6 @@ import {
   catalogTargets,
   flightBottles,
 } from "@peated/server/db/schema";
-import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq, isNull } from "drizzle-orm";
@@ -142,16 +141,12 @@ describe("GET /bottles", () => {
 
   test("keeps exact sibling Bottles distinct in list results", async ({
     fixtures,
-    defaults,
   }) => {
     const first = await fixtures.Bottle({ name: "Sibling Batch" });
-    const second = await createConcreteBottle({
-      context: { user: defaults.user },
-      input: {
-        kind: "source_bottle",
-        sourceBottleId: first.id,
-        exact: { edition: "Batch Two", releaseYear: 2026 },
-      },
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch Two",
+      releaseYear: 2026,
     });
 
     const { results } = await routerClient.bottles.list({
@@ -160,7 +155,7 @@ describe("GET /bottles", () => {
     });
 
     expect(results.map((result) => result.id).sort((a, b) => a - b)).toEqual(
-      [first.id, second.bottle.id].sort((a, b) => a - b),
+      [first.id, second.id].sort((a, b) => a - b),
     );
   });
 
