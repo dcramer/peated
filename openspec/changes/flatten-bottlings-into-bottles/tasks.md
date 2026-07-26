@@ -55,7 +55,7 @@ and map to an explicit removal task.
       cannot supply a source group as authority.
 - [x] 3.3 Remove public and moderator group selection, merge, and split
       workflows; retain only audited system-controlled regrouping.
-- [ ] 3.4 Preserve atomic shared-field fan-out so a group change rematerializes
+- [x] 3.4 Preserve atomic shared-field fan-out so a group change rematerializes
       complete member Bottles and retains old canonical names as aliases.
 - [ ] 3.5 Simplify exact Bottle merge so all consumers and promotion mappings
       converge directly on the selected surviving Bottle.

@@ -805,8 +805,8 @@ export async function updateConcreteBottleInTransaction(
     members = lockedMembers.filter(({ id }) => !retiredIds.has(id));
     if (
       members.length === 0 ||
-      (group.representativeBottleId !== null &&
-        !members.some(({ id }) => id === group.representativeBottleId))
+      group.representativeBottleId === null ||
+      !members.some(({ id }) => id === group.representativeBottleId)
     ) {
       throw new ConcreteBottleUpdateGraphError(
         "invalid_catalog_graph",

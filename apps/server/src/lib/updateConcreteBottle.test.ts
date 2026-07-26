@@ -983,7 +983,7 @@ describe("concrete Bottle updates", () => {
       .update(bottleGroups)
       .set({
         totalBottles: staleTotalBottles,
-        representativeBottleId: null,
+        representativeBottleId: representativeBefore,
       })
       .where(eq(bottleGroups.id, first.group.id));
 
@@ -1006,7 +1006,7 @@ describe("concrete Bottle updates", () => {
     expect(repair.changed).toBe(true);
     expect(repair.group).toMatchObject({
       totalBottles: staleTotalBottles,
-      representativeBottleId: null,
+      representativeBottleId: representativeBefore,
     });
     const repaired = (await loadGroupMembers(first.group.id)).find(
       ({ id }) => id === repairedMemberId,
@@ -1046,7 +1046,7 @@ describe("concrete Bottle updates", () => {
       category: groupBeforeNameOnly.category,
       flavorProfile: groupBeforeNameOnly.flavorProfile,
       totalBottles: staleTotalBottles,
-      representativeBottleId: null,
+      representativeBottleId: representativeBefore,
     });
     const membersAfterNameOnly = await loadGroupMembers(first.group.id);
     for (const [index, member] of membersAfterNameOnly.entries()) {
@@ -1071,6 +1071,137 @@ describe("concrete Bottle updates", () => {
     expect(await loadBottleDistillers(memberIds)).toEqual(
       distillersBeforeNameOnly,
     );
+  });
+
+  test("rejects shared fan-out without a representative and rolls back", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Representative Guard Brand" });
+    const firstDistiller = await fixtures.Entity({
+      name: "Representative Guard Distiller A",
+    });
+    const secondDistiller = await fixtures.Entity({
+      name: "Representative Guard Distiller B",
+    });
+    const { first, members } = await createGroup({
+      user: mod,
+      stable: {
+        name: "Representative Guard Label",
+        brand: brand.id,
+        distillers: [firstDistiller.id],
+      },
+      exacts: [{ edition: "One" }, { edition: "Two" }],
+    });
+    const memberIds = members.map(({ bottle }) => bottle.id);
+
+    await db
+      .update(bottleGroups)
+      .set({ representativeBottleId: null })
+      .where(eq(bottleGroups.id, first.group.id));
+    const [groupBefore] = await db
+      .select()
+      .from(bottleGroups)
+      .where(eq(bottleGroups.id, first.group.id));
+    const membersBefore = await loadGroupMembers(first.group.id);
+    const aliasesBefore = await loadAliases(memberIds);
+    const bottleDistillersBefore = await loadBottleDistillers(memberIds);
+    const groupDistillersBefore = await db
+      .select()
+      .from(bottleGroupDistillers)
+      .where(eq(bottleGroupDistillers.groupId, first.group.id))
+      .orderBy(asc(bottleGroupDistillers.distillerId));
+    resetQueueMock();
+
+    const error = await waitError(
+      updateConcreteBottle({
+        bottleId: members[0].bottle.id,
+        input: {
+          shared: {
+            name: "Must Not Persist",
+            distillers: [secondDistiller.id],
+          },
+        },
+        context: contextFor(mod),
+      }),
+      ConcreteBottleUpdateGraphError,
+    );
+
+    expect(error).toMatchObject({
+      bottleId: members[0].bottle.id,
+      code: "invalid_catalog_graph",
+      groupId: first.group.id,
+    });
+    expect(
+      (
+        await db
+          .select()
+          .from(bottleGroups)
+          .where(eq(bottleGroups.id, first.group.id))
+      )[0],
+    ).toEqual(groupBefore);
+    expect(await loadGroupMembers(first.group.id)).toEqual(membersBefore);
+    expect(await loadAliases(memberIds)).toEqual(aliasesBefore);
+    expect(await loadBottleDistillers(memberIds)).toEqual(
+      bottleDistillersBefore,
+    );
+    expect(
+      await db
+        .select()
+        .from(bottleGroupDistillers)
+        .where(eq(bottleGroupDistillers.groupId, first.group.id))
+        .orderBy(asc(bottleGroupDistillers.distillerId)),
+    ).toEqual(groupDistillersBefore);
+    expect(await loadUpdateAudits(memberIds)).toEqual([]);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+
+    resetQueueMock();
+    const exactResult = await updateConcreteBottle({
+      bottleId: members[0].bottle.id,
+      input: { exact: { description: "Selected Bottle content" } },
+      context: contextFor(mod),
+    });
+
+    expect(exactResult).toMatchObject({
+      changed: true,
+      bottle: {
+        id: members[0].bottle.id,
+        description: "Selected Bottle content",
+        descriptionSrc: "user",
+      },
+      group: groupBefore,
+    });
+    expect(
+      (
+        await db
+          .select()
+          .from(bottleGroups)
+          .where(eq(bottleGroups.id, first.group.id))
+      )[0],
+    ).toEqual(groupBefore);
+    const membersAfterExact = await loadGroupMembers(first.group.id);
+    expect(membersAfterExact[0]).toEqual({
+      ...membersBefore[0],
+      description: "Selected Bottle content",
+      descriptionSrc: "user",
+      updatedAt: expect.any(Date),
+    });
+    expect(membersAfterExact[1]).toEqual(membersBefore[1]);
+    expect(await loadAliases(memberIds)).toEqual(aliasesBefore);
+    expect(await loadBottleDistillers(memberIds)).toEqual(
+      bottleDistillersBefore,
+    );
+    expect(
+      await db
+        .select()
+        .from(bottleGroupDistillers)
+        .where(eq(bottleGroupDistillers.groupId, first.group.id))
+        .orderBy(asc(bottleGroupDistillers.distillerId)),
+    ).toEqual(groupDistillersBefore);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(1);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: members[0].bottle.id,
+    });
   });
 
   test("writes one contextual Bottle audit per member for a mixed update", async ({
