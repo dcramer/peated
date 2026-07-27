@@ -246,16 +246,6 @@ async function lockActiveBottleInTransaction(
   }
 }
 
-export type ExactBottleAliasBeforeSnapshot = BottleAliasIdentitySnapshot;
-
-export type ExactBottleAliasReservationWithPreimage =
-  | { name: string; changed: false }
-  | {
-      name: string;
-      changed: true;
-      before: ExactBottleAliasBeforeSnapshot | null;
-    };
-
 export type ExactBottleAliasReservationInput = {
   name: string;
   bottleId: number;
@@ -267,20 +257,7 @@ type ExactBottleAliasClaimResult = {
   alias: BottleAliasIdentitySnapshot;
   inserted: boolean;
   changed: boolean;
-  before: ExactBottleAliasBeforeSnapshot | null;
 };
-
-function exactBottleAliasBeforeSnapshot(
-  alias: BottleAliasIdentitySnapshot,
-): ExactBottleAliasBeforeSnapshot {
-  return {
-    name: alias.name,
-    bottleId: alias.bottleId,
-    ignored: alias.ignored,
-    assignmentSource: alias.assignmentSource,
-    assignedByActorId: alias.assignedByActorId,
-  };
-}
 
 /** Claims one runtime alias identity without reading or writing legacy evidence. */
 async function claimBottleAliasNameInTransaction(
@@ -354,7 +331,6 @@ async function claimBottleAliasNameInTransaction(
           alias: insertedAlias,
           inserted: true,
           changed: true,
-          before: null,
         };
       }
       continue;
@@ -392,7 +368,6 @@ async function claimBottleAliasNameInTransaction(
         alias: existingAlias,
         inserted: false,
         changed: false,
-        before: null,
       };
     }
 
@@ -418,7 +393,6 @@ async function claimBottleAliasNameInTransaction(
         alias: updatedAlias,
         inserted: false,
         changed: true,
-        before: exactBottleAliasBeforeSnapshot(existingAlias),
       };
     }
   }
@@ -429,33 +403,20 @@ async function claimBottleAliasNameInTransaction(
 async function reserveExactBottleAliasNameInTransaction(
   tx: AnyTransaction,
   input: ExactBottleAliasReservationInput,
-): Promise<ExactBottleAliasReservationWithPreimage> {
+): Promise<{ name: string; changed: boolean }> {
   await lockActiveBottleInTransaction(tx, input.bottleId);
   const result = await claimBottleAliasNameInTransaction(tx, {
     ...input,
     reservation: true,
   });
-  return result.changed
-    ? { name: result.alias.name, changed: true, before: result.before }
-    : { name: result.alias.name, changed: false };
-}
-
-/** Reserves a normalized canonical alias without migrating other references. */
-export async function reserveExactBottleAliasWithPreimageInTransaction(
-  tx: AnyTransaction,
-  input: ExactBottleAliasReservationInput,
-): Promise<ExactBottleAliasReservationWithPreimage> {
-  return reserveExactBottleAliasNameInTransaction(tx, {
-    ...input,
-    name: normalizeBottleAliasKey(input.name),
-  });
+  return { name: result.alias.name, changed: result.changed };
 }
 
 /** Reserves the literal trimmed canonical name already persisted on a Bottle. */
 export async function reserveLiteralCanonicalBottleAliasInTransaction(
   tx: AnyTransaction,
   input: ExactBottleAliasReservationInput,
-): Promise<ExactBottleAliasReservationWithPreimage> {
+): Promise<{ name: string; changed: boolean }> {
   return reserveExactBottleAliasNameInTransaction(tx, {
     ...input,
     name: input.name.trim(),
@@ -467,11 +428,10 @@ export async function reserveExactBottleAliasInTransaction(
   tx: AnyTransaction,
   input: ExactBottleAliasReservationInput,
 ): Promise<{ name: string; changed: boolean }> {
-  const result = await reserveExactBottleAliasWithPreimageInTransaction(
-    tx,
-    input,
-  );
-  return { name: result.name, changed: result.changed };
+  return reserveExactBottleAliasNameInTransaction(tx, {
+    ...input,
+    name: normalizeBottleAliasKey(input.name),
+  });
 }
 
 async function assertExpectedReviewIdentity(

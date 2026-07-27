@@ -26,7 +26,6 @@ import {
   bottleSeries,
   bottlesToDistillers,
   bottleTombstones,
-  catalogTargets,
   changes,
   entities,
 } from "@peated/server/db/schema";
@@ -51,7 +50,7 @@ import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 
 export { ConcreteBottleUpdateInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 export type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
@@ -123,7 +122,6 @@ export type ConcreteBottleUpdateFinalizationManifest =
   ConcreteBottleUpdateResult & {
     creationSource: CatalogVerificationCreationSource;
     changedBottleIds: number[];
-    changedTargetIds: number[];
     changedAliasNames: string[];
     changedEntityIds: number[];
     newEntityIds: number[];
@@ -679,7 +677,6 @@ function emptyResult(
     changed: false,
     creationSource,
     changedBottleIds: [],
-    changedTargetIds: [],
     changedAliasNames: [],
     changedEntityIds: [],
     newEntityIds: [],
@@ -814,44 +811,6 @@ export async function updateConcreteBottleInTransaction(
         groupId,
       );
     }
-  }
-
-  const genericTargets = await tx
-    .select()
-    .from(catalogTargets)
-    .where(
-      and(eq(catalogTargets.groupId, groupId), isNull(catalogTargets.bottleId)),
-    )
-    .for("update");
-  const exactTargets = await tx
-    .select()
-    .from(catalogTargets)
-    .where(
-      and(
-        eq(catalogTargets.groupId, groupId),
-        inArray(
-          catalogTargets.bottleId,
-          members.map(({ id }) => id),
-        ),
-      ),
-    )
-    .orderBy(asc(catalogTargets.bottleId))
-    .for("update");
-  const targetByBottleId = new Map(
-    exactTargets.flatMap((target) =>
-      target.bottleId === null ? [] : [[target.bottleId, target] as const],
-    ),
-  );
-  if (
-    genericTargets.length !== 1 ||
-    exactTargets.length !== members.length ||
-    members.some(({ id }) => !targetByBottleId.has(id))
-  ) {
-    throw new ConcreteBottleUpdateGraphError(
-      "invalid_catalog_graph",
-      bottleId,
-      groupId,
-    );
   }
 
   if (!sharedIntent && !exactIntent) {
@@ -1022,7 +981,6 @@ export async function updateConcreteBottleInTransaction(
           const desired = desiredByBottleId.get(member.id)!;
           return {
             bottleId: member.id,
-            targetId: targetByBottleId.get(member.id)!.id,
             current: {
               name: member.name,
               fullName: member.fullName,
@@ -1174,9 +1132,6 @@ export async function updateConcreteBottleInTransaction(
     changed: true,
     creationSource,
     changedBottleIds: affectedIds,
-    changedTargetIds: affectedIds.map(
-      (changedBottleId) => targetByBottleId.get(changedBottleId)!.id,
-    ),
     changedAliasNames,
     changedEntityIds: Array.from(changedEntityIds).sort(
       (left, right) => left - right,

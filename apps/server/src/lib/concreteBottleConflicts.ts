@@ -2,9 +2,8 @@ import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-cla
 import type { AnyTransaction } from "@peated/server/db";
 import { bottleAliases, bottles, entities } from "@peated/server/db/schema";
 import {
-  type ExactBottleAliasBeforeSnapshot,
   ExactBottleAliasConflictError,
-  reserveExactBottleAliasWithPreimageInTransaction,
+  reserveExactBottleAliasInTransaction,
   reserveLiteralCanonicalBottleAliasInTransaction,
 } from "@peated/server/lib/bottleAliases";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
@@ -25,16 +24,8 @@ export type ConcreteBottleIdentityState = {
 
 export type ConcreteBottleIdentityCandidate = {
   bottleId: number;
-  targetId: number;
   current: ConcreteBottleIdentityState;
   desired: ConcreteBottleIdentityState;
-};
-
-export type ConcreteBottleAliasMutation = {
-  name: string;
-  bottleId: number;
-  targetId: number;
-  before: ExactBottleAliasBeforeSnapshot | null;
 };
 
 export type ConcreteBottleIdentityConflictCause =
@@ -242,7 +233,6 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
   },
 ): Promise<{
   changedAliasNames: string[];
-  aliasMutations: ConcreteBottleAliasMutation[];
 }> {
   const sortedCandidates = [...candidates].sort(
     (left, right) => left.bottleId - right.bottleId,
@@ -333,13 +323,10 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
     }
   }
 
-  const reservations = new Map<
-    string,
-    { name: string; bottleId: number; targetId: number }
-  >();
+  const reservations = new Map<string, { name: string; bottleId: number }>();
   const literalReservations = new Map<
     string,
-    { name: string; bottleId: number; targetId: number }
+    { name: string; bottleId: number }
   >();
   for (const candidate of identityChanges) {
     for (const name of [
@@ -357,7 +344,6 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
       reservations.set(key, {
         name,
         bottleId: candidate.bottleId,
-        targetId: candidate.targetId,
       });
     }
 
@@ -373,15 +359,13 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
     literalReservations.set(literalKey, {
       name: literalName,
       bottleId: candidate.bottleId,
-      targetId: candidate.targetId,
     });
   }
 
   const changedAliasNames = new Set<string>();
-  const aliasMutations = new Map<string, ConcreteBottleAliasMutation>();
   const reserveAlias = async (
-    reservation: { name: string; bottleId: number; targetId: number },
-    reserve: typeof reserveExactBottleAliasWithPreimageInTransaction,
+    reservation: { name: string; bottleId: number },
+    reserve: typeof reserveExactBottleAliasInTransaction,
   ) => {
     try {
       const result = await reserve(tx, {
@@ -392,15 +376,6 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
       });
       if (result.changed) {
         changedAliasNames.add(result.name);
-        const key = result.name.toLowerCase();
-        if (!aliasMutations.has(key)) {
-          aliasMutations.set(key, {
-            name: result.name,
-            bottleId: reservation.bottleId,
-            targetId: reservation.targetId,
-            before: result.before,
-          });
-        }
       }
     } catch (error) {
       if (error instanceof ExactBottleAliasConflictError) {
@@ -420,10 +395,7 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
         .toLowerCase()
         .localeCompare(normalizeBottleAliasKey(right.name).toLowerCase()),
   )) {
-    await reserveAlias(
-      reservation,
-      reserveExactBottleAliasWithPreimageInTransaction,
-    );
+    await reserveAlias(reservation, reserveExactBottleAliasInTransaction);
   }
 
   for (const reservation of Array.from(literalReservations.values()).sort(
@@ -438,10 +410,5 @@ export async function reserveConcreteBottleIdentitiesInTransaction(
 
   return {
     changedAliasNames: Array.from(changedAliasNames).sort(),
-    aliasMutations: Array.from(aliasMutations.values()).sort(
-      (left, right) =>
-        left.name.toLowerCase().localeCompare(right.name.toLowerCase()) ||
-        left.name.localeCompare(right.name),
-    ),
   };
 }

@@ -15,6 +15,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
 import waitError from "@peated/server/lib/test/waitError";
 import {
@@ -81,14 +82,6 @@ async function loadGroupMembers(groupId: number) {
     .from(bottles)
     .where(eq(bottles.groupId, groupId))
     .orderBy(asc(bottles.id));
-}
-
-async function loadGroupTargets(groupId: number) {
-  return await db
-    .select()
-    .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, groupId))
-    .orderBy(asc(catalogTargets.id));
 }
 
 async function loadAliases(bottleIds: number[]) {
@@ -237,7 +230,6 @@ describe("concrete Bottle updates", () => {
       .from(bottleGroups)
       .where(eq(bottleGroups.id, first.group.id));
     const aliasesBefore = await loadAliases([first.bottle.id]);
-    const targetsBefore = await loadGroupTargets(first.group.id);
 
     const empty = await updateConcreteBottle({
       bottleId: first.bottle.id,
@@ -271,7 +263,6 @@ describe("concrete Bottle updates", () => {
     expect(groupAfter.updatedAt).toEqual(groupBefore.updatedAt);
     expect(await loadUpdateAudits([first.bottle.id])).toEqual([]);
     expect(await loadAliases([first.bottle.id])).toEqual(aliasesBefore);
-    expect(await loadGroupTargets(first.group.id)).toEqual(targetsBefore);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
@@ -665,10 +656,6 @@ describe("concrete Bottle updates", () => {
       .select()
       .from(bottleGroups)
       .where(eq(bottleGroups.id, first.group.id));
-    const targetsBefore = await loadGroupTargets(first.group.id);
-    const exactTarget = targetsBefore.find(
-      ({ bottleId }) => bottleId === selectedBefore.id,
-    )!;
 
     const identityResult = await updateConcreteBottle({
       bottleId: selectedBefore.id,
@@ -728,18 +715,15 @@ describe("concrete Bottle updates", () => {
         expect.objectContaining({
           name: selectedBefore.fullName,
           bottleId: selectedBefore.id,
-          targetId: exactTarget.id,
         }),
         expect.objectContaining({
           name: identityResult.bottle.fullName,
           bottleId: selectedBefore.id,
-          targetId: exactTarget.id,
         }),
       ]),
     );
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
     expect(identityResult.group).toEqual(groupBefore);
-    expect(await loadGroupTargets(groupBefore.id)).toEqual(targetsBefore);
 
     const identityBeforeContent = identityResult.bottle;
     const contentResult = await updateConcreteBottle({
@@ -762,7 +746,92 @@ describe("concrete Bottle updates", () => {
       distillersBefore,
     );
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
-    expect(await loadGroupTargets(groupBefore.id)).toEqual(targetsBefore);
+  });
+
+  test("updates direct Bottle identity without an exact CatalogTarget", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Direct Identity Brand" });
+    const { first } = await createGroup({
+      user: mod,
+      stable: { name: "Direct Identity", brand: brand.id },
+      exacts: [{ edition: "Original" }],
+    });
+    const oldLiteralName =
+      "Direct Identity Brand Direct Identity   12 years old";
+    const oldNormalizedName = normalizeBottleAliasKey(oldLiteralName);
+    await db
+      .update(bottles)
+      .set({ fullName: oldLiteralName })
+      .where(eq(bottles.id, first.bottle.id));
+    await db
+      .update(bottleAliases)
+      .set({ targetId: null })
+      .where(eq(bottleAliases.bottleId, first.bottle.id));
+    await db
+      .delete(catalogTargets)
+      .where(eq(catalogTargets.bottleId, first.bottle.id));
+    resetQueueMock();
+
+    const result = await updateConcreteBottle({
+      bottleId: first.bottle.id,
+      input: { exact: { edition: "Updated" } },
+      context: contextFor(mod),
+    });
+
+    expect(result).toMatchObject({
+      changed: true,
+      bottle: {
+        id: first.bottle.id,
+        groupId: first.group.id,
+        edition: "Updated",
+      },
+    });
+    const expectedAliasNames = Array.from(
+      new Set([
+        oldLiteralName,
+        oldNormalizedName,
+        result.bottle.fullName,
+        normalizeBottleAliasKey(result.bottle.fullName),
+      ]),
+    ).sort();
+    const directAliases = await db
+      .select({
+        name: bottleAliases.name,
+        bottleId: bottleAliases.bottleId,
+        targetId: bottleAliases.targetId,
+      })
+      .from(bottleAliases)
+      .where(inArray(bottleAliases.name, expectedAliasNames));
+    expect(directAliases).toHaveLength(expectedAliasNames.length);
+    expect(directAliases).toEqual(
+      expect.arrayContaining(
+        expectedAliasNames.map((name) => ({
+          name,
+          bottleId: first.bottle.id,
+          targetId: null,
+        })),
+      ),
+    );
+    expect(await loadUpdateAudits([first.bottle.id])).toEqual([
+      expect.objectContaining({
+        objectId: first.bottle.id,
+        data: expect.objectContaining({
+          updateScope: "exact",
+          edition: "Updated",
+        }),
+      }),
+    ]);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: first.bottle.id,
+    });
+    for (const name of expectedAliasNames) {
+      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+        "OnBottleAliasChange",
+        { name },
+      );
+    }
   });
 
   test("fans out every shared field and repairs member drift on an equal patch", async ({
@@ -812,7 +881,6 @@ describe("concrete Bottle updates", () => {
     const oldNames = new Map(
       members.map(({ bottle }) => [bottle.id, bottle.fullName]),
     );
-    const targetsBefore = await loadGroupTargets(first.group.id);
     const representativeBefore = first.group.representativeBottleId;
     const [persistedGroupBefore] = await db
       .select()
@@ -945,14 +1013,11 @@ describe("concrete Bottle updates", () => {
         newDistillers.map(({ id: distillerId }) => ({ bottleId, distillerId })),
       ),
     );
-    expect(await loadGroupTargets(first.group.id)).toEqual(targetsBefore);
     const aliasesAfterFanout = await loadAliases(memberIds);
     for (const [bottleId, oldName] of oldNames) {
-      const target = targetsBefore.find((row) => row.bottleId === bottleId)!;
       expect(aliasesAfterFanout).toContainEqual(
         expect.objectContaining({
           bottleId,
-          targetId: target.id,
           name: oldName,
         }),
       );
@@ -1023,7 +1088,6 @@ describe("concrete Bottle updates", () => {
     expect(
       selectBottleAggregates(await loadGroupMembers(first.group.id)),
     ).toEqual(bottleAggregatesBefore);
-    expect(await loadGroupTargets(first.group.id)).toEqual(targetsBefore);
 
     const [groupBeforeNameOnly] = await db
       .select()
@@ -1406,7 +1470,6 @@ describe("concrete Bottle updates", () => {
     await fixtures.BottleAlias({
       name: conflictingAliasName,
       bottleId: aliasOwner.bottle.id,
-      targetId: aliasOwner.exactTarget.id,
       assignmentSource: "human_approved",
     });
     const aliasesBeforeAliasCollision = await loadAliases([
@@ -1611,7 +1674,7 @@ describe("concrete Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
-  test("returns typed graph errors for absent, group-less, retired, and target-less Bottles", async ({
+  test("returns typed graph errors for absent, group-less, and retired Bottles", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -1621,21 +1684,12 @@ describe("concrete Bottle updates", () => {
       bottleId: retired.id,
       newBottleId: null,
     });
-    const targetless = await fixtures.Bottle();
-    await db
-      .update(bottleAliases)
-      .set({ targetId: null })
-      .where(eq(bottleAliases.bottleId, targetless.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, targetless.id));
     resetQueueMock();
 
     const cases = [
       { bottleId: 999_999, code: "not_found" },
       { bottleId: legacy.id, code: "missing_group" },
       { bottleId: retired.id, code: "retired" },
-      { bottleId: targetless.id, code: "invalid_catalog_graph" },
     ] as const;
     for (const expected of cases) {
       const error = await waitError(
@@ -1648,9 +1702,7 @@ describe("concrete Bottle updates", () => {
       );
       expect(error).toMatchObject(expected);
     }
-    expect(
-      await loadUpdateAudits([legacy.id, retired.id, targetless.id]),
-    ).toEqual([]);
+    expect(await loadUpdateAudits([legacy.id, retired.id])).toEqual([]);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
@@ -1705,7 +1757,6 @@ describe("concrete Bottle updates", () => {
           .where(eq(bottleReleases.id, legacyRelease.id))
       )[0],
     ).toEqual(legacyRelease);
-    expect(await loadGroupTargets(first.group.id)).toHaveLength(3);
     for (const seriesId of [oldSeries.id, newSeries.id]) {
       expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
         "IndexBottleSeriesSearchVectors",
