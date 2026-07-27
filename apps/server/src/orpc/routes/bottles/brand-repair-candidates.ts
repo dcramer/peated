@@ -1,5 +1,4 @@
 import { getBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
@@ -9,7 +8,6 @@ const BrandRepairCandidateSchema = z.object({
     id: z.number(),
     fullName: z.string(),
     name: z.string(),
-    numReleases: z.number(),
     totalTastings: z.number().nullable(),
   }),
   currentBrand: z.object({
@@ -73,13 +71,4 @@ export default procedure
       }),
     }),
   )
-  .handler(async function ({ input, errors }) {
-    try {
-      return await getBrandRepairCandidates(input);
-    } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      throw error;
-    }
-  });
+  .handler(async ({ input }) => getBrandRepairCandidates(input));

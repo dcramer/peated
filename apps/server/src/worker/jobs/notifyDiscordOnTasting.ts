@@ -1,8 +1,8 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { loadCatalogTarget } from "@peated/server/lib/catalogTargets";
 import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
+import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { absoluteUrl } from "@peated/server/lib/urls";
 
 if (!config.DISCORD_WEBHOOK) {
@@ -14,25 +14,32 @@ export default async function ({ tastingId }: { tastingId: number }) {
     return;
   }
 
-  const tasting = await db.query.tastings.findFirst({
-    where: (tastings, { eq }) => eq(tastings.id, tastingId),
-    with: {
-      createdBy: true,
-    },
+  const tasting = await db.transaction(async (tx) => {
+    const selected = await tx.query.tastings.findFirst({
+      where: (tastings, { eq }) => eq(tastings.id, tastingId),
+      with: {
+        createdBy: true,
+      },
+    });
+    if (!selected) {
+      throw new Error(`Unknown tasting: ${tastingId}`);
+    }
+    const bottleId = selected.bottleId;
+    if (bottleId === null) {
+      throw new Error(`Tasting ${tastingId} has no Bottle`);
+    }
+    await resolveActiveBottleIds(tx, [bottleId]);
+    const bottle = await tx.query.bottles.findFirst({
+      where: (bottles, { eq }) => eq(bottles.id, bottleId),
+      columns: { fullName: true },
+    });
+    if (!bottle) {
+      throw new Error(
+        `Tasting ${tastingId} references missing Bottle ${bottleId}`,
+      );
+    }
+    return { ...selected, bottle };
   });
-  if (!tasting) {
-    throw new Error(`Unknown tasting: ${tastingId}`);
-  }
-  if (tasting.targetId === null) {
-    throw new Error(`Tasting ${tastingId} has no CatalogTarget`);
-  }
-
-  const target = await loadCatalogTarget(tasting.targetId, {
-    actor: null,
-    permissions: { canReadCatalogIdentity: true },
-  });
-  const targetLabel =
-    target.kind === "bottle" ? target.bottle.fullName : target.group.fullName;
 
   // TODO: pretty sure we're mismatched timezones on db + server, and need normalization
   // move db to UTC (if its not, or if its not storing tzinfo), and then run all these checks
@@ -42,13 +49,6 @@ export default async function ({ tastingId }: { tastingId: number }) {
   // }
 
   const fields = [];
-  if (target.kind === "group")
-    fields.push({
-      name: "Bottle",
-      value: "Exact bottle not specified",
-      inline: true,
-    });
-
   if (tasting.rating !== null)
     fields.push({
       name: "Rating",
@@ -90,7 +90,7 @@ export default async function ({ tastingId }: { tastingId: number }) {
             ? absoluteUrl(config.API_SERVER, tasting.createdBy.pictureUrl)
             : null,
         },
-        title: targetLabel,
+        title: tasting.bottle.fullName,
         url: `${config.URL_PREFIX}/tastings/${tasting.id}`,
         description: tasting.notes || null,
         fields,

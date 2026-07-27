@@ -3,7 +3,7 @@ import { db } from "@peated/server/db";
 import {
   bottleGroups,
   bottleTombstones,
-  catalogTargets,
+  tastings,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
@@ -44,9 +44,7 @@ async function sentEmbed(): Promise<DiscordEmbed> {
   return embed;
 }
 
-test("uses the exact Bottle label for an exact tasting target", async ({
-  fixtures,
-}) => {
+test("uses the referenced Bottle label", async ({ fixtures }) => {
   const bottle = await fixtures.Bottle({ name: "Exact Notification" });
   const groupLabel = "Distinct Exact Discord Group Label";
   await db
@@ -67,70 +65,36 @@ test("uses the exact Bottle label for an exact tasting target", async ({
   });
 });
 
-test("uses the BottleGroup label for a generic tasting target", async ({
-  fixtures,
-}) => {
-  const bottle = await fixtures.Bottle({ name: "Exact Notification" });
-  const genericTarget = await db.query.catalogTargets.findFirst({
-    where: (catalogTargets, { and, eq, isNull }) =>
-      and(
-        eq(catalogTargets.groupId, bottle.groupId as number),
-        isNull(catalogTargets.bottleId),
-      ),
-  });
-  if (!genericTarget) throw new Error("Missing generic target fixture");
-  await db
-    .update(bottleGroups)
-    .set({ fullName: "Generic Notification Label" })
-    .where(eq(bottleGroups.id, bottle.groupId as number));
-  const tasting = await fixtures.Tasting({
-    bottleId: bottle.id,
-    targetId: genericTarget.id,
-  });
-
-  await notifyDiscordOnTasting({ tastingId: tasting.id });
-
-  const embed = await sentEmbed();
-  expect(embed.title).toBe("Generic Notification Label");
-  expect(embed.title).not.toBe(bottle.fullName);
-  expect(embed.fields).toContainEqual({
-    name: "Bottle",
-    value: "Exact bottle not specified",
-    inline: true,
-  });
-});
-
-test("rejects a targetless tasting without sending a webhook", async ({
+test("rejects a tasting without a Bottle without sending a webhook", async ({
   fixtures,
 }) => {
   const bottle = await fixtures.Bottle();
   const tasting = await fixtures.Tasting({
     bottleId: bottle.id,
-    targetId: null,
   });
+  await db
+    .update(tastings)
+    .set({ bottleId: null })
+    .where(eq(tastings.id, tasting.id));
 
   await expect(
     notifyDiscordOnTasting({ tastingId: tasting.id }),
-  ).rejects.toThrow(`Tasting ${tasting.id} has no CatalogTarget`);
+  ).rejects.toThrow(`Tasting ${tasting.id} has no Bottle`);
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
-test("rejects a retired exact target without sending a webhook", async ({
+test("rejects a retired Bottle without sending a webhook", async ({
   fixtures,
 }) => {
   const bottle = await fixtures.Bottle();
   const tasting = await fixtures.Tasting({ bottleId: bottle.id });
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottle.id),
-  });
-  if (!target) throw new Error("Missing exact target fixture");
   await db.insert(bottleTombstones).values({ bottleId: bottle.id });
 
   await expect(
     notifyDiscordOnTasting({ tastingId: tasting.id }),
   ).rejects.toMatchObject({
-    code: "CATALOG_TARGET_RETIRED",
-    identity: { bottleId: bottle.id },
+    reason: "bottle_retired",
+    bottleId: bottle.id,
   });
   expect(fetchMock).not.toHaveBeenCalled();
 });

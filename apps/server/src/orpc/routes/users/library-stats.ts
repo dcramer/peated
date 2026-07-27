@@ -1,13 +1,23 @@
 import { db } from "@peated/server/db";
-import { collectionBottles, entities } from "@peated/server/db/schema";
+import {
+  bottleGroupTombstones,
+  bottles,
+  bottlesToDistillers,
+  bottleTombstones,
+  collectionBottles,
+  entities,
+} from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
-import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
-import { CategoryEnum, type CatalogTargetV1 } from "@peated/server/schemas";
+import { CategoryEnum } from "@peated/server/schemas";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import {
+  readJoinedUserBottle,
+  type UserBottleRead,
+  UserBottleReadIntegrityError,
+} from "./tasting-bottle-scan";
 
 const LIBRARY_STATS_BATCH_SIZE = 200;
 
@@ -57,6 +67,7 @@ type LibraryStatsAccumulator = {
   distillerCounts: Map<number, number>;
   unstatedAgeCount: number;
 };
+type LibraryBottleRead = UserBottleRead & { distillerIds: number[] };
 
 const emptyStats: LibraryStats = {
   total: 0,
@@ -81,10 +92,6 @@ function incrementCount<TKey>(counts: Map<TKey, number>, key: TKey): void {
   counts.set(key, (counts.get(key) ?? 0) + 1);
 }
 
-function getTargetIdentity(target: CatalogTargetV1) {
-  return target.kind === "bottle" ? target.bottle : target.group;
-}
-
 function createLibraryStatsAccumulator(): LibraryStatsAccumulator {
   return {
     total: 0,
@@ -98,30 +105,29 @@ function createLibraryStatsAccumulator(): LibraryStatsAccumulator {
 
 function accumulateLibraryStats(
   accumulator: LibraryStatsAccumulator,
-  targets: Array<CatalogTargetV1 | null>,
+  bottleList: Array<LibraryBottleRead | null>,
 ): void {
-  accumulator.total += targets.length;
+  accumulator.total += bottleList.length;
 
-  for (const target of targets) {
-    if (!target) {
+  for (const bottle of bottleList) {
+    if (!bottle) {
       accumulator.unstatedAgeCount += 1;
       continue;
     }
 
-    const identity = getTargetIdentity(target);
-    if (identity.statedAge === null) {
+    if (bottle.statedAge === null) {
       accumulator.unstatedAgeCount += 1;
     } else {
-      accumulator.ages.push(identity.statedAge);
+      accumulator.ages.push(bottle.statedAge);
       accumulator.oldestAge =
         accumulator.oldestAge === null
-          ? identity.statedAge
-          : Math.max(accumulator.oldestAge, identity.statedAge);
+          ? bottle.statedAge
+          : Math.max(accumulator.oldestAge, bottle.statedAge);
     }
-    if (identity.category !== null) {
-      incrementCount(accumulator.categoryCounts, identity.category);
+    if (bottle.category !== null) {
+      incrementCount(accumulator.categoryCounts, bottle.category);
     }
-    for (const distillerId of identity.distillerIds) {
+    for (const distillerId of bottle.distillerIds) {
       incrementCount(accumulator.distillerCounts, distillerId);
     }
   }
@@ -153,7 +159,7 @@ async function finalizeLibraryStats(
   const distillers = Array.from(accumulator.distillerCounts, ([id, count]) => {
     const distiller = distillersById.get(id);
     if (!distiller) {
-      throw new Error(`Catalog target references missing distiller: ${id}`);
+      throw new Error(`Bottle references missing distiller: ${id}`);
     }
     return { id, name: distiller.name, count };
   })
@@ -266,11 +272,25 @@ export default procedure
         const rows = await db
           .select({
             id: collectionBottles.id,
-            targetId: collectionBottles.targetId,
-            bottleId: collectionBottles.bottleId,
-            releaseId: collectionBottles.releaseId,
+            storedBottleId: collectionBottles.bottleId,
+            bottle: {
+              id: bottles.id,
+              groupId: bottles.groupId,
+              brandId: bottles.brandId,
+              category: bottles.category,
+              flavorProfile: bottles.flavorProfile,
+              statedAge: bottles.statedAge,
+            },
+            retiredBottleId: bottleTombstones.bottleId,
+            retiredGroupId: bottleGroupTombstones.groupId,
           })
           .from(collectionBottles)
+          .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
+          .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
+          .leftJoin(
+            bottleGroupTombstones,
+            eq(bottleGroupTombstones.groupId, bottles.groupId),
+          )
           .where(
             and(
               eq(collectionBottles.collectionId, library.id),
@@ -283,24 +303,37 @@ export default procedure
 
         if (rows.length === 0) break;
 
-        const { targets } = await loadCatalogTargetReadsWithParity(
-          rows.map((row) => ({
-            consumerTable: "collection_bottle" as const,
-            rowLocator: { id: row.id },
-            targetId: row.targetId,
-            legacy: {
-              bottleId: row.bottleId,
-              releaseId: row.releaseId,
-            },
-          })),
-          {
-            actor: null,
-            permissions: { canReadCatalogIdentity: true },
-            caller: "users.libraryStats",
-            operation: "aggregate",
-          },
+        const directBottles = rows.map(readJoinedUserBottle);
+        const bottleIds = Array.from(
+          new Set(
+            directBottles.flatMap((bottle) =>
+              bottle === null ? [] : [bottle.id],
+            ),
+          ),
         );
-        accumulateLibraryStats(accumulator, targets);
+        const distillerRows = bottleIds.length
+          ? await db
+              .select()
+              .from(bottlesToDistillers)
+              .where(inArray(bottlesToDistillers.bottleId, bottleIds))
+          : [];
+        const distillerIdsByBottleId = new Map<number, number[]>();
+        for (const { bottleId, distillerId } of distillerRows) {
+          const ids = distillerIdsByBottleId.get(bottleId) ?? [];
+          ids.push(distillerId);
+          distillerIdsByBottleId.set(bottleId, ids);
+        }
+        accumulateLibraryStats(
+          accumulator,
+          directBottles.map((bottle) =>
+            bottle === null
+              ? null
+              : {
+                  ...bottle,
+                  distillerIds: distillerIdsByBottleId.get(bottle.id) ?? [],
+                },
+          ),
+        );
 
         afterId = rows.at(-1)!.id;
         if (rows.length < LIBRARY_STATS_BATCH_SIZE) break;
@@ -308,7 +341,7 @@ export default procedure
 
       return await finalizeLibraryStats(accumulator);
     } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
+      if (error instanceof UserBottleReadIntegrityError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;

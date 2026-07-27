@@ -1,19 +1,16 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { bottleGroups } from "@peated/server/db/schema";
-import { getUserActor } from "@peated/server/lib/actors";
 import {
-  CatalogTargetIntegrityMismatchError,
-  CatalogTargetNotFoundError,
-  CatalogTargetResolutionError,
-  loadCatalogTargetByBottleId,
-} from "@peated/server/lib/catalogTargets";
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
+import { absoluteUrl } from "@peated/server/lib/urls";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware/auth";
 import {
   BottleGroupV1Schema,
   ConcreteBottleV1Schema,
 } from "@peated/server/schemas";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 const BottleEditChoiceSchema = z
@@ -81,93 +78,101 @@ export default procedure
   })
   .input(z.object({ bottle: z.coerce.number().int().positive() }).strict())
   .output(BottleEditContextSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async function ({ input, errors }) {
     try {
-      const target = await loadCatalogTargetByBottleId(input.bottle, {
-        actor: await getUserActor(context.user),
-        permissions: { canReadCatalogIdentity: true },
-      });
-      if (target.kind !== "bottle") {
-        throw new CatalogTargetIntegrityMismatchError(
-          { bottleId: input.bottle },
-          "the Bottle resolved to a generic target",
-        );
-      }
-
-      const group = await db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, target.group.id),
-        with: {
-          brand: true,
-          bottler: true,
-          series: true,
-          distillers: { with: { distiller: true } },
-        },
-      });
-      if (!group) {
-        throw new CatalogTargetIntegrityMismatchError(
-          { bottleId: input.bottle },
-          "the BottleGroup edit context could not be hydrated",
-        );
-      }
-
-      const distillerRows = [...group.distillers].sort(
-        (left, right) => left.distillerId - right.distillerId,
-      );
-
-      return {
-        bottleId: target.bottle.id,
-        totalBottles: target.group.totalBottles,
-        shared: {
-          name: target.group.name,
-          statedAge: target.group.statedAge,
-          brand: { id: group.brand!.id, name: group.brand!.name },
-          distillers: distillerRows.map(({ distiller }) => ({
-            id: distiller!.id,
-            name: distiller!.name,
-          })),
-          bottler:
-            group.bottlerId !== null
-              ? { id: group.bottler!.id, name: group.bottler!.name }
-              : null,
-          series:
-            group.seriesId !== null
-              ? { id: group.series!.id, name: group.series!.name }
-              : null,
-          category: target.group.category,
-          flavorProfile: target.group.flavorProfile,
-        },
-        exact: {
-          edition: target.bottle.edition,
-          statedAge:
-            target.bottle.statedAge !== null &&
-            target.bottle.statedAge !== target.group.statedAge
-              ? target.bottle.statedAge
-              : null,
-          abv: target.bottle.abv,
-          singleCask: target.bottle.singleCask,
-          caskStrength: target.bottle.caskStrength,
-          vintageYear: target.bottle.vintageYear,
-          releaseYear: target.bottle.releaseYear,
-          caskSize: target.bottle.caskSize,
-          caskType: target.bottle.caskType,
-          caskFill: target.bottle.caskFill,
-          description: target.bottle.description,
-          descriptionSrc: target.bottle.descriptionSrc,
-          imageUrl: target.bottle.imageUrl,
-        },
-      };
-    } catch (error) {
-      if (error instanceof CatalogTargetNotFoundError) {
-        const existingBottle = await db.query.bottles.findFirst({
+      return await db.transaction(async (tx) => {
+        await resolveActiveBottleIds(tx, [input.bottle]);
+        const bottle = await tx.query.bottles.findFirst({
           where: (bottles, { eq }) => eq(bottles.id, input.bottle),
-          columns: { id: true },
+          with: {
+            group: {
+              with: {
+                brand: true,
+                bottler: true,
+                series: true,
+                distillers: { with: { distiller: true } },
+              },
+            },
+          },
         });
-        if (existingBottle) {
-          throw errors.CONFLICT({ message: error.message, cause: error });
+        if (!bottle?.group) {
+          throw new ActiveBottleSelectionError("unassigned", input.bottle);
         }
-        throw errors.NOT_FOUND({ message: error.message, cause: error });
-      }
-      if (error instanceof CatalogTargetResolutionError) {
+
+        const { group } = bottle;
+        if (!group.brand) {
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} is missing its Brand.`,
+          });
+        }
+        if (group.bottlerId !== null && !group.bottler) {
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} is missing its Bottler.`,
+          });
+        }
+        if (group.seriesId !== null && !group.series) {
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} is missing its Series.`,
+          });
+        }
+        const distillerRows = [...group.distillers].sort(
+          (left, right) => left.distillerId - right.distillerId,
+        );
+        if (distillerRows.some(({ distiller }) => !distiller)) {
+          throw errors.CONFLICT({
+            message: `BottleGroup ${group.id} is missing a Distiller.`,
+          });
+        }
+
+        return {
+          bottleId: bottle.id,
+          totalBottles: group.totalBottles,
+          shared: {
+            name: group.name,
+            statedAge: group.statedAge,
+            brand: { id: group.brand.id, name: group.brand.name },
+            distillers: distillerRows.map(({ distiller }) => ({
+              id: distiller!.id,
+              name: distiller!.name,
+            })),
+            bottler:
+              group.bottlerId !== null
+                ? { id: group.bottler!.id, name: group.bottler!.name }
+                : null,
+            series:
+              group.seriesId !== null
+                ? { id: group.series!.id, name: group.series!.name }
+                : null,
+            category: group.category,
+            flavorProfile: group.flavorProfile,
+          },
+          exact: {
+            edition: bottle.edition,
+            statedAge:
+              bottle.statedAge !== null && bottle.statedAge !== group.statedAge
+                ? bottle.statedAge
+                : null,
+            abv: bottle.abv,
+            singleCask: bottle.singleCask,
+            caskStrength: bottle.caskStrength,
+            vintageYear: bottle.vintageYear,
+            releaseYear: bottle.releaseYear,
+            caskSize: bottle.caskSize,
+            caskType: bottle.caskType,
+            caskFill: bottle.caskFill,
+            description: bottle.description,
+            descriptionSrc: bottle.descriptionSrc,
+            imageUrl: bottle.imageUrl
+              ? absoluteUrl(config.API_SERVER, bottle.imageUrl)
+              : null,
+          },
+        };
+      });
+    } catch (error) {
+      if (error instanceof ActiveBottleSelectionError) {
+        if (error.reason === "missing") {
+          throw errors.NOT_FOUND({ message: error.message, cause: error });
+        }
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;

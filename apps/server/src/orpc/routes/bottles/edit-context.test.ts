@@ -1,11 +1,10 @@
 import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
-  bottleAliases,
+  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
@@ -234,20 +233,24 @@ describe("GET /bottles/{bottle}/edit-context", () => {
     );
     expect(retiredError).toMatchObject({ status: 409 });
 
-    const invalid = await fixtures.Bottle({ name: "Invalid Edit Context" });
-    await db
-      .delete(bottleAliases)
-      .where(eq(bottleAliases.bottleId, invalid.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, invalid.id));
-    const invalidError = await waitError(
+    const retiredGroup = await fixtures.Bottle({
+      name: "Retired Group Edit Context",
+    });
+    const replacementGroup = await fixtures.Bottle({
+      name: "Replacement Group Edit Context",
+    });
+    await db.insert(bottleGroupTombstones).values({
+      groupId: retiredGroup.groupId as number,
+      newGroupId: replacementGroup.groupId as number,
+      createdByActorId: retiredGroup.createdByActorId,
+    });
+    const retiredGroupError = await waitError(
       routerClient.bottles.editContext(
-        { bottle: invalid.id },
+        { bottle: retiredGroup.id },
         { context: { user: mod } },
       ),
     );
-    expect(invalidError).toMatchObject({ status: 409 });
+    expect(retiredGroupError).toMatchObject({ status: 409 });
 
     const missingGroup = await fixtures.LegacyBottle({
       name: "Missing Group Edit Context",

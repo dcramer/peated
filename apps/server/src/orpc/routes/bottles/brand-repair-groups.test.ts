@@ -15,7 +15,7 @@ describe("GET /bottles/brand-repair-groups", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("returns conflict when selected alias evidence has a retired target", async ({
+  test("filters retired Bottles from grouped candidates", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -25,17 +25,12 @@ describe("GET /bottles/brand-repair-groups", () => {
       newBottleId: null,
     });
 
-    const error = await waitError(
-      routerClient.bottles.brandRepairGroups(
-        { query: bottle.fullName },
-        { context: { user } },
-      ),
+    const { results } = await routerClient.bottles.brandRepairGroups(
+      { query: bottle.fullName },
+      { context: { user } },
     );
 
-    expect(error).toMatchObject({
-      status: 409,
-      message: `Catalog target is retired (bottleId=${bottle.id}).`,
-    });
+    expect(results).toEqual([]);
   });
 
   test("groups a generic source brand into stronger eligible target brands", async ({

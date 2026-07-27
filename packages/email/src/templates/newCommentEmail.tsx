@@ -1,7 +1,6 @@
 import { Column, Img, Preview, Row } from "jsx-email";
 import React from "react";
 import {
-  boolean,
   defaulted,
   nullable,
   number,
@@ -22,8 +21,7 @@ export const TemplateStruct = object({
       comment: string(),
       tasting: object({
         id: number(),
-        targetLabel: string(),
-        exactBottleSpecified: boolean(),
+        bottleFullName: string(),
       }),
       createdBy: object({
         username: string(),
@@ -36,8 +34,7 @@ export const TemplateStruct = object({
         "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
       tasting: {
         id: 2,
-        targetLabel: "Macallan 12-year-old",
-        exactBottleSpecified: true,
+        bottleFullName: "Macallan 12-year-old",
       },
       createdBy: {
         username: "jane.doe",
@@ -102,12 +99,9 @@ export const Template = ({ comment, baseUrl }: TemplateProps) => {
                   textDecoration: "none",
                 }}
               >
-                {comment.tasting.targetLabel}
+                {comment.tasting.bottleFullName}
               </Link>
             </Heading>
-            {!comment.tasting.exactBottleSpecified && (
-              <Text>Exact bottle not specified</Text>
-            )}
           </Column>
         </Row>
       </Section>

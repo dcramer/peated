@@ -1,11 +1,13 @@
 import { db } from "@peated/server/db";
 import { countries, entities, regions } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { inArray } from "drizzle-orm";
 import { z } from "zod";
-import { scanUserTastingTargets } from "./tasting-target-scan";
+import {
+  scanUserTastingBottles,
+  UserBottleReadIntegrityError,
+} from "./tasting-bottle-scan";
 
 export default procedure
   .route({
@@ -66,20 +68,12 @@ export default procedure
     let totalCount = 0;
 
     try {
-      for await (const rows of scanUserTastingTargets(user.id, {
-        caller: "users.region-list",
-        operation: "aggregate_regions",
-      })) {
+      for await (const rows of scanUserTastingBottles(user.id)) {
         totalCount += rows.length;
         const tastingCountsByBrand = new Map<number, number>();
-        for (const { identity } of rows) {
-          const brandId =
-            identity?.kind === "bottle"
-              ? identity.bottle.brandId
-              : identity?.kind === "group"
-                ? identity.group.brandId
-                : null;
-          if (brandId === null) continue;
+        for (const { bottle } of rows) {
+          if (!bottle) continue;
+          const brandId = bottle.brandId;
           tastingCountsByBrand.set(
             brandId,
             (tastingCountsByBrand.get(brandId) ?? 0) + 1,
@@ -124,7 +118,7 @@ export default procedure
         }
       }
     } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
+      if (error instanceof UserBottleReadIntegrityError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;

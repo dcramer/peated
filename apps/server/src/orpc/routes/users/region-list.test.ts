@@ -2,34 +2,14 @@ import { db } from "@peated/server/db";
 import {
   bottleGroups,
   bottleGroupTombstones,
-  bottleReleasePromotions,
   bottles,
   bottleTombstones,
-  catalogTargets,
   tastings,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-
-async function targetIds(bottleId: number, groupId: number) {
-  const [exact, generic] = await Promise.all([
-    db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottleId),
-      columns: { id: true },
-    }),
-    db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, groupId),
-        isNull(catalogTargets.bottleId),
-      ),
-      columns: { id: true },
-    }),
-  ]);
-  if (!exact || !generic) throw new Error("Missing target fixtures");
-  return { exact: exact.id, generic: generic.id };
-}
 
 describe("GET /users/:user/regions", () => {
   test("lists regions", async ({ defaults, fixtures }) => {
@@ -213,7 +193,7 @@ describe("GET /users/:user/regions", () => {
     `);
   });
 
-  test("uses target-owned brands and keeps targetless identity out of buckets", async ({
+  test("uses Bottle-owned brands and keeps unresolved identity out of buckets", async ({
     defaults,
     fixtures,
   }) => {
@@ -221,11 +201,6 @@ describe("GET /users/:user/regions", () => {
     const highland = await fixtures.Region({
       countryId: scotland.id,
       name: "Highland",
-    });
-    const japan = await fixtures.Country({ name: "Japan" });
-    const hokkaido = await fixtures.Region({
-      countryId: japan.id,
-      name: "Hokkaido",
     });
     const ireland = await fixtures.Country({ name: "Ireland" });
     const exactBrand = await fixtures.Entity({
@@ -242,11 +217,6 @@ describe("GET /users/:user/regions", () => {
       countryId: scotland.id,
       regionId: null,
       name: "Country Only Brand",
-    });
-    const genericBrand = await fixtures.Entity({
-      countryId: japan.id,
-      regionId: hokkaido.id,
-      name: "Generic Brand",
     });
     const unrelatedRole = await fixtures.Entity({
       countryId: ireland.id,
@@ -277,10 +247,6 @@ describe("GET /users/:user/regions", () => {
       brandId: sameLocationBrand.id,
       name: "Same Location Bottle",
     });
-    const genericBottle = await fixtures.Bottle({
-      brandId: genericBrand.id,
-      name: "Generic Bottle",
-    });
     const retainedBottle = await fixtures.Bottle({
       brandId: exactBrand.id,
       name: "Retained Drift Bottle",
@@ -293,57 +259,41 @@ describe("GET /users/:user/regions", () => {
       brandId: countrylessBrand.id,
       name: "Countryless Bottle",
     });
-    const exact = await targetIds(exactBottle.id, exactBottle.groupId!);
-    const sameLocation = await targetIds(
-      sameLocationBottle.id,
-      sameLocationBottle.groupId!,
-    );
-    const generic = await targetIds(genericBottle.id, genericBottle.groupId!);
-    const countryOnly = await targetIds(
-      countryOnlyBottle.id,
-      countryOnlyBottle.groupId!,
-    );
-    const countryless = await targetIds(
-      countrylessBottle.id,
-      countrylessBottle.groupId!,
-    );
     const baseTime = Date.parse("2026-01-01T00:00:00.000Z");
     await fixtures.Tasting({
       bottleId: exactBottle.id,
-      targetId: exact.exact,
       createdById: defaults.user.id,
       createdAt: new Date(baseTime),
     });
     await fixtures.Tasting({
       bottleId: sameLocationBottle.id,
-      targetId: sameLocation.exact,
       createdById: defaults.user.id,
       createdAt: new Date(baseTime + 1),
     });
-    const driftedTasting = await fixtures.Tasting({
+    await fixtures.Tasting({
       bottleId: retainedBottle.id,
-      targetId: generic.generic,
       createdById: defaults.user.id,
       createdAt: new Date(baseTime + 2),
     });
     await fixtures.Tasting({
       bottleId: countryOnlyBottle.id,
-      targetId: countryOnly.exact,
       createdById: defaults.user.id,
       createdAt: new Date(baseTime + 3),
     });
     await fixtures.Tasting({
       bottleId: countrylessBottle.id,
-      targetId: countryless.exact,
       createdById: defaults.user.id,
       createdAt: new Date(baseTime + 4),
     });
-    const targetlessTasting = await fixtures.Tasting({
+    const unresolvedTasting = await fixtures.Tasting({
       bottleId: exactBottle.id,
-      targetId: null,
       createdById: defaults.user.id,
       createdAt: new Date(baseTime + 5),
     });
+    await db
+      .update(tastings)
+      .set({ bottleId: null })
+      .where(eq(tastings.id, unresolvedTasting.id));
 
     const data = await routerClient.users.regionList(
       { user: "me" },
@@ -356,43 +306,24 @@ describe("GET /users/:user/regions", () => {
         {
           country: { name: "Scotland", slug: "scotland" },
           region: { name: "Highland", slug: "highland" },
-          count: 2,
+          count: 3,
         },
         {
           country: { name: "Scotland", slug: "scotland" },
           region: null,
           count: 1,
         },
-        {
-          country: { name: "Japan", slug: "japan" },
-          region: { name: "Hokkaido", slug: "hokkaido" },
-          count: 1,
-        },
       ],
     });
     expect(
       await db.query.tastings.findFirst({
-        where: eq(tastings.id, driftedTasting.id),
-        columns: { bottleId: true, releaseId: true, targetId: true },
+        where: eq(tastings.id, unresolvedTasting.id),
+        columns: { bottleId: true },
       }),
-    ).toEqual({
-      bottleId: retainedBottle.id,
-      releaseId: null,
-      targetId: generic.generic,
-    });
-    expect(
-      await db.query.tastings.findFirst({
-        where: eq(tastings.id, targetlessTasting.id),
-        columns: { bottleId: true, releaseId: true, targetId: true },
-      }),
-    ).toEqual({
-      bottleId: exactBottle.id,
-      releaseId: null,
-      targetId: null,
-    });
+    ).toEqual({ bottleId: null });
   });
 
-  test("uses a promoted release's exact Bottle brand", async ({
+  test("uses the stored Bottle brand when legacy release evidence remains", async ({
     defaults,
     fixtures,
   }) => {
@@ -418,21 +349,9 @@ describe("GET /users/:user/regions", () => {
       .update(bottles)
       .set({ brandId: promotedBrand.id })
       .where(eq(bottles.id, promoted.id));
-    const promotedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, promoted.id),
-    });
-    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promoted.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
-    });
     await fixtures.Tasting({
-      bottleId: parent.id,
+      bottleId: promoted.id,
       releaseId: release.id,
-      targetId: promotedTarget.id,
       createdById: defaults.user.id,
     });
 
@@ -463,7 +382,6 @@ describe("GET /users/:user/regions", () => {
     const locations: Array<{
       bottleId: number;
       countryName: string;
-      targetId: number;
     }> = [];
     for (let index = 0; index < 26; index += 1) {
       const countryName = `Location ${String(index + 1).padStart(2, "0")}`;
@@ -473,20 +391,17 @@ describe("GET /users/:user/regions", () => {
         name: `${countryName} Brand`,
       });
       const bottle = await fixtures.Bottle({ brandId: brand.id });
-      const { exact } = await targetIds(bottle.id, bottle.groupId!);
-      locations.push({ bottleId: bottle.id, countryName, targetId: exact });
+      locations.push({ bottleId: bottle.id, countryName });
     }
     const createdAt = Date.parse("2026-02-01T00:00:00.000Z");
     await db.insert(tastings).values([
       ...Array.from({ length: 176 }, (_, index) => ({
         bottleId: locations[0]!.bottleId,
-        targetId: locations[0]!.targetId,
         createdById: defaults.user.id,
         createdAt: new Date(createdAt + index),
       })),
       ...locations.slice(1).map((location, index) => ({
         bottleId: location.bottleId,
-        targetId: location.targetId,
         createdById: defaults.user.id,
         createdAt: new Date(createdAt + 176 + index),
       })),
@@ -509,16 +424,14 @@ describe("GET /users/:user/regions", () => {
     );
   });
 
-  test("fails closed when an exact Bottle target is retired", async ({
+  test("fails closed when a Bottle is retired", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const { exact } = await targetIds(bottle.id, bottle.groupId!);
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: exact,
       createdById: defaults.user.id,
     });
     await db.insert(bottleTombstones).values({
@@ -536,16 +449,14 @@ describe("GET /users/:user/regions", () => {
     expect(error).toMatchObject({ status: 409 });
   });
 
-  test("fails closed when a generic BottleGroup target is retired", async ({
+  test("fails closed when a BottleGroup is retired", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const { generic } = await targetIds(bottle.id, bottle.groupId!);
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: generic,
       createdById: defaults.user.id,
     });
     await db.insert(bottleGroupTombstones).values({

@@ -21,8 +21,8 @@ import {
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
-import { loadCatalogTarget } from "./catalogTargets";
 import { logError, logInfo } from "./log";
+import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
@@ -92,17 +92,22 @@ export async function notifyComment({
   // dont notify self
   if (comment.createdById === comment.tasting.createdById) return;
 
-  if (comment.tasting.targetId === null) {
-    throw new Error(`Tasting ${comment.tasting.id} has no CatalogTarget`);
+  if (comment.tasting.bottleId === null) {
+    throw new Error(`Tasting ${comment.tasting.id} has no Bottle`);
   }
-  const target = await loadCatalogTarget(comment.tasting.targetId, {
-    actor: null,
-    permissions: { canReadCatalogIdentity: true },
+  const bottle = await db.transaction(async (tx) => {
+    await resolveActiveBottleIds(tx, [comment.tasting.bottleId!]);
+    return tx.query.bottles.findFirst({
+      where: (bottles, { eq }) => eq(bottles.id, comment.tasting.bottleId!),
+      columns: { fullName: true },
+    });
   });
-  const exactBottleSpecified = target.kind === "bottle";
-  const targetLabel = exactBottleSpecified
-    ? target.bottle.fullName
-    : target.group.fullName;
+  if (!bottle) {
+    throw new Error(
+      `Tasting ${comment.tasting.id} references missing Bottle ${comment.tasting.bottleId}`,
+    );
+  }
+  const bottleFullName = bottle.fullName;
 
   const userIds =
     comment.createdById === comment.tasting.createdById
@@ -155,8 +160,7 @@ export async function notifyComment({
         },
         tasting: {
           id: comment.tasting.id,
-          targetLabel,
-          exactBottleSpecified,
+          bottleFullName,
         },
       },
     }),
@@ -175,7 +179,7 @@ export async function notifyComment({
         ...getMailDefaults(),
         to: email,
         subject: "New Comment on Tasting",
-        text: `View this comment on Peated: ${commentUrl}\n\n${targetLabel}${exactBottleSpecified ? "" : "\nExact bottle not specified"}\n\n${comment.comment}`,
+        text: `View this comment on Peated: ${commentUrl}\n\n${bottleFullName}\n\n${comment.comment}`,
         html,
       });
     } catch (err) {

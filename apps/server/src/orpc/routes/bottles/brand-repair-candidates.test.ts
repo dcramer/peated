@@ -1,15 +1,13 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroupTombstones,
-  bottleReleasePromotions,
   bottles,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import { getBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /bottles/brand-repair-candidates", () => {
@@ -81,9 +79,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
     ]);
   });
 
-  test("does not use a targetless retained Bottle alias as repair evidence", async ({
-    fixtures,
-  }) => {
+  test("uses alias evidence from its direct Bottle", async ({ fixtures }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
       type: ["brand"],
@@ -95,65 +91,33 @@ describe("GET /bottles/brand-repair-candidates", () => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle({
       brandId: currentBrand.id,
-      name: "Targetless Reserve",
+      name: "Direct Alias Reserve",
     });
     await fixtures.BottleAlias({
       bottleId: bottle.id,
-      targetId: null,
-      name: "Canadian Club Targetless Reserve",
+      name: "Canadian Club Direct Alias Reserve",
     });
 
     const { results } = await routerClient.bottles.brandRepairCandidates(
-      { query: "Targetless Reserve" },
+      { query: "Direct Alias Reserve" },
       { context: { user } },
     );
 
-    expect(results).toEqual([]);
+    expect(results).toMatchObject([
+      {
+        bottle: { id: bottle.id },
+        currentBrand: { id: currentBrand.id },
+        supportingReferences: [
+          {
+            source: "alias",
+            text: "Canadian Club Direct Alias Reserve",
+          },
+        ],
+      },
+    ]);
   });
 
-  test("does not use a generic target alias as exact Bottle repair evidence", async ({
-    fixtures,
-  }) => {
-    const currentBrand = await fixtures.Entity({
-      name: "Canadian",
-      type: ["brand"],
-    });
-    await fixtures.Entity({
-      name: "Canadian Club",
-      type: ["brand"],
-    });
-    const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({
-      brandId: currentBrand.id,
-      name: "Generic Target Reserve",
-    });
-    if (bottle.groupId === null) {
-      throw new Error("Expected grouped Bottle fixture");
-    }
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, bottle.groupId),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) {
-      throw new Error("Expected BottleGroup generic target fixture");
-    }
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      targetId: genericTarget.id,
-      name: "Canadian Club Generic Target Reserve",
-    });
-
-    const { results } = await routerClient.bottles.brandRepairCandidates(
-      { query: "Generic Target Reserve" },
-      { context: { user } },
-    );
-
-    expect(results).toEqual([]);
-  });
-
-  test("attributes drifted alias support to the authoritative exact target Bottle", async ({
+  test("does not move alias evidence away from its direct Bottle", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -167,124 +131,41 @@ describe("GET /bottles/brand-repair-candidates", () => {
     const user = await fixtures.User({ mod: true });
     const retainedBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
-      name: "Retained Pair Drift",
+      name: "Direct Membership",
     });
-    const targetBottle = await fixtures.Bottle({
+    const unrelatedBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
-      name: "Authoritative Target",
+      name: "Unrelated Bottle",
     });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, targetBottle.id),
-    });
-    if (!exactTarget) {
-      throw new Error("Expected exact CatalogTarget fixture");
-    }
     await fixtures.BottleAlias({
       bottleId: retainedBottle.id,
-      targetId: exactTarget.id,
-      name: "Canadian Club Retained Pair Drift",
+      name: "Canadian Club Direct Membership",
     });
 
     const { results } = await routerClient.bottles.brandRepairCandidates(
-      { query: "Retained Pair Drift" },
+      { query: "Direct Membership" },
       { context: { user } },
     );
 
     expect(results).toMatchObject([
       {
-        bottle: { id: targetBottle.id },
+        bottle: { id: retainedBottle.id },
         currentBrand: { id: currentBrand.id },
         targetBrand: { id: targetBrand.id },
         supportingReferences: [
           {
             source: "alias",
-            text: "Canadian Club Retained Pair Drift",
+            text: "Canadian Club Direct Membership",
           },
         ],
       },
     ]);
     expect(results.map(({ bottle }) => bottle.id)).not.toContain(
-      retainedBottle.id,
+      unrelatedBottle.id,
     );
   });
 
-  test("uses promoted retained alias membership for parity without changing target authority", async ({
-    fixtures,
-  }) => {
-    const currentBrand = await fixtures.Entity({
-      name: "Canadian",
-      type: ["brand"],
-    });
-    const targetBrand = await fixtures.Entity({
-      name: "Canadian Club",
-      type: ["brand"],
-    });
-    const user = await fixtures.User({ mod: true });
-    const parent = await fixtures.Bottle({
-      brandId: currentBrand.id,
-      name: "Legacy Promotion Parent",
-    });
-    if (parent.groupId === null) {
-      throw new Error("Expected grouped Bottle fixture");
-    }
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const [promoted] = await db
-      .insert(bottles)
-      .values({
-        groupId: parent.groupId,
-        brandId: currentBrand.id,
-        name: "Promoted Concrete Bottle",
-        fullName: "Canadian Promoted Concrete Bottle",
-        createdByActorId: parent.createdByActorId,
-      })
-      .returning();
-    if (!promoted) throw new Error("Expected promoted Bottle fixture");
-    const [target] = await db
-      .insert(catalogTargets)
-      .values({ groupId: parent.groupId, bottleId: promoted.id })
-      .returning();
-    if (!target) throw new Error("Expected promoted target fixture");
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promoted.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
-    });
-    await fixtures.BottleAlias({
-      bottleId: parent.id,
-      releaseId: release.id,
-      targetId: target.id,
-      name: "Canadian Club Promoted Pair Evidence",
-    });
-
-    const routeResult = await routerClient.bottles.brandRepairCandidates(
-      { query: "Promoted Pair Evidence" },
-      { context: { user } },
-    );
-    const filteredResult = await getBrandRepairCandidates({
-      currentBrandId: currentBrand.id,
-      query: "Promoted Pair Evidence",
-    });
-
-    for (const { results } of [routeResult, filteredResult]) {
-      expect(results).toMatchObject([
-        {
-          bottle: { id: promoted.id },
-          currentBrand: { id: currentBrand.id },
-          targetBrand: { id: targetBrand.id },
-          supportingReferences: [
-            {
-              source: "alias",
-              text: "Canadian Club Promoted Pair Evidence",
-            },
-          ],
-        },
-      ]);
-    }
-  });
-
-  test("fails closed when selected alias evidence has a retired durable target", async ({
+  test("filters alias evidence for retired Bottles and groups", async ({
     fixtures,
   }) => {
     const currentBrand = await fixtures.Entity({
@@ -331,17 +212,12 @@ describe("GET /bottles/brand-repair-candidates", () => {
       createdByActorId: retiredGroupBottle.createdByActorId,
     });
 
-    const err = await waitError(
-      routerClient.bottles.brandRepairCandidates(
-        { query: "Retired" },
-        { context: { user } },
-      ),
+    const { results } = await routerClient.bottles.brandRepairCandidates(
+      { query: "Retired" },
+      { context: { user } },
     );
 
-    expect(err).toMatchObject({
-      status: 409,
-      message: `Catalog target is retired (bottleId=${retiredBottle.id}).`,
-    });
+    expect(results).toEqual([]);
   });
 
   test("scans only active exact Bottles with and without a current-brand filter", async ({
@@ -359,10 +235,12 @@ describe("GET /bottles/brand-repair-candidates", () => {
     const activeBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
       name: "Active Scan Evidence",
+      totalTastings: 10,
     });
-    const targetlessAliasBottle = await fixtures.Bottle({
+    const secondActiveBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
-      name: "Targetless Scan Evidence",
+      name: "Second Active Scan Evidence",
+      totalTastings: 5,
     });
     const retiredBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
@@ -386,9 +264,8 @@ describe("GET /bottles/brand-repair-candidates", () => {
       name: "Canadian Club Active Scan Evidence",
     });
     await fixtures.BottleAlias({
-      bottleId: targetlessAliasBottle.id,
-      targetId: null,
-      name: "Canadian Club Targetless Scan Evidence",
+      bottleId: secondActiveBottle.id,
+      name: "Canadian Club Second Active Scan Evidence",
     });
     await fixtures.BottleAlias({
       bottleId: retiredBottle.id,
@@ -420,8 +297,13 @@ describe("GET /bottles/brand-repair-candidates", () => {
           currentBrand: { id: currentBrand.id },
           targetBrand: { id: targetBrand.id },
         },
+        {
+          bottle: { id: secondActiveBottle.id },
+          currentBrand: { id: currentBrand.id },
+          targetBrand: { id: targetBrand.id },
+        },
       ]);
-      expect(results).toHaveLength(1);
+      expect(results).toHaveLength(2);
     }
   });
 

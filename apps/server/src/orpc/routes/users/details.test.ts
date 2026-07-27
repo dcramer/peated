@@ -10,26 +10,8 @@ import {
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
-
-async function targetIds(bottleId: number, groupId: number) {
-  const [exact, generic] = await Promise.all([
-    db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottleId),
-      columns: { id: true },
-    }),
-    db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, groupId),
-        isNull(catalogTargets.bottleId),
-      ),
-      columns: { id: true },
-    }),
-  ]);
-  if (!exact || !generic) throw new Error("Missing target fixtures");
-  return { exact: exact.id, generic: generic.id };
-}
 
 describe("GET /users/:user", () => {
   test("get user by id", async ({ defaults, fixtures }) => {
@@ -182,10 +164,10 @@ describe("GET /users/:user", () => {
       open: 1,
       sealed: 1,
     });
-    expect(data.stats.collected).toBe(0);
+    expect(data.stats.collected).toBe(5);
   });
 
-  test("uses authoritative exact and generic targets for profile counts", async ({
+  test("counts and deduplicates direct Bottle references", async ({
     defaults,
     fixtures,
   }) => {
@@ -197,89 +179,81 @@ describe("GET /users/:user", () => {
       name: "Other Collection",
       createdById: defaults.user.id,
     });
-    const exactBottle = await fixtures.Bottle();
-    const genericBottle = await fixtures.Bottle();
+    const firstBottle = await fixtures.Bottle();
+    if (firstBottle.groupId === null) {
+      throw new Error("Missing BottleGroup fixture");
+    }
+    const secondBottle = await fixtures.BottleGroupMember({
+      groupId: firstBottle.groupId,
+      edition: "Distinct profile member",
+    });
     const emptyBottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const retainedDriftBottle = await fixtures.Bottle();
-    const targetlessBottle = await fixtures.Bottle();
-    const exact = await targetIds(exactBottle.id, exactBottle.groupId!);
-    const generic = await targetIds(genericBottle.id, genericBottle.groupId!);
-    const empty = await targetIds(emptyBottle.id, emptyBottle.groupId!);
-    const other = await targetIds(otherBottle.id, otherBottle.groupId!);
-
-    const exactTasting = await fixtures.Tasting({
-      bottleId: retainedDriftBottle.id,
-      targetId: exact.exact,
+    const unresolvedTargetBottle = await fixtures.Bottle();
+    const unresolvedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, unresolvedTargetBottle.id),
+      columns: { id: true },
+    });
+    if (!unresolvedTarget) throw new Error("Missing target fixture");
+    await fixtures.Tasting({
+      bottleId: firstBottle.id,
       createdById: defaults.user.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
     });
     await Promise.all([
       fixtures.Tasting({
-        bottleId: exactBottle.id,
-        targetId: exact.exact,
+        bottleId: firstBottle.id,
         createdById: defaults.user.id,
         createdAt: new Date("2026-01-02T00:00:00.000Z"),
       }),
       fixtures.Tasting({
-        bottleId: genericBottle.id,
-        targetId: generic.generic,
+        bottleId: secondBottle.id,
         createdById: defaults.user.id,
         createdAt: new Date("2026-01-03T00:00:00.000Z"),
       }),
     ]);
-    const targetlessTasting = await fixtures.Tasting({
-      bottleId: targetlessBottle.id,
-      targetId: null,
+    const unresolvedTasting = await fixtures.Tasting({
+      bottleId: firstBottle.id,
       createdById: defaults.user.id,
       createdAt: new Date("2026-01-04T00:00:00.000Z"),
     });
+    await db
+      .update(tastings)
+      .set({ bottleId: null })
+      .where(eq(tastings.id, unresolvedTasting.id));
     await db.insert(collectionBottles).values([
       {
         collectionId: library.id,
-        bottleId: exactBottle.id,
-        targetId: exact.exact,
+        bottleId: firstBottle.id,
         status: "open",
       },
       {
         collectionId: library.id,
-        bottleId: genericBottle.id,
-        targetId: generic.generic,
+        bottleId: secondBottle.id,
         status: "sealed",
       },
       {
         collectionId: library.id,
         bottleId: emptyBottle.id,
-        targetId: empty.exact,
+        status: "empty",
+      },
+      {
+        collectionId: library.id,
+        bottleId: null,
+        targetId: unresolvedTarget.id,
+        status: null,
+      },
+      {
+        collectionId: otherCollection.id,
+        bottleId: otherBottle.id,
+        status: "open",
+      },
+      {
+        collectionId: otherCollection.id,
+        bottleId: firstBottle.id,
         status: "empty",
       },
     ]);
-    const [targetlessEntry] = await db
-      .insert(collectionBottles)
-      .values({
-        collectionId: library.id,
-        bottleId: targetlessBottle.id,
-        targetId: null,
-        status: null,
-      })
-      .returning();
-    if (!targetlessEntry) throw new Error("Missing targetless entry fixture");
-    const [driftEntry] = await db
-      .insert(collectionBottles)
-      .values({
-        collectionId: otherCollection.id,
-        bottleId: retainedDriftBottle.id,
-        targetId: other.exact,
-        status: "open",
-      })
-      .returning();
-    if (!driftEntry) throw new Error("Missing collection entry fixture");
-    await db.insert(collectionBottles).values({
-      collectionId: otherCollection.id,
-      bottleId: exactBottle.id,
-      targetId: exact.exact,
-      status: "empty",
-    });
 
     const data = await routerClient.users.details(
       { user: defaults.user.id },
@@ -293,61 +267,22 @@ describe("GET /users/:user", () => {
       library: { total: 3, open: 1, sealed: 1 },
     });
 
-    const [
-      persistedDriftTasting,
-      persistedTargetlessTasting,
-      persistedDriftEntry,
-      persistedTargetlessEntry,
-    ] = await Promise.all([
-      db.query.tastings.findFirst({
-        where: eq(tastings.id, exactTasting.id),
-        columns: { bottleId: true, releaseId: true, targetId: true },
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, unresolvedTasting.id),
+        columns: { bottleId: true },
       }),
-      db.query.tastings.findFirst({
-        where: eq(tastings.id, targetlessTasting.id),
-        columns: { bottleId: true, releaseId: true, targetId: true },
-      }),
-      db.query.collectionBottles.findFirst({
-        where: eq(collectionBottles.id, driftEntry.id),
-        columns: { bottleId: true, releaseId: true, targetId: true },
-      }),
-      db.query.collectionBottles.findFirst({
-        where: eq(collectionBottles.id, targetlessEntry.id),
-        columns: { bottleId: true, releaseId: true, targetId: true },
-      }),
-    ]);
-    expect(persistedDriftTasting).toEqual({
-      bottleId: retainedDriftBottle.id,
-      releaseId: null,
-      targetId: exact.exact,
-    });
-    expect(persistedTargetlessTasting).toEqual({
-      bottleId: targetlessBottle.id,
-      releaseId: null,
-      targetId: null,
-    });
-    expect(persistedDriftEntry).toEqual({
-      bottleId: retainedDriftBottle.id,
-      releaseId: null,
-      targetId: other.exact,
-    });
-    expect(persistedTargetlessEntry).toEqual({
-      bottleId: targetlessBottle.id,
-      releaseId: null,
-      targetId: null,
-    });
+    ).toEqual({ bottleId: null });
   });
 
-  test("scans tasting and collection targets across batch boundaries", async ({
+  test("scans tasting and collection Bottles across batch boundaries", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const { exact } = await targetIds(bottle.id, bottle.groupId!);
     await db.insert(tastings).values(
       Array.from({ length: 201 }, (_, index) => ({
         bottleId: bottle.id,
-        targetId: exact,
         createdById: defaults.user.id,
         createdAt: new Date(Date.UTC(2025, 0, 1, 0, 0, index)),
       })),
@@ -365,7 +300,6 @@ describe("GET /users/:user", () => {
       batchCollections.map((collection) => ({
         collectionId: collection.id,
         bottleId: bottle.id,
-        targetId: exact,
         status: "empty" as const,
       })),
     );
@@ -383,16 +317,14 @@ describe("GET /users/:user", () => {
     });
   });
 
-  test("fails closed when a tasting target is retired", async ({
+  test("fails closed when a tasting Bottle is retired", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const { exact } = await targetIds(bottle.id, bottle.groupId!);
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: exact,
       createdById: defaults.user.id,
     });
     await db.insert(bottleTombstones).values({
@@ -410,7 +342,7 @@ describe("GET /users/:user", () => {
     expect(error).toMatchObject({ status: 409 });
   });
 
-  test("fails closed when a collection target group is retired", async ({
+  test("fails closed when a collection BottleGroup is retired", async ({
     defaults,
     fixtures,
   }) => {
@@ -419,11 +351,9 @@ describe("GET /users/:user", () => {
     });
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const { generic } = await targetIds(bottle.id, bottle.groupId!);
     await db.insert(collectionBottles).values({
       collectionId: collection.id,
       bottleId: bottle.id,
-      targetId: generic,
       status: "sealed",
     });
     await db.insert(bottleGroupTombstones).values({

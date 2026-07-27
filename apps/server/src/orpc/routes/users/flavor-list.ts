@@ -1,9 +1,11 @@
 import { db } from "@peated/server/db";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { procedure } from "@peated/server/orpc";
 import { z } from "zod";
-import { scanUserTastingTargets } from "./tasting-target-scan";
+import {
+  scanUserTastingBottles,
+  UserBottleReadIntegrityError,
+} from "./tasting-bottle-scan";
 
 export default procedure
   .route({
@@ -54,23 +56,14 @@ export default procedure
     let totalScore = 0;
 
     try {
-      for await (const rows of scanUserTastingTargets(user.id, {
-        caller: "users.flavor-list",
-        operation: "aggregate_flavors",
-      })) {
-        for (const { identity, rating } of rows) {
+      for await (const rows of scanUserTastingBottles(user.id)) {
+        for (const { bottle, rating } of rows) {
           totalCount += 1;
           totalScore += rating ?? 0;
 
-          const source =
-            identity?.kind === "bottle"
-              ? identity.bottle
-              : identity?.kind === "group"
-                ? identity.group
-                : null;
-          if (!source?.flavorProfile) continue;
+          if (!bottle?.flavorProfile) continue;
 
-          const current = byFlavor.get(source.flavorProfile) ?? {
+          const current = byFlavor.get(bottle.flavorProfile) ?? {
             count: 0,
             score: 0,
             hasRating: false,
@@ -78,11 +71,11 @@ export default procedure
           current.count += 1;
           current.score += rating ?? 0;
           current.hasRating ||= rating !== null;
-          byFlavor.set(source.flavorProfile, current);
+          byFlavor.set(bottle.flavorProfile, current);
         }
       }
     } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
+      if (error instanceof UserBottleReadIntegrityError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;

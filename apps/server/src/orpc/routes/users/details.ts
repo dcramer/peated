@@ -1,42 +1,44 @@
 import { db } from "@peated/server/db";
 import {
+  bottleGroupTombstones,
+  bottles,
+  bottleTombstones,
   changes,
   collectionBottles,
   collections,
 } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
-import { loadCatalogTargetReadsWithParity } from "@peated/server/lib/catalogTargetReadParity";
-import { CatalogTargetResolutionError } from "@peated/server/lib/catalogTargets";
 import { RESERVED_COLLECTIONS } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
-import { UserSchema, detailsResponse } from "@peated/server/schemas";
+import { detailsResponse, UserSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
-import { scanUserTastingTargets } from "./tasting-target-scan";
+import {
+  readJoinedUserBottle,
+  scanUserTastingBottles,
+  UserBottleReadIntegrityError,
+} from "./tasting-bottle-scan";
 
 const USER_STATS_BATCH_SIZE = 200;
 
 async function aggregateTastingStats(userId: number) {
-  const targetIds = new Set<number>();
+  const bottleIds = new Set<number>();
   let total = 0;
 
-  for await (const rows of scanUserTastingTargets(userId, {
-    caller: "users.details",
-    operation: "aggregate_tastings",
-  })) {
+  for await (const rows of scanUserTastingBottles(userId)) {
     total += rows.length;
-    for (const { identity } of rows) {
-      if (identity) targetIds.add(identity.targetId);
+    for (const { bottle } of rows) {
+      if (bottle) bottleIds.add(bottle.id);
     }
   }
 
-  return { bottles: targetIds.size, tastings: total };
+  return { bottles: bottleIds.size, tastings: total };
 }
 
 async function aggregateCollectionStats(userId: number) {
-  const targetIds = new Set<number>();
+  const bottleIds = new Set<number>();
   const libraryName = RESERVED_COLLECTIONS.library.name.toLowerCase();
   const library = { total: 0, open: 0, sealed: 0 };
   let afterId: number | null = null;
@@ -45,9 +47,17 @@ async function aggregateCollectionStats(userId: number) {
     const rows = await db
       .select({
         id: collectionBottles.id,
-        targetId: collectionBottles.targetId,
-        bottleId: collectionBottles.bottleId,
-        releaseId: collectionBottles.releaseId,
+        storedBottleId: collectionBottles.bottleId,
+        bottle: {
+          id: bottles.id,
+          groupId: bottles.groupId,
+          brandId: bottles.brandId,
+          category: bottles.category,
+          flavorProfile: bottles.flavorProfile,
+          statedAge: bottles.statedAge,
+        },
+        retiredBottleId: bottleTombstones.bottleId,
+        retiredGroupId: bottleGroupTombstones.groupId,
         status: collectionBottles.status,
         collectionName: collections.name,
       })
@@ -55,6 +65,12 @@ async function aggregateCollectionStats(userId: number) {
       .innerJoin(
         collections,
         eq(collections.id, collectionBottles.collectionId),
+      )
+      .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
+      .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
+      .leftJoin(
+        bottleGroupTombstones,
+        eq(bottleGroupTombstones.groupId, bottles.groupId),
       )
       .where(
         and(
@@ -67,27 +83,9 @@ async function aggregateCollectionStats(userId: number) {
 
     if (rows.length === 0) break;
 
-    const { targets } = await loadCatalogTargetReadsWithParity(
-      rows.map((row) => ({
-        consumerTable: "collection_bottle" as const,
-        rowLocator: { id: row.id },
-        targetId: row.targetId,
-        legacy: {
-          bottleId: row.bottleId,
-          releaseId: row.releaseId,
-        },
-      })),
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "users.details",
-        operation: "aggregate_collections",
-      },
-    );
-
-    for (const [index, row] of rows.entries()) {
-      const target = targets[index];
-      if (target) targetIds.add(target.targetId);
+    for (const row of rows) {
+      const bottle = readJoinedUserBottle(row);
+      if (bottle) bottleIds.add(bottle.id);
 
       if (row.collectionName.toLowerCase() !== libraryName) continue;
       if (row.status !== "empty") library.total += 1;
@@ -99,7 +97,7 @@ async function aggregateCollectionStats(userId: number) {
     if (rows.length < USER_STATS_BATCH_SIZE) break;
   }
 
-  return { collected: targetIds.size, library };
+  return { collected: bottleIds.size, library };
 }
 
 export default procedure
@@ -152,7 +150,7 @@ export default procedure
       tastingStats = await aggregateTastingStats(user.id);
       collectionStats = await aggregateCollectionStats(user.id);
     } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
+      if (error instanceof UserBottleReadIntegrityError) {
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
       throw error;
