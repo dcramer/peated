@@ -39,7 +39,10 @@ export async function listUnmatchedBottleAliasNames(
     .select({ name: bottleAliases.name })
     .from(bottleAliases)
     .where(
-      and(eq(bottleAliases.ignored, false), isNull(bottleAliases.bottleId)),
+      and(
+        sql`${bottleAliases.ignored} IS DISTINCT FROM true`,
+        isNull(bottleAliases.bottleId),
+      ),
     )
     .orderBy(asc(bottleAliases.name))
     .offset(offset)
@@ -104,12 +107,7 @@ export class StaleBottleAliasReviewIdentityError extends Error {
 
 export type BottleAliasIdentitySnapshot = Pick<
   BottleAlias,
-  | "name"
-  | "bottleId"
-  | "ignored"
-  | "assignmentSource"
-  | "assignedByActorId"
-  | "createdAt"
+  "name" | "bottleId" | "ignored" | "assignmentSource" | "assignedByActorId"
 >;
 
 export class ExactBottleAliasConflictError extends Error {
@@ -201,8 +199,7 @@ function assertBottleAliasIdentitySnapshot(
     lockedAlias.bottleId !== snapshot.bottleId ||
     lockedAlias.ignored !== snapshot.ignored ||
     lockedAlias.assignmentSource !== snapshot.assignmentSource ||
-    lockedAlias.assignedByActorId !== snapshot.assignedByActorId ||
-    lockedAlias.createdAt.getTime() !== snapshot.createdAt.getTime()
+    lockedAlias.assignedByActorId !== snapshot.assignedByActorId
   ) {
     throw new BottleAliasIdentityChangedError(snapshot.name);
   }
@@ -220,7 +217,6 @@ async function lockBottleAliasIdentitySnapshotInTransaction(
       ignored: bottleAliases.ignored,
       assignmentSource: bottleAliases.assignmentSource,
       assignedByActorId: bottleAliases.assignedByActorId,
-      createdAt: bottleAliases.createdAt,
     })
     .from(bottleAliases)
     .where(eq(bottleAliases.name, snapshot.name))
@@ -283,7 +279,6 @@ function exactBottleAliasBeforeSnapshot(
     ignored: alias.ignored,
     assignmentSource: alias.assignmentSource,
     assignedByActorId: alias.assignedByActorId,
-    createdAt: alias.createdAt,
   };
 }
 
@@ -320,7 +315,6 @@ async function claimBottleAliasNameInTransaction(
         ignored: bottleAliases.ignored,
         assignmentSource: bottleAliases.assignmentSource,
         assignedByActorId: bottleAliases.assignedByActorId,
-        createdAt: bottleAliases.createdAt,
       })
       .from(bottleAliases)
       .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
@@ -354,7 +348,6 @@ async function claimBottleAliasNameInTransaction(
           ignored: bottleAliases.ignored,
           assignmentSource: bottleAliases.assignmentSource,
           assignedByActorId: bottleAliases.assignedByActorId,
-          createdAt: bottleAliases.createdAt,
         });
       if (insertedAlias) {
         return {
@@ -409,6 +402,7 @@ async function claimBottleAliasNameInTransaction(
         name,
         bottleId,
         ignored: nextIgnored,
+        embedding: null,
         ...assignmentValues,
       })
       .where(eq(bottleAliases.name, existingAlias.name))
@@ -418,7 +412,6 @@ async function claimBottleAliasNameInTransaction(
         ignored: bottleAliases.ignored,
         assignmentSource: bottleAliases.assignmentSource,
         assignedByActorId: bottleAliases.assignedByActorId,
-        createdAt: bottleAliases.createdAt,
       });
     if (updatedAlias) {
       return {
@@ -653,7 +646,6 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
         ignored: bottleAliases.ignored,
         assignmentSource: bottleAliases.assignmentSource,
         assignedByActorId: bottleAliases.assignedByActorId,
-        createdAt: bottleAliases.createdAt,
       })
       .from(bottleAliases)
       .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
@@ -661,9 +653,20 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
     if (!alias) {
       throw new Error(`Unknown bottle alias: ${name}`);
     }
-    if (alias.bottleId === null) return;
+    if (alias.ignored || alias.bottleId === null) return;
 
-    await lockActiveBottleInTransaction(tx, alias.bottleId);
+    try {
+      await lockActiveBottleInTransaction(tx, alias.bottleId);
+    } catch (error) {
+      if (
+        error instanceof BottleAliasBottleNotFoundError ||
+        error instanceof BottleAliasBottleRetiredError ||
+        error instanceof BottleAliasBottleInactiveError
+      ) {
+        return;
+      }
+      throw error;
+    }
     await syncBottleAliasConsumersInTransaction(tx, {
       bottleId: alias.bottleId,
       lookupNames: [alias.name.toLowerCase()],
@@ -677,9 +680,8 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
           eq(bottleAliases.name, alias.name),
           sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
           sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
-          eq(bottleAliases.assignmentSource, alias.assignmentSource),
-          eq(bottleAliases.assignedByActorId, alias.assignedByActorId),
-          eq(bottleAliases.createdAt, alias.createdAt),
+          sql`${bottleAliases.assignmentSource} IS NOT DISTINCT FROM ${alias.assignmentSource}`,
+          sql`${bottleAliases.assignedByActorId} IS NOT DISTINCT FROM ${alias.assignedByActorId}`,
         ),
       )
       .limit(1)

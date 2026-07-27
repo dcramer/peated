@@ -1,16 +1,8 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, catalogTargets } from "@peated/server/db/schema";
+import { bottleAliases } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
-
-async function exactTargetId(bottleId: number): Promise<number> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Missing exact CatalogTarget fixture");
-  return target.id;
-}
 
 describe("GET /bottle-aliases", () => {
   test("lists canonical and alternate names by direct Bottle id", async ({
@@ -42,51 +34,35 @@ describe("GET /bottle-aliases", () => {
         isCanonical: false,
       }),
     ]);
-    expect(results[0]).not.toHaveProperty("target");
   });
 
-  test("uses Bottle identity when retained target evidence disagrees", async ({
+  test("defines unresolved aliases by nullable Bottle id", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const otherBottle = await fixtures.Bottle();
-    const otherTargetId = await exactTargetId(otherBottle.id);
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      targetId: otherTargetId,
-      name: "Drifted Target Evidence",
-    });
-
-    const { results } = await routerClient.bottleAliases.list({
-      bottle: bottle.id,
-      query: "Drifted Target Evidence",
-    });
-
-    expect(results).toEqual([
-      expect.objectContaining({
-        name: "Drifted Target Evidence",
-        bottleId: bottle.id,
-      }),
-    ]);
-  });
-
-  test("defines unknown aliases by nullable Bottle id", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(bottle.id);
+    const actor = await getUserActor(await fixtures.User());
     await db.insert(bottleAliases).values([
       {
-        name: "Unknown With Target Evidence",
+        name: "Unresolved Bottle Alias",
         bottleId: null,
-        targetId,
-        assignedByActorId: bottle.createdByActorId,
+        assignedByActorId: actor.id,
       },
       {
-        name: "Known Without Target Evidence",
+        name: "Assigned Bottle Alias",
         bottleId: bottle.id,
-        targetId: null,
-        assignedByActorId: bottle.createdByActorId,
+        assignedByActorId: actor.id,
+      },
+      {
+        name: "Ignored Unresolved Alias",
+        bottleId: null,
+        ignored: true,
+        assignedByActorId: actor.id,
+      },
+      {
+        name: "Nullable Unresolved Alias",
+        bottleId: null,
+        ignored: null,
+        assignedByActorId: actor.id,
       },
     ]);
 
@@ -94,17 +70,14 @@ describe("GET /bottle-aliases", () => {
       onlyUnknown: true,
     });
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        name: "Unknown With Target Evidence",
-        bottleId: null,
-      }),
-    ]);
+    expect(results).toEqual(
+      ["Nullable Unresolved Alias", "Unresolved Bottle Alias"].map((name) =>
+        expect.objectContaining({ name, bottleId: null }),
+      ),
+    );
   });
 
-  test("supports query, ignored filtering, and pagination", async ({
-    fixtures,
-  }) => {
+  test("supports query filtering and pagination", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     await fixtures.BottleAlias({
       bottleId: bottle.id,
@@ -131,19 +104,26 @@ describe("GET /bottle-aliases", () => {
     });
 
     expect(first.results).toHaveLength(1);
-    expect(first.rel).toMatchObject({ nextCursor: 2, prevCursor: null });
+    expect(first.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(second.results).toHaveLength(1);
-    expect(second.rel.prevCursor).toBe(1);
+    expect(second.rel).toEqual({ nextCursor: null, prevCursor: 1 });
     expect(
       [...first.results, ...second.results].map(({ name }) => name),
     ).toEqual(["Paged Alias Alpha", "Paged Alias Beta"]);
   });
 
-  test("rejects an unknown Bottle filter", async () => {
-    const error = await waitError(
-      routerClient.bottleAliases.list({ bottle: 2_147_483_647 }),
-    );
+  test("rejects unknown Bottles and obsolete request fields", async () => {
+    await expect(
+      waitError(routerClient.bottleAliases.list({ bottle: 2_147_483_647 })),
+    ).resolves.toMatchInlineSnapshot(`[Error: Bottle not found.]`);
 
-    expect(error).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    await expect(
+      waitError(
+        routerClient.bottleAliases.list({
+          query: "Alias",
+          targetId: 1,
+        } as never),
+      ),
+    ).resolves.toMatchObject({ status: 400 });
   });
 });

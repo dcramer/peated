@@ -87,11 +87,20 @@ describe("listUnmatchedBottleAliasNames", () => {
         ignored: true,
         assignedByActorId: bottle.createdByActorId,
       },
+      {
+        name: "Nullable Ignored Unresolved Alias",
+        bottleId: null,
+        ignored: null,
+        assignedByActorId: bottle.createdByActorId,
+      },
     ]);
 
     await expect(
       listUnmatchedBottleAliasNames({ limit: 100, offset: 0 }),
-    ).resolves.toEqual(["Unresolved With Target Evidence"]);
+    ).resolves.toEqual([
+      "Nullable Ignored Unresolved Alias",
+      "Unresolved With Target Evidence",
+    ]);
   });
 });
 
@@ -234,7 +243,7 @@ describe("exact Bottle alias reservation", () => {
 });
 
 describe("assignBottleAliasInTransaction", () => {
-  test("writes one Bottle id while retaining legacy evidence", async ({
+  test("writes one Bottle id, clears its stale vector, and retains legacy evidence", async ({
     fixtures,
   }) => {
     const selected = await fixtures.Bottle();
@@ -248,6 +257,7 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: null,
       releaseId: release.id,
       targetId: target.id,
+      embedding: Array.from({ length: 3072 }, () => 0.125),
       assignedByActorId: legacy.createdByActorId,
     });
     const price = await fixtures.StorePrice({
@@ -295,6 +305,7 @@ describe("assignBottleAliasInTransaction", () => {
       releaseId: release.id,
       targetId: target.id,
       assignmentSource: "human_approved",
+      embedding: null,
     });
     expect(
       await db.query.storePrices.findFirst({
@@ -656,19 +667,22 @@ describe("assignBottleAliasInTransaction", () => {
 });
 
 describe("alias replay", () => {
-  test("raw alias replay uses Bottle identity without target resolution", async ({
+  test("replays direct Bottle identity without overwriting assigned consumers", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const target = await getGenericTarget(bottle.groupId!);
+    const otherBottle = await fixtures.Bottle();
     const alias = await fixtures.BottleAlias({
       name: "Replay Direct Bottle Alias",
       bottleId: bottle.id,
-      targetId: target.id,
     });
     const price = await fixtures.StorePrice({
       name: alias.name,
       bottleId: null,
+    });
+    const assignedReview = await fixtures.Review({
+      name: alias.name,
+      bottleId: otherBottle.id,
     });
 
     await syncBottleAliasConsumersForAliasChange(alias.name);
@@ -678,6 +692,78 @@ describe("alias replay", () => {
         where: eq(storePrices.id, price.id),
       }),
     ).toMatchObject({ bottleId: bottle.id });
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, assignedReview.id),
+      }),
+    ).toMatchObject({ bottleId: otherBottle.id });
+  });
+
+  test("replays an active alias with nullable snapshot state", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const alias = await fixtures.BottleAlias({
+      name: "Nullable Snapshot Replay Alias",
+      bottleId: bottle.id,
+      ignored: null,
+    });
+    const review = await fixtures.Review({
+      name: alias.name,
+      bottleId: null,
+    });
+
+    await syncBottleAliasConsumersForAliasChange(alias.name);
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
+  });
+
+  test("does not replay ignored, unbound, or retired aliases", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const ignoredAlias = await fixtures.BottleAlias({
+      name: "Ignored Replay Alias",
+      bottleId: bottle.id,
+      ignored: true,
+    });
+    const unboundAlias = await fixtures.BottleAlias({
+      name: "Unbound Replay Alias",
+      bottleId: null,
+    });
+    const retiredAlias = await fixtures.BottleAlias({
+      name: "Retired Replay Alias",
+      bottleId: bottle.id,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+    const prices = await Promise.all(
+      [ignoredAlias, unboundAlias, retiredAlias].map((alias) =>
+        fixtures.StorePrice({
+          name: alias.name,
+          bottleId: null,
+        }),
+      ),
+    );
+
+    for (const alias of [ignoredAlias, unboundAlias, retiredAlias]) {
+      await syncBottleAliasConsumersForAliasChange(alias.name);
+    }
+
+    for (const price of prices) {
+      expect(
+        await db.query.storePrices.findFirst({
+          where: eq(storePrices.id, price.id),
+        }),
+      ).toMatchObject({ bottleId: null });
+    }
   });
 });
 

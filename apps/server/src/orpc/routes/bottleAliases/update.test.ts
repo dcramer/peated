@@ -1,10 +1,14 @@
 import { db } from "@peated/server/db";
 import { bottleAliases } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
+import { createPostgresClient, waitForSessionBlockedBy } from "./testUtils";
+
+const EMBEDDING = Array.from({ length: 3072 }, () => 0.125);
 
 vi.mock("@peated/server/worker/client", () => ({
   pushJob: vi.fn(),
@@ -16,8 +20,8 @@ beforeEach(() => {
   vi.mocked(workerClient.pushUniqueJob).mockReset();
 });
 
-describe("PATCH /bottle-aliases/:name", () => {
-  test("updates ignored state without changing direct or retained identity", async ({
+describe("PATCH /bottle-aliases/:alias", () => {
+  test("updates ignored state by exact alias casing without changing its Bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -46,8 +50,6 @@ describe("PATCH /bottle-aliases/:name", () => {
       }),
     ).resolves.toMatchObject({
       bottleId: bottle.id,
-      releaseId: alias.releaseId,
-      targetId: alias.targetId,
       ignored: true,
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
@@ -59,42 +61,41 @@ describe("PATCH /bottle-aliases/:name", () => {
     );
   });
 
-  test("can ignore an unassigned retained alias without resolving its target", async ({
+  test("can ignore an unresolved alias without resolving a Bottle", async ({
     fixtures,
   }) => {
+    const actor = await getUserActor(await fixtures.User());
+    const [alias] = await db
+      .insert(bottleAliases)
+      .values({
+        bottleId: null,
+        ignored: false,
+        name: "Unresolved Alias",
+        assignedByActorId: actor.id,
+      })
+      .returning();
     const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({ name: "Retained Alias Bottle" });
-    const alias = await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      ignored: false,
-      name: "Retained Target Only Alias",
-    });
-    await db
-      .update(bottleAliases)
-      .set({ bottleId: null })
-      .where(eq(bottleAliases.name, alias.name));
 
     await routerClient.bottleAliases.update(
-      { alias: alias.name, ignored: true },
+      { alias: alias!.name, ignored: true },
       { context: { user } },
     );
 
     await expect(
       db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, alias.name),
+        where: eq(bottleAliases.name, alias!.name),
       }),
     ).resolves.toMatchObject({
       bottleId: null,
-      targetId: expect.any(Number),
       ignored: true,
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
-      name: alias.name,
+      name: alias!.name,
     });
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
-  test("does not allow the direct Bottle canonical name to be ignored", async ({
+  test("does not allow a Bottle canonical name to be ignored", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -139,6 +140,71 @@ describe("PATCH /bottle-aliases/:name", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
+  test("rejects a stale update after the alias changes concurrently", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Concurrent Alias Bottle" });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      ignored: false,
+      assignmentSource: "legacy",
+      name: "Concurrent Direct Alias",
+    });
+    const client = createPostgresClient();
+    let committed = false;
+    let update:
+      | ReturnType<typeof routerClient.bottleAliases.update>
+      | undefined;
+    let error: unknown;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `UPDATE "bottle" SET "updated_at" = "updated_at" WHERE "id" = $1`,
+        [bottle.id],
+      );
+
+      update = routerClient.bottleAliases.update(
+        { alias: alias.name, ignored: true },
+        { context: { user } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query(
+        `UPDATE "bottle_alias"
+         SET "assignment_source" = 'human_approved'
+         WHERE "name" = $1`,
+        [alias.name],
+      );
+      await client.query("COMMIT");
+      committed = true;
+      error = await waitError(update);
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await update?.catch(() => undefined);
+    }
+
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Bottle Alias changed while it was being updated. Retry the operation.]`,
+    );
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, alias.name),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: bottle.id,
+      ignored: false,
+      assignmentSource: "human_approved",
+    });
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
   test("keeps the committed update when indexing is unavailable", async ({
     fixtures,
   }) => {
@@ -148,6 +214,7 @@ describe("PATCH /bottle-aliases/:name", () => {
       bottleId: bottle.id,
       name: "Queue Failure Alias",
       ignored: false,
+      embedding: EMBEDDING,
     });
     vi.mocked(workerClient.pushJob).mockRejectedValueOnce(
       new Error("Queue unavailable"),
@@ -169,33 +236,33 @@ describe("PATCH /bottle-aliases/:name", () => {
       db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, alias.name),
       }),
-    ).resolves.toMatchObject({ ignored: true });
+    ).resolves.toMatchObject({ ignored: true, embedding: null });
   });
 
   test("returns not found for an unknown alias", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
 
-    const error = await waitError(
-      routerClient.bottleAliases.update(
-        { alias: "Missing Bottle Alias" },
-        { context: { user } },
+    await expect(
+      waitError(
+        routerClient.bottleAliases.update(
+          { alias: "Missing Bottle Alias" },
+          { context: { user } },
+        ),
       ),
-    );
-
-    expect(error).toMatchInlineSnapshot(`[Error: Alias not found.]`);
+    ).resolves.toMatchInlineSnapshot(`[Error: Alias not found.]`);
   });
 
   test("requires moderator access", async ({ fixtures }) => {
     const alias = await fixtures.BottleAlias();
     const user = await fixtures.User();
 
-    const error = await waitError(
-      routerClient.bottleAliases.update(
-        { alias: alias.name },
-        { context: { user } },
+    await expect(
+      waitError(
+        routerClient.bottleAliases.update(
+          { alias: alias.name },
+          { context: { user } },
+        ),
       ),
-    );
-
-    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    ).resolves.toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

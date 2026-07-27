@@ -22,7 +22,7 @@ export default procedure
       "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
     operationId: "upsertBottleAlias",
   })
-  .input(BottleAliasSchema)
+  .input(BottleAliasSchema.strict())
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     try {

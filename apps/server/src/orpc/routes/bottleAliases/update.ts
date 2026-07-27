@@ -36,7 +36,14 @@ export default procedure
 
     const updateResult = await db.transaction(async (tx) => {
       const [alias] = await tx
-        .select()
+        .select({
+          name: bottleAliases.name,
+          bottleId: bottleAliases.bottleId,
+          ignored: bottleAliases.ignored,
+          assignmentSource: bottleAliases.assignmentSource,
+          assignedByActorId: bottleAliases.assignedByActorId,
+          createdAt: bottleAliases.createdAt,
+        })
         .from(bottleAliases)
         .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
         .limit(1);
@@ -79,20 +86,21 @@ export default procedure
 
       const [updatedAlias] = await tx
         .update(bottleAliases)
-        .set(data)
+        .set({ ...data, embedding: null })
         .where(
           and(
             eq(bottleAliases.name, alias.name),
             sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
-            sql`${bottleAliases.releaseId} IS NOT DISTINCT FROM ${alias.releaseId}`,
-            sql`${bottleAliases.targetId} IS NOT DISTINCT FROM ${alias.targetId}`,
             sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
-            eq(bottleAliases.assignmentSource, alias.assignmentSource),
-            eq(bottleAliases.assignedByActorId, alias.assignedByActorId),
-            eq(bottleAliases.createdAt, alias.createdAt),
+            sql`${bottleAliases.assignmentSource} IS NOT DISTINCT FROM ${alias.assignmentSource}`,
+            sql`${bottleAliases.assignedByActorId} IS NOT DISTINCT FROM ${alias.assignedByActorId}`,
           ),
         )
-        .returning();
+        .returning({
+          name: bottleAliases.name,
+          bottleId: bottleAliases.bottleId,
+          createdAt: bottleAliases.createdAt,
+        });
 
       if (!updatedAlias) {
         throw errors.CONFLICT({
