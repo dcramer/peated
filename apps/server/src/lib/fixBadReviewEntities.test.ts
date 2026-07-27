@@ -104,7 +104,6 @@ describe("fixBadReviewEntities", () => {
         {
           action: "match",
           matchedBottleId: correctBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [correctBottle.id],
         },
         {
@@ -259,7 +258,6 @@ describe("fixBadReviewEntities", () => {
         {
           action: "match",
           matchedBottleId: stagedParent.id,
-          matchedReleaseId: stagedRelease.id,
           candidateBottleIds: [stagedParent.id],
         },
         {
@@ -422,7 +420,6 @@ describe("fixBadReviewEntities", () => {
         {
           action: "match",
           matchedBottleId: suggestedBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [suggestedBottle.id],
         },
         {
@@ -489,7 +486,6 @@ describe("fixBadReviewEntities", () => {
         {
           action: "match",
           matchedBottleId: suggestedBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [suggestedBottle.id],
         },
         {

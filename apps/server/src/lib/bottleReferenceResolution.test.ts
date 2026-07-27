@@ -29,10 +29,7 @@ vi.mock(
 
 function buildClassification(
   decision: Record<string, unknown>,
-  candidates: Array<{
-    bottleId: number;
-    releaseId?: number | null;
-  }> = [],
+  candidates: Array<{ bottleId: number }> = [],
 ) {
   return {
     status: "classified" as const,
@@ -195,7 +192,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [bottle.fullName],
       createdByActorId: actor.id,
@@ -233,7 +229,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [alias.name],
       createdByActorId: actor.id,
@@ -280,7 +275,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [alias.name],
       createdByActorId: actor.id,
@@ -317,7 +311,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [alias.name],
       createdByActorId: actor.id,
@@ -341,34 +334,29 @@ describe("resolveBottleReferenceTarget", () => {
     ).toBeUndefined();
   });
 
-  test("assigns the matched Bottle without retaining release identity", async ({
-    fixtures,
-  }) => {
+  test("assigns the matched Bottle directly", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const actor = await getUserActor(user);
-    const parent = await fixtures.LegacyBottle({
-      name: "Unpromoted Match Parent",
+    const bottle = await fixtures.Bottle({
+      name: "Matched Bottle",
     });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
           action: "match",
-          matchedBottleId: parent.id,
-          matchedReleaseId: release.id,
-          candidateBottleIds: [parent.id],
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
         },
-        [{ bottleId: parent.id, releaseId: release.id }],
+        [{ bottleId: bottle.id }],
       ),
     );
 
     const result = await resolveBottleReferenceTarget({
       reference: {
-        name: "Unpromoted Match Parent Release",
+        name: "Matched Bottle",
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       createdByActorId: actor.id,
       user,
@@ -377,55 +365,10 @@ describe("resolveBottleReferenceTarget", () => {
     expect(result).toMatchObject({
       assignment: {
         kind: "direct_bottle",
-        bottleId: parent.id,
+        bottleId: bottle.id,
       },
       source: "classifier_match",
       error: null,
-    });
-    expect(result).not.toHaveProperty("matchedReleaseIdEvidence");
-  });
-
-  test("does not use mismatched release evidence as resolver authority", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ admin: true });
-    const actor = await getUserActor(user);
-    const selectedParent = await fixtures.LegacyBottle({
-      name: "Selected Parent",
-    });
-    const otherParent = await fixtures.LegacyBottle({ name: "Other Parent" });
-    const otherRelease = await fixtures.BottleRelease({
-      bottleId: otherParent.id,
-    });
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification(
-        {
-          action: "match",
-          matchedBottleId: selectedParent.id,
-          matchedReleaseId: otherRelease.id,
-          candidateBottleIds: [selectedParent.id],
-        },
-        [{ bottleId: selectedParent.id, releaseId: otherRelease.id }],
-      ),
-    );
-
-    const result = await resolveBottleReferenceTarget({
-      reference: {
-        name: "Cross-parent release evidence",
-        url: null,
-        imageUrl: null,
-        currentBottleId: null,
-        currentReleaseId: null,
-      },
-      createdByActorId: actor.id,
-      user,
-    });
-
-    expect(result).toMatchObject({
-      assignment: {
-        kind: "direct_bottle",
-        bottleId: selectedParent.id,
-      },
     });
   });
 
@@ -445,7 +388,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: ["Ardbeg 10 years old"],
       createdByActorId: actor.id,
@@ -463,7 +405,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       extractedIdentity: null,
     });
@@ -491,7 +432,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: ["Ardbeg Ten Years"],
       createdByActorId: actor.id,
@@ -546,7 +486,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: "https://example.com/independent",
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [],
       createdByActorId: actor.id,
@@ -653,7 +592,6 @@ describe("resolveBottleReferenceTarget", () => {
         url: null,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [],
       createdByActorId: actor.id,

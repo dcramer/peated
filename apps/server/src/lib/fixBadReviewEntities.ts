@@ -62,9 +62,8 @@ export async function fixBadReviewEntities({
         url: review.url,
         imageUrl: null,
         currentBottleId: review.bottleId,
-        currentReleaseId: review.releaseId,
       },
-      // Normalized fallback aliases can erase release markers before the
+      // Normalized fallback aliases can erase exact identity markers before the
       // classifier sees the real reference title.
       aliasLookupNames: [review.name],
       createdByActorId: actor.id,

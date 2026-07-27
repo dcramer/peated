@@ -8,10 +8,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -36,10 +33,7 @@
       "when": ["quinta", "ruban"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition",
           "brand": "Glenmorangie",
           "bottler": null,
           "series": null,

@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": "The Macallan Sherry Oak Single Malt Scotch 30-year-old",
-        "bottleFullName": "The Macallan Sherry Oak 30-year-old",
         "brand": "The Macallan",
         "bottler": null,
         "series": null,
@@ -45,10 +42,7 @@
         "fullName": "The Macallan Sherry Oak 30-year-old"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "The Macallan Sherry Oak",
         "brand": "The Macallan",
         "bottler": null,
         "series": null,

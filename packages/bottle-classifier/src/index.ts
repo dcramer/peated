@@ -1,10 +1,4 @@
-export {
-  inferBottleCreationTarget,
-  normalizeBottleCreationDrafts,
-  normalizeProposedBottleDraft,
-  splitProposedBottleReleaseDraft,
-} from "./bottleCreationDrafts";
-export type { BottleCreationTarget } from "./bottleCreationDrafts";
+export { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 export {
   createBottleClassifier,
   type BottleClassifier,

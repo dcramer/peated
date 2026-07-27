@@ -92,7 +92,6 @@ export const BottleReferenceSchema = z
     url: BottleReferenceUrlSchema,
     imageUrl: BottleReferenceImageUrlSchema,
     currentBottleId: z.number().int().nullable().optional(),
-    currentReleaseId: z.number().int().nullable().optional(),
   })
   .strict();
 

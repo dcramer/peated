@@ -171,7 +171,6 @@ describe("createMissingBottles", () => {
       metadata: expect.objectContaining({
         classifierEvidence: {
           action: "create_bottle",
-          parentBottleId: null,
           identityScope: null,
           observation: null,
           identityBasis: null,
@@ -268,7 +267,6 @@ describe("createMissingBottles", () => {
       metadata: expect.objectContaining({
         classifierEvidence: {
           action: "create_bottle",
-          parentBottleId: null,
           identityScope: null,
           observation: null,
           identityBasis: null,
@@ -332,10 +330,9 @@ describe("createMissingBottles", () => {
         {
           action: "match",
           matchedBottleId: parent.id,
-          matchedReleaseId: release.id,
           candidateBottleIds: [parent.id],
         },
-        { candidates: [{ bottleId: parent.id, releaseId: release.id }] },
+        { candidates: [{ bottleId: parent.id }] },
       ),
     );
 
@@ -444,10 +441,9 @@ describe("createMissingBottles", () => {
         {
           action: "match",
           matchedBottleId: suggestedBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [suggestedBottle.id],
         },
-        { candidates: [{ bottleId: suggestedBottle.id, releaseId: null }] },
+        { candidates: [{ bottleId: suggestedBottle.id }] },
       );
     });
 

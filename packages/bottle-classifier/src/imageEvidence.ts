@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { CategoryEnum } from "./classifierTypes";
+import {
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
+  CategoryEnum,
+} from "./classifierTypes";
 
 const ConfidenceSchema = z.number().min(0).max(1);
 
@@ -107,6 +112,9 @@ export const ImageBottleFieldCandidatesSchema = z
     caskNumber: EvidenceStringFieldSchema.optional(),
     caskStrength: EvidenceBooleanFieldSchema.optional(),
     singleCask: EvidenceBooleanFieldSchema.optional(),
+    caskType: createEvidenceFieldSchema(CaskTypeEnum).optional(),
+    caskSize: createEvidenceFieldSchema(CaskSizeEnum).optional(),
+    caskFill: createEvidenceFieldSchema(CaskFillEnum).optional(),
   })
   .strict();
 

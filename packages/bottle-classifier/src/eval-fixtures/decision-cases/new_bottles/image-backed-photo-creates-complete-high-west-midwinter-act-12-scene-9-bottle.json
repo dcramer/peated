@@ -78,10 +78,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "release",
-        "bottleId": 43397,
-        "releaseId": 1,
-        "bottleFullName": "High West A Midwinter Night's Dram",
+        "bottleId": -1,
         "fullName": "High West A Midwinter Night's Dram - Act 12 - 2024 Release - 49.3% ABV",
         "brand": "High West",
         "series": "A Midwinter Night's Dram",
@@ -91,10 +88,7 @@
         "releaseYear": 2024
       },
       {
-        "kind": "bottle",
         "bottleId": 43397,
-        "releaseId": null,
-        "bottleFullName": "High West A Midwinter Night's Dram",
         "fullName": "High West A Midwinter Night's Dram",
         "brand": "High West",
         "series": "A Midwinter Night's Dram",
@@ -104,94 +98,55 @@
         "releaseYear": 2024
       },
       {
-        "kind": "bottle",
         "bottleId": 26125,
-        "releaseId": null,
-        "bottleFullName": "High West A Midwinter Night's Dram (Encore)",
         "fullName": "High West A Midwinter Night's Dram (Encore)"
       },
       {
-        "kind": "bottle",
         "bottleId": 44047,
-        "releaseId": null,
-        "bottleFullName": "High West Yippee Ki-Yay",
         "fullName": "High West Yippee Ki-Yay"
       },
       {
-        "kind": "bottle",
         "bottleId": 44040,
-        "releaseId": null,
-        "bottleFullName": "High West Rendezvous Rye",
         "fullName": "High West Rendezvous Rye"
       },
       {
-        "kind": "bottle",
         "bottleId": 44021,
-        "releaseId": null,
-        "bottleFullName": "High West Bourye",
         "fullName": "High West Bourye"
       },
       {
-        "kind": "release",
-        "bottleId": 44047,
-        "releaseId": 259,
-        "bottleFullName": "High West Yippee Ki-Yay",
+        "bottleId": -259,
         "fullName": "High West Yippee Ki-Yay - Batch 1"
       },
       {
-        "kind": "release",
-        "bottleId": 44040,
-        "releaseId": 246,
-        "bottleFullName": "High West Rendezvous Rye",
+        "bottleId": -246,
         "fullName": "High West Rendezvous Rye - Batch 10"
       },
       {
-        "kind": "release",
-        "bottleId": 26126,
-        "releaseId": 51,
-        "bottleFullName": "High West 16-year-old Rocky Mountain Rye",
+        "bottleId": -51,
         "fullName": "High West 16-year-old Rocky Mountain Rye - Batch 1"
       },
       {
-        "kind": "release",
-        "bottleId": 44040,
-        "releaseId": 255,
-        "bottleFullName": "High West Rendezvous Rye",
+        "bottleId": -255,
         "fullName": "High West Rendezvous Rye - Batch 18426"
       },
       {
-        "kind": "bottle",
         "bottleId": 44165,
-        "releaseId": null,
-        "bottleFullName": "High West 21-year-old Rocky Mountain Rye",
         "fullName": "High West 21-year-old Rocky Mountain Rye"
       },
       {
-        "kind": "release",
-        "bottleId": 44047,
-        "releaseId": 267,
-        "bottleFullName": "High West Yippee Ki-Yay",
+        "bottleId": -267,
         "fullName": "High West Yippee Ki-Yay - Batch 19C27"
       },
       {
-        "kind": "release",
-        "bottleId": 44165,
-        "releaseId": 396,
-        "bottleFullName": "High West 21-year-old Rocky Mountain Rye",
+        "bottleId": -396,
         "fullName": "High West 21-year-old Rocky Mountain Rye - Batch 2"
       },
       {
-        "kind": "release",
-        "bottleId": 44021,
-        "releaseId": 190,
-        "bottleFullName": "High West Bourye",
+        "bottleId": -190,
         "fullName": "High West Bourye - Batch 17A09"
       },
       {
-        "kind": "release",
-        "bottleId": 26123,
-        "releaseId": 50,
-        "bottleFullName": "High West Bottled in Bond",
+        "bottleId": -50,
         "fullName": "High West Bottled in Bond - Batch 23L19"
       }
     ]
@@ -250,6 +205,6 @@
       "abv": 49.3
     },
     "suggestedNextStep": "confirm_create",
-    "summary": "Create one independently complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle instead of repairing bottle 43397, selecting its group, returning no_match, or matching broader legacy release 1."
+    "summary": "Create one independently complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle instead of repairing or matching the broader Bottle 43397, selecting a group, or returning no_match."
   }
 }

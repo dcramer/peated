@@ -16,10 +16,7 @@ describe("toStorePriceMatchDecision", () => {
         aliasScope: "none",
         observation: null,
         matchedBottleId: 123,
-        matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: null,
-        proposedRelease: null,
       },
     });
 

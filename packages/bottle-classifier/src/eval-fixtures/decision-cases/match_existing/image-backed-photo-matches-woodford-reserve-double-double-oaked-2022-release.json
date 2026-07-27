@@ -88,108 +88,63 @@
     },
     "initialCandidates": [
       {
-        "kind": "release",
-        "bottleId": 44022,
-        "releaseId": 195,
-        "bottleFullName": "Woodford Reserve Double Double Oaked",
-        "fullName": "Woodford Reserve Double Double Oaked - 2022 Release - 2022 Release"
+        "bottleId": -195,
+        "fullName": "Woodford Reserve Double Double Oaked - 2022 Release"
       },
       {
-        "kind": "bottle",
         "bottleId": 44022,
-        "releaseId": null,
-        "bottleFullName": "Woodford Reserve Double Double Oaked",
         "fullName": "Woodford Reserve Double Double Oaked"
       },
       {
-        "kind": "release",
-        "bottleId": 44022,
-        "releaseId": 196,
-        "bottleFullName": "Woodford Reserve Double Double Oaked",
-        "fullName": "Woodford Reserve Double Double Oaked - 2025 Release - 2025 Release"
+        "bottleId": -196,
+        "fullName": "Woodford Reserve Double Double Oaked - 2025 Release"
       },
       {
-        "kind": "release",
-        "bottleId": 44022,
-        "releaseId": 197,
-        "bottleFullName": "Woodford Reserve Double Double Oaked",
-        "fullName": "Woodford Reserve Double Double Oaked - 2023 Release - 2023 Release"
+        "bottleId": -197,
+        "fullName": "Woodford Reserve Double Double Oaked - 2023 Release"
       },
       {
-        "kind": "release",
-        "bottleId": 44022,
-        "releaseId": 194,
-        "bottleFullName": "Woodford Reserve Double Double Oaked",
-        "fullName": "Woodford Reserve Double Double Oaked - 2017 Release - 2017 Release"
+        "bottleId": -194,
+        "fullName": "Woodford Reserve Double Double Oaked - 2017 Release"
       },
       {
-        "kind": "bottle",
         "bottleId": 44150,
-        "releaseId": null,
-        "bottleFullName": "Woodford Reserve Kentucky Straight Bourbon Whiskey",
         "fullName": "Woodford Reserve Kentucky Straight Bourbon Whiskey"
       },
       {
-        "kind": "bottle",
         "bottleId": 18503,
-        "releaseId": null,
-        "bottleFullName": "Woodford Reserve Distillery Master's Collection Four Grain",
         "fullName": "Woodford Reserve Distillery Master's Collection Four Grain"
       },
       {
-        "kind": "release",
-        "bottleId": 18503,
-        "releaseId": 380,
-        "bottleFullName": "Woodford Reserve Distillery Master's Collection Four Grain",
+        "bottleId": -380,
         "fullName": "Woodford Reserve Distillery Master's Collection Four Grain - Batch 2"
       },
       {
-        "kind": "bottle",
         "bottleId": 43962,
-        "releaseId": null,
-        "bottleFullName": "Woodford Reserve Master's Collection Sweet Oak (Series No. 21)",
         "fullName": "Woodford Reserve Master's Collection Sweet Oak (Series No. 21)"
       },
       {
-        "kind": "bottle",
         "bottleId": 16322,
-        "releaseId": null,
-        "bottleFullName": "Woodford Reserve Distiller's Select Rye",
         "fullName": "Woodford Reserve Distiller's Select Rye"
       },
       {
-        "kind": "bottle",
         "bottleId": 44129,
-        "releaseId": null,
-        "bottleFullName": "Hand Barrel Double Oak",
         "fullName": "Hand Barrel Double Oak"
       },
       {
-        "kind": "release",
-        "bottleId": 16322,
-        "releaseId": 277,
-        "bottleFullName": "Woodford Reserve Distiller's Select Rye",
+        "bottleId": -277,
         "fullName": "Woodford Reserve Distiller's Select Rye - Batch 0037"
       },
       {
-        "kind": "bottle",
         "bottleId": 44157,
-        "releaseId": null,
-        "bottleFullName": "Cooperstown Doubleday Bourbon",
         "fullName": "Cooperstown Doubleday Bourbon"
       },
       {
-        "kind": "bottle",
         "bottleId": 43961,
-        "releaseId": null,
-        "bottleFullName": "High Wire Distilling Co High Wire Distilling Co. Jimmy Red Double Oak",
         "fullName": "High Wire Distilling Co High Wire Distilling Co. Jimmy Red Double Oak"
       },
       {
-        "kind": "bottle",
         "bottleId": 11869,
-        "releaseId": null,
-        "bottleFullName": "Woodinville Whiskey Co. Straight Bourbon",
         "fullName": "Woodinville Whiskey Co. Straight Bourbon"
       }
     ]
@@ -222,17 +177,16 @@
         "notes": "The photo label gives 45.2% ABV for the 2022 release, but this eval is about routing to the existing release rather than enriching it."
       }
     ],
-    "notes": "Added from failed image photo-identification trace 413c334005c60d8dcc8dbf109761c5e3. The observed pending upload was t2l6vj6tc6zixonbv54lc87o at https://api.peated.com/uploads/pending-uploads/pending-upload-o5klpnm5zbjknwcu8w0sm3fd.webp, expiring 2026-07-10T02:41:47.889Z. The form returned suggestedNextStep manual_search even though classification matched bottle 44022 release 195; this fixture expects confirm_match so that routing regression is caught. The label evidence reads Woodford Reserve Double Double Oaked, 2022 release, 45.2% ABV, Distillery Series."
+    "notes": "Added from failed image photo-identification trace 413c334005c60d8dcc8dbf109761c5e3. The observed pending upload was t2l6vj6tc6zixonbv54lc87o at https://api.peated.com/uploads/pending-uploads/pending-upload-o5klpnm5zbjknwcu8w0sm3fd.webp, expiring 2026-07-10T02:41:47.889Z. The form returned suggestedNextStep manual_search even though classification matched the captured exact 2022 Bottle candidate. This fixture requires the eligible exact match to route to confirm_match automatically. The label evidence reads Woodford Reserve Double Double Oaked, 2022 release, 45.2% ABV, Distillery Series."
   },
   "expected": {
     "status": "classified",
     "action": "match",
     "identityScope": "product",
-    "matchedBottleId": 44022,
-    "matchedReleaseId": 195,
-    "expectedTier": "review",
-    "verifyEligible": false,
-    "suggestedNextStep": "manual_search",
-    "summary": "Match retained Woodford Reserve Double Double Oaked 2022 release 195 under bottle 44022, while routing the fresh legacy-release match through review until flattening removes that transitional target."
+    "matchedBottleId": -195,
+    "expectedTier": "auto",
+    "verifyEligible": true,
+    "suggestedNextStep": "confirm_match",
+    "summary": "Automatically confirm the independently complete Woodford Reserve Double Double Oaked 2022 Bottle candidate represented by fixture id -195. Historical release 195 remains provenance only."
   }
 }

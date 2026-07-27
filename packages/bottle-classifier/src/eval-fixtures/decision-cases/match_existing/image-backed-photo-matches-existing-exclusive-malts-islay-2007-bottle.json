@@ -76,10 +76,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%",
         "brand": "The Exclusive Malts",
         "bottler": null,
         "series": null,
@@ -98,10 +95,7 @@
         "fullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%"
       },
       {
-        "kind": "release",
-        "releaseId": 1,
         "alias": null,
-        "bottleFullName": "Pōkeno Totara Cask",
         "brand": "Pōkeno",
         "bottler": null,
         "series": null,
@@ -116,14 +110,11 @@
         "releaseYear": null,
         "score": 0.63,
         "source": ["vector", "release"],
-        "bottleId": 346,
+        "bottleId": -1,
         "fullName": "Pōkeno Totara Cask - 01 - Other"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Pōkeno Totara Cask",
         "brand": "Pōkeno",
         "bottler": null,
         "series": null,
@@ -148,10 +139,7 @@
       "when": ["exclusive", "malts", "islay", "2007"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "The Exclusive Malts Islay 2007 8-year-old 57.1%",
           "brand": "The Exclusive Malts",
           "bottler": null,
           "series": null,
@@ -184,7 +172,6 @@
     "status": "classified",
     "action": "match",
     "matchedBottleId": 347,
-    "matchedReleaseId": null,
     "summary": "Use the extracted label identity and local candidates to match existing bottle 347. The deterministic review layer must not turn this non-conflicting classifier-selected match into no_match just because deterministic support heuristics are incomplete."
   }
 }

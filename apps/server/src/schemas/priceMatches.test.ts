@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
 import {
+  PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
   StorePriceMatchAgentResponseSchema,
   StorePriceMatchDecisionSchema,
@@ -46,6 +47,48 @@ const baseProposedRelease = {
   tastingNotes: null,
   imageUrl: null,
 };
+
+describe("PriceMatchCandidateSchema", () => {
+  test("accepts historical release candidates", () => {
+    const candidate = PriceMatchCandidateSchema.parse({
+      kind: "release",
+      bottleId: 10,
+      releaseId: 20,
+      fullName: "Historical Bottle Batch 2",
+      bottleFullName: "Historical Bottle",
+      familyContext: {
+        parentBottleReleaseTraits: ["edition"],
+        childReleaseCount: 1,
+        siblingReleases: [
+          {
+            releaseId: 21,
+            fullName: "Historical Bottle Batch 1",
+            traitFields: ["edition"],
+            edition: "Batch 1",
+          },
+        ],
+        siblingBottles: [],
+      },
+    });
+
+    expect(candidate).toMatchObject({
+      kind: "release",
+      bottleId: 10,
+      releaseId: 20,
+    });
+  });
+
+  test("rejects unknown current candidate fields instead of legacy fallback", () => {
+    const result = PriceMatchCandidateSchema.safeParse({
+      bottleId: 10,
+      fullName: "Current Bottle",
+      source: ["current"],
+      caskTyp: "bourbon",
+    });
+
+    expect(result.success).toBe(false);
+  });
+});
 
 describe("StorePriceMatchDecisionSchema", () => {
   test("normalizes legacy Brave search evidence providers on read", () => {

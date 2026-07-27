@@ -56,9 +56,6 @@ export function buildBottleInputFromProposedBottle(
     descriptionSrc: null,
     imageUrl: null,
     flavorProfile: null,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
   };
 }
 

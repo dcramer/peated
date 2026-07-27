@@ -23,12 +23,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 469,
-        "releaseId": null,
         "alias": null,
         "fullName": "Springbank 25-year-old",
-        "bottleFullName": "Springbank 25-year-old",
         "brand": "Springbank",
         "bottler": "Springbank",
         "series": null,
@@ -45,12 +42,9 @@
         "source": ["text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 1563,
-        "releaseId": null,
         "alias": null,
         "fullName": "Springbank 25-year-old Limited Edition",
-        "bottleFullName": "Springbank 25-year-old Limited Edition",
         "brand": "Springbank",
         "bottler": "Springbank",
         "series": null,
@@ -67,12 +61,9 @@
         "source": ["text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 1230,
-        "releaseId": null,
         "alias": null,
         "fullName": "Longrow 1974",
-        "bottleFullName": "Longrow 1974",
         "brand": "Longrow",
         "bottler": "Springbank",
         "series": null,
@@ -95,12 +86,9 @@
       "when": ["springbank", "25"],
       "results": [
         {
-          "kind": "bottle",
           "bottleId": 469,
-          "releaseId": null,
           "alias": null,
           "fullName": "Springbank 25-year-old",
-          "bottleFullName": "Springbank 25-year-old",
           "brand": "Springbank",
           "bottler": "Springbank",
           "series": null,
@@ -117,12 +105,9 @@
           "source": ["text"]
         },
         {
-          "kind": "bottle",
           "bottleId": 1563,
-          "releaseId": null,
           "alias": null,
           "fullName": "Springbank 25-year-old Limited Edition",
-          "bottleFullName": "Springbank 25-year-old Limited Edition",
           "brand": "Springbank",
           "bottler": "Springbank",
           "series": null,
@@ -146,7 +131,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 469,
-    "matchedReleaseId": null,
     "summary": "Treat 'Aged' as generic age-statement wording, match the plain Springbank 25-year-old bottle, and avoid the more specific Limited Edition sibling unless the source supports that edition."
   }
 }

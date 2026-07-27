@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenmorangie 15-year-old The Cadboll Estate",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -45,10 +42,7 @@
         "fullName": "Glenmorangie 15-year-old The Cadboll Estate"
       },
       {
-        "kind": "release",
-        "releaseId": 9102,
         "alias": null,
-        "bottleFullName": "Glenmorangie 15-year-old The Cadboll Estate",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -63,14 +57,11 @@
         "releaseYear": null,
         "score": 0.93,
         "source": ["text"],
-        "bottleId": 660,
+        "bottleId": -9102,
         "fullName": "Glenmorangie 15-year-old The Cadboll Estate - Batch 4"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -94,8 +85,7 @@
     "status": "classified",
     "action": "match",
     "identityScope": "product",
-    "matchedBottleId": 660,
-    "matchedReleaseId": 9102,
-    "summary": "Match the exact Cadboll Estate Batch 4 target through its retained legacy bottling candidate instead of matching the broader Cadboll Estate Bottle."
+    "matchedBottleId": -9102,
+    "summary": "Match the independently complete Cadboll Estate Batch 4 Bottle candidate instead of the broader Cadboll Estate Bottle."
   }
 }

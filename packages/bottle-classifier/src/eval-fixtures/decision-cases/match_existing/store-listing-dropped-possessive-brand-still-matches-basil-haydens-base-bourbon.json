@@ -23,12 +23,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 39686,
-        "releaseId": null,
         "alias": "Basil Hayden's 10-year-old Kentucky Bourbon",
         "fullName": "Basil Hayden's 10-year-old Kentucky Bourbon",
-        "bottleFullName": "Basil Hayden's 10-year-old Kentucky Bourbon",
         "brand": "Basil Hayden's",
         "bottler": "Basil Hayden's",
         "series": null,
@@ -45,12 +42,9 @@
         "source": ["vector", "text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 13378,
-        "releaseId": null,
         "alias": null,
         "fullName": "Basil Hayden's 10-year-old Kentucky Straight Rye",
-        "bottleFullName": "Basil Hayden's 10-year-old Kentucky Straight Rye",
         "brand": "Basil Hayden's",
         "bottler": null,
         "series": null,
@@ -67,12 +61,9 @@
         "source": ["text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 39669,
-        "releaseId": null,
         "alias": "Basil Hayden's Kentucky Straight Bourbon",
         "fullName": "Basil Hayden's Kentucky Straight Bourbon",
-        "bottleFullName": "Basil Hayden's Kentucky Straight Bourbon",
         "brand": "Basil Hayden's",
         "bottler": null,
         "series": null,
@@ -89,12 +80,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 39668,
-        "releaseId": null,
         "alias": "Basil Hayden's Small Batch Bourbon",
         "fullName": "Basil Hayden's Small Batch Bourbon",
-        "bottleFullName": "Basil Hayden's Small Batch Bourbon",
         "brand": "Basil Hayden's",
         "bottler": null,
         "series": null,
@@ -111,12 +99,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 39671,
-        "releaseId": null,
         "alias": "Basil Hayden's Toast Bourbon",
         "fullName": "Basil Hayden's Toasted Oak Bourbon",
-        "bottleFullName": "Basil Hayden's Toasted Oak Bourbon",
         "brand": "Basil Hayden's",
         "bottler": null,
         "series": null,
@@ -133,12 +118,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 42426,
-        "releaseId": null,
         "alias": "Basil Hayden's Subtle Smoke",
         "fullName": "Basil Hayden's Subtle Smoke",
-        "bottleFullName": "Basil Hayden's Subtle Smoke",
         "brand": "Basil Hayden's",
         "bottler": null,
         "series": null,

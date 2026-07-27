@@ -158,7 +158,6 @@
     "action": "match",
     "identityScope": "exact_cask",
     "matchedBottleId": 11939,
-    "matchedReleaseId": null,
     "suggestedNextStep": "confirm_match",
     "summary": "Match existing bottle 11939 with no release."
   },
@@ -200,7 +199,6 @@
         "releaseYear": 2024
       }
     ],
-    "releases": [],
     "aliases": [
       {
         "name": "SMWS 95.71 Prepare for Winter",

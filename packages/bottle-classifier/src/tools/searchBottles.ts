@@ -12,7 +12,7 @@ const SearchBottlesResultSchema = z.object({
   results: z.array(BottleCandidateSchema),
 });
 const SEARCH_BOTTLES_TOOL_DESCRIPTION =
-  "Search local Peated bottle and release candidates. Use before web search when local matches are missing or conflicting, and again after web evidence reveals a canonical trait that could recover a better local candidate.";
+  "Search local Peated Bottle candidates. Use before web search when local matches are missing or conflicting, and again after web evidence reveals a canonical trait that could recover a better local candidate.";
 
 export type SearchBottlesResult = z.infer<typeof SearchBottlesResultSchema>;
 
@@ -63,6 +63,15 @@ export function createSearchBottlesTool({
       single_cask: BottleCandidateSearchInputSchema.shape.single_cask.describe(
         "True only when the reference explicitly says single cask, single barrel, or a specific cask selection.",
       ),
+      cask_type: BottleCandidateSearchInputSchema.shape.cask_type.describe(
+        "Canonical cask type when explicitly supported, such as bourbon, oloroso, or pedro_ximenez.",
+      ),
+      cask_size: BottleCandidateSearchInputSchema.shape.cask_size.describe(
+        "Canonical cask size when explicitly supported, such as barrel, hogshead, or butt.",
+      ),
+      cask_fill: BottleCandidateSearchInputSchema.shape.cask_fill.describe(
+        "Canonical fill when explicitly supported: 1st_fill, 2nd_fill, refill, or other.",
+      ),
       edition: BottleCandidateSearchInputSchema.shape.edition.describe(
         "Batch label, store-pick code, release code, or numbered edition.",
       ),
@@ -77,10 +86,6 @@ export function createSearchBottlesTool({
       currentBottleId:
         BottleCandidateSearchInputSchema.shape.currentBottleId.describe(
           "Current assigned bottle id, if the reference is already attached to a bottle.",
-        ),
-      currentReleaseId:
-        BottleCandidateSearchInputSchema.shape.currentReleaseId.describe(
-          "Current assigned release id, if the reference is already attached to a specific release.",
         ),
       limit: BottleCandidateSearchInputSchema.shape.limit.describe(
         "Maximum number of candidates to return.",

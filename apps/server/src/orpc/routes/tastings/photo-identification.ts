@@ -1,6 +1,6 @@
 // This route owns the photo lookup boundary for add-tasting. It may create or
-// reuse a pending upload, but it must not create tastings, bottles, releases, or
-// durable classifier trace rows.
+// reuse a pending upload, but it must not create tastings, bottles, or durable
+// classifier trace rows.
 import {
   agentActionRiskClass,
   deriveAutomationTier,
@@ -86,8 +86,6 @@ function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
       decision.action === "match" && decision.matchedBottleId !== null,
     reaffirmsCurrentAssignment: false,
     replacesCurrentAssignment: false,
-    matchesFreshReleaseTarget:
-      decision.action === "match" && decision.matchedReleaseId !== null,
     hasExactAliasAnchor: false,
     hasDeterministicAnchor: decision.identityScope === "exact_cask",
     hasPrimaryLabelOrImageEvidence: true,
@@ -146,7 +144,6 @@ async function serializePhotoIdentificationClassification(
 ): Promise<z.infer<typeof PhotoIdentificationSchema>["classification"]> {
   const artifacts = {
     candidates: classification.artifacts.candidates.map((candidate) => ({
-      bottleFullName: candidate.bottleFullName,
       fullName: candidate.fullName,
     })),
   };
@@ -168,23 +165,7 @@ async function serializePhotoIdentificationClassification(
 
   switch (decision.action) {
     case "match": {
-      const bottleId =
-        decision.matchedReleaseId === null
-          ? decision.matchedBottleId
-          : (
-              await db.query.bottleReleasePromotions.findFirst({
-                columns: { promotedBottleId: true },
-                where: (promotions, { and, eq, isNotNull }) =>
-                  and(
-                    eq(promotions.releaseId, decision.matchedReleaseId!),
-                    eq(promotions.status, "promoted"),
-                    isNotNull(promotions.promotedBottleId),
-                  ),
-              })
-            )?.promotedBottleId;
-      if (bottleId === null || bottleId === undefined) {
-        throw new Error("Photo identification match has no promoted Bottle.");
-      }
+      const bottleId = decision.matchedBottleId;
 
       const matchedBottle = await db.query.bottles.findFirst({
         where: (bottles, { eq }) => eq(bottles.id, bottleId),
@@ -214,6 +195,9 @@ async function serializePhotoIdentificationClassification(
           abv: decision.proposedBottle.abv,
           caskStrength: decision.proposedBottle.caskStrength,
           singleCask: decision.proposedBottle.singleCask,
+          caskType: decision.proposedBottle.caskType,
+          caskSize: decision.proposedBottle.caskSize,
+          caskFill: decision.proposedBottle.caskFill,
           vintageYear: decision.proposedBottle.vintageYear,
           releaseYear: decision.proposedBottle.releaseYear,
           brand: {
@@ -302,9 +286,6 @@ function getClassificationLogAttributes(
   const candidateBottleIds = classification.artifacts.candidates
     .map((candidate) => candidate.bottleId)
     .filter((id): id is number => typeof id === "number");
-  const candidateReleaseIds = classification.artifacts.candidates
-    .map((candidate) => candidate.releaseId)
-    .filter((id): id is number => typeof id === "number");
   const candidateNames = classification.artifacts.candidates
     .map((candidate) => candidate.fullName)
     .filter(Boolean)
@@ -314,7 +295,6 @@ function getClassificationLogAttributes(
   const candidateIdentity = candidates.slice(0, 5).map((candidate) =>
     JSON.stringify({
       bottleId: candidate.bottleId,
-      releaseId: candidate.releaseId,
       fullName: candidate.fullName,
       category: candidate.category,
       statedAge: candidate.statedAge,
@@ -329,7 +309,6 @@ function getClassificationLogAttributes(
       [`${prefix}.status`]: classification.status,
       [`${prefix}.candidate_count`]: candidates.length,
       [`${prefix}.candidate_bottle_ids`]: candidateBottleIds,
-      [`${prefix}.candidate_release_ids`]: candidateReleaseIds,
       [`${prefix}.candidate_names`]: candidateNames,
       [`${prefix}.candidate_identity`]: candidateIdentity,
     };
@@ -355,9 +334,6 @@ function getClassificationLogAttributes(
 
   if ("matchedBottleId" in decision && decision.matchedBottleId !== null) {
     attrs[`${prefix}.matched_bottle_id`] = decision.matchedBottleId;
-  }
-  if ("matchedReleaseId" in decision && decision.matchedReleaseId !== null) {
-    attrs[`${prefix}.matched_release_id`] = decision.matchedReleaseId;
   }
   if ("proposedBottle" in decision && decision.proposedBottle) {
     attrs[`${prefix}.proposed_bottle_brand`] =

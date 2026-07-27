@@ -90,7 +90,6 @@ function logCatalogImageApprovalError(
       userId,
       action: decision.action,
       bottleId: result.bottleId,
-      releaseId: result.releaseId,
       createdBottle: result.createdBottle,
     },
   });

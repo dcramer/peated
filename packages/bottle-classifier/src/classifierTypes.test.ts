@@ -7,7 +7,6 @@ import {
   BottleClassifierAgentDecisionSchema,
   BottleExtractedDetailsSchema,
   ProposedBottleSchema,
-  ProposedReleaseSchema,
 } from "./classifierTypes";
 
 describe("BottleClassifierAgentDecisionSchema", () => {
@@ -57,9 +56,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     expect(decision).toMatchObject({
       action: "repair_bottle",
       matchedBottleId: 123,
-      matchedReleaseId: null,
-      parentBottleId: null,
-      proposedRelease: null,
       proposedBottle: {
         category: null,
         distillers: [
@@ -103,27 +99,15 @@ describe("BottleClassifierAgentDecisionSchema", () => {
 
   test("parses identity basis and candidate family context", () => {
     const candidate = BottleCandidateSchema.parse({
-      kind: "bottle",
       bottleId: 100,
-      releaseId: null,
       fullName: "Example 18-year-old",
       familyContext: {
-        parentBottleReleaseTraits: ["vintageYear"],
-        childReleaseCount: 2,
         siblingBottles: [
           {
             bottleId: 101,
             fullName: "Example 21-year-old",
             traitFields: ["statedAge"],
             statedAge: 21,
-          },
-        ],
-        siblingReleases: [
-          {
-            releaseId: 200,
-            fullName: "Example 18-year-old 1993 Vintage",
-            traitFields: ["vintageYear"],
-            vintageYear: 1993,
           },
         ],
       },
@@ -140,11 +124,11 @@ describe("BottleClassifierAgentDecisionSchema", () => {
         releaseTraits: ["1994 vintage"],
         observationTraits: [],
         yearInterpretation: "vintage_year",
-        siblingEvidence: "existing_child_releases",
+        siblingEvidence: "existing_sibling_bottles",
         uncertainties: [],
       },
       confidenceBasis: {
-        positiveEvidence: ["local parent candidate exists"],
+        positiveEvidence: ["local related Bottle candidate exists"],
         unresolvedRisks: [
           {
             category: "release_ambiguity",
@@ -155,7 +139,6 @@ describe("BottleClassifierAgentDecisionSchema", () => {
         webEvidence: "not_used",
       },
       matchedBottleId: null,
-      matchedReleaseId: null,
       proposedBottle: {
         name: "18-year-old 1994 Vintage",
         brand: { id: null, name: "Example" },
@@ -164,37 +147,97 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       },
     });
 
-    expect(candidate.familyContext?.siblingReleases[0]?.vintageYear).toBe(1993);
     expect(candidate.familyContext?.siblingBottles[0]?.statedAge).toBe(21);
     expect(decision.identityBasis?.yearInterpretation).toBe("vintage_year");
   });
 
-  test("rejects removed structured cask fields at classifier boundaries", () => {
+  test("preserves structured cask fields at classifier boundaries", () => {
     expect(
-      BottleExtractedDetailsSchema.safeParse({ cask_type: "Sherry" }).success,
-    ).toBe(false);
+      BottleExtractedDetailsSchema.parse({
+        cask_type: "oloroso",
+        cask_size: "hogshead",
+        cask_fill: "1st_fill",
+      }),
+    ).toMatchObject({
+      cask_type: "oloroso",
+      cask_size: "hogshead",
+      cask_fill: "1st_fill",
+    });
     expect(
-      BottleCandidateSchema.safeParse({
+      BottleCandidateSchema.parse({
         bottleId: 1,
         fullName: "Example",
-        caskType: "Sherry",
-      }).success,
-    ).toBe(false);
+        caskType: "oloroso",
+        caskSize: "hogshead",
+        caskFill: "1st_fill",
+      }),
+    ).toMatchObject({
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
+    });
     expect(
-      BottleCandidateSearchInputSchema.safeParse({ cask_type: "Sherry" })
-        .success,
-    ).toBe(false);
+      BottleCandidateSearchInputSchema.parse({
+        cask_type: "oloroso",
+        cask_size: "hogshead",
+        cask_fill: "1st_fill",
+      }),
+    ).toMatchObject({
+      cask_type: "oloroso",
+      cask_size: "hogshead",
+      cask_fill: "1st_fill",
+    });
     expect(
-      ProposedBottleSchema.safeParse({
+      ProposedBottleSchema.parse({
         name: "Example",
         brand: { id: null, name: "Example" },
-        caskType: "Sherry",
-      }).success,
-    ).toBe(false);
-    expect(
-      ProposedReleaseSchema.safeParse({ caskType: "Sherry" }).success,
-    ).toBe(false);
+        caskType: "oloroso",
+        caskSize: "hogshead",
+        caskFill: "1st_fill",
+      }),
+    ).toMatchObject({
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
+    });
   });
+
+  test.each(["matchedReleaseId", "parentBottleId", "proposedRelease"] as const)(
+    "rejects obsolete decision field %s",
+    (field) => {
+      const agentDecision = {
+        action: "no_match" as const,
+        rationale: null,
+        candidateBottleIds: [],
+        identityScope: null,
+        aliasScope: null,
+        observation: null,
+        identityBasis: null,
+        confidenceBasis: null,
+        matchedBottleId: null,
+        proposedBottle: null,
+      };
+      const finalizedDecision = {
+        action: "no_match" as const,
+        candidateBottleIds: [],
+        matchedBottleId: null,
+        proposedBottle: null,
+      };
+
+      expect(
+        BottleClassifierAgentDecisionSchema.safeParse({
+          ...agentDecision,
+          [field]: null,
+        }).success,
+      ).toBe(false);
+      expect(
+        BottleClassificationDecisionSchema.safeParse({
+          ...finalizedDecision,
+          [field]: null,
+        }).success,
+      ).toBe(false);
+    },
+  );
 
   test.each([
     "create_release",
@@ -211,15 +254,12 @@ describe("BottleClassifierAgentDecisionSchema", () => {
       identityBasis: null,
       confidenceBasis: null,
       matchedBottleId: null,
-      matchedReleaseId: null,
       proposedBottle: null,
     };
     const otherwiseValidPersistedDecision = {
       ...otherwiseValidAgentDecision,
       identityScope: "product" as const,
       aliasScope: undefined,
-      parentBottleId: null,
-      proposedRelease: null,
     };
 
     expect(

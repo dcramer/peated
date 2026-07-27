@@ -9,33 +9,27 @@ const CANDIDATE_METADATA_FIELDS = [
   "edition",
   "caskStrength",
   "singleCask",
+  "caskType",
+  "caskSize",
+  "caskFill",
   "abv",
   "vintageYear",
   "releaseYear",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
 
-function getBottleCandidateKey(
-  candidate: Pick<BottleCandidate, "bottleId" | "releaseId" | "kind">,
-) {
-  return candidate.releaseId !== null || candidate.kind === "release"
-    ? `release:${candidate.releaseId ?? "missing"}`
-    : `bottle:${candidate.bottleId}`;
-}
-
 export function mergeBottleCandidate(
-  candidates: Map<string, BottleCandidate>,
+  candidates: Map<number, BottleCandidate>,
   candidate: BottleCandidate,
 ) {
   /**
    * Candidate results can arrive from exact match retrieval, local search, web
-   * follow-up, or current-bottle hydration. We merge by bottle/release identity
+   * follow-up, or current-bottle hydration. We merge by Bottle identity
    * so the runtime keeps one row per canonical candidate while preserving the
    * strongest score and any extra metadata discovered later.
    */
-  const key = getBottleCandidateKey(candidate);
-  const existing = candidates.get(key);
+  const existing = candidates.get(candidate.bottleId);
   if (!existing) {
-    candidates.set(key, candidate);
+    candidates.set(candidate.bottleId, candidate);
     return;
   }
 

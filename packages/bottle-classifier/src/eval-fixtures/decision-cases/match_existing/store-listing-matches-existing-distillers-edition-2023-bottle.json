@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Lagavulin Distillers Edition",
         "brand": "Lagavulin",
         "bottler": null,
         "series": null,
@@ -45,10 +42,7 @@
         "fullName": "Lagavulin Distillers Edition"
       },
       {
-        "kind": "release",
-        "releaseId": 78,
         "alias": null,
-        "bottleFullName": "Lagavulin Distillers Edition",
         "brand": "Lagavulin",
         "bottler": null,
         "series": null,
@@ -63,7 +57,7 @@
         "releaseYear": 2023,
         "score": 0.95,
         "source": ["brand", "release"],
-        "bottleId": 44006,
+        "bottleId": -78,
         "fullName": "Lagavulin Distillers Edition 2023 Release"
       }
     ]
@@ -72,8 +66,7 @@
     "status": "classified",
     "action": "match",
     "identityScope": "product",
-    "matchedBottleId": 44006,
-    "matchedReleaseId": 78,
-    "summary": "Treat the bare 2023 year as exact Bottle identity and match the existing Distillers Edition 2023 target through its retained legacy bottling candidate."
+    "matchedBottleId": -78,
+    "summary": "Treat the bare 2023 year as exact Bottle identity and match the independently complete Distillers Edition 2023 Bottle candidate."
   }
 }

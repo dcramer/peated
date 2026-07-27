@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenlivet Caribbean Reserve Rum Barrel Selection",
         "brand": "Glenlivet",
         "bottler": "Glenlivet",
         "series": null,
@@ -51,10 +48,7 @@
       "when": ["glenlivet", "caribbean reserve"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Glenlivet Caribbean Reserve Rum Barrel Selection",
           "brand": "Glenlivet",
           "bottler": "Glenlivet",
           "series": null,

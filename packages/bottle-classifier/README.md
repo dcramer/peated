@@ -36,7 +36,7 @@ import {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
   normalizeBottle,
-  normalizeBottleCreationDrafts,
+  normalizeProposedBottleDraft,
 } from "@peated/bottle-classifier";
 ```
 
@@ -60,25 +60,19 @@ Deterministic normalization entrypoints:
 
 ```ts
 normalizeBottle({ name, statedAge?, releaseYear?, ... });
-normalizeBottleCreationDrafts({
-  creationTarget?,
-  proposedBottle?,
-  proposedRelease?,
-});
+normalizeProposedBottleDraft(proposedBottle);
 ```
 
 These are the package-owned pure helpers that downstream server code should
 compose instead of re-implementing. They are the main low-cost surface for
-deterministic edge-case tests. `creationTarget` and `proposedRelease` remain
-legacy migration inputs to the normalization helper; the live classifier does
-not emit release-creation decisions.
+deterministic edge-case tests. A create decision always describes one
+independently complete Bottle.
 
 Use the narrow subpath exports for specialized or internal-only surfaces:
 
 ```ts
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
-import { normalizeBottleCreationDrafts } from "@peated/bottle-classifier/bottleCreationDrafts";
-import { deriveLegacyReleaseIdentityEvidence } from "@peated/bottle-classifier/legacyReleaseIdentityEvidence";
+import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
 import { parseDetailsFromName } from "@peated/bottle-classifier/smws";
 ```
 
@@ -122,10 +116,10 @@ Package-specific reminders:
 - [`src/instructions.ts`](./src/instructions.ts): classifier and extractor prompts
 - [`src/extractor.ts`](./src/extractor.ts): bottle-label extraction
 - [`src/normalize.ts`](./src/normalize.ts): bottle/name/category/volume normalization
-- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): legacy bottle-versus-release identity helpers retained during flattening
+- [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): canonical Bottle name and exact-trait normalization shared with staged migration consumers
 - [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): create-draft normalization
 - [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): shared evidence checks
-- [`src/legacyReleaseIdentityEvidence.ts`](./src/legacyReleaseIdentityEvidence.ts): transitional structural evidence for matching retained legacy release candidates; never a creation or grouping authority
+- [`src/legacyReleaseIdentityEvidence.ts`](./src/legacyReleaseIdentityEvidence.ts): isolated migration-only evidence for legacy catalog repair; not part of classifier retrieval or decisions
 - [`src/smws.ts`](./src/smws.ts): SMWS parsing and exact-code behavior
 - [`src/eval-fixtures/`](./src/eval-fixtures): file-backed eval fixtures
 - [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts): live classifier eval runner
@@ -146,11 +140,16 @@ When adding an eval from a real production miss:
 
 1. Start with the exact observed input: listing title, URL, extracted identity, local candidates, current assignment, and the failing classifier or automation outcome.
 2. Web-verify the real bottle before writing the expected result. Prioritize producer/brand pages, official shops, independent whisky databases, competition records, reviews, and publications whose content specifically confirms the bottle traits. Treat retailer copy as the source listing, not proof by itself.
-3. Decide the Peated DB outcome explicitly: exact `bottleId` or one complete Bottle creation, the retained legacy `releaseId` only when an existing release candidate is the exact match, and which source facts should remain observation-only. The classifier never creates a `bottle_release`, repairs a parent, or selects a BottleGroup.
+3. Decide the Peated DB outcome explicitly: exact `bottleId` or one complete Bottle creation, plus which source facts should remain observation-only. Historical release ids may remain in production provenance, but never enter classifier candidates or decisions. The classifier never creates a `bottle_release`, repairs a parent, or selects a BottleGroup.
 4. Apply `docs/architecture/whisky-identity-model.md`: every marketed release must remain independently correct as a Bottle, including its supported exact traits; BottleGroup assignment is automatic downstream.
 5. Encode the concrete regression, not a generalized pretend case. The fixture should name the real product, carry the real Peated ids or create expectation, and include `expected.expectedTier` when the automation outcome is part of the regression. Use `expected.verifyEligible` only when deliberately asserting the retained downstream existing-match verification compatibility projection; it is not the primary tier.
 6. Add `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome` so future reviewers can see the web verification and the intended DB action without rediscovering it from memory.
 7. If the family is ambiguous enough to regress in both directions, add paired positive and negative fixtures rather than a one-sided example.
+
+During the flattening migration, fixture-only negative Bottle ids represent
+historical release observations promoted to independently complete Bottle
+candidates. They prevent those rows from being confused with real Peated
+Bottle ids; the original positive release ids remain only in provenance.
 
 When adding a new bottle family or edge case:
 

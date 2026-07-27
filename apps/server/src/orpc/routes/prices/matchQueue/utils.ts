@@ -1,4 +1,8 @@
 import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
+import {
+  BottleCandidateSchema as ClassifierBottleCandidateSchema,
+  BottleExtractedDetailsSchema as ClassifierBottleExtractedDetailsSchema,
+} from "@peated/bottle-classifier/internal/types";
 import { db } from "@peated/server/db";
 import {
   type Bottle,
@@ -41,12 +45,9 @@ type StructuredAutomationIssue = {
 function normalizeStoredProposedBottle(
   proposedBottle: unknown,
 ): ReturnType<typeof ProposedBottleSchema.parse> {
-  return {
-    ...normalizeProposedBottleDraft(ProposedBottleSchema.parse(proposedBottle)),
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
-  };
+  return normalizeProposedBottleDraft(
+    ProposedBottleSchema.parse(proposedBottle),
+  );
 }
 
 function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
@@ -224,20 +225,26 @@ export function serializeProposal(
   const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
     proposal.searchEvidence,
   );
+  const classifierCandidates =
+    ClassifierBottleCandidateSchema.array().safeParse(candidateBottles);
+  const classifierExtractedLabel =
+    ClassifierBottleExtractedDetailsSchema.nullable().safeParse(extractedLabel);
   const automationAssessment =
     getPersistedAutomationAssessment(proposal) ??
-    (price
+    (price &&
+    proposedRelease === null &&
+    (proposal.creationTarget === null ||
+      proposal.creationTarget === "bottle") &&
+    classifierCandidates.success &&
+    classifierExtractedLabel.success
       ? getStorePriceMatchAutomationAssessment({
           action: proposal.proposalType,
           modelConfidence: proposal.confidence,
           price,
           suggestedBottleId: proposal.suggestedBottleId,
-          suggestedReleaseId: proposal.suggestedReleaseId,
-          candidateBottles,
-          extractedLabel,
+          candidateBottles: classifierCandidates.data,
+          extractedLabel: classifierExtractedLabel.data,
           proposedBottle: normalizedProposedBottle,
-          proposedRelease,
-          creationTarget: proposal.creationTarget,
           searchEvidence,
         })
       : {

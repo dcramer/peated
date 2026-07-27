@@ -1,0 +1,134 @@
+import config from "@peated/server/config";
+import { db } from "@peated/server/db";
+import { bottleTombstones } from "@peated/server/db/schema";
+import { afterEach, expect, test, vi } from "vitest";
+import {
+  findBottleReferenceCandidates,
+  getBottleCandidateById,
+  searchBottleCandidates,
+} from "./bottleReferenceCandidates";
+import * as openaiEmbeddings from "./openaiEmbeddings";
+
+const originalOpenAiApiKey = config.OPENAI_API_KEY;
+
+afterEach(() => {
+  config.OPENAI_API_KEY = originalOpenAiApiKey;
+  vi.restoreAllMocks();
+});
+
+test("returns a complete Bottle candidate with active BottleGroup siblings", async ({
+  fixtures,
+}) => {
+  config.OPENAI_API_KEY = undefined;
+  const bottle = await fixtures.Bottle({
+    name: "Warehouse Selection",
+    edition: "Batch 1",
+    releaseYear: 2024,
+    caskType: "bourbon",
+    caskSize: "barrel",
+    caskFill: "1st_fill",
+  });
+  if (bottle.groupId === null) {
+    throw new Error("Expected Bottle fixture to belong to a BottleGroup.");
+  }
+
+  const sibling = await fixtures.BottleGroupMember({
+    groupId: bottle.groupId,
+    edition: "Batch 2",
+    releaseYear: 2025,
+    caskType: "oloroso",
+    caskSize: "butt",
+    caskFill: "2nd_fill",
+  });
+  const retiredSibling = await fixtures.BottleGroupMember({
+    groupId: bottle.groupId,
+    edition: "Retired Batch",
+    releaseYear: 2023,
+  });
+  await db.insert(bottleTombstones).values({
+    bottleId: retiredSibling.id,
+  });
+
+  const candidate = await getBottleCandidateById(bottle.id);
+
+  expect(candidate).toMatchObject({
+    bottleId: bottle.id,
+    fullName: bottle.fullName,
+    edition: "Batch 1",
+    releaseYear: 2024,
+    caskType: "bourbon",
+    caskSize: "barrel",
+    caskFill: "1st_fill",
+    familyContext: {
+      siblingBottles: [
+        expect.objectContaining({
+          bottleId: sibling.id,
+          fullName: sibling.fullName,
+          edition: "Batch 2",
+          releaseYear: 2025,
+          caskType: "oloroso",
+          caskSize: "butt",
+          caskFill: "2nd_fill",
+        }),
+      ],
+    },
+  });
+  expect(candidate).not.toHaveProperty("kind");
+  expect(candidate).not.toHaveProperty("releaseId");
+  expect(candidate).not.toHaveProperty("bottleFullName");
+  expect(
+    candidate?.familyContext?.siblingBottles.map(({ bottleId }) => bottleId),
+  ).toEqual([sibling.id]);
+
+  const candidates = await findBottleReferenceCandidates(
+    {
+      name: bottle.fullName,
+      bottleId: bottle.id,
+    },
+    {
+      brand: null,
+      bottler: null,
+      expression: "Warehouse Selection",
+      series: null,
+      distillery: null,
+      category: null,
+      stated_age: null,
+      abv: null,
+      release_year: 2024,
+      vintage_year: null,
+      cask_type: "bourbon",
+      cask_size: "barrel",
+      cask_fill: "1st_fill",
+      cask_strength: null,
+      single_cask: null,
+      edition: "Batch 1",
+    },
+  );
+
+  expect(candidates).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        bottleId: bottle.id,
+        caskType: "bourbon",
+        caskSize: "barrel",
+        caskFill: "1st_fill",
+      }),
+    ]),
+  );
+});
+
+test("normalizes proof-like ABV before building candidate search evidence", async () => {
+  config.OPENAI_API_KEY = "test-openai-key";
+  const embeddingSpy = vi
+    .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
+    .mockResolvedValue(new Array<number>(1536).fill(0));
+
+  await searchBottleCandidates({
+    query: "Proof Normalization Candidate",
+    abv: 118.4,
+  });
+
+  expect(embeddingSpy).toHaveBeenCalledWith(
+    expect.stringContaining("59.2% ABV"),
+  );
+});

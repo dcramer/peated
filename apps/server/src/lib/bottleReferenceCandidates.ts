@@ -1,8 +1,13 @@
 import {
-  BOTTLE_RELEASE_TRAIT_FIELDS,
+  BOTTLE_EXACT_TRAIT_FIELDS,
+  BottleCandidateSchema,
+  BottleCandidateSearchInputSchema,
+  BottleExtractedDetailsSchema,
   mergeBottleCandidateFamilyContext,
+  type BottleCandidate,
+  type BottleCandidateSearchInput,
+  type BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
-import { deriveLegacyReleaseIdentityEvidence } from "@peated/bottle-classifier/legacyReleaseIdentityEvidence";
 import {
   normalizeBottle,
   normalizeBottleBatchNumber,
@@ -10,7 +15,6 @@ import {
 } from "@peated/bottle-classifier/normalize";
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import config from "@peated/server/config";
-import { CATEGORY_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -19,50 +23,31 @@ import {
   bottles,
   bottlesToDistillers,
   entities,
-  type StorePrice,
 } from "@peated/server/db/schema";
 import {
   normalizePotentialProofLikeAbvFields,
   normalizePotentialProofToAbv,
 } from "@peated/server/lib/abv";
 import { logError } from "@peated/server/lib/log";
-import {
-  BottleCandidateSchema,
-  BottleReferenceIdentitySchema,
-  CaskFillEnum,
-  CaskSizeEnum,
-} from "@peated/server/schemas";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { z } from "zod";
-import {
-  stripReleaseIdentityFromSearchName,
-  type BottleReferenceSearchSignals,
-} from "./bottleReferenceSearchName";
+import type { z } from "zod";
 import { getOpenAIEmbedding } from "./openaiEmbeddings";
 
 const VECTOR_CANDIDATE_LIMIT = 20;
 const TEXT_CANDIDATE_LIMIT = 10;
 const BRAND_CANDIDATE_LIMIT = 5;
-const MATCH_CANDIDATE_LIMIT = 15;
 
-// This module owns shared bottle-reference extraction and local candidate
-// retrieval. The bottle classifier is the primary consumer, while price
-// matching keeps thin compatibility exports on top so we only maintain one
-// search implementation.
-
-type BottleReferenceIdentity = z.infer<typeof BottleReferenceIdentitySchema>;
-type BottleCandidate = z.infer<typeof BottleCandidateSchema>;
+type BottleReferenceIdentity = BottleExtractedDetails;
 type RawBottleCandidateRow = {
   bottleId: number | string;
   alias?: string | null;
   fullName: string;
-  bottleFullName?: string | null;
   brand?: string | null;
   bottler?: string | null;
   series?: string | null;
   distillery?: string[] | null;
-  category?: z.infer<typeof BottleReferenceIdentitySchema>["category"] | null;
+  category?: BottleCandidate["category"];
   statedAge?: number | string | null;
   edition?: string | null;
   caskStrength?: boolean | null;
@@ -76,46 +61,20 @@ type RawBottleCandidateRow = {
   score?: number | string | null;
 };
 
-function normalizeMatchCategory<
-  T extends null | z.infer<typeof BottleReferenceIdentitySchema>["category"],
->(category: T) {
+function normalizeMatchCategory<T extends BottleCandidate["category"]>(
+  category: T,
+) {
   return category === "spirit" ? null : category;
 }
 
-export const BottleCandidateSearchInputSchema = z.object({
-  query: z.string().trim().nullable().default(null),
-  brand: z.string().trim().nullable().default(null),
-  bottler: z.string().trim().nullable().default(null),
-  expression: z.string().trim().nullable().default(null),
-  series: z.string().trim().nullable().default(null),
-  distillery: z.array(z.string().trim()).default([]),
-  category: z.enum(CATEGORY_LIST).nullable().default(null),
-  stated_age: z.number().nullable().default(null),
-  abv: z.number().nullable().default(null),
-  cask_type: z.string().trim().nullable().default(null),
-  cask_size: CaskSizeEnum.nullable().default(null),
-  cask_fill: CaskFillEnum.nullable().default(null),
-  cask_strength: z.boolean().nullable().default(null),
-  single_cask: z.boolean().nullable().default(null),
-  edition: z.string().trim().nullable().default(null),
-  vintage_year: z.number().int().nullable().default(null),
-  release_year: z.number().int().nullable().default(null),
-  currentBottleId: z.number().nullable().default(null),
-  currentReleaseId: z.number().nullable().default(null),
-  limit: z.number().int().min(1).max(25).default(MATCH_CANDIDATE_LIMIT),
-});
-
-type BottleCandidateSearchInput = z.infer<
-  typeof BottleCandidateSearchInputSchema
->;
 type BottleCandidateSearchInputRequest = z.input<
   typeof BottleCandidateSearchInputSchema
 >;
 type BottleCandidateFamilyContext = NonNullable<
   BottleCandidate["familyContext"]
 >;
-type BottleCandidateReleaseTraitField =
-  BottleCandidateFamilyContext["parentBottleReleaseTraits"][number];
+type BottleCandidateTraitField =
+  BottleCandidateFamilyContext["siblingBottles"][number]["traitFields"][number];
 
 const CANDIDATE_METADATA_FIELDS = [
   "bottler",
@@ -133,7 +92,7 @@ const CANDIDATE_METADATA_FIELDS = [
   "caskFill",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
 
-const CANDIDATE_FAMILY_CONTEXT_RELEASE_LIMIT = 8;
+const CANDIDATE_SIBLING_LIMIT = 8;
 
 function getNormalizedPriceName(name: string) {
   return normalizeBottle({
@@ -174,7 +133,7 @@ function buildSearchLabel(
     return null;
   }
 
-  return BottleReferenceIdentitySchema.parse({
+  return BottleExtractedDetailsSchema.parse({
     brand: input.brand,
     bottler: input.bottler,
     expression: input.expression,
@@ -346,12 +305,9 @@ function buildBottleCandidate(
   source: string,
 ): BottleCandidate {
   return BottleCandidateSchema.parse({
-    kind: "bottle",
     bottleId: Number(row.bottleId),
-    releaseId: null,
     alias: row.alias ?? null,
     fullName: row.fullName,
-    bottleFullName: row.bottleFullName ?? row.fullName,
     brand: row.brand ?? null,
     bottler: row.bottler ?? null,
     series: row.series ?? null,
@@ -455,103 +411,6 @@ function escapeRegExp(value: string) {
 
 function getExactCaskCodeSqlPattern(code: string) {
   return `(^|[^A-Z0-9])${escapeRegExp(code)}([^A-Z0-9]|$)`;
-}
-
-function getParentSearchSignals({
-  searchName,
-  extractedLabel,
-}: {
-  searchName: string;
-  extractedLabel: BottleReferenceIdentity | null;
-}): BottleReferenceSearchSignals {
-  const normalizedSearchName = normalizeBottle({ name: searchName });
-  const derivedLegacyReleaseIdentity = deriveLegacyReleaseIdentityEvidence({
-    fullName: searchName,
-    edition: extractedLabel?.edition ?? null,
-    releaseYear: extractedLabel?.release_year ?? null,
-  });
-
-  return {
-    edition:
-      extractedLabel?.edition ?? derivedLegacyReleaseIdentity?.edition ?? null,
-    releaseYear:
-      extractedLabel?.release_year ??
-      derivedLegacyReleaseIdentity?.releaseYear ??
-      normalizedSearchName.releaseYear ??
-      null,
-    statedAge:
-      extractedLabel?.stated_age ?? normalizedSearchName.statedAge ?? null,
-    vintageYear:
-      extractedLabel?.vintage_year ?? normalizedSearchName.vintageYear ?? null,
-  };
-}
-
-function buildParentCandidateSearchContext({
-  input,
-  extractedLabel,
-  normalizedName,
-}: {
-  input: BottleCandidateSearchInput;
-  extractedLabel: BottleReferenceIdentity | null;
-  normalizedName: string;
-}) {
-  const signals = getParentSearchSignals({
-    searchName: normalizedName,
-    extractedLabel,
-  });
-  const hasParentSearchSignal =
-    signals.edition !== null ||
-    signals.statedAge !== null ||
-    signals.releaseYear !== null ||
-    signals.vintageYear !== null;
-
-  if (!hasParentSearchSignal) {
-    return null;
-  }
-
-  const strippedQuery = stripReleaseIdentityFromSearchName(
-    normalizedName,
-    signals,
-  );
-  const strippedExpression = extractedLabel?.expression
-    ? stripReleaseIdentityFromSearchName(extractedLabel.expression, signals)
-    : null;
-  const parentInput: BottleCandidateSearchInput = {
-    ...input,
-    query: strippedQuery || input.query,
-    expression: strippedExpression || null,
-    stated_age: null,
-    abv: null,
-    cask_type: null,
-    cask_size: null,
-    cask_fill: null,
-    cask_strength: null,
-    single_cask: null,
-    edition: null,
-    vintage_year: null,
-    release_year: null,
-  };
-  const parentLabel = buildSearchLabel(parentInput);
-  const parentSearchName = buildRawSearchName(parentInput);
-
-  if (!parentSearchName) {
-    return null;
-  }
-
-  const parentNormalizedName = getNormalizedPriceName(parentSearchName);
-  if (parentNormalizedName.toLowerCase() === normalizedName.toLowerCase()) {
-    return null;
-  }
-
-  return {
-    exactSearchNames: buildExactSearchNames([
-      parentNormalizedName,
-      parentInput.query ? getNormalizedPriceName(parentInput.query) : null,
-    ]),
-    extractedLabel: parentLabel,
-    normalizedName: parentNormalizedName,
-    queryText: buildQueryText(parentNormalizedName, parentLabel),
-  };
 }
 
 function containsComparablePhrase(haystack: string, needle: string) {
@@ -740,6 +599,7 @@ function getExtractedBrandRankingAdjustment(
 
 type CandidateBottleMetadataRow = {
   bottleId: number;
+  groupId: number | null;
   brand: string | null;
   bottler: string | null;
   series: string | null;
@@ -756,19 +616,31 @@ type CandidateBottleMetadataRow = {
   caskFill: BottleCandidate["caskFill"];
 };
 
-type CandidateBottleSiblingRow = CandidateBottleMetadataRow & {
+type CandidateBottleSiblingRow = {
+  bottleId: number;
+  groupId: number | null;
   fullName: string;
+  statedAge: number | null;
+  edition: string | null;
+  caskStrength: boolean | null;
+  singleCask: boolean | null;
+  abv: number | null;
+  vintageYear: number | null;
+  releaseYear: number | null;
+  caskType: BottleCandidate["caskType"];
+  caskSize: BottleCandidate["caskSize"];
+  caskFill: BottleCandidate["caskFill"];
 };
 
-function getPopulatedReleaseTraitFields(
-  row: Partial<Record<BottleCandidateReleaseTraitField, unknown>>,
+function getPopulatedBottleTraitFields(
+  row: Partial<Record<BottleCandidateTraitField, unknown>>,
   {
     includeStatedAge = true,
   }: {
     includeStatedAge?: boolean;
   } = {},
-): BottleCandidateReleaseTraitField[] {
-  return BOTTLE_RELEASE_TRAIT_FIELDS.filter((field) => {
+): BottleCandidateTraitField[] {
+  return BOTTLE_EXACT_TRAIT_FIELDS.filter((field) => {
     if (field === "statedAge" && !includeStatedAge) {
       return false;
     }
@@ -784,100 +656,48 @@ function buildCandidateFamilyContext({
   siblingBottles: BottleCandidateFamilyContext["siblingBottles"];
 }): BottleCandidateFamilyContext {
   return {
-    parentBottleReleaseTraits: [],
-    childReleaseCount: 0,
     siblingBottles,
-    siblingReleases: [],
   };
-}
-
-function buildBottleSiblingFamilyKey(
-  bottleMetadata: CandidateBottleSiblingRow,
-): string {
-  const signals: BottleReferenceSearchSignals = {
-    edition: bottleMetadata.edition,
-    statedAge: bottleMetadata.statedAge,
-    releaseYear: bottleMetadata.releaseYear,
-    vintageYear: bottleMetadata.vintageYear,
-  };
-  const strippedFullName = stripReleaseIdentityFromSearchName(
-    bottleMetadata.fullName,
-    signals,
-  );
-
-  return normalizeComparableText(
-    [
-      bottleMetadata.brand,
-      bottleMetadata.series,
-      strippedFullName || bottleMetadata.fullName,
-    ]
-      .filter(Boolean)
-      .join(" "),
-  );
 }
 
 function buildBottleSiblingContext(
-  candidates: BottleCandidate[],
-  bottleMetadataById: Map<number, CandidateBottleMetadataRow>,
+  candidateMetadata: CandidateBottleMetadataRow[],
+  siblingRows: CandidateBottleSiblingRow[],
 ): Map<number, BottleCandidateFamilyContext["siblingBottles"]> {
-  const bottleSiblingRowsById = new Map<number, CandidateBottleSiblingRow>();
-
-  for (const candidate of candidates) {
-    const bottleMetadata = bottleMetadataById.get(candidate.bottleId);
-    if (!bottleMetadata || bottleSiblingRowsById.has(candidate.bottleId)) {
-      continue;
-    }
-    const fullName = [
-      candidate.bottleFullName,
-      candidate.fullName,
-      candidate.alias,
-    ].find((name): name is string => Boolean(name));
-    if (!fullName) {
+  const siblingRowsByGroupId = new Map<number, CandidateBottleSiblingRow[]>();
+  for (const sibling of siblingRows) {
+    if (sibling.groupId === null) {
       continue;
     }
 
-    bottleSiblingRowsById.set(candidate.bottleId, {
-      ...bottleMetadata,
-      fullName,
-    });
-  }
-
-  const bottleRowsByFamilyKey = new Map<string, CandidateBottleSiblingRow[]>();
-
-  for (const bottleMetadata of bottleSiblingRowsById.values()) {
-    const familyKey = buildBottleSiblingFamilyKey(bottleMetadata);
-    if (!familyKey) {
-      continue;
-    }
-
-    const siblings = bottleRowsByFamilyKey.get(familyKey) ?? [];
-    siblings.push(bottleMetadata);
-    bottleRowsByFamilyKey.set(familyKey, siblings);
+    const groupSiblings = siblingRowsByGroupId.get(sibling.groupId) ?? [];
+    groupSiblings.push(sibling);
+    siblingRowsByGroupId.set(sibling.groupId, groupSiblings);
   }
 
   const siblingContextByBottleId = new Map<
     number,
     BottleCandidateFamilyContext["siblingBottles"]
   >();
-  for (const bottleMetadata of bottleSiblingRowsById.values()) {
-    const familyKey = buildBottleSiblingFamilyKey(bottleMetadata);
-    const siblingRows = (bottleRowsByFamilyKey.get(familyKey) ?? []).filter(
-      (sibling) => sibling.bottleId !== bottleMetadata.bottleId,
-    );
-    if (!siblingRows.length) {
-      siblingContextByBottleId.set(bottleMetadata.bottleId, []);
+  for (const candidate of candidateMetadata) {
+    if (candidate.groupId === null) {
+      siblingContextByBottleId.set(candidate.bottleId, []);
       continue;
     }
 
+    const groupSiblings = (
+      siblingRowsByGroupId.get(candidate.groupId) ?? []
+    ).filter((sibling) => sibling.bottleId !== candidate.bottleId);
+
     siblingContextByBottleId.set(
-      bottleMetadata.bottleId,
-      siblingRows
+      candidate.bottleId,
+      groupSiblings
         .sort((left, right) => left.fullName.localeCompare(right.fullName))
-        .slice(0, CANDIDATE_FAMILY_CONTEXT_RELEASE_LIMIT)
+        .slice(0, CANDIDATE_SIBLING_LIMIT)
         .map((sibling) => ({
           bottleId: sibling.bottleId,
           fullName: sibling.fullName,
-          traitFields: getPopulatedReleaseTraitFields(sibling),
+          traitFields: getPopulatedBottleTraitFields(sibling),
           statedAge: sibling.statedAge,
           edition: sibling.edition,
           releaseYear: sibling.releaseYear,
@@ -885,6 +705,9 @@ function buildBottleSiblingContext(
           abv: sibling.abv,
           singleCask: sibling.singleCask,
           caskStrength: sibling.caskStrength,
+          caskType: sibling.caskType,
+          caskSize: sibling.caskSize,
+          caskFill: sibling.caskFill,
         })),
     );
   }
@@ -905,6 +728,7 @@ async function enrichBottleCandidates(candidates: BottleCandidate[]) {
   const bottleRows = await db
     .select({
       bottleId: bottles.id,
+      groupId: bottles.groupId,
       brand: brandEntity.name,
       bottler: bottlerEntity.name,
       series: bottleSeries.name,
@@ -929,9 +753,42 @@ async function enrichBottleCandidates(candidates: BottleCandidate[]) {
   const bottleMetadataById = new Map<number, CandidateBottleMetadataRow>(
     bottleRows.map((row) => [row.bottleId, row]),
   );
+  const groupIds = Array.from(
+    new Set(
+      bottleRows
+        .map((row) => row.groupId)
+        .filter((groupId): groupId is number => groupId !== null),
+    ),
+  );
+  const siblingRows =
+    groupIds.length === 0
+      ? []
+      : await db
+          .select({
+            bottleId: bottles.id,
+            groupId: bottles.groupId,
+            fullName: bottles.fullName,
+            statedAge: bottles.statedAge,
+            edition: bottles.edition,
+            caskStrength: bottles.caskStrength,
+            singleCask: bottles.singleCask,
+            abv: bottles.abv,
+            vintageYear: bottles.vintageYear,
+            releaseYear: bottles.releaseYear,
+            caskType: bottles.caskType,
+            caskSize: bottles.caskSize,
+            caskFill: bottles.caskFill,
+          })
+          .from(bottles)
+          .where(
+            and(
+              inArray(bottles.groupId, groupIds),
+              sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+            ),
+          );
   const siblingBottlesByBottleId = buildBottleSiblingContext(
-    candidates,
-    bottleMetadataById,
+    bottleRows,
+    siblingRows,
   );
 
   const distilleryRows = await db
@@ -1046,9 +903,8 @@ async function getVectorCandidates(
     bottleId: number;
     alias: string | null;
     fullName: string;
-    bottleFullName: string;
     brand: string | null;
-    category: z.infer<typeof BottleReferenceIdentitySchema>["category"] | null;
+    category: BottleCandidate["category"];
     statedAge: number | null;
     edition: string | null;
     caskStrength: boolean | null;
@@ -1065,7 +921,6 @@ async function getVectorCandidates(
       ${bottleAliases.bottleId} AS "bottleId",
       ${bottleAliases.name} AS alias,
       ${bottles.fullName} AS "fullName",
-      ${bottles.fullName} AS "bottleFullName",
       ${entities.name} AS brand,
       ${bottles.category} AS category,
       ${bottles.statedAge} AS "statedAge",
@@ -1106,9 +961,8 @@ async function getTextCandidates(
   const result = await db.execute<{
     bottleId: number;
     fullName: string;
-    bottleFullName: string;
     brand: string | null;
-    category: z.infer<typeof BottleReferenceIdentitySchema>["category"] | null;
+    category: BottleCandidate["category"];
     statedAge: number | null;
     edition: string | null;
     caskStrength: boolean | null;
@@ -1117,12 +971,13 @@ async function getTextCandidates(
     vintageYear: number | null;
     releaseYear: number | null;
     caskType: string | null;
+    caskSize: string | null;
+    caskFill: string | null;
     score: number | null;
   }>(sql`
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
-      ${bottles.fullName} AS "bottleFullName",
       ${entities.name} AS brand,
       ${bottles.category} AS category,
       ${bottles.statedAge} AS "statedAge",
@@ -1133,6 +988,8 @@ async function getTextCandidates(
       ${bottles.vintageYear} AS "vintageYear",
       ${bottles.releaseYear} AS "releaseYear",
       ${bottles.caskType} AS "caskType",
+      ${bottles.caskSize} AS "caskSize",
+      ${bottles.caskFill} AS "caskFill",
       ts_rank(${bottles.searchVector}, websearch_to_tsquery('english', ${queryText})) AS score
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
@@ -1183,9 +1040,8 @@ async function getBrandCandidates(
   const result = await db.execute<{
     bottleId: number;
     fullName: string;
-    bottleFullName: string;
     brand: string | null;
-    category: z.infer<typeof BottleReferenceIdentitySchema>["category"] | null;
+    category: BottleCandidate["category"];
     statedAge: number | null;
     edition: string | null;
     caskStrength: boolean | null;
@@ -1194,11 +1050,12 @@ async function getBrandCandidates(
     vintageYear: number | null;
     releaseYear: number | null;
     caskType: string | null;
+    caskSize: string | null;
+    caskFill: string | null;
   }>(sql`
     SELECT
       ${bottles.id} AS "bottleId",
       ${bottles.fullName} AS "fullName",
-      ${bottles.fullName} AS "bottleFullName",
       ${entities.name} AS brand
       , ${bottles.category} AS category
       , ${bottles.statedAge} AS "statedAge"
@@ -1209,6 +1066,8 @@ async function getBrandCandidates(
       , ${bottles.vintageYear} AS "vintageYear"
       , ${bottles.releaseYear} AS "releaseYear"
       , ${bottles.caskType} AS "caskType"
+      , ${bottles.caskSize} AS "caskSize"
+      , ${bottles.caskFill} AS "caskFill"
     FROM ${bottles}
     INNER JOIN ${entities} ON ${entities.id} = ${bottles.brandId}
     WHERE (
@@ -1234,7 +1093,6 @@ async function getOrdinaryBottleCandidateById(
     .select({
       bottleId: bottles.id,
       fullName: bottles.fullName,
-      bottleFullName: bottles.fullName,
       brand: entities.name,
       category: bottles.category,
       statedAge: bottles.statedAge,
@@ -1266,7 +1124,6 @@ async function getOrdinaryBottleCandidateById(
     {
       bottleId: result.bottleId,
       fullName: result.fullName,
-      bottleFullName: result.bottleFullName,
       brand: result.brand,
       category: result.category,
       statedAge: result.statedAge,
@@ -1289,7 +1146,6 @@ async function getOrdinaryBottleCandidateById(
 
 export async function getBottleCandidateById(
   bottleId: number,
-  _releaseId: number | null = null,
 ): Promise<BottleCandidate | null> {
   return await getOrdinaryBottleCandidateById(bottleId);
 }
@@ -1304,7 +1160,6 @@ async function getExactBottleCandidate(
       bottleId: bottles.id,
       alias: bottleAliases.name,
       fullName: bottles.fullName,
-      bottleFullName: bottles.fullName,
       brand: entities.name,
       category: bottles.category,
       statedAge: bottles.statedAge,
@@ -1337,7 +1192,6 @@ async function getExactBottleCandidate(
         bottleId: exactMatch.bottleId,
         alias: exactMatch.alias,
         fullName: exactMatch.fullName,
-        bottleFullName: exactMatch.bottleFullName,
         brand: exactMatch.brand || null,
         category: exactMatch.category,
         statedAge: exactMatch.statedAge,
@@ -1365,7 +1219,6 @@ async function getExactBottleCandidate(
       bottleId: bottles.id,
       alias: bottleAliases.name,
       fullName: bottles.fullName,
-      bottleFullName: bottles.fullName,
       brand: entities.name,
       category: bottles.category,
       statedAge: bottles.statedAge,
@@ -1402,7 +1255,6 @@ async function getExactBottleCandidate(
       bottleId: comparableMatch.bottleId,
       alias: comparableMatch.alias,
       fullName: comparableMatch.fullName,
-      bottleFullName: comparableMatch.bottleFullName,
       brand: comparableMatch.brand || null,
       category: comparableMatch.category,
       statedAge: comparableMatch.statedAge,
@@ -1435,11 +1287,14 @@ async function getExactBottleCandidateByNames(
 }
 
 export async function findBottleReferenceCandidates(
-  price: Pick<StorePrice, "name" | "bottleId"> & { releaseId?: number | null },
-  extractedLabel: BottleReferenceIdentity | null,
+  reference: {
+    name: string;
+    bottleId?: number | null;
+  },
+  extractedLabel: BottleExtractedDetails | null,
 ) {
   return await searchBottleCandidates({
-    query: price.name,
+    query: reference.name,
     brand: extractedLabel?.brand ?? null,
     bottler: extractedLabel?.bottler ?? null,
     expression: extractedLabel?.expression ?? null,
@@ -1456,9 +1311,7 @@ export async function findBottleReferenceCandidates(
     edition: extractedLabel?.edition ?? null,
     vintage_year: extractedLabel?.vintage_year ?? null,
     release_year: extractedLabel?.release_year ?? null,
-    currentBottleId: price.bottleId ?? null,
-    currentReleaseId: price.releaseId ?? null,
-    limit: MATCH_CANDIDATE_LIMIT,
+    currentBottleId: reference.bottleId ?? null,
   });
 }
 
@@ -1480,11 +1333,6 @@ export async function searchBottleCandidates(
     input.query ? getNormalizedPriceName(input.query) : null,
   ]);
   const queryText = buildQueryText(normalizedName, extractedLabel);
-  const parentSearchContext = buildParentCandidateSearchContext({
-    input,
-    extractedLabel,
-    normalizedName,
-  });
   const candidates = new Map<number, BottleCandidate>();
 
   const [
@@ -1493,21 +1341,13 @@ export async function searchBottleCandidates(
     textCandidates,
     brandCandidates,
     exactCandidate,
-    parentVectorCandidates,
-    parentTextCandidates,
-    parentBrandCandidates,
-    parentExactCandidate,
   ] = await Promise.all([
     input.currentBottleId
       ? runCandidateLookupSafely(
           "current",
           searchName,
           null,
-          async () =>
-            await getBottleCandidateById(
-              input.currentBottleId!,
-              input.currentReleaseId ?? null,
-            ),
+          async () => await getBottleCandidateById(input.currentBottleId!),
         )
       : Promise.resolve(null),
     runCandidateLookupSafely(
@@ -1534,45 +1374,6 @@ export async function searchBottleCandidates(
       null as BottleCandidate | null,
       async () => await getExactBottleCandidateByNames(exactSearchNames),
     ),
-    parentSearchContext
-      ? runCandidateLookupSafely(
-          "parent_vector",
-          searchName,
-          [] as BottleCandidate[],
-          async () => await getVectorCandidates(parentSearchContext.queryText),
-        )
-      : Promise.resolve([] as BottleCandidate[]),
-    parentSearchContext
-      ? runCandidateLookupSafely(
-          "parent_text",
-          searchName,
-          [] as BottleCandidate[],
-          async () => await getTextCandidates(parentSearchContext.queryText),
-        )
-      : Promise.resolve([] as BottleCandidate[]),
-    parentSearchContext
-      ? runCandidateLookupSafely(
-          "parent_brand",
-          searchName,
-          [] as BottleCandidate[],
-          async () =>
-            await getBrandCandidates(
-              parentSearchContext.normalizedName,
-              parentSearchContext.extractedLabel,
-            ),
-        )
-      : Promise.resolve([] as BottleCandidate[]),
-    parentSearchContext
-      ? runCandidateLookupSafely(
-          "parent_exact",
-          searchName,
-          null as BottleCandidate | null,
-          async () =>
-            await getExactBottleCandidateByNames(
-              parentSearchContext.exactSearchNames,
-            ),
-        )
-      : Promise.resolve(null as BottleCandidate | null),
   ]);
 
   if (currentCandidate) {
@@ -1590,19 +1391,6 @@ export async function searchBottleCandidates(
   if (exactCandidate) {
     mergeBottleCandidate(candidates, exactCandidate);
   }
-  for (const candidate of parentVectorCandidates) {
-    mergeBottleCandidate(candidates, candidate);
-  }
-  for (const candidate of parentTextCandidates) {
-    mergeBottleCandidate(candidates, candidate);
-  }
-  for (const candidate of parentBrandCandidates) {
-    mergeBottleCandidate(candidates, candidate);
-  }
-  if (parentExactCandidate) {
-    mergeBottleCandidate(candidates, parentExactCandidate);
-  }
-
   const enrichedCandidates = await enrichBottleCandidates(
     Array.from(candidates.values()),
   );

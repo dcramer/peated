@@ -107,7 +107,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 12825,
-    "matchedReleaseId": null,
     "suggestedNextStep": "confirm_match",
     "summary": "Match the plain ongoing product bottle 12825, High West High Country; 'Batch No. 23J12' is a bottling lot code carried as an observation, and the flattened lot-code row 44284 is downstream repair, not a match target."
   },
@@ -145,7 +144,6 @@
         "category": "rye"
       }
     ],
-    "releases": [],
     "aliases": [
       {
         "name": "High West High Country",

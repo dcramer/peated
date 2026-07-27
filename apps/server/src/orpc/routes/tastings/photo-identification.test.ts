@@ -201,8 +201,6 @@ async function identifyCreateProposal({
   decision: Record<string, unknown>;
   candidates?: Array<{
     bottleId: number;
-    releaseId?: number | null;
-    bottleFullName?: string;
     fullName?: string;
   }>;
   suitableAsBottleImage?: boolean;
@@ -342,16 +340,12 @@ describe("POST /tastings/photo-identification", () => {
         {
           action: "match",
           matchedBottleId,
-          matchedReleaseId: null,
         },
         {
           candidates: [
             {
-              kind: "bottle",
               bottleId: matchedBottleId,
-              releaseId: null,
               fullName: "Ardbeg Uigeadail",
-              bottleFullName: "Ardbeg Uigeadail",
               brand: "Ardbeg",
               score: 0.98,
               source: ["exact"],
@@ -386,7 +380,6 @@ describe("POST /tastings/photo-identification", () => {
       artifacts: {
         candidates: [
           {
-            bottleFullName: "Ardbeg Uigeadail",
             fullName: "Ardbeg Uigeadail",
           },
         ],
@@ -395,16 +388,12 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification.artifacts).toEqual({
       candidates: [
         {
-          bottleFullName: "Ardbeg Uigeadail",
           fullName: "Ardbeg Uigeadail",
         },
       ],
     });
     expect(response.classification.artifacts.candidates[0]).not.toHaveProperty(
       "bottleId",
-    );
-    expect(response.classification.artifacts.candidates[0]).not.toHaveProperty(
-      "releaseId",
     );
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);

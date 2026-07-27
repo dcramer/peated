@@ -64,7 +64,6 @@ export default procedure
         url: input.url,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [aliasKey, rawName],
       extractedIdentity: {

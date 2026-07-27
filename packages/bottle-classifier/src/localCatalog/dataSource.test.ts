@@ -11,6 +11,7 @@ const shieldaigCatalog = LocalCatalogSchema.parse({
       name: "Speyside",
       fullName: "Shieldaig Speyside",
       brandId: 3943,
+      groupId: 1001,
       category: "single_malt",
       statedAge: 18,
     },
@@ -19,11 +20,11 @@ const shieldaigCatalog = LocalCatalogSchema.parse({
       name: "Speyside 30-year-old",
       fullName: "Shieldaig Speyside 30-year-old",
       brandId: 3943,
+      groupId: 1001,
       category: "single_malt",
       statedAge: 30,
     },
   ],
-  releases: [],
   aliases: [{ name: "Shieldaig Speyside", bottleId: 44175 }],
 });
 
@@ -55,38 +56,89 @@ describe("local catalog data source", () => {
     }
   });
 
-  test("rejects release aliases pointing at another bottle", () => {
+  test("rejects aliases pointing at an unknown Bottle", () => {
     const result = LocalCatalogSchema.safeParse({
       entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
-      bottles: [
-        { id: 1, name: "Speyside", brandId: 1 },
-        { id: 2, name: "Highland", brandId: 1 },
-      ],
-      releases: [{ id: 10, bottleId: 2, edition: "Batch 1" }],
-      aliases: [
-        { name: "Shieldaig Speyside Batch 1", bottleId: 1, releaseId: 10 },
-      ],
+      bottles: [{ id: 1, name: "Speyside", brandId: 1 }],
+      aliases: [{ name: "Shieldaig Highland", bottleId: 2 }],
     });
 
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0]).toMatchObject({
-        path: ["aliases", 0, "releaseId"],
-        message: "Release 10 does not belong to bottle 1.",
+        path: ["aliases", 0, "bottleId"],
+        message: "Unknown bottle id 2.",
       });
     }
   });
 
-  test("rejects removed structured cask fields on catalog rows", () => {
-    const result = LocalCatalogSchema.safeParse({
+  test("preserves canonical structured cask fields on catalog rows", () => {
+    const result = LocalCatalogSchema.parse({
       entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
-      bottles: [{ id: 1, name: "Speyside", brandId: 1, caskType: "Sherry" }],
+      bottles: [
+        {
+          id: 1,
+          name: "Speyside",
+          brandId: 1,
+          caskType: "oloroso",
+          caskSize: "hogshead",
+          caskFill: "1st_fill",
+        },
+      ],
     });
 
-    expect(result.success).toBe(false);
+    expect(result.bottles[0]).toMatchObject({
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
+    });
   });
 
-  test("derives initial candidates and sibling context from catalog rows", async () => {
+  test("searches Bottle candidates by canonical cask traits", async () => {
+    const dataSource = createLocalCatalogDataSource(
+      LocalCatalogSchema.parse({
+        entities: [{ id: 1, name: "Example", type: ["brand"] }],
+        bottles: [
+          {
+            id: 1,
+            name: "Oloroso Cask",
+            brandId: 1,
+            caskType: "oloroso",
+            caskSize: "hogshead",
+            caskFill: "1st_fill",
+          },
+          {
+            id: 2,
+            name: "Bourbon Cask",
+            brandId: 1,
+            caskType: "bourbon",
+            caskSize: "barrel",
+            caskFill: "refill",
+          },
+        ],
+        aliases: [],
+      }),
+    );
+
+    await expect(
+      dataSource.searchBottles(
+        BottleCandidateSearchInputSchema.parse({
+          cask_type: "oloroso",
+          cask_size: "hogshead",
+          cask_fill: "1st_fill",
+        }),
+      ),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        bottleId: 1,
+        caskType: "oloroso",
+        caskSize: "hogshead",
+        caskFill: "1st_fill",
+      }),
+    ]);
+  });
+
+  test("derives sibling context from explicit group membership", async () => {
     const dataSource = createLocalCatalogDataSource(shieldaigCatalog);
 
     const candidates = await dataSource.findInitialCandidates?.({
@@ -106,6 +158,9 @@ describe("local catalog data source", () => {
         vintage_year: null,
         cask_strength: null,
         single_cask: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
         edition: null,
       },
     });
@@ -126,6 +181,37 @@ describe("local catalog data source", () => {
         ],
       },
     });
+  });
+
+  test("does not infer sibling context from similar Bottle names", async () => {
+    const catalog = LocalCatalogSchema.parse({
+      entities: [{ id: 1, name: "Example", type: ["brand"] }],
+      bottles: [
+        {
+          id: 1,
+          name: "Core 18-year-old",
+          brandId: 1,
+          statedAge: 18,
+        },
+        {
+          id: 2,
+          name: "Core 30-year-old",
+          brandId: 1,
+          statedAge: 30,
+        },
+      ],
+      aliases: [],
+    });
+    const dataSource = createLocalCatalogDataSource(catalog);
+
+    await expect(dataSource.getBottleCandidateById?.(1)).resolves.toMatchObject(
+      {
+        bottleId: 1,
+        familyContext: {
+          siblingBottles: [],
+        },
+      },
+    );
   });
 
   test("uses aliases for exact local search matches", async () => {
@@ -150,7 +236,7 @@ describe("local catalog data source", () => {
     const dataSource = createLocalCatalogDataSource(shieldaigCatalog);
 
     await expect(
-      dataSource.getBottleCandidateById?.(44266, null),
+      dataSource.getBottleCandidateById?.(44266),
     ).resolves.toMatchObject({
       bottleId: 44266,
       fullName: "Shieldaig Speyside 30-year-old",

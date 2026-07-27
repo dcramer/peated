@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-07-26T23:35:32.667Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Talisker Distillers Edition 2001 release"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Talisker Distillers Edition 2001 release",
+    "summary": "**Talisker Distillers Edition 2001 release** appears to refer to the **2001 vintage, bottled in 2012**. Confirmed bottle details:\n\n- **Producer / distillery:** Talisker, official **distillery bottling**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001))\n- **Series / edition:** **The Dis",
+    "results": [
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/36535/talisker-2001",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "thewhiskyexchange.com",
+        "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whisky.com",
+        "url": "https://www.whisky.com/whisky-database/details/talisker-distillers-edition-4.html",
+        "domain": "whisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "aafae115952f51bb13c6f3a015a2064a27e98b1f56fceb9cdae1be39832dcd25",
+    "mode": "auto"
+  }
+}

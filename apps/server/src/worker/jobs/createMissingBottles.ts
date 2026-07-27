@@ -48,10 +48,9 @@ export default async function createMissingBottles() {
           url: review.url,
           imageUrl: null,
           currentBottleId: review.bottleId,
-          currentReleaseId: review.releaseId,
         },
-        // Normalized fallback aliases can collapse real release detail to the
-        // parent before the classifier reviews the full reference title.
+        // Normalized fallback aliases can collapse exact identity detail before
+        // the classifier reviews the full reference title.
         aliasLookupNames: [aliasKey, review.name],
         user: systemUser,
         createdByActorId: systemActor.id,
@@ -64,7 +63,6 @@ export default async function createMissingBottles() {
           extra: {
             reviewId: review.id,
             bottleId,
-            releaseId: null,
             source: resolution.source,
           },
         });

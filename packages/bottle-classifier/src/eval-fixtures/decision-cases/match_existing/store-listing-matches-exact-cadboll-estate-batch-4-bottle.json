@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -45,10 +42,7 @@
         "fullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenmorangie 15-year-old The Cadboll Estate",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,
@@ -67,10 +61,7 @@
         "fullName": "Glenmorangie 15-year-old The Cadboll Estate"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)",
         "brand": "Glenmorangie",
         "bottler": null,
         "series": null,

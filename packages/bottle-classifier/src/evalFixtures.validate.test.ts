@@ -26,17 +26,11 @@ function inferDecisionScenario(
 
   if (fixture.expected.status === "classified") {
     const currentBottleId = fixture.input.reference.currentBottleId ?? null;
-    const currentReleaseId = fixture.input.reference.currentReleaseId ?? null;
 
-    if (
-      fixture.expected.action === "match" &&
-      (currentBottleId !== null || currentReleaseId !== null)
-    ) {
+    if (fixture.expected.action === "match" && currentBottleId !== null) {
       const matchedBottleId = fixture.expected.matchedBottleId ?? null;
-      const matchedReleaseId = fixture.expected.matchedReleaseId ?? null;
 
-      return currentBottleId === matchedBottleId &&
-        currentReleaseId === matchedReleaseId
+      return currentBottleId === matchedBottleId
         ? "match_existing"
         : "corrections";
     }
@@ -153,7 +147,6 @@ describe("eval fixture validation", () => {
       localCatalog: {
         entities: [{ id: 1, name: "Shieldaig", type: ["brand"] }],
         bottles: [],
-        releases: [],
         aliases: [],
       },
       provenance: {
@@ -179,6 +172,67 @@ describe("eval fixture validation", () => {
     expect(result.error.issues.map((issue) => issue.path.join("."))).toContain(
       "localCatalog",
     );
+  });
+
+  test("rejects duplicate initial candidate Bottle ids", () => {
+    const result = classifierEvalFixtureSchema.safeParse({
+      id: "duplicate-initial-candidate-ids",
+      name: "Duplicate initial candidate ids",
+      input: {
+        reference: {
+          name: "Example 10-year-old",
+        },
+        initialCandidates: [
+          {
+            bottleId: 1,
+            fullName: "Example 10-year-old",
+          },
+          {
+            bottleId: 1,
+            fullName: "Example 10-year-old Oloroso Cask",
+          },
+        ],
+      },
+      expected: {
+        status: "classified",
+        action: "match",
+        matchedBottleId: 1,
+        summary: "Duplicate candidate ids are invalid.",
+      },
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]).toMatchObject({
+        path: ["input", "initialCandidates", 1, "bottleId"],
+        message: "Duplicate initial candidate Bottle id 1.",
+      });
+    }
+  });
+
+  test("accepts canonical cask traits in exact Bottle identity", () => {
+    const fixture = realWorldNewBottleFixtureSchema.parse({
+      id: "canonical-cask-traits",
+      referenceName: "Example First Fill Oloroso Hogshead",
+      expectedBottleName: "Example First Fill Oloroso Hogshead",
+      summary: "Validates canonical structured cask traits.",
+      peatedBottleIds: [1],
+      expected: {
+        handlingStrategy: "classifier_required",
+        classifierExpectation: "bottle",
+        exactBottleIdentity: {
+          caskType: "oloroso",
+          caskSize: "hogshead",
+          caskFill: "1st_fill",
+        },
+      },
+    });
+
+    expect(fixture.expected.exactBottleIdentity).toEqual({
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
+    });
   });
 
   test("keeps file-backed eval fixture ids globally unique", () => {

@@ -102,7 +102,6 @@
     "action": "match",
     "identityScope": "exact_cask",
     "matchedBottleId": 11940,
-    "matchedReleaseId": null,
     "expectedTier": "auto",
     "suggestedNextStep": "confirm_match",
     "summary": "Compose the SMWS code 1.285 from the label's 'Distillery No. 1' + 'Single Cask No. 285' components and match existing exact-cask bottle 11940 with no release."
@@ -138,7 +137,6 @@
         "releaseYear": 2023
       }
     ],
-    "releases": [],
     "aliases": [
       {
         "name": "SMWS 1.285 Party in the afternoon",

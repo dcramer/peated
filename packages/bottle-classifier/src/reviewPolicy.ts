@@ -4,7 +4,7 @@ import {
   extractedIdentityLooksLikePlainAgeStatementReference,
   getExistingMatchIdentityConflicts,
 } from "./bottleClassificationEvidence";
-import { normalizeBottleCreationDrafts } from "./bottleCreationDrafts";
+import { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 import {
   BottleClassificationDecisionSchema,
   BottleClassifierAgentDecisionSchema,
@@ -1006,11 +1006,7 @@ function getMatchedTarget(
 
   return (
     candidates.find(
-      (candidate) =>
-        candidate.bottleId === decision.matchedBottleId &&
-        (decision.action === "match" && decision.matchedReleaseId != null
-          ? candidate.releaseId === decision.matchedReleaseId
-          : candidate.releaseId === null || candidate.kind === "bottle"),
+      (candidate) => candidate.bottleId === decision.matchedBottleId,
     ) ?? null
   );
 }
@@ -1082,44 +1078,10 @@ function maybeRejectExactCaskCreateDuplicate({
   });
 }
 
-function getTargetNameCandidates(
-  target: BottleCandidate,
-  decision: BottleClassificationDecision,
-): string[] {
-  const structuredReleaseNames =
-    (decision.action === "match" &&
-      (decision.matchedReleaseId != null || target.kind === "release")) ||
-    target.releaseId != null
-      ? [
-          target.bottleFullName && target.releaseYear != null
-            ? `${target.bottleFullName} ${target.releaseYear}`
-            : null,
-          target.bottleFullName && target.vintageYear != null
-            ? `${target.bottleFullName} ${target.vintageYear}`
-            : null,
-          target.bottleFullName && target.edition
-            ? `${target.bottleFullName} ${target.edition}`
-            : null,
-        ]
-      : [];
-  const names =
-    decision.action === "match" &&
-    (decision.matchedReleaseId != null || target.kind === "release")
-      ? [target.alias, target.fullName, ...structuredReleaseNames]
-      : [
-          target.alias,
-          target.bottleFullName ?? target.fullName,
-          target.fullName,
-          ...structuredReleaseNames,
-        ];
-
-  return Array.from(new Set(names.filter(Boolean))) as string[];
-}
-
 function getBottleTargetNameCandidates(target: BottleCandidate): string[] {
   return Array.from(
     new Set(
-      [target.alias, target.bottleFullName ?? target.fullName, target.fullName]
+      [target.alias, target.fullName]
         .filter(Boolean)
         .map((value) => value!.trim())
         .filter((value) => value.length > 0),
@@ -1319,6 +1281,27 @@ function proposedBottleNeedsMaterialTargetRepair({
     return true;
   }
 
+  if (
+    proposedBottle.caskType !== null &&
+    target.caskType !== proposedBottle.caskType
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.caskSize !== null &&
+    target.caskSize !== proposedBottle.caskSize
+  ) {
+    return true;
+  }
+
+  if (
+    proposedBottle.caskFill !== null &&
+    target.caskFill !== proposedBottle.caskFill
+  ) {
+    return true;
+  }
+
   if (proposedBottle.abv !== null && target.abv !== proposedBottle.abv) {
     return true;
   }
@@ -1357,6 +1340,9 @@ function proposedBottleHasKnownTargetConflict({
       caskStrength:
         target.caskStrength === null ? null : proposedBottle.caskStrength,
       singleCask: target.singleCask === null ? null : proposedBottle.singleCask,
+      caskType: target.caskType === null ? null : proposedBottle.caskType,
+      caskSize: target.caskSize === null ? null : proposedBottle.caskSize,
+      caskFill: target.caskFill === null ? null : proposedBottle.caskFill,
     },
     extractedIdentity,
   });
@@ -1391,10 +1377,6 @@ function findConflictingDuplicateCreateBottleCandidate({
   return (
     artifacts.candidates
       .filter((candidate) => {
-        if (candidate.kind !== "bottle" || candidate.releaseId !== null) {
-          return false;
-        }
-
         if (
           proposedBottleHasKnownTargetConflict({
             target: candidate,
@@ -1454,10 +1436,7 @@ function createNoMatchDecision({
     identityBasis: decision.identityBasis ?? null,
     confidenceBasis: decision.confidenceBasis ?? null,
     matchedBottleId: null,
-    matchedReleaseId: null,
-    parentBottleId: null,
     proposedBottle: null,
-    proposedRelease: null,
   });
 }
 
@@ -1714,11 +1693,6 @@ function sanitizeClassifierDecision({
   const candidateBottleIds = new Set(
     artifacts.candidates.map((candidate) => candidate.bottleId),
   );
-  const candidateReleaseIds = new Set(
-    artifacts.candidates
-      .map((candidate) => candidate.releaseId)
-      .filter((releaseId): releaseId is number => releaseId !== null),
-  );
   const resolvedEntitiesById = new Map(
     artifacts.resolvedEntities.map((entity) => [entity.entityId, entity]),
   );
@@ -1745,8 +1719,6 @@ function sanitizeClassifierDecision({
     }
 
     const matchedBottleId = decision.matchedBottleId;
-    const matchedReleaseId = decision.matchedReleaseId ?? null;
-
     if (!candidateBottleIds.has(matchedBottleId)) {
       throw new BottleClassificationError(
         `Classifier returned unknown matched bottle id (${matchedBottleId}).`,
@@ -1754,23 +1726,9 @@ function sanitizeClassifierDecision({
       );
     }
 
-    if (
-      matchedReleaseId != null &&
-      !candidateReleaseIds.has(matchedReleaseId)
-    ) {
-      throw new BottleClassificationError(
-        `Classifier returned unknown matched release id (${matchedReleaseId}).`,
-        artifacts,
-      );
-    }
-
     const target =
       artifacts.candidates.find(
-        (candidate) =>
-          candidate.bottleId === matchedBottleId &&
-          (matchedReleaseId != null
-            ? candidate.releaseId === matchedReleaseId
-            : candidate.releaseId === null || candidate.kind === "bottle"),
+        (candidate) => candidate.bottleId === matchedBottleId,
       ) ?? null;
 
     return {
@@ -1783,15 +1741,11 @@ function sanitizeClassifierDecision({
         target,
         extractedIdentity: artifacts.extractedIdentity,
         proposedBottle: null,
-        hasReleaseIdentity: matchedReleaseId != null,
         observation,
       }),
       observation,
       matchedBottleId,
-      matchedReleaseId,
-      parentBottleId: null,
       proposedBottle: null,
-      proposedRelease: null,
     };
   }
 
@@ -1823,28 +1777,8 @@ function sanitizeClassifierDecision({
       }),
       reference,
     });
-    const normalizedDrafts = normalizeBottleCreationDrafts({
-      creationTarget: "bottle",
-      proposedBottle: sanitizedBottleDraft,
-      proposedRelease: null,
-    });
-
-    if (!normalizedDrafts.proposedBottle) {
-      return createNoMatchDecision({
-        decision: {
-          ...decision,
-        },
-        candidateBottleIds: filteredCandidateBottleIds,
-        observation,
-        identityScope: "product",
-        rationale: appendRationale(
-          decision.rationale,
-          "Server downgraded create_bottle because the proposed bottle draft could not be normalized.",
-        ),
-      });
-    }
-
-    let proposedBottleDraft = normalizedDrafts.proposedBottle;
+    let proposedBottleDraft =
+      normalizeProposedBottleDraft(sanitizedBottleDraft);
 
     if (
       bottleNameDuplicatesBrand(
@@ -1885,10 +1819,7 @@ function sanitizeClassifierDecision({
       identityScope: decision.identityScope ?? "product",
       aliasScope: decision.aliasScope ?? undefined,
       matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: null,
       proposedBottle: proposedBottleDraft,
-      proposedRelease: null,
     };
     const hasSmwsCodeAnchor = Boolean(
       getSmwsCodeAnchor({
@@ -1926,12 +1857,9 @@ function sanitizeClassifierDecision({
           proposedBottle: proposedBottleDraft,
           forceAgeStatement: true,
         });
-        proposedBottleDraft =
-          normalizeBottleCreationDrafts({
-            creationTarget: "bottle",
-            proposedBottle: ageRestoredBottleDraft,
-            proposedRelease: null,
-          }).proposedBottle ?? proposedBottleDraft;
+        proposedBottleDraft = normalizeProposedBottleDraft(
+          ageRestoredBottleDraft,
+        );
       }
     }
 
@@ -2017,7 +1945,7 @@ function sanitizeClassifierDecision({
           decision.identityScope === "exact_cask" ||
           hasExactCaskSignals({
             reference,
-            proposedBottle: normalizedDrafts.proposedBottle,
+            proposedBottle: proposedBottleDraft,
             extractedIdentity: artifacts.extractedIdentity,
             observation,
           })
@@ -2027,15 +1955,11 @@ function sanitizeClassifierDecision({
         target: null,
         extractedIdentity: artifacts.extractedIdentity,
         proposedBottle: proposedBottleDraft,
-        hasReleaseIdentity: false,
         observation,
       }),
       observation,
       matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: null,
       proposedBottle: proposedBottleDraft,
-      proposedRelease: null,
     };
   }
 
@@ -2080,38 +2004,19 @@ function sanitizeClassifierDecision({
 
     const target =
       artifacts.candidates.find(
-        (candidate) =>
-          candidate.bottleId === matchedBottleId &&
-          (candidate.releaseId === null || candidate.kind === "bottle"),
+        (candidate) => candidate.bottleId === matchedBottleId,
       ) ?? null;
-    const normalizedDrafts = normalizeBottleCreationDrafts({
-      creationTarget: "bottle",
-      proposedBottle: sanitizeProposedBottleDraft(
+    const normalizedBottleDraft = normalizeProposedBottleDraft(
+      sanitizeProposedBottleDraft(
         decision.proposedBottle,
         resolvedEntitiesById,
       ),
-      proposedRelease: null,
-    });
-
-    if (!normalizedDrafts.proposedBottle) {
-      return createNoMatchDecision({
-        decision: {
-          ...decision,
-        },
-        candidateBottleIds: filteredCandidateBottleIds,
-        observation,
-        identityScope: "product",
-        rationale: appendRationale(
-          decision.rationale,
-          "Server downgraded repair_bottle because the proposed bottle repair draft could not be normalized.",
-        ),
-      });
-    }
+    );
 
     if (
       bottleNameDuplicatesBrand(
-        normalizedDrafts.proposedBottle.name,
-        normalizedDrafts.proposedBottle.brand.name,
+        normalizedBottleDraft.name,
+        normalizedBottleDraft.brand.name,
       )
     ) {
       return createNoMatchDecision({
@@ -2130,11 +2035,11 @@ function sanitizeClassifierDecision({
       target &&
       candidateMatchesProposedBottleDraftIdentity({
         target,
-        proposedBottle: normalizedDrafts.proposedBottle,
+        proposedBottle: normalizedBottleDraft,
       }) &&
       !proposedBottleNeedsMaterialTargetRepair({
         target,
-        proposedBottle: normalizedDrafts.proposedBottle,
+        proposedBottle: normalizedBottleDraft,
         extractedIdentity: artifacts.extractedIdentity,
       })
     ) {
@@ -2151,15 +2056,11 @@ function sanitizeClassifierDecision({
           target,
           extractedIdentity: artifacts.extractedIdentity,
           proposedBottle: null,
-          hasReleaseIdentity: false,
           observation,
         }),
         observation,
         matchedBottleId,
-        matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: null,
-        proposedRelease: null,
       };
     }
 
@@ -2172,16 +2073,12 @@ function sanitizeClassifierDecision({
         reference,
         target,
         extractedIdentity: artifacts.extractedIdentity,
-        proposedBottle: normalizedDrafts.proposedBottle,
-        hasReleaseIdentity: false,
+        proposedBottle: normalizedBottleDraft,
         observation,
       }),
       observation,
       matchedBottleId,
-      matchedReleaseId: null,
-      parentBottleId: null,
-      proposedBottle: normalizedDrafts.proposedBottle,
-      proposedRelease: null,
+      proposedBottle: normalizedBottleDraft,
     };
   }
 
@@ -2194,7 +2091,6 @@ function sanitizeClassifierDecision({
         target: null,
         extractedIdentity: artifacts.extractedIdentity,
         proposedBottle: null,
-        hasReleaseIdentity: false,
         observation,
       }),
       identityBasis: decision.identityBasis,
@@ -2268,13 +2164,10 @@ export function finalizeBottleReferenceClassification({
   decision: BottleClassifierAgentDecisionInput;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision {
-  const parsedDecision: BottleClassifierAgentDecision = {
-    ...BottleClassifierAgentDecisionSchema.parse(
+  const parsedDecision: BottleClassifierAgentDecision =
+    BottleClassifierAgentDecisionSchema.parse(
       normalizePotentialProofLikeDecision(decision),
-    ),
-    parentBottleId: null,
-    proposedRelease: null,
-  };
+    );
   const sanitizedDecision = sanitizeClassifierDecision({
     reference,
     decision: parsedDecision,

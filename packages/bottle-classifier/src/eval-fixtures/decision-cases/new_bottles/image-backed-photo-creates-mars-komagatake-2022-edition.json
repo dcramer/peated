@@ -82,7 +82,7 @@
     },
     "proposedBottleDistillerIdOneOf": [1953, 238555],
     "suggestedNextStep": "confirm_create",
-    "summary": "Create one independently complete Mars Komagatake 2022 Edition Bottle with the existing Mars and Shinshu entities; classification does not create a parent or select a group."
+    "summary": "Create one independently complete Mars Komagatake 2022 Edition Bottle with the existing Mars and Shinshu entities; classification does not create a broader Bottle or select a group."
   },
   "localCatalog": {
     "entities": [
@@ -122,7 +122,6 @@
         "releaseYear": 2019
       }
     ],
-    "releases": [],
     "aliases": []
   }
 }

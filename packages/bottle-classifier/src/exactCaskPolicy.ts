@@ -135,7 +135,6 @@ export function hasExactCaskSignals({
     extractedIdentity?.expression,
     proposedBottle?.name,
     target?.fullName,
-    target?.bottleFullName,
     target?.alias,
   ].some((value) =>
     textHasExactCaskSignalsForScope(value, {
@@ -153,7 +152,6 @@ export function inferBottleIdentityScope({
   target,
   proposedBottle,
   extractedIdentity,
-  hasReleaseIdentity,
   observation,
 }: {
   requestedIdentityScope: BottleClassifierAgentDecision["identityScope"] | null;
@@ -161,13 +159,8 @@ export function inferBottleIdentityScope({
   target?: BottleCandidate | null;
   proposedBottle?: BottleClassificationDecision["proposedBottle"];
   extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  hasReleaseIdentity: boolean;
   observation: BottleObservation | null;
 }): BottleClassificationDecision["identityScope"] {
-  if (hasReleaseIdentity) {
-    return "product";
-  }
-
   if (requestedIdentityScope !== "exact_cask") {
     return "product";
   }

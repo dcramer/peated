@@ -6,7 +6,14 @@ import { z } from "zod";
 import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
-import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
+import {
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
+  CategoryEnum,
+  ServingStyleEnum,
+  zDatetime,
+} from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
 
@@ -147,7 +154,6 @@ export const PhotoIdentificationDiagnosticsSchema = z.object({
 });
 
 const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
-  bottleFullName: true,
   fullName: true,
 });
 
@@ -159,6 +165,9 @@ const PhotoIdentificationProposedBottleSchema = z.object({
   abv: z.number().nullable(),
   caskStrength: z.boolean().nullable(),
   singleCask: z.boolean().nullable(),
+  caskType: CaskTypeEnum.nullable(),
+  caskSize: CaskSizeEnum.nullable(),
+  caskFill: CaskFillEnum.nullable(),
   vintageYear: z.number().nullable(),
   releaseYear: z.number().nullable(),
   brand: z.object({

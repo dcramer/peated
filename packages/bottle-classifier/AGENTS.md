@@ -36,15 +36,15 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
   `identityScope` signal validation lives in `src/exactCaskPolicy.ts`.
 - Post-agent deterministic gates may reject only unknown targets, schema
   violations, impossible states, and direct extracted-field conflicts on
-  explicit fields such as brand, category, age, ABV, cask flags, or years. They
+  explicit fields such as brand, category, age, ABV, cask flags, canonical cask
+  type/size/fill, or years. They
   must not require text-search rank, comparable-name support, or structured
   name/family heuristics to corroborate an agent's semantic `match`.
 - The model decides the exact marketed Bottle identity. Every marketed release
   is one independently complete Bottle; the classifier never chooses a parent,
   source group, or BottleGroup.
-- Retrieval may expose retained legacy `bottle_release` candidates and sibling
-  context as match evidence only. Never use that transitional evidence to
-  authorize creation, parent repair, or group assignment.
+- Retrieval exposes independently complete Bottle candidates. Sibling Bottle
+  context may inform matching, but never authorizes BottleGroup assignment.
 - Post-model code may sanitize, normalize, reject, or downgrade unsafe output. It must not promote semantic actions such as `no_match` or `match` into create/repair outcomes based on whisky-family heuristics.
 - Model-sensitive classification examples belong in eval fixtures. Unit tests should cover deterministic validation and post-processing invariants only.
 - Keep the classifier system prompt static and cache-friendly. Dynamic facts belong in runtime input, tools, tool schemas, and validated output.
@@ -63,10 +63,10 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
   support.
 - Do not add critic, reviewer, database, or retailer domain allowlists for reviewed create decisions. Let the agent judge source quality from content, independence, specificity, and corroboration, then enforce only the reviewed confidence/evidence contract in code.
 - Production-miss evals require the exact observed input, independent web verification of the real bottle, and an explicit Peated DB outcome before the expected result is encoded. Use fixture `provenance.source = "production_miss"` with `verifiedSourceUrls` and `dbOutcome`.
-- Expected eval outcomes must name the exact Peated Bottle ids, any explicitly
-  retained legacy release ids, exact create action, and auto-verification
-  expectation when those are known. Do not replace a production miss with a
-  generalized or pretend outcome.
+- Expected eval outcomes must name the exact Peated Bottle ids, exact create
+  action, and auto-verification expectation when those are known. Historical
+  release ids belong only in retained production provenance. Do not replace a
+  production miss with a generalized or pretend outcome.
 - Main classifier eval scoring is deterministic: encoded expected fields are required, unencoded optional enrichment is ignored, and LLM judges should not decide pass/fail for field-level expectations.
 - Live evals are expensive; run full evals only when explicitly asked or when doing an intentional scoped eval pass.
 - Replay JSON under `.vitest-evals/recordings/` is an eval artifact, not a local cache. Commit only deliberate replay changes tied to an eval fixture or harness change.

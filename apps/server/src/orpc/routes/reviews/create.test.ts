@@ -272,7 +272,6 @@ describe("POST /reviews", () => {
       metadata: expect.objectContaining({
         classifierEvidence: {
           action: "create_bottle",
-          parentBottleId: null,
           identityScope: null,
           observation: null,
           identityBasis: null,
@@ -364,7 +363,6 @@ describe("POST /reviews", () => {
       metadata: expect.objectContaining({
         classifierEvidence: {
           action: "create_bottle",
-          parentBottleId: null,
           identityScope: null,
           observation: null,
           identityBasis: null,
@@ -486,7 +484,6 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: bottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [bottle.id],
         },
         {
@@ -577,10 +574,9 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: bottle.id,
-          matchedReleaseId: release.id,
           candidateBottleIds: [bottle.id],
         },
-        { candidates: [{ bottleId: bottle.id, releaseId: release.id }] },
+        { candidates: [{ bottleId: bottle.id }] },
       ),
     );
 
@@ -638,10 +634,9 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: parent.id,
-          matchedReleaseId: null,
           candidateBottleIds: [parent.id],
         },
-        { candidates: [{ bottleId: parent.id, releaseId: null }] },
+        { candidates: [{ bottleId: parent.id }] },
       ),
     );
 
@@ -943,7 +938,6 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: incomingBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [incomingBottle.id],
         },
         {
@@ -1635,7 +1629,6 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: classifierBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [classifierBottle.id],
         },
         {
@@ -1715,7 +1708,6 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: bottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [bottle.id],
         },
         {
@@ -1914,7 +1906,6 @@ describe("POST /reviews", () => {
         {
           action: "match",
           matchedBottleId: bottle.id,
-          matchedReleaseId: release.id,
           candidateBottleIds: [bottle.id],
         },
         {

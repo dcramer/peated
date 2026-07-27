@@ -106,7 +106,7 @@ describe("concrete Bottle creation", () => {
       .from(bottleAliases)
       .where(eq(bottleAliases.bottleId, result.bottle.id));
     expect(alias).toMatchObject({
-      targetId: result.exactTarget.id,
+      targetId: null,
       assignmentSource: "canonical",
     });
 
@@ -157,6 +157,9 @@ describe("concrete Bottle creation", () => {
       statedAge: 12,
       caskStrength: null,
       singleCask: null,
+      caskType: null,
+      caskSize: null,
+      caskFill: null,
       abv: null,
       vintageYear: null,
       releaseYear: null,

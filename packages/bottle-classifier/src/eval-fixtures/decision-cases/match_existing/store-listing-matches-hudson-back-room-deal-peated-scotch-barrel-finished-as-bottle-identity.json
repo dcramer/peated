@@ -23,12 +23,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 11904,
-        "releaseId": null,
         "alias": null,
         "fullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
-        "bottleFullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
         "brand": "Hudson",
         "bottler": null,
         "series": null,
@@ -45,12 +42,9 @@
         "source": ["text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 17226,
-        "releaseId": null,
         "alias": "Hudson Manhattan Straight Rye (Batch 5)",
         "fullName": "Hudson Manhattan Rye Whiskey",
-        "bottleFullName": "Hudson Manhattan Rye Whiskey",
         "brand": "Hudson",
         "bottler": null,
         "series": null,
@@ -67,12 +61,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 17226,
-        "releaseId": 278,
+        "bottleId": -278,
         "alias": "Hudson Manhattan Rye Whiskey - Batch 5",
         "fullName": "Hudson Manhattan Rye Whiskey - Batch 5",
-        "bottleFullName": "Hudson Manhattan Rye Whiskey",
         "brand": "Hudson",
         "bottler": null,
         "series": null,
@@ -95,12 +86,9 @@
       "when": ["hudson", "back room deal"],
       "results": [
         {
-          "kind": "bottle",
           "bottleId": 11904,
-          "releaseId": null,
           "alias": null,
           "fullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
-          "bottleFullName": "Hudson Whiskey Back Room Deal Peated Scotch Barrel Finished",
           "brand": "Hudson",
           "bottler": null,
           "series": null,
@@ -141,7 +129,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 11904,
-    "matchedReleaseId": null,
     "summary": "Match the exact local Hudson Back Room Deal Peated Scotch Barrel Finished Bottle. The peated Scotch barrel finish is part of this complete Bottle identity, so the correct result is product-scope Bottle 11904."
   }
 }

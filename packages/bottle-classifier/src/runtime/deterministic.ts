@@ -39,6 +39,9 @@ export function getDeterministicIdentitySeed(
     vintage_year: null,
     cask_strength: null,
     single_cask: true,
+    cask_type: null,
+    cask_size: null,
+    cask_fill: null,
     edition: smwsReference.code,
   };
 }

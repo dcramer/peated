@@ -23,12 +23,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 13025,
-        "releaseId": null,
         "alias": "Shibui Grain Select",
         "fullName": "Shibui Grain Select",
-        "bottleFullName": "Shibui Grain Select",
         "brand": "Shibui",
         "bottler": null,
         "series": null,
@@ -45,12 +42,9 @@
         "source": ["brand", "exact"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44140,
-        "releaseId": null,
         "alias": "Shibui 10-year-old White Oak Cask",
         "fullName": "Shibui 10-year-old White Oak Cask",
-        "bottleFullName": "Shibui 10-year-old White Oak Cask",
         "brand": "Shibui",
         "bottler": null,
         "series": null,

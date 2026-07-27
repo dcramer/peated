@@ -23,8 +23,7 @@ The package has three distinct contracts:
 
 - `name`
 - optional `url` and `imageUrl`
-- optional current Bottle id and, during staged compatibility, a retained legacy
-  release id for matching an existing legacy candidate
+- optional current Bottle id
 - optional trace metadata
 - optional seeded extracted identity or candidates for closed review flows
 
@@ -39,7 +38,8 @@ It returns either `ignored` with a reason, or `classified` with:
 Decision actions are `match`, `repair_bottle`, `create_bottle`, and `no_match`.
 `create_bottle` proposes one complete observed marketed Bottle: a stable
 expression in `proposedBottle.name` plus every supported exact field, including
-edition, vintage year, release year, exact age, ABV, and cask flags. Canonical
+edition, vintage year, release year, exact age, ABV, cask flags, and canonical
+cask type, size, and fill. Canonical
 downstream materialization combines those values without duplicating exact
 markers in the stable name, creates the independently correct Bottle, and
 manages grouping automatically. The classifier never selects a BottleGroup.
@@ -87,6 +87,8 @@ evidence bars:
   corroborate missing canonical identity, but complete-Bottle creation may also
   be supported by reviewed label/image evidence, closed-form deterministic
   anchors, or explicit local sibling evidence where policy allows it.
+- Local sibling evidence comes only from explicit BottleGroup membership.
+  Catalog adapters must not infer sibling relationships from Bottle names.
 - Manual-search consumers should treat `no_match` as unresolved identity, not as
   a generic fallback for clear identities that happen to expose catalog repair
   or enrichment work.
@@ -99,8 +101,7 @@ The pipeline is:
 
 1. Extract structured identity from image or text.
 2. Ignore obvious non-whisky and non-single-bottle rows.
-3. Retrieve local Bottle candidates and any retained legacy release candidates
-   exposed solely for staged existing-match compatibility.
+3. Retrieve local Bottle candidates.
 4. Run deterministic resolvers before the agent. Today this is limited to SMWS
    code references.
 5. Resolve local brand, bottler, and distillery entities.
@@ -163,10 +164,9 @@ automation tier, but only binary invalid state or direct extracted-field
 conflict may erase the agent's semantic match.
 
 A literal stored alias shortcut is allowed only when the normalized input
-matches a non-ignored stored alias attached to exactly one Bottle or one
-explicit retained legacy release candidate. If there are multiple targets,
-fuzzy/comparable-only matches, legacy candidate ambiguity, or any required
-whisky interpretation, fall through to the agent.
+matches a non-ignored stored alias attached to exactly one Bottle. If there are
+multiple targets, fuzzy/comparable-only matches, or any required whisky
+interpretation, fall through to the agent.
 
 If behavior depends on brand context, marketed family meaning, source quality,
 or whether a fact is canonical versus observational, it belongs to the agent and
@@ -276,8 +276,7 @@ evidence by itself.
 The full classifier agent has read-only tools for local candidates, local
 entities, and live web evidence:
 
-- `search_bottles`: local Peated Bottle candidates plus explicit retained legacy
-  release candidates available only for staged existing-match compatibility
+- `search_bottles`: local Peated Bottle candidates
 - `search_entities`: local Peated brand, distillery, and bottler entities
 - `firecrawl_web_search`: configured default live web evidence search with
   scraped page excerpts

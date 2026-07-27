@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-07-27T00:05:19.012Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake 2022 limited edition 50% single malt Mars"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake 2022 limited edition 50% single malt Mars",
+    "summary": "**Komagatake 2022 Edition / Limited Edition** — confirmed bottle details:\n\n- **Name:** *Single Malt KOMAGATAKE 2022 Edition* (often sold as “Komagatake 2022 Limited Edition”). ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/))\n- **Producer / bottler:** **Mars Whisky / Hombo Shu",
+    "results": [
+      {
+        "title": "hombo.co.jp",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "skurnik.com",
+        "url": "https://www.skurnik.com/sku/single-malt-whisky-komagatake-limited-edition-2018-mars-shinshu-5/",
+        "domain": "skurnik.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "92ff1704882fe0d8691c4940eba9cc2d5e07e9e15af0da20e8f6d8b743ee0747",
+    "mode": "auto"
+  }
+}

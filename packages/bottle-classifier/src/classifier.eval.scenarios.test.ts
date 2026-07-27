@@ -36,17 +36,13 @@ describe("classifier eval scenarios", () => {
       }
 
       const currentBottleId = testCase.testCase.input.reference.currentBottleId;
-      const currentReleaseId =
-        testCase.testCase.input.reference.currentReleaseId;
 
       expect(testCase.testCase.expected.status).toBe("classified");
       expect(testCase.testCase.expected.action).toBe("match");
-      expect(currentBottleId != null || currentReleaseId != null).toBe(true);
+      expect(currentBottleId).not.toBeNull();
       expect(
         currentBottleId !==
-          (testCase.testCase.expected.matchedBottleId ?? null) ||
-          currentReleaseId !==
-            (testCase.testCase.expected.matchedReleaseId ?? null),
+          (testCase.testCase.expected.matchedBottleId ?? null),
       ).toBe(true);
     }
   });

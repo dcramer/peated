@@ -8,10 +8,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Jameson Cold Brew",
         "brand": "Jameson",
         "bottler": null,
         "series": null,
@@ -36,10 +33,7 @@
       "when": ["jameson", "cold brew"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Jameson Cold Brew",
           "brand": "Jameson",
           "bottler": null,
           "series": null,

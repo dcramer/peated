@@ -8,6 +8,13 @@
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
     "exactBottleIdentity": null,
-    "exactBottleIdentities": [{ "releaseYear": 2001 }, { "vintageYear": 2001 }]
+    "exactBottleIdentities": [
+      {
+        "releaseYear": 2001
+      },
+      {
+        "vintageYear": 2001
+      }
+    ]
   }
 }

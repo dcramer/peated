@@ -8,10 +8,7 @@ export function buildBottleCandidate(
     Partial<BottleCandidate>,
 ): BottleCandidate {
   return {
-    kind: "bottle",
-    releaseId: null,
     alias: null,
-    bottleFullName: candidate.fullName,
     brand: null,
     bottler: null,
     series: null,
@@ -21,6 +18,9 @@ export function buildBottleCandidate(
     edition: null,
     caskStrength: null,
     singleCask: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,
@@ -46,6 +46,9 @@ export function buildExtractedIdentity(
     vintage_year: null,
     cask_strength: null,
     single_cask: null,
+    cask_type: null,
+    cask_size: null,
+    cask_fill: null,
     edition: null,
     ...identity,
   };

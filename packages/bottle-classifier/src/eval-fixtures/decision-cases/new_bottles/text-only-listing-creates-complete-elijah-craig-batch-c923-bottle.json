@@ -8,10 +8,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -36,10 +33,7 @@
       "when": ["elijah", "barrel proof"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Elijah Craig Barrel Proof",
           "brand": "Elijah Craig",
           "bottler": null,
           "series": null,

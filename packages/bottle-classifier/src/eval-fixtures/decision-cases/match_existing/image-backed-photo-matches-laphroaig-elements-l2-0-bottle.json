@@ -24,93 +24,63 @@
     },
     "initialCandidates": [
       {
-        "bottleId": 44286,
-        "releaseId": 412,
-        "bottleFullName": "Laphroaig Elements",
+        "bottleId": -412,
         "fullName": "Laphroaig Elements - L1.0 - 58.6% ABV"
       },
       {
         "bottleId": 44286,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Elements",
         "fullName": "Laphroaig Elements"
       },
       {
         "bottleId": 3262,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Lp8 ElD Elements of Islay",
         "fullName": "Laphroaig Lp8 ElD Elements of Islay"
       },
       {
         "bottleId": 2890,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Lp9 ElD Elements of Islay",
         "fullName": "Laphroaig Lp9 ElD Elements of Islay"
       },
       {
         "bottleId": 3830,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Lp6 SMS Elements of Islay",
         "fullName": "Laphroaig Lp6 SMS Elements of Islay"
       },
       {
         "bottleId": 43018,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Elements 2.0 Cask Strength",
         "fullName": "Laphroaig Elements 2.0 Cask Strength"
       },
       {
-        "bottleId": 44005,
-        "releaseId": 61,
-        "bottleFullName": "Laphroaig Cask Strength",
+        "bottleId": -61,
         "fullName": "Laphroaig Cask Strength - Batch 002 - Cask Strength"
       },
       {
         "bottleId": 44035,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Single Cask Selection",
         "fullName": "Laphroaig Single Cask Selection"
       },
       {
-        "bottleId": 44005,
-        "releaseId": 70,
-        "bottleFullName": "Laphroaig Cask Strength",
+        "bottleId": -70,
         "fullName": "Laphroaig Cask Strength - Batch 001 - Cask Strength"
       },
       {
-        "bottleId": 44005,
-        "releaseId": 72,
-        "bottleFullName": "Laphroaig Cask Strength",
+        "bottleId": -72,
         "fullName": "Laphroaig Cask Strength - Batch 012 - Cask Strength"
       },
       {
-        "bottleId": 44005,
-        "releaseId": 71,
-        "bottleFullName": "Laphroaig Cask Strength",
+        "bottleId": -71,
         "fullName": "Laphroaig Cask Strength - Batch 003 - Cask Strength"
       },
       {
-        "bottleId": 44005,
-        "releaseId": null,
-        "bottleFullName": "Laphroaig Cask Strength",
+        "bottleId": -75,
         "fullName": "Laphroaig Cask Strength"
       },
       {
-        "bottleId": 44005,
-        "releaseId": 75,
-        "bottleFullName": "Laphroaig Cask Strength",
+        "bottleId": -63,
         "fullName": "Laphroaig Cask Strength - Batch 014 - Cask Strength"
       },
       {
         "bottleId": 44005,
-        "releaseId": 63,
-        "bottleFullName": "Laphroaig Cask Strength",
         "fullName": "Laphroaig Cask Strength - Batch 005 - Cask Strength"
       },
       {
-        "bottleId": 44035,
-        "releaseId": 241,
-        "bottleFullName": "Laphroaig Single Cask Selection",
+        "bottleId": -241,
         "fullName": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - Single Cask - Oak"
       }
     ],
@@ -210,6 +180,6 @@
     "matchedBottleId": 43018,
     "expectedTier": "auto",
     "suggestedNextStep": "confirm_match",
-    "summary": "Match the independently complete Laphroaig Elements 2.0 Cask Strength Bottle instead of the broader Elements Bottle or retained L1.0 release 412."
+    "summary": "Match the independently complete Laphroaig Elements 2.0 Cask Strength Bottle instead of the broader Elements Bottle or the L1.0 sibling Bottle candidate represented by fixture id -412."
   }
 }

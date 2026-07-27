@@ -34,7 +34,6 @@ export type BottleReferenceResolutionSource =
 
 export type BottleReferenceClassifierEvidence = {
   action: BottleClassificationDecision["action"];
-  parentBottleId: number | null;
   identityScope: BottleClassificationDecision["identityScope"] | null;
   observation: BottleObservation | null;
   identityBasis: BottleIdentityBasis | null;
@@ -94,7 +93,6 @@ function projectClassifierEvidence(
 ): BottleReferenceClassifierEvidence {
   return {
     action: decision.action,
-    parentBottleId: null,
     identityScope: decision.identityScope ?? null,
     observation: decision.observation ?? null,
     identityBasis: decision.identityBasis ?? null,
@@ -141,7 +139,6 @@ export async function applyClassifierCreateDecision({
   createdByActorId: number;
 }): Promise<{
   bottleId: number;
-  releaseId: null;
   createdBottle: boolean;
   assignment: BottleReferenceAssignment;
 }> {
@@ -163,7 +160,6 @@ export async function applyClassifierCreateDecision({
 
   return {
     bottleId: result.bottle.id,
-    releaseId: null,
     assignment: {
       kind: "direct_bottle",
       bottleId: result.bottle.id,
@@ -233,6 +229,9 @@ export async function resolveBottleReferenceTarget({
             abv: null,
             release_year: null,
             vintage_year: null,
+            cask_type: null,
+            cask_size: null,
+            cask_fill: null,
             cask_strength: null,
             single_cask: null,
             edition: null,

@@ -25,12 +25,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 16142,
-        "releaseId": null,
         "alias": null,
         "fullName": "Elijah Craig Single Barrel 18-year-old (No. 4040)",
-        "bottleFullName": "Elijah Craig Single Barrel 18-year-old (No. 4040)",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -47,12 +44,9 @@
         "source": ["brand", "text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 16806,
-        "releaseId": null,
         "alias": null,
         "fullName": "Elijah Craig 12-year-old Single Barrel",
-        "bottleFullName": "Elijah Craig 12-year-old Single Barrel",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -69,12 +63,9 @@
         "source": ["brand", "text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 16809,
-        "releaseId": null,
         "alias": null,
         "fullName": "Elijah Craig 21-year-old Single Barrel (No. 42)",
-        "bottleFullName": "Elijah Craig 21-year-old Single Barrel (No. 42)",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -91,12 +82,9 @@
         "source": ["brand", "text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 17039,
-        "releaseId": null,
         "alias": null,
         "fullName": "Elijah Craig Single Barrel 20-year-old (Barrel No. 13)",
-        "bottleFullName": "Elijah Craig Single Barrel 20-year-old (Barrel No. 13)",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -113,12 +101,9 @@
         "source": ["brand", "text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44014,
-        "releaseId": null,
         "alias": "Elijah Craig Barrel Proof",
         "fullName": "Elijah Craig Barrel Proof",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -135,12 +120,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44079,
-        "releaseId": null,
         "alias": "Elijah Craig 11-year-old 2 month old Barrel Proof",
         "fullName": "Elijah Craig 11-year-old 2 month old Barrel Proof",
-        "bottleFullName": "Elijah Craig 11-year-old 2 month old Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -157,12 +139,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44079,
-        "releaseId": 316,
+        "bottleId": -316,
         "alias": "Elijah Craig 11-year-old 2 month old Barrel Proof (Batch B524)",
         "fullName": "Elijah Craig 11-year-old 2 month old Barrel Proof - Batch B524 - Cask Strength",
-        "bottleFullName": "Elijah Craig 11-year-old 2 month old Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -179,12 +158,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 262,
+        "bottleId": -262,
         "alias": "Elijah Craig Barrel Proof Kentucky Straight Bourbon - Batch C920 - Cask Strength",
         "fullName": "Elijah Craig Barrel Proof - Batch C920 - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -201,12 +177,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 268,
+        "bottleId": -268,
         "alias": "Elijah Craig Barrel Proof Kentucky Straight Bourbon - Batch B520 - Cask Strength",
         "fullName": "Elijah Craig Barrel Proof - Batch B520 - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -223,12 +196,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 261,
+        "bottleId": -261,
         "alias": "Elijah Craig Barrel Proof Kentucky Straight Bourbon - Batch A120 - Cask Strength",
         "fullName": "Elijah Craig Barrel Proof - Batch A120 - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -245,12 +215,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 157,
+        "bottleId": -157,
         "alias": "Elijah Craig Barrel Proof (Batch C917)",
         "fullName": "Elijah Craig Barrel Proof - Batch C917 - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -267,12 +234,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 264,
+        "bottleId": -264,
         "alias": "Elijah Craig Barrel Proof Kentucky Straight Bourbon - Batch A121 - Cask Strength",
         "fullName": "Elijah Craig Barrel Proof - Batch A121 - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -289,12 +253,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 154,
+        "bottleId": -154,
         "alias": "Elijah Craig Barrel Proof (Batch C923)",
         "fullName": "Elijah Craig Barrel Proof - Batch C923 - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -311,12 +272,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44014,
-        "releaseId": 372,
+        "bottleId": -372,
         "alias": "Elijah Craig Barrel Proof - Batch A124 - 10-year-old - Cask Strength",
         "fullName": "Elijah Craig Barrel Proof - Batch A124 - 10-year-old - Cask Strength",
-        "bottleFullName": "Elijah Craig Barrel Proof",
         "brand": "Elijah Craig",
         "bottler": null,
         "series": null,
@@ -339,12 +297,9 @@
       "when": ["elijah", "craig", "single", "barrel"],
       "results": [
         {
-          "kind": "bottle",
           "bottleId": 16142,
-          "releaseId": null,
           "alias": null,
           "fullName": "Elijah Craig Single Barrel 18-year-old (No. 4040)",
-          "bottleFullName": "Elijah Craig Single Barrel 18-year-old (No. 4040)",
           "brand": "Elijah Craig",
           "bottler": null,
           "series": null,

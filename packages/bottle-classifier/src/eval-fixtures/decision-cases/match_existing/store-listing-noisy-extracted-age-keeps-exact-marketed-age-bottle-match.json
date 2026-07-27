@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Springbank 10 Year Old",
         "brand": "Springbank",
         "bottler": null,
         "series": null,
@@ -51,10 +48,7 @@
       "when": ["springbank", "10"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Springbank 10 Year Old",
           "brand": "Springbank",
           "bottler": null,
           "series": null,
@@ -80,7 +74,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 640,
-    "matchedReleaseId": null,
     "summary": "Treat a noisy differing age extraction conservatively when the matched Bottle explicitly markets 10 years in its name, and keep the exact Springbank 10 Year Old Bottle match."
   }
 }

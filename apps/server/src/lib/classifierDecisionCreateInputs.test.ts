@@ -1,5 +1,8 @@
 import type { ProposedBottle } from "@peated/bottle-classifier/internal/types";
-import { buildClassifierConcreteBottleInput } from "./classifierDecisionCreateInputs";
+import {
+  buildBottleInputFromProposedBottle,
+  buildClassifierConcreteBottleInput,
+} from "./classifierDecisionCreateInputs";
 import { materializeConcreteBottleIdentity } from "./concreteBottleIdentity";
 
 test("materializes a classifier draft into one independently complete Bottle", () => {
@@ -11,6 +14,9 @@ test("materializes a classifier draft into one independently complete Bottle", (
     statedAge: null,
     caskStrength: null,
     singleCask: null,
+    caskType: "ruby_port",
+    caskSize: "barrel",
+    caskFill: "2nd_fill",
     abv: 49.3,
     vintageYear: null,
     releaseYear: 2022,
@@ -19,13 +25,22 @@ test("materializes a classifier draft into one independently complete Bottle", (
     bottler: null,
   };
 
+  const bottleInput = buildBottleInputFromProposedBottle(proposedBottle);
   const concreteInput = buildClassifierConcreteBottleInput(proposedBottle);
 
+  expect(bottleInput).toMatchObject({
+    caskType: "ruby_port",
+    caskSize: "barrel",
+    caskFill: "2nd_fill",
+  });
   expect(concreteInput.stable.name).toBe("A Midwinter Night's Dram");
   expect(concreteInput.exact).toMatchObject({
     edition: "Act 10 Scene 4",
     releaseYear: 2022,
     abv: 49.3,
+    caskType: "ruby_port",
+    caskSize: "barrel",
+    caskFill: "2nd_fill",
   });
   expect(
     materializeConcreteBottleIdentity({
@@ -48,9 +63,9 @@ test("materializes a classifier draft into one independently complete Bottle", (
       },
     }),
   ).toEqual({
-    name: "A Midwinter Night's Dram - Act 10 Scene 4 - 2022 Release - 49.3% ABV",
+    name: "A Midwinter Night's Dram - Act 10 Scene 4 - 2022 Release - 49.3% ABV - Ruby Port Cask - Barrel - 2nd Fill",
     fullName:
-      "High West A Midwinter Night's Dram - Act 10 Scene 4 - 2022 Release - 49.3% ABV",
+      "High West A Midwinter Night's Dram - Act 10 Scene 4 - 2022 Release - 49.3% ABV - Ruby Port Cask - Barrel - 2nd Fill",
     statedAge: null,
   });
 });
@@ -64,6 +79,9 @@ test("keeps a marketed age exact without duplicating its name wording", () => {
     statedAge: 12,
     caskStrength: null,
     singleCask: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,

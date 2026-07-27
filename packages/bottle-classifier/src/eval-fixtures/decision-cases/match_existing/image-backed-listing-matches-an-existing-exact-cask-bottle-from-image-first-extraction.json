@@ -9,10 +9,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "SMWS 41.176 Baristaliscious",
         "brand": "The Scotch Malt Whisky Society",
         "bottler": "The Scotch Malt Whisky Society",
         "series": null,
@@ -37,10 +34,7 @@
       "when": ["41.176"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "SMWS 41.176 Baristaliscious",
           "brand": "The Scotch Malt Whisky Society",
           "bottler": "The Scotch Malt Whisky Society",
           "series": null,

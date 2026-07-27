@@ -134,13 +134,15 @@
         "series": "A Midwinter Night's Dram",
         "distillerIds": [1750],
         "category": "rye"
-      }
-    ],
-    "releases": [
+      },
       {
-        "id": 3,
-        "bottleId": 43397,
+        "id": -3,
+        "name": "A Midwinter Night's Dram",
         "fullName": "High West A Midwinter Night's Dram - Act 10 - 2022 Release - 49.3% ABV",
+        "brandId": 1750,
+        "series": "A Midwinter Night's Dram",
+        "distillerIds": [1750],
+        "category": "rye",
         "edition": "Act 10",
         "abv": 49.3,
         "releaseYear": 2022
@@ -149,13 +151,11 @@
     "aliases": [
       {
         "name": "High West A Midwinter Night's Dram Act 10",
-        "bottleId": 43397,
-        "releaseId": 3
+        "bottleId": -3
       },
       {
         "name": "High West Midwinter Nights Dram Act 10",
-        "bottleId": 43397,
-        "releaseId": 3
+        "bottleId": -3
       }
     ]
   }

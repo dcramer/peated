@@ -271,6 +271,96 @@ describe("price match queue", () => {
     ).toMatchObject({ id: bottle.id });
   });
 
+  test("serializes persisted BottleGroup sibling cask evidence", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const candidate = await fixtures.Bottle({
+      name: "Grouped Cask Candidate",
+      caskType: "bourbon",
+      caskSize: "barrel",
+      caskFill: "1st_fill",
+    });
+    if (candidate.groupId === null) {
+      throw new Error("Expected candidate Bottle to belong to a BottleGroup.");
+    }
+    const sibling = await fixtures.BottleGroupMember({
+      groupId: candidate.groupId,
+      edition: "Sherry Sibling",
+      caskType: "oloroso",
+      caskSize: "butt",
+      caskFill: "2nd_fill",
+    });
+    const price = await fixtures.StorePrice({
+      name: "Grouped Cask Candidate Listing",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        suggestedBottleId: candidate.id,
+        candidateBottles: [
+          {
+            bottleId: candidate.id,
+            fullName: candidate.fullName,
+            caskType: "bourbon",
+            caskSize: "barrel",
+            caskFill: "1st_fill",
+            source: ["current"],
+            familyContext: {
+              siblingBottles: [
+                {
+                  bottleId: sibling.id,
+                  fullName: sibling.fullName,
+                  traitFields: ["edition", "caskType", "caskSize", "caskFill"],
+                  edition: "Sherry Sibling",
+                  caskType: "oloroso",
+                  caskSize: "butt",
+                  caskFill: "2nd_fill",
+                },
+              ],
+            },
+          },
+        ],
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+
+    expect(
+      result.results.find((item) => item.id === proposal.id)?.candidateBottles,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: candidate.id,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
+          familyContext: expect.objectContaining({
+            siblingBottles: [
+              expect.objectContaining({
+                bottleId: sibling.id,
+                caskType: "oloroso",
+                caskSize: "butt",
+                caskFill: "2nd_fill",
+                traitFields: expect.arrayContaining([
+                  "caskType",
+                  "caskSize",
+                  "caskFill",
+                ]),
+              }),
+            ],
+          }),
+        }),
+      ]),
+    );
+  });
+
   test("hydrates the authoritative current Bottle despite stale release evidence", async ({
     fixtures,
   }) => {
@@ -665,9 +755,9 @@ describe("price match queue", () => {
           abv: null,
           vintageYear: null,
           releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
           brand: {
             id: brand.id,
             name: "The Whistler",
@@ -721,6 +811,9 @@ describe("price match queue", () => {
       proposedBottle: {
         name: "Bodega Cask",
         category: "single_malt",
+        caskType: "bourbon",
+        caskSize: "barrel",
+        caskFill: "1st_fill",
         distillers: [
           {
             name: "Boann Distillery",
@@ -1019,11 +1112,11 @@ describe("price match queue", () => {
       status: "approved",
       proposalType: "correction",
       currentBottleId: currentBottle.id,
-      currentReleaseId: proposal.currentReleaseId,
-      currentTargetId: proposal.currentTargetId,
+      currentReleaseId: null,
+      currentTargetId: null,
       suggestedBottleId: currentBottle.id,
-      suggestedReleaseId: proposal.suggestedReleaseId,
-      suggestedTargetId: proposal.suggestedTargetId,
+      suggestedReleaseId: null,
+      suggestedTargetId: null,
       reviewedById: user.id,
     });
     expect(memberDistillerRows).toEqual([
@@ -1816,11 +1909,11 @@ describe("price match queue", () => {
     expect(updatedProposal).toMatchObject({
       status: "approved",
       currentBottleId: bottle.id,
-      currentReleaseId: proposal.currentReleaseId,
-      currentTargetId: proposal.currentTargetId,
+      currentReleaseId: null,
+      currentTargetId: null,
       suggestedBottleId: bottle.id,
-      suggestedReleaseId: proposal.suggestedReleaseId,
-      suggestedTargetId: proposal.suggestedTargetId,
+      suggestedReleaseId: null,
+      suggestedTargetId: null,
       reviewedById: user.id,
     });
     expect(updatedAttempt).toMatchObject({
@@ -1959,11 +2052,11 @@ describe("price match queue", () => {
     });
     expect(updatedProposal).toMatchObject({
       currentBottleId: sourceBottle.id,
-      currentReleaseId: proposal.currentReleaseId,
-      currentTargetId: proposal.currentTargetId,
+      currentReleaseId: null,
+      currentTargetId: null,
       suggestedBottleId: sourceBottle.id,
-      suggestedReleaseId: proposal.suggestedReleaseId,
-      suggestedTargetId: proposal.suggestedTargetId,
+      suggestedReleaseId: null,
+      suggestedTargetId: null,
     });
     expect(updatedAttempt).toMatchObject({
       currentBottleId: sourceBottle.id,
@@ -2417,11 +2510,11 @@ describe("price match queue", () => {
     expect(updatedPrice).toMatchObject(expectedPriceIdentity);
     expect(updatedProposal).toMatchObject({
       currentBottleId: result.id,
-      currentReleaseId: proposal.currentReleaseId,
-      currentTargetId: proposal.currentTargetId,
+      currentReleaseId: null,
+      currentTargetId: null,
       suggestedBottleId: result.id,
-      suggestedReleaseId: proposal.suggestedReleaseId,
-      suggestedTargetId: proposal.suggestedTargetId,
+      suggestedReleaseId: null,
+      suggestedTargetId: null,
     });
     expect(updatedAttempt).toMatchObject({
       currentBottleId: result.id,

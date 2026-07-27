@@ -63,10 +63,7 @@ const lagavulinDistillersEditionParent = buildBottleCandidate({
 
 const lagavulinDistillersEdition2023Release = buildBottleCandidate({
   bottleId: 44006,
-  releaseId: 78,
-  kind: "release",
   fullName: "Lagavulin Distillers Edition 2023 Release",
-  bottleFullName: "Lagavulin Distillers Edition",
   brand: "Lagavulin",
   distillery: ["Lagavulin"],
   category: "single_malt",
@@ -95,26 +92,14 @@ const singleBarrel1792 = buildBottleCandidate({
   source: ["text"],
 });
 
-const marsKomagatakeLimitedEdition2020 = buildBottleCandidate({
-  bottleId: 13160,
-  fullName: "Mars Komagatake Limited Edition",
-  brand: "Mars",
-  distillery: ["Komagatake"],
-  category: "single_malt",
-  releaseYear: 2020,
-  score: 0.91,
-  source: ["text"],
-});
-
-const marsKomagatakeLimitedEdition2019 = buildBottleCandidate({
-  bottleId: 13331,
-  fullName: "Mars Komagatake Limited Edition",
-  brand: "Mars",
-  distillery: ["Komagatake"],
-  category: "single_malt",
-  releaseYear: 2019,
-  score: 0.89,
-  source: ["text"],
+const elijahCraigBarrelProof = buildBottleCandidate({
+  bottleId: 44014,
+  alias: "Elijah Craig Barrel Proof",
+  fullName: "Elijah Craig Barrel Proof",
+  brand: "Elijah Craig",
+  category: "bourbon",
+  score: 0.8935789341710437,
+  source: ["vector"],
 });
 
 const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: Partial<
@@ -213,27 +198,14 @@ const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: Partial<
       },
     ],
   },
-  "mars-komagatake-2022-edition": {
+  "elijah-craig-cask-strength": {
     input: {
-      extractedIdentity: buildExtractedIdentity({
-        brand: "Komagatake",
-        distillery: ["Mars Shinshu Distillery"],
-        category: "single_malt",
-        abv: 50,
-        release_year: 2022,
-      }),
-      initialCandidates: [
-        marsKomagatakeLimitedEdition2020,
-        marsKomagatakeLimitedEdition2019,
-      ],
+      initialCandidates: [elijahCraigBarrelProof],
     },
     searchResponses: [
       {
-        when: ["komagatake"],
-        results: [
-          marsKomagatakeLimitedEdition2020,
-          marsKomagatakeLimitedEdition2019,
-        ],
+        when: ["elijah"],
+        results: [elijahCraigBarrelProof],
       },
     ],
   },

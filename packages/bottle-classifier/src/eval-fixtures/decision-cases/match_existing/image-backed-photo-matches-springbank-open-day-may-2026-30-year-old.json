@@ -100,7 +100,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 44256,
-    "matchedReleaseId": null,
     "expectedTier": "auto",
     "verifyEligible": true,
     "suggestedNextStep": "confirm_match",
@@ -138,7 +137,6 @@
         "statedAge": 30
       }
     ],
-    "releases": [],
     "aliases": [
       {
         "name": "Springbank Open Day",

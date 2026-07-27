@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "SMWS RW6.5 Appley ever after",
         "brand": "The Scotch Malt Whisky Society",
         "bottler": "The Scotch Malt Whisky Society",
         "series": null,
@@ -51,10 +48,7 @@
       "when": ["rw6.5"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "SMWS RW6.5 Appley ever after",
           "brand": "The Scotch Malt Whisky Society",
           "bottler": "The Scotch Malt Whisky Society",
           "series": null,

@@ -1,7 +1,8 @@
 export { mergeBottleCandidateFamilyContext } from "../candidateFamilyContext";
 export {
-  BOTTLE_RELEASE_TRAIT_FIELDS,
+  BOTTLE_EXACT_TRAIT_FIELDS,
   BottleCandidateSchema,
+  BottleCandidateSearchInputSchema,
   BottleClassificationDecisionSchema,
   BottleClassifierAgentDecisionSchema,
   BottleClassifierAgentResponseSchema,
@@ -13,7 +14,6 @@ export {
   BottleSearchEvidenceSchema,
   EntityResolutionSchema,
   ProposedBottleSchema,
-  ProposedReleaseSchema,
   SearchEntitiesArgsSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
@@ -27,6 +27,5 @@ export {
   type BottleSearchEvidence,
   type EntityResolution,
   type ProposedBottle,
-  type ProposedRelease,
   type SearchEntitiesArgs,
 } from "../classifierTypes";

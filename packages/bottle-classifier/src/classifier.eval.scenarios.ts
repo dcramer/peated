@@ -50,17 +50,11 @@ function inferDecisionScenario(
 
   if (testCase.expected.status === "classified") {
     const currentBottleId = testCase.input.reference.currentBottleId ?? null;
-    const currentReleaseId = testCase.input.reference.currentReleaseId ?? null;
 
-    if (
-      testCase.expected.action === "match" &&
-      (currentBottleId !== null || currentReleaseId !== null)
-    ) {
+    if (testCase.expected.action === "match" && currentBottleId !== null) {
       const matchedBottleId = testCase.expected.matchedBottleId ?? null;
-      const matchedReleaseId = testCase.expected.matchedReleaseId ?? null;
 
-      return currentBottleId === matchedBottleId &&
-        currentReleaseId === matchedReleaseId
+      return currentBottleId === matchedBottleId
         ? "match_existing"
         : "corrections";
     }

@@ -38,12 +38,9 @@ function buildCandidate(
   overrides: Partial<AssessmentInput["candidateBottles"][number]> = {},
 ): AssessmentInput["candidateBottles"][number] {
   return {
-    kind: "bottle",
     bottleId: 1,
-    releaseId: null,
     alias: null,
     fullName: "Example Distillery Port Cask 10 Year",
-    bottleFullName: "Example Distillery Port Cask 10 Year",
     brand: "Example Distillery",
     bottler: null,
     series: null,
@@ -87,7 +84,7 @@ describe("priceMatchingAutomation", () => {
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
   });
 
-  test("does not flag a stable age statement as release-specific when the bottle already markets it", () => {
+  test("accepts exact fields carried directly by the suggested Bottle", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",
       modelConfidence: 88,
@@ -97,7 +94,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://example.com/whistler",
       },
       suggestedBottleId: 1,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "The Whistler",
         expression: "How The Years Whistle By",
@@ -114,8 +110,6 @@ describe("priceMatchingAutomation", () => {
           bottleId: 1,
           fullName:
             "The Whistler How The Years Whistle By 10-year-old Single Malt Irish Whiskey",
-          bottleFullName:
-            "The Whistler How The Years Whistle By 10-year-old Single Malt Irish Whiskey",
           brand: "The Whistler",
           distillery: ["The Whistler"],
           category: "single_malt",
@@ -126,9 +120,7 @@ describe("priceMatchingAutomation", () => {
       ],
     });
 
-    expect(assessment.automationBlockers).not.toContain(
-      "listing looks release-specific but the suggested target is only a bottle",
-    );
+    expect(assessment.automationBlockers).toEqual([]);
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
   });
 
@@ -142,7 +134,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://www.reservebar.com/example",
       },
       suggestedBottleId: 25,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "The Macallan",
         expression: "Double Cask",
@@ -158,7 +149,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 25,
           fullName: "The Macallan 12-year-old Double Cask",
-          bottleFullName: "The Macallan 12-year-old Double Cask",
           brand: "The Macallan",
           bottler: "The Macallan",
           distillery: ["The Macallan"],
@@ -177,9 +167,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 25,
-        suggestedReleaseId: null,
         webEvidence: "supportive",
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
@@ -197,7 +185,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://example.com/rare-breed-rye",
       },
       suggestedBottleId: 25,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Wild Turkey",
         expression: "Rare Breed",
@@ -213,8 +200,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 25,
           fullName: "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
-          bottleFullName:
-            "Wild Turkey Rare Breed Barrel-Proof Kentucky Straight Rye",
           brand: "Wild Turkey",
           distillery: ["Wild Turkey"],
           category: "rye",
@@ -232,9 +217,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 25,
-        suggestedReleaseId: null,
         webEvidence: "supportive",
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
@@ -252,7 +235,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://woodencork.com/products/shibui-grain-select-whisky",
       },
       suggestedBottleId: 13025,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Shibui",
         expression: "Grain Select",
@@ -268,7 +250,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 13025,
           fullName: "Shibui Grain Select",
-          bottleFullName: "Shibui Grain Select",
           brand: "Shibui",
           distillery: [],
           category: "spirit",
@@ -285,9 +266,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 13025,
-        suggestedReleaseId: null,
         webEvidence: "supportive",
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
@@ -305,7 +284,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://example.com/table-whiskey",
       },
       suggestedBottleId: 77,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Example Heritage",
         expression: "Table Whiskey",
@@ -346,7 +324,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 77,
           fullName: "Example Heritage Table Whiskey",
-          bottleFullName: "Example Heritage Table Whiskey",
           alias: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
@@ -369,9 +346,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "correction",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 77,
-        suggestedReleaseId: null,
         webEvidence: "supportive",
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
@@ -389,7 +364,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://example.com/table-whiskey",
       },
       suggestedBottleId: 77,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Example Heritage",
         expression: "Table Whiskey",
@@ -430,7 +404,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 77,
           fullName: "Example Heritage Table Whiskey",
-          bottleFullName: "Example Heritage Table Whiskey",
           alias: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
@@ -448,9 +421,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "correction",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 77,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
         plainAgeBottleAutoVerifyEligible: true,
@@ -468,7 +439,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://example.com/table-whiskey",
       },
       suggestedBottleId: 77,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Example Heritage",
         expression: "Table Whiskey",
@@ -504,7 +474,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 77,
           fullName: "Example Heritage Table Whiskey",
-          bottleFullName: "Example Heritage Table Whiskey",
           alias: "Example Heritage Table Whiskey",
           brand: "Example Heritage",
           distillery: [],
@@ -524,9 +493,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "correction",
         currentBottleId: 77,
-        currentReleaseId: null,
         suggestedBottleId: 77,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
@@ -543,7 +510,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://example.com/table-whiskey",
       },
       suggestedBottleId: 77,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Example Heritage",
         expression: "Table Whiskey",
@@ -565,9 +531,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "correction",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 77,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
       }),
@@ -588,7 +552,6 @@ describe("priceMatchingAutomation", () => {
     const target = buildCandidate({
       bottleId: 1760,
       fullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
-      bottleFullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
       brand: "Glenlivet",
       bottler: "Glenlivet",
       distillery: [],
@@ -627,7 +590,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://www.reservebar.com/products/the-glenlivet-caribbean-reserve/GROUPING-1419170.html",
       },
       suggestedBottleId: 1760,
-      suggestedReleaseId: null,
       extractedLabel,
       proposedBottle: null,
       searchEvidence,
@@ -647,9 +609,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 1760,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         webEvidence: "supportive",
         automationBlockers: assessment.automationBlockers,
@@ -662,9 +622,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 25,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
@@ -681,7 +639,6 @@ describe("priceMatchingAutomation", () => {
         url: "https://woodencork.com/products/springbank-aged-25-year-old-750-ml",
       },
       suggestedBottleId: 469,
-      suggestedReleaseId: null,
       extractedLabel: buildExtractedLabel({
         brand: "Springbank",
         expression: null,
@@ -697,7 +654,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 469,
           fullName: "Springbank 25-year-old",
-          bottleFullName: "Springbank 25-year-old",
           brand: "Springbank",
           bottler: "Springbank",
           distillery: [],
@@ -709,7 +665,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 1563,
           fullName: "Springbank 25-year-old Limited Edition",
-          bottleFullName: "Springbank 25-year-old Limited Edition",
           brand: "Springbank",
           bottler: "Springbank",
           distillery: [],
@@ -729,129 +684,13 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 469,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: assessment.automationBlockers,
         plainAgeBottleAutoVerifyEligible:
           assessment.plainAgeBottleAutoVerifyEligible,
       }),
     ).toBe(true);
-  });
-
-  test("keeps release-specific plain-age listings out of plain-age auto-approval", () => {
-    const assessment = getStorePriceMatchAutomationAssessment({
-      action: "match_existing",
-      modelConfidence: 93,
-      price: {
-        bottleId: null,
-        name: "Springbank 25-year-old Limited Edition",
-        url: "https://example.com/springbank-25-limited",
-      },
-      suggestedBottleId: 469,
-      suggestedReleaseId: null,
-      extractedLabel: buildExtractedLabel({
-        brand: "Springbank",
-        expression: null,
-        distillery: ["Springbank"],
-        category: null,
-        stated_age: 25,
-        edition: "Limited Edition",
-        abv: null,
-        cask_type: null,
-      }),
-      proposedBottle: null,
-      searchEvidence: [],
-      candidateBottles: [
-        buildCandidate({
-          bottleId: 469,
-          fullName: "Springbank 25-year-old",
-          bottleFullName: "Springbank 25-year-old",
-          brand: "Springbank",
-          bottler: "Springbank",
-          distillery: [],
-          category: "single_malt",
-          statedAge: 25,
-          abv: null,
-          caskType: null,
-        }),
-      ],
-    });
-
-    expect(assessment.plainAgeBottleAutoVerifyEligible).toBe(false);
-    expect(assessment.automationBlockers).toContain(
-      "listing looks release-specific but the suggested target is only a bottle",
-    );
-    expect(
-      shouldVerifyStorePriceMatch({
-        action: "match_existing",
-        currentBottleId: null,
-        currentReleaseId: null,
-        suggestedBottleId: 469,
-        suggestedReleaseId: null,
-        hasUnresolvedRisks: false,
-        automationBlockers: assessment.automationBlockers,
-        plainAgeBottleAutoVerifyEligible:
-          assessment.plainAgeBottleAutoVerifyEligible,
-      }),
-    ).toBe(false);
-  });
-
-  test("keeps the release-specific blocker when the bottle target does not represent the extracted edition", () => {
-    const assessment = getStorePriceMatchAutomationAssessment({
-      action: "match_existing",
-      modelConfidence: 88,
-      price: {
-        bottleId: 2,
-        name: "Springbank 12-year-old Cask Strength Batch 24",
-        url: "https://example.com/springbank",
-      },
-      suggestedBottleId: 2,
-      suggestedReleaseId: null,
-      extractedLabel: buildExtractedLabel({
-        brand: "Springbank",
-        expression: "12-year-old Cask Strength",
-        distillery: ["Springbank"],
-        category: "single_malt",
-        stated_age: 12,
-        abv: null,
-        cask_type: null,
-        cask_strength: true,
-        edition: "Batch 24",
-      }),
-      proposedBottle: null,
-      searchEvidence: [],
-      candidateBottles: [
-        buildCandidate({
-          bottleId: 2,
-          fullName: "Springbank 12-year-old Cask Strength",
-          bottleFullName: "Springbank 12-year-old Cask Strength",
-          brand: "Springbank",
-          distillery: ["Springbank"],
-          category: "single_malt",
-          statedAge: 12,
-          abv: null,
-          caskType: null,
-          caskStrength: true,
-        }),
-      ],
-    });
-
-    expect(assessment.automationBlockers).toContain(
-      "listing looks release-specific but the suggested target is only a bottle",
-    );
-    expect(
-      shouldVerifyStorePriceMatch({
-        action: "match_existing",
-        currentBottleId: null,
-        currentReleaseId: null,
-        suggestedBottleId: 2,
-        suggestedReleaseId: null,
-        hasUnresolvedRisks: false,
-        automationBlockers: assessment.automationBlockers,
-      }),
-    ).toBe(false);
   });
 
   test("does not treat originating retailer evidence as decisive for auto-create", () => {
@@ -1082,8 +921,6 @@ describe("priceMatchingAutomation", () => {
         buildCandidate({
           bottleId: 16142,
           fullName:
-            "Example Distillery 12-year-old Single Barrel Bourbon Select",
-          bottleFullName:
             "Example Distillery 12-year-old Single Barrel Bourbon Select",
           brand: "Example Distillery",
           distillery: [],
@@ -1463,9 +1300,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 1,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
@@ -1477,9 +1312,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: 1,
-        currentReleaseId: null,
         suggestedBottleId: 1,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
@@ -1491,9 +1324,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 1,
-        suggestedReleaseId: null,
         webEvidence: "supportive",
         hasUnresolvedRisks: false,
         automationBlockers: [],
@@ -1506,9 +1337,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 13437,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
@@ -1520,9 +1349,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 1,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: true,
         automationBlockers: [],
       }),
@@ -1534,28 +1361,12 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         identityScope: "exact_cask",
         suggestedBottleId: 41,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: [],
       }),
     ).toBe(true);
-  });
-
-  test("does not auto-approve unmatched release matches from confidence alone", () => {
-    expect(
-      shouldVerifyStorePriceMatch({
-        action: "match_existing",
-        currentBottleId: null,
-        currentReleaseId: null,
-        suggestedBottleId: 1,
-        suggestedReleaseId: 10,
-        hasUnresolvedRisks: false,
-        automationBlockers: [],
-      }),
-    ).toBe(false);
   });
 
   test("does not auto-approve existing matches with automation blockers", () => {
@@ -1563,9 +1374,7 @@ describe("priceMatchingAutomation", () => {
       shouldVerifyStorePriceMatch({
         action: "match_existing",
         currentBottleId: null,
-        currentReleaseId: null,
         suggestedBottleId: 1,
-        suggestedReleaseId: null,
         hasUnresolvedRisks: false,
         automationBlockers: ["candidate age conflicts with extracted label"],
       }),

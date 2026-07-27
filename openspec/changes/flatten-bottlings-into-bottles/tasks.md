@@ -148,7 +148,7 @@ and map to an explicit removal task.
 - [ ] 7.4 Run focused schema, migration, service, route, serializer, worker,
       classifier, and repair tests.
 - [ ] 7.5 Run server/web typechecks and file-scoped lint/format checks.
-- [ ] 7.6 Run classifier tests and evals in automatic recording/replay mode
+- [x] 7.6 Run classifier tests and evals in automatic recording/replay mode
       only when classifier identity contracts change.
 - [ ] 7.7 Run focused web Vitest and constrained end-to-end coverage.
 - [ ] 7.8 Manually review the full diff for UX, architecture, type safety,

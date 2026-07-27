@@ -2,8 +2,13 @@ import type {
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import {
+  BottleCandidateSchema,
+  BottleExtractedDetailsSchema,
+  type BottleCandidate,
+  type BottleExtractedDetails,
+} from "@peated/bottle-classifier/internal/types";
 import type { WebEvidenceJudgment } from "@peated/bottle-classifier/priceMatchingEvidence";
-import { getReleaseObservationFacts } from "@peated/bottle-classifier/releaseIdentity";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import {
   BottleClassificationError,
@@ -71,13 +76,9 @@ import {
   updateConcreteBottleInTransaction,
   type ConcreteBottleUpdateInput,
 } from "@peated/server/lib/updateConcreteBottle";
-import type {
-  PriceMatchSearchEvidenceSchema,
-  ProposedBottleSchema,
-} from "@peated/server/schemas";
+import type { PriceMatchSearchEvidenceSchema } from "@peated/server/schemas";
 import {
-  ExtractedBottleDetailsSchema,
-  PriceMatchCandidateSchema,
+  ProposedBottleSchema,
   StorePriceBottleRepairDraftSchema,
   StorePriceMatchDecisionSchema,
 } from "@peated/server/schemas";
@@ -86,8 +87,8 @@ import { and, eq, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
 import type { z } from "zod";
 
-type ExtractedBottleDetails = z.infer<typeof ExtractedBottleDetailsSchema>;
-type PriceMatchCandidate = z.infer<typeof PriceMatchCandidateSchema>;
+type ExtractedBottleDetails = BottleExtractedDetails;
+type PriceMatchCandidate = BottleCandidate;
 type SearchEvidence = z.infer<typeof PriceMatchSearchEvidenceSchema>;
 type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
 type StorePriceBottleRepairDraft = z.infer<
@@ -131,45 +132,30 @@ async function getPriceMatchWriteActorForDatabase(
   return storedActor;
 }
 
-function withStoreCaskBottleDefaults(
+function parseClassifierProposedBottle(
+  proposedBottle: NonNullable<BottleClassificationDecision["proposedBottle"]>,
+): ProposedBottle;
+function parseClassifierProposedBottle(
+  proposedBottle: BottleClassificationDecision["proposedBottle"],
+): ProposedBottle | null;
+function parseClassifierProposedBottle(
   proposedBottle: BottleClassificationDecision["proposedBottle"],
 ): ProposedBottle | null {
-  return proposedBottle
-    ? {
-        ...proposedBottle,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
-      }
-    : null;
+  return proposedBottle ? ProposedBottleSchema.parse(proposedBottle) : null;
 }
 
-function withStoreExtractedLabelDefaults(
+function parseClassifierExtractedLabel(
   extractedLabel: ClassifyBottleReferenceInput["extractedIdentity"],
 ): ExtractedBottleDetails | null {
   return extractedLabel
-    ? {
-        ...extractedLabel,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
-      }
+    ? BottleExtractedDetailsSchema.parse(extractedLabel)
     : null;
 }
 
-function withStoreCandidateDefaults(candidate: unknown): PriceMatchCandidate {
-  return PriceMatchCandidateSchema.parse({
-    ...(candidate as Record<string, unknown>),
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
-  });
-}
-
-function withStoreCandidateDefaultsList(
+function parseClassifierCandidates(
   candidates: unknown[],
 ): PriceMatchCandidate[] {
-  return candidates.map(withStoreCandidateDefaults);
+  return candidates.map((candidate) => BottleCandidateSchema.parse(candidate));
 }
 
 function parseStoredExtractedLabel(
@@ -179,7 +165,7 @@ function parseStoredExtractedLabel(
     return null;
   }
 
-  const parsed = ExtractedBottleDetailsSchema.safeParse(
+  const parsed = BottleExtractedDetailsSchema.safeParse(
     proposal.extractedLabel,
   );
   return parsed.success ? parsed.data : null;
@@ -304,7 +290,7 @@ function buildConcreteBottleRepairInput(
 function buildClassifierBottleRepairDraft(
   proposedBottle: BottleClassificationDecision["proposedBottle"],
 ): StorePriceBottleRepairDraft | null {
-  const normalized = withStoreCaskBottleDefaults(proposedBottle);
+  const normalized = parseClassifierProposedBottle(proposedBottle);
   return normalized ? { ...normalized, statedAgeScope: "exact" } : null;
 }
 
@@ -331,11 +317,9 @@ function candidateMatchesRepairDraftIdentity(
 ): boolean {
   const proposedFullName =
     `${proposedBottle.brand.name} ${proposedBottle.name}`.trim();
-  const candidateNames = [
-    candidate.alias,
-    candidate.bottleFullName,
-    candidate.fullName,
-  ].filter((value): value is string => Boolean(value));
+  const candidateNames = [candidate.alias, candidate.fullName].filter(
+    (value): value is string => Boolean(value),
+  );
 
   const brandMatches =
     textsOverlap(candidate.brand, proposedBottle.brand.name) ||
@@ -487,11 +471,8 @@ function maybeBuildExistingBottleRepairDecision({
   }
 
   const currentBottleCandidate =
-    candidates.find(
-      (candidate) =>
-        candidate.bottleId === price.bottleId &&
-        (candidate.releaseId == null || candidate.kind === "bottle"),
-    ) ?? null;
+    candidates.find((candidate) => candidate.bottleId === price.bottleId) ??
+    null;
   if (!currentBottleCandidate) {
     return null;
   }
@@ -499,11 +480,11 @@ function maybeBuildExistingBottleRepairDecision({
   if (
     !candidateMatchesRepairDraftIdentity(
       currentBottleCandidate,
-      withStoreCaskBottleDefaults(decision.proposedBottle)!,
+      parseClassifierProposedBottle(decision.proposedBottle),
     ) ||
     !candidateNeedsExistingBottleRepair(
       currentBottleCandidate,
-      withStoreCaskBottleDefaults(decision.proposedBottle)!,
+      parseClassifierProposedBottle(decision.proposedBottle),
     )
   ) {
     return null;
@@ -520,11 +501,7 @@ function maybeBuildExistingBottleRepairDecision({
     identityScope: decision.identityScope,
     aliasScope: decision.aliasScope ?? "none",
     suggestedBottleId: price.bottleId,
-    suggestedReleaseId: null,
-    parentBottleId: null,
-    creationTarget: null,
     proposedBottle: buildClassifierBottleRepairDraft(decision.proposedBottle),
-    proposedRelease: null,
   };
 }
 
@@ -555,11 +532,7 @@ export function toStorePriceMatchDecision({
       identityScope: decision.identityScope,
       aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: decision.matchedBottleId,
-      suggestedReleaseId: null,
-      parentBottleId: null,
-      creationTarget: null,
       proposedBottle: null,
-      proposedRelease: null,
     };
   }
 
@@ -572,11 +545,7 @@ export function toStorePriceMatchDecision({
       identityScope: decision.identityScope,
       aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: decision.matchedBottleId,
-      suggestedReleaseId: null,
-      parentBottleId: null,
-      creationTarget: null,
       proposedBottle: buildClassifierBottleRepairDraft(decision.proposedBottle),
-      proposedRelease: null,
     };
   }
 
@@ -598,11 +567,7 @@ export function toStorePriceMatchDecision({
       identityScope: decision.identityScope,
       aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: null,
-      creationTarget: "bottle",
-      proposedBottle: withStoreCaskBottleDefaults(decision.proposedBottle),
-      proposedRelease: null,
+      proposedBottle: parseClassifierProposedBottle(decision.proposedBottle),
     };
   }
 
@@ -614,11 +579,7 @@ export function toStorePriceMatchDecision({
     identityScope: decision.identityScope,
     aliasScope: decision.aliasScope ?? "none",
     suggestedBottleId: null,
-    suggestedReleaseId: null,
-    parentBottleId: null,
-    creationTarget: null,
     proposedBottle: null,
-    proposedRelease: null,
   };
 }
 
@@ -688,10 +649,8 @@ function getProposalStatus(
     shouldVerifyStorePriceMatch({
       action: decision.action,
       currentBottleId: price.bottleId,
-      currentReleaseId: null,
       identityScope: decision.identityScope,
       suggestedBottleId: decision.suggestedBottleId,
-      suggestedReleaseId: null,
       hasUnresolvedRisks: decisionEvidence?.hasUnresolvedRisks ?? false,
       webEvidence: decisionEvidence?.webEvidence ?? null,
       automationBlockers: automationAssessment.automationBlockers,
@@ -875,9 +834,7 @@ function shouldAutoCreateStorePriceMatchProposal({
 }) {
   return (
     decision.action === "create_new" &&
-    decision.creationTarget === "bottle" &&
     decision.proposedBottle !== null &&
-    decision.proposedRelease === null &&
     automationAssessment?.automationEligible === true
   );
 }
@@ -948,11 +905,7 @@ async function canContinueStorePriceMatchProcessing(
 function buildStorePriceMatchConcreteInput(
   decision: StorePriceMatchDecision,
 ): ConcreteBottleCreateInput {
-  if (
-    decision.action !== "create_new" ||
-    decision.creationTarget !== "bottle" ||
-    decision.proposedBottle === null
-  ) {
+  if (decision.action !== "create_new" || decision.proposedBottle === null) {
     throw new Error(
       "Price match decision does not contain one concrete Bottle creation input.",
     );
@@ -990,18 +943,12 @@ function getStorePriceBottleRepairDraft(
 function buildStorePriceObservationFacts(
   proposal: Pick<
     StorePriceMatchProposalForReview,
-    "proposalType" | "creationTarget" | "proposedBottle"
+    "proposalType" | "proposedBottle"
   >,
 ) {
-  const releaseFacts = proposal.proposedBottle
-    ? getReleaseObservationFacts(proposal.proposedBottle)
-    : {};
-
   return {
     proposalType: proposal.proposalType,
-    creationTarget: proposal.creationTarget,
     proposedBottle: proposal.proposedBottle ?? null,
-    releaseFacts,
   };
 }
 
@@ -1010,14 +957,10 @@ function assertDirectBottleProposalShape(
     StorePriceMatchProposal,
     "id" | "creationTarget" | "proposedRelease"
   >,
-  { requireCreationTarget = false }: { requireCreationTarget?: boolean } = {},
 ) {
   if (
     proposal.proposedRelease !== null ||
-    (requireCreationTarget
-      ? proposal.creationTarget !== "bottle"
-      : proposal.creationTarget !== null &&
-        proposal.creationTarget !== "bottle")
+    (proposal.creationTarget !== null && proposal.creationTarget !== "bottle")
   ) {
     throw new StorePriceMatchProposalIdentityChangedError(proposal.id);
   }
@@ -1113,10 +1056,6 @@ export async function upsertStorePriceMatchProposal({
           decisionEvidence ?? null,
         )
       : "errored");
-  const creationTarget =
-    parsedDecision?.action === "create_new"
-      ? (parsedDecision.creationTarget ?? null)
-      : null;
   const enteredQueueAt = shouldTrackStorePriceQueueEntry(status)
     ? sql`NOW()`
     : null;
@@ -1126,13 +1065,10 @@ export async function upsertStorePriceMatchProposal({
     confidence: parsedDecision?.confidence ?? null,
     currentBottleId: price.bottleId,
     suggestedBottleId: parsedDecision?.suggestedBottleId ?? null,
-    parentBottleId: parsedDecision?.parentBottleId ?? null,
-    creationTarget,
     aliasScope: parsedDecision?.aliasScope ?? null,
     candidateBottles: candidates,
     extractedLabel,
     proposedBottle: parsedDecision?.proposedBottle ?? null,
-    proposedRelease: parsedDecision?.proposedRelease ?? null,
     searchEvidence: searchEvidence || [],
     automationAssessment: automationAssessment ?? null,
     rationale: parsedDecision?.rationale ?? null,
@@ -1150,10 +1086,20 @@ export async function upsertStorePriceMatchProposal({
     currentTargetId: null,
     suggestedReleaseId: null,
     suggestedTargetId: null,
+    parentBottleId: null,
+    creationTarget: null,
+    proposedRelease: null,
     enteredQueueAt,
   };
   const updateValues = {
     ...proposalRuntimeValues,
+    currentReleaseId: null,
+    currentTargetId: null,
+    suggestedReleaseId: null,
+    suggestedTargetId: null,
+    parentBottleId: null,
+    creationTarget: null,
+    proposedRelease: null,
     enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
   };
   const [proposal] = await tx
@@ -1225,9 +1171,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     tx,
     proposalId,
   );
-  assertDirectBottleProposalShape(preflight, {
-    requireCreationTarget: true,
-  });
+  assertDirectBottleProposalShape(preflight);
 
   const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
     userId: user.id,
@@ -1270,7 +1214,6 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
         decision: createResult ? "create_bottle" : "match_existing",
         createdBottle: !!createResult,
         metadata: {
-          creationTarget: "bottle",
           creationSource,
           reusedExistingBottle: !createResult,
         },
@@ -1399,7 +1342,6 @@ export async function resolveStorePriceMatchProposal(
         url: price.url ?? null,
         imageUrl: price.imageUrl ?? null,
         currentBottleId: price.bottleId ?? null,
-        currentReleaseId: null,
       },
     };
     if (candidateExpansion !== "open") {
@@ -1412,12 +1354,10 @@ export async function resolveStorePriceMatchProposal(
 
     const classification = await classifyBottleReference(classificationInput);
 
-    extractedLabel = withStoreExtractedLabelDefaults(
+    extractedLabel = parseClassifierExtractedLabel(
       classification.artifacts.extractedIdentity,
     );
-    candidates = withStoreCandidateDefaultsList(
-      classification.artifacts.candidates,
-    );
+    candidates = parseClassifierCandidates(classification.artifacts.candidates);
     searchEvidence = classification.artifacts.searchEvidence;
 
     if (isIgnoredBottleClassification(classification)) {
@@ -1466,15 +1406,9 @@ export async function resolveStorePriceMatchProposal(
       modelConfidence: decision.confidence,
       price,
       suggestedBottleId: decision.suggestedBottleId,
-      suggestedReleaseId: null,
       candidateBottles: candidates,
       extractedLabel,
       proposedBottle: decision.proposedBottle,
-      proposedRelease: decision.proposedRelease ?? null,
-      creationTarget:
-        decision.action === "create_new"
-          ? (decision.creationTarget ?? null)
-          : null,
       searchEvidence,
       webEvidenceJudgment:
         classification.decision.confidenceBasis?.webEvidence ?? null,
@@ -1609,11 +1543,11 @@ export async function resolveStorePriceMatchProposal(
       price,
       extractedLabel:
         err instanceof BottleClassificationError
-          ? withStoreExtractedLabelDefaults(err.artifacts.extractedIdentity)
+          ? parseClassifierExtractedLabel(err.artifacts.extractedIdentity)
           : extractedLabel,
       candidates:
         err instanceof BottleClassificationError
-          ? withStoreCandidateDefaultsList(err.artifacts.candidates)
+          ? parseClassifierCandidates(err.artifacts.candidates)
           : candidates,
       searchEvidence:
         err instanceof BottleClassificationError
@@ -1749,7 +1683,11 @@ async function markApprovedStorePriceMatchProposalInTransaction(
     .set({
       status: "approved",
       currentBottleId: bottleId,
+      currentReleaseId: null,
+      currentTargetId: null,
       suggestedBottleId: bottleId,
+      suggestedReleaseId: null,
+      suggestedTargetId: null,
       parentBottleId: null,
       creationTarget: null,
       proposedRelease: null,
@@ -1871,7 +1809,6 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
       rationale: proposal.rationale,
       metadata: {
         proposalType: proposal.proposalType,
-        creationTarget: proposal.creationTarget,
         ...(actor.type === "system" ? { initiatedByUserId: reviewedById } : {}),
         ...decisionLog.metadata,
       },

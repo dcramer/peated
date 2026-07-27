@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Glenglassaugh 1978 Rare Cask Release",
         "brand": "Glenglassaugh",
         "bottler": null,
         "series": null,
@@ -51,7 +48,6 @@
     "action": "no_match",
     "identityScope": "product",
     "matchedBottleId": null,
-    "matchedReleaseId": null,
     "proposedBottle": null,
     "expectedTier": "review",
     "summary": "Reject Bottle creation because web evidence shows Batch 1 refers to cask-specific 35-year-old Bottles while the source lacks the exact cask identity and the only local row conflicts on age."

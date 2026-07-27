@@ -4,6 +4,9 @@ import {
   AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
   CategoryEnum,
 } from "./classifierTypes";
 import {
@@ -120,7 +123,6 @@ export const classifierEvalExpectationSchema = z.object({
   identityScope: z.enum(["product", "exact_cask"]).optional(),
   aliasScope: AliasScopeEnum.optional(),
   matchedBottleId: z.number().int().nullable().optional(),
-  matchedReleaseId: z.number().int().nullable().optional(),
   proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
   proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
   proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
@@ -156,6 +158,21 @@ export const classifierEvalFixtureSchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    const initialCandidateIds = new Set<number>();
+    for (const [
+      candidateIndex,
+      candidate,
+    ] of value.input.initialCandidates?.entries() ?? []) {
+      if (initialCandidateIds.has(candidate.bottleId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate initial candidate Bottle id ${candidate.bottleId}.`,
+          path: ["input", "initialCandidates", candidateIndex, "bottleId"],
+        });
+      }
+      initialCandidateIds.add(candidate.bottleId);
+    }
+
     if (value.localCatalog !== undefined) {
       if (value.input.initialCandidates !== undefined) {
         ctx.addIssue({
@@ -214,13 +231,12 @@ export const classifierEvalFixtureSchema = z
     if (
       value.localCatalog !== undefined &&
       value.input.initialCandidates === undefined &&
-      value.localCatalog.bottles.length === 0 &&
-      value.localCatalog.releases.length === 0
+      value.localCatalog.bottles.length === 0
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "`production_miss` localCatalog fixtures must include at least one local bottle or release row.",
+          "`production_miss` localCatalog fixtures must include at least one local Bottle.",
         path: ["localCatalog"],
       });
     }
@@ -231,6 +247,9 @@ export const bottleNormalizationExactBottleIdentitySchema = z
     edition: z.string().nullable().optional(),
     releaseYear: z.number().int().nullable().optional(),
     vintageYear: z.number().int().nullable().optional(),
+    caskType: CaskTypeEnum.nullable().optional(),
+    caskSize: CaskSizeEnum.nullable().optional(),
+    caskFill: CaskFillEnum.nullable().optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {
@@ -249,6 +268,10 @@ export const bottleNormalizationExpectationSchema = z
       .array(z.enum(["bottle", "exact_cask", "review_required"]))
       .min(1)
       .optional(),
+    action: z
+      .enum(["match", "create_bottle", "repair_bottle", "no_match"])
+      .optional(),
+    matchedBottleId: z.number().int().nullable().optional(),
     exactBottleIdentity:
       bottleNormalizationExactBottleIdentitySchema.nullable(),
     exactBottleIdentities: z
@@ -276,6 +299,14 @@ export const bottleNormalizationExpectationSchema = z
         code: z.ZodIssueCode.custom,
         message:
           "`block_if_uncertain` fixtures must use `review_required` classifier expectation.",
+      });
+    }
+
+    if (value.matchedBottleId !== undefined && value.action !== "match") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "`matchedBottleId` requires `action = match`.",
+        path: ["matchedBottleId"],
       });
     }
   });

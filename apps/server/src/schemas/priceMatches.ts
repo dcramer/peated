@@ -1,3 +1,7 @@
+import {
+  BOTTLE_EXACT_TRAIT_FIELDS,
+  BottleCandidateSchema as CurrentBottleCandidateSchema,
+} from "@peated/bottle-classifier/internal/types";
 import { DEFAULT_BOTTLE_CREATION_TARGET } from "@peated/bottle-classifier/releaseIdentity";
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
@@ -35,7 +39,7 @@ export const ExtractedBottleDetailsSchema = z.object({
 });
 export const BottleReferenceIdentitySchema = ExtractedBottleDetailsSchema;
 
-const BottleReleaseTraitFieldEnum = z.enum([
+const LegacyBottleReleaseTraitFieldEnum = z.enum([
   "edition",
   "statedAge",
   "releaseYear",
@@ -44,12 +48,13 @@ const BottleReleaseTraitFieldEnum = z.enum([
   "singleCask",
   "caskStrength",
 ]);
+const PersistedBottleExactTraitFieldEnum = z.enum(BOTTLE_EXACT_TRAIT_FIELDS);
 
-const PriceMatchCandidateReleaseSiblingSchema = z
+const LegacyPriceMatchCandidateReleaseSiblingSchema = z
   .object({
     releaseId: z.number().int(),
     fullName: z.string(),
-    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
+    traitFields: z.array(LegacyBottleReleaseTraitFieldEnum).default([]),
     edition: z.string().trim().nullable().default(null),
     statedAge: z.number().min(0).max(100).nullable().default(null),
     releaseYear: z
@@ -72,11 +77,11 @@ const PriceMatchCandidateReleaseSiblingSchema = z
   })
   .strict();
 
-const PriceMatchCandidateBottleSiblingSchema = z
+const LegacyPriceMatchCandidateBottleSiblingSchema = z
   .object({
     bottleId: z.number().int(),
     fullName: z.string(),
-    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
+    traitFields: z.array(PersistedBottleExactTraitFieldEnum).default([]),
     statedAge: z.number().min(0).max(100).nullable().default(null),
     edition: z.string().trim().nullable().default(null),
     releaseYear: z
@@ -96,64 +101,79 @@ const PriceMatchCandidateBottleSiblingSchema = z
     abv: z.number().min(0).max(100).nullable().default(null),
     singleCask: z.boolean().nullable().default(null),
     caskStrength: z.boolean().nullable().default(null),
+    caskType: CaskTypeEnum.nullable().default(null),
+    caskSize: CaskSizeEnum.nullable().default(null),
+    caskFill: CaskFillEnum.nullable().default(null),
   })
   .strict();
 
-const PriceMatchCandidateFamilyContextSchema = z
+const LegacyPriceMatchCandidateFamilyContextSchema = z
   .object({
-    parentBottleReleaseTraits: z.array(BottleReleaseTraitFieldEnum).default([]),
+    parentBottleReleaseTraits: z
+      .array(LegacyBottleReleaseTraitFieldEnum)
+      .default([]),
     childReleaseCount: z.number().int().min(0).default(0),
     siblingReleases: z
-      .array(PriceMatchCandidateReleaseSiblingSchema)
+      .array(LegacyPriceMatchCandidateReleaseSiblingSchema)
       .default([]),
-    siblingBottles: z.array(PriceMatchCandidateBottleSiblingSchema).default([]),
+    siblingBottles: z
+      .array(LegacyPriceMatchCandidateBottleSiblingSchema)
+      .default([]),
   })
   .strict();
 
-export const PriceMatchCandidateSchema = z.object({
-  kind: z
-    .enum(["bottle", "release"])
-    .optional()
-    .describe(
-      "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
-    ),
-  bottleId: z.number().int(),
-  releaseId: z.number().int().nullable().optional(),
-  alias: z.string().nullable().default(null),
-  fullName: z.string(),
-  bottleFullName: z.string().nullable().optional(),
-  brand: z.string().nullable().default(null),
-  bottler: z.string().nullable().default(null),
-  series: z.string().nullable().default(null),
-  distillery: z.array(z.string()).default([]),
-  category: CategoryEnum.nullable().default(null),
-  statedAge: z.number().min(0).max(100).nullable().default(null),
-  edition: z.string().trim().nullable().default(null),
-  caskStrength: z.boolean().nullable().default(null),
-  singleCask: z.boolean().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
-  vintageYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(new Date().getFullYear())
-    .nullable()
-    .default(null),
-  releaseYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(new Date().getFullYear())
-    .nullable()
-    .default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
-  score: z.number().nullable().default(null),
-  source: z.array(z.string()).default([]),
-  familyContext: PriceMatchCandidateFamilyContextSchema.nullable().optional(),
-});
-export const BottleCandidateSchema = PriceMatchCandidateSchema;
+const LegacyPriceMatchCandidateSchema = z
+  .object({
+    kind: z
+      .enum(["bottle", "release"])
+      .optional()
+      .describe(
+        "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
+      ),
+    bottleId: z.number().int(),
+    releaseId: z.number().int().nullable().optional(),
+    alias: z.string().nullable().default(null),
+    fullName: z.string(),
+    bottleFullName: z.string().nullable().optional(),
+    brand: z.string().nullable().default(null),
+    bottler: z.string().nullable().default(null),
+    series: z.string().nullable().default(null),
+    distillery: z.array(z.string()).default([]),
+    category: CategoryEnum.nullable().default(null),
+    statedAge: z.number().min(0).max(100).nullable().default(null),
+    edition: z.string().trim().nullable().default(null),
+    caskStrength: z.boolean().nullable().default(null),
+    singleCask: z.boolean().nullable().default(null),
+    abv: z.number().min(0).max(100).nullable().default(null),
+    vintageYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(new Date().getFullYear())
+      .nullable()
+      .default(null),
+    releaseYear: z
+      .number()
+      .int()
+      .gte(1800)
+      .lte(new Date().getFullYear())
+      .nullable()
+      .default(null),
+    caskType: CaskTypeEnum.nullable().default(null),
+    caskSize: CaskSizeEnum.nullable().default(null),
+    caskFill: CaskFillEnum.nullable().default(null),
+    score: z.number().nullable().default(null),
+    source: z.array(z.string()).default([]),
+    familyContext:
+      LegacyPriceMatchCandidateFamilyContextSchema.nullable().optional(),
+  })
+  .strict();
+
+export const PriceMatchCandidateSchema = z.union([
+  CurrentBottleCandidateSchema,
+  LegacyPriceMatchCandidateSchema,
+]);
+export const BottleCandidateSchema = CurrentBottleCandidateSchema;
 
 export const PriceMatchSearchResultSchema = z.object({
   title: z.string(),

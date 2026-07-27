@@ -13,12 +13,6 @@ export function mergeBottleCandidateFamilyContext(
     return existing;
   }
 
-  const siblingReleasesById = new Map(
-    existing.siblingReleases.map((release) => [release.releaseId, release]),
-  );
-  for (const release of candidate.siblingReleases) {
-    siblingReleasesById.set(release.releaseId, release);
-  }
   const siblingBottlesById = new Map(
     existing.siblingBottles.map((bottle) => [bottle.bottleId, bottle]),
   );
@@ -27,17 +21,6 @@ export function mergeBottleCandidateFamilyContext(
   }
 
   return {
-    parentBottleReleaseTraits: Array.from(
-      new Set([
-        ...existing.parentBottleReleaseTraits,
-        ...candidate.parentBottleReleaseTraits,
-      ]),
-    ),
-    childReleaseCount: Math.max(
-      existing.childReleaseCount,
-      candidate.childReleaseCount,
-    ),
-    siblingReleases: Array.from(siblingReleasesById.values()),
     siblingBottles: Array.from(siblingBottlesById.values()),
   };
 }
