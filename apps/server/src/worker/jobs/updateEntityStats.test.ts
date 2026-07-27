@@ -1,24 +1,17 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupDistillers,
-  bottleGroups,
-  bottles,
-  bottlesToDistillers,
+  bottleGroupTombstones,
+  bottleTombstones,
   catalogTargets,
   entities,
+  tastings,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateEntityStats from "./updateEntityStats";
 
 const ownerRoles = ["brand", "bottler", "distiller"] as const;
-const targetKinds = ["exact", "generic"] as const;
 
 type OwnerRole = (typeof ownerRoles)[number];
-type TargetKind = (typeof targetKinds)[number];
-
-const targetOwnerCases = targetKinds.flatMap((targetKind) =>
-  ownerRoles.map((ownerRole) => ({ ownerRole, targetKind })),
-);
 
 function bottleOwnerData(ownerRole: OwnerRole, entityId: number) {
   switch (ownerRole) {
@@ -36,67 +29,6 @@ function requireBottleGroupId(bottle: { groupId: number | null }) {
   return bottle.groupId;
 }
 
-async function replaceNonAuthoritativeOwner({
-  bottle,
-  entityId,
-  ownerRole,
-  targetKind,
-}: {
-  bottle: { id: number; groupId: number };
-  entityId: number;
-  ownerRole: OwnerRole;
-  targetKind: TargetKind;
-}) {
-  if (targetKind === "exact") {
-    switch (ownerRole) {
-      case "brand":
-        await db
-          .update(bottleGroups)
-          .set({ brandId: entityId })
-          .where(eq(bottleGroups.id, bottle.groupId));
-        return;
-      case "bottler":
-        await db
-          .update(bottleGroups)
-          .set({ bottlerId: entityId })
-          .where(eq(bottleGroups.id, bottle.groupId));
-        return;
-      case "distiller":
-        await db
-          .delete(bottleGroupDistillers)
-          .where(eq(bottleGroupDistillers.groupId, bottle.groupId));
-        await db.insert(bottleGroupDistillers).values({
-          groupId: bottle.groupId,
-          distillerId: entityId,
-        });
-        return;
-    }
-  }
-
-  switch (ownerRole) {
-    case "brand":
-      await db
-        .update(bottles)
-        .set({ brandId: entityId })
-        .where(eq(bottles.id, bottle.id));
-      return;
-    case "bottler":
-      await db
-        .update(bottles)
-        .set({ bottlerId: entityId })
-        .where(eq(bottles.id, bottle.id));
-      return;
-    case "distiller":
-      await db
-        .delete(bottlesToDistillers)
-        .where(eq(bottlesToDistillers.bottleId, bottle.id));
-      await db.insert(bottlesToDistillers).values({
-        bottleId: bottle.id,
-        distillerId: entityId,
-      });
-  }
-}
-
 async function getEntity(entityId: number) {
   const [entity] = await db
     .select()
@@ -106,11 +38,18 @@ async function getEntity(entityId: number) {
   return entity;
 }
 
-test("counts only active concrete Bottles", async ({ fixtures }) => {
-  const entity = await fixtures.Entity({ name: "Active Bottle Entity" });
-  await fixtures.Bottle({ name: "Exact Brand", brandId: entity.id });
-  await fixtures.Bottle({ name: "Exact Bottler", bottlerId: entity.id });
-  await fixtures.Bottle({ name: "Exact Distiller", distillerIds: [entity.id] });
+test("counts direct active Bottles and tastings for every Entity association", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Direct Bottle Entity" });
+
+  for (const ownerRole of ownerRoles) {
+    const bottle = await fixtures.Bottle({
+      ...bottleOwnerData(ownerRole, entity.id),
+      name: `Direct ${ownerRole} Bottle`,
+    });
+    await fixtures.Tasting({ bottleId: bottle.id });
+  }
   await fixtures.LegacyBottle({
     name: "Ungrouped Legacy Bottle",
     brandId: entity.id,
@@ -118,92 +57,154 @@ test("counts only active concrete Bottles", async ({ fixtures }) => {
 
   await updateEntityStats({ entityId: entity.id });
 
-  expect((await getEntity(entity.id)).totalBottles).toBe(3);
+  expect(await getEntity(entity.id)).toMatchObject({
+    totalBottles: 3,
+    totalTastings: 3,
+  });
 });
 
-describe.each(targetOwnerCases)(
-  "$targetKind target with $ownerRole ownership",
-  ({ ownerRole, targetKind }) => {
-    test("counts tastings for the authoritative owner", async ({
-      fixtures,
-    }) => {
-      const targetOwner = await fixtures.Entity({
-        name: `${targetKind} ${ownerRole} owner`,
-      });
-      const nonAuthoritativeOwner = await fixtures.Entity({
-        name: `${targetKind} ${ownerRole} non-authoritative owner`,
-      });
-      const retainedPairOwner = await fixtures.Entity({
-        name: `${targetKind} ${ownerRole} retained-pair owner`,
-      });
-      const targetBottle = await fixtures.Bottle(
-        bottleOwnerData(ownerRole, targetOwner.id),
-      );
-      const groupId = requireBottleGroupId(targetBottle);
-      const retainedPairBottle = await fixtures.LegacyBottle({
-        brandId: retainedPairOwner.id,
-      });
-      await replaceNonAuthoritativeOwner({
-        bottle: { id: targetBottle.id, groupId },
-        entityId: nonAuthoritativeOwner.id,
-        ownerRole,
-        targetKind,
-      });
-
-      const target = await db.query.catalogTargets.findFirst({
-        where: (catalogTargets, { and, eq, isNull }) =>
-          targetKind === "exact"
-            ? eq(catalogTargets.bottleId, targetBottle.id)
-            : and(
-                eq(catalogTargets.groupId, groupId),
-                isNull(catalogTargets.bottleId),
-              ),
-      });
-      if (!target) throw new Error(`Missing ${targetKind} target fixture`);
-
-      await fixtures.Tasting({
-        bottleId: retainedPairBottle.id,
-        targetId: target.id,
-      });
-
-      for (const entityId of [
-        targetOwner.id,
-        nonAuthoritativeOwner.id,
-        retainedPairOwner.id,
-      ]) {
-        await updateEntityStats({ entityId });
-      }
-
-      expect((await getEntity(targetOwner.id)).totalTastings).toBe(1);
-      expect((await getEntity(nonAuthoritativeOwner.id)).totalTastings).toBe(0);
-      expect((await getEntity(retainedPairOwner.id)).totalTastings).toBe(0);
-    });
-  },
-);
-
-test("counts each tasting once when an Entity fills every owner role", async ({
+test("counts each tasting once when an Entity fills every Bottle association", async ({
   fixtures,
 }) => {
-  const entity = await fixtures.Entity({ name: "All Target Roles Entity" });
+  const entity = await fixtures.Entity({ name: "All Bottle Roles Entity" });
   const bottle = await fixtures.Bottle({
+    name: "All Bottle Roles Expression",
     brandId: entity.id,
     bottlerId: entity.id,
     distillerIds: [entity.id],
   });
-  const groupId = requireBottleGroupId(bottle);
-  const targets = await db
-    .select()
-    .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, groupId));
-  const exactTarget = targets.find(({ bottleId }) => bottleId === bottle.id);
-  const genericTarget = targets.find(({ bottleId }) => bottleId === null);
-  if (!exactTarget || !genericTarget) throw new Error("Missing target fixture");
-  await fixtures.Tasting({ bottleId: bottle.id, targetId: exactTarget.id });
-  await fixtures.Tasting({ bottleId: bottle.id, targetId: genericTarget.id });
+  await fixtures.Tasting({ bottleId: bottle.id });
 
   await updateEntityStats({ entityId: entity.id });
 
-  expect((await getEntity(entity.id)).totalTastings).toBe(2);
+  expect(await getEntity(entity.id)).toMatchObject({
+    totalBottles: 1,
+    totalTastings: 1,
+  });
+});
+
+test("follows tasting.bottleId and ignores stale CatalogTarget evidence", async ({
+  fixtures,
+}) => {
+  const directOwner = await fixtures.Entity({ name: "Direct Bottle Owner" });
+  const staleTargetOwner = await fixtures.Entity({
+    name: "Stale Target Owner",
+  });
+  const directBottle = await fixtures.Bottle({
+    name: "Direct Identity Expression",
+    brandId: directOwner.id,
+  });
+  const staleTargetBottle = await fixtures.Bottle({
+    name: "Stale Target Expression",
+    brandId: staleTargetOwner.id,
+  });
+  const staleTarget = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, staleTargetBottle.id),
+  });
+  if (!staleTarget) throw new Error("Missing exact CatalogTarget fixture");
+
+  await fixtures.Tasting({
+    bottleId: directBottle.id,
+    targetId: staleTarget.id,
+  });
+
+  await updateEntityStats({ entityId: directOwner.id });
+  await updateEntityStats({ entityId: staleTargetOwner.id });
+
+  expect(await getEntity(directOwner.id)).toMatchObject({
+    totalBottles: 1,
+    totalTastings: 1,
+  });
+  expect(await getEntity(staleTargetOwner.id)).toMatchObject({
+    totalBottles: 1,
+    totalTastings: 0,
+  });
+});
+
+test("ignores unresolved tastings with a null bottleId", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Resolved Bottle Owner" });
+  const bottle = await fixtures.Bottle({
+    name: "Resolved Tasting Expression",
+    brandId: entity.id,
+  });
+  const tasting = await fixtures.Tasting({ bottleId: bottle.id });
+  await db
+    .update(tastings)
+    .set({ bottleId: null })
+    .where(eq(tastings.id, tasting.id));
+
+  await updateEntityStats({ entityId: entity.id });
+
+  expect(await getEntity(entity.id)).toMatchObject({
+    totalBottles: 1,
+    totalTastings: 0,
+  });
+});
+
+test("counts exact Bottles in the same group independently", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Same Group Owner" });
+  const first = await fixtures.Bottle({
+    name: "Same Group Expression",
+    brandId: entity.id,
+  });
+  const second = await fixtures.BottleGroupMember({
+    groupId: requireBottleGroupId(first),
+    edition: "Second Exact Bottle",
+  });
+  await fixtures.Tasting({ bottleId: first.id });
+  await fixtures.Tasting({ bottleId: second.id });
+
+  await updateEntityStats({ entityId: entity.id });
+
+  expect(await getEntity(entity.id)).toMatchObject({
+    totalBottles: 2,
+    totalTastings: 2,
+  });
+});
+
+test("excludes Bottle- and group-tombstoned members and their tastings", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Active Entity" });
+  const activeBottle = await fixtures.Bottle({
+    name: "Active Stats Expression",
+    brandId: entity.id,
+  });
+  const retiredBottle = await fixtures.Bottle({
+    name: "Retired Bottle Expression",
+    brandId: entity.id,
+  });
+  const retiredGroupBottle = await fixtures.Bottle({
+    name: "Retired Group Expression",
+    brandId: entity.id,
+  });
+  const destination = await fixtures.Bottle({
+    name: "Tombstone Destination Expression",
+  });
+  await fixtures.Tasting({ bottleId: activeBottle.id });
+  await fixtures.Tasting({ bottleId: retiredBottle.id });
+  await fixtures.Tasting({ bottleId: retiredGroupBottle.id });
+
+  await db.insert(bottleTombstones).values({
+    bottleId: retiredBottle.id,
+    newBottleId: destination.id,
+  });
+  await db.insert(bottleGroupTombstones).values({
+    groupId: requireBottleGroupId(retiredGroupBottle),
+    newGroupId: requireBottleGroupId(destination),
+    createdByActorId: retiredGroupBottle.createdByActorId,
+  });
+
+  await updateEntityStats({ entityId: entity.id });
+
+  expect(await getEntity(entity.id)).toMatchObject({
+    totalBottles: 1,
+    totalTastings: 1,
+  });
 });
 
 test.each([

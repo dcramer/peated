@@ -4,7 +4,6 @@ import {
   bottles,
   bottlesToDistillers,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { BottleSchema, listResponse } from "@peated/server/schemas";
@@ -25,13 +24,10 @@ import {
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 
-const activeExactTargetJoin = and(
-  eq(catalogTargets.bottleId, bottles.id),
-  eq(catalogTargets.groupId, bottles.groupId),
-);
-const activeExactBottleConditions = and(
+const activeBottleConditions = and(
+  isNotNull(bottles.groupId),
   sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-  sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
+  sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
 );
 
 export default procedure
@@ -60,8 +56,7 @@ export default procedure
     const [source] = await db
       .select({ bottle: bottles })
       .from(bottles)
-      .innerJoin(catalogTargets, activeExactTargetJoin)
-      .where(and(eq(bottles.id, input.bottle), activeExactBottleConditions));
+      .where(and(eq(bottles.id, input.bottle), activeBottleConditions));
 
     if (!source) {
       throw errors.NOT_FOUND({
@@ -74,10 +69,9 @@ export default procedure
       await db
         .select({ bottle: bottles })
         .from(bottles)
-        .innerJoin(catalogTargets, activeExactTargetJoin)
         .where(
           and(
-            activeExactBottleConditions,
+            activeBottleConditions,
             eq(bottles.brandId, bottle.brandId),
             eq(bottles.name, bottle.name),
             ne(bottles.id, bottle.id),
@@ -88,7 +82,7 @@ export default procedure
     ).map((row) => row.bottle);
 
     const where: (SQL<unknown> | undefined)[] = [
-      activeExactBottleConditions,
+      activeBottleConditions,
       eq(bottles.brandId, bottle.brandId),
       notInArray(bottles.id, [bottle.id, ...results.map((r) => r.id)]),
     ];
@@ -117,7 +111,6 @@ export default procedure
         await db
           .select({ bottle: bottles })
           .from(bottles)
-          .innerJoin(catalogTargets, activeExactTargetJoin)
           .where(and(...where))
           .limit(limit - results.length)
           .orderBy(asc(bottles.fullName))

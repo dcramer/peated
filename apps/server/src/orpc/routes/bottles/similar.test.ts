@@ -1,8 +1,10 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottleGroups,
   bottleGroupTombstones,
   bottleTombstones,
+  catalogTargets,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -12,6 +14,20 @@ import { describe, expect, test } from "vitest";
 function requireGroupId(groupId: number | null): number {
   if (groupId === null) throw new Error("Missing BottleGroup fixture");
   return groupId;
+}
+
+async function removeExactTarget(bottleId: number): Promise<void> {
+  const target = await db.query.catalogTargets.findFirst({
+    where: eq(catalogTargets.bottleId, bottleId),
+    columns: { id: true },
+  });
+  if (!target) throw new Error("Missing exact target fixture");
+
+  await db
+    .update(bottleAliases)
+    .set({ targetId: null })
+    .where(eq(bottleAliases.targetId, target.id));
+  await db.delete(catalogTargets).where(eq(catalogTargets.id, target.id));
 }
 
 describe("GET /bottles/:bottle/similar", () => {
@@ -78,39 +94,56 @@ describe("GET /bottles/:bottle/similar", () => {
     expect(results.length).toBe(0);
   });
 
-  test("requires exact targets for the source and results", async ({
+  test("uses direct Bottle identity without exact targets or stale target evidence", async ({
     fixtures,
   }) => {
-    const brand = await fixtures.Entity({ name: "Target Brand" });
-    const distiller = await fixtures.Entity({ name: "Target Distiller" });
+    const brand = await fixtures.Entity({ name: "Direct Brand" });
+    const distiller = await fixtures.Entity({ name: "Direct Distiller" });
     const source = await fixtures.Bottle({
       brandId: brand.id,
       distillerIds: [distiller.id],
-      name: "Targeted Bottle",
+      name: "Direct Bottle",
     });
-    const legacySource = await fixtures.LegacyBottle({
+    const candidate = await fixtures.Bottle({
       brandId: brand.id,
       distillerIds: [distiller.id],
-      name: "Legacy Source",
+      name: source.name,
+      edition: "Targetless Candidate",
     });
     await fixtures.LegacyBottle({
       brandId: brand.id,
       distillerIds: [distiller.id],
-      name: "Legacy Similar Result",
+      name: "Unassigned Similar Bottle",
     });
+    const unrelated = await fixtures.Bottle({
+      brandId: (await fixtures.Entity({ name: "Unrelated Target Brand" })).id,
+      name: "Unrelated Target Bottle",
+    });
+    const unrelatedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, unrelated.id),
+      columns: { id: true },
+    });
+    if (!unrelatedTarget) throw new Error("Missing unrelated target fixture");
 
-    const sourceError = await waitError(
-      routerClient.bottles.similar({ bottle: legacySource.id }),
-    );
+    const sourceTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, source.id),
+      columns: { id: true },
+    });
+    if (!sourceTarget) throw new Error("Missing source target fixture");
+    await db
+      .update(bottleAliases)
+      .set({ targetId: unrelatedTarget.id })
+      .where(eq(bottleAliases.targetId, sourceTarget.id));
+    await db
+      .delete(catalogTargets)
+      .where(eq(catalogTargets.id, sourceTarget.id));
+    await removeExactTarget(candidate.id);
+
     const { results } = await routerClient.bottles.similar({
       bottle: source.id,
     });
 
-    expect(sourceError).toMatchObject({
-      status: 404,
-      message: "Bottle not found.",
-    });
-    expect(results).toHaveLength(0);
+    expect(results.map(({ id }) => id)).toEqual([candidate.id]);
   });
 
   test("excludes Bottle tombstones as sources and results", async ({

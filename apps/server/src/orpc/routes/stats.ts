@@ -3,12 +3,11 @@ import {
   bottleGroupTombstones,
   bottleTombstones,
   bottles,
-  catalogTargets,
   entities,
   tastings,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { and, eq, sql } from "drizzle-orm";
+import { and, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -42,15 +41,9 @@ export default procedure
         totalBottles: sql<string>`COUNT(${bottles.id})`,
       })
       .from(bottles)
-      .innerJoin(
-        catalogTargets,
-        and(
-          eq(catalogTargets.bottleId, bottles.id),
-          eq(catalogTargets.groupId, bottles.groupId),
-        ),
-      )
       .where(
         and(
+          isNotNull(bottles.groupId),
           sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
           sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
         ),

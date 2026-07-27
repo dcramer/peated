@@ -126,7 +126,7 @@ describe("GET /countries/categories", () => {
     expect(totalCount).toBe(3);
   });
 
-  test("counts only active exact Bottles using Bottle-owned identity", async ({
+  test("counts active Bottles directly and ignores legacy target evidence", async ({
     fixtures,
   }) => {
     const country = await fixtures.Country();
@@ -143,8 +143,19 @@ describe("GET /countries/categories", () => {
       category: "bourbon",
       distillerIds: [countryDistiller.id],
     });
-    const genericOnlyBottle = await fixtures.Bottle({
+    if (activeBottle.groupId === null) {
+      throw new Error("Expected grouped Bottle fixture");
+    }
+    const sameGroupBottle = await fixtures.BottleGroupMember({
+      groupId: activeBottle.groupId,
+      edition: "Related Release",
+    });
+    const targetlessBottle = await fixtures.Bottle({
       category: "single_malt",
+      distillerIds: [countryDistiller.id],
+    });
+    const staleEvidenceBottle = await fixtures.Bottle({
+      category: "blend",
       distillerIds: [countryDistiller.id],
     });
     const legacyBottle = await fixtures.LegacyBottle({
@@ -164,7 +175,6 @@ describe("GET /countries/categories", () => {
       distillerIds: [otherDistiller.id],
     });
     if (
-      activeBottle.groupId === null ||
       retiredGroupBottle.groupId === null ||
       destinationBottle.groupId === null
     ) {
@@ -173,10 +183,21 @@ describe("GET /countries/categories", () => {
 
     await db
       .delete(bottleAliases)
-      .where(eq(bottleAliases.bottleId, genericOnlyBottle.id));
+      .where(eq(bottleAliases.bottleId, targetlessBottle.id));
     await db
       .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, genericOnlyBottle.id));
+      .where(eq(catalogTargets.bottleId, targetlessBottle.id));
+    const destinationTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, destinationBottle.id),
+    });
+    if (!destinationTarget) throw new Error("Missing exact target fixture");
+    await db
+      .update(bottleAliases)
+      .set({ targetId: destinationTarget.id })
+      .where(eq(bottleAliases.bottleId, staleEvidenceBottle.id));
+    await db
+      .delete(catalogTargets)
+      .where(eq(catalogTargets.bottleId, staleEvidenceBottle.id));
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,
@@ -203,9 +224,14 @@ describe("GET /countries/categories", () => {
     });
 
     expect(data).toEqual({
-      results: [{ category: "bourbon", count: 1 }],
-      totalCount: 1,
+      results: [
+        { category: "blend", count: 1 },
+        { category: "bourbon", count: 2 },
+        { category: "single_malt", count: 1 },
+      ],
+      totalCount: 4,
     });
+    expect(sameGroupBottle.groupId).toBe(activeBottle.groupId);
     expect(legacyBottle.groupId).toBeNull();
   });
 

@@ -1,11 +1,9 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupDistillers,
-  bottleGroups,
+  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   entities,
   tastings,
 } from "@peated/server/db/schema";
@@ -52,61 +50,38 @@ export default async (input: unknown) => {
             FROM ${bottleTombstones}
             WHERE ${bottleTombstones.bottleId} = ${bottles.id}
           )
-          AND EXISTS (
+          AND ${bottles.groupId} IS NOT NULL
+          AND NOT EXISTS (
             SELECT 1
-            FROM ${catalogTargets}
-            WHERE ${catalogTargets.bottleId} = ${bottles.id}
-            AND ${catalogTargets.groupId} = ${bottles.groupId}
+            FROM ${bottleGroupTombstones}
+            WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId}
           )
         )`,
         totalTastings: sql<string>`(
           SELECT COUNT(*)
           FROM ${tastings}
-          INNER JOIN ${catalogTargets}
-            ON ${catalogTargets.id} = ${tastings.targetId}
+          INNER JOIN ${bottles}
+            ON ${bottles.id} = ${tastings.bottleId}
           WHERE (
-            (
-              ${catalogTargets.bottleId} IS NOT NULL
-              AND EXISTS (
-                SELECT 1
-                FROM ${bottles}
-                WHERE ${bottles.id} = ${catalogTargets.bottleId}
-                AND ${bottles.groupId} = ${catalogTargets.groupId}
-                AND NOT EXISTS (
-                  SELECT 1
-                  FROM ${bottleTombstones}
-                  WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-                )
-                AND (
-                  ${bottles.brandId} = ${entities.id}
-                  OR ${bottles.bottlerId} = ${entities.id}
-                  OR EXISTS (
-                    SELECT 1
-                    FROM ${bottlesToDistillers}
-                    WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                    AND ${bottlesToDistillers.distillerId} = ${entities.id}
-                  )
-                )
-              )
+            ${bottles.brandId} = ${entities.id}
+            OR ${bottles.bottlerId} = ${entities.id}
+            OR EXISTS (
+              SELECT 1
+              FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${bottlesToDistillers.distillerId} = ${entities.id}
             )
-            OR (
-              ${catalogTargets.bottleId} IS NULL
-              AND EXISTS (
-                SELECT 1
-                FROM ${bottleGroups}
-                WHERE ${bottleGroups.id} = ${catalogTargets.groupId}
-                AND (
-                  ${bottleGroups.brandId} = ${entities.id}
-                  OR ${bottleGroups.bottlerId} = ${entities.id}
-                  OR EXISTS (
-                    SELECT 1
-                    FROM ${bottleGroupDistillers}
-                    WHERE ${bottleGroupDistillers.groupId} = ${bottleGroups.id}
-                    AND ${bottleGroupDistillers.distillerId} = ${entities.id}
-                  )
-                )
-              )
-            )
+          )
+          AND NOT EXISTS (
+            SELECT 1
+            FROM ${bottleTombstones}
+            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+          )
+          AND ${bottles.groupId} IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1
+            FROM ${bottleGroupTombstones}
+            WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId}
           )
         )`,
         updatedAt: sql`NOW()`,
