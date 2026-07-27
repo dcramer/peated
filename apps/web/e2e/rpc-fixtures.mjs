@@ -77,10 +77,8 @@ export const createdBottleId = 9302;
 export const existingReleaseId = 9303;
 export const legacyPromotedBottleId = 9305;
 export const legacyIncompleteReleaseId = 9306;
-export const exactReplacementSourceBottleId = 9307;
-export const retiredParentBottleId = 9308;
-export const missingPageTargetBottleId = 9309;
-export const conflictingPageTargetBottleId = 9310;
+export const replacementSourceBottleId = 9307;
+export const missingBottleId = 9309;
 export const exactMergeOtherBottleId = 9311;
 export const exactSearchBottleId = 9312;
 export const createdTastingId = 9401;
@@ -308,11 +306,7 @@ export const legacyPromotedBottle = {
  *   "imageUrl"
  * >} ConcreteFixtureBottle
  */
-/** @typedef {ReturnType<typeof buildBottleRelease>} FixtureBottleRelease */
 /** @typedef {import("@peated/server/schemas").BottleGroupV1} BottleGroupV1 */
-/** @typedef {import("@peated/server/schemas").CatalogTargetV1} CatalogTargetV1 */
-/** @typedef {import("@peated/server/schemas").ExactCatalogTargetV1} ExactCatalogTargetV1 */
-/** @typedef {import("@peated/server/schemas").GenericCatalogTargetV1} GenericCatalogTargetV1 */
 /** @typedef {import("@peated/server/types").CollectionBottle} CollectionBottle */
 
 /**
@@ -360,90 +354,6 @@ function buildBottleGroup({
     createdByActorId: testUser.id,
     createdAt: bottle.createdAt,
     updatedAt: bottle.updatedAt,
-  };
-}
-
-/**
- * @typedef {object} ExactCatalogTargetFixtureOptions
- * @property {FixtureBottle | ConcreteFixtureBottle} [bottle]
- * @property {FixtureBottleRelease | null} [release]
- */
-
-/**
- * @param {ExactCatalogTargetFixtureOptions} [options]
- * @returns {ExactCatalogTargetV1}
- */
-export function buildExactCatalogTarget({
-  bottle = existingBottle,
-  release = null,
-} = {}) {
-  const group = buildBottleGroup({ bottle });
-  const concreteBottleId = release?.id ?? bottle.id;
-  const fullName = release
-    ? `${bottle.fullName} - ${release.edition ?? release.name}${
-        release.releaseYear ? ` (${release.releaseYear})` : ""
-      }`
-    : bottle.fullName;
-
-  return {
-    schemaVersion: 1,
-    kind: "bottle",
-    targetId: (release ? 20_000_000 : 10_000_000) + (release?.id ?? bottle.id),
-    group,
-    bottle: {
-      schemaVersion: 1,
-      id: concreteBottleId,
-      groupId: group.id,
-      fullName,
-      name: release?.name ?? bottle.name,
-      brandId: bottle.brand.id,
-      bottlerId: bottle.bottler?.id ?? null,
-      distillerIds: bottle.distillers.map((distiller) => distiller.id),
-      category: /** @type {ExactCatalogTargetV1["bottle"]["category"]} */ (
-        bottle.category
-      ),
-      seriesId: bottle.series?.id ?? null,
-      flavorProfile: bottle.flavorProfile,
-      edition: release ? release.edition : bottle.edition,
-      statedAge: release ? release.statedAge : bottle.statedAge,
-      abv: release ? release.abv : bottle.abv,
-      singleCask: release ? release.singleCask : bottle.singleCask,
-      caskStrength: release ? release.caskStrength : bottle.caskStrength,
-      vintageYear: release ? release.vintageYear : bottle.vintageYear,
-      releaseYear: release ? release.releaseYear : bottle.releaseYear,
-      caskSize: release ? release.caskSize : bottle.caskSize,
-      caskType: release ? release.caskType : bottle.caskType,
-      caskFill: release ? release.caskFill : bottle.caskFill,
-      description: release ? release.description : bottle.description,
-      descriptionSrc: bottle.descriptionSrc,
-      imageUrl: release ? release.imageUrl : bottle.imageUrl,
-      tastingNotes: release ? release.tastingNotes : bottle.tastingNotes,
-      suggestedTags: release ? release.suggestedTags : bottle.suggestedTags,
-      avgRating: release ? release.avgRating : bottle.avgRating,
-      ratingStats: bottle.ratingStats,
-      totalTastings: release ? release.totalTastings : bottle.totalTastings,
-      createdByActorId: testUser.id,
-      createdAt: release ? release.createdAt : bottle.createdAt,
-      updatedAt: release ? release.updatedAt : bottle.updatedAt,
-    },
-  };
-}
-
-export const genericCollectionTargetLabel = "Lagavulin Core Range";
-export const genericCollectionTargetGroupId = 40_000_002;
-
-/** @returns {GenericCatalogTargetV1} */
-export function buildGenericCatalogTarget() {
-  return {
-    schemaVersion: 1,
-    kind: "group",
-    targetId: 40_000_001,
-    group: buildBottleGroup({
-      id: genericCollectionTargetGroupId,
-      fullName: genericCollectionTargetLabel,
-      name: "Core Range",
-      representativeBottleId: existingBottle.id,
-    }),
   };
 }
 
@@ -530,31 +440,6 @@ export const bottleGroup = {
   totalBottles: 3,
 };
 
-/**
- * Rebinds an independently complete exact Bottle target to the shared group fixture.
- *
- * @param {ConcreteFixtureBottle} bottle
- * @param {number} targetId
- */
-function buildBottleGroupMemberTarget(bottle, targetId) {
-  const target = buildExactCatalogTarget({ bottle });
-  return {
-    ...target,
-    targetId,
-    group: bottleGroup,
-    bottle: {
-      ...target.bottle,
-      groupId: bottleGroup.id,
-    },
-  };
-}
-
-export const bottleGroupMemberTargets = [
-  buildBottleGroupMemberTarget(bottleGroupRepresentative, 50_201),
-  buildBottleGroupMemberTarget(bottleGroupMember, 50_202),
-  buildBottleGroupMemberTarget(bottleGroupThirdMember, 50_203),
-];
-
 /** @type {(ConcreteFixtureBottle & {group: BottleGroupV1})[]} */
 export const bottleGroupMembers = [
   bottleGroupRepresentative,
@@ -573,12 +458,12 @@ export const flightBottleFixture = {
   createdBy: testUser,
   bottles: [
     {
-      bottle: bottleGroupMemberTargets[0].bottle,
+      bottle: bottleGroupMembers[0],
       hasTasted: false,
       isLibrary: false,
     },
     {
-      bottle: bottleGroupMemberTargets[1].bottle,
+      bottle: bottleGroupMembers[1],
       hasTasted: false,
       isLibrary: false,
     },
@@ -600,26 +485,26 @@ export const groupedBottleDetails = {
   group: bottleGroup,
 };
 
-export const priceChangeExactTarget = buildExactCatalogTarget();
-export const priceChangeGenericTarget = buildGenericCatalogTarget();
+export const priceChangeFirstBottle = existingBottle;
+export const priceChangeSecondBottle = exactSearchBottle;
 
 export const priceChangeList = {
   results: [
     {
-      id: priceChangeExactTarget.targetId,
+      id: priceChangeFirstBottle.id,
       price: 7_999,
       previousPrice: 8_999,
       currency: "usd",
-      target: priceChangeExactTarget,
+      bottle: priceChangeFirstBottle,
       isLibrary: true,
       hasTasted: false,
     },
     {
-      id: priceChangeGenericTarget.targetId,
+      id: priceChangeSecondBottle.id,
       price: 6_499,
       previousPrice: 5_999,
       currency: "usd",
-      target: priceChangeGenericTarget,
+      bottle: priceChangeSecondBottle,
       isLibrary: false,
       hasTasted: true,
     },
@@ -639,39 +524,39 @@ export const priceSite = {
   runEvery: 60,
 };
 
-export const exactStorePriceName = "Exact bottle store listing";
-export const genericStorePriceName = "Generic range store listing";
-export const targetlessStorePriceName = "Unresolved store listing";
+export const firstStorePriceName = "First Bottle store listing";
+export const secondStorePriceName = "Second Bottle store listing";
+export const unresolvedStorePriceName = "Unresolved store listing";
 
 export const storePriceList = {
   results: [
     {
       id: 9902,
-      name: exactStorePriceName,
+      name: firstStorePriceName,
       price: 7_999,
       currency: "usd",
-      url: "https://example.com/exact-bottle",
+      url: "https://example.com/first-bottle",
       volume: 750,
       updatedAt: timestamp,
       imageUrl: null,
       isValid: true,
-      target: priceChangeExactTarget,
+      bottle: priceChangeFirstBottle,
     },
     {
       id: 9903,
-      name: genericStorePriceName,
+      name: secondStorePriceName,
       price: 6_499,
       currency: "usd",
-      url: "https://example.com/generic-range",
+      url: "https://example.com/second-bottle",
       volume: 750,
       updatedAt: timestamp,
       imageUrl: null,
       isValid: true,
-      target: priceChangeGenericTarget,
+      bottle: priceChangeSecondBottle,
     },
     {
       id: 9904,
-      name: targetlessStorePriceName,
+      name: unresolvedStorePriceName,
       price: 5_499,
       currency: "usd",
       url: "https://example.com/unresolved",
@@ -679,7 +564,7 @@ export const storePriceList = {
       updatedAt: timestamp,
       imageUrl: null,
       isValid: true,
-      target: null,
+      bottle: null,
     },
   ],
   rel: {

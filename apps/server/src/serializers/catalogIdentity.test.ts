@@ -1,13 +1,8 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupDistillers,
-  bottleGroups,
-  catalogTargets,
-} from "@peated/server/db/schema";
+import { bottleGroupDistillers, bottleGroups } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   BottleGroupV1Schema,
-  CatalogTargetV1Schema,
   ConcreteBottleV1Schema,
 } from "@peated/server/schemas/catalogIdentity";
 import { eq } from "drizzle-orm";
@@ -15,7 +10,6 @@ import { describe, expect, test } from "vitest";
 import { serialize } from ".";
 import {
   BottleGroupSummarySerializer,
-  CatalogTargetSerializer,
   ConcreteBottleSerializer,
   type BottleGroupSummarySerializerItem,
   type CatalogIdentitySerializerContext,
@@ -135,55 +129,6 @@ describe("catalog identity serializers", () => {
       releaseYear: 2024,
       abv: 57.2,
       imageUrl: "http://localhost:4300/bottles/batch-24.jpg",
-    });
-  });
-
-  test("keeps generic and exact target results discriminated", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({
-      name: "Annual Release",
-      edition: "2026 Release",
-    });
-    await db
-      .update(bottleGroups)
-      .set({ totalBottles: 1, representativeBottleId: bottle.id })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
-
-    const group = await loadGroup(bottle.groupId as number);
-    const targets = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.groupId, group.id));
-    const generic = targets.find((target) => target.bottleId === null);
-    const exact = targets.find((target) => target.bottleId === bottle.id);
-    if (!generic || !exact) throw new Error("Missing test CatalogTargets");
-
-    const [genericResult, exactResult] = await serialize(
-      CatalogTargetSerializer,
-      [
-        { ...generic, group, bottle: null },
-        { ...exact, group, bottle: { ...bottle, distillerIds: [] } },
-      ],
-      undefined,
-      [],
-      context(null),
-    );
-
-    expect(CatalogTargetV1Schema.parse(genericResult)).toEqual(genericResult);
-    expect(genericResult).toMatchObject({
-      kind: "group",
-      targetId: generic.id,
-      group: { id: group.id, representativeBottleId: bottle.id },
-    });
-    expect(genericResult).not.toHaveProperty("bottle");
-
-    expect(CatalogTargetV1Schema.parse(exactResult)).toEqual(exactResult);
-    expect(exactResult).toMatchObject({
-      kind: "bottle",
-      targetId: exact.id,
-      group: { id: group.id },
-      bottle: { id: bottle.id, groupId: group.id },
     });
   });
 

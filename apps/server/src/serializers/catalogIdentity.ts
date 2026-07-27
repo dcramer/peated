@@ -7,20 +7,17 @@ import type {
   Actor,
   Bottle,
   BottleGroup,
-  CatalogTarget,
   User,
 } from "@peated/server/db/schema";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   BottleGroupV1Schema,
   CATALOG_IDENTITY_SCHEMA_VERSION,
-  CatalogTargetV1Schema,
   ConcreteBottleV1Schema,
   type BottleGroupV1,
-  type CatalogTargetV1,
   type ConcreteBottleV1,
 } from "@peated/server/schemas/catalogIdentity";
-import { serialize, serializer } from ".";
+import { serializer } from ".";
 
 export type CatalogIdentitySerializerContext = {
   actor: Pick<Actor, "id" | "type"> | null;
@@ -35,11 +32,6 @@ export type BottleGroupSummarySerializerItem = BottleGroup & {
 
 export type ConcreteBottleSerializerItem = Bottle & {
   distillerIds: readonly number[];
-};
-
-export type CatalogTargetSerializerItem = CatalogTarget & {
-  group: BottleGroupSummarySerializerItem;
-  bottle: ConcreteBottleSerializerItem | null;
 };
 
 export function assertCatalogIdentityReadContext(
@@ -139,103 +131,6 @@ export const ConcreteBottleSerializer = serializer({
       createdByActorId: item.createdByActorId,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
-    });
-  },
-});
-
-type CatalogTargetAttrs = {
-  group: BottleGroupV1;
-  bottle: ConcreteBottleV1 | null;
-};
-
-export const CatalogTargetSerializer = serializer({
-  name: "catalogTarget",
-  attrs: async (
-    itemList: CatalogTargetSerializerItem[],
-    _currentUser?: User | null,
-    context?: CatalogIdentitySerializerContext,
-  ): Promise<Record<number, CatalogTargetAttrs>> => {
-    assertCatalogIdentityReadContext(context);
-
-    const groups = await serialize(
-      BottleGroupSummarySerializer,
-      itemList.map((item) => item.group),
-      undefined,
-      [],
-      context,
-    );
-    const exactItems = itemList.filter(
-      (
-        item,
-      ): item is CatalogTargetSerializerItem & {
-        bottle: ConcreteBottleSerializerItem;
-      } => item.bottle !== null,
-    );
-    const bottles = await serialize(
-      ConcreteBottleSerializer,
-      exactItems.map((item) => item.bottle),
-      undefined,
-      [],
-      context,
-    );
-    const groupByTargetId = Object.fromEntries(
-      itemList.map((item, index) => [item.id, groups[index]]),
-    );
-    const bottleByTargetId = Object.fromEntries(
-      exactItems.map((item, index) => [item.id, bottles[index]]),
-    );
-
-    return Object.fromEntries(
-      itemList.map((item) => [
-        item.id,
-        {
-          group: groupByTargetId[item.id],
-          bottle: bottleByTargetId[item.id] ?? null,
-        },
-      ]),
-    );
-  },
-  item: (
-    item: CatalogTargetSerializerItem,
-    attrs: CatalogTargetAttrs,
-    _currentUser?: User | null,
-    context?: CatalogIdentitySerializerContext,
-  ): CatalogTargetV1 => {
-    assertCatalogIdentityReadContext(context);
-
-    if (item.groupId !== item.group.id) {
-      throw new Error(`Catalog target ${item.id} has a mismatched group`);
-    }
-
-    if (item.bottleId === null) {
-      if (item.bottle !== null) {
-        throw new Error(`Generic catalog target ${item.id} hydrated a Bottle`);
-      }
-
-      return CatalogTargetV1Schema.parse({
-        schemaVersion: CATALOG_IDENTITY_SCHEMA_VERSION,
-        kind: "group",
-        targetId: item.id,
-        group: attrs.group,
-      });
-    }
-
-    if (
-      !item.bottle ||
-      item.bottle.id !== item.bottleId ||
-      item.bottle.groupId !== item.groupId
-    ) {
-      throw new Error(
-        `Exact catalog target ${item.id} has a mismatched Bottle`,
-      );
-    }
-
-    return CatalogTargetV1Schema.parse({
-      schemaVersion: CATALOG_IDENTITY_SCHEMA_VERSION,
-      kind: "bottle",
-      targetId: item.id,
-      group: attrs.group,
-      bottle: attrs.bottle,
     });
   },
 });

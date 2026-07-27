@@ -14,19 +14,7 @@ import {
 } from "@peated/server/db/schema";
 import { readExactBottleMergePromotionHistory } from "@peated/server/lib/exactBottleMergePromotionMetadata";
 import { logInfo } from "@peated/server/lib/log";
-import type {
-  BottlePageTarget,
-  CatalogTargetV1,
-} from "@peated/server/schemas/catalogIdentity";
-import { serialize } from "@peated/server/serializers";
-import {
-  assertCatalogIdentityReadContext,
-  CatalogTargetSerializer,
-  type CatalogIdentitySerializerContext,
-  type CatalogTargetSerializerItem,
-} from "@peated/server/serializers/catalogIdentity";
 import { and, asc, eq, inArray, isNull, type SQL } from "drizzle-orm";
-import { ZodError } from "zod";
 
 export type CatalogTargetIdentity =
   | { targetId: number }
@@ -144,9 +132,6 @@ export type CatalogTargetOperationContext = {
   caller: string;
   operation: string;
 };
-
-export type LegacyCatalogTargetResolutionContext =
-  CatalogIdentitySerializerContext & CatalogTargetOperationContext;
 
 export type CatalogTargetAssignmentIntent =
   | { kind: "target"; targetId: number }
@@ -475,58 +460,6 @@ function recordLegacyCatalogTargetUsage(
   });
 }
 
-async function queryHydratedCatalogTarget(
-  database: AnyDatabase,
-  where: SQL<unknown>,
-) {
-  return await database.query.catalogTargets.findFirst({
-    where,
-    with: {
-      group: {
-        with: {
-          distillers: true,
-        },
-      },
-      bottle: {
-        with: {
-          bottlesToDistillers: {
-            columns: { distillerId: true },
-          },
-        },
-      },
-    },
-  });
-}
-
-async function queryHydratedCatalogTargets(
-  database: AnyDatabase,
-  targetIds: number[],
-) {
-  if (!targetIds.length) return [];
-
-  return await database.query.catalogTargets.findMany({
-    where: inArray(catalogTargets.id, targetIds),
-    with: {
-      group: {
-        with: {
-          distillers: true,
-        },
-      },
-      bottle: {
-        with: {
-          bottlesToDistillers: {
-            columns: { distillerId: true },
-          },
-        },
-      },
-    },
-  });
-}
-
-type HydratedCatalogTarget = NonNullable<
-  Awaited<ReturnType<typeof queryHydratedCatalogTarget>>
->;
-
 async function queryCatalogTargetAssignment(
   database: AnyDatabase,
   where: SQL<unknown>,
@@ -710,39 +643,6 @@ async function findTargetByGroupIdUsing<
   return target;
 }
 
-async function findTargetById(
-  targetId: number,
-  database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
-  return await findTargetByIdUsing(
-    targetId,
-    database,
-    queryHydratedCatalogTarget,
-  );
-}
-
-async function findTargetByBottleId(
-  bottleId: number,
-  database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
-  return await findTargetByBottleIdUsing(
-    bottleId,
-    database,
-    queryHydratedCatalogTarget,
-  );
-}
-
-async function findTargetByGroupId(
-  groupId: number,
-  database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
-  return await findTargetByGroupIdUsing(
-    groupId,
-    database,
-    queryHydratedCatalogTarget,
-  );
-}
-
 async function findAssignmentTargetById(
   targetId: number,
   database: AnyDatabase,
@@ -774,51 +674,6 @@ async function findAssignmentTargetByGroupId(
     database,
     queryCatalogTargetAssignment,
   );
-}
-
-function toSerializerItem(
-  target: HydratedCatalogTarget,
-): CatalogTargetSerializerItem {
-  return {
-    ...target,
-    group: {
-      ...target.group,
-      distillerIds: target.group.distillers.map(
-        ({ distillerId }) => distillerId,
-      ),
-    },
-    bottle: target.bottle
-      ? {
-          ...target.bottle,
-          distillerIds: target.bottle.bottlesToDistillers.map(
-            ({ distillerId }) => distillerId,
-          ),
-        }
-      : null,
-  };
-}
-
-async function serializeTarget(
-  target: HydratedCatalogTarget,
-  context: CatalogIdentitySerializerContext,
-): Promise<CatalogTargetV1> {
-  try {
-    return await serialize(
-      CatalogTargetSerializer,
-      toSerializerItem(target),
-      undefined,
-      [],
-      context,
-    );
-  } catch (error) {
-    if (error instanceof ZodError) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { targetId: target.id },
-        error.message,
-      );
-    }
-    throw error;
-  }
 }
 
 /** Validates the durable, contiguous merge chain behind a moved promotion. */
@@ -1016,18 +871,6 @@ async function findLegacyTargetUsing<
   }
 }
 
-async function findLegacyTarget(
-  reference: LegacyCatalogTargetReference,
-  context: CatalogTargetOperationContext,
-  access: LegacyCatalogTargetAccess,
-  database: AnyDatabase,
-): Promise<HydratedCatalogTarget> {
-  return await findLegacyTargetUsing(reference, context, access, database, {
-    byBottleId: findTargetByBottleId,
-    byGroupId: findTargetByGroupId,
-  });
-}
-
 async function findAssignmentLegacyTarget(
   reference: LegacyCatalogTargetReference,
   context: CatalogTargetOperationContext,
@@ -1045,230 +888,6 @@ async function findAssignmentLegacyTarget(
       byGroupId: findAssignmentTargetByGroupId,
     },
     recordUsage,
-  );
-}
-
-/** Load one target by its durable target id without changing generic intent. */
-export async function loadCatalogTarget(
-  targetId: number,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
-): Promise<CatalogTargetV1> {
-  return await serializeTarget(
-    await findTargetById(targetId, database),
-    context,
-  );
-}
-
-export type CatalogTargetBatchResolution =
-  | { ok: true; target: CatalogTargetV1 }
-  | { ok: false; error: unknown };
-
-/** Batch-hydrate targets while retaining each target's own resolution error. */
-export async function loadCatalogTargetBatch(
-  targetIds: number[],
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
-): Promise<Map<number, CatalogTargetBatchResolution>> {
-  assertCatalogIdentityReadContext(context);
-
-  const uniqueTargetIds = [...new Set(targetIds)];
-  const targets = await queryHydratedCatalogTargets(database, uniqueTargetIds);
-  const targetById = new Map(targets.map((target) => [target.id, target]));
-  const groupIds = [...new Set(targets.map((target) => target.groupId))];
-  const bottleIds = [
-    ...new Set(
-      targets.flatMap((target) =>
-        target.bottleId === null ? [] : [target.bottleId],
-      ),
-    ),
-  ];
-  const [groupTombstoneRows, bottleTombstoneRows] = await Promise.all([
-    groupIds.length
-      ? database.query.bottleGroupTombstones.findMany({
-          where: inArray(bottleGroupTombstones.groupId, groupIds),
-        })
-      : [],
-    bottleIds.length
-      ? database.query.bottleTombstones.findMany({
-          where: inArray(bottleTombstones.bottleId, bottleIds),
-        })
-      : [],
-  ]);
-  const groupTombstoneById = new Map(
-    groupTombstoneRows.map((tombstone) => [tombstone.groupId, tombstone]),
-  );
-  const bottleTombstoneById = new Map(
-    bottleTombstoneRows.map((tombstone) => [tombstone.bottleId, tombstone]),
-  );
-
-  const entries: [number, CatalogTargetBatchResolution][] = await Promise.all(
-    uniqueTargetIds.map(async (targetId) => {
-      try {
-        const target = targetById.get(targetId);
-        if (!target) throw new CatalogTargetNotFoundError({ targetId });
-        assertTargetIntegrity(target);
-        assertGroupNotRetired(
-          target.groupId,
-          groupTombstoneById.get(target.groupId),
-        );
-        if (target.bottleId !== null) {
-          assertBottleNotRetired(
-            target.bottleId,
-            bottleTombstoneById.get(target.bottleId),
-          );
-        }
-        return [
-          targetId,
-          { ok: true, target: await serializeTarget(target, context) },
-        ] as [number, CatalogTargetBatchResolution];
-      } catch (error) {
-        return [targetId, { ok: false, error }] as [
-          number,
-          CatalogTargetBatchResolution,
-        ];
-      }
-    }),
-  );
-  return new Map(entries);
-}
-
-/** Load the exact target owned by one concrete Bottle. */
-export async function loadCatalogTargetByBottleId(
-  bottleId: number,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
-): Promise<CatalogTargetV1> {
-  return await serializeTarget(
-    await findTargetByBottleId(bottleId, database),
-    context,
-  );
-}
-
-/** Load the generic target for a BottleGroup without selecting a representative. */
-export async function loadCatalogTargetByGroupId(
-  groupId: number,
-  context: CatalogIdentitySerializerContext,
-  database: AnyDatabase = db,
-): Promise<CatalogTargetV1> {
-  return await serializeTarget(
-    await findTargetByGroupId(groupId, database),
-    context,
-  );
-}
-
-function projectBottlePageTarget(
-  target: Pick<CatalogTargetAssignmentDescriptor, "groupId" | "bottleId">,
-): BottlePageTarget {
-  return target.bottleId === null
-    ? { kind: "group", groupId: target.groupId }
-    : { kind: "bottle", bottleId: target.bottleId };
-}
-
-async function resolveBottlePageReplacement(
-  bottleId: number,
-  replacement: RetiredCatalogTargetReplacement | null,
-  database: AnyDatabase,
-): Promise<BottlePageTarget> {
-  if (!replacement) {
-    throw new CatalogTargetRetiredError({ bottleId }, null);
-  }
-
-  try {
-    const target =
-      replacement.kind === "bottle"
-        ? await findAssignmentTargetByBottleId(replacement.bottleId, database)
-        : await findAssignmentTargetByGroupId(replacement.groupId, database);
-    return projectBottlePageTarget(target);
-  } catch (error) {
-    if (error instanceof CatalogTargetResolutionError) {
-      throw new CatalogTargetIntegrityMismatchError(
-        { bottleId },
-        `the retired Bottle replacement is invalid: ${error.message}`,
-      );
-    }
-    throw error;
-  }
-}
-
-function recordLegacyBottlePageTargetUsage(
-  bottleId: number,
-  target: BottlePageTarget,
-  context: CatalogTargetOperationContext,
-): void {
-  if (target.kind === "group") {
-    recordLegacyCatalogTargetUsage(
-      { bottleId, releaseId: null },
-      context,
-      "read",
-    );
-  }
-}
-
-/** Resolves one Bottle page id without substituting a group representative. */
-export async function resolveBottlePageTarget(
-  bottleId: number,
-  context: CatalogTargetOperationContext,
-  database: AnyDatabase = db,
-): Promise<BottlePageTarget> {
-  try {
-    await findAssignmentTargetByBottleId(bottleId, database);
-    return { kind: "bottle", bottleId };
-  } catch (error) {
-    if (error instanceof CatalogTargetRetiredError) {
-      if (
-        !("bottleId" in error.identity) ||
-        error.identity.bottleId !== bottleId
-      ) {
-        throw error;
-      }
-
-      const target = await resolveBottlePageReplacement(
-        bottleId,
-        error.replacement,
-        database,
-      );
-      recordLegacyBottlePageTargetUsage(bottleId, target, context);
-      return target;
-    }
-    if (!(error instanceof CatalogTargetNotFoundError)) throw error;
-  }
-
-  try {
-    const reference = { bottleId, releaseId: null };
-    const target = await findAssignmentLegacyTarget(
-      reference,
-      context,
-      database,
-      "read",
-      false,
-    );
-    const pageTarget = projectBottlePageTarget(target);
-    recordLegacyBottlePageTargetUsage(bottleId, pageTarget, context);
-    return pageTarget;
-  } catch (error) {
-    if (error instanceof CatalogTargetRetiredError) {
-      const target = await resolveBottlePageReplacement(
-        bottleId,
-        error.replacement,
-        database,
-      );
-      recordLegacyBottlePageTargetUsage(bottleId, target, context);
-      return target;
-    }
-    throw error;
-  }
-}
-
-/** Resolve a measured legacy pair using promotion and parent-cardinality rules. */
-export async function loadCatalogTargetByLegacyReference(
-  reference: LegacyCatalogTargetReference,
-  context: LegacyCatalogTargetResolutionContext,
-  database: AnyDatabase = db,
-): Promise<CatalogTargetV1> {
-  return await serializeTarget(
-    await findLegacyTarget(reference, context, "read", database),
-    context,
   );
 }
 

@@ -18,7 +18,7 @@ import {
   updateConcreteBottle,
 } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 import generateBottleDetails, {
   type GeneratedBottleDetails,
@@ -90,22 +90,12 @@ async function createTwoMemberGroup(user: User, brandId: number) {
       finish: "Sibling finish",
     },
   });
-  const siblingExactTarget = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, siblingBottle.id),
-  });
-  if (!siblingExactTarget) {
-    throw new Error("Missing sibling exact target fixture.");
-  }
-  const sibling = {
-    bottle: siblingBottle,
-    exactTarget: siblingExactTarget,
-  };
   await db
     .update(bottles)
     .set({ suggestedTags: ["sibling-tag"] })
-    .where(eq(bottles.id, sibling.bottle.id));
+    .where(eq(bottles.id, siblingBottle.id));
   vi.mocked(workerClient.pushUniqueJob).mockClear();
-  return { source, sibling };
+  return { source, sibling: { bottle: siblingBottle } };
 }
 
 beforeEach(() => {
@@ -113,13 +103,13 @@ beforeEach(() => {
   vi.mocked(workerClient.pushUniqueJob).mockClear();
 });
 
-test("rejects targetless legacy identity before invoking AI", async ({
+test("rejects an unassigned Bottle before invoking AI", async ({
   fixtures,
 }) => {
   const bottle = await fixtures.LegacyBottle();
 
   await expect(generateBottleDetails({ bottleId: bottle.id })).rejects.toThrow(
-    `Bottle ${bottle.id} does not have an active exact CatalogTarget.`,
+    `Bottle ${bottle.id} does not belong to an active BottleGroup.`,
   );
   expect(getStructuredResponse).not.toHaveBeenCalled();
 });
@@ -150,13 +140,13 @@ test("rejects Bottle and BottleGroup tombstones before invoking AI", async ({
 
   for (const bottleId of [retiredBottle.id, retiredGroupBottle.id]) {
     await expect(generateBottleDetails({ bottleId })).rejects.toThrow(
-      `Bottle ${bottleId} does not have an active exact CatalogTarget.`,
+      `Bottle ${bottleId} does not belong to an active BottleGroup.`,
     );
   }
   expect(getStructuredResponse).not.toHaveBeenCalled();
 });
 
-test("fans out generated shared details and keeps exact content selected-only", async ({
+test("fans out generated details without CatalogTargets and keeps exact content selected-only", async ({
   defaults,
   fixtures,
 }) => {
@@ -167,6 +157,28 @@ test("fans out generated shared details and keeps exact content selected-only", 
     defaults.user,
     brand.id,
   );
+  const targetRows = await db
+    .select({ id: catalogTargets.id })
+    .from(catalogTargets)
+    .where(eq(catalogTargets.groupId, source.group.id));
+  await db
+    .update(bottleAliases)
+    .set({ targetId: null })
+    .where(
+      inArray(
+        bottleAliases.targetId,
+        targetRows.map(({ id }) => id),
+      ),
+    );
+  await db
+    .delete(catalogTargets)
+    .where(eq(catalogTargets.groupId, source.group.id));
+  expect(
+    await db
+      .select({ id: catalogTargets.id })
+      .from(catalogTargets)
+      .where(eq(catalogTargets.groupId, source.group.id)),
+  ).toEqual([]);
   vi.mocked(getStructuredResponse).mockResolvedValue({
     description: "Generated description",
     tastingNotes: {
@@ -492,37 +504,20 @@ test("does not fan out after the selected Bottle moves groups", async ({
   expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 });
 
-test("rolls back generated details when the group target graph is invalid", async ({
+test("rejects invalid shared authority before invoking AI", async ({
   defaults,
   fixtures,
 }) => {
   const brand = await fixtures.Entity({ name: "Generated Rollback Brand" });
-  const smoke = await fixtures.Tag({ name: "smoke" });
-  const { source, sibling } = await createTwoMemberGroup(
-    defaults.user,
-    brand.id,
-  );
+  const { source } = await createTwoMemberGroup(defaults.user, brand.id);
   await db
-    .delete(bottleAliases)
-    .where(eq(bottleAliases.targetId, sibling.exactTarget.id));
-  await db
-    .delete(catalogTargets)
-    .where(eq(catalogTargets.id, sibling.exactTarget.id));
-  vi.mocked(getStructuredResponse).mockResolvedValue({
-    description: "Must roll back",
-    tastingNotes: {
-      nose: "Rollback nose",
-      palate: "Rollback palate",
-      finish: "Rollback finish",
-    },
-    category: "single_malt",
-    suggestedTags: [smoke.name],
-    flavorProfile: "peated",
-  });
+    .update(bottleGroups)
+    .set({ representativeBottleId: null })
+    .where(eq(bottleGroups.id, source.group.id));
 
   await expect(
     generateBottleDetails({ bottleId: source.bottle.id }),
-  ).rejects.toThrow("invalid_catalog_graph");
+  ).rejects.toThrow(`Bottle ${source.bottle.id} has invalid shared authority.`);
 
   expect(
     await db.query.bottles.findFirst({
@@ -553,4 +548,5 @@ test("rolls back generated details when the group target graph is invalid", asyn
       .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update"))),
   ).toEqual([]);
   expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(getStructuredResponse).not.toHaveBeenCalled();
 });

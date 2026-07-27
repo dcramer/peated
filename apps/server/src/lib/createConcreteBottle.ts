@@ -25,7 +25,7 @@ export type { ConcreteBottleCreateResult } from "@peated/server/lib/createBottle
 
 export type CreateConcreteBottleResult = Pick<
   ConcreteBottleCreateResult,
-  "bottle" | "group" | "genericTarget" | "exactTarget"
+  "bottle" | "group"
 >;
 
 /** Parses untrusted input once and owns transaction plus post-commit dispatch. */
@@ -53,7 +53,5 @@ export async function createConcreteBottle({
   return {
     bottle: result.bottle,
     group: result.group,
-    genericTarget: result.genericTarget,
-    exactTarget: result.exactTarget,
   };
 }

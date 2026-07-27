@@ -15,7 +15,6 @@ import type { AnyTransaction } from "@peated/server/db";
 import type {
   Bottle,
   BottleGroup,
-  CatalogTarget,
   Entity,
   NewBottle,
   User,
@@ -36,11 +35,6 @@ import {
 } from "@peated/server/lib/bottleAliases";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
-  lockCatalogTargetAssignmentDescriptorInTransaction,
-  resolveCatalogTargetForAssignment,
-  type CatalogTargetAssignmentDescriptor,
-} from "@peated/server/lib/catalogTargets";
-import {
   getCatalogVerificationCreationMetadata,
   queueBottleCreationVerification,
   queueEntityCreationVerification,
@@ -48,6 +42,7 @@ import {
 import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
+import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
@@ -114,8 +109,6 @@ type StableBottleGroupInput = ConcreteBottleCreateInput["stable"];
 
 export type ConcreteBottleCreateResult = CreateBottleResult & {
   group: BottleGroup;
-  genericTarget: CatalogTarget;
-  exactTarget: CatalogTarget;
 };
 
 /** Resolves entities and materializes the complete Bottle insert. */
@@ -500,12 +493,9 @@ async function createIndependentGroupPrefix(
     );
   }
 
-  const [genericTarget] = await tx
-    .insert(catalogTargets)
-    .values({ groupId: group.id })
-    .returning();
+  await tx.insert(catalogTargets).values({ groupId: group.id });
 
-  return { group, genericTarget };
+  return group;
 }
 
 /** Owns the complete singleton Bottle graph transaction. */
@@ -550,7 +540,7 @@ export async function createConcreteBottleInTransaction(
     context,
   });
 
-  const { group, genericTarget } = await createIndependentGroupPrefix(tx, {
+  const group = await createIndependentGroupPrefix(tx, {
     actorId: createdByActorId,
     stable,
     stableFullName: prepared.stableFullName,
@@ -566,10 +556,9 @@ export async function createConcreteBottleInTransaction(
   const bottleResult = await insertPreparedBottleInTransaction(tx, prepared, {
     groupId: group.id,
   });
-  const [exactTarget] = await tx
+  await tx
     .insert(catalogTargets)
-    .values({ groupId: group.id, bottleId: bottleResult.bottle.id })
-    .returning();
+    .values({ groupId: group.id, bottleId: bottleResult.bottle.id });
 
   const [persistedGroup] = await tx
     .update(bottleGroups)
@@ -580,14 +569,11 @@ export async function createConcreteBottleInTransaction(
   return {
     ...bottleResult,
     group: persistedGroup,
-    genericTarget,
-    exactTarget,
   };
 }
 
 export type ConcreteBottleCreateOrReuseResult = {
   bottle: Bottle;
-  target: CatalogTargetAssignmentDescriptor & { bottleId: number };
   createResult: ConcreteBottleCreateResult | null;
 };
 
@@ -647,27 +633,12 @@ export async function createOrReuseConcreteBottleInTransaction(
     );
     return {
       bottle: createResult.bottle,
-      target: {
-        targetId: createResult.exactTarget.id,
-        groupId: createResult.group.id,
-        bottleId: createResult.bottle.id,
-      },
       createResult,
     };
   } catch (error) {
     if (!(error instanceof BottleAlreadyExistsError)) throw error;
 
-    const existingTarget = await resolveCatalogTargetForAssignment(
-      { kind: "bottle", bottleId: error.bottleId },
-      tx,
-    );
-    if (existingTarget.bottleId === null) throw error;
-
-    await lockCatalogTargetAssignmentDescriptorInTransaction(
-      tx,
-      existingTarget,
-      { composition: "concrete_bottle_mutation" },
-    );
+    await resolveActiveBottleIds(tx, [error.bottleId], { lock: "update" });
 
     const existingBottle = await tx.query.bottles.findFirst({
       where: eq(bottles.id, error.bottleId),
@@ -678,10 +649,6 @@ export async function createOrReuseConcreteBottleInTransaction(
 
     return {
       bottle: existingBottle,
-      target: {
-        ...existingTarget,
-        bottleId: existingTarget.bottleId,
-      },
       createResult: null,
     };
   }

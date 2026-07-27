@@ -2,7 +2,9 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroupDistillers,
+  bottleGroupTombstones,
   bottleGroups,
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   catalogTargets,
@@ -10,7 +12,10 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { buildClassifierConcreteBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
-import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
+import {
+  BottleAlreadyExistsError,
+  createOrReuseConcreteBottleInTransaction,
+} from "@peated/server/lib/createBottle";
 import {
   ConcreteBottleCreateInputSchema,
   createConcreteBottle,
@@ -93,14 +98,7 @@ describe("concrete Bottle creation", () => {
       totalBottles: 1,
       representativeBottleId: result.bottle.id,
     });
-    expect(result.genericTarget).toMatchObject({
-      groupId: result.group.id,
-      bottleId: null,
-    });
-    expect(result.exactTarget).toMatchObject({
-      groupId: result.group.id,
-      bottleId: result.bottle.id,
-    });
+    expect(Object.keys(result).sort()).toEqual(["bottle", "group"]);
 
     const [alias] = await db
       .select()
@@ -489,6 +487,102 @@ describe("concrete Bottle creation", () => {
         attemptedSmwsCode: "35.331",
       }),
     );
+  });
+
+  test("returns only Bottle-native identity when safely reusing a canonical duplicate", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Reuse Result Brand" });
+    const actor = await getUserActor(defaults.user);
+    const input = ConcreteBottleCreateInputSchema.parse({
+      stable: { name: "Reuse Result Expression", brand: brand.id },
+      exact: { edition: "Batch 1" },
+    });
+    const created = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input,
+    });
+
+    const reused = await db.transaction((tx) =>
+      createOrReuseConcreteBottleInTransaction(tx, {
+        creationSource: "bottle_classifier",
+        createdByActorId: actor.id,
+        input,
+        context: contextFor(defaults.user),
+      }),
+    );
+
+    expect(Object.keys(reused).sort()).toEqual(["bottle", "createResult"]);
+    expect(reused).toMatchObject({
+      bottle: { id: created.bottle.id },
+      createResult: null,
+    });
+  });
+
+  test("fails closed instead of reusing retired Bottle identities", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const actor = await getUserActor(defaults.user);
+    const context = contextFor(defaults.user);
+    const replacement = await fixtures.Bottle();
+    const groupReplacement = await fixtures.Bottle();
+    const scenarios = [
+      {
+        reason: "bottle_retired",
+        retire: async (
+          bottle: Awaited<ReturnType<typeof createConcreteBottle>>,
+        ) => {
+          await db.insert(bottleTombstones).values({
+            bottleId: bottle.bottle.id,
+            newBottleId: replacement.id,
+          });
+        },
+      },
+      {
+        reason: "group_retired",
+        retire: async (
+          bottle: Awaited<ReturnType<typeof createConcreteBottle>>,
+        ) => {
+          await db.insert(bottleGroupTombstones).values({
+            groupId: bottle.group.id,
+            newGroupId: groupReplacement.groupId!,
+            createdByActorId: bottle.bottle.createdByActorId,
+          });
+        },
+      },
+    ] as const;
+
+    for (const [index, scenario] of scenarios.entries()) {
+      const brand = await fixtures.Entity({
+        name: `Inactive Reuse Brand ${index}`,
+      });
+      const input = ConcreteBottleCreateInputSchema.parse({
+        stable: {
+          name: `Inactive Reuse Expression ${index}`,
+          brand: brand.id,
+        },
+        exact: {},
+      });
+      const created = await createConcreteBottle({ context, input });
+      await scenario.retire(created);
+
+      await expect(
+        db.transaction((tx) =>
+          createOrReuseConcreteBottleInTransaction(tx, {
+            creationSource: "bottle_classifier",
+            createdByActorId: actor.id,
+            input,
+            context,
+          }),
+        ),
+      ).rejects.toMatchObject({
+        name: "ActiveBottleSelectionError",
+        reason: scenario.reason,
+        bottleId: created.bottle.id,
+      });
+    }
   });
 
   test("rolls back the group, Bottle, aliases, targets, and audit on a literal alias collision", async ({

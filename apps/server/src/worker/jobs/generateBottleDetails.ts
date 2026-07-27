@@ -9,7 +9,6 @@ import {
   bottles,
   bottleSeries,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
@@ -151,19 +150,12 @@ export default async function ({ bottleId }: { bottleId: number }) {
       series: bottleSeries,
     })
     .from(bottles)
-    .innerJoin(
-      catalogTargets,
-      and(
-        eq(catalogTargets.bottleId, bottles.id),
-        eq(catalogTargets.groupId, bottles.groupId),
-      ),
-    )
-    .innerJoin(bottleGroups, eq(bottleGroups.id, catalogTargets.groupId))
+    .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
     .leftJoin(bottleSeries, eq(bottleSeries.id, bottleGroups.seriesId))
     .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
     .leftJoin(
       bottleGroupTombstones,
-      eq(bottleGroupTombstones.groupId, catalogTargets.groupId),
+      eq(bottleGroupTombstones.groupId, bottles.groupId),
     )
     .where(
       and(
@@ -175,11 +167,14 @@ export default async function ({ bottleId }: { bottleId: number }) {
     .limit(1);
   if (!owned) {
     throw new Error(
-      `Bottle ${bottleId} does not have an active exact CatalogTarget.`,
+      `Bottle ${bottleId} does not belong to an active BottleGroup.`,
     );
   }
   const bottle = owned.bottle;
-  if (owned.group.seriesId !== null && !owned.series) {
+  if (
+    owned.group.representativeBottleId === null ||
+    (owned.group.seriesId !== null && !owned.series)
+  ) {
     throw new Error(`Bottle ${bottleId} has invalid shared authority.`);
   }
   const groupDistillers = await db

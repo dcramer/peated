@@ -1,8 +1,4 @@
-import {
-  BottleGroupV1Schema,
-  CatalogTargetV1Schema,
-  ConcreteBottleV1Schema,
-} from "./catalogIdentity";
+import { BottleGroupV1Schema, ConcreteBottleV1Schema } from "./catalogIdentity";
 
 const ratingStats = {
   pass: 0,
@@ -76,46 +72,23 @@ const bottle = ConcreteBottleV1Schema.parse({
 });
 
 describe("catalog identity runtime schemas", () => {
-  test("parses group and exact Bottle targets as distinct results", () => {
-    expect(
-      CatalogTargetV1Schema.parse({
-        schemaVersion: 1,
-        kind: "group",
-        targetId: 10,
-        group,
-      }),
-    ).not.toHaveProperty("bottle");
-    expect(
-      CatalogTargetV1Schema.parse({
-        schemaVersion: 1,
-        kind: "bottle",
-        targetId: 11,
-        group,
-        bottle,
-      }),
-    ).toMatchObject({
-      kind: "bottle",
-      bottle: {
-        id: 3,
-        groupId: 1,
-        brandId: 2,
-        bottlerId: 5,
-        distillerIds: [6, 7],
-        category: "single_malt",
-        seriesId: 8,
-        flavorProfile: "peated",
-      },
+  test("parses BottleGroup and independently complete Bottle results", () => {
+    expect(BottleGroupV1Schema.parse(group)).toEqual(group);
+    expect(ConcreteBottleV1Schema.parse(bottle)).toMatchObject({
+      id: 3,
+      groupId: 1,
+      brandId: 2,
+      bottlerId: 5,
+      distillerIds: [6, 7],
+      category: "single_malt",
+      seriesId: 8,
+      flavorProfile: "peated",
     });
   });
 
-  test("rejects an exact target without a concrete Bottle", () => {
-    expect(() =>
-      CatalogTargetV1Schema.parse({
-        schemaVersion: 1,
-        kind: "bottle",
-        targetId: 11,
-        group,
-      }),
-    ).toThrow();
+  test("rejects a Bottle without its independently owned identity", () => {
+    const { brandId: _, ...incompleteBottle } = bottle;
+
+    expect(() => ConcreteBottleV1Schema.parse(incompleteBottle)).toThrow();
   });
 });

@@ -5,9 +5,12 @@ import {
   listBottleGroupBottles,
 } from "@peated/server/lib/bottleGroupReads";
 import { procedure } from "@peated/server/orpc";
-import { BottleSchema, listResponse } from "@peated/server/schemas";
+import {
+  BottleGroupReplacementDataSchema,
+  BottleSchema,
+  listResponse,
+} from "@peated/server/schemas";
 import { z } from "zod";
-import { serializeBottleGroupRetiredTargetData } from "./retired-target";
 
 export default procedure
   .route({
@@ -48,9 +51,8 @@ export default procedure
         throw errors.CONFLICT({
           message: error.message,
           cause: error,
-          data: serializeBottleGroupRetiredTargetData({
-            kind: "group",
-            groupId: error.newGroupId,
+          data: BottleGroupReplacementDataSchema.parse({
+            replacementGroupId: error.newGroupId,
           }),
         });
       }

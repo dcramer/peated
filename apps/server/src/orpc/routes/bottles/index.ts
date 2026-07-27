@@ -10,7 +10,6 @@ import editContext from "./edit-context";
 import imageUpdate from "./image-update";
 import list from "./list";
 import merge from "./merge";
-import pageTarget from "./page-target";
 import prices from "./prices";
 import similar from "./similar";
 import suggestedTags from "./suggested-tags";
@@ -34,7 +33,6 @@ export default base.tag("bottles").router({
   validation,
   similar,
   tags,
-  pageTarget,
   suggestedTags,
   imageUpdate,
   upsert,

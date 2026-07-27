@@ -88,9 +88,7 @@ describe("GET /bottle-groups/:group/bottles", () => {
     expect(error).toMatchObject({
       status: 409,
       message: `Bottle group is retired (groupId=${source.groupId}).`,
-      data: {
-        replacement: { kind: "group", groupId: destination.groupId },
-      },
+      data: { replacementGroupId: destination.groupId },
     });
   });
 });

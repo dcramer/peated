@@ -1,12 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  bottleGroupDetails: vi.fn(),
   details: vi.fn(),
   getAnonymousServerClient: vi.fn(),
   headers: vi.fn(),
   isORPCNotFoundError: vi.fn(),
-  pageTarget: vi.fn(),
+  notFound: vi.fn(),
   permanentRedirect: vi.fn(),
 }));
 
@@ -19,7 +18,7 @@ vi.mock("next/headers", () => ({
 }));
 
 vi.mock("next/navigation", () => ({
-  notFound: vi.fn(),
+  notFound: mocks.notFound,
   permanentRedirect: mocks.permanentRedirect,
 }));
 
@@ -37,25 +36,21 @@ import { getBottlePage } from "./bottlePage.server";
 
 const redirectSignal = new Error("permanent redirect");
 const typedNotFound = new Error("typed not found");
+const notFoundSignal = new Error("not found");
 
 describe("getBottlePage", () => {
   beforeEach(() => {
     mocks.details.mockReset();
-    mocks.bottleGroupDetails.mockReset();
     mocks.getAnonymousServerClient.mockReset();
     mocks.headers.mockReset();
     mocks.isORPCNotFoundError.mockReset();
-    mocks.pageTarget.mockReset();
+    mocks.notFound.mockReset();
     mocks.permanentRedirect.mockReset();
 
     mocks.getAnonymousServerClient.mockResolvedValue({
       client: {
         bottles: {
           details: mocks.details,
-          pageTarget: mocks.pageTarget,
-        },
-        bottleGroups: {
-          details: mocks.bottleGroupDetails,
         },
       },
     });
@@ -66,15 +61,17 @@ describe("getBottlePage", () => {
     mocks.permanentRedirect.mockImplementation(() => {
       throw redirectSignal;
     });
+    mocks.notFound.mockImplementation(() => {
+      throw notFoundSignal;
+    });
   });
 
-  it("returns an active exact Bottle without resolving a page target", async () => {
+  it("returns an active independently complete Bottle", async () => {
     const bottle = { id: 11, fullName: "Lagavulin 16-year-old" };
     mocks.details.mockResolvedValue(bottle);
 
     await expect(getBottlePage(11)).resolves.toBe(bottle);
 
-    expect(mocks.pageTarget).not.toHaveBeenCalled();
     expect(mocks.permanentRedirect).not.toHaveBeenCalled();
   });
 
@@ -93,46 +90,24 @@ describe("getBottlePage", () => {
     expect(mocks.permanentRedirect).toHaveBeenCalledWith(
       "/bottles/22/tastings?source=legacy&tag=one&tag=two",
     );
-    expect(mocks.pageTarget).not.toHaveBeenCalled();
   });
 
-  it("redirects a retired parent through its generic family route anchor", async () => {
+  it("renders not found when the direct Bottle read returns typed not found", async () => {
     mocks.details.mockRejectedValue(typedNotFound);
-    mocks.pageTarget.mockResolvedValue({ kind: "group", groupId: 33 });
-    mocks.bottleGroupDetails.mockResolvedValue({
-      id: 33,
-      representativeBottleId: 44,
-    });
-    mocks.headers.mockResolvedValue(
-      new Headers({
-        "x-peated-request-path":
-          "/bottles/11/tastings?source=legacy&tag=one&tag=two",
-      }),
-    );
 
-    await expect(getBottlePage(11)).rejects.toBe(redirectSignal);
+    await expect(getBottlePage(11)).rejects.toBe(notFoundSignal);
 
     expect(mocks.isORPCNotFoundError).toHaveBeenCalledWith(typedNotFound);
-    expect(mocks.pageTarget).toHaveBeenCalledOnce();
-    expect(mocks.pageTarget).toHaveBeenCalledWith({ bottle: 11 });
-    expect(mocks.bottleGroupDetails).toHaveBeenCalledWith({ group: 33 });
-    expect(mocks.permanentRedirect).toHaveBeenCalledOnce();
-    expect(mocks.permanentRedirect).toHaveBeenCalledWith(
-      "/bottles/44/releases?source=legacy&tag=one&tag=two",
-    );
+    expect(mocks.notFound).toHaveBeenCalledOnce();
+    expect(mocks.permanentRedirect).not.toHaveBeenCalled();
   });
 
-  it("fails closed when a retired parent's group has no active route anchor", async () => {
-    mocks.details.mockRejectedValue(typedNotFound);
-    mocks.pageTarget.mockResolvedValue({ kind: "group", groupId: 33 });
-    mocks.bottleGroupDetails.mockResolvedValue({
-      id: 33,
-      representativeBottleId: null,
-    });
+  it("preserves non-not-found detail errors", async () => {
+    const error = new Error("upstream failure");
+    mocks.details.mockRejectedValue(error);
 
-    await expect(getBottlePage(11)).rejects.toThrow(
-      "Active release family 33 has no valid representative Bottle",
-    );
+    await expect(getBottlePage(11)).rejects.toBe(error);
+    expect(mocks.notFound).not.toHaveBeenCalled();
     expect(mocks.permanentRedirect).not.toHaveBeenCalled();
   });
 });

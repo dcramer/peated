@@ -1,17 +1,9 @@
-import { BottleGroupRetiredTargetDataSchema } from "./bottleGroups";
+import { BottleGroupReplacementDataSchema } from "./bottleGroups";
 
-describe("BottleGroupRetiredTargetDataSchema", () => {
-  test("preserves null, generic-group, and exact-Bottle replacement identity", () => {
-    const payloads = [
-      { replacement: null },
-      { replacement: { kind: "group", groupId: 12 } },
-      { replacement: { kind: "bottle", bottleId: 34 } },
-    ] as const;
+describe("BottleGroupReplacementDataSchema", () => {
+  test("preserves the replacement BottleGroup id", () => {
+    const payload = { replacementGroupId: 12 };
 
-    expect(
-      payloads.map((payload) =>
-        BottleGroupRetiredTargetDataSchema.parse(payload),
-      ),
-    ).toEqual(payloads);
+    expect(BottleGroupReplacementDataSchema.parse(payload)).toEqual(payload);
   });
 });

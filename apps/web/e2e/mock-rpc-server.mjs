@@ -6,17 +6,14 @@ import {
   bottleGroup,
   bottleGroupId,
   bottleGroupMembers,
-  bottleGroupMemberTargets,
   bottleGroupRepresentative,
   bottleImageBottleId,
   bottleImageUrl,
   buildActivity,
   buildBottle,
   buildCollectionBottle,
-  buildExactCatalogTarget,
   buildFavoriteActivity,
   buildTasting,
-  conflictingPageTargetBottleId,
   createdBottleId,
   createdBottleName,
   createdFlightBottleFixtureId,
@@ -27,7 +24,6 @@ import {
   emptyList,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
-  exactReplacementSourceBottleId,
   exactSearchBottle,
   existingBottle,
   existingBottleId,
@@ -40,11 +36,11 @@ import {
   legacyIncompleteReleaseId,
   legacyPromotedBottle,
   legacyPromotedBottleId,
-  missingPageTargetBottleId,
+  missingBottleId,
   photoTastingNotes,
   priceChangeList,
   priceSite,
-  retiredParentBottleId,
+  replacementSourceBottleId,
   storePriceList,
   suggestedTags,
   tastingNotes,
@@ -331,11 +327,7 @@ async function handleRpcRequest({ request, response, url }) {
 
         appliedQueueProposalTokens.add(token);
         const bottle = buildReleaseOnlyQueueBottle();
-        sendRpcResponse(response, {
-          targetId: buildExactCatalogTarget({ bottle }).targetId,
-          bottle,
-          release: null,
-        });
+        sendRpcResponse(response, bottle);
         return true;
       }
 
@@ -357,11 +349,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       const bottle = buildBottleForId(createdBottleId);
-      sendRpcResponse(response, {
-        targetId: buildExactCatalogTarget({ bottle }).targetId,
-        bottle,
-        release: null,
-      });
+      sendRpcResponse(response, bottle);
       return true;
     }
     case "prices/changeList":
@@ -449,55 +437,16 @@ async function handleRpcRequest({ request, response, url }) {
       });
       return true;
     }
-    case "bottles/pageTarget": {
-      if (input?.bottle === exactReplacementSourceBottleId) {
-        sendRpcResponse(response, {
-          kind: "bottle",
-          bottleId: legacyPromotedBottleId,
-        });
-        return true;
-      }
-
-      if (input?.bottle === retiredParentBottleId) {
-        sendRpcResponse(response, { kind: "group", groupId: bottleGroupId });
-        return true;
-      }
-
-      if (input?.bottle === missingPageTargetBottleId) {
-        sendRpcNotFound(response, "Bottle page target not found.");
-        return true;
-      }
-
-      if (input?.bottle === conflictingPageTargetBottleId) {
-        sendRpcConflict(response, "Bottle page target is ambiguous.");
-        return true;
-      }
-
-      if (typeof input?.bottle !== "number") {
-        sendRpcError(response, "Unexpected Bottle page target payload");
-        return true;
-      }
-
-      sendRpcResponse(response, {
-        kind: "bottle",
-        bottleId: getMockExactTarget(request, input.bottle).bottle.id,
-      });
-      return true;
-    }
     case "bottles/details": {
-      if (
-        input?.bottle === retiredParentBottleId ||
-        input?.bottle === missingPageTargetBottleId ||
-        input?.bottle === conflictingPageTargetBottleId
-      ) {
+      if (input?.bottle === missingBottleId) {
         sendRpcNotFound(response, "Bottle not found.");
         return true;
       }
 
-      if (input?.bottle === exactReplacementSourceBottleId) {
+      if (input?.bottle === replacementSourceBottleId) {
         sendRpcResponse(
           response,
-          withTargetId(withCollectionStatus(request, legacyPromotedBottle)),
+          withCollectionStatus(request, legacyPromotedBottle),
         );
         return true;
       }
@@ -506,10 +455,7 @@ async function handleRpcRequest({ request, response, url }) {
         const bottle = buildCreatedBottle({
           includeExactBottleDetails: isExactBottlePhotoScenario(request),
         });
-        sendRpcResponse(
-          response,
-          withTargetId(withCollectionStatus(request, bottle)),
-        );
+        sendRpcResponse(response, withCollectionStatus(request, bottle));
         return true;
       }
 
@@ -521,26 +467,21 @@ async function handleRpcRequest({ request, response, url }) {
       if (input.bottle === groupedBottleDetails.id) {
         sendRpcResponse(
           response,
-          withTargetId(withCollectionStatus(request, groupedBottleDetails)),
+          withCollectionStatus(request, groupedBottleDetails),
         );
         return true;
       }
 
       sendRpcResponse(
         response,
-        withTargetId(
-          withCollectionStatus(request, getMockBottle(request, input.bottle)),
-        ),
+        withCollectionStatus(request, getMockBottle(request, input.bottle)),
       );
       return true;
     }
     case "bottles/list":
       if (getAccessToken(request).includes("exact-bottle-merge")) {
         sendRpcResponse(response, {
-          results: [
-            withTargetId(existingBottle),
-            withTargetId(exactMergeOtherBottle),
-          ],
+          results: [existingBottle, exactMergeOtherBottle],
           rel: { nextCursor: null, prevCursor: null },
         });
         return true;
@@ -1560,7 +1501,7 @@ function buildBottleAndReleaseProposal() {
       volume: 750,
       updatedAt: "2026-06-07T12:00:00.000Z",
       isValid: true,
-      target: null,
+      bottle: null,
       site: {
         id: 9903,
         name: "Playwright Store",
@@ -1884,33 +1825,13 @@ function getMockBottle(request, bottleId) {
     });
   }
   if (bottleId === groupedBottleDetails.id) return groupedBottleDetails;
-  const groupMember = bottleGroupMemberTargets.find(
-    (target) => target.bottle.id === bottleId,
+  const groupMember = bottleGroupMembers.find(
+    (bottle) => bottle.id === bottleId,
   );
-  if (groupMember) {
-    return { ...groupMember.bottle, group: groupMember.group };
-  }
+  if (groupMember) return groupMember;
   if (bottleId === exactSearchBottle.id) return exactSearchBottle;
   if (bottleId === legacyPromotedBottleId) return legacyPromotedBottle;
   return buildBottleForId(bottleId);
-}
-
-function withTargetId(bottle) {
-  const groupedTarget = bottleGroupMemberTargets.find(
-    (target) => target.bottle.id === bottle.id,
-  );
-  return {
-    ...bottle,
-    targetId:
-      groupedTarget?.targetId ?? buildExactCatalogTarget({ bottle }).targetId,
-  };
-}
-
-function getMockExactTarget(request, bottleId) {
-  return (
-    bottleGroupMemberTargets.find((target) => target.bottle.id === bottleId) ??
-    buildExactCatalogTarget({ bottle: getMockBottle(request, bottleId) })
-  );
 }
 
 function hasBottleInCollection(collection, bottleId) {
