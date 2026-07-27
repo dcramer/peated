@@ -110,9 +110,8 @@ export default procedure
     }
 
     const created = await db.transaction(async (tx) => {
-      let bottleId: number;
       try {
-        [bottleId] = await resolveActiveBottleIds(tx, [input.bottle]);
+        await resolveActiveBottleIds(tx, [input.bottle]);
       } catch (error) {
         if (!(error instanceof ActiveBottleSelectionError)) throw error;
         throw errors.BAD_REQUEST({
@@ -120,6 +119,7 @@ export default procedure
           cause: error,
         });
       }
+      const bottleId = input.bottle;
 
       let flight: Flight | null = null;
       if (input.flight) {
@@ -149,8 +149,6 @@ export default procedure
           .values({
             ...data,
             bottleId,
-            releaseId: null,
-            targetId: null,
             flightId: flight?.id ?? null,
           })
           .returning();

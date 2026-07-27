@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroupTombstones,
+  bottles,
   bottleTombstones,
+  catalogTargets,
   flightBottles,
   flights,
 } from "@peated/server/db/schema";
@@ -155,6 +157,48 @@ describe("PATCH /flights/:flight", () => {
     expect(memberships.map(({ bottleId }) => bottleId).sort()).toEqual(
       [firstBottle.id, addedBottle.id].sort(),
     );
+  });
+
+  test("keeps same-group replacement Bottles distinct and ordered", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const laterBottle = await fixtures.Bottle({
+      name: "Zulu release",
+      fullName: "Zulu release",
+    });
+    if (laterBottle.groupId === null) {
+      throw new Error("Bottle group fixture not found");
+    }
+    const [firstBottle] = await db
+      .insert(bottles)
+      .values({
+        groupId: laterBottle.groupId,
+        brandId: laterBottle.brandId,
+        createdByActorId: laterBottle.createdByActorId,
+        name: "Alpha release",
+        fullName: "Alpha release",
+      })
+      .returning();
+    if (!firstBottle) throw new Error("Same-group Bottle fixture not found");
+    const flight = await fixtures.Flight();
+
+    await routerClient.flights.update(
+      {
+        flight: flight.publicId,
+        bottles: [laterBottle.id, firstBottle.id],
+      },
+      { context: { user } },
+    );
+
+    const details = await routerClient.flights.details(
+      { flight: flight.publicId },
+      { context: { user } },
+    );
+    expect(details.bottles.map(({ bottle }) => bottle.id)).toEqual([
+      firstBottle.id,
+      laterBottle.id,
+    ]);
   });
 
   test("deduplicates the replacement Bottle set", async ({ fixtures }) => {
@@ -330,6 +374,88 @@ describe("PATCH /flights/:flight", () => {
       expect.objectContaining({
         flightId: flight.id,
         bottleId: retainedBottle.id,
+      }),
+    ]);
+  });
+
+  test("retired Bottle replacement rolls back metadata and memberships", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const retainedBottle = await fixtures.Bottle();
+    const retiredBottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const flight = await fixtures.Flight({ bottles: [retainedBottle.id] });
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredBottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const error = await waitError(() =>
+      routerClient.flights.update(
+        {
+          flight: flight.publicId,
+          name: "Should not persist",
+          bottles: [retiredBottle.id],
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      code: "BAD_REQUEST",
+      message:
+        "One or more Bottles are missing or not ready for Flight activity.",
+    });
+    await expect(
+      db.query.flights.findFirst({ where: eq(flights.id, flight.id) }),
+    ).resolves.toMatchObject({ name: flight.name });
+    await expect(
+      db.query.flightBottles.findMany({
+        where: eq(flightBottles.flightId, flight.id),
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        flightId: flight.id,
+        bottleId: retainedBottle.id,
+      }),
+    ]);
+  });
+
+  test("ignores stale target evidence when replacing memberships", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle();
+    const unrelatedBottle = await fixtures.Bottle();
+    const flight = await fixtures.Flight({ bottles: [bottle.id] });
+    const staleTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
+    });
+    if (!staleTarget) throw new Error("Legacy target fixture not found");
+    await db
+      .update(flightBottles)
+      .set({ targetId: staleTarget.id })
+      .where(eq(flightBottles.flightId, flight.id));
+
+    await routerClient.flights.update(
+      {
+        flight: flight.publicId,
+        bottles: [bottle.id],
+      },
+      { context: { user } },
+    );
+
+    await expect(
+      db.query.flightBottles.findMany({
+        where: eq(flightBottles.flightId, flight.id),
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        flightId: flight.id,
+        bottleId: bottle.id,
+        releaseId: null,
+        targetId: null,
       }),
     ]);
   });

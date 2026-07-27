@@ -75,6 +75,8 @@ describe("POST /flights", () => {
       .select({
         flightId: flightBottles.flightId,
         bottleId: flightBottles.bottleId,
+        releaseId: flightBottles.releaseId,
+        targetId: flightBottles.targetId,
       })
       .from(flightBottles)
       .where(eq(flightBottles.flightId, flight.id));
@@ -85,33 +87,48 @@ describe("POST /flights", () => {
         (left, right) => (left.bottleId ?? 0) - (right.bottleId ?? 0),
       ),
     ).toEqual([
-      { flightId: flight.id, bottleId: firstBottle.id },
-      { flightId: flight.id, bottleId: secondBottle.id },
+      {
+        flightId: flight.id,
+        bottleId: firstBottle.id,
+        releaseId: null,
+        targetId: null,
+      },
+      {
+        flightId: flight.id,
+        bottleId: secondBottle.id,
+        releaseId: null,
+        targetId: null,
+      },
     ]);
   });
 
-  test("keeps distinct Bottles from the same group", async ({ fixtures }) => {
+  test("keeps same-group Bottles distinct and deterministically ordered", async ({
+    fixtures,
+  }) => {
     const user = await fixtures.User();
-    const firstBottle = await fixtures.Bottle();
-    if (firstBottle.groupId === null) {
+    const laterBottle = await fixtures.Bottle({
+      name: "Zulu release",
+      fullName: "Zulu release",
+    });
+    if (laterBottle.groupId === null) {
       throw new Error("Bottle group fixture not found");
     }
-    const [secondBottle] = await db
+    const [firstBottle] = await db
       .insert(bottles)
       .values({
-        groupId: firstBottle.groupId,
-        brandId: firstBottle.brandId,
-        createdByActorId: firstBottle.createdByActorId,
-        name: "Second batch",
-        fullName: `${firstBottle.fullName} Second batch`,
+        groupId: laterBottle.groupId,
+        brandId: laterBottle.brandId,
+        createdByActorId: laterBottle.createdByActorId,
+        name: "Alpha release",
+        fullName: "Alpha release",
       })
       .returning();
-    if (!secondBottle) throw new Error("Second Bottle fixture not found");
+    if (!firstBottle) throw new Error("Same-group Bottle fixture not found");
 
     const data = await routerClient.flights.create(
       {
         name: "Same group flight",
-        bottles: [firstBottle.id, secondBottle.id],
+        bottles: [laterBottle.id, firstBottle.id],
       },
       { context: { user } },
     );
@@ -126,8 +143,17 @@ describe("POST /flights", () => {
       .where(eq(flightBottles.flightId, flight.id));
 
     expect(memberships.map(({ bottleId }) => bottleId).sort()).toEqual(
-      [firstBottle.id, secondBottle.id].sort(),
+      [firstBottle.id, laterBottle.id].sort(),
     );
+
+    const details = await routerClient.flights.details(
+      { flight: data.id },
+      { context: { user } },
+    );
+    expect(details.bottles.map(({ bottle }) => bottle.id)).toEqual([
+      firstBottle.id,
+      laterBottle.id,
+    ]);
   });
 
   test("deduplicates repeated Bottle ids", async ({ fixtures }) => {

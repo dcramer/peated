@@ -49,7 +49,6 @@ export default procedure
             bottleIds.map((bottleId) => ({
               flightId: flight.id,
               bottleId,
-              releaseId: null,
             })),
           );
         }

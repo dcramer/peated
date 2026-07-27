@@ -1,8 +1,10 @@
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottleGroupTombstones,
   bottleTags,
   bottleTombstones,
+  catalogTargets,
   tastings,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -56,17 +58,14 @@ describe("POST /tastings", () => {
         where: eq(tastings.id, result.tasting.id),
         columns: {
           bottleId: true,
-          releaseId: true,
-          targetId: true,
           rating: true,
         },
       }),
     ).toEqual({
       bottleId: bottle.id,
-      releaseId: null,
-      targetId: null,
       rating: 1,
     });
+    expect(result.tasting.bottle.fullName).toBe(bottle.fullName);
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
       { bottleId: bottle.id },
@@ -74,10 +73,11 @@ describe("POST /tastings", () => {
     );
   });
 
-  test("rejects missing and retired Bottles", async ({
+  test("rejects missing, unassigned, and retired Bottles", async ({
     defaults,
     fixtures,
   }) => {
+    const unassigned = await fixtures.LegacyBottle();
     const retired = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
     await db.insert(bottleTombstones).values({
@@ -85,7 +85,7 @@ describe("POST /tastings", () => {
       newBottleId: replacement.id,
     });
 
-    for (const bottle of [999_999, retired.id]) {
+    for (const bottle of [999_999, unassigned.id, retired.id]) {
       const error = await waitError(() =>
         routerClient.tastings.create(
           { bottle },
@@ -97,6 +97,51 @@ describe("POST /tastings", () => {
         message: "Cannot identify bottle.",
       });
     }
+  });
+
+  test("ignores stale target evidence and returns the selected Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const firstBottle = await fixtures.Bottle({ name: "Tasting Family" });
+    if (firstBottle.groupId === null) {
+      throw new Error("Expected grouped Bottle fixture.");
+    }
+    const selectedBottle = await fixtures.BottleGroupMember({
+      groupId: firstBottle.groupId,
+      edition: "Batch 2",
+    });
+    const unrelatedBottle = await fixtures.Bottle({
+      name: "Unrelated Target Evidence",
+    });
+    const unrelatedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
+    });
+    if (!unrelatedTarget) throw new Error("Missing exact target fixture.");
+    await db
+      .update(bottleAliases)
+      .set({ targetId: unrelatedTarget.id })
+      .where(eq(bottleAliases.bottleId, selectedBottle.id));
+    await db
+      .delete(catalogTargets)
+      .where(eq(catalogTargets.bottleId, selectedBottle.id));
+
+    const result = await routerClient.tastings.create(
+      { bottle: selectedBottle.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result.tasting.bottle).toMatchObject({
+      id: selectedBottle.id,
+      fullName: selectedBottle.fullName,
+    });
+    expect(result.tasting.bottle.id).not.toBe(firstBottle.id);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, result.tasting.id),
+        columns: { bottleId: true },
+      }),
+    ).toEqual({ bottleId: selectedBottle.id });
   });
 
   test("rejects a Bottle in a retired BottleGroup", async ({
@@ -188,5 +233,45 @@ describe("POST /tastings", () => {
       ),
     );
     expect(error).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
+  });
+
+  test("rolls back the Tasting when a tag aggregate write fails", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.Tag({ name: "caramel" });
+    await db.insert(bottleTags).values({
+      bottleId: bottle.id,
+      tag: "caramel",
+      count: 2_147_483_647,
+    });
+
+    await expect(
+      routerClient.tastings.create(
+        { bottle: bottle.id, tags: ["caramel"] },
+        { context: { user: defaults.user } },
+      ),
+    ).rejects.toThrow("integer out of range");
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: (tastings, { and, eq }) =>
+          and(
+            eq(tastings.bottleId, bottle.id),
+            eq(tastings.createdById, defaults.user.id),
+          ),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.bottleTags.findFirst({
+        where: (bottleTags, { and, eq }) =>
+          and(
+            eq(bottleTags.bottleId, bottle.id),
+            eq(bottleTags.tag, "caramel"),
+          ),
+        columns: { count: true },
+      }),
+    ).toEqual({ count: 2_147_483_647 });
   });
 });

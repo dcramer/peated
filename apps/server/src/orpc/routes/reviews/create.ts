@@ -9,10 +9,7 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
-import {
-  lockBottleReferenceResolutionAssignmentInTransaction,
-  resolveBottleReferenceTarget,
-} from "@peated/server/lib/bottleReferenceResolution";
+import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import { mapRows } from "@peated/server/lib/db";
 import {
   getIncomingBottleDecisionFromResolutionSource,
@@ -20,6 +17,10 @@ import {
   shouldRecordIncomingBottleDecision,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ReviewInputSchema, ReviewSchema } from "@peated/server/schemas";
@@ -83,26 +84,29 @@ export default procedure
     }
     const resolvedAssignment = resolution.assignment;
     const bottleId = resolvedAssignment?.bottleId ?? null;
-    const classifierCreated = resolution.source === "classifier_create_bottle";
     const reviewName = normalizedName;
     const reviewNameCandidates = [reviewName.toLowerCase()];
 
     const { review, aliasAssignment } = await db.transaction(async (tx) => {
-      const lockedAssignment =
-        await lockBottleReferenceResolutionAssignmentInTransaction(
-          tx,
-          resolution,
-          { caller: "reviews.create", operation: "persistResolution" },
-        );
-
-      if (classifierCreated) {
-        if (bottleId === null || lockedAssignment?.bottleId !== bottleId) {
-          throw new Error(
-            "Classifier concrete Bottle creation returned an incomplete Bottle assignment.",
-          );
+      if (bottleId !== null) {
+        try {
+          await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+        } catch (error) {
+          if (!(error instanceof ActiveBottleSelectionError)) throw error;
+          if (error.reason === "missing") {
+            throw errors.NOT_FOUND({
+              message: "Bottle not found.",
+              cause: error,
+            });
+          }
+          throw errors.CONFLICT({
+            message:
+              error.reason === "bottle_retired"
+                ? `Bottle ${bottleId} is retired.`
+                : `Bottle ${bottleId} is not active.`,
+            cause: error,
+          });
         }
-      }
-      if (lockedAssignment) {
         const aliasLookupNames = Array.from(
           new Set(
             [aliasKey, reviewName, rawName].map((name) => name.toLowerCase()),
@@ -175,10 +179,10 @@ export default procedure
           .returning();
       } else {
         const { rows } = await tx.execute(
-          // New rows carry only direct Bottle identity. Conflict updates retain
-          // legacy release/target evidence and apply Bottle identity by CAS.
-          sql`INSERT INTO ${reviews} (target_id, bottle_id, release_id, external_site_id, name, issue, rating, url)
-              VALUES (NULL, ${bottleId}, NULL, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
+          // A concurrent conflict may add identity first, so only fill an
+          // unresolved row or reaffirm the same Bottle.
+          sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
+              VALUES (${bottleId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
               ON CONFLICT (external_site_id, LOWER(name), issue)
               DO UPDATE
               SET bottle_id = CASE
@@ -205,9 +209,6 @@ export default procedure
         resolution.source === "exact_alias"
           ? undefined
           : ("classifier_approved" as const);
-      if (!lockedAssignment) {
-        throw new Error("Bottle resolution returned no locked assignment.");
-      }
       const aliasInput = {
         name: aliasKey,
         backfillNames: [reviewName, rawName],

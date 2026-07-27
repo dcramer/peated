@@ -34,15 +34,15 @@ const MAX_MEMBERSHIP_REPLACEMENT_ATTEMPTS = 3;
 
 class FlightMembershipSnapshotChangedError extends Error {}
 
-function membershipSnapshotKey(
-  membership: Pick<FlightBottle, "bottleId">,
-): string {
+type FlightMembershipSnapshot = Pick<FlightBottle, "bottleId">;
+
+function membershipSnapshotKey(membership: FlightMembershipSnapshot): string {
   return String(membership.bottleId);
 }
 
 function membershipSnapshotsMatch(
-  first: FlightBottle[],
-  second: FlightBottle[],
+  first: FlightMembershipSnapshot[],
+  second: FlightMembershipSnapshot[],
 ): boolean {
   if (first.length !== second.length) return false;
   const firstKeys = first.map(membershipSnapshotKey).sort();
@@ -111,7 +111,7 @@ export default procedure
         try {
           newFlight = await db.transaction(async (tx) => {
             const membershipSnapshot = await tx
-              .select()
+              .select({ bottleId: flightBottles.bottleId })
               .from(flightBottles)
               .where(eq(flightBottles.flightId, flight.id));
             const bottleIds = await resolveActiveBottleIds(tx, selectedBottles);
@@ -137,7 +137,7 @@ export default procedure
             }
 
             const lockedMemberships = await tx
-              .select()
+              .select({ bottleId: flightBottles.bottleId })
               .from(flightBottles)
               .where(eq(flightBottles.flightId, currentFlight.id))
               .for("update");
@@ -163,7 +163,6 @@ export default procedure
                 bottleIds.map((bottleId) => ({
                   flightId: currentFlight.id,
                   bottleId,
-                  releaseId: null,
                 })),
               );
             }
