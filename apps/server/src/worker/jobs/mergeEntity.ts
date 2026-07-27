@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import {
   bottleGroupDistillers,
   bottleGroups,
-  bottleReleases,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -15,8 +14,7 @@ import {
   getConcreteBottleExactIdentity,
   materializeConcreteBottleForGroup,
 } from "@peated/server/lib/concreteBottleIdentity";
-import { upsertBottleAlias } from "@peated/server/lib/db";
-import { formatBottleName, formatReleaseName } from "@peated/server/lib/format";
+import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
   finalizeConcreteBottleMerge,
@@ -30,18 +28,8 @@ import {
   updateConcreteBottleInTransaction,
   type ConcreteBottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateConcreteBottle";
-import { ConflictError } from "@peated/server/orpc/errors";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import {
-  and,
-  asc,
-  eq,
-  inArray,
-  isNull,
-  notInArray,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, asc, eq, inArray, notInArray, or, sql } from "drizzle-orm";
 
 function replaceMergedEntityIds(
   ids: readonly number[],
@@ -54,7 +42,6 @@ function replaceMergedEntityIds(
   ).sort((left, right) => left - right);
 }
 
-// TODO: this should happen async
 export default async function mergeEntity({
   toEntityId,
   fromEntityIds,
@@ -76,8 +63,6 @@ export default async function mergeEntity({
   }
 
   const automationUser = await getAutomationModeratorUser();
-  const updatedBottleIds: number[] = [];
-  const updatedAliasNames = new Set<string>();
   const bottleMergeManifests: ConcreteBottleMergeFinalizationManifest[] = [];
   const bottleUpdateManifests: ConcreteBottleUpdateFinalizationManifest[] = [];
 
@@ -268,133 +253,10 @@ export default async function mergeEntity({
       );
     }
 
-    // Pre-flattening rows remain an explicitly migration-only compatibility
-    // branch. OpenSpec task 9.7 removes it after every Bottle owns a group/target.
-    const legacyBottleList = await tx
-      .select()
-      .from(bottles)
-      .where(
-        and(isNull(bottles.groupId), inArray(bottles.brandId, fromEntityIds)),
-      );
-    for (const bottle of legacyBottleList) {
-      const fullName = formatBottleName({
-        ...bottle,
-        name: `${toEntity.shortName || toEntity.name} ${bottle.name}`,
-      });
-      const alias = await upsertBottleAlias(tx, fullName, bottle.id, null, {
-        assignedByActorId: actor.id,
-      });
-      if (alias.bottleId && alias.bottleId !== bottle.id) {
-        const [existingBottle] = await tx
-          .select()
-          .from(bottles)
-          .where(eq(bottles.id, alias.bottleId));
-        if (existingBottle.brandId !== toEntity.id) {
-          throw new ConflictError(
-            existingBottle,
-            undefined,
-            "An error occurred while trying to merge duplicate bottles.",
-          );
-        }
-        bottleMergeManifests.push(
-          await mergeConcreteBottlesInTransaction(tx, {
-            sourceBottleId: bottle.id,
-            destinationBottleId: alias.bottleId,
-            actorId: actor.id,
-          }),
-        );
-        continue;
-      }
-
-      await tx
-        .update(bottles)
-        .set({ brandId: toEntity.id, fullName })
-        .where(eq(bottles.id, bottle.id));
-      const releases = await tx
-        .select()
-        .from(bottleReleases)
-        .where(eq(bottleReleases.bottleId, bottle.id));
-      for (const release of releases) {
-        const next = {
-          name: formatReleaseName({
-            name: bottle.name,
-            edition: release.edition,
-            abv: release.abv,
-            statedAge: bottle.statedAge ? null : release.statedAge,
-            releaseYear: release.releaseYear,
-            vintageYear: release.vintageYear,
-            singleCask: release.singleCask,
-            caskStrength: release.caskStrength,
-            caskFill: release.caskFill,
-            caskType: release.caskType,
-            caskSize: release.caskSize,
-          }),
-          fullName: formatReleaseName({
-            name: fullName,
-            edition: release.edition,
-            abv: release.abv,
-            statedAge: bottle.statedAge ? null : release.statedAge,
-            releaseYear: release.releaseYear,
-            vintageYear: release.vintageYear,
-            singleCask: release.singleCask,
-            caskStrength: release.caskStrength,
-            caskFill: release.caskFill,
-            caskType: release.caskType,
-            caskSize: release.caskSize,
-          }),
-        };
-        await tx
-          .update(bottleReleases)
-          .set(next)
-          .where(eq(bottleReleases.id, release.id));
-        const releaseAlias = await upsertBottleAlias(
-          tx,
-          next.fullName,
-          bottle.id,
-          release.id,
-          { assignedByActorId: actor.id },
-        );
-        if (
-          releaseAlias.bottleId !== bottle.id ||
-          (releaseAlias.releaseId ?? null) !== release.id
-        ) {
-          throw new Error(
-            "Release alias already belongs to a different bottle.",
-          );
-        }
-        updatedAliasNames.add(next.fullName);
-      }
-      updatedBottleIds.push(bottle.id);
-    }
-
-    const legacyBottleIds = await tx
-      .select({ id: bottles.id })
-      .from(bottles)
-      .where(isNull(bottles.groupId));
-    await tx
-      .update(bottles)
-      .set({ bottlerId: toEntity.id })
-      .where(
-        and(isNull(bottles.groupId), inArray(bottles.bottlerId, fromEntityIds)),
-      );
     await tx
       .update(entityAliases)
       .set({ entityId: toEntity.id })
       .where(inArray(entityAliases.entityId, fromEntityIds));
-    if (legacyBottleIds.length) {
-      await tx
-        .update(bottlesToDistillers)
-        .set({ distillerId: toEntity.id })
-        .where(
-          and(
-            inArray(
-              bottlesToDistillers.bottleId,
-              legacyBottleIds.map(({ id }) => id),
-            ),
-            inArray(bottlesToDistillers.distillerId, fromEntityIds),
-          ),
-        );
-    }
 
     for (const sourceSeries of sourceSeriesRows) {
       const targetFullName = `${toEntity.name} ${sourceSeries.name}`;
@@ -412,12 +274,6 @@ export default async function mergeEntity({
         )
         .limit(1);
       if (targetSeries && targetSeries.id !== sourceSeries.id) {
-        await tx
-          .update(bottles)
-          .set({ seriesId: targetSeries.id })
-          .where(
-            and(isNull(bottles.groupId), eq(bottles.seriesId, sourceSeries.id)),
-          );
         await tx
           .delete(bottleSeries)
           .where(eq(bottleSeries.id, sourceSeries.id));
@@ -453,24 +309,6 @@ export default async function mergeEntity({
   }
   for (const manifest of bottleUpdateManifests) {
     await finalizeConcreteBottleUpdate(manifest);
-  }
-  for (const bottleId of updatedBottleIds) {
-    try {
-      await pushUniqueJob(
-        "IndexBottleSearchVectors",
-        { bottleId },
-        { delay: 5000 },
-      );
-    } catch (err) {
-      logError(err, { bottle: { id: bottleId } });
-    }
-  }
-  for (const name of updatedAliasNames) {
-    try {
-      await pushUniqueJob("OnBottleAliasChange", { name }, { delay: 5000 });
-    } catch (err) {
-      logError(err, { alias: { name } });
-    }
   }
   try {
     await pushUniqueJob(

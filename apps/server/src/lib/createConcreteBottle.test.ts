@@ -16,6 +16,7 @@ import {
   createConcreteBottle,
   createConcreteBottleInTransaction,
 } from "@peated/server/lib/createConcreteBottle";
+import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq } from "drizzle-orm";
@@ -139,6 +140,69 @@ describe("concrete Bottle creation", () => {
       displayName: result.bottle.fullName,
       type: "add",
     });
+  });
+
+  test("owns normalized and literal canonical aliases and queues both after commit", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Literal™ Alias Brand" });
+    const queuedAliases: string[] = [];
+    let failedAliasName: string | null = null;
+    vi.mocked(workerClient.pushUniqueJob).mockImplementation(
+      async (jobName, args) => {
+        if (jobName !== "OnBottleAliasChange") return;
+
+        const name = (args as { name: string }).name;
+        const [persistedAlias] = await db
+          .select()
+          .from(bottleAliases)
+          .where(eq(bottleAliases.name, name));
+        expect(persistedAlias).toMatchObject({
+          name,
+          assignmentSource: "canonical",
+          ignored: false,
+        });
+        queuedAliases.push(name);
+        if (failedAliasName === null) {
+          failedAliasName = name;
+          throw new Error("alias queue unavailable");
+        }
+      },
+    );
+
+    const result = await createConcreteBottle({
+      context: contextFor(defaults.user),
+      input: {
+        stable: { name: "Canonical Alias", brand: brand.id },
+        exact: {},
+      },
+    });
+
+    const literalName = result.bottle.fullName;
+    const normalizedName = normalizeBottleAliasKey(literalName);
+    expect(normalizedName).not.toBe(literalName);
+    const expectedNames = [literalName, normalizedName].sort();
+    const aliases = await db
+      .select()
+      .from(bottleAliases)
+      .where(eq(bottleAliases.bottleId, result.bottle.id));
+    expect(aliases).toHaveLength(expectedNames.length);
+    expect(aliases).toEqual(
+      expect.arrayContaining(
+        expectedNames.map((name) =>
+          expect.objectContaining({
+            name,
+            bottleId: result.bottle.id,
+            targetId: null,
+            assignmentSource: "canonical",
+            ignored: false,
+          }),
+        ),
+      ),
+    );
+    expect(queuedAliases.sort()).toEqual(expectedNames);
+    expect(failedAliasName).not.toBeNull();
   });
 
   test("preserves classifier exact age through singleton creation and shared rematerialization", async ({
@@ -425,6 +489,76 @@ describe("concrete Bottle creation", () => {
         attemptedSmwsCode: "35.331",
       }),
     );
+  });
+
+  test("rolls back the group, Bottle, aliases, targets, and audit on a literal alias collision", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Collision™ Test Brand" });
+    const owner = await fixtures.Bottle({ name: "Existing Alias Owner" });
+    const attemptedCanonicalFullName =
+      "Collision™ Test Brand Blocked Expression";
+    const normalizedAliasName = normalizeBottleAliasKey(
+      attemptedCanonicalFullName,
+    );
+    await fixtures.BottleAlias({
+      name: attemptedCanonicalFullName,
+      bottleId: owner.id,
+      assignmentSource: "human_approved",
+    });
+    const changesBefore = await db.select({ id: changes.id }).from(changes);
+    const targetsBefore = await db
+      .select({ id: catalogTargets.id })
+      .from(catalogTargets);
+
+    await expect(
+      createConcreteBottle({
+        context: contextFor(defaults.user),
+        input: {
+          stable: { name: "Blocked Expression", brand: brand.id },
+          exact: {},
+        },
+      }),
+    ).rejects.toEqual(
+      new BottleAlreadyExistsError(owner.id, {
+        kind: "alias",
+        attemptedCanonicalFullName,
+      }),
+    );
+
+    expect(
+      await db
+        .select()
+        .from(bottleGroups)
+        .where(eq(bottleGroups.fullName, attemptedCanonicalFullName)),
+    ).toEqual([]);
+    expect(
+      await db
+        .select()
+        .from(bottles)
+        .where(eq(bottles.fullName, attemptedCanonicalFullName)),
+    ).toEqual([]);
+    expect(
+      await db
+        .select()
+        .from(bottleAliases)
+        .where(eq(bottleAliases.name, normalizedAliasName)),
+    ).toEqual([]);
+    const [persistedCollision] = await db
+      .select()
+      .from(bottleAliases)
+      .where(eq(bottleAliases.name, attemptedCanonicalFullName));
+    expect(persistedCollision).toMatchObject({
+      bottleId: owner.id,
+      assignmentSource: "human_approved",
+    });
+    expect(await db.select({ id: changes.id }).from(changes)).toEqual(
+      changesBefore,
+    );
+    expect(
+      await db.select({ id: catalogTargets.id }).from(catalogTargets),
+    ).toEqual(targetsBefore);
   });
 
   test("keeps similar independent creates in distinct singleton groups", async ({

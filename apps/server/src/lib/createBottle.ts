@@ -21,7 +21,6 @@ import type {
   User,
 } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
   bottles,
@@ -30,7 +29,11 @@ import {
   catalogTargets,
   changes,
 } from "@peated/server/db/schema";
-import { reserveExactBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
+import {
+  ExactBottleAliasConflictError,
+  reserveExactBottleAliasInTransaction,
+  reserveLiteralCanonicalBottleAliasInTransaction,
+} from "@peated/server/lib/bottleAliases";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   lockCatalogTargetAssignmentDescriptorInTransaction,
@@ -42,11 +45,7 @@ import {
   queueBottleCreationVerification,
   queueEntityCreationVerification,
 } from "@peated/server/lib/catalogVerification";
-import {
-  coerceToUpsert,
-  upsertBottleAlias,
-  upsertEntity,
-} from "@peated/server/lib/db";
+import { coerceToUpsert, upsertEntity } from "@peated/server/lib/db";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
@@ -54,7 +53,7 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
   findConflictingSmwsBottleId,
@@ -92,7 +91,6 @@ export type CreateBottleResult = {
 };
 
 type PreparedBottleCreate = {
-  aliasName: string;
   bottleInsertData: NewBottle;
   creationSource: CatalogVerificationCreationSource;
   createdByActorId: number;
@@ -120,28 +118,7 @@ export type ConcreteBottleCreateResult = CreateBottleResult & {
   exactTarget: CatalogTarget;
 };
 
-async function getExistingBottleForAlias(
-  tx: AnyTransaction,
-  aliasName: string,
-): Promise<{
-  bottleId: number;
-  ignored: boolean | null;
-  assignmentSource: (typeof bottleAliases.$inferSelect)["assignmentSource"];
-} | null> {
-  const [result] = await tx
-    .select({
-      bottleId: bottleAliases.bottleId,
-      ignored: bottleAliases.ignored,
-      assignmentSource: bottleAliases.assignmentSource,
-    })
-    .from(bottleAliases)
-    .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
-    .limit(1);
-
-  return result?.bottleId ? { ...result, bottleId: result.bottleId } : null;
-}
-
-/** Writes prerequisites and reserves the alias for same-transaction Bottle insertion. */
+/** Resolves entities and materializes the complete Bottle insert. */
 async function prepareBottleCreateInTransaction(
   tx: AnyTransaction,
   {
@@ -328,27 +305,7 @@ async function prepareBottleCreateInTransaction(
     fullName,
   };
 
-  const alias = await upsertBottleAlias(
-    tx,
-    bottleInsertData.fullName,
-    null,
-    null,
-    {
-      assignedByActorId: actorId,
-    },
-  );
-  if (alias.bottleId) {
-    throw new BottleAlreadyExistsError(alias.bottleId, {
-      kind:
-        alias.assignmentSource === "canonical" && alias.ignored !== true
-          ? "canonical_name"
-          : "alias",
-      attemptedCanonicalFullName: bottleInsertData.fullName,
-    });
-  }
-
   return {
-    aliasName: alias.name,
     bottleInsertData,
     creationSource,
     createdByActorId: actorId,
@@ -360,6 +317,58 @@ async function prepareBottleCreateInTransaction(
   };
 }
 
+function mapExactBottleAliasConflict(
+  error: ExactBottleAliasConflictError,
+  attemptedCanonicalFullName: string,
+) {
+  if (error.conflictingBottleId === null) return error;
+
+  return new BottleAlreadyExistsError(error.conflictingBottleId, {
+    kind:
+      error.alias.assignmentSource === "canonical" &&
+      error.alias.ignored !== true
+        ? "canonical_name"
+        : "alias",
+    attemptedCanonicalFullName,
+  });
+}
+
+async function reserveCanonicalBottleAliasesInTransaction(
+  tx: AnyTransaction,
+  {
+    bottle,
+    assignedByActorId,
+  }: {
+    bottle: Bottle;
+    assignedByActorId: number;
+  },
+) {
+  const changedAliasNames = new Set<string>();
+  const reserveAlias = async (
+    reserve: typeof reserveExactBottleAliasInTransaction,
+  ) => {
+    try {
+      const result = await reserve(tx, {
+        name: bottle.fullName,
+        bottleId: bottle.id,
+        assignmentSource: "canonical",
+        assignedByActorId,
+      });
+      if (result.changed) changedAliasNames.add(result.name);
+    } catch (error) {
+      if (error instanceof ExactBottleAliasConflictError) {
+        throw mapExactBottleAliasConflict(error, bottle.fullName);
+      }
+      throw error;
+    }
+  };
+
+  await reserveAlias(reserveExactBottleAliasInTransaction);
+  await reserveAlias(reserveLiteralCanonicalBottleAliasInTransaction);
+
+  return Array.from(changedAliasNames).sort();
+}
+
 /** Persists the Bottle, its durable distiller joins, alias, and audit rows. */
 async function insertPreparedBottleInTransaction(
   tx: AnyTransaction,
@@ -367,7 +376,6 @@ async function insertPreparedBottleInTransaction(
   { groupId = null }: { groupId?: number | null } = {},
 ): Promise<CreateBottleResult> {
   const {
-    aliasName,
     bottleInsertData,
     creationSource,
     createdByActorId,
@@ -381,42 +389,10 @@ async function insertPreparedBottleInTransaction(
     .values({ ...bottleInsertData, groupId })
     .returning();
 
-  const [newAlias] = await tx
-    .update(bottleAliases)
-    .set({
-      bottleId: bottle.id,
-      assignmentSource: "canonical",
-      assignedByActorId: createdByActorId,
-    })
-    .where(
-      and(
-        eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()),
-        isNull(bottleAliases.bottleId),
-      ),
-    )
-    .returning();
-
-  if (!newAlias) {
-    const existingAlias = await getExistingBottleForAlias(tx, aliasName);
-    if (existingAlias && existingAlias.bottleId !== bottle.id) {
-      throw new BottleAlreadyExistsError(existingAlias.bottleId, {
-        kind:
-          existingAlias.assignmentSource === "canonical" &&
-          existingAlias.ignored !== true
-            ? "canonical_name"
-            : "alias",
-        attemptedCanonicalFullName: bottleInsertData.fullName,
-      });
-    }
-    throw new Error("Failed to finalize bottle alias.");
-  }
-
-  if (newAlias.bottleId && newAlias.bottleId !== bottle.id) {
-    throw new BottleAlreadyExistsError(newAlias.bottleId, {
-      kind: "canonical_name",
-      attemptedCanonicalFullName: bottleInsertData.fullName,
-    });
-  }
+  const newAliases = await reserveCanonicalBottleAliasesInTransaction(tx, {
+    bottle,
+    assignedByActorId: createdByActorId,
+  });
 
   const promises: Promise<any>[] = [
     tx.insert(changes).values({
@@ -448,7 +424,7 @@ async function insertPreparedBottleInTransaction(
 
   return {
     bottle,
-    newAliases: [aliasName],
+    newAliases,
     newEntityIds,
     seriesCreated,
   };
@@ -594,13 +570,6 @@ export async function createConcreteBottleInTransaction(
     .insert(catalogTargets)
     .values({ groupId: group.id, bottleId: bottleResult.bottle.id })
     .returning();
-
-  await reserveExactBottleAliasInTransaction(tx, {
-    name: prepared.aliasName,
-    bottleId: bottleResult.bottle.id,
-    assignmentSource: "canonical",
-    assignedByActorId: createdByActorId,
-  });
 
   const [persistedGroup] = await tx
     .update(bottleGroups)

@@ -5,23 +5,10 @@ import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { AnyDatabase } from "../db";
-import type {
-  BottleAlias,
-  BottleAliasAssignmentSource,
-  Collection,
-  Entity,
-  EntityType,
-} from "../db/schema";
-import {
-  bottleAliases,
-  changes,
-  collections,
-  entities,
-  entityAliases,
-} from "../db/schema";
+import type { Collection, Entity, EntityType } from "../db/schema";
+import { changes, collections, entities, entityAliases } from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
-import type { BottleAliasAssignmentOptions } from "./bottleAliases";
 import { getCatalogVerificationCreationMetadata } from "./catalogVerification";
 
 export type UpsertOutcome<T> =
@@ -510,77 +497,6 @@ async function getLegacyDefaultCollection(
       orderBy: (collections, { asc }) => asc(collections.id),
     })) || null
   );
-}
-
-/**
- * Upserts a bottle alias without stealing an existing target. Targeted aliases
- * default to legacy assertions unless explicit provenance is supplied.
- */
-export async function upsertBottleAlias(
-  db: AnyDatabase,
-  name: string,
-  bottleId: number | null = null,
-  releaseId: number | null = null,
-  options: BottleAliasAssignmentOptions,
-) {
-  const { assignmentSource, assignedByActorId } = options;
-  const hasExplicitAssignmentSource = assignmentSource !== undefined;
-  const nextAssignmentSource = assignmentSource ?? "legacy";
-  const nextAssignedByActorId = assignedByActorId;
-
-  // Preserve existing targets on conflicts. Explicit provenance may update an
-  // already-bound alias only when the incoming target is the same target.
-  const query =
-    bottleId || releaseId
-      ? await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_actor_id)
-      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedByActorId})
-      ON CONFLICT (LOWER(name))
-      DO UPDATE SET
-        bottle_id = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL
-            THEN EXCLUDED.bottle_id
-            ELSE ${bottleAliases.bottleId}
-          END,
-        release_id = CASE
-          WHEN ${bottleAliases.releaseId} IS NULL
-            THEN EXCLUDED.release_id
-            ELSE ${bottleAliases.releaseId}
-          END,
-        assignment_source = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${hasExplicitAssignmentSource}
-            AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
-            AND (
-              ${bottleAliases.releaseId} IS NULL
-              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
-            )
-          )
-            THEN EXCLUDED.assignment_source
-            ELSE ${bottleAliases.assignmentSource}
-          END,
-        assigned_by_actor_id = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
-            AND (
-              ${bottleAliases.releaseId} IS NULL
-              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
-            )
-          )
-            THEN EXCLUDED.assigned_by_actor_id
-            ELSE ${bottleAliases.assignedByActorId}
-          END
-      RETURNING *`,
-        )
-      : await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_actor_id)
-      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedByActorId})
-      ON CONFLICT (LOWER(name))
-      DO UPDATE SET name = ${bottleAliases.name}
-      RETURNING *`,
-        );
-
-  return mapRows(query.rows, bottleAliases)[0];
 }
 
 export function mapRows<T extends TableConfig>(
