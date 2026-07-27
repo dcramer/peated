@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
 import { db, type AnyDatabase } from "../db";
 import { bottleAliases } from "../db/schema";
 import type { BottleAliasIdentitySnapshot } from "./bottleAliases";
@@ -16,25 +16,24 @@ async function findBottleAliasIdentitySnapshot(
     .select({
       name: bottleAliases.name,
       bottleId: bottleAliases.bottleId,
-      releaseId: bottleAliases.releaseId,
-      targetId: bottleAliases.targetId,
       ignored: bottleAliases.ignored,
+      assignmentSource: bottleAliases.assignmentSource,
+      assignedByActorId: bottleAliases.assignedByActorId,
+      createdAt: bottleAliases.createdAt,
     })
     .from(bottleAliases)
     .where(
       and(
         eq(sql`LOWER(${bottleAliases.name})`, sql`LOWER(${name})`),
         sql`${bottleAliases.ignored} IS DISTINCT FROM true`,
+        isNotNull(bottleAliases.bottleId),
       ),
     )
     .limit(1);
   return alias ?? null;
 }
 
-/**
- * Resolves an accepted alias to its directly assigned Bottle. Retained release,
- * promotion, and CatalogTarget evidence never overrides `bottleId`.
- */
+/** Resolves a non-ignored alias to its directly assigned Bottle id. */
 export async function findBottleAliasAssignment(
   name: string,
   database: AnyDatabase = db,

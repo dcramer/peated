@@ -102,35 +102,26 @@ export class StaleBottleAliasReviewIdentityError extends Error {
   }
 }
 
-export type ExactBottleAliasConflictCode =
-  | "another_bottle"
-  | "canonical_metadata"
-  | "legacy_release";
+export type BottleAliasIdentitySnapshot = Pick<
+  BottleAlias,
+  | "name"
+  | "bottleId"
+  | "ignored"
+  | "assignmentSource"
+  | "assignedByActorId"
+  | "createdAt"
+>;
 
 export class ExactBottleAliasConflictError extends Error {
   constructor(
-    readonly code: ExactBottleAliasConflictCode,
-    readonly alias: Pick<
-      BottleAlias,
-      | "name"
-      | "bottleId"
-      | "releaseId"
-      | "targetId"
-      | "ignored"
-      | "assignmentSource"
-      | "assignedByActorId"
-    >,
+    readonly code: "another_bottle",
+    readonly alias: BottleAliasIdentitySnapshot,
     readonly conflictingBottleId: number | null,
   ) {
     super(`Cannot reserve exact Bottle alias "${alias.name}": ${code}.`);
     this.name = "ExactBottleAliasConflictError";
   }
 }
-
-export type BottleAliasIdentitySnapshot = Pick<
-  BottleAlias,
-  "name" | "bottleId" | "releaseId" | "targetId" | "ignored"
->;
 
 export class BottleAliasIdentityChangedError extends Error {
   constructor(readonly aliasName: string) {
@@ -141,7 +132,7 @@ export class BottleAliasIdentityChangedError extends Error {
 
 export type BottleAliasReviewIdentitySnapshot = Pick<
   typeof reviews.$inferSelect,
-  "id" | "name" | "bottleId" | "releaseId" | "targetId"
+  "id" | "name" | "bottleId"
 >;
 
 export type BottleAliasAssignmentInput = {
@@ -168,7 +159,7 @@ type BottleImageCandidate = {
 };
 
 export type BottleAliasAssignmentResult = {
-  alias: BottleAlias;
+  alias: BottleAliasIdentitySnapshot;
   aliasChanged: boolean;
   isNew: boolean;
   bottleImageCandidate: BottleImageCandidate | null;
@@ -208,9 +199,10 @@ function assertBottleAliasIdentitySnapshot(
     !lockedAlias ||
     lockedAlias.name !== snapshot.name ||
     lockedAlias.bottleId !== snapshot.bottleId ||
-    lockedAlias.releaseId !== snapshot.releaseId ||
-    lockedAlias.targetId !== snapshot.targetId ||
-    lockedAlias.ignored !== snapshot.ignored
+    lockedAlias.ignored !== snapshot.ignored ||
+    lockedAlias.assignmentSource !== snapshot.assignmentSource ||
+    lockedAlias.assignedByActorId !== snapshot.assignedByActorId ||
+    lockedAlias.createdAt.getTime() !== snapshot.createdAt.getTime()
   ) {
     throw new BottleAliasIdentityChangedError(snapshot.name);
   }
@@ -225,39 +217,16 @@ async function lockBottleAliasIdentitySnapshotInTransaction(
     .select({
       name: bottleAliases.name,
       bottleId: bottleAliases.bottleId,
-      releaseId: bottleAliases.releaseId,
-      targetId: bottleAliases.targetId,
       ignored: bottleAliases.ignored,
+      assignmentSource: bottleAliases.assignmentSource,
+      assignedByActorId: bottleAliases.assignedByActorId,
+      createdAt: bottleAliases.createdAt,
     })
     .from(bottleAliases)
     .where(eq(bottleAliases.name, snapshot.name))
     .limit(1)
     .for("update");
   assertBottleAliasIdentitySnapshot(lockedAlias, snapshot);
-}
-
-/**
- * Retains the migration-only target evidence writer until the legacy columns
- * and migration audit are removed.
- */
-export async function backfillLegacyBottleAliasTargetInTransaction(
-  tx: AnyTransaction,
-  snapshot: BottleAliasIdentitySnapshot,
-  targetId: number,
-): Promise<"updated" | "reused"> {
-  await lockBottleAliasIdentitySnapshotInTransaction(tx, snapshot);
-  if (snapshot.targetId === targetId) return "reused";
-  if (snapshot.targetId !== null) {
-    throw new TypeError(
-      `Legacy Bottle alias ${snapshot.name} already has another target.`,
-    );
-  }
-
-  await tx
-    .update(bottleAliases)
-    .set({ targetId })
-    .where(eq(bottleAliases.name, snapshot.name));
-  return "updated";
 }
 
 async function lockActiveBottleInTransaction(
@@ -281,17 +250,7 @@ async function lockActiveBottleInTransaction(
   }
 }
 
-export type ExactBottleAliasBeforeSnapshot = Pick<
-  BottleAlias,
-  | "name"
-  | "bottleId"
-  | "releaseId"
-  | "targetId"
-  | "ignored"
-  | "assignmentSource"
-  | "assignedByActorId"
-  | "createdAt"
->;
+export type ExactBottleAliasBeforeSnapshot = BottleAliasIdentitySnapshot;
 
 export type ExactBottleAliasReservationWithPreimage =
   | { name: string; changed: false }
@@ -309,20 +268,18 @@ export type ExactBottleAliasReservationInput = {
 };
 
 type ExactBottleAliasClaimResult = {
-  alias: BottleAlias;
+  alias: BottleAliasIdentitySnapshot;
   inserted: boolean;
   changed: boolean;
   before: ExactBottleAliasBeforeSnapshot | null;
 };
 
 function exactBottleAliasBeforeSnapshot(
-  alias: BottleAlias,
+  alias: BottleAliasIdentitySnapshot,
 ): ExactBottleAliasBeforeSnapshot {
   return {
     name: alias.name,
     bottleId: alias.bottleId,
-    releaseId: alias.releaseId,
-    targetId: alias.targetId,
     ignored: alias.ignored,
     assignmentSource: alias.assignmentSource,
     assignedByActorId: alias.assignedByActorId,
@@ -330,10 +287,7 @@ function exactBottleAliasBeforeSnapshot(
   };
 }
 
-/**
- * Claims one alias for a Bottle. Legacy release and target columns are retained
- * as migration evidence but never participate in runtime identity decisions.
- */
+/** Claims one runtime alias identity without reading or writing legacy evidence. */
 async function claimBottleAliasNameInTransaction(
   tx: AnyTransaction,
   {
@@ -360,7 +314,14 @@ async function claimBottleAliasNameInTransaction(
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const [existingAlias] = await tx
-      .select()
+      .select({
+        name: bottleAliases.name,
+        bottleId: bottleAliases.bottleId,
+        ignored: bottleAliases.ignored,
+        assignmentSource: bottleAliases.assignmentSource,
+        assignedByActorId: bottleAliases.assignedByActorId,
+        createdAt: bottleAliases.createdAt,
+      })
       .from(bottleAliases)
       .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
       .limit(1)
@@ -376,8 +337,6 @@ async function claimBottleAliasNameInTransaction(
         .values({
           name,
           bottleId,
-          releaseId: null,
-          targetId: null,
           ...(reservation
             ? { ignored: false }
             : ignored !== undefined
@@ -389,7 +348,14 @@ async function claimBottleAliasNameInTransaction(
           }),
         })
         .onConflictDoNothing()
-        .returning();
+        .returning({
+          name: bottleAliases.name,
+          bottleId: bottleAliases.bottleId,
+          ignored: bottleAliases.ignored,
+          assignmentSource: bottleAliases.assignmentSource,
+          assignedByActorId: bottleAliases.assignedByActorId,
+          createdAt: bottleAliases.createdAt,
+        });
       if (insertedAlias) {
         return {
           alias: insertedAlias,
@@ -446,7 +412,14 @@ async function claimBottleAliasNameInTransaction(
         ...assignmentValues,
       })
       .where(eq(bottleAliases.name, existingAlias.name))
-      .returning();
+      .returning({
+        name: bottleAliases.name,
+        bottleId: bottleAliases.bottleId,
+        ignored: bottleAliases.ignored,
+        assignmentSource: bottleAliases.assignmentSource,
+        assignedByActorId: bottleAliases.assignedByActorId,
+        createdAt: bottleAliases.createdAt,
+      });
     if (updatedAlias) {
       return {
         alias: updatedAlias,
@@ -496,102 +469,6 @@ export async function reserveLiteralCanonicalBottleAliasInTransaction(
   });
 }
 
-export type LegacyPromotionCanonicalAliasInput = {
-  name: string;
-  promotedBottleId: number;
-  targetId: number;
-  legacyBottleId: number;
-  legacyReleaseId: number;
-  assignedByActorId: number;
-};
-
-/**
- * Claims one promoted release's canonical alias. This is migration-only: it
- * preserves the exact target id as retained audit evidence while Bottle owns
- * the runtime identity.
- */
-export async function reserveLegacyPromotionCanonicalAliasInTransaction(
-  tx: AnyTransaction,
-  input: LegacyPromotionCanonicalAliasInput,
-): Promise<{ changed: boolean }> {
-  await lockActiveBottleInTransaction(tx, input.promotedBottleId);
-  const name = input.name.trim();
-  const [existingAlias] = await tx
-    .select()
-    .from(bottleAliases)
-    .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
-    .limit(1)
-    .for("update");
-
-  const matchesLegacyIdentity =
-    existingAlias?.bottleId === input.legacyBottleId &&
-    existingAlias.releaseId === input.legacyReleaseId;
-  const matchesPromotedIdentity =
-    existingAlias?.bottleId === input.promotedBottleId &&
-    existingAlias.releaseId === null;
-  const isUnresolved =
-    existingAlias?.bottleId === null && existingAlias.releaseId === null;
-  if (
-    existingAlias &&
-    ((!matchesLegacyIdentity && !matchesPromotedIdentity && !isUnresolved) ||
-      (existingAlias.targetId !== null &&
-        existingAlias.targetId !== input.targetId))
-  ) {
-    throw new ExactBottleAliasConflictError(
-      existingAlias.releaseId !== null && !matchesLegacyIdentity
-        ? "legacy_release"
-        : existingAlias.bottleId !== input.promotedBottleId
-          ? "another_bottle"
-          : "canonical_metadata",
-      existingAlias,
-      existingAlias.bottleId,
-    );
-  }
-
-  if (!existingAlias) {
-    const [insertedAlias] = await tx
-      .insert(bottleAliases)
-      .values({
-        name,
-        bottleId: input.promotedBottleId,
-        releaseId: null,
-        targetId: input.targetId,
-        ignored: false,
-        assignmentSource: "canonical",
-        assignedByActorId: input.assignedByActorId,
-      })
-      .returning();
-    if (!insertedAlias) throw new FailedToSaveBottleAliasError();
-    return { changed: true };
-  }
-
-  const isCanonical =
-    existingAlias.name === name &&
-    existingAlias.bottleId === input.promotedBottleId &&
-    existingAlias.releaseId === null &&
-    existingAlias.targetId === input.targetId &&
-    existingAlias.ignored === false &&
-    existingAlias.assignmentSource === "canonical" &&
-    existingAlias.assignedByActorId === input.assignedByActorId;
-  if (isCanonical) return { changed: false };
-
-  const [updatedAlias] = await tx
-    .update(bottleAliases)
-    .set({
-      name,
-      bottleId: input.promotedBottleId,
-      releaseId: null,
-      targetId: input.targetId,
-      ignored: false,
-      assignmentSource: "canonical",
-      assignedByActorId: input.assignedByActorId,
-    })
-    .where(eq(bottleAliases.name, existingAlias.name))
-    .returning();
-  if (!updatedAlias) throw new FailedToSaveBottleAliasError();
-  return { changed: true };
-}
-
 /** Reserves a normalized canonical alias without migrating other references. */
 export async function reserveExactBottleAliasInTransaction(
   tx: AnyTransaction,
@@ -613,8 +490,6 @@ async function assertExpectedReviewIdentity(
       id: reviews.id,
       name: reviews.name,
       bottleId: reviews.bottleId,
-      releaseId: reviews.releaseId,
-      targetId: reviews.targetId,
     })
     .from(reviews)
     .where(eq(reviews.id, expectedReview.id))
@@ -623,9 +498,7 @@ async function assertExpectedReviewIdentity(
   if (
     !lockedReview ||
     lockedReview.name !== expectedReview.name ||
-    lockedReview.bottleId !== expectedReview.bottleId ||
-    lockedReview.releaseId !== expectedReview.releaseId ||
-    lockedReview.targetId !== expectedReview.targetId
+    lockedReview.bottleId !== expectedReview.bottleId
   ) {
     throw new StaleBottleAliasReviewIdentityError(expectedReview.id);
   }
@@ -707,10 +580,7 @@ async function syncBottleAliasConsumersInTransaction(
   };
 }
 
-/**
- * Assigns an alias and matching consumers to one independently complete Bottle.
- * Legacy release and target columns remain untouched as migration evidence.
- */
+/** Assigns an alias and matching consumers to one independently complete Bottle. */
 export async function assignBottleAliasInTransaction(
   tx: AnyTransaction,
   {
@@ -773,11 +643,18 @@ export async function assignBottleAliasInTransaction(
   };
 }
 
-/** Replays a raw alias producer without resolving a group or release. */
+/** Replays one assigned alias directly to eligible consumers. */
 export async function syncBottleAliasConsumersForAliasChange(name: string) {
   await db.transaction(async (tx) => {
     const [alias] = await tx
-      .select()
+      .select({
+        name: bottleAliases.name,
+        bottleId: bottleAliases.bottleId,
+        ignored: bottleAliases.ignored,
+        assignmentSource: bottleAliases.assignmentSource,
+        assignedByActorId: bottleAliases.assignedByActorId,
+        createdAt: bottleAliases.createdAt,
+      })
       .from(bottleAliases)
       .where(eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()))
       .limit(1);
@@ -799,8 +676,6 @@ export async function syncBottleAliasConsumersForAliasChange(name: string) {
         and(
           eq(bottleAliases.name, alias.name),
           sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
-          sql`${bottleAliases.releaseId} IS NOT DISTINCT FROM ${alias.releaseId}`,
-          sql`${bottleAliases.targetId} IS NOT DISTINCT FROM ${alias.targetId}`,
           sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
           eq(bottleAliases.assignmentSource, alias.assignmentSource),
           eq(bottleAliases.assignedByActorId, alias.assignedByActorId),

@@ -211,6 +211,50 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
+  test("keeps an inactive exact alias visible until persistence rejects it", async ({
+    fixtures,
+  }) => {
+    const retired = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const alias = await fixtures.BottleAlias({
+      name: "Retired Exact Alias",
+      bottleId: retired.id,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    const resolution = await resolveBottleReferenceTarget({
+      reference: {
+        name: alias.name,
+        url: null,
+        imageUrl: null,
+        currentBottleId: null,
+      },
+      aliasLookupNames: [alias.name],
+      user: await fixtures.User(),
+      createdByActorId: retired.createdByActorId,
+    });
+
+    expect(resolution).toMatchObject({
+      assignment: {
+        kind: "direct_bottle",
+        bottleId: retired.id,
+      },
+      source: "exact_alias",
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    await expect(
+      db.transaction((tx) =>
+        lockBottleReferenceResolutionAssignmentInTransaction(tx, resolution, {
+          caller: "test",
+          operation: "persist",
+        }),
+      ),
+    ).rejects.toThrow(`Bottle ${retired.id} is retired.`);
+  });
+
   test("uses the alias Bottle without reconstructing a catalog target", async ({
     fixtures,
   }) => {

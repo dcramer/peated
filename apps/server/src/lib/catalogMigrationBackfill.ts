@@ -26,9 +26,9 @@ import {
   type BottleRelease,
 } from "../db/schema";
 import {
-  ExactBottleAliasConflictError,
+  CatalogMigrationBottleAliasConflictError,
   reserveLegacyPromotionCanonicalAliasInTransaction,
-} from "./bottleAliases";
+} from "./catalogMigrationBottleAliases";
 
 export type CatalogMigrationBackfillErrorCode =
   | "invalid_limit"
@@ -767,7 +767,9 @@ async function reservePromotionCanonicalAlias(
       );
     }
   } catch (error) {
-    if (!(error instanceof ExactBottleAliasConflictError)) throw error;
+    if (!(error instanceof CatalogMigrationBottleAliasConflictError)) {
+      throw error;
+    }
     throw new CatalogMigrationBackfillError(
       "alias_collision",
       parent.id,

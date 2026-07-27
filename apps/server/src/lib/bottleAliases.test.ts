@@ -13,10 +13,10 @@ import {
   BottleAliasBottleNotFoundError,
   BottleAliasBottleRetiredError,
   BottleAliasIdentityChangedError,
+  ExactBottleAliasConflictError,
   finalizeBottleAliasAssignment,
   listUnmatchedBottleAliasNames,
   reserveExactBottleAliasInTransaction,
-  reserveLegacyPromotionCanonicalAliasInTransaction,
   StaleBottleAliasReviewIdentityError,
   syncBottleAliasConsumersForAliasChange,
 } from "@peated/server/lib/bottleAliases";
@@ -288,6 +288,8 @@ describe("assignBottleAliasInTransaction", () => {
       aliasChanged: true,
       isNew: false,
     });
+    expect(result.alias).not.toHaveProperty("releaseId");
+    expect(result.alias).not.toHaveProperty("targetId");
     expect(await getAlias(name)).toMatchObject({
       bottleId: selected.id,
       releaseId: release.id,
@@ -391,34 +393,102 @@ describe("assignBottleAliasInTransaction", () => {
     ).toBeUndefined();
   });
 
-  test("rolls back when a source alias snapshot changes", async ({
+  test("rolls back when source alias Bottle, name, or ignored state changes", async ({
+    fixtures,
+  }) => {
+    for (const field of ["bottleId", "name", "ignored"] as const) {
+      const bottle = await fixtures.Bottle();
+      const concurrent = await fixtures.Bottle();
+      const source = await fixtures.BottleAlias({
+        name: `Raw Source Alias ${field}`,
+        bottleId: null,
+      });
+      if (field === "bottleId") {
+        await db
+          .update(bottleAliases)
+          .set({ bottleId: concurrent.id })
+          .where(eq(bottleAliases.name, source.name));
+      } else if (field === "name") {
+        await db
+          .update(bottleAliases)
+          .set({ name: `${source.name} changed` })
+          .where(eq(bottleAliases.name, source.name));
+      } else {
+        await db
+          .update(bottleAliases)
+          .set({ ignored: !source.ignored })
+          .where(eq(bottleAliases.name, source.name));
+      }
+
+      const assignedName = `Normalized Source Alias ${field}`;
+      await expect(
+        db.transaction((tx) =>
+          assignBottleAliasInTransaction(tx, {
+            bottleId: bottle.id,
+            name: assignedName,
+            assignedByActorId: bottle.createdByActorId,
+            sourceAliasIdentity: source,
+          }),
+        ),
+      ).rejects.toBeInstanceOf(BottleAliasIdentityChangedError);
+      expect(
+        await db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, assignedName),
+        }),
+      ).toBeUndefined();
+    }
+  });
+
+  test("ignores legacy evidence drift during direct alias CAS", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
+    const legacy = await fixtures.Bottle();
+    const changedLegacy = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({ bottleId: legacy.id });
+    const changedRelease = await fixtures.BottleRelease({
+      bottleId: changedLegacy.id,
+    });
+    const target = await getGenericTarget(legacy.groupId!);
+    const changedTarget = await getGenericTarget(changedLegacy.groupId!);
     const source = await fixtures.BottleAlias({
-      name: "Raw Source Alias",
+      name: "Legacy Evidence Source Alias",
       bottleId: null,
+      releaseId: release.id,
+      targetId: target.id,
     });
     await db
       .update(bottleAliases)
-      .set({ ignored: !source.ignored })
+      .set({
+        releaseId: changedRelease.id,
+        targetId: changedTarget.id,
+      })
       .where(eq(bottleAliases.name, source.name));
 
-    await expect(
-      db.transaction((tx) =>
-        assignBottleAliasInTransaction(tx, {
-          bottleId: bottle.id,
-          name: "Normalized Source Alias",
-          assignedByActorId: bottle.createdByActorId,
-          sourceAliasIdentity: source,
-        }),
-      ),
-    ).rejects.toBeInstanceOf(BottleAliasIdentityChangedError);
+    const result = await db.transaction((tx) =>
+      assignBottleAliasInTransaction(tx, {
+        bottleId: bottle.id,
+        name: "Direct Alias After Evidence Drift",
+        assignedByActorId: bottle.createdByActorId,
+        sourceAliasIdentity: source,
+      }),
+    );
+
+    expect(result.alias).toMatchObject({
+      name: "Direct Alias After Evidence Drift",
+      bottleId: bottle.id,
+    });
+    expect(result.alias).not.toHaveProperty("releaseId");
+    expect(result.alias).not.toHaveProperty("targetId");
     expect(
       await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, "Normalized Source Alias"),
+        where: eq(bottleAliases.name, source.name),
       }),
-    ).toBeUndefined();
+    ).toMatchObject({
+      bottleId: null,
+      releaseId: changedRelease.id,
+      targetId: changedTarget.id,
+    });
   });
 
   test("release promotion evidence cannot authorize an alias retarget", async ({
@@ -459,6 +529,45 @@ describe("assignBottleAliasInTransaction", () => {
       releaseId: release.id,
       targetId: alias.targetId,
     });
+  });
+
+  test("allows one winner when Bottles race to claim the same alias", async ({
+    fixtures,
+  }) => {
+    const first = await fixtures.Bottle();
+    const second = await fixtures.Bottle();
+    const name = "Concurrent Direct Alias";
+    const price = await fixtures.StorePrice({ name, bottleId: null });
+
+    const outcomes = await Promise.allSettled(
+      [first, second].map((bottle) =>
+        db.transaction((tx) =>
+          assignBottleAliasInTransaction(tx, {
+            bottleId: bottle.id,
+            name,
+            assignedByActorId: bottle.createdByActorId,
+          }),
+        ),
+      ),
+    );
+
+    const fulfilled = outcomes.filter(
+      (outcome) => outcome.status === "fulfilled",
+    );
+    const rejected = outcomes.filter(
+      (outcome) => outcome.status === "rejected",
+    );
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0]!.reason).toBeInstanceOf(ExactBottleAliasConflictError);
+
+    const winnerBottleId = fulfilled[0]!.value.bottleId;
+    expect(await getAlias(name)).toMatchObject({ bottleId: winnerBottleId });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: winnerBottleId });
   });
 
   test("scopes propagation by site and volume", async ({ fixtures }) => {
@@ -546,42 +655,7 @@ describe("assignBottleAliasInTransaction", () => {
   });
 });
 
-describe("migration and replay compatibility", () => {
-  test("promotion changes runtime Bottle identity and retains target evidence", async ({
-    fixtures,
-  }) => {
-    const legacy = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: legacy.id });
-    const promoted = await fixtures.Bottle();
-    const target = await getExactTarget(promoted.id);
-    await db
-      .update(bottleAliases)
-      .set({
-        bottleId: legacy.id,
-        releaseId: release.id,
-        targetId: null,
-      })
-      .where(eq(bottleAliases.name, release.fullName));
-
-    await db.transaction((tx) =>
-      reserveLegacyPromotionCanonicalAliasInTransaction(tx, {
-        name: release.fullName,
-        promotedBottleId: promoted.id,
-        targetId: target.id,
-        legacyBottleId: legacy.id,
-        legacyReleaseId: release.id,
-        assignedByActorId: promoted.createdByActorId,
-      }),
-    );
-
-    expect(await getAlias(release.fullName)).toMatchObject({
-      bottleId: promoted.id,
-      releaseId: null,
-      targetId: target.id,
-      assignmentSource: "canonical",
-    });
-  });
-
+describe("alias replay", () => {
   test("raw alias replay uses Bottle identity without target resolution", async ({
     fixtures,
   }) => {

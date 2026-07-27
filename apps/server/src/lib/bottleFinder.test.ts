@@ -1,19 +1,9 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
-  bottleReleasePromotions,
-  catalogTargets,
+  bottleGroupTombstones,
+  bottleTombstones,
 } from "@peated/server/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
 import { findBottleAliasAssignment, findBottleId } from "./bottleFinder";
-
-async function getExactTargetId(bottleId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Exact target fixture not found.");
-  return target.id;
-}
 
 describe("findBottleId", () => {
   test("matches exact", async ({ fixtures }) => {
@@ -58,111 +48,98 @@ describe("findBottleId", () => {
     expect(result).toMatchInlineSnapshot(`1`);
   });
 
-  test("uses the alias Bottle instead of retained exact-target drift", async ({
+  test("returns a target- and release-free direct Bottle snapshot", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const staleBottle = await fixtures.Bottle();
-    const targetId = await getExactTargetId(bottle.id);
-    await fixtures.BottleAlias({
-      bottleId: staleBottle.id,
-      targetId,
-      name: "Target-backed Exact Alias",
+    const evidenceBottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: evidenceBottle.id,
+    });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: "Direct Alias With Evidence",
     });
 
-    await expect(
-      findBottleAliasAssignment("Target-backed Exact Alias"),
-    ).resolves.toMatchObject({
+    const result = await findBottleAliasAssignment(alias.name);
+
+    expect(result).toMatchObject({
       alias: {
-        bottleId: staleBottle.id,
-        targetId,
+        name: alias.name,
+        bottleId: bottle.id,
+        ignored: false,
+        assignmentSource: alias.assignmentSource,
+        assignedByActorId: alias.assignedByActorId,
       },
-      bottleId: staleBottle.id,
+      bottleId: bottle.id,
     });
+    expect(result?.alias).not.toHaveProperty("releaseId");
+    expect(result?.alias).not.toHaveProperty("targetId");
   });
 
   test("resolves a general alias to its retained Bottle", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, bottle.groupId!),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) throw new Error("Generic target fixture not found.");
-    await fixtures.BottleAlias({
+    const alias = await fixtures.BottleAlias({
       bottleId: bottle.id,
-      targetId: genericTarget.id,
-      name: "Generic Alias",
+      name: "General Bottle Alias",
     });
 
-    await expect(
-      findBottleAliasAssignment("Generic Alias"),
-    ).resolves.toMatchObject({
-      alias: {
-        bottleId: bottle.id,
-        targetId: genericTarget.id,
-      },
+    await expect(findBottleAliasAssignment(alias.name)).resolves.toMatchObject({
+      alias: { bottleId: bottle.id },
       bottleId: bottle.id,
     });
   });
 
-  test("projects a legacy alias as one direct Bottle", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    await db.insert(bottleAliases).values({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      targetId: null,
-      name: "Legacy Release Alias",
-      assignedByActorId: bottle.createdByActorId,
-    });
-
-    await expect(
-      findBottleAliasAssignment("Legacy Release Alias"),
-    ).resolves.toMatchObject({
-      alias: {
-        bottleId: bottle.id,
-        releaseId: release.id,
-        targetId: null,
-      },
-      bottleId: bottle.id,
-    });
-  });
-
-  test("retained release promotion evidence cannot override the alias Bottle", async ({
+  test("excludes ignored aliases but preserves inactive direct assignments", async ({
     fixtures,
   }) => {
-    const parent = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await fixtures.Bottle();
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promoted.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
+    const ignored = await fixtures.Bottle();
+    const unassigned = await fixtures.LegacyBottle();
+    const retired = await fixtures.Bottle();
+    const groupRetired = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const groupReplacement = await fixtures.Bottle();
+    await fixtures.BottleAlias({
+      name: "Ignored Alias",
+      bottleId: ignored.id,
+      ignored: true,
     });
-    await db.insert(bottleAliases).values({
-      bottleId: parent.id,
-      releaseId: release.id,
-      targetId: null,
-      name: "Promoted Direct Alias",
-      assignedByActorId: parent.createdByActorId,
+    await fixtures.BottleAlias({
+      name: "Unbound Alias",
+      bottleId: null,
+    });
+    await fixtures.BottleAlias({
+      name: "Unassigned Alias",
+      bottleId: unassigned.id,
+    });
+    await fixtures.BottleAlias({
+      name: "Retired Alias",
+      bottleId: retired.id,
+    });
+    await fixtures.BottleAlias({
+      name: "Retired Group Alias",
+      bottleId: groupRetired.id,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+    await db.insert(bottleGroupTombstones).values({
+      groupId: groupRetired.groupId!,
+      newGroupId: groupReplacement.groupId!,
+      createdByActorId: groupRetired.createdByActorId,
     });
 
-    await expect(
-      findBottleAliasAssignment("Promoted Direct Alias"),
-    ).resolves.toMatchObject({
-      alias: {
-        bottleId: parent.id,
-        releaseId: release.id,
-        targetId: null,
-      },
-      bottleId: parent.id,
-    });
+    await expect(findBottleId("Ignored Alias")).resolves.toBeNull();
+    await expect(findBottleId("Unbound Alias")).resolves.toBeNull();
+    await expect(findBottleId("Unassigned Alias")).resolves.toBe(unassigned.id);
+    await expect(findBottleId("Retired Alias")).resolves.toBe(retired.id);
+    await expect(findBottleId("Retired Group Alias")).resolves.toBe(
+      groupRetired.id,
+    );
   });
 
   test("prioritizes correct prefix", async ({ fixtures }) => {

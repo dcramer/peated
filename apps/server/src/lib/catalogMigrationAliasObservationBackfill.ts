@@ -8,9 +8,9 @@ import { bottleAliases, bottleObservations } from "../db/schema";
 import type { CatalogMigrationAliasObservationTable } from "../schemas/catalogMigrationRun";
 import {
   backfillLegacyBottleAliasTargetInTransaction,
-  BottleAliasIdentityChangedError,
-  type BottleAliasIdentitySnapshot,
-} from "./bottleAliases";
+  CatalogMigrationBottleAliasIdentityChangedError,
+  type CatalogMigrationBottleAliasIdentitySnapshot,
+} from "./catalogMigrationBottleAliases";
 import {
   CatalogMigrationFamilyTargetError,
   lockCatalogMigrationFamilyTargetsInTransaction,
@@ -52,7 +52,7 @@ export type CatalogMigrationAliasObservationParentResult = {
 };
 
 type AliasPlan = {
-  snapshot: BottleAliasIdentitySnapshot;
+  snapshot: CatalogMigrationBottleAliasIdentitySnapshot;
   target: CatalogTargetAssignmentDescriptor;
 };
 
@@ -347,7 +347,11 @@ export async function backfillLegacyCatalogAliasObservationsForParent(
         if (outcome === "updated") aliasesUpdated += 1;
         else aliasesReused += 1;
       } catch (error) {
-        if (!(error instanceof BottleAliasIdentityChangedError)) throw error;
+        if (
+          !(error instanceof CatalogMigrationBottleAliasIdentityChangedError)
+        ) {
+          throw error;
+        }
         throw rowError(
           "row_changed",
           parentId,
