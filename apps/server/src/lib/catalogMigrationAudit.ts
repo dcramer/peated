@@ -93,25 +93,64 @@ export function summarizePromotionMappings({
   };
 }
 
+/**
+ * Retired Bottles are not migration parents, but their legacy releases remain
+ * visible because a release-bearing tombstone makes migration unsafe.
+ */
 async function loadLegacyCatalogSummary(
   database: AnyDatabase,
 ): Promise<CatalogMigrationLegacySummary> {
   const result = await database.execute<{
     report: CatalogMigrationLegacySummary;
   }>(sql`
-    WITH release_counts AS (
+    WITH completed_promotions AS (
+      SELECT promoted_bottle_id
+      FROM bottle_release_promotion
+      WHERE status = 'promoted'
+        AND promoted_bottle_id IS NOT NULL
+        AND completed_at IS NOT NULL
+        AND error IS NULL
+    ), release_counts AS (
       SELECT bottle_id, COUNT(*)::int AS release_count
       FROM bottle_release
       GROUP BY bottle_id
+    ), legacy_parent_candidates AS (
+      SELECT
+        b.*,
+        COALESCE(release_counts.release_count, 0) AS legacy_release_count,
+        tombstone.bottle_id IS NOT NULL AS is_retired
+      FROM bottle b
+      LEFT JOIN completed_promotions promotion
+        ON promotion.promoted_bottle_id = b.id
+      LEFT JOIN release_counts
+        ON release_counts.bottle_id = b.id
+      LEFT JOIN bottle_tombstone tombstone
+        ON tombstone.bottle_id = b.id
+      WHERE promotion.promoted_bottle_id IS NULL
+    ), legacy_parents AS (
+      SELECT *
+      FROM legacy_parent_candidates
+      WHERE NOT is_retired
     )
     SELECT json_build_object(
       'totalParents', COUNT(*)::int,
-      'parentsWithZeroReleases', COUNT(*) FILTER (WHERE COALESCE(rc.release_count, 0) = 0)::int,
-      'parentsWithOneRelease', COUNT(*) FILTER (WHERE rc.release_count = 1)::int,
-      'parentsWithMultipleReleases', COUNT(*) FILTER (WHERE rc.release_count > 1)::int,
+      'parentsWithZeroReleases', COUNT(*) FILTER (WHERE b.legacy_release_count = 0)::int,
+      'parentsWithOneRelease', COUNT(*) FILTER (WHERE b.legacy_release_count = 1)::int,
+      'parentsWithMultipleReleases', COUNT(*) FILTER (WHERE b.legacy_release_count > 1)::int,
+      'retiredParents', (
+        SELECT COUNT(*)::int
+        FROM legacy_parent_candidates candidate
+        WHERE candidate.is_retired
+      ),
+      'retiredParentsWithReleases', (
+        SELECT COUNT(*)::int
+        FROM legacy_parent_candidates candidate
+        WHERE candidate.is_retired
+          AND candidate.legacy_release_count > 0
+      ),
       'totalReleases', (SELECT COUNT(*)::int FROM bottle_release),
       'parentsWithReleaseLikeFields', COUNT(*) FILTER (
-        WHERE COALESCE(rc.release_count, 0) > 0
+        WHERE b.legacy_release_count > 0
           AND (
             b.edition IS NOT NULL OR b.vintage_year IS NOT NULL OR
             b.release_year IS NOT NULL OR b.abv IS NOT NULL OR
@@ -164,8 +203,7 @@ async function loadLegacyCatalogSummary(
         WHERE r.image_url IS NULL OR BTRIM(r.image_url) = ''
       )
     ) AS report
-    FROM bottle b
-    LEFT JOIN release_counts rc ON rc.bottle_id = b.id
+    FROM legacy_parents b
     LEFT JOIN actor parent_actor ON parent_actor.id = b.created_by_actor_id
   `);
 
@@ -190,6 +228,13 @@ async function loadReferenceSummaries(
         ('proposals_suggested'),
         ('proposal_attempts_current'),
         ('proposal_attempts_suggested')
+    ), completed_promotions AS (
+      SELECT release_id, promoted_bottle_id
+      FROM bottle_release_promotion
+      WHERE status = 'promoted'
+        AND promoted_bottle_id IS NOT NULL
+        AND completed_at IS NOT NULL
+        AND error IS NULL
     ), reference_rows AS (
       SELECT 'tastings'::text AS surface, bottle_id, release_id FROM tasting
       UNION ALL SELECT 'reviews', bottle_id, release_id FROM review
@@ -218,20 +263,30 @@ async function loadReferenceSummaries(
       COUNT(*) FILTER (WHERE refs.release_id IS NOT NULL AND r.id IS NULL)::int AS "missingReleaseReferences",
       COUNT(*) FILTER (
         WHERE refs.release_id IS NOT NULL
-          AND (refs.bottle_id IS NULL OR r.bottle_id IS DISTINCT FROM refs.bottle_id)
+          AND (
+            refs.bottle_id IS NULL OR
+            COALESCE(promotion.promoted_bottle_id, r.bottle_id)
+              IS DISTINCT FROM refs.bottle_id
+          )
       )::int AS "mismatchedPairs",
       COUNT(*) FILTER (
         WHERE (refs.bottle_id IS NOT NULL AND b.id IS NULL)
           OR (refs.release_id IS NOT NULL AND r.id IS NULL)
           OR (
             refs.release_id IS NOT NULL
-            AND (refs.bottle_id IS NULL OR r.bottle_id IS DISTINCT FROM refs.bottle_id)
+            AND (
+              refs.bottle_id IS NULL OR
+              COALESCE(promotion.promoted_bottle_id, r.bottle_id)
+                IS DISTINCT FROM refs.bottle_id
+            )
           )
       )::int AS "invalidRows"
     FROM surfaces
     LEFT JOIN reference_rows refs ON refs.surface = surfaces.surface
     LEFT JOIN bottle b ON b.id = refs.bottle_id
     LEFT JOIN bottle_release r ON r.id = refs.release_id
+    LEFT JOIN completed_promotions promotion
+      ON promotion.release_id = refs.release_id
     GROUP BY surfaces.surface
     ORDER BY surfaces.surface
   `);
@@ -307,7 +362,11 @@ async function loadCollisions(
       FROM bottle_alias a
       INNER JOIN bottle_release r ON r.id = a.release_id
       INNER JOIN bottle b ON LOWER(b.full_name) = LOWER(a.name)
+      LEFT JOIN valid_promotions promotion
+        ON promotion.release_id = r.id
+        AND promotion.promoted_bottle_id = b.id
       WHERE NOT COALESCE(a.ignored, false)
+        AND promotion.release_id IS NULL
 
       UNION ALL
 
@@ -371,7 +430,68 @@ async function loadPromotionMappingSummary({
   });
 }
 
-/** Runs the migration preflight in a database-enforced read-only transaction. */
+/**
+ * Collects one complete audit on a caller-owned snapshot. Migration apply uses
+ * this after its fixed table locks for preflight comparison and postflight.
+ */
+export async function collectCatalogMigrationAudit(
+  database: AnyDatabase,
+): Promise<CatalogMigrationAudit> {
+  const databaseResult = await database.execute<{ databaseName: string }>(sql`
+    SELECT current_database() AS "databaseName"
+  `);
+  const legacyCatalog = await loadLegacyCatalogSummary(database);
+  const references = await loadReferenceSummaries(database);
+  const promotionMappings = await loadPromotionMappingSummary({
+    database,
+    totalLegacyReleases: legacyCatalog.totalReleases,
+  });
+  const collisions = await loadCollisions(
+    database,
+    promotionMappings.tablePresent,
+  );
+
+  const invalidReferenceCount = references.reduce(
+    (total, reference) => total + reference.invalidRows,
+    0,
+  );
+  const blockingIssueCount =
+    legacyCatalog.parentsWithReleaseLikeFields +
+    legacyCatalog.childParentAgeConflicts +
+    legacyCatalog.orphanReleases +
+    legacyCatalog.missingParentCreators +
+    legacyCatalog.missingReleaseCreators +
+    legacyCatalog.retiredParentsWithReleases +
+    invalidReferenceCount +
+    collisions.length +
+    promotionMappings.duplicateReleaseMappings +
+    promotionMappings.pendingMappings +
+    promotionMappings.failedMappings +
+    promotionMappings.partialMappings +
+    promotionMappings.invalidStatusMappings;
+  const warningCount =
+    legacyCatalog.missingParentAliases +
+    legacyCatalog.missingReleaseAliases +
+    legacyCatalog.missingParentImages +
+    legacyCatalog.missingReleaseImages;
+
+  return CatalogMigrationAuditSchema.parse({
+    schemaVersion: CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION,
+    generatedAt: new Date().toISOString(),
+    databaseName: firstRow(databaseResult, "database identity").databaseName,
+    legacyCatalog,
+    references,
+    collisions: {
+      count: collisions.length,
+      items: collisions,
+    },
+    promotionMappings,
+    blockingIssueCount,
+    warningCount,
+  });
+}
+
+/** Runs the migration audit in a database-enforced read-only transaction. */
 export async function runCatalogMigrationAudit(
   database: AnyConnection = db,
 ): Promise<CatalogMigrationAudit> {
@@ -379,55 +499,7 @@ export async function runCatalogMigrationAudit(
     await tx.execute(
       sql`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`,
     );
-
-    const databaseResult = await tx.execute<{ databaseName: string }>(sql`
-      SELECT current_database() AS "databaseName"
-    `);
-    const legacyCatalog = await loadLegacyCatalogSummary(tx);
-    const references = await loadReferenceSummaries(tx);
-    const promotionMappings = await loadPromotionMappingSummary({
-      database: tx,
-      totalLegacyReleases: legacyCatalog.totalReleases,
-    });
-    const collisions = await loadCollisions(tx, promotionMappings.tablePresent);
-
-    const invalidReferenceCount = references.reduce(
-      (total, reference) => total + reference.invalidRows,
-      0,
-    );
-    const blockingIssueCount =
-      legacyCatalog.parentsWithReleaseLikeFields +
-      legacyCatalog.childParentAgeConflicts +
-      legacyCatalog.orphanReleases +
-      legacyCatalog.missingParentCreators +
-      legacyCatalog.missingReleaseCreators +
-      invalidReferenceCount +
-      collisions.length +
-      promotionMappings.duplicateReleaseMappings +
-      promotionMappings.pendingMappings +
-      promotionMappings.failedMappings +
-      promotionMappings.partialMappings +
-      promotionMappings.invalidStatusMappings;
-    const warningCount =
-      legacyCatalog.missingParentAliases +
-      legacyCatalog.missingReleaseAliases +
-      legacyCatalog.missingParentImages +
-      legacyCatalog.missingReleaseImages;
-
-    return CatalogMigrationAuditSchema.parse({
-      schemaVersion: CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION,
-      generatedAt: new Date().toISOString(),
-      databaseName: firstRow(databaseResult, "database identity").databaseName,
-      legacyCatalog,
-      references,
-      collisions: {
-        count: collisions.length,
-        items: collisions,
-      },
-      promotionMappings,
-      blockingIssueCount,
-      warningCount,
-    });
+    return await collectCatalogMigrationAudit(tx);
   });
 }
 
@@ -442,6 +514,7 @@ export function formatCatalogMigrationAudit(
     "",
     "Legacy catalog",
     `  Parents: ${catalog.totalParents} (${catalog.parentsWithZeroReleases} zero / ${catalog.parentsWithOneRelease} one / ${catalog.parentsWithMultipleReleases} multiple releases)`,
+    `  Retired parents: ${catalog.retiredParents} (${catalog.retiredParentsWithReleases} with releases)`,
     `  Releases: ${catalog.totalReleases}`,
     `  Parent release-like fields: ${catalog.parentsWithReleaseLikeFields}`,
     `  Parent/child age conflicts: ${catalog.childParentAgeConflicts}`,

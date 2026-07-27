@@ -1,12 +1,14 @@
 import { z } from "zod";
 
-export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 2 as const;
+export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 3 as const;
 
 export const CatalogMigrationLegacySummarySchema = z.object({
   totalParents: z.number().int().gte(0),
   parentsWithZeroReleases: z.number().int().gte(0),
   parentsWithOneRelease: z.number().int().gte(0),
   parentsWithMultipleReleases: z.number().int().gte(0),
+  retiredParents: z.number().int().gte(0),
+  retiredParentsWithReleases: z.number().int().gte(0),
   totalReleases: z.number().int().gte(0),
   parentsWithReleaseLikeFields: z.number().int().gte(0),
   childParentAgeConflicts: z.number().int().gte(0),

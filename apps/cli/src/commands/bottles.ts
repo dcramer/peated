@@ -6,17 +6,15 @@ import {
   bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
   entities,
 } from "@peated/server/db/schema";
-import { getExactCatalogTargetStatsRepairPage } from "@peated/server/lib/catalogTargetStatsRepair";
 import { findEntityByExactNameOrAlias } from "@peated/server/lib/db";
 import { fixBadReviewEntities } from "@peated/server/lib/fixBadReviewEntities";
 import { repairBottleBrandDistilleryAssignments } from "@peated/server/lib/repairBottleBrandDistilleryAssignments";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import { routerClient } from "@peated/server/orpc/router";
 import { runJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 
 const subcommand = program.command("bottles");
 
@@ -58,15 +56,8 @@ subcommand
     const step = 1000;
     const baseQuery = db
       .select({ id: bottles.id })
-      .from(catalogTargets)
-      .innerJoin(
-        bottles,
-        and(
-          eq(catalogTargets.bottleId, bottles.id),
-          eq(catalogTargets.groupId, bottles.groupId),
-        ),
-      )
-      .innerJoin(bottleGroups, eq(bottleGroups.id, catalogTargets.groupId))
+      .from(bottles)
+      .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
       .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
       .leftJoin(
         bottleGroupTombstones,
@@ -74,7 +65,6 @@ subcommand
       )
       .where(
         and(
-          isNotNull(catalogTargets.bottleId),
           isNull(bottleTombstones.bottleId),
           isNull(bottleGroupTombstones.groupId),
           bottleIds.length
@@ -138,14 +128,30 @@ subcommand
     let offset = 0;
     while (hasResults) {
       hasResults = false;
-      const query = await getExactCatalogTargetStatsRepairPage({
-        bottleIds: requestedBottleIds,
-        limit: step,
-        offset,
-      });
-      for (const { bottleId, targetId } of query) {
+      const query = await db
+        .select({ bottleId: bottles.id })
+        .from(bottles)
+        .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
+        .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
+        .leftJoin(
+          bottleGroupTombstones,
+          eq(bottleGroupTombstones.groupId, bottleGroups.id),
+        )
+        .where(
+          and(
+            isNull(bottleTombstones.bottleId),
+            isNull(bottleGroupTombstones.groupId),
+            requestedBottleIds.length
+              ? inArray(bottles.id, requestedBottleIds)
+              : undefined,
+          ),
+        )
+        .orderBy(asc(bottles.id))
+        .offset(offset)
+        .limit(step);
+      for (const { bottleId } of query) {
         console.log(`Updating stats for Bottle ${bottleId}.`);
-        await runJob("UpdateBottleStats", { targetId });
+        await runJob("UpdateBottleStats", { bottleId });
         hasResults = true;
       }
       offset += step;

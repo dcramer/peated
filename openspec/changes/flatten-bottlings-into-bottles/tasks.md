@@ -69,29 +69,29 @@ and map to an explicit removal task.
 
 ## 4. One-Shot Legacy Migration
 
-- [ ] 4.1 Replace target/checkpoint migration writers with one transaction
+- [x] 4.1 Replace target/checkpoint migration writers with one transaction
       owner and one retained read-only pre/post audit boundary.
-- [ ] 4.2 Lock affected tables in a documented fixed order and rerun collision
+- [x] 4.2 Lock affected tables in a documented fixed order and rerun collision
       and integrity preflight before the first mutation.
-- [ ] 4.3 Assign every legacy parent Bottle to one migration-created group and
+- [x] 4.3 Assign every legacy parent Bottle to one migration-created group and
       retain it as the general/unversioned member.
-- [ ] 4.4 Promote every BottleRelease into an independently complete Bottle in
+- [x] 4.4 Promote every BottleRelease into an independently complete Bottle in
       its parent's group and persist a completed durable mapping.
-- [ ] 4.5 Repoint every release-specific consumer Bottle reference to the
+- [x] 4.5 Repoint every release-specific consumer Bottle reference to the
       promoted Bottle while retaining its release id as historical evidence until
       separately approved cleanup.
-- [ ] 4.6 Preserve every parent-only consumer reference on the retained parent
+- [x] 4.6 Preserve every parent-only consumer reference on the retained parent
       Bottle.
-- [ ] 4.7 Migrate aliases, observations, reviews, collections, Flights, prices,
+- [x] 4.7 Migrate aliases, observations, reviews, collections, Flights, prices,
       decisions, proposals, and attempts using the same direct-Bottle rule without
       invoking runtime side effects.
-- [ ] 4.8 Assert counts, mappings, Bottle materialization, group membership,
+- [x] 4.8 Assert counts, mappings, Bottle materialization, group membership,
       direct foreign keys, and membership uniqueness before commit.
-- [ ] 4.9 Remove the external checkpoint state machine, filesystem report lock,
+- [x] 4.9 Remove the external checkpoint state machine, filesystem report lock,
       resumable three-phase orchestrator, target parity runtime, and their tests.
-- [ ] 4.10 Add integration tests for clean, collision, invalid-pair,
+- [x] 4.10 Add integration tests for clean, collision, invalid-pair,
       concurrent-drift, rollback, complete migration, and postflight cases.
-- [ ] 4.11 Keep the first migration non-destructive: do not drop BottleRelease,
+- [x] 4.11 Keep the first migration non-destructive: do not drop BottleRelease,
       legacy columns, or permanent redirect evidence.
 
 ## 5. Server And API Cutover

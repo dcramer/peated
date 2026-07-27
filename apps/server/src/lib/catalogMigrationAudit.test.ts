@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { bottleAliases, bottleReleasePromotions, bottles } from "../db/schema";
+import {
+  bottleAliases,
+  bottleReleasePromotions,
+  bottles,
+  bottleTombstones,
+} from "../db/schema";
 import {
   formatCatalogMigrationAudit,
   runCatalogMigrationAudit,
@@ -37,6 +42,8 @@ describe("catalog migration audit", () => {
       parentsWithZeroReleases: 0,
       parentsWithOneRelease: 1,
       parentsWithMultipleReleases: 0,
+      retiredParents: 0,
+      retiredParentsWithReleases: 0,
       totalReleases: 1,
       parentsWithReleaseLikeFields: 0,
       childParentAgeConflicts: 0,
@@ -75,6 +82,66 @@ describe("catalog migration audit", () => {
     });
     expect(report.blockingIssueCount).toBe(0);
     expect(report.warningCount).toBe(0);
+  });
+
+  test("reports a retired zero-release parent without blocking migration", async ({
+    fixtures,
+  }) => {
+    const retired = await fixtures.LegacyBottle();
+    await db.insert(bottleTombstones).values({ bottleId: retired.id });
+
+    const report = await runCatalogMigrationAudit();
+
+    expect(report.legacyCatalog).toMatchObject({
+      totalParents: 0,
+      parentsWithZeroReleases: 0,
+      parentsWithOneRelease: 0,
+      parentsWithMultipleReleases: 0,
+      retiredParents: 1,
+      retiredParentsWithReleases: 0,
+      totalReleases: 0,
+    });
+    expect(report.blockingIssueCount).toBe(0);
+    expect(
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, retired.id),
+      }),
+    ).toMatchObject({ bottleId: retired.id });
+  });
+
+  test("blocks a retired parent that still owns a legacy release", async ({
+    fixtures,
+  }) => {
+    const retired = await fixtures.LegacyBottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: retired.id,
+      name: `${retired.name} retired release`,
+      fullName: `${retired.fullName} retired release`,
+    });
+    await db.insert(bottleTombstones).values({ bottleId: retired.id });
+
+    const report = await runCatalogMigrationAudit();
+
+    expect(report.legacyCatalog).toMatchObject({
+      totalParents: 0,
+      parentsWithZeroReleases: 0,
+      parentsWithOneRelease: 0,
+      parentsWithMultipleReleases: 0,
+      retiredParents: 1,
+      retiredParentsWithReleases: 1,
+      totalReleases: 1,
+    });
+    expect(report.blockingIssueCount).toBe(1);
+    expect(
+      await db.query.bottleTombstones.findFirst({
+        where: eq(bottleTombstones.bottleId, retired.id),
+      }),
+    ).toMatchObject({ bottleId: retired.id });
+    expect(
+      await db.query.bottleReleases.findFirst({
+        where: (releases, { eq }) => eq(releases.id, release.id),
+      }),
+    ).toMatchObject({ id: release.id, bottleId: retired.id });
   });
 
   test("reports release-like parent fields, age conflicts, and name collisions", async ({
@@ -226,9 +293,21 @@ describe("catalog migration audit", () => {
     fixtures,
   }) => {
     const parent = await fixtures.LegacyBottle();
-    const pending = await fixtures.BottleRelease({ bottleId: parent.id });
-    const failed = await fixtures.BottleRelease({ bottleId: parent.id });
-    const partial = await fixtures.BottleRelease({ bottleId: parent.id });
+    const pending = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: `${parent.name} pending`,
+      fullName: `${parent.fullName} pending`,
+    });
+    const failed = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: `${parent.name} failed`,
+      fullName: `${parent.fullName} failed`,
+    });
+    const partial = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      name: `${parent.name} partial`,
+      fullName: `${parent.fullName} partial`,
+    });
     const promoted = await fixtures.Bottle();
 
     await db.insert(bottleReleasePromotions).values([
@@ -284,12 +363,25 @@ describe("catalog migration audit", () => {
       startedAt: new Date("2026-01-01T00:00:00.000Z"),
       completedAt: new Date("2026-01-01T00:00:01.000Z"),
     });
+    await fixtures.Tasting({
+      bottleId: promoted.id,
+      releaseId: release.id,
+      tags: [],
+    });
 
     const completedReport = await runCatalogMigrationAudit();
 
+    expect(completedReport.legacyCatalog.totalParents).toBe(1);
     expect(completedReport.promotionMappings).toMatchObject({
       mappedReleases: 1,
       completedMappings: 1,
+    });
+    expect(
+      completedReport.references.find(({ surface }) => surface === "tastings"),
+    ).toMatchObject({
+      releaseRows: 1,
+      mismatchedPairs: 0,
+      invalidRows: 0,
     });
     expect(
       completedReport.collisions.items.filter(
@@ -332,10 +424,11 @@ describe("catalog migration audit", () => {
       await runCatalogMigrationAudit(),
     );
 
-    expect(output).toContain("Catalog migration audit v2");
+    expect(output).toContain("Catalog migration audit v3");
     expect(output).toContain(
       "Parents: 1 (1 zero / 0 one / 0 multiple releases)",
     );
+    expect(output).toContain("Retired parents: 0 (0 with releases)");
     expect(output).toContain(
       "Promotion mappings: present (0/0 completed; 0 pending / 0 failed / 0 partial / 0 invalid status)",
     );
