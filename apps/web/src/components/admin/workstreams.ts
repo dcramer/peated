@@ -1,6 +1,6 @@
 export type AdminWorkstream = {
   href: string;
-  id: "brand-repairs" | "canon-repairs" | "entity-audits" | "queue";
+  id: "brand-repairs" | "entity-audits" | "queue";
   pageTitle: string;
   sidebarLabel: string;
   summary: string;
@@ -14,7 +14,7 @@ export const ADMIN_WORKSTREAMS: AdminWorkstream[] = [
     pageTitle: "Incoming Listings",
     sidebarLabel: "Incoming Listings",
     summary:
-      "Review new or changed retailer listings and approve the exact Bottle or release-family assignment.",
+      "Review new or changed retailer listings and approve the exact Bottle assignment.",
     whenToUse:
       "Use this when a listing is wrong or unmatched, but the catalog bottle itself may still be correct.",
   },
@@ -37,15 +37,5 @@ export const ADMIN_WORKSTREAMS: AdminWorkstream[] = [
       "Move bottles onto the correct brand entity when the bottle identity is right but the stored producer assignment is wrong.",
     whenToUse:
       "Use this when the current bottle title or aliases clearly point at an existing brand entity, and the old producer may still belong as a distillery link.",
-  },
-  {
-    id: "canon-repairs",
-    href: "/admin/canon-repairs",
-    pageTitle: "Bottle Name Repairs",
-    sidebarLabel: "Bottle Name Repairs",
-    summary:
-      "Merge same-brand wording variants into the cleaner existing bottle record.",
-    whenToUse:
-      "Use this when two bottle records represent the same bottle and one name should win.",
   },
 ];

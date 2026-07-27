@@ -119,7 +119,6 @@ Package-specific reminders:
 - [`src/releaseIdentity.ts`](./src/releaseIdentity.ts): canonical Bottle name and exact-trait normalization shared with staged migration consumers
 - [`src/bottleCreationDrafts.ts`](./src/bottleCreationDrafts.ts): create-draft normalization
 - [`src/priceMatchingEvidence.ts`](./src/priceMatchingEvidence.ts): shared evidence checks
-- [`src/legacyReleaseIdentityEvidence.ts`](./src/legacyReleaseIdentityEvidence.ts): isolated migration-only evidence for legacy catalog repair; not part of classifier retrieval or decisions
 - [`src/smws.ts`](./src/smws.ts): SMWS parsing and exact-code behavior
 - [`src/eval-fixtures/`](./src/eval-fixtures): file-backed eval fixtures
 - [`src/classifier.eval.test.ts`](./src/classifier.eval.test.ts): live classifier eval runner

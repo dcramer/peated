@@ -14,7 +14,6 @@ export type CatalogVerificationCreationSource = z.infer<
 
 export const CatalogVerificationWorkstreamEnum = z.enum([
   "brand-repairs",
-  "canon-repairs",
   "entity-audits",
 ]);
 
@@ -24,7 +23,6 @@ export type CatalogVerificationWorkstream = z.infer<
 
 export const CatalogVerificationFindingKindEnum = z.enum([
   "brand_repair_candidate",
-  "canon_repair_candidate",
   "entity_audit_candidate",
 ]);
 
@@ -40,6 +38,15 @@ export const CatalogVerificationFindingSchema = z
 export type CatalogVerificationFinding = z.infer<
   typeof CatalogVerificationFindingSchema
 >;
+
+const HistoricalCatalogVerificationFindingSchema = z
+  .object({
+    kind: z.literal("canon_repair_candidate"),
+    summary: z.string().min(1),
+    details: z.string().nullable().default(null),
+    workstream: z.literal("canon-repairs"),
+  })
+  .strict();
 
 export const CatalogVerificationCreationMetadataSchema = z
   .object({
@@ -62,7 +69,7 @@ export type CatalogVerificationStatus = z.infer<
   typeof CatalogVerificationStatusEnum
 >;
 
-export const CatalogVerificationResultSchema = z
+const ActiveCatalogVerificationResultSchema = z
   .object({
     phase: z.literal("result"),
     source: CatalogVerificationCreationSourceEnum,
@@ -73,6 +80,22 @@ export const CatalogVerificationResultSchema = z
   .strict();
 
 export type CatalogVerificationResult = z.infer<
+  typeof ActiveCatalogVerificationResultSchema
+>;
+
+export const CatalogVerificationResultSchema =
+  ActiveCatalogVerificationResultSchema.extend({
+    findings: z
+      .array(
+        z.union([
+          CatalogVerificationFindingSchema,
+          HistoricalCatalogVerificationFindingSchema,
+        ]),
+      )
+      .default([]),
+  });
+
+export type PersistedCatalogVerificationResult = z.infer<
   typeof CatalogVerificationResultSchema
 >;
 
@@ -136,7 +159,7 @@ export function buildCatalogVerificationCreationMetadata(
 export function buildCatalogVerificationResult(
   input: Omit<CatalogVerificationResult, "phase">,
 ): CatalogVerificationResult {
-  return CatalogVerificationResultSchema.parse({
+  return ActiveCatalogVerificationResultSchema.parse({
     phase: "result",
     ...input,
   });

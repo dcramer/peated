@@ -2,11 +2,8 @@ import type { CatalogVerificationFinding } from "@peated/catalog-verifier";
 import { db } from "@peated/server/db";
 import { bottles, entities } from "@peated/server/db/schema";
 import { findBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
-import { getCanonRepairCandidates } from "@peated/server/lib/canonRepairCandidates";
 import { getEntityClassificationReference } from "@peated/server/lib/entityAuditCandidates";
 import { eq } from "drizzle-orm";
-
-const EXACT_LOOKUP_LIMIT = 100;
 
 export async function getBottleCatalogVerificationFindings({
   bottleId,
@@ -27,17 +24,10 @@ export async function getBottleCatalogVerificationFindings({
     throw new Error(`Unknown bottle: ${bottleId}`);
   }
 
-  const [brandRepairResults, canonRepairResults] = await Promise.all([
-    findBrandRepairCandidates({
-      currentBrandId: bottle.brandId ?? undefined,
-      query: bottle.fullName,
-    }),
-    getCanonRepairCandidates({
-      query: bottle.fullName,
-      cursor: 1,
-      limit: EXACT_LOOKUP_LIMIT,
-    }),
-  ]);
+  const brandRepairResults = await findBrandRepairCandidates({
+    currentBrandId: bottle.brandId ?? undefined,
+    query: bottle.fullName,
+  });
 
   const findings: CatalogVerificationFinding[] = [];
 
@@ -53,18 +43,6 @@ export async function getBottleCatalogVerificationFindings({
         .slice(0, 3)
         .join(" | "),
       workstream: "brand-repairs",
-    });
-  }
-
-  const canonRepair = canonRepairResults.results.find(
-    (candidate) => candidate.bottle.id === bottleId,
-  );
-  if (canonRepair) {
-    findings.push({
-      kind: "canon_repair_candidate",
-      summary: `Bottle looks like a wording variant of ${canonRepair.targetBottle.fullName}.`,
-      details: null,
-      workstream: "canon-repairs",
     });
   }
 

@@ -68,6 +68,29 @@ const suggestedBottle = {
   hasTasted: false,
 } satisfies QueueBottle;
 
+const localCandidate = {
+  bottleId: 19,
+  alias: "Springbank Batch 24",
+  fullName: "Springbank 12 Cask Strength Batch 24",
+  brand: "Springbank",
+  bottler: null,
+  series: null,
+  distillery: ["Springbank"],
+  category: "single_malt",
+  statedAge: 12,
+  edition: "Batch 24",
+  caskStrength: true,
+  singleCask: false,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  abv: 57.8,
+  vintageYear: null,
+  releaseYear: 2024,
+  score: 0.93,
+  source: ["vector"],
+} satisfies QueueItem["candidateBottles"][number];
+
 function queueItem(): QueueItem {
   const item = {
     id: 99,
@@ -119,7 +142,7 @@ function queueItem(): QueueItem {
     parentBottle: null,
     proposedBottle: null,
     proposedRelease: null,
-    candidateBottles: [],
+    candidateBottles: [localCandidate],
     webEvidenceChecks: [],
     searchEvidence: [],
   } satisfies Partial<QueueItem>;
@@ -143,5 +166,6 @@ describe("formatPriceMatchQueueLlmExport", () => {
     expect(payload.proposal).not.toHaveProperty("currentReleaseId");
     expect(payload.proposal).not.toHaveProperty("suggestedBottleId");
     expect(payload.proposal).not.toHaveProperty("suggestedReleaseId");
+    expect(payload.artifacts.localCandidates).toEqual([localCandidate]);
   });
 });

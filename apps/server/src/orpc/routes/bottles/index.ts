@@ -3,7 +3,6 @@ import applyBrandRepair from "./apply-brand-repair";
 import applyBrandRepairGroup from "./apply-brand-repair-group";
 import brandRepairCandidates from "./brand-repair-candidates";
 import brandRepairGroups from "./brand-repair-groups";
-import canonRepairCandidates from "./canon-repair-candidates";
 import create from "./create";
 import delete_ from "./delete";
 import details from "./details";
@@ -27,7 +26,6 @@ export default base.tag("bottles").router({
   create,
   update,
   editContext,
-  canonRepairCandidates,
   brandRepairCandidates,
   brandRepairGroups,
   applyBrandRepair,

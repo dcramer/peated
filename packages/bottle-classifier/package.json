@@ -39,10 +39,6 @@
       "types": "./src/error.ts",
       "default": "./src/error.ts"
     },
-    "./legacyReleaseIdentityEvidence": {
-      "types": "./src/legacyReleaseIdentityEvidence.ts",
-      "default": "./src/legacyReleaseIdentityEvidence.ts"
-    },
     "./releaseIdentity": {
       "types": "./src/releaseIdentity.ts",
       "default": "./src/releaseIdentity.ts"

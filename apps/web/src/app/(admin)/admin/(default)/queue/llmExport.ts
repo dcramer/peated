@@ -181,12 +181,9 @@ export function formatPriceMatchQueueLlmExport(item: QueueItem) {
       },
       artifacts: {
         localCandidates: item.candidateBottles.map((candidate) => ({
-          kind: candidate.kind ?? null,
           bottleId: candidate.bottleId,
-          releaseId: candidate.releaseId ?? null,
           alias: candidate.alias,
           fullName: candidate.fullName,
-          bottleFullName: candidate.bottleFullName ?? null,
           brand: candidate.brand,
           bottler: candidate.bottler,
           series: candidate.series,

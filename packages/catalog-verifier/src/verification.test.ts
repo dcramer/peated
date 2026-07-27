@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   CatalogVerificationFindingKindEnum,
+  CatalogVerificationResultSchema,
   CatalogVerificationWorkstreamEnum,
   buildCatalogVerificationCreationMetadata,
   buildCatalogVerificationResult,
@@ -12,12 +13,10 @@ describe("catalog verifier policy", () => {
   test("exposes only active verification workstreams and finding kinds", () => {
     expect(CatalogVerificationWorkstreamEnum.options).toEqual([
       "brand-repairs",
-      "canon-repairs",
       "entity-audits",
     ]);
     expect(CatalogVerificationFindingKindEnum.options).toEqual([
       "brand_repair_candidate",
-      "canon_repair_candidate",
       "entity_audit_candidate",
     ]);
   });
@@ -79,5 +78,52 @@ describe("catalog verifier policy", () => {
       status: "flagged",
       source: "manual_entry",
     });
+  });
+
+  test("parses historical canon-repair findings without exposing them as active options", () => {
+    expect(
+      CatalogVerificationResultSchema.parse({
+        phase: "result",
+        source: "manual_entry",
+        status: "flagged",
+        reason: null,
+        findings: [
+          {
+            kind: "canon_repair_candidate",
+            summary: "Bottle wording may match another release.",
+            details: null,
+            workstream: "canon-repairs",
+          },
+        ],
+      }),
+    ).toMatchObject({
+      findings: [
+        {
+          kind: "canon_repair_candidate",
+          workstream: "canon-repairs",
+        },
+      ],
+    });
+  });
+
+  test("rejects historical canon-repair findings from the active result builder", () => {
+    const historicalFinding = {
+      kind: "canon_repair_candidate",
+      summary: "Bottle wording may match another release.",
+      details: null,
+      workstream: "canon-repairs",
+    } as const;
+
+    expect(() =>
+      buildCatalogVerificationResult({
+        source: "manual_entry",
+        status: "flagged",
+        reason: null,
+        findings: [
+          // @ts-expect-error Historical findings are readable but cannot be written.
+          historicalFinding,
+        ],
+      }),
+    ).toThrow();
   });
 });
