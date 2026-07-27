@@ -2,8 +2,10 @@ import { db } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
   bottleAliases,
+  bottleGroupTombstones,
   bottleReleasePromotions,
   bottleTombstones,
+  bottles,
   catalogTargets,
 } from "@peated/server/db/schema";
 import { mergeConcreteBottles } from "@peated/server/lib/mergeConcreteBottles";
@@ -28,10 +30,6 @@ async function promoteRelease({
     groupId: parent.groupId as number,
     edition,
   });
-  const exactTarget = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottle.id),
-  });
-  if (!exactTarget) throw new Error("Missing exact target fixture.");
   await db.insert(bottleReleasePromotions).values({
     releaseId: release.id,
     promotedBottleId: bottle.id,
@@ -39,7 +37,7 @@ async function promoteRelease({
     completedAt: new Date(),
     createdByActorId: parent.createdByActorId,
   });
-  return { bottle, exactTarget };
+  return bottle;
 }
 
 describe("GET /bottle-releases/{release}/target", () => {
@@ -61,7 +59,7 @@ describe("GET /bottle-releases/{release}/target", () => {
       release: release.id,
     });
 
-    expect(result).toEqual({ bottleId: promoted.bottle.id });
+    expect(result).toEqual({ bottleId: promoted.id });
   });
 
   test.each([
@@ -128,41 +126,40 @@ describe("GET /bottle-releases/{release}/target", () => {
     expect(error).toMatchObject({
       status: 409,
       message: expect.stringContaining(
-        "the release does not have a completed promotion mapping",
+        "release does not have a completed promotion mapping",
       ),
     });
   });
 
-  test("returns conflict for a completed promotion into the wrong group", async ({
+  test("uses the durable promotion after the promoted Bottle is regrouped", async ({
+    defaults,
     fixtures,
   }) => {
-    const parent = await fixtures.Bottle({ name: "Corrupt Parent" });
+    const parent = await fixtures.Bottle({ name: "Regrouped Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const wrongGroupBottle = await fixtures.Bottle({
-      name: "Wrong Group Promotion",
+    const promoted = await promoteRelease({
+      parent,
+      release,
+      user: defaults.user,
+      edition: "Regrouped Edition",
     });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: wrongGroupBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
+    const newGroupAnchor = await fixtures.Bottle({
+      name: "Regrouped Destination",
+    });
+    await db
+      .update(bottles)
+      .set({ groupId: newGroupAnchor.groupId })
+      .where(eq(bottles.id, promoted.id));
+
+    const result = await routerClient.bottleReleases.target({
+      bottle: parent.id,
+      release: release.id,
     });
 
-    const error = await waitError(
-      routerClient.bottleReleases.target({
-        bottle: parent.id,
-        release: release.id,
-      }),
-    );
-
-    expect(error).toMatchObject({
-      status: 409,
-      message: expect.stringContaining("integrity mismatch"),
-    });
+    expect(result).toEqual({ bottleId: promoted.id });
   });
 
-  test("returns conflict when a completed promotion has lost its exact target", async ({
+  test("does not require a CatalogTarget for the promoted Bottle", async ({
     defaults,
     fixtures,
   }) => {
@@ -174,24 +171,23 @@ describe("GET /bottle-releases/{release}/target", () => {
       user: defaults.user,
       edition: "Missing Target Edition",
     });
+    const exactTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, promoted.id),
+    });
+    if (!exactTarget) throw new Error("Missing exact target fixture.");
     await db
       .delete(bottleAliases)
-      .where(eq(bottleAliases.targetId, promoted.exactTarget.id));
+      .where(eq(bottleAliases.targetId, exactTarget.id));
     await db
       .delete(catalogTargets)
-      .where(eq(catalogTargets.id, promoted.exactTarget.id));
+      .where(eq(catalogTargets.id, exactTarget.id));
 
-    const error = await waitError(
-      routerClient.bottleReleases.target({
-        bottle: parent.id,
-        release: release.id,
-      }),
-    );
-
-    expect(error).toMatchObject({
-      status: 409,
-      message: expect.stringContaining("integrity mismatch"),
+    const result = await routerClient.bottleReleases.target({
+      bottle: parent.id,
+      release: release.id,
     });
+
+    expect(result).toEqual({ bottleId: promoted.id });
   });
 
   test("returns conflict when the mapped promoted Bottle is retired", async ({
@@ -210,7 +206,7 @@ describe("GET /bottle-releases/{release}/target", () => {
       name: "Retired Target Replacement",
     });
     await db.insert(bottleTombstones).values({
-      bottleId: promoted.bottle.id,
+      bottleId: promoted.id,
       newBottleId: replacement.id,
     });
 
@@ -223,7 +219,41 @@ describe("GET /bottle-releases/{release}/target", () => {
 
     expect(error).toMatchObject({
       status: 409,
-      message: `Catalog target is retired (bottleId=${promoted.bottle.id}).`,
+      message: `Promoted Bottle ${promoted.id} is unavailable.`,
+    });
+  });
+
+  test("returns conflict when the promoted BottleGroup is retired", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const parent = await fixtures.Bottle({ name: "Retired Group Parent" });
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await promoteRelease({
+      parent,
+      release,
+      user: defaults.user,
+      edition: "Retired Group Edition",
+    });
+    const replacement = await fixtures.Bottle({
+      name: "Retired Group Replacement",
+    });
+    await db.insert(bottleGroupTombstones).values({
+      groupId: promoted.groupId as number,
+      newGroupId: replacement.groupId as number,
+      createdByActorId: promoted.createdByActorId,
+    });
+
+    const error = await waitError(
+      routerClient.bottleReleases.target({
+        bottle: parent.id,
+        release: release.id,
+      }),
+    );
+
+    expect(error).toMatchObject({
+      status: 409,
+      message: `Promoted Bottle ${promoted.id} is unavailable.`,
     });
   });
 
@@ -244,7 +274,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     });
 
     await mergeConcreteBottles({
-      sourceBottleId: promoted.bottle.id,
+      sourceBottleId: promoted.id,
       destinationBottleId: destination.id,
       context: { user: mod },
     });

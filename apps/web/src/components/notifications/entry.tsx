@@ -1,13 +1,8 @@
 "use client";
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import type { CatalogTargetV1 } from "@peated/server/schemas";
 import type { Notification } from "@peated/server/types";
 import Link from "@peated/web/components/link";
-import {
-  getCatalogTargetLabel,
-  getCatalogTargetScopeLabel,
-} from "@peated/web/lib/catalogTarget";
 import classNames from "@peated/web/lib/classNames";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../userAvatar";
@@ -114,15 +109,12 @@ export const getStatusMessage = ({
         <>
           toasted{" "}
           {notification.ref ? (
-            <>
-              <Link
-                href={`/tastings/${notification.ref.id}`}
-                className="font-semibold"
-              >
-                {getCatalogTargetLabel(notification.ref.target)}
-              </Link>
-              <CatalogTargetScope target={notification.ref.target} />
-            </>
+            <Link
+              href={`/tastings/${notification.ref.id}`}
+              className="font-semibold"
+            >
+              {notification.ref.bottle.fullName}
+            </Link>
           ) : (
             "unknown tasting"
           )}
@@ -133,15 +125,12 @@ export const getStatusMessage = ({
         <>
           commented on{" "}
           {notification.ref ? (
-            <>
-              <Link
-                href={`/tastings/${notification.ref.id}`}
-                className="font-semibold"
-              >
-                {getCatalogTargetLabel(notification.ref.target)}
-              </Link>
-              <CatalogTargetScope target={notification.ref.target} />
-            </>
+            <Link
+              href={`/tastings/${notification.ref.id}`}
+              className="font-semibold"
+            >
+              {notification.ref.bottle.fullName}
+            </Link>
           ) : (
             "an unknown tasting"
           )}
@@ -150,19 +139,6 @@ export const getStatusMessage = ({
     default:
       return null;
   }
-};
-
-const CatalogTargetScope = ({ target }: { target: CatalogTargetV1 }) => {
-  if (target.kind === "bottle") return null;
-
-  return (
-    <>
-      {" "}
-      <span className="text-muted text-xs">
-        ({getCatalogTargetScopeLabel(target)})
-      </span>
-    </>
-  );
 };
 
 const NotificationEntryRef = ({

@@ -1,6 +1,8 @@
 import { db } from "@peated/server/db";
+import { tastings } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /notifications", () => {
@@ -28,27 +30,16 @@ describe("GET /notifications", () => {
       throw new Error("Missing toast notification tasting");
     }
     expect(result.ref.id).toEqual(tasting.id);
-    expect(result.ref.target).toMatchObject({
-      kind: "bottle",
-      targetId: tasting.targetId,
-      bottle: { id: tasting.bottleId },
+    expect(result.ref.bottle).toMatchObject({
+      id: tasting.bottleId,
     });
   });
 
   test("lists notifications w/ comment", async ({ defaults, fixtures }) => {
     const bottle = await fixtures.Bottle();
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: (table, { and, eq, isNull }) =>
-        and(
-          eq(table.groupId, bottle.groupId as number),
-          isNull(table.bottleId),
-        ),
-    });
-    if (!genericTarget) throw new Error("Missing generic target fixture");
     const tasting = await fixtures.Tasting({
       createdById: defaults.user.id,
       bottleId: bottle.id,
-      targetId: genericTarget.id,
     });
     const comment = await fixtures.Comment({ tastingId: tasting.id });
     const notification = await createNotification(db, {
@@ -70,11 +61,35 @@ describe("GET /notifications", () => {
       throw new Error("Missing comment notification tasting");
     }
     expect(result.ref.id).toEqual(tasting.id);
-    expect(result.ref.target).toMatchObject({
-      kind: "group",
-      targetId: genericTarget.id,
-      group: { id: bottle.groupId },
+    expect(result.ref.bottle).toMatchObject({
+      id: bottle.id,
+      fullName: bottle.fullName,
     });
+  });
+
+  test("fails closed when the referenced Tasting has no Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const tasting = await fixtures.Tasting({
+      createdById: defaults.user.id,
+    });
+    const toast = await fixtures.Toast({ tastingId: tasting.id });
+    await createNotification(db, {
+      objectId: toast.id,
+      type: "toast",
+      userId: tasting.createdById,
+      fromUserId: toast.createdById,
+      createdAt: toast.createdAt,
+    });
+    await db
+      .update(tastings)
+      .set({ bottleId: null })
+      .where(eq(tastings.id, tasting.id));
+
+    await expect(
+      routerClient.notifications.list({}, { context: { user: defaults.user } }),
+    ).rejects.toThrow(`Tasting ${tasting.id} has no Bottle.`);
   });
 
   test("lists notifications w/ friend_request", async ({

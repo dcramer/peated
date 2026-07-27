@@ -7,7 +7,6 @@ import {
   bottleReleases,
   bottles,
   bottleTombstones,
-  catalogTargets,
   changes,
   collectionBottles,
   flightBottles,
@@ -33,7 +32,6 @@ async function snapshotCatalogGraph() {
   const [
     groups,
     bottleRows,
-    targets,
     releases,
     promotions,
     aliases,
@@ -47,7 +45,6 @@ async function snapshotCatalogGraph() {
   ] = await Promise.all([
     db.select().from(bottleGroups).orderBy(asc(bottleGroups.id)),
     db.select().from(bottles).orderBy(asc(bottles.id)),
-    db.select().from(catalogTargets).orderBy(asc(catalogTargets.id)),
     db.select().from(bottleReleases).orderBy(asc(bottleReleases.id)),
     db
       .select()
@@ -69,7 +66,6 @@ async function snapshotCatalogGraph() {
   return {
     groups,
     bottles: bottleRows,
-    targets,
     releases,
     promotions,
     aliases,
@@ -116,7 +112,7 @@ describe("DELETE /bottle-releases/{release}", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });
 
-  test("rejects missing, pending, and corrupt promotion mappings without writes", async ({
+  test("rejects missing, pending, and incomplete promotion mappings without writes", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
@@ -136,14 +132,17 @@ describe("DELETE /bottle-releases/{release}", () => {
       status: "pending",
     });
 
-    const corruptParent = await fixtures.Bottle({ name: "Delete Corrupt" });
-    const corruptRelease = await fixtures.BottleRelease({
-      bottleId: corruptParent.id,
+    const incompleteParent = await fixtures.Bottle({
+      name: "Delete Incomplete",
     });
-    const wrongGroupBottle = await fixtures.Bottle({
-      name: "Delete Wrong Group",
+    const incompleteRelease = await fixtures.BottleRelease({
+      bottleId: incompleteParent.id,
     });
-    await promoteRelease(corruptRelease.id, wrongGroupBottle.id);
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: incompleteRelease.id,
+      promotedBottleId: incompleteParent.id,
+      status: "promoted",
+    });
 
     const before = await snapshotCatalogGraph();
     vi.clearAllMocks();
@@ -151,7 +150,7 @@ describe("DELETE /bottle-releases/{release}", () => {
     for (const releaseId of [
       missingRelease.id,
       pendingRelease.id,
-      corruptRelease.id,
+      incompleteRelease.id,
     ]) {
       const error = await waitError(
         routerClient.bottleReleases.delete(
@@ -177,40 +176,31 @@ describe("DELETE /bottle-releases/{release}", () => {
       groupId: parent.groupId as number,
       edition: "Delete Exact",
     });
-    const promotedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, promoted.id),
-    });
-    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
     await promoteRelease(release.id, promoted.id);
 
     await db.insert(bottleAliases).values({
       name: "Delete Retained Alias",
-      bottleId: parent.id,
+      bottleId: promoted.id,
       releaseId: release.id,
-      targetId: promotedTarget.id,
       assignedByActorId: release.createdByActorId,
     });
     await db.insert(collectionBottles).values({
       collectionId: (await fixtures.Collection()).id,
-      bottleId: parent.id,
+      bottleId: promoted.id,
       releaseId: release.id,
-      targetId: promotedTarget.id,
     });
     await db.insert(flightBottles).values({
       flightId: (await fixtures.Flight()).id,
-      bottleId: parent.id,
+      bottleId: promoted.id,
       releaseId: release.id,
-      targetId: promotedTarget.id,
     });
     await fixtures.Tasting({
-      bottleId: parent.id,
+      bottleId: promoted.id,
       releaseId: release.id,
-      targetId: promotedTarget.id,
     });
     await fixtures.Review({
-      bottleId: parent.id,
+      bottleId: promoted.id,
       releaseId: release.id,
-      targetId: promotedTarget.id,
       name: release.fullName,
     });
 
@@ -226,7 +216,7 @@ describe("DELETE /bottle-releases/{release}", () => {
 
     expect(error).toMatchObject({
       status: 409,
-      message: `BottleRelease ${release.id} maps to Bottle ${promoted.id} through exact target ${promotedTarget.id}; merge that Bottle into an explicit destination instead.`,
+      message: `BottleRelease ${release.id} maps to Bottle ${promoted.id}; merge that Bottle into an explicit destination instead.`,
     });
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
@@ -258,11 +248,6 @@ describe("DELETE /bottle-releases/{release}", () => {
       where: eq(bottleReleasePromotions.releaseId, release.id),
     });
     expect(promotion).toMatchObject({ promotedBottleId: survivor.id });
-    const survivorTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, survivor.id),
-    });
-    expect(survivorTarget).toBeDefined();
-
     const before = await snapshotCatalogGraph();
     vi.clearAllMocks();
 
@@ -275,7 +260,7 @@ describe("DELETE /bottle-releases/{release}", () => {
 
     expect(error).toMatchObject({
       status: 409,
-      message: `BottleRelease ${release.id} maps to Bottle ${survivor.id} through exact target ${survivorTarget!.id}; merge that Bottle into an explicit destination instead.`,
+      message: `BottleRelease ${release.id} maps to Bottle ${survivor.id}; merge that Bottle into an explicit destination instead.`,
     });
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();

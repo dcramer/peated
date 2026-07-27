@@ -6,7 +6,6 @@ import router, { type Inputs, type Outputs } from "../orpc/router";
 import {
   type BottleGroupV1,
   BottleSchema,
-  type CatalogTargetV1,
   CursorSchema,
   type NotificationSchema,
   StorePriceSchema,
@@ -54,21 +53,6 @@ function getOperationIds(spec: Awaited<ReturnType<typeof generateSpec>>) {
   );
 }
 
-function expectExactTargetResponse(schema: any) {
-  expect(Object.keys(schema?.properties ?? {})).toEqual(
-    expect.arrayContaining([
-      "schemaVersion",
-      "kind",
-      "targetId",
-      "group",
-      "bottle",
-    ]),
-  );
-  expect(schema?.properties?.release).toBeUndefined();
-  expect(schema?.properties?.releaseId).toBeUndefined();
-  expect(JSON.stringify(schema)).not.toContain("BottleRelease");
-}
-
 function expectBottleResponse(schema: any) {
   const refs = [
     schema?.$ref,
@@ -77,16 +61,6 @@ function expectBottleResponse(schema: any) {
   expect(refs).toContain("#/components/schemas/Bottle");
   expect(JSON.stringify(schema)).not.toContain("targetId");
   expect(JSON.stringify(schema)).not.toContain('"kind"');
-}
-
-function expectGenericTargetResponse(schema: any) {
-  expect(Object.keys(schema?.properties ?? {})).toEqual(
-    expect.arrayContaining(["schemaVersion", "kind", "targetId", "group"]),
-  );
-  expect(schema?.properties?.bottle).toBeUndefined();
-  expect(schema?.properties?.release).toBeUndefined();
-  expect(schema?.properties?.releaseId).toBeUndefined();
-  expect(JSON.stringify(schema)).not.toContain("BottleRelease");
 }
 
 describe("OpenAPI generation ($ref reuse)", () => {
@@ -128,6 +102,8 @@ describe("OpenAPI generation ($ref reuse)", () => {
 
     expect(spec.paths?.["/bottles/from/{bottle}"]).toBeUndefined();
     expect(getOperationIds(spec)).not.toContain("createBottleFromSource");
+    expect(spec.paths?.["/bottles/{bottle}/target"]).toBeUndefined();
+    expect(getOperationIds(spec)).not.toContain("getBottleTarget");
     expect(spec.paths?.["/bottle-releases"]?.post).toBeUndefined();
     expect(getOperationIds(spec)).not.toContain("createBottleRelease");
 
@@ -384,7 +360,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<false>();
   });
 
-  it("publishes discriminated target-backed notification contracts", async () => {
+  it("publishes direct-Bottle notification contracts", async () => {
     const spec = await generateSpec();
     const listItemSchema = getJsonResponseSchema(
       spec.paths?.["/notifications"]?.get,
@@ -430,15 +406,13 @@ describe("OpenAPI generation ($ref reuse)", () => {
         const refObject = ref.anyOf.find(
           (candidate: any) => candidate.type === "object",
         );
-        expect(Object.keys(refObject.properties)).toEqual(["id", "target"]);
-        expect(refObject.required).toEqual(["id", "target"]);
+        expect(Object.keys(refObject.properties)).toEqual(["id", "bottle"]);
+        expect(refObject.required).toEqual(["id", "bottle"]);
         expect(refObject.properties.id).toMatchObject({
           type: "integer",
           exclusiveMinimum: 0,
         });
-        const [genericTarget, exactTarget] = refObject.properties.target.anyOf;
-        expectGenericTargetResponse(genericTarget);
-        expectExactTargetResponse(exactTarget);
+        expectBottleResponse(refObject.properties.bottle);
       }
     }
 
@@ -462,8 +436,8 @@ describe("OpenAPI generation ($ref reuse)", () => {
       { type: "friend_request" }
     >;
     expectTypeOf<
-      NonNullable<ToastNotification["ref"]>["target"]
-    >().toEqualTypeOf<CatalogTargetV1>();
+      NonNullable<ToastNotification["ref"]>["bottle"]
+    >().toEqualTypeOf<z.infer<typeof BottleSchema>>();
     expectTypeOf<
       NonNullable<FriendRequestNotification["ref"]>
     >().toEqualTypeOf<{

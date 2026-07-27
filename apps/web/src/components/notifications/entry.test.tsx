@@ -1,97 +1,72 @@
-import type { CatalogTargetV1 } from "@peated/server/schemas";
-import { CatalogTargetV1Schema } from "@peated/server/schemas";
-import type { Notification } from "@peated/server/types";
+import type { Bottle, Entity, Notification } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { getStatusMessage } from "./entry";
 import { getFriendRequestPresentation } from "./friendRequestEntry";
 
-const ratingStats = {
-  pass: 0,
-  sip: 0,
-  savor: 0,
-  total: 0,
-  avg: null,
-  percentage: { pass: 0, sip: 0, savor: 0 },
-};
+const timestamp = "2026-07-21T00:00:00.000Z";
 
-const group = {
-  schemaVersion: 1,
-  id: 7,
-  fullName: "Springbank 12 Cask Strength",
-  name: "12 Cask Strength",
-  brandId: 8,
-  bottlerId: null,
-  distillerIds: [8],
-  category: "single_malt",
-  seriesId: null,
-  statedAge: 12,
-  representativeBottleId: 19,
+const brand = {
+  id: 8,
+  name: "Springbank",
+  shortName: null,
+  type: ["brand"],
   description: null,
   descriptionSrc: null,
-  imageUrl: null,
-  flavorProfile: null,
-  tastingNotes: null,
-  suggestedTags: [],
-  avgRating: null,
-  ratingStats,
-  totalTastings: 1,
+  yearEstablished: null,
+  website: null,
+  country: null,
+  region: null,
+  address: null,
+  location: null,
+  totalTastings: 0,
   totalBottles: 1,
-  createdByActorId: 9,
-  createdAt: "2026-07-21T00:00:00.000Z",
-  updatedAt: "2026-07-21T00:00:00.000Z",
-};
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies Entity;
 
 const bottle = {
-  schemaVersion: 1,
   id: 19,
-  groupId: group.id,
   fullName: "Springbank 12 Cask Strength Batch 24",
   name: "12 Cask Strength Batch 24",
-  brandId: group.brandId,
-  bottlerId: null,
-  distillerIds: group.distillerIds,
-  category: group.category,
-  seriesId: null,
-  flavorProfile: null,
+  series: null,
+  category: "single_malt",
   edition: "Batch 24",
   statedAge: 12,
-  abv: 56.2,
-  singleCask: false,
   caskStrength: true,
+  singleCask: false,
+  abv: 56.2,
   vintageYear: null,
   releaseYear: 2026,
-  caskSize: null,
   caskType: null,
+  caskSize: null,
   caskFill: null,
+  brand,
+  distillers: [],
+  bottler: null,
   description: null,
   descriptionSrc: null,
   imageUrl: null,
+  flavorProfile: null,
   tastingNotes: null,
   suggestedTags: [],
   avgRating: null,
-  ratingStats,
+  ratingStats: {
+    pass: 0,
+    sip: 0,
+    savor: 0,
+    total: 0,
+    avg: null,
+    percentage: { pass: 0, sip: 0, savor: 0 },
+  },
   totalTastings: 1,
-  createdByActorId: 9,
-  createdAt: "2026-07-21T00:00:00.000Z",
-  updatedAt: "2026-07-21T00:00:00.000Z",
-};
-
-const groupTarget = CatalogTargetV1Schema.parse({
-  schemaVersion: 1,
-  kind: "group",
-  targetId: 41,
-  group,
-});
-
-const bottleTarget = CatalogTargetV1Schema.parse({
-  schemaVersion: 1,
-  kind: "bottle",
-  targetId: 42,
-  group,
-  bottle,
-});
+  createdAt: timestamp,
+  updatedAt: timestamp,
+  isFavorite: false,
+  isLibrary: false,
+  hasTasted: false,
+} satisfies Bottle;
 
 const notificationBase = {
   id: 1,
@@ -101,8 +76,8 @@ const notificationBase = {
   read: false,
 };
 
-function tasting(target: CatalogTargetV1) {
-  return { id: 3, target };
+function tasting() {
+  return { id: 3, bottle };
 }
 
 describe("notification status message", () => {
@@ -110,7 +85,7 @@ describe("notification status message", () => {
     const notification = {
       ...notificationBase,
       type: "toast",
-      ref: tasting(bottleTarget),
+      ref: tasting(),
     } satisfies Notification;
 
     const html = renderToStaticMarkup(getStatusMessage({ notification }));
@@ -121,21 +96,19 @@ describe("notification status message", () => {
     expect(html).not.toContain("Exact bottle");
   });
 
-  it("renders a generic BottleGroup label without inventing a Bottle", () => {
+  it("renders the exact Bottle label for a comment", () => {
     const notification = {
       ...notificationBase,
       type: "comment",
-      ref: tasting(groupTarget),
+      ref: tasting(),
     } satisfies Notification;
 
     const html = renderToStaticMarkup(getStatusMessage({ notification }));
 
     expect(html).toContain("commented on <a");
-    expect(html).toContain("</a> <span");
     expect(html).toContain('href="/tastings/3"');
-    expect(html).toContain("Springbank 12 Cask Strength");
-    expect(html).not.toContain("Batch 24");
-    expect(html).toContain("Exact bottle not specified");
+    expect(html).toContain("Springbank 12 Cask Strength Batch 24");
+    expect(html).not.toContain("Exact bottle not specified");
   });
 
   const missingTastingCases = [

@@ -3,7 +3,6 @@ import {
   bottleReleasePromotions,
   bottleTombstones,
   bottles,
-  catalogTargets,
   collectionBottles,
   type Bottle,
   type BottleRelease,
@@ -39,15 +38,6 @@ async function mapPromotedRelease(release: BottleRelease, bottle: Bottle) {
   });
 }
 
-async function getExactTargetId(bottleId: number): Promise<number> {
-  const [target] = await db
-    .select({ id: catalogTargets.id })
-    .from(catalogTargets)
-    .where(eq(catalogTargets.bottleId, bottleId));
-  if (!target) throw new Error("Missing exact CatalogTarget fixture.");
-  return target.id;
-}
-
 describe("GET /bottle-releases/:release", function () {
   it("projects the promoted Bottle through the legacy response shape", async function ({
     fixtures,
@@ -69,7 +59,6 @@ describe("GET /bottle-releases/:release", function () {
     });
     await mapPromotedRelease(release, promoted);
 
-    const targetId = await getExactTargetId(promoted.id);
     const favorites = await fixtures.Collection({
       name: RESERVED_COLLECTIONS.default.name,
       createdById: defaults.user.id,
@@ -77,11 +66,9 @@ describe("GET /bottle-releases/:release", function () {
     await db.insert(collectionBottles).values({
       collectionId: favorites.id,
       bottleId: promoted.id,
-      targetId,
     });
     await fixtures.Tasting({
       bottleId: promoted.id,
-      targetId,
       createdById: defaults.user.id,
     });
 
@@ -120,11 +107,11 @@ describe("GET /bottle-releases/:release", function () {
     );
 
     expect(err.message).toContain(
-      "the release does not have a completed promotion mapping",
+      "release does not have a completed promotion mapping",
     );
   });
 
-  it("conflicts when promotion points outside the legacy parent group", async function ({
+  it("projects the mapped Bottle independently of its current group", async function ({
     fixtures,
   }) {
     const groupedParent = await fixtures.Bottle();
@@ -134,13 +121,16 @@ describe("GET /bottle-releases/:release", function () {
     const promoted = await fixtures.Bottle();
     await mapPromotedRelease(release, promoted);
 
-    const err = await waitError(
-      routerClient.bottleReleases.details({ release: release.id }),
-    );
+    const result = await routerClient.bottleReleases.details({
+      release: release.id,
+    });
 
-    expect(err.message).toContain(
-      "the promoted Bottle belongs to a different group than the legacy parent",
-    );
+    expect(result).toMatchObject({
+      id: release.id,
+      bottleId: groupedParent.id,
+      name: promoted.name,
+      fullName: promoted.fullName,
+    });
   });
 
   it("conflicts when the promoted Bottle is retired", async function ({
@@ -162,7 +152,9 @@ describe("GET /bottle-releases/:release", function () {
       routerClient.bottleReleases.details({ release: release.id }),
     );
 
-    expect(err.message).toContain("Catalog target is retired");
+    expect(err.message).toContain(
+      `Promoted Bottle ${promoted.id} is unavailable`,
+    );
   });
 
   it("errors on invalid release", async function () {

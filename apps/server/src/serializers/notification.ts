@@ -3,11 +3,17 @@ import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Notification, User } from "../db/schema";
-import { comments, follows, tastings, toasts, users } from "../db/schema";
-import { loadCatalogTargetReadsWithParity } from "../lib/catalogTargetReadParity";
-import { CatalogTargetIntegrityMismatchError } from "../lib/catalogTargets";
+import {
+  bottles,
+  comments,
+  follows,
+  tastings,
+  toasts,
+  users,
+} from "../db/schema";
 import { logError } from "../lib/log";
 import { type NotificationSchema } from "../schemas";
+import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
 type SerializedNotification = z.infer<typeof NotificationSchema>;
@@ -87,9 +93,7 @@ export const NotificationSerializer = serializer({
           .select({
             objectId: toasts.id,
             tastingId: tastings.id,
-            targetId: tastings.targetId,
             bottleId: tastings.bottleId,
-            releaseId: tastings.releaseId,
           })
           .from(tastings)
           .innerJoin(toasts, eq(tastings.id, toasts.tastingId))
@@ -104,9 +108,7 @@ export const NotificationSerializer = serializer({
           .select({
             objectId: comments.id,
             tastingId: tastings.id,
-            targetId: tastings.targetId,
             bottleId: tastings.bottleId,
-            releaseId: tastings.releaseId,
           })
           .from(tastings)
           .innerJoin(comments, eq(tastings.id, comments.tastingId))
@@ -122,42 +124,40 @@ export const NotificationSerializer = serializer({
         type: "comment" as const,
       })),
     ];
-    const { targets } = await loadCatalogTargetReadsWithParity(
-      tastingReferenceList.map((reference) => ({
-        consumerTable: "tasting",
-        rowLocator: { id: reference.tastingId },
-        targetId: reference.targetId,
-        legacy: {
-          bottleId: reference.bottleId,
-          releaseId: reference.releaseId,
-        },
-      })),
-      {
-        actor: null,
-        permissions: { canReadCatalogIdentity: true },
-        caller: "NotificationSerializer",
-        operation: "serialize_tasting_ref",
-      },
+    const directBottleReferences = tastingReferenceList.map((reference) => {
+      if (reference.bottleId === null) {
+        throw new Error(`Tasting ${reference.tastingId} has no Bottle.`);
+      }
+      return { ...reference, bottleId: reference.bottleId };
+    });
+    const bottleIds = Array.from(
+      new Set(directBottleReferences.map((reference) => reference.bottleId)),
+    );
+    const bottleList = bottleIds.length
+      ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
+      : [];
+    const serializedBottleList = await serialize(
+      BottleSerializer,
+      bottleList,
+      currentUser,
+    );
+    const bottlesById = new Map(
+      serializedBottleList.map((bottle, index) => [
+        bottleList[index].id,
+        bottle,
+      ]),
     );
     const tastingRefsByKey: Record<string, TastingRef> = {};
-    tastingReferenceList.forEach((reference, index) => {
-      const target = targets[index];
-      if (!target) {
-        if (reference.targetId === null && reference.bottleId === null) {
-          throw new Error(
-            `notification referenced tasting ${reference.tastingId} with no catalog identity`,
-          );
-        }
-        throw new CatalogTargetIntegrityMismatchError(
-          reference.targetId !== null
-            ? { targetId: reference.targetId }
-            : { bottleId: reference.bottleId! },
-          `notification referenced tasting ${reference.tastingId} has no durable CatalogTarget`,
+    directBottleReferences.forEach((reference) => {
+      const bottle = bottlesById.get(reference.bottleId);
+      if (!bottle) {
+        throw new Error(
+          `Tasting ${reference.tastingId} references missing Bottle ${reference.bottleId}.`,
         );
       }
       tastingRefsByKey[`${reference.type}:${reference.objectId}`] = {
         id: reference.tastingId,
-        target,
+        bottle,
       };
     });
 

@@ -3,7 +3,6 @@ import {
   bottleReleasePromotions,
   bottleTombstones,
   bottles,
-  catalogTargets,
   collectionBottles,
   type Bottle,
   type BottleRelease,
@@ -44,15 +43,6 @@ async function promoteRelease(
   });
   await mapPromotedRelease(release, promoted);
   return promoted;
-}
-
-async function getExactTargetId(bottleId: number): Promise<number> {
-  const [target] = await db
-    .select({ id: catalogTargets.id })
-    .from(catalogTargets)
-    .where(eq(catalogTargets.bottleId, bottleId));
-  if (!target) throw new Error("Missing exact CatalogTarget fixture.");
-  return target.id;
 }
 
 describe("GET /bottles/:bottle/releases", () => {
@@ -105,7 +95,7 @@ describe("GET /bottles/:bottle/releases", () => {
     expect(rel.prevCursor).toBe(null);
   });
 
-  it("uses exact-target viewer state from the promoted Bottle", async ({
+  it("uses direct Bottle viewer state from the promoted Bottle", async ({
     fixtures,
     defaults,
   }) => {
@@ -123,7 +113,6 @@ describe("GET /bottles/:bottle/releases", () => {
       },
     );
 
-    const targetId = await getExactTargetId(promoted.id);
     const favorites = await fixtures.Collection({
       name: RESERVED_COLLECTIONS.default.name,
       createdById: defaults.user.id,
@@ -131,11 +120,9 @@ describe("GET /bottles/:bottle/releases", () => {
     await db.insert(collectionBottles).values({
       collectionId: favorites.id,
       bottleId: promoted.id,
-      targetId,
     });
     await fixtures.Tasting({
       bottleId: promoted.id,
-      targetId,
       createdById: defaults.user.id,
     });
 
@@ -274,7 +261,7 @@ describe("GET /bottles/:bottle/releases", () => {
     expect(response.results).toEqual([]);
   });
 
-  it("conflicts on a completed promotion outside the legacy parent group", async ({
+  it("lists a mapped Bottle independently of its current group", async ({
     fixtures,
   }) => {
     const parent = await fixtures.Bottle({ name: "Grouped Legacy Parent" });
@@ -291,13 +278,18 @@ describe("GET /bottles/:bottle/releases", () => {
       completedAt: new Date(),
     });
 
-    const error = await waitError(
-      routerClient.bottleReleases.list({ bottle: parent.id }),
-    );
+    const { results } = await routerClient.bottleReleases.list({
+      bottle: parent.id,
+    });
 
-    expect(error.message).toContain(
-      "the promoted Bottle belongs to a different group than the legacy parent",
-    );
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: release.id,
+        bottleId: parent.id,
+        name: promoted.name,
+        fullName: promoted.fullName,
+      }),
+    ]);
   });
 
   it("accepts a promotion canonically repointed by an exact Bottle merge", async ({

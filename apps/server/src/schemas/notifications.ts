@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CatalogTargetV1Schema } from "./catalogIdentity";
+import { BottleSchema } from "./bottles";
 import { FriendStatusEnum } from "./shared";
 import { UserSchema } from "./users";
 
@@ -18,9 +18,7 @@ const NotificationBaseSchema = z.object({
 
 const TastingNotificationRefSchema = z.object({
   id: z.number().int().positive().describe("Referenced tasting ID"),
-  target: CatalogTargetV1Schema.describe(
-    "Exact Bottle or generic BottleGroup referenced by the notification",
-  ),
+  bottle: BottleSchema,
 });
 
 const FriendRequestNotificationRefSchema = z.object({

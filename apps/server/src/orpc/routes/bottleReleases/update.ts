@@ -1,15 +1,24 @@
-import { call } from "@orpc/server";
 import { db } from "@peated/server/db";
-import { bottleReleases } from "@peated/server/db/schema";
+import { bottleReleasePromotions } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import {
-  CatalogTargetResolutionError,
-  resolveCatalogTargetForAssignment,
-} from "@peated/server/lib/catalogTargets";
+  LegacyBottleReleasePromotionError,
+  resolveLegacyBottleReleasePromotion,
+} from "@peated/server/lib/legacyBottleReleasePromotion";
 import { logInfo } from "@peated/server/lib/log";
+import {
+  ConcreteBottleUpdateConflictError,
+  ConcreteBottleUpdateGraphError,
+  ConcreteBottleUpdateInputError,
+  finalizeConcreteBottleUpdate,
+  updateConcreteBottleInTransaction,
+  type ConcreteBottleUpdateFinalizationManifest,
+} from "@peated/server/lib/updateConcreteBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import updateBottle from "@peated/server/orpc/routes/bottles/update";
 import { BottleReleaseInputSchema, BottleSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -66,15 +75,6 @@ export default procedure
   .input(InputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
-    const [release] = await db
-      .select({ id: bottleReleases.id, bottleId: bottleReleases.bottleId })
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, input.release))
-      .limit(1);
-    if (!release) {
-      throw errors.NOT_FOUND({ message: "Release not found." });
-    }
-
     if (input.imageUrl !== undefined && input.imageUrl !== null) {
       throw errors.BAD_REQUEST({
         message:
@@ -82,60 +82,124 @@ export default procedure
       });
     }
 
-    let target;
+    let promotion: Awaited<
+      ReturnType<typeof resolveLegacyBottleReleasePromotion>
+    >;
+    let updateManifest: ConcreteBottleUpdateFinalizationManifest;
     try {
-      target = await resolveCatalogTargetForAssignment({
-        kind: "legacy",
-        bottleId: release.bottleId,
-        releaseId: release.id,
+      promotion = await resolveLegacyBottleReleasePromotion({
+        releaseId: input.release,
         context: {
+          access: "write",
           caller: "bottleReleases.update",
           operation: "update_concrete_bottle",
         },
       });
+
+      const exact = {
+        ...(input.edition !== undefined ? { edition: input.edition } : {}),
+        ...(input.statedAge !== undefined
+          ? { statedAge: input.statedAge }
+          : {}),
+        ...(input.abv !== undefined ? { abv: input.abv } : {}),
+        ...(input.caskStrength !== undefined
+          ? { caskStrength: input.caskStrength }
+          : {}),
+        ...(input.singleCask !== undefined
+          ? { singleCask: input.singleCask }
+          : {}),
+        ...(input.vintageYear !== undefined
+          ? { vintageYear: input.vintageYear }
+          : {}),
+        ...(input.releaseYear !== undefined
+          ? { releaseYear: input.releaseYear }
+          : {}),
+        ...(input.caskType !== undefined ? { caskType: input.caskType } : {}),
+        ...(input.caskSize !== undefined ? { caskSize: input.caskSize } : {}),
+        ...(input.caskFill !== undefined ? { caskFill: input.caskFill } : {}),
+        ...(input.description !== undefined
+          ? { description: input.description }
+          : {}),
+        ...(input.tastingNotes !== undefined
+          ? { tastingNotes: input.tastingNotes }
+          : {}),
+        ...(input.imageUrl === null ? { image: null } : {}),
+      };
+      const actor = await getUserActor(context.user);
+      updateManifest = await db.transaction(async (tx) => {
+        const manifest = await updateConcreteBottleInTransaction(tx, {
+          bottleId: promotion.bottle.id,
+          input: { exact },
+          user: context.user,
+          actorId: actor.id,
+          creationSource: "manual_entry",
+        });
+
+        // Canonical Bottle locks come first. Lock the compatibility evidence
+        // only after them, then reject a concurrent promotion repoint.
+        const [lockedPromotion] = await tx
+          .select({
+            promotedBottleId: bottleReleasePromotions.promotedBottleId,
+            status: bottleReleasePromotions.status,
+            completedAt: bottleReleasePromotions.completedAt,
+          })
+          .from(bottleReleasePromotions)
+          .where(eq(bottleReleasePromotions.releaseId, promotion.release.id))
+          .limit(1)
+          .for("update");
+        if (
+          !lockedPromotion ||
+          lockedPromotion.status !== "promoted" ||
+          lockedPromotion.completedAt === null ||
+          lockedPromotion.promotedBottleId !== manifest.bottle.id
+        ) {
+          throw new LegacyBottleReleasePromotionError(
+            "promotion_integrity_mismatch",
+            "BottleRelease promotion changed during the Bottle update.",
+          );
+        }
+
+        return manifest;
+      });
     } catch (error) {
-      if (error instanceof CatalogTargetResolutionError) {
+      if (error instanceof LegacyBottleReleasePromotionError) {
+        if (error.code === "release_not_found") {
+          throw errors.NOT_FOUND({ message: error.message, cause: error });
+        }
         throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      if (error instanceof ConcreteBottleUpdateInputError) {
+        throw errors.BAD_REQUEST({ message: error.message, cause: error });
+      }
+      if (
+        error instanceof ConcreteBottleUpdateGraphError &&
+        error.code === "not_found"
+      ) {
+        throw errors.NOT_FOUND({ message: error.message, cause: error });
+      }
+      if (error instanceof ConcreteBottleUpdateGraphError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      if (error instanceof ConcreteBottleUpdateConflictError) {
+        throw errors.CONFLICT({
+          message: error.message,
+          data:
+            error.conflictingBottleId === null
+              ? undefined
+              : { bottle: error.conflictingBottleId },
+          cause: error,
+        });
       }
       throw error;
     }
-    if (target.bottleId === null) {
-      throw errors.CONFLICT({
-        message: "BottleRelease promotion does not resolve to an exact Bottle.",
-      });
-    }
 
-    const exact = {
-      ...(input.edition !== undefined ? { edition: input.edition } : {}),
-      ...(input.statedAge !== undefined ? { statedAge: input.statedAge } : {}),
-      ...(input.abv !== undefined ? { abv: input.abv } : {}),
-      ...(input.caskStrength !== undefined
-        ? { caskStrength: input.caskStrength }
-        : {}),
-      ...(input.singleCask !== undefined
-        ? { singleCask: input.singleCask }
-        : {}),
-      ...(input.vintageYear !== undefined
-        ? { vintageYear: input.vintageYear }
-        : {}),
-      ...(input.releaseYear !== undefined
-        ? { releaseYear: input.releaseYear }
-        : {}),
-      ...(input.caskType !== undefined ? { caskType: input.caskType } : {}),
-      ...(input.caskSize !== undefined ? { caskSize: input.caskSize } : {}),
-      ...(input.caskFill !== undefined ? { caskFill: input.caskFill } : {}),
-      ...(input.description !== undefined
-        ? { description: input.description }
-        : {}),
-      ...(input.tastingNotes !== undefined
-        ? { tastingNotes: input.tastingNotes }
-        : {}),
-      ...(input.imageUrl === null ? { image: null } : {}),
-    };
-    const updated = await call(
-      updateBottle,
-      { bottle: target.bottleId, exact },
-      { context },
+    await finalizeConcreteBottleUpdate(updateManifest);
+    const updated = await serialize(
+      BottleSerializer,
+      updateManifest.bottle,
+      context.user,
+      [],
+      { includeGroupSummary: true },
     );
 
     logInfo("Legacy BottleRelease compatibility write", {
@@ -144,8 +208,8 @@ export default procedure
         access: "write",
         caller: "bottleReleases.update",
         operation: "update_concrete_bottle",
-        legacyBottleId: release.bottleId,
-        releaseId: release.id,
+        legacyBottleId: promotion.release.bottleId,
+        releaseId: promotion.release.id,
         replacementBottleId: updated.id,
       },
     });

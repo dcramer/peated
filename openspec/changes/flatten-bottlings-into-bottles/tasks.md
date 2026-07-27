@@ -111,7 +111,7 @@ and map to an explicit removal task.
       to Bottle ids; remove generic-target branches.
 - [ ] 5.7 Update statistics, badges, Library, country/entity/user analytics, and
       activity feeds to Bottle-owned data and member-derived group aggregates.
-- [ ] 5.8 Keep BottleRelease compatibility routes translation-only over the
+- [x] 5.8 Keep BottleRelease compatibility routes translation-only over the
       promotion mapping and canonical Bottle services.
 - [ ] 5.9 Regenerate OpenAPI/client types and remove target-shaped contracts.
 - [ ] 5.10 Add focused API integration tests for every direct-Bottle consumer,

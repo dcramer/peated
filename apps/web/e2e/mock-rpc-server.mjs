@@ -551,14 +551,6 @@ async function handleRpcRequest({ request, response, url }) {
         rel: { nextCursor: null, prevCursor: null },
       });
       return true;
-    case "bottles/target": {
-      if (typeof input?.bottle !== "number") {
-        sendRpcError(response, "Unexpected Bottle target payload");
-        return true;
-      }
-      sendRpcResponse(response, getMockExactTarget(request, input.bottle));
-      return true;
-    }
     case "bottleReleases/target": {
       if (
         input?.bottle === existingBottleId &&

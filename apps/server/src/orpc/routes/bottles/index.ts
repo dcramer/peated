@@ -15,7 +15,6 @@ import prices from "./prices";
 import similar from "./similar";
 import suggestedTags from "./suggested-tags";
 import tags from "./tags";
-import target from "./target";
 import update from "./update";
 import upsert from "./upsert";
 import validation from "./validation";
@@ -35,7 +34,6 @@ export default base.tag("bottles").router({
   validation,
   similar,
   tags,
-  target,
   pageTarget,
   suggestedTags,
   imageUpdate,

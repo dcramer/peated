@@ -5,17 +5,13 @@ import {
   bottleReleases,
   bottleTombstones,
   bottles,
-  catalogTargets,
 } from "@peated/server/db/schema";
-import {
-  CatalogTargetResolutionError,
-  loadCatalogTargetByLegacyReference,
-} from "@peated/server/lib/catalogTargets";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { BottleReleaseSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { and, asc, desc, eq, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, sql, type SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
 import { projectLegacyBottleRelease } from "./project-legacy-release";
@@ -78,10 +74,22 @@ export default procedure
       });
     }
 
+    logInfo("Legacy BottleRelease compatibility access", {
+      extra: {
+        event: "bottle_release.compatibility",
+        access: "read",
+        caller: "bottleReleases.list",
+        operation: "list_promoted_bottles",
+        legacyBottleId: bottle.id,
+      },
+    });
+
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleReleases.bottleId, bottle.id),
+      isNotNull(bottleReleasePromotions.completedAt),
+      isNotNull(promotedBottles.groupId),
       sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${promotedBottles.id})`,
-      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${catalogTargets.groupId})`,
+      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${promotedBottles.groupId})`,
     ];
 
     if (query) {
@@ -142,7 +150,6 @@ export default procedure
       .select({
         releaseId: bottleReleases.id,
         legacyBottleId: bottleReleases.bottleId,
-        targetId: catalogTargets.id,
         bottle: promotedBottles,
       })
       .from(bottleReleases)
@@ -157,55 +164,12 @@ export default procedure
         promotedBottles,
         eq(promotedBottles.id, bottleReleasePromotions.promotedBottleId),
       )
-      .innerJoin(
-        catalogTargets,
-        and(
-          eq(catalogTargets.bottleId, promotedBottles.id),
-          eq(catalogTargets.groupId, promotedBottles.groupId),
-        ),
-      )
       .where(where ? and(...where) : undefined)
       .orderBy(orderBy, asc(bottleReleases.id))
       .limit(limit + 1)
       .offset(offset);
 
     const page = results.slice(0, limit);
-    await Promise.all(
-      page.map(async (result) => {
-        let target;
-        try {
-          target = await loadCatalogTargetByLegacyReference(
-            {
-              bottleId: result.legacyBottleId,
-              releaseId: result.releaseId,
-            },
-            {
-              actor: null,
-              permissions: { canReadCatalogIdentity: true },
-              caller: "bottleReleases.list",
-              operation: "read_promoted_bottle",
-            },
-          );
-        } catch (error) {
-          if (error instanceof CatalogTargetResolutionError) {
-            throw errors.CONFLICT({ message: error.message, cause: error });
-          }
-          throw error;
-        }
-
-        if (
-          target.kind !== "bottle" ||
-          target.targetId !== result.targetId ||
-          target.bottle.id !== result.bottle.id
-        ) {
-          throw errors.CONFLICT({
-            message:
-              "BottleRelease promotion does not match its active exact Bottle target.",
-          });
-        }
-      }),
-    );
-
     const serializedBottles = await serialize(
       BottleSerializer,
       page.map(({ bottle }) => bottle),

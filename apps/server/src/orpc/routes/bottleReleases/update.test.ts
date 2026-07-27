@@ -5,7 +5,6 @@ import {
   bottleReleasePromotions,
   bottleReleases,
   bottles,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -78,10 +77,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       edition: "Untouched Sibling",
       abv: 46,
     });
-    const promotedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, promoted.id),
-    });
-    if (!promotedTarget) throw new Error("Missing promoted target fixture.");
     await promoteRelease(release.id, promoted.id);
 
     const [releaseBefore] = await db
@@ -96,11 +91,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       .select()
       .from(bottleGroups)
       .where(eq(bottleGroups.id, parent.groupId!));
-    const targetsBefore = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.groupId, parent.groupId!))
-      .orderBy(asc(catalogTargets.id));
     const [parentBefore] = await db
       .select()
       .from(bottles)
@@ -171,7 +161,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       expect.objectContaining({
         bottleId: promoted.id,
         releaseId: null,
-        targetId: promotedTarget.id,
         assignmentSource: "canonical",
       }),
     ]);
@@ -221,13 +210,6 @@ describe("PATCH /bottle-releases/{release}", () => {
         .from(bottleGroups)
         .where(eq(bottleGroups.id, parent.groupId!)),
     ).toEqual([groupBefore]);
-    expect(
-      await db
-        .select()
-        .from(catalogTargets)
-        .where(eq(catalogTargets.groupId, parent.groupId!))
-        .orderBy(asc(catalogTargets.id)),
-    ).toEqual(targetsBefore);
     expect(
       await db.select().from(bottles).where(eq(bottles.id, parent.id)),
     ).toEqual([parentBefore]);
@@ -316,7 +298,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     expect(error).toMatchObject({ status: 404 });
   });
 
-  test("rejects missing, pending, and corrupt promotion mappings", async ({
+  test("rejects missing, pending, and incomplete promotion mappings", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -336,12 +318,17 @@ describe("PATCH /bottle-releases/{release}", () => {
       status: "pending",
     });
 
-    const corruptParent = await fixtures.Bottle({ name: "Corrupt Mapping" });
-    const corruptRelease = await fixtures.BottleRelease({
-      bottleId: corruptParent.id,
+    const incompleteParent = await fixtures.Bottle({
+      name: "Incomplete Mapping",
     });
-    const wrongGroupBottle = await fixtures.Bottle({ name: "Wrong Group" });
-    await promoteRelease(corruptRelease.id, wrongGroupBottle.id);
+    const incompleteRelease = await fixtures.BottleRelease({
+      bottleId: incompleteParent.id,
+    });
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: incompleteRelease.id,
+      promotedBottleId: incompleteParent.id,
+      status: "promoted",
+    });
     const bottlesBefore = await db
       .select()
       .from(bottles)
@@ -354,7 +341,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     for (const releaseId of [
       missingRelease.id,
       pendingRelease.id,
-      corruptRelease.id,
+      incompleteRelease.id,
     ]) {
       const error = await waitError(
         routerClient.bottleReleases.update(
@@ -396,10 +383,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       .select()
       .from(bottleAliases)
       .orderBy(asc(bottleAliases.name));
-    const targetsBefore = await db
-      .select()
-      .from(catalogTargets)
-      .orderBy(asc(catalogTargets.id));
     const groupsBefore = await db
       .select()
       .from(bottleGroups)
@@ -435,9 +418,6 @@ describe("PATCH /bottle-releases/{release}", () => {
     expect(
       await db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
     ).toEqual(aliasesBefore);
-    expect(
-      await db.select().from(catalogTargets).orderBy(asc(catalogTargets.id)),
-    ).toEqual(targetsBefore);
     expect(
       await db.select().from(bottleGroups).orderBy(asc(bottleGroups.id)),
     ).toEqual(groupsBefore);
