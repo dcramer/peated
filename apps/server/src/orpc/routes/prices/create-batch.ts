@@ -12,9 +12,16 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
+  BottleAliasBottleInactiveError,
+  BottleAliasBottleNotFoundError,
+  BottleAliasBottleRetiredError,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -70,25 +77,36 @@ export default procedure
                 match = await findBottleAliasAssignment(sp.name, tx);
               }
               const bottleId = match?.bottleId ?? null;
-              const actor = await getUserActorForDatabase(tx, context.user);
-              const aliasAssignment =
-                bottleId !== null
-                  ? await assignBottleAliasInTransaction(tx, {
-                      name: aliasKey,
-                      backfillNames: [name, sp.name],
-                      externalSiteId: site.id,
-                      volume: sp.volume,
-                      assignmentSource: "source_approved",
-                      assignedByActorId: actor.id,
-                      bottleId,
-                      sourceAliasIdentity: match?.alias,
-                    })
-                  : null;
+              if (bottleId !== null) {
+                try {
+                  await resolveActiveBottleIds(tx, [bottleId], {
+                    lock: "update",
+                  });
+                } catch (error) {
+                  if (!(error instanceof ActiveBottleSelectionError)) {
+                    throw error;
+                  }
+                  switch (error.reason) {
+                    case "missing":
+                      throw new BottleAliasBottleNotFoundError(error.bottleId);
+                    case "bottle_retired":
+                      throw new BottleAliasBottleRetiredError(
+                        error.bottleId,
+                        error.replacementBottleId,
+                      );
+                    case "unassigned":
+                    case "group_retired":
+                      throw new BottleAliasBottleInactiveError(
+                        error.bottleId,
+                        error.reason,
+                      );
+                  }
+                }
+              }
 
               // XXX: maybe we should constrain on URL?
-              // New rows carry only direct Bottle identity. Conflict updates
-              // preserve legacy release/target evidence while filling a null
-              // Bottle assignment or confirming the same Bottle.
+              // A concurrent conflict may add identity first, so only fill an
+              // unresolved row or reaffirm the same Bottle.
               const {
                 rows: [
                   { id: rawPriceId, imageUrl, bottleId: rawPersistedBottleId },
@@ -96,8 +114,8 @@ export default procedure
               } = await tx.execute<
                 Pick<StorePrice, "id" | "imageUrl" | "bottleId">
               >(sql`
-              INSERT INTO ${storePrices} (target_id, bottle_id, release_id, external_site_id, name, volume, price, currency, url)
-              VALUES (NULL, ${bottleId}, NULL, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+              INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
+              VALUES (${bottleId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
               ON CONFLICT (external_site_id, LOWER(name), volume)
               DO UPDATE
               SET bottle_id = CASE
@@ -118,6 +136,22 @@ export default procedure
                 rawPersistedBottleId === null
                   ? null
                   : Number(rawPersistedBottleId);
+              const hasAliasMatch =
+                bottleId !== null && persistedBottleId === bottleId;
+              const aliasAssignment = hasAliasMatch
+                ? await assignBottleAliasInTransaction(tx, {
+                    name: aliasKey,
+                    backfillNames: [name, sp.name],
+                    externalSiteId: site.id,
+                    volume: sp.volume,
+                    assignmentSource: "source_approved",
+                    assignedByActorId: (
+                      await getUserActorForDatabase(tx, context.user)
+                    ).id,
+                    bottleId,
+                    sourceAliasIdentity: match?.alias,
+                  })
+                : null;
 
               await tx
                 .insert(storePriceHistories)
@@ -134,8 +168,7 @@ export default procedure
                 price: {
                   id: priceId,
                   imageUrl,
-                  hasAliasMatch:
-                    bottleId !== null && persistedBottleId === bottleId,
+                  hasAliasMatch,
                 },
                 aliasAssignment,
               };

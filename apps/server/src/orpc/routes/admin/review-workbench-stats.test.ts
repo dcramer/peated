@@ -64,7 +64,7 @@ async function createProposalFixture(
     storePrice,
     targetId,
   }: {
-    bottleId: number;
+    bottleId: number | null;
     storePrice: StorePriceFixtureFactory;
     targetId?: number | null;
   },
@@ -231,16 +231,18 @@ describe("GET /admin/review-workbench/stats", () => {
     );
   });
 
-  test("counts approved listings as matched only through targetId", async ({
+  test("counts only approved direct Bottle assignments as matched", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle();
+    const unrelatedBottle = await fixtures.Bottle();
     const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
+      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
     });
     if (!target) throw new Error("Missing exact target fixture");
     const createdAt = daysAgoAt(0, 8);
+
     await createProposalFixture(
       { createdAt, status: "approved" },
       {
@@ -257,15 +259,37 @@ describe("GET /admin/review-workbench/stats", () => {
         targetId: target.id,
       },
     );
+    await createProposalFixture(
+      { createdAt, status: "approved" },
+      {
+        bottleId: null,
+        storePrice: fixtures.StorePrice,
+        targetId: target.id,
+      },
+    );
+    await createProposalFixture(
+      {
+        createdAt,
+        enteredQueueAt: createdAt,
+        status: "approved",
+      },
+      {
+        bottleId: null,
+        storePrice: fixtures.StorePrice,
+        targetId: null,
+      },
+    );
 
     const result = await routerClient.admin.reviewWorkbenchStats(undefined, {
       context: { user },
     });
 
     expect(result.snapshot.today).toMatchObject({
-      newListings: 2,
-      matchedSuccessfully: 1,
-      autoResolved: 1,
+      newListings: 4,
+      matchedSuccessfully: 2,
+      autoResolved: 2,
+      sentToQueue: 1,
+      queueApproved: 1,
     });
   });
 });

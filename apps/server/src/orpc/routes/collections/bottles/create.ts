@@ -169,7 +169,6 @@ export default procedure
         .values({
           collectionId: collection.id,
           bottleId,
-          releaseId: null,
           status: statusProvided ? (input.status ?? null) : null,
         })
         .onConflictDoNothing()

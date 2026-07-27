@@ -1,47 +1,26 @@
-import {
-  normalizeBottle,
-  normalizeBottleAliasKey,
-} from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
-  bottleReleasePromotions,
   bottleTombstones,
-  bottles,
   catalogTargets,
   reviews,
   storePriceHistories,
   storePrices,
 } from "@peated/server/db/schema";
+import {
+  normalizeBottle,
+  normalizeBottleAliasKey,
+} from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
-
-async function getExactTargetId(bottleId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Exact target fixture not found.");
-  return target.id;
-}
-
-async function getGenericTargetId(groupId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: and(
-      eq(catalogTargets.groupId, groupId),
-      isNull(catalogTargets.bottleId),
-    ),
-  });
-  if (!target) throw new Error("Generic target fixture not found.");
-  return target.id;
-}
 
 async function waitForSessionBlockedBy(
   client: NodePgClient,
@@ -60,7 +39,7 @@ async function waitForSessionBlockedBy(
     if (result.rows[0]?.blocked) return;
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
-  throw new Error("Timed out waiting for Bottle assignment lock.");
+  throw new Error("Timed out waiting for expected database lock.");
 }
 
 vi.mock("@peated/server/worker/client", () => ({
@@ -74,273 +53,50 @@ describe("POST /external-sites/:site/prices", () => {
   });
 
   test("requires authentication", async () => {
-    const err = await waitError(() =>
+    const error = await waitError(() =>
       routerClient.prices.createBatch({ site: "healthyspirits", prices: [] }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
   test("requires admin", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
+    const moderator = await fixtures.User({ mod: true });
 
-    const err = await waitError(() =>
+    const error = await waitError(() =>
       routerClient.prices.createBatch(
         { site: "healthyspirits", prices: [] },
-        { context: { user } },
+        { context: { user: moderator } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("returns error for non-existent site", async ({ fixtures }) => {
-    const user = await fixtures.User({ admin: true });
+  test("rejects invalid site input", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
 
-    const err = await waitError(() =>
+    const error = await waitError(() =>
       routerClient.prices.createBatch(
-        { site: "non-existent-site" as any, prices: [] },
-        { context: { user } },
+        { site: "not-a-site" as never, prices: [] },
+        { context: { user: admin } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 
-  test("processes new price", async ({ fixtures }) => {
+  test("processes a mixed batch with direct and unresolved Bottle identity", async ({
+    fixtures,
+  }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ name: "Ardbeg" });
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      brandId: brand.id,
     });
-    expect(bottle.fullName).toBe("Ardbeg 10-year-old");
-
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: "Ardbeg 10-year-old",
-            price: 9999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com",
-            imageUrl: "http://example.com/foo.jpg",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const prices = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-    expect(prices.length).toBe(1);
-    expect(prices[0].bottleId).toBe(bottle.id);
-    expect(prices[0].price).toBe(9999);
-    expect(prices[0].name).toBe("Ardbeg 10-year-old");
-    expect(prices[0].url).toBe("http://example.com");
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "Ardbeg 10-year-old"),
-    });
-    expect(alias).toMatchObject({
-      bottleId: bottle.id,
-      targetId: expect.any(Number),
-      assignmentSource: "source_approved",
-    });
-    expect(prices[0].targetId).toBeNull();
-    expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
-      priceId: prices[0].id,
-      imageUrl: "http://example.com/foo.jpg",
-    });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      { bottleId: bottle.id },
-    );
-  });
-
-  test("ignores target-only alias evidence and preserves existing Bottle identity", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle();
-    const staleBottle = await fixtures.Bottle();
-    const staleRelease = await fixtures.BottleRelease({
-      bottleId: staleBottle.id,
-    });
-    const staleTargetId = await getExactTargetId(staleBottle.id);
-    const genericTargetId = await getGenericTargetId(bottle.groupId!);
-    const user = await fixtures.User({ admin: true });
-    await db.insert(bottleAliases).values({
-      name: "Stable Expression Alias",
-      bottleId: null,
-      releaseId: null,
-      targetId: genericTargetId,
-      assignedByActorId: bottle.createdByActorId,
-    });
-    const existing = await fixtures.StorePrice({
-      name: "Stable Expression Alias",
-      externalSiteId: site.id,
-      bottleId: staleBottle.id,
-      targetId: staleTargetId,
-    });
-    await db
-      .update(storePrices)
-      .set({ releaseId: staleRelease.id })
-      .where(eq(storePrices.id, existing.id));
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: "Stable Expression Alias",
-            price: 7_999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/generic",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const price = await db.query.storePrices.findFirst({
-      where: eq(storePrices.externalSiteId, site.id),
-    });
-    expect(price).toMatchObject({
-      id: existing.id,
-      targetId: staleTargetId,
-      bottleId: staleBottle.id,
-      releaseId: staleRelease.id,
-    });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      { priceId: existing.id },
-    );
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      expect.anything(),
-    );
-  });
-
-  test("preserves a different existing Bottle and queues resolution", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const expectedBottle = await fixtures.Bottle();
-    const staleBottle = await fixtures.Bottle();
-    const staleRelease = await fixtures.BottleRelease({
-      bottleId: staleBottle.id,
-    });
-    const expectedTargetId = await getExactTargetId(expectedBottle.id);
-    const staleTargetId = await getExactTargetId(staleBottle.id);
-    const user = await fixtures.User({ admin: true });
-    const name = "Atomic Exact Listing";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: expectedBottle.id,
-      releaseId: null,
-      targetId: expectedTargetId,
-      assignedByActorId: expectedBottle.createdByActorId,
-    });
-    const existing = await fixtures.StorePrice({
-      name,
-      externalSiteId: site.id,
-      bottleId: staleBottle.id,
-      targetId: staleTargetId,
-    });
-    await db
-      .update(storePrices)
-      .set({ releaseId: staleRelease.id })
-      .where(eq(storePrices.id, existing.id));
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name,
-            price: 8_999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/exact-replacement",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, existing.id),
-      }),
-    ).toMatchObject({
-      targetId: staleTargetId,
-      bottleId: staleBottle.id,
-      releaseId: staleRelease.id,
-    });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      { priceId: existing.id },
-    );
-  });
-
-  test("rolls back price and history writes for a retired alias target", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle();
-    const user = await fixtures.User({ admin: true });
-    await db.insert(bottleTombstones).values({
-      bottleId: bottle.id,
-      newBottleId: null,
-    });
-
-    await expect(
-      routerClient.prices.createBatch(
-        {
-          site: site.type,
-          prices: [
-            {
-              name: bottle.fullName,
-              price: 10_999,
-              currency: "usd",
-              volume: 750,
-              url: "http://example.com/retired-target",
-            },
-          ],
-        },
-        { context: { user } },
-      ),
-    ).rejects.toThrow(`Bottle ${bottle.id} is retired`);
-
-    expect(
-      await db.query.storePrices.findMany({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toHaveLength(0);
-    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
-  });
-
-  test("finalizes a matched price image onto an empty Bottle image", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-      imageUrl: null,
-    });
-    const imageUrl = "http://example.com/retailer-bottle.jpg";
-    const existingPrice = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      externalSiteId: site.id,
-      name: bottle.fullName,
-      volume: 750,
-      imageUrl,
-    });
-    const user = await fixtures.User({ admin: true });
+    const imageUrl = "https://example.com/images/ardbeg.jpg";
 
     await routerClient.prices.createBatch(
       {
@@ -348,90 +104,326 @@ describe("POST /external-sites/:site/prices", () => {
         prices: [
           {
             name: bottle.fullName,
-            price: 9999,
+            price: 9_999,
             currency: "usd",
             volume: 750,
-            url: "http://example.com/finalized-image",
+            url: "https://example.com/prices/ardbeg",
+            imageUrl,
+          },
+          {
+            name: "Unresolved Batch Listing",
+            price: 7_999,
+            currency: "usd",
+            volume: 500,
+            url: "https://example.com/prices/unresolved",
           },
         ],
       },
-      { context: { user } },
+      { context: { user: admin } },
     );
 
-    expect(
-      await db.query.bottles.findFirst({
-        where: eq(bottles.id, bottle.id),
-      }),
-    ).toMatchObject({ imageUrl });
-    const updatedPrice = await db.query.storePrices.findFirst({
-      where: (prices, { and, eq }) =>
-        and(
-          eq(prices.externalSiteId, site.id),
-          eq(prices.name, bottle.fullName),
-        ),
+    const prices = await db.query.storePrices.findMany({
+      where: eq(storePrices.externalSiteId, site.id),
     });
-    const exactAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, bottle.fullName),
-    });
-    expect(updatedPrice).toMatchObject({
+    const matched = prices.find(({ name }) => name === bottle.fullName);
+    const unresolved = prices.find(({ bottleId }) => bottleId === null);
+    expect(matched).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: existingPrice.targetId,
+      targetId: null,
+      price: 9_999,
+    });
+    expect(unresolved).toMatchObject({
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+      price: 7_999,
+    });
+    expect(await db.select().from(storePriceHistories)).toHaveLength(2);
+    expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
+      priceId: matched!.id,
       imageUrl,
     });
-    expect(exactAlias?.targetId).toEqual(expect.any(Number));
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "CapturePriceImage",
-      expect.anything(),
-    );
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "IndexBottleSearchVectors",
       { bottleId: bottle.id },
     );
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: unresolved!.id },
+    );
   });
 
-  test("processes existing price", async ({ fixtures }) => {
+  test("ignores stale target evidence on a direct Bottle alias", async ({
+    fixtures,
+  }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      name: "Direct Price Bottle",
     });
-    expect(bottle.fullName).toBe("Ardbeg 10-year-old");
-    const existingPrice = await fixtures.StorePrice({
+    const unrelatedBottle = await fixtures.Bottle({
+      name: "Unrelated Price Target",
+    });
+    const unrelatedTarget = await db.query.catalogTargets.findFirst({
+      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
+    });
+    if (!unrelatedTarget) throw new Error("Missing exact target fixture");
+    const aliasName = "Price Alias With Stale Target";
+    await fixtures.BottleAlias({
+      name: aliasName,
       bottleId: bottle.id,
-      externalSiteId: site.id,
+      targetId: unrelatedTarget.id,
     });
-    expect(existingPrice.name).toBe(bottle.fullName);
-
-    const user = await fixtures.User({ admin: true });
 
     await routerClient.prices.createBatch(
       {
         site: site.type,
         prices: [
           {
-            name: "Ardbeg 10-year-old",
-            price: 2999,
+            name: aliasName,
+            price: 8_999,
             currency: "usd",
             volume: 750,
-            url: "http://example.com",
+            url: "https://example.com/prices/stale-target",
           },
         ],
       },
-      { context: { user } },
+      { context: { user: admin } },
     );
 
-    const prices = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      targetId: null,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      targetId: unrelatedTarget.id,
+    });
+  });
 
-    expect(prices.length).toBe(1);
-    expect(prices[0].id).toBe(existingPrice.id);
-    expect(prices[0].bottleId).toBe(bottle.id);
-    expect(prices[0].price).toBe(2999);
-    expect(prices[0].name).toBe("Ardbeg 10-year-old");
-    expect(prices[0].url).toBe("http://example.com");
+  test("uses an identity-preserving alias key as an exact match", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ name: "Ardbeg" });
+    const bottle = await fixtures.Bottle({
+      name: "10-year-old",
+      brandId: brand.id,
+    });
+    const rawName = "Ardbeg 10 years old";
+    expect(normalizeBottleAliasKey(rawName)).toBe(bottle.fullName);
+
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name: rawName,
+            price: 3_999,
+            currency: "usd",
+            volume: 750,
+            url: "https://example.com/prices/identity-key",
+          },
+        ],
+      },
+      { context: { user: admin } },
+    );
+
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.externalSiteId, site.id),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      name: bottle.fullName,
+    });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      expect.anything(),
+    );
+  });
+
+  test("does not use a lossy display-normalized name as an exact match", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ name: "Lagavulin" });
+    const normalizedAliasBottle = await fixtures.Bottle({
+      name: "Distillers Edition",
+      brandId: brand.id,
+    });
+    const rawName = "Lagavulin Distillers Edition 2011 Release";
+    expect(normalizeBottleAliasKey(rawName)).not.toBe(
+      normalizedAliasBottle.fullName,
+    );
+
+    await routerClient.prices.createBatch(
+      {
+        site: site.type,
+        prices: [
+          {
+            name: rawName,
+            price: 3_999,
+            currency: "usd",
+            volume: 750,
+            url: "https://example.com/prices/lossy-name",
+          },
+        ],
+      },
+      { context: { user: admin } },
+    );
+
+    const price = await db.query.storePrices.findFirst({
+      where: eq(storePrices.externalSiteId, site.id),
+    });
+    expect(price).toMatchObject({
+      bottleId: null,
+      name: normalizedAliasBottle.fullName,
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: price!.id },
+    );
+  });
+
+  test("a concurrent conflict preserves its committed Bottle without incoming finalization", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
+    const incomingBottle = await fixtures.Bottle({
+      name: "Concurrent Incoming Price Bottle",
+    });
+    const committedBottle = await fixtures.Bottle({
+      name: "Concurrent Committed Price Bottle",
+    });
+    const listingName = "Concurrent Price Listing® 2024 Release";
+    const aliasKey = normalizeBottleAliasKey(listingName);
+    const normalizedListingName = normalizeBottle({ name: listingName }).name;
+    expect(aliasKey).not.toBe(listingName);
+    expect(normalizedListingName).not.toBe(aliasKey);
+    await fixtures.BottleAlias({
+      name: listingName,
+      bottleId: incomingBottle.id,
+      targetId: null,
+    });
+    const siblingPrice = await fixtures.StorePrice({
+      bottleId: null,
+      targetId: null,
+      externalSiteId: site.id,
+      name: aliasKey,
+      volume: 750,
+      url: "https://example.com/prices/concurrent-sibling",
+    });
+    const siblingReview = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      targetId: null,
+      externalSiteId: site.id,
+      name: aliasKey,
+      url: "https://example.com/reviews/concurrent-sibling",
+    });
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation:
+      | ReturnType<typeof routerClient.prices.createBatch>
+      | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `INSERT INTO "store_price"
+          ("bottle_id", "external_site_id", "name", "volume", "price", "currency", "url")
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          committedBottle.id,
+          site.id,
+          normalizedListingName,
+          750,
+          8_000,
+          "usd",
+          "https://example.com/prices/concurrent-holder",
+        ],
+      );
+
+      creation = routerClient.prices.createBatch(
+        {
+          site: site.type,
+          prices: [
+            {
+              name: listingName,
+              price: 9_999,
+              currency: "usd",
+              volume: 750,
+              url: "https://example.com/prices/concurrent-result",
+            },
+          ],
+        },
+        { context: { user: admin } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+      await creation;
+
+      const price = await db.query.storePrices.findFirst({
+        where: (storePrices, { and, eq }) =>
+          and(
+            eq(storePrices.externalSiteId, site.id),
+            eq(storePrices.name, normalizedListingName),
+          ),
+      });
+      expect(price).toMatchObject({
+        bottleId: committedBottle.id,
+        releaseId: null,
+        targetId: null,
+        price: 9_999,
+        url: "https://example.com/prices/concurrent-result",
+      });
+      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+        "ResolveStorePriceBottle",
+        { priceId: price!.id },
+      );
+      expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+        "IndexBottleSearchVectors",
+        { bottleId: incomingBottle.id },
+      );
+      expect(
+        await db.query.storePrices.findFirst({
+          where: eq(storePrices.id, siblingPrice.id),
+        }),
+      ).toMatchObject({ bottleId: null });
+      expect(
+        await db.query.reviews.findFirst({
+          where: eq(reviews.id, siblingReview.id),
+        }),
+      ).toMatchObject({ bottleId: null });
+      expect(
+        await db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, aliasKey),
+        }),
+      ).toBeUndefined();
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
   });
 
   test("locks the Bottle before an existing StorePrice", async ({
@@ -445,7 +437,7 @@ describe("POST /external-sites/:site/prices", () => {
       name: bottle.fullName,
       volume: 750,
     });
-    const user = await fixtures.User({ admin: true });
+    const admin = await fixtures.User({ admin: true });
     const client = new Client(getPostgresConnectionConfig());
     let committed = false;
     let creation:
@@ -455,6 +447,7 @@ describe("POST /external-sites/:site/prices", () => {
     await client.connect();
     try {
       await client.query("BEGIN");
+      await client.query("SET LOCAL lock_timeout = '1s'");
       const blockerPid = (
         await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
       ).rows[0]!.pid;
@@ -476,7 +469,7 @@ describe("POST /external-sites/:site/prices", () => {
             },
           ],
         },
-        { context: { user } },
+        { context: { user: admin } },
       );
       await waitForSessionBlockedBy(client, blockerPid);
 
@@ -495,7 +488,7 @@ describe("POST /external-sites/:site/prices", () => {
 
     expect(
       await db.query.storePrices.findFirst({
-        where: eq(storePrices.externalSiteId, site.id),
+        where: eq(storePrices.id, existingPrice.id),
       }),
     ).toMatchObject({
       bottleId: bottle.id,
@@ -503,399 +496,37 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
-  test("uses the retained Bottle for a promotion-incomplete release alias", async ({
+  test("an unresolved retry preserves a durable Bottle and queues resolution", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
-      name: "Reserve",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      name: "Durable Price Bottle",
     });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      abv: 46,
-    });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: release.fullName,
-            price: 4999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/release",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const [price] = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-
-    const normalizedReleaseName = normalizeBottle({
-      name: release.fullName,
-    }).name;
-
-    expect(price).toMatchObject({
-      bottleId: bottle.id,
-      releaseId: null,
-      targetId: null,
-      name: normalizedReleaseName,
-    });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      expect.anything(),
-    );
-  });
-
-  test("uses the direct Bottle retained on a promoted legacy release alias", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const parent = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const [promotedBottle] = await db
-      .insert(bottles)
-      .values({
-        groupId: parent.groupId,
-        brandId: parent.brandId,
-        createdByActorId: parent.createdByActorId,
-        name: "Promoted price Bottle",
-        fullName: "Promoted price Bottle",
-      })
-      .returning();
-    if (!promotedBottle || parent.groupId === null) {
-      throw new Error("Unable to create promoted Bottle fixture.");
-    }
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
-    });
-    const name = "Promoted Legacy Price Alias";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: parent.id,
-      releaseId: release.id,
-      targetId: null,
-      assignedByActorId: parent.createdByActorId,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name,
-            price: 9_999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/promoted",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: null,
-    });
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: release.id,
-    });
-  });
-
-  test("uses the direct Bottle from a legacy parent alias", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const parent = await fixtures.Bottle();
-    await fixtures.BottleRelease({ bottleId: parent.id });
-    const name = "Legacy Generic Price Alias";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: parent.id,
-      releaseId: null,
-      targetId: null,
-      assignedByActorId: parent.createdByActorId,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name,
-            price: 10_499,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/legacy-generic",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: null,
-    });
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: null,
-    });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      expect.anything(),
-    );
-  });
-
-  test("retains a validated legacy pair from a target-backed generic alias", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const parent = await fixtures.Bottle();
-    await fixtures.BottleRelease({ bottleId: parent.id });
-    const genericTargetId = await getGenericTargetId(parent.groupId!);
-    const name = "Target-backed Generic Legacy Pair";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: parent.id,
-      releaseId: null,
-      targetId: genericTargetId,
-      assignedByActorId: parent.createdByActorId,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name,
-            price: 10_749,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/generic-retained-pair",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: parent.id,
-      releaseId: null,
-    });
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      targetId: genericTargetId,
-      bottleId: parent.id,
-      releaseId: null,
-    });
-  });
-
-  test("uses the direct alias Bottle when retained target evidence disagrees", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const targetParent = await fixtures.Bottle();
-    await fixtures.BottleRelease({ bottleId: targetParent.id });
-    const retainedParent = await fixtures.Bottle();
-    await fixtures.BottleRelease({ bottleId: retainedParent.id });
-    const genericTargetId = await getGenericTargetId(targetParent.groupId!);
-    const name = "Invalid Generic Legacy Pair";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: retainedParent.id,
-      releaseId: null,
-      targetId: genericTargetId,
-      assignedByActorId: targetParent.createdByActorId,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name,
-            price: 10_999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/invalid-generic-retained-pair",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.externalSiteId, site.id),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: retainedParent.id,
-      releaseId: null,
-    });
-    expect(await db.select().from(storePriceHistories)).toHaveLength(1);
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, name),
-      }),
-    ).toMatchObject({
-      targetId: genericTargetId,
-      bottleId: retainedParent.id,
-    });
-  });
-
-  test("legacy aliases do not overwrite a different existing Bottle", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const legacyBottle = await fixtures.Bottle();
-    const legacyRelease = await fixtures.BottleRelease({
-      bottleId: legacyBottle.id,
-    });
-    const previousBottle = await fixtures.Bottle();
-    const previousRelease = await fixtures.BottleRelease({
-      bottleId: previousBottle.id,
-    });
-    expect(legacyRelease.id).not.toBe(previousRelease.id);
-    const name = "Staged Targetless Listing";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: legacyBottle.id,
-      releaseId: legacyRelease.id,
-      targetId: null,
-      assignedByActorId: legacyBottle.createdByActorId,
-    });
+    const listingName = "Durable Unresolved Price";
     const existing = await fixtures.StorePrice({
-      name,
       externalSiteId: site.id,
-      bottleId: previousBottle.id,
+      bottleId: bottle.id,
       targetId: null,
+      name: listingName,
+      volume: 750,
     });
-    await db
-      .update(storePrices)
-      .set({ releaseId: previousRelease.id })
-      .where(eq(storePrices.id, existing.id));
-    const user = await fixtures.User({ admin: true });
 
     await routerClient.prices.createBatch(
       {
         site: site.type,
         prices: [
           {
-            name,
-            price: 5_999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/targetless",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, existing.id),
-      }),
-    ).toMatchObject({
-      targetId: null,
-      bottleId: previousBottle.id,
-      releaseId: previousRelease.id,
-    });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      { priceId: existing.id },
-    );
-  });
-
-  test("targetless legacy aliases cannot downgrade durable price identity", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const legacyBottle = await fixtures.Bottle();
-    const durableBottle = await fixtures.Bottle();
-    const durableTargetId = await getExactTargetId(durableBottle.id);
-    const name = "Durable Price Listing";
-    await db.insert(bottleAliases).values({
-      name,
-      bottleId: legacyBottle.id,
-      targetId: null,
-      assignedByActorId: legacyBottle.createdByActorId,
-    });
-    const existing = await fixtures.StorePrice({
-      name,
-      externalSiteId: site.id,
-      bottleId: durableBottle.id,
-      targetId: durableTargetId,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name,
+            name: listingName,
             price: 6_999,
             currency: "usd",
             volume: 750,
-            url: "http://example.com/durable",
+            url: "https://example.com/prices/durable-retry",
           },
         ],
       },
-      { context: { user } },
+      { context: { user: admin } },
     );
 
     expect(
@@ -903,9 +534,8 @@ describe("POST /external-sites/:site/prices", () => {
         where: eq(storePrices.id, existing.id),
       }),
     ).toMatchObject({
-      targetId: durableTargetId,
-      bottleId: durableBottle.id,
-      releaseId: null,
+      bottleId: bottle.id,
+      price: 6_999,
     });
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
@@ -913,303 +543,87 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("processes new price without bottle", async ({ fixtures }) => {
+  test("rolls back StorePrice and history writes for a retired alias Bottle", async ({
+    fixtures,
+  }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const user = await fixtures.User({ admin: true });
+    const admin = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle({
+      name: "Retired Price Bottle",
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: null,
+    });
 
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: "Ardbeg 10-year-old",
-            price: 2999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com",
-          },
-        ],
-      },
-      { context: { user } },
-    );
+    await expect(
+      routerClient.prices.createBatch(
+        {
+          site: site.type,
+          prices: [
+            {
+              name: bottle.fullName,
+              price: 10_999,
+              currency: "usd",
+              volume: 750,
+              url: "https://example.com/prices/retired",
+            },
+          ],
+        },
+        { context: { user: admin } },
+      ),
+    ).rejects.toThrow(`Bottle ${bottle.id} is retired`);
 
-    const prices = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-    expect(prices.length).toBe(1);
-    expect(prices[0].bottleId).toBeNull();
-    expect(prices[0].price).toBe(2999);
-    expect(prices[0].name).toBe("Ardbeg 10-year-old");
-    expect(prices[0].url).toBe("http://example.com");
     expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, "Ardbeg 10-year-old"),
+      await db.query.storePrices.findMany({
+        where: eq(storePrices.externalSiteId, site.id),
       }),
-    ).toBeUndefined();
-    expect(workerClient.pushJob).not.toHaveBeenCalled();
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      {
-        priceId: prices[0].id,
-      },
-    );
+    ).toHaveLength(0);
+    expect(await db.select().from(storePriceHistories)).toHaveLength(0);
   });
 
-  test("uses identity-preserving alias keys as exact matches", async ({
+  test("finalizes a matched StorePrice image onto an empty Bottle image", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
+    const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      name: "Image Price Bottle",
+      imageUrl: null,
     });
-    expect(bottle.fullName).toBe("Ardbeg 10-year-old");
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: "Ardbeg 10 years old",
-            price: 3999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/normalized-alias",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const prices = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-
-    expect(prices.length).toBe(1);
-    expect(prices[0].bottleId).toBe(bottle.id);
-    expect(prices[0].releaseId).toBeNull();
-    expect(prices[0].name).toBe("Ardbeg 10-year-old");
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      { bottleId: bottle.id },
-    );
-  });
-
-  test("falls back to existing raw aliases for legacy exact matches", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-    });
-    const rawName = "Ardbeg 10 years old";
-    const aliasKey = normalizeBottleAliasKey(rawName);
-    expect(aliasKey).not.toBe(rawName);
-    await fixtures.BottleAlias({
+    const imageUrl = "https://example.com/images/retailer-bottle.jpg";
+    await fixtures.StorePrice({
       bottleId: bottle.id,
-      name: rawName,
-    });
-    const rawReview = await fixtures.Review({
-      bottleId: null,
-      releaseId: null,
-      name: rawName,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: rawName,
-            price: 3999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/legacy-raw-alias",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const [price] = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, aliasKey),
-    });
-    const updatedRawReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, rawReview.id),
-    });
-
-    expect(price.bottleId).toBe(bottle.id);
-    expect(price.targetId).toBeNull();
-    expect(updatedRawReview).toMatchObject({
-      bottleId: bottle.id,
-      releaseId: null,
-      targetId: null,
-    });
-    expect(alias).toMatchObject({
-      bottleId: bottle.id,
-      targetId: expect.any(Number),
-      assignmentSource: "source_approved",
-    });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      { bottleId: bottle.id },
-    );
-  });
-
-  test("does not use lossy normalized listing names as exact matches", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle({
-      name: "Distillers Edition",
-      brandId: (await fixtures.Entity({ name: "Lagavulin" })).id,
-    });
-    expect(bottle.fullName).toBe("Lagavulin Distillers Edition");
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: "Lagavulin Distillers Edition 2011 Release",
-            price: 3999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/lossy-normalized-alias",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const [price] = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-
-    expect(price.bottleId).toBeNull();
-    expect(price.releaseId).toBeNull();
-    expect(price.name).toBe(bottle.fullName);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      {
-        priceId: price.id,
-      },
-    );
-  });
-
-  test("writes the same accepted alias key used for lookup", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-    });
-    const rawName = "Ardbeg 10 years old Whisky";
-    const aliasKey = normalizeBottleAliasKey(rawName);
-    expect(aliasKey).not.toBe(rawName);
-
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      name: aliasKey,
-    });
-    const user = await fixtures.User({ admin: true });
-
-    await routerClient.prices.createBatch(
-      {
-        site: site.type,
-        prices: [
-          {
-            name: rawName,
-            price: 3999,
-            currency: "usd",
-            volume: 750,
-            url: "http://example.com/raw-alias",
-          },
-        ],
-      },
-      { context: { user } },
-    );
-
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, aliasKey),
-    });
-    expect(alias).toMatchObject({
-      bottleId: bottle.id,
-      assignmentSource: "source_approved",
-    });
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, rawName),
-      }),
-    ).toBeUndefined();
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearchVectors",
-      { bottleId: bottle.id },
-    );
-  });
-
-  test("does not unset bottle for existing price", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
-    const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-    });
-    expect(bottle.fullName).toBe("Ardbeg 10-year-old");
-    const targetId = await getExactTargetId(bottle.id);
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const existingPrice = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      targetId,
-      name: "Ardbeg 10-year-old Single Malt",
       externalSiteId: site.id,
+      name: bottle.fullName,
+      volume: 750,
+      imageUrl,
     });
-    await db
-      .update(storePrices)
-      .set({ releaseId: release.id })
-      .where(eq(storePrices.id, existingPrice.id));
-
-    const user = await fixtures.User({ admin: true });
 
     await routerClient.prices.createBatch(
       {
         site: site.type,
         prices: [
           {
-            name: "Ardbeg 10-year-old Single Malt",
-            price: 2999,
+            name: bottle.fullName,
+            price: 9_999,
             currency: "usd",
             volume: 750,
-            url: "http://example.com",
+            url: "https://example.com/prices/image-finalization",
           },
         ],
       },
-      { context: { user } },
+      { context: { user: admin } },
     );
 
-    const prices = await db
-      .select()
-      .from(storePrices)
-      .where(eq(storePrices.externalSiteId, site.id));
-
-    expect(prices.length).toBe(1);
-    expect(prices[0].id).toBe(existingPrice.id);
-    expect(prices[0].bottleId).toBe(bottle.id);
-    expect(prices[0].releaseId).toBe(release.id);
-    expect(prices[0].targetId).toBe(targetId);
-    expect(prices[0].price).toBe(2999);
-    expect(prices[0].name).toBe("Ardbeg 10-year-old Single Malt");
-    expect(prices[0].url).toBe("http://example.com");
+    expect(
+      await db.query.bottles.findFirst({
+        where: (bottles, { eq }) => eq(bottles.id, bottle.id),
+      }),
+    ).toMatchObject({ imageUrl });
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "CapturePriceImage",
+      expect.anything(),
+    );
   });
 });
