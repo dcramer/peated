@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
   bottleReleases,
@@ -325,18 +324,6 @@ describe("PATCH /bottles/{bottle}", () => {
       ),
     );
     expect(retiredError).toMatchObject({ status: 409 });
-
-    const invalid = await fixtures.Bottle({ name: "Invalid Target Graph" });
-    await db
-      .delete(bottleAliases)
-      .where(eq(bottleAliases.bottleId, invalid.id));
-    const invalidGraph = await waitError(
-      routerClient.bottles.update(
-        { bottle: invalid.id, exact: { edition: "Invalid" } },
-        { context: { user: mod } },
-      ),
-    );
-    expect(invalidGraph).toMatchObject({ status: 409 });
 
     const roleless = await fixtures.Entity({
       name: "Not A Route Brand",

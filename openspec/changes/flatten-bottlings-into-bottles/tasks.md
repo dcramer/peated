@@ -145,14 +145,14 @@ and map to an explicit removal task.
 - [x] 7.2 Rewrite identity, schema, Bottle entry, photo tasting, price matching,
       rating, and migration docs for direct Bottle references and non-targetable
       groups.
-- [ ] 7.3 Validate OpenSpec and generated migration history.
-- [ ] 7.4 Run focused schema, migration, service, route, serializer, worker,
+- [x] 7.3 Validate OpenSpec and generated migration history.
+- [x] 7.4 Run focused schema, migration, service, route, serializer, worker,
       classifier, and repair tests.
-- [ ] 7.5 Run server/web typechecks and file-scoped lint/format checks.
+- [x] 7.5 Run server/web typechecks and file-scoped lint/format checks.
 - [x] 7.6 Run classifier tests and evals in automatic recording/replay mode
       only when classifier identity contracts change.
 - [x] 7.7 Run focused web Vitest and constrained end-to-end coverage.
-- [ ] 7.8 Manually review the full diff for UX, architecture, type safety,
+- [x] 7.8 Manually review the full diff for UX, architecture, type safety,
       duplicate business logic, and unexpected file-tree growth.
 
 ## 8. Production Migration And Later Destructive Cleanup

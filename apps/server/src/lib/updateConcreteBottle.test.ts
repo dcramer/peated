@@ -556,6 +556,115 @@ describe("concrete Bottle updates", () => {
     );
   });
 
+  test("dispatches old and new shared owners exactly once after commit", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const oldBrand = await fixtures.Entity({
+      name: "Aggregate Old Brand",
+      type: ["brand"],
+    });
+    const oldBottler = await fixtures.Entity({
+      name: "Aggregate Old Bottler",
+      type: ["bottler"],
+    });
+    const oldDistiller = await fixtures.Entity({
+      name: "Aggregate Old Distiller",
+      type: ["distiller"],
+    });
+    const newBrand = await fixtures.Entity({
+      name: "Aggregate New Brand",
+      type: ["brand"],
+    });
+    const newBottler = await fixtures.Entity({
+      name: "Aggregate New Bottler",
+      type: ["bottler"],
+    });
+    const newDistiller = await fixtures.Entity({
+      name: "Aggregate New Distiller",
+      type: ["distiller"],
+    });
+    const { first } = await createGroup({
+      user: mod,
+      stable: {
+        name: "Aggregate Owners",
+        brand: oldBrand.id,
+        bottler: oldBottler.id,
+        distillers: [oldDistiller.id],
+      },
+      exacts: [{ edition: "One" }],
+    });
+    resetQueueMock();
+
+    let observedCommittedOwners = false;
+    vi.mocked(workerClient.pushUniqueJob).mockImplementation(
+      async (jobName) => {
+        if (jobName !== "OnEntityChange" || observedCommittedOwners) return;
+
+        const persistedGroup = await db.query.bottleGroups.findFirst({
+          where: eq(bottleGroups.id, first.group.id),
+          with: {
+            distillers: {
+              columns: { distillerId: true },
+            },
+          },
+        });
+        observedCommittedOwners =
+          persistedGroup?.brandId === newBrand.id &&
+          persistedGroup.bottlerId === newBottler.id &&
+          persistedGroup.distillers.length === 1 &&
+          persistedGroup.distillers[0]?.distillerId === newDistiller.id;
+      },
+    );
+
+    await updateConcreteBottle({
+      bottleId: first.bottle.id,
+      input: {
+        shared: {
+          brand: newBrand.id,
+          bottler: newBottler.id,
+          distillers: [newDistiller.id],
+        },
+      },
+      context: contextFor(mod),
+    });
+
+    const ownerEntityIds = vi
+      .mocked(workerClient.pushUniqueJob)
+      .mock.calls.flatMap(([jobName, payload]) =>
+        jobName === "OnEntityChange" && "entityId" in payload
+          ? [payload.entityId]
+          : [],
+      );
+    const expectedOwnerEntityIds = [
+      oldBrand.id,
+      oldBottler.id,
+      oldDistiller.id,
+      newBrand.id,
+      newBottler.id,
+      newDistiller.id,
+    ].sort((left, right) => left - right);
+    expect(observedCommittedOwners).toBe(true);
+    expect(ownerEntityIds).toEqual(expectedOwnerEntityIds);
+    expect(new Set(ownerEntityIds).size).toBe(ownerEntityIds.length);
+
+    resetQueueMock();
+    await expect(
+      updateConcreteBottle({
+        bottleId: first.bottle.id,
+        input: {
+          shared: {
+            brand: newBrand.id,
+            bottler: newBottler.id,
+            distillers: [newDistiller.id],
+          },
+        },
+        context: contextFor(mod),
+      }),
+    ).resolves.toMatchObject({ changed: false });
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  });
+
   test("rejects a retained or explicit series owned by another brand", async ({
     fixtures,
   }) => {
@@ -1832,8 +1941,8 @@ describe("concrete Bottle updates", () => {
     expect(payloadsFor("OnBottleChange")).toEqual([
       JSON.stringify({ bottleId: first.bottle.id }),
     ]);
-    const entityPayloads = createdEntities
-      .map(({ id }) => JSON.stringify({ entityId: id }))
+    const entityPayloads = [brand.id, ...createdEntities.map(({ id }) => id)]
+      .map((entityId) => JSON.stringify({ entityId }))
       .sort();
     const verificationPayloads = createdEntities
       .map(({ id }) =>

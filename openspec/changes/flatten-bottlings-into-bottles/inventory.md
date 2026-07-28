@@ -168,13 +168,14 @@ Remove target indirection from:
 - CatalogTarget statistics and repair services;
 - Bottle/BottleGroup recomputation;
 - tasting statistics dispatch;
-- `UpdateBottleStats`, `UpdateBottleGroupStats`, `OnBottleChange`, alias,
-  reconciliation, indexing, notification, and entity-stat workers;
+- `UpdateBottleStats`, `OnBottleChange`, alias, reconciliation, indexing,
+  notification, and entity-stat workers;
 - badges;
 - Library, country, entity, global, user, flavor, and region analytics.
 
-Bottle jobs carry `bottleId`. Group jobs carry `groupId`. Group totals query raw
-member-Bottle activity.
+Bottle jobs carry `bottleId`. Group totals query raw member-Bottle activity and
+are recomputed by the Bottle job or the transaction that changes membership;
+there is no parallel group-stats queue path.
 
 ### Shared fixtures
 

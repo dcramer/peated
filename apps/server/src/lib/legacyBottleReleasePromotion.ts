@@ -8,7 +8,7 @@ import {
   bottleTombstones,
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 export type LegacyBottleReleasePromotionErrorCode =
   | "parent_mismatch"
@@ -75,14 +75,24 @@ export async function resolveLegacyBottleReleasePromotion(
     },
   });
 
-  if (
-    expectedParentBottleId !== undefined &&
-    release.bottleId !== expectedParentBottleId
-  ) {
-    throw new LegacyBottleReleasePromotionError(
-      "parent_mismatch",
-      "The release does not belong to the supplied parent Bottle.",
-    );
+  if (expectedParentBottleId !== undefined) {
+    const parentMatches = release.bottleId === expectedParentBottleId;
+    const parentWasMergedIntoCurrent = parentMatches
+      ? undefined
+      : await database.query.bottleTombstones.findFirst({
+          where: and(
+            eq(bottleTombstones.bottleId, expectedParentBottleId),
+            eq(bottleTombstones.newBottleId, release.bottleId),
+          ),
+          columns: { bottleId: true },
+        });
+
+    if (!parentMatches && !parentWasMergedIntoCurrent) {
+      throw new LegacyBottleReleasePromotionError(
+        "parent_mismatch",
+        "The release does not belong to the supplied parent Bottle.",
+      );
+    }
   }
 
   const promotion = await database.query.bottleReleasePromotions.findFirst({

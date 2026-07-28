@@ -43,27 +43,3 @@ export async function queueBottleEntityStats(bottleId: number): Promise<void> {
     ),
   });
 }
-
-/** Queue entity aggregates owned by one BottleGroup's shared presentation. */
-export async function queueBottleGroupEntityStats(
-  groupId: number,
-): Promise<void> {
-  const owner = await db.query.bottleGroups.findFirst({
-    columns: { brandId: true, bottlerId: true },
-    where: (bottleGroups, { eq }) => eq(bottleGroups.id, groupId),
-    with: {
-      distillers: {
-        columns: { distillerId: true },
-      },
-    },
-  });
-  if (!owner) {
-    throw new Error(`BottleGroup ${groupId} is not active.`);
-  }
-
-  await queueEntityStats({
-    brandId: owner.brandId,
-    bottlerId: owner.bottlerId,
-    distillerIds: owner.distillers.map(({ distillerId }) => distillerId),
-  });
-}

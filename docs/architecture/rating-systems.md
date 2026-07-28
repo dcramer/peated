@@ -103,9 +103,9 @@ failure is logged without rolling back the committed tasting.
 2. its current BottleGroup;
 3. Bottle-owned entity statistics.
 
-`UpdateBottleGroupStats` carries only `groupId` and is reserved for work whose
-aggregate owner is the group. Both jobs are idempotent, remove successful jobs,
-and retain failures for diagnosis and retry.
+There is no separate group-stats queue path. Transactions that change group
+membership recompute affected groups before commit; ordinary tasting activity
+converges through the idempotent Bottle job.
 
 ## Legacy Rating Migration
 

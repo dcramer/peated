@@ -879,6 +879,22 @@ export async function updateConcreteBottleInTransaction(
     currentGroupDistillerIds,
     stable.distillerIds,
   );
+  if (group.brandId !== stable.brandId) {
+    changedEntityIds.add(group.brandId);
+    changedEntityIds.add(stable.brandId);
+  }
+  if (group.bottlerId !== stable.bottlerId) {
+    if (group.bottlerId !== null) changedEntityIds.add(group.bottlerId);
+    if (stable.bottlerId !== null) changedEntityIds.add(stable.bottlerId);
+  }
+  if (groupDistillersChanged) {
+    for (const distillerId of [
+      ...currentGroupDistillerIds,
+      ...stable.distillerIds,
+    ]) {
+      changedEntityIds.add(distillerId);
+    }
+  }
   const exactIdentityIntent = hasExactIdentityFields(input.exact);
 
   const bottleDistillerRows = await tx

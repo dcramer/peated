@@ -7,6 +7,7 @@ import {
   bottleReleases,
   bottles,
   bottleSeries,
+  bottleTombstones,
   changes,
   entities,
   entityTombstones,
@@ -294,10 +295,7 @@ test("fans merged shared entity roles through every BottleGroup member", async (
   });
 });
 
-async function expectReleaseOwnedDuplicateRollback(
-  fixtures: typeof Fixtures,
-  releaseOwner: "source" | "destination",
-) {
+async function expectReleaseOwnedDuplicateRollback(fixtures: typeof Fixtures) {
   const sourceEntity = await fixtures.Entity({ name: "Release Source" });
   const destinationEntity = await fixtures.Entity({
     name: "Release Destination",
@@ -311,9 +309,8 @@ async function expectReleaseOwnedDuplicateRollback(
     name: "Duplicate",
   });
   const release = await fixtures.BottleRelease({
-    bottleId:
-      releaseOwner === "source" ? sourceBottle.id : destinationBottle.id,
-    edition: `${releaseOwner} child`,
+    bottleId: sourceBottle.id,
+    edition: "source child",
   });
   const entityIds = [sourceEntity.id, destinationEntity.id];
   const bottleIds = [sourceBottle.id, destinationBottle.id];
@@ -379,11 +376,65 @@ async function expectReleaseOwnedDuplicateRollback(
 test("rolls back duplicate merges when the source Bottle owns releases", async ({
   fixtures,
 }) => {
-  await expectReleaseOwnedDuplicateRollback(fixtures, "source");
+  await expectReleaseOwnedDuplicateRollback(fixtures);
 });
 
-test("rolls back duplicate merges when the destination Bottle owns releases", async ({
+test("merges duplicates without changing destination-owned release evidence", async ({
   fixtures,
 }) => {
-  await expectReleaseOwnedDuplicateRollback(fixtures, "destination");
+  const sourceEntity = await fixtures.Entity({ name: "Release Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Release Destination",
+  });
+  const sourceBottle = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    name: "Duplicate",
+  });
+  const destinationBottle = await fixtures.Bottle({
+    brandId: destinationEntity.id,
+    name: "Duplicate",
+  });
+  const release = await fixtures.BottleRelease({
+    bottleId: destinationBottle.id,
+    edition: "destination child",
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, sourceEntity.id),
+    }),
+  ).toBeUndefined();
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, sourceEntity.id),
+    }),
+  ).toMatchObject({ newEntityId: destinationEntity.id });
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, sourceBottle.id),
+    }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottleTombstones.findFirst({
+      where: eq(bottleTombstones.bottleId, sourceBottle.id),
+    }),
+  ).toMatchObject({ newBottleId: destinationBottle.id });
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, destinationBottle.id),
+    }),
+  ).toMatchObject({
+    id: destinationBottle.id,
+    brandId: destinationEntity.id,
+  });
+  expect(
+    await db.query.bottleReleases.findFirst({
+      where: eq(bottleReleases.id, release.id),
+    }),
+  ).toEqual(release);
 });
