@@ -140,9 +140,9 @@ and map to an explicit removal task.
 
 ## 7. Cleanup, Documentation, And Local Verification
 
-- [ ] 7.1 Rerun the legacy and target inventory; remove obsolete helpers,
+- [x] 7.1 Rerun the legacy and target inventory; remove obsolete helpers,
       schemas, types, routes, workers, forms, comments, tests, and abstractions.
-- [ ] 7.2 Rewrite identity, schema, Bottle entry, photo tasting, price matching,
+- [x] 7.2 Rewrite identity, schema, Bottle entry, photo tasting, price matching,
       rating, and migration docs for direct Bottle references and non-targetable
       groups.
 - [ ] 7.3 Validate OpenSpec and generated migration history.

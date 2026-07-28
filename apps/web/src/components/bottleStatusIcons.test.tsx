@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import BottleStatusIcons, { BottleStatusIndicators } from "./bottleStatusIcons";
 
 describe("BottleStatusIndicators", () => {
-  it("renders target-keyed tasting and Library state", () => {
+  it("renders Bottle tasting and Library state", () => {
     const markup = renderToStaticMarkup(
       <BottleStatusIndicators hasTasted isLibrary />,
     );
@@ -12,7 +12,7 @@ describe("BottleStatusIndicators", () => {
     expect(markup).toContain('aria-label="In Library"');
   });
 
-  it("keeps Bottle status rendering as a compatibility wrapper", () => {
+  it("renders status from a Bottle projection", () => {
     const markup = renderToStaticMarkup(
       <BottleStatusIcons
         bottle={{ hasTasted: true, isLibrary: true }}

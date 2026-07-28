@@ -8,7 +8,7 @@ save unless it is required for deterministic correctness.
 
 Every marketed release is one concrete Bottle. Each Bottle durably stores the
 shared expression values and exact fields needed to render, search, and
-understand it without loading its BottleGroup. The group owns the generic
+understand it without loading its BottleGroup. The group owns the shared
 expression label, shared editing semantics, relationship presentation, and
 member-derived aggregates; it does not supply missing exact Bottle data at read
 time.
@@ -21,7 +21,8 @@ create, select, or name a BottleGroup.
 
 “Add another release” pre-fills the selected Bottle's durable fields and submits
 the same independent Bottle creation operation. It also creates a singleton;
-later grouping is automatic and outside manual intervention.
+it does not join the source group. Automatic regrouping is a separate future
+capability, not a dormant service in this release.
 
 Bottle pages and search results render exact fields from the independently
 complete Bottle. A Bottle page may link quietly to all related releases using
@@ -33,8 +34,8 @@ ids, and there is no public `/bottle-groups` route.
 Consumer workflows carry one Bottle id. Assigned aliases also point directly to
 one Bottle; a general expression alias points to the retained general Bottle,
 not BottleGroup or its representative. Library, tasting, Flight, review, and
-price flows use that same Bottle identity without a CatalogTarget or second
-resolver. Uncertain identity remains unresolved.
+price flows use that same Bottle identity without a second resolver. Uncertain
+identity remains unresolved.
 
 ## Creation And Editing
 
@@ -52,9 +53,8 @@ resolver. Uncertain identity remains unresolved.
   every member Bottle's complete shared identity while preserving each
   member's exact fields. A shared name change therefore regenerates all member
   Bottle names.
-- Automatic grouping runs outside ordinary creation. Likely related groups may
-  be suggested, but name similarity, shared brand, or shared series is not
-  enough to merge them silently.
+- Independently created Bottles remain in singleton groups. Name similarity,
+  shared brand, or shared series never merges them silently.
 
 Image uploads may still be part of the visible save flow, but the server remains
 authoritative for final image dimensions, encoding, and quality. Client-side
@@ -68,9 +68,7 @@ resizing should reduce upload latency without replacing server processing.
   field ownership.
 - Exact Bottle search and related-release rows share one Bottle-owned metadata
   renderer; BottleGroup hydration is not required for exact details.
-- Automatic grouping changes are audited catalog operations outside the manual
-  entry workflow. They never move Bottle-owned activity or aliases onto a
-  BottleGroup.
+- No manual or automatic regrouping operation ships in this release.
 - Bottle and tasting image uploads avoid GCS resumable-session startup for small
   processed images.
 - Browser-side image blobs keep a high-quality intermediate image capped at a

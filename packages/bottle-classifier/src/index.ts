@@ -53,6 +53,5 @@ export { normalizeBottle, type NormalizedBottle } from "./normalize";
 export {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
-  hasExtractedReleaseIdentity,
 } from "./releaseIdentity";
 export type { ReleaseIdentityInput } from "./releaseIdentity";

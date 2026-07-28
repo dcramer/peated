@@ -1,8 +1,8 @@
 # Bottle Creation And Alias System
 
-This document defines the live target architecture for creating and resolving
-Bottle identity across manual entry, scraped sources, reviews, prices, photos,
-classifier workflows, and backfills.
+This document defines the live architecture for creating and resolving Bottle
+identity across manual entry, scraped sources, reviews, prices, photos,
+classifier workflows, and migration.
 
 The central principle is that every marketed version is one independently
 complete Bottle. Raw source input is evidence, not canonical identity. Cheap
@@ -26,8 +26,8 @@ Related architecture:
 - Preserve observation-only source facts without silently promoting them into
   canonical Bottle identity.
 - Keep every assignment and automated create decision auditable.
-- Assign BottleGroups automatically rather than asking a classifier, user, or
-  normalization helper to select one.
+- Create singleton BottleGroups automatically and keep group selection out of
+  classifier, user, and normalization contracts.
 
 ## Non-Goals
 
@@ -47,10 +47,10 @@ Peated has three relevant identity layers:
 
 - `Bottle`: one concrete marketed version with a stable expression plus every
   supported structured exact field.
-- `BottleGroup`: the automatically managed same-expression aggregate across
-  related Bottles. It owns shared editing semantics, relationship presentation,
-  and member-derived aggregates, but a Bottle remains complete and renderable
-  without group hydration.
+- `BottleGroup`: a same-expression relationship aggregate established by
+  singleton creation or deterministic legacy migration. It owns shared editing
+  semantics, relationship presentation, and member-derived aggregates, but a
+  Bottle remains complete and renderable without group hydration.
 - `BottleObservation`: source facts useful as evidence but outside canonical
   catalog identity.
 
@@ -78,19 +78,18 @@ including retailer selectors, URLs, listing images, bottle numbers, outturn, and
 unreviewed label fragments. A fact becomes canonical only when reliable evidence
 establishes that it identifies the marketed Bottle.
 
-### Automatic Group Assignment
+### Group Assignment
 
 Independent Bottle creation atomically creates a singleton BottleGroup and its
-complete Bottle. Trusted group reuse is limited to deterministic migration,
-measured compatibility adapters, and explicitly system-controlled grouping.
-Classifier output never contains a parent or group selection, and manual or
-ordinary API clients cannot supply a source Bottle or group id to bypass that
-boundary.
+complete Bottle. Deterministic legacy migration places a retained parent and
+its promoted release Bottles in one migration-created group. Classifier output
+never contains a parent or group selection, and manual or ordinary API clients
+cannot supply a source Bottle or group id to bypass that boundary.
 
 Likely same-expression matches may be suggestions. Similar names, shared brand,
-or shared series do not silently merge independently created groups. Automatic
-group merge and split operations are system-controlled, audited catalog
-operations.
+or shared series do not silently merge independently created groups. This
+release ships no automatic regrouping service; that capability requires a
+separate reviewed change.
 
 ## Alias Model
 
@@ -194,7 +193,7 @@ The Add Bottle workflow accepts stable expression fields and structured exact
 fields in one form and always creates one Bottle. Independent entry receives an
 automatic singleton group. “Add another release” may prefill the same form from
 an existing Bottle, but submission still uses independent creation and starts in
-a singleton group. Automatic grouping happens outside the manual workflow.
+a singleton group. It does not silently join the source group.
 
 ### Store Prices And Reviews
 
@@ -220,8 +219,6 @@ BottleRelease is not part of live creation. The only retained release-shaped
 behavior is measured compatibility for existing data and callers while legacy
 rows are promoted:
 
-- classifier search may expose a retained legacy release candidate only to
-  match an existing historical identity;
 - a completed promotion mapping resolves a legacy `releaseId` to its promoted
   Bottle;
 - retained `releaseId` columns may remain as historical migration evidence
@@ -232,11 +229,11 @@ rows are promoted:
   `bottle_release`; and
 - old nested URLs resolve through retained mappings and redirects.
 
-This compatibility is instrumented and removal-owned. Tasks 7.3 and 9.5 cut
-reads over and verify the compatibility window; task 9.6 removes obsolete pair
-storage and the `bottle_release` table; task 9.7 removes release routes, schemas,
-workers, serializers, and runtime branches. New architecture must not add a
-second release business system while those adapters remain.
+This compatibility is instrumented and removal-owned. Deployment validates the
+promotion mappings and compatibility traffic before separately approved
+cleanup removes legacy pair storage, the `bottle_release` table, and obsolete
+release routes and branches. New architecture must not add a second release
+business system while those adapters remain.
 
 ## Minimum Test Coverage
 

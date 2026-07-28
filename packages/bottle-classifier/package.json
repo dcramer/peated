@@ -43,10 +43,6 @@
       "types": "./src/releaseIdentity.ts",
       "default": "./src/releaseIdentity.ts"
     },
-    "./bottleSchemaRules": {
-      "types": "./src/bottleSchemaRules.ts",
-      "default": "./src/bottleSchemaRules.ts"
-    },
     "./bottleSchemaGuidance": {
       "types": "./src/bottleSchemaGuidance.ts",
       "default": "./src/bottleSchemaGuidance.ts"

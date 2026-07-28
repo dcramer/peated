@@ -10,15 +10,15 @@ Authoritative policy lives in:
 - [Bottle Creation And Alias System](../architecture/bottle-creation-alias-system.md)
 - [Bottle Classifier](../architecture/bottle-classifier.md)
 
-Price matching is one consumer of the generic bottle-reference classifier. It
+Price matching is one consumer of the shared bottle-reference classifier. It
 adds store-price persistence, queueing, moderation, and automation policy around
 that classifier boundary.
 
 ## Local Contract
 
 - A non-null `store_price.bottleId` is the authoritative catalog identity.
-  Historical `targetId` and `releaseId` columns are migration evidence only
-  until their schema-removal gate.
+  The retained `releaseId` column is migration evidence only until its
+  separately approved schema-removal gate.
 - Known expression identity whose exact Bottle is uncertain may use the retained
   general Bottle. It never uses BottleGroup or substitutes a representative.
 - A durable Bottle assignment is never downgraded or reconstructed from
@@ -88,7 +88,8 @@ Evaluation order:
 2. extract structured identity from image or text
 3. auto-ignore obvious non-whisky rows plus clearly non-single-bottle listings such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings
 4. build local concrete Bottle candidates
-5. ask the generic bottle classifier for bottle-centric actions (`match`, `repair_bottle`, `create_bottle`, or `no_match`)
+5. ask the shared bottle classifier for Bottle-centric actions (`match`,
+   `repair_bottle`, `create_bottle`, or `no_match`)
 6. map and sanitize classifier output against real candidates and resolved entities
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
@@ -113,9 +114,10 @@ Bottle entry flow.
 
 Candidate search presents independently complete Bottles, keyed by `bottleId`.
 Accepted aliases resolve directly to their Bottle; unassigned and ignored
-aliases do not produce Bottle candidates. An explicit historical release id can
-contribute only through its completed promotion mapping to the promoted Bottle,
-never through retained BottleRelease metadata.
+aliases do not produce Bottle candidates. Retained release ids and
+BottleRelease rows are not classifier candidate inputs; migration and bounded
+compatibility routes resolve them through the durable promotion mapping before
+entering Bottle-native logic.
 
 Sources:
 
@@ -157,13 +159,13 @@ The extractor should prefer missing values over invented certainty.
 
 ## Classifier Contract
 
-Store-price matching is a consumer of the generic bottle classifier, not the
+Store-price matching is a consumer of the shared Bottle classifier, not the
 owner of bottle-identity policy. The older `priceMatching*` helper names remain
 only as compatibility shims around the canonical bottle-classifier modules.
 
 The classifier receives:
 
-- generic bottle reference metadata
+- bottle-reference metadata
 - the current Bottle, if present
 - extracted identity
 - initial local candidates
@@ -194,15 +196,15 @@ Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
 - `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; the proposed bottle draft is a sparse repair draft and unknown fields must not clear existing bottle facts
-- a retained `matchedReleaseId`, when present during staged compatibility, must
-  map to the known concrete Bottle candidate and is never a new picker choice
+- classifier decisions carry Bottle ids only; they do not expose a legacy
+  release-id picker
 - `create_bottle` carries one complete marketed Bottle draft, including exact
   Bottle traits; it never chooses a parent Bottle or BottleGroup
 - `identityScope` is reviewed as `product | exact_cask`
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
 - When re-evaluation auto-ignores a bundle or damaged-condition listing, price
-  matching clears the stale `store_price.bottleId` while preserving historical
-  `releaseId` and `targetId` evidence until their schema-removal gate
+  matching clears the stale `store_price.bottleId` and retained `releaseId`
+  rather than preserving a conflicting identity pair
 
 ## Proposal Types
 
@@ -211,11 +213,11 @@ Additional rules:
 - `create_new`
 - `no_match`
 
-New proposals emit `create_new` with `creationTarget = bottle` and one complete
-`proposedBottle`. No live producer emits the historical `release` or
-`bottle_and_release` proposal shapes. The staged approval adapter still consumes
-and translates persisted historical shapes until its explicit removal task;
-those shapes are not a supported producer contract.
+New proposals emit `create_new` with one complete `proposedBottle`. Live writers
+clear the historical release ids, parent id, `creationTarget`, and
+`proposedRelease` columns. Immutable attempt rows may retain those values as
+audit evidence, but a release-shaped current proposal must be reclassified
+before approval; it is not translated into a live picker choice.
 
 ### Correction repair compatibility
 
@@ -235,8 +237,8 @@ and fill are exact edits for only the selected Bottle.
 Null fields and empty distillers mean unknown and preserve existing catalog
 facts; marked and unmarked null age never clears or changes either scope. False
 and zero remain explicit values. After pending historical correction proposals
-are drained or migrated, OpenSpec task 9.7 removes the marker and unmarked
-shared-age fallback together.
+are drained or migrated, separately approved cleanup removes the marker and
+unmarked shared-age fallback together.
 
 ## Statuses
 
@@ -352,7 +354,7 @@ Schema-first alias rule:
 - every assigned alias resolves directly to one Bottle id
 - a general expression alias resolves to the retained general Bottle and never
   selects the representative Bottle
-- no BottleGroup or CatalogTarget alias identity and no second resolver remain
+- no BottleGroup alias identity or second resolver remains
 - matching propagation preserves the same site / listing name / volume scope
   and does not retarget cross-volume proposals
 

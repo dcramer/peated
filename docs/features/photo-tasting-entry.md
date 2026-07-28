@@ -920,12 +920,12 @@ Scope:
 
 - decide whether v1 permits immediate create from photo lookup
 - if enabled, route the single `create_bottle` classifier action through
-  canonical independent concrete Bottle creation and return its active exact
-  target; grouping happens automatically outside photo classification
+  canonical independent Bottle creation and return that Bottle directly in its
+  new singleton group
 - show canonical fields before confirmation
 - queue catalog verification after creation
-- promote only to the concrete Bottle image, and only after the Bottle and exact
-  target are durable
+- promote only to the concrete Bottle image, and only after the Bottle is
+  durable
 
 Tests:
 

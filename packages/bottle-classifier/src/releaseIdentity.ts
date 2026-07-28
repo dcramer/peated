@@ -1,13 +1,12 @@
 /**
- * Pure bottle-versus-release identity rules for already extracted structured
- * fields.
+ * Pure exact-Bottle identity rules for materializing already extracted release
+ * traits.
  *
  * Keep this module structurally safe and brand-agnostic. If a decision depends
  * on marketed family meaning or producer-specific semantics, it belongs in the
  * reviewed classifier, not in these helpers. New hardcoded phrase rules need
  * verified whisky research and focused tests before being added here.
  */
-import type { BottleExtractedDetails } from "./classifierTypes";
 import { normalizeBottle } from "./normalize";
 
 export type ReleaseIdentityInput = {
@@ -23,24 +22,10 @@ export type ReleaseIdentityInput = {
   caskFill?: string | null;
 };
 
-export type BottleLevelReleaseTraitsInput = Omit<
-  ReleaseIdentityInput,
-  "statedAge"
->;
+type BottleLevelReleaseTraitsInput = Omit<ReleaseIdentityInput, "statedAge">;
 
 type BottleReleaseIdentityBottleInput = BottleNameInput &
   Partial<BottleLevelReleaseTraitsInput>;
-
-type ExtractedReleaseIdentityInput = Pick<
-  BottleExtractedDetails,
-  | "stated_age"
-  | "edition"
-  | "abv"
-  | "release_year"
-  | "vintage_year"
-  | "cask_strength"
-  | "single_cask"
->;
 
 type BottleNameInput = {
   fullName: string | null | undefined;
@@ -48,11 +33,7 @@ type BottleNameInput = {
   statedAge: number | null | undefined;
 };
 
-export const DEFAULT_BOTTLE_CREATION_TARGET = "bottle" as const;
-export const DEFAULT_PRICE_MATCH_CREATION_TARGET =
-  DEFAULT_BOTTLE_CREATION_TARGET;
-
-export const RELEASE_IDENTITY_FIELDS = [
+const RELEASE_IDENTITY_FIELDS = [
   "edition",
   "statedAge",
   "releaseYear",
@@ -65,80 +46,10 @@ export const RELEASE_IDENTITY_FIELDS = [
   "caskFill",
 ] as const satisfies ReadonlyArray<keyof ReleaseIdentityInput>;
 
-export const BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
-  "edition",
-  "releaseYear",
-  "vintageYear",
-  "abv",
-  "singleCask",
-  "caskStrength",
-  "caskType",
-  "caskSize",
-  "caskFill",
-] as const satisfies ReadonlyArray<keyof BottleLevelReleaseTraitsInput>;
-
 const STABLE_BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS = [
   "singleCask",
   "caskStrength",
-] as const satisfies ReadonlyArray<
-  Extract<
-    (typeof BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS)[number],
-    keyof ReleaseIdentityInput
-  >
->;
-
-export const EXTRACTED_RELEASE_IDENTITY_FIELDS = [
-  "edition",
-  "stated_age",
-  "abv",
-  "release_year",
-  "vintage_year",
-  "cask_strength",
-  "single_cask",
-] as const satisfies ReadonlyArray<keyof ExtractedReleaseIdentityInput>;
-
-export function getReleaseObservationFacts(
-  release: Partial<ReleaseIdentityInput>,
-) {
-  return Object.fromEntries(
-    Object.entries({
-      edition: release.edition ?? null,
-      statedAge: release.statedAge ?? null,
-      releaseYear: release.releaseYear ?? null,
-      vintageYear: release.vintageYear ?? null,
-      abv: release.abv ?? null,
-      singleCask: release.singleCask ?? null,
-      caskStrength: release.caskStrength ?? null,
-      caskType: release.caskType ?? null,
-      caskSize: release.caskSize ?? null,
-      caskFill: release.caskFill ?? null,
-    }).filter(([, value]) => value !== null && value !== undefined),
-  );
-}
-
-export function getBottleLevelReleaseTraits(
-  bottle: Partial<BottleLevelReleaseTraitsInput>,
-) {
-  return Object.fromEntries(
-    Object.entries({
-      edition: bottle.edition ?? null,
-      releaseYear: bottle.releaseYear ?? null,
-      vintageYear: bottle.vintageYear ?? null,
-      abv: bottle.abv ?? null,
-      singleCask: bottle.singleCask ?? null,
-      caskStrength: bottle.caskStrength ?? null,
-      caskType: bottle.caskType ?? null,
-      caskSize: bottle.caskSize ?? null,
-      caskFill: bottle.caskFill ?? null,
-    }).filter(([, value]) => value !== null && value !== undefined),
-  );
-}
-
-export function hasBottleLevelReleaseTraits(
-  bottle: Partial<BottleLevelReleaseTraitsInput>,
-) {
-  return Object.keys(getBottleLevelReleaseTraits(bottle)).length > 0;
-}
+] as const satisfies ReadonlyArray<keyof BottleLevelReleaseTraitsInput>;
 
 function bottleNameMarketsPattern(
   bottle: BottleNameInput,
@@ -236,22 +147,6 @@ export function hasDirtyBottleLevelStatedAgeConflict({
     bottle.statedAge !== releaseStatedAge &&
     !bottleMarketsStatedAge(bottle)
   );
-}
-
-export function isAddingBottleLevelReleaseTraits({
-  current,
-  next,
-}: {
-  current: Partial<BottleLevelReleaseTraitsInput>;
-  next: Partial<BottleLevelReleaseTraitsInput>;
-}) {
-  return BOTTLE_LEVEL_RELEASE_TRAIT_FIELDS.some((field) => {
-    const nextValue = next[field];
-    if (nextValue === null || nextValue === undefined) {
-      return false;
-    }
-    return nextValue !== current[field];
-  });
 }
 
 function formatReleaseTraitLabel(
@@ -413,42 +308,4 @@ export function formatCanonicalReleaseName({
     name: nameBits.join(" - "),
     fullName: fullNameBits.join(" - "),
   };
-}
-
-export function doesStoreListingAliasIdentifyRelease({
-  aliasName,
-  canonicalReleaseFullName,
-}: {
-  aliasName: string;
-  canonicalReleaseFullName: string;
-}): boolean {
-  return (
-    aliasName.trim().toLowerCase() ===
-    canonicalReleaseFullName.trim().toLowerCase()
-  );
-}
-
-export function getCanonicalReleaseAliasNames({
-  fullName,
-}: {
-  fullName: string;
-}): string[] {
-  return [fullName];
-}
-
-export function hasExtractedReleaseIdentity(
-  extractedLabel: ExtractedReleaseIdentityInput | null,
-): boolean {
-  if (!extractedLabel) {
-    return false;
-  }
-
-  return EXTRACTED_RELEASE_IDENTITY_FIELDS.some((field) => {
-    const value = extractedLabel[field];
-    if (typeof value === "string") {
-      return value.length > 0;
-    }
-
-    return value !== null;
-  });
 }

@@ -5,7 +5,7 @@ alias lookup, duplicate checks, search, or classifier input.
 
 The short version: normalization may make the same reference string easier to
 compare. It must not decide how source facts become canonical Bottle identity,
-CatalogTarget identity, or BottleGroup membership.
+consumer identity, or BottleGroup membership.
 
 Use this with:
 
@@ -36,10 +36,10 @@ identity. Source facts that describe only the observed listing or physical unit,
 such as a retailer selector, bottle number, or outturn, remain observations and
 do not become canonical identity without reviewed evidence.
 
-BottleGroup assignment is automatic and outside normalization. Independent
-creation starts in a singleton group; trusted group reuse and curated merge or
-split operations are separate catalog operations. Normalization never chooses a
-group or strips text in order to manufacture a group key.
+Independent creation starts in a singleton BottleGroup. Deterministic legacy
+migration groups retained parents with their promoted release Bottles.
+Normalization never chooses a group or strips text in order to manufacture a
+group key. Automatic regrouping is a separate future capability.
 
 ## Non-Goals
 
@@ -140,8 +140,9 @@ should build that form through `normalizeBottleAliasKey`.
 
 If normalization is lossy or semantic, it is not a safe deterministic alias key.
 Use it for search or classifier evidence instead. An exact accepted alias maps
-to its authoritative exact Bottle or generic BottleGroup CatalogTarget; it does
-not reconstruct a legacy paired identity.
+directly to its authoritative Bottle. A general expression alias may map to the
+retained general Bottle; no alias maps to BottleGroup or reconstructs a legacy
+paired identity.
 
 ## Test Requirements
 

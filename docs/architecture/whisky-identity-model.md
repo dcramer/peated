@@ -12,8 +12,9 @@ Deterministic name cleanup is governed by the
   release without loading its BottleGroup.
 - **BottleGroup** relates releases of the same expression. It owns the shared
   editing scope, relationship presentation, and member-derived aggregate
-  statistics. Groups are created and maintained by the system; ordinary Bottle
-  creation never asks a user to choose one.
+  statistics. Ordinary Bottle creation creates a singleton group, and the
+  legacy migration creates deterministic family groups. Users never choose or
+  manage groups.
 - **BottleSeries** is a broader named range that can contain distinct
   expressions. Series membership is organizational context, not evidence that
   two Bottles belong to the same BottleGroup.
@@ -39,7 +40,8 @@ does not create another catalog identity layer.
   not reuse the source Bottle's group.
 - Semantic grouping happens outside ordinary creation. Similar names, a shared
   brand, or a shared BottleSeries may suggest a relationship but do not prove
-  same-expression identity.
+  same-expression identity. This release does not ship an automatic regrouping
+  service; independently created Bottles remain in their singleton groups.
 
 There is no parent-versus-release creation decision and no `repair_parent`
 workflow. Discovering another release does not change an existing Bottle's
@@ -49,7 +51,7 @@ identity.
 
 BottleGroup owns shared editing semantics for:
 
-- the generic expression name;
+- the shared expression name;
 - brand, bottler, distillers, category, series, and flavor profile;
 - stated age when it is invariant across the expression's releases;
 - shared editorial content, representative presentation, and aggregate
@@ -91,11 +93,19 @@ the group's current age is an exact override; null or an equal value inherits
 the group age. Shared-age edits preserve differing exact overrides and
 materialize the new shared age on every other member.
 
-Automatic group merge and split operations are audited catalog operations. A
-merge applies the destination group's shared identity to all moved Bottles
-without changing their Bottle ids. A split moves selected Bottles without
-changing their exact identities. Neither operation retargets Bottle-owned
-activity or aliases to the group.
+This release has no manual or dormant group merge/split service. Any future
+automatic regrouping system must be a separately reviewed change that preserves
+Bottle ids and consumer references, rematerializes shared fields
+transactionally, recomputes affected group aggregates, and records an auditable
+before/after result.
+
+## Exact Bottle Merge
+
+Exact Bottle merge is the only operation that retires a duplicate Bottle and
+repoints consumer Bottle ids. A moderator selects an explicit surviving Bottle;
+consumer rows, assigned aliases, release-promotion mappings, and tombstones
+converge on that Bottle in one canonical operation. BottleGroup is never the
+merge destination and a representative Bottle is never selected implicitly.
 
 ## BottleGroup Versus BottleSeries
 
@@ -158,9 +168,9 @@ label. A code must not invent a missing component or subtitle.
 
 Tastings, reviews, collection entries, flights, prices, aliases, observations,
 and similar consumers reference one Bottle id. Assigned aliases resolve
-directly to that Bottle with no CatalogTarget or BottleGroup alias identity and
-no second resolver. A general expression alias may reference the retained
-general Bottle; otherwise an uncertain source remains unresolved.
+directly to that Bottle with no BottleGroup alias identity and no second
+resolver. A general expression alias may reference the retained general Bottle;
+otherwise an uncertain source remains unresolved.
 
 Bottle statistics include only activity assigned to that Bottle. BottleGroup
 statistics derive from raw activity on current member Bottle ids, counted once;

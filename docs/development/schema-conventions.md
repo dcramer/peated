@@ -42,9 +42,9 @@ correct and renderable without BottleGroup hydration.
 
 There is no single-known-release exception. A dated, batched, vintage, or
 otherwise specific marketed form is a Bottle from the start. Discovering a
-sibling later may lead the automatic grouping system to relate their singleton
-BottleGroups; it does not turn either Bottle into a parent or move its exact
-fields to another object.
+sibling later does not turn either Bottle into a parent or move its exact fields
+to another object. This release leaves independently created Bottles in
+singleton groups; automatic regrouping is a separate future capability.
 
 ## Shared Editing Semantics
 
@@ -179,8 +179,9 @@ flags, ABV, then year fields.
 
 Exact Bottle matching and BottleGroup grouping are separate decisions. A
 classifier or user-created Bottle does not select a group. Similarity may
-produce a grouping suggestion, but only the automatic/system-controlled
-grouping boundary establishes shared expression identity.
+produce future grouping evidence, but it does not change membership in the
+current system. Only singleton creation and deterministic legacy migration
+establish group membership in this release.
 
 ## Consumer Bottle Selection
 

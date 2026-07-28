@@ -2,66 +2,12 @@ import { describe, expect, test } from "vitest";
 
 import {
   bottleMarketsStatedAge,
-  doesStoreListingAliasIdentifyRelease,
   formatCanonicalReleaseName,
-  getBottleLevelReleaseTraits,
-  getCanonicalReleaseAliasNames,
-  getReleaseObservationFacts,
   getResolvedReleaseIdentity,
-  hasBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
-  hasExtractedReleaseIdentity,
-  isAddingBottleLevelReleaseTraits,
 } from "./releaseIdentity";
 
 describe("releaseIdentity", () => {
-  test("detects bottle-level release traits", () => {
-    expect(
-      hasBottleLevelReleaseTraits({
-        edition: null,
-        releaseYear: null,
-        vintageYear: null,
-        abv: null,
-        singleCask: null,
-        caskStrength: null,
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBottleLevelReleaseTraits({
-        edition: "Batch 24",
-      }),
-    ).toBe(true);
-
-    expect(
-      getBottleLevelReleaseTraits({
-        edition: "Batch 24",
-        releaseYear: null,
-        abv: 58.4,
-      }),
-    ).toEqual({
-      edition: "Batch 24",
-      abv: 58.4,
-    });
-  });
-
-  test("returns only populated release observation facts", () => {
-    expect(
-      getReleaseObservationFacts({
-        edition: "Batch C923",
-        releaseYear: 2023,
-        statedAge: null,
-        abv: 62.4,
-        caskStrength: true,
-      }),
-    ).toEqual({
-      edition: "Batch C923",
-      releaseYear: 2023,
-      abv: 62.4,
-      caskStrength: true,
-    });
-  });
-
   test("tracks when the bottle itself markets its stated age", () => {
     expect(
       bottleMarketsStatedAge({
@@ -289,94 +235,5 @@ describe("releaseIdentity", () => {
       name: "Glendronach 1972 Single Cask - Batch 1",
       fullName: "Glendronach 1972 Single Cask - Batch 1",
     });
-  });
-
-  test("detects extracted release identity from structured classifier output", () => {
-    expect(
-      hasExtractedReleaseIdentity({
-        edition: null,
-        stated_age: null,
-        abv: null,
-        release_year: null,
-        vintage_year: null,
-        cask_strength: null,
-        single_cask: null,
-      }),
-    ).toBe(false);
-
-    expect(
-      hasExtractedReleaseIdentity({
-        edition: "Batch 24",
-        stated_age: null,
-        abv: null,
-        release_year: null,
-        vintage_year: null,
-        cask_strength: null,
-        single_cask: null,
-      }),
-    ).toBe(true);
-  });
-
-  test("tracks when a write is adding bottle-level release traits", () => {
-    expect(
-      isAddingBottleLevelReleaseTraits({
-        current: {
-          edition: null,
-          abv: null,
-        },
-        next: {
-          edition: null,
-          abv: null,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      isAddingBottleLevelReleaseTraits({
-        current: {
-          edition: null,
-          abv: null,
-        },
-        next: {
-          edition: "Batch 24",
-          abv: null,
-        },
-      }),
-    ).toBe(true);
-
-    expect(
-      isAddingBottleLevelReleaseTraits({
-        current: {
-          edition: "Batch 24",
-          abv: 58.4,
-        },
-        next: {
-          edition: "Batch 24",
-          abv: 58.4,
-        },
-      }),
-    ).toBe(false);
-  });
-
-  test("treats canonical release aliases as exact-name matches only", () => {
-    expect(
-      doesStoreListingAliasIdentifyRelease({
-        aliasName: "Lagavulin Distillers Edition - 2011 Release",
-        canonicalReleaseFullName: "Lagavulin Distillers Edition - 2011 Release",
-      }),
-    ).toBe(true);
-
-    expect(
-      doesStoreListingAliasIdentifyRelease({
-        aliasName: "Lagavulin Distillers Edition",
-        canonicalReleaseFullName: "Lagavulin Distillers Edition - 2011 Release",
-      }),
-    ).toBe(false);
-
-    expect(
-      getCanonicalReleaseAliasNames({
-        fullName: "Lagavulin Distillers Edition - 2011 Release",
-      }),
-    ).toEqual(["Lagavulin Distillers Edition - 2011 Release"]);
   });
 });

@@ -54,8 +54,8 @@ Retain:
 
 Generated files to rebuild from the last shipped migration:
 
-- `apps/server/migrations/0193_brave_spectrum.sql`
-- `apps/server/migrations/0194_polite_ben_parker.sql`
+- `apps/server/migrations/0193_outstanding_tombstone.sql`
+- `apps/server/migrations/0194_spooky_black_knight.sql`
 - `apps/server/migrations/meta/0193_snapshot.json`
 - `apps/server/migrations/meta/0194_snapshot.json`
 - `apps/server/migrations/meta/_journal.json`
@@ -218,8 +218,8 @@ Rewrite:
 - `docs/features/store-price-matching.md`
 - `docs/features/simple-rating-system.md`
 
-Remove CatalogTarget and generic activity semantics while preserving automatic
-groups and independently complete Bottles.
+Remove CatalogTarget and generic activity semantics while preserving
+migration-created and singleton groups plus independently complete Bottles.
 
 ## Implementation Slices
 
@@ -236,6 +236,54 @@ groups and independently complete Bottles.
 Agents assigned to a slice must not edit files owned by another concurrent
 slice. Verification agents are no-edit and report commands, status, concise
 results, failure locators, and skipped checks only.
+
+## Final Local Runtime Inventory
+
+Rerun against the current cleanup worktree based on `6d440777`:
+
+```sh
+rg -l -S 'CatalogTarget|catalogTarget|catalog_target|currentTargetId|suggestedTargetId|current_target_id|suggested_target_id' \
+  apps packages --glob '!**/migrations/**' --glob '!**/*.test.ts' --glob '!**/*.snap'
+
+rg -n -S '\btargetId\b|\btarget_id\b' \
+  apps/server/src apps/cli/src packages \
+  --glob '!**/migrations/**' --glob '!**/*.test.ts' --glob '!**/*.snap'
+
+rg -l -S 'mergeBottleGroups|splitBottleGroup|merge-bottle-groups|split-bottle-group|repair_parent' \
+  apps packages --glob '!**/migrations/**' --glob '!**/*.test.ts' --glob '!**/*.snap'
+```
+
+All three commands return no runtime matches. Negative contract tests,
+generated migration history, and unrelated browser event targets are outside
+these runtime scans.
+
+The retained BottleRelease inventory is reproduced by:
+
+```sh
+rg -l -S 'BottleRelease|bottle_release|releaseId|release_id|bottleReleases' \
+  apps/server/src apps/cli/src apps/web/src packages \
+  --glob '!**/*.test.ts' --glob '!**/*.spec.ts' --glob '!**/*.snap' \
+  --glob '!**/*.md' --glob '!**/eval-fixtures/**' \
+  --glob '!**/.vitest-evals/**'
+```
+
+It returns 42 non-test implementation and package-contract files. Every match
+is classified and retained for one of these staged reasons:
+
+- unreleased schema columns, foreign keys, enums, and pending-upload namespaces
+  retained as migration evidence;
+- the read-only audit, one-shot transaction, CLI entry point, fixtures, and
+  revision evidence required for deployment;
+- the durable promotion resolver and BottleRelease compatibility routes that
+  translate, delegate, or refuse unsupported legacy mutation;
+- exact Bottle merge and delete guards that preserve or validate promotion
+  evidence;
+- bounded web redirects and legacy query-input translation; or
+- classifier naming for exact marketed-release traits and immutable evaluation
+  provenance, not a second catalog consumer identity.
+
+No remaining runtime match selects BottleGroup as activity identity, exposes
+manual group management, or operates a dormant automatic grouper.
 
 ## Acceptance Criteria
 
