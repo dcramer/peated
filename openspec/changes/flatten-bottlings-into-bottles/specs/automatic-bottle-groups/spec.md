@@ -79,7 +79,7 @@ shared materialized fields and complete names of every affected member Bottle.
 
 #### Scenario: Change the shared name
 
-- **WHEN** an internal grouping process changes the shared Bottle name prefix
+- **WHEN** a trusted shared edit changes the shared Bottle name prefix
 - **THEN** every member Bottle receives a newly materialized complete name
 - **AND** each previous canonical name remains an alias for the same Bottle
 - **AND** any collision rolls back the entire change
@@ -88,25 +88,6 @@ shared materialized fields and complete names of every affected member Bottle.
 
 - **WHEN** any API, page, search result, worker, or serializer loads a Bottle
 - **THEN** the Bottle is independently correct without BottleGroup hydration
-
-### Requirement: Automatic regrouping preserves Bottle identity
-
-System-controlled regrouping SHALL move Bottles without changing Bottle ids or
-consumer references and SHALL retain an auditable before/after record.
-
-#### Scenario: Consolidate two groups
-
-- **WHEN** automatic grouping establishes that two groups are the same
-  expression
-- **THEN** member Bottles move to the selected group
-- **AND** shared fields are rematerialized
-- **AND** Bottle ids and all consumer Bottle references remain unchanged
-
-#### Scenario: Correct an incorrect group
-
-- **WHEN** automatic grouping separates selected Bottles
-- **THEN** it creates a new group and moves those Bottles
-- **AND** their Bottle ids and activity remain unchanged
 
 ### Requirement: Group aggregation is member-derived
 

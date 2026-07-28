@@ -42,8 +42,9 @@ catalog integrations should never need a second polymorphic target identity.
 
 - `concrete-bottle-catalog`: One independently correct Bottle entity and one
   add/edit/search/detail workflow for all marketed releases.
-- `automatic-bottle-groups`: Automatic relationship grouping, shared
-  materialization, related-release presentation, and member-derived aggregates.
+- `automatic-bottle-groups`: Relationship groups established by migration or
+  singleton creation, shared materialization, related-release presentation, and
+  member-derived aggregates. Automatic regrouping is a separate future change.
 - `direct-bottle-identity`: One direct Bottle reference for all activity and
   integrations, including deterministic legacy migration.
 

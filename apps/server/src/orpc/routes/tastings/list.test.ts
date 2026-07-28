@@ -59,6 +59,41 @@ describe("GET /tastings", () => {
     ).toEqual([]);
   });
 
+  test("paginates hydrated direct Bottles", async ({ fixtures }) => {
+    const bottles = await Promise.all([
+      fixtures.Bottle({ name: "Pagination One" }),
+      fixtures.Bottle({ name: "Pagination Two" }),
+      fixtures.Bottle({ name: "Pagination Three" }),
+    ]);
+    await Promise.all(
+      bottles.map((bottle, index) =>
+        fixtures.Tasting({
+          bottleId: bottle.id,
+          createdAt: new Date(`2026-01-0${index + 1}T00:00:00.000Z`),
+        }),
+      ),
+    );
+
+    const firstPage = await routerClient.tastings.list({
+      cursor: 1,
+      limit: 2,
+    });
+    const secondPage = await routerClient.tastings.list({
+      cursor: 2,
+      limit: 2,
+    });
+
+    expect(firstPage.results.map(({ bottle }) => bottle.id)).toEqual([
+      bottles[2]!.id,
+      bottles[1]!.id,
+    ]);
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(secondPage.results.map(({ bottle }) => bottle.id)).toEqual([
+      bottles[0]!.id,
+    ]);
+    expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
+  });
+
   test("requires authentication for the friends filter", async () => {
     const error = await waitError(
       routerClient.tastings.list({ filter: "friends" }),

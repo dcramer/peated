@@ -35,8 +35,9 @@ never a catalog-consumer target.
 - A representative Bottle is presentation/route state, never a substitute for
   missing activity identity.
 - Exact Bottle merge is the only operation that repoints consumer Bottle ids.
-- Automatic regrouping changes `Bottle.groupId`, shared materialization, and
-  affected group aggregates; it does not change consumer Bottle ids.
+- This change does not operate automatic regrouping. A future grouping process
+  may change `Bottle.groupId`, shared materialization, and affected group
+  aggregates, but must not change consumer Bottle ids.
 
 ## Shared Materialization
 

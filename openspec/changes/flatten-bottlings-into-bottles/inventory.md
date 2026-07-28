@@ -121,15 +121,17 @@ resolution, and shadow parity. Direct Bottle loaders and serializers remain.
 
 ### Bottle and BottleGroup domain
 
-- creation, conflict, update, Bottle merge, group merge/split, group reads, and
-  consumer consolidation services under `apps/server/src/lib/`
+- creation, conflict, update, exact Bottle merge, and group reads under
+  `apps/server/src/lib/`
 - Bottle and BottleGroup oRPC routes and serializers
 - BottleRelease compatibility routes
 
 Creation stops creating target rows. Group operations become internal
-membership/presentation operations and never repoint activity. Exact Bottle
-merge repoints direct consumer Bottle ids. BottleRelease adapters resolve the
-promotion mapping and delegate.
+presentation operations and never repoint activity. This change removes manual
+group merge/split and does not retain a dormant regrouping service; a future
+automatic grouper is a separate change. Exact Bottle merge repoints direct
+consumer Bottle ids. BottleRelease adapters resolve the promotion mapping and
+delegate.
 
 ### Direct consumer writers
 
@@ -243,7 +245,6 @@ results, failure locators, and skipped checks only.
 - Release-specific legacy references resolve to promoted Bottles.
 - Every Bottle is independently complete.
 - Group aggregate activity equals raw member-Bottle activity once.
-- Group moves preserve Bottle ids and consumer references.
 - Exact Bottle merge owns all consumer repointing.
 - BottleRelease compatibility only translates and delegates.
 - Revised generated migration is additive and reviewed.

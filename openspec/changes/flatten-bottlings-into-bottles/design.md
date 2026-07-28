@@ -103,12 +103,14 @@ that it duplicates another Bottle.
 
 Every ordinary creation creates a Bottle and singleton group atomically.
 “Add another release” copies values into the same independent Bottle form and
-also creates a singleton. A system-controlled grouping process may later
+also creates a singleton. Defining and operating an automatic grouping process
+is intentionally outside this change; a later system-controlled process may
 consolidate or separate groups.
 
 There is no public group selection input and no moderator group-management UX
-in this change. Internal regrouping is audited, preserves Bottle ids and
-consumer references, and rematerializes shared fields transactionally.
+in this change. This change does not ship a dormant regrouping service. Any
+future process must be audited, preserve Bottle ids and consumer references,
+and rematerialize shared fields transactionally.
 
 ### Relationship pages are Bottle-anchored
 
@@ -128,8 +130,8 @@ statistics query raw activity across current member Bottle ids. They do not sum
 materialized Bottle totals and do not add generic group activity.
 
 Queue payloads carry Bottle ids. An exact Bottle update can recompute that
-Bottle and its current group. Regrouping recomputes the affected source and
-destination groups without retargeting consumer rows.
+Bottle and its current group. Any future regrouping change must recompute the
+affected source and destination groups without retargeting consumer rows.
 
 ### Aliases and integrations use Bottle ids
 
@@ -270,9 +272,9 @@ working, and receive focused verification before commit.
   preflight and again under lock; never suffix or choose arbitrarily.
 - **Shared edits can partially drift member identity.** Lock the group, members,
   and aliases and roll back the entire fan-out on collision.
-- **Automatic grouping can be wrong.** Start ordinary Bottles in singleton
-  groups, require strong evidence, audit regrouping, and preserve Bottle ids so
-  correction does not move activity.
+- **Future automatic grouping can be wrong.** Start ordinary Bottles in
+  singleton groups. A later grouping change must define strong evidence, audit
+  regrouping, and preserve Bottle ids so correction does not move activity.
 - **Cleanup is hard to undo.** Keep it separate, backup-gated, and explicitly
   approved.
 

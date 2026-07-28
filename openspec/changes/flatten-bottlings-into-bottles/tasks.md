@@ -43,7 +43,7 @@ and map to an explicit removal task.
       never hand-write SQL or migration metadata.
 - [x] 2.8 Review generated DDL, table locks, indexes, foreign-key order,
       nullability, and rollback feasibility.
-- [ ] 2.9 Add database-backed tests for Bottle membership, direct consumer
+- [x] 2.9 Add database-backed tests for Bottle membership, direct consumer
       references, runtime duplicate membership, invalid Bottle ids, last-member
       group protection, and the post-repoint direct-only uniqueness activation.
 - [x] 2.10 Update shared fixtures to create Bottle/group graphs without targets.
@@ -55,18 +55,18 @@ and map to an explicit removal task.
 - [x] 3.2 Keep ordinary creation and “add another release” independent; callers
       cannot supply a source group as authority.
 - [x] 3.3 Remove public and moderator group selection, merge, and split
-      workflows; retain only audited system-controlled regrouping.
+      workflows without retaining a dormant regrouping service; automatic
+      grouping is a separate future change.
 - [x] 3.4 Preserve atomic shared-field fan-out so a group change rematerializes
       complete member Bottles and retains old canonical names as aliases.
 - [x] 3.5 Simplify exact Bottle merge so all consumers and promotion mappings
       converge directly on the selected surviving Bottle.
 - [x] 3.6 Recompute Bottle statistics from direct Bottle activity and
       BottleGroup statistics from raw member-Bottle activity.
-- [x] 3.7 Keep indexing, verification, grouping, and other slow post-save work
+- [x] 3.7 Keep indexing, verification, and other slow post-save work
       idempotent and post-commit.
-- [ ] 3.8 Add database-backed tests for creation rollback, duplicate conflicts,
-      shared fan-out, regrouping, Bottle merge, representatives, and direct
-      aggregates.
+- [x] 3.8 Add database-backed tests for creation rollback, duplicate conflicts,
+      shared fan-out, Bottle merge, representatives, and direct aggregates.
 
 ## 4. One-Shot Legacy Migration
 
@@ -115,7 +115,7 @@ and map to an explicit removal task.
 - [x] 5.8 Keep BottleRelease compatibility routes translation-only over the
       promotion mapping and canonical Bottle services.
 - [x] 5.9 Regenerate OpenAPI/client types and remove target-shaped contracts.
-- [ ] 5.10 Add focused API integration tests for every direct-Bottle consumer,
+- [x] 5.10 Add focused API integration tests for every direct-Bottle consumer,
       nullable unresolved state, promotion mapping, authorization, pagination, and
       conflict behavior.
 

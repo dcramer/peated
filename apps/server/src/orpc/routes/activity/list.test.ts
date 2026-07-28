@@ -62,6 +62,9 @@ describe("GET /activity", () => {
       priority: "primary",
       tasting: {
         id: tasting.id,
+        bottle: {
+          id: tasting.bottleId,
+        },
       },
     });
     expect(result.results[1]).toMatchObject({
