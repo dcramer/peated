@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildIndependentBottleProposalDraft } from "./independentBottleProposal";
+import { buildBottleProposalDraft } from "./bottleProposalDraft";
 
 const sourceBottle = {
   name: "16-year-old",
@@ -12,9 +12,9 @@ const sourceBottle = {
   releaseYear: 2020,
 };
 
-describe("buildIndependentBottleProposalDraft", () => {
+describe("buildBottleProposalDraft", () => {
   test("uses the shared source name with exact source fields", () => {
-    const draft = buildIndependentBottleProposalDraft({
+    const draft = buildBottleProposalDraft({
       sourceBottle: {
         ...sourceBottle,
         name: "16-year-old - Distillers Edition",
@@ -31,7 +31,7 @@ describe("buildIndependentBottleProposalDraft", () => {
   });
 
   test("keeps a proposed Bottle name ahead of the shared source name", () => {
-    const draft = buildIndependentBottleProposalDraft({
+    const draft = buildBottleProposalDraft({
       sourceBottle: {
         ...sourceBottle,
         name: "16-year-old - Distillers Edition",
@@ -44,7 +44,7 @@ describe("buildIndependentBottleProposalDraft", () => {
   });
 
   test("inherits serialized null stable evidence but preserves non-null and empty-list values", () => {
-    const draft = buildIndependentBottleProposalDraft({
+    const draft = buildBottleProposalDraft({
       sourceBottle: {
         name: "Source Name",
         statedAge: 16,
@@ -113,7 +113,7 @@ describe("buildIndependentBottleProposalDraft", () => {
       },
     };
 
-    const draft = buildIndependentBottleProposalDraft({
+    const draft = buildBottleProposalDraft({
       sourceBottle: source,
     });
 
@@ -156,22 +156,24 @@ describe("buildIndependentBottleProposalDraft", () => {
     }
   });
 
-  test("keeps durable shared identity for release-only evidence", () => {
+  test("uses one proposed Bottle for stable and exact evidence", () => {
     expect(
-      buildIndependentBottleProposalDraft({
+      buildBottleProposalDraft({
         sourceBottle,
-        proposedRelease: {
-          statedAge: null,
+        proposedBottle: {
+          name: "18-year-old",
+          statedAge: 18,
+          brand: { id: 20, name: "Proposed Brand" },
           edition: "Cask 42",
           abv: null,
           releaseYear: 2025,
         },
       }),
     ).toMatchObject({
-      name: "16-year-old",
-      statedAge: 16,
+      name: "18-year-old",
+      statedAge: 18,
       category: "single_malt",
-      brand: { id: 10, name: "Example" },
+      brand: { id: 20, name: "Proposed Brand" },
       distillers: [{ id: 11, name: "Example Distillery" }],
       edition: "Cask 42",
       abv: null,
@@ -179,76 +181,57 @@ describe("buildIndependentBottleProposalDraft", () => {
     });
   });
 
-  test("keeps proposed Bottle age and exact fallbacks for combined evidence", () => {
+  test("falls back to source values only when proposed Bottle fields are absent", () => {
     expect(
-      buildIndependentBottleProposalDraft({
+      buildBottleProposalDraft({
         sourceBottle,
         proposedBottle: {
           name: "18-year-old",
           statedAge: 18,
           brand: { id: 20, name: "Proposed Brand" },
           edition: "Bottle Edition",
-          abv: 46,
-          releaseYear: 2024,
-        },
-        proposedRelease: {
-          statedAge: null,
-          edition: "Release Edition",
           abv: null,
-          releaseYear: null,
+          releaseYear: 2024,
         },
       }),
     ).toMatchObject({
       name: "18-year-old",
       statedAge: 18,
       brand: { id: 20, name: "Proposed Brand" },
-      edition: "Release Edition",
-      abv: 46,
+      edition: "Bottle Edition",
+      abv: null,
       releaseYear: 2024,
+      category: "single_malt",
+      distillers: [{ id: 11, name: "Example Distillery" }],
     });
   });
 
   test.each([
     {
-      name: "release-selected description",
+      name: "proposed Bottle-selected description",
       proposedBottle: {
         description: "Bottle description",
         descriptionSrc: "user" as const,
       },
-      proposedRelease: { description: "Release description" },
-      expected: { description: "Release description", descriptionSrc: null },
-    },
-    {
-      name: "proposed Bottle-selected description",
-      proposedBottle: {
-        description: "Bottle description",
-        descriptionSrc: null,
-      },
-      proposedRelease: { description: null },
-      expected: { description: "Bottle description", descriptionSrc: null },
+      expected: { description: "Bottle description", descriptionSrc: "user" },
     },
     {
       name: "source-selected description",
       proposedBottle: {
         descriptionSrc: "generated" as const,
       },
-      proposedRelease: { description: null },
       expected: { description: "Source description", descriptionSrc: "user" },
     },
-  ])(
-    "tracks $name provenance",
-    ({ proposedBottle, proposedRelease, expected }) => {
-      expect(
-        buildIndependentBottleProposalDraft({
-          sourceBottle: {
-            ...sourceBottle,
-            description: "Source description",
-            descriptionSrc: "user",
-          },
-          proposedBottle,
-          proposedRelease,
-        }),
-      ).toMatchObject(expected);
-    },
-  );
+  ])("tracks $name provenance", ({ proposedBottle, expected }) => {
+    expect(
+      buildBottleProposalDraft({
+        sourceBottle: {
+          ...sourceBottle,
+          description: "Source description",
+          descriptionSrc: "user",
+        },
+        proposedBottle,
+      }),
+    ).toMatchObject(expected);
+  });
 });

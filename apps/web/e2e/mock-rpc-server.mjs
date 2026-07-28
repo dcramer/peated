@@ -282,13 +282,13 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "prices/matchQueue/list": {
       const token = getAccessToken(request);
-      if (!token.includes("queue-release-only")) {
+      if (!token.includes("queue-direct-bottle")) {
         return false;
       }
 
       const applied = appliedQueueProposalTokens.has(token);
       sendRpcResponse(response, {
-        results: applied ? [] : [buildReleaseOnlyQueueProposal()],
+        results: applied ? [] : [buildDirectBottleQueueProposal()],
         rel: { nextCursor: null, prevCursor: null },
         stats: {
           actionableCount: applied ? 0 : 1,
@@ -298,7 +298,7 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "prices/matchQueue/activeRetryRun":
-      if (!getAccessToken(request).includes("queue-release-only")) {
+      if (!getAccessToken(request).includes("queue-direct-bottle")) {
         return false;
       }
       sendRpcResponse(response, { run: null });
@@ -312,21 +312,21 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      sendRpcResponse(response, buildBottleAndReleaseProposal());
+      sendRpcResponse(response, buildDirectBottleProposal());
       return true;
     case "prices/matchQueue/createBottle": {
       const token = getAccessToken(request);
-      if (token.includes("queue-release-only")) {
-        if (!isExpectedReleaseOnlyQueueCreateInput(input)) {
+      if (token.includes("queue-direct-bottle")) {
+        if (!isExpectedDirectBottleQueueCreateInput(input)) {
           sendRpcError(
             response,
-            "Unexpected release-only queue create Bottle payload",
+            "Unexpected direct queue create Bottle payload",
           );
           return true;
         }
 
         appliedQueueProposalTokens.add(token);
-        const bottle = buildReleaseOnlyQueueBottle();
+        const bottle = buildDirectBottleQueueBottle();
         sendRpcResponse(response, bottle);
         return true;
       }
@@ -1315,30 +1315,31 @@ function buildCreatedBottle({ includeExactBottleDetails = false } = {}) {
   };
 }
 
-const releaseOnlyQueueProposalId = 9911;
-const releaseOnlyQueueEdition = "Cask 17";
+const directBottleQueueProposalId = 9911;
+const directBottleQueueEdition = "Cask 17";
 
-function buildReleaseOnlyQueueBottle() {
+function buildDirectBottleQueueBottle() {
   return {
     ...anotherReleaseSourceBottle,
     id: createdBottleId,
-    fullName: `${anotherReleaseSourceBottle.brand.name} ${anotherReleaseSourceBottle.name} ${releaseOnlyQueueEdition}`,
-    edition: releaseOnlyQueueEdition,
+    fullName: `${anotherReleaseSourceBottle.brand.name} ${anotherReleaseSourceBottle.name} ${directBottleQueueEdition}`,
+    edition: directBottleQueueEdition,
     abv: 52.3,
     releaseYear: 2025,
   };
 }
 
-function buildReleaseOnlyQueueProposal() {
+function buildDirectBottleQueueProposal() {
+  const proposal = buildDirectBottleProposal();
+
   return {
-    ...buildBottleAndReleaseProposal(),
-    id: releaseOnlyQueueProposalId,
-    creationTarget: "release",
-    parentBottleId: anotherReleaseSourceBottle.id,
-    proposedBottle: null,
-    proposedRelease: {
-      edition: releaseOnlyQueueEdition,
-      statedAge: null,
+    ...proposal,
+    id: directBottleQueueProposalId,
+    proposedBottle: {
+      ...proposal.proposedBottle,
+      name: anotherReleaseSourceBottle.name,
+      statedAge: anotherReleaseSourceBottle.statedAge,
+      edition: directBottleQueueEdition,
       abv: 52.3,
       caskStrength: true,
       singleCask: true,
@@ -1347,25 +1348,20 @@ function buildReleaseOnlyQueueProposal() {
       caskType: "oloroso",
       caskSize: "hogshead",
       caskFill: "1st_fill",
-      description: "Retailer release description.",
-      tastingNotes: null,
     },
     price: {
-      ...buildBottleAndReleaseProposal().price,
+      ...proposal.price,
       id: 9912,
-      name: `${anotherReleaseSourceBottle.fullName} ${releaseOnlyQueueEdition}`,
+      name: `${anotherReleaseSourceBottle.fullName} ${directBottleQueueEdition}`,
     },
-    currentTarget: null,
-    suggestedTarget: null,
-    parentBottle: anotherReleaseSourceBottle,
   };
 }
 
-function isExpectedReleaseOnlyQueueCreateInput(input) {
+function isExpectedDirectBottleQueueCreateInput(input) {
   if (
     !input ||
     Object.keys(input).sort().join(",") !== "independentBottle,proposal" ||
-    input.proposal !== releaseOnlyQueueProposalId
+    input.proposal !== directBottleQueueProposalId
   ) {
     return false;
   }
@@ -1381,7 +1377,7 @@ function isExpectedReleaseOnlyQueueCreateInput(input) {
     brandIsCanonical &&
     bottle?.name === anotherReleaseSourceBottle.name &&
     bottle?.statedAge === anotherReleaseSourceBottle.statedAge &&
-    bottle?.edition === releaseOnlyQueueEdition &&
+    bottle?.edition === directBottleQueueEdition &&
     bottle?.abv === 52.3 &&
     bottle?.singleCask === true &&
     bottle?.caskStrength === true &&
@@ -1390,9 +1386,9 @@ function isExpectedReleaseOnlyQueueCreateInput(input) {
     bottle?.caskType === "oloroso" &&
     bottle?.caskFill === "1st_fill" &&
     bottle?.caskSize === "hogshead" &&
-    bottle?.description === "Retailer release description." &&
+    bottle?.description === null &&
     bottle?.descriptionSrc === null &&
-    bottle?.tastingNotes === null &&
+    bottle?.tastingNotes == null &&
     ![
       "bottle",
       "release",
@@ -1426,7 +1422,7 @@ function isExpectedOrdinaryExactBottleCreateInput(input) {
   );
 }
 
-function buildBottleAndReleaseProposal() {
+function buildDirectBottleProposal() {
   return {
     id: 9901,
     status: "pending_review",
@@ -1440,45 +1436,25 @@ function buildBottleAndReleaseProposal() {
     plainAgeBottleAutoVerifyEligible: false,
     differentiatingAttributes: [],
     webEvidenceChecks: [],
-    currentBottleId: null,
-    currentReleaseId: null,
-    suggestedBottleId: null,
-    suggestedReleaseId: null,
-    parentBottleId: null,
-    creationTarget: "bottle_and_release",
     candidateBottles: [],
     extractedLabel: null,
     proposedBottle: {
       name: createdBottleName,
       series: null,
       category: "single_malt",
-      edition: null,
+      edition: "First Fill Oloroso",
       statedAge: null,
       caskStrength: null,
       singleCask: null,
       abv: null,
       vintageYear: null,
-      releaseYear: null,
+      releaseYear: 2026,
       caskType: null,
       caskSize: null,
       caskFill: null,
       brand: { id: testBrand.id, name: testBrand.name },
       distillers: [{ id: testBrand.id, name: testBrand.name }],
       bottler: null,
-    },
-    proposedRelease: {
-      edition: "First Fill Oloroso",
-      statedAge: null,
-      abv: null,
-      caskStrength: null,
-      singleCask: null,
-      vintageYear: null,
-      releaseYear: 2026,
-      caskType: null,
-      caskSize: null,
-      caskFill: null,
-      description: null,
-      tastingNotes: null,
     },
     searchEvidence: [],
     rationale: null,
@@ -1512,10 +1488,7 @@ function buildBottleAndReleaseProposal() {
       },
     },
     currentBottle: null,
-    currentRelease: null,
     suggestedBottle: null,
-    suggestedRelease: null,
-    parentBottle: null,
   };
 }
 

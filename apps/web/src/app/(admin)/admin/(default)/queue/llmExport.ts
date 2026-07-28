@@ -12,10 +12,9 @@ type SeriesLike = {
   name: string;
 } | null;
 
-type BottleLike = NonNullable<QueueItem["parentBottle"]>;
+type BottleLike = NonNullable<QueueItem["currentBottle"]>;
 
 type ProposedBottleLike = NonNullable<QueueItem["proposedBottle"]>;
-type ProposedReleaseLike = NonNullable<QueueItem["proposedRelease"]>;
 
 function serializeEntity(value: EntityLike | null) {
   if (!value) {
@@ -98,36 +97,15 @@ function serializeProposedBottleDraft(value: ProposedBottleLike | null) {
   };
 }
 
-function serializeProposedReleaseDraft(value: ProposedReleaseLike | null) {
-  if (!value) {
-    return null;
-  }
-
-  return {
-    edition: value.edition,
-    statedAge: value.statedAge,
-    abv: value.abv,
-    caskStrength: value.caskStrength,
-    singleCask: value.singleCask,
-    vintageYear: value.vintageYear,
-    releaseYear: value.releaseYear,
-    caskType: value.caskType,
-    caskSize: value.caskSize,
-    caskFill: value.caskFill,
-    imageUrl: value.imageUrl,
-  };
-}
-
 export function formatPriceMatchQueueLlmExport(item: QueueItem) {
   return JSON.stringify(
     {
-      schemaVersion: 3,
+      schemaVersion: 4,
       source: "peated.admin.match_queue",
       proposal: {
         id: item.id,
         status: item.status,
         proposalType: item.proposalType,
-        creationTarget: item.creationTarget,
         confidence: item.confidence,
         modelConfidence: item.modelConfidence,
         model: item.model,
@@ -173,11 +151,7 @@ export function formatPriceMatchQueueLlmExport(item: QueueItem) {
       currentAssignment: serializeBottleIdentity(item.currentBottle),
       recommendation: {
         suggestedBottle: serializeBottleIdentity(item.suggestedBottle),
-        createDraft: {
-          parentBottle: serializeBottleIdentity(item.parentBottle),
-          proposedBottle: serializeProposedBottleDraft(item.proposedBottle),
-          proposedBottling: serializeProposedReleaseDraft(item.proposedRelease),
-        },
+        proposedBottle: serializeProposedBottleDraft(item.proposedBottle),
       },
       artifacts: {
         localCandidates: item.candidateBottles.map((candidate) => ({

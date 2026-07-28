@@ -1,11 +1,9 @@
-import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 import type { BottleFormInitialData } from "@peated/web/components/bottleForm";
 
 type ProposalDraftInput = {
   sourceBottle?: BottleFormInitialData | null;
   sourceSharedName?: BottleFormInitialData["name"];
   proposedBottle?: BottleFormInitialData | null;
-  proposedRelease?: BottleFormInitialData | null;
 };
 
 type ExactField =
@@ -56,18 +54,11 @@ function selectStableName({
 
 function mergeExactField<Field extends ExactField>(
   field: Field,
-  { sourceBottle, proposedBottle, proposedRelease }: ProposalDraftInput,
+  { sourceBottle, proposedBottle }: ProposalDraftInput,
 ): BottleFormInitialData[Field] {
   const sourceValue = sourceBottle?.[field];
   const bottleValue = proposedBottle?.[field];
-  const releaseValue = proposedRelease?.[field];
 
-  if (proposedRelease && proposedBottle) {
-    return releaseValue ?? bottleValue ?? sourceValue;
-  }
-  if (proposedRelease) {
-    return releaseValue === undefined ? sourceValue : releaseValue;
-  }
   if (proposedBottle) {
     return bottleValue === undefined ? sourceValue : bottleValue;
   }
@@ -94,24 +85,11 @@ function mergeExactFields(
 function selectDescription({
   sourceBottle,
   proposedBottle,
-  proposedRelease,
 }: ProposalDraftInput): Pick<
   BottleFormInitialData,
   "description" | "descriptionSrc"
 > {
-  if (proposedRelease && proposedBottle) {
-    if (proposedRelease.description != null) {
-      return { description: proposedRelease.description, descriptionSrc: null };
-    }
-    if (proposedBottle.description != null) {
-      return {
-        description: proposedBottle.description,
-        descriptionSrc: proposedBottle.descriptionSrc,
-      };
-    }
-  } else if (proposedRelease?.description !== undefined) {
-    return { description: proposedRelease.description, descriptionSrc: null };
-  } else if (proposedBottle?.description !== undefined) {
+  if (proposedBottle?.description !== undefined) {
     return {
       description: proposedBottle.description,
       descriptionSrc: proposedBottle.descriptionSrc,
@@ -124,22 +102,19 @@ function selectDescription({
   };
 }
 
-/** Composes legacy proposal evidence into one independently complete Bottle draft. */
-export function buildIndependentBottleProposalDraft({
+/** Composes one proposed Bottle with optional prefill-only source evidence. */
+export function buildBottleProposalDraft({
   sourceBottle,
   sourceSharedName,
   proposedBottle,
-  proposedRelease,
 }: ProposalDraftInput): BottleFormInitialData {
   const exact = mergeExactFields({
     sourceBottle,
     proposedBottle,
-    proposedRelease,
   });
   const description = selectDescription({
     sourceBottle,
     proposedBottle,
-    proposedRelease,
   });
 
   return {
@@ -148,9 +123,10 @@ export function buildIndependentBottleProposalDraft({
       sourceSharedName,
       proposedBottle,
     }),
-    statedAge:
-      proposedRelease?.statedAge ??
-      selectStableField("statedAge", { sourceBottle, proposedBottle }),
+    statedAge: selectStableField("statedAge", {
+      sourceBottle,
+      proposedBottle,
+    }),
     series: selectStableField("series", { sourceBottle, proposedBottle }),
     category: selectStableField("category", { sourceBottle, proposedBottle }),
     brand: selectStableField("brand", { sourceBottle, proposedBottle }),
@@ -166,11 +142,4 @@ export function buildIndependentBottleProposalDraft({
     ...exact,
     ...description,
   };
-}
-
-/** Parses a proposal draft at the same boundary as ordinary Bottle creation. */
-export function buildIndependentBottleProposalInput(input: ProposalDraftInput) {
-  return IndependentConcreteBottleCreateRouteInputSchema.parse(
-    buildIndependentBottleProposalDraft(input),
-  );
 }

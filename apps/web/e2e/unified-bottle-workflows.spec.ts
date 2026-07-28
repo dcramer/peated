@@ -18,12 +18,12 @@ import {
 import { signIn } from "./session";
 
 test.describe("unified Bottle workflows", () => {
-  test("applies a release-only queue draft as one independent Bottle", async ({
+  test("applies a direct Bottle queue draft as one independent Bottle", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "queue-release-only"),
+      accessToken: uniqueAccessToken(testInfo, "queue-direct-bottle"),
       user: { ...testUser, admin: true, mod: true },
     });
 
@@ -70,9 +70,9 @@ test.describe("unified Bottle workflows", () => {
     expect(independentBottle.caskType).toBe("oloroso");
     expect(independentBottle.caskFill).toBe("1st_fill");
     expect(independentBottle.caskSize).toBe("hogshead");
-    expect(independentBottle.description).toBe("Retailer release description.");
+    expect(independentBottle.description).toBeNull();
     expect(independentBottle.descriptionSrc).toBeNull();
-    expect(independentBottle.tastingNotes).toBeNull();
+    expect(independentBottle.tastingNotes).toBeUndefined();
     for (const legacyField of [
       "bottle",
       "release",

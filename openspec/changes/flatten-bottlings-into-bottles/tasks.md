@@ -114,7 +114,7 @@ and map to an explicit removal task.
       activity feeds to Bottle-owned data and member-derived group aggregates.
 - [x] 5.8 Keep BottleRelease compatibility routes translation-only over the
       promotion mapping and canonical Bottle services.
-- [ ] 5.9 Regenerate OpenAPI/client types and remove target-shaped contracts.
+- [x] 5.9 Regenerate OpenAPI/client types and remove target-shaped contracts.
 - [ ] 5.10 Add focused API integration tests for every direct-Bottle consumer,
       nullable unresolved state, promotion mapping, authorization, pagination, and
       conflict behavior.
@@ -124,16 +124,16 @@ and map to an explicit removal task.
 - [x] 6.1 Use one Bottle form for stable and exact fields.
 - [x] 6.2 Make `/bottles/new` and “add another release” create independent
       Bottles without manual group selection.
-- [ ] 6.3 Replace target selectors and exact/generic discriminated rendering
+- [x] 6.3 Replace target selectors and exact/generic discriminated rendering
       with Bottle selection and Bottle summaries.
 - [x] 6.4 Keep `/bottles/:id/releases` as a related-release page and remove
       group activity actions plus manual group merge/split controls.
-- [ ] 6.5 Update tasting, Library, collection, Flight, price, review, photo, and
+- [x] 6.5 Update tasting, Library, collection, Flight, price, review, photo, and
       return-intent flows to carry Bottle ids.
 - [x] 6.6 Keep nested BottleRelease pages removed and permanent redirects
       active.
-- [ ] 6.7 Remove obsolete target components, helpers, tests, and copy.
-- [ ] 6.8 Add focused web tests for Add Bottle, edit Bottle, add another
+- [x] 6.7 Remove obsolete target components, helpers, tests, and copy.
+- [x] 6.8 Add focused web tests for Add Bottle, edit Bottle, add another
       release, direct Bottle selection, related releases, redirects, and return
       intents.
 - [x] 6.9 Run constrained desktop/mobile visual QA using the local playbook.
@@ -151,7 +151,7 @@ and map to an explicit removal task.
 - [ ] 7.5 Run server/web typechecks and file-scoped lint/format checks.
 - [x] 7.6 Run classifier tests and evals in automatic recording/replay mode
       only when classifier identity contracts change.
-- [ ] 7.7 Run focused web Vitest and constrained end-to-end coverage.
+- [x] 7.7 Run focused web Vitest and constrained end-to-end coverage.
 - [ ] 7.8 Manually review the full diff for UX, architecture, type safety,
       duplicate business logic, and unexpected file-tree growth.
 

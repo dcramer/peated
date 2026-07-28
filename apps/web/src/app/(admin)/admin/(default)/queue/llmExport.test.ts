@@ -91,12 +91,30 @@ const localCandidate = {
   source: ["vector"],
 } satisfies QueueItem["candidateBottles"][number];
 
-function queueItem(): QueueItem {
+const proposedBottle = {
+  name: "12 Cask Strength Batch 25",
+  brand: { id: 1, name: "Springbank" },
+  series: null,
+  category: "single_malt",
+  distillers: [{ id: 2, name: "Springbank Distillery" }],
+  bottler: null,
+  edition: "Batch 25",
+  statedAge: 12,
+  abv: 56.5,
+  caskStrength: true,
+  singleCask: false,
+  vintageYear: null,
+  releaseYear: 2025,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+} satisfies NonNullable<QueueItem["proposedBottle"]>;
+
+function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
   const item = {
     id: 99,
     status: "pending_review",
     proposalType: "match_existing",
-    creationTarget: null,
     confidence: 0.98,
     modelConfidence: 0.98,
     model: "test-model",
@@ -138,13 +156,11 @@ function queueItem(): QueueItem {
     extractedLabel: null,
     currentBottle: null,
     suggestedBottle,
-    parentBottleId: null,
-    parentBottle: null,
     proposedBottle: null,
-    proposedRelease: null,
     candidateBottles: [localCandidate],
     webEvidenceChecks: [],
     searchEvidence: [],
+    ...overrides,
   } satisfies Partial<QueueItem>;
 
   return item as QueueItem;
@@ -154,7 +170,7 @@ describe("formatPriceMatchQueueLlmExport", () => {
   it("exports direct Bottle identities without target authority", () => {
     const payload = JSON.parse(formatPriceMatchQueueLlmExport(queueItem()));
 
-    expect(payload.schemaVersion).toBe(3);
+    expect(payload.schemaVersion).toBe(4);
     expect(payload.currentAssignment).toBeNull();
     expect(payload.recommendation.suggestedBottle).toMatchObject({
       id: 19,
@@ -166,6 +182,28 @@ describe("formatPriceMatchQueueLlmExport", () => {
     expect(payload.proposal).not.toHaveProperty("currentReleaseId");
     expect(payload.proposal).not.toHaveProperty("suggestedBottleId");
     expect(payload.proposal).not.toHaveProperty("suggestedReleaseId");
+    expect(payload.proposal).not.toHaveProperty("creationTarget");
+    expect(payload.recommendation).toMatchObject({
+      proposedBottle: null,
+    });
+    expect(payload.recommendation).not.toHaveProperty("createDraft");
     expect(payload.artifacts.localCandidates).toEqual([localCandidate]);
+  });
+
+  it("exports one independently complete proposed Bottle", () => {
+    const payload = JSON.parse(
+      formatPriceMatchQueueLlmExport(
+        queueItem({
+          proposalType: "create_new",
+          suggestedBottle: null,
+          proposedBottle,
+        }),
+      ),
+    );
+
+    expect(payload.recommendation).toEqual({
+      suggestedBottle: null,
+      proposedBottle,
+    });
   });
 });

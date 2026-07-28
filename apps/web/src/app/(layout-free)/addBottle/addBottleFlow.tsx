@@ -635,7 +635,6 @@ function AddBottleFlowContent() {
   const requestedReleaseId = parseId(
     searchParams.get("release") ?? searchParams.get("bottling"),
   );
-  const requestedGroupId = parseId(searchParams.get("group"));
   const requestedFlightId = searchParams.get("flight") || null;
   const requestedPendingImage = useMemo(
     () => getPendingImageFromParams(new URLSearchParams(searchParams)),
@@ -643,19 +642,14 @@ function AddBottleFlowContent() {
   );
   const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
-    if (requestedGroupId) {
-      return `unsupported-group:${requestedGroupId}:${pendingImageKey}`;
+    if (requestedReleaseId && !requestedBottleId) {
+      return `unsupported-release:${requestedReleaseId}:${pendingImageKey}`;
     }
     if (requestedBottleId) {
       return `bottle:${requestedBottleId}:${requestedReleaseId ?? "base"}:${pendingImageKey}`;
     }
     return null;
-  }, [
-    requestedBottleId,
-    requestedGroupId,
-    requestedPendingImage?.id,
-    requestedReleaseId,
-  ]);
+  }, [requestedBottleId, requestedPendingImage?.id, requestedReleaseId]);
 
   const [loadedBottleKey, setLoadedBottleKey] = useState<string | null>(null);
   const [loadingBottle, setLoadingBottle] = useState(false);
@@ -695,12 +689,12 @@ function AddBottleFlowContent() {
   }, [selectedBottle?.previewUrl]);
 
   useEffect(() => {
-    if (requestedGroupId) {
+    if (requestedReleaseId && !requestedBottleId) {
       setSelectedBottle(null);
       setLoadedBottleKey(requestedBottleKey);
       setLoadingBottle(false);
       setBottleLoadError(
-        "This release-family link is no longer supported. Search for the exact bottle instead.",
+        "This old release link is incomplete. Search for the exact bottle instead.",
       );
       return;
     }
@@ -772,7 +766,6 @@ function AddBottleFlowContent() {
     loadedBottleKey,
     orpc,
     requestedBottleId,
-    requestedGroupId,
     requestedPendingImage,
     requestedReleaseId,
     requestedBottleKey,

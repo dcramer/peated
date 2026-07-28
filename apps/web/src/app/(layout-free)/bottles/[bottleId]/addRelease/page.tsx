@@ -8,7 +8,7 @@ import Spinner from "@peated/web/components/spinner";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
-import { buildIndependentBottleProposalDraft } from "@peated/web/lib/independentBottleProposal";
+import { buildBottleProposalDraft } from "@peated/web/lib/bottleProposalDraft";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
@@ -65,11 +65,10 @@ function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
   }
 
   const initialData = {
-    ...buildIndependentBottleProposalDraft({
+    ...buildBottleProposalDraft({
       sourceBottle,
       sourceSharedName: sourceBottle.group.name,
       proposedBottle: proposalQuery.data?.proposedBottle,
-      proposedRelease: proposalQuery.data?.proposedRelease,
     }),
     imageUrl: proposalQuery.data?.price.imageUrl ?? undefined,
   };

@@ -139,7 +139,6 @@ function CreateBottleForm() {
         mergeCreateBottleInitialData({
           initialData,
           proposalData,
-          proposalExactData: proposalQuery.data?.proposedRelease,
           proposalImageUrl: proposalQuery.data?.price.imageUrl,
           distiller: distillerQuery.data,
           brand: brandQuery.data,

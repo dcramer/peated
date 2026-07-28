@@ -5,10 +5,8 @@ import type { Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
-import { getAddAnotherReleasePath } from "@peated/web/lib/addBottle";
 import classNames from "@peated/web/lib/classNames";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
-import { buildIndependentBottleProposalDraft } from "@peated/web/lib/independentBottleProposal";
 import { type ReactNode, useState } from "react";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
@@ -46,10 +44,7 @@ type RecommendationBottle = {
 };
 type CurrentBottle = NonNullable<QueueItem["currentBottle"]>;
 type BottleReference = Pick<CurrentBottle, "id">;
-type RepairProposalItem = Pick<
-  QueueItem,
-  "proposalType" | "proposedBottle" | "proposedRelease"
-> & {
+type RepairProposalItem = Pick<QueueItem, "proposalType" | "proposedBottle"> & {
   currentBottle: BottleReference | null;
   suggestedBottle: BottleReference | null;
 };
@@ -274,8 +269,7 @@ export function isRepairProposal(item: RepairProposalItem): boolean {
     item.currentBottle !== null &&
     item.suggestedBottle !== null &&
     item.currentBottle.id === item.suggestedBottle.id &&
-    !!item.proposedBottle &&
-    !item.proposedRelease
+    !!item.proposedBottle
   );
 }
 
@@ -296,12 +290,9 @@ function getChoiceName(
   return typeof choice === "object" && choice?.name ? choice.name : null;
 }
 
-function getConcreteBottleDraftFields(item: QueueItem): RecommendationField[] {
-  const bottle = buildIndependentBottleProposalDraft({
-    sourceBottle: item.parentBottle,
-    proposedBottle: item.proposedBottle,
-    proposedRelease: item.proposedRelease,
-  });
+function getConcreteBottleDraftFields(
+  bottle: NonNullable<QueueItem["proposedBottle"]>,
+): RecommendationField[] {
   const fields: RecommendationField[] = [
     {
       label: "Brand",
@@ -706,7 +697,7 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     );
   }
 
-  if (!item.proposedBottle && !item.proposedRelease) {
+  if (!item.proposedBottle) {
     return (
       <div className="mt-2 text-sm text-slate-300">
         No safe existing Bottle suggested.
@@ -719,7 +710,7 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
       <RecommendationSection
         label="Bottle Draft"
         title={item.price.name}
-        fields={getConcreteBottleDraftFields(item)}
+        fields={getConcreteBottleDraftFields(item.proposedBottle)}
       />
     </div>
   );
@@ -773,7 +764,7 @@ function getCreateProposalActions(
   item: QueueItem,
   returnTo: string,
 ): CreateProposalActions | null {
-  if (!item.proposedBottle && !item.proposedRelease) {
+  if (!item.proposedBottle) {
     return null;
   }
 
@@ -782,10 +773,7 @@ function getCreateProposalActions(
   return {
     applyLabel: "Apply Bottle Draft",
     editLabel: "Edit Bottle Draft",
-    editHref:
-      item.creationTarget === "release" && item.parentBottle
-        ? `${getAddAnotherReleasePath(item.parentBottle.id)}?${queryString}`
-        : `/bottles/new?${queryString}`,
+    editHref: `/bottles/new?${queryString}`,
   };
 }
 
@@ -811,7 +799,7 @@ export default function QueueItemCard({
   const canCreateBottle =
     item.status === "pending_review" &&
     item.proposalType === "create_new" &&
-    (!!item.proposedBottle || !!item.proposedRelease) &&
+    !!item.proposedBottle &&
     !isProcessing;
   const canApplyRepair = item.status === "pending_review" && repairProposal;
   const createProposalActions = getCreateProposalActions(item, returnTo);

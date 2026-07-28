@@ -21,7 +21,6 @@ function decisionItem(overrides: Partial<DecisionItem> = {}): DecisionItem {
     currentBottle: null,
     suggestedBottle: bottle(10),
     proposedBottle: null,
-    proposedRelease: null,
     ...overrides,
   };
 }
@@ -60,12 +59,6 @@ describe("queue item Bottle actions", () => {
         ...repair,
         currentBottle: null,
         suggestedBottle: null,
-      }),
-    ).toBe(false);
-    expect(
-      isRepairProposal({
-        ...repair,
-        proposedRelease: {} as NonNullable<DecisionItem["proposedRelease"]>,
       }),
     ).toBe(false);
   });

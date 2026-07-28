@@ -1,8 +1,18 @@
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { redirect } from "next/navigation";
+import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
+import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { notFound, redirect } from "next/navigation";
 
 function getFirst(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function parseId(value: string) {
+  const id = Number(value);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    notFound();
+  }
+  return id;
 }
 
 export default async function AddTasting(props: {
@@ -13,13 +23,22 @@ export default async function AddTasting(props: {
     props.params,
     props.searchParams,
   ]);
-  const releaseId =
+  const legacyReleaseId =
     getFirst(searchParams.release) ?? getFirst(searchParams.bottling);
+  const directBottleId = legacyReleaseId
+    ? (
+        await resolveOrNotFound(
+          (await getAnonymousServerClient()).client.bottleReleases.bottle({
+            bottle: parseId(bottleId),
+            release: parseId(legacyReleaseId),
+          }),
+        )
+      ).bottleId
+    : parseId(bottleId);
 
   redirect(
     getAddBottleHref({
-      bottleId,
-      releaseId,
+      bottleId: directBottleId,
       flightId: getFirst(searchParams.flight),
       intent: "tasting",
     }),

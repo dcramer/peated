@@ -1,5 +1,6 @@
 "use client";
 
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 import type { Bottle } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -10,7 +11,6 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import TextInput from "@peated/web/components/textInput";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { buildIndependentBottleProposalInput } from "@peated/web/lib/independentBottleProposal";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
 import {
@@ -234,13 +234,15 @@ export default function Page() {
   }
 
   async function handleApplyCreateProposal(item: QueueItem): Promise<void> {
+    if (!item.proposedBottle) {
+      return;
+    }
+
     const created = await createBottleMutation.mutateAsync({
       proposal: item.id,
-      independentBottle: buildIndependentBottleProposalInput({
-        sourceBottle: item.parentBottle,
-        proposedBottle: item.proposedBottle,
-        proposedRelease: item.proposedRelease,
-      }),
+      independentBottle: IndependentConcreteBottleCreateRouteInputSchema.parse(
+        item.proposedBottle,
+      ),
     });
     await refreshQueueList();
     flash(
