@@ -4,7 +4,6 @@ import {
   bottleReleases,
   bottleTombstones,
   bottlesToDistillers,
-  catalogTargets,
   collectionBottles,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
@@ -299,15 +298,9 @@ describe("GET /users/:user/library/stats", () => {
         status: "open" as const,
       })),
     );
-    const compatibilityTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, compatibilityBottle.id),
-      columns: { id: true },
-    });
-    if (!compatibilityTarget) throw new Error("Missing target fixture");
     await db.insert(collectionBottles).values({
       collectionId: library.id,
-      bottleId: null,
-      targetId: compatibilityTarget.id,
+      bottleId: compatibilityBottle.id,
       status: "open",
     });
 
@@ -419,7 +412,7 @@ describe("GET /users/:user/library/stats", () => {
     });
   });
 
-  test("uses direct Bottle identity without target evidence", async ({
+  test("uses direct Bottle identity for compatibility entries", async ({
     defaults,
     fixtures,
   }) => {

@@ -1,12 +1,8 @@
 import { db } from "@peated/server/db";
-import {
-  catalogTargets,
-  incomingBottleDecisionLogs,
-} from "@peated/server/db/schema";
+import { incomingBottleDecisionLogs } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /admin/incoming-bottle-decisions", () => {
@@ -141,10 +137,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     const release = await fixtures.BottleRelease({
       bottleId: evidenceBottle.id,
     });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, evidenceBottle.id),
-    });
-    if (!target) throw new Error("Missing historical target fixture");
 
     await db.insert(incomingBottleDecisionLogs).values({
       sourceKind: "store_price",
@@ -155,7 +147,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       actorId: actor.id,
       bottleId: bottle.id,
       releaseId: release.id,
-      targetId: target.id,
       createdRelease: true,
     });
 

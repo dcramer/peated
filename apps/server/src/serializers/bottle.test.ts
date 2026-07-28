@@ -163,13 +163,11 @@ describe("BottleSerializer", () => {
     ]);
     await fixtures.Tasting({
       bottleId: selectedBottle.id,
-      targetId: null,
       createdById: viewer.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
     });
     await fixtures.Tasting({
       bottleId: otherBottle.id,
-      targetId: null,
       createdById: viewer.id,
       createdAt: new Date("2026-01-02T00:00:00.000Z"),
     });

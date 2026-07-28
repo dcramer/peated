@@ -3,7 +3,6 @@ import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
   bottleTombstones,
-  catalogTargets,
   reviews,
   storePriceHistories,
   storePrices,
@@ -130,13 +129,11 @@ describe("POST /external-sites/:site/prices", () => {
     expect(matched).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
       price: 9_999,
     });
     expect(unresolved).toMatchObject({
       bottleId: null,
       releaseId: null,
-      targetId: null,
       price: 7_999,
     });
     expect(await db.select().from(storePriceHistories)).toHaveLength(2);
@@ -154,26 +151,16 @@ describe("POST /external-sites/:site/prices", () => {
     );
   });
 
-  test("ignores stale target evidence on a direct Bottle alias", async ({
-    fixtures,
-  }) => {
+  test("uses a directly assigned Bottle alias", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
       name: "Direct Price Bottle",
     });
-    const unrelatedBottle = await fixtures.Bottle({
-      name: "Unrelated Price Target",
-    });
-    const unrelatedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
-    });
-    if (!unrelatedTarget) throw new Error("Missing exact target fixture");
-    const aliasName = "Price Alias With Stale Target";
+    const aliasName = "Direct Price Alias";
     await fixtures.BottleAlias({
       name: aliasName,
       bottleId: bottle.id,
-      targetId: unrelatedTarget.id,
     });
 
     await routerClient.prices.createBatch(
@@ -199,7 +186,6 @@ describe("POST /external-sites/:site/prices", () => {
     ).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -207,7 +193,6 @@ describe("POST /external-sites/:site/prices", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      targetId: unrelatedTarget.id,
     });
   });
 
@@ -317,11 +302,9 @@ describe("POST /external-sites/:site/prices", () => {
     await fixtures.BottleAlias({
       name: listingName,
       bottleId: incomingBottle.id,
-      targetId: null,
     });
     const siblingPrice = await fixtures.StorePrice({
       bottleId: null,
-      targetId: null,
       externalSiteId: site.id,
       name: aliasKey,
       volume: 750,
@@ -330,7 +313,6 @@ describe("POST /external-sites/:site/prices", () => {
     const siblingReview = await fixtures.Review({
       bottleId: null,
       releaseId: null,
-      targetId: null,
       externalSiteId: site.id,
       name: aliasKey,
       url: "https://example.com/reviews/concurrent-sibling",
@@ -392,7 +374,6 @@ describe("POST /external-sites/:site/prices", () => {
       expect(price).toMatchObject({
         bottleId: committedBottle.id,
         releaseId: null,
-        targetId: null,
         price: 9_999,
         url: "https://example.com/prices/concurrent-result",
       });
@@ -508,7 +489,6 @@ describe("POST /external-sites/:site/prices", () => {
     const existing = await fixtures.StorePrice({
       externalSiteId: site.id,
       bottleId: bottle.id,
-      targetId: null,
       name: listingName,
       volume: 750,
     });

@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottles,
-  catalogTargets,
-} from "@peated/server/db/schema";
+import { bottleAliases, bottles } from "@peated/server/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 import indexBottleSearchVectors from "./indexBottleSearchVectors";
@@ -55,38 +51,24 @@ describe("indexBottleSearchVectors", () => {
       edition: "Legacy Child Eclipse",
     });
 
-    const bottleTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    const unrelatedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
-    });
-    if (!bottleTarget || !unrelatedTarget) {
-      throw new Error("CatalogTarget fixtures not found.");
-    }
-
     await fixtures.BottleAlias({
       name: "Authoritative Alias Aurora",
       bottleId: bottle.id,
-      targetId: unrelatedTarget.id,
       ignored: false,
     });
     await fixtures.BottleAlias({
-      name: "Direct Targetless Quasar",
+      name: "Direct Alias Quasar",
       bottleId: bottle.id,
-      targetId: null,
       ignored: false,
     });
     await fixtures.BottleAlias({
       name: "Ignored Exact Nebula",
       bottleId: bottle.id,
-      targetId: bottleTarget.id,
       ignored: true,
     });
     await fixtures.BottleAlias({
       name: "Foreign Direct Pulsar",
       bottleId: unrelatedBottle.id,
-      targetId: bottleTarget.id,
       ignored: false,
     });
 
@@ -109,9 +91,9 @@ describe("indexBottleSearchVectors", () => {
     expect(
       await searchVectorMatches(bottle.id, "Authoritative Alias Aurora"),
     ).toBe(true);
-    expect(
-      await searchVectorMatches(bottle.id, "Direct Targetless Quasar"),
-    ).toBe(true);
+    expect(await searchVectorMatches(bottle.id, "Direct Alias Quasar")).toBe(
+      true,
+    );
     expect(await searchVectorMatches(bottle.id, "Ignored Exact Nebula")).toBe(
       false,
     );
@@ -130,7 +112,7 @@ describe("indexBottleSearchVectors", () => {
     ).toEqual(
       expect.arrayContaining([
         { name: "Authoritative Alias Aurora" },
-        { name: "Direct Targetless Quasar" },
+        { name: "Direct Alias Quasar" },
         { name: "Ignored Exact Nebula" },
       ]),
     );

@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { catalogTargets, storePrices } from "@peated/server/db/schema";
+import { storePrices } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
@@ -22,22 +22,13 @@ describe("GET /bottles/:bottle/price-history", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    const otherTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, otherBottle.id),
-    });
-    if (!target || !otherTarget) throw new Error("Missing target fixture");
     const included = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: otherTarget.id,
       name: "Included direct Bottle price",
     });
     const excluded = await fixtures.StorePrice({
       bottleId: otherBottle.id,
-      targetId: target.id,
-      name: "Excluded stale target evidence",
+      name: "Excluded other Bottle price",
     });
     await db
       .update(storePrices)
@@ -62,14 +53,11 @@ describe("GET /bottles/:bottle/price-history", () => {
     expect(results.map(({ avgPrice }) => avgPrice)).not.toContain(133);
   });
 
-  test("includes alias-propagated history without target evidence", async ({
-    fixtures,
-  }) => {
+  test("includes directly assigned price history", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
-      name: "Alias-propagated history",
+      name: "Direct history",
       price: 15_000,
     });
 

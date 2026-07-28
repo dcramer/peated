@@ -2,12 +2,10 @@ import type serverConfig from "@peated/server/config";
 import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleGroups,
   bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
@@ -18,7 +16,7 @@ import {
   updateConcreteBottle,
 } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
 import generateBottleDetails, {
   type GeneratedBottleDetails,
@@ -146,7 +144,7 @@ test("rejects Bottle and BottleGroup tombstones before invoking AI", async ({
   expect(getStructuredResponse).not.toHaveBeenCalled();
 });
 
-test("fans out generated details without CatalogTargets and keeps exact content selected-only", async ({
+test("fans out generated details and keeps exact content selected-only", async ({
   defaults,
   fixtures,
 }) => {
@@ -157,28 +155,6 @@ test("fans out generated details without CatalogTargets and keeps exact content 
     defaults.user,
     brand.id,
   );
-  const targetRows = await db
-    .select({ id: catalogTargets.id })
-    .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, source.group.id));
-  await db
-    .update(bottleAliases)
-    .set({ targetId: null })
-    .where(
-      inArray(
-        bottleAliases.targetId,
-        targetRows.map(({ id }) => id),
-      ),
-    );
-  await db
-    .delete(catalogTargets)
-    .where(eq(catalogTargets.groupId, source.group.id));
-  expect(
-    await db
-      .select({ id: catalogTargets.id })
-      .from(catalogTargets)
-      .where(eq(catalogTargets.groupId, source.group.id)),
-  ).toEqual([]);
   vi.mocked(getStructuredResponse).mockResolvedValue({
     description: "Generated description",
     tastingNotes: {

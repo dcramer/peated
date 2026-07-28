@@ -1,6 +1,6 @@
 {
-  "id": "eb864141-fb52-4d54-ba16-75ddf561e138",
-  "prevId": "6b14c096-7570-47a8-bba6-259e9dab83db",
+  "id": "3ee920d8-0297-4e67-88ad-62c6c611ac8b",
+  "prevId": "1b041af8-46cc-4107-a0cb-df73cfc2a18a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -400,12 +400,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "target_id": {
-          "name": "target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
@@ -493,21 +487,6 @@
           "method": "btree",
           "with": {}
         },
-        "bottle_alias_target_idx": {
-          "name": "bottle_alias_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "bottle_alias_assigned_by_actor_idx": {
           "name": "bottle_alias_assigned_by_actor_idx",
           "columns": [
@@ -544,19 +523,6 @@
           "tableTo": "bottle_release",
           "columnsFrom": [
             "release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "bottle_alias_target_id_catalog_target_id_fk": {
-          "name": "bottle_alias_target_id_catalog_target_id_fk",
-          "tableFrom": "bottle_alias",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
           ],
           "columnsTo": [
             "id"
@@ -1135,12 +1101,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "target_id": {
-          "name": "target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "source_type": {
           "name": "source_type",
           "type": "varchar(32)",
@@ -1262,21 +1222,6 @@
           "method": "btree",
           "with": {}
         },
-        "bottle_observation_target_idx": {
-          "name": "bottle_observation_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "bottle_observation_external_site_idx": {
           "name": "bottle_observation_external_site_idx",
           "columns": [
@@ -1318,19 +1263,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "bottle_observation_target_id_catalog_target_id_fk": {
-          "name": "bottle_observation_target_id_catalog_target_id_fk",
-          "tableFrom": "bottle_observation",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "bottle_observation_external_site_id_external_site_id_fk": {
@@ -2009,55 +1941,14 @@
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
-        },
-        "new_bottle_group_id": {
-          "name": "new_bottle_group_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
         }
       },
-      "indexes": {
-        "bottle_tombstone_new_group_idx": {
-          "name": "bottle_tombstone_new_group_idx",
-          "columns": [
-            {
-              "expression": "new_bottle_group_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "bottle_tombstone_new_bottle_group_id_bottle_group_id_fk": {
-          "name": "bottle_tombstone_new_bottle_group_id_bottle_group_id_fk",
-          "tableFrom": "bottle_tombstone",
-          "tableTo": "bottle_group",
-          "columnsFrom": [
-            "new_bottle_group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {
-        "bottle_tombstone_destination_check": {
-          "name": "bottle_tombstone_destination_check",
-          "value": "NOT (\"bottle_tombstone\".\"new_bottle_id\" IS NOT NULL AND \"bottle_tombstone\".\"new_bottle_group_id\" IS NOT NULL)"
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.bottle": {
@@ -2520,120 +2411,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.catalog_target": {
-      "name": "catalog_target",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "bottle_group_id": {
-          "name": "bottle_group_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "bottle_id": {
-          "name": "bottle_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "catalog_target_generic_group_unq": {
-          "name": "catalog_target_generic_group_unq",
-          "columns": [
-            {
-              "expression": "bottle_group_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"catalog_target\".\"bottle_id\" IS NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "catalog_target_bottle_unq": {
-          "name": "catalog_target_bottle_unq",
-          "columns": [
-            {
-              "expression": "bottle_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "catalog_target_group_idx": {
-          "name": "catalog_target_group_idx",
-          "columns": [
-            {
-              "expression": "bottle_group_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "catalog_target_bottle_group_id_bottle_group_id_fk": {
-          "name": "catalog_target_bottle_group_id_bottle_group_id_fk",
-          "tableFrom": "catalog_target",
-          "tableTo": "bottle_group",
-          "columnsFrom": [
-            "bottle_group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "catalog_target_bottle_membership_fk": {
-          "name": "catalog_target_bottle_membership_fk",
-          "tableFrom": "catalog_target",
-          "tableTo": "bottle",
-          "columnsFrom": [
-            "bottle_id",
-            "bottle_group_id"
-          ],
-          "columnsTo": [
-            "id",
-            "group_id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.change": {
       "name": "change",
       "schema": "",
@@ -2750,16 +2527,10 @@
           "name": "bottle_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "release_id": {
           "name": "release_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "target_id": {
-          "name": "target_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -2786,56 +2557,6 @@
         }
       },
       "indexes": {
-        "collection_bottle_legacy_unq": {
-          "name": "collection_bottle_legacy_unq",
-          "columns": [
-            {
-              "expression": "collection_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "bottle_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "COALESCE(\"release_id\", 0)",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"collection_bottle\".\"bottle_id\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "collection_bottle_target_unq": {
-          "name": "collection_bottle_target_unq",
-          "columns": [
-            {
-              "expression": "collection_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"collection_bottle\".\"target_id\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "collection_bottle_bottle_idx": {
           "name": "collection_bottle_bottle_idx",
           "columns": [
@@ -2856,21 +2577,6 @@
           "columns": [
             {
               "expression": "release_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "collection_bottle_target_idx": {
-          "name": "collection_bottle_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2921,30 +2627,22 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        },
-        "collection_bottle_target_id_catalog_target_id_fk": {
-          "name": "collection_bottle_target_id_catalog_target_id_fk",
-          "tableFrom": "collection_bottle",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "collection_bottle_identity_check": {
-          "name": "collection_bottle_identity_check",
-          "value": "\"collection_bottle\".\"bottle_id\" IS NOT NULL OR (\"collection_bottle\".\"target_id\" IS NOT NULL AND \"collection_bottle\".\"release_id\" IS NULL)"
+      "uniqueConstraints": {
+        "collection_bottle_collection_id_bottle_id_release_id_unique": {
+          "name": "collection_bottle_collection_id_bottle_id_release_id_unique",
+          "nullsNotDistinct": true,
+          "columns": [
+            "collection_id",
+            "bottle_id",
+            "release_id"
+          ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.collection": {
@@ -3905,77 +3603,36 @@
           "name": "bottle_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "release_id": {
           "name": "release_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
-        },
-        "target_id": {
-          "name": "target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {
-        "flight_bottle_legacy_unq": {
-          "name": "flight_bottle_legacy_unq",
+        "flight_bottle_bottle_idx": {
+          "name": "flight_bottle_bottle_idx",
           "columns": [
-            {
-              "expression": "flight_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
             {
               "expression": "bottle_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
-            },
-            {
-              "expression": "COALESCE(\"release_id\", 0)",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
             }
           ],
-          "isUnique": true,
-          "where": "\"flight_bottle\".\"bottle_id\" IS NOT NULL",
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
         },
-        "flight_bottle_target_unq": {
-          "name": "flight_bottle_target_unq",
+        "flight_bottle_release_idx": {
+          "name": "flight_bottle_release_idx",
           "columns": [
             {
-              "expression": "flight_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"flight_bottle\".\"target_id\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "flight_bottle_target_idx": {
-          "name": "flight_bottle_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
+              "expression": "release_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -4026,30 +3683,22 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        },
-        "flight_bottle_target_id_catalog_target_id_fk": {
-          "name": "flight_bottle_target_id_catalog_target_id_fk",
-          "tableFrom": "flight_bottle",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "flight_bottle_identity_check": {
-          "name": "flight_bottle_identity_check",
-          "value": "\"flight_bottle\".\"bottle_id\" IS NOT NULL OR (\"flight_bottle\".\"target_id\" IS NOT NULL AND \"flight_bottle\".\"release_id\" IS NULL)"
+      "uniqueConstraints": {
+        "flight_bottle_flight_id_bottle_id_release_id_unique": {
+          "name": "flight_bottle_flight_id_bottle_id_release_id_unique",
+          "nullsNotDistinct": true,
+          "columns": [
+            "flight_id",
+            "bottle_id",
+            "release_id"
+          ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.flight": {
@@ -4410,12 +4059,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "target_id": {
-          "name": "target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_bottle": {
           "name": "created_bottle",
           "type": "boolean",
@@ -4545,21 +4188,6 @@
           "method": "btree",
           "with": {}
         },
-        "incoming_bottle_decision_target_idx": {
-          "name": "incoming_bottle_decision_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "incoming_bottle_decision_actor_ref_idx": {
           "name": "incoming_bottle_decision_actor_ref_idx",
           "columns": [
@@ -4635,19 +4263,6 @@
           "tableTo": "bottle_release",
           "columnsFrom": [
             "release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "incoming_bottle_decision_log_target_id_catalog_target_id_fk": {
-          "name": "incoming_bottle_decision_log_target_id_catalog_target_id_fk",
-          "tableFrom": "incoming_bottle_decision_log",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
           ],
           "columnsTo": [
             "id"
@@ -5402,12 +5017,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "target_id": {
-          "name": "target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "hidden": {
           "name": "hidden",
           "type": "boolean",
@@ -5505,21 +5114,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "review_target_idx": {
-          "name": "review_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -5555,19 +5149,6 @@
           "tableTo": "bottle_release",
           "columnsFrom": [
             "release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "review_target_id_catalog_target_id_fk": {
-          "name": "review_target_id_catalog_target_id_fk",
-          "tableFrom": "review",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
           ],
           "columnsTo": [
             "id"
@@ -5745,12 +5326,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "current_target_id": {
-          "name": "current_target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "suggested_bottle_id": {
           "name": "suggested_bottle_id",
           "type": "bigint",
@@ -5759,12 +5334,6 @@
         },
         "suggested_release_id": {
           "name": "suggested_release_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "suggested_target_id": {
-          "name": "suggested_target_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -5894,36 +5463,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "store_price_match_attempt_current_target_idx": {
-          "name": "store_price_match_attempt_current_target_idx",
-          "columns": [
-            {
-              "expression": "current_target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "store_price_match_attempt_suggested_target_idx": {
-          "name": "store_price_match_attempt_suggested_target_idx",
-          "columns": [
-            {
-              "expression": "suggested_target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -5979,19 +5518,6 @@
           "onDelete": "set null",
           "onUpdate": "no action"
         },
-        "store_price_match_attempt_current_target_id_catalog_target_id_fk": {
-          "name": "store_price_match_attempt_current_target_id_catalog_target_id_fk",
-          "tableFrom": "store_price_match_attempt",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "current_target_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
         "store_price_match_attempt_suggested_bottle_id_bottle_id_fk": {
           "name": "store_price_match_attempt_suggested_bottle_id_bottle_id_fk",
           "tableFrom": "store_price_match_attempt",
@@ -6011,19 +5537,6 @@
           "tableTo": "bottle_release",
           "columnsFrom": [
             "suggested_release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        },
-        "store_price_match_attempt_suggested_target_id_catalog_target_id_fk": {
-          "name": "store_price_match_attempt_suggested_target_id_catalog_target_id_fk",
-          "tableFrom": "store_price_match_attempt",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "suggested_target_id"
           ],
           "columnsTo": [
             "id"
@@ -6113,12 +5626,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "current_target_id": {
-          "name": "current_target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "suggested_bottle_id": {
           "name": "suggested_bottle_id",
           "type": "bigint",
@@ -6127,12 +5634,6 @@
         },
         "suggested_release_id": {
           "name": "suggested_release_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "suggested_target_id": {
-          "name": "suggested_target_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -6345,21 +5846,6 @@
           "method": "btree",
           "with": {}
         },
-        "store_price_match_proposal_current_target_idx": {
-          "name": "store_price_match_proposal_current_target_idx",
-          "columns": [
-            {
-              "expression": "current_target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "store_price_match_proposal_processing_expires_idx": {
           "name": "store_price_match_proposal_processing_expires_idx",
           "columns": [
@@ -6410,21 +5896,6 @@
           "columns": [
             {
               "expression": "suggested_release_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "store_price_match_proposal_suggested_target_idx": {
-          "name": "store_price_match_proposal_suggested_target_idx",
-          "columns": [
-            {
-              "expression": "suggested_target_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -6506,19 +5977,6 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "store_price_match_proposal_current_target_id_catalog_target_id_fk": {
-          "name": "store_price_match_proposal_current_target_id_catalog_target_id_fk",
-          "tableFrom": "store_price_match_proposal",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "current_target_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "store_price_match_proposal_suggested_bottle_id_bottle_id_fk": {
           "name": "store_price_match_proposal_suggested_bottle_id_bottle_id_fk",
           "tableFrom": "store_price_match_proposal",
@@ -6538,19 +5996,6 @@
           "tableTo": "bottle_release",
           "columnsFrom": [
             "suggested_release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "store_price_match_proposal_suggested_target_id_catalog_target_id_fk": {
-          "name": "store_price_match_proposal_suggested_target_id_catalog_target_id_fk",
-          "tableFrom": "store_price_match_proposal",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "suggested_target_id"
           ],
           "columnsTo": [
             "id"
@@ -7037,12 +6482,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "target_id": {
-          "name": "target_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
         "hidden": {
           "name": "hidden",
           "type": "boolean",
@@ -7147,21 +6586,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "store_price_target_idx": {
-          "name": "store_price_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -7197,19 +6621,6 @@
           "tableTo": "bottle_release",
           "columnsFrom": [
             "release_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "store_price_target_id_catalog_target_id_fk": {
-          "name": "store_price_target_id_catalog_target_id_fk",
-          "tableFrom": "store_price",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
           ],
           "columnsTo": [
             "id"
@@ -7394,16 +6805,10 @@
           "name": "bottle_id",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "release_id": {
           "name": "release_id",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "target_id": {
-          "name": "target_id",
           "type": "bigint",
           "primaryKey": false,
           "notNull": false
@@ -7494,68 +6899,6 @@
         }
       },
       "indexes": {
-        "tasting_legacy_unq": {
-          "name": "tasting_legacy_unq",
-          "columns": [
-            {
-              "expression": "bottle_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "COALESCE(\"release_id\", 0)",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_by_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"tasting\".\"bottle_id\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "tasting_target_unq": {
-          "name": "tasting_target_unq",
-          "columns": [
-            {
-              "expression": "target_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_by_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"tasting\".\"target_id\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "tasting_bottle_idx": {
           "name": "tasting_bottle_idx",
           "columns": [
@@ -7576,21 +6919,6 @@
           "columns": [
             {
               "expression": "release_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "tasting_target_idx": {
-          "name": "tasting_target_idx",
-          "columns": [
-            {
-              "expression": "target_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -7659,19 +6987,6 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "tasting_target_id_catalog_target_id_fk": {
-          "name": "tasting_target_id_catalog_target_id_fk",
-          "tableFrom": "tasting",
-          "tableTo": "catalog_target",
-          "columnsFrom": [
-            "target_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "tasting_flight_id_flight_id_fk": {
           "name": "tasting_flight_id_flight_id_fk",
           "tableFrom": "tasting",
@@ -7700,14 +7015,20 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "tasting_identity_check": {
-          "name": "tasting_identity_check",
-          "value": "\"tasting\".\"bottle_id\" IS NOT NULL OR (\"tasting\".\"target_id\" IS NOT NULL AND \"tasting\".\"release_id\" IS NULL)"
+      "uniqueConstraints": {
+        "tasting_unq": {
+          "name": "tasting_unq",
+          "nullsNotDistinct": true,
+          "columns": [
+            "bottle_id",
+            "release_id",
+            "created_by_id",
+            "created_at"
+          ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.toasts": {

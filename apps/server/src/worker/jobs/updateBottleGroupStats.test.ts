@@ -33,12 +33,10 @@ test("recomputes direct member activity and queues only group-owned entities", a
   await db.update(bottles).set({ groupId }).where(eq(bottles.id, member.id));
   await fixtures.Tasting({
     bottleId: bottle.id,
-    targetId: null,
     rating: SIMPLE_RATING_VALUES.PASS,
   });
   await fixtures.Tasting({
     bottleId: member.id,
-    targetId: null,
     rating: SIMPLE_RATING_VALUES.SAVOR,
   });
 
@@ -102,7 +100,7 @@ test.each([
   { groupId: 1.5 },
   { groupId: "1" },
   { groupId: 1, unexpected: true },
-  { targetId: 1 },
+  { legacyId: 1 },
 ])("rejects malformed job input %#", async (input) => {
   await expect(updateBottleGroupStats(input)).rejects.toThrow();
 });

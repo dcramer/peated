@@ -1,5 +1,4 @@
 import { db } from "@peated/server/db";
-import { tastings } from "@peated/server/db/schema";
 import { createNotification } from "@peated/server/lib/notifications";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -65,31 +64,6 @@ describe("GET /notifications", () => {
       id: bottle.id,
       fullName: bottle.fullName,
     });
-  });
-
-  test("fails closed when the referenced Tasting has no Bottle", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-    });
-    const toast = await fixtures.Toast({ tastingId: tasting.id });
-    await createNotification(db, {
-      objectId: toast.id,
-      type: "toast",
-      userId: tasting.createdById,
-      fromUserId: toast.createdById,
-      createdAt: toast.createdAt,
-    });
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id));
-
-    await expect(
-      routerClient.notifications.list({}, { context: { user: defaults.user } }),
-    ).rejects.toThrow(`Tasting ${tasting.id} has no Bottle.`);
   });
 
   test("lists notifications w/ friend_request", async ({

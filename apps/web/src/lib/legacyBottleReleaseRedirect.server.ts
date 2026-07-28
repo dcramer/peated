@@ -9,13 +9,13 @@ export async function resolveLegacyBottleReleaseRedirect(
   const { client } = await getAnonymousServerClient();
 
   try {
-    const target = await resolveOrNotFound(
-      client.bottleReleases.target({
+    const bottle = await resolveOrNotFound(
+      client.bottleReleases.bottle({
         bottle: bottleId,
         release: releaseId,
       }),
     );
-    return { bottleId: target.bottleId };
+    return { bottleId: bottle.bottleId };
   } catch (error) {
     if (isORPCClientError(error) && error.status === 409) {
       return { conflict: true };

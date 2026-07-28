@@ -2,7 +2,6 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
-  check,
   doublePrecision,
   index,
   integer,
@@ -11,13 +10,14 @@ import {
   smallint,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
 import { SERVING_STYLE_LIST } from "../../constants";
 import { badgeAwards } from "./badges";
-import { bottleReleases, bottles, catalogTargets } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
 
@@ -26,22 +26,19 @@ export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 /**
  * User-authored tasting records.
  *
- * Target identity is authoritative. The retained Bottle/Release pair is
- * nullable compatibility storage until task 9.6 removes it.
+ * Bottle identity is authoritative. releaseId is retained as historical
+ * migration evidence until separately approved cleanup.
  */
 export const tastings = pgTable(
   "tasting",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
 
-    bottleId: bigint("bottle_id", { mode: "number" }).references(
-      () => bottles.id,
-    ),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
-    ),
-    targetId: bigint("target_id", { mode: "number" }).references(
-      () => catalogTargets.id,
     ),
     tags: varchar("tags", { length: 64 })
       .array()
@@ -70,25 +67,11 @@ export const tastings = pgTable(
       .notNull(),
   },
   (table) => [
-    check(
-      "tasting_identity_check",
-      sql`${table.bottleId} IS NOT NULL OR (${table.targetId} IS NOT NULL AND ${table.releaseId} IS NULL)`,
-    ),
-    uniqueIndex("tasting_legacy_unq")
-      .using(
-        "btree",
-        table.bottleId,
-        sql`COALESCE(${table.releaseId}, 0)`,
-        table.createdById,
-        table.createdAt,
-      )
-      .where(sql`${table.bottleId} IS NOT NULL`),
-    uniqueIndex("tasting_target_unq")
-      .on(table.targetId, table.createdById, table.createdAt)
-      .where(sql`${table.targetId} IS NOT NULL`),
+    unique("tasting_unq")
+      .on(table.bottleId, table.releaseId, table.createdById, table.createdAt)
+      .nullsNotDistinct(),
     index("tasting_bottle_idx").on(table.bottleId),
     index("tasting_release_idx").on(table.releaseId),
-    index("tasting_target_idx").on(table.targetId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
   ],
@@ -99,9 +82,9 @@ export const tastingsRelations = relations(tastings, ({ one }) => ({
     fields: [tastings.bottleId],
     references: [bottles.id],
   }),
-  target: one(catalogTargets, {
-    fields: [tastings.targetId],
-    references: [catalogTargets.id],
+  release: one(bottleReleases, {
+    fields: [tastings.releaseId],
+    references: [bottleReleases.id],
   }),
   createdBy: one(users, {
     fields: [tastings.createdById],

@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, catalogTargets } from "@peated/server/db/schema";
+import { bottleAliases } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -138,7 +138,7 @@ describe("GET /search", () => {
     expect(results).toHaveLength(0);
   });
 
-  test("searches only exact-target Bottles and exact aliases", async ({
+  test("searches only active Bottles and directly assigned aliases", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Canonical Search Bottle" });
@@ -147,14 +147,9 @@ describe("GET /search", () => {
       bottleId: retainedBottle.id,
     });
     await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    if (!target) throw new Error("Missing exact target fixture");
     await db.insert(bottleAliases).values({
       bottleId: retainedBottle.id,
       releaseId: retainedRelease.id,
-      targetId: target.id,
       name: "Authoritative Search Alias",
       assignedByActorId: bottle.createdByActorId,
     });
@@ -171,7 +166,7 @@ describe("GET /search", () => {
     ]);
 
     expect(aliasSearch.results).toMatchObject([
-      { type: "bottle", ref: { id: bottle.id } },
+      { type: "bottle", ref: { id: retainedBottle.id } },
     ]);
     expect(legacySearch.results).toHaveLength(0);
   });

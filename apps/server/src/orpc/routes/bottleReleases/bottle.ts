@@ -19,13 +19,13 @@ const InputSchema = z
 export default procedure
   .route({
     method: "GET",
-    path: "/bottle-releases/{release}/target",
-    summary: "Get promoted Bottle target",
+    path: "/bottle-releases/{release}/bottle",
+    summary: "Get Bottle for legacy release",
     description:
-      "Resolve a legacy parent Bottle and BottleRelease pair to its promoted exact Bottle target",
+      "Resolve a legacy parent Bottle and BottleRelease pair to its promoted Bottle",
     spec: (spec) => ({
       ...spec,
-      operationId: "getBottleReleaseTarget",
+      operationId: "getBottleForRelease",
     }),
   })
   .input(InputSchema)
@@ -43,7 +43,7 @@ export default procedure
         expectedParentBottleId: input.bottle,
         context: {
           access: "read",
-          caller: "bottleReleases.target",
+          caller: "bottleReleases.bottle",
           operation: "redirect_legacy_nested_bottling",
         },
       });

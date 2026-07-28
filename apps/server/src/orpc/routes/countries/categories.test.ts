@@ -1,11 +1,9 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroupTombstones,
   bottleGroups,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -126,7 +124,7 @@ describe("GET /countries/categories", () => {
     expect(totalCount).toBe(3);
   });
 
-  test("counts active Bottles directly and ignores legacy target evidence", async ({
+  test("counts active Bottles directly and ignores legacy ungrouped identity", async ({
     fixtures,
   }) => {
     const country = await fixtures.Country();
@@ -150,11 +148,11 @@ describe("GET /countries/categories", () => {
       groupId: activeBottle.groupId,
       edition: "Related Release",
     });
-    const targetlessBottle = await fixtures.Bottle({
+    await fixtures.Bottle({
       category: "single_malt",
       distillerIds: [countryDistiller.id],
     });
-    const staleEvidenceBottle = await fixtures.Bottle({
+    await fixtures.Bottle({
       category: "blend",
       distillerIds: [countryDistiller.id],
     });
@@ -181,23 +179,6 @@ describe("GET /countries/categories", () => {
       throw new Error("Expected grouped Bottle fixtures");
     }
 
-    await db
-      .delete(bottleAliases)
-      .where(eq(bottleAliases.bottleId, targetlessBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, targetlessBottle.id));
-    const destinationTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, destinationBottle.id),
-    });
-    if (!destinationTarget) throw new Error("Missing exact target fixture");
-    await db
-      .update(bottleAliases)
-      .set({ targetId: destinationTarget.id })
-      .where(eq(bottleAliases.bottleId, staleEvidenceBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, staleEvidenceBottle.id));
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,

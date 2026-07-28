@@ -130,7 +130,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       description: null,
       tastingNotes: null,
     });
-    expect(result).not.toHaveProperty("targetId");
     expect(result).not.toHaveProperty("kind");
 
     const [updatedBottle] = await db

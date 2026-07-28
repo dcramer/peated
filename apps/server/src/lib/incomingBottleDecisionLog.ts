@@ -5,7 +5,10 @@ import {
   type IncomingBottleDecisionLog,
 } from "@peated/server/db/schema";
 
-export type IncomingBottleDecisionType = IncomingBottleDecisionLog["decision"];
+export type IncomingBottleDecisionType = Extract<
+  IncomingBottleDecisionLog["decision"],
+  "match_existing" | "create_bottle"
+>;
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
@@ -87,10 +90,7 @@ export async function recordIncomingBottleDecisionInTransaction(
       decision,
       actorId: actor.id,
       bottleId,
-      releaseId: null,
-      targetId: null,
       createdBottle,
-      createdRelease: false,
       confidence,
       model,
       rationale,

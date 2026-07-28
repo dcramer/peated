@@ -7,7 +7,6 @@ import {
   bottleTombstones,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -105,7 +104,6 @@ describe("concrete Bottle creation", () => {
       .from(bottleAliases)
       .where(eq(bottleAliases.bottleId, result.bottle.id));
     expect(alias).toMatchObject({
-      targetId: null,
       assignmentSource: "canonical",
     });
 
@@ -192,7 +190,6 @@ describe("concrete Bottle creation", () => {
           expect.objectContaining({
             name,
             bottleId: result.bottle.id,
-            targetId: null,
             assignmentSource: "canonical",
             ignored: false,
           }),
@@ -585,7 +582,7 @@ describe("concrete Bottle creation", () => {
     }
   });
 
-  test("rolls back the group, Bottle, aliases, targets, and audit on a literal alias collision", async ({
+  test("rolls back the group, Bottle, aliases, and audit on a literal alias collision", async ({
     defaults,
     fixtures,
   }) => {
@@ -602,10 +599,6 @@ describe("concrete Bottle creation", () => {
       assignmentSource: "human_approved",
     });
     const changesBefore = await db.select({ id: changes.id }).from(changes);
-    const targetsBefore = await db
-      .select({ id: catalogTargets.id })
-      .from(catalogTargets);
-
     await expect(
       createConcreteBottle({
         context: contextFor(defaults.user),
@@ -650,9 +643,6 @@ describe("concrete Bottle creation", () => {
     expect(await db.select({ id: changes.id }).from(changes)).toEqual(
       changesBefore,
     );
-    expect(
-      await db.select({ id: catalogTargets.id }).from(catalogTargets),
-    ).toEqual(targetsBefore);
   });
 
   test("keeps similar independent creates in distinct singleton groups", async ({
@@ -737,12 +727,6 @@ describe("concrete Bottle creation", () => {
         .select()
         .from(bottleAliases)
         .where(eq(bottleAliases.name, attempted.newAliases[0])),
-    ).toEqual([]);
-    expect(
-      await db
-        .select()
-        .from(catalogTargets)
-        .where(eq(catalogTargets.groupId, attempted.group.id)),
     ).toEqual([]);
     expect(
       await db

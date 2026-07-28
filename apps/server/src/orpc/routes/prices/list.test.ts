@@ -1,13 +1,12 @@
 import { db } from "@peated/server/db";
 import {
   bottleTombstones,
-  catalogTargets,
   externalSites,
   storePrices,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("GET /prices", () => {
@@ -64,22 +63,16 @@ describe("GET /prices", () => {
   }) => {
     const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle();
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    if (!exactTarget) throw new Error("Missing exact target fixture");
     const site = await fixtures.ExternalSiteOrExisting();
     await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
       externalSiteId: site.id,
-      name: "Direct listing without target evidence",
+      name: "Direct listing",
     });
-    const unresolvedWithTargetEvidence = await fixtures.StorePrice({
+    const unresolved = await fixtures.StorePrice({
       bottleId: null,
-      targetId: exactTarget.id,
       externalSiteId: site.id,
-      name: "Unresolved listing with target evidence",
+      name: "Unresolved listing",
     });
 
     const result = await routerClient.prices.list(
@@ -87,56 +80,31 @@ describe("GET /prices", () => {
       { context: { user: admin } },
     );
 
-    expect(result.results.map(({ id }) => id)).toEqual([
-      unresolvedWithTargetEvidence.id,
-    ]);
+    expect(result.results.map(({ id }) => id)).toEqual([unresolved.id]);
     expect(result.results[0]?.bottle).toBeNull();
   });
 
-  test("returns direct Bottle identity and ignores retained target evidence", async ({
+  test("returns direct Bottle identity and nullable unresolved listings", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
-    const exactBottle = await fixtures.Bottle({ name: "Exact price" });
-    const genericParent = await fixtures.Bottle({ name: "Generic price" });
-    await fixtures.BottleRelease({ bottleId: genericParent.id });
-    const mismatchBottle = await fixtures.Bottle({ name: "Mismatch price" });
+    const firstBottle = await fixtures.Bottle({ name: "First price" });
+    const secondBottle = await fixtures.Bottle({ name: "Second price" });
     const site = await fixtures.ExternalSiteOrExisting();
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, exactBottle.id),
-    });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, genericParent.groupId as number),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!exactTarget || !genericTarget) {
-      throw new Error("Missing CatalogTarget fixture");
-    }
-    const exact = await fixtures.StorePrice({
-      bottleId: exactBottle.id,
-      targetId: exactTarget.id,
+    const first = await fixtures.StorePrice({
+      bottleId: firstBottle.id,
       externalSiteId: site.id,
-      name: "A exact",
+      name: "A first",
     });
-    const generic = await fixtures.StorePrice({
-      bottleId: genericParent.id,
-      targetId: genericTarget.id,
+    const second = await fixtures.StorePrice({
+      bottleId: secondBottle.id,
       externalSiteId: site.id,
-      name: "B generic",
+      name: "B second",
     });
-    const targetless = await fixtures.StorePrice({
+    const unresolved = await fixtures.StorePrice({
       bottleId: null,
-      targetId: null,
       externalSiteId: site.id,
-      name: "C targetless",
-    });
-    const mismatch = await fixtures.StorePrice({
-      bottleId: mismatchBottle.id,
-      targetId: exactTarget.id,
-      externalSiteId: site.id,
-      name: "D mismatch",
+      name: "C unresolved",
     });
 
     const result = await routerClient.prices.list(
@@ -147,14 +115,13 @@ describe("GET /prices", () => {
       result.results.map((price) => [price.id, price]),
     );
 
-    expect(byId[exact.id]?.bottle?.id).toBe(exactBottle.id);
-    expect(byId[generic.id]?.bottle?.id).toBe(genericParent.id);
-    expect(byId[targetless.id]?.bottle).toBeNull();
-    expect(byId[mismatch.id]?.bottle?.id).toBe(mismatchBottle.id);
+    expect(byId[first.id]?.bottle?.id).toBe(firstBottle.id);
+    expect(byId[second.id]?.bottle?.id).toBe(secondBottle.id);
+    expect(byId[unresolved.id]?.bottle).toBeNull();
     expect(result.results.every((price) => !("target" in price))).toBe(true);
   });
 
-  test("fails closed for a retired authoritative target", async ({
+  test("fails closed for a retired authoritative Bottle", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });

@@ -1,12 +1,10 @@
 import { db } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleGroupTombstones,
   bottleReleasePromotions,
   bottleTombstones,
   bottles,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import { mergeConcreteBottles } from "@peated/server/lib/mergeConcreteBottles";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
@@ -40,7 +38,7 @@ async function promoteRelease({
   return bottle;
 }
 
-describe("GET /bottle-releases/{release}/target", () => {
+describe("GET /bottle-releases/{release}/bottle", () => {
   test("resolves a completed legacy pair anonymously to its exact promoted Bottle", async ({
     defaults,
     fixtures,
@@ -54,7 +52,7 @@ describe("GET /bottle-releases/{release}/target", () => {
       edition: "Redirected Edition",
     });
 
-    const result = await routerClient.bottleReleases.target({
+    const result = await routerClient.bottleReleases.bottle({
       bottle: parent.id,
       release: release.id,
     });
@@ -66,7 +64,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     { bottle: 0, release: 1 },
     { bottle: 1, release: -1 },
   ])("rejects non-positive legacy ids: %o", async (input) => {
-    const error = await waitError(routerClient.bottleReleases.target(input));
+    const error = await waitError(routerClient.bottleReleases.bottle(input));
     expect(error).toMatchObject({ status: 400 });
   });
 
@@ -76,7 +74,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     const parent = await fixtures.Bottle({ name: "Missing Release Parent" });
 
     const error = await waitError(
-      routerClient.bottleReleases.target({
+      routerClient.bottleReleases.bottle({
         bottle: parent.id,
         release: 999_999,
       }),
@@ -98,7 +96,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     });
 
     const error = await waitError(
-      routerClient.bottleReleases.target({
+      routerClient.bottleReleases.bottle({
         bottle: parent.id,
         release: release.id,
       }),
@@ -117,7 +115,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
 
     const error = await waitError(
-      routerClient.bottleReleases.target({
+      routerClient.bottleReleases.bottle({
         bottle: parent.id,
         release: release.id,
       }),
@@ -151,59 +149,27 @@ describe("GET /bottle-releases/{release}/target", () => {
       .set({ groupId: newGroupAnchor.groupId })
       .where(eq(bottles.id, promoted.id));
 
-    const result = await routerClient.bottleReleases.target({
+    const result = await routerClient.bottleReleases.bottle({
       bottle: parent.id,
       release: release.id,
     });
 
     expect(result).toEqual({ bottleId: promoted.id });
   });
-
-  test("does not require a CatalogTarget for the promoted Bottle", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const parent = await fixtures.Bottle({ name: "Missing Target Parent" });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await promoteRelease({
-      parent,
-      release,
-      user: defaults.user,
-      edition: "Missing Target Edition",
-    });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, promoted.id),
-    });
-    if (!exactTarget) throw new Error("Missing exact target fixture.");
-    await db
-      .delete(bottleAliases)
-      .where(eq(bottleAliases.targetId, exactTarget.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.id, exactTarget.id));
-
-    const result = await routerClient.bottleReleases.target({
-      bottle: parent.id,
-      release: release.id,
-    });
-
-    expect(result).toEqual({ bottleId: promoted.id });
-  });
-
   test("returns conflict when the mapped promoted Bottle is retired", async ({
     defaults,
     fixtures,
   }) => {
-    const parent = await fixtures.Bottle({ name: "Retired Target Parent" });
+    const parent = await fixtures.Bottle({ name: "Retired Promoted Parent" });
     const release = await fixtures.BottleRelease({ bottleId: parent.id });
     const promoted = await promoteRelease({
       parent,
       release,
       user: defaults.user,
-      edition: "Retired Target Edition",
+      edition: "Retired Promoted Edition",
     });
     const replacement = await fixtures.Bottle({
-      name: "Retired Target Replacement",
+      name: "Retired Promoted Replacement",
     });
     await db.insert(bottleTombstones).values({
       bottleId: promoted.id,
@@ -211,7 +177,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     });
 
     const error = await waitError(
-      routerClient.bottleReleases.target({
+      routerClient.bottleReleases.bottle({
         bottle: parent.id,
         release: release.id,
       }),
@@ -245,7 +211,7 @@ describe("GET /bottle-releases/{release}/target", () => {
     });
 
     const error = await waitError(
-      routerClient.bottleReleases.target({
+      routerClient.bottleReleases.bottle({
         bottle: parent.id,
         release: release.id,
       }),
@@ -279,7 +245,7 @@ describe("GET /bottle-releases/{release}/target", () => {
       context: { user: mod },
     });
 
-    const result = await routerClient.bottleReleases.target({
+    const result = await routerClient.bottleReleases.bottle({
       bottle: parent.id,
       release: release.id,
     });

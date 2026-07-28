@@ -182,12 +182,13 @@ classifier or user-created Bottle does not select a group. Similarity may
 produce a grouping suggestion, but only the automatic/system-controlled
 grouping boundary establishes shared expression identity.
 
-## Catalog Target Selection
+## Consumer Bottle Selection
 
 When writing activity or catalog evidence:
 
-- select the Bottle's exact CatalogTarget when the marketed release is known;
-- select the BottleGroup's generic CatalogTarget when only the expression is
-  known;
-- never use a representative Bottle to stand in for a generic target;
-- keep target identity distinct from observation or collection-unit details.
+- select the independently complete Bottle when the marketed release is known;
+- select the retained general Bottle only when evidence identifies that
+  general expression;
+- otherwise preserve the consumer's supported unresolved state;
+- never use BottleGroup or its representative as consumer identity;
+- keep Bottle identity distinct from observation or collection-unit details.

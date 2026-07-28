@@ -697,11 +697,7 @@ async function recordStorePriceMatchAttempt({
       finalStatus: getInitialAttemptFinalStatus(proposal.status),
       confidence: proposal.confidence,
       currentBottleId: proposal.currentBottleId,
-      currentReleaseId: null,
-      currentTargetId: null,
       suggestedBottleId: proposal.suggestedBottleId,
-      suggestedReleaseId: null,
-      suggestedTargetId: null,
       parentBottleId: proposal.parentBottleId,
       creationTarget: proposal.creationTarget,
       automationEligible: automationAssessment?.automationEligible ?? false,
@@ -984,8 +980,6 @@ async function upsertStorePriceObservationInTransaction(
     .insert(bottleObservations)
     .values({
       bottleId,
-      releaseId: null,
-      targetId: null,
       sourceType: "store_price",
       sourceKey: `store_price:${proposal.price.id}`,
       sourceName: proposal.price.name,
@@ -1082,10 +1076,6 @@ export async function upsertStorePriceMatchProposal({
   };
   const proposalValues = {
     ...proposalRuntimeValues,
-    currentReleaseId: null,
-    currentTargetId: null,
-    suggestedReleaseId: null,
-    suggestedTargetId: null,
     parentBottleId: null,
     creationTarget: null,
     proposedRelease: null,
@@ -1093,10 +1083,6 @@ export async function upsertStorePriceMatchProposal({
   };
   const updateValues = {
     ...proposalRuntimeValues,
-    currentReleaseId: null,
-    currentTargetId: null,
-    suggestedReleaseId: null,
-    suggestedTargetId: null,
     parentBottleId: null,
     creationTarget: null,
     proposedRelease: null,
@@ -1683,11 +1669,7 @@ async function markApprovedStorePriceMatchProposalInTransaction(
     .set({
       status: "approved",
       currentBottleId: bottleId,
-      currentReleaseId: null,
-      currentTargetId: null,
       suggestedBottleId: bottleId,
-      suggestedReleaseId: null,
-      suggestedTargetId: null,
       parentBottleId: null,
       creationTarget: null,
       proposedRelease: null,

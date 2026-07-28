@@ -165,6 +165,14 @@ legacy rows are repointed to the promoted Bottle during migration. Nullable
 Bottle references remain nullable only where unresolved identity is a supported
 domain state.
 
+The first additive migration preserves the existing release-aware collection,
+Flight, and tasting uniqueness constraints. Replacing those constraints with
+direct-Bottle-only keys before the data transaction would reject valid legacy
+rows that share a parent Bottle but reference different releases. After the
+one-shot transaction has repointed those rows, a separately generated,
+non-destructive activation migration removes `releaseId` from the uniqueness
+keys. This ordering is mandatory; application code does not issue ad hoc DDL.
+
 ### Read-only preflight
 
 The retained audit reports:
@@ -212,6 +220,8 @@ processes cannot write legacy-only release references after commit.
 
 Immediately after migration, rerun and retain the audit. Validate Bottle,
 group, mapping, direct-reference, aggregate, URL, and primary UX behavior.
+Then apply the separately reviewed direct-Bottle uniqueness activation before
+accepting new catalog-consumer traffic.
 
 The first migration does not drop BottleRelease or consumer release columns.
 The retained `(bottleId, releaseId)` values are no longer interpreted as a

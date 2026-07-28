@@ -489,7 +489,6 @@ describe("applyCatalogMigration", () => {
     await db.insert(bottleTombstones).values({
       bottleId: retired.id,
       newBottleId: null,
-      newGroupId: null,
     });
     const bottleBefore = await db.query.bottles.findFirst({
       where: eq(bottles.id, retired.id),
@@ -563,7 +562,6 @@ describe("applyCatalogMigration", () => {
     await db.insert(bottleTombstones).values({
       bottleId: retired.id,
       newBottleId: null,
-      newGroupId: null,
     });
     const input = await approvedInput();
     expect(input.candidate.audit).toMatchObject({

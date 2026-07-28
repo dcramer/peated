@@ -1,11 +1,9 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroupDistillers,
   bottleGroupTombstones,
   bottleGroups,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -81,7 +79,7 @@ describe("GET /entities/:entity/categories", () => {
     });
   });
 
-  test("counts active Bottles directly and ignores legacy target evidence", async ({
+  test("counts active Bottles directly and ignores legacy ungrouped identity", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -110,20 +108,20 @@ describe("GET /entities/:entity/categories", () => {
       distillerIds: [otherEntity.id],
       category: "single_malt",
     });
-    const targetlessBottle = await fixtures.Bottle({
-      name: "Targetless Identity",
+    await fixtures.Bottle({
+      name: "Second Active Identity",
       brandId: entity.id,
       distillerIds: [entity.id],
       category: "rye",
     });
-    const staleEvidenceBottle = await fixtures.Bottle({
-      name: "Stale Target Evidence Identity",
+    await fixtures.Bottle({
+      name: "Third Active Identity",
       brandId: entity.id,
       distillerIds: [entity.id],
       category: "blend",
     });
     const legacyBottle = await fixtures.LegacyBottle({
-      name: "Legacy Targetless Identity",
+      name: "Legacy Ungrouped Identity",
       brandId: entity.id,
       distillerIds: [entity.id],
       category: "blend",
@@ -184,23 +182,6 @@ describe("GET /entities/:entity/categories", () => {
       groupId: groupOnlyBottle.groupId,
       distillerId: entity.id,
     });
-    await db
-      .delete(bottleAliases)
-      .where(eq(bottleAliases.bottleId, targetlessBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, targetlessBottle.id));
-    const destinationTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, destinationBottle.id),
-    });
-    if (!destinationTarget) throw new Error("Missing exact target fixture");
-    await db
-      .update(bottleAliases)
-      .set({ targetId: destinationTarget.id })
-      .where(eq(bottleAliases.bottleId, staleEvidenceBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, staleEvidenceBottle.id));
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,

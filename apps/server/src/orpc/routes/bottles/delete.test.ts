@@ -6,7 +6,6 @@ import {
   bottleObservations,
   bottleReleases,
   bottles,
-  catalogTargets,
   collectionBottles,
   flightBottles,
   reviews,
@@ -30,13 +29,7 @@ async function loadGroupedBottleGraph(groupId: number) {
     .from(bottleGroups)
     .where(eq(bottleGroups.id, groupId))
     .orderBy(bottleGroups.id);
-  const targets = await db
-    .select()
-    .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, groupId))
-    .orderBy(catalogTargets.id);
-
-  return { group, members, targets };
+  return { group, members };
 }
 
 describe("DELETE /bottles/:bottle", () => {
@@ -89,7 +82,6 @@ describe("DELETE /bottles/:bottle", () => {
     const before = await loadGroupedBottleGraph(groupId);
     expect(before.group[0]?.representativeBottleId).toBe(bottle.id);
     expect(before.members).toHaveLength(1);
-    expect(before.targets).toHaveLength(2);
 
     const err = await waitError(
       routerClient.bottles.delete({ bottle: bottle.id }, { context: { user } }),
@@ -125,15 +117,6 @@ describe("DELETE /bottles/:bottle", () => {
         .update(bottles)
         .set({ groupId })
         .where(eq(bottles.id, sibling.id));
-      const [target] = await tx
-        .insert(catalogTargets)
-        .values({ groupId, bottleId: sibling.id })
-        .returning({ id: catalogTargets.id });
-      if (!target) throw new Error("Unable to create sibling exact target.");
-      await tx
-        .update(bottleAliases)
-        .set({ targetId: target.id })
-        .where(eq(bottleAliases.bottleId, sibling.id));
       await tx
         .update(bottleGroups)
         .set({ totalBottles: 2 })
@@ -143,7 +126,6 @@ describe("DELETE /bottles/:bottle", () => {
     const before = await loadGroupedBottleGraph(groupId);
     expect(before.group[0]?.representativeBottleId).toBe(representative.id);
     expect(before.members).toHaveLength(2);
-    expect(before.targets).toHaveLength(3);
 
     for (const bottleId of [representative.id, sibling.id]) {
       const err = await waitError(

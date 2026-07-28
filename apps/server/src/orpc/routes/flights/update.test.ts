@@ -3,7 +3,6 @@ import {
   bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
   flightBottles,
   flights,
 } from "@peated/server/db/schema";
@@ -418,44 +417,6 @@ describe("PATCH /flights/:flight", () => {
       expect.objectContaining({
         flightId: flight.id,
         bottleId: retainedBottle.id,
-      }),
-    ]);
-  });
-
-  test("ignores stale target evidence when replacing memberships", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle();
-    const unrelatedBottle = await fixtures.Bottle();
-    const flight = await fixtures.Flight({ bottles: [bottle.id] });
-    const staleTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
-    });
-    if (!staleTarget) throw new Error("Legacy target fixture not found");
-    await db
-      .update(flightBottles)
-      .set({ targetId: staleTarget.id })
-      .where(eq(flightBottles.flightId, flight.id));
-
-    await routerClient.flights.update(
-      {
-        flight: flight.publicId,
-        bottles: [bottle.id],
-      },
-      { context: { user } },
-    );
-
-    await expect(
-      db.query.flightBottles.findMany({
-        where: eq(flightBottles.flightId, flight.id),
-      }),
-    ).resolves.toEqual([
-      expect.objectContaining({
-        flightId: flight.id,
-        bottleId: bottle.id,
-        releaseId: null,
-        targetId: null,
       }),
     ]);
   });

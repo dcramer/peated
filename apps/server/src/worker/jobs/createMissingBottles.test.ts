@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleReleases,
-  catalogTargets,
   incomingBottleDecisionLogs,
   reviews,
   storePrices,
@@ -10,7 +9,7 @@ import {
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
@@ -131,14 +130,12 @@ describe("createMissingBottles", () => {
       where: (table, { eq }) => eq(table.id, updatedReview!.bottleId as number),
     });
     expect(bottle?.fullName).toEqual("Springbank Bottle Name");
-    expect(updatedReview?.targetId).toBeNull();
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
     });
     expect(alias).toMatchObject({
       bottleId: updatedReview?.bottleId,
-      targetId: null,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -147,7 +144,6 @@ describe("createMissingBottles", () => {
       where: eq(storePrices.id, price.id),
     });
     expect(updatedPrice?.bottleId).toEqual(updatedReview?.bottleId);
-    expect(updatedPrice?.targetId).toBeNull();
 
     const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
       where: and(
@@ -162,7 +158,6 @@ describe("createMissingBottles", () => {
       actorId: systemActor.id,
       bottleId: updatedReview?.bottleId,
       releaseId: null,
-      targetId: null,
       createdBottle: true,
       createdRelease: false,
       confidence: null,
@@ -205,9 +200,6 @@ describe("createMissingBottles", () => {
           eq(bottleAliases.name, bottle.fullName),
         ),
       );
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
@@ -261,7 +253,6 @@ describe("createMissingBottles", () => {
       decision: "match_existing",
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
       createdBottle: false,
       createdRelease: false,
       metadata: expect.objectContaining({
@@ -319,7 +310,6 @@ describe("createMissingBottles", () => {
       externalSiteId: site.id,
       bottleId: null,
       releaseId: null,
-      targetId: null,
       name: "Worker Unpromoted Release Review",
       issue: "Default",
       url: "https://example.com/worker-unpromoted-review",
@@ -343,7 +333,6 @@ describe("createMissingBottles", () => {
     ).toMatchObject({
       bottleId: parent.id,
       releaseId: null,
-      targetId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -352,7 +341,6 @@ describe("createMissingBottles", () => {
     ).toMatchObject({
       bottleId: parent.id,
       releaseId: null,
-      targetId: null,
       assignmentSource: "classifier_approved",
     });
     expect(
@@ -366,25 +354,14 @@ describe("createMissingBottles", () => {
       decision: "match_existing",
       bottleId: parent.id,
       releaseId: null,
-      targetId: null,
     });
   });
 
-  test("attempts unresolved Reviews even when legacy target evidence remains", async ({
-    fixtures,
-  }) => {
+  test("attempts unresolved Reviews", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const systemUser = await fixtures.User({ admin: true });
-    const member = await fixtures.Bottle({ name: "Generic Review Group" });
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, member.groupId!),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
     const review = await fixtures.Review({
       externalSiteId: site.id,
-      targetId: genericTarget!.id,
       bottleId: null,
       releaseId: null,
       name: "Generic Review Group",
@@ -401,7 +378,6 @@ describe("createMissingBottles", () => {
     ).toMatchObject({
       bottleId: null,
       releaseId: null,
-      targetId: genericTarget!.id,
     });
   });
 
@@ -415,9 +391,6 @@ describe("createMissingBottles", () => {
     });
     const concurrentBottle = await fixtures.Bottle({
       name: "Concurrent Worker Bottle",
-    });
-    const concurrentTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, concurrentBottle.id),
     });
     const review = await fixtures.Review({
       externalSiteId: site.id,
@@ -434,7 +407,6 @@ describe("createMissingBottles", () => {
         .set({
           bottleId: concurrentBottle.id,
           releaseId: null,
-          targetId: concurrentTarget!.id,
         })
         .where(eq(reviews.id, review.id));
       return buildClassification(
@@ -455,7 +427,6 @@ describe("createMissingBottles", () => {
     expect(preserved).toMatchObject({
       bottleId: concurrentBottle.id,
       releaseId: null,
-      targetId: concurrentTarget!.id,
     });
   });
 });

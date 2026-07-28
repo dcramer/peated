@@ -76,7 +76,6 @@ describe("POST /flights", () => {
         flightId: flightBottles.flightId,
         bottleId: flightBottles.bottleId,
         releaseId: flightBottles.releaseId,
-        targetId: flightBottles.targetId,
       })
       .from(flightBottles)
       .where(eq(flightBottles.flightId, flight.id));
@@ -91,13 +90,11 @@ describe("POST /flights", () => {
         flightId: flight.id,
         bottleId: firstBottle.id,
         releaseId: null,
-        targetId: null,
       },
       {
         flightId: flight.id,
         bottleId: secondBottle.id,
         releaseId: null,
-        targetId: null,
       },
     ]);
   });

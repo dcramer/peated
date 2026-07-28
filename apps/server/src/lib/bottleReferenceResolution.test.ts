@@ -1,13 +1,10 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroupTombstones,
-  bottleGroups,
   bottleReleasePromotions,
   bottleReleases,
   bottleTombstones,
   bottles,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
@@ -75,24 +72,6 @@ function buildSmwsProposedBottle() {
 async function countBottles() {
   const rows = await db.select({ id: bottles.id }).from(bottles);
   return rows.length;
-}
-
-async function getCatalogRowCounts() {
-  const [bottleRows, groupRows, targetRows, aliasRows, releaseRows] =
-    await Promise.all([
-      db.select({ id: bottles.id }).from(bottles),
-      db.select({ id: bottleGroups.id }).from(bottleGroups),
-      db.select({ id: catalogTargets.id }).from(catalogTargets),
-      db.select({ name: bottleAliases.name }).from(bottleAliases),
-      db.select({ id: bottleReleases.id }).from(bottleReleases),
-    ]);
-  return {
-    bottles: bottleRows.length,
-    groups: groupRows.length,
-    targets: targetRows.length,
-    aliases: aliasRows.length,
-    releases: releaseRows.length,
-  };
 }
 
 function directResolution(bottleId: number): BottleReferenceResolution {
@@ -264,7 +243,6 @@ describe("resolveBottleReferenceTarget", () => {
     await fixtures.BottleRelease({ bottleId: parent.id });
     const alias = await fixtures.BottleAlias({
       bottleId: parent.id,
-      targetId: null,
       name: "Grouped Parent Alias",
     });
     const result = await resolveBottleReferenceTarget({
@@ -310,7 +288,6 @@ describe("resolveBottleReferenceTarget", () => {
     const alias = await fixtures.BottleAlias({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: null,
       name: "Promoted Release Alias",
     });
     const result = await resolveBottleReferenceTarget({
@@ -335,9 +312,7 @@ describe("resolveBottleReferenceTarget", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("resolves a direct alias when the Bottle has no catalog target", async ({
-    fixtures,
-  }) => {
+  test("resolves a direct Bottle alias", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: true });
     const actor = await getUserActor(user);
     const bottle = await fixtures.LegacyBottle({
@@ -345,7 +320,6 @@ describe("resolveBottleReferenceTarget", () => {
     });
     const alias = await fixtures.BottleAlias({
       bottleId: bottle.id,
-      targetId: null,
       name: "Staged Exact Alias",
     });
 
@@ -370,12 +344,6 @@ describe("resolveBottleReferenceTarget", () => {
       createdBottle: false,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(
-      await db.query.catalogTargets.findFirst({
-        where: (catalogTargets, { eq }) =>
-          eq(catalogTargets.bottleId, bottle.id),
-      }),
-    ).toBeUndefined();
   });
 
   test("assigns the matched Bottle directly", async ({ fixtures }) => {
@@ -567,19 +535,14 @@ describe("resolveBottleReferenceTarget", () => {
       statedAge: 12,
       abv: 46,
     });
-    const groupTargets = await db.query.catalogTargets.findMany({
-      where: (targets, { eq }) => eq(targets.groupId, created!.groupId!),
+    const groupMembers = await db.query.bottles.findMany({
+      where: (table, { eq }) => eq(table.groupId, created!.groupId!),
     });
-    expect(groupTargets).toHaveLength(2);
-    expect(groupTargets).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ bottleId: null }),
-        expect.objectContaining({
-          bottleId: assignment.bottleId,
-          groupId: created!.groupId,
-        }),
-      ]),
-    );
+    expect(groupMembers).toHaveLength(1);
+    expect(groupMembers[0]).toMatchObject({
+      id: assignment.bottleId,
+      groupId: created!.groupId,
+    });
     expect(await db.select().from(bottleReleases)).toEqual([]);
   });
 
@@ -655,12 +618,6 @@ describe("resolveBottleReferenceTarget", () => {
     if (!assignment) {
       throw new Error("Expected classifier reuse to return a Bottle.");
     }
-    expect(
-      await db.query.catalogTargets.findFirst({
-        where: (targets, { eq }) => eq(targets.bottleId, assignment.bottleId),
-      }),
-    ).toMatchObject({ bottleId: bottle.id, groupId: bottle.groupId });
-
     expect(await countBottles()).toBe(bottleCount);
   });
 });

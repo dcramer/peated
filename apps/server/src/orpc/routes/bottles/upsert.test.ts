@@ -166,6 +166,5 @@ describe("PUT /bottles", () => {
       brand: { id: brand.id },
     });
     expect(data).not.toHaveProperty("bottle");
-    expect(data).not.toHaveProperty("targetId");
   });
 });

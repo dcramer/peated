@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleTombstones, catalogTargets } from "@peated/server/db/schema";
+import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -46,32 +46,21 @@ describe("GET /bottles/:bottle/tags", () => {
   }) => {
     const bottle = await fixtures.Bottle({ name: "Selected Bottle" });
     const otherBottle = await fixtures.Bottle({ name: "Other Bottle" });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    const otherTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, otherBottle.id),
-    });
-    if (!target || !otherTarget) throw new Error("Missing target fixture");
 
     await fixtures.Tasting({
       bottleId: otherBottle.id,
-      targetId: target.id,
       tags: ["wrong-bottle"],
     });
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: otherTarget.id,
-      tags: ["target-drift"],
+      tags: ["selected-a"],
     });
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: null,
-      tags: ["targetless"],
+      tags: ["selected-b"],
     });
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: target.id,
       tags: [],
     });
 

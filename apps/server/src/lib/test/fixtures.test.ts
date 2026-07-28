@@ -6,20 +6,15 @@ import {
   bottleGroups,
   bottleGroupTombstones,
   bottlesToDistillers,
-  catalogTargets,
   changes,
   flightBottles,
 } from "../../db/schema";
 
 describe("catalog identity fixtures", () => {
-  test("standard consumers use the Bottle exact target", async ({
+  test("standard consumers reference the Bottle directly", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    if (!exactTarget) throw new Error("Bottle fixture is missing exact target");
     const group = await db.query.bottleGroups.findFirst({
       where: eq(bottleGroups.id, bottle.groupId as number),
     });
@@ -41,39 +36,33 @@ describe("catalog identity fixtures", () => {
       }),
     ]);
 
-    expect(tasting.targetId).toBe(exactTarget.id);
-    expect(review.targetId).toBe(exactTarget.id);
-    expect(price.targetId).toBe(exactTarget.id);
-    expect(alias.targetId).toBe(exactTarget.id);
+    expect(tasting.bottleId).toBe(bottle.id);
+    expect(review.bottleId).toBe(bottle.id);
+    expect(price.bottleId).toBe(bottle.id);
+    expect(alias.bottleId).toBe(bottle.id);
     expect(canonicalAlias?.assignmentSource).toBe("canonical");
-    expect(flightBottle?.targetId).toBe(exactTarget.id);
+    expect(flightBottle?.bottleId).toBe(bottle.id);
     expect(group?.totalBottles).toBe(1);
   });
 
-  test("legacy fixtures retain nullable group and target identity", async ({
+  test("explicit legacy fixtures retain pre-flattening group state", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.LegacyBottle();
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
-    const targets = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.bottleId, bottle.id));
     const aliases = await db
       .select()
       .from(bottleAliases)
       .where(eq(bottleAliases.bottleId, bottle.id));
 
     expect(bottle.groupId).toBeNull();
-    expect(targets).toEqual([]);
     expect(aliases).toEqual([
       expect.objectContaining({
         bottleId: bottle.id,
-        targetId: null,
         assignmentSource: "legacy",
       }),
     ]);
-    expect(tasting.targetId).toBeNull();
+    expect(tasting.bottleId).toBe(bottle.id);
   });
 
   test("group member fixtures materialize a complete active-group graph", async ({
@@ -102,13 +91,10 @@ describe("catalog identity fixtures", () => {
       releaseYear: 2025,
     });
 
-    const [group, target, alias, audit, groupDistillers, memberDistillers] =
+    const [group, alias, audit, groupDistillers, memberDistillers] =
       await Promise.all([
         db.query.bottleGroups.findFirst({
           where: eq(bottleGroups.id, first.groupId as number),
-        }),
-        db.query.catalogTargets.findFirst({
-          where: eq(catalogTargets.bottleId, member.id),
         }),
         db.query.bottleAliases.findFirst({
           where: eq(bottleAliases.bottleId, member.id),
@@ -146,13 +132,8 @@ describe("catalog identity fixtures", () => {
       representativeBottleId: first.id,
       totalBottles: 2,
     });
-    expect(target).toMatchObject({
-      groupId: first.groupId,
-      bottleId: member.id,
-    });
     expect(alias).toMatchObject({
       bottleId: member.id,
-      targetId: target?.id,
       name: member.fullName,
       assignmentSource: "canonical",
     });
@@ -185,26 +166,33 @@ describe("catalog identity fixtures", () => {
     );
   });
 
-  test("StorePrice conflicts replace an existing target with null", async ({
+  test("StorePrice preserves an explicitly unresolved Bottle", async ({
     fixtures,
   }) => {
-    const bottle = await fixtures.Bottle();
     const externalSite = await fixtures.ExternalSite();
-    const initial = await fixtures.StorePrice({
-      bottleId: bottle.id,
+    const price = await fixtures.StorePrice({
+      bottleId: null,
       externalSiteId: externalSite.id,
-      name: "Target replacement fixture",
+      name: "Unresolved Bottle fixture",
       volume: 750,
     });
-    const updated = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      targetId: null,
-      externalSiteId: externalSite.id,
-      name: initial.name,
-      volume: initial.volume,
-    });
 
-    expect(updated.id).toBe(initial.id);
-    expect(updated.targetId).toBeNull();
+    expect(price.bottleId).toBeNull();
+    expect(price.releaseId).toBeNull();
+  });
+
+  test("legacy release evidence is only added when requested", async ({
+    fixtures,
+  }) => {
+    const release = await fixtures.BottleRelease();
+    const tasting = await fixtures.Tasting({ releaseId: release.id });
+    const review = await fixtures.Review({ releaseId: release.id });
+    const price = await fixtures.StorePrice({ releaseId: release.id });
+    const alias = await fixtures.BottleAlias({ releaseId: release.id });
+
+    for (const consumer of [tasting, review, price, alias]) {
+      expect(consumer.bottleId).toBe(release.bottleId);
+      expect(consumer.releaseId).toBe(release.id);
+    }
   });
 });

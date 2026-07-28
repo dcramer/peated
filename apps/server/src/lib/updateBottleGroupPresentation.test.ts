@@ -7,7 +7,6 @@ import {
   bottleGroupTombstones,
   bottles,
   bottleTombstones,
-  catalogTargets,
   changes,
   tastings,
 } from "@peated/server/db/schema";
@@ -465,7 +464,7 @@ describe("BottleGroup presentation updates", () => {
     );
   });
 
-  test("does not mutate member Bottles, targets, aliases, activity, identity, or aggregates", async ({
+  test("does not mutate member Bottles, aliases, activity, identity, or aggregates", async ({
     defaults,
     fixtures,
   }) => {
@@ -485,33 +484,19 @@ describe("BottleGroup presentation updates", () => {
         totalBottles: 2,
       })
       .where(eq(bottleGroups.id, groupId));
-    const targets = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.groupId, groupId))
-      .orderBy(asc(catalogTargets.id));
-    const genericTarget = targets.find(({ bottleId }) => bottleId === null);
-    const secondTarget = targets.find(
-      ({ bottleId }) => bottleId === second.bottle.id,
-    );
-    if (!genericTarget || !secondTarget) throw new Error("Expected targets.");
     await fixtures.BottleAlias({
       bottleId: second.bottle.id,
-      targetId: secondTarget.id,
       name: "Protected exact alias",
     });
     await fixtures.BottleAlias({
       bottleId: first.bottle.id,
-      targetId: genericTarget.id,
       name: "Protected stable alias",
     });
     await fixtures.Tasting({
       bottleId: first.bottle.id,
-      targetId: genericTarget.id,
     });
     await fixtures.Tasting({
       bottleId: second.bottle.id,
-      targetId: secondTarget.id,
     });
 
     const beforeGroup = await loadGroup(groupId);
@@ -520,11 +505,6 @@ describe("BottleGroup presentation updates", () => {
       .from(bottles)
       .where(inArray(bottles.id, memberIds))
       .orderBy(asc(bottles.id));
-    const beforeTargets = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.groupId, groupId))
-      .orderBy(asc(catalogTargets.id));
     const beforeAliases = await db
       .select()
       .from(bottleAliases)
@@ -533,12 +513,7 @@ describe("BottleGroup presentation updates", () => {
     const beforeTastings = await db
       .select()
       .from(tastings)
-      .where(
-        inArray(
-          tastings.targetId,
-          targets.map(({ id }) => id),
-        ),
-      )
+      .where(inArray(tastings.bottleId, memberIds))
       .orderBy(asc(tastings.id));
     resetQueueMock();
 
@@ -561,13 +536,6 @@ describe("BottleGroup presentation updates", () => {
     expect(
       await db
         .select()
-        .from(catalogTargets)
-        .where(eq(catalogTargets.groupId, groupId))
-        .orderBy(asc(catalogTargets.id)),
-    ).toEqual(beforeTargets);
-    expect(
-      await db
-        .select()
         .from(bottleAliases)
         .where(inArray(bottleAliases.bottleId, memberIds))
         .orderBy(asc(bottleAliases.name)),
@@ -576,12 +544,7 @@ describe("BottleGroup presentation updates", () => {
       await db
         .select()
         .from(tastings)
-        .where(
-          inArray(
-            tastings.targetId,
-            targets.map(({ id }) => id),
-          ),
-        )
+        .where(inArray(tastings.bottleId, memberIds))
         .orderBy(asc(tastings.id)),
     ).toEqual(beforeTastings);
     const afterGroup = await loadGroup(groupId);

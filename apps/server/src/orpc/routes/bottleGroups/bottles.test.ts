@@ -45,7 +45,6 @@ describe("GET /bottle-groups/:group/bottles", () => {
       releaseYear: 2025,
       abv: 52.4,
     });
-    expect(firstPage.results[0]).not.toHaveProperty("targetId");
     expect(firstPage.results[0]).not.toHaveProperty("kind");
     expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(secondPage.results[0]).toMatchObject({

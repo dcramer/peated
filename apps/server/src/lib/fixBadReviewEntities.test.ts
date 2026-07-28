@@ -150,27 +150,23 @@ describe("fixBadReviewEntities", () => {
     });
     expect(updatedReview?.bottleId).toEqual(correctBottle.id);
     expect(updatedReview?.releaseId).toBeNull();
-    expect(updatedReview?.targetId).toBeNull();
 
     const alias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, review.name),
     });
     expect(alias).toMatchObject({
       bottleId: correctBottle.id,
-      targetId: expect.any(Number),
     });
 
     const siblingReview = await db.query.reviews.findFirst({
       where: eq(reviews.id, sameNameReview.id),
     });
     expect(siblingReview?.bottleId).toEqual(correctBottle.id);
-    expect(siblingReview?.targetId).toEqual(updatedReview?.targetId);
 
     const siblingPrice = await db.query.storePrices.findFirst({
       where: eq(storePrices.id, sameNamePrice.id),
     });
     expect(siblingPrice?.bottleId).toEqual(correctBottle.id);
-    expect(siblingPrice?.targetId).toEqual(updatedReview?.targetId);
     expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
       bottleId: correctBottle.id,
     });
@@ -190,7 +186,6 @@ describe("fixBadReviewEntities", () => {
     const alias = await fixtures.BottleAlias({
       bottleId: stagedBottle.id,
       releaseId: null,
-      targetId: null,
       name: "Staged Exact Alias Review",
     });
     const [review] = await db
@@ -199,7 +194,6 @@ describe("fixBadReviewEntities", () => {
         externalSiteId: site.id,
         bottleId: wrongBottle.id,
         releaseId: null,
-        targetId: null,
         name: alias.name,
         issue: "Default",
         rating: 90,
@@ -221,7 +215,6 @@ describe("fixBadReviewEntities", () => {
     ).toMatchObject({
       bottleId: stagedBottle.id,
       releaseId: null,
-      targetId: null,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
@@ -246,7 +239,6 @@ describe("fixBadReviewEntities", () => {
         externalSiteId: site.id,
         bottleId: wrongBottle.id,
         releaseId: null,
-        targetId: null,
         name: "Unpromoted Classifier Match Review",
         issue: "Default",
         rating: 90,
@@ -287,7 +279,6 @@ describe("fixBadReviewEntities", () => {
     ).toMatchObject({
       bottleId: stagedParent.id,
       releaseId: null,
-      targetId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -296,7 +287,6 @@ describe("fixBadReviewEntities", () => {
     ).toMatchObject({
       bottleId: stagedParent.id,
       releaseId: null,
-      targetId: null,
       assignmentSource: "classifier_approved",
     });
   });
@@ -444,7 +434,6 @@ describe("fixBadReviewEntities", () => {
     ).toMatchObject({
       bottleId: wrongBottle.id,
       releaseId: null,
-      targetId: null,
     });
   });
 
@@ -456,9 +445,6 @@ describe("fixBadReviewEntities", () => {
     const suggestedBottle = await fixtures.Bottle({ name: "Suggested Bottle" });
     const concurrentBottle = await fixtures.Bottle({
       name: "Concurrent Bottle",
-    });
-    const concurrentTarget = await db.query.catalogTargets.findFirst({
-      where: (table, { eq }) => eq(table.bottleId, concurrentBottle.id),
     });
     const site = await fixtures.ExternalSiteOrExisting();
     const [review] = await db
@@ -479,7 +465,6 @@ describe("fixBadReviewEntities", () => {
         .set({
           bottleId: concurrentBottle.id,
           releaseId: null,
-          targetId: concurrentTarget!.id,
         })
         .where(eq(reviews.id, review.id));
       return buildClassification(
@@ -510,7 +495,6 @@ describe("fixBadReviewEntities", () => {
     expect(preserved).toMatchObject({
       bottleId: concurrentBottle.id,
       releaseId: null,
-      targetId: concurrentTarget!.id,
     });
   });
 });

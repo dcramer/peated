@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /users/:user/flavors", () => {
-  test("uses Bottle-owned flavors and preserves unresolved and null-rating behavior", async ({
+  test("uses Bottle-owned flavors and preserves null-rating behavior", async ({
     defaults,
     fixtures,
   }) => {
@@ -42,15 +42,6 @@ describe("GET /users/:user/flavors", () => {
       .set({ flavorProfile: "lightly_peated" })
       .where(eq(bottleGroups.id, spicyBottle.groupId!));
 
-    const unresolvedTasting = await fixtures.Tasting({
-      bottleId: oldBottle.id,
-      rating: 2,
-      createdById: defaults.user.id,
-    });
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, unresolvedTasting.id));
     await Promise.all([
       fixtures.Tasting({
         bottleId: peatedBottle.id,
@@ -107,8 +98,8 @@ describe("GET /users/:user/flavors", () => {
         { flavorProfile: "spicy_dry", count: 1, score: 1 },
         { flavorProfile: "sweet_fruit_mellow", count: 1, score: 1 },
       ],
-      totalScore: 12,
-      totalCount: 8,
+      totalScore: 10,
+      totalCount: 7,
     });
   });
 

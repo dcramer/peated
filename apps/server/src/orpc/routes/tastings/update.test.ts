@@ -91,27 +91,4 @@ describe("PATCH /tastings/{tasting}", () => {
       { tag: "old", count: 0 },
     ]);
   });
-
-  test("fails closed when statistics need a missing Bottle", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-    });
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id));
-
-    const error = await waitError(
-      routerClient.tastings.update(
-        { tasting: tasting.id, rating: 2 },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(error).toMatchObject({
-      message: `Tasting ${tasting.id} has no Bottle.`,
-    });
-  });
 });

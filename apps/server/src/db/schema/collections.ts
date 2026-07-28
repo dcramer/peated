@@ -2,17 +2,17 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   bigserial,
-  check,
   index,
   pgEnum,
   pgTable,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleReleases, bottles, catalogTargets } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { users } from "./users";
 
 export const collections = pgTable(
@@ -54,10 +54,7 @@ export const collectionBottleStatusEnum = pgEnum("collection_bottle_status", [
   "empty",
 ]);
 
-/**
- * Target identity is authoritative. The nullable Bottle/Release pair remains
- * compatibility storage until task 9.6 removes it.
- */
+/** A collection membership selects one Bottle; releaseId is legacy evidence. */
 export const collectionBottles = pgTable(
   "collection_bottle",
   {
@@ -65,38 +62,22 @@ export const collectionBottles = pgTable(
     collectionId: bigint("collection_id", { mode: "number" })
       .references(() => collections.id)
       .notNull(),
-    bottleId: bigint("bottle_id", { mode: "number" }).references(
-      () => bottles.id,
-    ),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
-    ),
-    targetId: bigint("target_id", { mode: "number" }).references(
-      () => catalogTargets.id,
     ),
     imageUrl: text("image_url"),
     status: collectionBottleStatusEnum("status"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    check(
-      "collection_bottle_identity_check",
-      sql`${table.bottleId} IS NOT NULL OR (${table.targetId} IS NOT NULL AND ${table.releaseId} IS NULL)`,
-    ),
-    uniqueIndex("collection_bottle_legacy_unq")
-      .using(
-        "btree",
-        table.collectionId,
-        table.bottleId,
-        sql`COALESCE(${table.releaseId}, 0)`,
-      )
-      .where(sql`${table.bottleId} IS NOT NULL`),
-    uniqueIndex("collection_bottle_target_unq")
-      .on(table.collectionId, table.targetId)
-      .where(sql`${table.targetId} IS NOT NULL`),
+    unique()
+      .on(table.collectionId, table.bottleId, table.releaseId)
+      .nullsNotDistinct(),
     index("collection_bottle_bottle_idx").on(table.bottleId),
     index("collection_bottle_release_idx").on(table.releaseId),
-    index("collection_bottle_target_idx").on(table.targetId),
   ],
 );
 
@@ -111,9 +92,9 @@ export const collectionBottlesRelations = relations(
       fields: [collectionBottles.bottleId],
       references: [bottles.id],
     }),
-    target: one(catalogTargets, {
-      fields: [collectionBottles.targetId],
-      references: [catalogTargets.id],
+    release: one(bottleReleases, {
+      fields: [collectionBottles.releaseId],
+      references: [bottleReleases.id],
     }),
   }),
 );

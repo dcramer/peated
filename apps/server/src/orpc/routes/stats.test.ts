@@ -1,9 +1,7 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroupTombstones,
   bottleTombstones,
-  catalogTargets,
   entities,
   tastings,
 } from "@peated/server/db/schema";
@@ -34,8 +32,8 @@ describe("GET /stats", () => {
     if (activeBottle.groupId === null) {
       throw new Error("Expected grouped Bottle fixture");
     }
-    const targetlessBottle = await fixtures.Bottle();
-    const staleEvidenceBottle = await fixtures.Bottle();
+    await fixtures.Bottle();
+    await fixtures.Bottle();
     const sameGroupBottle = await fixtures.BottleGroupMember({
       groupId: activeBottle.groupId,
       edition: "Related Release",
@@ -47,23 +45,6 @@ describe("GET /stats", () => {
       throw new Error("Expected grouped Bottle fixtures");
     }
 
-    await db
-      .delete(bottleAliases)
-      .where(eq(bottleAliases.bottleId, targetlessBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, targetlessBottle.id));
-    const sameGroupTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, sameGroupBottle.id),
-    });
-    if (!sameGroupTarget) throw new Error("Missing exact target fixture");
-    await db
-      .update(bottleAliases)
-      .set({ targetId: sameGroupTarget.id })
-      .where(eq(bottleAliases.bottleId, staleEvidenceBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, staleEvidenceBottle.id));
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: activeBottle.id,

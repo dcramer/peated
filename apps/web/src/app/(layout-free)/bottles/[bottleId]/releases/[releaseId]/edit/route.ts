@@ -22,15 +22,18 @@ export async function GET(
     await context.params;
   const bottleId = parseRouteId(bottleParam);
   const releaseId = parseRouteId(releaseParam);
-  const target = await resolveLegacyBottleReleaseRedirect(bottleId, releaseId);
-  if ("conflict" in target) {
+  const promotedBottle = await resolveLegacyBottleReleaseRedirect(
+    bottleId,
+    releaseId,
+  );
+  if ("conflict" in promotedBottle) {
     return new Response(null, { status: 409 });
   }
 
   return new Response(null, {
     status: 308,
     headers: {
-      Location: `/bottles/${target.bottleId}/edit${request.nextUrl.search}`,
+      Location: `/bottles/${promotedBottle.bottleId}/edit${request.nextUrl.search}`,
     },
   });
 }

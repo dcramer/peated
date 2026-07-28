@@ -723,7 +723,7 @@ function AddBottleFlowContent() {
       try {
         const promotedBottleId = requestedReleaseId
           ? (
-              await orpc.bottleReleases.target.call({
+              await orpc.bottleReleases.bottle.call({
                 bottle: bottleId,
                 release: requestedReleaseId,
               })

@@ -1,7 +1,4 @@
-import { db } from "@peated/server/db";
-import { catalogTargets } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 
 describe("GET /bottles/:bottle/prices", () => {
   test("includes prices older than a week by default", async ({ fixtures }) => {
@@ -64,36 +61,24 @@ describe("GET /bottles/:bottle/prices", () => {
     expect(result.results[0].id).toBe(recentPrice.id);
   });
 
-  test("lists only the selected direct Bottle despite target evidence drift", async ({
-    fixtures,
-  }) => {
+  test("lists only the selected direct Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    const otherTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, otherBottle.id),
-    });
-    if (!target || !otherTarget) throw new Error("Missing target fixture");
     const site = await fixtures.ExternalSiteOrExisting();
-    const directWithStaleEvidence = await fixtures.StorePrice({
+    const firstDirect = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: otherTarget.id,
       externalSiteId: site.id,
       name: "A direct Bottle price",
     });
     await fixtures.StorePrice({
       bottleId: otherBottle.id,
-      targetId: target.id,
       externalSiteId: site.id,
-      name: "B stale target evidence",
+      name: "B other Bottle price",
     });
-    const directWithoutTarget = await fixtures.StorePrice({
+    const secondDirect = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
       externalSiteId: site.id,
-      name: "C alias-propagated price",
+      name: "C second direct price",
     });
 
     const result = await routerClient.bottles.prices.list({
@@ -101,8 +86,8 @@ describe("GET /bottles/:bottle/prices", () => {
     });
 
     expect(result.results.map(({ id }) => id)).toEqual([
-      directWithStaleEvidence.id,
-      directWithoutTarget.id,
+      firstDirect.id,
+      secondDirect.id,
     ]);
     expect(
       result.results.every(
@@ -112,19 +97,15 @@ describe("GET /bottles/:bottle/prices", () => {
     expect(result.results.every((price) => !("target" in price))).toBe(true);
   });
 
-  test("filters direct Bottle prices by validity without target evidence", async ({
-    fixtures,
-  }) => {
+  test("filters direct Bottle prices by validity", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const current = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
-      name: "Current alias-propagated listing",
+      name: "Current direct listing",
     });
     await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
-      name: "Stale alias-propagated listing",
+      name: "Stale direct listing",
       updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
     });
 
@@ -134,22 +115,5 @@ describe("GET /bottles/:bottle/prices", () => {
     });
 
     expect(result.results.map(({ id }) => id)).toEqual([current.id]);
-  });
-
-  test("lists a Bottle without requiring a CatalogTarget", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.LegacyBottle();
-    const price = await fixtures.StorePrice({
-      bottleId: bottle.id,
-      targetId: null,
-    });
-
-    const result = await routerClient.bottles.prices.list({
-      bottle: bottle.id,
-    });
-
-    expect(result.results.map(({ id }) => id)).toEqual([price.id]);
-    expect(result.results[0]?.bottle?.id).toBe(bottle.id);
   });
 });

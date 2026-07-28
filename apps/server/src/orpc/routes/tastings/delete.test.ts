@@ -76,27 +76,4 @@ describe("DELETE /tastings/{tasting}", () => {
       `[Error: Cannot delete another user's tasting.]`,
     );
   });
-
-  test("fails closed when the Tasting has no Bottle", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-    });
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id));
-
-    const error = await waitError(
-      routerClient.tastings.delete(
-        { tasting: tasting.id },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(error).toMatchInlineSnapshot(
-      `[Error: Tasting ${tasting.id} has no Bottle.]`,
-    );
-  });
 });

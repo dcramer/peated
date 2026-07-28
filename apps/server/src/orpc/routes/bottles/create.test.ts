@@ -8,7 +8,6 @@ import {
   bottles,
   bottleSeries,
   bottlesToDistillers,
-  catalogTargets,
   changes,
   entities,
 } from "@peated/server/db/schema";
@@ -66,7 +65,6 @@ describe("POST /bottles", () => {
     const graphBefore = {
       bottles: await db.select().from(bottles),
       groups: await db.select().from(bottleGroups),
-      targets: await db.select().from(catalogTargets),
     };
     const cases = [
       ["unauthenticated", null, 401],
@@ -89,7 +87,6 @@ describe("POST /bottles", () => {
 
     expect(await db.select().from(bottles)).toEqual(graphBefore.bottles);
     expect(await db.select().from(bottleGroups)).toEqual(graphBefore.groups);
-    expect(await db.select().from(catalogTargets)).toEqual(graphBefore.targets);
   });
 
   test("rejects invalid numeric fields at the route boundary", async ({
@@ -199,7 +196,6 @@ describe("POST /bottles", () => {
       },
     });
     expect(data.group!.representativeBottleId).toBe(data.id);
-    expect(data).not.toHaveProperty("targetId");
     expect(data).not.toHaveProperty("kind");
 
     const [bottle] = await db
@@ -241,20 +237,6 @@ describe("POST /bottles", () => {
       totalBottles: 1,
     });
 
-    const targets = await db
-      .select()
-      .from(catalogTargets)
-      .where(eq(catalogTargets.groupId, group.id));
-    expect(targets).toHaveLength(2);
-    expect(targets).toContainEqual(
-      expect.objectContaining({ groupId: group.id, bottleId: null }),
-    );
-    expect(targets).toContainEqual(
-      expect.objectContaining({
-        groupId: group.id,
-        bottleId: bottle.id,
-      }),
-    );
     expect(await db.select().from(bottleReleases)).toHaveLength(0);
 
     const distillers = await db

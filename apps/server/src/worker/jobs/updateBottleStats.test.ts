@@ -47,7 +47,6 @@ test("recomputes direct Bottle and group activity and queues Bottle-owned entiti
   });
   await fixtures.Tasting({
     bottleId: bottle.id,
-    targetId: null,
     rating: SIMPLE_RATING_VALUES.SIP,
   });
 
@@ -113,7 +112,7 @@ test.each([
   { bottleId: 1.5 },
   { bottleId: "1" },
   { bottleId: 1, unexpected: true },
-  { targetId: 1 },
+  { legacyId: 1 },
 ])("rejects malformed job input %#", async (input) => {
   await expect(updateBottleStats(input)).rejects.toThrow();
 });

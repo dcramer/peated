@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import {
   bottleGroupTombstones,
   bottleTombstones,
-  catalogTargets,
   collectionBottles,
   collections,
   tastings,
@@ -189,12 +188,6 @@ describe("GET /users/:user", () => {
     });
     const emptyBottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const unresolvedTargetBottle = await fixtures.Bottle();
-    const unresolvedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unresolvedTargetBottle.id),
-      columns: { id: true },
-    });
-    if (!unresolvedTarget) throw new Error("Missing target fixture");
     await fixtures.Tasting({
       bottleId: firstBottle.id,
       createdById: defaults.user.id,
@@ -212,15 +205,6 @@ describe("GET /users/:user", () => {
         createdAt: new Date("2026-01-03T00:00:00.000Z"),
       }),
     ]);
-    const unresolvedTasting = await fixtures.Tasting({
-      bottleId: firstBottle.id,
-      createdById: defaults.user.id,
-      createdAt: new Date("2026-01-04T00:00:00.000Z"),
-    });
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, unresolvedTasting.id));
     await db.insert(collectionBottles).values([
       {
         collectionId: library.id,
@@ -236,12 +220,6 @@ describe("GET /users/:user", () => {
         collectionId: library.id,
         bottleId: emptyBottle.id,
         status: "empty",
-      },
-      {
-        collectionId: library.id,
-        bottleId: null,
-        targetId: unresolvedTarget.id,
-        status: null,
       },
       {
         collectionId: otherCollection.id,
@@ -261,18 +239,11 @@ describe("GET /users/:user", () => {
     );
 
     expect(data.stats).toMatchObject({
-      tastings: 4,
+      tastings: 3,
       bottles: 2,
       collected: 4,
       library: { total: 3, open: 1, sealed: 1 },
     });
-
-    expect(
-      await db.query.tastings.findFirst({
-        where: eq(tastings.id, unresolvedTasting.id),
-        columns: { bottleId: true },
-      }),
-    ).toEqual({ bottleId: null });
   });
 
   test("scans tasting and collection Bottles across batch boundaries", async ({

@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  catalogTargets,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -12,7 +11,6 @@ import { describe, expect, test } from "vitest";
 type StorePriceFixtureFactory = (
   data?: Partial<{
     bottleId: null | number;
-    targetId: null | number;
     hidden: boolean;
     imageUrl: null | string;
     name: string;
@@ -62,16 +60,13 @@ async function createProposalFixture(
   {
     bottleId,
     storePrice,
-    targetId,
   }: {
     bottleId: number | null;
     storePrice: StorePriceFixtureFactory;
-    targetId?: number | null;
   },
 ) {
   const price = await storePrice({
     bottleId: status === "approved" ? bottleId : null,
-    ...(targetId === undefined ? {} : { targetId }),
     hidden,
     imageUrl: null,
     name: `Fixture ${Math.random().toString(36).slice(2)}`,
@@ -237,10 +232,6 @@ describe("GET /admin/review-workbench/stats", () => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle();
     const unrelatedBottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
-    });
-    if (!target) throw new Error("Missing exact target fixture");
     const createdAt = daysAgoAt(0, 8);
 
     await createProposalFixture(
@@ -248,15 +239,13 @@ describe("GET /admin/review-workbench/stats", () => {
       {
         bottleId: bottle.id,
         storePrice: fixtures.StorePrice,
-        targetId: null,
       },
     );
     await createProposalFixture(
       { createdAt, status: "approved" },
       {
-        bottleId: bottle.id,
+        bottleId: unrelatedBottle.id,
         storePrice: fixtures.StorePrice,
-        targetId: target.id,
       },
     );
     await createProposalFixture(
@@ -264,7 +253,6 @@ describe("GET /admin/review-workbench/stats", () => {
       {
         bottleId: null,
         storePrice: fixtures.StorePrice,
-        targetId: target.id,
       },
     );
     await createProposalFixture(
@@ -276,7 +264,6 @@ describe("GET /admin/review-workbench/stats", () => {
       {
         bottleId: null,
         storePrice: fixtures.StorePrice,
-        targetId: null,
       },
     );
 

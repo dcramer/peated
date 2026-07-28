@@ -8,7 +8,6 @@ import {
   bottleTombstones,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
@@ -54,14 +53,6 @@ async function loadMembers(groupId: number) {
     .from(bottles)
     .where(eq(bottles.groupId, groupId))
     .orderBy(asc(bottles.id));
-}
-
-async function loadTargets(groupId: number) {
-  return await db
-    .select()
-    .from(catalogTargets)
-    .where(eq(catalogTargets.groupId, groupId))
-    .orderBy(asc(catalogTargets.id));
 }
 
 describe("PATCH /bottles/{bottle}", () => {
@@ -117,7 +108,6 @@ describe("PATCH /bottles/{bottle}", () => {
       id: bottle.id,
       group: { id: bottle.groupId },
     });
-    expect(result).not.toHaveProperty("targetId");
     expect(result).not.toHaveProperty("kind");
     expect(
       await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
@@ -156,7 +146,6 @@ describe("PATCH /bottles/{bottle}", () => {
     });
     if (!groupBefore) throw new Error("Expected BottleGroup fixture.");
     const siblingBefore = members[1].bottle;
-    const targetsBefore = await loadTargets(first.group.id);
 
     const result = await routerClient.bottles.update(
       {
@@ -182,7 +171,6 @@ describe("PATCH /bottles/{bottle}", () => {
       description: "Selected content",
     });
     expect((await loadMembers(groupBefore.id))[1]).toEqual(siblingBefore);
-    expect(await loadTargets(groupBefore.id)).toEqual(targetsBefore);
     expect(
       await db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, groupBefore.id),
@@ -214,7 +202,6 @@ describe("PATCH /bottles/{bottle}", () => {
       ],
     );
     const memberIds = members.map(({ bottle }) => bottle.id);
-    const targetsBefore = await loadTargets(first.group.id);
     const release = await fixtures.BottleRelease({
       bottleId: first.bottle.id,
       edition: "Legacy child",
@@ -297,7 +284,6 @@ describe("PATCH /bottles/{bottle}", () => {
         .from(bottleGroupDistillers)
         .where(eq(bottleGroupDistillers.groupId, first.group.id)),
     ).toHaveLength(newDistillers.length);
-    expect(await loadTargets(first.group.id)).toEqual(targetsBefore);
     expect(
       await db.query.bottleReleases.findFirst({
         where: eq(bottleReleases.id, release.id),
@@ -344,9 +330,6 @@ describe("PATCH /bottles/{bottle}", () => {
     await db
       .delete(bottleAliases)
       .where(eq(bottleAliases.bottleId, invalid.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, invalid.id));
     const invalidGraph = await waitError(
       routerClient.bottles.update(
         { bottle: invalid.id, exact: { edition: "Invalid" } },

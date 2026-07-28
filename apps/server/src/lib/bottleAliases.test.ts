@@ -4,7 +4,6 @@ import {
   bottleGroupTombstones,
   bottleReleasePromotions,
   bottleTombstones,
-  catalogTargets,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -22,7 +21,7 @@ import {
 } from "@peated/server/lib/bottleAliases";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/worker/client";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
 
 vi.mock("@peated/server/worker/client", () => ({
@@ -35,25 +34,6 @@ beforeEach(() => {
   vi.mocked(workerClient.pushUniqueJob).mockReset();
 });
 
-async function getExactTarget(bottleId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Exact target fixture not found.");
-  return target;
-}
-
-async function getGenericTarget(groupId: number) {
-  const target = await db.query.catalogTargets.findFirst({
-    where: and(
-      eq(catalogTargets.groupId, groupId),
-      isNull(catalogTargets.bottleId),
-    ),
-  });
-  if (!target) throw new Error("Generic target fixture not found.");
-  return target;
-}
-
 async function getAlias(name: string) {
   const alias = await db.query.bottleAliases.findFirst({
     where: eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()),
@@ -63,22 +43,17 @@ async function getAlias(name: string) {
 }
 
 describe("listUnmatchedBottleAliasNames", () => {
-  test("uses nullable Bottle identity and ignores retained target evidence", async ({
-    fixtures,
-  }) => {
+  test("uses nullable Bottle identity", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    const target = await getExactTarget(bottle.id);
     await db.insert(bottleAliases).values([
       {
-        name: "Unresolved With Target Evidence",
+        name: "Unresolved Alias",
         bottleId: null,
-        targetId: target.id,
         assignedByActorId: bottle.createdByActorId,
       },
       {
-        name: "Resolved Without Target Evidence",
+        name: "Resolved Alias",
         bottleId: bottle.id,
-        targetId: null,
         assignedByActorId: bottle.createdByActorId,
       },
       {
@@ -99,23 +74,21 @@ describe("listUnmatchedBottleAliasNames", () => {
       listUnmatchedBottleAliasNames({ limit: 100, offset: 0 }),
     ).resolves.toEqual([
       "Nullable Ignored Unresolved Alias",
-      "Unresolved With Target Evidence",
+      "Unresolved Alias",
     ]);
   });
 });
 
 describe("exact Bottle alias reservation", () => {
-  test("normalizes the name and preserves legacy evidence columns", async ({
+  test("normalizes the name and preserves legacy release evidence", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const target = await getExactTarget(bottle.id);
     const original = await fixtures.BottleAlias({
       name: normalizeBottleAliasKey("Reserved   12-year-old"),
       bottleId: bottle.id,
       releaseId: release.id,
-      targetId: target.id,
       assignmentSource: "legacy",
     });
 
@@ -132,7 +105,6 @@ describe("exact Bottle alias reservation", () => {
     expect(await getAlias(original.name)).toMatchObject({
       bottleId: bottle.id,
       releaseId: release.id,
-      targetId: target.id,
       assignmentSource: "canonical",
     });
   });
@@ -250,13 +222,11 @@ describe("assignBottleAliasInTransaction", () => {
     const legacy = await fixtures.Bottle();
     const alreadyAssigned = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: legacy.id });
-    const target = await getGenericTarget(legacy.groupId!);
     const name = "Shared Retailer Bottle Name";
     await db.insert(bottleAliases).values({
       name,
       bottleId: null,
       releaseId: release.id,
-      targetId: target.id,
       embedding: Array.from({ length: 3072 }, () => 0.125),
       assignedByActorId: legacy.createdByActorId,
     });
@@ -264,14 +234,12 @@ describe("assignBottleAliasInTransaction", () => {
       name,
       bottleId: null,
       releaseId: release.id,
-      targetId: target.id,
       volume: 750,
     });
     const review = await fixtures.Review({
       name,
       bottleId: null,
       releaseId: release.id,
-      targetId: target.id,
     });
     const assignedPrice = await fixtures.StorePrice({
       name,
@@ -299,11 +267,9 @@ describe("assignBottleAliasInTransaction", () => {
       isNew: false,
     });
     expect(result.alias).not.toHaveProperty("releaseId");
-    expect(result.alias).not.toHaveProperty("targetId");
     expect(await getAlias(name)).toMatchObject({
       bottleId: selected.id,
       releaseId: release.id,
-      targetId: target.id,
       assignmentSource: "human_approved",
       embedding: null,
     });
@@ -314,14 +280,12 @@ describe("assignBottleAliasInTransaction", () => {
     ).toMatchObject({
       bottleId: selected.id,
       releaseId: price.releaseId,
-      targetId: price.targetId,
     });
     expect(
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({
       bottleId: selected.id,
       releaseId: review.releaseId,
-      targetId: review.targetId,
     });
     expect(
       await db.query.storePrices.findFirst({
@@ -450,7 +414,7 @@ describe("assignBottleAliasInTransaction", () => {
     }
   });
 
-  test("ignores legacy evidence drift during direct alias CAS", async ({
+  test("ignores legacy release evidence drift during direct alias CAS", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -460,19 +424,15 @@ describe("assignBottleAliasInTransaction", () => {
     const changedRelease = await fixtures.BottleRelease({
       bottleId: changedLegacy.id,
     });
-    const target = await getGenericTarget(legacy.groupId!);
-    const changedTarget = await getGenericTarget(changedLegacy.groupId!);
     const source = await fixtures.BottleAlias({
       name: "Legacy Evidence Source Alias",
       bottleId: null,
       releaseId: release.id,
-      targetId: target.id,
     });
     await db
       .update(bottleAliases)
       .set({
         releaseId: changedRelease.id,
-        targetId: changedTarget.id,
       })
       .where(eq(bottleAliases.name, source.name));
 
@@ -490,7 +450,6 @@ describe("assignBottleAliasInTransaction", () => {
       bottleId: bottle.id,
     });
     expect(result.alias).not.toHaveProperty("releaseId");
-    expect(result.alias).not.toHaveProperty("targetId");
     expect(
       await db.query.bottleAliases.findFirst({
         where: eq(bottleAliases.name, source.name),
@@ -498,7 +457,6 @@ describe("assignBottleAliasInTransaction", () => {
     ).toMatchObject({
       bottleId: null,
       releaseId: changedRelease.id,
-      targetId: changedTarget.id,
     });
   });
 
@@ -538,7 +496,6 @@ describe("assignBottleAliasInTransaction", () => {
     expect(await getAlias(alias.name)).toMatchObject({
       bottleId: parent.id,
       releaseId: release.id,
-      targetId: alias.targetId,
     });
   });
 

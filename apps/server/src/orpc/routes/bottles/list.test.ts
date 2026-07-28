@@ -2,12 +2,11 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleTombstones,
-  catalogTargets,
   flightBottles,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 describe("GET /bottles", () => {
   test("lists bottles", async ({ fixtures }) => {
@@ -18,7 +17,6 @@ describe("GET /bottles", () => {
 
     expect(results.length).toBe(2);
     expect(results.every((result) => result.group?.id)).toBe(true);
-    expect(results.every((result) => !("targetId" in result))).toBe(true);
   });
 
   test("lists bottles with query", async ({ fixtures }) => {
@@ -37,17 +35,9 @@ describe("GET /bottles", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Private Selection" });
-    const staleEvidenceBottle = await fixtures.Bottle({
-      name: "Stale Evidence Bottle",
-    });
-    const staleEvidenceTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, staleEvidenceBottle.id),
-    });
-    if (!staleEvidenceTarget) throw new Error("Missing exact target fixture");
 
     await db.insert(bottleAliases).values({
       bottleId: bottle.id,
-      targetId: staleEvidenceTarget.id,
       name: "Direct Bottle Alias",
       assignedByActorId: bottle.createdByActorId,
     });
@@ -65,37 +55,20 @@ describe("GET /bottles", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Alias Boundary" });
-    const [genericTarget, exactTarget] = await Promise.all([
-      db.query.catalogTargets.findFirst({
-        where: and(
-          eq(catalogTargets.groupId, bottle.groupId as number),
-          isNull(catalogTargets.bottleId),
-        ),
-      }),
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, bottle.id),
-      }),
-    ]);
-    if (!genericTarget || !exactTarget) {
-      throw new Error("Missing CatalogTarget fixture");
-    }
     await db.insert(bottleAliases).values([
       {
         bottleId: bottle.id,
-        targetId: genericTarget.id,
         name: "Assigned General Alias",
         assignedByActorId: bottle.createdByActorId,
       },
       {
         bottleId: bottle.id,
-        targetId: exactTarget.id,
         name: "Ignored Exact Alias",
         ignored: true,
         assignedByActorId: bottle.createdByActorId,
       },
       {
         bottleId: null,
-        targetId: exactTarget.id,
         name: "Unresolved Retained Alias",
         assignedByActorId: bottle.createdByActorId,
       },
@@ -113,38 +86,7 @@ describe("GET /bottles", () => {
     expect(unresolvedResults.results).toHaveLength(0);
   });
 
-  test("lists and searches a grouped Bottle without an exact target", async ({
-    fixtures,
-  }) => {
-    const targetlessBottle = await fixtures.Bottle({
-      name: "Targetless Bottle Token",
-    });
-    const bottle = await fixtures.Bottle({ name: "Current Bottle" });
-    await db
-      .update(bottleAliases)
-      .set({ targetId: null })
-      .where(eq(bottleAliases.bottleId, targetlessBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, targetlessBottle.id));
-
-    const { results } = await routerClient.bottles.list({ sort: "name" });
-    const search = await routerClient.bottles.list({
-      query: "Targetless Bottle Token",
-    });
-
-    expect(results.map((result) => result.id)).toEqual(
-      expect.arrayContaining([bottle.id, targetlessBottle.id]),
-    );
-    expect(results).toHaveLength(2);
-    expect(search.results.map((result) => result.id)).toEqual([
-      targetlessBottle.id,
-    ]);
-  });
-
-  test("excludes a retired Bottle even while its exact target remains", async ({
-    fixtures,
-  }) => {
+  test("excludes a retired Bottle", async ({ fixtures }) => {
     const retired = await fixtures.Bottle({ name: "Retired Bottle" });
     const replacement = await fixtures.Bottle({ name: "Replacement Bottle" });
     await db.insert(bottleTombstones).values({
@@ -366,27 +308,15 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
-  test("filters tags by direct Bottle identity despite target evidence drift", async ({
-    fixtures,
-  }) => {
+  test("filters tags by direct Bottle identity", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
     const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
-    const target1 = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle1.id),
-    });
-    const target2 = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle2.id),
-    });
-    if (!target1 || !target2) throw new Error("Missing exact target fixture");
-
     await fixtures.Tasting({
       bottleId: bottle2.id,
-      targetId: target1.id,
       tags: ["smoky", "peated"],
     });
     await fixtures.Tasting({
       bottleId: bottle1.id,
-      targetId: target2.id,
       tags: ["retained-only"],
     });
 
@@ -403,28 +333,17 @@ describe("GET /bottles", () => {
     ]);
   });
 
-  test("filters flights by direct Bottle identity despite target evidence drift", async ({
-    fixtures,
-  }) => {
+  test("filters flights by direct Bottle identity", async ({ fixtures }) => {
     const flight = await fixtures.Flight({ name: "Exact target flight" });
-    const exactBottle = await fixtures.Bottle({
-      name: "Exact flight member",
-    });
     const retainedBottle = await fixtures.Bottle({
-      name: "Drifted retained member",
+      name: "Flight member",
     });
     await fixtures.Bottle({
       name: "Unrelated Bottle",
     });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, exactBottle.id),
-    });
-    if (!exactTarget) throw new Error("Missing exact target fixture");
-
     await db.insert(flightBottles).values({
       flightId: flight.id,
       bottleId: retainedBottle.id,
-      targetId: exactTarget.id,
     });
 
     const { results } = await routerClient.bottles.list({
@@ -433,35 +352,6 @@ describe("GET /bottles", () => {
     });
 
     expect(results.map((result) => result.id)).toEqual([retainedBottle.id]);
-  });
-
-  test("uses direct Bottle identity for membership with generic target evidence", async ({
-    fixtures,
-  }) => {
-    const flight = await fixtures.Flight({ name: "Generic target flight" });
-    const representative = await fixtures.Bottle({
-      name: "Generic group representative",
-    });
-    if (!representative.groupId) throw new Error("Missing BottleGroup fixture");
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, representative.groupId),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) throw new Error("Missing generic target fixture");
-
-    await db.insert(flightBottles).values({
-      flightId: flight.id,
-      bottleId: representative.id,
-      targetId: genericTarget.id,
-    });
-
-    const { results } = await routerClient.bottles.list({
-      flight: flight.publicId,
-    });
-
-    expect(results.map((result) => result.id)).toEqual([representative.id]);
   });
 
   test("returns empty results for an unknown flight", async ({ fixtures }) => {

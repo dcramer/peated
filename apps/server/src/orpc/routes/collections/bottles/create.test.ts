@@ -1,10 +1,8 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroupTombstones,
   bottleTombstones,
   bottles,
-  catalogTargets,
   collectionBottles,
   collections,
   pendingUploads,
@@ -127,10 +125,7 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     ).toMatchObject({ totalBottles: 2 });
   });
 
-  test("ignores stale target evidence and stores the selected Bottle", async ({
-    defaults,
-    fixtures,
-  }) => {
+  test("stores the selected exact Bottle", async ({ defaults, fixtures }) => {
     const firstBottle = await fixtures.Bottle({ name: "Collection Family" });
     if (firstBottle.groupId === null) {
       throw new Error("Expected grouped Bottle fixture.");
@@ -139,22 +134,6 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
       groupId: firstBottle.groupId,
       edition: "Batch 2",
     });
-    const unrelatedBottle = await fixtures.Bottle({
-      name: "Unrelated Target Evidence",
-    });
-    const unrelatedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
-    });
-    if (!unrelatedTarget) {
-      throw new Error("Missing exact target fixture.");
-    }
-    await db
-      .update(bottleAliases)
-      .set({ targetId: unrelatedTarget.id })
-      .where(eq(bottleAliases.bottleId, selectedBottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, selectedBottle.id));
     const collection = await fixtures.Collection({
       createdById: defaults.user.id,
     });

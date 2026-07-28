@@ -1,25 +1,16 @@
 import { db } from "@peated/server/db";
-import { catalogTargets, collectionBottles } from "@peated/server/db/schema";
+import { collectionBottles } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
 const ONE_WEEK_AGO = () =>
   new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-async function exactTargetId(bottleId: number): Promise<number> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-  });
-  if (!target) throw new Error("Missing exact target fixture");
-  return target.id;
-}
-
 describe("GET /price-changes", () => {
   test("lists price changes by direct Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
       price: 10_000,
       updatedAt: new Date(),
     });
@@ -115,31 +106,24 @@ describe("GET /price-changes", () => {
     expect(rel.prevCursor).toBeNull();
   });
 
-  test("groups by direct Bottle and currency regardless of target evidence", async ({
-    fixtures,
-  }) => {
-    const evidenceBottle = await fixtures.Bottle({ name: "Target evidence" });
+  test("groups by direct Bottle and currency", async ({ fixtures }) => {
     const firstBottle = await fixtures.Bottle({ name: "First change" });
     const secondBottle = await fixtures.Bottle({ name: "Second change" });
-    const staleTargetId = await exactTargetId(evidenceBottle.id);
 
     const firstUsd = await fixtures.StorePrice({
       bottleId: firstBottle.id,
-      targetId: staleTargetId,
       name: "First USD price",
       price: 10_000,
       updatedAt: new Date(),
     });
     const firstUsdSecond = await fixtures.StorePrice({
       bottleId: firstBottle.id,
-      targetId: staleTargetId,
       name: "First USD second price",
       price: 14_000,
       updatedAt: new Date(),
     });
     const firstEuro = await fixtures.StorePrice({
       bottleId: firstBottle.id,
-      targetId: staleTargetId,
       name: "First EUR price",
       price: 15_000,
       currency: "eur",
@@ -147,7 +131,6 @@ describe("GET /price-changes", () => {
     });
     const secondUsd = await fixtures.StorePrice({
       bottleId: secondBottle.id,
-      targetId: staleTargetId,
       name: "Second USD price",
       price: 20_000,
       updatedAt: new Date(),
@@ -206,23 +189,17 @@ describe("GET /price-changes", () => {
     });
   });
 
-  test("excludes unresolved listings even when target evidence exists", async ({
-    fixtures,
-  }) => {
-    const evidenceBottle = await fixtures.Bottle();
+  test("excludes unresolved listings", async ({ fixtures }) => {
     const resolvedBottle = await fixtures.Bottle();
-    const targetId = await exactTargetId(evidenceBottle.id);
     const unresolved = await fixtures.StorePrice({
       bottleId: null,
-      targetId,
-      name: "Unresolved target evidence",
+      name: "Unresolved listing",
       price: 10_000,
       updatedAt: new Date(),
     });
     const resolved = await fixtures.StorePrice({
       bottleId: resolvedBottle.id,
-      targetId: null,
-      name: "Resolved without target evidence",
+      name: "Resolved listing",
       price: 20_000,
       updatedAt: new Date(),
     });
@@ -249,20 +226,16 @@ describe("GET /price-changes", () => {
     fixtures,
   }) => {
     const user = await fixtures.User();
-    const evidenceBottle = await fixtures.Bottle();
     const libraryBottle = await fixtures.Bottle({ name: "Library change" });
     const tastedBottle = await fixtures.Bottle({ name: "Tasted change" });
-    const staleTargetId = await exactTargetId(evidenceBottle.id);
     const libraryPrice = await fixtures.StorePrice({
       bottleId: libraryBottle.id,
-      targetId: staleTargetId,
       name: "Library Bottle price change",
       price: 10_000,
       updatedAt: new Date(),
     });
     const tastedPrice = await fixtures.StorePrice({
       bottleId: tastedBottle.id,
-      targetId: staleTargetId,
       name: "Tasted Bottle price change",
       price: 20_000,
       updatedAt: new Date(),
@@ -286,11 +259,9 @@ describe("GET /price-changes", () => {
     await db.insert(collectionBottles).values({
       collectionId: library.id,
       bottleId: libraryBottle.id,
-      targetId: staleTargetId,
     });
     await fixtures.Tasting({
       bottleId: tastedBottle.id,
-      targetId: staleTargetId,
       createdById: user.id,
     });
 

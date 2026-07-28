@@ -31,21 +31,22 @@ and map to an explicit removal task.
       creator/timestamps, and required tombstone support.
 - [x] 2.2 Add Bottle `groupId` and group membership relations.
 - [x] 2.3 Add durable BottleRelease-to-Bottle promotion mappings.
-- [ ] 2.4 Remove `catalog_target` schema, relations, inferred types, indexes,
+- [x] 2.4 Remove `catalog_target` schema, relations, inferred types, indexes,
       constraints, and generated migration state.
-- [ ] 2.5 Remove consumer `targetId`, `currentTargetId`, and
+- [x] 2.5 Remove consumer `targetId`, `currentTargetId`, and
       `suggestedTargetId` schema additions while preserving direct Bottle foreign
       keys and supported nullable unresolved states.
-- [ ] 2.6 Define direct-Bottle uniqueness and foreign-key constraints for
-      tastings, collections, Flights, aliases, and other membership surfaces.
-- [ ] 2.7 Generate the revised additive migration with `pnpm db:generate`;
+- [x] 2.6 Define direct-Bottle foreign keys and staged uniqueness activation
+      for tastings, collections, Flights, aliases, and other membership surfaces;
+      preserve release-aware uniqueness until the one-shot repoint completes.
+- [x] 2.7 Generate the revised additive migration with `pnpm db:generate`;
       never hand-write SQL or migration metadata.
-- [ ] 2.8 Review generated DDL, table locks, indexes, foreign-key order,
+- [x] 2.8 Review generated DDL, table locks, indexes, foreign-key order,
       nullability, and rollback feasibility.
 - [ ] 2.9 Add database-backed tests for Bottle membership, direct consumer
-      references, duplicate membership, invalid Bottle ids, and last-member group
-      protection.
-- [ ] 2.10 Update shared fixtures to create Bottle/group graphs without targets.
+      references, runtime duplicate membership, invalid Bottle ids, last-member
+      group protection, and the post-repoint direct-only uniqueness activation.
+- [x] 2.10 Update shared fixtures to create Bottle/group graphs without targets.
 
 ## 3. Bottle And Group Domain
 
@@ -57,7 +58,7 @@ and map to an explicit removal task.
       workflows; retain only audited system-controlled regrouping.
 - [x] 3.4 Preserve atomic shared-field fan-out so a group change rematerializes
       complete member Bottles and retains old canonical names as aliases.
-- [ ] 3.5 Simplify exact Bottle merge so all consumers and promotion mappings
+- [x] 3.5 Simplify exact Bottle merge so all consumers and promotion mappings
       converge directly on the selected surviving Bottle.
 - [x] 3.6 Recompute Bottle statistics from direct Bottle activity and
       BottleGroup statistics from raw member-Bottle activity.
@@ -96,7 +97,7 @@ and map to an explicit removal task.
 
 ## 5. Server And API Cutover
 
-- [ ] 5.1 Remove CatalogTarget runtime schemas, loaders, resolvers, serializers,
+- [x] 5.1 Remove CatalogTarget runtime schemas, loaders, resolvers, serializers,
       assignment descriptors, parity readers, and error types.
 - [ ] 5.2 Make Bottle the response and input identity for creation, aliases,
       observations, tastings, reviews, collections, Flights, prices, proposals,
@@ -164,7 +165,9 @@ and map to an explicit removal task.
       release references after the transaction commits.
 - [ ] 8.4 Run the approved one-shot transaction and retain the postflight audit.
 - [ ] 8.5 Validate counts, mappings, direct Bottle references, aggregates,
-      redirects, queue health, latency, and major user workflows.
+      redirects, queue health, latency, and major user workflows; then generate,
+      review, and apply the non-destructive direct-only uniqueness activation
+      before accepting new catalog-consumer traffic.
 - [ ] 8.6 Observe compatibility traffic and disable BottleRelease writes with
       explicit replacement responses.
 - [ ] 8.7 Only after separate backup and explicit approval, generate and apply

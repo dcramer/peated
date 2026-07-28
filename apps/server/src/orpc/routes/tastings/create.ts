@@ -77,7 +77,7 @@ export default procedure
       }
     }
 
-    const data: NewTasting = {
+    const data: Omit<NewTasting, "bottleId"> = {
       notes: input.notes || null,
       rating: input.rating || null,
       servingStyle: input.servingStyle || null,

@@ -1,10 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import {
-  bottleGroups,
-  bottleTombstones,
-  tastings,
-} from "@peated/server/db/schema";
+import { bottleGroups, bottleTombstones } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 import notifyDiscordOnTasting from "./notifyDiscordOnTasting";
@@ -63,24 +59,6 @@ test("uses the referenced Bottle label", async ({ fixtures }) => {
     value: "Exact bottle not specified",
     inline: true,
   });
-});
-
-test("rejects a tasting without a Bottle without sending a webhook", async ({
-  fixtures,
-}) => {
-  const bottle = await fixtures.Bottle();
-  const tasting = await fixtures.Tasting({
-    bottleId: bottle.id,
-  });
-  await db
-    .update(tastings)
-    .set({ bottleId: null })
-    .where(eq(tastings.id, tasting.id));
-
-  await expect(
-    notifyDiscordOnTasting({ tastingId: tasting.id }),
-  ).rejects.toThrow(`Tasting ${tasting.id} has no Bottle`);
-  expect(fetchMock).not.toHaveBeenCalled();
 });
 
 test("rejects a retired Bottle without sending a webhook", async ({

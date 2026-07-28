@@ -182,8 +182,6 @@ function firstRow<T>(rows: T[], label: string): T {
  * SHARE ROW EXCLUSIVE permits retained read-only inspection while preventing
  * every application writer from drifting identity after the approved audit.
  * The alphabetical order is stable across the CLI and integration tests.
- * `catalog_target` remains here only until task 2.4 removes the unreleased
- * compatibility table whose membership foreign key cascades Bottle updates.
  */
 async function lockMigrationTables(tx: AnyTransaction): Promise<void> {
   await tx.execute(
@@ -202,7 +200,6 @@ async function lockMigrationTables(tx: AnyTransaction): Promise<void> {
       bottle_release_promotion,
       bottle_tag,
       bottle_tombstone,
-      catalog_target,
       collection_bottle,
       flight_bottle,
       incoming_bottle_decision_log,

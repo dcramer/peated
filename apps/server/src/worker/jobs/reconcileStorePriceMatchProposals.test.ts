@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  catalogTargets,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
@@ -92,33 +91,27 @@ describe("reconcileStorePriceMatchProposals", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    if (!target) throw new Error("Missing exact target fixture");
-    const unresolvedWithTargetEvidence = await fixtures.StorePrice({
+    const unresolved = await fixtures.StorePrice({
       bottleId: null,
-      targetId: target.id,
-      name: "Unresolved listing with target evidence",
+      name: "Unresolved listing",
     });
-    const directWithoutTarget = await fixtures.StorePrice({
+    const direct = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
-      name: "Direct Bottle listing without target evidence",
+      name: "Direct Bottle listing",
     });
-    await agePrice(unresolvedWithTargetEvidence.id, 60);
-    await agePrice(directWithoutTarget.id, 60);
+    await agePrice(unresolved.id, 60);
+    await agePrice(direct.id, 60);
 
     const result = await reconcileStorePriceMatchProposals();
 
     expect(result).toEqual({ queuedCount: 1 });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      { priceId: unresolvedWithTargetEvidence.id },
+      { priceId: unresolved.id },
     );
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
-      { priceId: directWithoutTarget.id },
+      { priceId: direct.id },
     );
   });
 

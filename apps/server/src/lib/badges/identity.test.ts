@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroups,
-  bottleTombstones,
-  tastings,
-} from "@peated/server/db/schema";
+import { bottleGroups, bottleTombstones } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { loadBadgeTastings } from "./identity";
 
@@ -40,19 +36,6 @@ describe("loadBadgeTastings", () => {
       bottler: { id: bottleBottler.id },
       distillers: [{ id: bottleDistiller.id }],
     });
-  });
-
-  test("fails closed when a Tasting has no Bottle", async ({ fixtures }) => {
-    const tasting = await fixtures.Tasting();
-    const [withoutBottle] = await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id))
-      .returning();
-
-    await expect(loadBadgeTastings(db, [withoutBottle!])).rejects.toThrow(
-      `Tasting ${tasting.id} has no Bottle.`,
-    );
   });
 
   test("fails closed for a retired Bottle", async ({ fixtures }) => {

@@ -224,9 +224,9 @@ rows are promoted:
   match an existing historical identity;
 - a completed promotion mapping resolves a legacy `releaseId` to its promoted
   Bottle;
-- retained `releaseId` and `targetId` columns may remain as historical migration
-  evidence until their schema-removal gate, but live alias reads and writes use
-  only `bottleId`;
+- retained `releaseId` columns may remain as historical migration evidence
+  until their schema-removal gate, but live reads and writes use only
+  `bottleId`;
 - compatibility adapters translate legacy input/output and delegate to the
   canonical concrete-Bottle services; they do not insert or update
   `bottle_release`; and

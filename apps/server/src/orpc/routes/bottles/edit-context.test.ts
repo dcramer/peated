@@ -149,7 +149,6 @@ describe("GET /bottles/{bottle}/edit-context", () => {
       },
     });
     expect(result).not.toHaveProperty("groupId");
-    expect(result).not.toHaveProperty("targetId");
     expect(result).not.toHaveProperty("exact.tastingNotes");
     expect(Object.keys(result.shared.brand)).toEqual(["id", "name"]);
     expect(Object.keys(result.shared.distillers[0]!)).toEqual(["id", "name"]);

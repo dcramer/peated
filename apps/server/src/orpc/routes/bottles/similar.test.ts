@@ -1,10 +1,8 @@
 import { db } from "@peated/server/db";
 import {
-  bottleAliases,
   bottleGroups,
   bottleGroupTombstones,
   bottleTombstones,
-  catalogTargets,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -14,20 +12,6 @@ import { describe, expect, test } from "vitest";
 function requireGroupId(groupId: number | null): number {
   if (groupId === null) throw new Error("Missing BottleGroup fixture");
   return groupId;
-}
-
-async function removeExactTarget(bottleId: number): Promise<void> {
-  const target = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, bottleId),
-    columns: { id: true },
-  });
-  if (!target) throw new Error("Missing exact target fixture");
-
-  await db
-    .update(bottleAliases)
-    .set({ targetId: null })
-    .where(eq(bottleAliases.targetId, target.id));
-  await db.delete(catalogTargets).where(eq(catalogTargets.id, target.id));
 }
 
 describe("GET /bottles/:bottle/similar", () => {
@@ -94,7 +78,7 @@ describe("GET /bottles/:bottle/similar", () => {
     expect(results.length).toBe(0);
   });
 
-  test("uses direct Bottle identity without exact targets or stale target evidence", async ({
+  test("uses direct Bottle identity and excludes ungrouped legacy Bottles", async ({
     fixtures,
   }) => {
     const brand = await fixtures.Entity({ name: "Direct Brand" });
@@ -108,37 +92,13 @@ describe("GET /bottles/:bottle/similar", () => {
       brandId: brand.id,
       distillerIds: [distiller.id],
       name: source.name,
-      edition: "Targetless Candidate",
+      edition: "Direct Candidate",
     });
     await fixtures.LegacyBottle({
       brandId: brand.id,
       distillerIds: [distiller.id],
       name: "Unassigned Similar Bottle",
     });
-    const unrelated = await fixtures.Bottle({
-      brandId: (await fixtures.Entity({ name: "Unrelated Target Brand" })).id,
-      name: "Unrelated Target Bottle",
-    });
-    const unrelatedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelated.id),
-      columns: { id: true },
-    });
-    if (!unrelatedTarget) throw new Error("Missing unrelated target fixture");
-
-    const sourceTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, source.id),
-      columns: { id: true },
-    });
-    if (!sourceTarget) throw new Error("Missing source target fixture");
-    await db
-      .update(bottleAliases)
-      .set({ targetId: unrelatedTarget.id })
-      .where(eq(bottleAliases.targetId, sourceTarget.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.id, sourceTarget.id));
-    await removeExactTarget(candidate.id);
-
     const { results } = await routerClient.bottles.similar({
       bottle: source.id,
     });

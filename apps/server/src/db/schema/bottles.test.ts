@@ -5,105 +5,59 @@ import {
   bottleGroups,
   bottleReleasePromotions,
   bottles,
-  catalogTargets,
 } from "./bottles";
 
-describe("BottleGroup and CatalogTarget constraints", () => {
-  test("accepts a singleton group with generic and exact targets", async ({
+describe("BottleGroup membership constraints", () => {
+  test("accepts a singleton group with its Bottle as representative", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const targets = await db.query.catalogTargets.findMany({
-      where: eq(catalogTargets.groupId, bottle.groupId as number),
-      orderBy: catalogTargets.bottleId,
+    const group = await db.query.bottleGroups.findFirst({
+      where: eq(bottleGroups.id, bottle.groupId as number),
+    });
+    const members = await db.query.bottles.findMany({
+      where: eq(bottles.groupId, bottle.groupId as number),
     });
 
     expect(bottle.groupId).not.toBeNull();
-    expect(targets).toHaveLength(2);
-    expect(targets).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          groupId: bottle.groupId,
-          bottleId: null,
-        }),
-        expect.objectContaining({
-          groupId: bottle.groupId,
-          bottleId: bottle.id,
-        }),
-      ]),
-    );
+    expect(group?.representativeBottleId).toBe(bottle.id);
+    expect(members.map(({ id }) => id)).toEqual([bottle.id]);
   });
 
-  test("rejects a second generic target for a group", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
-
-    await expect(
-      db.insert(catalogTargets).values({
-        groupId: bottle.groupId as number,
-      }),
-    ).rejects.toThrow(/catalog_target_generic_group_unq/);
-  });
-
-  test("rejects a second exact target for a Bottle", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
-
-    await expect(
-      db.insert(catalogTargets).values({
-        groupId: bottle.groupId as number,
-        bottleId: bottle.id,
-      }),
-    ).rejects.toThrow(/catalog_target_bottle_unq/);
-  });
-
-  test("cascades exact target membership when a Bottle moves groups", async ({
+  test("allows a non-representative Bottle to move between groups", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const destinationBottle = await fixtures.Bottle();
-    const targetBefore = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
+    const member = await fixtures.BottleGroupMember({
+      groupId: bottle.groupId as number,
+      edition: "Movable Member",
     });
-    if (!targetBefore) throw new Error("Missing exact CatalogTarget fixture");
-
-    await db
-      .update(bottleGroups)
-      .set({ representativeBottleId: null })
-      .where(eq(bottleGroups.id, bottle.groupId as number));
+    const destinationBottle = await fixtures.Bottle();
 
     await db
       .update(bottles)
       .set({ groupId: destinationBottle.groupId })
-      .where(eq(bottles.id, bottle.id));
+      .where(eq(bottles.id, member.id));
 
-    const targetAfter = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
+    const moved = await db.query.bottles.findFirst({
+      where: eq(bottles.id, member.id),
     });
-    expect(targetAfter).toMatchObject({
-      id: targetBefore.id,
-      bottleId: bottle.id,
-      groupId: destinationBottle.groupId,
-    });
+    expect(moved?.groupId).toBe(destinationBottle.groupId);
   });
 
-  test("rejects an exact target from a different group", async ({
-    fixtures,
-  }) => {
+  test("rejects a missing BottleGroup membership", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    const otherBottle = await fixtures.Bottle();
-    await db
-      .update(bottleAliases)
-      .set({ targetId: null })
-      .where(eq(bottleAliases.bottleId, bottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, bottle.id));
+    const member = await fixtures.BottleGroupMember({
+      groupId: bottle.groupId as number,
+      edition: "Missing Group Member",
+    });
 
     await expect(
-      db.insert(catalogTargets).values({
-        groupId: otherBottle.groupId as number,
-        bottleId: bottle.id,
-      }),
-    ).rejects.toThrow(/catalog_target_bottle_membership_fk/);
+      db
+        .update(bottles)
+        .set({ groupId: 9_000_000_000 })
+        .where(eq(bottles.id, member.id)),
+    ).rejects.toThrow(/bottle_group_id_bottle_group_id_fk/);
   });
 
   test("rejects a representative Bottle from a different group", async ({
@@ -129,13 +83,6 @@ describe("BottleGroup and CatalogTarget constraints", () => {
       .update(bottleGroups)
       .set({ representativeBottleId: bottle.id })
       .where(eq(bottleGroups.id, bottle.groupId as number));
-    await db
-      .update(bottleAliases)
-      .set({ targetId: null })
-      .where(eq(bottleAliases.bottleId, bottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, bottle.id));
 
     await expect(
       db

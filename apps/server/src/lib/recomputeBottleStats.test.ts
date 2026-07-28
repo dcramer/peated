@@ -23,7 +23,6 @@ async function createTasting(
 ) {
   await db.insert(tastings).values({
     bottleId,
-    targetId: null,
     rating,
     createdById,
     createdAt: new Date(Date.UTC(2026, 0, 2, 0, 0, sequence)),

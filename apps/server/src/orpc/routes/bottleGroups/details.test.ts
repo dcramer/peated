@@ -1,12 +1,8 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroups,
-  bottleGroupTombstones,
-  catalogTargets,
-} from "@peated/server/db/schema";
+import { bottleGroups, bottleGroupTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 describe("GET /bottle-groups/:group", () => {
   test("returns direct group-owned relationship and aggregate data", async ({
@@ -30,7 +26,6 @@ describe("GET /bottle-groups/:group", () => {
       totalTastings: 7,
       totalBottles: 1,
     });
-    expect(result).not.toHaveProperty("targetId");
     expect(result).not.toHaveProperty("kind");
   });
 
@@ -59,27 +54,6 @@ describe("GET /bottle-groups/:group", () => {
       status: 409,
       message: `Bottle group is retired (groupId=${source.groupId}).`,
       data: { replacementGroupId: destination.groupId },
-    });
-  });
-
-  test("does not require a generic target to return an existing group", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({ name: "Malformed Group" });
-    await db
-      .delete(catalogTargets)
-      .where(
-        and(
-          eq(catalogTargets.groupId, bottle.groupId as number),
-          isNull(catalogTargets.bottleId),
-        ),
-      );
-
-    await expect(
-      routerClient.bottleGroups.details({ group: bottle.groupId as number }),
-    ).resolves.toMatchObject({
-      id: bottle.groupId,
-      representativeBottleId: bottle.id,
     });
   });
 });

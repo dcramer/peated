@@ -317,34 +317,6 @@ export const bottleGroupDistillers = pgTable(
 export type BottleGroupDistiller = typeof bottleGroupDistillers.$inferSelect;
 export type NewBottleGroupDistiller = typeof bottleGroupDistillers.$inferInsert;
 
-/** Prevents duplicate generic and exact targets and constrains exact membership. */
-export const catalogTargets = pgTable(
-  "catalog_target",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    groupId: bigint("bottle_group_id", { mode: "number" })
-      .references(() => bottleGroups.id)
-      .notNull(),
-    bottleId: bigint("bottle_id", { mode: "number" }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-  },
-  (table) => [
-    uniqueIndex("catalog_target_generic_group_unq")
-      .on(table.groupId)
-      .where(sql`${table.bottleId} IS NULL`),
-    uniqueIndex("catalog_target_bottle_unq").on(table.bottleId),
-    index("catalog_target_group_idx").on(table.groupId),
-    foreignKey({
-      columns: [table.bottleId, table.groupId],
-      foreignColumns: [bottles.id, bottles.groupId],
-      name: "catalog_target_bottle_membership_fk",
-    }).onUpdate("cascade"),
-  ],
-);
-
-export type CatalogTarget = typeof catalogTargets.$inferSelect;
-export type NewCatalogTarget = typeof catalogTargets.$inferInsert;
-
 export const bottleGroupTombstones = pgTable(
   "bottle_group_tombstone",
   {
@@ -376,10 +348,6 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   }),
   representativeForGroups: many(bottleGroups, {
     relationName: "bottle_group_representative_bottle",
-  }),
-  exactTarget: one(catalogTargets, {
-    fields: [bottles.id, bottles.groupId],
-    references: [catalogTargets.bottleId, catalogTargets.groupId],
   }),
   brand: one(entities, {
     fields: [bottles.brandId],
@@ -450,7 +418,6 @@ export const bottleGroupsRelations = relations(
       relationName: "bottle_group_members",
     }),
     distillers: many(bottleGroupDistillers),
-    targets: many(catalogTargets),
   }),
 );
 
@@ -467,17 +434,6 @@ export const bottleGroupDistillersRelations = relations(
     }),
   }),
 );
-
-export const catalogTargetsRelations = relations(catalogTargets, ({ one }) => ({
-  group: one(bottleGroups, {
-    fields: [catalogTargets.groupId],
-    references: [bottleGroups.id],
-  }),
-  bottle: one(bottles, {
-    fields: [catalogTargets.bottleId],
-    references: [bottles.id],
-  }),
-}));
 
 export const bottleGroupTombstonesRelations = relations(
   bottleGroupTombstones,
@@ -642,10 +598,10 @@ export type NewBottleReleasePromotion =
   typeof bottleReleasePromotions.$inferInsert;
 
 /**
- * Store-listing evidence attached to a bottle or bottle_release.
+ * Store-listing evidence attached to a Bottle.
  *
- * Today this table is populated from approved store-price matches. It keeps
- * exact listing facts without forcing them into canonical bottle/release rows.
+ * The release id is retained only as historical migration evidence. Listing
+ * facts remain separate from canonical Bottle fields.
  */
 export const bottleObservations = pgTable(
   "bottle_observation",
@@ -657,9 +613,6 @@ export const bottleObservations = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
       { onDelete: "cascade" },
-    ),
-    targetId: bigint("target_id", { mode: "number" }).references(
-      () => catalogTargets.id,
     ),
     sourceType: varchar("source_type", {
       length: 32,
@@ -687,7 +640,6 @@ export const bottleObservations = pgTable(
     ),
     index("bottle_observation_bottle_idx").on(table.bottleId),
     index("bottle_observation_release_idx").on(table.releaseId),
-    index("bottle_observation_target_idx").on(table.targetId),
     index("bottle_observation_external_site_idx").on(table.externalSiteId),
   ],
 );
@@ -702,10 +654,6 @@ export const bottleObservationsRelations = relations(
     release: one(bottleReleases, {
       fields: [bottleObservations.releaseId],
       references: [bottleReleases.id],
-    }),
-    target: one(catalogTargets, {
-      fields: [bottleObservations.targetId],
-      references: [catalogTargets.id],
     }),
     externalSite: one(externalSites, {
       fields: [bottleObservations.externalSiteId],
@@ -782,9 +730,6 @@ export const bottleAliases = pgTable(
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
-    targetId: bigint("target_id", { mode: "number" }).references(
-      () => catalogTargets.id,
-    ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
     // Ignored aliases are retained for audit/history but excluded from exact matching.
@@ -806,7 +751,6 @@ export const bottleAliases = pgTable(
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
     index("bottle_alias_release_idx").on(table.releaseId),
-    index("bottle_alias_target_idx").on(table.targetId),
     index("bottle_alias_assigned_by_actor_idx").on(table.assignedByActorId),
   ],
 );
@@ -820,10 +764,6 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
     fields: [bottleAliases.releaseId],
     references: [bottleReleases.id],
   }),
-  target: one(catalogTargets, {
-    fields: [bottleAliases.targetId],
-    references: [catalogTargets.id],
-  }),
   assignedByActor: one(actors, {
     fields: [bottleAliases.assignedByActorId],
     references: [actors.id],
@@ -833,24 +773,10 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
 export type BottleAlias = typeof bottleAliases.$inferSelect;
 export type NewBottleAlias = typeof bottleAliases.$inferInsert;
 
-export const bottleTombstones = pgTable(
-  "bottle_tombstone",
-  {
-    bottleId: bigint("bottle_id", { mode: "number" }).primaryKey(),
-    // A deletion has no successor; otherwise Bottle and group destinations are exclusive.
-    newBottleId: bigint("new_bottle_id", { mode: "number" }),
-    newGroupId: bigint("new_bottle_group_id", { mode: "number" }).references(
-      () => bottleGroups.id,
-    ),
-  },
-  (table) => [
-    index("bottle_tombstone_new_group_idx").on(table.newGroupId),
-    check(
-      "bottle_tombstone_destination_check",
-      sql`NOT (${table.newBottleId} IS NOT NULL AND ${table.newGroupId} IS NOT NULL)`,
-    ),
-  ],
-);
+export const bottleTombstones = pgTable("bottle_tombstone", {
+  bottleId: bigint("bottle_id", { mode: "number" }).primaryKey(),
+  newBottleId: bigint("new_bottle_id", { mode: "number" }),
+});
 
 export const bottleTombstonesRelations = relations(
   bottleTombstones,
@@ -862,10 +788,6 @@ export const bottleTombstonesRelations = relations(
     newBottle: one(bottles, {
       fields: [bottleTombstones.newBottleId],
       references: [bottles.id],
-    }),
-    newGroup: one(bottleGroups, {
-      fields: [bottleTombstones.newGroupId],
-      references: [bottleGroups.id],
     }),
   }),
 );

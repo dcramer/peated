@@ -3,7 +3,6 @@ import {
   bottleAliases,
   bottleGroups,
   bottles,
-  catalogTargets,
   changes,
   entities,
   entityAliases,
@@ -12,7 +11,7 @@ import { getUserActor } from "@peated/server/lib/actors";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 
 describe("PATCH /entities/:entity", () => {
   test("requires authentication", async () => {
@@ -255,20 +254,10 @@ describe("PATCH /entities/:entity", () => {
       new Set([first.groupId, otherGroup.groupId]),
     );
 
-    const targetsBefore = await db
-      .select()
-      .from(catalogTargets)
-      .where(
-        inArray(
-          catalogTargets.bottleId,
-          originalBottles.map(({ id }) => id),
-        ),
-      );
     await db.insert(bottleAliases).values({
       name: "New Foo Reserve",
       bottleId: null,
       releaseId: null,
-      targetId: null,
       assignedByActorId: otherGroup.createdByActorId,
     });
 
@@ -306,18 +295,6 @@ describe("PATCH /entities/:entity", () => {
       });
       expect(updated?.fullName).toMatch(/^New Foo /);
 
-      const targetBefore = targetsBefore.find(
-        ({ bottleId }) => bottleId === original.id,
-      );
-      const targetAfter = await db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, original.id),
-      });
-      expect(targetAfter).toMatchObject({
-        id: targetBefore?.id,
-        groupId: original.groupId,
-        bottleId: original.id,
-      });
-
       const aliases = await db
         .select()
         .from(bottleAliases)
@@ -326,12 +303,10 @@ describe("PATCH /entities/:entity", () => {
         expect.arrayContaining([
           expect.objectContaining({
             name: original.fullName,
-            targetId: targetBefore?.id,
             releaseId: null,
           }),
           expect.objectContaining({
             name: updated?.fullName,
-            targetId: targetBefore?.id,
             releaseId: null,
           }),
         ]),
@@ -410,12 +385,9 @@ describe("PATCH /entities/:entity", () => {
         eq(bottleAliases.name, newBottle.fullName),
       ),
     });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     expect(newAlias).toMatchObject({
       name: newBottle.fullName,
-      targetId: exactTarget?.id,
+      bottleId: bottle.id,
       releaseId: null,
     });
 
@@ -555,12 +527,8 @@ describe("PATCH /entities/:entity", () => {
     const oldBottleAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "F Bar"),
     });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     expect(oldBottleAlias).toMatchObject({
       bottleId: bottle.id,
-      targetId: exactTarget?.id,
       releaseId: null,
     });
 
@@ -612,12 +580,8 @@ describe("PATCH /entities/:entity", () => {
     const oldShortNameAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "F Bar"),
     });
-    const exactTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     expect(oldShortNameAlias).toMatchObject({
       bottleId: bottle.id,
-      targetId: exactTarget?.id,
       releaseId: null,
     });
 
@@ -653,9 +617,6 @@ describe("PATCH /entities/:entity", () => {
       bottleId: conflictingBottle.id,
       name: "Renamed Brand Core",
     });
-    const originalTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     const modUser = await fixtures.User({ mod: true });
 
     const error = await waitError(
@@ -674,22 +635,13 @@ describe("PATCH /entities/:entity", () => {
     const unchangedBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
     });
-    const unchangedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     const retainedConflict = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, conflictingAlias.name),
     });
     expect(unchangedEntity?.name).toBe("Original Brand");
     expect(unchangedBottle?.fullName).toBe("Original Brand Core");
-    expect(unchangedTarget).toMatchObject({
-      id: originalTarget?.id,
-      groupId: bottle.groupId,
-      bottleId: bottle.id,
-    });
     expect(retainedConflict).toMatchObject({
       bottleId: conflictingBottle.id,
-      targetId: conflictingAlias.targetId,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -750,7 +702,7 @@ describe("PATCH /entities/:entity", () => {
     });
   });
 
-  test("ungrouped compatibility preserves the previous name and claims only a targetless alias", async ({
+  test("ungrouped compatibility preserves the previous name and claims its aliases", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -788,13 +740,12 @@ describe("PATCH /entities/:entity", () => {
       expect(alias).toMatchObject({
         bottleId: legacyBottle.id,
         releaseId: null,
-        targetId: null,
         assignedByActorId: actor.id,
       });
     }
   });
 
-  test("ungrouped compatibility claims an existing unowned targetless alias", async ({
+  test("ungrouped compatibility claims an existing unowned alias", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -809,7 +760,6 @@ describe("PATCH /entities/:entity", () => {
       name: "Renamed Legacy Core",
       bottleId: null,
       releaseId: null,
-      targetId: null,
       assignedByActorId: legacyBottle.createdByActorId,
     });
     const modUser = await fixtures.User({ mod: true });
@@ -827,7 +777,6 @@ describe("PATCH /entities/:entity", () => {
     ).toMatchObject({
       bottleId: legacyBottle.id,
       releaseId: null,
-      targetId: null,
       assignedByActorId: actor.id,
     });
     expect(
@@ -837,60 +786,6 @@ describe("PATCH /entities/:entity", () => {
     ).toMatchObject({
       fullName: "Renamed Legacy Core",
       groupId: null,
-    });
-  });
-
-  test("ungrouped compatibility cannot steal a generic target alias", async ({
-    fixtures,
-  }) => {
-    const entity = await fixtures.Entity({
-      name: "Legacy Brand",
-      type: ["brand"],
-    });
-    const legacyBottle = await fixtures.LegacyBottle({
-      brandId: entity.id,
-      name: "Core",
-    });
-    const targetOwner = await fixtures.Bottle();
-    const genericTarget = await db.query.catalogTargets.findFirst({
-      where: and(
-        eq(catalogTargets.groupId, targetOwner.groupId as number),
-        isNull(catalogTargets.bottleId),
-      ),
-    });
-    if (!genericTarget) throw new Error("Missing generic target fixture.");
-    await db.insert(bottleAliases).values({
-      name: "Renamed Legacy Core",
-      bottleId: null,
-      releaseId: null,
-      targetId: genericTarget.id,
-      assignedByActorId: legacyBottle.createdByActorId,
-    });
-    const modUser = await fixtures.User({ mod: true });
-
-    const error = await waitError(
-      routerClient.entities.update(
-        { entity: entity.id, name: "Renamed Legacy" },
-        { context: { user: modUser } },
-      ),
-    );
-    expect(error.message).toContain("generic_target");
-
-    const unchangedEntity = await db.query.entities.findFirst({
-      where: eq(entities.id, entity.id),
-    });
-    const unchangedBottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, legacyBottle.id),
-    });
-    const retainedAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "Renamed Legacy Core"),
-    });
-    expect(unchangedEntity?.name).toBe("Legacy Brand");
-    expect(unchangedBottle?.fullName).toBe("Legacy Brand Core");
-    expect(retainedAlias).toMatchObject({
-      bottleId: null,
-      releaseId: null,
-      targetId: genericTarget.id,
     });
   });
 
@@ -912,7 +807,6 @@ describe("PATCH /entities/:entity", () => {
       name: "Renamed Legacy Core",
       bottleId: null,
       releaseId: release.id,
-      targetId: null,
     });
     const oldAliasBefore = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, legacyBottle.fullName),
@@ -943,7 +837,6 @@ describe("PATCH /entities/:entity", () => {
     expect(retainedAlias).toMatchObject({
       bottleId: null,
       releaseId: release.id,
-      targetId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({

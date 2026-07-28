@@ -154,11 +154,11 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<false>();
   });
 
-  it("publishes the legacy BottleRelease redirect target", async () => {
+  it("publishes the legacy BottleRelease-to-Bottle adapter", async () => {
     const spec = await generateSpec();
-    const operation = spec.paths?.["/bottle-releases/{release}/target"]?.get;
+    const operation = spec.paths?.["/bottle-releases/{release}/bottle"]?.get;
 
-    expect(operation?.operationId).toBe("getBottleReleaseTarget");
+    expect(operation?.operationId).toBe("getBottleForRelease");
     expect(operation?.parameters).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -184,7 +184,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(responseSchema?.oneOf).toBeUndefined();
     expect(responseSchema?.anyOf).toBeUndefined();
 
-    expectTypeOf<Outputs["bottleReleases"]["target"]>().toEqualTypeOf<{
+    expectTypeOf<Outputs["bottleReleases"]["bottle"]>().toEqualTypeOf<{
       bottleId: number;
     }>();
     expectBottleResponse(

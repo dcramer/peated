@@ -26,10 +26,10 @@ export async function GET(
   ]);
   const bottleId = parseRouteId(params.bottleId);
   const releaseId = parseRouteId(params.bottlingId);
-  let target;
+  let promotedBottle;
   try {
-    target = await resolveOrNotFound(
-      client.bottleReleases.target({
+    promotedBottle = await resolveOrNotFound(
+      client.bottleReleases.bottle({
         bottle: bottleId,
         release: releaseId,
       }),
@@ -45,7 +45,7 @@ export async function GET(
   return new Response(null, {
     status: 308,
     headers: {
-      Location: `/bottles/${target.bottleId}${request.nextUrl.search}`,
+      Location: `/bottles/${promotedBottle.bottleId}${request.nextUrl.search}`,
     },
   });
 }

@@ -88,10 +88,9 @@ describe("direct-Bottle badge awarding", () => {
     ).toHaveLength(201);
   });
 
-  test("fails closed when a Tasting Bottle is missing or retired", async ({
+  test("fails closed when a Tasting Bottle is retired", async ({
     fixtures,
   }) => {
-    const badge = await fixtures.Badge();
     const bottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
@@ -102,15 +101,6 @@ describe("direct-Bottle badge awarding", () => {
     });
     await expect(awardAllBadgeXp(db, tasting)).rejects.toThrow(
       `references inactive Bottle ${bottle.id}`,
-    );
-
-    const [withoutBottle] = await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id))
-      .returning();
-    await expect(rescanBadge(badge)).rejects.toThrow(
-      `Tasting ${withoutBottle!.id} has no Bottle.`,
     );
   });
 });

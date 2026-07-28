@@ -5,7 +5,6 @@ import {
   bottleGroups,
   bottles,
   bottleSeries,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
@@ -124,11 +123,6 @@ describe("DELETE /bottle-series/:series", () => {
     const groupedMembers = [...firstGroup.members, ...secondGroup.members];
     const groupedBottleIds = groupedMembers.map(({ bottle }) => bottle.id);
     const groupIds = [firstGroup.first.group.id, secondGroup.first.group.id];
-    const targetsBefore = await db
-      .select()
-      .from(catalogTargets)
-      .where(inArray(catalogTargets.bottleId, groupedBottleIds))
-      .orderBy(asc(catalogTargets.id));
     const legacyBottle = await fixtures.LegacyBottle({
       name: "Legacy Bottle",
       brandId: brand.id,
@@ -179,13 +173,6 @@ describe("DELETE /bottle-series/:series", () => {
     expect(updatedBottles.every(({ seriesId }) => seriesId === null)).toBe(
       true,
     );
-
-    const targetsAfter = await db
-      .select()
-      .from(catalogTargets)
-      .where(inArray(catalogTargets.bottleId, groupedBottleIds))
-      .orderBy(asc(catalogTargets.id));
-    expect(targetsAfter).toEqual(targetsBefore);
 
     const bottleAudits = await db
       .select()

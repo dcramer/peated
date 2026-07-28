@@ -43,7 +43,7 @@ test.each([
   { bottleId: 1.5 },
   { bottleId: "1" },
   { bottleId: 1, unexpected: true },
-  { targetId: 1 },
+  { legacyId: 1 },
 ])("rejects malformed job input %#", async (input) => {
   await expect(onBottleChange(input)).rejects.toThrow();
 });

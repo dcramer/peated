@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { actors, catalogTargets } from "@peated/server/db/schema";
+import { actors } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
@@ -88,49 +88,32 @@ describe("GET /reviews", () => {
     expect(results[0].id).toEqual(review.id);
   });
 
-  test("lists reviews by direct Bottle identity despite target evidence", async ({
-    fixtures,
-  }) => {
+  test("lists reviews by direct Bottle identity", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const [target, otherTarget] = await Promise.all([
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, bottle.id),
-      }),
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, otherBottle.id),
-      }),
-    ]);
-    if (!target || !otherTarget) throw new Error("Missing targets");
     const site = await fixtures.ExternalSiteOrExisting();
-    const directWithStaleEvidence = await fixtures.Review({
+    const firstDirect = await fixtures.Review({
       externalSiteId: site.id,
-      targetId: otherTarget.id,
       bottleId: bottle.id,
-      issue: "Direct with stale evidence",
+      issue: "First direct review",
     });
-    const directWithoutTarget = await fixtures.Review({
+    const secondDirect = await fixtures.Review({
       externalSiteId: site.id,
-      targetId: null,
       bottleId: bottle.id,
-      issue: "Direct without target evidence",
+      issue: "Second direct review",
     });
-    const staleTargetOnly = await fixtures.Review({
+    const otherReview = await fixtures.Review({
       externalSiteId: site.id,
-      targetId: target.id,
       bottleId: otherBottle.id,
-      issue: "Stale target only",
+      issue: "Other Bottle review",
     });
 
     const { results } = await routerClient.reviews.list({ bottle: bottle.id });
 
     expect(results.map(({ id }) => id)).toEqual(
-      expect.arrayContaining([
-        directWithStaleEvidence.id,
-        directWithoutTarget.id,
-      ]),
+      expect.arrayContaining([firstDirect.id, secondDirect.id]),
     );
-    expect(results.map(({ id }) => id)).not.toContain(staleTargetOnly.id);
+    expect(results.map(({ id }) => id)).not.toContain(otherReview.id);
     expect(
       results.every(
         ({ bottle: resultBottle }) => resultBottle?.id === bottle.id,
@@ -208,32 +191,18 @@ describe("GET /reviews", () => {
     const unresolved = await fixtures.Review({
       bottleId: null,
       releaseId: null,
-      targetId: null,
       externalSiteId: site.id,
     });
     const retainedBottle = await fixtures.Bottle();
-    const targetBottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, targetBottle.id),
-    });
-    if (!target) throw new Error("Missing exact target fixture");
-    const bottleAssignedWithoutTarget = await fixtures.Review({
+    const firstAssigned = await fixtures.Review({
       bottleId: retainedBottle.id,
-      targetId: null,
       externalSiteId: site.id,
-      issue: "Bottle assigned without target",
+      issue: "First assigned review",
     });
-    const bottleAssignedWithTarget = await fixtures.Review({
+    const secondAssigned = await fixtures.Review({
       bottleId: retainedBottle.id,
-      targetId: target.id,
       externalSiteId: site.id,
-      issue: "Bottle assigned with target",
-    });
-    const unresolvedWithTargetEvidence = await fixtures.Review({
-      bottleId: null,
-      targetId: target.id,
-      externalSiteId: site.id,
-      issue: "Unresolved with target evidence",
+      issue: "Second assigned review",
     });
 
     const unknownResults = await routerClient.reviews.list(
@@ -246,21 +215,17 @@ describe("GET /reviews", () => {
     );
 
     expect(unknownResults.results.map(({ id }) => id)).toContain(unresolved.id);
-    expect(unknownResults.results.map(({ id }) => id)).toContain(
-      unresolvedWithTargetEvidence.id,
+    expect(unknownResults.results.map(({ id }) => id)).not.toContain(
+      firstAssigned.id,
     );
     expect(unknownResults.results.map(({ id }) => id)).not.toContain(
-      bottleAssignedWithoutTarget.id,
-    );
-    expect(unknownResults.results.map(({ id }) => id)).not.toContain(
-      bottleAssignedWithTarget.id,
+      secondAssigned.id,
     );
     expect(allResults.results.map(({ id }) => id)).toEqual(
       expect.arrayContaining([
         unresolved.id,
-        unresolvedWithTargetEvidence.id,
-        bottleAssignedWithoutTarget.id,
-        bottleAssignedWithTarget.id,
+        firstAssigned.id,
+        secondAssigned.id,
       ]),
     );
     expect(unknownResults.results.every(({ bottle }) => bottle === null)).toBe(

@@ -75,7 +75,6 @@ describe("findBottleId", () => {
       bottleId: bottle.id,
     });
     expect(result?.alias).not.toHaveProperty("releaseId");
-    expect(result?.alias).not.toHaveProperty("targetId");
   });
 
   test("resolves a general alias to its retained Bottle", async ({

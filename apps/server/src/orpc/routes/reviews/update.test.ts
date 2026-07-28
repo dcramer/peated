@@ -3,7 +3,6 @@ import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleGroupTombstones,
   bottleTombstones,
-  catalogTargets,
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
@@ -49,7 +48,7 @@ describe("PATCH /reviews/:review", () => {
     ).rejects.toThrow("Unauthorized.");
   });
 
-  test("hidden-only updates preserve Bottle and historical evidence", async ({
+  test("hidden-only updates preserve Bottle and release evidence", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -58,13 +57,9 @@ describe("PATCH /reviews/:review", () => {
     const evidenceRelease = await fixtures.BottleRelease({
       bottleId: evidenceBottle.id,
     });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     const review = await fixtures.Review({
       bottleId: bottle.id,
       releaseId: evidenceRelease.id,
-      targetId: target!.id,
       hidden: false,
     });
 
@@ -80,7 +75,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: bottle.id,
       releaseId: evidenceRelease.id,
-      targetId: target!.id,
       hidden: true,
     });
     expect(response.bottle?.id).toBe(bottle.id);
@@ -95,13 +89,9 @@ describe("PATCH /reviews/:review", () => {
     const evidenceRelease = await fixtures.BottleRelease({
       bottleId: previousBottle.id,
     });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, previousBottle.id),
-    });
     const review = await fixtures.Review({
       bottleId: null,
       releaseId: evidenceRelease.id,
-      targetId: target!.id,
     });
 
     const response = await routerClient.reviews.update(
@@ -116,7 +106,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: nextBottle.id,
       releaseId: evidenceRelease.id,
-      targetId: target!.id,
     });
     expect(response.bottle?.id).toBe(nextBottle.id);
 
@@ -131,7 +120,6 @@ describe("PATCH /reviews/:review", () => {
       decision: "match_existing",
       bottleId: nextBottle.id,
       releaseId: null,
-      targetId: null,
     });
   });
 
@@ -141,13 +129,9 @@ describe("PATCH /reviews/:review", () => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
     const review = await fixtures.Review({
       bottleId: bottle.id,
       releaseId: release.id,
-      targetId: target!.id,
     });
 
     const response = await routerClient.reviews.update(
@@ -162,7 +146,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: null,
       releaseId: release.id,
-      targetId: target!.id,
     });
     expect(response.bottle).toBeNull();
   });
@@ -187,7 +170,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: review.bottleId,
       releaseId: review.releaseId,
-      targetId: review.targetId,
       hidden: false,
     });
   });
@@ -241,7 +223,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: review.bottleId,
       releaseId: review.releaseId,
-      targetId: review.targetId,
       hidden: false,
     });
   });
@@ -273,7 +254,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: review.bottleId,
       releaseId: review.releaseId,
-      targetId: review.targetId,
       hidden: false,
     });
   });
@@ -284,15 +264,8 @@ describe("PATCH /reviews/:review", () => {
     const user = await fixtures.User({ mod: true });
     const originalBottle = await fixtures.Bottle();
     const concurrentBottle = await fixtures.Bottle();
-    const originalTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, originalBottle.id),
-    });
-    const concurrentTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, concurrentBottle.id),
-    });
     const review = await fixtures.Review({
       bottleId: originalBottle.id,
-      targetId: originalTarget!.id,
       hidden: false,
     });
     const client = new Client(getPostgresConnectionConfig());
@@ -306,8 +279,8 @@ describe("PATCH /reviews/:review", () => {
         await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
       ).rows[0]!.pid;
       await client.query(
-        `UPDATE "review" SET "bottle_id" = $1, "target_id" = $2 WHERE "id" = $3`,
-        [concurrentBottle.id, concurrentTarget!.id, review.id],
+        `UPDATE "review" SET "bottle_id" = $1 WHERE "id" = $2`,
+        [concurrentBottle.id, review.id],
       );
 
       update = routerClient.reviews.update(
@@ -330,7 +303,6 @@ describe("PATCH /reviews/:review", () => {
       }),
     ).toMatchObject({
       bottleId: concurrentBottle.id,
-      targetId: concurrentTarget!.id,
       hidden: true,
     });
   });
@@ -344,13 +316,9 @@ describe("PATCH /reviews/:review", () => {
     const concurrentRelease = await fixtures.BottleRelease({
       bottleId: concurrentBottle.id,
     });
-    const concurrentTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, concurrentBottle.id),
-    });
     const review = await fixtures.Review({
       bottleId: null,
       releaseId: null,
-      targetId: null,
       hidden: false,
     });
     const client = new Client(getPostgresConnectionConfig());
@@ -374,13 +342,8 @@ describe("PATCH /reviews/:review", () => {
       );
       await waitForSessionBlockedBy(client, blockerPid);
       await client.query(
-        `UPDATE "review" SET "bottle_id" = $1, "release_id" = $2, "target_id" = $3 WHERE "id" = $4`,
-        [
-          concurrentBottle.id,
-          concurrentRelease.id,
-          concurrentTarget!.id,
-          review.id,
-        ],
+        `UPDATE "review" SET "bottle_id" = $1, "release_id" = $2 WHERE "id" = $3`,
+        [concurrentBottle.id, concurrentRelease.id, review.id],
       );
       await client.query("COMMIT");
       committed = true;
@@ -398,7 +361,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       bottleId: selectedBottle.id,
       releaseId: concurrentRelease.id,
-      targetId: concurrentTarget!.id,
       hidden: true,
     });
   });

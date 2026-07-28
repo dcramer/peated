@@ -66,8 +66,6 @@ describe("recordIncomingBottleDecisionInTransaction", () => {
 
     expect(result).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
-      targetId: null,
       createdBottle: true,
       createdRelease: false,
     });
@@ -77,8 +75,6 @@ describe("recordIncomingBottleDecisionInTransaction", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
-      targetId: null,
       createdBottle: true,
       createdRelease: false,
     });

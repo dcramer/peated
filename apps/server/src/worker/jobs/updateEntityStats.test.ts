@@ -2,9 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleGroupTombstones,
   bottleTombstones,
-  catalogTargets,
   entities,
-  tastings,
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateEntityStats from "./updateEntityStats";
@@ -80,66 +78,6 @@ test("counts each tasting once when an Entity fills every Bottle association", a
   expect(await getEntity(entity.id)).toMatchObject({
     totalBottles: 1,
     totalTastings: 1,
-  });
-});
-
-test("follows tasting.bottleId and ignores stale CatalogTarget evidence", async ({
-  fixtures,
-}) => {
-  const directOwner = await fixtures.Entity({ name: "Direct Bottle Owner" });
-  const staleTargetOwner = await fixtures.Entity({
-    name: "Stale Target Owner",
-  });
-  const directBottle = await fixtures.Bottle({
-    name: "Direct Identity Expression",
-    brandId: directOwner.id,
-  });
-  const staleTargetBottle = await fixtures.Bottle({
-    name: "Stale Target Expression",
-    brandId: staleTargetOwner.id,
-  });
-  const staleTarget = await db.query.catalogTargets.findFirst({
-    where: eq(catalogTargets.bottleId, staleTargetBottle.id),
-  });
-  if (!staleTarget) throw new Error("Missing exact CatalogTarget fixture");
-
-  await fixtures.Tasting({
-    bottleId: directBottle.id,
-    targetId: staleTarget.id,
-  });
-
-  await updateEntityStats({ entityId: directOwner.id });
-  await updateEntityStats({ entityId: staleTargetOwner.id });
-
-  expect(await getEntity(directOwner.id)).toMatchObject({
-    totalBottles: 1,
-    totalTastings: 1,
-  });
-  expect(await getEntity(staleTargetOwner.id)).toMatchObject({
-    totalBottles: 1,
-    totalTastings: 0,
-  });
-});
-
-test("ignores unresolved tastings with a null bottleId", async ({
-  fixtures,
-}) => {
-  const entity = await fixtures.Entity({ name: "Resolved Bottle Owner" });
-  const bottle = await fixtures.Bottle({
-    name: "Resolved Tasting Expression",
-    brandId: entity.id,
-  });
-  const tasting = await fixtures.Tasting({ bottleId: bottle.id });
-  await db
-    .update(tastings)
-    .set({ bottleId: null })
-    .where(eq(tastings.id, tasting.id));
-
-  await updateEntityStats({ entityId: entity.id });
-
-  expect(await getEntity(entity.id)).toMatchObject({
-    totalBottles: 1,
-    totalTastings: 0,
   });
 });
 

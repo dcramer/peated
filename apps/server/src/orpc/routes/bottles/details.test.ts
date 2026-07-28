@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleAliases,
-  bottleTombstones,
-  catalogTargets,
-} from "@peated/server/db/schema";
+import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -16,7 +12,6 @@ describe("GET /bottles/:bottle", () => {
       bottle: bottle.id,
     });
     expect(data.id).toEqual(bottle.id);
-    expect(data).not.toHaveProperty("targetId");
     expect(data.group?.id).toEqual(bottle.groupId);
     expect("createdBy" in data).toBe(false);
   });
@@ -70,24 +65,6 @@ describe("GET /bottles/:bottle", () => {
     expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 
-  test("loads a Bottle without requiring a CatalogTarget", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    await db
-      .update(bottleAliases)
-      .set({ targetId: null })
-      .where(eq(bottleAliases.bottleId, bottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, bottle.id));
-
-    const result = await routerClient.bottles.details({ bottle: bottle.id });
-
-    expect(result.id).toBe(bottle.id);
-    expect(result).not.toHaveProperty("targetId");
-  });
-
   test("gets bottle with tombstone", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Delicious Wood" });
     await db.insert(bottleTombstones).values({
@@ -107,27 +84,14 @@ describe("GET /bottles/:bottle", () => {
       edition: "Sibling Edition",
       releaseYear: 2026,
     });
-    const [target, siblingTarget] = await Promise.all([
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, bottle.id),
-      }),
-      db.query.catalogTargets.findFirst({
-        where: eq(catalogTargets.bottleId, sibling.id),
-      }),
-    ]);
-    if (!target || !siblingTarget) {
-      throw new Error("Missing CatalogTarget fixture");
-    }
     const exactPerson = await fixtures.User();
     const siblingPerson = await fixtures.User();
     await fixtures.Tasting({
       bottleId: bottle.id,
-      targetId: siblingTarget.id,
       createdById: exactPerson.id,
     });
     await fixtures.Tasting({
       bottleId: sibling.id,
-      targetId: target.id,
       createdById: siblingPerson.id,
     });
 
@@ -145,23 +109,14 @@ describe("GET /bottles/:bottle", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const target = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, bottle.id),
-    });
-    const otherTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, otherBottle.id),
-    });
-    if (!target || !otherTarget) throw new Error("Missing target fixture");
     const directPrice = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: otherTarget.id,
       name: "Direct Bottle detail price",
       updatedAt: new Date(Date.now() - 1_000),
     });
     await fixtures.StorePrice({
       bottleId: otherBottle.id,
-      targetId: target.id,
-      name: "Newer stale target evidence",
+      name: "Newer unrelated price",
       updatedAt: new Date(),
     });
 
@@ -172,13 +127,12 @@ describe("GET /bottles/:bottle", () => {
     expect(data.lastPrice).not.toHaveProperty("target");
   });
 
-  test("returns an alias-propagated price without target evidence", async ({
+  test("returns an alias-propagated price through direct Bottle identity", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const directPrice = await fixtures.StorePrice({
       bottleId: bottle.id,
-      targetId: null,
       name: "Alias-propagated detail price",
     });
 

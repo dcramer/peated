@@ -48,7 +48,6 @@ describe("catalog migration statistics", () => {
     await db.insert(tastings).values([
       {
         bottleId: parent.id,
-        targetId: null,
         releaseId: null,
         createdById: defaults.user.id,
         rating: SIMPLE_RATING_VALUES.PASS,
@@ -56,7 +55,6 @@ describe("catalog migration statistics", () => {
       },
       {
         bottleId: parent.id,
-        targetId: null,
         releaseId: release.id,
         createdById: defaults.user.id,
         rating: SIMPLE_RATING_VALUES.SIP,
@@ -64,7 +62,6 @@ describe("catalog migration statistics", () => {
       },
       {
         bottleId: parent.id,
-        targetId: null,
         releaseId: release.id,
         createdById: defaults.user.id,
         rating: SIMPLE_RATING_VALUES.SAVOR,
@@ -72,7 +69,6 @@ describe("catalog migration statistics", () => {
       },
       {
         bottleId: parent.id,
-        targetId: null,
         releaseId: release.id,
         createdById: defaults.user.id,
         rating: null,

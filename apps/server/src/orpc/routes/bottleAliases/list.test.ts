@@ -112,18 +112,9 @@ describe("GET /bottle-aliases", () => {
     ).toEqual(["Paged Alias Alpha", "Paged Alias Beta"]);
   });
 
-  test("rejects unknown Bottles and obsolete request fields", async () => {
+  test("rejects unknown Bottles", async () => {
     await expect(
       waitError(routerClient.bottleAliases.list({ bottle: 2_147_483_647 })),
     ).resolves.toMatchInlineSnapshot(`[Error: Bottle not found.]`);
-
-    await expect(
-      waitError(
-        routerClient.bottleAliases.list({
-          query: "Alias",
-          targetId: 1,
-        } as never),
-      ),
-    ).resolves.toMatchObject({ status: 400 });
   });
 });

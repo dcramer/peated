@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottleGroups, tastings } from "@peated/server/db/schema";
+import { bottleGroups } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -57,20 +57,6 @@ describe("GET /tastings", () => {
         })
       ).results,
     ).toEqual([]);
-  });
-
-  test("fails closed when a persisted Tasting has no Bottle", async ({
-    fixtures,
-  }) => {
-    const tasting = await fixtures.Tasting();
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id));
-
-    await expect(routerClient.tastings.list()).rejects.toThrow(
-      `Tasting ${tasting.id} has no Bottle.`,
-    );
   });
 
   test("requires authentication for the friends filter", async () => {

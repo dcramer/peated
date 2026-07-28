@@ -1,10 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import {
-  bottleGroups,
-  bottleTombstones,
-  tastings,
-} from "@peated/server/db/schema";
+import { bottleGroups, bottleTombstones } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
@@ -138,41 +134,6 @@ describe("notifyComment", () => {
     expect(msg.html).not.toContain(groupLabel);
     expect(msg.text).toContain(bottle.fullName);
     expect(msg.text).not.toContain(groupLabel);
-  });
-
-  test("rejects a tasting without a Bottle", async ({ fixtures }) => {
-    const otherAuthor = await fixtures.User({ verified: true });
-    const author = await fixtures.User({
-      email: "joe@example.com",
-      verified: true,
-    });
-    const bottle = await fixtures.Bottle();
-    const tasting = await fixtures.Tasting({
-      bottleId: bottle.id,
-      createdById: author.id,
-    });
-    const [bottlelessTasting] = await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, tasting.id))
-      .returning();
-    if (!bottlelessTasting) throw new Error("Missing tasting fixture");
-    const comment = await fixtures.Comment({
-      tastingId: tasting.id,
-      createdById: otherAuthor.id,
-    });
-
-    await expect(
-      notifyComment({
-        comment: {
-          ...comment,
-          createdBy: otherAuthor,
-          tasting: { ...bottlelessTasting, createdBy: author },
-        },
-        transport,
-      }),
-    ).rejects.toThrow(`Tasting ${tasting.id} has no Bottle`);
-    expect(outbox).toHaveLength(0);
   });
 
   test("rejects a retired Bottle", async ({ fixtures }) => {

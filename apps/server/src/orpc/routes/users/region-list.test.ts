@@ -285,23 +285,13 @@ describe("GET /users/:user/regions", () => {
       createdById: defaults.user.id,
       createdAt: new Date(baseTime + 4),
     });
-    const unresolvedTasting = await fixtures.Tasting({
-      bottleId: exactBottle.id,
-      createdById: defaults.user.id,
-      createdAt: new Date(baseTime + 5),
-    });
-    await db
-      .update(tastings)
-      .set({ bottleId: null })
-      .where(eq(tastings.id, unresolvedTasting.id));
-
     const data = await routerClient.users.regionList(
       { user: "me" },
       { context: { user: defaults.user } },
     );
 
     expect(data).toEqual({
-      totalCount: 6,
+      totalCount: 5,
       results: [
         {
           country: { name: "Scotland", slug: "scotland" },
@@ -315,12 +305,6 @@ describe("GET /users/:user/regions", () => {
         },
       ],
     });
-    expect(
-      await db.query.tastings.findFirst({
-        where: eq(tastings.id, unresolvedTasting.id),
-        columns: { bottleId: true },
-      }),
-    ).toEqual({ bottleId: null });
   });
 
   test("uses the stored Bottle brand when legacy release evidence remains", async ({

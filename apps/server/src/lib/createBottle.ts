@@ -25,7 +25,6 @@ import {
   bottles,
   bottleSeries,
   bottlesToDistillers,
-  catalogTargets,
   changes,
 } from "@peated/server/db/schema";
 import {
@@ -493,8 +492,6 @@ async function createIndependentGroupPrefix(
     );
   }
 
-  await tx.insert(catalogTargets).values({ groupId: group.id });
-
   return group;
 }
 
@@ -556,9 +553,6 @@ export async function createConcreteBottleInTransaction(
   const bottleResult = await insertPreparedBottleInTransaction(tx, prepared, {
     groupId: group.id,
   });
-  await tx
-    .insert(catalogTargets)
-    .values({ groupId: group.id, bottleId: bottleResult.bottle.id });
 
   const [persistedGroup] = await tx
     .update(bottleGroups)

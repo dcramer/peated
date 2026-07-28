@@ -4,7 +4,6 @@ import {
   bottleAliases,
   bottleGroupTombstones,
   bottleTombstones,
-  catalogTargets,
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
@@ -169,7 +168,6 @@ describe("POST /reviews", () => {
       id: result.id,
       bottleId: null,
       releaseId: null,
-      targetId: null,
       name: "Unresolved Review Bottle",
       rating: 89,
     });
@@ -206,7 +204,6 @@ describe("POST /reviews", () => {
       id: result.id,
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
     });
     expect(result.bottle).toMatchObject({ id: bottle.id });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
@@ -294,28 +291,18 @@ describe("POST /reviews", () => {
     expect(classifyBottleReferenceMock).toHaveBeenCalledOnce();
   });
 
-  test("ignores stale target evidence on a direct Bottle alias", async ({
-    fixtures,
-  }) => {
+  test("uses a directly assigned Bottle alias", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
       name: "Direct Review Identity",
     });
-    const unrelatedBottle = await fixtures.Bottle({
-      name: "Unrelated Target Identity",
-    });
-    const unrelatedTarget = await db.query.catalogTargets.findFirst({
-      where: eq(catalogTargets.bottleId, unrelatedBottle.id),
-    });
-    if (!unrelatedTarget) throw new Error("Missing exact target fixture");
-    const aliasName = "Review Alias With Stale Target";
+    const aliasName = "Direct Review Alias";
     await fixtures.BottleAlias({
       name: aliasName,
       bottleId: bottle.id,
-      targetId: unrelatedTarget.id,
     });
-    const url = "https://example.com/reviews/stale-target";
+    const url = "https://example.com/reviews/direct-alias";
 
     await routerClient.reviews.create(
       {
@@ -332,7 +319,6 @@ describe("POST /reviews", () => {
     expect(await findReviewByUrl(url)).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -340,7 +326,6 @@ describe("POST /reviews", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      targetId: unrelatedTarget.id,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
@@ -383,7 +368,6 @@ describe("POST /reviews", () => {
       id: result.id,
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -392,7 +376,6 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -407,7 +390,6 @@ describe("POST /reviews", () => {
       decision: "match_existing",
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
       createdBottle: false,
     });
   });
@@ -443,7 +425,6 @@ describe("POST /reviews", () => {
       id: result.id,
       bottleId: expect.any(Number),
       releaseId: null,
-      targetId: null,
     });
     expect(
       await db.query.bottles.findFirst({
@@ -584,7 +565,6 @@ describe("POST /reviews", () => {
       await fixtures.BottleAlias({
         name: normalizeBottleAliasKey(reviewName),
         bottleId: conflictingBottle.id,
-        targetId: null,
       });
       return buildClassification(
         {
@@ -688,7 +668,6 @@ describe("POST /reviews", () => {
         id: result.id,
         bottleId: committedBottle.id,
         releaseId: null,
-        targetId: null,
         rating: 96,
       });
       expect(
@@ -724,7 +703,6 @@ describe("POST /reviews", () => {
       externalSiteId: site.id,
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
       name: reviewName,
       url: "https://example.com/reviews/durable-original",
     });
@@ -747,7 +725,6 @@ describe("POST /reviews", () => {
       id: result.id,
       bottleId: bottle.id,
       releaseId: null,
-      targetId: null,
       rating: 97,
     });
   });
@@ -767,13 +744,11 @@ describe("POST /reviews", () => {
     await fixtures.BottleAlias({
       name: aliasName,
       bottleId: incomingBottle.id,
-      targetId: null,
     });
     const existing = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: durableBottle.id,
       releaseId: null,
-      targetId: null,
       name: aliasName,
       url: "https://example.com/reviews/conflict-original",
     });
@@ -796,7 +771,6 @@ describe("POST /reviews", () => {
       id: result.id,
       bottleId: durableBottle.id,
       releaseId: null,
-      targetId: null,
       rating: 98,
     });
     expect(

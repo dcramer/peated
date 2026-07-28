@@ -1,18 +1,18 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   bigint,
   bigserial,
   boolean,
-  check,
   index,
   pgTable,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleReleases, bottles, catalogTargets } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { users } from "./users";
 
 export const flights = pgTable(
@@ -43,43 +43,26 @@ export const flightsRelations = relations(flights, ({ one, many }) => ({
 export type Flight = typeof flights.$inferSelect;
 export type NewFlight = typeof flights.$inferInsert;
 
-/**
- * Target identity is authoritative. The nullable Bottle/Release pair remains
- * compatibility storage until task 9.6 removes it.
- */
+/** A Flight membership selects one Bottle; releaseId is legacy evidence. */
 export const flightBottles = pgTable(
   "flight_bottle",
   {
     flightId: bigint("flight_id", { mode: "number" })
       .references(() => flights.id)
       .notNull(),
-    bottleId: bigint("bottle_id", { mode: "number" }).references(
-      () => bottles.id,
-    ),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id)
+      .notNull(),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
     ),
-    targetId: bigint("target_id", { mode: "number" }).references(
-      () => catalogTargets.id,
-    ),
   },
   (table) => [
-    check(
-      "flight_bottle_identity_check",
-      sql`${table.bottleId} IS NOT NULL OR (${table.targetId} IS NOT NULL AND ${table.releaseId} IS NULL)`,
-    ),
-    uniqueIndex("flight_bottle_legacy_unq")
-      .using(
-        "btree",
-        table.flightId,
-        table.bottleId,
-        sql`COALESCE(${table.releaseId}, 0)`,
-      )
-      .where(sql`${table.bottleId} IS NOT NULL`),
-    uniqueIndex("flight_bottle_target_unq")
-      .on(table.flightId, table.targetId)
-      .where(sql`${table.targetId} IS NOT NULL`),
-    index("flight_bottle_target_idx").on(table.targetId),
+    unique()
+      .on(table.flightId, table.bottleId, table.releaseId)
+      .nullsNotDistinct(),
+    index("flight_bottle_bottle_idx").on(table.bottleId),
+    index("flight_bottle_release_idx").on(table.releaseId),
   ],
 );
 
@@ -95,10 +78,6 @@ export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({
   release: one(bottleReleases, {
     fields: [flightBottles.releaseId],
     references: [bottleReleases.id],
-  }),
-  target: one(catalogTargets, {
-    fields: [flightBottles.targetId],
-    references: [catalogTargets.id],
   }),
 }));
 

@@ -10,7 +10,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { bottleReleases, bottles, catalogTargets } from "./bottles";
+import { bottleReleases, bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 
 export const reviews = pgTable(
@@ -26,9 +26,6 @@ export const reviews = pgTable(
     ),
     releaseId: bigint("release_id", { mode: "number" }).references(
       () => bottleReleases.id,
-    ),
-    targetId: bigint("target_id", { mode: "number" }).references(
-      () => catalogTargets.id,
     ),
     hidden: boolean("hidden").default(false),
     // ratings are 0-100
@@ -47,7 +44,6 @@ export const reviews = pgTable(
     ),
     index("review_bottle_idx").on(table.bottleId),
     index("review_release_idx").on(table.releaseId),
-    index("review_target_idx").on(table.targetId),
   ],
 );
 
@@ -59,10 +55,6 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   release: one(bottleReleases, {
     fields: [reviews.releaseId],
     references: [bottleReleases.id],
-  }),
-  target: one(catalogTargets, {
-    fields: [reviews.targetId],
-    references: [catalogTargets.id],
   }),
   store: one(externalSites, {
     fields: [reviews.externalSiteId],

@@ -9,7 +9,6 @@ import {
   bottleTombstones,
   bottles,
   bottlesToDistillers,
-  catalogTargets,
   changes,
   entities,
 } from "@peated/server/db/schema";
@@ -748,7 +747,7 @@ describe("concrete Bottle updates", () => {
     expect((await loadGroupMembers(groupBefore.id))[1]).toEqual(siblingBefore);
   });
 
-  test("updates direct Bottle identity without an exact CatalogTarget", async ({
+  test("updates direct Bottle identity and owns aliases directly", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -765,13 +764,6 @@ describe("concrete Bottle updates", () => {
       .update(bottles)
       .set({ fullName: oldLiteralName })
       .where(eq(bottles.id, first.bottle.id));
-    await db
-      .update(bottleAliases)
-      .set({ targetId: null })
-      .where(eq(bottleAliases.bottleId, first.bottle.id));
-    await db
-      .delete(catalogTargets)
-      .where(eq(catalogTargets.bottleId, first.bottle.id));
     resetQueueMock();
 
     const result = await updateConcreteBottle({
@@ -800,7 +792,6 @@ describe("concrete Bottle updates", () => {
       .select({
         name: bottleAliases.name,
         bottleId: bottleAliases.bottleId,
-        targetId: bottleAliases.targetId,
       })
       .from(bottleAliases)
       .where(inArray(bottleAliases.name, expectedAliasNames));
@@ -810,7 +801,6 @@ describe("concrete Bottle updates", () => {
         expectedAliasNames.map((name) => ({
           name,
           bottleId: first.bottle.id,
-          targetId: null,
         })),
       ),
     );
