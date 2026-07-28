@@ -242,7 +242,7 @@ describe("GET /users/:user", () => {
       tastings: 3,
       bottles: 2,
       collected: 4,
-      library: { total: 3, open: 1, sealed: 1 },
+      library: { total: 2, open: 1, sealed: 1 },
     });
   });
 

@@ -4,9 +4,22 @@ import {
   CatalogMigrationApprovalCandidateSchema,
 } from "./catalogMigrationApply";
 
+const databaseEvidence = {
+  identity: {
+    databaseName: "peated",
+    systemIdentifier: "7312345678901234567",
+    isInRecovery: false,
+  },
+  connection: {
+    serverAddress: "10.0.0.1",
+    serverPort: 5432,
+    currentUser: "catalog_auditor",
+  },
+};
+
 const revision = {
   gitRevision: "a".repeat(40),
-  databaseName: "peated",
+  databaseEvidence,
   databaseMigration: {
     id: 193,
     hash: "migration-hash",
@@ -15,9 +28,9 @@ const revision = {
 };
 
 const audit = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   generatedAt: "2026-07-27T00:00:00.000Z",
-  databaseName: "peated",
+  databaseEvidence,
   legacyCatalog: {
     totalParents: 1,
     parentsWithZeroReleases: 1,
@@ -75,7 +88,7 @@ const consumerBySlot = {
 describe("CatalogMigration approval and apply schemas", () => {
   test("parses the retained approval candidate and apply input", () => {
     const candidate = CatalogMigrationApprovalCandidateSchema.parse({
-      schemaVersion: 1,
+      schemaVersion: 2,
       audit,
       revision,
     });
@@ -94,9 +107,64 @@ describe("CatalogMigration approval and apply schemas", () => {
     });
   });
 
+  test("requires full same-transaction evidence in an approval candidate", () => {
+    expect(
+      CatalogMigrationApprovalCandidateSchema.safeParse({
+        schemaVersion: 2,
+        audit,
+        revision: {
+          ...revision,
+          databaseEvidence: {
+            ...databaseEvidence,
+            connection: {
+              serverAddress: "10.0.0.2",
+              serverPort: 6432,
+              currentUser: "catalog_writer",
+            },
+          },
+        },
+      }).success,
+    ).toBe(false);
+
+    expect(
+      CatalogMigrationApprovalCandidateSchema.safeParse({
+        schemaVersion: 2,
+        audit,
+        revision: {
+          ...revision,
+          databaseEvidence: {
+            ...databaseEvidence,
+            identity: {
+              ...databaseEvidence.identity,
+              systemIdentifier: "7312345678901234568",
+            },
+          },
+        },
+      }).success,
+    ).toBe(false);
+  });
+
+  test("rejects evidence collected from a recovery server", () => {
+    const standbyEvidence = {
+      ...databaseEvidence,
+      identity: {
+        ...databaseEvidence.identity,
+        isInRecovery: true,
+      },
+    };
+
+    expect(
+      CatalogMigrationApprovalCandidateSchema.safeParse({
+        schemaVersion: 2,
+        audit: { ...audit, databaseEvidence: standbyEvidence },
+        revision: { ...revision, databaseEvidence: standbyEvidence },
+      }).success,
+    ).toBe(false);
+  });
+
   test("requires consumer totals to equal the per-slot sum", () => {
     const baseResult = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       status: "applied",
       approvedAuditGeneratedAt: audit.generatedAt,
       revision,
@@ -132,6 +200,36 @@ describe("CatalogMigration approval and apply schemas", () => {
     expect(
       CatalogMigrationApplyResultSchema.safeParse(baseResult).success,
     ).toBe(true);
+    expect(
+      CatalogMigrationApplyResultSchema.safeParse({
+        ...baseResult,
+        postflightAudit: {
+          ...audit,
+          databaseEvidence: {
+            ...databaseEvidence,
+            connection: {
+              ...databaseEvidence.connection,
+              currentUser: "catalog_writer",
+            },
+          },
+        },
+      }).success,
+    ).toBe(false);
+    expect(
+      CatalogMigrationApplyResultSchema.safeParse({
+        ...baseResult,
+        postflightAudit: {
+          ...audit,
+          databaseEvidence: {
+            ...databaseEvidence,
+            identity: {
+              ...databaseEvidence.identity,
+              databaseName: "other_database",
+            },
+          },
+        },
+      }).success,
+    ).toBe(false);
     expect(CatalogMigrationApplyResultSchema.parse(baseResult).counts).toEqual(
       baseResult.counts,
     );

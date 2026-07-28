@@ -1,12 +1,8 @@
 import program from "@peated/cli/program";
 import config from "@peated/server/config";
 import { applyCatalogMigration } from "@peated/server/lib/catalogMigrationApply";
-import { runCatalogMigrationAudit } from "@peated/server/lib/catalogMigrationAudit";
-import { loadCatalogMigrationRevisionEvidence } from "@peated/server/lib/catalogMigrationRevision";
-import {
-  CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
-  CatalogMigrationApprovalCandidateSchema,
-} from "@peated/server/schemas/catalogMigrationApply";
+import { loadCatalogMigrationApprovalCandidate } from "@peated/server/lib/catalogMigrationApprovalCandidate";
+import { CatalogMigrationApprovalCandidateSchema } from "@peated/server/schemas/catalogMigrationApply";
 import { execFile as execFileCallback } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
@@ -81,15 +77,7 @@ program
     const gitRevision = await resolveCatalogMigrationGitRevision(
       options.expectGitRevision,
     );
-    const [audit, revision] = await Promise.all([
-      runCatalogMigrationAudit(),
-      loadCatalogMigrationRevisionEvidence(gitRevision),
-    ]);
-    const candidate = CatalogMigrationApprovalCandidateSchema.parse({
-      schemaVersion: CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
-      audit,
-      revision,
-    });
+    const candidate = await loadCatalogMigrationApprovalCandidate(gitRevision);
     process.stdout.write(`${JSON.stringify(candidate, null, 2)}\n`);
   });
 

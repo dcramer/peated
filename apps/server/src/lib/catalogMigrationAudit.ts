@@ -9,6 +9,8 @@ import {
   type CatalogMigrationMappingSummary,
   type CatalogMigrationReferenceSummary,
 } from "../schemas/catalogMigrationAudit";
+import type { CatalogMigrationDatabaseEvidence } from "../schemas/catalogMigrationDatabaseIdentity";
+import { loadCatalogMigrationDatabaseEvidence } from "./catalogMigrationDatabaseEvidence";
 
 type PromotionMappingRow = {
   releaseId: number;
@@ -436,10 +438,8 @@ async function loadPromotionMappingSummary({
  */
 export async function collectCatalogMigrationAudit(
   database: AnyDatabase,
+  databaseEvidence: CatalogMigrationDatabaseEvidence,
 ): Promise<CatalogMigrationAudit> {
-  const databaseResult = await database.execute<{ databaseName: string }>(sql`
-    SELECT current_database() AS "databaseName"
-  `);
   const legacyCatalog = await loadLegacyCatalogSummary(database);
   const references = await loadReferenceSummaries(database);
   const promotionMappings = await loadPromotionMappingSummary({
@@ -478,7 +478,7 @@ export async function collectCatalogMigrationAudit(
   return CatalogMigrationAuditSchema.parse({
     schemaVersion: CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION,
     generatedAt: new Date().toISOString(),
-    databaseName: firstRow(databaseResult, "database identity").databaseName,
+    databaseEvidence,
     legacyCatalog,
     references,
     collisions: {
@@ -499,7 +499,8 @@ export async function runCatalogMigrationAudit(
     await tx.execute(
       sql`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`,
     );
-    return await collectCatalogMigrationAudit(tx);
+    const databaseEvidence = await loadCatalogMigrationDatabaseEvidence(tx);
+    return await collectCatalogMigrationAudit(tx, databaseEvidence);
   });
 }
 
@@ -509,7 +510,7 @@ export function formatCatalogMigrationAudit(
   const catalog = report.legacyCatalog;
   const lines = [
     `Catalog migration audit v${report.schemaVersion}`,
-    `Database: ${report.databaseName}`,
+    `Database: ${report.databaseEvidence.identity.databaseName} (${report.databaseEvidence.identity.systemIdentifier})`,
     `Generated: ${report.generatedAt}`,
     "",
     "Legacy catalog",

@@ -6,6 +6,8 @@ import {
   CatalogMigrationRevisionEvidenceSchema,
   type CatalogMigrationRevisionEvidence,
 } from "../schemas/catalogMigrationApply";
+import type { CatalogMigrationDatabaseEvidence } from "../schemas/catalogMigrationDatabaseIdentity";
+import { loadCatalogMigrationDatabaseEvidence } from "./catalogMigrationDatabaseEvidence";
 
 export type CatalogMigrationRevisionErrorCode =
   | "invalid_git_revision"
@@ -36,6 +38,7 @@ export async function loadCatalogMigrationRevisionEvidenceInTransaction(
   gitRevision: string,
   tx: AnyTransaction,
   migrationsFolder = DEFAULT_MIGRATIONS_FOLDER,
+  databaseEvidence?: CatalogMigrationDatabaseEvidence,
 ): Promise<CatalogMigrationRevisionEvidence> {
   const gitResult =
     CatalogMigrationRevisionEvidenceSchema.shape.gitRevision.safeParse(
@@ -60,9 +63,6 @@ export async function loadCatalogMigrationRevisionEvidenceInTransaction(
     throw new CatalogMigrationRevisionError("missing_local_migration");
   }
 
-  const databaseResult = await tx.execute<{ databaseName: string }>(sql`
-    SELECT current_database() AS "databaseName"
-  `);
   const migrationResult = await tx.execute<{
     id: number;
     hash: string;
@@ -73,13 +73,7 @@ export async function loadCatalogMigrationRevisionEvidenceInTransaction(
     ORDER BY created_at DESC, id DESC
     LIMIT 1
   `);
-  const databaseName = databaseResult.rows[0]?.databaseName;
   const applied = migrationResult.rows[0];
-  if (!databaseName) {
-    throw new CatalogMigrationRevisionError("missing_applied_migration", {
-      reason: "database_name_missing",
-    });
-  }
   if (!applied) {
     throw new CatalogMigrationRevisionError("missing_applied_migration");
   }
@@ -98,7 +92,8 @@ export async function loadCatalogMigrationRevisionEvidenceInTransaction(
 
   return CatalogMigrationRevisionEvidenceSchema.parse({
     gitRevision: gitResult.data,
-    databaseName,
+    databaseEvidence:
+      databaseEvidence ?? (await loadCatalogMigrationDatabaseEvidence(tx)),
     databaseMigration: {
       id: applied.id,
       hash: applied.hash,
@@ -114,11 +109,15 @@ export async function loadCatalogMigrationRevisionEvidence(
   migrationsFolder = DEFAULT_MIGRATIONS_FOLDER,
 ): Promise<CatalogMigrationRevisionEvidence> {
   return await database.transaction(async (tx) => {
-    await tx.execute(sql`SET TRANSACTION READ ONLY`);
+    await tx.execute(
+      sql`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY`,
+    );
+    const databaseEvidence = await loadCatalogMigrationDatabaseEvidence(tx);
     return await loadCatalogMigrationRevisionEvidenceInTransaction(
       gitRevision,
       tx,
       migrationsFolder,
+      databaseEvidence,
     );
   });
 }

@@ -18,25 +18,22 @@ import {
   applyCatalogMigration,
   CatalogMigrationApplyError,
 } from "./catalogMigrationApply";
-import { runCatalogMigrationAudit } from "./catalogMigrationAudit";
-import { loadCatalogMigrationRevisionEvidence } from "./catalogMigrationRevision";
+import { loadCatalogMigrationApprovalCandidate } from "./catalogMigrationApprovalCandidate";
+import { CatalogMigrationDatabaseEvidenceError } from "./catalogMigrationDatabaseEvidence";
 import waitError from "./test/waitError";
 
 const TEST_GIT_REVISION = "a".repeat(40);
 
 async function approvedInput(): Promise<CatalogMigrationApplyInput> {
-  const audit = await runCatalogMigrationAudit();
-  const revision =
-    await loadCatalogMigrationRevisionEvidence(TEST_GIT_REVISION);
+  const candidate =
+    await loadCatalogMigrationApprovalCandidate(TEST_GIT_REVISION);
   return {
-    candidate: {
-      schemaVersion: 1,
-      audit,
-      revision,
-    },
+    candidate,
     approval: {
       approvedBy: "catalog-migration-test",
-      approvedAt: new Date(Date.parse(audit.generatedAt) + 1_000).toISOString(),
+      approvedAt: new Date(
+        Date.parse(candidate.audit.generatedAt) + 1_000,
+      ).toISOString(),
     },
   };
 }
@@ -190,9 +187,22 @@ describe("applyCatalogMigration", () => {
     });
 
     const input = await approvedInput();
+    const auditConnection = {
+      serverAddress: "192.0.2.10",
+      serverPort: 6432,
+      currentUser: "retained_catalog_auditor",
+    };
+    input.candidate.audit.databaseEvidence.connection = auditConnection;
+    input.candidate.revision.databaseEvidence.connection = auditConnection;
     const result = await applyCatalogMigration(input);
 
     expect(result.status).toBe("applied");
+    expect(result.revision.databaseEvidence.connection).not.toEqual(
+      auditConnection,
+    );
+    expect(result.revision.databaseEvidence.identity).toEqual(
+      input.candidate.revision.databaseEvidence.identity,
+    );
     expect(result.counts).toEqual({
       parents: 3,
       groups: 3,
@@ -654,6 +664,89 @@ describe("applyCatalogMigration", () => {
         .from(bottles)
         .where(eq(bottles.id, parent.id)),
     ).toEqual([{ groupId: null }]);
+  });
+
+  test("preflight rejects a recovery server before the authoritative transaction", async () => {
+    const input = await approvedInput();
+    const execute = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            databaseName: "peated",
+            systemIdentifier:
+              input.candidate.revision.databaseEvidence.identity
+                .systemIdentifier,
+            isInRecovery: true,
+            serverAddress: "10.0.0.2",
+            serverPort: 5432,
+            currentUser: "catalog_writer",
+          },
+        ],
+      });
+    const transaction = vi.fn(
+      async <T>(callback: (tx: AnyTransaction) => Promise<T>): Promise<T> =>
+        await callback({ execute } as unknown as AnyTransaction),
+    );
+    const standbyDatabase = { transaction } as unknown as AnyConnection;
+
+    const error = await waitError(
+      applyCatalogMigration(input, standbyDatabase),
+    );
+
+    expect(error).toBeInstanceOf(CatalogMigrationDatabaseEvidenceError);
+    expect(error).toMatchObject({ code: "database_in_recovery" });
+    expect(transaction).toHaveBeenCalledTimes(1);
+    expect(execute).toHaveBeenCalledTimes(2);
+  });
+
+  test("authoritative transaction locks before loading its database evidence", async () => {
+    const input = await approvedInput();
+    const identityRow = {
+      databaseName:
+        input.candidate.revision.databaseEvidence.identity.databaseName,
+      systemIdentifier:
+        input.candidate.revision.databaseEvidence.identity.systemIdentifier,
+      isInRecovery: false,
+      serverAddress: "10.0.0.2",
+      serverPort: 5432,
+      currentUser: "catalog_writer",
+    };
+    const preflightExecute = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [identityRow] });
+    const authoritativeFailure = Object.assign(
+      new Error("forced evidence failure"),
+      { code: "ECONNRESET" },
+    );
+    const authoritativeExecute = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockRejectedValueOnce(authoritativeFailure);
+    let transactionCount = 0;
+    const transaction = vi.fn(
+      async <T>(callback: (tx: AnyTransaction) => Promise<T>): Promise<T> => {
+        transactionCount += 1;
+        const execute =
+          transactionCount === 1 ? preflightExecute : authoritativeExecute;
+        return await callback({ execute } as unknown as AnyTransaction);
+      },
+    );
+    const testDatabase = { transaction } as unknown as AnyConnection;
+
+    const error = await waitError(applyCatalogMigration(input, testDatabase));
+
+    expect(error).toBeInstanceOf(CatalogMigrationDatabaseEvidenceError);
+    expect(error).toMatchObject({
+      code: "database_identity_unavailable",
+      cause: authoritativeFailure,
+    });
+    expect(transaction).toHaveBeenCalledTimes(2);
+    expect(preflightExecute).toHaveBeenCalledTimes(2);
+    expect(authoritativeExecute).toHaveBeenCalledTimes(3);
   });
 
   test("rolls back earlier family writes when a late mapping write fails", async ({

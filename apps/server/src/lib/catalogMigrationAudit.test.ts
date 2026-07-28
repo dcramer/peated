@@ -424,7 +424,7 @@ describe("catalog migration audit", () => {
       await runCatalogMigrationAudit(),
     );
 
-    expect(output).toContain("Catalog migration audit v3");
+    expect(output).toContain("Catalog migration audit v4");
     expect(output).toContain(
       "Parents: 1 (1 zero / 0 one / 0 multiple releases)",
     );

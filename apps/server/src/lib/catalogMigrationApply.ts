@@ -28,6 +28,7 @@ import {
   type CatalogMigrationApprovalCandidate,
   type CatalogMigrationRevisionEvidence,
 } from "../schemas/catalogMigrationApply";
+import { sameCatalogMigrationDatabaseIdentity } from "../schemas/catalogMigrationDatabaseIdentity";
 import {
   ExactBottleAliasConflictError,
   reserveExactBottleAliasInTransaction,
@@ -40,6 +41,7 @@ import {
   repointLegacyConsumersInTransaction,
   type CatalogMigrationConsumerResult,
 } from "./catalogMigrationConsumers";
+import { loadCatalogMigrationDatabaseEvidence } from "./catalogMigrationDatabaseEvidence";
 import { loadCatalogMigrationRevisionEvidenceInTransaction } from "./catalogMigrationRevision";
 import {
   assertCatalogMigrationStatsInTransaction,
@@ -143,7 +145,10 @@ function sameRevision(
 ) {
   return (
     left.gitRevision === right.gitRevision &&
-    left.databaseName === right.databaseName &&
+    sameCatalogMigrationDatabaseIdentity(
+      left.databaseEvidence.identity,
+      right.databaseEvidence.identity,
+    ) &&
     left.databaseMigration.id === right.databaseMigration.id &&
     left.databaseMigration.hash === right.databaseMigration.hash &&
     left.databaseMigration.createdAt === right.databaseMigration.createdAt
@@ -176,6 +181,20 @@ function firstRow<T>(rows: T[], label: string): T {
     });
   }
   return row;
+}
+
+/**
+ * Rejects an obvious standby before opening the authoritative transaction.
+ * This disposable read-only check is not retained or reused as migration
+ * evidence; the locked transaction reloads its own database evidence.
+ */
+async function assertWritablePrimaryPreflight(
+  database: AnyConnection,
+): Promise<void> {
+  await database.transaction(async (tx) => {
+    await tx.execute(sql`SET TRANSACTION READ ONLY`);
+    await loadCatalogMigrationDatabaseEvidence(tx);
+  });
 }
 
 /**
@@ -245,12 +264,6 @@ function assertApprovedPreflight(
       current: revision,
     });
   }
-  if (approved.audit.databaseName !== revision.databaseName) {
-    throw new CatalogMigrationApplyError("revision_changed", {
-      auditDatabaseName: approved.audit.databaseName,
-      revisionDatabaseName: revision.databaseName,
-    });
-  }
   if (
     approved.audit.blockingIssueCount !== 0 ||
     approved.audit.collisions.count !== 0
@@ -273,11 +286,36 @@ function assertApprovedPreflight(
 async function assertAuditUnchanged(
   tx: AnyTransaction,
   candidate: CatalogMigrationApprovalCandidate,
+  revision: CatalogMigrationRevisionEvidence,
 ): Promise<void> {
-  const current = await collectCatalogMigrationAudit(tx);
-  const { generatedAt: _approvedGeneratedAt, ...approvedSnapshot } =
-    candidate.audit;
-  const { generatedAt: _currentGeneratedAt, ...currentSnapshot } = current;
+  const current = await collectCatalogMigrationAudit(
+    tx,
+    revision.databaseEvidence,
+  );
+  const {
+    generatedAt: _approvedGeneratedAt,
+    databaseEvidence: {
+      connection: _approvedConnection,
+      ...approvedDatabaseEvidence
+    },
+    ...approvedAudit
+  } = candidate.audit;
+  const {
+    generatedAt: _currentGeneratedAt,
+    databaseEvidence: {
+      connection: _currentConnection,
+      ...currentDatabaseEvidence
+    },
+    ...currentAudit
+  } = current;
+  const approvedSnapshot = {
+    ...approvedAudit,
+    databaseEvidence: approvedDatabaseEvidence,
+  };
+  const currentSnapshot = {
+    ...currentAudit,
+    databaseEvidence: currentDatabaseEvidence,
+  };
   if (JSON.stringify(currentSnapshot) !== JSON.stringify(approvedSnapshot)) {
     throw new CatalogMigrationApplyError("audit_changed", {
       approved: approvedSnapshot,
@@ -1188,15 +1226,19 @@ export async function applyCatalogMigration(
       auditGeneratedAt: parsed.candidate.audit.generatedAt,
     });
   }
-  const startedAt = new Date();
+  await assertWritablePrimaryPreflight(database);
 
+  const startedAt = new Date();
   const transactionResult = await database.transaction(async (tx) => {
     await tx.execute(sql`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`);
+    // Preserve the authoritative snapshot: no SELECT may precede these locks.
     await lockMigrationTables(tx);
+    const databaseEvidence = await loadCatalogMigrationDatabaseEvidence(tx);
     const revision = await loadCatalogMigrationRevisionEvidenceInTransaction(
       parsed.candidate.revision.gitRevision,
       tx,
       migrationsFolder,
+      databaseEvidence,
     );
     assertApprovedPreflight(parsed.candidate, revision);
 
@@ -1210,7 +1252,10 @@ export async function applyCatalogMigration(
         tx,
         completedStatsFamilies,
       );
-      const postflightAudit = await collectCatalogMigrationAudit(tx);
+      const postflightAudit = await collectCatalogMigrationAudit(
+        tx,
+        revision.databaseEvidence,
+      );
       assertPostflightAudit(postflightAudit, {
         parentCount: classification.families.length,
         releaseCount: state.releases.length,
@@ -1226,7 +1271,7 @@ export async function applyCatalogMigration(
       };
     }
 
-    await assertAuditUnchanged(tx, parsed.candidate);
+    await assertAuditUnchanged(tx, parsed.candidate, revision);
     const plans = await buildFamilyPlans(tx, state);
     const consumerPreflight = await preflightLegacyConsumersInTransaction(tx);
     const now = new Date();
@@ -1261,7 +1306,10 @@ export async function applyCatalogMigration(
         mappingCount: finalState.mappings.length,
       });
     }
-    const postflightAudit = await collectCatalogMigrationAudit(tx);
+    const postflightAudit = await collectCatalogMigrationAudit(
+      tx,
+      revision.databaseEvidence,
+    );
     assertPostflightAudit(postflightAudit, {
       parentCount: plans.length,
       releaseCount: state.releases.length,

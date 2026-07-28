@@ -191,6 +191,11 @@ The retained audit reports:
 
 Production application requires a fresh reconciled report and explicit
 approval. Local fixtures do not satisfy this gate.
+The retained audit and revision evidence come from one read-only repeatable-read
+transaction and record the primary cluster/database identity plus connection
+metadata. Evidence generation fails closed unless its database role can execute
+`pg_control_system()` and `pg_is_in_recovery()`; apply may use a different
+writer role but must attest to the same primary cluster and database.
 
 ### One fail-fast transaction
 

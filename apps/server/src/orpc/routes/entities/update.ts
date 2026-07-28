@@ -3,25 +3,18 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
   bottleGroups,
-  bottles,
   changes,
   countries,
   entities,
   regions,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import {
-  assignBottleAliasInTransaction,
-  ExactBottleAliasConflictError,
-  finalizeBottleAliasAssignment,
-  type BottleAliasAssignmentResult,
-} from "@peated/server/lib/bottleAliases";
+import { ExactBottleAliasConflictError } from "@peated/server/lib/bottleAliases";
 import {
   DuplicateEntityAliasError,
   upsertEntityAliases,
 } from "@peated/server/lib/db";
 import { arraysEqual } from "@peated/server/lib/equals";
-import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import {
   ConcreteBottleUpdateConflictError,
@@ -37,7 +30,7 @@ import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -187,16 +180,12 @@ export default procedure
     let updateResult: {
       entity: Entity | undefined;
       bottleUpdates: ConcreteBottleUpdateFinalizationManifest[];
-      legacyAliasAssignments: BottleAliasAssignmentResult[];
-      changedLegacyBottleIds: number[];
     };
     try {
       updateResult = await db.transaction(async (tx) => {
         const actorId = (await getUserActorForDatabase(tx, user)).id;
         let newEntity: Entity | undefined;
         const bottleUpdates: ConcreteBottleUpdateFinalizationManifest[] = [];
-        const legacyAliasAssignments: BottleAliasAssignmentResult[] = [];
-        const changedLegacyBottleIds: number[] = [];
 
         try {
           [newEntity] = await tx
@@ -220,8 +209,6 @@ export default procedure
           return {
             entity: undefined,
             bottleUpdates,
-            legacyAliasAssignments,
-            changedLegacyBottleIds,
           };
         }
 
@@ -268,39 +255,6 @@ export default procedure
               }),
             );
           }
-
-          const legacyBottles = await tx
-            .select()
-            .from(bottles)
-            .where(
-              and(eq(bottles.brandId, newEntity.id), isNull(bottles.groupId)),
-            )
-            .orderBy(asc(bottles.id))
-            .for("update");
-
-          for (const bottle of legacyBottles) {
-            const nextFullName = formatBottleName({
-              ...bottle,
-              name: `${newEntity.shortName || newEntity.name} ${bottle.name}`,
-            });
-            for (const aliasName of new Set([bottle.fullName, nextFullName])) {
-              legacyAliasAssignments.push(
-                await assignBottleAliasInTransaction(tx, {
-                  bottleId: bottle.id,
-                  name: aliasName,
-                  assignmentSource: "legacy",
-                  assignedByActorId: actorId,
-                }),
-              );
-            }
-            if (bottle.fullName !== nextFullName) {
-              await tx
-                .update(bottles)
-                .set({ fullName: nextFullName, updatedAt: new Date() })
-                .where(and(eq(bottles.id, bottle.id), isNull(bottles.groupId)));
-              changedLegacyBottleIds.push(bottle.id);
-            }
-          }
         }
 
         await tx.insert(changes).values({
@@ -317,8 +271,6 @@ export default procedure
         return {
           entity: newEntity,
           bottleUpdates,
-          legacyAliasAssignments,
-          changedLegacyBottleIds,
         };
       });
     } catch (error) {
@@ -343,22 +295,6 @@ export default procedure
 
     for (const bottleUpdate of updateResult.bottleUpdates) {
       await finalizeConcreteBottleUpdate(bottleUpdate);
-    }
-    for (const aliasAssignment of updateResult.legacyAliasAssignments) {
-      await finalizeBottleAliasAssignment(aliasAssignment, {
-        entity: { id: newEntity.id },
-      });
-    }
-    for (const bottleId of updateResult.changedLegacyBottleIds) {
-      try {
-        await pushUniqueJob(
-          "IndexBottleSearchVectors",
-          { bottleId },
-          { delay: 5000 },
-        );
-      } catch (err) {
-        logError(err, { bottle: { id: bottleId } });
-      }
     }
 
     try {

@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { CatalogMigrationDatabaseEvidenceSchema } from "./catalogMigrationDatabaseIdentity";
 
-export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 3 as const;
+export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 4 as const;
 
 export const CatalogMigrationLegacySummarySchema = z.object({
   totalParents: z.number().int().gte(0),
@@ -65,7 +66,7 @@ export const CatalogMigrationMappingSummarySchema = z.object({
 export const CatalogMigrationAuditSchema = z.object({
   schemaVersion: z.literal(CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION),
   generatedAt: z.string().datetime(),
-  databaseName: z.string().min(1),
+  databaseEvidence: CatalogMigrationDatabaseEvidenceSchema,
   legacyCatalog: CatalogMigrationLegacySummarySchema,
   references: z.array(CatalogMigrationReferenceSummarySchema),
   collisions: z.object({
