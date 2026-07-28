@@ -46,11 +46,6 @@ describe("indexBottleSearchVectors", () => {
     const unrelatedBottle = await fixtures.Bottle({
       name: "Unrelated Expression",
     });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Legacy Child Eclipse",
-    });
-
     await fixtures.BottleAlias({
       name: "Authoritative Alias Aurora",
       bottleId: bottle.id,
@@ -100,10 +95,6 @@ describe("indexBottleSearchVectors", () => {
     expect(await searchVectorMatches(bottle.id, "Foreign Direct Pulsar")).toBe(
       false,
     );
-    expect(await searchVectorMatches(bottle.id, "Legacy Child Eclipse")).toBe(
-      false,
-    );
-
     expect(
       await db
         .select({ name: bottleAliases.name })

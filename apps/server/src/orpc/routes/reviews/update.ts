@@ -18,8 +18,8 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  review: z.coerce.number(),
-  bottle: z.number().nullable().optional(),
+  review: z.coerce.number().int().positive(),
+  bottle: z.number().int().positive().nullable().optional(),
   hidden: z.boolean().optional(),
 });
 

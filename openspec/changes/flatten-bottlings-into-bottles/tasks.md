@@ -62,7 +62,7 @@ and map to an explicit removal task.
       converge directly on the selected surviving Bottle.
 - [x] 3.6 Recompute Bottle statistics from direct Bottle activity and
       BottleGroup statistics from raw member-Bottle activity.
-- [ ] 3.7 Keep indexing, verification, grouping, and other slow post-save work
+- [x] 3.7 Keep indexing, verification, grouping, and other slow post-save work
       idempotent and post-commit.
 - [ ] 3.8 Add database-backed tests for creation rollback, duplicate conflicts,
       shared fan-out, regrouping, Bottle merge, representatives, and direct
@@ -99,18 +99,18 @@ and map to an explicit removal task.
 
 - [x] 5.1 Remove CatalogTarget runtime schemas, loaders, resolvers, serializers,
       assignment descriptors, parity readers, and error types.
-- [ ] 5.2 Make Bottle the response and input identity for creation, aliases,
+- [x] 5.2 Make Bottle the response and input identity for creation, aliases,
       observations, tastings, reviews, collections, Flights, prices, proposals,
       decisions, activity, and photo flows.
-- [ ] 5.3 Update alias propagation and direct consumer writers to validate and
+- [x] 5.3 Update alias propagation and direct consumer writers to validate and
       write one Bottle id atomically without a second resolver.
-- [ ] 5.4 Update StorePrice ingestion, matching, proposals, attempts, approvals,
+- [x] 5.4 Update StorePrice ingestion, matching, proposals, attempts, approvals,
       and assignment clearing to one direct Bottle identity tuple.
-- [ ] 5.5 Update classifier, importers, scraper, CLI mutations, and background
+- [x] 5.5 Update classifier, importers, scraper, CLI mutations, and background
       workers to create or consume independently complete Bottles.
-- [ ] 5.6 Update cache, revalidation, notification, indexing, and queue payloads
+- [x] 5.6 Update cache, revalidation, notification, indexing, and queue payloads
       to Bottle ids; remove generic-target branches.
-- [ ] 5.7 Update statistics, badges, Library, country/entity/user analytics, and
+- [x] 5.7 Update statistics, badges, Library, country/entity/user analytics, and
       activity feeds to Bottle-owned data and member-derived group aggregates.
 - [x] 5.8 Keep BottleRelease compatibility routes translation-only over the
       promotion mapping and canonical Bottle services.

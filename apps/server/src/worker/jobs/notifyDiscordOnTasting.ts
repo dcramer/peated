@@ -4,12 +4,21 @@ import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { z } from "zod";
 
 if (!config.DISCORD_WEBHOOK) {
   logWarn("DISCORD_WEBHOOK is not configured", {});
 }
 
-export default async function ({ tastingId }: { tastingId: number }) {
+export const NotifyDiscordOnTastingJobArgsSchema = z
+  .object({
+    tastingId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async function notifyDiscordOnTasting(input: unknown) {
+  const { tastingId } = NotifyDiscordOnTastingJobArgsSchema.parse(input);
+
   if (!config.DISCORD_WEBHOOK) {
     return;
   }

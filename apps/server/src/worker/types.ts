@@ -15,7 +15,6 @@ export type JobName =
   | "IndexBottleSearchVectors"
   | "IndexBottleSeriesSearchVectors"
   | "IndexEntitySearchVectors"
-  | "MergeBottle"
   | "MergeEntity"
   | "NotifyDiscordOnTasting"
   | "OnBottleChange"

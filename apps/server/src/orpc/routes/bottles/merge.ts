@@ -15,7 +15,7 @@ export default procedure
   .use(requireMod)
   .route({
     method: "POST",
-    path: "/bottles/{bottle}/merge-targets",
+    path: "/bottles/{bottle}/merge",
     summary: "Merge bottles",
     description:
       "Merge two bottles together, combining their data and references. Requires moderator privileges",

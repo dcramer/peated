@@ -35,6 +35,12 @@ if (!config.OPENAI_API_KEY) {
   logWarn("OPENAI_API_KEY is not configured", {});
 }
 
+export const GenerateBottleDetailsJobArgsSchema = z
+  .object({
+    bottleId: z.number().int().positive(),
+  })
+  .strict();
+
 function generatePrompt(bottle: Partial<Bottle>, tagList: string[]) {
   const infoLines = [];
   if (bottle.category) {
@@ -142,7 +148,9 @@ export async function getGeneratedBottleDetails(
   );
 }
 
-export default async function ({ bottleId }: { bottleId: number }) {
+export default async function generateBottleDetails(rawJobArgs: unknown) {
+  const { bottleId } = GenerateBottleDetailsJobArgsSchema.parse(rawJobArgs);
+
   const [owned] = await db
     .select({
       bottle: bottles,

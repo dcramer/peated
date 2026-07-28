@@ -448,8 +448,11 @@ describe("OpenAPI generation ($ref reuse)", () => {
 
   it("returns the created Bottle from photo creation", async () => {
     const spec = await generateSpec();
-    const photoCreateSchema = getJsonResponseSchema(
-      spec.paths?.["/tastings/photo-identification-create"]?.post,
+    const photoCreateOperation =
+      spec.paths?.["/tastings/photo-identification-create"]?.post;
+    const photoCreateSchema = getJsonResponseSchema(photoCreateOperation);
+    expect(photoCreateOperation?.operationId).toBe(
+      "createTastingBottleFromPhotoIdentification",
     );
     expect(photoCreateSchema?.required).toContain("bottle");
     expect(photoCreateSchema?.properties).not.toHaveProperty("release");
@@ -457,6 +460,58 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<
       Outputs["tastings"]["photoIdentificationCreate"]["bottle"]["id"]
     >().toEqualTypeOf<number>();
+  });
+
+  it("publishes direct Bottle mutation contracts", async () => {
+    const spec = await generateSpec();
+    const mergeOperation = spec.paths?.["/bottles/{bottle}/merge"]?.post;
+    const mergeRequest = getJsonRequestSchema(mergeOperation);
+    const tastingRequest = getJsonRequestSchema(
+      spec.paths?.["/tastings"]?.post,
+    );
+    const flightRequest = getJsonRequestSchema(spec.paths?.["/flights"]?.post);
+    const reviewRequest = getJsonRequestSchema(
+      spec.paths?.["/reviews/{review}"]?.patch,
+    );
+
+    expect(spec.paths?.["/bottles/{bottle}/merge-targets"]).toBeUndefined();
+    expect(mergeOperation?.operationId).toBe("mergeBottle");
+    expect(mergeRequest?.properties).toHaveProperty("other");
+    expect(mergeRequest?.properties).not.toHaveProperty("target");
+    expect(mergeRequest?.properties).not.toHaveProperty("release");
+
+    expect(tastingRequest?.required).toContain("bottle");
+    expect(tastingRequest?.properties).not.toHaveProperty("target");
+    expect(tastingRequest?.properties).not.toHaveProperty("release");
+
+    expect(flightRequest?.properties?.bottles?.items).toMatchObject({
+      type: "integer",
+      exclusiveMinimum: 0,
+    });
+    expect(flightRequest?.properties).not.toHaveProperty("targets");
+    expect(flightRequest?.properties).not.toHaveProperty("releases");
+
+    expect(reviewRequest?.properties?.bottle).toMatchObject({
+      anyOf: expect.arrayContaining([
+        expect.objectContaining({
+          type: "integer",
+          exclusiveMinimum: 0,
+        }),
+        expect.objectContaining({ type: "null" }),
+      ]),
+    });
+    expect(reviewRequest?.properties).not.toHaveProperty("target");
+    expect(reviewRequest?.properties).not.toHaveProperty("release");
+
+    expectTypeOf<
+      Inputs["tastings"]["create"]["bottle"]
+    >().toEqualTypeOf<number>();
+    expectTypeOf<Inputs["flights"]["create"]["bottles"]>().toEqualTypeOf<
+      number[] | undefined
+    >();
+    expectTypeOf<Inputs["reviews"]["update"]["bottle"]>().toEqualTypeOf<
+      number | null | undefined
+    >();
   });
 
   it("publishes direct Bottle collection contracts", async () => {

@@ -41,7 +41,7 @@ async function expectCommittedMerge({
   ).toEqual([expect.objectContaining({ newBottleId: destination.id })]);
 }
 
-describe("POST /bottles/:bottle/merge-targets", () => {
+describe("POST /bottles/:bottle/merge", () => {
   test("requires authentication", async () => {
     const err = await waitError(
       routerClient.bottles.merge(

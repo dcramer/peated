@@ -25,18 +25,7 @@ export const CollectionBottleSerializer = serializer({
     itemList: CollectionBottle[],
     currentUser?: User,
   ): Promise<Record<number, CollectionBottleAttrs>> => {
-    const bottleIds = [
-      ...new Set(
-        itemList.map((item) => {
-          if (item.bottleId === null) {
-            throw new Error(
-              `collection membership ${item.id} has no Bottle identity`,
-            );
-          }
-          return item.bottleId;
-        }),
-      ),
-    ];
+    const bottleIds = [...new Set(itemList.map(({ bottleId }) => bottleId))];
     const bottleRows = await db
       .select()
       .from(bottles)
@@ -61,12 +50,12 @@ export const CollectionBottleSerializer = serializer({
                   inArray(tastings.bottleId, bottleIds),
                 ),
               )
-          ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId]))
+          ).map(({ bottleId }) => bottleId)
         : [],
     );
     return Object.fromEntries(
       itemList.map((item) => {
-        const bottle = bottleById.get(item.bottleId!);
+        const bottle = bottleById.get(item.bottleId);
         if (!bottle) {
           throw new Error(
             `collection membership ${item.id} references missing Bottle ${item.bottleId}`,

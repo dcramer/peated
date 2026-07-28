@@ -10,11 +10,18 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import { logInfo } from "@peated/server/lib/log";
 import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { z } from "zod";
 
 const CASK_STRENGTH_SEARCH_TERMS =
   "cask strength barrel strength barrel proof full proof natural strength";
 const SINGLE_CASK_SEARCH_TERMS = "single cask single barrel";
 const MAX_SEARCH_SOURCE_ATTEMPTS = 2;
+
+export const IndexBottleAliasJobArgsSchema = z
+  .object({
+    name: z.string().min(1),
+  })
+  .strict();
 
 type BottleAliasSearchSource = {
   alias: {
@@ -227,7 +234,9 @@ function buildBottleAliasSearchText({
   return bits.join(" ");
 }
 
-export default async ({ name }: { name: string }) => {
+export default async function indexBottleAlias(input: unknown) {
+  const { name } = IndexBottleAliasJobArgsSchema.parse(input);
+
   logInfo("Updating index for bottle alias {name}", {
     extra: {
       name,
@@ -273,4 +282,4 @@ export default async ({ name }: { name: string }) => {
   throw new Error(
     `Bottle alias search source changed repeatedly while indexing: ${name}`,
   );
-};
+}

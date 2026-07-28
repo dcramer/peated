@@ -1,5 +1,5 @@
 import {
-  type CatalogVerificationCreationSource,
+  CatalogVerificationCreationSourceEnum,
   getCatalogVerificationSkipReason,
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
@@ -9,14 +9,23 @@ import {
   getBottleCatalogVerificationFindings,
   getCatalogVerificationDisplayName,
 } from "@peated/server/lib/catalogVerificationFindings";
+import { z } from "zod";
 
-export default async function ({
-  bottleId,
-  creationSource,
-}: {
-  bottleId: number;
-  creationSource: CatalogVerificationCreationSource;
-}) {
+export const VerifyBottleCreationJobArgsSchema = z
+  .object({
+    bottleId: z.number().int().positive(),
+    creationSource: z.enum(CatalogVerificationCreationSourceEnum.options),
+  })
+  .strict();
+
+export type VerifyBottleCreationJobArgs = z.infer<
+  typeof VerifyBottleCreationJobArgsSchema
+>;
+
+export default async function verifyBottleCreation(input: unknown) {
+  const { bottleId, creationSource } =
+    VerifyBottleCreationJobArgsSchema.parse(input);
+
   const displayName = await getCatalogVerificationDisplayName({
     objectId: bottleId,
     objectType: "bottle",

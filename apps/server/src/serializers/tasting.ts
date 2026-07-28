@@ -27,16 +27,7 @@ export const TastingSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<string, TastingAttrs>> => {
     const itemIds = itemList.map((t) => t.id);
-    const bottleIds = [
-      ...new Set(
-        itemList.map(({ bottleId, id }) => {
-          if (bottleId === null) {
-            throw new Error(`Tasting ${id} has no Bottle.`);
-          }
-          return bottleId;
-        }),
-      ),
-    ];
+    const bottleIds = [...new Set(itemList.map(({ bottleId }) => bottleId))];
     const bottleList = bottleIds.length
       ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
       : [];
@@ -133,12 +124,18 @@ export const TastingSerializer = serializer({
 
     return Object.fromEntries(
       itemList.map((item) => {
+        const bottle = serializedBottleById.get(item.bottleId);
+        if (!bottle) {
+          throw new Error(
+            `Tasting ${item.id} references missing Bottle ${item.bottleId}.`,
+          );
+        }
         return [
           item.id,
           {
             hasToasted: userToastsList.includes(item.id),
             createdBy: creatorsById[item.createdById],
-            bottle: serializedBottleById.get(item.bottleId!)!,
+            bottle,
             friends: item.friends.map((f) => usersById[f]).filter(notEmpty),
             awards: awardsByTasting[item.id] || [],
           },

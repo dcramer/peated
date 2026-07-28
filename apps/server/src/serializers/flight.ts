@@ -44,18 +44,7 @@ export const FlightDetailsSerializer = serializer({
       .from(flightBottles)
       .where(inArray(flightBottles.flightId, flightIds))
       .orderBy(asc(flightBottles.flightId), asc(flightBottles.bottleId));
-    const bottleIds = [
-      ...new Set(
-        memberships.map((membership) => {
-          if (membership.bottleId === null) {
-            throw new Error(
-              `flight membership ${membership.flightId} has no Bottle identity`,
-            );
-          }
-          return membership.bottleId;
-        }),
-      ),
-    ];
+    const bottleIds = [...new Set(memberships.map(({ bottleId }) => bottleId))];
     const bottleRows = bottleIds.length
       ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
       : [];
@@ -86,7 +75,7 @@ export const FlightDetailsSerializer = serializer({
         : [];
     const tastedKeys = new Set(
       tastedRows.flatMap(({ flightId, bottleId }) =>
-        flightId && bottleId ? [`${flightId}:${bottleId}`] : [],
+        flightId === null ? [] : [`${flightId}:${bottleId}`],
       ),
     );
 
@@ -105,13 +94,13 @@ export const FlightDetailsSerializer = serializer({
                   inArray(collectionBottles.bottleId, bottleIds),
                 ),
               )
-          ).flatMap(({ bottleId }) => (bottleId ? [bottleId] : []))
+          ).map(({ bottleId }) => bottleId)
         : [],
     );
 
     const bottlesByFlightId = new Map<number, FlightBottle[]>();
     memberships.forEach((membership) => {
-      const bottle = bottleById.get(membership.bottleId!);
+      const bottle = bottleById.get(membership.bottleId);
       if (!bottle) {
         throw new Error(
           `flight membership ${membership.flightId} references missing Bottle ${membership.bottleId}`,

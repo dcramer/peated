@@ -226,6 +226,10 @@ describe("price match queue", () => {
     expect(queueItem).not.toHaveProperty("currentReleaseId");
     expect(queueItem).not.toHaveProperty("suggestedBottleId");
     expect(queueItem).not.toHaveProperty("suggestedReleaseId");
+    expect(queueItem).not.toHaveProperty("parentBottle");
+    expect(queueItem).not.toHaveProperty("parentBottleId");
+    expect(queueItem).not.toHaveProperty("creationTarget");
+    expect(queueItem).not.toHaveProperty("proposedRelease");
   });
 
   test("hydrates a direct Bottle suggestion", async ({ fixtures }) => {
@@ -250,6 +254,63 @@ describe("price match queue", () => {
     expect(
       result.results.find((item) => item.id === proposal.id)?.suggestedBottle,
     ).toMatchObject({ id: bottle.id });
+  });
+
+  test("translates historical Bottle candidates and omits release candidates", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Legacy Queue Candidate" });
+    const price = await fixtures.StorePrice({ name: "Legacy Queue Listing" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+        candidateBottles: [
+          {
+            kind: "bottle",
+            bottleId: bottle.id,
+            releaseId: null,
+            bottleFullName: bottle.fullName,
+            fullName: bottle.fullName,
+            source: ["legacy"],
+            familyContext: {
+              parentBottleReleaseTraits: ["edition"],
+              siblingReleases: [{ releaseId: 101, fullName: "Legacy Release" }],
+              siblingBottles: [],
+            },
+          },
+          {
+            kind: "release",
+            bottleId: bottle.id,
+            releaseId: 101,
+            fullName: "Legacy Release",
+            source: ["legacy"],
+          },
+        ],
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+    const candidates = result.results.find(
+      (item) => item.id === proposal.id,
+    )?.candidateBottles;
+
+    expect(candidates).toEqual([
+      expect.objectContaining({
+        bottleId: bottle.id,
+        fullName: bottle.fullName,
+        familyContext: { siblingBottles: [] },
+      }),
+    ]);
+    expect(candidates?.[0]).not.toHaveProperty("kind");
+    expect(candidates?.[0]).not.toHaveProperty("releaseId");
+    expect(candidates?.[0]).not.toHaveProperty("bottleFullName");
   });
 
   test("serializes persisted BottleGroup sibling cask evidence", async ({
@@ -2035,12 +2096,10 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Single Cask",
           brand: { id: brand.id, name: brand.name },
         }),
-        proposedRelease: null,
       })
       .returning();
     const priorReviewer = await fixtures.User({ mod: true });
@@ -2187,14 +2246,12 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Private Selection",
           brand: { id: brand.id, name: brand.name },
           edition: "Batch 7",
           releaseYear: 2024,
         }),
-        proposedRelease: null,
       })
       .returning();
 
@@ -2260,12 +2317,10 @@ describe("price match queue", () => {
         proposalType: "create_new",
         currentBottleId: previousBottle.id,
         currentReleaseId: null,
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Replacement Decision",
           brand: { id: brand.id, name: brand.name },
         }),
-        proposedRelease: null,
       })
       .returning();
     const [attempt] = await db
@@ -2431,8 +2486,6 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        parentBottleId: sourceBottle.id,
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Trusted Expression",
           brand: { id: durableBrand.id, name: durableBrand.name },
@@ -2447,7 +2500,6 @@ describe("price match queue", () => {
           abv: 55.2,
           releaseYear: 2025,
         }),
-        proposedRelease: null,
       })
       .returning();
     const releasesBefore = await db.select().from(bottleReleases);
@@ -2724,8 +2776,6 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        parentBottleId: sourceBottle.id,
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Retry Expression",
           brand: { id: brand.id, name: brand.name },
@@ -2734,7 +2784,6 @@ describe("price match queue", () => {
           statedAge: 15,
           abv: 54,
         }),
-        proposedRelease: null,
       })
       .returning();
     const [seriesBefore, bottlesBefore, groupsBefore, releasesBefore] =
@@ -2839,14 +2888,11 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        parentBottleId: sourceBottle.id,
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Cross Group Expression",
           brand: { id: brand.id, name: brand.name },
           edition: "Batch 8",
         }),
-        proposedRelease: null,
       })
       .returning();
 
@@ -2986,48 +3032,6 @@ describe("price match queue", () => {
     expect(groupsAfter).toHaveLength(groupsBefore.length);
   });
 
-  test("rejects retired proposal prefill sources", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
-    const retired = await fixtures.Bottle({ name: "Retired Proposal Source" });
-    const replacement = await fixtures.Bottle({
-      name: "Replacement Proposal Source",
-    });
-    await db.insert(bottleTombstones).values({
-      bottleId: retired.id,
-      newBottleId: replacement.id,
-    });
-    const price = await fixtures.StorePrice({
-      name: "Trusted Source Retired",
-      bottleId: null,
-    });
-    const [proposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        status: "pending_review",
-        proposalType: "create_new",
-        parentBottleId: retired.id,
-        creationTarget: "release",
-      })
-      .returning();
-
-    const error = await waitError(
-      (routerClient.prices.matchQueue.createBottle as any)(
-        {
-          proposal: proposal.id,
-          release: { edition: "Retired" },
-        },
-        { context: { user } },
-      ),
-    );
-    const updatedProposal = await db.query.storePriceMatchProposals.findFirst({
-      where: eq(storePriceMatchProposals.id, proposal.id),
-    });
-
-    expect(error).toMatchObject({ status: 400 });
-    expect(updatedProposal).toMatchObject({ status: "pending_review" });
-  });
-
   test("rejects proposal-backed bottle creation for non-create_new proposals", async ({
     fixtures,
   }) => {
@@ -3043,12 +3047,10 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "match_existing",
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Should Not Exist",
           brand: { id: brand.id, name: brand.name },
         }),
-        proposedRelease: null,
       })
       .returning();
 
@@ -3090,12 +3092,10 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "approved",
         proposalType: "create_new",
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Already Reviewed",
           brand: { id: brand.id, name: brand.name },
         }),
-        proposedRelease: null,
       })
       .returning();
     const err = await waitError(
@@ -3188,12 +3188,10 @@ describe("price match queue", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        creationTarget: "bottle",
         proposedBottle: completeProposedBottle({
           name: "Fresh Release",
           brand: { id: brand.id, name: brand.name },
         }),
-        proposedRelease: null,
       })
       .returning();
 

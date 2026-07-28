@@ -1,7 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
   normalizePotentialProofLikeAbvFields,
-  normalizePotentialProofLikeDecision,
   normalizePotentialProofToAbv,
 } from "./abv";
 
@@ -28,26 +27,6 @@ describe("ABV normalization", () => {
     ).toEqual({
       abv: 57.8,
       caskStrength: true,
-    });
-  });
-
-  test("normalizes create_new decision draft ABV fields", () => {
-    expect(
-      normalizePotentialProofLikeDecision({
-        action: "create_new",
-        proposedBottle: null,
-        proposedRelease: {
-          abv: 115.6,
-          caskStrength: true,
-        },
-      }),
-    ).toEqual({
-      action: "create_new",
-      proposedBottle: null,
-      proposedRelease: {
-        abv: 57.8,
-        caskStrength: true,
-      },
     });
   });
 });

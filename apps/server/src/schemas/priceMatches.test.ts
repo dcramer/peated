@@ -1,10 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { z } from "zod";
 
 import {
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
-  StorePriceMatchAgentResponseSchema,
   StorePriceMatchDecisionSchema,
   StorePriceMatchProposalSchema,
   StorePriceMatchQueueItemSchema,
@@ -32,266 +30,180 @@ const baseProposedBottle = {
   bottler: null,
 };
 
-const baseProposedRelease = {
-  edition: "Batch 1",
-  statedAge: null,
-  abv: 58.4,
-  caskStrength: true,
-  singleCask: null,
-  vintageYear: null,
-  releaseYear: 2024,
-  caskType: "tawny_port" as const,
-  caskSize: null,
-  caskFill: null,
-  description: null,
-  tastingNotes: null,
-  imageUrl: null,
-};
-
 describe("PriceMatchCandidateSchema", () => {
-  test("accepts historical release candidates", () => {
+  test("accepts independently complete Bottle candidates", () => {
     const candidate = PriceMatchCandidateSchema.parse({
-      kind: "release",
       bottleId: 10,
-      releaseId: 20,
-      fullName: "Historical Bottle Batch 2",
-      bottleFullName: "Historical Bottle",
+      fullName: "Example Bottle Batch 2",
+      edition: "Batch 2",
       familyContext: {
-        parentBottleReleaseTraits: ["edition"],
-        childReleaseCount: 1,
-        siblingReleases: [
+        siblingBottles: [
           {
-            releaseId: 21,
-            fullName: "Historical Bottle Batch 1",
+            bottleId: 11,
+            fullName: "Example Bottle Batch 1",
             traitFields: ["edition"],
             edition: "Batch 1",
           },
         ],
-        siblingBottles: [],
       },
     });
 
     expect(candidate).toMatchObject({
-      kind: "release",
       bottleId: 10,
-      releaseId: 20,
+      edition: "Batch 2",
+      familyContext: {
+        siblingBottles: [{ bottleId: 11, edition: "Batch 1" }],
+      },
     });
   });
 
-  test("rejects unknown current candidate fields instead of legacy fallback", () => {
-    const result = PriceMatchCandidateSchema.safeParse({
-      bottleId: 10,
-      fullName: "Current Bottle",
-      source: ["current"],
-      caskTyp: "bourbon",
-    });
+  test.each([
+    { kind: "release" },
+    { releaseId: 20 },
+    {
+      familyContext: {
+        siblingBottles: [],
+        siblingReleases: [{ releaseId: 21, fullName: "Legacy release" }],
+      },
+    },
+  ])("rejects legacy release candidate shape %o", (legacyFields) => {
+    expect(
+      PriceMatchCandidateSchema.safeParse({
+        bottleId: 10,
+        fullName: "Current Bottle",
+        ...legacyFields,
+      }).success,
+    ).toBe(false);
+  });
 
-    expect(result.success).toBe(false);
+  test("rejects unknown candidate fields", () => {
+    expect(
+      PriceMatchCandidateSchema.safeParse({
+        bottleId: 10,
+        fullName: "Current Bottle",
+        caskTyp: "bourbon",
+      }).success,
+    ).toBe(false);
   });
 });
 
 describe("StorePriceMatchDecisionSchema", () => {
-  test("normalizes legacy Brave search evidence providers on read", () => {
+  test("normalizes retained Brave search evidence providers on read", () => {
     const parsed = PriceMatchSearchEvidenceSchema.parse({
       provider: "brave",
       query: "example bottle",
-      summary: "Legacy Brave evidence",
+      summary: "Retained search evidence",
       results: [],
     });
 
     expect(parsed.provider).toBe("openai");
   });
 
-  test("uses a flat agent response schema without a decision union", () => {
-    const jsonSchema = z.toJSONSchema(
-      StorePriceMatchAgentResponseSchema,
-    ) as unknown as {
-      type?: string;
-      properties?: {
-        decision?: {
-          type?: string;
-          properties?: Record<string, unknown>;
-          anyOf?: unknown[];
-          oneOf?: unknown[];
-          required?: string[];
-        };
-      };
-      required?: string[];
-      additionalProperties?: boolean;
-    };
-
-    expect(jsonSchema.type).toBe("object");
-    expect(jsonSchema.additionalProperties).toBe(false);
-    expect(jsonSchema.required).toEqual(["decision"]);
-    expect(jsonSchema.properties?.decision).toBeDefined();
-    expect(jsonSchema.properties?.decision?.type).toBe("object");
-    expect(jsonSchema.properties?.decision?.oneOf).toBeUndefined();
-    expect(jsonSchema.properties?.decision?.anyOf).toBeUndefined();
-    expect((jsonSchema.properties?.decision?.required ?? []).sort()).toEqual(
-      [
-        "action",
-        "candidateBottleIds",
-        "confidence",
-        "creationTarget",
-        "identityScope",
-        "parentBottleId",
-        "proposedBottle",
-        "proposedRelease",
-        "rationale",
-        "suggestedBottleId",
-        "suggestedReleaseId",
-      ].sort(),
-    );
-  });
-
-  test("accepts alias metadata on match decisions", () => {
-    const parsed = StorePriceMatchDecisionSchema.parse({
-      action: "match_existing",
-      confidence: 96,
-      suggestedBottleId: 123,
-      aliasScope: "global_alias",
-    });
-
-    expect(parsed).toMatchObject({
-      aliasScope: "global_alias",
-    });
-  });
-
-  test("rejects unsupported alias scope values", () => {
+  test("accepts the four direct-Bottle decisions", () => {
     expect(
-      StorePriceMatchDecisionSchema.safeParse({
+      StorePriceMatchDecisionSchema.parse({
         action: "match_existing",
-        confidence: 96,
         suggestedBottleId: 123,
-        aliasScope: "local_alias",
-      }).success,
-    ).toBe(false);
-
+        aliasScope: "global_alias",
+      }),
+    ).toMatchObject({
+      action: "match_existing",
+      suggestedBottleId: 123,
+      proposedBottle: null,
+    });
     expect(
-      StorePriceMatchAgentResponseSchema.safeParse({
-        decision: {
-          action: "match_existing",
-          confidence: 96,
-          suggestedBottleId: 123,
-          aliasScope: "local_alias",
-        },
-      }).success,
-    ).toBe(false);
+      StorePriceMatchDecisionSchema.parse({
+        action: "correction",
+        suggestedBottleId: 123,
+        proposedBottle: baseProposedBottle,
+      }),
+    ).toMatchObject({
+      action: "correction",
+      suggestedBottleId: 123,
+      proposedBottle: baseProposedBottle,
+    });
+    expect(
+      StorePriceMatchDecisionSchema.parse({
+        action: "create_new",
+        proposedBottle: baseProposedBottle,
+      }),
+    ).toMatchObject({
+      action: "create_new",
+      suggestedBottleId: null,
+      proposedBottle: baseProposedBottle,
+    });
+    expect(
+      StorePriceMatchDecisionSchema.parse({
+        action: "no_match",
+      }),
+    ).toMatchObject({
+      action: "no_match",
+      suggestedBottleId: null,
+      proposedBottle: null,
+    });
   });
 
-  test("uses fully required proposedBottle fields for structured outputs", () => {
-    const jsonSchema = z.toJSONSchema(
-      StorePriceMatchDecisionSchema,
-    ) as unknown as {
-      anyOf?: Array<{
-        properties?: Record<string, unknown>;
-        required?: string[];
-      }>;
-      oneOf?: Array<{
-        properties?: Record<string, unknown>;
-        required?: string[];
-      }>;
-    };
-
-    const decisionSchemas = jsonSchema.oneOf ?? jsonSchema.anyOf ?? [];
-    const createNewSchema = decisionSchemas.find(
-      (schema) =>
-        schema.properties &&
-        "action" in schema.properties &&
-        (schema.properties.action as { const?: string }).const === "create_new",
-    ) as
-      | {
-          properties?: {
-            proposedBottle?: {
-              properties?: Record<string, unknown>;
-              required?: string[];
-            };
-          };
-        }
-      | undefined;
-    const proposedBottle = (
-      createNewSchema?.properties?.proposedBottle as
-        | {
-            anyOf?: Array<{
-              type?: string;
-              properties?: Record<string, unknown>;
-              required?: string[];
-            }>;
-          }
-        | undefined
-    )?.anyOf?.find((schema) => schema.type === "object");
-    const series = proposedBottle?.properties?.series as
-      | {
-          anyOf?: Array<{
-            type?: string;
-            properties?: Record<string, unknown>;
-            required?: string[];
-          }>;
-        }
-      | undefined;
-    const brand = proposedBottle?.properties?.brand as
-      | {
-          properties?: Record<string, unknown>;
-          required?: string[];
-        }
-      | undefined;
-    const distillers = proposedBottle?.properties?.distillers as
-      | {
-          items?: {
-            properties?: Record<string, unknown>;
-            required?: string[];
-          };
-        }
-      | undefined;
-
-    expect(proposedBottle).toBeDefined();
-    expect((proposedBottle?.required ?? []).sort()).toEqual(
-      Object.keys(proposedBottle?.properties ?? {}).sort(),
-    );
-
-    const seriesObject = series?.anyOf?.find(
-      (schema) => schema.type === "object",
-    );
-    expect(seriesObject).toBeDefined();
-    expect((seriesObject?.required ?? []).sort()).toEqual(
-      Object.keys(seriesObject?.properties ?? {}).sort(),
-    );
-
-    expect((brand?.required ?? []).sort()).toEqual(
-      Object.keys(brand?.properties ?? {}).sort(),
-    );
-
-    expect((distillers?.items?.required ?? []).sort()).toEqual(
-      Object.keys(distillers?.items?.properties ?? {}).sort(),
-    );
-  });
-
-  test("requires suggested bottle ids for match_existing and correction", () => {
+  test.each([
+    "suggestedReleaseId",
+    "parentBottleId",
+    "creationTarget",
+    "proposedRelease",
+  ])("rejects obsolete release decision field %s", (field) => {
     expect(
       StorePriceMatchDecisionSchema.safeParse({
-        action: "match_existing",
-        confidence: 91,
-        rationale: null,
-        candidateBottleIds: [1],
+        action: "no_match",
+        [field]: null,
+      }).success,
+    ).toBe(false);
+  });
+
+  test.each([
+    "create_release",
+    "create_bottle_and_release",
+    "repair_parent",
+    "repair_parent_and_create_release",
+  ])("rejects obsolete decision action %s", (action) => {
+    expect(
+      StorePriceMatchDecisionSchema.safeParse({
+        action,
+        suggestedBottleId: null,
         proposedBottle: null,
       }).success,
     ).toBe(false);
+  });
 
+  test("requires a Bottle id for existing matches and corrections", () => {
+    expect(
+      StorePriceMatchDecisionSchema.safeParse({
+        action: "match_existing",
+      }).success,
+    ).toBe(false);
     expect(
       StorePriceMatchDecisionSchema.safeParse({
         action: "correction",
-        confidence: 91,
-        rationale: null,
-        candidateBottleIds: [1],
         proposedBottle: null,
       }).success,
     ).toBe(false);
   });
 
-  test("preserves exact-age repair scope while accepting unmarked legacy drafts", () => {
+  test("requires one complete Bottle draft for creation", () => {
+    expect(
+      StorePriceMatchDecisionSchema.safeParse({
+        action: "create_new",
+        proposedBottle: null,
+      }).success,
+    ).toBe(false);
+    expect(
+      StorePriceMatchDecisionSchema.safeParse({
+        action: "create_new",
+        proposedBottle: baseProposedBottle,
+      }).success,
+    ).toBe(true);
+  });
+
+  test("preserves exact-age repair scope and direct historical repair drafts", () => {
     const exactRepair = StorePriceMatchDecisionSchema.parse({
       action: "correction",
-      confidence: null,
       suggestedBottleId: 1,
       proposedBottle: {
         ...baseProposedBottle,
@@ -299,9 +211,8 @@ describe("StorePriceMatchDecisionSchema", () => {
         statedAgeScope: "exact",
       },
     });
-    const legacyRepair = StorePriceMatchDecisionSchema.parse({
+    const unmarkedRepair = StorePriceMatchDecisionSchema.parse({
       action: "correction",
-      confidence: null,
       suggestedBottleId: 1,
       proposedBottle: {
         ...baseProposedBottle,
@@ -313,205 +224,19 @@ describe("StorePriceMatchDecisionSchema", () => {
       statedAge: 12,
       statedAgeScope: "exact",
     });
-    expect(legacyRepair.proposedBottle).toMatchObject({ statedAge: 12 });
-    expect(legacyRepair.proposedBottle).not.toHaveProperty("statedAgeScope");
+    expect(unmarkedRepair.proposedBottle).toMatchObject({ statedAge: 12 });
+    expect(unmarkedRepair.proposedBottle).not.toHaveProperty("statedAgeScope");
   });
 
-  test("rejects suggested bottle ids for create_new and no_match", () => {
-    expect(
-      StorePriceMatchDecisionSchema.safeParse({
-        action: "create_new",
-        confidence: 91,
-        rationale: null,
-        suggestedBottleId: 1,
-        candidateBottleIds: [],
-        proposedBottle: {
-          name: "Example Bottle",
-          series: null,
-          category: "single_malt",
-          edition: null,
-          statedAge: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
-          brand: {
-            id: null,
-            name: "Example Brand",
-          },
-          distillers: [],
-          bottler: null,
-        },
-      }).success,
-    ).toBe(false);
-
-    expect(
-      StorePriceMatchDecisionSchema.safeParse({
-        action: "no_match",
-        confidence: 91,
-        rationale: null,
-        suggestedBottleId: 1,
-        candidateBottleIds: [],
-        proposedBottle: null,
-      }).success,
-    ).toBe(false);
-  });
-
-  test("allows proposed bottle drafts only for create_new and correction", () => {
-    expect(
-      StorePriceMatchDecisionSchema.safeParse({
-        action: "create_new",
-        confidence: 91,
-        rationale: null,
-        candidateBottleIds: [],
-        proposedBottle: null,
-      }).success,
-    ).toBe(false);
-
-    expect(
-      StorePriceMatchDecisionSchema.safeParse({
-        action: "match_existing",
-        confidence: 91,
-        rationale: null,
-        suggestedBottleId: 1,
-        candidateBottleIds: [1],
-        proposedBottle: {
-          name: "Should Not Be Here",
-          series: null,
-          category: "single_malt",
-          edition: null,
-          statedAge: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
-          brand: {
-            id: null,
-            name: "Example Brand",
-          },
-          distillers: [],
-          bottler: null,
-        },
-      }).success,
-    ).toBe(false);
-
-    expect(
-      StorePriceMatchDecisionSchema.safeParse({
-        action: "correction",
-        confidence: 91,
-        rationale: null,
-        suggestedBottleId: 1,
-        candidateBottleIds: [1],
-        proposedBottle: {
-          name: "Example Bottle",
-          series: null,
-          category: "single_malt",
-          edition: null,
-          statedAge: null,
-          caskStrength: null,
-          singleCask: null,
-          abv: null,
-          vintageYear: null,
-          releaseYear: null,
-          caskType: null,
-          caskSize: null,
-          caskFill: null,
-          brand: {
-            id: null,
-            name: "Example Brand",
-          },
-          distillers: [],
-          bottler: null,
-        },
-      }).success,
-    ).toBe(true);
-  });
-
-  test("allows no-match proposals to carry complete review-only parent repair drafts", () => {
-    const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "no_match",
-      confidence: 90,
-      rationale:
-        "Parent bottle metadata must be repaired before this release can be created.",
-      suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: 123,
-      creationTarget: null,
-      candidateBottleIds: [123],
-      proposedBottle: baseProposedBottle,
-      proposedRelease: baseProposedRelease,
-    });
-
-    if (!result.success) {
-      throw new Error(
-        "Expected complete parent repair no-match draft to parse.",
-      );
-    }
-
-    expect(result.data.parentBottleId).toBe(123);
-    expect(result.data.proposedBottle).toEqual(baseProposedBottle);
-    expect(result.data.proposedRelease).toEqual(baseProposedRelease);
-  });
-
-  test("rejects partial no-match parent repair drafts", () => {
-    const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "no_match",
-      confidence: 90,
-      rationale: "Incomplete compound repair.",
-      suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: 123,
-      creationTarget: null,
-      candidateBottleIds: [123],
-      proposedBottle: baseProposedBottle,
-      proposedRelease: null,
-    });
-
-    if (result.success) {
-      throw new Error("Expected partial parent repair no-match draft to fail.");
-    }
-
-    expect(result.error.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          path: ["proposedRelease"],
-        }),
-      ]),
-    );
-  });
-
-  test("rejects fractional ids in classifier output", () => {
+  test("rejects fractional entity ids in Bottle drafts", () => {
     const result = StorePriceMatchDecisionSchema.safeParse({
       action: "create_new",
-      confidence: 91,
-      rationale: null,
-      suggestedBottleId: null,
-      candidateBottleIds: [],
       proposedBottle: {
-        name: "Example Bottle",
+        ...baseProposedBottle,
         series: {
           id: 0.92,
           name: "Example Series",
         },
-        category: "single_malt",
-        edition: null,
-        statedAge: 12,
-        caskStrength: null,
-        singleCask: null,
-        abv: 46,
-        vintageYear: null,
-        releaseYear: null,
-        caskType: null,
-        caskSize: null,
-        caskFill: null,
         brand: {
           id: 1,
           name: "Example Brand",
@@ -522,16 +247,13 @@ describe("StorePriceMatchDecisionSchema", () => {
             name: "Example Distillery",
           },
         ],
-        bottler: null,
       },
     });
 
     expect(result.success).toBe(false);
-
     if (result.success) {
-      throw new Error("Expected classifier output validation to fail");
+      throw new Error("Expected Bottle draft validation to fail.");
     }
-
     expect(result.error.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -543,157 +265,26 @@ describe("StorePriceMatchDecisionSchema", () => {
       ]),
     );
   });
-
-  test("defaults create_new proposals to bottle-only creation", () => {
-    const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "create_new",
-      confidence: 91,
-      rationale: null,
-      suggestedBottleId: null,
-      candidateBottleIds: [],
-      proposedBottle: baseProposedBottle,
-    });
-
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      throw new Error("Expected bottle-only proposal to parse");
-    }
-
-    expect(result.data.creationTarget).toBeUndefined();
-    expect(result.data.parentBottleId).toBeUndefined();
-    expect(result.data.proposedRelease).toBeUndefined();
-  });
-
-  test("allows proof-like ABV values in agent create_new drafts", () => {
-    const result = StorePriceMatchAgentResponseSchema.safeParse({
-      decision: {
-        action: "create_new",
-        confidence: 91,
-        rationale: null,
-        suggestedBottleId: null,
-        suggestedReleaseId: null,
-        parentBottleId: null,
-        creationTarget: "release",
-        candidateBottleIds: [],
-        proposedBottle: null,
-        proposedRelease: {
-          ...baseProposedRelease,
-          abv: 115.6,
-        },
-      },
-    });
-
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      throw new Error(
-        "Expected agent response schema to accept proof-like ABV",
-      );
-    }
-
-    expect(result.data.decision.proposedRelease?.abv).toBe(115.6);
-  });
-
-  test("rejects release creation without a parent bottle", () => {
-    const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "create_new",
-      confidence: 91,
-      rationale: null,
-      suggestedBottleId: null,
-      candidateBottleIds: [],
-      creationTarget: "release",
-      proposedBottle: null,
-      proposedRelease: baseProposedRelease,
-    });
-
-    expect(result.success).toBe(false);
-
-    if (result.success) {
-      throw new Error("Expected release-only proposal validation to fail");
-    }
-
-    expect(result.error.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          path: ["parentBottleId"],
-        }),
-      ]),
-    );
-  });
-
-  test("rejects bottle-only creation when release fields are stuffed into it", () => {
-    const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "create_new",
-      confidence: 91,
-      rationale: null,
-      suggestedBottleId: null,
-      candidateBottleIds: [],
-      creationTarget: "bottle",
-      proposedBottle: baseProposedBottle,
-      proposedRelease: baseProposedRelease,
-    });
-
-    expect(result.success).toBe(false);
-
-    if (result.success) {
-      throw new Error("Expected bottle-only proposal validation to fail");
-    }
-
-    expect(result.error.issues).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          path: ["proposedRelease"],
-        }),
-      ]),
-    );
-  });
-
-  test("accepts bottle and release creation only when both payloads are present", () => {
-    const result = StorePriceMatchDecisionSchema.safeParse({
-      action: "create_new",
-      confidence: 91,
-      rationale: null,
-      suggestedBottleId: null,
-      candidateBottleIds: [],
-      creationTarget: "bottle_and_release",
-      proposedBottle: baseProposedBottle,
-      proposedRelease: baseProposedRelease,
-    });
-
-    expect(result.success).toBe(true);
-
-    if (!result.success) {
-      throw new Error("Expected bottle-and-release proposal to parse");
-    }
-
-    expect(result.data.creationTarget).toBe("bottle_and_release");
-    expect(result.data.proposedBottle).toEqual(baseProposedBottle);
-    expect(result.data.proposedRelease).toEqual(baseProposedRelease);
-  });
 });
 
 describe("StorePriceMatchQueueItemSchema", () => {
-  test("exposes bottle identities without retained current or suggested ids", () => {
+  test("exposes only direct Bottle identities", () => {
     expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
       "currentBottle",
     );
     expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty(
       "suggestedBottle",
     );
-    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
-      "currentTarget",
-    );
-    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
-      "currentRelease",
-    );
-    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
-      "suggestedTarget",
-    );
-    expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(
-      "suggestedRelease",
-    );
 
+    for (const field of [
+      "currentTarget",
+      "currentRelease",
+      "suggestedTarget",
+      "suggestedRelease",
+      "parentBottle",
+    ]) {
+      expect(StorePriceMatchQueueItemSchema.shape).not.toHaveProperty(field);
+    }
     for (const field of [
       "currentBottleId",
       "currentReleaseId",
@@ -701,12 +292,11 @@ describe("StorePriceMatchQueueItemSchema", () => {
       "suggestedBottleId",
       "suggestedReleaseId",
       "suggestedTargetId",
+      "parentBottleId",
+      "creationTarget",
+      "proposedRelease",
     ]) {
       expect(StorePriceMatchProposalSchema.shape).not.toHaveProperty(field);
     }
-    expect(StorePriceMatchQueueItemSchema.shape).toHaveProperty("parentBottle");
-    expect(StorePriceMatchProposalSchema.shape).toHaveProperty(
-      "parentBottleId",
-    );
   });
 });

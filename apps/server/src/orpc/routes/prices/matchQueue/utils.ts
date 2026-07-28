@@ -2,15 +2,17 @@ import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCr
 import {
   BottleCandidateSchema as ClassifierBottleCandidateSchema,
   BottleExtractedDetailsSchema as ClassifierBottleExtractedDetailsSchema,
+  type BottleCandidate,
 } from "@peated/bottle-classifier/internal/types";
 import { db } from "@peated/server/db";
 import {
+  bottles,
   type Bottle,
   type ExternalSite,
   type StorePrice,
   type StorePriceMatchProposal,
-  bottles,
 } from "@peated/server/db/schema";
+import { logWarn } from "@peated/server/lib/log";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
 import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
 import { type Context } from "@peated/server/orpc/context";
@@ -19,7 +21,6 @@ import {
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
   ProposedBottleSchema,
-  ProposedReleaseSchema,
   StorePriceMatchAutomationAssessmentSchema,
   StorePriceMatchProposalSchema,
   StorePriceMatchQueueItemSchema,
@@ -41,6 +42,74 @@ type StructuredAutomationIssue = {
   message?: unknown;
   path?: unknown;
 };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Historical queue snapshots can contain BottleRelease candidates. They are
+ * audit evidence, not current identity: omit release candidates and translate
+ * old Bottle candidates into the strict direct-Bottle output shape.
+ */
+function normalizeStoredPriceMatchCandidates(
+  value: unknown,
+  proposalId: number,
+) {
+  const candidates = Array.isArray(value) ? value : [];
+  const normalized: BottleCandidate[] = [];
+  let discarded = Array.isArray(value) ? 0 : 1;
+  let translated = 0;
+
+  for (const candidate of candidates) {
+    const direct = PriceMatchCandidateSchema.safeParse(candidate);
+    if (direct.success) {
+      normalized.push(direct.data);
+      continue;
+    }
+    if (
+      !isRecord(candidate) ||
+      candidate.kind === "release" ||
+      typeof candidate.releaseId === "number"
+    ) {
+      discarded += 1;
+      continue;
+    }
+
+    const translatedCandidate = { ...candidate };
+    delete translatedCandidate.kind;
+    delete translatedCandidate.releaseId;
+    delete translatedCandidate.bottleFullName;
+    if (isRecord(translatedCandidate.familyContext)) {
+      const siblingBottles = translatedCandidate.familyContext.siblingBottles;
+      if (Array.isArray(siblingBottles)) {
+        translatedCandidate.familyContext = { siblingBottles };
+      } else {
+        delete translatedCandidate.familyContext;
+      }
+    }
+
+    const parsed = PriceMatchCandidateSchema.safeParse(translatedCandidate);
+    if (parsed.success) {
+      normalized.push(parsed.data);
+      translated += 1;
+    } else {
+      discarded += 1;
+    }
+  }
+
+  if (translated > 0 || discarded > 0) {
+    logWarn("Normalized legacy price-match candidate evidence", {
+      extra: {
+        proposalId,
+        translatedCandidates: translated,
+        discardedCandidates: discarded,
+      },
+    });
+  }
+
+  return normalized;
+}
 
 function normalizeStoredProposedBottle(
   proposedBottle: unknown,
@@ -147,11 +216,9 @@ export async function serializeQueueItems(
   const bottleIds = Array.from(
     new Set(
       rows.flatMap(({ proposal }) =>
-        [
-          proposal.currentBottleId,
-          proposal.suggestedBottleId,
-          proposal.parentBottleId,
-        ].filter((id): id is number => id !== null),
+        [proposal.currentBottleId, proposal.suggestedBottleId].filter(
+          (id): id is number => id !== null,
+        ),
       ),
     ),
   );
@@ -193,9 +260,6 @@ export async function serializeQueueItems(
       suggestedBottle: row.proposal.suggestedBottleId
         ? (bottlesById[row.proposal.suggestedBottleId] ?? null)
         : null,
-      parentBottle: row.proposal.parentBottleId
-        ? (bottlesById[row.proposal.parentBottleId] ?? null)
-        : null,
     });
   });
 }
@@ -210,17 +274,15 @@ export function serializeProposal(
     price?: StorePrice & { externalSite: ExternalSite };
   } = {},
 ) {
-  const candidateBottles = PriceMatchCandidateSchema.array().parse(
+  const candidateBottles = normalizeStoredPriceMatchCandidates(
     proposal.candidateBottles,
+    proposal.id,
   );
   const extractedLabel = proposal.extractedLabel
     ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
     : null;
   const normalizedProposedBottle = proposal.proposedBottle
     ? normalizeStoredProposedBottle(proposal.proposedBottle)
-    : null;
-  const proposedRelease = proposal.proposedRelease
-    ? ProposedReleaseSchema.parse(proposal.proposedRelease)
     : null;
   const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
     proposal.searchEvidence,
@@ -231,12 +293,7 @@ export function serializeProposal(
     ClassifierBottleExtractedDetailsSchema.nullable().safeParse(extractedLabel);
   const automationAssessment =
     getPersistedAutomationAssessment(proposal) ??
-    (price &&
-    proposedRelease === null &&
-    (proposal.creationTarget === null ||
-      proposal.creationTarget === "bottle") &&
-    classifierCandidates.success &&
-    classifierExtractedLabel.success
+    (price && classifierCandidates.success && classifierExtractedLabel.success
       ? getStorePriceMatchAutomationAssessment({
           action: proposal.proposalType,
           modelConfidence: proposal.confidence,
@@ -278,12 +335,9 @@ export function serializeProposal(
       automationAssessment.plainAgeBottleAutoVerifyEligible,
     differentiatingAttributes: automationAssessment.differentiatingAttributes,
     webEvidenceChecks: automationAssessment.webEvidenceChecks,
-    parentBottleId: proposal.parentBottleId,
-    creationTarget: proposal.creationTarget,
     candidateBottles,
     extractedLabel,
     proposedBottle: normalizedProposedBottle,
-    proposedRelease,
     searchEvidence,
     rationale: proposal.rationale,
     model: proposal.model,

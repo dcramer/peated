@@ -198,27 +198,11 @@ function buildMockBottleReferenceClassification(
     artifacts: {
       extractedIdentity: extractedLabel ?? null,
       searchEvidence: Array.isArray(searchEvidence) ? searchEvidence : [],
-      candidates: Array.isArray(candidateBottles)
-        ? candidateBottles.map(normalizeMockBottleCandidate)
-        : [],
+      candidates: Array.isArray(candidateBottles) ? candidateBottles : [],
       resolvedEntities: Array.isArray(resolvedEntities) ? resolvedEntities : [],
     },
     ...restOverrides,
   } as any;
-}
-
-function normalizeMockBottleCandidate(candidate: unknown) {
-  if (typeof candidate !== "object" || candidate === null) {
-    return candidate;
-  }
-
-  const {
-    kind: _kind,
-    releaseId: _releaseId,
-    bottleFullName: _bottleFullName,
-    ...directBottleCandidate
-  } = candidate as Record<string, unknown>;
-  return directBottleCandidate;
 }
 
 async function countBottles() {
@@ -775,7 +759,6 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        creationTarget: "bottle",
         extractedLabel: {
           brand: "SMWS",
           bottler: "SMWS",
@@ -929,13 +912,11 @@ describe("priceMatching", () => {
           priceId: firstPrice.id,
           status: "pending_review",
           proposalType: "create_new",
-          creationTarget: "bottle",
         },
         {
           priceId: secondPrice.id,
           status: "pending_review",
           proposalType: "create_new",
-          creationTarget: "bottle",
         },
       ])
       .returning();
@@ -1003,7 +984,6 @@ describe("priceMatching", () => {
         priceId: ignoredPrice.id,
         status: "pending_review",
         proposalType: "create_new",
-        creationTarget: "bottle",
       })
       .returning();
 
@@ -1290,12 +1270,9 @@ describe("priceMatching", () => {
         searchEvidence: [],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: generic12Bottle.id,
-            releaseId: null,
             alias: "Tomatin Single Malt 12-year-old",
             fullName: generic12Bottle.fullName,
-            bottleFullName: generic12Bottle.fullName,
             brand: "Tomatin",
             bottler: null,
             series: null,
@@ -1315,12 +1292,9 @@ describe("priceMatching", () => {
             source: ["text"],
           },
           {
-            kind: "bottle",
             bottleId: bourbonAndSherryBottle.id,
-            releaseId: null,
             alias: null,
             fullName: bourbonAndSherryBottle.fullName,
-            bottleFullName: bourbonAndSherryBottle.fullName,
             brand: "Tomatin",
             bottler: null,
             series: null,
@@ -1340,12 +1314,9 @@ describe("priceMatching", () => {
             source: ["text"],
           },
           {
-            kind: "bottle",
             bottleId: caskStrengthBottle.id,
-            releaseId: null,
             alias: null,
             fullName: caskStrengthBottle.fullName,
-            bottleFullName: caskStrengthBottle.fullName,
             brand: "Tomatin",
             bottler: null,
             series: null,
@@ -1466,12 +1437,9 @@ describe("priceMatching", () => {
         searchEvidence: [],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: "Example Distillery Port Cask 10 Year",
             fullName: "Example Distillery Port Cask 10 Year",
-            bottleFullName: "Example Distillery Port Cask 10 Year",
             brand: "Example Distillery",
             bottler: null,
             series: null,
@@ -1682,12 +1650,9 @@ describe("priceMatching", () => {
         searchEvidence: [],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: null,
             fullName: "Jameson Cold Brew",
-            bottleFullName: "Jameson Cold Brew",
             brand: "Jameson",
             bottler: null,
             series: null,
@@ -1803,12 +1768,9 @@ describe("priceMatching", () => {
         searchEvidence: [],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: null,
             fullName: bottle.fullName,
-            bottleFullName: bottle.fullName,
             brand: "Wild Turkey",
             bottler: null,
             series: null,
@@ -1926,12 +1888,9 @@ describe("priceMatching", () => {
         ],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: null,
             fullName: bottle.fullName,
-            bottleFullName: bottle.fullName,
             brand: "Wild Turkey",
             bottler: null,
             series: null,
@@ -2067,12 +2026,9 @@ describe("priceMatching", () => {
         ],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: null,
             fullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
-            bottleFullName: "Glenlivet Caribbean Reserve Rum Barrel Selection",
             brand: "Glenlivet",
             bottler: "Glenlivet",
             series: null,
@@ -2188,7 +2144,6 @@ describe("priceMatching", () => {
             "The existing bottle is the marketed identity, but the proposed canonical fields need review.",
           confidenceBasis: autoVerificationConfidenceBasis,
           matchedBottleId: bottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [bottle.id],
           proposedBottle: {
             name: "Table Whiskey",
@@ -2220,12 +2175,9 @@ describe("priceMatching", () => {
         searchEvidence: [],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: "Example Heritage Table Whiskey",
             fullName: "Example Heritage Table Whiskey",
-            bottleFullName: "Example Heritage Table Whiskey",
             brand: "Example Heritage",
             bottler: null,
             series: null,
@@ -2326,12 +2278,9 @@ describe("priceMatching", () => {
         searchEvidence: [],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: null,
             fullName: "Ardbeg Uigeadail",
-            bottleFullName: "Ardbeg Uigeadail",
             brand: "Ardbeg",
             bottler: null,
             series: null,
@@ -2684,8 +2633,6 @@ describe("priceMatching", () => {
             "The current bottle identity looks right, but the stored producer metadata does not match the evidence.",
           candidateBottleIds: [currentBottle.id],
           matchedBottleId: currentBottle.id,
-          matchedReleaseId: null,
-          parentBottleId: null,
           proposedBottle: {
             name: "Bodega Cask",
             series: null,
@@ -2712,7 +2659,6 @@ describe("priceMatching", () => {
             ],
             bottler: null,
           },
-          proposedRelease: null,
         },
         extractedLabel: {
           brand: "The Whistler",
@@ -3136,7 +3082,6 @@ describe("priceMatching", () => {
           rationale: "The listing looks like a distinct release.",
           suggestedBottleId: null,
           candidateBottleIds: [],
-          creationTarget: "bottle",
           proposedBottle: {
             name: "8-year-old (Batch 7)",
             series: null,
@@ -3597,12 +3542,9 @@ describe("priceMatching", () => {
         },
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: price.name,
             fullName: bottle.fullName,
-            bottleFullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
             series: null,
@@ -3718,12 +3660,9 @@ describe("priceMatching", () => {
         },
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: price.name,
             fullName: bottle.fullName,
-            bottleFullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
             series: null,
@@ -3824,7 +3763,6 @@ describe("priceMatching", () => {
           action: "create_new",
           confidence: 95,
           rationale: "Classifier created the SMWS exact-cask bottle.",
-          creationTarget: "bottle",
           candidateBottleIds: [],
           proposedBottle: {
             name: "RW6.5 Sauna Smoke",
@@ -4017,12 +3955,9 @@ describe("priceMatching", () => {
         },
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: price.name,
             fullName: bottle.fullName,
-            bottleFullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
             series: null,
@@ -4152,12 +4087,9 @@ describe("priceMatching", () => {
         },
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: bottle.id,
-            releaseId: null,
             alias: price.name,
             fullName: bottle.fullName,
-            bottleFullName: bottle.fullName,
             brand: "The Scotch Malt Whisky Society",
             bottler: "The Scotch Malt Whisky Society",
             series: null,
@@ -4321,7 +4253,6 @@ describe("priceMatching", () => {
           confidence: 95,
           rationale:
             "Classifier preserved the SMWS code as the identity anchor.",
-          creationTarget: "bottle",
           candidateBottleIds: [mismatchedBottle.id],
           proposedBottle: {
             name: "RW6.5 Sauna Smoke",
@@ -4374,12 +4305,9 @@ describe("priceMatching", () => {
         ],
         candidateBottles: [
           {
-            kind: "bottle",
             bottleId: mismatchedBottle.id,
-            releaseId: null,
             alias: null,
             fullName: mismatchedBottle.fullName,
-            bottleFullName: mismatchedBottle.fullName,
             brand: "SMWS",
             bottler: "SMWS",
             series: null,
@@ -6045,8 +5973,8 @@ describe("priceMatching", () => {
       reviewedById: null,
       reviewedAt: null,
       suggestedBottleId: bottle.id,
-      currentReleaseId: evidenceRelease.id,
-      suggestedReleaseId: evidenceRelease.id,
+      currentReleaseId: null,
+      suggestedReleaseId: null,
     });
     expect(attempt).toMatchObject({
       currentReleaseId: null,
@@ -7379,7 +7307,6 @@ describe("priceMatching", () => {
         priceId: price.id,
         status: "pending_review",
         proposalType: "create_new",
-        creationTarget: "bottle",
         extractedLabel: {
           brand: "Observation Brand",
           bottler: null,
@@ -7575,7 +7502,9 @@ describe("priceMatching", () => {
     ]);
     expect(updatedProposal).toMatchObject({
       currentBottleId: directBottle.id,
+      currentReleaseId: null,
       suggestedBottleId: directBottle.id,
+      suggestedReleaseId: null,
       parentBottleId: null,
       creationTarget: null,
       proposedRelease: null,
@@ -7595,34 +7524,47 @@ describe("priceMatching", () => {
   }) => {
     const reviewer = await fixtures.User();
     const bottle = await fixtures.Bottle();
-    const prices = await Promise.all([
-      fixtures.StorePrice({
-        bottleId: null,
+    const legacyRelease = await fixtures.BottleRelease({
+      bottleId: bottle.id,
+      edition: "Legacy Evidence",
+    });
+    const legacyEvidence = [
+      {
         name: "Legacy Proposed Release",
-      }),
-      fixtures.StorePrice({
-        bottleId: null,
+        values: { proposedRelease: { edition: "Legacy Batch" } },
+      },
+      {
         name: "Legacy Release Creation Target",
-      }),
-    ]);
+        values: { creationTarget: "release" as const },
+      },
+      {
+        name: "Legacy Current Release",
+        values: { currentReleaseId: legacyRelease.id },
+      },
+      {
+        name: "Legacy Suggested Release",
+        values: { suggestedReleaseId: legacyRelease.id },
+      },
+      {
+        name: "Legacy Parent Bottle",
+        values: { parentBottleId: bottle.id },
+      },
+    ];
+    const prices = await Promise.all(
+      legacyEvidence.map(({ name }) =>
+        fixtures.StorePrice({ bottleId: null, name }),
+      ),
+    );
     const proposals = await db
       .insert(storePriceMatchProposals)
-      .values([
-        {
-          priceId: prices[0].id,
-          status: "pending_review",
-          proposalType: "match_existing",
-          proposedRelease: {
-            edition: "Legacy Batch",
-          },
-        },
-        {
-          priceId: prices[1].id,
-          status: "pending_review",
-          proposalType: "create_new",
-          creationTarget: "release",
-        },
-      ])
+      .values(
+        prices.map((price, index) => ({
+          priceId: price.id,
+          status: "pending_review" as const,
+          proposalType: "match_existing" as const,
+          ...legacyEvidence[index]!.values,
+        })),
+      )
       .returning();
 
     for (const proposal of proposals) {
@@ -7657,9 +7599,9 @@ describe("priceMatching", () => {
       }),
     ]);
 
-    expect(storedPrices).toHaveLength(2);
+    expect(storedPrices).toHaveLength(legacyEvidence.length);
     expect(storedPrices.every((price) => price.bottleId === null)).toBe(true);
-    expect(storedProposals).toHaveLength(2);
+    expect(storedProposals).toHaveLength(legacyEvidence.length);
     expect(
       storedProposals.every((proposal) => proposal.status === "pending_review"),
     ).toBe(true);
@@ -7986,9 +7928,9 @@ describe("priceMatching", () => {
         status: "pending_review",
         proposalType: "match_existing",
         currentBottleId: otherParent.id,
-        currentReleaseId: otherRelease.id,
+        currentReleaseId: null,
         suggestedBottleId: requestedParent.id,
-        suggestedReleaseId: otherRelease.id,
+        suggestedReleaseId: null,
       })
       .returning();
     await db.insert(storePriceMatchAttempts).values({
@@ -8039,9 +7981,9 @@ describe("priceMatching", () => {
     expect(updatedProposal).toMatchObject({
       status: "approved",
       currentBottleId: requestedParent.id,
-      currentReleaseId: otherRelease.id,
+      currentReleaseId: null,
       suggestedBottleId: requestedParent.id,
-      suggestedReleaseId: otherRelease.id,
+      suggestedReleaseId: null,
     });
     expect(updatedAttempt).toMatchObject({
       finalStatus: "approved",

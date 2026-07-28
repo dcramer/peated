@@ -167,10 +167,10 @@ export default procedure
   .route({
     method: "POST",
     path: "/tastings/photo-identification-create",
-    summary: "Create bottle target from photo identification",
+    summary: "Create Bottle from photo identification",
     description:
       "Create a Bottle from a reviewed photo identification result, with public catalog image promotion when the scan is suitable.",
-    operationId: "createTastingBottleTargetFromPhotoIdentification",
+    operationId: "createTastingBottleFromPhotoIdentification",
   })
   .input(
     z.object({
@@ -183,7 +183,7 @@ export default procedure
       warnings: z
         .array(CatalogImageWarningSchema)
         .optional()
-        .describe("Non-fatal warnings for side effects after target creation"),
+        .describe("Non-fatal warnings for side effects after Bottle creation"),
     }),
   )
   .handler(async function ({ input, context, errors }) {

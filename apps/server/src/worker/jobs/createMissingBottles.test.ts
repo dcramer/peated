@@ -302,27 +302,26 @@ describe("createMissingBottles", () => {
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const systemUser = await fixtures.User({ admin: true });
-    const parent = await fixtures.Bottle({
-      name: "Worker Unpromoted Parent",
+    const bottle = await fixtures.Bottle({
+      name: "Worker Direct Bottle",
     });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
       releaseId: null,
-      name: "Worker Unpromoted Release Review",
+      name: "Worker Direct Bottle Review",
       issue: "Default",
-      url: "https://example.com/worker-unpromoted-review",
+      url: "https://example.com/worker-direct-bottle-review",
     });
     getAutomationModeratorUserMock.mockResolvedValue(systemUser);
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
           action: "match",
-          matchedBottleId: parent.id,
-          candidateBottleIds: [parent.id],
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
         },
-        { candidates: [{ bottleId: parent.id }] },
+        { candidates: [{ bottleId: bottle.id }] },
       ),
     );
 
@@ -331,7 +330,7 @@ describe("createMissingBottles", () => {
     expect(
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({
-      bottleId: parent.id,
+      bottleId: bottle.id,
       releaseId: null,
     });
     expect(
@@ -339,7 +338,7 @@ describe("createMissingBottles", () => {
         where: eq(bottleAliases.name, normalizeBottleAliasKey(review.name)),
       }),
     ).toMatchObject({
-      bottleId: parent.id,
+      bottleId: bottle.id,
       releaseId: null,
       assignmentSource: "classifier_approved",
     });
@@ -352,7 +351,7 @@ describe("createMissingBottles", () => {
       }),
     ).toMatchObject({
       decision: "match_existing",
-      bottleId: parent.id,
+      bottleId: bottle.id,
       releaseId: null,
     });
   });

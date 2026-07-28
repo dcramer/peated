@@ -99,6 +99,16 @@ type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
 
+// These legacy columns survive until the separately approved destructive
+// cleanup. Runtime writers clear them rather than treating them as identity.
+const CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE = {
+  currentReleaseId: null,
+  suggestedReleaseId: null,
+  parentBottleId: null,
+  creationTarget: null,
+  proposedRelease: null,
+} as const;
+
 async function getPriceMatchWriteActorForDatabase(
   tx: AnyDatabase,
   actor: IncomingBottleDecisionActor,
@@ -698,8 +708,6 @@ async function recordStorePriceMatchAttempt({
       confidence: proposal.confidence,
       currentBottleId: proposal.currentBottleId,
       suggestedBottleId: proposal.suggestedBottleId,
-      parentBottleId: proposal.parentBottleId,
-      creationTarget: proposal.creationTarget,
       automationEligible: automationAssessment?.automationEligible ?? false,
       automationScore: automationAssessment?.automationScore ?? null,
       model: proposal.model,
@@ -916,8 +924,7 @@ function getStorePriceBottleRepairDraft(
   if (
     proposal.currentBottleId === null ||
     proposal.suggestedBottleId === null ||
-    proposal.currentBottleId !== proposal.suggestedBottleId ||
-    proposal.proposedRelease !== null
+    proposal.currentBottleId !== proposal.suggestedBottleId
   ) {
     throw new StorePriceBottleRepairBadRequestError(
       "Price match proposal is not an existing-bottle repair.",
@@ -948,15 +955,27 @@ function buildStorePriceObservationFacts(
   };
 }
 
-function assertDirectBottleProposalShape(
+/**
+ * Legacy proposal columns remain only as migration evidence. Refuse historical
+ * release-shaped rows instead of translating them into a current Bottle write.
+ */
+function assertNoLegacyReleaseProposalEvidence(
   proposal: Pick<
     StorePriceMatchProposal,
-    "id" | "creationTarget" | "proposedRelease"
+    | "id"
+    | "currentReleaseId"
+    | "suggestedReleaseId"
+    | "parentBottleId"
+    | "creationTarget"
+    | "proposedRelease"
   >,
 ) {
   if (
-    proposal.proposedRelease !== null ||
-    (proposal.creationTarget !== null && proposal.creationTarget !== "bottle")
+    proposal.currentReleaseId !== null ||
+    proposal.suggestedReleaseId !== null ||
+    proposal.parentBottleId !== null ||
+    proposal.creationTarget !== null ||
+    proposal.proposedRelease !== null
   ) {
     throw new StorePriceMatchProposalIdentityChangedError(proposal.id);
   }
@@ -1076,16 +1095,12 @@ export async function upsertStorePriceMatchProposal({
   };
   const proposalValues = {
     ...proposalRuntimeValues,
-    parentBottleId: null,
-    creationTarget: null,
-    proposedRelease: null,
+    ...CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE,
     enteredQueueAt,
   };
   const updateValues = {
     ...proposalRuntimeValues,
-    parentBottleId: null,
-    creationTarget: null,
-    proposedRelease: null,
+    ...CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE,
     enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
   };
   const [proposal] = await tx
@@ -1153,11 +1168,8 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     expectedProcessingToken?: string;
   },
 ) {
-  const preflight = await getStorePriceMatchProposalTargetPreflight(
-    tx,
-    proposalId,
-  );
-  assertDirectBottleProposalShape(preflight);
+  const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
+  assertNoLegacyReleaseProposalEvidence(preflight);
 
   const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
     userId: user.id,
@@ -1180,11 +1192,8 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   });
   if (
     proposal.priceId !== preflight.priceId ||
-    proposal.parentBottleId !== preflight.parentBottleId ||
     proposal.price.bottleId !== preflight.price.bottleId ||
-    proposal.creationTarget !== preflight.creationTarget ||
-    !isDeepStrictEqual(proposal.proposedBottle, preflight.proposedBottle) ||
-    !isDeepStrictEqual(proposal.proposedRelease, preflight.proposedRelease)
+    !isDeepStrictEqual(proposal.proposedBottle, preflight.proposedBottle)
   ) {
     throw new StorePriceMatchProposalIdentityChangedError(proposalId);
   }
@@ -1628,7 +1637,7 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
  * Performs an intentionally unlocked catalog-identity preflight so callers can
  * acquire catalog identity locks ahead of proposal and mutation locks.
  */
-async function getStorePriceMatchProposalTargetPreflight(
+async function getStorePriceMatchProposalPreflight(
   tx: AnyDatabase,
   proposalId: number,
 ): Promise<StorePriceMatchProposalForReview> {
@@ -1670,9 +1679,7 @@ async function markApprovedStorePriceMatchProposalInTransaction(
       status: "approved",
       currentBottleId: bottleId,
       suggestedBottleId: bottleId,
-      parentBottleId: null,
-      creationTarget: null,
-      proposedRelease: null,
+      ...CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE,
       processingToken: null,
       processingQueuedAt: null,
       processingExpiresAt: null,
@@ -1715,7 +1722,7 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     bottleId: number;
   },
 ) {
-  assertDirectBottleProposalShape(proposal);
+  assertNoLegacyReleaseProposalEvidence(proposal);
 
   const actor = await getPriceMatchWriteActorForDatabase(
     tx,
@@ -1887,24 +1894,18 @@ export async function applyStorePriceBottleRepairFromProposal({
   expectedProcessingToken?: string;
 }) {
   const { updateManifest, aliasResult } = await db.transaction(async (tx) => {
-    const preflight = await getStorePriceMatchProposalTargetPreflight(
-      tx,
-      proposalId,
-    );
+    const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
+    assertNoLegacyReleaseProposalEvidence(preflight);
     if (
       preflight.proposalType !== "correction" ||
-      preflight.currentBottleId === null ||
-      preflight.proposedRelease !== null
+      preflight.currentBottleId === null
     ) {
       throw new StorePriceBottleRepairBadRequestError(
         "Price match proposal is not an existing-bottle repair.",
       );
     }
     const repairBottleId = preflight.currentBottleId;
-    if (
-      preflight.suggestedBottleId !== repairBottleId ||
-      preflight.proposedRelease !== null
-    ) {
+    if (preflight.suggestedBottleId !== repairBottleId) {
       throw new StorePriceBottleRepairBadRequestError(
         "Price match repair must select the current Bottle.",
       );
