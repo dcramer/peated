@@ -48,7 +48,7 @@ test.describe("Bottle page redirects", () => {
       }),
     ).toBeVisible();
     await expect(
-      page.getByText("Similar bottles", { exact: true }),
+      page.locator("header").getByText("Similar bottles", { exact: true }),
     ).toBeVisible();
   });
 

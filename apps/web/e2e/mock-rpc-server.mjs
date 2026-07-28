@@ -492,7 +492,7 @@ async function handleRpcRequest({ request, response, url }) {
         rel: { nextCursor: null, prevCursor: null },
       });
       return true;
-    case "bottleReleases/target": {
+    case "bottleReleases/bottle": {
       if (
         input?.bottle === existingBottleId &&
         input?.release === legacyIncompleteReleaseId
