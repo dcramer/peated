@@ -3,7 +3,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import { type Currency } from "@peated/server/types";
-import BetaNotice from "@peated/web/components/betaNotice";
 import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
@@ -75,7 +74,6 @@ export default function PriceChanges() {
 
   return (
     <div>
-      <BetaNotice>This is a work in progress.</BetaNotice>
       {data.results.length ? (
         <table className="my-2 min-w-full text-sm">
           <colgroup>

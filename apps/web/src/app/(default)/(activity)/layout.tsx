@@ -62,7 +62,7 @@ export default async function Layout({
               </Suspense>
             </ActivityRailSection>
 
-            <ActivityRailSection title="Market Prices">
+            <ActivityRailSection title="Market Prices" badge="Beta">
               <Suspense fallback={<PriceChangesSkeleton />}>
                 <PriceChanges />
               </Suspense>
