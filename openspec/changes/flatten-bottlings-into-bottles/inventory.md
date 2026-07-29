@@ -53,8 +53,8 @@ Retain:
 
 Generated files to rebuild from the last shipped migration:
 
-- `apps/server/migrations/0193_outstanding_tombstone.sql`
-- `apps/server/migrations/0194_spooky_black_knight.sql`
+- `apps/server/migrations/0193_flatten_bottlings_into_bottles.sql`
+- `apps/server/migrations/0194_add_bottle_group_representative_membership.sql`
 - `apps/server/migrations/meta/0193_snapshot.json`
 - `apps/server/migrations/meta/0194_snapshot.json`
 - `apps/server/migrations/meta/_journal.json`

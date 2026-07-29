@@ -160,8 +160,9 @@ and map to an explicit removal task.
       release-to-Bottle identity without checkpoint lifecycle state.
 - [x] 7.11 Remove BottleGroup tombstones and retired-group branches; preserve
       user-facing retirement through canonical Bottle tombstones.
-- [ ] 7.12 Regenerate the unreleased additive migration once from the corrected
-      schema and rerun focused schema, migration, API, and web verification.
+- [x] 7.12 Regenerate the unreleased additive migration history from the
+      corrected schema and rerun focused schema, migration, API, and web
+      verification.
 
 ## 8. Production Migration And Later Destructive Cleanup
 
