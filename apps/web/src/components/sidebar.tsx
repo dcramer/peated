@@ -27,8 +27,8 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-slate-800 bg-slate-950 px-6 pb-4">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-60 lg:flex-col">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-slate-800 bg-slate-950 px-5 pb-4">
           <div className="text-highlight flex h-16 shrink-0 items-center hover:text-white">
             <HeaderLogo />
           </div>
@@ -103,10 +103,6 @@ export default function Sidebar() {
                   >
                     Locations
                   </SidebarLink>
-                </ul>
-              </li>
-              <li>
-                <ul role="list" className="-mx-2 space-y-1">
                   <SidebarLink
                     href="/distillers"
                     icon={DistillerIcon}

@@ -41,7 +41,7 @@ export default function Layout({
       )}
 
       <div className="flex">
-        <main className="w-full max-w-7xl flex-auto lg:pl-64">
+        <main className="w-full max-w-7xl flex-auto lg:pl-60">
           <div className={classNames("mx-auto", noMargin ? "" : "py-4 lg:p-8")}>
             {children}
           </div>
