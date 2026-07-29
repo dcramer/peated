@@ -1,10 +1,8 @@
 import program from "@peated/cli/program";
 import config from "@peated/server/config";
-import { applyCatalogMigration } from "@peated/server/lib/catalogMigrationApply";
 import { loadCatalogMigrationApprovalCandidate } from "@peated/server/lib/catalogMigrationApprovalCandidate";
-import { CatalogMigrationApprovalCandidateSchema } from "@peated/server/schemas/catalogMigrationApply";
 import { execFile as execFileCallback } from "node:child_process";
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 
 const execFile = promisify(execFileCallback);
@@ -37,16 +35,7 @@ async function resolveCleanWorktreeRevision(): Promise<string> {
   return result;
 }
 
-async function resolveCatalogMigrationGitRevision(
-  expectedRevision?: string,
-): Promise<string> {
-  if (
-    expectedRevision !== undefined &&
-    !FULL_GIT_REVISION.test(expectedRevision)
-  ) {
-    throw new Error("--expect-git-revision must be a full commit SHA.");
-  }
-
+async function resolveCatalogMigrationGitRevision(): Promise<string> {
   const revision =
     config.ENV === "production"
       ? FULL_GIT_REVISION.test(
@@ -58,11 +47,6 @@ async function resolveCatalogMigrationGitRevision(
   if (revision === null) {
     throw new Error(
       "Production catalog migration evidence requires VERSION to be a full commit SHA.",
-    );
-  }
-  if (expectedRevision !== undefined && revision !== expectedRevision) {
-    throw new Error(
-      `Catalog migration Git revision ${revision} does not match expected ${expectedRevision}.`,
     );
   }
   return revision;
@@ -81,53 +65,4 @@ program
     process.stdout.write(
       `Catalog migration audit written to ${output} (${candidate.audit.blockingIssueCount} blocking issues, ${candidate.audit.warningCount} warnings).\n`,
     );
-  });
-
-program
-  .command("apply-catalog-migration")
-  .description("Apply or resume an approved BottleRelease migration")
-  .argument(
-    "<approved-audit>",
-    "retained approval-candidate JSON from audit-catalog-migration",
-  )
-  .action(async (approvedAudit: string) => {
-    const candidate = CatalogMigrationApprovalCandidateSchema.parse(
-      JSON.parse(await readFile(approvedAudit, "utf8")),
-    );
-    const gitRevision = await resolveCatalogMigrationGitRevision(
-      candidate.revision.gitRevision,
-    );
-    if (candidate.revision.gitRevision !== gitRevision) {
-      throw new Error(
-        `Approved catalog migration Git revision ${candidate.revision.gitRevision} does not match running revision ${gitRevision}.`,
-      );
-    }
-
-    const result = await applyCatalogMigration(
-      {
-        candidate,
-        approval: {
-          approvedBy: process.env.USER?.trim() || "cli-operator",
-          approvedAt: new Date(
-            Math.max(Date.now(), Date.parse(candidate.audit.generatedAt) + 1),
-          ).toISOString(),
-        },
-      },
-      undefined,
-      undefined,
-      {
-        onProgress(progress) {
-          if (progress.phase === "catalog") {
-            process.stdout.write(
-              `Committed catalog batch: ${progress.committedGroups}/${progress.totalGroups} groups, ${progress.committedParents}/${progress.totalParents} parents, ${progress.committedReleases}/${progress.totalReleases} releases.\n`,
-            );
-          } else {
-            process.stdout.write(
-              `Postflight complete: ${progress.totalGroups} groups, ${progress.totalParents} parents, ${progress.totalReleases} releases.\n`,
-            );
-          }
-        },
-      },
-    );
-    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   });

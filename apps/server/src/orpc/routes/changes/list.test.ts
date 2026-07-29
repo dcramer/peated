@@ -1,3 +1,5 @@
+import { db } from "@peated/server/db";
+import { changes } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -44,5 +46,26 @@ describe("GET /changes", () => {
     );
     expect(otherResults).toHaveLength(1);
     expect(otherResults[0].createdByActor.id).toBe(otherActor.id);
+  });
+
+  test("keeps historical object types out of the current feed", async ({
+    defaults,
+  }) => {
+    const actor = await getUserActor(defaults.user);
+    await db.insert(changes).values({
+      objectType: "bottle_release",
+      objectId: 42,
+      actorId: actor.id,
+      displayName: "Historical release",
+      type: "add",
+      data: {},
+    });
+
+    const { results } = await routerClient.changes.list(
+      {},
+      { context: { user: defaults.user } },
+    );
+
+    expect(results).toEqual([]);
   });
 });

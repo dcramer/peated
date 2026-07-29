@@ -334,7 +334,6 @@ describe("GET /users/:user/regions", () => {
       .where(eq(bottles.id, promoted.id));
     await fixtures.Tasting({
       bottleId: promoted.id,
-      releaseId: release.id,
       createdById: defaults.user.id,
     });
 

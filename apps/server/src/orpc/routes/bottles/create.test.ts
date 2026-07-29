@@ -4,7 +4,6 @@ import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
-  bottleReleases,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -13,6 +12,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";

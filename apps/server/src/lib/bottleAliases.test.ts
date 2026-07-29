@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleReleasePromotions,
   bottleTombstones,
   reviews,
   storePrices,
@@ -19,6 +18,7 @@ import {
   syncBottleAliasConsumersForAliasChange,
 } from "@peated/server/lib/bottleAliases";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { bottleReleasePromotions } from "@peated/server/lib/test/legacyCatalogSchema";
 import * as workerClient from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
@@ -87,7 +87,6 @@ describe("exact Bottle alias reservation", () => {
     const original = await fixtures.BottleAlias({
       name: normalizeBottleAliasKey("Reserved   12-year-old"),
       bottleId: bottle.id,
-      releaseId: release.id,
       assignmentSource: "legacy",
     });
 
@@ -103,7 +102,6 @@ describe("exact Bottle alias reservation", () => {
     expect(result).toEqual({ name: original.name, changed: true });
     expect(await getAlias(original.name)).toMatchObject({
       bottleId: bottle.id,
-      releaseId: release.id,
       assignmentSource: "canonical",
     });
   });
@@ -203,20 +201,17 @@ describe("assignBottleAliasInTransaction", () => {
     await db.insert(bottleAliases).values({
       name,
       bottleId: null,
-      releaseId: release.id,
       embedding: Array.from({ length: 3072 }, () => 0.125),
       assignedByActorId: legacy.createdByActorId,
     });
     const price = await fixtures.StorePrice({
       name,
       bottleId: null,
-      releaseId: release.id,
       volume: 750,
     });
     const review = await fixtures.Review({
       name,
       bottleId: null,
-      releaseId: release.id,
     });
     const assignedPrice = await fixtures.StorePrice({
       name,
@@ -246,23 +241,8 @@ describe("assignBottleAliasInTransaction", () => {
     expect(result.alias).not.toHaveProperty("releaseId");
     expect(await getAlias(name)).toMatchObject({
       bottleId: selected.id,
-      releaseId: release.id,
       assignmentSource: "human_approved",
       embedding: null,
-    });
-    expect(
-      await db.query.storePrices.findFirst({
-        where: eq(storePrices.id, price.id),
-      }),
-    ).toMatchObject({
-      bottleId: selected.id,
-      releaseId: price.releaseId,
-    });
-    expect(
-      await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
-    ).toMatchObject({
-      bottleId: selected.id,
-      releaseId: review.releaseId,
     });
     expect(
       await db.query.storePrices.findFirst({
@@ -391,52 +371,6 @@ describe("assignBottleAliasInTransaction", () => {
     }
   });
 
-  test("ignores legacy release evidence drift during direct alias CAS", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const legacy = await fixtures.Bottle();
-    const changedLegacy = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: legacy.id });
-    const changedRelease = await fixtures.BottleRelease({
-      bottleId: changedLegacy.id,
-    });
-    const source = await fixtures.BottleAlias({
-      name: "Legacy Evidence Source Alias",
-      bottleId: null,
-      releaseId: release.id,
-    });
-    await db
-      .update(bottleAliases)
-      .set({
-        releaseId: changedRelease.id,
-      })
-      .where(eq(bottleAliases.name, source.name));
-
-    const result = await db.transaction((tx) =>
-      assignBottleAliasInTransaction(tx, {
-        bottleId: bottle.id,
-        name: "Direct Alias After Evidence Drift",
-        assignedByActorId: bottle.createdByActorId,
-        sourceAliasIdentity: source,
-      }),
-    );
-
-    expect(result.alias).toMatchObject({
-      name: "Direct Alias After Evidence Drift",
-      bottleId: bottle.id,
-    });
-    expect(result.alias).not.toHaveProperty("releaseId");
-    expect(
-      await db.query.bottleAliases.findFirst({
-        where: eq(bottleAliases.name, source.name),
-      }),
-    ).toMatchObject({
-      bottleId: null,
-      releaseId: changedRelease.id,
-    });
-  });
-
   test("release promotion evidence cannot authorize an alias retarget", async ({
     fixtures,
   }) => {
@@ -450,7 +384,6 @@ describe("assignBottleAliasInTransaction", () => {
     const alias = await fixtures.BottleAlias({
       name: "Promotion Evidence Alias",
       bottleId: parent.id,
-      releaseId: release.id,
     });
 
     await expect(
@@ -469,7 +402,6 @@ describe("assignBottleAliasInTransaction", () => {
     });
     expect(await getAlias(alias.name)).toMatchObject({
       bottleId: parent.id,
-      releaseId: release.id,
     });
   });
 

@@ -5,7 +5,6 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroups,
-  bottleReleases,
   bottles,
   pendingUploads,
   tastings,
@@ -13,6 +12,7 @@ import {
 import type * as pendingUploadsModule from "@peated/server/lib/pendingUploads";
 import type * as photoIdentificationModule from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";

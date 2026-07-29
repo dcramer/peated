@@ -3,7 +3,6 @@ import type { Bottle, User } from "@peated/server/db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
-  bottleReleases,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -11,6 +10,7 @@ import {
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, asc, eq, inArray } from "drizzle-orm";
@@ -201,10 +201,6 @@ describe("PATCH /bottles/{bottle}", () => {
       ],
     );
     const memberIds = members.map(({ bottle }) => bottle.id);
-    const release = await fixtures.BottleRelease({
-      bottleId: first.bottle.id,
-      edition: "Legacy child",
-    });
 
     const result = await routerClient.bottles.update(
       {
@@ -283,11 +279,6 @@ describe("PATCH /bottles/{bottle}", () => {
         .from(bottleGroupDistillers)
         .where(eq(bottleGroupDistillers.groupId, first.group.id)),
     ).toHaveLength(newDistillers.length);
-    expect(
-      await db.query.bottleReleases.findFirst({
-        where: eq(bottleReleases.id, release.id),
-      }),
-    ).toEqual(release);
   });
 
   test("maps input, graph, and identity failures to stable statuses", async ({

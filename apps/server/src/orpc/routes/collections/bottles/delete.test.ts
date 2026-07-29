@@ -30,7 +30,6 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
     await db.insert(collectionBottles).values({
       collectionId: collection.id,
       bottleId: bottle.id,
-      releaseId: null,
     });
 
     await routerClient.collections.bottles.delete(
@@ -68,12 +67,10 @@ describe("DELETE /users/:user/collections/:collection/bottles", () => {
       {
         collectionId: collection.id,
         bottleId: selected.id,
-        releaseId: null,
       },
       {
         collectionId: collection.id,
         bottleId: retained.id,
-        releaseId: null,
       },
     ]);
 

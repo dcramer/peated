@@ -1,11 +1,10 @@
-import { eq } from "drizzle-orm";
-import { db } from "../db";
 import {
-  bottleAliases,
   bottleReleasePromotions,
-  bottles,
-  bottleTombstones,
-} from "../db/schema";
+  bottleReleases,
+} from "@peated/server/lib/test/legacyCatalogSchema";
+import { eq, sql } from "drizzle-orm";
+import { db } from "../db";
+import { bottleAliases, bottles, bottleTombstones } from "../db/schema";
 import {
   formatCatalogMigrationAudit,
   runCatalogMigrationAudit,
@@ -30,10 +29,14 @@ describe("catalog migration audit", () => {
     });
     await db.insert(bottleAliases).values({
       bottleId: parent.id,
-      releaseId: release.id,
       name: release.fullName,
       assignedByActorId: parent.createdByActorId,
     });
+    await db.execute(sql`
+      UPDATE bottle_alias
+      SET release_id = ${release.id}
+      WHERE name = ${release.fullName}
+    `);
 
     const report = await runCatalogMigrationAudit();
 
@@ -135,9 +138,13 @@ describe("catalog migration audit", () => {
       }),
     ).toMatchObject({ bottleId: retired.id });
     expect(
-      await db.query.bottleReleases.findFirst({
-        where: (releases, { eq }) => eq(releases.id, release.id),
-      }),
+      (
+        await db
+          .select()
+          .from(bottleReleases)
+          .where(eq(bottleReleases.id, release.id))
+          .limit(1)
+      )[0],
     ).toMatchObject({ id: release.id, bottleId: retired.id });
   });
 
@@ -223,10 +230,14 @@ describe("catalog migration audit", () => {
       bottleId: releaseParent.id,
     });
     const mismatchedParent = await fixtures.LegacyBottle();
-    await fixtures.Tasting({
+    const tasting = await fixtures.Tasting({
       bottleId: mismatchedParent.id,
-      releaseId: release.id,
     });
+    await db.execute(sql`
+      UPDATE tasting
+      SET release_id = ${release.id}
+      WHERE id = ${tasting.id}
+    `);
 
     const report = await runCatalogMigrationAudit();
     const tastingReferences = report.references.find(
@@ -325,11 +336,15 @@ describe("catalog migration audit", () => {
       releaseId: release.id,
       promotedBottleId: promoted.id,
     });
-    await fixtures.Tasting({
+    const tasting = await fixtures.Tasting({
       bottleId: promoted.id,
-      releaseId: release.id,
       tags: [],
     });
+    await db.execute(sql`
+      UPDATE tasting
+      SET release_id = ${release.id}
+      WHERE id = ${tasting.id}
+    `);
 
     const completedReport = await runCatalogMigrationAudit();
 

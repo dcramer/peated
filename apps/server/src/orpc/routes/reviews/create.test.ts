@@ -166,7 +166,6 @@ describe("POST /reviews", () => {
     expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: null,
-      releaseId: null,
       name: "Unresolved Review Bottle",
       rating: 89,
     });
@@ -202,7 +201,6 @@ describe("POST /reviews", () => {
     expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
-      releaseId: null,
     });
     expect(result.bottle).toMatchObject({ id: bottle.id });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
@@ -317,7 +315,6 @@ describe("POST /reviews", () => {
 
     expect(await findReviewByUrl(url)).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -366,7 +363,6 @@ describe("POST /reviews", () => {
     expect(await findReviewByUrl(url)).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
-      releaseId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -374,7 +370,6 @@ describe("POST /reviews", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
       assignmentSource: "classifier_approved",
       assignedByActorId: systemActor.id,
     });
@@ -388,7 +383,6 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       decision: "match_existing",
       bottleId: bottle.id,
-      releaseId: null,
       createdBottle: false,
     });
   });
@@ -423,7 +417,6 @@ describe("POST /reviews", () => {
     expect(review).toMatchObject({
       id: result.id,
       bottleId: expect.any(Number),
-      releaseId: null,
     });
     expect(
       await db.query.bottles.findFirst({
@@ -657,7 +650,6 @@ describe("POST /reviews", () => {
       expect(await findReviewByUrl(resultUrl)).toMatchObject({
         id: result.id,
         bottleId: committedBottle.id,
-        releaseId: null,
         rating: 96,
       });
       expect(
@@ -692,7 +684,6 @@ describe("POST /reviews", () => {
     const existing = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: bottle.id,
-      releaseId: null,
       name: reviewName,
       url: "https://example.com/reviews/durable-original",
     });
@@ -714,7 +705,6 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       id: result.id,
       bottleId: bottle.id,
-      releaseId: null,
       rating: 97,
     });
   });
@@ -738,7 +728,6 @@ describe("POST /reviews", () => {
     const existing = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: durableBottle.id,
-      releaseId: null,
       name: aliasName,
       url: "https://example.com/reviews/conflict-original",
     });
@@ -760,7 +749,6 @@ describe("POST /reviews", () => {
     ).toMatchObject({
       id: result.id,
       bottleId: durableBottle.id,
-      releaseId: null,
       rating: 98,
     });
     expect(

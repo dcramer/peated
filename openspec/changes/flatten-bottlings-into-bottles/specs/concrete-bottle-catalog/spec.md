@@ -102,6 +102,11 @@ The system SHALL stop producing BottleRelease rows before removing public
 routes and schemas, and SHALL separately gate destructive removal of legacy
 tables, columns, migration-only jobs, and retained audit support.
 
+The system SHALL deploy an application revision that no longer models or
+accesses those legacy database objects before a later migration physically
+removes them. Historical change records MAY retain their original object type
+as inert audit data but SHALL NOT appear in current change feeds.
+
 #### Scenario: New write after application cutover
 
 - **WHEN** any supported workflow creates catalog identity
@@ -113,3 +118,15 @@ tables, columns, migration-only jobs, and retained audit support.
 - **WHEN** a retained preflight, migration, direct-reference validation, backup,
   or explicit approval is missing
 - **THEN** destructive BottleRelease cleanup is blocked
+
+#### Scenario: Runtime detachment deploy
+
+- **WHEN** the pre-drop application revision is deployed
+- **THEN** normal API and worker paths do not model, read, or write
+  BottleRelease tables or consumer columns
+- **AND** it may remove legacy foreign-key constraints required to keep
+  canonical Bottle operations functional
+- **AND** no table or column cleanup DDL is generated or auto-applied by that
+  revision
+- **AND** the read-only pre-drop audit can still inspect the physical legacy
+  objects

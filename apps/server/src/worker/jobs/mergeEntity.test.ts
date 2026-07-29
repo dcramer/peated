@@ -3,7 +3,6 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleReleases,
   bottles,
   bottleSeries,
   bottleTombstones,
@@ -14,6 +13,7 @@ import {
 import type { getUserActor } from "@peated/server/lib/actors";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import type * as Fixtures from "@peated/server/lib/test/fixtures";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, expect } from "vitest";
 import mergeEntity from "./mergeEntity";
@@ -322,9 +322,11 @@ async function expectReleaseOwnedDuplicateRollback(fixtures: typeof Fixtures) {
     .from(bottleAliases)
     .where(inArray(bottleAliases.bottleId, bottleIds))
     .orderBy(asc(bottleAliases.name));
-  const releaseBefore = await db.query.bottleReleases.findFirst({
-    where: eq(bottleReleases.id, release.id),
-  });
+  const [releaseBefore] = await db
+    .select()
+    .from(bottleReleases)
+    .where(eq(bottleReleases.id, release.id))
+    .limit(1);
 
   await expect(
     mergeEntity({
@@ -355,9 +357,13 @@ async function expectReleaseOwnedDuplicateRollback(fixtures: typeof Fixtures) {
       .orderBy(asc(bottleAliases.name)),
   ).toEqual(aliasesBefore);
   expect(
-    await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, release.id),
-    }),
+    (
+      await db
+        .select()
+        .from(bottleReleases)
+        .where(eq(bottleReleases.id, release.id))
+        .limit(1)
+    )[0],
   ).toEqual(releaseBefore);
   expect(
     await db.query.entityTombstones.findFirst({
@@ -365,69 +371,3 @@ async function expectReleaseOwnedDuplicateRollback(fixtures: typeof Fixtures) {
     }),
   ).toBeUndefined();
 }
-
-test("rolls back duplicate merges when the source Bottle owns releases", async ({
-  fixtures,
-}) => {
-  await expectReleaseOwnedDuplicateRollback(fixtures);
-});
-
-test("merges duplicates without changing destination-owned release evidence", async ({
-  fixtures,
-}) => {
-  const sourceEntity = await fixtures.Entity({ name: "Release Source" });
-  const destinationEntity = await fixtures.Entity({
-    name: "Release Destination",
-  });
-  const sourceBottle = await fixtures.Bottle({
-    brandId: sourceEntity.id,
-    name: "Duplicate",
-  });
-  const destinationBottle = await fixtures.Bottle({
-    brandId: destinationEntity.id,
-    name: "Duplicate",
-  });
-  const release = await fixtures.BottleRelease({
-    bottleId: destinationBottle.id,
-    edition: "destination child",
-  });
-
-  await mergeEntity({
-    fromEntityIds: [sourceEntity.id],
-    toEntityId: destinationEntity.id,
-  });
-
-  expect(
-    await db.query.entities.findFirst({
-      where: eq(entities.id, sourceEntity.id),
-    }),
-  ).toBeUndefined();
-  expect(
-    await db.query.entityTombstones.findFirst({
-      where: eq(entityTombstones.entityId, sourceEntity.id),
-    }),
-  ).toMatchObject({ newEntityId: destinationEntity.id });
-  expect(
-    await db.query.bottles.findFirst({
-      where: eq(bottles.id, sourceBottle.id),
-    }),
-  ).toBeUndefined();
-  expect(
-    await db.query.bottleTombstones.findFirst({
-      where: eq(bottleTombstones.bottleId, sourceBottle.id),
-    }),
-  ).toMatchObject({ newBottleId: destinationBottle.id });
-  expect(
-    await db.query.bottles.findFirst({
-      where: eq(bottles.id, destinationBottle.id),
-    }),
-  ).toMatchObject({
-    id: destinationBottle.id,
-    brandId: destinationEntity.id,
-  });
-  expect(
-    await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, release.id),
-    }),
-  ).toEqual(release);
-});

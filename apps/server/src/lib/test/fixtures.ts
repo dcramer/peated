@@ -680,29 +680,11 @@ export const LegacyBottle = async (
 };
 
 async function resolveFixtureBottleId(
-  {
-    bottleId,
-    releaseId,
-  }: {
-    bottleId?: number | null;
-    releaseId?: number | null;
-  },
-  db: AnyDatabase,
+  { bottleId }: { bottleId?: number | null },
+  _db: AnyDatabase,
 ): Promise<number | null> {
   if (bottleId !== undefined) return bottleId;
-
-  if (releaseId != null) {
-    const release = await db.query.bottleReleases.findFirst({
-      where: eq(dbSchema.bottleReleases.id, releaseId),
-      columns: { bottleId: true },
-    });
-    if (!release) {
-      throw new Error(`BottleRelease fixture does not exist (${releaseId})`);
-    }
-    return release.bottleId;
-  }
-
-  return (await Bottle({}, db)).id;
+  return (await Bottle({}, _db)).id;
 }
 
 export const BottleAlias = async (
@@ -980,22 +962,40 @@ export const StorePrice = async (
 
     data.bottleId = bottleId;
 
-    const { rows } = await tx.execute<dbSchema.StorePrice>(
-      sql`
-        INSERT INTO ${storePrices} (bottle_id, release_id, external_site_id, name, volume, price, currency, url, hidden, image_url, updated_at)
-        VALUES (${data.bottleId}, ${data.releaseId ?? null}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url}, ${data.hidden}, ${data.imageUrl ?? null}, ${data.updatedAt || sql`NOW()`})
-        ON CONFLICT (external_site_id, LOWER(name), volume)
-        DO UPDATE
-        SET bottle_id = excluded.bottle_id,
-            release_id = excluded.release_id,
-            price = excluded.price,
-            currency = excluded.currency,
-            url = excluded.url,
-            updated_at = ${data.updatedAt || sql`NOW()`}
-        RETURNING *
-      `,
-    );
-
+    const { rows } = await tx.execute<dbSchema.StorePrice>(sql`
+      INSERT INTO ${storePrices} (
+        bottle_id,
+        external_site_id,
+        name,
+        volume,
+        price,
+        currency,
+        url,
+        hidden,
+        image_url,
+        updated_at
+      )
+      VALUES (
+        ${data.bottleId},
+        ${data.externalSiteId},
+        ${data.name},
+        ${data.volume},
+        ${data.price},
+        ${data.currency},
+        ${data.url},
+        ${data.hidden},
+        ${data.imageUrl ?? null},
+        ${data.updatedAt || sql`NOW()`}
+      )
+      ON CONFLICT (external_site_id, LOWER(name), volume)
+      DO UPDATE
+      SET bottle_id = excluded.bottle_id,
+          price = excluded.price,
+          currency = excluded.currency,
+          url = excluded.url,
+          updated_at = ${data.updatedAt || sql`NOW()`}
+      RETURNING *
+    `);
     const [price] = mapRows(rows, storePrices);
 
     if (!price) throw new Error("Unable to create StorePrice fixture");
@@ -1043,36 +1043,23 @@ export const Review = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.Review> => {
   const [result] = await db.transaction(async (tx) => {
-    const release = data.releaseId
-      ? await tx.query.bottleReleases.findFirst({
-          where: eq(dbSchema.bottleReleases.id, data.releaseId),
-        })
-      : null;
-
     if (!data.name) {
-      if (release) {
-        if (data.bottleId === undefined) data.bottleId = release.bottleId;
-        data.name = release.fullName;
-      } else {
-        const bottle =
-          typeof data.bottleId === "number"
-            ? await tx.query.bottles.findFirst({
-                where: eq(bottles.id, data.bottleId),
-                with: { brand: true },
-              })
-            : data.bottleId === undefined
-              ? await Bottle({}, tx)
-              : null;
-        if (typeof data.bottleId === "number" && !bottle) {
-          throw new Error(`Bottle fixture does not exist (${data.bottleId})`);
-        }
-        if (data.bottleId === undefined) data.bottleId = bottle?.id;
-        data.name =
-          bottle?.fullName ??
-          `${toTitleCase(faker.word.noun())} ${chooseBottleName(true)}`;
+      const bottle =
+        typeof data.bottleId === "number"
+          ? await tx.query.bottles.findFirst({
+              where: eq(bottles.id, data.bottleId),
+              with: { brand: true },
+            })
+          : data.bottleId === undefined
+            ? await Bottle({}, tx)
+            : null;
+      if (typeof data.bottleId === "number" && !bottle) {
+        throw new Error(`Bottle fixture does not exist (${data.bottleId})`);
       }
-    } else if (release && data.bottleId === undefined) {
-      data.bottleId = release.bottleId;
+      if (data.bottleId === undefined) data.bottleId = bottle?.id;
+      data.name =
+        bottle?.fullName ??
+        `${toTitleCase(faker.word.noun())} ${chooseBottleName(true)}`;
     }
 
     data.bottleId = await resolveFixtureBottleId(data, tx);
@@ -1204,10 +1191,33 @@ export const SampleSquareImagePath = async () => {
   return path.join(__dirname, "assets", "sample-square-image.jpg");
 };
 
+type LegacyBottleReleaseFixtureData = {
+  bottleId?: number;
+  fullName?: string;
+  name?: string;
+  edition?: string | null;
+  abv?: number | null;
+  statedAge?: number | null;
+  imageUrl?: string | null;
+  totalTastings?: number;
+  createdByActorId?: number;
+};
+
+type LegacyBottleReleaseFixture = {
+  id: number;
+  bottleId: number;
+  fullName: string;
+  name: string;
+  edition: string | null;
+  statedAge: number | null;
+  imageUrl: string | null;
+  createdByActorId: number;
+};
+
 export const BottleRelease = async (
-  { ...data }: Partial<Omit<dbSchema.NewBottleRelease, "id">> = {},
+  { ...data }: LegacyBottleReleaseFixtureData = {},
   db: AnyDatabase = dbConn,
-): Promise<dbSchema.BottleRelease> => {
+): Promise<LegacyBottleReleaseFixture> => {
   const [result] = await db.transaction(async (tx) => {
     const bottle = data.bottleId
       ? await tx.query.bottles.findFirst({
@@ -1225,27 +1235,50 @@ export const BottleRelease = async (
     const edition = data.edition ?? choose([null, faker.lorem.word()]);
 
     const name = data.name ?? `${bottle.name}${edition ? ` ${edition}` : ""}`;
-    const fullName = formatBottleName({
-      ...data,
-      name: `${bottleBrand.shortName || bottleBrand.name} ${name}`,
-    });
+    const fullName =
+      data.fullName ??
+      formatBottleName({
+        ...data,
+        name: `${bottleBrand.shortName || bottleBrand.name} ${name}`,
+      });
 
-    const releaseData: dbSchema.NewBottleRelease = {
-      bottleId: bottle.id,
-      fullName,
-      name,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...data,
-      createdByActorId:
-        data.createdByActorId ??
-        (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id,
-    };
-
-    return await tx
-      .insert(dbSchema.bottleReleases)
-      .values(releaseData)
-      .returning();
+    const createdByActorId =
+      data.createdByActorId ??
+      (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id;
+    const result = await tx.execute<LegacyBottleReleaseFixture>(sql`
+      INSERT INTO bottle_release (
+        bottle_id,
+        full_name,
+        name,
+        edition,
+        abv,
+        stated_age,
+        image_url,
+        total_tastings,
+        created_by_actor_id
+      )
+      VALUES (
+        ${bottle.id},
+        ${fullName},
+        ${name},
+        ${edition},
+        ${data.abv ?? null},
+        ${data.statedAge ?? null},
+        ${data.imageUrl ?? null},
+        ${data.totalTastings ?? 0},
+        ${createdByActorId}
+      )
+      RETURNING
+        id::int,
+        bottle_id::int AS "bottleId",
+        full_name AS "fullName",
+        name,
+        edition,
+        stated_age AS "statedAge",
+        image_url AS "imageUrl",
+        created_by_actor_id::int AS "createdByActorId"
+    `);
+    return result.rows;
   });
 
   if (!result) throw new Error("Unable to create BottleRelease fixture");

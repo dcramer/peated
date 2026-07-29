@@ -326,7 +326,6 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
     references: [bottleSeries.id],
   }),
   bottlesToDistillers: many(bottlesToDistillers),
-  releases: many(bottleReleases),
   observations: many(bottleObservations),
   createdByActor: one(actors, {
     fields: [bottles.createdByActorId],
@@ -400,137 +399,8 @@ export const bottleGroupDistillersRelations = relations(
 );
 
 /**
- * Legacy compatibility schema retained for the staged migration.
- * Canonical marketed releases are Bottle rows; OpenSpec tasks 9.6 and 9.7
- * remove this table after its remaining compatibility readers and writers.
- */
-export const bottleReleases = pgTable(
-  "bottle_release",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    bottleId: bigint("bottle_id", { mode: "number" })
-      .references(() => bottles.id, { onDelete: "cascade" })
-      .notNull(),
-
-    // canonical name, including brand
-    fullName: varchar("full_name", { length: 255 }).notNull(),
-    // canonical name, excluding brand
-    name: varchar("name", { length: 255 }).notNull(),
-
-    searchVector: tsvector("search_vector"),
-
-    // Release-specific fields
-    edition: varchar("edition", { length: 255 }),
-    vintageYear: smallint("vintage_year"),
-    releaseYear: smallint("release_year"),
-    abv: doublePrecision("abv"),
-    singleCask: boolean("single_cask"),
-    caskStrength: boolean("cask_strength"),
-    statedAge: smallint("stated_age"),
-
-    // Cask details
-    caskSize: varchar("cask_size", { length: 255, enum: CASK_SIZE_IDS }),
-    caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
-    caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
-
-    // Release-specific content
-    description: text("description"),
-    descriptionSrc: contentSourceEnum("description_src"),
-    imageUrl: text("image_url"),
-    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
-    suggestedTags: varchar("suggested_tags", { length: 64 })
-      .array()
-      .default(sql`array[]::varchar[]`)
-      .notNull(),
-
-    // Release-specific stats
-    avgRating: doublePrecision("avg_rating"),
-    totalTastings: bigint("total_tastings", { mode: "number" })
-      .default(0)
-      .notNull(),
-
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-    createdByActorId: bigint("created_by_actor_id", {
-      mode: "number",
-    })
-      .references(() => actors.id)
-      .notNull(),
-  },
-  (table) => [
-    index("bottle_release_bottle_idx").on(table.bottleId),
-    index("bottle_release_created_by_actor_idx").on(table.createdByActorId),
-    uniqueIndex("bottle_release_full_name_idx").on(table.fullName),
-    check(
-      "bottle_release_stated_age_check",
-      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
-    ),
-  ],
-);
-
-export const bottleReleasesRelations = relations(
-  bottleReleases,
-  ({ one, many }) => ({
-    bottle: one(bottles, {
-      fields: [bottleReleases.bottleId],
-      references: [bottles.id],
-    }),
-    observations: many(bottleObservations),
-    createdByActor: one(actors, {
-      fields: [bottleReleases.createdByActorId],
-      references: [actors.id],
-    }),
-  }),
-);
-
-export type BottleRelease = typeof bottleReleases.$inferSelect;
-export type NewBottleRelease = typeof bottleReleases.$inferInsert;
-
-/**
- * Retains one audited mapping per legacy release throughout compatibility.
- * Exact Bottle merges may make multiple legacy releases converge on one Bottle.
- */
-export const bottleReleasePromotions = pgTable(
-  "bottle_release_promotion",
-  {
-    releaseId: bigint("release_id", { mode: "number" })
-      .references(() => bottleReleases.id)
-      .primaryKey(),
-    promotedBottleId: bigint("promoted_bottle_id", {
-      mode: "number",
-    })
-      .references(() => bottles.id)
-      .notNull(),
-  },
-  (table) => [
-    index("bottle_release_promotion_bottle_idx").on(table.promotedBottleId),
-  ],
-);
-
-export const bottleReleasePromotionsRelations = relations(
-  bottleReleasePromotions,
-  ({ one }) => ({
-    legacyRelease: one(bottleReleases, {
-      fields: [bottleReleasePromotions.releaseId],
-      references: [bottleReleases.id],
-    }),
-    promotedBottle: one(bottles, {
-      fields: [bottleReleasePromotions.promotedBottleId],
-      references: [bottles.id],
-    }),
-  }),
-);
-
-export type BottleReleasePromotion =
-  typeof bottleReleasePromotions.$inferSelect;
-export type NewBottleReleasePromotion =
-  typeof bottleReleasePromotions.$inferInsert;
-
-/**
  * Store-listing evidence attached to a Bottle.
- *
- * The release id is retained only as historical migration evidence. Listing
- * facts remain separate from canonical Bottle fields.
+ * Listing facts remain separate from canonical Bottle fields.
  */
 export const bottleObservations = pgTable(
   "bottle_observation",
@@ -539,10 +409,6 @@ export const bottleObservations = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id, { onDelete: "cascade" })
       .notNull(),
-    releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
-      { onDelete: "cascade" },
-    ),
     sourceType: varchar("source_type", {
       length: 32,
       enum: OBSERVATION_SOURCE_TYPES,
@@ -568,7 +434,6 @@ export const bottleObservations = pgTable(
       table.sourceKey,
     ),
     index("bottle_observation_bottle_idx").on(table.bottleId),
-    index("bottle_observation_release_idx").on(table.releaseId),
     index("bottle_observation_external_site_idx").on(table.externalSiteId),
   ],
 );
@@ -579,10 +444,6 @@ export const bottleObservationsRelations = relations(
     bottle: one(bottles, {
       fields: [bottleObservations.bottleId],
       references: [bottles.id],
-    }),
-    release: one(bottleReleases, {
-      fields: [bottleObservations.releaseId],
-      references: [bottleReleases.id],
     }),
     externalSite: one(externalSites, {
       fields: [bottleObservations.externalSiteId],
@@ -656,9 +517,6 @@ export const bottleAliases = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
-    releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
-    ),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
     // Ignored aliases are retained for audit/history but excluded from exact matching.
@@ -679,7 +537,6 @@ export const bottleAliases = pgTable(
       sql`LOWER(${table.name})`,
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
-    index("bottle_alias_release_idx").on(table.releaseId),
     index("bottle_alias_assigned_by_actor_idx").on(table.assignedByActorId),
   ],
 );
@@ -688,10 +545,6 @@ export const bottleAliasesRelations = relations(bottleAliases, ({ one }) => ({
   bottle: one(bottles, {
     fields: [bottleAliases.bottleId],
     references: [bottles.id],
-  }),
-  release: one(bottleReleases, {
-    fields: [bottleAliases.releaseId],
-    references: [bottleReleases.id],
   }),
   assignedByActor: one(actors, {
     fields: [bottleAliases.assignedByActorId],

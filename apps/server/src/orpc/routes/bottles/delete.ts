@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleFlavorProfiles,
-  bottleReleases,
   bottleTags,
   bottleTombstones,
   bottles,
@@ -77,37 +76,28 @@ export default procedure
       });
     }
 
-    const [
-      distillerRows,
-      releaseRows,
-      tastingRows,
-      collectionRows,
-      flightRows,
-    ] = await Promise.all([
-      db
-        .select({ distillerId: bottlesToDistillers.distillerId })
-        .from(bottlesToDistillers)
-        .where(eq(bottlesToDistillers.bottleId, bottle.id)),
-      db
-        .select({ id: bottleReleases.id })
-        .from(bottleReleases)
-        .where(eq(bottleReleases.bottleId, bottle.id)),
-      db
-        .select({ id: tastings.id })
-        .from(tastings)
-        .where(eq(tastings.bottleId, bottle.id))
-        .limit(1),
-      db
-        .select({ id: collectionBottles.id })
-        .from(collectionBottles)
-        .where(eq(collectionBottles.bottleId, bottle.id))
-        .limit(1),
-      db
-        .select({ flightId: flightBottles.flightId })
-        .from(flightBottles)
-        .where(eq(flightBottles.bottleId, bottle.id))
-        .limit(1),
-    ]);
+    const [distillerRows, tastingRows, collectionRows, flightRows] =
+      await Promise.all([
+        db
+          .select({ distillerId: bottlesToDistillers.distillerId })
+          .from(bottlesToDistillers)
+          .where(eq(bottlesToDistillers.bottleId, bottle.id)),
+        db
+          .select({ id: tastings.id })
+          .from(tastings)
+          .where(eq(tastings.bottleId, bottle.id))
+          .limit(1),
+        db
+          .select({ id: collectionBottles.id })
+          .from(collectionBottles)
+          .where(eq(collectionBottles.bottleId, bottle.id))
+          .limit(1),
+        db
+          .select({ flightId: flightBottles.flightId })
+          .from(flightBottles)
+          .where(eq(flightBottles.bottleId, bottle.id))
+          .limit(1),
+      ]);
 
     const blockingReferences: string[] = [];
     if (tastingRows.length > 0) {
@@ -127,23 +117,6 @@ export default procedure
     }
 
     const distillerIds = distillerRows.map(({ distillerId }) => distillerId);
-    const releaseIds = releaseRows.map(({ id }) => id);
-    const deletedReleaseMatchesAliases = releaseIds.length
-      ? inArray(bottleAliases.releaseId, releaseIds)
-      : sql`false`;
-    const deletedReleaseMatchesReviews = releaseIds.length
-      ? inArray(reviews.releaseId, releaseIds)
-      : sql`false`;
-    const deletedReleaseMatchesStorePrices = releaseIds.length
-      ? inArray(storePrices.releaseId, releaseIds)
-      : sql`false`;
-    const deletedReleaseMatchesCurrentProposal = releaseIds.length
-      ? inArray(storePriceMatchProposals.currentReleaseId, releaseIds)
-      : sql`false`;
-    const deletedReleaseMatchesSuggestedProposal = releaseIds.length
-      ? inArray(storePriceMatchProposals.suggestedReleaseId, releaseIds)
-      : sql`false`;
-
     const aliasFilters: SQL<unknown>[] = [
       eq(bottleAliases.bottleId, bottle.id),
     ];
@@ -154,18 +127,7 @@ export default procedure
     const proposalFilters: SQL<unknown>[] = [
       eq(storePriceMatchProposals.currentBottleId, bottle.id),
       eq(storePriceMatchProposals.suggestedBottleId, bottle.id),
-      eq(storePriceMatchProposals.parentBottleId, bottle.id),
     ];
-
-    if (releaseIds.length > 0) {
-      aliasFilters.push(deletedReleaseMatchesAliases);
-      reviewFilters.push(deletedReleaseMatchesReviews);
-      storePriceFilters.push(deletedReleaseMatchesStorePrices);
-      proposalFilters.push(
-        deletedReleaseMatchesCurrentProposal,
-        deletedReleaseMatchesSuggestedProposal,
-      );
-    }
 
     await db.transaction(async (tx) => {
       const actorId = (await getUserActorForDatabase(tx, context.user)).id;
@@ -211,48 +173,21 @@ export default procedure
         tx
           .update(bottleAliases)
           .set({
-            bottleId: sql`CASE
-              WHEN ${bottleAliases.bottleId} = ${bottle.id}
-                THEN NULL
-              ELSE ${bottleAliases.bottleId}
-            END`,
-            releaseId: sql`CASE
-              WHEN ${deletedReleaseMatchesAliases}
-                THEN NULL
-              ELSE ${bottleAliases.releaseId}
-            END`,
+            bottleId: null,
           })
           .where(or(...aliasFilters)),
 
         tx
           .update(reviews)
           .set({
-            bottleId: sql`CASE
-              WHEN ${reviews.bottleId} = ${bottle.id}
-                THEN NULL
-              ELSE ${reviews.bottleId}
-            END`,
-            releaseId: sql`CASE
-              WHEN ${deletedReleaseMatchesReviews}
-                THEN NULL
-              ELSE ${reviews.releaseId}
-            END`,
+            bottleId: null,
           })
           .where(or(...reviewFilters)),
 
         tx
           .update(storePrices)
           .set({
-            bottleId: sql`CASE
-              WHEN ${storePrices.bottleId} = ${bottle.id}
-                THEN NULL
-              ELSE ${storePrices.bottleId}
-            END`,
-            releaseId: sql`CASE
-              WHEN ${deletedReleaseMatchesStorePrices}
-                THEN NULL
-              ELSE ${storePrices.releaseId}
-            END`,
+            bottleId: null,
           })
           .where(or(...storePriceFilters)),
 
@@ -264,25 +199,10 @@ export default procedure
                 THEN NULL
               ELSE ${storePriceMatchProposals.currentBottleId}
             END`,
-            currentReleaseId: sql`CASE
-              WHEN ${deletedReleaseMatchesCurrentProposal}
-                THEN NULL
-              ELSE ${storePriceMatchProposals.currentReleaseId}
-            END`,
             suggestedBottleId: sql`CASE
               WHEN ${storePriceMatchProposals.suggestedBottleId} = ${bottle.id}
                 THEN NULL
               ELSE ${storePriceMatchProposals.suggestedBottleId}
-            END`,
-            suggestedReleaseId: sql`CASE
-              WHEN ${deletedReleaseMatchesSuggestedProposal}
-                THEN NULL
-              ELSE ${storePriceMatchProposals.suggestedReleaseId}
-            END`,
-            parentBottleId: sql`CASE
-              WHEN ${storePriceMatchProposals.parentBottleId} = ${bottle.id}
-                THEN NULL
-              ELSE ${storePriceMatchProposals.parentBottleId}
             END`,
             enteredQueueAt: sql`CASE
               WHEN ${storePriceMatchProposals.status} IN ('approved', 'verified')

@@ -22,7 +22,6 @@ describe("BottleGroup reads", () => {
     });
     await db.insert(bottleAliases).values({
       bottleId: related.id,
-      releaseId: null,
       name: "Alternate exact member",
       assignmentSource: "source_approved",
       assignedByActorId: source.createdByActorId,

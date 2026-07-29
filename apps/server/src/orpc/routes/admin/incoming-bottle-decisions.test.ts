@@ -146,7 +146,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
       decision: "create_release",
       actorId: actor.id,
       bottleId: bottle.id,
-      releaseId: release.id,
       createdRelease: true,
     });
 

@@ -386,7 +386,6 @@ describe("GET /users/:user/library/stats", () => {
     await db.insert(collectionBottles).values({
       collectionId: library.id,
       bottleId: promoted.id,
-      releaseId: release.id,
       status: "open",
     });
 

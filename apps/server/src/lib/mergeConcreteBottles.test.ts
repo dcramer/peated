@@ -5,8 +5,6 @@ import {
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
-  bottleReleasePromotions,
-  bottleReleases,
   bottles,
   bottleTags,
   bottleTombstones,
@@ -29,6 +27,10 @@ import {
   mergeConcreteBottles,
   mergeConcreteBottlesInTransaction,
 } from "@peated/server/lib/mergeConcreteBottles";
+import {
+  bottleReleasePromotions,
+  bottleReleases,
+} from "@peated/server/lib/test/legacyCatalogSchema";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -121,7 +123,6 @@ describe("exact Bottle merges", () => {
         proposalType: "match_existing",
         currentBottleId: source.id,
         suggestedBottleId: source.id,
-        parentBottleId: source.id,
       })
       .returning();
     const [attempt] = await db
@@ -133,7 +134,6 @@ describe("exact Bottle merges", () => {
         initialStatus: "pending_review",
         currentBottleId: source.id,
         suggestedBottleId: source.id,
-        parentBottleId: source.id,
       })
       .returning();
     const [decisionLog] = await db
@@ -189,18 +189,6 @@ describe("exact Bottle merges", () => {
       bottleId: destination.id,
       flavorProfile: "peated",
       count: 3,
-    });
-
-    const legacyParent = await fixtures.LegacyBottle({
-      name: "Promotion Parent",
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: legacyParent.id,
-      edition: "Mapped Release",
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: source.id,
     });
 
     const result = await mergeConcreteBottles({
@@ -268,7 +256,6 @@ describe("exact Bottle merges", () => {
     ).toMatchObject({
       currentBottleId: destination.id,
       suggestedBottleId: destination.id,
-      parentBottleId: destination.id,
     });
     expect(
       await db.query.storePriceMatchAttempts.findFirst({
@@ -277,7 +264,6 @@ describe("exact Bottle merges", () => {
     ).toMatchObject({
       currentBottleId: destination.id,
       suggestedBottleId: destination.id,
-      parentBottleId: destination.id,
     });
 
     expect(
@@ -309,13 +295,6 @@ describe("exact Bottle merges", () => {
         where: eq(bottleAliases.name, sourceAlias.name),
       }),
     ).toMatchObject({ bottleId: destination.id });
-    expect(
-      await db.query.bottleReleasePromotions.findFirst({
-        where: eq(bottleReleasePromotions.releaseId, release.id),
-      }),
-    ).toMatchObject({
-      promotedBottleId: destination.id,
-    });
     expect(
       await db.query.bottleTags.findFirst({
         where: and(
@@ -426,13 +405,11 @@ describe("exact Bottle merges", () => {
       {
         collectionId: collection.id,
         bottleId: source.id,
-        releaseId: sourceEvidenceA.id,
         imageUrl: "https://example.com/source.jpg",
       },
       {
         collectionId: collection.id,
         bottleId: destination.id,
-        releaseId: destinationEvidenceA.id,
         imageUrl: "https://example.com/destination.jpg",
       },
     ]);
@@ -440,12 +417,10 @@ describe("exact Bottle merges", () => {
       {
         flightId: flight.id,
         bottleId: source.id,
-        releaseId: sourceEvidenceA.id,
       },
       {
         flightId: flight.id,
         bottleId: destination.id,
-        releaseId: destinationEvidenceA.id,
       },
     ]);
 
@@ -465,7 +440,6 @@ describe("exact Bottle merges", () => {
     ).toEqual([
       expect.objectContaining({
         bottleId: destination.id,
-        releaseId: destinationEvidenceA.id,
         imageUrl: "https://example.com/destination.jpg",
       }),
     ]);
@@ -482,7 +456,6 @@ describe("exact Bottle merges", () => {
     ).toEqual([
       expect.objectContaining({
         bottleId: destination.id,
-        releaseId: destinationEvidenceA.id,
       }),
     ]);
   });
@@ -609,139 +582,6 @@ describe("exact Bottle merges", () => {
         where: eq(bottleTombstones.bottleId, source.id),
       }),
     ).toBeUndefined();
-  });
-
-  test("rejects a Bottle that still owns legacy releases", async ({
-    fixtures,
-  }) => {
-    const actor = await getUserActor(await fixtures.User({ mod: true }));
-    const source = await fixtures.Bottle({ name: "Unmigrated Source" });
-    const destination = await fixtures.Bottle({
-      name: "Unmigrated Destination",
-    });
-    await fixtures.BottleRelease({
-      bottleId: source.id,
-      edition: "Legacy Child",
-    });
-
-    await expect(
-      db.transaction((tx) =>
-        mergeConcreteBottlesInTransaction(tx, {
-          sourceBottleId: source.id,
-          destinationBottleId: destination.id,
-          actorId: actor.id,
-        }),
-      ),
-    ).rejects.toEqual(
-      new ConcreteBottleMergeGraphError("unmigrated", source.id),
-    );
-  });
-
-  test("retargets fully promoted legacy release ownership within its family", async ({
-    fixtures,
-  }) => {
-    const actor = await getUserActor(await fixtures.User({ mod: true }));
-    const source = await fixtures.Bottle({ name: "Migrated Parent Source" });
-    const destination = await fixtures.BottleGroupMember({
-      groupId: source.groupId!,
-      edition: "Surviving Parent",
-    });
-    const promotedBottle = await fixtures.BottleGroupMember({
-      groupId: source.groupId!,
-      edition: "Promoted Child",
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: source.id,
-      edition: "Promoted Child",
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-    });
-
-    await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
-        sourceBottleId: source.id,
-        destinationBottleId: destination.id,
-        actorId: actor.id,
-      }),
-    );
-
-    expect(
-      await db.query.bottleReleases.findFirst({
-        where: eq(bottleReleases.id, release.id),
-      }),
-    ).toMatchObject({ id: release.id, bottleId: destination.id });
-    expect(
-      await db.query.bottleReleasePromotions.findFirst({
-        where: eq(bottleReleasePromotions.releaseId, release.id),
-      }),
-    ).toMatchObject({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-    });
-  });
-
-  test("reparents retained legacy release evidence across groups", async ({
-    fixtures,
-  }) => {
-    const actor = await getUserActor(await fixtures.User({ mod: true }));
-    const source = await fixtures.Bottle({ name: "Legacy Family Source" });
-    const promotedBottle = await fixtures.BottleGroupMember({
-      groupId: source.groupId!,
-      edition: "Promoted Child",
-    });
-    await db
-      .update(bottleGroups)
-      .set({ representativeBottleId: promotedBottle.id })
-      .where(eq(bottleGroups.id, source.groupId!));
-    const destination = await fixtures.Bottle({
-      name: "Other Family Destination",
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: source.id,
-      edition: "Promoted Child",
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-    });
-
-    await db.transaction((tx) =>
-      mergeConcreteBottlesInTransaction(tx, {
-        sourceBottleId: source.id,
-        destinationBottleId: destination.id,
-        actorId: actor.id,
-      }),
-    );
-
-    expect(
-      await db.query.bottles.findFirst({
-        where: eq(bottles.id, source.id),
-      }),
-    ).toBeUndefined();
-    expect(
-      await db.query.bottleReleases.findFirst({
-        where: eq(bottleReleases.id, release.id),
-      }),
-    ).toMatchObject({
-      bottleId: destination.id,
-    });
-    expect(
-      await db.query.bottleReleasePromotions.findFirst({
-        where: eq(bottleReleasePromotions.releaseId, release.id),
-      }),
-    ).toMatchObject({
-      promotedBottleId: promotedBottle.id,
-    });
-    expect(
-      await db.query.bottleGroups.findFirst({
-        where: eq(bottleGroups.id, source.groupId!),
-      }),
-    ).toMatchObject({
-      representativeBottleId: promotedBottle.id,
-      totalBottles: 1,
-    });
   });
 
   test("rejects retired destinations and a source already merged elsewhere", async ({

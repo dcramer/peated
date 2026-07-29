@@ -12,7 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleReleases, bottles } from "./bottles";
+import { bottles } from "./bottles";
 import { users } from "./users";
 
 export const collections = pgTable(
@@ -54,7 +54,7 @@ export const collectionBottleStatusEnum = pgEnum("collection_bottle_status", [
   "empty",
 ]);
 
-/** A collection membership selects one Bottle; releaseId is legacy evidence. */
+/** A collection membership selects one Bottle. */
 export const collectionBottles = pgTable(
   "collection_bottle",
   {
@@ -65,9 +65,6 @@ export const collectionBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
-    ),
     imageUrl: text("image_url"),
     status: collectionBottleStatusEnum("status"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -75,7 +72,6 @@ export const collectionBottles = pgTable(
   (table) => [
     unique().on(table.collectionId, table.bottleId),
     index("collection_bottle_bottle_idx").on(table.bottleId),
-    index("collection_bottle_release_idx").on(table.releaseId),
   ],
 );
 
@@ -89,10 +85,6 @@ export const collectionBottlesRelations = relations(
     bottle: one(bottles, {
       fields: [collectionBottles.bottleId],
       references: [bottles.id],
-    }),
-    release: one(bottleReleases, {
-      fields: [collectionBottles.releaseId],
-      references: [bottleReleases.id],
     }),
   }),
 );

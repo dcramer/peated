@@ -17,7 +17,7 @@ import {
 
 import { SERVING_STYLE_LIST } from "../../constants";
 import { badgeAwards } from "./badges";
-import { bottleReleases, bottles } from "./bottles";
+import { bottles } from "./bottles";
 import { flights } from "./flights";
 import { users } from "./users";
 
@@ -26,8 +26,7 @@ export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 /**
  * User-authored tasting records.
  *
- * Bottle identity is authoritative. releaseId is retained as historical
- * migration evidence until separately approved cleanup.
+ * Bottle identity is authoritative.
  */
 export const tastings = pgTable(
   "tasting",
@@ -37,9 +36,6 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
-    ),
     tags: varchar("tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)
@@ -73,7 +69,6 @@ export const tastings = pgTable(
       table.createdAt,
     ),
     index("tasting_bottle_idx").on(table.bottleId),
-    index("tasting_release_idx").on(table.releaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
   ],
@@ -83,10 +78,6 @@ export const tastingsRelations = relations(tastings, ({ one }) => ({
   bottle: one(bottles, {
     fields: [tastings.bottleId],
     references: [bottles.id],
-  }),
-  release: one(bottleReleases, {
-    fields: [tastings.releaseId],
-    references: [bottleReleases.id],
   }),
   createdBy: one(users, {
     fields: [tastings.createdById],

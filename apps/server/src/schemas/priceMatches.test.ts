@@ -59,11 +59,10 @@ describe("PriceMatchCandidateSchema", () => {
 
   test.each([
     { kind: "release" },
-    { releaseId: 20 },
     {
       familyContext: {
         siblingBottles: [],
-        siblingReleases: [{ releaseId: 21, fullName: "Legacy release" }],
+        siblingReleases: [{ fullName: "Legacy release" }],
       },
     },
   ])("rejects legacy release candidate shape %o", (legacyFields) => {

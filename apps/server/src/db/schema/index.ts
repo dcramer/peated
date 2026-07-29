@@ -17,7 +17,6 @@ export * from "./notifications";
 export * from "./passkeys";
 export * from "./pendingUploads";
 export * from "./regions";
-export * from "./repairs";
 export * from "./reviews";
 export * from "./stores";
 export * from "./tags";

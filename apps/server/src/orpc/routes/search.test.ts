@@ -149,7 +149,6 @@ describe("GET /search", () => {
     await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
     await db.insert(bottleAliases).values({
       bottleId: retainedBottle.id,
-      releaseId: retainedRelease.id,
       name: "Authoritative Search Alias",
       assignedByActorId: bottle.createdByActorId,
     });

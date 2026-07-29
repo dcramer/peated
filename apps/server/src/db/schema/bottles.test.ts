@@ -1,11 +1,7 @@
+import { bottleReleasePromotions } from "@peated/server/lib/test/legacyCatalogSchema";
 import { eq } from "drizzle-orm";
 import { db } from "../index";
-import {
-  bottleAliases,
-  bottleGroups,
-  bottleReleasePromotions,
-  bottles,
-} from "./bottles";
+import { bottleAliases, bottleGroups, bottles } from "./bottles";
 
 describe("BottleGroup membership constraints", () => {
   test("accepts a singleton group with its Bottle as representative", async ({

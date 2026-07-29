@@ -1,16 +1,15 @@
 import { db } from "@peated/server/db";
-import {
-  bottleReleasePromotions,
-  bottleReleases,
-  bottleTombstones,
-  bottles,
-} from "@peated/server/db/schema";
+import { bottleTombstones, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   lockBottleReferenceResolutionAssignmentInTransaction,
   resolveBottleReferenceTarget,
   type BottleReferenceResolution,
 } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  bottleReleasePromotions,
+  bottleReleases,
+} from "@peated/server/lib/test/legacyCatalogSchema";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -269,7 +268,6 @@ describe("resolveBottleReferenceTarget", () => {
     });
     const alias = await fixtures.BottleAlias({
       bottleId: parent.id,
-      releaseId: release.id,
       name: "Promoted Release Alias",
     });
     const result = await resolveBottleReferenceTarget({
@@ -454,7 +452,6 @@ describe("resolveBottleReferenceTarget", () => {
         confidenceBasis: null,
         matchedBottleId: null,
         matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: {
           name: "Independent Expression",
           series: null,
@@ -470,7 +467,6 @@ describe("resolveBottleReferenceTarget", () => {
           distillers: [],
           bottler: null,
         },
-        proposedRelease: null,
       }),
     );
 
@@ -569,9 +565,7 @@ describe("resolveBottleReferenceTarget", () => {
         },
         matchedBottleId: null,
         matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: buildSmwsProposedBottle(),
-        proposedRelease: null,
       }),
     );
 
