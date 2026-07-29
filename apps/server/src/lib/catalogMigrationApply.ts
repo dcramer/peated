@@ -86,7 +86,10 @@ export class CatalogMigrationApplyError extends Error {
     readonly details: Record<string, unknown> = {},
     options?: ErrorOptions,
   ) {
-    super(`Catalog migration apply failed (${code}).`, options);
+    super(
+      `Catalog migration apply failed (${code}): ${JSON.stringify(details)}`,
+      options,
+    );
     this.name = "CatalogMigrationApplyError";
   }
 }
@@ -103,6 +106,8 @@ type FamilyPlan = {
   parent: Bottle;
   releases: BottleRelease[];
   ownedRows: ParentOwnedRows;
+  groupKey: string;
+  sharedParentIdentity: boolean;
 };
 
 type MigrationState = {
@@ -114,6 +119,9 @@ type MigrationState = {
 type AppliedFamily = {
   plan: FamilyPlan;
   groupId: number;
+  representativeParentId: number;
+  groupTotalBottles: number;
+  groupDistillerIds: number[];
   promoted: Array<{
     release: BottleRelease;
     bottle: Bottle;
@@ -499,9 +507,24 @@ async function buildFamilyPlans(
   const aliasByName = new Map(
     aliases.map((alias) => [claimKey(alias.name), alias]),
   );
+  const groupKeyByParentId = new Map(
+    state.bottles.map((parent) => [parent.id, claimKey(parent.fullName)]),
+  );
+  const parentCountByGroupKey = new Map<string, number>();
+  for (const groupKey of groupKeyByParentId.values()) {
+    parentCountByGroupKey.set(
+      groupKey,
+      (parentCountByGroupKey.get(groupKey) ?? 0) + 1,
+    );
+  }
   const plannedClaimByName = new Map<
     string,
-    { bottleId: number | null; parentId: number; releaseId: number | null }
+    {
+      bottleId: number | null;
+      parentId: number;
+      releaseId: number | null;
+      groupKey: string;
+    }
   >();
   const claimCanonicalIdentity = ({
     fullName,
@@ -514,12 +537,24 @@ async function buildFamilyPlans(
     parentId: number;
     releaseId: number | null;
   }) => {
+    const groupKey = groupKeyByParentId.get(parentId);
+    if (!groupKey) {
+      throw new CatalogMigrationApplyError("family_changed", {
+        parentId,
+        reason: "parent_group_key_missing",
+      });
+    }
     for (const name of canonicalNames(fullName)) {
       const key = claimKey(name);
       const planned = plannedClaimByName.get(key);
       if (
         planned &&
-        (planned.parentId !== parentId || planned.releaseId !== releaseId)
+        (planned.parentId !== parentId || planned.releaseId !== releaseId) &&
+        !(
+          planned.releaseId === null &&
+          releaseId === null &&
+          planned.groupKey === groupKey
+        )
       ) {
         throw new CatalogMigrationApplyError("name_collision", {
           name,
@@ -529,10 +564,18 @@ async function buildFamilyPlans(
           conflictingReleaseId: planned.releaseId,
         });
       }
-      plannedClaimByName.set(key, { bottleId, parentId, releaseId });
+      plannedClaimByName.set(key, {
+        bottleId,
+        parentId,
+        releaseId,
+        groupKey,
+      });
 
       const canonicalCollision = (bottleByCanonicalName.get(key) ?? []).find(
-        (bottle) => releaseId !== null || bottle.id !== parentId,
+        (bottle) =>
+          releaseId !== null ||
+          (bottle.id !== parentId &&
+            groupKeyByParentId.get(bottle.id) !== groupKey),
       );
       if (canonicalCollision) {
         throw new CatalogMigrationApplyError("name_collision", {
@@ -545,9 +588,16 @@ async function buildFamilyPlans(
 
       const alias = aliasByName.get(key);
       if (!alias) continue;
+      const aliasParentGroupKey =
+        alias.releaseId === null && alias.bottleId !== null
+          ? groupKeyByParentId.get(alias.bottleId)
+          : undefined;
       const owned =
         releaseId === null
-          ? alias.bottleId === parentId && alias.releaseId === null
+          ? alias.releaseId === null &&
+            (alias.bottleId === parentId ||
+              ((parentCountByGroupKey.get(groupKey) ?? 0) > 1 &&
+                aliasParentGroupKey === groupKey))
           : (alias.releaseId === releaseId &&
               (alias.bottleId === parentId || alias.bottleId === null)) ||
             (alias.releaseId === null && alias.bottleId === parentId);
@@ -581,19 +631,27 @@ async function buildFamilyPlans(
     }
   }
 
-  return state.bottles.map((parent) => ({
-    parent,
-    releases: releasesByParentId.get(parent.id) ?? [],
-    ownedRows: {
-      distillerIds: distillerIdsByBottleId.get(parent.id) ?? [],
-      tags: tagsByBottleId.get(parent.id) ?? [],
-      flavorProfiles: flavorProfilesByBottleId.get(parent.id) ?? [],
-    },
-  }));
+  return state.bottles.map((parent) => {
+    const groupKey = groupKeyByParentId.get(parent.id)!;
+    return {
+      parent,
+      releases: releasesByParentId.get(parent.id) ?? [],
+      ownedRows: {
+        distillerIds: distillerIdsByBottleId.get(parent.id) ?? [],
+        tags: tagsByBottleId.get(parent.id) ?? [],
+        flavorProfiles: flavorProfilesByBottleId.get(parent.id) ?? [],
+      },
+      groupKey,
+      sharedParentIdentity: (parentCountByGroupKey.get(groupKey) ?? 0) > 1,
+    };
+  });
 }
 
-function groupValues(plan: FamilyPlan): typeof bottleGroups.$inferInsert {
-  const { parent, releases } = plan;
+function groupValues(
+  plan: FamilyPlan,
+  totalBottles: number,
+): typeof bottleGroups.$inferInsert {
+  const { parent } = plan;
   return {
     fullName: parent.fullName,
     name: parent.name,
@@ -603,116 +661,149 @@ function groupValues(plan: FamilyPlan): typeof bottleGroups.$inferInsert {
     brandId: parent.brandId,
     bottlerId: parent.bottlerId,
     flavorProfile: parent.flavorProfile,
-    totalBottles: releases.length + 1,
+    totalBottles,
     createdAt: parent.createdAt,
     updatedAt: parent.updatedAt,
     createdByActorId: parent.createdByActorId,
   };
 }
 
-async function insertFamily(
+async function insertGroup(
   tx: AnyTransaction,
-  plan: FamilyPlan,
-): Promise<AppliedFamily> {
+  plans: FamilyPlan[],
+): Promise<AppliedFamily[]> {
+  const representativePlan = plans[0];
+  if (!representativePlan) return [];
+  const totalBottles = plans.reduce(
+    (total, plan) => total + plan.releases.length + 1,
+    0,
+  );
+  const groupDistillerIds = [
+    ...new Set(plans.flatMap((plan) => plan.ownedRows.distillerIds)),
+  ].sort((left, right) => left - right);
   const [group] = await tx
     .insert(bottleGroups)
-    .values(groupValues(plan))
+    .values(groupValues(representativePlan, totalBottles))
     .returning();
   if (!group) {
     throw new CatalogMigrationApplyError("postflight_failed", {
-      parentId: plan.parent.id,
+      parentId: representativePlan.parent.id,
       reason: "group_insert_missing",
     });
   }
 
-  const [assignedParent] = await tx
-    .update(bottles)
-    .set({ groupId: group.id })
-    .where(and(eq(bottles.id, plan.parent.id), isNull(bottles.groupId)))
-    .returning({ id: bottles.id });
-  if (!assignedParent) {
-    throw new CatalogMigrationApplyError("family_changed", {
-      parentId: plan.parent.id,
-      reason: "parent_assignment_changed",
-    });
-  }
-
-  if (plan.ownedRows.distillerIds.length) {
+  if (groupDistillerIds.length) {
     await tx.insert(bottleGroupDistillers).values(
-      plan.ownedRows.distillerIds.map((distillerId) => ({
+      groupDistillerIds.map((distillerId) => ({
         groupId: group.id,
         distillerId,
       })),
     );
   }
 
-  const promoted: AppliedFamily["promoted"] = [];
-  for (const release of plan.releases) {
-    const [bottle] = await tx
-      .insert(bottles)
-      .values(materializedBottle(plan.parent, release, group.id))
-      .returning();
-    if (!bottle) {
-      throw new CatalogMigrationApplyError("postflight_failed", {
+  const applied: AppliedFamily[] = [];
+  for (const plan of plans) {
+    const [assignedParent] = await tx
+      .update(bottles)
+      .set({ groupId: group.id })
+      .where(and(eq(bottles.id, plan.parent.id), isNull(bottles.groupId)))
+      .returning({ id: bottles.id });
+    if (!assignedParent) {
+      throw new CatalogMigrationApplyError("family_changed", {
         parentId: plan.parent.id,
-        releaseId: release.id,
-        reason: "promoted_bottle_insert_missing",
+        reason: "parent_assignment_changed",
       });
     }
-    if (plan.ownedRows.distillerIds.length) {
-      await tx.insert(bottlesToDistillers).values(
-        plan.ownedRows.distillerIds.map((distillerId) => ({
-          bottleId: bottle.id,
-          distillerId,
-        })),
-      );
-    }
-    if (plan.ownedRows.tags.length) {
-      await tx
-        .insert(bottleTags)
-        .values(
-          plan.ownedRows.tags.map((tag) => ({ bottleId: bottle.id, ...tag })),
+    const promoted: AppliedFamily["promoted"] = [];
+    for (const release of plan.releases) {
+      const [bottle] = await tx
+        .insert(bottles)
+        .values(materializedBottle(plan.parent, release, group.id))
+        .returning();
+      if (!bottle) {
+        throw new CatalogMigrationApplyError("postflight_failed", {
+          parentId: plan.parent.id,
+          releaseId: release.id,
+          reason: "promoted_bottle_insert_missing",
+        });
+      }
+      if (plan.ownedRows.distillerIds.length) {
+        await tx.insert(bottlesToDistillers).values(
+          plan.ownedRows.distillerIds.map((distillerId) => ({
+            bottleId: bottle.id,
+            distillerId,
+          })),
         );
+      }
+      if (plan.ownedRows.tags.length) {
+        await tx
+          .insert(bottleTags)
+          .values(
+            plan.ownedRows.tags.map((tag) => ({ bottleId: bottle.id, ...tag })),
+          );
+      }
+      if (plan.ownedRows.flavorProfiles.length) {
+        await tx.insert(bottleFlavorProfiles).values(
+          plan.ownedRows.flavorProfiles.map((profile) => ({
+            bottleId: bottle.id,
+            ...profile,
+          })),
+        );
+      }
+      await tx.insert(bottleReleasePromotions).values({
+        releaseId: release.id,
+        promotedBottleId: bottle.id,
+      });
+      promoted.push({ release, bottle });
     }
-    if (plan.ownedRows.flavorProfiles.length) {
-      await tx.insert(bottleFlavorProfiles).values(
-        plan.ownedRows.flavorProfiles.map((profile) => ({
-          bottleId: bottle.id,
-          ...profile,
-        })),
-      );
-    }
-    await tx.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: bottle.id,
+    applied.push({
+      plan,
+      groupId: group.id,
+      representativeParentId: representativePlan.parent.id,
+      groupTotalBottles: totalBottles,
+      groupDistillerIds,
+      promoted,
     });
-    promoted.push({ release, bottle });
   }
 
   const [represented] = await tx
     .update(bottleGroups)
-    .set({ representativeBottleId: plan.parent.id })
+    .set({ representativeBottleId: representativePlan.parent.id })
     .where(eq(bottleGroups.id, group.id))
     .returning({ id: bottleGroups.id });
   if (!represented) {
     throw new CatalogMigrationApplyError("postflight_failed", {
-      parentId: plan.parent.id,
+      parentId: representativePlan.parent.id,
       groupId: group.id,
       reason: "representative_update_missing",
     });
   }
 
-  return { plan, groupId: group.id, promoted };
+  return applied;
 }
 
 function statsFamilies(
   applied: readonly AppliedFamily[],
 ): CatalogMigrationStatsFamily[] {
-  return applied.map(({ plan, groupId, promoted }) => ({
-    groupId,
-    retainedParentBottleId: plan.parent.id,
-    promotedBottleIds: promoted.map(({ bottle }) => bottle.id),
-  }));
+  const byGroupId = new Map<number, AppliedFamily[]>();
+  for (const family of applied) {
+    const groupFamilies = byGroupId.get(family.groupId) ?? [];
+    groupFamilies.push(family);
+    byGroupId.set(family.groupId, groupFamilies);
+  }
+  return [...byGroupId.entries()].map(([groupId, families]) => {
+    const firstFamily = families[0]!;
+    return {
+      groupId,
+      retainedParentBottleId: firstFamily.representativeParentId,
+      promotedBottleIds: families.flatMap((family) => [
+        ...(family.plan.parent.id === firstFamily.representativeParentId
+          ? []
+          : [family.plan.parent.id]),
+        ...family.promoted.map(({ bottle }) => bottle.id),
+      ]),
+    };
+  });
 }
 
 async function reserveCanonicalAliases(
@@ -751,11 +842,13 @@ async function reserveCanonicalAliases(
   };
 
   for (const family of applied) {
-    await reserve(reserveExactBottleAliasInTransaction, family.plan.parent);
-    await reserve(
-      reserveLiteralCanonicalBottleAliasInTransaction,
-      family.plan.parent,
-    );
+    if (!family.plan.sharedParentIdentity) {
+      await reserve(reserveExactBottleAliasInTransaction, family.plan.parent);
+      await reserve(
+        reserveLiteralCanonicalBottleAliasInTransaction,
+        family.plan.parent,
+      );
+    }
     for (const { bottle } of family.promoted) {
       for (const name of canonicalNames(bottle.fullName)) {
         const reassigned = await tx
@@ -946,8 +1039,8 @@ async function assertAppliedFamilies(
       !parent ||
       !group ||
       parent.groupId !== group.id ||
-      group.representativeBottleId !== parent.id ||
-      group.totalBottles !== family.plan.releases.length + 1
+      group.representativeBottleId !== family.representativeParentId ||
+      group.totalBottles !== family.groupTotalBottles
     ) {
       throw new CatalogMigrationApplyError("postflight_failed", {
         parentId: family.plan.parent.id,
@@ -957,7 +1050,7 @@ async function assertAppliedFamilies(
     }
     const groupDistillers =
       state.groupDistillerIdsByGroupId.get(group.id) ?? [];
-    if (!sameValue(groupDistillers, family.plan.ownedRows.distillerIds)) {
+    if (!sameValue(groupDistillers, family.groupDistillerIds)) {
       throw new CatalogMigrationApplyError("postflight_failed", {
         parentId: parent.id,
         reason: "group_distillers_mismatch",
@@ -990,7 +1083,7 @@ async function assertAppliedFamilies(
       }
     }
     assertCanonicalAliases(state.aliasByName, [
-      parent,
+      ...(family.plan.sharedParentIdentity ? [] : [parent]),
       ...family.promoted.map(({ bottle }) => bottle),
     ]);
   }
@@ -1022,6 +1115,13 @@ async function loadCompletedFamilies(
   const bottleById = new Map(
     state.bottles.map((bottle) => [bottle.id, bottle]),
   );
+  const plansByGroupId = new Map<number, FamilyPlan[]>();
+  for (const plan of plans) {
+    if (plan.parent.groupId === null) continue;
+    const groupPlans = plansByGroupId.get(plan.parent.groupId) ?? [];
+    groupPlans.push(plan);
+    plansByGroupId.set(plan.parent.groupId, groupPlans);
+  }
   return plans.map((plan) => {
     if (plan.parent.groupId === null) {
       throw new CatalogMigrationApplyError("partial_state", {
@@ -1029,9 +1129,23 @@ async function loadCompletedFamilies(
         reason: "parent_group_missing",
       });
     }
+    const groupPlans = plansByGroupId.get(plan.parent.groupId) ?? [plan];
+    const representativeParentId = Math.min(
+      ...groupPlans.map(({ parent }) => parent.id),
+    );
     return {
       plan,
       groupId: plan.parent.groupId,
+      representativeParentId,
+      groupTotalBottles: groupPlans.reduce(
+        (total, groupPlan) => total + groupPlan.releases.length + 1,
+        0,
+      ),
+      groupDistillerIds: [
+        ...new Set(
+          groupPlans.flatMap(({ ownedRows }) => ownedRows.distillerIds),
+        ),
+      ].sort((left, right) => left - right),
       promoted: plan.releases.map((release) => {
         const mapping = mappingByReleaseId.get(release.id);
         const bottle =
@@ -1064,12 +1178,25 @@ async function buildFamilyPlansForCompletedState(
   }
   const parentIds = new Set(state.bottles.map(({ id }) => id));
   const ownedRowsByBottleId = await loadBottleOwnedRowsByBottleId(tx);
+  const parentCountByGroupId = new Map<number, number>();
+  for (const parent of state.bottles) {
+    if (parent.groupId !== null) {
+      parentCountByGroupId.set(
+        parent.groupId,
+        (parentCountByGroupId.get(parent.groupId) ?? 0) + 1,
+      );
+    }
+  }
   const plans: FamilyPlan[] = [];
   for (const parent of state.bottles) {
     plans.push({
       parent,
       releases: releasesByParentId.get(parent.id) ?? [],
       ownedRows: ownedRowsByBottleId.get(parent.id) ?? emptyOwnedRows(),
+      groupKey: claimKey(parent.fullName),
+      sharedParentIdentity:
+        parent.groupId !== null &&
+        (parentCountByGroupId.get(parent.groupId) ?? 0) > 1,
     });
   }
   if (state.releases.some((release) => !parentIds.has(release.bottleId))) {
@@ -1130,17 +1257,23 @@ function countsFor(
   );
   return {
     parents: plans.length,
-    groups: plans.length,
+    groups: new Set(plans.map(({ groupKey }) => groupKey)).size,
     parentBottlesAssigned: plans.length,
     releases,
     promotedBottles: releases,
     promotionMappings: releases,
     canonicalAliasesChanged: aliases.changed,
     canonicalAliasesReused: aliases.reused,
-    groupDistillers: plans.reduce(
-      (count, family) => count + family.ownedRows.distillerIds.length,
-      0,
-    ),
+    groupDistillers: [
+      ...plans
+        .reduce((byGroup, family) => {
+          const ids = byGroup.get(family.groupKey) ?? new Set<number>();
+          for (const id of family.ownedRows.distillerIds) ids.add(id);
+          byGroup.set(family.groupKey, ids);
+          return byGroup;
+        }, new Map<string, Set<number>>())
+        .values(),
+    ].reduce((count, ids) => count + ids.size, 0),
     bottleDistillers: plans.reduce(
       (count, family) =>
         count + family.ownedRows.distillerIds.length * family.releases.length,
@@ -1260,9 +1393,15 @@ export async function applyCatalogMigration(
     await assertAuditUnchanged(tx, parsed.candidate, revision);
     const plans = await buildFamilyPlans(tx, state);
     const consumerPreflight = await preflightLegacyConsumersInTransaction(tx);
-    const applied: AppliedFamily[] = [];
+    const plansByGroupKey = new Map<string, FamilyPlan[]>();
     for (const plan of plans) {
-      applied.push(await insertFamily(tx, plan));
+      const groupPlans = plansByGroupKey.get(plan.groupKey) ?? [];
+      groupPlans.push(plan);
+      plansByGroupKey.set(plan.groupKey, groupPlans);
+    }
+    const applied: AppliedFamily[] = [];
+    for (const groupPlans of plansByGroupKey.values()) {
+      applied.push(...(await insertGroup(tx, groupPlans)));
     }
 
     const consumers = await repointLegacyConsumersInTransaction(

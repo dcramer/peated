@@ -171,6 +171,8 @@ and map to an explicit removal task.
 - [x] 7.15 Correct production preflight false positives for Bottle-owned exact
       fields and same-family aliases, and make the retained-audit CLI
       self-contained.
+- [x] 7.16 Group literal same-name legacy parents deterministically without
+      merging Bottle identities or creating ambiguous canonical aliases.
 
 ## 8. Production Migration And Later Destructive Cleanup
 
