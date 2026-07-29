@@ -306,7 +306,7 @@ describe("GET /users/:user/regions", () => {
     });
   });
 
-  test("uses the stored Bottle brand when legacy release evidence remains", async ({
+  test("uses the stored Bottle brand instead of another group member", async ({
     defaults,
     fixtures,
   }) => {
@@ -323,7 +323,6 @@ describe("GET /users/:user/regions", () => {
       name: "Promoted Brand",
     });
     const parent = await fixtures.Bottle({ brandId: parentBrand.id });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
     const promoted = await fixtures.BottleGroupMember({
       groupId: parent.groupId as number,
       edition: "Promoted Edition",

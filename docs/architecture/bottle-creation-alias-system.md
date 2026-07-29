@@ -213,22 +213,16 @@ including source URL, raw title, retailer image, price/volume context, selector,
 bottle number, outturn, and unreviewed maturation fragments. They attach through
 the same validated Bottle id when identity is known.
 
-## Retained BottleRelease Migration Evidence
+## Retired BottleRelease Identity
 
-BottleRelease is not part of live creation or public identity. After legacy
-rows are promoted:
+BottleRelease is not part of live creation, public identity, or the physical
+application schema. Legacy releases were promoted to independently complete
+Bottles before the promotion mapping, legacy pair columns, migration-only
+writers, and retained audit support were removed.
 
-- a durable promotion mapping records each legacy `releaseId` and its promoted
-  Bottle for migration, audit, merge, and cleanup internals;
-- retained `releaseId` columns may remain as historical migration evidence
-  until their schema-removal gate, but live reads and writes use only
-  `bottleId`; and
-- public BottleRelease APIs, runtime schemas, and old nested URL redirects are
-  removed.
-
-Separately approved destructive cleanup removes legacy pair storage, the
-`bottle_release` table, migration-only writers, and retained audit branches.
-New architecture must not add a second release identity layer.
+Historical change records may retain `bottle_release` as inert audit vocabulary,
+but current feeds exclude those records. New architecture must not add a second
+release identity layer.
 
 ## Minimum Test Coverage
 

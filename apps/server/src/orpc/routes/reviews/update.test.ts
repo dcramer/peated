@@ -47,15 +47,9 @@ describe("PATCH /reviews/:review", () => {
     ).rejects.toThrow("Unauthorized.");
   });
 
-  test("hidden-only updates preserve Bottle and release evidence", async ({
-    fixtures,
-  }) => {
+  test("hidden-only updates preserve Bottle identity", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
-    const evidenceBottle = await fixtures.LegacyBottle();
-    const evidenceRelease = await fixtures.BottleRelease({
-      bottleId: evidenceBottle.id,
-    });
     const review = await fixtures.Review({
       bottleId: bottle.id,
       hidden: false,
@@ -77,15 +71,9 @@ describe("PATCH /reviews/:review", () => {
     expect(response.bottle?.id).toBe(bottle.id);
   });
 
-  test("assigns an independently valid Bottle and preserves historical evidence", async ({
-    fixtures,
-  }) => {
+  test("assigns an independently valid Bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
-    const previousBottle = await fixtures.Bottle();
     const nextBottle = await fixtures.Bottle();
-    const evidenceRelease = await fixtures.BottleRelease({
-      bottleId: previousBottle.id,
-    });
     const review = await fixtures.Review({
       bottleId: null,
     });
@@ -117,12 +105,9 @@ describe("PATCH /reviews/:review", () => {
     });
   });
 
-  test("explicit unassignment preserves historical evidence", async ({
-    fixtures,
-  }) => {
+  test("supports explicit unassignment", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const review = await fixtures.Review({
       bottleId: bottle.id,
     });
@@ -250,15 +235,10 @@ describe("PATCH /reviews/:review", () => {
     });
   });
 
-  test("locks a selected Bottle before the Review and preserves concurrent evidence", async ({
-    fixtures,
-  }) => {
+  test("locks a selected Bottle before the Review", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const selectedBottle = await fixtures.Bottle();
     const concurrentBottle = await fixtures.Bottle();
-    const concurrentRelease = await fixtures.BottleRelease({
-      bottleId: concurrentBottle.id,
-    });
     const review = await fixtures.Review({
       bottleId: null,
       hidden: false,
@@ -284,8 +264,8 @@ describe("PATCH /reviews/:review", () => {
       );
       await waitForSessionBlockedBy(client, blockerPid);
       await client.query(
-        `UPDATE "review" SET "bottle_id" = $1, "release_id" = $2 WHERE "id" = $3`,
-        [concurrentBottle.id, concurrentRelease.id, review.id],
+        `UPDATE "review" SET "bottle_id" = $1 WHERE "id" = $2`,
+        [concurrentBottle.id, review.id],
       );
       await client.query("COMMIT");
       committed = true;

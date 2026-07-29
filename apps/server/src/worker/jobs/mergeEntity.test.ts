@@ -12,8 +12,6 @@ import {
 } from "@peated/server/db/schema";
 import type { getUserActor } from "@peated/server/lib/actors";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
-import type * as Fixtures from "@peated/server/lib/test/fixtures";
-import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { beforeEach, expect } from "vitest";
 import mergeEntity from "./mergeEntity";
@@ -287,87 +285,3 @@ test("fans merged shared entity roles through every BottleGroup member", async (
     data: expect.objectContaining({ creationSource: "repair_workflow" }),
   });
 });
-
-async function expectReleaseOwnedDuplicateRollback(fixtures: typeof Fixtures) {
-  const sourceEntity = await fixtures.Entity({ name: "Release Source" });
-  const destinationEntity = await fixtures.Entity({
-    name: "Release Destination",
-  });
-  const sourceBottle = await fixtures.Bottle({
-    brandId: sourceEntity.id,
-    name: "Duplicate",
-  });
-  const destinationBottle = await fixtures.Bottle({
-    brandId: destinationEntity.id,
-    name: "Duplicate",
-  });
-  const release = await fixtures.BottleRelease({
-    bottleId: sourceBottle.id,
-    edition: "source child",
-  });
-  const entityIds = [sourceEntity.id, destinationEntity.id];
-  const bottleIds = [sourceBottle.id, destinationBottle.id];
-  const entitiesBefore = await db
-    .select()
-    .from(entities)
-    .where(inArray(entities.id, entityIds))
-    .orderBy(asc(entities.id));
-  const bottlesBefore = await db
-    .select()
-    .from(bottles)
-    .where(inArray(bottles.id, bottleIds))
-    .orderBy(asc(bottles.id));
-  const aliasesBefore = await db
-    .select()
-    .from(bottleAliases)
-    .where(inArray(bottleAliases.bottleId, bottleIds))
-    .orderBy(asc(bottleAliases.name));
-  const [releaseBefore] = await db
-    .select()
-    .from(bottleReleases)
-    .where(eq(bottleReleases.id, release.id))
-    .limit(1);
-
-  await expect(
-    mergeEntity({
-      fromEntityIds: [sourceEntity.id],
-      toEntityId: destinationEntity.id,
-    }),
-  ).rejects.toMatchObject({ code: "unmigrated" });
-
-  expect(
-    await db
-      .select()
-      .from(entities)
-      .where(inArray(entities.id, entityIds))
-      .orderBy(asc(entities.id)),
-  ).toEqual(entitiesBefore);
-  expect(
-    await db
-      .select()
-      .from(bottles)
-      .where(inArray(bottles.id, bottleIds))
-      .orderBy(asc(bottles.id)),
-  ).toEqual(bottlesBefore);
-  expect(
-    await db
-      .select()
-      .from(bottleAliases)
-      .where(inArray(bottleAliases.bottleId, bottleIds))
-      .orderBy(asc(bottleAliases.name)),
-  ).toEqual(aliasesBefore);
-  expect(
-    (
-      await db
-        .select()
-        .from(bottleReleases)
-        .where(eq(bottleReleases.id, release.id))
-        .limit(1)
-    )[0],
-  ).toEqual(releaseBefore);
-  expect(
-    await db.query.entityTombstones.findFirst({
-      where: eq(entityTombstones.entityId, sourceEntity.id),
-    }),
-  ).toBeUndefined();
-}

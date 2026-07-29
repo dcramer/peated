@@ -314,13 +314,6 @@ describe("priceMatching", () => {
       name: "Authoritative Exact Candidate",
       edition: "Target edition",
     });
-    const legacyParent = await fixtures.Bottle({
-      name: "Retained Pair Parent",
-    });
-    const legacyRelease = await fixtures.BottleRelease({
-      bottleId: legacyParent.id,
-      name: "Retained Pair Release",
-    });
     await fixtures.BottleAlias({
       bottleId: targetBottle.id,
       name: "Direct Bottle Alias ZXQ",
@@ -342,9 +335,6 @@ describe("priceMatching", () => {
         }),
       ]),
     );
-    expect(
-      candidates.some((candidate) => candidate.bottleId === legacyParent.id),
-    ).toBe(false);
   });
 
   test("uses assigned aliases and excludes ignored or unresolved aliases", async ({
@@ -432,28 +422,6 @@ describe("priceMatching", () => {
       newBottleId: (await fixtures.Bottle({ name: "Promotion Survivor" })).id,
     });
     await expect(getBottleCandidateById(parent.id)).resolves.toBeNull();
-  });
-
-  test("does not search the legacy BottleRelease text index", async ({
-    fixtures,
-  }) => {
-    config.OPENAI_API_KEY = undefined;
-
-    const parent = await fixtures.LegacyBottle({
-      name: "Unindexed Legacy Parent",
-    });
-    await fixtures.BottleRelease({
-      bottleId: parent.id,
-      name: "Legacy Release Text Only ZXQ",
-      fullName: "Legacy Release Text Only ZXQ",
-    });
-
-    await expect(
-      searchBottleCandidates({
-        query: "Legacy Release Text Only ZXQ",
-        limit: 15,
-      }),
-    ).resolves.toEqual([]);
   });
 
   test("finds age-specific photo candidates when stored bottles are missing ABV", async ({
@@ -1206,7 +1174,6 @@ describe("priceMatching", () => {
       category: "single_malt",
       statedAge: 12,
     });
-    await fixtures.BottleRelease({ bottleId: generic12Bottle.id });
     const bourbonAndSherryBottle = await fixtures.Bottle({
       brandId: tomatin.id,
       distillerIds: [tomatin.id],
@@ -2875,8 +2842,7 @@ describe("priceMatching", () => {
       await mutator.query("BEGIN");
       await mutator.query(
         `UPDATE store_price_match_proposal
-         SET suggested_bottle_id = $2,
-             suggested_release_id = NULL
+         SET suggested_bottle_id = $2
          WHERE id = $1`,
         [proposal.id, replacement.id],
       );
@@ -5781,9 +5747,6 @@ describe("priceMatching", () => {
 
     const reviewer = await fixtures.User();
     const bottle = await fixtures.Bottle();
-    const evidenceRelease = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-    });
     const price = await fixtures.StorePrice({
       name: "Retry Candidate",
       imageUrl: null,
@@ -6847,7 +6810,7 @@ describe("priceMatching", () => {
 
       await hierarchyBlocker.query(
         `UPDATE store_price
-         SET bottle_id = $2, release_id = NULL
+         SET bottle_id = $2
          WHERE id = $1`,
         [price.id, replacementBottle.id],
       );
@@ -6967,7 +6930,7 @@ describe("priceMatching", () => {
       await reverter.query("BEGIN");
       revertUpdate = reverter.query(
         `UPDATE store_price
-         SET bottle_id = $2, release_id = NULL
+         SET bottle_id = $2
          WHERE id = $1`,
         [price.id, originalBottle.id],
       );
@@ -7227,9 +7190,6 @@ describe("priceMatching", () => {
     fixtures,
   }) => {
     const legacyBottle = await fixtures.Bottle();
-    const legacyRelease = await fixtures.BottleRelease({
-      bottleId: legacyBottle.id,
-    });
     const directBottle = await fixtures.Bottle();
     const price = await fixtures.StorePrice({
       bottleId: directBottle.id,
@@ -7292,10 +7252,9 @@ describe("priceMatching", () => {
     });
   });
 
-  test("approves a retained general Bottle directly", async ({ fixtures }) => {
+  test("approves a selected Bottle directly", async ({ fixtures }) => {
     const reviewer = await fixtures.User();
     const parent = await fixtures.Bottle();
-    await fixtures.BottleRelease({ bottleId: parent.id });
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const price = await fixtures.StorePrice({
       bottleId: null,
@@ -7363,10 +7322,6 @@ describe("priceMatching", () => {
     const replacementParent = await fixtures.Bottle({
       name: "Generic Approval After Drift",
     });
-    await Promise.all([
-      fixtures.BottleRelease({ bottleId: suggestedParent.id }),
-      fixtures.BottleRelease({ bottleId: replacementParent.id }),
-    ]);
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Generic Approval Identity Drift Listing",
@@ -7416,8 +7371,7 @@ describe("priceMatching", () => {
       await mutator.query("BEGIN");
       await mutator.query(
         `UPDATE store_price_match_proposal
-         SET suggested_bottle_id = $2,
-             suggested_release_id = NULL
+         SET suggested_bottle_id = $2
          WHERE id = $1`,
         [proposal.id, replacementParent.id],
       );
@@ -7479,10 +7433,6 @@ describe("priceMatching", () => {
     const reviewer = await fixtures.User();
     const suggestedParent = await fixtures.Bottle();
     const otherParent = await fixtures.Bottle();
-    await Promise.all([
-      fixtures.BottleRelease({ bottleId: suggestedParent.id }),
-      fixtures.BottleRelease({ bottleId: otherParent.id }),
-    ]);
     const price = await fixtures.StorePrice({
       bottleId: null,
       name: "Unrelated Generic Target",
@@ -7522,15 +7472,10 @@ describe("priceMatching", () => {
     });
   });
 
-  test("updates an existing store-price observation while retaining legacy evidence", async ({
-    fixtures,
-  }) => {
+  test("updates an existing store-price observation", async ({ fixtures }) => {
     const reviewer = await fixtures.User();
     const oldBottle = await fixtures.Bottle();
     const approvedBottle = await fixtures.Bottle();
-    const oldRelease = await fixtures.BottleRelease({
-      bottleId: oldBottle.id,
-    });
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const price = await fixtures.StorePrice({
       bottleId: null,

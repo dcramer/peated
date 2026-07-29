@@ -8,9 +8,7 @@ import {
 const MISSING_BOTTLE_ID = 9_000_000_000;
 
 describe("direct Bottle consumer constraints", () => {
-  test("collections require a unique valid Bottle while retaining release evidence", async ({
-    fixtures,
-  }) => {
+  test("collections require a unique valid Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const collection = await fixtures.Collection();
 
@@ -26,10 +24,6 @@ describe("direct Bottle consumer constraints", () => {
       }),
     ).rejects.toThrow(/collection_bottle_collection_id_bottle_id_unique/);
 
-    const firstRelease = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Collection Evidence One",
-    });
     const legacyCollection = await fixtures.Collection();
     await expect(
       db.insert(collectionBottles).values([
@@ -66,9 +60,7 @@ describe("direct Bottle consumer constraints", () => {
     ).rejects.toThrow(/not-null constraint/);
   });
 
-  test("Flights require a unique valid Bottle while retaining release evidence", async ({
-    fixtures,
-  }) => {
+  test("Flights require a unique valid Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const flight = await fixtures.Flight();
 
@@ -84,10 +76,6 @@ describe("direct Bottle consumer constraints", () => {
       }),
     ).rejects.toThrow(/flight_bottle_flight_id_bottle_id_unique/);
 
-    const firstRelease = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Flight Evidence One",
-    });
     const legacyFlight = await fixtures.Flight();
     await expect(
       db.insert(flightBottles).values([
@@ -124,9 +112,7 @@ describe("direct Bottle consumer constraints", () => {
     ).rejects.toThrow(/not-null constraint/);
   });
 
-  test("tastings require a unique valid Bottle while retaining release evidence", async ({
-    fixtures,
-  }) => {
+  test("tastings require a unique valid Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
     const user = await fixtures.User();
@@ -147,10 +133,6 @@ describe("direct Bottle consumer constraints", () => {
       }),
     ).rejects.toThrow(/tasting_unq/);
 
-    const firstRelease = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Tasting Evidence One",
-    });
     await expect(
       db.insert(tastings).values([
         {

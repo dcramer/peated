@@ -22,7 +22,8 @@ every consumer use one direct Bottle foreign key.
   representative selection, and aggregation scope.
 - Keep grouping outside ordinary user creation and activity workflows.
 - Migrate all data in retained-audit-gated, resumable, bounded transactions.
-- Preserve legacy release ids as migration evidence through durable mappings.
+- Preserve legacy release ids through migration validation, then remove the
+  mappings with separately approved cleanup.
 - Remove the unreleased CatalogTarget implementation rather than maintain two
   identity systems.
 
@@ -95,8 +96,8 @@ For a legacy family:
   selects a more suitable member;
 - parent-only consumer references remain on the parent;
 - release-specific references move to the promoted Bottle;
-- the release-to-Bottle mapping remains durable as migration, merge, and
-  destructive-cleanup evidence.
+- the release-to-Bottle mapping remains available through destructive-cleanup
+  approval and is then removed.
 
 Legacy parents with the same case-insensitive complete canonical name, or whose
 canonical name is an active exact alias of another legacy parent, share one
@@ -258,6 +259,13 @@ read-only audit remains available during this interval, and historical change
 rows remain stored but are excluded from current feeds. Only after every API
 and worker process runs the detached revision may a later, separately approved
 migration physically drop the legacy database objects.
+
+The cleanup migration removes the BottleRelease tables, promotion and repair
+tables, consumer release columns, proposal/attempt migration evidence, and
+migration-only enum types. The same release removes the retained audit CLI,
+schemas, libraries, and pre-cleanup test fixtures. Historical change rows keep
+their original object type as inert data and remain excluded from current
+feeds.
 
 Destructive cleanup requires:
 

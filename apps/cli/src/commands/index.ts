@@ -1,6 +1,5 @@
 export * from "./badges";
 export * from "./bottles";
-export * from "./catalogMigration";
 export * from "./classifier";
 export * from "./countries";
 export * from "./data";

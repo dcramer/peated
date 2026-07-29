@@ -27,10 +27,6 @@ import {
   mergeConcreteBottles,
   mergeConcreteBottlesInTransaction,
 } from "@peated/server/lib/mergeConcreteBottles";
-import {
-  bottleReleasePromotions,
-  bottleReleases,
-} from "@peated/server/lib/test/legacyCatalogSchema";
 import * as workerClient from "@peated/server/worker/client";
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -386,17 +382,6 @@ describe("exact Bottle merges", () => {
     const source = await fixtures.Bottle({ name: "Membership Source" });
     const destination = await fixtures.Bottle({
       name: "Membership Destination",
-    });
-    const evidenceParent = await fixtures.LegacyBottle({
-      name: "Membership Evidence",
-    });
-    const sourceEvidenceA = await fixtures.BottleRelease({
-      bottleId: evidenceParent.id,
-      edition: "Source A",
-    });
-    const destinationEvidenceA = await fixtures.BottleRelease({
-      bottleId: evidenceParent.id,
-      edition: "Destination A",
     });
     const collection = await fixtures.Collection({ totalBottles: 2 });
     const flight = await fixtures.Flight();

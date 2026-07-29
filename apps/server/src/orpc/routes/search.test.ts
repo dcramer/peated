@@ -143,9 +143,6 @@ describe("GET /search", () => {
   }) => {
     const bottle = await fixtures.Bottle({ name: "Canonical Search Bottle" });
     const retainedBottle = await fixtures.Bottle({ name: "Retained Pair" });
-    const retainedRelease = await fixtures.BottleRelease({
-      bottleId: retainedBottle.id,
-    });
     await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
     await db.insert(bottleAliases).values({
       bottleId: retainedBottle.id,

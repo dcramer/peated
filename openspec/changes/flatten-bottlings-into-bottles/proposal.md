@@ -31,7 +31,8 @@ catalog integrations should never need a second polymorphic target identity.
   identity fields.
 - Migrate legacy releases and consumer references in audited, resumable,
   component-complete batches after a retained production preflight. Retain
-  durable release-to-Bottle mappings as migration and cleanup evidence.
+  release-to-Bottle mappings through validation, then remove them with the
+  separately approved physical cleanup.
 - **BREAKING**: retire `BottleRelease`, nested bottling APIs, `releaseId`, and
   the unreleased `CatalogTarget` system after validation and backup approval.
 - Supersede `add-target-aware-catalog-creation`, which would deepen the paired

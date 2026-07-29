@@ -1380,6 +1380,13 @@
       "when": 1785357880274,
       "tag": "0196_regular_centennial",
       "breakpoints": false
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1785361522352,
+      "tag": "0197_brainy_jack_power",
+      "breakpoints": false
     }
   ]
 }

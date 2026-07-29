@@ -303,16 +303,8 @@ describe("BottleSerializer", () => {
     });
   });
 
-  it("does not hydrate image or release counts from BottleRelease", async ({
-    fixtures,
-  }) => {
+  it("does not expose legacy release fields", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle({ imageUrl: null });
-
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 24",
-      imageUrl: "bottlings/batch-24.jpg",
-    });
 
     const [result] = await serialize(BottleSerializer, [bottle]);
 

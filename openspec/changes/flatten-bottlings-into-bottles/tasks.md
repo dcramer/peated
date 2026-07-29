@@ -203,5 +203,5 @@ explicit removal task and must not become a second business-logic system.
 - [ ] 8.9 Only after the detached application and workers are fully deployed,
       separate backup and explicit approval, generate and apply cleanup that
       removes BottleRelease tables/columns and retained audit support.
-- [ ] 8.10 Run and retain the final zero-legacy audit and full repository test
+- [x] 8.10 Run and retain the final zero-legacy audit and full repository test
       gate before cleanup release.

@@ -20,10 +20,6 @@ import {
 import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import {
-  bottleReleasePromotions,
-  bottleReleases,
-} from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { ProposedBottleSchema } from "@peated/server/schemas/priceMatches";
@@ -392,23 +388,9 @@ describe("price match queue", () => {
     );
   });
 
-  test("hydrates the authoritative current Bottle despite stale release evidence", async ({
-    fixtures,
-  }) => {
+  test("hydrates the authoritative current Bottle", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const parent = await fixtures.Bottle({ name: "Legacy Parent" });
-    const release = await fixtures.BottleRelease({
-      bottleId: parent.id,
-      edition: "Legacy Release",
-    });
-    const promoted = await fixtures.BottleGroupMember({
-      groupId: parent.groupId!,
-      edition: "Promoted Release",
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promoted.id,
-    });
     const price = await fixtures.StorePrice({ name: "Promoted Listing" });
     const [proposal] = await db
       .insert(storePriceMatchProposals)
@@ -882,11 +864,6 @@ describe("price match queue", () => {
       releaseYear: 2021,
     });
     const siblingId = sibling.id;
-    const legacyRelease = await fixtures.BottleRelease({
-      bottleId: currentBottle.id,
-      edition: "Legacy Child",
-      abv: 43,
-    });
     await db
       .update(bottleSeries)
       .set({ numReleases: 2 })
@@ -1006,7 +983,6 @@ describe("price match queue", () => {
       groupDistillerRows,
       updatedSourceSeries,
       updatedTargetSeries,
-      updatedLegacyRelease,
       repairChanges,
     ] = await Promise.all([
       db.query.bottleGroups.findFirst({
@@ -1043,12 +1019,6 @@ describe("price match queue", () => {
       db.query.bottleSeries.findFirst({
         where: eq(bottleSeries.id, targetSeries.id),
       }),
-      db
-        .select()
-        .from(bottleReleases)
-        .where(eq(bottleReleases.id, legacyRelease.id))
-        .limit(1)
-        .then(([row]) => row),
       db
         .select()
         .from(changes)
@@ -1119,8 +1089,6 @@ describe("price match queue", () => {
     ]);
     expect(updatedSourceSeries?.numReleases).toEqual(0);
     expect(updatedTargetSeries?.numReleases).toEqual(2);
-    expect(updatedLegacyRelease).toMatchObject(legacyRelease);
-
     const actorId = (await getUserActor(user)).id;
     expect(repairChanges).toHaveLength(2);
     expect(repairChanges).toEqual([
@@ -1919,10 +1887,6 @@ describe("price match queue", () => {
       .update(bottleGroups)
       .set({ representativeBottleId: representative.id })
       .where(eq(bottleGroups.id, sourceBottle.groupId!));
-    await fixtures.BottleRelease({
-      bottleId: sourceBottle.id,
-      edition: "Legacy Child",
-    });
     const price = await fixtures.StorePrice({
       name: "Generic Group Listing",
       bottleId: null,
@@ -2016,10 +1980,6 @@ describe("price match queue", () => {
       name: "Suggested Generic",
     });
     const otherBottle = await fixtures.Bottle({ name: "Other Generic" });
-    await Promise.all([
-      fixtures.BottleRelease({ bottleId: suggestedBottle.id }),
-      fixtures.BottleRelease({ bottleId: otherBottle.id }),
-    ]);
     const price = await fixtures.StorePrice({ name: "Stale Generic Listing" });
     const [proposal] = await db
       .insert(storePriceMatchProposals)
@@ -2100,10 +2060,6 @@ describe("price match queue", () => {
         initialStatus: "pending_review",
       })
       .returning();
-    const releasesBefore = await db
-      .select({ id: bottleReleases.id })
-      .from(bottleReleases);
-
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
@@ -2144,10 +2100,6 @@ describe("price match queue", () => {
         where: eq(storePriceMatchAttempts.id, latestAttempt.id),
       }),
     ]);
-    const releasesAfter = await db
-      .select({ id: bottleReleases.id })
-      .from(bottleReleases);
-
     const userActor = await getUserActor(user);
 
     expect(result.fullName).toBe("Queue Brand Single Cask");
@@ -2182,7 +2134,6 @@ describe("price match queue", () => {
     expect(observation).toMatchObject({
       bottleId: result.id,
     });
-    expect(releasesAfter).toHaveLength(releasesBefore.length);
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
       bottleId: result.id,
       creationSource: "price_match_review",
@@ -2447,8 +2398,6 @@ describe("price match queue", () => {
         }),
       })
       .returning();
-    const releasesBefore = await db.select().from(bottleReleases);
-
     const result = await routerClient.prices.matchQueue.createBottle(
       {
         proposal: proposal.id,
@@ -2487,7 +2436,6 @@ describe("price match queue", () => {
       createdDistillers,
       sourceAfter,
       sourceGroupAfter,
-      releasesAfter,
     ] = await Promise.all([
       db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, createdBottle.groupId),
@@ -2506,7 +2454,6 @@ describe("price match queue", () => {
       db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, sourceBottle.groupId!),
       }),
-      db.select().from(bottleReleases),
     ]);
 
     expect(createdBottle).toMatchObject({
@@ -2550,7 +2497,6 @@ describe("price match queue", () => {
     });
     expect(sourceAfter).toEqual(sourceBefore);
     expect(sourceGroupAfter).toEqual(sourceGroupBefore);
-    expect(releasesAfter).toEqual(releasesBefore);
   });
 
   test("rejects mixed canonical and legacy create inputs without writes", async ({
@@ -2643,15 +2589,13 @@ describe("price match queue", () => {
         }),
       })
       .returning();
-    const [seriesBefore, bottlesBefore, groupsBefore, releasesBefore] =
-      await Promise.all([
-        db.query.bottleSeries.findFirst({
-          where: eq(bottleSeries.id, series.id),
-        }),
-        db.select({ id: bottles.id }).from(bottles),
-        db.select({ id: bottleGroups.id }).from(bottleGroups),
-        db.select({ id: bottleReleases.id }).from(bottleReleases),
-      ]);
+    const [seriesBefore, bottlesBefore, groupsBefore] = await Promise.all([
+      db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, series.id),
+      }),
+      db.select({ id: bottles.id }).from(bottles),
+      db.select({ id: bottleGroups.id }).from(bottleGroups),
+    ]);
     queueBottleCreationVerificationMock.mockClear();
 
     const result = await routerClient.prices.matchQueue.createBottle(
@@ -2669,30 +2613,23 @@ describe("price match queue", () => {
       { context: { user } },
     );
 
-    const [
-      updatedPrice,
-      decisionLog,
-      seriesAfter,
-      bottlesAfter,
-      groupsAfter,
-      releasesAfter,
-    ] = await Promise.all([
-      db.query.storePrices.findFirst({
-        where: eq(storePrices.id, price.id),
-      }),
-      db.query.incomingBottleDecisionLogs.findFirst({
-        where: and(
-          eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
-          eq(incomingBottleDecisionLogs.sourceId, price.id),
-        ),
-      }),
-      db.query.bottleSeries.findFirst({
-        where: eq(bottleSeries.id, series.id),
-      }),
-      db.select({ id: bottles.id }).from(bottles),
-      db.select({ id: bottleGroups.id }).from(bottleGroups),
-      db.select({ id: bottleReleases.id }).from(bottleReleases),
-    ]);
+    const [updatedPrice, decisionLog, seriesAfter, bottlesAfter, groupsAfter] =
+      await Promise.all([
+        db.query.storePrices.findFirst({
+          where: eq(storePrices.id, price.id),
+        }),
+        db.query.incomingBottleDecisionLogs.findFirst({
+          where: and(
+            eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
+            eq(incomingBottleDecisionLogs.sourceId, price.id),
+          ),
+        }),
+        db.query.bottleSeries.findFirst({
+          where: eq(bottleSeries.id, series.id),
+        }),
+        db.select({ id: bottles.id }).from(bottles),
+        db.select({ id: bottleGroups.id }).from(bottleGroups),
+      ]);
 
     expect(result).toMatchObject({
       id: expect.any(Number),
@@ -2712,7 +2649,6 @@ describe("price match queue", () => {
     );
     expect(bottlesAfter).toHaveLength(bottlesBefore.length + 1);
     expect(groupsAfter).toHaveLength(groupsBefore.length + 1);
-    expect(releasesAfter).toHaveLength(releasesBefore.length);
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
       bottleId: result.id,
       creationSource: "price_match_review",

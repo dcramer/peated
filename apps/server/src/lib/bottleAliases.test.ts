@@ -18,7 +18,6 @@ import {
   syncBottleAliasConsumersForAliasChange,
 } from "@peated/server/lib/bottleAliases";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { bottleReleasePromotions } from "@peated/server/lib/test/legacyCatalogSchema";
 import * as workerClient from "@peated/server/worker/client";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";
@@ -79,11 +78,8 @@ describe("listUnmatchedBottleAliasNames", () => {
 });
 
 describe("exact Bottle alias reservation", () => {
-  test("normalizes the name and preserves legacy release evidence", async ({
-    fixtures,
-  }) => {
+  test("normalizes the name", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const original = await fixtures.BottleAlias({
       name: normalizeBottleAliasKey("Reserved   12-year-old"),
       bottleId: bottle.id,
@@ -190,13 +186,12 @@ describe("exact Bottle alias reservation", () => {
 });
 
 describe("assignBottleAliasInTransaction", () => {
-  test("writes one Bottle id, clears its stale vector, and retains legacy evidence", async ({
+  test("writes one Bottle id and clears its stale vector", async ({
     fixtures,
   }) => {
     const selected = await fixtures.Bottle();
     const legacy = await fixtures.Bottle();
     const alreadyAssigned = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: legacy.id });
     const name = "Shared Retailer Bottle Name";
     await db.insert(bottleAliases).values({
       name,
@@ -369,40 +364,6 @@ describe("assignBottleAliasInTransaction", () => {
         }),
       ).toBeUndefined();
     }
-  });
-
-  test("release promotion evidence cannot authorize an alias retarget", async ({
-    fixtures,
-  }) => {
-    const parent = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await fixtures.Bottle();
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promoted.id,
-    });
-    const alias = await fixtures.BottleAlias({
-      name: "Promotion Evidence Alias",
-      bottleId: parent.id,
-    });
-
-    await expect(
-      db.transaction((tx) =>
-        assignBottleAliasInTransaction(tx, {
-          bottleId: promoted.id,
-          name: alias.name,
-          assignedByActorId: promoted.createdByActorId,
-          sourceAliasIdentity: alias,
-        }),
-      ),
-    ).rejects.toMatchObject({
-      name: "ExactBottleAliasConflictError",
-      code: "another_bottle",
-      conflictingBottleId: parent.id,
-    });
-    expect(await getAlias(alias.name)).toMatchObject({
-      bottleId: parent.id,
-    });
   });
 
   test("allows one winner when Bottles race to claim the same alias", async ({
