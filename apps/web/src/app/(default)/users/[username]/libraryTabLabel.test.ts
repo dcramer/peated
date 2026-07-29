@@ -3,11 +3,10 @@ import { formatLibraryTabLabel } from "./libraryTabLabel";
 
 describe("formatLibraryTabLabel", () => {
   test.each([
-    [{ open: 2, sealed: 3 }, "Library (2 open/3 sealed)"],
-    [{ open: 2, sealed: 0 }, "Library (2 open)"],
-    [{ open: 0, sealed: 3 }, "Library (3 sealed)"],
-    [{ open: 0, sealed: 0 }, "Library"],
-  ])("formats status counts", (counts, expected) => {
+    [{ total: 5 }, "Library (5)"],
+    [{ total: 0 }, "Library (0)"],
+    [{ total: 1234 }, "Library (1,234)"],
+  ])("formats the total bottle count", (counts, expected) => {
     expect(formatLibraryTabLabel(counts)).toBe(expected);
   });
 });
