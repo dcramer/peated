@@ -1,9 +1,9 @@
 /**
- * Owns the one-shot legacy BottleRelease migration. The complete catalog is
- * planned under a fixed table lock set, then committed or rolled back as one
- * transaction without invoking runtime queues or target compatibility.
+ * Owns the resumable legacy BottleRelease migration. Complete family
+ * components are committed in bounded transactions without invoking runtime
+ * queues or target compatibility.
  */
-import { and, asc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db, type AnyConnection, type AnyTransaction } from "../db";
 import {
   bottleAliases,
@@ -130,6 +130,23 @@ type AppliedFamily = {
 
 type CoreCounts = Omit<CatalogMigrationApplyResult["counts"], "consumers">;
 
+export type CatalogMigrationProgress = Readonly<{
+  phase: "catalog" | "postflight";
+  committedGroups: number;
+  totalGroups: number;
+  committedParents: number;
+  totalParents: number;
+  committedReleases: number;
+  totalReleases: number;
+}>;
+
+export type CatalogMigrationApplyOptions = Readonly<{
+  batchSize?: number;
+  onProgress?: (progress: CatalogMigrationProgress) => void | Promise<void>;
+}>;
+
+const DEFAULT_CATALOG_MIGRATION_BATCH_SIZE = 250;
+
 const ZERO_CORE_COUNTS: CoreCounts = {
   parents: 0,
   groups: 0,
@@ -146,6 +163,31 @@ const ZERO_CORE_COUNTS: CoreCounts = {
   bottleStatsRecomputed: 0,
   groupStatsRecomputed: 0,
 };
+
+function emptyApplyCounts(): CatalogMigrationApplyResult["counts"] {
+  return {
+    ...ZERO_CORE_COUNTS,
+    consumers: {
+      bySlot: { ...EMPTY_CONSUMER_RESULT.bySlot },
+      total: 0,
+    },
+  };
+}
+
+function addApplyCounts(
+  total: CatalogMigrationApplyResult["counts"],
+  addition: CatalogMigrationApplyResult["counts"],
+): void {
+  for (const key of Object.keys(ZERO_CORE_COUNTS) as Array<keyof CoreCounts>) {
+    total[key] += addition[key];
+  }
+  for (const slot of Object.keys(total.consumers.bySlot) as Array<
+    keyof CatalogMigrationConsumerResult["bySlot"]
+  >) {
+    total.consumers.bySlot[slot] += addition.consumers.bySlot[slot];
+  }
+  total.consumers.total += addition.consumers.total;
+}
 
 function sameRevision(
   left: CatalogMigrationRevisionEvidence,
@@ -367,7 +409,6 @@ function materializedBottle(
       : parent.suggestedTags,
     avgRating: release.avgRating,
     totalTastings: release.totalTastings,
-    searchVector: release.searchVector,
     createdAt: release.createdAt,
     updatedAt: release.updatedAt,
     createdByActorId: release.createdByActorId,
@@ -398,7 +439,6 @@ const MATERIALIZED_BOTTLE_FIELDS = [
   "imageUrl",
   "tastingNotes",
   "suggestedTags",
-  "searchVector",
   "createdAt",
   "updatedAt",
   "createdByActorId",
@@ -435,6 +475,11 @@ function canonicalNames(name: string): string[] {
 async function buildFamilyPlans(
   tx: AnyTransaction,
   state: MigrationState,
+  {
+    collisionBottles = state.bottles,
+  }: {
+    collisionBottles?: Bottle[];
+  } = {},
 ): Promise<FamilyPlan[]> {
   const parentById = new Map(
     state.bottles.map((bottle) => [bottle.id, bottle]),
@@ -498,7 +543,7 @@ async function buildFamilyPlans(
   }
 
   const bottleByCanonicalName = new Map<string, Bottle[]>();
-  for (const bottle of state.bottles) {
+  for (const bottle of collisionBottles) {
     const key = claimKey(bottle.fullName);
     const matchingBottles = bottleByCanonicalName.get(key) ?? [];
     matchingBottles.push(bottle);
@@ -546,6 +591,20 @@ async function buildFamilyPlans(
     if (firstParentId === undefined) continue;
     for (const duplicateParentId of duplicateParentIds) {
       unionParentGroups(firstParentId, duplicateParentId);
+    }
+  }
+  const parentIdsByCheckpointGroup = new Map<number, number[]>();
+  for (const parent of state.bottles) {
+    if (parent.groupId === null) continue;
+    const parentIds = parentIdsByCheckpointGroup.get(parent.groupId) ?? [];
+    parentIds.push(parent.id);
+    parentIdsByCheckpointGroup.set(parent.groupId, parentIds);
+  }
+  for (const parentIds of parentIdsByCheckpointGroup.values()) {
+    const [firstParentId, ...groupedParentIds] = parentIds;
+    if (firstParentId === undefined) continue;
+    for (const groupedParentId of groupedParentIds) {
+      unionParentGroups(firstParentId, groupedParentId);
     }
   }
   for (const alias of aliases) {
@@ -676,6 +735,7 @@ async function buildFamilyPlans(
   };
 
   for (const parent of state.bottles) {
+    if (parent.groupId !== null) continue;
     claimCanonicalIdentity({
       fullName: parent.fullName,
       bottleId: parent.id,
@@ -787,6 +847,13 @@ async function insertGroup(
           releaseId: release.id,
           reason: "promoted_bottle_insert_missing",
         });
+      }
+      if (release.searchVector !== null) {
+        await tx.execute(
+          sql`UPDATE ${bottles}
+              SET search_vector = ${release.searchVector}::tsvector
+              WHERE id = ${bottle.id}`,
+        );
       }
       if (plan.ownedRows.distillerIds.length) {
         await tx.insert(bottlesToDistillers).values(
@@ -947,10 +1014,17 @@ function emptyOwnedRows(): ParentOwnedRows {
 
 async function loadBottleOwnedRowsByBottleId(
   tx: AnyTransaction,
+  bottleIds?: readonly number[],
 ): Promise<Map<number, ParentOwnedRows>> {
+  const scopedBottleIds = bottleIds ? [...bottleIds] : undefined;
   const distillers = await tx
     .select()
     .from(bottlesToDistillers)
+    .where(
+      scopedBottleIds
+        ? inArray(bottlesToDistillers.bottleId, scopedBottleIds)
+        : undefined,
+    )
     .orderBy(
       asc(bottlesToDistillers.bottleId),
       asc(bottlesToDistillers.distillerId),
@@ -958,10 +1032,20 @@ async function loadBottleOwnedRowsByBottleId(
   const tags = await tx
     .select()
     .from(bottleTags)
+    .where(
+      scopedBottleIds
+        ? inArray(bottleTags.bottleId, scopedBottleIds)
+        : undefined,
+    )
     .orderBy(asc(bottleTags.bottleId), asc(bottleTags.tag));
   const flavorProfiles = await tx
     .select()
     .from(bottleFlavorProfiles)
+    .where(
+      scopedBottleIds
+        ? inArray(bottleFlavorProfiles.bottleId, scopedBottleIds)
+        : undefined,
+    )
     .orderBy(
       asc(bottleFlavorProfiles.bottleId),
       asc(bottleFlavorProfiles.flavorProfile),
@@ -1036,29 +1120,56 @@ type AppliedFamilyPostflightState = {
 
 async function loadAppliedFamilyPostflightState(
   tx: AnyTransaction,
+  applied: readonly AppliedFamily[],
 ): Promise<AppliedFamilyPostflightState> {
+  const bottleIds = [
+    ...new Set(
+      applied.flatMap((family) => [
+        family.plan.parent.id,
+        ...family.promoted.map(({ bottle }) => bottle.id),
+      ]),
+    ),
+  ];
+  const groupIds = [...new Set(applied.map(({ groupId }) => groupId))];
+  const releaseIds = [
+    ...new Set(
+      applied.flatMap((family) =>
+        family.promoted.map(({ release }) => release.id),
+      ),
+    ),
+  ];
   const bottleRows = await tx
     .select({ bottle: bottles })
     .from(bottles)
     .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .where(isNull(bottleTombstones.bottleId))
+    .where(
+      and(isNull(bottleTombstones.bottleId), inArray(bottles.id, bottleIds)),
+    )
     .orderBy(asc(bottles.id));
   const groups = await tx
     .select()
     .from(bottleGroups)
+    .where(inArray(bottleGroups.id, groupIds))
     .orderBy(asc(bottleGroups.id));
-  const mappings = await tx
-    .select()
-    .from(bottleReleasePromotions)
-    .orderBy(asc(bottleReleasePromotions.releaseId));
+  const mappings = releaseIds.length
+    ? await tx
+        .select()
+        .from(bottleReleasePromotions)
+        .where(inArray(bottleReleasePromotions.releaseId, releaseIds))
+        .orderBy(asc(bottleReleasePromotions.releaseId))
+    : [];
   const groupDistillers = await tx
     .select()
     .from(bottleGroupDistillers)
+    .where(inArray(bottleGroupDistillers.groupId, groupIds))
     .orderBy(
       asc(bottleGroupDistillers.groupId),
       asc(bottleGroupDistillers.distillerId),
     );
-  const ownedRowsByBottleId = await loadBottleOwnedRowsByBottleId(tx);
+  const ownedRowsByBottleId = await loadBottleOwnedRowsByBottleId(
+    tx,
+    bottleIds,
+  );
   const aliases = await tx
     .select({
       name: bottleAliases.name,
@@ -1092,7 +1203,8 @@ async function assertAppliedFamilies(
   tx: AnyTransaction,
   applied: AppliedFamily[],
 ): Promise<void> {
-  const state = await loadAppliedFamilyPostflightState(tx);
+  if (!applied.length) return;
+  const state = await loadAppliedFamilyPostflightState(tx, applied);
   for (const family of applied) {
     const parent = state.bottleById.get(family.plan.parent.id);
     const group = state.groupById.get(family.groupId);
@@ -1150,160 +1262,105 @@ async function assertAppliedFamilies(
   }
 }
 
-async function loadCompletedFamilies(
-  tx: AnyTransaction,
-  state: MigrationState,
-): Promise<AppliedFamily[]> {
-  if (state.mappings.length !== state.releases.length) {
-    throw new CatalogMigrationApplyError("partial_state", {
-      releaseCount: state.releases.length,
-      mappingCount: state.mappings.length,
-    });
-  }
+function parentMigrationState(state: MigrationState): MigrationState {
   const promotedIds = new Set(
     state.mappings.flatMap(({ promotedBottleId }) =>
       promotedBottleId === null ? [] : [promotedBottleId],
     ),
   );
-  const parentState: MigrationState = {
+  return {
     ...state,
     bottles: state.bottles.filter(({ id }) => !promotedIds.has(id)),
   };
-  const plans = await buildFamilyPlansForCompletedState(tx, parentState);
+}
+
+function partitionFamilyPlans(
+  state: MigrationState,
+  plans: FamilyPlan[],
+): {
+  pendingGroups: FamilyPlan[][];
+  completedFamilies: AppliedFamily[];
+} {
   const mappingByReleaseId = new Map(
     state.mappings.map((mapping) => [mapping.releaseId, mapping]),
   );
   const bottleById = new Map(
     state.bottles.map((bottle) => [bottle.id, bottle]),
   );
-  const plansByGroupId = new Map<number, FamilyPlan[]>();
+  const plansByGroupKey = new Map<string, FamilyPlan[]>();
   for (const plan of plans) {
-    if (plan.parent.groupId === null) continue;
-    const groupPlans = plansByGroupId.get(plan.parent.groupId) ?? [];
+    const groupPlans = plansByGroupKey.get(plan.groupKey) ?? [];
     groupPlans.push(plan);
-    plansByGroupId.set(plan.parent.groupId, groupPlans);
+    plansByGroupKey.set(plan.groupKey, groupPlans);
   }
-  return plans.map((plan) => {
-    if (plan.parent.groupId === null) {
+
+  const pendingGroups: FamilyPlan[][] = [];
+  const completedFamilies: AppliedFamily[] = [];
+  for (const groupPlans of plansByGroupKey.values()) {
+    const assignedGroupIds = new Set(
+      groupPlans.flatMap(({ parent }) =>
+        parent.groupId === null ? [] : [parent.groupId],
+      ),
+    );
+    const releases = groupPlans.flatMap((plan) => plan.releases);
+    const mappedReleaseCount = releases.filter((release) =>
+      mappingByReleaseId.has(release.id),
+    ).length;
+    if (assignedGroupIds.size === 0 && mappedReleaseCount === 0) {
+      pendingGroups.push(groupPlans);
+      continue;
+    }
+    if (
+      assignedGroupIds.size !== 1 ||
+      groupPlans.some(({ parent }) => parent.groupId === null) ||
+      mappedReleaseCount !== releases.length
+    ) {
       throw new CatalogMigrationApplyError("partial_state", {
-        parentId: plan.parent.id,
-        reason: "parent_group_missing",
+        parentIds: groupPlans.map(({ parent }) => parent.id),
+        assignedGroupIds: [...assignedGroupIds],
+        releaseCount: releases.length,
+        mappedReleaseCount,
+        reason: "incomplete_group_checkpoint",
       });
     }
-    const groupPlans = plansByGroupId.get(plan.parent.groupId) ?? [plan];
+    const groupId = [...assignedGroupIds][0]!;
     const representativeParentId = Math.min(
       ...groupPlans.map(({ parent }) => parent.id),
     );
-    return {
-      plan,
-      groupId: plan.parent.groupId,
-      representativeParentId,
-      groupTotalBottles: groupPlans.reduce(
-        (total, groupPlan) => total + groupPlan.releases.length + 1,
-        0,
-      ),
-      groupDistillerIds: [
-        ...new Set(
-          groupPlans.flatMap(({ ownedRows }) => ownedRows.distillerIds),
-        ),
-      ].sort((left, right) => left - right),
-      promoted: plan.releases.map((release) => {
-        const mapping = mappingByReleaseId.get(release.id);
-        const bottle =
-          mapping?.promotedBottleId === null ||
-          mapping?.promotedBottleId === undefined
-            ? undefined
-            : bottleById.get(mapping.promotedBottleId);
-        if (!mapping || !bottle || bottle.groupId !== plan.parent.groupId) {
-          throw new CatalogMigrationApplyError("partial_state", {
-            parentId: plan.parent.id,
-            releaseId: release.id,
-            reason: "promotion_missing",
-          });
-        }
-        return { release, bottle };
-      }),
-    };
-  });
-}
-
-async function buildFamilyPlansForCompletedState(
-  tx: AnyTransaction,
-  state: MigrationState,
-): Promise<FamilyPlan[]> {
-  const releasesByParentId = new Map<number, BottleRelease[]>();
-  for (const release of state.releases) {
-    const familyReleases = releasesByParentId.get(release.bottleId) ?? [];
-    familyReleases.push(release);
-    releasesByParentId.set(release.bottleId, familyReleases);
-  }
-  const parentIds = new Set(state.bottles.map(({ id }) => id));
-  const ownedRowsByBottleId = await loadBottleOwnedRowsByBottleId(tx);
-  const parentCountByGroupId = new Map<number, number>();
-  for (const parent of state.bottles) {
-    if (parent.groupId !== null) {
-      parentCountByGroupId.set(
-        parent.groupId,
-        (parentCountByGroupId.get(parent.groupId) ?? 0) + 1,
-      );
-    }
-  }
-  const plans: FamilyPlan[] = [];
-  for (const parent of state.bottles) {
-    plans.push({
-      parent,
-      releases: releasesByParentId.get(parent.id) ?? [],
-      ownedRows: ownedRowsByBottleId.get(parent.id) ?? emptyOwnedRows(),
-      groupKey: claimKey(parent.fullName),
-      sharedParentIdentity:
-        parent.groupId !== null &&
-        (parentCountByGroupId.get(parent.groupId) ?? 0) > 1,
-    });
-  }
-  if (state.releases.some((release) => !parentIds.has(release.bottleId))) {
-    throw new CatalogMigrationApplyError("partial_state", {
-      reason: "release_parent_missing",
-    });
-  }
-  return plans;
-}
-
-async function classifyState(
-  tx: AnyTransaction,
-  state: MigrationState,
-): Promise<
-  | { status: "pending" }
-  | { status: "already_complete"; families: AppliedFamily[] }
-> {
-  if (
-    !state.bottles.length &&
-    !state.releases.length &&
-    !state.mappings.length
-  ) {
-    return { status: "already_complete", families: [] };
-  }
-  if (!state.mappings.length) {
-    const assignedParents = state.bottles.filter(
-      ({ groupId }) => groupId !== null,
+    const groupTotalBottles = groupPlans.reduce(
+      (total, groupPlan) => total + groupPlan.releases.length + 1,
+      0,
     );
-    if (!assignedParents.length) return { status: "pending" };
-    if (
-      !state.releases.length &&
-      assignedParents.length === state.bottles.length
-    ) {
-      const families = await loadCompletedFamilies(tx, state);
-      return { status: "already_complete", families };
+    const groupDistillerIds = [
+      ...new Set(groupPlans.flatMap(({ ownedRows }) => ownedRows.distillerIds)),
+    ].sort((left, right) => left - right);
+    for (const plan of groupPlans) {
+      completedFamilies.push({
+        plan,
+        groupId,
+        representativeParentId,
+        groupTotalBottles,
+        groupDistillerIds,
+        promoted: plan.releases.map((release) => {
+          const mapping = mappingByReleaseId.get(release.id);
+          const bottle =
+            mapping?.promotedBottleId === null ||
+            mapping?.promotedBottleId === undefined
+              ? undefined
+              : bottleById.get(mapping.promotedBottleId);
+          if (!mapping || !bottle || bottle.groupId !== groupId) {
+            throw new CatalogMigrationApplyError("partial_state", {
+              parentId: plan.parent.id,
+              releaseId: release.id,
+              reason: "invalid_promotion_checkpoint",
+            });
+          }
+          return { release, bottle };
+        }),
+      });
     }
-    throw new CatalogMigrationApplyError("partial_state", {
-      assignedParentIds: assignedParents.map(({ id }) => id),
-      mappingCount: 0,
-      releaseCount: state.releases.length,
-    });
   }
-  return {
-    status: "already_complete",
-    families: await loadCompletedFamilies(tx, state),
-  };
+  return { pendingGroups, completedFamilies };
 }
 
 function countsFor(
@@ -1387,14 +1444,37 @@ function assertPostflightAudit(
   }
 }
 
+function assertResumableBaseline(
+  candidate: CatalogMigrationApprovalCandidate,
+  state: MigrationState,
+  parentState: MigrationState,
+): void {
+  if (
+    parentState.bottles.length !== candidate.audit.legacyCatalog.totalParents ||
+    state.releases.length !== candidate.audit.legacyCatalog.totalReleases ||
+    state.mappings.length > state.releases.length
+  ) {
+    throw new CatalogMigrationApplyError("partial_state", {
+      expectedParentCount: candidate.audit.legacyCatalog.totalParents,
+      actualParentCount: parentState.bottles.length,
+      expectedReleaseCount: candidate.audit.legacyCatalog.totalReleases,
+      actualReleaseCount: state.releases.length,
+      mappingCount: state.mappings.length,
+      reason: "baseline_count_mismatch",
+    });
+  }
+}
+
 /**
- * Applies the approved catalog migration exactly once. A complete second call
- * validates the committed graph and returns `already_complete` with zero writes.
+ * Applies the approved catalog migration in bounded, component-complete
+ * transactions. Group assignments and promotion mappings are durable
+ * checkpoints; reruns skip committed components and continue safely.
  */
 export async function applyCatalogMigration(
   input: unknown,
   database: AnyConnection = db,
   migrationsFolder?: string,
+  options: CatalogMigrationApplyOptions = {},
 ): Promise<CatalogMigrationApplyResult> {
   const parsed = CatalogMigrationApplyInputSchema.parse(input);
   if (
@@ -1409,9 +1489,112 @@ export async function applyCatalogMigration(
   await assertWritablePrimaryPreflight(database);
 
   const startedAt = new Date();
+  const batchSize = options.batchSize ?? DEFAULT_CATALOG_MIGRATION_BATCH_SIZE;
+  if (!Number.isSafeInteger(batchSize) || batchSize <= 0) {
+    throw new CatalogMigrationApplyError("approval_invalid", {
+      batchSize,
+      reason: "invalid_batch_size",
+    });
+  }
+  const counts = emptyApplyCounts();
+  let appliedAny = false;
+
+  for (;;) {
+    const batch = await database.transaction(async (tx) => {
+      await tx.execute(sql`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`);
+      await lockMigrationTables(tx);
+      const databaseEvidence = await loadCatalogMigrationDatabaseEvidence(tx);
+      const revision = await loadCatalogMigrationRevisionEvidenceInTransaction(
+        parsed.candidate.revision.gitRevision,
+        tx,
+        migrationsFolder,
+        databaseEvidence,
+      );
+      assertApprovedPreflight(parsed.candidate, revision);
+
+      const state = await loadMigrationState(tx);
+      const parentState = parentMigrationState(state);
+      assertResumableBaseline(parsed.candidate, state, parentState);
+      const plans = await buildFamilyPlans(tx, parentState, {
+        collisionBottles: state.bottles,
+      });
+      const { pendingGroups, completedFamilies } = partitionFamilyPlans(
+        state,
+        plans,
+      );
+      const completedGroupCount = new Set(
+        completedFamilies.map(({ groupId }) => groupId),
+      ).size;
+      const totalGroups = completedGroupCount + pendingGroups.length;
+      if (!completedFamilies.length) {
+        await assertAuditUnchanged(tx, parsed.candidate, revision);
+        await preflightLegacyConsumersInTransaction(tx);
+      }
+      if (!pendingGroups.length) {
+        return {
+          kind: "catalog_complete" as const,
+          revision,
+          totalGroups,
+          totalParents: plans.length,
+          totalReleases: state.releases.length,
+        };
+      }
+
+      const selectedGroups = pendingGroups.slice(0, batchSize);
+      const selectedPlans = selectedGroups.flat();
+      const applied: AppliedFamily[] = [];
+      for (const groupPlans of selectedGroups) {
+        applied.push(...(await insertGroup(tx, groupPlans)));
+      }
+      const releaseIds = selectedPlans.flatMap((plan) =>
+        plan.releases.map(({ id }) => id),
+      );
+      const consumers = releaseIds.length
+        ? await repointLegacyConsumersInTransaction(
+            tx,
+            await preflightLegacyConsumersInTransaction(tx, releaseIds),
+            releaseIds,
+          )
+        : emptyApplyCounts().consumers;
+      const aliases = await reserveCanonicalAliases(tx, applied);
+      const appliedStatsFamilies = statsFamilies(applied);
+      const stats = await recomputeCatalogMigrationStatsInTransaction(
+        tx,
+        appliedStatsFamilies,
+      );
+      await assertAppliedFamilies(tx, applied);
+      if (releaseIds.length) {
+        await assertLegacyConsumersPromotedInTransaction(tx, releaseIds);
+      }
+
+      return {
+        kind: "batch_committed" as const,
+        revision,
+        counts: countsFor(selectedPlans, aliases, consumers, stats),
+        progress: {
+          phase: "catalog" as const,
+          committedGroups: completedGroupCount + selectedGroups.length,
+          totalGroups,
+          committedParents: completedFamilies.length + applied.length,
+          totalParents: plans.length,
+          committedReleases:
+            completedFamilies.reduce(
+              (total, family) => total + family.promoted.length,
+              0,
+            ) + releaseIds.length,
+          totalReleases: state.releases.length,
+        },
+      };
+    });
+
+    if (batch.kind === "catalog_complete") break;
+    appliedAny = true;
+    addApplyCounts(counts, batch.counts);
+    await options.onProgress?.(batch.progress);
+  }
+
   const transactionResult = await database.transaction(async (tx) => {
     await tx.execute(sql`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE`);
-    // Preserve the authoritative snapshot: no SELECT may precede these locks.
     await lockMigrationTables(tx);
     const databaseEvidence = await loadCatalogMigrationDatabaseEvidence(tx);
     const revision = await loadCatalogMigrationRevisionEvidenceInTransaction(
@@ -1423,72 +1606,34 @@ export async function applyCatalogMigration(
     assertApprovedPreflight(parsed.candidate, revision);
 
     const state = await loadMigrationState(tx);
-    const classification = await classifyState(tx, state);
-    if (classification.status === "already_complete") {
-      const completedStatsFamilies = statsFamilies(classification.families);
-      await assertAppliedFamilies(tx, classification.families);
-      await assertLegacyConsumersPromotedInTransaction(tx);
-      await assertCatalogMigrationStatsInTransaction(
-        tx,
-        completedStatsFamilies,
-      );
-      const postflightAudit = await collectCatalogMigrationAudit(
-        tx,
-        revision.databaseEvidence,
-      );
-      assertPostflightAudit(postflightAudit, {
-        parentCount: classification.families.length,
-        releaseCount: state.releases.length,
+    const parentState = parentMigrationState(state);
+    assertResumableBaseline(parsed.candidate, state, parentState);
+    const plans = await buildFamilyPlans(tx, parentState, {
+      collisionBottles: state.bottles,
+    });
+    const { pendingGroups, completedFamilies } = partitionFamilyPlans(
+      state,
+      plans,
+    );
+    if (pendingGroups.length) {
+      throw new CatalogMigrationApplyError("partial_state", {
+        pendingGroupCount: pendingGroups.length,
+        reason: "catalog_checkpoint_regressed",
       });
-      return {
-        status: "already_complete" as const,
-        revision,
-        counts: {
-          ...ZERO_CORE_COUNTS,
-          consumers: EMPTY_CONSUMER_RESULT,
-        },
-        postflightAudit,
-      };
     }
-
-    await assertAuditUnchanged(tx, parsed.candidate, revision);
-    const plans = await buildFamilyPlans(tx, state);
-    const consumerPreflight = await preflightLegacyConsumersInTransaction(tx);
-    const plansByGroupKey = new Map<string, FamilyPlan[]>();
-    for (const plan of plans) {
-      const groupPlans = plansByGroupKey.get(plan.groupKey) ?? [];
-      groupPlans.push(plan);
-      plansByGroupKey.set(plan.groupKey, groupPlans);
-    }
-    const applied: AppliedFamily[] = [];
-    for (const groupPlans of plansByGroupKey.values()) {
-      applied.push(...(await insertGroup(tx, groupPlans)));
-    }
-
-    const consumers = await repointLegacyConsumersInTransaction(
-      tx,
-      consumerPreflight,
-    );
-    const aliases = await reserveCanonicalAliases(tx, applied);
-    const appliedStatsFamilies = statsFamilies(applied);
-    const stats = await recomputeCatalogMigrationStatsInTransaction(
-      tx,
-      appliedStatsFamilies,
-    );
-    await assertAppliedFamilies(tx, applied);
+    const completedStatsFamilies = statsFamilies(completedFamilies);
+    await assertAppliedFamilies(tx, completedFamilies);
     await assertLegacyConsumersPromotedInTransaction(tx);
-
-    const finalState = await loadMigrationState(tx);
+    await assertCatalogMigrationStatsInTransaction(tx, completedStatsFamilies);
     if (
-      finalState.bottles.length !==
-        state.bottles.length + state.releases.length ||
-      finalState.mappings.length !== state.releases.length
+      state.bottles.length !== plans.length + state.releases.length ||
+      state.mappings.length !== state.releases.length
     ) {
       throw new CatalogMigrationApplyError("postflight_failed", {
-        initialBottleCount: state.bottles.length,
-        finalBottleCount: finalState.bottles.length,
+        parentCount: plans.length,
+        bottleCount: state.bottles.length,
         releaseCount: state.releases.length,
-        mappingCount: finalState.mappings.length,
+        mappingCount: state.mappings.length,
       });
     }
     const postflightAudit = await collectCatalogMigrationAudit(
@@ -1499,24 +1644,32 @@ export async function applyCatalogMigration(
       parentCount: plans.length,
       releaseCount: state.releases.length,
     });
+    return { revision, postflightAudit, plans, completedFamilies };
+  });
 
-    return {
-      status: "applied" as const,
-      revision,
-      counts: countsFor(plans, aliases, consumers, stats),
-      postflightAudit,
-    };
+  await options.onProgress?.({
+    phase: "postflight",
+    committedGroups: new Set(
+      transactionResult.completedFamilies.map(({ groupId }) => groupId),
+    ).size,
+    totalGroups: new Set(
+      transactionResult.completedFamilies.map(({ groupId }) => groupId),
+    ).size,
+    committedParents: transactionResult.plans.length,
+    totalParents: transactionResult.plans.length,
+    committedReleases: parsed.candidate.audit.legacyCatalog.totalReleases,
+    totalReleases: parsed.candidate.audit.legacyCatalog.totalReleases,
   });
 
   return CatalogMigrationApplyResultSchema.parse({
     schemaVersion: CATALOG_MIGRATION_APPLY_SCHEMA_VERSION,
-    status: transactionResult.status,
+    status: appliedAny ? "applied" : "already_complete",
     approvedAuditGeneratedAt: parsed.candidate.audit.generatedAt,
     revision: transactionResult.revision,
     approval: parsed.approval,
     startedAt: startedAt.toISOString(),
     completedAt: new Date().toISOString(),
-    counts: transactionResult.counts,
+    counts,
     postflightAudit: transactionResult.postflightAudit,
   });
 }

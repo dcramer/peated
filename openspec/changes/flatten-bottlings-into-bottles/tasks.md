@@ -70,8 +70,8 @@ and map to an explicit removal task.
 
 ## 4. One-Shot Legacy Migration
 
-- [x] 4.1 Replace target/checkpoint migration writers with one transaction
-      owner and one retained read-only pre/post audit boundary.
+- [x] 4.1 Replace target/checkpoint migration writers with one migration owner
+      and one retained read-only pre/post audit boundary.
 - [x] 4.2 Lock affected tables in a documented fixed order and rerun collision
       and integrity preflight before the first mutation.
 - [x] 4.3 Assign every legacy parent Bottle to one migration-created group and
@@ -177,6 +177,9 @@ and map to an explicit removal task.
       Bottle canonicalization instead of treating them as collisions.
 - [x] 7.18 Group legacy parents connected by assigned exact aliases while
       preserving both Bottle identities and the existing alias assignment.
+- [x] 7.19 Preserve legacy tsvector values without re-tokenizing them and make
+      catalog migration batches transactionally complete, resumable from durable
+      graph checkpoints, and observable after each commit.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

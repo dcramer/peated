@@ -21,7 +21,7 @@ every consumer use one direct Bottle foreign key.
 - Keep BottleGroup as relationship, shared identity-edit intent,
   representative selection, and aggregation scope.
 - Keep grouping outside ordinary user creation and activity workflows.
-- Migrate all data in one retained-audit-gated, fail-fast transaction.
+- Migrate all data in retained-audit-gated, resumable, bounded transactions.
 - Preserve legacy URLs and release ids through durable mappings.
 - Remove the unreleased CatalogTarget implementation rather than maintain two
   identity systems.
@@ -214,31 +214,28 @@ metadata. Evidence generation fails closed unless its database role can execute
 `pg_control_system()` and `pg_is_in_recovery()`; apply may use a different
 writer role but must attest to the same primary cluster and database.
 
-### One fail-fast transaction
+### Resumable bounded transactions
 
-The migration executes once inside one database transaction:
+The migration executes deterministic BottleGroup components in bounded batches:
 
-1. acquire affected tables in a fixed documented order;
-2. rerun collision and integrity preflight under the transaction;
-3. create or validate one BottleGroup per legacy parent;
-4. keep each parent Bottle and assign it to its group;
-5. promote every BottleRelease to a complete Bottle;
-6. create durable release-to-Bottle mappings;
-7. repoint every release-specific consumer Bottle reference to the promoted
-   Bottle while retaining `releaseId` as historical migration evidence until
-   separately approved cleanup;
-8. leave every parent-only Bottle reference on the parent;
-9. materialize aliases, observations, proposals, and attempts with the same
-   direct-Bottle rule;
-10. assert mapping completeness, valid Bottle foreign keys, group membership,
-    uniqueness, counts, and no remaining supported release-specific runtime
-    reference;
-11. commit or roll back everything.
+1. acquire affected tables in a fixed documented order for one bounded batch;
+2. on the first batch, rerun the retained collision and integrity preflight;
+3. create whole BottleGroups, assign every linked legacy parent, and promote
+   every release for those groups;
+4. repoint only those releases' consumers, reserve their aliases, and recompute
+   their Bottle and group statistics;
+5. validate the batch and commit;
+6. emit committed group, parent, and release progress;
+7. on rerun, infer completed components from group assignments and durable
+   promotion mappings, reject half-written components, and skip complete ones;
+8. after all batches commit, run one full postflight validation and audit.
 
-No checkpoint state machine, per-family partial commit, shadow target parity, or
-generic target reconciliation remains. Table locks intentionally queue writes
-for the bounded transaction. Activation must ensure old application and worker
-processes cannot write legacy-only release references after commit.
+Group assignment plus the durable release-to-Bottle mapping form the checkpoint;
+no separate checkpoint table or external state machine is required. A failed
+batch rolls back without discarding earlier complete batches. Table locks
+intentionally queue writes only for each bounded transaction. Activation must
+ensure old application and worker processes cannot write legacy-only release
+references during the migration.
 
 ### Postflight and cleanup
 
@@ -267,8 +264,8 @@ Destructive cleanup requires:
 2. Remove CatalogTarget schema and regenerate the unreleased additive migration.
 3. Replace target loaders, schemas, serializers, and domain services with
    direct Bottle ownership.
-4. Replace the resumable target backfill with one fail-fast direct-Bottle
-   migration transaction and retained pre/post audit.
+4. Replace the target backfill with resumable component-complete direct-Bottle
+   migration batches and retained pre/post audit.
 5. Cut server consumers, routes, workers, statistics, badges, analytics, and
    integrations to Bottle ids.
 6. Cut web workflows and generated clients to Bottle-only selection and
@@ -284,9 +281,9 @@ working, and receive focused verification before commit.
 
 - **A parent-only row may describe a specific but unknown release.** Keeping it
   on the general Bottle preserves recorded knowledge without inventing detail.
-- **A one-shot transaction can block writes.** Use the retained production
-  audit to establish bounded size, lock tables in a fixed order, run during the
-  low-traffic migration window, and fail before mutation on ambiguity.
+- **Migration batches can block writes.** Bound each transaction by complete
+  identity components, print progress after commit, retain resumable
+  checkpoints, and run during the low-traffic migration window.
 - **An old process can write a release reference after migration.** Coordinate
   application/worker activation so legacy writers are stopped or rejected
   before transaction commit.

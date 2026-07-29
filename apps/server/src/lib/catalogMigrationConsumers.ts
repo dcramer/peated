@@ -192,7 +192,22 @@ function firstRow<T>(rows: T[], label: string): T {
   return row;
 }
 
-function referencesSql(): string {
+function sqlIdList(releaseIds: readonly number[] | undefined): string | null {
+  if (releaseIds === undefined) return null;
+  if (
+    !releaseIds.length ||
+    releaseIds.some((id) => !Number.isSafeInteger(id) || id <= 0)
+  ) {
+    throw new CatalogMigrationConsumerError("postflight_failed", null, null, {
+      reason: "invalid_release_scope",
+      releaseIds,
+    });
+  }
+  return [...new Set(releaseIds)].join(",");
+}
+
+function referencesSql(releaseIds?: readonly number[]): string {
+  const scopedIds = sqlIdList(releaseIds);
   return CONSUMER_SLOT_DEFINITIONS.map(
     ({ slot, table, bottleColumn, releaseColumn, rowId }) => `
       SELECT
@@ -202,6 +217,7 @@ function referencesSql(): string {
         ${releaseColumn} AS release_id
       FROM ${table}
       WHERE ${releaseColumn} IS NOT NULL
+        ${scopedIds === null ? "" : `AND ${releaseColumn} IN (${scopedIds})`}
     `,
   ).join("\nUNION ALL\n");
 }
@@ -217,10 +233,11 @@ function emptyResult(): CatalogMigrationConsumerResult {
 
 async function loadConsumerCounts(
   tx: AnyTransaction,
+  releaseIds?: readonly number[],
 ): Promise<CatalogMigrationConsumerResult> {
   const result = await tx.execute<ConsumerCountRow>(
     sql.raw(`
-    WITH refs AS (${referencesSql()})
+    WITH refs AS (${referencesSql(releaseIds)})
     SELECT slot, COUNT(*)::int AS count
     FROM refs
     GROUP BY slot
@@ -234,12 +251,23 @@ async function loadConsumerCounts(
   return counts;
 }
 
-async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
+async function assertNoMembershipConflicts(
+  tx: AnyTransaction,
+  releaseIds?: readonly number[],
+): Promise<void> {
+  const scopedIds = sqlIdList(releaseIds);
+  const releaseScope = (qualifier = "") =>
+    scopedIds === null ? "" : `AND ${qualifier}release_id IN (${scopedIds})`;
+  const bottleScope =
+    scopedIds === null
+      ? ""
+      : "AND bottle_id IN (SELECT promoted_bottle_id FROM complete_promotion)";
   const result = await tx.execute<MembershipConflictRow>(
     sql.raw(`
     WITH complete_promotion AS (
       SELECT release_id, promoted_bottle_id
       FROM bottle_release_promotion
+      WHERE TRUE ${releaseScope()}
     ),
     tasting_final AS (
       SELECT
@@ -249,7 +277,7 @@ async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
         t.created_at
       FROM tasting t
       LEFT JOIN complete_promotion p ON p.release_id = t.release_id
-      WHERE t.release_id IS NOT NULL
+      WHERE t.release_id IS NOT NULL ${releaseScope("t.")}
       UNION ALL
       SELECT
         id::text,
@@ -257,7 +285,7 @@ async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
         created_by_id,
         created_at
       FROM tasting
-      WHERE release_id IS NULL AND bottle_id IS NOT NULL
+      WHERE release_id IS NULL AND bottle_id IS NOT NULL ${bottleScope}
     ),
     collection_final AS (
       SELECT
@@ -266,11 +294,11 @@ async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
         COALESCE(p.promoted_bottle_id, -c.release_id) AS final_bottle_id
       FROM collection_bottle c
       LEFT JOIN complete_promotion p ON p.release_id = c.release_id
-      WHERE c.release_id IS NOT NULL
+      WHERE c.release_id IS NOT NULL ${releaseScope("c.")}
       UNION ALL
       SELECT id::text, collection_id, bottle_id
       FROM collection_bottle
-      WHERE release_id IS NULL AND bottle_id IS NOT NULL
+      WHERE release_id IS NULL AND bottle_id IS NOT NULL ${bottleScope}
     ),
     flight_final AS (
       SELECT
@@ -279,14 +307,14 @@ async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
         COALESCE(p.promoted_bottle_id, -f.release_id) AS final_bottle_id
       FROM flight_bottle f
       LEFT JOIN complete_promotion p ON p.release_id = f.release_id
-      WHERE f.release_id IS NOT NULL
+      WHERE f.release_id IS NOT NULL ${releaseScope("f.")}
       UNION ALL
       SELECT
         CONCAT(flight_id, ':', bottle_id, ':null'),
         flight_id,
         bottle_id
       FROM flight_bottle
-      WHERE release_id IS NULL AND bottle_id IS NOT NULL
+      WHERE release_id IS NULL AND bottle_id IS NOT NULL ${bottleScope}
     ),
     conflicts AS (
       SELECT
@@ -339,10 +367,13 @@ async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
   }
 }
 
-async function assertLegacyPairs(tx: AnyTransaction): Promise<void> {
+async function assertLegacyPairs(
+  tx: AnyTransaction,
+  releaseIds?: readonly number[],
+): Promise<void> {
   const result = await tx.execute<InvalidPairRow>(
     sql.raw(`
-    WITH refs AS (${referencesSql()})
+    WITH refs AS (${referencesSql(releaseIds)})
     SELECT
       refs.slot,
       refs.row_id AS "rowId",
@@ -377,7 +408,11 @@ async function assertLegacyPairs(tx: AnyTransaction): Promise<void> {
   }
 }
 
-async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
+async function assertPromotionGraph(
+  tx: AnyTransaction,
+  releaseIds?: readonly number[],
+): Promise<void> {
+  const scopedIds = sqlIdList(releaseIds);
   const result = await tx.execute<InvalidPromotionRow>(
     sql.raw(`
     SELECT
@@ -410,15 +445,18 @@ async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
       ON parent_tombstone.bottle_id = parent.id
     LEFT JOIN bottle_tombstone promoted_tombstone
       ON promoted_tombstone.bottle_id = promoted.id
-    WHERE promotion.release_id IS NULL
-       OR promotion.promoted_bottle_id = release.bottle_id
-       OR parent.id IS NULL
-       OR parent.group_id IS NULL
-       OR parent_tombstone.bottle_id IS NOT NULL
-       OR promoted.id IS NULL
-       OR promoted.group_id IS NULL
-       OR promoted_tombstone.bottle_id IS NOT NULL
-       OR parent.group_id IS DISTINCT FROM promoted.group_id
+    WHERE (
+      promotion.release_id IS NULL
+      OR promotion.promoted_bottle_id = release.bottle_id
+      OR parent.id IS NULL
+      OR parent.group_id IS NULL
+      OR parent_tombstone.bottle_id IS NOT NULL
+      OR promoted.id IS NULL
+      OR promoted.group_id IS NULL
+      OR promoted_tombstone.bottle_id IS NOT NULL
+      OR parent.group_id IS DISTINCT FROM promoted.group_id
+    )
+    ${scopedIds === null ? "" : `AND release.id IN (${scopedIds})`}
     ORDER BY release.id
     LIMIT 1
   `),
@@ -484,8 +522,10 @@ function assertSameCounts(
 async function applySlot(
   tx: AnyTransaction,
   definition: ConsumerSlotDefinition,
+  releaseIds?: readonly number[],
 ): Promise<number> {
   const { table, bottleColumn, releaseColumn } = definition;
+  const scopedIds = sqlIdList(releaseIds);
   const result = await tx.execute<{ count: number }>(
     sql.raw(`
     WITH updated AS (
@@ -496,6 +536,7 @@ async function applySlot(
         ON promotion.release_id = release.id
       WHERE consumer.${releaseColumn} = release.id
         AND consumer.${bottleColumn} IS DISTINCT FROM promotion.promoted_bottle_id
+        ${scopedIds === null ? "" : `AND release.id IN (${scopedIds})`}
       RETURNING 1
     )
     SELECT COUNT(*)::int AS count
@@ -507,10 +548,11 @@ async function applySlot(
 
 async function assertPromotedPairs(
   tx: AnyTransaction,
+  releaseIds?: readonly number[],
 ): Promise<CatalogMigrationConsumerResult> {
   const result = await tx.execute<InvalidPairRow>(
     sql.raw(`
-    WITH refs AS (${referencesSql()})
+    WITH refs AS (${referencesSql(releaseIds)})
     SELECT
       refs.slot,
       refs.row_id AS "rowId",
@@ -546,7 +588,7 @@ async function assertPromotedPairs(
       },
     );
   }
-  return await loadConsumerCounts(tx);
+  return await loadConsumerCounts(tx, releaseIds);
 }
 
 /**
@@ -555,10 +597,11 @@ async function assertPromotedPairs(
  */
 export async function preflightLegacyConsumersInTransaction(
   tx: AnyTransaction,
+  releaseIds?: readonly number[],
 ): Promise<CatalogMigrationConsumerPreflight> {
-  const counts = await loadConsumerCounts(tx);
-  await assertNoMembershipConflicts(tx);
-  await assertLegacyPairs(tx);
+  const counts = await loadConsumerCounts(tx, releaseIds);
+  await assertNoMembershipConflicts(tx, releaseIds);
+  await assertLegacyPairs(tx, releaseIds);
   return Object.freeze({
     bySlot: Object.freeze({ ...counts.bySlot }),
     total: counts.total,
@@ -574,20 +617,21 @@ export async function preflightLegacyConsumersInTransaction(
 export async function repointLegacyConsumersInTransaction(
   tx: AnyTransaction,
   preflight: CatalogMigrationConsumerPreflight,
+  releaseIds?: readonly number[],
 ): Promise<CatalogMigrationConsumerResult> {
-  await assertPromotionGraph(tx);
-  const before = await loadConsumerCounts(tx);
+  await assertPromotionGraph(tx, releaseIds);
+  const before = await loadConsumerCounts(tx, releaseIds);
   assertSameCounts(preflight.bySlot, before.bySlot, "mutation_count_mismatch");
-  await assertLegacyPairs(tx);
-  await assertNoMembershipConflicts(tx);
+  await assertLegacyPairs(tx, releaseIds);
+  await assertNoMembershipConflicts(tx, releaseIds);
 
   const bySlot = emptyResult().bySlot;
   for (const definition of CONSUMER_SLOT_DEFINITIONS) {
-    bySlot[definition.slot] = await applySlot(tx, definition);
+    bySlot[definition.slot] = await applySlot(tx, definition, releaseIds);
   }
   assertSameCounts(preflight.bySlot, bySlot, "mutation_count_mismatch");
 
-  const after = await assertPromotedPairs(tx);
+  const after = await assertPromotedPairs(tx, releaseIds);
   assertSameCounts(preflight.bySlot, after.bySlot, "postflight_failed");
   return { bySlot, total: preflight.total };
 }
@@ -598,8 +642,9 @@ export async function repointLegacyConsumersInTransaction(
  */
 export async function assertLegacyConsumersPromotedInTransaction(
   tx: AnyTransaction,
+  releaseIds?: readonly number[],
 ): Promise<CatalogMigrationConsumerResult> {
-  await assertPromotionGraph(tx);
-  await assertNoMembershipConflicts(tx);
-  return await assertPromotedPairs(tx);
+  await assertPromotionGraph(tx, releaseIds);
+  await assertNoMembershipConflicts(tx, releaseIds);
+  return await assertPromotedPairs(tx, releaseIds);
 }
