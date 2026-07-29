@@ -62,6 +62,10 @@ export default procedure
       });
     }
     const bottle = source.bottle;
+    if (bottle.groupId === null) {
+      throw new Error(`Active Bottle ${bottle.id} has no BottleGroup.`);
+    }
+    const groupId = bottle.groupId;
 
     const results = (
       await db
@@ -72,6 +76,7 @@ export default procedure
             activeBottleConditions,
             eq(bottles.brandId, bottle.brandId),
             eq(bottles.name, bottle.name),
+            ne(bottles.groupId, groupId),
             ne(bottles.id, bottle.id),
           ),
         )
@@ -82,6 +87,7 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [
       activeBottleConditions,
       eq(bottles.brandId, bottle.brandId),
+      ne(bottles.groupId, groupId),
       notInArray(bottles.id, [bottle.id, ...results.map((r) => r.id)]),
     ];
 

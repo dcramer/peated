@@ -63,6 +63,16 @@ display promoted and newly created Bottles in the same way as any other Bottle.
 - **THEN** the page displays Bottle-owned identity, activity, prices, images,
   and an optional related-release link
 
+#### Scenario: List exact Bottles
+
+- **WHEN** the web application lists exact Bottles in a Library or related
+  release family
+- **THEN** each row presents structured Bottle identity and exact metadata
+  appropriate to that context
+- **AND** the average rating uses a continuous fractional-thumb visualization
+  with the number of rated tastings
+- **AND** total tasting activity is not substituted for the rated-sample count
+
 ### Requirement: Legacy bottling identity is retired from public interfaces
 
 The system SHALL retain an auditable mapping from every migrated BottleRelease

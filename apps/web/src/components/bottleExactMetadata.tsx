@@ -17,12 +17,22 @@ export type BottleExactMetadataSource = Pick<
   | "caskSize"
 >;
 
+export type BottleExactMetadataKey =
+  | "category"
+  | "age"
+  | "abv"
+  | "vintage"
+  | "release"
+  | "single-cask"
+  | "cask-strength"
+  | "cask-details";
+
 type MetadataItem = {
-  key: string;
+  key: BottleExactMetadataKey;
   content: ReactNode;
 };
 
-function getBottleExactMetadata(
+export function getBottleExactMetadata(
   bottle: BottleExactMetadataSource,
 ): MetadataItem[] {
   const metadata: MetadataItem[] = [];
@@ -71,13 +81,18 @@ function getBottleExactMetadata(
 
 export default function BottleExactMetadata({
   bottle,
+  exclude = [],
   leadingContent,
 }: {
   bottle: BottleExactMetadataSource;
+  exclude?: BottleExactMetadataKey[];
   leadingContent?: ReactNode;
 }) {
-  const metadata = getBottleExactMetadata(bottle);
-  const items: MetadataItem[] =
+  const excluded = new Set(exclude);
+  const metadata = getBottleExactMetadata(bottle).filter(
+    ({ key }) => !excluded.has(key),
+  );
+  const items: { key: string; content: ReactNode }[] =
     leadingContent !== undefined
       ? [{ key: "leading", content: leadingContent }, ...metadata]
       : metadata;

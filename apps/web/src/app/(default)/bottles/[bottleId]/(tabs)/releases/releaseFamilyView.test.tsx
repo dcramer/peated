@@ -116,22 +116,20 @@ const bottle = {
 } satisfies Bottle;
 
 describe("ReleaseFamilyView", () => {
-  it("presents similar bottles without group activity or management actions", () => {
+  it("presents releases without group activity or management actions", () => {
     const html = renderToStaticMarkup(
       <ReleaseFamilyView
-        group={group}
         bottleList={{
           results: [bottle],
           rel: { prevCursor: null, nextCursor: 2 },
         }}
+        currentBottleId={bottle.id}
       />,
     );
 
-    expect(html).toContain("Lagavulin 18");
-    expect(html).toContain("Similar bottles");
-    expect(html).toContain('id="similar-bottles-heading"');
-    expect(html).toContain("Similar bottles</dt><dd");
-    expect(html).toContain(">2</dd>");
+    expect(html).toContain('id="releases-heading"');
+    expect(html).not.toContain("Release statistics");
+    expect(html).not.toContain("Combined ratings");
     expect(html).not.toContain("Exact release not specified");
     expect(html).not.toContain("Release family");
     expect(html).not.toContain("Save");
@@ -141,7 +139,10 @@ describe("ReleaseFamilyView", () => {
     expect(html).not.toContain("/addBottle?group=");
 
     expect(html).toContain('href="/bottles/42"');
-    expect(html).toContain("Lagavulin 21 Cask 42");
+    expect(html).toContain("Cask 42");
+    expect(html).toContain('aria-current="page"');
+    expect(html).toContain('title="Currently viewing"');
+    expect(html).not.toContain(">Viewing<");
     expect(html).toContain("21 years");
     expect(html).toContain("55.1% ABV");
     expect(html).toContain("2004 vintage");
@@ -149,22 +150,25 @@ describe("ReleaseFamilyView", () => {
     expect(html).toContain("Single cask");
     expect(html).toContain("Cask strength");
     expect(html).toContain("1st Fill Oloroso Hogshead cask");
+    expect(html).toContain("1 rating");
+    expect(html).not.toContain("1 tasting");
+    expect(html).toContain("Average rating 2.00");
     expect(html).toContain('src="https://example.com/exact.webp"');
-    expect(html).toContain('aria-label="Similar bottle pagination"');
+    expect(html).toContain('aria-label="Release pagination"');
     expect(html).toContain("cursor next page: 2");
   });
 
-  it("describes an empty result as an empty similar-bottle list", () => {
+  it("describes an empty result as an empty release list", () => {
     const html = renderToStaticMarkup(
       <ReleaseFamilyView
-        group={{ ...group, totalBottles: 0 }}
         bottleList={{
           results: [],
           rel: { prevCursor: null, nextCursor: null },
         }}
+        currentBottleId={bottle.id}
       />,
     );
 
-    expect(html).toContain("No similar bottles found.");
+    expect(html).toContain("No releases found.");
   });
 });

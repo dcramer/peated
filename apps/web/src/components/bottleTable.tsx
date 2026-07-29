@@ -7,8 +7,9 @@ import BottleStatusIcons, {
 } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
-import classNames from "../lib/classNames";
+import BottleIdentity from "./bottleIdentity";
 import BottleLink from "./bottleLink";
+import BottleRatingSummary from "./bottleRatingSummary";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
 import SingleCaskChip from "./singleCaskChip";
 import Table from "./table";
@@ -31,6 +32,8 @@ export default function BottleTable({
   renderCollectionBottleActions,
   hideLibraryStatus = false,
   showBottleStats = true,
+  showRatingSummary = false,
+  identityMode = "legacy",
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   bottleList: (Bottle | CollectionBottle)[];
@@ -40,6 +43,8 @@ export default function BottleTable({
   renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
   hideLibraryStatus?: boolean;
   showBottleStats?: boolean;
+  showRatingSummary?: boolean;
+  identityMode?: "legacy" | "absolute";
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
     "bottle" in item
@@ -62,9 +67,23 @@ export default function BottleTable({
           title: "Bottle",
           sort: "name",
           sortDefaultOrder: "asc",
-          className: showBottleStats ? "min-w-full sm:w-1/2" : "w-full",
+          className: showRatingSummary
+            ? "min-w-full sm:w-auto"
+            : showBottleStats
+              ? "min-w-full sm:w-1/2"
+              : "w-full",
           value: (item) => {
             const { bottle } = item;
+            const categoryName = bottle.category
+              ? formatCategoryName(bottle.category)
+              : null;
+            const identityTitle = bottle.group?.name ?? bottle.name;
+            const showCategory =
+              categoryName &&
+              String(bottle.category) !== "other" &&
+              (identityMode === "legacy" ||
+                categoryName.toLocaleLowerCase() !==
+                  identityTitle.toLocaleLowerCase());
             const collectionImage =
               item.collectionBottle &&
               renderCollectionBottleImage?.(item.collectionBottle);
@@ -74,57 +93,71 @@ export default function BottleTable({
             const mobileCollectionActions =
               item.collectionBottle &&
               renderCollectionBottleActions?.(item.collectionBottle);
+            const statusIndicators = item.collectionBottle ? (
+              <BottleStatusIndicators
+                hasTasted={item.collectionBottle.hasTasted}
+                isLibrary={false}
+              />
+            ) : (
+              <BottleStatusIcons
+                bottle={bottle}
+                hideLibrary={hideLibraryStatus}
+              />
+            );
+            const categoryLink = showCategory ? (
+              <Link
+                href={`/bottles/?category=${bottle.category}`}
+                className="hover:underline"
+              >
+                {categoryName}
+              </Link>
+            ) : null;
 
             return (
-              <div
-                className={classNames(
-                  "min-w-0",
-                  collectionImage
-                    ? "flex items-start gap-3"
-                    : "flex flex-col justify-center gap-y-2",
-                )}
-              >
+              <div className="flex min-w-0 items-start gap-3">
                 {collectionImage}
-                <div
-                  className={classNames(
-                    "min-w-0",
-                    collectionImage
-                      ? "flex flex-1 flex-col justify-center gap-y-2"
-                      : "flex flex-col justify-center gap-y-2",
-                  )}
-                >
-                  <div className="flex min-w-0 flex-wrap items-center gap-x-1">
-                    <BottleLink
-                      bottle={bottle}
-                      className="font-medium hover:underline"
-                    >
-                      {bottle.fullName}
-                    </BottleLink>
-                    {item.collectionBottle ? (
-                      <BottleStatusIndicators
-                        hasTasted={item.collectionBottle.hasTasted}
-                        isLibrary={false}
-                      />
-                    ) : (
-                      <BottleStatusIcons
+                <div className="flex min-w-0 flex-1 flex-col justify-center">
+                  {identityMode === "absolute" ? (
+                    <BottleIdentity bottle={bottle} mode="absolute" />
+                  ) : (
+                    <div className="flex min-w-0 flex-wrap items-center gap-x-1">
+                      <BottleLink
                         bottle={bottle}
-                        hideLibrary={hideLibraryStatus}
-                      />
-                    )}
-                    {collectionMeta}
-                    {bottle.singleCask && <SingleCaskChip />}
-                  </div>
-                  <div className="text-muted flex flex-col gap-y-1 text-sm">
-                    {bottle.category && String(bottle.category) !== "other" && (
-                      <Link
-                        href={`/bottles/?category=${bottle.category}`}
-                        className="hover:underline"
+                        className="font-medium hover:underline"
                       >
-                        {formatCategoryName(bottle.category)}
-                      </Link>
-                    )}
-                  </div>
+                        {bottle.fullName}
+                      </BottleLink>
+                    </div>
+                  )}
+                  {identityMode === "absolute" ? (
+                    <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
+                      {statusIndicators}
+                      {collectionMeta}
+                      {collectionMeta && categoryLink ? (
+                        <span aria-hidden="true">&middot;</span>
+                      ) : null}
+                      {categoryLink}
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-1">
+                        {statusIndicators}
+                        {collectionMeta}
+                        {bottle.singleCask ? <SingleCaskChip /> : null}
+                      </div>
+                      <div className="text-muted flex flex-col gap-y-1 text-sm">
+                        {categoryLink}
+                      </div>
+                    </>
+                  )}
                 </div>
+                {showRatingSummary ? (
+                  <BottleRatingSummary
+                    avgRating={bottle.avgRating}
+                    totalRatings={bottle.ratingStats.total}
+                    className="w-20 sm:hidden"
+                  />
+                ) : null}
                 {mobileCollectionActions && (
                   <div className="ml-auto shrink-0 sm:hidden">
                     {mobileCollectionActions}
@@ -134,6 +167,22 @@ export default function BottleTable({
             );
           },
         },
+        ...(showRatingSummary
+          ? [
+              {
+                name: "rating-summary",
+                title: "Rating",
+                value: (item: BottleRow) => (
+                  <BottleRatingSummary
+                    avgRating={item.bottle.avgRating}
+                    totalRatings={item.bottle.ratingStats.total}
+                  />
+                ),
+                className: "sm:w-24",
+                align: "center" as const,
+              },
+            ]
+          : []),
         ...(showBottleStats
           ? [
               {
@@ -187,7 +236,8 @@ export default function BottleTable({
                     </div>
                   ) : null;
                 },
-                className: showBottleStats ? "sm:w-16" : "sm:w-36",
+                className:
+                  showBottleStats || showRatingSummary ? "sm:w-16" : "sm:w-36",
               },
             ]
           : []),

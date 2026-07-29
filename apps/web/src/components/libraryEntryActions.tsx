@@ -362,12 +362,7 @@ function LibraryEntryStatusMenu({
         type="button"
         disabled={disabled}
         aria-label={`Change bottle status, current status ${label}`}
-        className={classNames(
-          "inline-flex h-7 items-center gap-1 rounded border px-2 text-xs font-semibold transition-colors disabled:cursor-auto disabled:opacity-70",
-          currentMeta
-            ? currentMeta.labelClassName
-            : "border-slate-700 bg-slate-900 text-slate-300",
-        )}
+        className="text-muted inline-flex h-7 items-center gap-1 text-xs font-medium transition-colors hover:text-white disabled:cursor-auto disabled:opacity-70"
       >
         {label}
         <ChevronDownIcon className="h-3.5 w-3.5" aria-hidden="true" />

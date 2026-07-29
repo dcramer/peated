@@ -135,6 +135,9 @@ explicit removal task and must not become a second business-logic system.
 - [x] 6.8 Add focused web tests for Add Bottle, edit Bottle, add another
       release, direct Bottle selection, related releases, and return intents.
 - [x] 6.9 Run constrained desktop/mobile visual QA using the local playbook.
+- [x] 6.10 Replace name-only related-release and Library rows with shared
+      structured Bottle identity, centered fractional average ratings, and
+      rated-sample counts; add focused responsive tests and visual QA.
 
 ## 7. Cleanup, Documentation, And Local Verification
 

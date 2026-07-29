@@ -31,9 +31,12 @@ describe("library bottle status", () => {
     expect(
       renderToStaticMarkup(<CollectionBottleStatusLabel status={null} />),
     ).toBe("");
-    expect(
-      renderToStaticMarkup(<CollectionBottleStatusLabel status="sealed" />),
-    ).toContain("Sealed");
+    const html = renderToStaticMarkup(
+      <CollectionBottleStatusLabel status="sealed" />,
+    );
+    expect(html).toContain("Sealed");
+    expect(html).toContain("text-muted");
+    expect(html).not.toContain("border-emerald");
   });
 
   it("renders editable chips with the selected status pressed", () => {
