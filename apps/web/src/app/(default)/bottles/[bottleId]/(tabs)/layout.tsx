@@ -1,5 +1,6 @@
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
+import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
 import { type ReactNode } from "react";
 import type { Product, WithContext } from "schema-dts";
 import BottleFullHeader from "../bottleFullHeader";
@@ -12,7 +13,7 @@ export async function generateMetadata(props: {
 
   const { bottleId } = params;
 
-  const bottle = await getBottlePage(Number(bottleId));
+  const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
 
   const description = summarize(bottle.description || "", 200);
   const images = bottle.imageUrl ? [bottle.imageUrl] : [];
@@ -41,7 +42,7 @@ export default async function Layout(props: {
 
   const { children } = props;
 
-  const bottleId = Number(params.bottleId);
+  const bottleId = parseReleaseFamilyRouteId(params.bottleId);
   const bottle = await getBottlePage(bottleId);
   const jsonLd: WithContext<Product> = {
     "@context": "https://schema.org",

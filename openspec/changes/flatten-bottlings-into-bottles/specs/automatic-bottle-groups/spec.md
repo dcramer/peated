@@ -64,6 +64,10 @@ activity or catalog-consumer identity.
 - **WHEN** a user opens `/bottles/:memberBottleId/releases`
 - **THEN** the member locates its group
 - **AND** the page lists the group's independently complete member Bottles
+- **AND** each row emphasizes the exact identity fields that distinguish that
+  member from the shared expression instead of repeating only its complete name
+- **AND** the row presents the Bottle's average rating and rated-sample count in
+  a centered comparison column
 - **AND** user-facing copy describes related or other releases without exposing
   BottleGroup ids
 

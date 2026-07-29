@@ -60,6 +60,38 @@ describe("GET /bottles/:bottle/similar", () => {
     );
   });
 
+  test("excludes releases from the same Bottle group", async ({ fixtures }) => {
+    const brand = await fixtures.Entity({ name: "Release Family Brand" });
+    const distiller = await fixtures.Entity({
+      name: "Release Family Distiller",
+    });
+    const source = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Grouped Bottle",
+      statedAge: 12,
+      category: "bourbon",
+    });
+    await fixtures.BottleGroupMember({
+      groupId: requireGroupId(source.groupId),
+      edition: "Sibling Release",
+      statedAge: 12,
+    });
+    const otherSimilarBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      distillerIds: [distiller.id],
+      name: "Other Similar Bottle",
+      statedAge: 14,
+      category: "bourbon",
+    });
+
+    const { results } = await routerClient.bottles.similar({
+      bottle: source.id,
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([otherSimilarBottle.id]);
+  });
+
   test("returns empty when no similar bottles", async ({ fixtures }) => {
     const brand = await fixtures.Entity();
     const bottle = await fixtures.Bottle({

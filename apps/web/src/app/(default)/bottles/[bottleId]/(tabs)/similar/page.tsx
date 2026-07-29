@@ -1,30 +1,13 @@
-"use client";
-import { use } from "react";
+import {
+  getReleaseFamilyHref,
+  parseReleaseFamilyRouteId,
+} from "@peated/web/lib/releaseFamily";
+import { permanentRedirect } from "next/navigation";
 
-import BetaNotice from "@peated/web/components/betaNotice";
-import BottleTable from "@peated/web/components/bottleTable";
-import { useORPC } from "@peated/web/lib/orpc/context";
-import { useSuspenseQuery } from "@tanstack/react-query";
+export default async function Page(props: {
+  params: Promise<{ bottleId: string }>;
+}) {
+  const { bottleId } = await props.params;
 
-export default function Page(props: { params: Promise<{ bottleId: string }> }) {
-  const params = use(props.params);
-
-  const { bottleId } = params;
-
-  const orpc = useORPC();
-  const { data: bottleList } = useSuspenseQuery(
-    orpc.bottles.similar.queryOptions({
-      input: {
-        bottle: Number(bottleId),
-      },
-    }),
-  );
-
-  return (
-    <div className="mt-6 px-3 lg:px-0">
-      <BetaNotice>This is a work in progress.</BetaNotice>
-
-      <BottleTable bottleList={bottleList.results} rel={bottleList.rel} />
-    </div>
-  );
+  permanentRedirect(getReleaseFamilyHref(parseReleaseFamilyRouteId(bottleId)));
 }

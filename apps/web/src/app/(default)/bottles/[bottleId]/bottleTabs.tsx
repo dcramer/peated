@@ -16,9 +16,11 @@ export default function BottleTabs({ bottle }: { bottle: Bottle }) {
       <TabItem as={Link} href={`${baseUrl}/prices`} controlled desktopOnly>
         Prices
       </TabItem>
-      <TabItem as={Link} href={`${baseUrl}/similar`} controlled desktopOnly>
-        Similar
-      </TabItem>
+      {bottle.group && bottle.group.totalBottles > 1 ? (
+        <TabItem as={Link} href={`${baseUrl}/releases`} controlled>
+          Releases ({bottle.group.totalBottles.toLocaleString()})
+        </TabItem>
+      ) : null}
     </Tabs>
   );
 }

@@ -39,13 +39,13 @@ export async function generateMetadata(props: {
   const { group } = await getReleaseFamilyGroup(
     parseReleaseFamilyRouteId(bottleId),
   );
-  const description = `Explore similar bottles related to ${group.fullName}. Each bottle has its own details, tastings, and Library entry.`;
+  const description = `Explore releases of ${group.fullName}. Each bottle has its own details, tastings, and Library entry.`;
 
   return {
-    title: `${group.fullName} similar bottles`,
+    title: `${group.fullName} releases`,
     description,
     openGraph: {
-      title: `${group.fullName} similar bottles`,
+      title: `${group.fullName} releases`,
       description,
     },
   };
@@ -59,9 +59,8 @@ export default async function ReleaseFamilyPage(props: {
     props.params,
     props.searchParams,
   ]);
-  const { client, group } = await getReleaseFamilyGroup(
-    parseReleaseFamilyRouteId(bottleId),
-  );
+  const anchorBottleId = parseReleaseFamilyRouteId(bottleId);
+  const { client, group } = await getReleaseFamilyGroup(anchorBottleId);
   const bottleList = await resolveOrNotFound(
     client.bottleGroups.bottles({
       group: group.id,
@@ -72,5 +71,10 @@ export default async function ReleaseFamilyPage(props: {
     }),
   );
 
-  return <ReleaseFamilyView group={group} bottleList={bottleList} />;
+  return (
+    <ReleaseFamilyView
+      bottleList={bottleList}
+      currentBottleId={anchorBottleId}
+    />
+  );
 }

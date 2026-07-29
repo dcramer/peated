@@ -56,16 +56,9 @@ export function CollectionBottleStatusLabel({
 }) {
   if (!status) return null;
 
-  const meta = COLLECTION_BOTTLE_STATUS_META[status];
-
   return (
-    <span
-      className={classNames(
-        "inline-flex h-7 items-center self-start rounded border px-2 text-xs font-semibold",
-        meta.labelClassName,
-      )}
-    >
-      {meta.label}
+    <span className="text-muted inline-flex items-center text-sm">
+      {COLLECTION_BOTTLE_STATUS_META[status].label}
     </span>
   );
 }
