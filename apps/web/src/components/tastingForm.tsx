@@ -140,7 +140,7 @@ export default function TastingForm(
       onSave={handleSubmit(onSubmitHandler)}
       saveDisabled={isSubmitting}
     >
-      <div className="lg:mb-8 lg:p-0">
+      <div className="-mt-4 lg:-mt-8 lg:mb-8 lg:p-0">
         <TastingBottleIdentity bottle={props.initialData.bottle} />
       </div>
 
