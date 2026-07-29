@@ -11,6 +11,7 @@ import {
   bottleImageUrl,
   buildActivity,
   buildBottle,
+  buildBottleGroup,
   buildCollectionBottle,
   buildFavoriteActivity,
   buildTasting,
@@ -1299,11 +1300,15 @@ function isExactBottlePhotoScenario(request) {
 }
 
 function buildCreatedBottle({ includeExactBottleDetails = false } = {}) {
-  const bottle = buildBottle({
+  const bottleWithoutGroup = buildBottle({
     id: createdBottleId,
     name: createdBottleName,
     brand: testBrand,
   });
+  const bottle = {
+    ...bottleWithoutGroup,
+    group: buildBottleGroup({ bottle: bottleWithoutGroup }),
+  };
   if (!includeExactBottleDetails) return bottle;
 
   return {

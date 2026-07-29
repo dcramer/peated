@@ -180,7 +180,13 @@ async function serializePhotoIdentificationClassification(
 
       serializedDecision = {
         action: "match",
-        matchedBottle: await serialize(BottleSerializer, matchedBottle),
+        matchedBottle: await serialize(
+          BottleSerializer,
+          matchedBottle,
+          undefined,
+          [],
+          { includeGroupSummary: true },
+        ),
       };
       break;
     }

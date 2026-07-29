@@ -61,7 +61,7 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(page.getByTitle(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
     const createRequestPromise = waitForTastingCreate(page);
