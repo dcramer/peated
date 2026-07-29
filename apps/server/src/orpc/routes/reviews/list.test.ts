@@ -190,7 +190,6 @@ describe("GET /reviews", () => {
     const site = await fixtures.ExternalSiteOrExisting();
     const unresolved = await fixtures.Review({
       bottleId: null,
-      releaseId: null,
       externalSiteId: site.id,
     });
     const retainedBottle = await fixtures.Bottle();

@@ -11,8 +11,6 @@ import {
   bottleGroupDistillers,
   bottleGroups,
   bottleObservations,
-  bottleReleasePromotions,
-  bottleReleases,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -35,7 +33,7 @@ import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recom
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 
 export class ConcreteBottleMergeAuthorizationError extends Error {
   constructor() {
@@ -230,11 +228,7 @@ async function consolidateFlightMemberships(
     .where(
       inArray(flightBottles.bottleId, [sourceBottleId, destinationBottleId]),
     )
-    .orderBy(
-      asc(flightBottles.flightId),
-      asc(flightBottles.bottleId),
-      asc(flightBottles.releaseId),
-    )
+    .orderBy(asc(flightBottles.flightId), asc(flightBottles.bottleId))
     .for("update");
   const rowsByFlightId = new Map<number, typeof rows>();
   for (const row of rows) {
@@ -260,9 +254,6 @@ async function consolidateFlightMemberships(
           and(
             eq(flightBottles.flightId, row.flightId),
             eq(flightBottles.bottleId, row.bottleId),
-            row.releaseId === null
-              ? isNull(flightBottles.releaseId)
-              : eq(flightBottles.releaseId, row.releaseId),
           ),
         );
       collapsed += 1;
@@ -276,9 +267,6 @@ async function consolidateFlightMemberships(
           and(
             eq(flightBottles.flightId, survivor.flightId),
             eq(flightBottles.bottleId, sourceBottleId),
-            survivor.releaseId === null
-              ? isNull(flightBottles.releaseId)
-              : eq(flightBottles.releaseId, survivor.releaseId),
           ),
         );
       moved += 1;
@@ -363,14 +351,12 @@ async function repointBottleConsumers(
       .set({
         currentBottleId: sql`CASE WHEN ${table.currentBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${table.currentBottleId} END`,
         suggestedBottleId: sql`CASE WHEN ${table.suggestedBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${table.suggestedBottleId} END`,
-        parentBottleId: sql`CASE WHEN ${table.parentBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${table.parentBottleId} END`,
         updatedAt: new Date(),
       })
       .where(
         or(
           eq(table.currentBottleId, sourceBottleId),
           eq(table.suggestedBottleId, sourceBottleId),
-          eq(table.parentBottleId, sourceBottleId),
         ),
       )
       .returning({ id: table.id });
@@ -557,32 +543,6 @@ export async function mergeConcreteBottlesInTransaction(
   const sourceSingleton = survivingSourceMembers.length === 0;
   const survivingSourceRepresentative = survivingSourceMembers[0];
 
-  const ownedReleases = await tx
-    .select({ id: bottleReleases.id })
-    .from(bottleReleases)
-    .where(eq(bottleReleases.bottleId, sourceBottleId))
-    .orderBy(asc(bottleReleases.id))
-    .for("update");
-  const ownedReleasePromotions = ownedReleases.length
-    ? await tx
-        .select()
-        .from(bottleReleasePromotions)
-        .where(
-          inArray(
-            bottleReleasePromotions.releaseId,
-            ownedReleases.map(({ id }) => id),
-          ),
-        )
-        .orderBy(asc(bottleReleasePromotions.releaseId))
-        .for("update")
-    : [];
-  const completeOwnedReleaseIds = new Set(
-    ownedReleasePromotions.map(({ releaseId }) => releaseId),
-  );
-  if (ownedReleases.some(({ id }) => !completeOwnedReleaseIds.has(id))) {
-    throw new ConcreteBottleMergeGraphError("unmigrated", sourceBottleId);
-  }
-
   const sourceDistillers = await tx
     .select()
     .from(bottlesToDistillers)
@@ -615,12 +575,6 @@ export async function mergeConcreteBottlesInTransaction(
     throw new ConcreteBottleMergeConflictError("identity_conflict");
   }
 
-  const promotionRows = await tx
-    .select()
-    .from(bottleReleasePromotions)
-    .where(eq(bottleReleasePromotions.promotedBottleId, sourceBottleId))
-    .orderBy(asc(bottleReleasePromotions.releaseId))
-    .for("update");
   let consumerCounts: Record<string, number>;
   try {
     consumerCounts = await repointBottleConsumers(
@@ -653,21 +607,6 @@ export async function mergeConcreteBottlesInTransaction(
       assignedByActorId: actorId,
     });
   }
-
-  if (promotionRows.length) {
-    await tx
-      .update(bottleReleasePromotions)
-      .set({ promotedBottleId: destinationBottleId })
-      .where(eq(bottleReleasePromotions.promotedBottleId, sourceBottleId));
-  }
-  const retargetedLegacyReleases = ownedReleases.length
-    ? await tx
-        .update(bottleReleases)
-        .set({ bottleId: destinationBottleId })
-        .where(eq(bottleReleases.bottleId, sourceBottleId))
-        .returning({ id: bottleReleases.id })
-    : [];
-  consumerCounts.legacyReleases = retargetedLegacyReleases.length;
 
   const sourceTags = await tx
     .select()
@@ -779,7 +718,6 @@ export async function mergeConcreteBottlesInTransaction(
     sourceBefore: source,
     destinationBefore: destination,
     sourceAliasNames: sourceAliases.map(({ name }) => name),
-    promotedReleaseIds: promotionRows.map(({ releaseId }) => releaseId),
     consumerCounts,
   };
   for (const before of groups) {

@@ -36,12 +36,10 @@ describe("direct Bottle consumer constraints", () => {
         {
           collectionId: legacyCollection.id,
           bottleId: bottle.id,
-          releaseId: firstRelease.id,
         },
         {
           collectionId: legacyCollection.id,
           bottleId: bottle.id,
-          releaseId: null,
         },
       ]),
     ).rejects.toThrow(/collection_bottle_collection_id_bottle_id_unique/);
@@ -96,12 +94,10 @@ describe("direct Bottle consumer constraints", () => {
         {
           flightId: legacyFlight.id,
           bottleId: bottle.id,
-          releaseId: firstRelease.id,
         },
         {
           flightId: legacyFlight.id,
           bottleId: bottle.id,
-          releaseId: null,
         },
       ]),
     ).rejects.toThrow(/flight_bottle_flight_id_bottle_id_unique/);
@@ -159,13 +155,11 @@ describe("direct Bottle consumer constraints", () => {
       db.insert(tastings).values([
         {
           bottleId: bottle.id,
-          releaseId: firstRelease.id,
           createdById: user.id,
           createdAt: new Date(createdAt.getTime() + 10_000),
         },
         {
           bottleId: bottle.id,
-          releaseId: null,
           createdById: user.id,
           createdAt: new Date(createdAt.getTime() + 10_000),
         },

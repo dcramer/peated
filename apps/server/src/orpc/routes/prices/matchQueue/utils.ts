@@ -43,14 +43,9 @@ type StructuredAutomationIssue = {
   path?: unknown;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 /**
- * Historical queue snapshots can contain BottleRelease candidates. They are
- * audit evidence, not current identity: omit release candidates and translate
- * old Bottle candidates into the strict direct-Bottle output shape.
+ * Stored queue snapshots are untrusted JSON. Only current direct-Bottle
+ * candidates are returned to the queue.
  */
 function normalizeStoredPriceMatchCandidates(
   value: unknown,
@@ -59,50 +54,20 @@ function normalizeStoredPriceMatchCandidates(
   const candidates = Array.isArray(value) ? value : [];
   const normalized: BottleCandidate[] = [];
   let discarded = Array.isArray(value) ? 0 : 1;
-  let translated = 0;
 
   for (const candidate of candidates) {
     const direct = PriceMatchCandidateSchema.safeParse(candidate);
     if (direct.success) {
       normalized.push(direct.data);
-      continue;
-    }
-    if (
-      !isRecord(candidate) ||
-      candidate.kind === "release" ||
-      typeof candidate.releaseId === "number"
-    ) {
-      discarded += 1;
-      continue;
-    }
-
-    const translatedCandidate = { ...candidate };
-    delete translatedCandidate.kind;
-    delete translatedCandidate.releaseId;
-    delete translatedCandidate.bottleFullName;
-    if (isRecord(translatedCandidate.familyContext)) {
-      const siblingBottles = translatedCandidate.familyContext.siblingBottles;
-      if (Array.isArray(siblingBottles)) {
-        translatedCandidate.familyContext = { siblingBottles };
-      } else {
-        delete translatedCandidate.familyContext;
-      }
-    }
-
-    const parsed = PriceMatchCandidateSchema.safeParse(translatedCandidate);
-    if (parsed.success) {
-      normalized.push(parsed.data);
-      translated += 1;
     } else {
       discarded += 1;
     }
   }
 
-  if (translated > 0 || discarded > 0) {
-    logWarn("Normalized legacy price-match candidate evidence", {
+  if (discarded > 0) {
+    logWarn("Discarded invalid price-match candidate evidence", {
       extra: {
         proposalId,
-        translatedCandidates: translated,
         discardedCandidates: discarded,
       },
     });

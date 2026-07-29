@@ -249,12 +249,23 @@ The retained `(bottleId, releaseId)` values are no longer interpreted as a
 parent/release pair after `bottleId` is repointed; rollback to the old
 application therefore uses the verified database backup rather than mixed-mode
 reads.
+
+Cleanup uses a two-deploy contract. The first deploy removes legacy foreign-key
+constraints that would otherwise block canonical Bottle merges/deletes, then
+removes the legacy tables and columns from the application-owned Drizzle schema
+and all normal runtime paths. It does not drop tables or columns. A raw-SQL,
+read-only audit remains available during this interval, and historical change
+rows remain stored but are excluded from current feeds. Only after every API
+and worker process runs the detached revision may a later, separately approved
+migration physically drop the legacy database objects.
+
 Destructive cleanup requires:
 
 - a database backup;
 - successful preflight, migration, and postflight evidence;
 - no supported BottleRelease writes;
 - no public BottleRelease API, runtime schema, or legacy nested URL redirect;
+- all application and worker processes running the runtime-detached revision;
 - full test and visual QA gates;
 - explicit user approval.
 

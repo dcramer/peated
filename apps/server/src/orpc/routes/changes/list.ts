@@ -5,7 +5,7 @@ import { ChangeSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { ChangeSerializer } from "@peated/server/serializers/change";
 import type { SQL } from "drizzle-orm";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -31,7 +31,9 @@ export default procedure
     const { cursor, limit, ...rest } = input;
     const offset = (cursor - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [];
+    const where: (SQL<unknown> | undefined)[] = [
+      inArray(changes.objectType, ["bottle", "entity"]),
+    ];
 
     if (rest.type) {
       where.push(eq(changes.objectType, rest.type));

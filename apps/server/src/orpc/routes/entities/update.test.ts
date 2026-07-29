@@ -256,7 +256,6 @@ describe("PATCH /entities/:entity", () => {
     await db.insert(bottleAliases).values({
       name: "New Foo Reserve",
       bottleId: null,
-      releaseId: null,
       assignedByActorId: otherGroup.createdByActorId,
     });
 
@@ -302,11 +301,9 @@ describe("PATCH /entities/:entity", () => {
         expect.arrayContaining([
           expect.objectContaining({
             name: original.fullName,
-            releaseId: null,
           }),
           expect.objectContaining({
             name: updated?.fullName,
-            releaseId: null,
           }),
         ]),
       );
@@ -387,7 +384,6 @@ describe("PATCH /entities/:entity", () => {
     expect(newAlias).toMatchObject({
       name: newBottle.fullName,
       bottleId: bottle.id,
-      releaseId: null,
     });
 
     const [newOtherBottle] = await db
@@ -528,7 +524,6 @@ describe("PATCH /entities/:entity", () => {
     });
     expect(oldBottleAlias).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
     });
 
     const newBottleAlias = await db.query.bottleAliases.findFirst({
@@ -581,7 +576,6 @@ describe("PATCH /entities/:entity", () => {
     });
     expect(oldShortNameAlias).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
     });
 
     const oldEntityAlias = await db.query.entityAliases.findFirst({

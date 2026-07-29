@@ -4,7 +4,7 @@ import {
   CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
   CatalogMigrationApprovalCandidateSchema,
   type CatalogMigrationApprovalCandidate,
-} from "../schemas/catalogMigrationApply";
+} from "../schemas/catalogMigrationApprovalCandidate";
 import { collectCatalogMigrationAudit } from "./catalogMigrationAudit";
 import { loadCatalogMigrationDatabaseEvidence } from "./catalogMigrationDatabaseEvidence";
 import { loadCatalogMigrationRevisionEvidenceInTransaction } from "./catalogMigrationRevision";

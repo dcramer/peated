@@ -1373,6 +1373,13 @@
       "when": 1785344318826,
       "tag": "0195_concerned_monster_badoon",
       "breakpoints": false
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1785357880274,
+      "tag": "0196_regular_centennial",
+      "breakpoints": false
     }
   ]
 }

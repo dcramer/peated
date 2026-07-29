@@ -128,12 +128,10 @@ describe("POST /external-sites/:site/prices", () => {
     const unresolved = prices.find(({ bottleId }) => bottleId === null);
     expect(matched).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
       price: 9_999,
     });
     expect(unresolved).toMatchObject({
       bottleId: null,
-      releaseId: null,
       price: 7_999,
     });
     expect(await db.select().from(storePriceHistories)).toHaveLength(2);
@@ -185,7 +183,6 @@ describe("POST /external-sites/:site/prices", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -312,7 +309,6 @@ describe("POST /external-sites/:site/prices", () => {
     });
     const siblingReview = await fixtures.Review({
       bottleId: null,
-      releaseId: null,
       externalSiteId: site.id,
       name: aliasKey,
       url: "https://example.com/reviews/concurrent-sibling",
@@ -373,7 +369,6 @@ describe("POST /external-sites/:site/prices", () => {
       });
       expect(price).toMatchObject({
         bottleId: committedBottle.id,
-        releaseId: null,
         price: 9_999,
         url: "https://example.com/prices/concurrent-result",
       });

@@ -4,7 +4,6 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleReleases,
   bottleSeries,
   bottleTombstones,
   bottles,
@@ -16,6 +15,7 @@ import { getUserActor } from "@peated/server/lib/actors";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import {
   ConcreteBottleUpdateAuthorizationError,
@@ -1805,9 +1805,7 @@ describe("concrete Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
-  test("recomputes old and new series and leaves BottleRelease rows untouched", async ({
-    fixtures,
-  }) => {
+  test("recomputes old and new series", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Series Update Brand" });
     const oldSeries = await fixtures.BottleSeries({
@@ -1827,10 +1825,6 @@ describe("concrete Bottle updates", () => {
       },
       exacts: [{ edition: "One" }, { edition: "Two" }],
     });
-    const legacyRelease = await fixtures.BottleRelease({
-      bottleId: members[0].bottle.id,
-      edition: "Legacy child",
-    });
     resetQueueMock();
 
     await updateConcreteBottle({
@@ -1848,14 +1842,6 @@ describe("concrete Bottle updates", () => {
         seriesRows.map(({ id, numReleases }) => [id, numReleases]),
       ),
     ).toEqual({ [oldSeries.id]: 0, [newSeries.id]: 2 });
-    expect(
-      (
-        await db
-          .select()
-          .from(bottleReleases)
-          .where(eq(bottleReleases.id, legacyRelease.id))
-      )[0],
-    ).toEqual(legacyRelease);
     for (const seriesId of [oldSeries.id, newSeries.id]) {
       expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
         "IndexBottleSeriesSearchVectors",

@@ -195,8 +195,13 @@ explicit removal task and must not become a second business-logic system.
 - [x] 8.6 Disable BottleRelease writes with explicit replacement responses.
 - [x] 8.7 Remove public BottleRelease APIs and schemas, legacy nested URL
       redirects, release-query translation, and their compatibility runtime.
-- [ ] 8.8 Only after separate backup and explicit approval, generate and apply
-      cleanup that removes BottleRelease tables/columns, migration-only writers,
-      and retained migration/audit branches.
-- [ ] 8.9 Run and retain the final zero-legacy audit and full repository test
+- [x] 8.8 Detach application runtime and Drizzle schema from BottleRelease
+      tables and consumer columns; generate only the non-destructive legacy
+      foreign-key removal needed to keep canonical Bottle merges/deletes
+      operational, retire migration writers, and retain the read-only pre-drop
+      audit and inert historical change records.
+- [ ] 8.9 Only after the detached application and workers are fully deployed,
+      separate backup and explicit approval, generate and apply cleanup that
+      removes BottleRelease tables/columns and retained audit support.
+- [ ] 8.10 Run and retain the final zero-legacy audit and full repository test
       gate before cleanup release.

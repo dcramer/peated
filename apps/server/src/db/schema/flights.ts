@@ -12,7 +12,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-import { bottleReleases, bottles } from "./bottles";
+import { bottles } from "./bottles";
 import { users } from "./users";
 
 export const flights = pgTable(
@@ -43,7 +43,7 @@ export const flightsRelations = relations(flights, ({ one, many }) => ({
 export type Flight = typeof flights.$inferSelect;
 export type NewFlight = typeof flights.$inferInsert;
 
-/** A Flight membership selects one Bottle; releaseId is legacy evidence. */
+/** A Flight membership selects one Bottle. */
 export const flightBottles = pgTable(
   "flight_bottle",
   {
@@ -53,14 +53,10 @@ export const flightBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
-    releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
-    ),
   },
   (table) => [
     unique().on(table.flightId, table.bottleId),
     index("flight_bottle_bottle_idx").on(table.bottleId),
-    index("flight_bottle_release_idx").on(table.releaseId),
   ],
 );
 
@@ -72,10 +68,6 @@ export const flightBottlesRelations = relations(flightBottles, ({ one }) => ({
   bottle: one(bottles, {
     fields: [flightBottles.bottleId],
     references: [bottles.id],
-  }),
-  release: one(bottleReleases, {
-    fields: [flightBottles.releaseId],
-    references: [bottleReleases.id],
   }),
 }));
 

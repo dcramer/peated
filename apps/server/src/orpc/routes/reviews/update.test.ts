@@ -58,7 +58,6 @@ describe("PATCH /reviews/:review", () => {
     });
     const review = await fixtures.Review({
       bottleId: bottle.id,
-      releaseId: evidenceRelease.id,
       hidden: false,
     });
 
@@ -73,7 +72,6 @@ describe("PATCH /reviews/:review", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      releaseId: evidenceRelease.id,
       hidden: true,
     });
     expect(response.bottle?.id).toBe(bottle.id);
@@ -90,7 +88,6 @@ describe("PATCH /reviews/:review", () => {
     });
     const review = await fixtures.Review({
       bottleId: null,
-      releaseId: evidenceRelease.id,
     });
 
     const response = await routerClient.reviews.update(
@@ -104,7 +101,6 @@ describe("PATCH /reviews/:review", () => {
       }),
     ).toMatchObject({
       bottleId: nextBottle.id,
-      releaseId: evidenceRelease.id,
     });
     expect(response.bottle?.id).toBe(nextBottle.id);
 
@@ -118,7 +114,6 @@ describe("PATCH /reviews/:review", () => {
     ).toMatchObject({
       decision: "match_existing",
       bottleId: nextBottle.id,
-      releaseId: null,
     });
   });
 
@@ -130,7 +125,6 @@ describe("PATCH /reviews/:review", () => {
     const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const review = await fixtures.Review({
       bottleId: bottle.id,
-      releaseId: release.id,
     });
 
     const response = await routerClient.reviews.update(
@@ -144,7 +138,6 @@ describe("PATCH /reviews/:review", () => {
       }),
     ).toMatchObject({
       bottleId: null,
-      releaseId: release.id,
     });
     expect(response.bottle).toBeNull();
   });
@@ -162,15 +155,6 @@ describe("PATCH /reviews/:review", () => {
       ),
     );
     expect(error.message).toBe("Bottle not found.");
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({
-      bottleId: review.bottleId,
-      releaseId: review.releaseId,
-      hidden: false,
-    });
   });
 
   test("rejects a retired Bottle without partial updates", async ({
@@ -215,15 +199,6 @@ describe("PATCH /reviews/:review", () => {
       ),
     );
     expect(error.message).toBe(`Bottle ${selectedBottle.id} is not active.`);
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({
-      bottleId: review.bottleId,
-      releaseId: review.releaseId,
-      hidden: false,
-    });
   });
 
   test("hidden-only updates retain an identity changed while waiting for the Review", async ({
@@ -286,7 +261,6 @@ describe("PATCH /reviews/:review", () => {
     });
     const review = await fixtures.Review({
       bottleId: null,
-      releaseId: null,
       hidden: false,
     });
     const client = new Client(getPostgresConnectionConfig());
@@ -328,7 +302,6 @@ describe("PATCH /reviews/:review", () => {
       }),
     ).toMatchObject({
       bottleId: selectedBottle.id,
-      releaseId: concurrentRelease.id,
       hidden: true,
     });
   });

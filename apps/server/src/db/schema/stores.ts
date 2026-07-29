@@ -13,7 +13,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { bottleReleases, bottles } from "./bottles";
+import { bottles } from "./bottles";
 import { externalSites } from "./externalSites";
 import { users } from "./users";
 
@@ -25,10 +25,6 @@ export const storePriceMatchProposalStatusEnum = pgEnum(
 export const storePriceMatchProposalTypeEnum = pgEnum(
   "store_price_match_proposal_type",
   ["match_existing", "create_new", "correction", "no_match"],
-);
-export const storePriceMatchCreationTargetEnum = pgEnum(
-  "store_price_match_creation_target",
-  ["bottle", "release", "bottle_and_release"],
 );
 export const storePriceMatchRetryRunKindEnum = pgEnum(
   "store_price_match_retry_run_kind",
@@ -59,9 +55,6 @@ export const storePrices = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
-    releaseId: bigint("release_id", { mode: "number" }).references(
-      () => bottleReleases.id,
-    ),
     hidden: boolean("hidden").default(false),
     price: integer("price").notNull(),
     currency: currencyEnum("currency").notNull(),
@@ -78,7 +71,6 @@ export const storePrices = pgTable(
       table.volume,
     ),
     index("store_price_bottle_idx").on(table.bottleId),
-    index("store_price_release_idx").on(table.releaseId),
   ],
 );
 
@@ -86,10 +78,6 @@ export const storePricesRelations = relations(storePrices, ({ one }) => ({
   bottle: one(bottles, {
     fields: [storePrices.bottleId],
     references: [bottles.id],
-  }),
-  release: one(bottleReleases, {
-    fields: [storePrices.releaseId],
-    references: [bottleReleases.id],
   }),
   externalSite: one(externalSites, {
     fields: [storePrices.externalSiteId],
@@ -149,19 +137,9 @@ export const storePriceMatchProposals = pgTable(
     currentBottleId: bigint("current_bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
-    currentReleaseId: bigint("current_release_id", {
-      mode: "number",
-    }).references(() => bottleReleases.id),
     suggestedBottleId: bigint("suggested_bottle_id", {
       mode: "number",
     }).references(() => bottles.id),
-    suggestedReleaseId: bigint("suggested_release_id", {
-      mode: "number",
-    }).references(() => bottleReleases.id),
-    parentBottleId: bigint("parent_bottle_id", { mode: "number" }).references(
-      () => bottles.id,
-    ),
-    creationTarget: storePriceMatchCreationTargetEnum("creation_target"),
     // Classifier-asserted alias safety. A generic listing title is only safe to
     // reuse as a global bottle alias when the decision asserts `global_alias`;
     // null/"none" mean the exact listing may match but its title must not become
@@ -173,7 +151,6 @@ export const storePriceMatchProposals = pgTable(
       .notNull(),
     extractedLabel: jsonb("extracted_label").$type<Record<string, unknown>>(),
     proposedBottle: jsonb("proposed_bottle").$type<Record<string, unknown>>(),
-    proposedRelease: jsonb("proposed_release").$type<Record<string, unknown>>(),
     searchEvidence: jsonb("search_evidence")
       .$type<Record<string, unknown>[]>()
       .default(sql`'[]'::jsonb`)
@@ -203,9 +180,6 @@ export const storePriceMatchProposals = pgTable(
     index("store_price_match_proposal_current_bottle_idx").on(
       table.currentBottleId,
     ),
-    index("store_price_match_proposal_current_release_idx").on(
-      table.currentReleaseId,
-    ),
     index("store_price_match_proposal_processing_expires_idx").on(
       table.processingExpiresAt,
     ),
@@ -214,12 +188,6 @@ export const storePriceMatchProposals = pgTable(
     ),
     index("store_price_match_proposal_suggested_bottle_idx").on(
       table.suggestedBottleId,
-    ),
-    index("store_price_match_proposal_suggested_release_idx").on(
-      table.suggestedReleaseId,
-    ),
-    index("store_price_match_proposal_parent_bottle_idx").on(
-      table.parentBottleId,
     ),
     index("store_price_match_proposal_reviewed_by_idx").on(table.reviewedById),
   ],
@@ -249,20 +217,9 @@ export const storePriceMatchAttempts = pgTable(
       () => bottles.id,
       { onDelete: "set null" },
     ),
-    currentReleaseId: bigint("current_release_id", {
-      mode: "number",
-    }).references(() => bottleReleases.id, { onDelete: "set null" }),
     suggestedBottleId: bigint("suggested_bottle_id", {
       mode: "number",
     }).references(() => bottles.id, { onDelete: "set null" }),
-    suggestedReleaseId: bigint("suggested_release_id", {
-      mode: "number",
-    }).references(() => bottleReleases.id, { onDelete: "set null" }),
-    parentBottleId: bigint("parent_bottle_id", { mode: "number" }).references(
-      () => bottles.id,
-      { onDelete: "set null" },
-    ),
-    creationTarget: storePriceMatchCreationTargetEnum("creation_target"),
     automationEligible: boolean("automation_eligible").default(false).notNull(),
     automationScore: integer("automation_score"),
     model: text("model"),
@@ -303,25 +260,10 @@ export const storePriceMatchAttemptsRelations = relations(
       references: [bottles.id],
       relationName: "store_price_match_attempt_current_bottle",
     }),
-    currentRelease: one(bottleReleases, {
-      fields: [storePriceMatchAttempts.currentReleaseId],
-      references: [bottleReleases.id],
-      relationName: "store_price_match_attempt_current_release",
-    }),
     suggestedBottle: one(bottles, {
       fields: [storePriceMatchAttempts.suggestedBottleId],
       references: [bottles.id],
       relationName: "store_price_match_attempt_suggested_bottle",
-    }),
-    suggestedRelease: one(bottleReleases, {
-      fields: [storePriceMatchAttempts.suggestedReleaseId],
-      references: [bottleReleases.id],
-      relationName: "store_price_match_attempt_suggested_release",
-    }),
-    parentBottle: one(bottles, {
-      fields: [storePriceMatchAttempts.parentBottleId],
-      references: [bottles.id],
-      relationName: "store_price_match_attempt_parent_bottle",
     }),
   }),
 );
@@ -342,22 +284,9 @@ export const storePriceMatchProposalsRelations = relations(
       fields: [storePriceMatchProposals.currentBottleId],
       references: [bottles.id],
     }),
-    currentRelease: one(bottleReleases, {
-      fields: [storePriceMatchProposals.currentReleaseId],
-      references: [bottleReleases.id],
-    }),
     suggestedBottle: one(bottles, {
       fields: [storePriceMatchProposals.suggestedBottleId],
       references: [bottles.id],
-    }),
-    suggestedRelease: one(bottleReleases, {
-      fields: [storePriceMatchProposals.suggestedReleaseId],
-      references: [bottleReleases.id],
-    }),
-    parentBottle: one(bottles, {
-      fields: [storePriceMatchProposals.parentBottleId],
-      references: [bottles.id],
-      relationName: "store_price_match_parent_bottle",
     }),
     reviewedBy: one(users, {
       fields: [storePriceMatchProposals.reviewedById],

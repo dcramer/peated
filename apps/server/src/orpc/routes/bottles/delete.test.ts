@@ -4,7 +4,6 @@ import {
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
-  bottleReleases,
   bottles,
   collectionBottles,
   flightBottles,
@@ -12,6 +11,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -180,7 +180,6 @@ describe("DELETE /bottles/:bottle", () => {
     await db.insert(collectionBottles).values({
       collectionId: collection.id,
       bottleId: bottle.id,
-      releaseId: null,
     });
 
     const err = await waitError(
@@ -207,7 +206,6 @@ describe("DELETE /bottles/:bottle", () => {
     await db.insert(flightBottles).values({
       flightId: flight.id,
       bottleId: bottle.id,
-      releaseId: null,
     });
 
     const err = await waitError(
@@ -224,31 +222,20 @@ describe("DELETE /bottles/:bottle", () => {
     );
   });
 
-  test("clears system-owned bottle and release references when deleting a bottle", async ({
+  test("clears system-owned bottle references when deleting a bottle", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
     const bottle = await fixtures.LegacyBottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
-    await db
-      .update(storePrices)
-      .set({ releaseId: release.id })
-      .where(eq(storePrices.id, price.id));
     const review = await fixtures.Review({
       bottleId: bottle.id,
-      releaseId: release.id,
     });
     const reviewer = await fixtures.User();
     const priorQueueEntryAt = new Date("2026-03-01T00:30:00.000Z");
     const bottleAlias = await fixtures.BottleAlias({
       bottleId: bottle.id,
       name: "Deleted Bottle Alias",
-    });
-    const releaseAlias = await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: "Deleted Release Alias",
     });
 
     await db.insert(bottleFlavorProfiles).values({
@@ -258,7 +245,6 @@ describe("DELETE /bottles/:bottle", () => {
     });
     await db.insert(bottleObservations).values({
       bottleId: bottle.id,
-      releaseId: release.id,
       sourceType: "store_price",
       sourceKey: `store_price:${price.id}`,
       sourceName: price.name,
@@ -271,10 +257,7 @@ describe("DELETE /bottles/:bottle", () => {
         status: "approved",
         proposalType: "match_existing",
         currentBottleId: bottle.id,
-        currentReleaseId: release.id,
         suggestedBottleId: bottle.id,
-        suggestedReleaseId: release.id,
-        parentBottleId: bottle.id,
         enteredQueueAt: priorQueueEntryAt,
         reviewedById: reviewer.id,
         reviewedAt: new Date("2026-03-11T00:30:00.000Z"),
@@ -300,12 +283,6 @@ describe("DELETE /bottles/:bottle", () => {
     const updatedBottleAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, bottleAlias.name),
     });
-    const updatedReleaseAlias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, releaseAlias.name),
-    });
-    const deletedRelease = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, release.id),
-    });
     const remainingFlavorProfiles = await db
       .select()
       .from(bottleFlavorProfiles)
@@ -315,32 +292,21 @@ describe("DELETE /bottles/:bottle", () => {
     });
 
     expect(updatedPrice?.bottleId).toBeNull();
-    expect(updatedPrice?.releaseId).toBeNull();
     expect(updatedReview?.bottleId).toBeNull();
-    expect(updatedReview?.releaseId).toBeNull();
     expect(updatedProposal).toMatchObject({
       currentBottleId: null,
-      currentReleaseId: null,
       suggestedBottleId: null,
-      suggestedReleaseId: null,
-      parentBottleId: null,
       status: "pending_review",
       reviewedById: null,
       reviewedAt: null,
     });
     expect(updatedBottleAlias).toMatchObject({
       bottleId: null,
-      releaseId: null,
-    });
-    expect(updatedReleaseAlias).toMatchObject({
-      bottleId: null,
-      releaseId: null,
     });
     expect(updatedProposal?.enteredQueueAt).not.toBeNull();
     expect(updatedProposal!.enteredQueueAt!.getTime()).toBeGreaterThan(
       priorQueueEntryAt.getTime(),
     );
-    expect(deletedRelease).toBeUndefined();
     expect(remainingFlavorProfiles).toHaveLength(0);
     expect(deletedObservation).toBeUndefined();
   });

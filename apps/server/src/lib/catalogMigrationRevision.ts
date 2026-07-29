@@ -5,7 +5,7 @@ import { db, type AnyConnection, type AnyTransaction } from "../db";
 import {
   CatalogMigrationRevisionEvidenceSchema,
   type CatalogMigrationRevisionEvidence,
-} from "../schemas/catalogMigrationApply";
+} from "../schemas/catalogMigrationApprovalCandidate";
 import type { CatalogMigrationDatabaseEvidence } from "../schemas/catalogMigrationDatabaseIdentity";
 import { loadCatalogMigrationDatabaseEvidence } from "./catalogMigrationDatabaseEvidence";
 

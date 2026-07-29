@@ -161,21 +161,5 @@ describe("catalog identity fixtures", () => {
     });
 
     expect(price.bottleId).toBeNull();
-    expect(price.releaseId).toBeNull();
-  });
-
-  test("legacy release evidence is only added when requested", async ({
-    fixtures,
-  }) => {
-    const release = await fixtures.BottleRelease();
-    const tasting = await fixtures.Tasting({ releaseId: release.id });
-    const review = await fixtures.Review({ releaseId: release.id });
-    const price = await fixtures.StorePrice({ releaseId: release.id });
-    const alias = await fixtures.BottleAlias({ releaseId: release.id });
-
-    for (const consumer of [tasting, review, price, alias]) {
-      expect(consumer.bottleId).toBe(release.bottleId);
-      expect(consumer.releaseId).toBe(release.id);
-    }
   });
 });

@@ -99,16 +99,6 @@ type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
 
-// These legacy columns survive until the separately approved destructive
-// cleanup. Runtime writers clear them rather than treating them as identity.
-const CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE = {
-  currentReleaseId: null,
-  suggestedReleaseId: null,
-  parentBottleId: null,
-  creationTarget: null,
-  proposedRelease: null,
-} as const;
-
 async function getPriceMatchWriteActorForDatabase(
   tx: AnyDatabase,
   actor: IncomingBottleDecisionActor,
@@ -955,32 +945,6 @@ function buildStorePriceObservationFacts(
   };
 }
 
-/**
- * Legacy proposal columns remain only as migration evidence. Refuse historical
- * release-shaped rows instead of translating them into a current Bottle write.
- */
-function assertNoLegacyReleaseProposalEvidence(
-  proposal: Pick<
-    StorePriceMatchProposal,
-    | "id"
-    | "currentReleaseId"
-    | "suggestedReleaseId"
-    | "parentBottleId"
-    | "creationTarget"
-    | "proposedRelease"
-  >,
-) {
-  if (
-    proposal.currentReleaseId !== null ||
-    proposal.suggestedReleaseId !== null ||
-    proposal.parentBottleId !== null ||
-    proposal.creationTarget !== null ||
-    proposal.proposedRelease !== null
-  ) {
-    throw new StorePriceMatchProposalIdentityChangedError(proposal.id);
-  }
-}
-
 async function upsertStorePriceObservationInTransaction(
   tx: AnyDatabase,
   {
@@ -1095,12 +1059,10 @@ export async function upsertStorePriceMatchProposal({
   };
   const proposalValues = {
     ...proposalRuntimeValues,
-    ...CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE,
     enteredQueueAt,
   };
   const updateValues = {
     ...proposalRuntimeValues,
-    ...CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE,
     enteredQueueAt: getStorePriceQueueEntryUpdateValue(status),
   };
   const [proposal] = await tx
@@ -1169,7 +1131,6 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   },
 ) {
   const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
-  assertNoLegacyReleaseProposalEvidence(preflight);
 
   const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
     userId: user.id,
@@ -1679,7 +1640,6 @@ async function markApprovedStorePriceMatchProposalInTransaction(
       status: "approved",
       currentBottleId: bottleId,
       suggestedBottleId: bottleId,
-      ...CLEARED_LEGACY_RELEASE_PROPOSAL_EVIDENCE,
       processingToken: null,
       processingQueuedAt: null,
       processingExpiresAt: null,
@@ -1722,8 +1682,6 @@ export async function applyApprovedStorePriceMatchProposalInTransaction(
     bottleId: number;
   },
 ) {
-  assertNoLegacyReleaseProposalEvidence(proposal);
-
   const actor = await getPriceMatchWriteActorForDatabase(
     tx,
     decisionLog.actor,
@@ -1895,7 +1853,6 @@ export async function applyStorePriceBottleRepairFromProposal({
 }) {
   const { updateManifest, aliasResult } = await db.transaction(async (tx) => {
     const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
-    assertNoLegacyReleaseProposalEvidence(preflight);
     if (
       preflight.proposalType !== "correction" ||
       preflight.currentBottleId === null

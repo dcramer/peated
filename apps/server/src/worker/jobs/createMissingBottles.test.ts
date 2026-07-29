@@ -1,13 +1,13 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleReleases,
   incomingBottleDecisionLogs,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
+import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -79,7 +79,6 @@ describe("createMissingBottles", () => {
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: "Springbank Bottle Name",
       issue: "Default",
       url: "https://example.com/review",
@@ -87,7 +86,6 @@ describe("createMissingBottles", () => {
     const price = await fixtures.StorePrice({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: review.name,
     });
 
@@ -124,7 +122,6 @@ describe("createMissingBottles", () => {
       where: eq(reviews.id, review.id),
     });
     expect(updatedReview?.bottleId).toBeTruthy();
-    expect(updatedReview?.releaseId).toBeNull();
 
     const bottle = await db.query.bottles.findFirst({
       where: (table, { eq }) => eq(table.id, updatedReview!.bottleId as number),
@@ -157,7 +154,6 @@ describe("createMissingBottles", () => {
       decision: "create_bottle",
       actorId: systemActor.id,
       bottleId: updatedReview?.bottleId,
-      releaseId: null,
       createdBottle: true,
       createdRelease: false,
       confidence: null,
@@ -203,7 +199,6 @@ describe("createMissingBottles", () => {
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: `${bottle.fullName} critic review`,
       issue: "Canonical reuse",
       url: "https://example.com/worker-safe-canonical-reuse",
@@ -247,12 +242,10 @@ describe("createMissingBottles", () => {
 
     expect(updatedReview).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
     });
     expect(decisionLog).toMatchObject({
       decision: "match_existing",
       bottleId: bottle.id,
-      releaseId: null,
       createdBottle: false,
       createdRelease: false,
       metadata: expect.objectContaining({
@@ -280,7 +273,6 @@ describe("createMissingBottles", () => {
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: "Unknown Review Title",
       issue: "Default",
       url: "https://example.com/unresolved-review",
@@ -294,7 +286,6 @@ describe("createMissingBottles", () => {
       where: eq(reviews.id, review.id),
     });
     expect(unchangedReview?.bottleId).toBeNull();
-    expect(unchangedReview?.releaseId).toBeNull();
   });
 
   test("assigns a classifier match to its direct active Bottle", async ({
@@ -308,7 +299,6 @@ describe("createMissingBottles", () => {
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: "Worker Direct Bottle Review",
       issue: "Default",
       url: "https://example.com/worker-direct-bottle-review",
@@ -331,7 +321,6 @@ describe("createMissingBottles", () => {
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
     });
     expect(
       await db.query.bottleAliases.findFirst({
@@ -339,7 +328,6 @@ describe("createMissingBottles", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
       assignmentSource: "classifier_approved",
     });
     expect(
@@ -352,7 +340,6 @@ describe("createMissingBottles", () => {
     ).toMatchObject({
       decision: "match_existing",
       bottleId: bottle.id,
-      releaseId: null,
     });
   });
 
@@ -362,7 +349,6 @@ describe("createMissingBottles", () => {
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: "Generic Review Group",
       issue: "Default",
       url: "https://example.com/generic-review",
@@ -376,7 +362,6 @@ describe("createMissingBottles", () => {
       await db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
     ).toMatchObject({
       bottleId: null,
-      releaseId: null,
     });
   });
 
@@ -394,7 +379,6 @@ describe("createMissingBottles", () => {
     const review = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: null,
-      releaseId: null,
       name: "Concurrent Worker Review",
       issue: "Default",
       url: "https://example.com/concurrent-worker-review",
@@ -405,7 +389,6 @@ describe("createMissingBottles", () => {
         .update(reviews)
         .set({
           bottleId: concurrentBottle.id,
-          releaseId: null,
         })
         .where(eq(reviews.id, review.id));
       return buildClassification(
@@ -425,7 +408,6 @@ describe("createMissingBottles", () => {
     });
     expect(preserved).toMatchObject({
       bottleId: concurrentBottle.id,
-      releaseId: null,
     });
   });
 });

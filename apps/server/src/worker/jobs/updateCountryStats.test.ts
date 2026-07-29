@@ -50,7 +50,7 @@ test.each([
   { countryId: 0 },
   { countryId: 1.5 },
   { countryId: "1" },
-  { countryId: 1, releaseId: 2 },
+  { countryId: 1 },
 ])("rejects malformed job input %#", async (input) => {
   await expect(updateCountryStats(input)).rejects.toThrow();
 });
