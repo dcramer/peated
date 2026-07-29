@@ -153,27 +153,6 @@ describe("GET /users/:user/flavors", () => {
     expect(error).toMatchObject({ status: 409 });
   });
 
-  test("fails closed when a BottleGroup is retired", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({ flavorProfile: "peated" });
-    const replacement = await fixtures.Bottle();
-    await fixtures.Tasting({
-      bottleId: bottle.id,
-      createdById: defaults.user.id,
-    });
-
-    const error = await waitError(
-      routerClient.users.flavorList(
-        { user: "me" },
-        { context: { user: defaults.user } },
-      ),
-    );
-
-    expect(error).toMatchObject({ status: 409 });
-  });
-
   test("cannot list private without friend", async ({ fixtures }) => {
     const otherUser = await fixtures.User({ private: true });
 

@@ -226,32 +226,6 @@ describe("PATCH /reviews/:review", () => {
     });
   });
 
-  test("rejects a group-retired Bottle without partial updates", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const selectedBottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    const review = await fixtures.Review({ hidden: false });
-
-    const error = await waitError(
-      routerClient.reviews.update(
-        { review: review.id, bottle: selectedBottle.id, hidden: true },
-        { context: { user } },
-      ),
-    );
-    expect(error.message).toBe(`Bottle ${selectedBottle.id} is not active.`);
-    expect(
-      await db.query.reviews.findFirst({
-        where: eq(reviews.id, review.id),
-      }),
-    ).toMatchObject({
-      bottleId: review.bottleId,
-      releaseId: review.releaseId,
-      hidden: false,
-    });
-  });
-
   test("hidden-only updates retain an identity changed while waiting for the Review", async ({
     fixtures,
   }) => {

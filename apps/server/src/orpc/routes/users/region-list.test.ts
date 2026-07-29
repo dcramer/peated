@@ -431,25 +431,4 @@ describe("GET /users/:user/regions", () => {
 
     expect(error).toMatchObject({ status: 409 });
   });
-
-  test("fails closed when a BottleGroup is retired", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    await fixtures.Tasting({
-      bottleId: bottle.id,
-      createdById: defaults.user.id,
-    });
-
-    const error = await waitError(
-      routerClient.users.regionList(
-        { user: defaults.user.id },
-        { context: { user: defaults.user } },
-      ),
-    );
-
-    expect(error).toMatchObject({ status: 409 });
-  });
 });

@@ -166,6 +166,8 @@ and map to an explicit removal task.
 - [x] 7.13 Consolidate the canonical Bottle creation module and correct
       similar-Bottle labels and legacy redirect delegation found in final
       runtime review.
+- [x] 7.14 Remove stale BottleGroup editorial and retirement assertions exposed
+      by the full CI server shards.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

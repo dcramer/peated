@@ -144,7 +144,6 @@ describe("PUT /bottles", () => {
 
     expect(persistedGroup).toMatchObject({
       category: "single_malt",
-      description: null,
     });
     expect(persistedSelected).toMatchObject({
       groupId: persistedGroup.id,

@@ -312,31 +312,6 @@ describe("GET /users/:user", () => {
     expect(error).toMatchObject({ status: 409 });
   });
 
-  test("fails closed when a collection BottleGroup is retired", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const collection = await fixtures.Collection({
-      createdById: defaults.user.id,
-    });
-    const bottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    await db.insert(collectionBottles).values({
-      collectionId: collection.id,
-      bottleId: bottle.id,
-      status: "sealed",
-    });
-
-    const error = await waitError(
-      routerClient.users.details(
-        { user: defaults.user.id },
-        { context: { user: defaults.user } },
-      ),
-    );
-
-    expect(error).toMatchObject({ status: 409 });
-  });
-
   test("preserves private profile detail visibility", async ({
     defaults,
     fixtures,
