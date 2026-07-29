@@ -39,6 +39,45 @@ async function approvedInput(): Promise<CatalogMigrationApplyInput> {
 }
 
 describe("applyCatalogMigration", () => {
+  test("reassigns a same-family canonical alias to its promoted Bottle", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.LegacyBottle({
+      edition: "Legacy Edition",
+      statedAge: 10,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      fullName: `${parent.fullName} 12 Year`,
+      name: `${parent.name} 12 Year`,
+      statedAge: 12,
+    });
+    await db.insert(bottleAliases).values({
+      bottleId: parent.id,
+      name: release.fullName,
+      assignedByActorId: parent.createdByActorId,
+    });
+    const input = await approvedInput();
+
+    expect(input.candidate.audit.blockingIssueCount).toBe(0);
+
+    const result = await applyCatalogMigration(input);
+    const mapping = await db.query.bottleReleasePromotions.findFirst({
+      where: eq(bottleReleasePromotions.releaseId, release.id),
+    });
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, release.fullName),
+    });
+
+    expect(result.status).toBe("applied");
+    expect(mapping).toBeDefined();
+    expect(alias).toMatchObject({
+      bottleId: mapping?.promotedBottleId,
+      releaseId: null,
+      assignmentSource: "canonical",
+    });
+  });
+
   test("promotes zero, one, and multi-release families atomically and is idempotent", async ({
     fixtures,
   }) => {

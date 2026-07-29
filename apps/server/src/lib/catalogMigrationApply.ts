@@ -548,8 +548,9 @@ async function buildFamilyPlans(
       const owned =
         releaseId === null
           ? alias.bottleId === parentId && alias.releaseId === null
-          : alias.releaseId === releaseId &&
-            (alias.bottleId === parentId || alias.bottleId === null);
+          : (alias.releaseId === releaseId &&
+              (alias.bottleId === parentId || alias.bottleId === null)) ||
+            (alias.releaseId === null && alias.bottleId === parentId);
       if (!owned || alias.ignored === true) {
         throw new CatalogMigrationApplyError("alias_collision", {
           name,
@@ -756,6 +757,25 @@ async function reserveCanonicalAliases(
       family.plan.parent,
     );
     for (const { bottle } of family.promoted) {
+      for (const name of canonicalNames(bottle.fullName)) {
+        const reassigned = await tx
+          .update(bottleAliases)
+          .set({
+            bottleId: bottle.id,
+            assignmentSource: "canonical",
+            assignedByActorId: bottle.createdByActorId,
+            embedding: null,
+          })
+          .where(
+            and(
+              eq(bottleAliases.bottleId, family.plan.parent.id),
+              isNull(bottleAliases.releaseId),
+              sql`LOWER(${bottleAliases.name}) = LOWER(${name})`,
+            ),
+          )
+          .returning({ name: bottleAliases.name });
+        changed += reassigned.length;
+      }
       await reserve(reserveExactBottleAliasInTransaction, bottle);
       await reserve(reserveLiteralCanonicalBottleAliasInTransaction, bottle);
     }

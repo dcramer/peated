@@ -318,6 +318,10 @@ async function loadCollisions(
         ON promotion.release_id = r.id
         AND promotion.promoted_bottle_id = a.bottle_id
       WHERE a.release_id IS DISTINCT FROM r.id
+        AND NOT (
+          a.release_id IS NULL
+          AND a.bottle_id = r.bottle_id
+        )
         AND NOT COALESCE(a.ignored, false)
         AND promotion.release_id IS NULL
 
@@ -421,8 +425,6 @@ export async function collectCatalogMigrationAudit(
     0,
   );
   const blockingIssueCount =
-    legacyCatalog.parentsWithReleaseLikeFields +
-    legacyCatalog.childParentAgeConflicts +
     legacyCatalog.orphanReleases +
     legacyCatalog.missingParentCreators +
     legacyCatalog.missingReleaseCreators +
@@ -432,6 +434,8 @@ export async function collectCatalogMigrationAudit(
     promotionMappings.duplicateReleaseMappings +
     promotionMappings.invalidMappings;
   const warningCount =
+    legacyCatalog.parentsWithReleaseLikeFields +
+    legacyCatalog.childParentAgeConflicts +
     legacyCatalog.missingParentAliases +
     legacyCatalog.missingReleaseAliases +
     legacyCatalog.missingParentImages +

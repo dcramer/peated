@@ -5,7 +5,7 @@ import {
   sameCatalogMigrationDatabaseEvidence,
 } from "./catalogMigrationDatabaseIdentity";
 
-export const CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION = 2 as const;
+export const CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION = 3 as const;
 export const CATALOG_MIGRATION_APPLY_SCHEMA_VERSION = 3 as const;
 
 export const CatalogMigrationDatabaseRevisionSchema = z.object({
