@@ -174,7 +174,7 @@ render logs \
   --start 2026-07-08T14:23:00Z \
   --end 2026-07-08T14:26:00Z \
   --direction forward \
-  --path /rpc/bottles/details,/rpc/bottleReleases/details \
+  --path /rpc/bottles/details \
   --output json \
   --confirm \
   --limit 200
@@ -262,21 +262,18 @@ RSC error. Sentry issue `PEATED-48Z` showed the real web exception:
 - Trace ID: `3d4c25c0164df2bab2036b321729b166`
 - Time: `2026-07-08T14:24:21Z`
 
-The trace showed server-side RPC calls to:
-
-- `POST https://api.peated.com/rpc/bottles/details`
-- `POST https://api.peated.com/rpc/bottleReleases/details`
-
-Both returned HTTP 502. Vercel logs for `peated-web-next` confirmed the web
+The trace showed server-side RPC calls, including
+`POST https://api.peated.com/rpc/bottles/details`, returning HTTP 502. Vercel
+logs for `peated-web-next` confirmed the web
 route logged `Error: Bad Gateway` while the web request itself returned `200`.
 The upstream response headers included Cloudflare and Render headers, including
 `x-render-routing: dynamic-paid-error`, so the next root-cause step was API
 host/log inspection, not further web route debugging.
 
 Render request logs showed a burst of HTTP 502s across many API paths starting
-at `2026-07-08T14:24:17Z`, including `/uploads/*`, `/rpc/bottles/details`, and
-`/rpc/bottleReleases/details`. API app logs at the same time showed both live
-instances logging an unhandled rejection:
+at `2026-07-08T14:24:17Z`, including `/uploads/*` and
+`/rpc/bottles/details`. API app logs at the same time showed both live instances
+logging an unhandled rejection:
 
 ```text
 Error [ERR_STREAM_UNABLE_TO_PIPE]: Cannot pipe to a closed or destroyed stream

@@ -1,6 +1,4 @@
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { notFound, redirect } from "next/navigation";
 
 function getFirst(value: string | string[] | undefined) {
@@ -23,22 +21,9 @@ export default async function AddTasting(props: {
     props.params,
     props.searchParams,
   ]);
-  const legacyReleaseId =
-    getFirst(searchParams.release) ?? getFirst(searchParams.bottling);
-  const directBottleId = legacyReleaseId
-    ? (
-        await resolveOrNotFound(
-          (await getAnonymousServerClient()).client.bottleReleases.bottle({
-            bottle: parseId(bottleId),
-            release: parseId(legacyReleaseId),
-          }),
-        )
-      ).bottleId
-    : parseId(bottleId);
-
   redirect(
     getAddBottleHref({
-      bottleId: directBottleId,
+      bottleId: parseId(bottleId),
       flightId: getFirst(searchParams.flight),
       intent: "tasting",
     }),

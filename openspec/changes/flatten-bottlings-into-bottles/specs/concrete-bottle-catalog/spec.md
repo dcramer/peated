@@ -63,27 +63,26 @@ display promoted and newly created Bottles in the same way as any other Bottle.
 - **THEN** the page displays Bottle-owned identity, activity, prices, images,
   and an optional related-release link
 
-### Requirement: Legacy bottling identity remains reachable
+### Requirement: Legacy bottling identity is retired from public interfaces
 
 The system SHALL retain an auditable mapping from every migrated BottleRelease
-to its promoted Bottle.
+to its promoted Bottle while exposing only canonical Bottle interfaces.
 
-#### Scenario: Open a nested bottling URL
+#### Scenario: Request a retired nested bottling URL
 
 - **WHEN** a legacy nested BottleRelease URL is requested
-- **THEN** it permanently redirects to the promoted Bottle URL
+- **THEN** no compatibility route handles the request
 
-#### Scenario: Open a legacy family URL
+#### Scenario: Request a retired family URL
 
 - **WHEN** a legacy family URL is requested
-- **THEN** it redirects to `/bottles/:activeMemberBottleId/releases`
-- **AND** the active member is only a route locator
+- **THEN** no compatibility route handles the request
 
-#### Scenario: Use a retained compatibility API
+#### Scenario: Request a retired BottleRelease API
 
-- **WHEN** a compatibility API receives a known legacy release id
-- **THEN** it resolves the mapped Bottle and delegates to canonical Bottle logic
-- **AND** it emits bounded compatibility telemetry
+- **WHEN** a client requests any BottleRelease operation
+- **THEN** the operation is absent from oRPC and OpenAPI
+- **AND** canonical Bottle operations remain available
 
 ### Requirement: Bottle retirement requires an explicit Bottle destination
 
@@ -99,8 +98,9 @@ with an explicitly selected surviving Bottle.
 
 ### Requirement: BottleRelease cleanup is separately approved
 
-The system SHALL stop producing BottleRelease rows before removing legacy
-tables, columns, routes, schemas, jobs, and compatibility branches.
+The system SHALL stop producing BottleRelease rows before removing public
+routes and schemas, and SHALL separately gate destructive removal of legacy
+tables, columns, migration-only jobs, and retained audit support.
 
 #### Scenario: New write after application cutover
 

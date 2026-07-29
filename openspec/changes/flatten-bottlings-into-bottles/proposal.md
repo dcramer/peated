@@ -30,9 +30,8 @@ catalog integrations should never need a second polymorphic target identity.
 - Collapse Add Bottle and Add Bottling into one Bottle form with all concrete
   identity fields.
 - Migrate legacy releases and consumer references in audited, resumable,
-  component-complete batches after a retained production preflight. Preserve
-  old URLs and API references through durable release-to-Bottle mappings and
-  redirects.
+  component-complete batches after a retained production preflight. Retain
+  durable release-to-Bottle mappings as migration and cleanup evidence.
 - **BREAKING**: retire `BottleRelease`, nested bottling APIs, `releaseId`, and
   the unreleased `CatalogTarget` system after validation and backup approval.
 - Supersede `add-target-aware-catalog-creation`, which would deepen the paired
@@ -62,8 +61,8 @@ None.
 - Bottle, legacy release, alias, observation, tasting, review, collection,
   flight, price, proposal, classifier, activity, search, statistics, and
   indexing services.
-- oRPC/OpenAPI inputs and results, CLI/classifier contracts, compatibility
-  adapters, and nested bottling redirects.
+- oRPC/OpenAPI inputs and results, CLI/classifier contracts, and removal of
+  BottleRelease compatibility APIs and nested bottling redirects.
 - Add/edit Bottle forms, Bottle pages, related-release pages, search, Library,
   tasting, price, review, and flight workflows.
 - A retained production preflight, resumable bounded data transactions,

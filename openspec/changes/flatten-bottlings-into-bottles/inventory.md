@@ -123,14 +123,13 @@ resolution, and shadow parity. Direct Bottle loaders and serializers remain.
 - creation, conflict, update, exact Bottle merge, and group reads under
   `apps/server/src/lib/`
 - Bottle and BottleGroup oRPC routes and serializers
-- BottleRelease compatibility routes
 
 Creation stops creating target rows. Group operations become internal
 presentation operations and never repoint activity. This change removes manual
 group merge/split and does not retain a dormant regrouping service; a future
 automatic grouper is a separate change. Exact Bottle merge repoints direct
-consumer Bottle ids. BottleRelease adapters resolve the promotion mapping and
-delegate.
+consumer Bottle ids. BottleRelease compatibility routes and schemas are removed
+after production cutover; the promotion mapping remains internal evidence.
 
 ### Direct consumer writers
 
@@ -202,7 +201,8 @@ Cutover:
 - related-release pages show member Bottles and member-derived aggregates;
 - remove manual group merge/split controls;
 - keep user-facing “Similar bottles” copy;
-- preserve nested BottleRelease redirects;
+- remove nested BottleRelease redirects and release-query translation after
+  production cutover;
 - regenerate client types without CatalogTarget.
 
 ## Documentation
@@ -267,23 +267,23 @@ rg -l -S 'BottleRelease|bottle_release|releaseId|release_id|bottleReleases' \
   --glob '!**/.vitest-evals/**'
 ```
 
-It returns 42 non-test implementation and package-contract files. Every match
-is classified and retained for one of these staged reasons:
+It returns 24 non-test implementation and package-contract files. Every
+remaining match is classified and retained for one of these staged reasons:
 
 - unreleased schema columns, foreign keys, enums, and pending-upload namespaces
   retained as migration evidence;
 - the read-only audit, one-shot transaction, CLI entry point, fixtures, and
   revision evidence required for deployment;
-- the durable promotion resolver and BottleRelease compatibility routes that
-  translate, delegate, or refuse unsupported legacy mutation;
+- the durable promotion mapping and internal merge/delete handling required to
+  preserve migration evidence;
 - exact Bottle merge and delete guards that preserve or validate promotion
   evidence;
-- bounded web redirects and legacy query-input translation; or
 - classifier naming for exact marketed-release traits and immutable evaluation
   provenance, not a second catalog consumer identity.
 
 No remaining runtime match selects BottleGroup as activity identity, exposes
-manual group management, or operates a dormant automatic grouper.
+manual group management, operates a dormant automatic grouper, or exposes a
+BottleRelease API, schema, nested URL redirect, or web query translation.
 
 ## Acceptance Criteria
 
@@ -294,7 +294,7 @@ manual group management, or operates a dormant automatic grouper.
 - Every Bottle is independently complete.
 - Group aggregate activity equals raw member-Bottle activity once.
 - Exact Bottle merge owns all consumer repointing.
-- BottleRelease compatibility only translates and delegates.
+- BottleRelease is absent from public API and web routing surfaces.
 - Revised generated migration is additive and reviewed.
 - Focused DB/API/web tests, server/web typechecks, lint/format, OpenSpec
   validation, diff check, and constrained visual QA pass.

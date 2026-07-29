@@ -326,8 +326,8 @@ Required behavior:
 - age: chosen pending upload TTL, for example 2 or 3 days
 
 The lifecycle rule must not match permanent prefixes such as `tastings/`,
-`bottles/`, `badges/`, or `avatars/`. While staged BottleRelease compatibility
-exists, it must also exclude the retained `bottle-releases/` prefix.
+`bottles/`, `badges/`, or `avatars/`. Until destructive legacy-storage cleanup,
+it must also exclude the retained `bottle-releases/` prefix.
 
 This is an operational setup step outside the application migration. The app
 should still store `expiresAt` and run cleanup jobs so the database reflects

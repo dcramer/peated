@@ -14,12 +14,11 @@ import {
   createdBottleId,
   createdBottleName,
   createdTastingId,
+  exactMatchedBottle,
+  exactMatchedBottleId,
   exactSearchBottle,
   existingBottle,
   existingBottleId,
-  existingReleaseId,
-  legacyPromotedBottle,
-  legacyPromotedBottleId,
   photoTastingNotes,
   testAccessToken,
   testBrand,
@@ -504,65 +503,6 @@ test.describe("add bottle flow", () => {
     ).toBeVisible();
     await expect(page.getByText(existingBottle.fullName)).toBeVisible();
     await expectNoHorizontalOverflow(page);
-  });
-
-  test("shows exact actions for a resolved legacy release query", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "release"),
-    });
-
-    await page.goto(
-      `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
-    );
-
-    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
-    await expect(
-      page.getByRole("main").getByRole("button", { name: "Log Tasting" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "View Bottle" }),
-    ).toHaveAttribute("href", `/bottles/${legacyPromotedBottleId}`);
-
-    await page.getByRole("button", { name: "Add to Library" }).click();
-
-    await expect(
-      page.getByRole("heading", { name: "Added to Library" }),
-    ).toBeVisible();
-    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
-  });
-
-  test("keeps the promoted Bottle Library action available when the base bottle is saved", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "release-after-base"),
-    });
-
-    await page.goto(`/addBottle?bottle=${existingBottle.id}`);
-    await page.getByRole("button", { name: "Add to Library" }).click();
-    await expect(
-      page.getByRole("heading", { name: "Added to Library" }),
-    ).toBeVisible();
-
-    await page.goto(
-      `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}`,
-    );
-    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
-    const addReleaseButton = page.getByRole("button", {
-      name: "Add to Library",
-    });
-    await expect(addReleaseButton).toBeVisible();
-    await expect(addReleaseButton).toBeEnabled();
-
-    await addReleaseButton.click();
-    await expect(
-      page.getByRole("heading", { name: "Added to Library" }),
-    ).toBeVisible();
-    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
   });
 
   test("routes Add Bottle search results into the resolver outcome", async ({
@@ -1368,7 +1308,7 @@ test.describe("add bottle flow", () => {
     await page.goto("/addBottle");
     await uploadLabel(page);
 
-    await expect(page.getByText(legacyPromotedBottle.fullName)).toBeVisible();
+    await expect(page.getByText(exactMatchedBottle.fullName)).toBeVisible();
     await expect(
       page.getByText("Matched to existing bottle in Peated"),
     ).toBeVisible();

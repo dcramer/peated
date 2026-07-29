@@ -213,27 +213,22 @@ including source URL, raw title, retailer image, price/volume context, selector,
 bottle number, outturn, and unreviewed maturation fragments. They attach through
 the same validated Bottle id when identity is known.
 
-## Staged BottleRelease Compatibility
+## Retained BottleRelease Migration Evidence
 
-BottleRelease is not part of live creation. The only retained release-shaped
-behavior is measured compatibility for existing data and callers while legacy
+BottleRelease is not part of live creation or public identity. After legacy
 rows are promoted:
 
-- a durable promotion mapping resolves a legacy `releaseId` to its promoted
-  Bottle;
+- a durable promotion mapping records each legacy `releaseId` and its promoted
+  Bottle for migration, audit, merge, and cleanup internals;
 - retained `releaseId` columns may remain as historical migration evidence
   until their schema-removal gate, but live reads and writes use only
-  `bottleId`;
-- compatibility adapters translate legacy input/output and delegate to the
-  canonical concrete-Bottle services; they do not insert or update
-  `bottle_release`; and
-- old nested URLs resolve through retained mappings and redirects.
+  `bottleId`; and
+- public BottleRelease APIs, runtime schemas, and old nested URL redirects are
+  removed.
 
-This compatibility is instrumented and removal-owned. Deployment validates the
-promotion mappings and compatibility traffic before separately approved
-cleanup removes legacy pair storage, the `bottle_release` table, and obsolete
-release routes and branches. New architecture must not add a second release
-business system while those adapters remain.
+Separately approved destructive cleanup removes legacy pair storage, the
+`bottle_release` table, migration-only writers, and retained audit branches.
+New architecture must not add a second release identity layer.
 
 ## Minimum Test Coverage
 

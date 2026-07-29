@@ -11,9 +11,6 @@ import {
   bottleImageBottleId,
   bottleImageUrl,
   existingBottle,
-  existingReleaseId,
-  legacyPromotedBottle,
-  legacyPromotedBottleId,
   testAccessToken,
   testUser,
 } from "./rpc-fixtures.mjs";
@@ -169,51 +166,6 @@ test.describe("profile library", () => {
       page.getByRole("link", { name: "Library" }).last(),
     ).toHaveAttribute("href", `/users/${testUser.username}/library`);
     await expectNoHorizontalOverflow(page);
-  });
-
-  test("renders promoted Bottle names in Library", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: [
-        testAccessToken,
-        "library-release-name",
-        testInfo.project.name,
-        testInfo.workerIndex,
-        testInfo.retry,
-      ].join("-"),
-    });
-
-    await page.goto(
-      `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
-    );
-    const createRequestPromise = page.waitForRequest((request) =>
-      request.url().includes("/rpc/collections/bottles/create"),
-    );
-    await page.getByRole("button", { name: "Add to Library" }).click();
-    const createInput = getRpcInput(await createRequestPromise);
-
-    expect(createInput.bottle).toBe(legacyPromotedBottleId);
-    expect(createInput).not.toHaveProperty("target");
-    expect(createInput).not.toHaveProperty("release");
-    await expect(
-      page.getByRole("heading", { name: "Added to Library" }),
-    ).toBeVisible();
-
-    await page.goto(`/users/${testUser.username}/library`, {
-      waitUntil: "commit",
-    });
-
-    const promotedBottleLink = page.getByRole("link", {
-      name: legacyPromotedBottle.fullName,
-    });
-
-    await expect(promotedBottleLink).toBeVisible();
-    await expect(promotedBottleLink).toHaveAttribute(
-      "href",
-      `/bottles/${legacyPromotedBottleId}`,
-    );
   });
 
   test("filters Library entries from the profile tab", async ({

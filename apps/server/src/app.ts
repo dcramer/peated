@@ -35,7 +35,6 @@ import {
   AuthSchema,
   BadgeAwardSchema,
   BadgeSchema,
-  BottleReleaseSchema,
   // Core domain
   BottleSchema,
   BottleSeriesSchema,
@@ -305,7 +304,6 @@ export const app = honoApp
             schema: CollectionBottleSchema,
             strategy: "output",
           },
-          BottleRelease: { schema: BottleReleaseSchema, strategy: "output" },
           BottleSeries: { schema: BottleSeriesSchema, strategy: "output" },
           Badge: { schema: BadgeSchema, strategy: "output" },
           BadgeAward: { schema: BadgeAwardSchema, strategy: "output" },

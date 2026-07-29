@@ -1,9 +1,8 @@
 ## 1. Contract And Inventory
 
 Implementation rule: every cutover removes its superseded internal
-implementation in the same slice. A retained compatibility route may only
-translate legacy input/output, delegate to Bottle logic, emit bounded telemetry,
-and map to an explicit removal task.
+implementation in the same slice. Temporary compatibility code must have an
+explicit removal task and must not become a second business-logic system.
 
 - [x] 1.1 Supersede `add-target-aware-catalog-creation`.
 - [x] 1.2 Inventory every `bottle_release`, `releaseId`, BottleGroup,
@@ -93,7 +92,7 @@ and map to an explicit removal task.
 - [x] 4.10 Add integration tests for clean, collision, invalid-pair,
       concurrent-drift, rollback, complete migration, and postflight cases.
 - [x] 4.11 Keep the first migration non-destructive: do not drop BottleRelease,
-      legacy columns, or permanent redirect evidence.
+      legacy columns, or retained migration evidence.
 
 ## 5. Server And API Cutover
 
@@ -112,8 +111,8 @@ and map to an explicit removal task.
       to Bottle ids; remove generic-target branches.
 - [x] 5.7 Update statistics, badges, Library, country/entity/user analytics, and
       activity feeds to Bottle-owned data and member-derived group aggregates.
-- [x] 5.8 Keep BottleRelease compatibility routes translation-only over the
-      promotion mapping and canonical Bottle services.
+- [x] 5.8 Initially keep BottleRelease compatibility routes translation-only
+      over the promotion mapping and canonical Bottle services.
 - [x] 5.9 Regenerate OpenAPI/client types and remove target-shaped contracts.
 - [x] 5.10 Add focused API integration tests for every direct-Bottle consumer,
       nullable unresolved state, promotion mapping, authorization, pagination, and
@@ -130,12 +129,11 @@ and map to an explicit removal task.
       group activity actions plus manual group merge/split controls.
 - [x] 6.5 Update tasting, Library, collection, Flight, price, review, photo, and
       return-intent flows to carry Bottle ids.
-- [x] 6.6 Keep nested BottleRelease pages removed and permanent redirects
-      active.
+- [x] 6.6 Remove nested BottleRelease pages and initially retain bounded
+      redirects for cutover.
 - [x] 6.7 Remove obsolete target components, helpers, tests, and copy.
 - [x] 6.8 Add focused web tests for Add Bottle, edit Bottle, add another
-      release, direct Bottle selection, related releases, redirects, and return
-      intents.
+      release, direct Bottle selection, related releases, and return intents.
 - [x] 6.9 Run constrained desktop/mobile visual QA using the local playbook.
 
 ## 7. Cleanup, Documentation, And Local Verification
@@ -164,7 +162,7 @@ and map to an explicit removal task.
       corrected schema and rerun focused schema, migration, API, and web
       verification.
 - [x] 7.13 Consolidate the canonical Bottle creation module and correct
-      similar-Bottle labels and legacy redirect delegation found in final
+      similar-Bottle labels and the initial redirect delegation found in final
       runtime review.
 - [x] 7.14 Remove stale BottleGroup editorial and retirement assertions exposed
       by the full CI server shards.
@@ -191,13 +189,14 @@ and map to an explicit removal task.
       release references after the transaction commits.
 - [x] 8.4 Run the approved one-shot transaction and retain the postflight audit.
 - [ ] 8.5 Validate counts, mappings, direct Bottle references, aggregates,
-      redirects, queue health, latency, and major user workflows; then generate,
+      queue health, latency, and major user workflows; then generate,
       review, and apply the non-destructive direct-only uniqueness activation
       before accepting new catalog-consumer traffic.
 - [x] 8.6 Disable BottleRelease writes with explicit replacement responses.
-- [ ] 8.7 Only after separate backup and explicit approval, generate and apply
-      cleanup that removes BottleRelease tables/columns, release-specific runtime,
-      migration-only writers, and compatibility branches while retaining permanent
-      redirect mappings and read-only audit support.
-- [ ] 8.8 Run and retain the final zero-legacy audit and full repository test
+- [x] 8.7 Remove public BottleRelease APIs and schemas, legacy nested URL
+      redirects, release-query translation, and their compatibility runtime.
+- [ ] 8.8 Only after separate backup and explicit approval, generate and apply
+      cleanup that removes BottleRelease tables/columns, migration-only writers,
+      and retained migration/audit branches.
+- [ ] 8.9 Run and retain the final zero-legacy audit and full repository test
       gate before cleanup release.
