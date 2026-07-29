@@ -100,8 +100,8 @@ Bottle identity atomically with the consumer mutation.
 
 ### Requirement: Legacy migration is fail-fast and auditable
 
-The system SHALL provide a retained read-only preflight and one all-or-nothing
-database transaction for the initial legacy data migration.
+The system SHALL provide a retained read-only preflight and resumable,
+component-complete database transactions for the initial legacy data migration.
 
 #### Scenario: Run production preflight
 
@@ -114,17 +114,18 @@ database transaction for the initial legacy data migration.
 #### Scenario: Apply the migration
 
 - **WHEN** an approved migration begins
-- **THEN** it locks affected tables in a fixed order
-- **AND** creates or validates groups, promoted Bottles, mappings, aliases, and
-  direct Bottle references in one database transaction
-- **AND** validates all invariants before commit
+- **THEN** each bounded batch locks affected tables in a fixed order
+- **AND** creates or validates whole groups, promoted Bottles, mappings,
+  aliases, scoped direct Bottle references, and statistics atomically
+- **AND** emits progress only after the batch commits
 
 #### Scenario: Migration fails
 
-- **WHEN** any collision, invalid pair, concurrent drift, or final assertion
+- **WHEN** any collision, invalid pair, concurrent drift, or batch assertion
   fails
-- **THEN** the complete transaction rolls back
-- **AND** no partial family or consumer migration remains
+- **THEN** the current batch rolls back
+- **AND** prior committed group checkpoints remain valid
+- **AND** a rerun skips committed groups and resumes unfinished work
 
 #### Scenario: Migration succeeds
 

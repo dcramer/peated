@@ -39,6 +39,134 @@ async function approvedInput(): Promise<CatalogMigrationApplyInput> {
 }
 
 describe("applyCatalogMigration", () => {
+  test("commits complete batches, reports progress, and resumes after interruption", async ({
+    fixtures,
+  }) => {
+    const parents = await Promise.all([
+      fixtures.LegacyBottle({ name: "Resume Family One" }),
+      fixtures.LegacyBottle({ name: "Resume Family Two" }),
+      fixtures.LegacyBottle({ name: "Resume Family Three" }),
+    ]);
+    const releases = await Promise.all(
+      parents.map((parent, index) =>
+        fixtures.BottleRelease({
+          bottleId: parent.id,
+          name: `${parent.name} Release`,
+          fullName: `${parent.fullName} Release`,
+          edition: `Resume ${index + 1}`,
+        }),
+      ),
+    );
+    const releaseTastings = await Promise.all(
+      releases.map((release, index) =>
+        fixtures.Tasting({
+          bottleId: release.bottleId,
+          releaseId: release.id,
+          notes: `resume tasting ${index + 1}`,
+          tags: [],
+          createdAt: new Date(`2025-01-0${index + 1}T00:00:00.000Z`),
+        }),
+      ),
+    );
+    const input = await approvedInput();
+
+    await expect(
+      applyCatalogMigration(input, db, undefined, {
+        batchSize: 1,
+        onProgress() {
+          throw new Error("intentional interruption");
+        },
+      }),
+    ).rejects.toThrow("intentional interruption");
+
+    const checkpointedParents = await db
+      .select({ id: bottles.id, groupId: bottles.groupId })
+      .from(bottles)
+      .where(
+        inArray(
+          bottles.id,
+          parents.map(({ id }) => id),
+        ),
+      )
+      .orderBy(asc(bottles.id));
+    expect(
+      checkpointedParents.filter(({ groupId }) => groupId !== null),
+    ).toEqual([expect.objectContaining({ id: parents[0]?.id })]);
+    expect(await db.select().from(bottleGroups)).toHaveLength(1);
+    const checkpointedMappings = await db
+      .select()
+      .from(bottleReleasePromotions);
+    expect(checkpointedMappings).toHaveLength(1);
+    expect(checkpointedMappings[0]?.releaseId).toBe(releases[0]?.id);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, releaseTastings[0]!.id),
+      }),
+    ).toMatchObject({
+      bottleId: checkpointedMappings[0]?.promotedBottleId,
+      releaseId: releases[0]?.id,
+    });
+
+    const progress: Array<{
+      phase: string;
+      committedGroups: number;
+      totalGroups: number;
+    }> = [];
+    const result = await applyCatalogMigration(input, db, undefined, {
+      batchSize: 1,
+      onProgress(event) {
+        progress.push(event);
+      },
+    });
+
+    expect(result.status).toBe("applied");
+    expect(result.counts).toMatchObject({
+      parents: 2,
+      groups: 2,
+      parentBottlesAssigned: 2,
+      releases: 2,
+      consumers: {
+        bySlot: { tasting: 2 },
+        total: 2,
+      },
+    });
+    expect(progress).toEqual([
+      expect.objectContaining({
+        phase: "catalog",
+        committedGroups: 2,
+        totalGroups: 3,
+        committedReleases: 2,
+      }),
+      expect.objectContaining({
+        phase: "catalog",
+        committedGroups: 3,
+        totalGroups: 3,
+        committedReleases: 3,
+      }),
+      expect.objectContaining({
+        phase: "postflight",
+        committedGroups: 3,
+        totalGroups: 3,
+      }),
+    ]);
+    expect(await db.select().from(bottleGroups)).toHaveLength(3);
+    expect(
+      await db
+        .select({ groupId: bottles.groupId })
+        .from(bottles)
+        .where(
+          inArray(
+            bottles.id,
+            parents.map(({ id }) => id),
+          ),
+        ),
+    ).toEqual([
+      { groupId: expect.any(Number) },
+      { groupId: expect.any(Number) },
+      { groupId: expect.any(Number) },
+    ]);
+  });
+
   test("claims unresolved canonical aliases for retained and promoted Bottles", async ({
     fixtures,
   }) => {
@@ -538,6 +666,7 @@ describe("applyCatalogMigration", () => {
     });
     expect(promotedOne?.createdAt).toEqual(releaseCreatedAt);
     expect(promotedOne?.updatedAt).toEqual(releaseUpdatedAt);
+    expect(promotedOne?.searchVector).toEqual(oneRelease.searchVector);
     const fallbackMapping = mappings.find(
       ({ releaseId }) => releaseId === multiReleases[0]?.id,
     );

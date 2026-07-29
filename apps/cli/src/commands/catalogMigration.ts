@@ -85,7 +85,7 @@ program
 
 program
   .command("apply-catalog-migration")
-  .description("Apply an approved BottleRelease migration in one transaction")
+  .description("Apply or resume an approved BottleRelease migration")
   .argument(
     "<approved-audit>",
     "retained approval-candidate JSON from audit-catalog-migration",
@@ -103,14 +103,31 @@ program
       );
     }
 
-    const result = await applyCatalogMigration({
-      candidate,
-      approval: {
-        approvedBy: process.env.USER?.trim() || "cli-operator",
-        approvedAt: new Date(
-          Math.max(Date.now(), Date.parse(candidate.audit.generatedAt) + 1),
-        ).toISOString(),
+    const result = await applyCatalogMigration(
+      {
+        candidate,
+        approval: {
+          approvedBy: process.env.USER?.trim() || "cli-operator",
+          approvedAt: new Date(
+            Math.max(Date.now(), Date.parse(candidate.audit.generatedAt) + 1),
+          ).toISOString(),
+        },
       },
-    });
+      undefined,
+      undefined,
+      {
+        onProgress(progress) {
+          if (progress.phase === "catalog") {
+            process.stdout.write(
+              `Committed catalog batch: ${progress.committedGroups}/${progress.totalGroups} groups, ${progress.committedParents}/${progress.totalParents} parents, ${progress.committedReleases}/${progress.totalReleases} releases.\n`,
+            );
+          } else {
+            process.stdout.write(
+              `Postflight complete: ${progress.totalGroups} groups, ${progress.totalParents} parents, ${progress.totalReleases} releases.\n`,
+            );
+          }
+        },
+      },
+    );
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   });
