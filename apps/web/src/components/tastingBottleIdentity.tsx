@@ -21,11 +21,9 @@ export default function TastingBottleIdentity({
   bottle: TastingBottleIdentitySource;
   variant?: "inline" | "panel";
 }) {
-  if (!bottle.group) {
-    throw new Error("Tasting bottle is missing its display identity.");
-  }
-
-  const displayName = `${bottle.brand.shortName || bottle.brand.name} ${bottle.group.name}`;
+  const displayName = bottle.group
+    ? `${bottle.brand.shortName || bottle.brand.name} ${bottle.group.name}`
+    : bottle.fullName;
 
   if (variant === "inline") {
     return (

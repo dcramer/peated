@@ -62,11 +62,20 @@ describe("TastingBottleIdentity", () => {
     expect(text).not.toContain("55.1% ABV");
   });
 
-  it("requires the tasting API display identity", () => {
-    expect(() =>
-      renderToStaticMarkup(
-        <TastingBottleIdentity bottle={{ ...bottle, group: undefined }} />,
-      ),
-    ).toThrowError("Tasting bottle is missing its display identity.");
-  });
+  it.each(["inline", "panel"] as const)(
+    "falls back to the exact Bottle name in the %s variant",
+    (variant) => {
+      const html = renderToStaticMarkup(
+        <TastingBottleIdentity
+          bottle={{ ...bottle, group: undefined }}
+          variant={variant}
+        />,
+      );
+
+      expect(html).toContain('href="/bottles/42"');
+      expect(html).toContain(
+        "Lagavulin 21 - 2025 Release - 55.1% ABV - Single Cask - Cask 42",
+      );
+    },
+  );
 });
