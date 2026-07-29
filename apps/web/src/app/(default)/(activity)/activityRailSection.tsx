@@ -11,7 +11,7 @@ export default function ActivityRailSection({
 }) {
   return (
     <section className="mb-8">
-      <h2 className="border-highlight mb-2 flex items-center border-l-2 px-2 text-sm font-semibold text-slate-300">
+      <h2 className="border-highlight mb-2 flex items-center border-l-2 px-2 text-sm font-bold text-slate-200">
         <span>{title}</span>
         {badge && (
           <span
