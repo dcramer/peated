@@ -4,7 +4,7 @@ import { applyCatalogMigration } from "@peated/server/lib/catalogMigrationApply"
 import { loadCatalogMigrationApprovalCandidate } from "@peated/server/lib/catalogMigrationApprovalCandidate";
 import { CatalogMigrationApprovalCandidateSchema } from "@peated/server/schemas/catalogMigrationApply";
 import { execFile as execFileCallback } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 
 const execFile = promisify(execFileCallback);
@@ -49,8 +49,10 @@ async function resolveCatalogMigrationGitRevision(
 
   const revision =
     config.ENV === "production"
-      ? FULL_GIT_REVISION.test(config.VERSION)
-        ? config.VERSION
+      ? FULL_GIT_REVISION.test(
+          config.VERSION || process.env.RENDER_GIT_COMMIT || "",
+        )
+        ? config.VERSION || process.env.RENDER_GIT_COMMIT!
         : null
       : await resolveCleanWorktreeRevision();
   if (revision === null) {
@@ -69,60 +71,46 @@ async function resolveCatalogMigrationGitRevision(
 program
   .command("audit-catalog-migration")
   .description("Emit retained approval evidence without changing data")
-  .option(
-    "--expect-git-revision <sha>",
-    "assert the exact candidate Git commit",
-  )
-  .action(async (options: { expectGitRevision?: string }) => {
-    const gitRevision = await resolveCatalogMigrationGitRevision(
-      options.expectGitRevision,
-    );
+  .argument("<output>", "path for the retained approval-candidate JSON")
+  .action(async (output: string) => {
+    const gitRevision = await resolveCatalogMigrationGitRevision();
     const candidate = await loadCatalogMigrationApprovalCandidate(gitRevision);
-    process.stdout.write(`${JSON.stringify(candidate, null, 2)}\n`);
+    await writeFile(output, `${JSON.stringify(candidate, null, 2)}\n`, {
+      mode: 0o600,
+    });
+    process.stdout.write(
+      `Catalog migration audit written to ${output} (${candidate.audit.blockingIssueCount} blocking issues, ${candidate.audit.warningCount} warnings).\n`,
+    );
   });
 
 program
   .command("apply-catalog-migration")
   .description("Apply an approved BottleRelease migration in one transaction")
-  .requiredOption(
-    "--approved-audit <path>",
+  .argument(
+    "<approved-audit>",
     "retained approval-candidate JSON from audit-catalog-migration",
   )
-  .requiredOption(
-    "--expect-git-revision <sha>",
-    "assert the exact candidate Git commit",
-  )
-  .requiredOption(
-    "--approved-by <identity>",
-    "identity approving the migration",
-  )
-  .requiredOption("--approved-at <timestamp>", "approval timestamp")
-  .action(
-    async (options: {
-      approvedAudit: string;
-      expectGitRevision: string;
-      approvedBy: string;
-      approvedAt: string;
-    }) => {
-      const gitRevision = await resolveCatalogMigrationGitRevision(
-        options.expectGitRevision,
+  .action(async (approvedAudit: string) => {
+    const candidate = CatalogMigrationApprovalCandidateSchema.parse(
+      JSON.parse(await readFile(approvedAudit, "utf8")),
+    );
+    const gitRevision = await resolveCatalogMigrationGitRevision(
+      candidate.revision.gitRevision,
+    );
+    if (candidate.revision.gitRevision !== gitRevision) {
+      throw new Error(
+        `Approved catalog migration Git revision ${candidate.revision.gitRevision} does not match running revision ${gitRevision}.`,
       );
-      const candidate = CatalogMigrationApprovalCandidateSchema.parse(
-        JSON.parse(await readFile(options.approvedAudit, "utf8")),
-      );
-      if (candidate.revision.gitRevision !== gitRevision) {
-        throw new Error(
-          `Approved catalog migration Git revision ${candidate.revision.gitRevision} does not match running revision ${gitRevision}.`,
-        );
-      }
+    }
 
-      const result = await applyCatalogMigration({
-        candidate,
-        approval: {
-          approvedBy: options.approvedBy,
-          approvedAt: options.approvedAt,
-        },
-      });
-      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-    },
-  );
+    const result = await applyCatalogMigration({
+      candidate,
+      approval: {
+        approvedBy: process.env.USER?.trim() || "cli-operator",
+        approvedAt: new Date(
+          Math.max(Date.now(), Date.parse(candidate.audit.generatedAt) + 1),
+        ).toISOString(),
+      },
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  });

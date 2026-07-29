@@ -161,17 +161,41 @@ describe("catalog migration audit", () => {
     expect(report.collisions.items).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          type: "release_full_name_vs_alias",
-          name: parent.fullName,
-        }),
-        expect.objectContaining({
           type: "release_full_name_vs_bottle",
           name: parent.fullName,
           bottleId: parent.id,
         }),
       ]),
     );
-    expect(report.blockingIssueCount).toBeGreaterThanOrEqual(4);
+    expect(report.blockingIssueCount).toBe(1);
+    expect(report.warningCount).toBeGreaterThanOrEqual(2);
+  });
+
+  test("treats Bottle-owned exact fields and same-family aliases as warnings", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.LegacyBottle({
+      edition: "Legacy Edition",
+      statedAge: 10,
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      fullName: `${parent.fullName} 12 Year`,
+      statedAge: 12,
+    });
+    await db.insert(bottleAliases).values({
+      bottleId: parent.id,
+      name: release.fullName,
+      assignedByActorId: parent.createdByActorId,
+    });
+
+    const report = await runCatalogMigrationAudit();
+
+    expect(report.legacyCatalog.parentsWithReleaseLikeFields).toBe(1);
+    expect(report.legacyCatalog.childParentAgeConflicts).toBe(1);
+    expect(report.collisions).toEqual({ count: 0, items: [] });
+    expect(report.blockingIssueCount).toBe(0);
+    expect(report.warningCount).toBeGreaterThanOrEqual(2);
   });
 
   test("reports missing release promotion inputs", async ({ fixtures }) => {
@@ -360,7 +384,7 @@ describe("catalog migration audit", () => {
       await runCatalogMigrationAudit(),
     );
 
-    expect(output).toContain("Catalog migration audit v5");
+    expect(output).toContain("Catalog migration audit v6");
     expect(output).toContain(
       "Parents: 1 (1 zero / 0 one / 0 multiple releases)",
     );

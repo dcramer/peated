@@ -1,8 +1,11 @@
 import {
+  CATALOG_MIGRATION_APPLY_SCHEMA_VERSION,
+  CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
   CatalogMigrationApplyInputSchema,
   CatalogMigrationApplyResultSchema,
   CatalogMigrationApprovalCandidateSchema,
 } from "./catalogMigrationApply";
+import { CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION } from "./catalogMigrationAudit";
 
 const databaseEvidence = {
   identity: {
@@ -28,7 +31,7 @@ const revision = {
 };
 
 const audit = {
-  schemaVersion: 5,
+  schemaVersion: CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION,
   generatedAt: "2026-07-27T00:00:00.000Z",
   databaseEvidence,
   legacyCatalog: {
@@ -85,7 +88,7 @@ const consumerBySlot = {
 describe("CatalogMigration approval and apply schemas", () => {
   test("parses the retained approval candidate and apply input", () => {
     const candidate = CatalogMigrationApprovalCandidateSchema.parse({
-      schemaVersion: 2,
+      schemaVersion: CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
       audit,
       revision,
     });
@@ -107,7 +110,7 @@ describe("CatalogMigration approval and apply schemas", () => {
   test("requires full same-transaction evidence in an approval candidate", () => {
     expect(
       CatalogMigrationApprovalCandidateSchema.safeParse({
-        schemaVersion: 2,
+        schemaVersion: CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
         audit,
         revision: {
           ...revision,
@@ -125,7 +128,7 @@ describe("CatalogMigration approval and apply schemas", () => {
 
     expect(
       CatalogMigrationApprovalCandidateSchema.safeParse({
-        schemaVersion: 2,
+        schemaVersion: CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
         audit,
         revision: {
           ...revision,
@@ -152,7 +155,7 @@ describe("CatalogMigration approval and apply schemas", () => {
 
     expect(
       CatalogMigrationApprovalCandidateSchema.safeParse({
-        schemaVersion: 2,
+        schemaVersion: CATALOG_MIGRATION_APPROVAL_CANDIDATE_SCHEMA_VERSION,
         audit: { ...audit, databaseEvidence: standbyEvidence },
         revision: { ...revision, databaseEvidence: standbyEvidence },
       }).success,
@@ -161,7 +164,7 @@ describe("CatalogMigration approval and apply schemas", () => {
 
   test("requires consumer totals to equal the per-slot sum", () => {
     const baseResult = {
-      schemaVersion: 3,
+      schemaVersion: CATALOG_MIGRATION_APPLY_SCHEMA_VERSION,
       status: "applied",
       approvedAuditGeneratedAt: audit.generatedAt,
       revision,

@@ -168,6 +168,9 @@ and map to an explicit removal task.
       runtime review.
 - [x] 7.14 Remove stale BottleGroup editorial and retirement assertions exposed
       by the full CI server shards.
+- [x] 7.15 Correct production preflight false positives for Bottle-owned exact
+      fields and same-family aliases, and make the retained-audit CLI
+      self-contained.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CatalogMigrationDatabaseEvidenceSchema } from "./catalogMigrationDatabaseIdentity";
 
-export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 5 as const;
+export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 6 as const;
 
 export const CatalogMigrationLegacySummarySchema = z.object({
   totalParents: z.number().int().gte(0),
