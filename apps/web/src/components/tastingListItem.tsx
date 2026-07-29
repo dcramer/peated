@@ -108,7 +108,7 @@ export default function TastingListItem({
   const totalToasts =
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
-  const canToast = !hasToasted && !isTaster && user;
+  const canToast = Boolean(user && !hasToasted && !isTaster);
 
   return (
     <li className="-mt-1 flex flex-col gap-y-4 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
@@ -176,7 +176,7 @@ export default function TastingListItem({
         tasting.rating ||
         tasting.tags.length > 0) && (
         <div className="text-muted px-3 text-sm sm:px-5">
-          <DefinitionList className="grid-cols grid grid-cols-2 sm:grid-cols-2">
+          <DefinitionList className="grid-cols mb-0 grid grid-cols-2 gap-y-2 sm:grid-cols-2 [&>div>dd]:mb-0">
             {tasting.rating && (
               <div>
                 <DefinitionList.Term>Rating</DefinitionList.Term>
@@ -261,7 +261,7 @@ export default function TastingListItem({
             tastingActionClassName,
             hasToasted && "text-highlight",
           )}
-          disabled={!canToast}
+          disabled={hasToasted || isTaster}
           onClick={
             canToast
               ? () => {
@@ -286,7 +286,7 @@ export default function TastingListItem({
           <Counter value={totalToasts} />
         </Button>
 
-        {user && !noCommentAction && (
+        {!noCommentAction && (
           <Button
             icon={
               <ChatBubbleLeftRightIcon
