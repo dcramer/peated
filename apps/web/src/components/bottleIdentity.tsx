@@ -1,3 +1,4 @@
+import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import type { ReactNode } from "react";
@@ -33,6 +34,51 @@ type RelativeIdentity = {
 
 function formatAbv(abv: number) {
   return `${abv.toFixed(1)}% ABV`;
+}
+
+function getCanonicalMetadataSegments(bottle: BottleIdentitySource) {
+  return new Set(
+    [
+      bottle.statedAge !== null ? `${bottle.statedAge}-year-old` : undefined,
+      bottle.releaseYear !== null ? `${bottle.releaseYear} Release` : undefined,
+      bottle.vintageYear !== null ? `${bottle.vintageYear} Vintage` : undefined,
+      bottle.abv !== null ? formatAbv(bottle.abv) : undefined,
+      bottle.singleCask ? "Single Cask" : undefined,
+      bottle.caskStrength ? "Cask Strength" : undefined,
+      bottle.caskType ? `${toTitleCase(bottle.caskType)} Cask` : undefined,
+      bottle.caskSize ? toTitleCase(bottle.caskSize) : undefined,
+      bottle.caskFill
+        ? bottle.caskFill === "other"
+          ? "Other Fill"
+          : toTitleCase(bottle.caskFill)
+        : undefined,
+    ]
+      .filter((value): value is string => value !== undefined)
+      .map((value) => value.toLocaleLowerCase()),
+  );
+}
+
+/**
+ * Removes only canonical trailing metadata from an ungrouped Bottle name.
+ * A metadata-only name remains intact so identities such as "21-year-old"
+ * still have a useful headline.
+ */
+export function getAbsoluteBottleTitle(bottle: BottleIdentitySource) {
+  if (bottle.group) return bottle.group.name;
+
+  const metadataSegments = getCanonicalMetadataSegments(bottle);
+  const titleSegments = bottle.name.split(" - ");
+
+  while (
+    titleSegments.length &&
+    metadataSegments.has(
+      titleSegments[titleSegments.length - 1]!.toLocaleLowerCase(),
+    )
+  ) {
+    titleSegments.pop();
+  }
+
+  return titleSegments.length ? titleSegments.join(" - ") : bottle.name;
 }
 
 function getEditionMetadataDuplicates(
@@ -197,7 +243,7 @@ export default function BottleIdentity({
   const relativeIdentity = getRelativeBottleIdentity(bottle);
   const isAbsolute = mode === "absolute";
   const title = isAbsolute
-    ? (bottle.group?.name ?? bottle.name)
+    ? getAbsoluteBottleTitle(bottle)
     : relativeIdentity.label;
   const leadingContent =
     isAbsolute && bottle.group && !relativeIdentity.fallback
