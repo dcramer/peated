@@ -22,7 +22,7 @@ describe("Bottle job payloads", () => {
   });
 
   test.each([
-    [GenerateBottleDetailsJobArgsSchema, { bottleId: 1 }],
+    [GenerateBottleDetailsJobArgsSchema, { bottleId: 1, releaseId: 2 }],
     [IndexBottleSearchVectorsJobArgsSchema, { bottleId: 1, groupId: 2 }],
     [IndexBottleAliasJobArgsSchema, { name: "" }],
     [OnBottleAliasChangeJobArgsSchema, { targetId: 1 }],
