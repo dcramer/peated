@@ -39,6 +39,76 @@ async function approvedInput(): Promise<CatalogMigrationApplyInput> {
 }
 
 describe("applyCatalogMigration", () => {
+  test("groups literal duplicate legacy parents without merging their Bottle identities", async ({
+    fixtures,
+  }) => {
+    const firstParent = await fixtures.LegacyBottle({
+      fullName: "Migration Duplicate Family",
+      name: "Duplicate Family",
+    });
+    const secondParent = await fixtures.LegacyBottle({
+      name: "Temporary Duplicate Family",
+    });
+    await db
+      .delete(bottleAliases)
+      .where(eq(bottleAliases.bottleId, secondParent.id));
+    await db
+      .update(bottles)
+      .set({ fullName: firstParent.fullName, name: firstParent.name })
+      .where(eq(bottles.id, secondParent.id));
+    const firstRelease = await fixtures.BottleRelease({
+      bottleId: firstParent.id,
+      fullName: "Migration Duplicate Family 2024",
+      name: "Duplicate Family 2024",
+    });
+    const secondRelease = await fixtures.BottleRelease({
+      bottleId: secondParent.id,
+      fullName: "Migration Duplicate Family 2025",
+      name: "Duplicate Family 2025",
+    });
+    const input = await approvedInput();
+
+    expect(input.candidate.audit.blockingIssueCount).toBe(0);
+
+    const result = await applyCatalogMigration(input);
+    const parentRows = await db
+      .select({ id: bottles.id, groupId: bottles.groupId })
+      .from(bottles)
+      .where(inArray(bottles.id, [firstParent.id, secondParent.id]))
+      .orderBy(asc(bottles.id));
+    const groups = await db.select().from(bottleGroups);
+    const mappings = await db
+      .select()
+      .from(bottleReleasePromotions)
+      .orderBy(asc(bottleReleasePromotions.releaseId));
+
+    expect(result.status).toBe("applied");
+    expect(result.counts).toMatchObject({
+      parents: 2,
+      groups: 1,
+      parentBottlesAssigned: 2,
+      releases: 2,
+      promotedBottles: 2,
+      groupStatsRecomputed: 1,
+    });
+    expect(parentRows[0]?.groupId).not.toBeNull();
+    expect(parentRows[1]?.groupId).toBe(parentRows[0]?.groupId);
+    expect(groups).toHaveLength(1);
+    expect(groups[0]).toMatchObject({
+      representativeBottleId: firstParent.id,
+      totalBottles: 4,
+    });
+    expect(mappings.map(({ releaseId }) => releaseId)).toEqual([
+      firstRelease.id,
+      secondRelease.id,
+    ]);
+    expect(await db.select().from(bottleTombstones)).toEqual([]);
+
+    const repeated = await applyCatalogMigration(input);
+    expect(repeated.status).toBe("already_complete");
+    expect(await db.select().from(bottleGroups)).toHaveLength(1);
+  });
+
   test("reassigns a same-family canonical alias to its promoted Bottle", async ({
     fixtures,
   }) => {
