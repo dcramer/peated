@@ -1,5 +1,4 @@
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
-import { summarize } from "@peated/web/lib/markdown";
 import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import {
@@ -40,21 +39,14 @@ export async function generateMetadata(props: {
   const { group } = await getReleaseFamilyGroup(
     parseReleaseFamilyRouteId(bottleId),
   );
-  const description = summarize(group.description || "", 200);
-  const images = group.imageUrl ? [group.imageUrl] : [];
+  const description = `Explore similar bottles related to ${group.fullName}. Each bottle has its own details, tastings, and Library entry.`;
 
   return {
     title: `${group.fullName} similar bottles`,
     description,
-    images,
     openGraph: {
       title: `${group.fullName} similar bottles`,
       description,
-      images,
-    },
-    twitter: {
-      card: "summary",
-      images,
     },
   };
 }

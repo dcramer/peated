@@ -1,10 +1,5 @@
-/**
- * Maps group-owned relationship presentation. Every caller supplies explicit
- * actor and read-permission context.
- */
-import config from "@peated/server/config";
+/** Maps shared group identity and aggregates with explicit read context. */
 import type { Actor, BottleGroup, User } from "@peated/server/db/schema";
-import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   BottleGroupV1Schema,
   CATALOG_IDENTITY_SCHEMA_VERSION,
@@ -34,10 +29,6 @@ export function assertCatalogIdentityReadContext(
   }
 }
 
-function serializeImageUrl(imageUrl: string | null): string | null {
-  return imageUrl ? absoluteUrl(config.API_SERVER, imageUrl) : null;
-}
-
 export const BottleGroupSummarySerializer = serializer({
   name: "bottleGroupSummary",
   item: (
@@ -60,12 +51,7 @@ export const BottleGroupSummarySerializer = serializer({
       seriesId: item.seriesId,
       statedAge: item.statedAge,
       representativeBottleId: item.representativeBottleId,
-      description: item.description,
-      descriptionSrc: item.descriptionSrc,
-      imageUrl: serializeImageUrl(item.imageUrl),
       flavorProfile: item.flavorProfile,
-      tastingNotes: item.tastingNotes,
-      suggestedTags: item.suggestedTags,
       avgRating: item.avgRating,
       ratingStats: item.ratingStats,
       totalTastings: item.totalTastings,

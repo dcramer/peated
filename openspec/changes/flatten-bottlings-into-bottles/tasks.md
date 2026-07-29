@@ -154,6 +154,14 @@ and map to an explicit removal task.
 - [x] 7.7 Run focused web Vitest and constrained end-to-end coverage.
 - [x] 7.8 Manually review the full diff for UX, architecture, type safety,
       duplicate business logic, and unexpected file-tree growth.
+- [x] 7.9 Remove BottleGroup-owned exact editorial presentation and its manual
+      writer; use the representative Bottle for relationship presentation.
+- [ ] 7.10 Simplify the durable BottleRelease promotion record to committed
+      release-to-Bottle identity without checkpoint lifecycle state.
+- [ ] 7.11 Remove BottleGroup tombstones and retired-group branches; preserve
+      user-facing retirement through canonical Bottle tombstones.
+- [ ] 7.12 Regenerate the unreleased additive migration once from the corrected
+      schema and rerun focused schema, migration, API, and web verification.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

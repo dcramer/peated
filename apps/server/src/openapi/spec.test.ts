@@ -250,16 +250,11 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<z.infer<typeof BottleSchema> | null>();
   });
 
-  it("publishes member-anchored BottleGroup reads and presentation without management operations", async () => {
+  it("publishes member-anchored BottleGroup reads without management operations", async () => {
     const spec = await generateSpec();
     const operations = [
       ["/bottle-groups/{group}", "get", "getBottleGroup"],
       ["/bottle-groups/{group}/bottles", "get", "listBottleGroupBottles"],
-      [
-        "/bottle-groups/{group}/presentation",
-        "patch",
-        "updateBottleGroupPresentation",
-      ],
     ] as const;
     const operationIds = getOperationIds(spec);
 
@@ -280,7 +275,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
             )
           : [],
       ),
-    ).toHaveLength(3);
+    ).toHaveLength(2);
     expect(spec.paths?.["/bottle-groups"]).toBeUndefined();
     expect(
       spec.paths?.["/bottle-groups/{group}/merge-targets"],
@@ -302,37 +297,20 @@ describe("OpenAPI generation ($ref reuse)", () => {
         "totalBottles",
       ]),
     );
-    expect(JSON.stringify(groupDetails)).not.toContain("targetId");
-    expect(JSON.stringify(groupDetails)).not.toContain('"kind"');
-    expectBottleResponse(relatedBottleItem);
-
-    const presentationRequest = getJsonRequestSchema(
-      spec.paths?.["/bottle-groups/{group}/presentation"]?.patch,
-    );
-    expect(Object.keys(presentationRequest?.properties ?? {})).toEqual([
-      "representativeBottleId",
+    for (const bottleOwnedField of [
       "description",
       "descriptionSrc",
       "imageUrl",
       "tastingNotes",
-    ]);
-    for (const sharedIdentityField of [
-      "name",
-      "fullName",
-      "brandId",
-      "bottlerId",
-      "distillerIds",
-      "category",
-      "seriesId",
-      "statedAge",
-      "flavorProfile",
-      "groupId",
-      "targetId",
+      "suggestedTags",
     ]) {
-      expect(
-        presentationRequest?.properties?.[sharedIdentityField],
-      ).toBeUndefined();
+      expect(groupDetails?.properties?.[bottleOwnedField]).toBeUndefined();
     }
+    expect(JSON.stringify(groupDetails)).not.toContain("targetId");
+    expect(JSON.stringify(groupDetails)).not.toContain('"kind"');
+    expectBottleResponse(relatedBottleItem);
+
+    expect(spec.paths?.["/bottle-groups/{group}/presentation"]).toBeUndefined();
 
     type CursorResult<T> = {
       results: T[];
@@ -344,11 +322,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<Outputs["bottleGroups"]["bottles"]>().toEqualTypeOf<
       CursorResult<z.infer<typeof BottleSchema>>
     >();
-    expectTypeOf<
-      "name" extends keyof Inputs["bottleGroups"]["updatePresentation"]
-        ? true
-        : false
-    >().toEqualTypeOf<false>();
     expectTypeOf<
       "list" extends keyof Inputs["bottleGroups"] ? true : false
     >().toEqualTypeOf<false>();

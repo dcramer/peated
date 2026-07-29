@@ -18,7 +18,8 @@ every consumer use one direct Bottle foreign key.
 - Keep every Bottle independently complete and renderable.
 - Preserve each legacy parent as a valid general/unversioned Bottle.
 - Promote each BottleRelease to another Bottle in the same automatic group.
-- Keep BottleGroup as relationship, shared-presentation, and aggregation scope.
+- Keep BottleGroup as relationship, shared identity-edit intent,
+  representative selection, and aggregation scope.
 - Keep grouping outside ordinary user creation and activity workflows.
 - Migrate all data in one retained-audit-gated, fail-fast transaction.
 - Preserve legacy URLs and release ids through durable mappings.
@@ -63,11 +64,13 @@ bottler, distillers, category, series, flavor profile, effective stated age,
 edition, release/vintage year, ABV, flags, cask traits, exact content, aliases,
 and statistics. Bottle reads do not hydrate BottleGroup to become correct.
 
-BottleGroup owns shared editing intent, relationship presentation,
-representative selection, and member-derived aggregates. A shared change is a
-transactional fan-out: it updates the group and rematerializes the common fields
-and complete names of all member Bottles. Previous canonical names remain exact
-Bottle aliases. Any collision rolls back the full change.
+BottleGroup owns shared editing intent, representative selection, and
+member-derived aggregates. Exact editorial presentation remains Bottle-owned;
+relationship pages use the representative Bottle rather than a second group
+editorial record. A shared identity change is a transactional fan-out: it
+updates the group and rematerializes the common fields and complete names of all
+member Bottles. Previous canonical names remain exact Bottle aliases. Any
+collision rolls back the full change.
 
 ### Every consumer selects a Bottle
 

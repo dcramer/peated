@@ -9,9 +9,9 @@ save unless it is required for deterministic correctness.
 Every marketed release is one concrete Bottle. Each Bottle durably stores the
 shared expression values and exact fields needed to render, search, and
 understand it without loading its BottleGroup. The group owns the shared
-expression label, shared editing semantics, relationship presentation, and
-member-derived aggregates; it does not supply missing exact Bottle data at read
-time.
+expression label, shared editing semantics, representative relationship, and
+member-derived aggregates; it does not own editorial presentation or supply
+missing exact Bottle data at read time.
 
 Manual entry uses one concrete Bottle form for add and edit. The form combines
 shared expression fields with exact Bottle fields such as edition, ABV, release
@@ -27,9 +27,9 @@ capability, not a dormant service in this release.
 Bottle pages and search results render exact fields from the independently
 complete Bottle. A Bottle page may link quietly to all related releases using
 that active member as the route anchor. The release-family page uses group-owned
-presentation and aggregate data and lists independently complete member
-Bottles. Canonical paths and user-facing terminology do not expose BottleGroup
-ids, and there is no public `/bottle-groups` route.
+identity and aggregate data and lists independently complete member Bottles.
+Canonical paths and user-facing terminology do not expose BottleGroup ids, and
+there is no public `/bottle-groups` route.
 
 Consumer workflows carry one Bottle id. Assigned aliases also point directly to
 one Bottle; a general expression alias points to the retained general Bottle,

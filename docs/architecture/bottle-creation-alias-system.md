@@ -49,7 +49,7 @@ Peated has three relevant identity layers:
   supported structured exact field.
 - `BottleGroup`: a same-expression relationship aggregate established by
   singleton creation or deterministic legacy migration. It owns shared editing
-  semantics, relationship presentation, and member-derived aggregates, but a
+  semantics, representative selection, and member-derived aggregates, but a
   Bottle remains complete and renderable without group hydration.
 - `BottleObservation`: source facts useful as evidence but outside canonical
   catalog identity.

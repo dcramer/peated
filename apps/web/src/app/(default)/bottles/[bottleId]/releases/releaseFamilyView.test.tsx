@@ -43,12 +43,7 @@ const group = {
   seriesId: null,
   statedAge: 18,
   representativeBottleId: 999,
-  description: "Shared group description.",
-  descriptionSrc: "user",
-  imageUrl: "https://example.com/group.webp",
   flavorProfile: "peated",
-  tastingNotes: null,
-  suggestedTags: [],
   avgRating: 1.25,
   ratingStats,
   totalTastings: 12,
@@ -135,8 +130,6 @@ describe("ReleaseFamilyView", () => {
     expect(html).toContain("Lagavulin 18");
     expect(html).toContain("Similar bottles");
     expect(html).toContain("Other releases");
-    expect(html).toContain("Shared group description.");
-    expect(html).toContain('src="https://example.com/group.webp"');
     expect(html).toContain("Similar bottles</dt><dd");
     expect(html).toContain(">2</dd>");
     expect(html).not.toContain("Exact release not specified");

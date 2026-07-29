@@ -53,12 +53,7 @@ describe("catalog identity serializers", () => {
 
     await db
       .update(bottleGroups)
-      .set({
-        description: "Stable expression description",
-        imageUrl: "/groups/core-expression.jpg",
-        totalBottles: 1,
-        representativeBottleId: bottle.id,
-      })
+      .set({ totalBottles: 1, representativeBottleId: bottle.id })
       .where(eq(bottleGroups.id, bottle.groupId as number));
 
     const group = await loadGroup(bottle.groupId as number);
@@ -75,7 +70,6 @@ describe("catalog identity serializers", () => {
       id: bottle.groupId,
       distillerIds: [distiller.id],
       representativeBottleId: bottle.id,
-      imageUrl: "http://localhost:4300/groups/core-expression.jpg",
       totalBottles: 1,
     });
   });

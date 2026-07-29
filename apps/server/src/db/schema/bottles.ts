@@ -225,9 +225,9 @@ export type Bottle = typeof bottles.$inferSelect;
 export type NewBottle = typeof bottles.$inferInsert;
 
 /**
- * Owns generic identity, aggregate presentation, and shared editing semantics.
- * Member Bottles durably materialize shared values; any representative must be
- * a member and does not substitute for an exact Bottle identity.
+ * Owns the shared identity prefix, aggregate statistics, and editing semantics.
+ * Member Bottles own their exact presentation and durably materialize shared
+ * values; a representative never substitutes for an exact Bottle identity.
  */
 export const bottleGroups = pgTable(
   "bottle_group",
@@ -250,14 +250,6 @@ export const bottleGroups = pgTable(
     representativeBottleId: bigint("representative_bottle_id", {
       mode: "number",
     }),
-    description: text("description"),
-    descriptionSrc: contentSourceEnum("description_src"),
-    imageUrl: text("image_url"),
-    tastingNotes: jsonb("tasting_notes").$type<TastingNotes>(),
-    suggestedTags: varchar("suggested_tags", { length: 64 })
-      .array()
-      .default(sql`array[]::varchar[]`)
-      .notNull(),
     avgRating: doublePrecision("avg_rating"),
     ratingStats: jsonb("rating_stats")
       .default(DEFAULT_RATING_STATS)

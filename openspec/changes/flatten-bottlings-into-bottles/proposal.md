@@ -24,8 +24,9 @@ catalog integrations should never need a second polymorphic target identity.
 - Point tastings, reviews, collection entries, flights, prices, aliases,
   observations, classifier decisions, proposals, activity, statistics, and
   other catalog consumers directly to Bottle.
-- Do not create a generic group activity target. BottleGroup is relationship,
-  shared-presentation, and aggregate scope only.
+- Do not create a generic group activity target. BottleGroup owns relationship,
+  shared identity-edit intent, representative selection, and aggregate scope
+  only; exact editorial presentation remains on Bottle.
 - Collapse Add Bottle and Add Bottling into one Bottle form with all concrete
   identity fields.
 - Migrate legacy releases and consumer references in one audited, fail-fast

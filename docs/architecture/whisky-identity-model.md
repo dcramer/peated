@@ -11,7 +11,7 @@ Deterministic name cleanup is governed by the
   and durably stores every field needed to search, render, and understand that
   release without loading its BottleGroup.
 - **BottleGroup** relates releases of the same expression. It owns the shared
-  editing scope, relationship presentation, and member-derived aggregate
+  editing scope, representative relationship, and member-derived aggregate
   statistics. Ordinary Bottle creation creates a singleton group, and the
   legacy migration creates deterministic family groups. Users never choose or
   manage groups.
@@ -54,8 +54,7 @@ BottleGroup owns shared editing semantics for:
 - the shared expression name;
 - brand, bottler, distillers, category, series, and flavor profile;
 - stated age when it is invariant across the expression's releases;
-- shared editorial content, representative presentation, and aggregate
-  statistics.
+- representative selection and aggregate statistics.
 
 Every Bottle durably materializes those shared values as part of its complete
 exact identity and additionally owns:

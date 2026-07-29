@@ -39,12 +39,7 @@ const group = {
   seriesId: null,
   statedAge: 16,
   representativeBottleId: 42,
-  description: null,
-  descriptionSrc: null,
-  imageUrl: null,
   flavorProfile: "peated",
-  tastingNotes: null,
-  suggestedTags: [],
   avgRating: null,
   ratingStats: {
     pass: 0,

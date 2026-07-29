@@ -12,7 +12,7 @@ import {
 import { signIn } from "./session";
 
 test.describe("Similar bottles", () => {
-  test("renders read-only presentation, aggregate stats, and related Bottles", async ({
+  test("renders shared identity, aggregate stats, and related Bottles", async ({
     page,
   }) => {
     await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
@@ -28,13 +28,6 @@ test.describe("Similar bottles", () => {
     ).toHaveCount(0);
     await expect(page.locator('a[href$="/releases/merge"]')).toHaveCount(0);
     await expect(page.locator('a[href$="/releases/split"]')).toHaveCount(0);
-    await expect(
-      page.getByText(bottleGroup.description ?? "", { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("img", { name: bottleGroup.fullName }),
-    ).toBeVisible();
-
     await expect(groupStatistic(page, "Tastings")).toHaveText("37");
     await expect(groupStatistic(page, "Similar bottles")).toHaveText("3");
     await expect(groupStatistic(page, "Ratings")).toHaveText("9");

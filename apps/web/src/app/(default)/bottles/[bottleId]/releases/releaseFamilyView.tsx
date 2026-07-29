@@ -2,7 +2,6 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
 import Link from "@peated/web/components/link";
-import Markdown from "@peated/web/components/markdown";
 import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
 import { Suspense } from "react";
@@ -19,7 +18,7 @@ export default function ReleaseFamilyView({
 }) {
   return (
     <div className="px-3 lg:px-0">
-      <header className="my-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+      <header className="my-6">
         <div className="min-w-0">
           <p className="text-highlight text-sm font-semibold uppercase tracking-wide">
             Similar bottles
@@ -40,16 +39,6 @@ export default function ReleaseFamilyView({
             ) : null}
           </div>
         </div>
-
-        {group.imageUrl ? (
-          <div className="flex justify-center rounded border border-slate-800 bg-white p-3 lg:justify-self-end">
-            <img
-              src={group.imageUrl}
-              alt={group.fullName}
-              className="max-h-64 max-w-full object-contain"
-            />
-          </div>
-        ) : null}
       </header>
 
       <section aria-labelledby="group-statistics-heading" className="my-8">
@@ -78,40 +67,17 @@ export default function ReleaseFamilyView({
         </dl>
       </section>
 
-      {(group.description || group.ratingStats.total > 0) && (
-        <div
-          className={
-            group.description && group.ratingStats.total > 0
-              ? "my-8 grid gap-8 lg:grid-cols-2"
-              : "my-8"
-          }
-        >
-          {group.description ? (
-            <section aria-labelledby="about-release-family-heading">
-              <h2
-                id="about-release-family-heading"
-                className="text-highlight mb-3 text-lg font-bold"
-              >
-                About these bottles
-              </h2>
-              <div className="prose prose-invert max-w-none">
-                <Markdown content={group.description} />
-              </div>
-            </section>
-          ) : null}
-          {group.ratingStats.total > 0 ? (
-            <section aria-labelledby="aggregate-ratings-heading">
-              <h2
-                id="aggregate-ratings-heading"
-                className="text-highlight mb-3 text-lg font-bold"
-              >
-                Combined ratings
-              </h2>
-              <SimpleRatingStats stats={group.ratingStats} />
-            </section>
-          ) : null}
-        </div>
-      )}
+      {group.ratingStats.total > 0 ? (
+        <section aria-labelledby="aggregate-ratings-heading" className="my-8">
+          <h2
+            id="aggregate-ratings-heading"
+            className="text-highlight mb-3 text-lg font-bold"
+          >
+            Combined ratings
+          </h2>
+          <SimpleRatingStats stats={group.ratingStats} />
+        </section>
+      ) : null}
 
       <section aria-labelledby="related-releases-heading" className="my-8">
         <div className="mb-4">

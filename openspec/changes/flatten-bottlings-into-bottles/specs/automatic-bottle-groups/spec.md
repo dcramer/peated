@@ -55,8 +55,9 @@ BottleSeries SHALL remain a broader merchandising relationship.
 
 ### Requirement: BottleGroup is relational, not targetable
 
-BottleGroup SHALL provide relationship, shared-presentation, and aggregation
-scope, but SHALL NOT be selectable as activity or catalog-consumer identity.
+BottleGroup SHALL provide relationship, shared identity-edit intent,
+representative selection, and aggregation scope, but SHALL NOT be selectable as
+activity or catalog-consumer identity.
 
 #### Scenario: Render related releases
 
@@ -102,11 +103,13 @@ its member Bottles without double counting.
 
 ### Requirement: Group presentation is deterministic
 
-The system SHALL use group-owned shared presentation data and a valid
-representative Bottle only as a deterministic route or image source.
+The system SHALL use a valid representative Bottle as the deterministic
+relationship presentation source and SHALL NOT persist a second group-owned
+editorial description, image, tasting-note, or tag record.
 
 #### Scenario: Representative changes
 
 - **WHEN** the representative Bottle changes
-- **THEN** relationship routes and presentation use the new representative
+- **THEN** relationship routes and editorial presentation use the new
+  representative Bottle
 - **AND** no activity identity changes
