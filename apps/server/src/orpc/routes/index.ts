@@ -5,7 +5,6 @@ import auth from "./auth";
 import badges from "./badges";
 import bottleAliases from "./bottleAliases";
 import bottleGroups from "./bottleGroups";
-import bottleReleases from "./bottleReleases";
 import bottles from "./bottles";
 import bottleSeries from "./bottleSeries";
 import changes from "./changes";
@@ -42,7 +41,6 @@ export interface Router {
   bottles: typeof bottles;
   bottleAliases: typeof bottleAliases;
   bottleGroups: typeof bottleGroups;
-  bottleReleases: typeof bottleReleases;
   bottleSeries: typeof bottleSeries;
   changes: typeof changes;
   collections: typeof collections;
@@ -79,7 +77,6 @@ export default {
   bottles,
   bottleAliases,
   bottleGroups,
-  bottleReleases,
   bottleSeries,
   changes,
   collections,

@@ -22,7 +22,7 @@ every consumer use one direct Bottle foreign key.
   representative selection, and aggregation scope.
 - Keep grouping outside ordinary user creation and activity workflows.
 - Migrate all data in retained-audit-gated, resumable, bounded transactions.
-- Preserve legacy URLs and release ids through durable mappings.
+- Preserve legacy release ids as migration evidence through durable mappings.
 - Remove the unreleased CatalogTarget implementation rather than maintain two
   identity systems.
 
@@ -95,8 +95,8 @@ For a legacy family:
   selects a more suitable member;
 - parent-only consumer references remain on the parent;
 - release-specific references move to the promoted Bottle;
-- the release-to-Bottle mapping remains durable for redirects and old API
-  translation.
+- the release-to-Bottle mapping remains durable as migration, merge, and
+  destructive-cleanup evidence.
 
 Legacy parents with the same case-insensitive complete canonical name, or whose
 canonical name is an active exact alias of another legacy parent, share one
@@ -240,7 +240,7 @@ references during the migration.
 ### Postflight and cleanup
 
 Immediately after migration, rerun and retain the audit. Validate Bottle,
-group, mapping, direct-reference, aggregate, URL, and primary UX behavior.
+group, mapping, direct-reference, aggregate, and primary UX behavior.
 Then apply the separately reviewed direct-Bottle uniqueness activation before
 accepting new catalog-consumer traffic.
 
@@ -254,6 +254,7 @@ Destructive cleanup requires:
 - a database backup;
 - successful preflight, migration, and postflight evidence;
 - no supported BottleRelease writes;
+- no public BottleRelease API, runtime schema, or legacy nested URL redirect;
 - full test and visual QA gates;
 - explicit user approval.
 

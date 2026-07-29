@@ -16,7 +16,7 @@ never a catalog-consumer target.
 | Catalog identity                                     | No                               | Owns through `bottleId`             | Points to Bottle when assigned     | Points to Bottle when assigned  |
 | Activity and exact statistics                        | Member-derived aggregate only    | Owns direct activity/statistics     | No                                 | Owns event/unit fields          |
 | Group aggregate statistics                           | Owns raw member-Bottle aggregate | Contributes through direct activity | No                                 | No                              |
-| Legacy release redirect                              | No                               | Promotion destination               | No                                 | May retain `releaseId` evidence |
+| Legacy release migration evidence                    | No                               | Promotion destination               | No                                 | May retain `releaseId` evidence |
 
 ## Invariants
 
@@ -110,15 +110,9 @@ The migration never deletes or arbitrarily reassigns the parent Bottle.
 - Badges and user analytics use Bottle-owned fields.
 - Group analytics derive their population from current Bottle membership.
 
-## Compatibility Ownership
+## Retained Migration Evidence
 
-Retained BottleRelease routes:
-
-- resolve the durable promotion mapping;
-- translate input/output;
-- delegate to canonical Bottle operations;
-- emit bounded telemetry;
-- never write BottleRelease or maintain target/release business logic.
-
-Legacy nested URLs redirect to the promoted Bottle or Bottle-anchored related
-release page. Permanent mappings survive BottleRelease cleanup.
+The durable BottleRelease promotion mapping remains available only to migration,
+audit, merge, and destructive-cleanup internals. Public BottleRelease routes,
+schemas, and legacy nested URL redirects are removed. Canonical Bottle URLs and
+operations are the only supported interface.

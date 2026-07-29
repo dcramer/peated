@@ -115,9 +115,8 @@ Bottle entry flow.
 Candidate search presents independently complete Bottles, keyed by `bottleId`.
 Accepted aliases resolve directly to their Bottle; unassigned and ignored
 aliases do not produce Bottle candidates. Retained release ids and
-BottleRelease rows are not classifier candidate inputs; migration and bounded
-compatibility routes resolve them through the durable promotion mapping before
-entering Bottle-native logic.
+BottleRelease rows are not classifier candidate inputs. The durable promotion
+mapping is retained only for migration, audit, merge, and cleanup internals.
 
 Sources:
 

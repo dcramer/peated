@@ -24,16 +24,14 @@ describe("getAddBottleHref", () => {
     ).toBe("/addBottle?bottle=42&intent=tasting");
   });
 
-  it("never serializes legacy release or group identity", () => {
-    const legacyOptions = {
+  it("serializes the supported Bottle and return context", () => {
+    const options = {
       bottleId: 42,
       flightId: "flight-qa",
       intent: "tasting",
-      releaseId: 84,
-      groupId: 21,
     } as const;
 
-    expect(getAddBottleHref(legacyOptions)).toBe(
+    expect(getAddBottleHref(options)).toBe(
       "/addBottle?bottle=42&flight=flight-qa&intent=tasting",
     );
   });

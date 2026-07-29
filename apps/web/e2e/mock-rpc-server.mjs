@@ -23,20 +23,17 @@ import {
   destinationBottleGroupId,
   emptyLibraryStats,
   emptyList,
+  exactMatchedBottle,
+  exactMatchedBottleId,
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
   exactSearchBottle,
   existingBottle,
   existingBottleId,
-  existingRelease,
-  existingReleaseId,
   failingTastingNotes,
   flightBottleFixture,
   flightBottleFixtureId,
   groupedBottleDetails,
-  legacyIncompleteReleaseId,
-  legacyPromotedBottle,
-  legacyPromotedBottleId,
   missingBottleId,
   photoTastingNotes,
   priceChangeList,
@@ -447,7 +444,7 @@ async function handleRpcRequest({ request, response, url }) {
       if (input?.bottle === replacementSourceBottleId) {
         sendRpcResponse(
           response,
-          withCollectionStatus(request, legacyPromotedBottle),
+          withCollectionStatus(request, exactMatchedBottle),
         );
         return true;
       }
@@ -493,29 +490,6 @@ async function handleRpcRequest({ request, response, url }) {
         rel: { nextCursor: null, prevCursor: null },
       });
       return true;
-    case "bottleReleases/bottle": {
-      if (
-        input?.bottle === existingBottleId &&
-        input?.release === legacyIncompleteReleaseId
-      ) {
-        sendRpcConflict(
-          response,
-          "Legacy BottleRelease mapping is incomplete.",
-        );
-        return true;
-      }
-
-      if (
-        input?.bottle === existingBottleId &&
-        input?.release === existingReleaseId
-      ) {
-        sendRpcResponse(response, { bottleId: legacyPromotedBottleId });
-        return true;
-      }
-
-      sendRpcNotFound(response, "Legacy BottleRelease mapping not found.");
-      return true;
-    }
     case "bottles/suggestedTags":
       if (![createdBottleId, existingBottleId].includes(input?.bottle)) {
         sendRpcError(response, "Unexpected suggested tags payload");
@@ -727,7 +701,6 @@ async function handleRpcRequest({ request, response, url }) {
               candidates: [
                 {
                   bottleId: existingBottleId,
-                  releaseId: null,
                   bottleFullName: existingBottle.fullName,
                   fullName: existingBottle.fullName,
                 },
@@ -1195,7 +1168,6 @@ function buildCreateProposalPhotoIdentification({
         candidates: [
           {
             bottleId: existingBottleId,
-            releaseId: null,
             bottleFullName: existingBottle.fullName,
             fullName: existingBottle.fullName,
           },
@@ -1652,19 +1624,17 @@ function buildManualSearchMatchPhotoIdentification() {
       status: "classified",
       decision: {
         action: "match",
-        matchedBottle: legacyPromotedBottle,
+        matchedBottle: exactMatchedBottle,
       },
       artifacts: {
         candidates: [
           {
-            bottleId: existingBottleId,
-            releaseId: existingReleaseId,
-            bottleFullName: existingBottle.fullName,
-            fullName: existingRelease.fullName,
+            bottleId: exactMatchedBottleId,
+            bottleFullName: exactMatchedBottle.fullName,
+            fullName: exactMatchedBottle.fullName,
           },
           {
             bottleId: existingBottleId,
-            releaseId: null,
             bottleFullName: existingBottle.fullName,
             fullName: existingBottle.fullName,
           },
@@ -1746,7 +1716,6 @@ function buildNeedsReviewPhotoIdentification() {
         candidates: [
           {
             bottleId: existingBottleId,
-            releaseId: null,
             bottleFullName: existingBottle.fullName,
             fullName: existingBottle.fullName,
           },
@@ -1808,7 +1777,7 @@ function getMockBottle(request, bottleId) {
   );
   if (groupMember) return groupMember;
   if (bottleId === exactSearchBottle.id) return exactSearchBottle;
-  if (bottleId === legacyPromotedBottleId) return legacyPromotedBottle;
+  if (bottleId === exactMatchedBottleId) return exactMatchedBottle;
   return buildBottleForId(bottleId);
 }
 

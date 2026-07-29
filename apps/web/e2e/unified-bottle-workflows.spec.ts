@@ -8,8 +8,6 @@ import {
   exactMergeOtherBottle,
   exactMergeOtherBottleId,
   existingBottleId,
-  existingReleaseId,
-  legacyPromotedBottleId,
   testAccessToken,
   testBrand,
   testUser,
@@ -290,56 +288,6 @@ test.describe("unified Bottle workflows", () => {
     });
     await expect(page).toHaveURL(
       new RegExp(`/bottles/${exactMergeOtherBottleId}$`),
-    );
-  });
-
-  test("permanently preserves the query when redirecting legacy creation", async ({
-    baseURL,
-  }) => {
-    const legacyPath = `/bottles/${existingBottleId}/bottlings/new?returnAction=view&tag=one&tag=two`;
-    const destination = `/bottles/${existingBottleId}/addRelease?returnAction=view&tag=one&tag=two`;
-
-    const response = await fetch(new URL(legacyPath, requireBaseURL(baseURL)), {
-      redirect: "manual",
-    });
-
-    expect(response.status).toBe(308);
-    expect(response.headers.get("location")).toBe(destination);
-  });
-
-  test("permanently redirects legacy Bottling edits to the promoted Bottle", async ({
-    baseURL,
-  }) => {
-    const query = "?returnAction=view&tag=one&tag=two";
-    const response = await fetch(
-      new URL(
-        `/bottles/${existingBottleId}/bottlings/${existingReleaseId}/edit${query}`,
-        requireBaseURL(baseURL),
-      ),
-      { redirect: "manual" },
-    );
-
-    expect(response.status).toBe(308);
-    expect(response.headers.get("location")).toBe(
-      `/bottles/${legacyPromotedBottleId}/edit${query}`,
-    );
-  });
-
-  test("preserves repeated query values through the releases edit adapter", async ({
-    baseURL,
-  }) => {
-    const query = "?returnAction=view&tag=one&tag=two";
-    const response = await fetch(
-      new URL(
-        `/bottles/${existingBottleId}/releases/${existingReleaseId}/edit${query}`,
-        requireBaseURL(baseURL),
-      ),
-      { redirect: "manual" },
-    );
-
-    expect(response.status).toBe(308);
-    expect(response.headers.get("location")).toBe(
-      `/bottles/${legacyPromotedBottleId}/edit${query}`,
     );
   });
 });

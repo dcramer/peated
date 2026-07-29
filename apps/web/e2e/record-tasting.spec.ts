@@ -5,7 +5,6 @@ import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdTastingId,
   existingBottle,
-  existingReleaseId,
   failingTastingNotes,
   photoTastingNotes,
   tastingNotes,
@@ -14,29 +13,6 @@ import {
 import { signIn } from "./session";
 
 test.describe("log tasting", () => {
-  test("preserves query params when redirecting legacy bottle tasting links", async ({
-    context,
-    page,
-  }) => {
-    await signIn(context);
-
-    await page.goto(
-      `/bottles/${existingBottle.id}/addTasting?bottling=${existingReleaseId}&flight=flight-qa`,
-    );
-
-    await expect(page).toHaveURL(/\/addBottle\?/);
-    const currentUrl = new URL(page.url());
-    expect(currentUrl.pathname).toBe("/addBottle");
-    expect(currentUrl.searchParams.get("bottle")).toBe(
-      String(existingBottle.id),
-    );
-    expect(currentUrl.searchParams.get("bottling")).toBe(
-      String(existingReleaseId),
-    );
-    expect(currentUrl.searchParams.get("flight")).toBe("flight-qa");
-    expect(currentUrl.searchParams.get("intent")).toBe("tasting");
-  });
-
   test("logs a tasting for a fixture bottle", async ({ context, page }) => {
     await signIn(context);
 

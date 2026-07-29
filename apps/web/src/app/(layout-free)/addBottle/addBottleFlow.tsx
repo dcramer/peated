@@ -632,9 +632,6 @@ function AddBottleFlowContent() {
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
   const requestedBottleId = parseId(searchParams.get("bottle"));
-  const requestedReleaseId = parseId(
-    searchParams.get("release") ?? searchParams.get("bottling"),
-  );
   const requestedFlightId = searchParams.get("flight") || null;
   const requestedPendingImage = useMemo(
     () => getPendingImageFromParams(new URLSearchParams(searchParams)),
@@ -642,14 +639,11 @@ function AddBottleFlowContent() {
   );
   const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
-    if (requestedReleaseId && !requestedBottleId) {
-      return `unsupported-release:${requestedReleaseId}:${pendingImageKey}`;
-    }
     if (requestedBottleId) {
-      return `bottle:${requestedBottleId}:${requestedReleaseId ?? "base"}:${pendingImageKey}`;
+      return `bottle:${requestedBottleId}:${pendingImageKey}`;
     }
     return null;
-  }, [requestedBottleId, requestedPendingImage?.id, requestedReleaseId]);
+  }, [requestedBottleId, requestedPendingImage?.id]);
 
   const [loadedBottleKey, setLoadedBottleKey] = useState<string | null>(null);
   const [loadingBottle, setLoadingBottle] = useState(false);
@@ -689,15 +683,6 @@ function AddBottleFlowContent() {
   }, [selectedBottle?.previewUrl]);
 
   useEffect(() => {
-    if (requestedReleaseId && !requestedBottleId) {
-      setSelectedBottle(null);
-      setLoadedBottleKey(requestedBottleKey);
-      setLoadingBottle(false);
-      setBottleLoadError(
-        "This old release link is incomplete. Search for the exact bottle instead.",
-      );
-      return;
-    }
     if (!requestedBottleKey || !requestedBottleId) {
       setLoadedBottleKey(null);
       return;
@@ -715,16 +700,8 @@ function AddBottleFlowContent() {
       setTastingLoadError(undefined);
 
       try {
-        const promotedBottleId = requestedReleaseId
-          ? (
-              await orpc.bottleReleases.bottle.call({
-                bottle: bottleId,
-                release: requestedReleaseId,
-              })
-            ).bottleId
-          : bottleId;
         const bottle = await orpc.bottles.details.call({
-          bottle: promotedBottleId,
+          bottle: bottleId,
         });
         const collectionStatus = await orpc.collections.bottles.list.call({
           user: "me",
@@ -767,7 +744,6 @@ function AddBottleFlowContent() {
     orpc,
     requestedBottleId,
     requestedPendingImage,
-    requestedReleaseId,
     requestedBottleKey,
   ]);
 

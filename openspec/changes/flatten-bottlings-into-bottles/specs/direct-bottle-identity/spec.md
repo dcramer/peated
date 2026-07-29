@@ -134,21 +134,20 @@ component-complete database transactions for the initial legacy data migration.
   Bottle references, and group/member integrity
 - **AND** legacy tables and columns remain until separately approved cleanup
 
-### Requirement: Legacy references remain reachable
+### Requirement: Public identity exposes only Bottle
 
-Compatibility routes SHALL translate legacy BottleRelease identity through the
-durable promotion mapping and delegate to Bottle operations.
+Public routes and API operations SHALL NOT accept or return BottleRelease
+identity after the direct-Bottle cutover.
 
-#### Scenario: Resolve a nested release URL
+#### Scenario: Request a retired nested release URL
 
 - **WHEN** an old nested BottleRelease URL references a promoted release
-- **THEN** it permanently redirects to the promoted Bottle URL
+- **THEN** no compatibility route resolves or redirects it
 
-#### Scenario: Translate a legacy API request
+#### Scenario: Inspect the public API
 
-- **WHEN** a retained compatibility API receives a known release id
-- **THEN** it resolves the mapped Bottle and delegates to the Bottle service
-- **AND** it does not maintain a second release business-logic system
+- **WHEN** the oRPC router and OpenAPI document are generated
+- **THEN** they expose no BottleRelease route, operation, or schema
 
 ### Requirement: Statistics derive from Bottle activity
 

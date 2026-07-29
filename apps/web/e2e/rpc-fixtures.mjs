@@ -74,9 +74,7 @@ export const testBrand = {
 
 export const existingBottleId = 9301;
 export const createdBottleId = 9302;
-export const existingReleaseId = 9303;
-export const legacyPromotedBottleId = 9305;
-export const legacyIncompleteReleaseId = 9306;
+export const exactMatchedBottleId = 9305;
 export const replacementSourceBottleId = 9307;
 export const missingBottleId = 9309;
 export const exactMergeOtherBottleId = 9311;
@@ -224,72 +222,26 @@ export const unifiedBottleEditContext = {
   },
 };
 
-/**
- * Builds the bottle-release RPC fixture used by bottling-specific E2E flows.
- */
-export function buildBottleRelease({
-  id = existingReleaseId,
-  bottleId = existingBottleId,
-  fullName = `${existingBottle.fullName} Distillers Edition`,
-  name = "Distillers Edition",
-  edition = "Distillers Edition",
-  releaseYear = 2024,
-} = {}) {
-  return {
-    id,
-    bottleId,
-    fullName,
-    name,
-    edition,
-    statedAge: null,
-    abv: null,
-    caskStrength: null,
-    singleCask: null,
-    vintageYear: null,
-    releaseYear,
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
-    description: null,
-    tastingNotes: null,
-    imageUrl: null,
-    avgRating: null,
-    totalTastings: 0,
-    suggestedTags: [],
-    isFavorite: false,
-    hasTasted: false,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  };
-}
-
-export const existingRelease = buildBottleRelease();
-
-export const legacyPromotedBottle = {
+export const exactMatchedBottle = {
   ...existingBottle,
-  id: legacyPromotedBottleId,
-  fullName: existingRelease.fullName,
-  name: existingRelease.name,
-  edition: existingRelease.edition,
-  statedAge: existingRelease.statedAge ?? existingBottle.statedAge,
-  abv: existingRelease.abv,
-  caskStrength: existingRelease.caskStrength,
-  singleCask: existingRelease.singleCask,
-  vintageYear: existingRelease.vintageYear,
-  releaseYear: existingRelease.releaseYear,
-  caskType: existingRelease.caskType,
-  caskSize: existingRelease.caskSize,
-  caskFill: existingRelease.caskFill,
-  description: existingRelease.description ?? existingBottle.description,
-  imageUrl: existingRelease.imageUrl ?? existingBottle.imageUrl,
-  tastingNotes: existingRelease.tastingNotes ?? existingBottle.tastingNotes,
-  suggestedTags: existingRelease.suggestedTags,
-  avgRating: existingRelease.avgRating,
-  totalTastings: existingRelease.totalTastings,
-  isFavorite: existingRelease.isFavorite,
-  hasTasted: existingRelease.hasTasted,
-  createdAt: existingRelease.createdAt,
-  updatedAt: existingRelease.updatedAt,
+  id: exactMatchedBottleId,
+  fullName: `${existingBottle.fullName} Distillers Edition`,
+  name: "Distillers Edition",
+  edition: "Distillers Edition",
+  statedAge: existingBottle.statedAge,
+  abv: null,
+  caskStrength: null,
+  singleCask: null,
+  vintageYear: null,
+  releaseYear: 2024,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
+  suggestedTags: [],
+  avgRating: null,
+  totalTastings: 0,
+  isFavorite: false,
+  hasTasted: false,
 };
 
 /**

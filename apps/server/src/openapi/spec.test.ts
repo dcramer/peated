@@ -106,6 +106,15 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expect(getOperationIds(spec)).not.toContain("getBottleTarget");
     expect(spec.paths?.["/bottle-releases"]?.post).toBeUndefined();
     expect(getOperationIds(spec)).not.toContain("createBottleRelease");
+    expect(spec.paths?.["/bottles/{bottle}/releases"]).toBeUndefined();
+    expect(spec.paths?.["/bottle-releases/{release}"]).toBeUndefined();
+    expect(spec.paths?.["/bottle-releases/{release}/bottle"]).toBeUndefined();
+    expect(spec.components?.schemas?.BottleRelease).toBeUndefined();
+    expect(getOperationIds(spec)).not.toContain("listBottleReleases");
+    expect(getOperationIds(spec)).not.toContain("getBottleRelease");
+    expect(getOperationIds(spec)).not.toContain("getBottleForRelease");
+    expect(getOperationIds(spec)).not.toContain("updateBottleRelease");
+    expect(getOperationIds(spec)).not.toContain("deleteBottleRelease");
 
     expect(spec.paths?.["/bottles"]?.post?.operationId).toBe("createBottle");
     expect(spec.paths?.["/bottles/{bottle}"]?.patch?.operationId).toBe(
@@ -149,50 +158,6 @@ describe("OpenAPI generation ($ref reuse)", () => {
     expectTypeOf<
       "createFromSource" extends keyof Outputs["bottles"] ? true : false
     >().toEqualTypeOf<false>();
-    expectTypeOf<
-      "create" extends keyof Outputs["bottleReleases"] ? true : false
-    >().toEqualTypeOf<false>();
-  });
-
-  it("publishes the legacy BottleRelease-to-Bottle adapter", async () => {
-    const spec = await generateSpec();
-    const operation = spec.paths?.["/bottle-releases/{release}/bottle"]?.get;
-
-    expect(operation?.operationId).toBe("getBottleForRelease");
-    expect(operation?.parameters).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: "release",
-          in: "path",
-          required: true,
-        }),
-        expect.objectContaining({
-          name: "bottle",
-          in: "query",
-          required: true,
-        }),
-      ]),
-    );
-    const responseSchema = getJsonResponseSchema(operation);
-    expect(responseSchema?.type).toBe("object");
-    expect(responseSchema?.required).toEqual(["bottleId"]);
-    expect(Object.keys(responseSchema?.properties ?? {})).toEqual(["bottleId"]);
-    expect(responseSchema?.properties?.bottleId).toMatchObject({
-      type: "integer",
-      exclusiveMinimum: 0,
-    });
-    expect(responseSchema?.oneOf).toBeUndefined();
-    expect(responseSchema?.anyOf).toBeUndefined();
-
-    expectTypeOf<Outputs["bottleReleases"]["bottle"]>().toEqualTypeOf<{
-      bottleId: number;
-    }>();
-    expectBottleResponse(
-      getJsonResponseSchema(spec.paths?.["/bottle-releases/{release}"]?.patch),
-    );
-    expectTypeOf<Outputs["bottleReleases"]["update"]>().toEqualTypeOf<
-      z.infer<typeof BottleSchema>
-    >();
   });
 
   it("publishes Bottle aliases with one direct Bottle identity", async () => {
