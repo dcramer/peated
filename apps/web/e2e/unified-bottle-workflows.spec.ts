@@ -110,7 +110,7 @@ test.describe("unified Bottle workflows", () => {
     );
 
     await expect(
-      page.getByRole("heading", { name: "Add another release" }),
+      page.getByRole("heading", { name: "Add a similar bottle" }),
     ).toBeVisible();
     await expect(page.getByLabel("Bottle", { exact: true })).toHaveValue(
       createdBottleName,

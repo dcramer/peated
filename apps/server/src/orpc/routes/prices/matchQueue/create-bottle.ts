@@ -7,7 +7,7 @@ import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
-} from "@peated/server/lib/createBottle";
+} from "@peated/server/lib/createConcreteBottle";
 import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
 import {
   createBottleFromStorePriceMatchProposal,

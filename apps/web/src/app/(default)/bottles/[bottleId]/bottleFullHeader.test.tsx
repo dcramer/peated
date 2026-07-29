@@ -22,7 +22,7 @@ describe("BottleRelationshipLinks", () => {
     expect(html).toContain('href="/bottles/42/releases"');
     expect(html).toContain("View all 3 releases");
     expect(html).toContain('href="/bottles/42/addRelease"');
-    expect(html).toContain("Add another release");
+    expect(html).toContain("Add a similar bottle");
   });
 
   it("does not advertise a related-release list for a singleton group", () => {

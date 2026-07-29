@@ -30,7 +30,7 @@ import TastingForm, {
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import {
-  getAddAnotherReleasePath,
+  getAddSimilarBottlePath,
   getPendingImageFromParams,
 } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
@@ -321,13 +321,13 @@ function MatchedOutcomeActions({
       View Bottle
     </OutcomeButton>
   );
-  const addAnotherReleaseButton = (
+  const addSimilarBottleButton = (
     <OutcomeButton
-      key="another-release"
-      href={getAddAnotherReleasePath(bottle.id)}
+      key="similar-bottle"
+      href={getAddSimilarBottlePath(bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add another release
+      Add a similar bottle
     </OutcomeButton>
   );
   const actionButtons =
@@ -336,13 +336,13 @@ function MatchedOutcomeActions({
           tastingButton,
           libraryButton,
           viewButton,
-          addAnotherReleaseButton,
+          addSimilarBottleButton,
         ].filter(Boolean)
       : [
           libraryButton,
           tastingButton,
           viewButton,
-          addAnotherReleaseButton,
+          addSimilarBottleButton,
         ].filter(Boolean);
 
   return <div className="grid gap-3 sm:grid-cols-4">{actionButtons}</div>;
@@ -464,13 +464,13 @@ function OutcomeSelection({
       View Bottle
     </OutcomeButton>
   );
-  const addAnotherReleaseButton = (
+  const addSimilarBottleButton = (
     <OutcomeButton
-      key="another-release"
-      href={getAddAnotherReleasePath(selection.bottle.id)}
+      key="similar-bottle"
+      href={getAddSimilarBottlePath(selection.bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add another release
+      Add a similar bottle
     </OutcomeButton>
   );
   const actionButtons =
@@ -479,13 +479,13 @@ function OutcomeSelection({
           tastingButton,
           libraryButton,
           viewButton,
-          addAnotherReleaseButton,
+          addSimilarBottleButton,
         ].filter(Boolean)
       : [
           libraryButton,
           tastingButton,
           viewButton,
-          addAnotherReleaseButton,
+          addSimilarBottleButton,
         ].filter(Boolean);
 
   return (

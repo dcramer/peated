@@ -191,7 +191,7 @@ an invalid Bottle leave the source unresolved or route it to review.
 
 The Add Bottle workflow accepts stable expression fields and structured exact
 fields in one form and always creates one Bottle. Independent entry receives an
-automatic singleton group. “Add another release” may prefill the same form from
+automatic singleton group. “Add a similar bottle” may prefill the same form from
 an existing Bottle, but submission still uses independent creation and starts in
 a singleton group. It does not silently join the source group.
 

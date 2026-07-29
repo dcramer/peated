@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getAddAnotherReleasePath, getAddBottleHref } from "./addBottle";
+import { getAddBottleHref, getAddSimilarBottlePath } from "./addBottle";
 
-describe("getAddAnotherReleasePath", () => {
-  it("builds the canonical independent-release path", () => {
-    expect(getAddAnotherReleasePath(123)).toBe("/bottles/123/addRelease");
+describe("getAddSimilarBottlePath", () => {
+  it("builds the independent similar-Bottle path", () => {
+    expect(getAddSimilarBottlePath(123)).toBe("/bottles/123/addRelease");
   });
 });
 

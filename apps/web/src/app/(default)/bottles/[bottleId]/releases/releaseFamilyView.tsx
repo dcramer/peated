@@ -79,13 +79,13 @@ export default function ReleaseFamilyView({
         </section>
       ) : null}
 
-      <section aria-labelledby="related-releases-heading" className="my-8">
+      <section aria-labelledby="similar-bottles-heading" className="my-8">
         <div className="mb-4">
           <h2
-            id="related-releases-heading"
+            id="similar-bottles-heading"
             className="text-highlight text-lg font-bold"
           >
-            Other releases
+            Similar bottles
           </h2>
           <p className="text-muted mt-1 text-sm">
             Choose a bottle to see its details, tastings, and prices.
@@ -126,14 +126,14 @@ export default function ReleaseFamilyView({
           </ul>
         ) : (
           <p className="text-muted border-y border-slate-800 py-6">
-            No other releases found.
+            No similar bottles found.
           </p>
         )}
 
         <Suspense>
           <PaginationButtons
             rel={bottleList.rel}
-            ariaLabel="Other release pagination"
+            ariaLabel="Similar bottle pagination"
           />
         </Suspense>
       </section>

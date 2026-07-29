@@ -31,6 +31,9 @@ test.describe("Similar bottles", () => {
     await expect(groupStatistic(page, "Tastings")).toHaveText("37");
     await expect(groupStatistic(page, "Similar bottles")).toHaveText("3");
     await expect(groupStatistic(page, "Ratings")).toHaveText("9");
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Similar bottles" }),
+    ).toBeVisible();
 
     for (const bottle of bottleGroupMembers) {
       await expect(
@@ -71,7 +74,7 @@ test.describe("Similar bottles", () => {
       page.getByRole("link", { name: "View all 3 releases" }),
     ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/releases`);
     await expect(
-      page.getByRole("link", { name: "Add another release" }),
+      page.getByRole("link", { name: "Add a similar bottle" }),
     ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/addRelease`);
 
     await page.goto("/search?q=Lagavulin");

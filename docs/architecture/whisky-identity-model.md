@@ -36,7 +36,7 @@ does not create another catalog identity layer.
 - A general expression alias points to the retained general Bottle, not the
   group's representative Bottle.
 - Ordinary creation atomically creates a complete Bottle and a singleton
-  BottleGroup. “Add another release” only prefills a new Bottle draft; it does
+  BottleGroup. “Add a similar bottle” only prefills a new Bottle draft; it does
   not reuse the source Bottle's group.
 - Semantic grouping happens outside ordinary creation. Similar names, a shared
   brand, or a shared BottleSeries may suggest a relationship but do not prove

@@ -105,7 +105,7 @@ that it duplicates another Bottle.
 ### Grouping is automatic and outside user workflows
 
 Every ordinary creation creates a Bottle and singleton group atomically.
-“Add another release” copies values into the same independent Bottle form and
+“Add a similar bottle” copies values into the same independent Bottle form and
 also creates a singleton. Defining and operating an automatic grouping process
 is intentionally outside this change; a later system-controlled process may
 consolidate or separate groups.

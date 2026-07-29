@@ -381,7 +381,7 @@ test.describe("create bottle", () => {
     ).toBeVisible();
   });
 
-  test("creates an independent Bottle from Add another release", async ({
+  test("creates an independent Bottle from Add a similar bottle", async ({
     context,
     page,
   }, testInfo) => {
@@ -398,7 +398,7 @@ test.describe("create bottle", () => {
     await page.goto(`/bottles/${existingBottleId}/addRelease`);
 
     await expect(
-      page.getByRole("heading", { name: "Add another release" }),
+      page.getByRole("heading", { name: "Add a similar bottle" }),
     ).toBeVisible();
     await expect(
       page.getByRole("textbox", { name: "Bottle", exact: true }),
@@ -491,7 +491,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await expect(
-      page.getByRole("link", { name: "Add another release" }),
+      page.getByRole("link", { name: "Add a similar bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addRelease`);
     await expect(
       page.getByRole("link", { name: "Search Bottles" }),
@@ -761,7 +761,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: "Add another release" }),
+      page.getByRole("link", { name: "Add a similar bottle" }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),

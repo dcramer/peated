@@ -12,12 +12,10 @@ import { getUserActor } from "@peated/server/lib/actors";
 import { buildClassifierConcreteBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   BottleAlreadyExistsError,
-  createOrReuseConcreteBottleInTransaction,
-} from "@peated/server/lib/createBottle";
-import {
   ConcreteBottleCreateInputSchema,
   createConcreteBottle,
   createConcreteBottleInTransaction,
+  createOrReuseConcreteBottleInTransaction,
 } from "@peated/server/lib/createConcreteBottle";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
@@ -92,7 +90,6 @@ describe("concrete Bottle creation", () => {
       name: "Cask Strength",
       fullName: "Creation Test Brand Cask Strength",
       statedAge: 12,
-      description: null,
       totalBottles: 1,
       representativeBottleId: result.bottle.id,
     });

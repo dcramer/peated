@@ -42,7 +42,7 @@ import type { ConcreteBottleCreateInput } from "@peated/server/lib/concreteBottl
 import {
   createOrReuseConcreteBottleInTransaction,
   finalizeCreatedBottle,
-} from "@peated/server/lib/createBottle";
+} from "@peated/server/lib/createConcreteBottle";
 import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,

@@ -23,9 +23,9 @@ create a singleton group automatically for every ordinary Bottle creation.
 The system SHALL keep semantic grouping outside ordinary Bottle creation and
 SHALL NOT ask users to select, create, merge, or split BottleGroups.
 
-#### Scenario: Add another release
+#### Scenario: Add a similar bottle
 
-- **WHEN** a user starts “add another release” from an existing Bottle
+- **WHEN** a user starts “add a similar bottle” from an existing Bottle
 - **THEN** the source pre-fills an independently complete Bottle draft
 - **AND** submission creates a new Bottle in a singleton group
 - **AND** a later system-controlled process may group it

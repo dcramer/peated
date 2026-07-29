@@ -19,7 +19,7 @@ import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
 import {
   createOrReuseConcreteBottleInTransaction,
   finalizeCreatedBottle,
-} from "@peated/server/lib/createBottle";
+} from "@peated/server/lib/createConcreteBottle";
 import { buildClassifierConcreteBottleInput } from "./classifierDecisionCreateInputs";
 import {
   ActiveBottleSelectionError,

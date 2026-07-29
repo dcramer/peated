@@ -14,19 +14,19 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 
-export default function AddAnotherRelease(props: {
+export default function AddSimilarBottle(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = use(props.params);
 
   return (
     <VerifiedRequired>
-      <AddAnotherReleaseForm bottleId={bottleId} />
+      <AddSimilarBottleForm bottleId={bottleId} />
     </VerifiedRequired>
   );
 }
 
-function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
+function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
   const { user } = useAuth();
   const orpc = useORPC();
   const router = useRouter();
@@ -61,7 +61,7 @@ function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
 
   if (proposalId && proposalQuery.isLoading) return <Spinner />;
   if (!sourceBottle.group) {
-    throw new Error("Add another release requires a BottleGroup summary.");
+    throw new Error("Adding a similar Bottle requires a BottleGroup summary.");
   }
 
   const initialData = {
@@ -75,7 +75,7 @@ function AddAnotherReleaseForm({ bottleId }: { bottleId: string }) {
 
   return (
     <BottleForm
-      title="Add another release"
+      title="Add a similar bottle"
       saveLabel="Create Bottle"
       returnTo={returnTo}
       initialData={initialData}

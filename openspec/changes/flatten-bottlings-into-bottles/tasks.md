@@ -163,6 +163,9 @@ and map to an explicit removal task.
 - [x] 7.12 Regenerate the unreleased additive migration history from the
       corrected schema and rerun focused schema, migration, API, and web
       verification.
+- [x] 7.13 Consolidate the canonical Bottle creation module and correct
+      similar-Bottle labels and legacy redirect delegation found in final
+      runtime review.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

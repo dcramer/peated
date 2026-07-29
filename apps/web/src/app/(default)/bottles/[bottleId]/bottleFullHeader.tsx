@@ -9,8 +9,8 @@ import Link from "@peated/web/components/link";
 import ShareButton from "@peated/web/components/shareButton";
 import SkeletonButton from "@peated/web/components/skeletonButton";
 import {
-  getAddAnotherReleasePath,
   getAddBottleHref,
+  getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
 import { getReleaseFamilyHref } from "@peated/web/lib/releaseFamily";
 import { Suspense } from "react";
@@ -36,10 +36,10 @@ export function BottleRelationshipLinks({
         </Link>
       ) : null}
       <Link
-        href={getAddAnotherReleasePath(bottle.id)}
+        href={getAddSimilarBottlePath(bottle.id)}
         className="hover:text-white hover:underline"
       >
-        Add another release
+        Add a similar bottle
       </Link>
     </div>
   );

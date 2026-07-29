@@ -7,7 +7,7 @@ import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
-import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
+import { BottleAlreadyExistsError } from "@peated/server/lib/createConcreteBottle";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToBottle,

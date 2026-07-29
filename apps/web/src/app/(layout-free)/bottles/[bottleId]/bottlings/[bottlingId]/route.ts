@@ -1,6 +1,4 @@
-import { isORPCClientError } from "@peated/orpc/client/errors";
-import { getAnonymousServerClient } from "@peated/web/lib/orpc/client.server";
-import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
+import { resolveLegacyBottleReleaseRedirect } from "@peated/web/lib/legacyBottleReleaseRedirect.server";
 import { notFound } from "next/navigation";
 import type { NextRequest } from "next/server";
 
@@ -20,26 +18,15 @@ export async function GET(
     params: Promise<{ bottleId: string; bottlingId: string }>;
   },
 ) {
-  const [params, { client }] = await Promise.all([
-    context.params,
-    getAnonymousServerClient(),
-  ]);
+  const params = await context.params;
   const bottleId = parseRouteId(params.bottleId);
   const releaseId = parseRouteId(params.bottlingId);
-  let promotedBottle;
-  try {
-    promotedBottle = await resolveOrNotFound(
-      client.bottleReleases.bottle({
-        bottle: bottleId,
-        release: releaseId,
-      }),
-    );
-  } catch (error) {
-    if (isORPCClientError(error) && error.status === 409) {
-      return new Response(null, { status: 409 });
-    }
-
-    throw error;
+  const promotedBottle = await resolveLegacyBottleReleaseRedirect(
+    bottleId,
+    releaseId,
+  );
+  if ("conflict" in promotedBottle) {
+    return new Response(null, { status: 409 });
   }
 
   return new Response(null, {

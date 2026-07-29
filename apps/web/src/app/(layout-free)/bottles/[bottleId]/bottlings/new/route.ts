@@ -1,4 +1,4 @@
-import { getAddAnotherReleasePath } from "@peated/web/lib/addBottle";
+import { getAddSimilarBottlePath } from "@peated/web/lib/addBottle";
 import type { NextRequest } from "next/server";
 
 export async function GET(
@@ -10,7 +10,7 @@ export async function GET(
   return new Response(null, {
     status: 308,
     headers: {
-      Location: `${getAddAnotherReleasePath(bottleId)}${request.nextUrl.search}`,
+      Location: `${getAddSimilarBottlePath(bottleId)}${request.nextUrl.search}`,
     },
   });
 }

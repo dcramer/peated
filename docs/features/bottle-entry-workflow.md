@@ -19,7 +19,7 @@ year, vintage year, and cask details. Independent creation atomically creates a
 complete Bottle and an automatic singleton BottleGroup. Ordinary users never
 create, select, or name a BottleGroup.
 
-“Add another release” pre-fills the selected Bottle's durable fields and submits
+“Add a similar bottle” pre-fills the selected Bottle's durable fields and submits
 the same independent Bottle creation operation. It also creates a singleton;
 it does not join the source group. Automatic regrouping is a separate future
 capability, not a dormant service in this release.
@@ -41,7 +41,7 @@ identity remains unresolved.
 
 - Add Bottle accepts shared and exact fields in one submission and always
   creates a Bottle, never a child release record.
-- “Add another release” uses the selected Bottle and its group's shared label
+- “Add a similar bottle” uses the selected Bottle and its group's shared label
   only to prefill the same independent form. Submission does not carry source
   Bottle or group authority and starts in a new singleton group.
 - Creation returns the complete Bottle. Library, tasting, image, proposal, and

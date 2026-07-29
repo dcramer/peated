@@ -250,7 +250,7 @@ async function handleRpcRequest({ request, response, url }) {
           input?.abv !== addAnotherReleaseSourceBottle.abv ||
           input?.releaseYear !== addAnotherReleaseSourceBottle.releaseYear
         ) {
-          sendRpcError(response, "Unexpected add another release payload");
+          sendRpcError(response, "Unexpected similar Bottle payload");
           return true;
         }
 

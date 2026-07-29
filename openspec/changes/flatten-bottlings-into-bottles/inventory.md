@@ -201,7 +201,7 @@ Cutover:
 - remove generic activity buttons and exactness copy;
 - related-release pages show member Bottles and member-derived aggregates;
 - remove manual group merge/split controls;
-- keep user-facing “Similar bottles” or “Other releases” copy;
+- keep user-facing “Similar bottles” copy;
 - preserve nested BottleRelease redirects;
 - regenerate client types without CatalogTarget.
 
