@@ -5,6 +5,7 @@ import PendingVerificationAlert from "@peated/web/components/pendingVerification
 import Tabs, { TabItem } from "@peated/web/components/tabs";
 import { getCurrentUser } from "@peated/web/lib/auth.server";
 import { Suspense, type ReactNode } from "react";
+import ActivityRailSection from "./activityRailSection";
 import NewBottles, { NewBottlesSkeleton } from "./newBottles";
 import PriceChanges, { PriceChangesSkeleton } from "./priceChanges";
 import UpcomingEvents, { UpcomingEventsSkeleton } from "./upcomingEvents";
@@ -50,39 +51,33 @@ export default async function Layout({
               </Button>
             </div>
           )}
-          <div>
-            <Tabs fullWidth>
-              <TabItem active>Upcoming Events</TabItem>
-            </Tabs>
+          <div className={user ? "pt-7" : "mt-8"}>
             <Suspense fallback={<UpcomingEventsSkeleton />}>
               <UpcomingEvents />
             </Suspense>
 
-            <Tabs fullWidth>
-              <TabItem active>Newest Bottles</TabItem>
-            </Tabs>
-            <Suspense fallback={<NewBottlesSkeleton />}>
-              <NewBottles />
-            </Suspense>
+            <ActivityRailSection title="Newest Bottles">
+              <Suspense fallback={<NewBottlesSkeleton />}>
+                <NewBottles />
+              </Suspense>
+            </ActivityRailSection>
 
-            <Tabs fullWidth>
-              <TabItem active>Market Prices</TabItem>
-            </Tabs>
-            <Suspense fallback={<PriceChangesSkeleton />}>
-              <PriceChanges />
-            </Suspense>
+            <ActivityRailSection title="Market Prices">
+              <Suspense fallback={<PriceChangesSkeleton />}>
+                <PriceChanges />
+              </Suspense>
+            </ActivityRailSection>
 
-            <Tabs fullWidth>
-              <TabItem active>Quick Links</TabItem>
-            </Tabs>
-            <div className="text-muted text-center text-sm">
-              <Link
-                href="/entities/4263/codes"
-                className="text-inherit hover:underline"
-              >
-                SMWS Distillery Codes
-              </Link>
-            </div>
+            <ActivityRailSection title="Quick Links">
+              <div className="text-muted px-3 text-sm">
+                <Link
+                  href="/entities/4263/codes"
+                  className="text-inherit hover:underline"
+                >
+                  SMWS Distillery Codes
+                </Link>
+              </div>
+            </ActivityRailSection>
           </div>
         </div>
       </div>

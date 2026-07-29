@@ -30,9 +30,7 @@ function PriceDelta({
 }
 
 export function PriceChangesSkeleton() {
-  return (
-    <div className="mb-8 animate-pulse bg-slate-800" style={{ height: 200 }} />
-  );
+  return <div className="animate-pulse bg-slate-800" style={{ height: 200 }} />;
 }
 
 export function PriceChangeIdentity({
@@ -76,7 +74,7 @@ export default function PriceChanges() {
   );
 
   return (
-    <div className="mb-8">
+    <div>
       <BetaNotice>This is a work in progress.</BetaNotice>
       {data.results.length ? (
         <table className="my-2 min-w-full text-sm">
@@ -124,9 +122,7 @@ export default function PriceChanges() {
           </tbody>
         </table>
       ) : (
-        <p className="text-muted mb-8 text-center text-sm">
-          No price history found.
-        </p>
+        <p className="text-muted px-3 text-sm">No price history found.</p>
       )}
     </div>
   );
