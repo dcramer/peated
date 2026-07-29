@@ -23,8 +23,6 @@ async function promoteRelease(releaseId: number, promotedBottleId: number) {
   await db.insert(bottleReleasePromotions).values({
     releaseId,
     promotedBottleId,
-    status: "promoted",
-    completedAt: new Date(),
   });
 }
 
@@ -112,7 +110,7 @@ describe("DELETE /bottle-releases/{release}", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Release not found.]`);
   });
 
-  test("rejects missing, pending, and incomplete promotion mappings without writes", async ({
+  test("rejects a missing promotion mapping without writes", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
@@ -122,44 +120,16 @@ describe("DELETE /bottle-releases/{release}", () => {
       bottleId: missingParent.id,
     });
 
-    const pendingParent = await fixtures.Bottle({ name: "Delete Pending" });
-    const pendingRelease = await fixtures.BottleRelease({
-      bottleId: pendingParent.id,
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: pendingRelease.id,
-      promotedBottleId: pendingParent.id,
-      status: "pending",
-    });
-
-    const incompleteParent = await fixtures.Bottle({
-      name: "Delete Incomplete",
-    });
-    const incompleteRelease = await fixtures.BottleRelease({
-      bottleId: incompleteParent.id,
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: incompleteRelease.id,
-      promotedBottleId: incompleteParent.id,
-      status: "promoted",
-    });
-
     const before = await snapshotCatalogGraph();
     vi.clearAllMocks();
 
-    for (const releaseId of [
-      missingRelease.id,
-      pendingRelease.id,
-      incompleteRelease.id,
-    ]) {
-      const error = await waitError(
-        routerClient.bottleReleases.delete(
-          { release: releaseId },
-          { context: { user: admin } },
-        ),
-      );
-      expect(error).toMatchObject({ status: 409 });
-    }
+    const error = await waitError(
+      routerClient.bottleReleases.delete(
+        { release: missingRelease.id },
+        { context: { user: admin } },
+      ),
+    );
+    expect(error).toMatchObject({ status: 409 });
 
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();

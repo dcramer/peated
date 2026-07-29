@@ -67,7 +67,8 @@ For every legacy parent:
   non-null exact age, exact content, creator, and timestamps;
 - missing exact presentation fields copy from the parent as durable Bottle data;
 - common joins and shared fields materialize on every promoted Bottle;
-- the durable mapping owns legacy release id to promoted Bottle id;
+- the durable mapping owns only legacy release id to non-null promoted Bottle
+  id; failed work leaves no mapping because the one-shot transaction rolls back;
 - parent-only consumer rows keep the parent Bottle id;
 - release-specific consumer rows receive the promoted Bottle id and retain the
   old release id only as migration evidence until cleanup.

@@ -14,10 +14,7 @@ import { loadCatalogMigrationDatabaseEvidence } from "./catalogMigrationDatabase
 
 type PromotionMappingRow = {
   releaseId: number;
-  promotedBottleId: number | null;
-  status: string;
-  completedAt: Date | null;
-  error: string | null;
+  promotedBottleId: number;
   legacyReleaseExists: boolean;
   promotedBottleExists: boolean;
 };
@@ -39,12 +36,9 @@ export function summarizePromotionMappings({
   rows: PromotionMappingRow[];
 }): CatalogMigrationMappingSummary {
   const releaseCounts = new Map<number, number>();
-  const completedReleaseIds = new Set<number>();
-  let completedMappings = 0;
-  let pendingMappings = 0;
-  let failedMappings = 0;
-  let partialMappings = 0;
-  let invalidStatusMappings = 0;
+  const mappedReleaseIds = new Set<number>();
+  let validMappings = 0;
+  let invalidMappings = 0;
 
   for (const row of rows) {
     releaseCounts.set(
@@ -52,39 +46,24 @@ export function summarizePromotionMappings({
       (releaseCounts.get(row.releaseId) ?? 0) + 1,
     );
 
-    const isComplete =
-      row.status === "promoted" &&
-      row.promotedBottleId !== null &&
-      row.completedAt !== null &&
-      row.error === null &&
-      row.legacyReleaseExists &&
-      row.promotedBottleExists;
-    if (isComplete) {
-      completedMappings += 1;
-      completedReleaseIds.add(row.releaseId);
-    } else if (row.status === "pending") {
-      pendingMappings += 1;
-    } else if (row.status === "failed") {
-      failedMappings += 1;
-    } else if (row.status === "promoted") {
-      partialMappings += 1;
+    const isValid = row.legacyReleaseExists && row.promotedBottleExists;
+    if (isValid) {
+      validMappings += 1;
+      mappedReleaseIds.add(row.releaseId);
     } else {
-      invalidStatusMappings += 1;
+      invalidMappings += 1;
     }
   }
 
-  const mappedReleases = completedReleaseIds.size;
+  const mappedReleases = mappedReleaseIds.size;
   return {
     tablePresent,
     totalLegacyReleases,
     totalMappings: rows.length,
     mappedReleases,
     unmappedReleases: Math.max(totalLegacyReleases - mappedReleases, 0),
-    completedMappings,
-    pendingMappings,
-    failedMappings,
-    partialMappings,
-    invalidStatusMappings,
+    validMappings,
+    invalidMappings,
     duplicateReleaseMappings: Array.from(releaseCounts.values()).filter(
       (count) => count > 1,
     ).length,
@@ -105,13 +84,9 @@ async function loadLegacyCatalogSummary(
   const result = await database.execute<{
     report: CatalogMigrationLegacySummary;
   }>(sql`
-    WITH completed_promotions AS (
+    WITH mapped_promotions AS (
       SELECT promoted_bottle_id
       FROM bottle_release_promotion
-      WHERE status = 'promoted'
-        AND promoted_bottle_id IS NOT NULL
-        AND completed_at IS NOT NULL
-        AND error IS NULL
     ), release_counts AS (
       SELECT bottle_id, COUNT(*)::int AS release_count
       FROM bottle_release
@@ -122,7 +97,7 @@ async function loadLegacyCatalogSummary(
         COALESCE(release_counts.release_count, 0) AS legacy_release_count,
         tombstone.bottle_id IS NOT NULL AS is_retired
       FROM bottle b
-      LEFT JOIN completed_promotions promotion
+      LEFT JOIN mapped_promotions promotion
         ON promotion.promoted_bottle_id = b.id
       LEFT JOIN release_counts
         ON release_counts.bottle_id = b.id
@@ -230,13 +205,9 @@ async function loadReferenceSummaries(
         ('proposals_suggested'),
         ('proposal_attempts_current'),
         ('proposal_attempts_suggested')
-    ), completed_promotions AS (
+    ), mapped_promotions AS (
       SELECT release_id, promoted_bottle_id
       FROM bottle_release_promotion
-      WHERE status = 'promoted'
-        AND promoted_bottle_id IS NOT NULL
-        AND completed_at IS NOT NULL
-        AND error IS NULL
     ), reference_rows AS (
       SELECT 'tastings'::text AS surface, bottle_id, release_id FROM tasting
       UNION ALL SELECT 'reviews', bottle_id, release_id FROM review
@@ -287,7 +258,7 @@ async function loadReferenceSummaries(
     LEFT JOIN reference_rows refs ON refs.surface = surfaces.surface
     LEFT JOIN bottle b ON b.id = refs.bottle_id
     LEFT JOIN bottle_release r ON r.id = refs.release_id
-    LEFT JOIN completed_promotions promotion
+    LEFT JOIN mapped_promotions promotion
       ON promotion.release_id = refs.release_id
     GROUP BY surfaces.surface
     ORDER BY surfaces.surface
@@ -306,9 +277,6 @@ async function loadCollisions(
         FROM bottle_release_promotion mapping
         INNER JOIN bottle_release release ON release.id = mapping.release_id
         INNER JOIN bottle promoted ON promoted.id = mapping.promoted_bottle_id
-        WHERE mapping.status = 'promoted'
-          AND mapping.completed_at IS NOT NULL
-          AND mapping.error IS NULL
       `
     : sql`
         SELECT NULL::bigint AS release_id, NULL::bigint AS promoted_bottle_id
@@ -415,9 +383,6 @@ async function loadPromotionMappingSummary({
     SELECT
       mapping.release_id::int AS "releaseId",
       mapping.promoted_bottle_id::int AS "promotedBottleId",
-      mapping.status::text AS "status",
-      mapping.completed_at AS "completedAt",
-      mapping.error AS "error",
       release.id IS NOT NULL AS "legacyReleaseExists",
       promoted.id IS NOT NULL AS "promotedBottleExists"
     FROM bottle_release_promotion mapping
@@ -465,10 +430,7 @@ export async function collectCatalogMigrationAudit(
     invalidReferenceCount +
     collisions.length +
     promotionMappings.duplicateReleaseMappings +
-    promotionMappings.pendingMappings +
-    promotionMappings.failedMappings +
-    promotionMappings.partialMappings +
-    promotionMappings.invalidStatusMappings;
+    promotionMappings.invalidMappings;
   const warningCount =
     legacyCatalog.missingParentAliases +
     legacyCatalog.missingReleaseAliases +
@@ -536,7 +498,7 @@ export function formatCatalogMigrationAudit(
         `  ${collision.type}: release ${collision.releaseId} (${collision.name})${collision.bottleId ? ` vs bottle ${collision.bottleId}` : ""}${collision.otherReleaseId ? ` vs release ${collision.otherReleaseId}` : ""}`,
     ),
     "",
-    `Promotion mappings: ${report.promotionMappings.tablePresent ? "present" : "not created"} (${report.promotionMappings.mappedReleases}/${report.promotionMappings.totalLegacyReleases} completed; ${report.promotionMappings.pendingMappings} pending / ${report.promotionMappings.failedMappings} failed / ${report.promotionMappings.partialMappings} partial / ${report.promotionMappings.invalidStatusMappings} invalid status)`,
+    `Promotion mappings: ${report.promotionMappings.tablePresent ? "present" : "not created"} (${report.promotionMappings.mappedReleases}/${report.promotionMappings.totalLegacyReleases} mapped; ${report.promotionMappings.invalidMappings} invalid)`,
     `Blocking issues: ${report.blockingIssueCount}`,
     `Warnings: ${report.warningCount}`,
   ];

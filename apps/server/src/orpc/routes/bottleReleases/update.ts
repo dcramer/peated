@@ -140,8 +140,6 @@ export default procedure
         const [lockedPromotion] = await tx
           .select({
             promotedBottleId: bottleReleasePromotions.promotedBottleId,
-            status: bottleReleasePromotions.status,
-            completedAt: bottleReleasePromotions.completedAt,
           })
           .from(bottleReleasePromotions)
           .where(eq(bottleReleasePromotions.releaseId, promotion.release.id))
@@ -149,8 +147,6 @@ export default procedure
           .for("update");
         if (
           !lockedPromotion ||
-          lockedPromotion.status !== "promoted" ||
-          lockedPromotion.completedAt === null ||
           lockedPromotion.promotedBottleId !== manifest.bottle.id
         ) {
           throw new LegacyBottleReleasePromotionError(

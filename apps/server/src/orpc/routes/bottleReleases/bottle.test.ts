@@ -31,9 +31,6 @@ async function promoteRelease({
   await db.insert(bottleReleasePromotions).values({
     releaseId: release.id,
     promotedBottleId: bottle.id,
-    status: "promoted",
-    completedAt: new Date(),
-    createdByActorId: parent.createdByActorId,
   });
   return bottle;
 }
@@ -108,7 +105,7 @@ describe("GET /bottle-releases/{release}/bottle", () => {
     });
   });
 
-  test("returns conflict while a valid release lacks a completed promotion", async ({
+  test("returns conflict while a valid release lacks a promotion mapping", async ({
     fixtures,
   }) => {
     const parent = await fixtures.Bottle({ name: "Incomplete Parent" });
@@ -124,7 +121,7 @@ describe("GET /bottle-releases/{release}/bottle", () => {
     expect(error).toMatchObject({
       status: 409,
       message: expect.stringContaining(
-        "release does not have a completed promotion mapping",
+        "release does not have a promotion mapping",
       ),
     });
   });

@@ -419,9 +419,6 @@ describe("price match queue", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promoted.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
     });
     const price = await fixtures.StorePrice({ name: "Promoted Listing" });
     const [proposal] = await db

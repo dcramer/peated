@@ -48,14 +48,9 @@ async function createPromotedFamily(
     groupId: parent.groupId,
     edition: `${label} edition`,
   });
-  const actor = await getUserActor(await fixtures.User());
   await db.insert(bottleReleasePromotions).values({
     releaseId: release.id,
     promotedBottleId: promoted.id,
-    status: "promoted",
-    startedAt: new Date("2024-01-01T00:00:00.000Z"),
-    completedAt: new Date("2024-01-01T00:01:00.000Z"),
-    createdByActorId: actor.id,
   });
   return {
     mapping: {
@@ -420,10 +415,6 @@ describe("repointLegacyConsumersInTransaction", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promoted.id,
-      status: "promoted",
-      startedAt: new Date("2024-01-01T00:00:00.000Z"),
-      completedAt: new Date("2024-01-01T00:01:00.000Z"),
-      createdByActorId: actor.id,
     });
 
     const result = await db.transaction(async (tx) =>
@@ -590,31 +581,26 @@ describe("repointLegacyConsumersInTransaction", () => {
     });
   });
 
-  test("validates the durable promotion state", async ({ fixtures }) => {
+  test("validates the durable promotion mapping", async ({ fixtures }) => {
     const { mapping, parent } = await createPromotedFamily(fixtures, "mapping");
 
     await db
-      .update(bottleReleasePromotions)
-      .set({ status: "pending", completedAt: null })
+      .delete(bottleReleasePromotions)
       .where(eq(bottleReleasePromotions.releaseId, mapping.releaseId));
     await expectConsumerError(run(), {
-      code: "promotion_incomplete",
+      code: "promotion_missing",
     });
 
-    await db
-      .update(bottleReleasePromotions)
-      .set({
-        status: "promoted",
-        completedAt: new Date("2024-01-01T00:01:00.000Z"),
-        promotedBottleId: parent.id,
-      })
-      .where(eq(bottleReleasePromotions.releaseId, mapping.releaseId));
+    await db.insert(bottleReleasePromotions).values({
+      releaseId: mapping.releaseId,
+      promotedBottleId: parent.id,
+    });
     await expectConsumerError(run(), {
       code: "promotion_mismatch",
     });
   });
 
-  test("rejects a release without a completed promotion", async ({
+  test("rejects a release without a promotion mapping", async ({
     fixtures,
   }) => {
     const parent = await fixtures.Bottle();
@@ -628,7 +614,7 @@ describe("repointLegacyConsumersInTransaction", () => {
     });
 
     await expectConsumerError(run(), {
-      code: "promotion_incomplete",
+      code: "promotion_missing",
       slot: null,
     });
   });

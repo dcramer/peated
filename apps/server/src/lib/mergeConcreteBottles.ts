@@ -31,7 +31,6 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { appendExactBottleMergePromotionEvent } from "@peated/server/lib/exactBottleMergePromotionMetadata";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
@@ -601,15 +600,7 @@ export async function mergeConcreteBottlesInTransaction(
         .for("update")
     : [];
   const completeOwnedReleaseIds = new Set(
-    ownedReleasePromotions
-      .filter(
-        ({ status, promotedBottleId, completedAt, error }) =>
-          status === "promoted" &&
-          promotedBottleId !== null &&
-          completedAt !== null &&
-          error === null,
-      )
-      .map(({ releaseId }) => releaseId),
+    ownedReleasePromotions.map(({ releaseId }) => releaseId),
   );
   if (ownedReleases.some(({ id }) => !completeOwnedReleaseIds.has(id))) {
     throw new ConcreteBottleMergeGraphError("unmigrated", sourceBottleId);
@@ -653,33 +644,6 @@ export async function mergeConcreteBottlesInTransaction(
     .where(eq(bottleReleasePromotions.promotedBottleId, sourceBottleId))
     .orderBy(asc(bottleReleasePromotions.releaseId))
     .for("update");
-  const mergeAudit = {
-    sourceBottleId,
-    sourceGroupId,
-    destinationBottleId,
-    destinationGroupId,
-    actorId,
-  };
-  let promotionAuditUpdates: Array<{
-    releaseId: number;
-    auditMetadata: Record<string, unknown>;
-  }>;
-  try {
-    promotionAuditUpdates = promotionRows.map((promotion) => ({
-      releaseId: promotion.releaseId,
-      auditMetadata: appendExactBottleMergePromotionEvent(
-        promotion.auditMetadata,
-        mergeAudit,
-      ),
-    }));
-  } catch (error) {
-    throw new ConcreteBottleMergeGraphError(
-      "invalid_catalog_graph",
-      sourceBottleId,
-      { cause: error },
-    );
-  }
-
   let consumerCounts: Record<string, number>;
   try {
     consumerCounts = await repointBottleConsumers(
@@ -713,15 +677,11 @@ export async function mergeConcreteBottlesInTransaction(
     });
   }
 
-  for (const promotion of promotionAuditUpdates) {
+  if (promotionRows.length) {
     await tx
       .update(bottleReleasePromotions)
-      .set({
-        promotedBottleId: destinationBottleId,
-        auditMetadata: promotion.auditMetadata,
-        updatedAt: new Date(),
-      })
-      .where(eq(bottleReleasePromotions.releaseId, promotion.releaseId));
+      .set({ promotedBottleId: destinationBottleId })
+      .where(eq(bottleReleasePromotions.promotedBottleId, sourceBottleId));
   }
   const retargetedLegacyReleases = ownedReleases.length
     ? await tx

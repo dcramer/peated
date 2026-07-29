@@ -613,7 +613,6 @@ function groupValues(plan: FamilyPlan): typeof bottleGroups.$inferInsert {
 async function insertFamily(
   tx: AnyTransaction,
   plan: FamilyPlan,
-  now: Date,
 ): Promise<AppliedFamily> {
   const [group] = await tx
     .insert(bottleGroups)
@@ -686,17 +685,6 @@ async function insertFamily(
     await tx.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: bottle.id,
-      status: "promoted",
-      startedAt: now,
-      completedAt: now,
-      createdByActorId: release.createdByActorId,
-      auditMetadata: {
-        legacyParentBottleId: plan.parent.id,
-        releaseId: release.id,
-        promotedBottleId: bottle.id,
-        groupId: group.id,
-      },
-      error: null,
     });
     promoted.push({ release, bottle });
   }
@@ -960,14 +948,7 @@ async function assertAppliedFamilies(
     for (const { release, bottle: insertedBottle } of family.promoted) {
       const bottle = state.bottleById.get(insertedBottle.id);
       const mapping = state.mappingByReleaseId.get(release.id);
-      if (
-        !bottle ||
-        !mapping ||
-        mapping.status !== "promoted" ||
-        mapping.promotedBottleId !== bottle.id ||
-        mapping.completedAt === null ||
-        mapping.error !== null
-      ) {
+      if (!bottle || !mapping || mapping.promotedBottleId !== bottle.id) {
         throw new CatalogMigrationApplyError("postflight_failed", {
           parentId: parent.id,
           releaseId: release.id,
@@ -1039,18 +1020,11 @@ async function loadCompletedFamilies(
           mapping?.promotedBottleId === undefined
             ? undefined
             : bottleById.get(mapping.promotedBottleId);
-        if (
-          !mapping ||
-          mapping.status !== "promoted" ||
-          mapping.completedAt === null ||
-          mapping.error !== null ||
-          !bottle ||
-          bottle.groupId !== plan.parent.groupId
-        ) {
+        if (!mapping || !bottle || bottle.groupId !== plan.parent.groupId) {
           throw new CatalogMigrationApplyError("partial_state", {
             parentId: plan.parent.id,
             releaseId: release.id,
-            reason: "promotion_incomplete",
+            reason: "promotion_missing",
           });
         }
         return { release, bottle };
@@ -1186,12 +1160,10 @@ function assertPostflightAudit(
     audit.legacyCatalog.totalReleases !== releaseCount ||
     audit.promotionMappings.totalLegacyReleases !== releaseCount ||
     audit.promotionMappings.totalMappings !== releaseCount ||
-    audit.promotionMappings.completedMappings !== releaseCount ||
+    audit.promotionMappings.validMappings !== releaseCount ||
     audit.promotionMappings.mappedReleases !== releaseCount ||
     audit.promotionMappings.unmappedReleases !== 0 ||
-    audit.promotionMappings.pendingMappings !== 0 ||
-    audit.promotionMappings.failedMappings !== 0 ||
-    audit.promotionMappings.partialMappings !== 0 ||
+    audit.promotionMappings.invalidMappings !== 0 ||
     audit.references.some(({ invalidRows }) => invalidRows !== 0)
   ) {
     throw new CatalogMigrationApplyError("postflight_failed", {
@@ -1269,10 +1241,9 @@ export async function applyCatalogMigration(
     await assertAuditUnchanged(tx, parsed.candidate, revision);
     const plans = await buildFamilyPlans(tx, state);
     const consumerPreflight = await preflightLegacyConsumersInTransaction(tx);
-    const now = new Date();
     const applied: AppliedFamily[] = [];
     for (const plan of plans) {
-      applied.push(await insertFamily(tx, plan, now));
+      applied.push(await insertFamily(tx, plan));
     }
 
     const consumers = await repointLegacyConsumersInTransaction(

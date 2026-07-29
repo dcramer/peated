@@ -32,8 +32,6 @@ async function mapPromotedRelease(release: BottleRelease, bottle: Bottle) {
     await tx.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: bottle.id,
-      status: "promoted",
-      completedAt: new Date(),
     });
   });
 }
@@ -97,18 +95,11 @@ describe("GET /bottle-releases/:release", function () {
     const release = await fixtures.BottleRelease({
       bottleId: legacyParent.id,
     });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      status: "pending",
-    });
-
     const err = await waitError(
       routerClient.bottleReleases.details({ release: release.id }),
     );
 
-    expect(err.message).toContain(
-      "release does not have a completed promotion mapping",
-    );
+    expect(err.message).toContain("release does not have a promotion mapping");
   });
 
   it("projects the mapped Bottle independently of its current group", async function ({

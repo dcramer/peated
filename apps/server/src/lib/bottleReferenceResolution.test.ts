@@ -282,8 +282,6 @@ describe("resolveBottleReferenceTarget", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
     });
     const alias = await fixtures.BottleAlias({
       bottleId: parent.id,

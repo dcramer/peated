@@ -17,8 +17,6 @@ async function promoteRelease(releaseId: number, promotedBottleId: number) {
   await db.insert(bottleReleasePromotions).values({
     releaseId,
     promotedBottleId,
-    status: "promoted",
-    completedAt: new Date(),
   });
 }
 
@@ -297,9 +295,7 @@ describe("PATCH /bottle-releases/{release}", () => {
     expect(error).toMatchObject({ status: 404 });
   });
 
-  test("rejects missing, pending, and incomplete promotion mappings", async ({
-    fixtures,
-  }) => {
+  test("rejects a missing promotion mapping", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
 
     const missingParent = await fixtures.Bottle({ name: "Missing Mapping" });
@@ -307,27 +303,6 @@ describe("PATCH /bottle-releases/{release}", () => {
       bottleId: missingParent.id,
     });
 
-    const pendingParent = await fixtures.Bottle({ name: "Pending Mapping" });
-    const pendingRelease = await fixtures.BottleRelease({
-      bottleId: pendingParent.id,
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: pendingRelease.id,
-      promotedBottleId: pendingParent.id,
-      status: "pending",
-    });
-
-    const incompleteParent = await fixtures.Bottle({
-      name: "Incomplete Mapping",
-    });
-    const incompleteRelease = await fixtures.BottleRelease({
-      bottleId: incompleteParent.id,
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: incompleteRelease.id,
-      promotedBottleId: incompleteParent.id,
-      status: "promoted",
-    });
     const bottlesBefore = await db
       .select()
       .from(bottles)
@@ -337,19 +312,13 @@ describe("PATCH /bottle-releases/{release}", () => {
       .from(changes)
       .orderBy(asc(changes.id));
 
-    for (const releaseId of [
-      missingRelease.id,
-      pendingRelease.id,
-      incompleteRelease.id,
-    ]) {
-      const error = await waitError(
-        routerClient.bottleReleases.update(
-          { release: releaseId, edition: "Must not apply" },
-          { context: { user: mod } },
-        ),
-      );
-      expect(error).toMatchObject({ status: 409 });
-    }
+    const error = await waitError(
+      routerClient.bottleReleases.update(
+        { release: missingRelease.id, edition: "Must not apply" },
+        { context: { user: mod } },
+      ),
+    );
+    expect(error).toMatchObject({ status: 409 });
     expect(await db.select().from(bottles).orderBy(asc(bottles.id))).toEqual(
       bottlesBefore,
     );

@@ -77,7 +77,7 @@ and map to an explicit removal task.
 - [x] 4.3 Assign every legacy parent Bottle to one migration-created group and
       retain it as the general/unversioned member.
 - [x] 4.4 Promote every BottleRelease into an independently complete Bottle in
-      its parent's group and persist a completed durable mapping.
+      its parent's group and persist a durable release-to-Bottle mapping.
 - [x] 4.5 Repoint every release-specific consumer Bottle reference to the
       promoted Bottle while retaining its release id as historical evidence until
       separately approved cleanup.
@@ -156,7 +156,7 @@ and map to an explicit removal task.
       duplicate business logic, and unexpected file-tree growth.
 - [x] 7.9 Remove BottleGroup-owned exact editorial presentation and its manual
       writer; use the representative Bottle for relationship presentation.
-- [ ] 7.10 Simplify the durable BottleRelease promotion record to committed
+- [x] 7.10 Simplify the durable BottleRelease promotion record to committed
       release-to-Bottle identity without checkpoint lifecycle state.
 - [ ] 7.11 Remove BottleGroup tombstones and retired-group branches; preserve
       user-facing retirement through canonical Bottle tombstones.

@@ -86,7 +86,6 @@ export default procedure
 
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleReleases.bottleId, bottle.id),
-      isNotNull(bottleReleasePromotions.completedAt),
       isNotNull(promotedBottles.groupId),
       sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${promotedBottles.id})`,
       sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${promotedBottles.groupId})`,
@@ -155,10 +154,7 @@ export default procedure
       .from(bottleReleases)
       .innerJoin(
         bottleReleasePromotions,
-        and(
-          eq(bottleReleasePromotions.releaseId, bottleReleases.id),
-          eq(bottleReleasePromotions.status, "promoted"),
-        ),
+        eq(bottleReleasePromotions.releaseId, bottleReleases.id),
       )
       .innerJoin(
         promotedBottles,

@@ -35,10 +35,6 @@ describe("resolveLegacyBottleReleasePromotion", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      error: null,
-      createdByActorId: actor.id,
     });
 
     await db.transaction((tx) =>
@@ -78,7 +74,6 @@ describe("resolveLegacyBottleReleasePromotion", () => {
   });
 
   test("rejects an unrelated expected parent", async ({ fixtures }) => {
-    const actor = await getUserActor(await fixtures.User({ mod: true }));
     const parent = await fixtures.Bottle({ name: "Actual legacy parent" });
     const unrelatedParent = await fixtures.Bottle({
       name: "Unrelated legacy parent",
@@ -94,10 +89,6 @@ describe("resolveLegacyBottleReleasePromotion", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      error: null,
-      createdByActorId: actor.id,
     });
 
     await expect(

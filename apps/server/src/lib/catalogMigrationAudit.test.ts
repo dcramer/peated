@@ -74,11 +74,8 @@ describe("catalog migration audit", () => {
       totalMappings: 0,
       mappedReleases: 0,
       unmappedReleases: 1,
-      completedMappings: 0,
-      pendingMappings: 0,
-      failedMappings: 0,
-      partialMappings: 0,
-      invalidStatusMappings: 0,
+      validMappings: 0,
+      invalidMappings: 0,
     });
     expect(report.blockingIssueCount).toBe(0);
     expect(report.warningCount).toBe(0);
@@ -219,7 +216,7 @@ describe("catalog migration audit", () => {
     expect(report.blockingIssueCount).toBeGreaterThanOrEqual(1);
   });
 
-  test("distinguishes completed, pending, failed, partial, and invalid mappings", () => {
+  test("distinguishes complete, duplicate, and dangling mappings", () => {
     expect(
       summarizePromotionMappings({
         tablePresent: true,
@@ -228,45 +225,24 @@ describe("catalog migration audit", () => {
           {
             releaseId: 1,
             promotedBottleId: 101,
-            status: "promoted",
-            completedAt: new Date("2026-01-01T00:00:00.000Z"),
-            error: null,
             legacyReleaseExists: true,
             promotedBottleExists: true,
           },
           {
             releaseId: 1,
             promotedBottleId: 102,
-            status: "pending",
-            completedAt: null,
-            error: null,
             legacyReleaseExists: true,
             promotedBottleExists: true,
           },
           {
             releaseId: 2,
             promotedBottleId: 103,
-            status: "failed",
-            completedAt: null,
-            error: "promotion failed",
             legacyReleaseExists: false,
             promotedBottleExists: false,
           },
           {
             releaseId: 3,
-            promotedBottleId: null,
-            status: "promoted",
-            completedAt: null,
-            error: null,
-            legacyReleaseExists: true,
-            promotedBottleExists: false,
-          },
-          {
-            releaseId: 4,
-            promotedBottleId: null,
-            status: "unexpected",
-            completedAt: null,
-            error: null,
+            promotedBottleId: 104,
             legacyReleaseExists: true,
             promotedBottleExists: false,
           },
@@ -275,75 +251,38 @@ describe("catalog migration audit", () => {
     ).toEqual({
       tablePresent: true,
       totalLegacyReleases: 6,
-      totalMappings: 5,
+      totalMappings: 4,
       mappedReleases: 1,
       unmappedReleases: 5,
-      completedMappings: 1,
-      pendingMappings: 1,
-      failedMappings: 1,
-      partialMappings: 1,
-      invalidStatusMappings: 1,
+      validMappings: 2,
+      invalidMappings: 2,
       duplicateReleaseMappings: 1,
       missingLegacyReleases: 1,
-      missingPromotedBottles: 3,
+      missingPromotedBottles: 2,
     });
   });
 
-  test("reports incomplete mapping statuses as blockers", async ({
-    fixtures,
-  }) => {
+  test("reports unmapped releases before apply", async ({ fixtures }) => {
     const parent = await fixtures.LegacyBottle();
-    const pending = await fixtures.BottleRelease({
+    await fixtures.BottleRelease({
       bottleId: parent.id,
-      name: `${parent.name} pending`,
-      fullName: `${parent.fullName} pending`,
+      name: `${parent.name} unmapped`,
+      fullName: `${parent.fullName} unmapped`,
     });
-    const failed = await fixtures.BottleRelease({
-      bottleId: parent.id,
-      name: `${parent.name} failed`,
-      fullName: `${parent.fullName} failed`,
-    });
-    const partial = await fixtures.BottleRelease({
-      bottleId: parent.id,
-      name: `${parent.name} partial`,
-      fullName: `${parent.fullName} partial`,
-    });
-    const promoted = await fixtures.Bottle();
-
-    await db.insert(bottleReleasePromotions).values([
-      {
-        releaseId: pending.id,
-        status: "pending",
-        startedAt: new Date(),
-      },
-      {
-        releaseId: failed.id,
-        status: "failed",
-        error: "fixture failure",
-      },
-      {
-        releaseId: partial.id,
-        promotedBottleId: promoted.id,
-        status: "promoted",
-      },
-    ]);
 
     const report = await runCatalogMigrationAudit();
 
     expect(report.promotionMappings).toMatchObject({
-      totalMappings: 3,
+      totalMappings: 0,
       mappedReleases: 0,
-      unmappedReleases: 3,
-      completedMappings: 0,
-      pendingMappings: 1,
-      failedMappings: 1,
-      partialMappings: 1,
-      invalidStatusMappings: 0,
+      unmappedReleases: 1,
+      validMappings: 0,
+      invalidMappings: 0,
     });
-    expect(report.blockingIssueCount).toBeGreaterThanOrEqual(3);
+    expect(report.blockingIssueCount).toBe(0);
   });
 
-  test("does not report a completed promotion as its own collision", async ({
+  test("does not report a mapped promotion as its own collision", async ({
     fixtures,
   }) => {
     const parent = await fixtures.LegacyBottle();
@@ -359,9 +298,6 @@ describe("catalog migration audit", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promoted.id,
-      status: "promoted",
-      startedAt: new Date("2026-01-01T00:00:00.000Z"),
-      completedAt: new Date("2026-01-01T00:00:01.000Z"),
     });
     await fixtures.Tasting({
       bottleId: promoted.id,
@@ -374,7 +310,7 @@ describe("catalog migration audit", () => {
     expect(completedReport.legacyCatalog.totalParents).toBe(1);
     expect(completedReport.promotionMappings).toMatchObject({
       mappedReleases: 1,
-      completedMappings: 1,
+      validMappings: 1,
     });
     expect(
       completedReport.references.find(({ surface }) => surface === "tastings"),
@@ -424,13 +360,13 @@ describe("catalog migration audit", () => {
       await runCatalogMigrationAudit(),
     );
 
-    expect(output).toContain("Catalog migration audit v4");
+    expect(output).toContain("Catalog migration audit v5");
     expect(output).toContain(
       "Parents: 1 (1 zero / 0 one / 0 multiple releases)",
     );
     expect(output).toContain("Retired parents: 0 (0 with releases)");
     expect(output).toContain(
-      "Promotion mappings: present (0/0 completed; 0 pending / 0 failed / 0 partial / 0 invalid status)",
+      "Promotion mappings: present (0/0 mapped; 0 invalid)",
     );
   });
 });

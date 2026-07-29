@@ -28,7 +28,7 @@ const revision = {
 };
 
 const audit = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   generatedAt: "2026-07-27T00:00:00.000Z",
   databaseEvidence,
   legacyCatalog: {
@@ -57,11 +57,8 @@ const audit = {
     totalMappings: 0,
     mappedReleases: 0,
     unmappedReleases: 0,
-    completedMappings: 0,
-    pendingMappings: 0,
-    failedMappings: 0,
-    partialMappings: 0,
-    invalidStatusMappings: 0,
+    validMappings: 0,
+    invalidMappings: 0,
     duplicateReleaseMappings: 0,
     missingLegacyReleases: 0,
     missingPromotedBottles: 0,

@@ -155,7 +155,8 @@ Keep:
 
 - `bottle_group`;
 - `bottle.groupId`;
-- durable BottleRelease-to-Bottle promotion mapping;
+- durable BottleRelease-to-Bottle promotion mapping containing only the legacy
+  release id and its non-null promoted Bottle id;
 - BottleGroup tombstone/redirect support where required;
 - legacy BottleRelease tables and columns until cleanup approval.
 
@@ -209,7 +210,7 @@ The migration executes once inside one database transaction:
 3. create or validate one BottleGroup per legacy parent;
 4. keep each parent Bottle and assign it to its group;
 5. promote every BottleRelease to a complete Bottle;
-6. create completed durable release-to-Bottle mappings;
+6. create durable release-to-Bottle mappings;
 7. repoint every release-specific consumer Bottle reference to the promoted
    Bottle while retaining `releaseId` as historical migration evidence until
    separately approved cleanup;

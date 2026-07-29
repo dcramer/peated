@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CatalogMigrationDatabaseEvidenceSchema } from "./catalogMigrationDatabaseIdentity";
 
-export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 4 as const;
+export const CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION = 5 as const;
 
 export const CatalogMigrationLegacySummarySchema = z.object({
   totalParents: z.number().int().gte(0),
@@ -53,11 +53,8 @@ export const CatalogMigrationMappingSummarySchema = z.object({
   totalMappings: z.number().int().gte(0),
   mappedReleases: z.number().int().gte(0),
   unmappedReleases: z.number().int().gte(0),
-  completedMappings: z.number().int().gte(0),
-  pendingMappings: z.number().int().gte(0),
-  failedMappings: z.number().int().gte(0),
-  partialMappings: z.number().int().gte(0),
-  invalidStatusMappings: z.number().int().gte(0),
+  validMappings: z.number().int().gte(0),
+  invalidMappings: z.number().int().gte(0),
   duplicateReleaseMappings: z.number().int().gte(0),
   missingLegacyReleases: z.number().int().gte(0),
   missingPromotedBottles: z.number().int().gte(0),

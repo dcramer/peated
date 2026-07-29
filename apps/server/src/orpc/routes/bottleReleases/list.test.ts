@@ -19,8 +19,6 @@ async function mapPromotedRelease(release: BottleRelease, bottle: Bottle) {
   await db.insert(bottleReleasePromotions).values({
     releaseId: release.id,
     promotedBottleId: bottle.id,
-    status: "promoted",
-    completedAt: new Date(),
   });
 }
 
@@ -46,7 +44,7 @@ async function promoteRelease(
 }
 
 describe("GET /bottles/:bottle/releases", () => {
-  it("lists completed promotions as legacy release projections", async ({
+  it("lists mapped promotions as legacy release projections", async ({
     fixtures,
     defaults,
   }) => {
@@ -209,11 +207,6 @@ describe("GET /bottles/:bottle/releases", () => {
         searchVector: sql`to_tsvector('english', ${promoted.fullName})`,
       })
       .where(eq(bottles.id, promoted.id));
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: pendingRelease.id,
-      status: "pending",
-    });
-
     const { results, rel } = await routerClient.bottleReleases.list({
       bottle: bottle.id,
       query: "Compatibility",
@@ -274,8 +267,6 @@ describe("GET /bottles/:bottle/releases", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promoted.id,
-      status: "promoted",
-      completedAt: new Date(),
     });
 
     const { results } = await routerClient.bottleReleases.list({

@@ -469,9 +469,6 @@ describe("assignBottleAliasInTransaction", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promoted.id,
-      status: "promoted",
-      completedAt: new Date(),
-      createdByActorId: parent.createdByActorId,
     });
     const alias = await fixtures.BottleAlias({
       name: "Promotion Evidence Alias",

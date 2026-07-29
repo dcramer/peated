@@ -202,10 +202,6 @@ describe("exact Bottle merges", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: source.id,
-      status: "promoted",
-      auditMetadata: { source: "test" },
-      completedAt: new Date(),
-      createdByActorId: actor.id,
     });
 
     const result = await mergeConcreteBottles({
@@ -325,15 +321,6 @@ describe("exact Bottle merges", () => {
       }),
     ).toMatchObject({
       promotedBottleId: destination.id,
-      auditMetadata: {
-        source: "test",
-        exactBottleMerges: [
-          expect.objectContaining({
-            sourceBottleId: source.id,
-            destinationBottleId: destination.id,
-          }),
-        ],
-      },
     });
     expect(
       await db.query.bottleTags.findFirst({
@@ -767,10 +754,6 @@ describe("exact Bottle merges", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      error: null,
-      createdByActorId: actor.id,
     });
 
     await db.transaction((tx) =>
@@ -793,7 +776,6 @@ describe("exact Bottle merges", () => {
     ).toMatchObject({
       releaseId: release.id,
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
     });
   });
 
@@ -820,10 +802,6 @@ describe("exact Bottle merges", () => {
     await db.insert(bottleReleasePromotions).values({
       releaseId: release.id,
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      completedAt: new Date(),
-      error: null,
-      createdByActorId: actor.id,
     });
 
     await db.transaction((tx) =>
@@ -852,8 +830,6 @@ describe("exact Bottle merges", () => {
       }),
     ).toMatchObject({
       promotedBottleId: promotedBottle.id,
-      status: "promoted",
-      error: null,
     });
     expect(
       await db.query.bottleGroups.findFirst({

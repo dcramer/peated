@@ -219,7 +219,7 @@ BottleRelease is not part of live creation. The only retained release-shaped
 behavior is measured compatibility for existing data and callers while legacy
 rows are promoted:
 
-- a completed promotion mapping resolves a legacy `releaseId` to its promoted
+- a durable promotion mapping resolves a legacy `releaseId` to its promoted
   Bottle;
 - retained `releaseId` columns may remain as historical migration evidence
   until their schema-removal gate, but live reads and writes use only

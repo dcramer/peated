@@ -115,16 +115,10 @@ describe("BottleRelease promotion constraints", () => {
       {
         releaseId: firstRelease.id,
         promotedBottleId: promotedBottle.id,
-        status: "promoted",
-        completedAt: new Date(),
-        createdByActorId: promotedBottle.createdByActorId,
       },
       {
         releaseId: secondRelease.id,
         promotedBottleId: promotedBottle.id,
-        status: "promoted",
-        completedAt: new Date(),
-        createdByActorId: promotedBottle.createdByActorId,
       },
     ]);
 
@@ -133,9 +127,6 @@ describe("BottleRelease promotion constraints", () => {
       db.insert(bottleReleasePromotions).values({
         releaseId: firstRelease.id,
         promotedBottleId: otherPromotedBottle.id,
-        status: "promoted",
-        completedAt: new Date(),
-        createdByActorId: promotedBottle.createdByActorId,
       }),
     ).rejects.toThrow(/bottle_release_promotion_pkey/);
   });

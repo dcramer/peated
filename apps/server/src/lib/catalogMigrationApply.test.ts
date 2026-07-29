@@ -242,7 +242,7 @@ describe("applyCatalogMigration", () => {
       promotionMappings: {
         totalLegacyReleases: 3,
         totalMappings: 3,
-        completedMappings: 3,
+        validMappings: 3,
         unmappedReleases: 0,
       },
     });
@@ -272,12 +272,7 @@ describe("applyCatalogMigration", () => {
       .orderBy(asc(bottleReleasePromotions.releaseId));
     expect(mappings).toHaveLength(3);
     expect(
-      mappings.every(
-        ({ status, completedAt, promotedBottleId }) =>
-          status === "promoted" &&
-          completedAt !== null &&
-          promotedBottleId !== null,
-      ),
+      mappings.every(({ promotedBottleId }) => promotedBottleId !== null),
     ).toBe(true);
     const oneMapping = mappings.find(
       ({ releaseId }) => releaseId === oneRelease.id,

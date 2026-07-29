@@ -13,7 +13,7 @@ import { and, eq } from "drizzle-orm";
 export type LegacyBottleReleasePromotionErrorCode =
   | "parent_mismatch"
   | "promoted_bottle_unavailable"
-  | "promotion_incomplete"
+  | "promotion_missing"
   | "promotion_integrity_mismatch"
   | "release_not_found";
 
@@ -34,7 +34,7 @@ type CompatibilityContext = {
 };
 
 /**
- * Resolves one retained BottleRelease through its completed promotion mapping.
+ * Resolves one retained BottleRelease through its durable promotion mapping.
  * This compatibility boundary returns only the independently complete Bottle.
  */
 export async function resolveLegacyBottleReleasePromotion(
@@ -98,15 +98,10 @@ export async function resolveLegacyBottleReleasePromotion(
   const promotion = await database.query.bottleReleasePromotions.findFirst({
     where: eq(bottleReleasePromotions.releaseId, release.id),
   });
-  if (
-    !promotion ||
-    promotion.status !== "promoted" ||
-    promotion.promotedBottleId === null ||
-    promotion.completedAt === null
-  ) {
+  if (!promotion) {
     throw new LegacyBottleReleasePromotionError(
-      "promotion_incomplete",
-      "The release does not have a completed promotion mapping.",
+      "promotion_missing",
+      "The release does not have a promotion mapping.",
     );
   }
 

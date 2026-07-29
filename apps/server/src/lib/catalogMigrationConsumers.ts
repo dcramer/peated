@@ -32,7 +32,7 @@ export type CatalogMigrationConsumerPreflight = Readonly<{
 export type CatalogMigrationConsumerErrorCode =
   | "invalid_pair"
   | "membership_conflict"
-  | "promotion_incomplete"
+  | "promotion_missing"
   | "promotion_mismatch"
   | "inactive_bottle"
   | "group_mismatch"
@@ -173,7 +173,7 @@ type InvalidPromotionRow = {
   parentBottleId: number;
   promotedBottleId: number | null;
   reason:
-    | "promotion_incomplete"
+    | "promotion_missing"
     | "promotion_matches_parent"
     | "parent_inactive"
     | "promoted_inactive"
@@ -240,9 +240,6 @@ async function assertNoMembershipConflicts(tx: AnyTransaction): Promise<void> {
     WITH complete_promotion AS (
       SELECT release_id, promoted_bottle_id
       FROM bottle_release_promotion
-      WHERE status = 'promoted'
-        AND completed_at IS NOT NULL
-        AND promoted_bottle_id IS NOT NULL
     ),
     tasting_final AS (
       SELECT
@@ -389,10 +386,7 @@ async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
       promotion.promoted_bottle_id AS "promotedBottleId",
       CASE
         WHEN promotion.release_id IS NULL
-          OR promotion.status <> 'promoted'
-          OR promotion.completed_at IS NULL
-          OR promotion.promoted_bottle_id IS NULL
-          THEN 'promotion_incomplete'
+          THEN 'promotion_missing'
         WHEN promotion.promoted_bottle_id = release.bottle_id
           THEN 'promotion_matches_parent'
         WHEN parent.id IS NULL
@@ -423,9 +417,6 @@ async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
     LEFT JOIN bottle_group_tombstone promoted_group_tombstone
       ON promoted_group_tombstone.bottle_group_id = promoted.group_id
     WHERE promotion.release_id IS NULL
-       OR promotion.status <> 'promoted'
-       OR promotion.completed_at IS NULL
-       OR promotion.promoted_bottle_id IS NULL
        OR promotion.promoted_bottle_id = release.bottle_id
        OR parent.id IS NULL
        OR parent.group_id IS NULL
@@ -451,9 +442,9 @@ async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
     promotedGroupId: invalid.promotedGroupId,
   };
   switch (invalid.reason) {
-    case "promotion_incomplete":
+    case "promotion_missing":
       throw new CatalogMigrationConsumerError(
-        "promotion_incomplete",
+        "promotion_missing",
         null,
         invalid.releaseId,
         details,
@@ -511,9 +502,6 @@ async function applySlot(
       FROM bottle_release AS release
       INNER JOIN bottle_release_promotion AS promotion
         ON promotion.release_id = release.id
-       AND promotion.status = 'promoted'
-       AND promotion.completed_at IS NOT NULL
-       AND promotion.promoted_bottle_id IS NOT NULL
       WHERE consumer.${releaseColumn} = release.id
         AND consumer.${bottleColumn} IS DISTINCT FROM promotion.promoted_bottle_id
       RETURNING 1
@@ -541,9 +529,6 @@ async function assertPromotedPairs(
     LEFT JOIN bottle_release release ON release.id = refs.release_id
     LEFT JOIN bottle_release_promotion promotion
       ON promotion.release_id = release.id
-     AND promotion.status = 'promoted'
-     AND promotion.completed_at IS NOT NULL
-     AND promotion.promoted_bottle_id IS NOT NULL
     WHERE release.id IS NULL
        OR promotion.release_id IS NULL
        OR refs.bottle_id IS DISTINCT FROM promotion.promoted_bottle_id

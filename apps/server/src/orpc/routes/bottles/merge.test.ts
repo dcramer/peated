@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleReleasePromotions,
   bottleTombstones,
   bottles,
   type Bottle,
@@ -131,43 +130,5 @@ describe("POST /bottles/:bottle/merge", () => {
         { context: { user: mod } },
       ),
     ).rejects.toMatchObject({ status: 409 });
-  });
-
-  test("maps corrupt promotion metadata to an invalid-graph conflict", async ({
-    fixtures,
-  }) => {
-    const mod = await fixtures.User({ mod: true });
-    const parent = await fixtures.Bottle({ name: "Promotion Parent" });
-    const source = await fixtures.Bottle({ name: "Promotion Source" });
-    const destination = await fixtures.Bottle({
-      name: "Promotion Destination",
-    });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: source.id,
-      status: "promoted",
-      createdByActorId: source.createdByActorId,
-      auditMetadata: [] as unknown as Record<string, unknown>,
-    });
-
-    await expect(
-      routerClient.bottles.merge(
-        {
-          bottle: source.id,
-          other: destination.id,
-          direction: "mergeInto",
-        },
-        { context: { user: mod } },
-      ),
-    ).rejects.toMatchObject({ status: 409 });
-    expect(
-      await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
-    ).toBeDefined();
-    expect(
-      await db.query.bottleTombstones.findFirst({
-        where: eq(bottleTombstones.bottleId, source.id),
-      }),
-    ).toBeUndefined();
   });
 });

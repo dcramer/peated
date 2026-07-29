@@ -80,11 +80,6 @@ export const bottleAliasAssignmentSourceEnum = pgEnum(
   "bottle_alias_assignment_source",
   BOTTLE_ALIAS_ASSIGNMENT_SOURCES,
 );
-export const bottleReleasePromotionStatusEnum = pgEnum(
-  "bottle_release_promotion_status",
-  ["pending", "promoted", "failed"],
-);
-
 /**
  * Represents a series of bottles from a brand.
  * A series groups related bottles together and contains shared characteristics.
@@ -540,29 +535,12 @@ export const bottleReleasePromotions = pgTable(
       .primaryKey(),
     promotedBottleId: bigint("promoted_bottle_id", {
       mode: "number",
-    }).references(() => bottles.id),
-    status: bottleReleasePromotionStatusEnum("status")
-      .default("pending")
+    })
+      .references(() => bottles.id)
       .notNull(),
-    auditMetadata: jsonb("audit_metadata")
-      .$type<Record<string, unknown>>()
-      .default(sql`'{}'::jsonb`)
-      .notNull(),
-    error: text("error"),
-    startedAt: timestamp("started_at"),
-    completedAt: timestamp("completed_at"),
-    createdByActorId: bigint("created_by_actor_id", {
-      mode: "number",
-    }).references(() => actors.id),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("bottle_release_promotion_bottle_idx").on(table.promotedBottleId),
-    index("bottle_release_promotion_status_idx").on(table.status),
-    index("bottle_release_promotion_created_by_actor_idx").on(
-      table.createdByActorId,
-    ),
   ],
 );
 
@@ -576,10 +554,6 @@ export const bottleReleasePromotionsRelations = relations(
     promotedBottle: one(bottles, {
       fields: [bottleReleasePromotions.promotedBottleId],
       references: [bottles.id],
-    }),
-    createdByActor: one(actors, {
-      fields: [bottleReleasePromotions.createdByActorId],
-      references: [actors.id],
     }),
   }),
 );
