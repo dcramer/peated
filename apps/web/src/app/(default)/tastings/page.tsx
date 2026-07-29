@@ -68,7 +68,10 @@ function TastingList() {
               title: "Bottle",
               className: "min-w-full sm:w-1/2",
               value: (tasting) => (
-                <TastingBottleIdentity bottle={tasting.bottle} compact />
+                <TastingBottleIdentity
+                  bottle={tasting.bottle}
+                  variant="inline"
+                />
               ),
             },
             {

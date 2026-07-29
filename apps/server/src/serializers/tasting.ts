@@ -43,6 +43,8 @@ export const TastingSerializer = serializer({
       BottleSerializer,
       bottleList,
       currentUser,
+      [],
+      { includeGroupSummary: true },
     );
     const serializedBottleById = new Map(
       bottleList.map((bottle, index) => [bottle.id, serializedBottles[index]!]),
