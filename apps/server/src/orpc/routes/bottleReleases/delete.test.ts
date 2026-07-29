@@ -180,6 +180,7 @@ describe("DELETE /bottle-releases/{release}", () => {
     expect(error).toMatchObject({
       status: 409,
       message: `BottleRelease ${release.id} maps to Bottle ${promoted.id}; merge that Bottle into an explicit destination instead.`,
+      data: { bottle: promoted.id },
     });
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
@@ -224,6 +225,7 @@ describe("DELETE /bottle-releases/{release}", () => {
     expect(error).toMatchObject({
       status: 409,
       message: `BottleRelease ${release.id} maps to Bottle ${survivor.id}; merge that Bottle into an explicit destination instead.`,
+      data: { bottle: survivor.id },
     });
     expect(await snapshotCatalogGraph()).toEqual(before);
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();

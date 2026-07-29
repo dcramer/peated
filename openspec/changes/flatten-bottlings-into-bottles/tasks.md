@@ -194,8 +194,7 @@ and map to an explicit removal task.
       redirects, queue health, latency, and major user workflows; then generate,
       review, and apply the non-destructive direct-only uniqueness activation
       before accepting new catalog-consumer traffic.
-- [ ] 8.6 Observe compatibility traffic and disable BottleRelease writes with
-      explicit replacement responses.
+- [x] 8.6 Disable BottleRelease writes with explicit replacement responses.
 - [ ] 8.7 Only after separate backup and explicit approval, generate and apply
       cleanup that removes BottleRelease tables/columns, release-specific runtime,
       migration-only writers, and compatibility branches while retaining permanent

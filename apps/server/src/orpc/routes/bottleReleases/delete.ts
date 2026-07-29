@@ -63,5 +63,6 @@ export default procedure
 
     throw errors.CONFLICT({
       message: `BottleRelease ${promotion.release.id} maps to Bottle ${promotion.bottle.id}; merge that Bottle into an explicit destination instead.`,
+      data: { bottle: promotion.bottle.id },
     });
   });

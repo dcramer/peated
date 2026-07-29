@@ -1,28 +1,15 @@
-import { db } from "@peated/server/db";
-import { bottleReleasePromotions } from "@peated/server/db/schema";
-import { getUserActor } from "@peated/server/lib/actors";
 import {
   LegacyBottleReleasePromotionError,
   resolveLegacyBottleReleasePromotion,
 } from "@peated/server/lib/legacyBottleReleasePromotion";
 import { logInfo } from "@peated/server/lib/log";
-import {
-  ConcreteBottleUpdateConflictError,
-  ConcreteBottleUpdateGraphError,
-  ConcreteBottleUpdateInputError,
-  finalizeConcreteBottleUpdate,
-  updateConcreteBottleInTransaction,
-  type ConcreteBottleUpdateFinalizationManifest,
-} from "@peated/server/lib/updateConcreteBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleReleaseInputSchema, BottleSchema } from "@peated/server/schemas";
-import { serialize } from "@peated/server/serializers";
-import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-// PATCH must distinguish omitted fields from explicit null clears.
+// Preserve the retired request contract so legacy callers receive a deliberate
+// replacement response instead of failing input validation first.
 const InputSchema = z.object({
   release: z.coerce.number(),
   edition: BottleReleaseInputSchema.shape.edition.removeDefault().optional(),
@@ -55,9 +42,8 @@ const InputSchema = z.object({
 });
 
 /**
- * Measured compatibility over the promoted Bottle's canonical exact update.
- * Task 5.8 keeps this translation-only; tasks 8.6 and 8.7 disable and then
- * remove the legacy write surface after compatibility traffic is reviewed.
+ * Refuses the retired BottleRelease mutation while resolving its canonical
+ * Bottle so callers can move to the direct-Bottle update route.
  */
 export default procedure
   .use(requireMod)
@@ -66,7 +52,7 @@ export default procedure
     path: "/bottle-releases/{release}",
     summary: "Update bottle bottling",
     description:
-      "Update bottling information including edition, vintage, and cask details. Requires moderator privileges",
+      "Resolve a legacy bottling to its promoted Bottle and require the canonical Bottle update route. Requires moderator privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "updateBottleRelease",
@@ -74,88 +60,16 @@ export default procedure
   })
   .input(InputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
-    if (input.imageUrl !== undefined && input.imageUrl !== null) {
-      throw errors.BAD_REQUEST({
-        message:
-          "BottleRelease imageUrl is not supported by concrete Bottle updates.",
-      });
-    }
-
-    let promotion: Awaited<
-      ReturnType<typeof resolveLegacyBottleReleasePromotion>
-    >;
-    let updateManifest: ConcreteBottleUpdateFinalizationManifest;
+  .handler(async function ({ input, errors }) {
+    let promotion;
     try {
       promotion = await resolveLegacyBottleReleasePromotion({
         releaseId: input.release,
         context: {
           access: "write",
           caller: "bottleReleases.update",
-          operation: "update_concrete_bottle",
+          operation: "require_concrete_bottle_update",
         },
-      });
-
-      const exact = {
-        ...(input.edition !== undefined ? { edition: input.edition } : {}),
-        ...(input.statedAge !== undefined
-          ? { statedAge: input.statedAge }
-          : {}),
-        ...(input.abv !== undefined ? { abv: input.abv } : {}),
-        ...(input.caskStrength !== undefined
-          ? { caskStrength: input.caskStrength }
-          : {}),
-        ...(input.singleCask !== undefined
-          ? { singleCask: input.singleCask }
-          : {}),
-        ...(input.vintageYear !== undefined
-          ? { vintageYear: input.vintageYear }
-          : {}),
-        ...(input.releaseYear !== undefined
-          ? { releaseYear: input.releaseYear }
-          : {}),
-        ...(input.caskType !== undefined ? { caskType: input.caskType } : {}),
-        ...(input.caskSize !== undefined ? { caskSize: input.caskSize } : {}),
-        ...(input.caskFill !== undefined ? { caskFill: input.caskFill } : {}),
-        ...(input.description !== undefined
-          ? { description: input.description }
-          : {}),
-        ...(input.tastingNotes !== undefined
-          ? { tastingNotes: input.tastingNotes }
-          : {}),
-        ...(input.imageUrl === null ? { image: null } : {}),
-      };
-      const actor = await getUserActor(context.user);
-      updateManifest = await db.transaction(async (tx) => {
-        const manifest = await updateConcreteBottleInTransaction(tx, {
-          bottleId: promotion.bottle.id,
-          input: { exact },
-          user: context.user,
-          actorId: actor.id,
-          creationSource: "manual_entry",
-        });
-
-        // Canonical Bottle locks come first. Lock the compatibility evidence
-        // only after them, then reject a concurrent promotion repoint.
-        const [lockedPromotion] = await tx
-          .select({
-            promotedBottleId: bottleReleasePromotions.promotedBottleId,
-          })
-          .from(bottleReleasePromotions)
-          .where(eq(bottleReleasePromotions.releaseId, promotion.release.id))
-          .limit(1)
-          .for("update");
-        if (
-          !lockedPromotion ||
-          lockedPromotion.promotedBottleId !== manifest.bottle.id
-        ) {
-          throw new LegacyBottleReleasePromotionError(
-            "promotion_integrity_mismatch",
-            "BottleRelease promotion changed during the Bottle update.",
-          );
-        }
-
-        return manifest;
       });
     } catch (error) {
       if (error instanceof LegacyBottleReleasePromotionError) {
@@ -164,51 +78,24 @@ export default procedure
         }
         throw errors.CONFLICT({ message: error.message, cause: error });
       }
-      if (error instanceof ConcreteBottleUpdateInputError) {
-        throw errors.BAD_REQUEST({ message: error.message, cause: error });
-      }
-      if (
-        error instanceof ConcreteBottleUpdateGraphError &&
-        error.code === "not_found"
-      ) {
-        throw errors.NOT_FOUND({ message: error.message, cause: error });
-      }
-      if (error instanceof ConcreteBottleUpdateGraphError) {
-        throw errors.CONFLICT({ message: error.message, cause: error });
-      }
-      if (error instanceof ConcreteBottleUpdateConflictError) {
-        throw errors.CONFLICT({
-          message: error.message,
-          data:
-            error.conflictingBottleId === null
-              ? undefined
-              : { bottle: error.conflictingBottleId },
-          cause: error,
-        });
-      }
       throw error;
     }
 
-    await finalizeConcreteBottleUpdate(updateManifest);
-    const updated = await serialize(
-      BottleSerializer,
-      updateManifest.bottle,
-      context.user,
-      [],
-      { includeGroupSummary: true },
-    );
-
-    logInfo("Legacy BottleRelease compatibility write", {
+    logInfo("Legacy BottleRelease compatibility write refused", {
       extra: {
         event: "bottle_release.compatibility",
         access: "write",
         caller: "bottleReleases.update",
-        operation: "update_concrete_bottle",
+        operation: "require_concrete_bottle_update",
+        outcome: "bottle_update_required",
         legacyBottleId: promotion.release.bottleId,
         releaseId: promotion.release.id,
-        replacementBottleId: updated.id,
+        replacementBottleId: promotion.bottle.id,
       },
     });
 
-    return updated;
+    throw errors.CONFLICT({
+      message: `BottleRelease ${promotion.release.id} maps to Bottle ${promotion.bottle.id}; update that Bottle through PATCH /bottles/${promotion.bottle.id} instead.`,
+      data: { bottle: promotion.bottle.id },
+    });
   });

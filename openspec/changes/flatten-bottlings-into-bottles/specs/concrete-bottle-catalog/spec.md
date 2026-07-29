@@ -110,6 +110,6 @@ tables, columns, routes, schemas, jobs, and compatibility branches.
 
 #### Scenario: Cleanup gate is not satisfied
 
-- **WHEN** a retained preflight, migration, direct-reference validation,
-  compatibility-traffic gate, backup, or explicit approval is missing
+- **WHEN** a retained preflight, migration, direct-reference validation, backup,
+  or explicit approval is missing
 - **THEN** destructive BottleRelease cleanup is blocked
