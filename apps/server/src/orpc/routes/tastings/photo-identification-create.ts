@@ -281,7 +281,9 @@ export default procedure
       });
     }
     return {
-      bottle: await serialize(BottleSerializer, bottle, user),
+      bottle: await serialize(BottleSerializer, bottle, user, [], {
+        includeGroupSummary: true,
+      }),
       ...(warning ? { warnings: [warning] } : {}),
     };
   });

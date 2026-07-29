@@ -15,6 +15,9 @@ describe("GET /tastings", () => {
     expect(results.find(({ id }) => id === tasting.id)?.bottle.id).toBe(
       bottle.id,
     );
+    expect(results.find(({ id }) => id === tasting.id)?.bottle.group?.id).toBe(
+      bottle.groupId,
+    );
     expect(results[0]).not.toHaveProperty("target");
     expect(results[0]).not.toHaveProperty("release");
   });

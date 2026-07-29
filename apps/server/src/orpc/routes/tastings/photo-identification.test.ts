@@ -375,7 +375,10 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification).toMatchObject({
       decision: {
         action: "match",
-        matchedBottle: { id: matchedBottleId },
+        matchedBottle: {
+          id: matchedBottleId,
+          group: { id: matchedBottle.groupId },
+        },
       },
       artifacts: {
         candidates: [
@@ -900,6 +903,7 @@ describe("POST /tastings/photo-identification", () => {
     const bottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, response.bottle.id),
     });
+    expect(response.bottle.group?.id).toBe(bottle?.groupId);
     expect(bottle?.imageUrl).toMatch(
       new RegExp(
         `^/uploads/bottles/bottle-${response.bottle.id}-pending-upload-.+\\.webp$`,

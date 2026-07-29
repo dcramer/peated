@@ -144,7 +144,11 @@ export function buildBottle({
   };
 }
 
-export const existingBottle = buildBottle();
+const existingBottleWithoutGroup = buildBottle();
+export const existingBottle = {
+  ...existingBottleWithoutGroup,
+  group: buildBottleGroup({ bottle: existingBottleWithoutGroup }),
+};
 
 export const exactMergeOtherBottle = {
   ...buildBottle({
@@ -322,7 +326,7 @@ export const legacyPromotedBottle = {
  * @param {BottleGroupFixtureOptions} [options]
  * @returns {BottleGroupV1}
  */
-function buildBottleGroup({
+export function buildBottleGroup({
   id,
   fullName,
   name,
