@@ -170,6 +170,54 @@ describe("applyCatalogMigration", () => {
     expect(await db.select().from(bottleGroups)).toHaveLength(1);
   });
 
+  test("groups legacy parents connected by an assigned exact alias", async ({
+    fixtures,
+  }) => {
+    const aliasOwner = await fixtures.LegacyBottle({
+      name: "Canonical Alias Owner",
+    });
+    const matchingParent = await fixtures.LegacyBottle({
+      name: "Canonical Alias Match",
+    });
+    await db
+      .delete(bottleAliases)
+      .where(eq(bottleAliases.bottleId, matchingParent.id));
+    await fixtures.BottleAlias({
+      bottleId: aliasOwner.id,
+      releaseId: null,
+      name: matchingParent.fullName,
+      assignedByActorId: aliasOwner.createdByActorId,
+    });
+    const input = await approvedInput();
+
+    expect(input.candidate.audit.blockingIssueCount).toBe(0);
+
+    const result = await applyCatalogMigration(input);
+    const parents = await db
+      .select({ id: bottles.id, groupId: bottles.groupId })
+      .from(bottles)
+      .where(inArray(bottles.id, [aliasOwner.id, matchingParent.id]))
+      .orderBy(asc(bottles.id));
+    const alias = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, matchingParent.fullName),
+    });
+
+    expect(result.status).toBe("applied");
+    expect(result.counts).toMatchObject({
+      parents: 2,
+      groups: 1,
+      parentBottlesAssigned: 2,
+      groupStatsRecomputed: 1,
+    });
+    expect(parents[0]?.groupId).not.toBeNull();
+    expect(parents[1]?.groupId).toBe(parents[0]?.groupId);
+    expect(alias).toMatchObject({
+      bottleId: aliasOwner.id,
+      releaseId: null,
+    });
+    expect(await db.select().from(bottleTombstones)).toEqual([]);
+  });
+
   test("reassigns a same-family canonical alias to its promoted Bottle", async ({
     fixtures,
   }) => {
