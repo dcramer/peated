@@ -254,7 +254,6 @@ Destructive cleanup requires:
 - a database backup;
 - successful preflight, migration, and postflight evidence;
 - no supported BottleRelease writes;
-- compatibility traffic review;
 - full test and visual QA gates;
 - explicit user approval.
 
