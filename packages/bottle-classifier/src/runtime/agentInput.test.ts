@@ -4,12 +4,9 @@ import { buildAgentInput } from "./agentInput";
 
 function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
   return {
-    kind: "bottle",
     bottleId: 100,
-    releaseId: null,
     alias: "Example Parent",
     fullName: "Example Parent",
-    bottleFullName: "Example Parent",
     brand: "Example",
     bottler: null,
     series: null,
@@ -19,6 +16,9 @@ function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
     edition: null,
     caskStrength: null,
     singleCask: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,
@@ -41,8 +41,6 @@ describe("buildAgentInput", () => {
             bottleId: 44175,
             fullName: "Shieldaig Speyside",
             familyContext: {
-              parentBottleReleaseTraits: ["statedAge"],
-              childReleaseCount: 1,
               siblingBottles: [
                 {
                   bottleId: 44176,
@@ -55,20 +53,9 @@ describe("buildAgentInput", () => {
                   abv: null,
                   caskStrength: null,
                   singleCask: null,
-                },
-              ],
-              siblingReleases: [
-                {
-                  releaseId: 9001,
-                  fullName: "Shieldaig Speyside 18-year-old",
-                  traitFields: ["statedAge"],
-                  statedAge: 18,
-                  edition: null,
-                  releaseYear: null,
-                  vintageYear: null,
-                  abv: null,
-                  caskStrength: null,
-                  singleCask: null,
+                  caskType: null,
+                  caskSize: null,
+                  caskFill: null,
                 },
               ],
             },
@@ -77,10 +64,7 @@ describe("buildAgentInput", () => {
             bottleId: 43912,
             fullName: "Shieldaig Highland",
             familyContext: {
-              parentBottleReleaseTraits: [],
-              childReleaseCount: 0,
               siblingBottles: [],
-              siblingReleases: [],
             },
           }),
         ],
@@ -92,8 +76,6 @@ describe("buildAgentInput", () => {
 
     expect(input.localSearch).not.toHaveProperty("familyContextSummary");
     expect(input.localSearch.candidates[0].familyContext).toEqual({
-      parentBottleReleaseTraits: ["statedAge"],
-      childReleaseCount: 1,
       siblingBottles: [
         {
           bottleId: 44176,
@@ -106,20 +88,9 @@ describe("buildAgentInput", () => {
           abv: null,
           caskStrength: null,
           singleCask: null,
-        },
-      ],
-      siblingReleases: [
-        {
-          releaseId: 9001,
-          fullName: "Shieldaig Speyside 18-year-old",
-          traitFields: ["statedAge"],
-          statedAge: 18,
-          edition: null,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          caskStrength: null,
-          singleCask: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
         },
       ],
     });
@@ -145,6 +116,9 @@ describe("buildAgentInput", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         imageEvidence: {

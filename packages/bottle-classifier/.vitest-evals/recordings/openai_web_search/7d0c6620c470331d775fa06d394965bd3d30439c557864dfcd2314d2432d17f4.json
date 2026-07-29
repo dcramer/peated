@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:57:27.082Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series Vol 3 bourbon whiskey",
+    "summary": "Here’s the bottle-specific summary for **Heaven’s Door Bootleg Series Vol. III**:\n\n- **Producer/brand:** Heaven’s Door Spirits. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series?utm_source=openai))\n- **Edition:** **The Bootleg Series Volume III**, part of Heaven’s Door’s annual Bootleg Series. The official ",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/86194/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/brand/86194/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/204229/heavens-door-13-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/204229/heavens-door-13-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/233444/heavens-door-11-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/233444/heavens-door-11-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/post/best-bourbons-of-the-21st-century",
+        "url": "https://www.heavensdoor.com/post/best-bourbons-of-the-21st-century",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "domain": "prnewswire.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7d0c6620c470331d775fa06d394965bd3d30439c557864dfcd2314d2432d17f4",
+    "mode": "auto"
+  }
+}

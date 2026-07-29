@@ -9,19 +9,22 @@ import {
   FLAVOR_PROFILES,
 } from "@peated/server/constants";
 import {
+  ConcreteBottleUpdateInputSchema,
+  IndependentConcreteBottleCreateRouteInputSchema,
+} from "@peated/server/lib/concreteBottleSchemas";
+import {
   formatCategoryName,
   formatFlavorProfile,
   notesForProfile,
 } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
-import { BottleInputSchema } from "@peated/server/schemas";
 import type { Entity, FlavorProfile } from "@peated/server/types";
-import { PreviewBottleCard } from "@peated/web/components/bottleCard";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
 import ImageField from "@peated/web/components/imageField";
+import { PreviewBottleCard } from "@peated/web/components/previewBottleCard";
 import type { Option } from "@peated/web/components/selectField";
 import SelectField from "@peated/web/components/selectField";
 import SeriesField from "@peated/web/components/seriesField";
@@ -73,20 +76,40 @@ const caskTypeList = CASK_TYPES.map(({ id }) => ({
   name: toTitleCase(id),
 }));
 
-type FormSchemaType = z.infer<typeof BottleInputSchema>;
+type CreateFormSchemaType = z.infer<
+  typeof IndependentConcreteBottleCreateRouteInputSchema
+>;
+const BottleFormSchema =
+  IndependentConcreteBottleCreateRouteInputSchema.safeExtend({
+    exactStatedAge:
+      ConcreteBottleUpdateInputSchema.shape.exact.unwrap().shape.statedAge,
+  });
+type FormSchemaType = z.infer<typeof BottleFormSchema>;
 type ChoiceLike = {
   id?: number | null;
   name?: string | null;
 };
 export type BottleFormInitialData = Partial<
-  Omit<FormSchemaType, "brand" | "distillers" | "bottler" | "series" | "image">
+  Omit<
+    CreateFormSchemaType,
+    "brand" | "distillers" | "bottler" | "series" | "image"
+  >
 > & {
   brand?: number | Entity | ChoiceLike | null;
   distillers?: Array<number | Entity | ChoiceLike>;
   bottler?: number | Entity | ChoiceLike | null;
   series?: number | ChoiceLike | null;
   imageUrl?: string | null;
-  numReleases?: number | null;
+};
+
+export type BottleFormSubmitValue = Omit<FormSchemaType, "image"> & {
+  image: HTMLCanvasElement | null | undefined;
+};
+
+export type BottleFormFieldName = keyof FormSchemaType;
+
+export type BottleFormSubmitMeta = {
+  dirtyFields: ReadonlySet<BottleFormFieldName>;
 };
 
 const toEntityChoiceValue = (
@@ -114,19 +137,21 @@ export default function BottleForm({
   title,
   returnTo,
   saveLabel,
-  showBottleReleaseDetails = false,
+  sharedIdentityBottleCount,
+  exactStatedAge,
 }: {
-  onSubmit: SubmitHandler<
-    Omit<FormSchemaType, "image"> & {
-      image: HTMLCanvasElement | null | undefined;
-    }
-  >;
+  onSubmit: (
+    value: BottleFormSubmitValue,
+    meta: BottleFormSubmitMeta,
+  ) => void | Promise<void>;
   initialData: BottleFormInitialData;
   title: string;
   returnTo?: string | null;
   saveLabel?: string;
-  showBottleReleaseDetails?: boolean;
+  sharedIdentityBottleCount?: number;
+  exactStatedAge?: number | null;
 }) {
+  const { imageUrl, ...initialFormData } = initialData;
   const {
     control,
     register,
@@ -134,15 +159,16 @@ export default function BottleForm({
     getValues,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { dirtyFields, errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(BottleInputSchema),
+    resolver: zodResolver(BottleFormSchema),
     defaultValues: {
-      ...initialData,
+      ...initialFormData,
       bottler: toEntityChoiceValue(initialData.bottler),
       brand: toEntityChoiceValue(initialData.brand) ?? undefined,
       distillers: toDistillerChoiceValues(initialData.distillers),
       series: toSeriesChoiceValue(initialData.series),
+      ...(exactStatedAge !== undefined ? { exactStatedAge } : {}),
     },
   });
 
@@ -161,7 +187,14 @@ export default function BottleForm({
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      await onSubmit({ image, ...data });
+      await onSubmit(
+        { image, ...data },
+        {
+          dirtyFields: new Set(
+            Object.keys(dirtyFields) as Array<keyof FormSchemaType>,
+          ),
+        },
+      );
     } catch (err) {
       setError(
         getFormErrorMessage(err, {
@@ -187,7 +220,18 @@ export default function BottleForm({
   const previewData = {
     name: watch("name"),
     category: watch("category"),
-    statedAge: watch("statedAge"),
+    sharedStatedAge: watch("statedAge"),
+    exactStatedAge:
+      exactStatedAge !== undefined ? watch("exactStatedAge") : null,
+    edition: watch("edition"),
+    releaseYear: watch("releaseYear"),
+    vintageYear: watch("vintageYear"),
+    abv: watch("abv"),
+    singleCask: watch("singleCask"),
+    caskStrength: watch("caskStrength"),
+    caskFill: watch("caskFill"),
+    caskType: watch("caskType"),
+    caskSize: watch("caskSize"),
     distillers: distillersValue,
     brand: brandValue,
   };
@@ -198,7 +242,10 @@ export default function BottleForm({
       previewData.brand ||
       previewData.distillers.length,
     ) ||
-    (previewData.statedAge !== null && previewData.statedAge !== undefined);
+    (previewData.sharedStatedAge !== null &&
+      previewData.sharedStatedAge !== undefined) ||
+    (previewData.exactStatedAge !== null &&
+      previewData.exactStatedAge !== undefined);
 
   return (
     <FormScreen
@@ -217,11 +264,19 @@ export default function BottleForm({
             <em>Hibiki</em>), and the bottle name, if nothing else, you can use
             the full bottle label.
           </p>
-          <p>
-            Keep this form focused on the core bottle. If you care about a
-            specific batch, single cask, or other exact bottling, you can track
-            that later from the bottle page or when recording a tasting.
-          </p>
+          {sharedIdentityBottleCount !== undefined ? (
+            <p>
+              {sharedIdentityBottleCount === 1
+                ? "This release family has 1 Bottle, so shared edits update only this Bottle's identity."
+                : `Shared edits update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this release family.`}{" "}
+              Exact Bottle details below affect only this Bottle.
+            </p>
+          ) : (
+            <p>
+              Enter the shared expression details and any exact release details
+              shown on this Bottle.
+            </p>
+          )}
           <p>
             Have any suggestions for making it easier to enter correct data?{" "}
             <a href={config.GITHUB_REPO}>Open an Issue on GitHub</a> or{" "}
@@ -244,6 +299,16 @@ export default function BottleForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
+          <legend className="text-highlight px-1 pt-4 text-lg font-bold">
+            Release family details
+          </legend>
+          <p className="text-muted pb-2 text-sm leading-6">
+            {sharedIdentityBottleCount === undefined
+              ? "These details describe the expression shared by related releases."
+              : sharedIdentityBottleCount === 1
+                ? "Changes here update this Bottle's shared release-family identity."
+                : `Changes here update all ${sharedIdentityBottleCount.toLocaleString()} Bottles in this release family.`}
+          </p>
           <Controller
             name="brand"
             control={control}
@@ -327,24 +392,30 @@ export default function BottleForm({
                 disabled={!brandValue}
                 canCreate
                 onChange={(value) => {
-                  onChange(value?.id || value);
+                  onChange(value?.id ?? value ?? null);
                   setSeriesValue(value);
                 }}
                 value={seriesValue}
               />
             )}
           />
-        </Fieldset>
-        <Fieldset>
           <TextField
             {...register("statedAge", {
               setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
             })}
             error={errors.statedAge}
             type="number"
-            label="Stated Age"
+            label={
+              sharedIdentityBottleCount === undefined
+                ? "Stated Age"
+                : "Shared Stated Age"
+            }
             placeholder="e.g. 12"
-            helpText="The number of years the spirit was aged, as stated on the bottle."
+            helpText={
+              sharedIdentityBottleCount === undefined
+                ? "The number of years the spirit was aged, as stated on the bottle."
+                : "The stated age shared by every Bottle in this group unless a Bottle-specific override is set below."
+            }
             suffixLabel="years"
           />
 
@@ -391,7 +462,7 @@ export default function BottleForm({
                 createDialogHelpText="The distiller is the group that makes the spirit."
                 suggestedOptions={brandValue ? [brandValue] : []}
                 onChange={(value) => {
-                  onChange(value.map((t: any) => t.id || t));
+                  onChange(value.map((option) => option.id || option));
                   setDistillersValue(value);
                 }}
                 canCreate
@@ -418,7 +489,7 @@ export default function BottleForm({
                   bottleName: watch("name"),
                 }}
                 onChange={(value) => {
-                  onChange(value?.id || value);
+                  onChange(value?.id ?? value ?? null);
                   setBottlerValue(value);
                 }}
                 canCreate
@@ -426,180 +497,6 @@ export default function BottleForm({
               />
             )}
           />
-        </Fieldset>
-
-        {showBottleReleaseDetails && (
-          <Fieldset>
-            <div className="text-muted text-sm leading-6">
-              {initialData.numReleases ? (
-                <p>
-                  This bottle already has tracked bottlings. These parent-level
-                  fields should usually be cleared before splitting legacy data
-                  into child bottlings.
-                </p>
-              ) : (
-                <p>
-                  Use these only when the bottle itself is the exact marketed
-                  release and there is no reusable child bottling yet.
-                </p>
-              )}
-            </div>
-
-            <TextField
-              {...register("edition")}
-              error={errors.edition}
-              type="text"
-              label="Edition / Label"
-              helpText="Optional bottle-level release label when this bottle is itself the specific marketed release."
-              placeholder="e.g. Batch 24, 1990 Release"
-            />
-
-            <TextField
-              {...register("abv", {
-                setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
-              })}
-              error={errors.abv}
-              type="number"
-              label="ABV"
-              placeholder="e.g. 40.5"
-              helpText="Bottle-level ABV only when it belongs to the bottle identity or no child bottlings exist yet."
-              suffixLabel="%"
-              step="0.1"
-              min="0"
-              max="100"
-            />
-
-            <TextField
-              {...register("releaseYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.releaseYear}
-              type="number"
-              label="Release Year"
-              placeholder="e.g. 1990"
-              helpText="Bottle-level release year only when there is not a reusable child bottling yet."
-            />
-
-            <TextField
-              {...register("vintageYear", {
-                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-              })}
-              error={errors.vintageYear}
-              type="number"
-              label="Vintage Year"
-              placeholder="e.g. 1986"
-              helpText="Bottle-level vintage year only when it belongs to the bottle identity or no child bottlings exist yet."
-            />
-
-            <BooleanField
-              control={control}
-              label="Single Cask"
-              helpText="Whether the bottle itself is explicitly a single-cask release."
-              name="singleCask"
-            />
-
-            <BooleanField
-              control={control}
-              label="Cask Strength"
-              helpText="Whether the bottle itself is explicitly bottled at cask strength."
-              name="caskStrength"
-            />
-
-            <Controller
-              name="caskFill"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.caskFill}
-                  label="Cask Fill"
-                  placeholder="e.g. 1st Fill"
-                  simple
-                  options={caskFillList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? caskFillList.find((item) => item.id === value)
-                      : undefined
-                  }
-                />
-              )}
-            />
-
-            <Controller
-              name="caskType"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.caskType}
-                  label="Cask Type"
-                  placeholder="e.g. Bourbon"
-                  simple
-                  options={caskTypeList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? caskTypeList.find((item) => item.id === value)
-                      : undefined
-                  }
-                />
-              )}
-            />
-
-            <Controller
-              name="caskSize"
-              control={control}
-              render={({ field: { onChange, value, ref, ...field } }) => (
-                <SelectField
-                  {...field}
-                  error={errors.caskSize}
-                  label="Cask Size"
-                  placeholder="e.g. Hogshead"
-                  simple
-                  options={caskSizeList}
-                  onChange={(value) => onChange(value?.id)}
-                  value={
-                    value
-                      ? caskSizeList.find((item) => item.id === value)
-                      : undefined
-                  }
-                />
-              )}
-            />
-          </Fieldset>
-        )}
-
-        <Fieldset>
-          <div className="flex items-center justify-between gap-4">
-            <div className="font-medium">Additional Details</div>
-            {canUseBottleLookup && (
-              <Button
-                color="primary"
-                onClick={async () => {
-                  const result =
-                    await generateDataMutation.mutateAsync(getValues());
-
-                  if (!result) return;
-                  const currentValues = getValues();
-                  if (result.description && !currentValues.description) {
-                    setValue("description", result.description);
-                    setValue("descriptionSrc", "generated");
-                  }
-
-                  if (result.flavorProfile && !currentValues.flavorProfile)
-                    setValue(
-                      "flavorProfile",
-                      result.flavorProfile as FlavorProfile,
-                    );
-                }}
-                disabled={generateDataMutation.isPending}
-                icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
-              >
-                Help me fill this in [Beta]
-              </Button>
-            )}
-          </div>
 
           <Controller
             name="flavorProfile"
@@ -639,11 +536,204 @@ export default function BottleForm({
               />
             )}
           />
+        </Fieldset>
+
+        <Fieldset>
+          <legend className="text-highlight px-1 pt-4 text-lg font-bold">
+            Exact Bottle details
+          </legend>
+          <div className="text-muted pb-2 text-sm leading-6">
+            <p>
+              These details belong only to this exact Bottle.
+              {sharedIdentityBottleCount !== undefined && (
+                <>
+                  {" "}
+                  {sharedIdentityBottleCount === 1
+                    ? "This release family has 1 Bottle; shared edits above update its identity."
+                    : `Shared edits above update all ${sharedIdentityBottleCount.toLocaleString()} Bottle identities in this release family.`}
+                </>
+              )}
+            </p>
+          </div>
+
+          <TextField
+            {...register("edition")}
+            error={errors.edition}
+            type="text"
+            label="Edition / Label"
+            helpText="Optional edition, batch, or label for this exact Bottle."
+            placeholder="e.g. Batch 24, 1990 Release"
+          />
+
+          {exactStatedAge !== undefined && (
+            <TextField
+              {...register("exactStatedAge", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.exactStatedAge}
+              type="number"
+              label="Bottle-specific Stated Age"
+              helpText={`Optional override for this exact Bottle. Leave blank to inherit the shared stated age${watch("statedAge") == null ? "." : ` of ${watch("statedAge")} years.`}`}
+              placeholder="Inherit shared age"
+              suffixLabel="years"
+            />
+          )}
+
+          <TextField
+            {...register("abv", {
+              setValueAs: (v) => (v === "" || !v ? null : parseFloat(v)),
+            })}
+            error={errors.abv}
+            type="number"
+            label="ABV"
+            placeholder="e.g. 40.5"
+            helpText="Alcohol by volume for this exact Bottle."
+            suffixLabel="%"
+            step="0.1"
+            min="0"
+            max="100"
+          />
+
+          <TextField
+            {...register("releaseYear", {
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+            })}
+            error={errors.releaseYear}
+            type="number"
+            label="Release Year"
+            placeholder="e.g. 1990"
+            helpText="The year this exact Bottle was released."
+          />
+
+          <TextField
+            {...register("vintageYear", {
+              setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+            })}
+            error={errors.vintageYear}
+            type="number"
+            label="Vintage Year"
+            placeholder="e.g. 1986"
+            helpText="The distillation vintage for this exact Bottle."
+          />
+
+          <BooleanField
+            control={control}
+            label="Single Cask"
+            helpText="Whether the bottle itself is explicitly a single-cask release."
+            name="singleCask"
+          />
+
+          <BooleanField
+            control={control}
+            label="Cask Strength"
+            helpText="Whether the bottle itself is explicitly bottled at cask strength."
+            name="caskStrength"
+          />
+
+          <Controller
+            name="caskFill"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.caskFill}
+                label="Cask Fill"
+                placeholder="e.g. 1st Fill"
+                simple
+                options={caskFillList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? caskFillList.find((item) => item.id === value)
+                    : undefined
+                }
+              />
+            )}
+          />
+
+          <Controller
+            name="caskType"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.caskType}
+                label="Cask Type"
+                placeholder="e.g. Bourbon"
+                simple
+                options={caskTypeList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? caskTypeList.find((item) => item.id === value)
+                    : undefined
+                }
+              />
+            )}
+          />
+
+          <Controller
+            name="caskSize"
+            control={control}
+            render={({ field: { onChange, value, ref, ...field } }) => (
+              <SelectField
+                {...field}
+                error={errors.caskSize}
+                label="Cask Size"
+                placeholder="e.g. Hogshead"
+                simple
+                options={caskSizeList}
+                onChange={(value) => onChange(value?.id)}
+                value={
+                  value
+                    ? caskSizeList.find((item) => item.id === value)
+                    : undefined
+                }
+              />
+            )}
+          />
+        </Fieldset>
+
+        <Fieldset>
+          <div className="flex items-center justify-between gap-4">
+            <div className="font-medium">Additional Details</div>
+            {canUseBottleLookup && (
+              <Button
+                color="primary"
+                onClick={async () => {
+                  const result =
+                    await generateDataMutation.mutateAsync(getValues());
+
+                  if (!result) return;
+                  const currentValues = getValues();
+                  if (result.description && !currentValues.description) {
+                    setValue("description", result.description, {
+                      shouldDirty: true,
+                    });
+                    setValue("descriptionSrc", "generated", {
+                      shouldDirty: true,
+                    });
+                  }
+
+                  if (result.flavorProfile && !currentValues.flavorProfile)
+                    setValue(
+                      "flavorProfile",
+                      result.flavorProfile as FlavorProfile,
+                      { shouldDirty: true },
+                    );
+                }}
+                disabled={generateDataMutation.isPending}
+                icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+              >
+                Suggest description &amp; family flavor [Beta]
+              </Button>
+            )}
+          </div>
 
           <ImageField
             name="image"
             label="Image"
-            value={initialData.imageUrl}
+            value={imageUrl}
             onChange={(value) => setImage(value)}
             noEditor
           />
@@ -652,7 +742,7 @@ export default function BottleForm({
             {...register("description", {
               setValueAs: (v) => (v === "" || !v ? null : v),
               onChange: () => {
-                setValue("descriptionSrc", "user");
+                setValue("descriptionSrc", "user", { shouldDirty: true });
               },
             })}
             error={errors.description}

@@ -53,6 +53,14 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       bottleId: reserveBottle.id,
       name: "Canadian Club Reserve 9-year-old Triple Aged Batch Repair",
     });
+    const reserveBatch = await fixtures.BottleGroupMember({
+      groupId: reserveBottle.groupId as number,
+      edition: "Batch 2",
+    });
+    await fixtures.BottleAlias({
+      bottleId: reserveBatch.id,
+      name: "Canadian Club Reserve 9-year-old Triple Aged Batch 2 Repair",
+    });
 
     const premiumBottle = await fixtures.Bottle({
       brandId: currentBrand.id,
@@ -95,9 +103,28 @@ describe("POST /bottles/apply-brand-repair-group", () => {
 
     expect(result).toMatchObject({
       appliedCount: 2,
-      bottleIds: expect.arrayContaining([reserveBottle.id, premiumBottle.id]),
-      candidateCount: 2,
+      appliedGroupCount: 2,
+      appliedGroupIds: [reserveBottle.groupId!, premiumBottle.groupId!].sort(
+        (left, right) => left - right,
+      ),
+      bottleIds: expect.arrayContaining([
+        reserveBottle.id,
+        reserveBatch.id,
+        premiumBottle.id,
+      ]),
+      candidateBottleCount: 3,
+      candidateBottleIds: expect.arrayContaining([
+        reserveBottle.id,
+        reserveBatch.id,
+        premiumBottle.id,
+      ]),
+      candidateCount: 3,
       failedCount: 0,
+      failedGroupCount: 0,
+      failedGroupIds: [],
+      groupIds: [reserveBottle.groupId!, premiumBottle.groupId!].sort(
+        (left, right) => left - right,
+      ),
       status: "applied",
     });
 
@@ -106,6 +133,12 @@ describe("POST /bottles/apply-brand-repair-group", () => {
       .from(bottles)
       .where(eq(bottles.id, reserveBottle.id));
     expect(updatedReserveBottle?.brandId).toEqual(canadianClub.id);
+
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, reserveBatch.id),
+      }),
+    ).toMatchObject({ brandId: canadianClub.id });
 
     const [updatedPremiumBottle] = await db
       .select()

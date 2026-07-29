@@ -23,10 +23,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": "Tomatin Single Malt 12-year-old",
-        "bottleFullName": "Tomatin 12-year-old",
         "brand": "Tomatin",
         "bottler": null,
         "series": null,
@@ -45,10 +42,7 @@
         "fullName": "Tomatin 12-year-old"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Tomatin 12-year-old Bourbon & Sherry Casks",
         "brand": "Tomatin",
         "bottler": null,
         "series": null,
@@ -67,10 +61,7 @@
         "fullName": "Tomatin 12-year-old Bourbon & Sherry Casks"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Tomatin Cask Strength",
         "brand": "Tomatin",
         "bottler": null,
         "series": null,
@@ -96,6 +87,6 @@
     "identityScope": "product",
     "matchedBottleId": 65001,
     "expectedTier": "auto",
-    "summary": "Keep the plain Tomatin 12-year-old bottle match instead of inventing a child release beneath the unrelated Tomatin Cask Strength family."
+    "summary": "Keep the exact plain Tomatin 12-year-old Bottle match instead of inventing a different Bottle under the unrelated Tomatin Cask Strength family."
   }
 }

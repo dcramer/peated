@@ -1,143 +1,94 @@
 import { db } from "@peated/server/db";
-import { bottleTags, bottles, tastings } from "@peated/server/db/schema";
-import { omit } from "@peated/server/lib/filter";
+import { bottleTags, tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq, gt } from "drizzle-orm";
+import * as workerClient from "@peated/server/worker/client";
+import { eq } from "drizzle-orm";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("PUT /tastings/:tasting", () => {
-  test("requires auth", async () => {
-    const err = await waitError(routerClient.tastings.update({ tasting: 1 }));
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+vi.mock("@peated/server/worker/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof workerClient>()),
+  pushJob: vi.fn().mockResolvedValue(undefined),
+}));
+
+describe("PATCH /tastings/{tasting}", () => {
+  beforeEach(() => {
+    vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
   });
 
-  test("cannot update another users tasting", async ({
+  test("requires auth", async () => {
+    const error = await waitError(routerClient.tastings.update({ tasting: 1 }));
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("cannot update another user's Tasting", async ({
     defaults,
     fixtures,
   }) => {
     const tasting = await fixtures.Tasting();
-    const err = await waitError(
+    const error = await waitError(
       routerClient.tastings.update(
-        { tasting: tasting.id },
+        { tasting: tasting.id, notes: "changed" },
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Tasting not found.]`);
   });
 
-  test("no changes", async ({ defaults, fixtures }) => {
+  test("updates rating and queues direct Bottle statistics", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
       createdById: defaults.user.id,
+      rating: 1,
     });
 
-    const data = await routerClient.tastings.update(
-      { tasting: tasting.id },
+    const result = await routerClient.tastings.update(
+      { tasting: tasting.id, rating: 2 },
       { context: { user: defaults.user } },
     );
 
-    expect(data.id).toBeDefined();
-
-    const [newTasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.id));
-
-    expect(tasting).toEqual(newTasting);
-  });
-
-  test("updates rating", async ({ defaults, fixtures }) => {
-    // Use rating: 2 to ensure the update to rating: 1 actually triggers a change
-    // This avoids flakiness when the fixture randomly picks the same rating
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-      rating: 2,
-    });
-
-    const data = await routerClient.tastings.update(
+    expect(result.bottle.id).toBe(bottle.id);
+    expect(result.rating).toBe(2);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
       {
-        tasting: tasting.id,
-        rating: 1,
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
       },
-      { context: { user: defaults.user } },
     );
-
-    expect(data.id).toBeDefined();
-
-    const [newTasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.id));
-
-    expect(omit(tasting, "rating")).toEqual(omit(newTasting, "rating"));
-    expect(newTasting.rating).toEqual(1);
-
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, newTasting.bottleId));
-    expect(bottle.avgRating).toEqual(1);
   });
 
-  test("updates notes", async ({ defaults, fixtures }) => {
+  test("updates tag accounting on the direct Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.Tag({ name: "new" });
     const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
       createdById: defaults.user.id,
+      tags: ["old"],
     });
 
-    const data = await routerClient.tastings.update(
-      {
-        tasting: tasting.id,
-        notes: "hello world",
-      },
+    await routerClient.tastings.update(
+      { tasting: tasting.id, tags: ["new"] },
       { context: { user: defaults.user } },
     );
 
-    expect(data.id).toBeDefined();
-
-    const [newTasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.id));
-
-    expect(omit(tasting, "notes")).toEqual(omit(newTasting, "notes"));
-    expect(newTasting.notes).toEqual("hello world");
-  });
-
-  test("updates tags", async ({ defaults, fixtures }) => {
-    const tag = await fixtures.Tag();
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-    });
-
-    const data = await routerClient.tastings.update(
-      {
-        tasting: tasting.id,
-        tags: [tag.name],
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.id).toBeDefined();
-
-    const [newTasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.id));
-
-    expect(omit(tasting, "tags")).toEqual(omit(newTasting, "tags"));
-    expect(newTasting.tags).toEqual([tag.name]);
-
-    const tagList = await db
-      .select()
-      .from(bottleTags)
-      .where(
-        and(
-          eq(bottleTags.bottleId, newTasting.bottleId),
-          gt(bottleTags.count, 0),
-        ),
-      );
-
-    expect(tagList.length).toEqual(1);
-    expect(tagList[0].tag).toEqual(tag.name);
-    expect(tagList[0].count).toEqual(1);
+    expect(
+      await db.query.bottleTags.findMany({
+        where: eq(bottleTags.bottleId, bottle.id),
+        orderBy: (tags, { asc }) => asc(tags.tag),
+      }),
+    ).toMatchObject([
+      { tag: "new", count: 1 },
+      { tag: "old", count: 0 },
+    ]);
   });
 });

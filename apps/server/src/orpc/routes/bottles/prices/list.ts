@@ -54,13 +54,13 @@ export default procedure
       });
     }
 
-    const where: (SQL<unknown> | undefined)[] = [
-      eq(storePrices.bottleId, bottle.id),
+    const baseWhere: (SQL<unknown> | undefined)[] = [
       eq(storePrices.hidden, false),
+      eq(storePrices.bottleId, bottle.id),
     ];
 
     if (input.onlyValid) {
-      where.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
+      baseWhere.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
     }
 
     const results = await db
@@ -73,7 +73,7 @@ export default procedure
         externalSites,
         eq(storePrices.externalSiteId, externalSites.id),
       )
-      .where(and(...where))
+      .where(and(...baseWhere))
       .orderBy(
         desc(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`),
         asc(storePrices.name),

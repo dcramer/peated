@@ -1,4 +1,4 @@
-import type { Bottle, PagingRel, StorePrice } from "@peated/server/types";
+import type { PagingRel, StorePrice } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import PaginationButtons from "../paginationButtons";
@@ -7,9 +7,7 @@ export default function StorePriceTable({
   priceList,
   rel,
 }: {
-  priceList: (StorePrice & {
-    bottle?: Bottle;
-  })[];
+  priceList: StorePrice[];
   rel?: PagingRel;
 }) {
   return (
@@ -38,10 +36,7 @@ export default function StorePriceTable({
         <tbody>
           {priceList.map((price) => {
             return (
-              <tr
-                key={price.name}
-                className="border-b border-slate-800 text-sm"
-              >
+              <tr key={price.id} className="border-b border-slate-800 text-sm">
                 <td>
                   {price.imageUrl && (
                     <img src={price.imageUrl} className="max-h-16 max-w-full" />
@@ -56,8 +51,11 @@ export default function StorePriceTable({
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
                     {price.bottle ? (
-                      <Link href={`/bottles/${price.bottle.id}`}>
-                        Bottle {price.bottle.id}
+                      <Link
+                        href={`/bottles/${price.bottle.id}`}
+                        className="font-semibold hover:underline"
+                      >
+                        {price.bottle.fullName}
                       </Link>
                     ) : (
                       <em>No Bottle</em>

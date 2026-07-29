@@ -1,10 +1,4 @@
-export {
-  inferBottleCreationTarget,
-  normalizeBottleCreationDrafts,
-  normalizeProposedBottleDraft,
-  splitProposedBottleReleaseDraft,
-} from "./bottleCreationDrafts";
-export type { BottleCreationTarget } from "./bottleCreationDrafts";
+export { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 export {
   createBottleClassifier,
   type BottleClassifier,
@@ -59,6 +53,5 @@ export { normalizeBottle, type NormalizedBottle } from "./normalize";
 export {
   formatCanonicalReleaseName,
   getResolvedReleaseIdentity,
-  hasExtractedReleaseIdentity,
 } from "./releaseIdentity";
 export type { ReleaseIdentityInput } from "./releaseIdentity";

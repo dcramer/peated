@@ -1,7 +1,12 @@
 import { db } from "@peated/server/db";
-import { bottleAliases, flightBottles } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleTombstones,
+  flightBottles,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 describe("GET /bottles", () => {
   test("lists bottles", async ({ fixtures }) => {
@@ -11,6 +16,7 @@ describe("GET /bottles", () => {
     const { results } = await routerClient.bottles.list({});
 
     expect(results.length).toBe(2);
+    expect(results.every((result) => result.group?.id)).toBe(true);
   });
 
   test("lists bottles with query", async ({ fixtures }) => {
@@ -25,30 +31,92 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
-  test("lists parent bottles for exact release aliases", async ({
+  test("resolves aliases through direct Bottle ownership", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ name: "Private Selection" });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "S2B13",
-      name: "Private Selection - S2B13",
-      fullName: `${bottle.fullName} - S2B13`,
-    });
 
     await db.insert(bottleAliases).values({
       bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-      assignedByActorId: release.createdByActorId,
+      name: "Direct Bottle Alias",
+      assignedByActorId: bottle.createdByActorId,
     });
 
     const { results } = await routerClient.bottles.list({
-      query: release.fullName,
+      query: "Direct Bottle Alias",
     });
 
     expect(results.length).toBe(1);
     expect(results[0].id).toBe(bottle.id);
+    expect(results[0].group?.id).toBe(bottle.groupId);
+  });
+
+  test("resolves assigned aliases and excludes ignored or unresolved aliases", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Alias Boundary" });
+    await db.insert(bottleAliases).values([
+      {
+        bottleId: bottle.id,
+        name: "Assigned General Alias",
+        assignedByActorId: bottle.createdByActorId,
+      },
+      {
+        bottleId: bottle.id,
+        name: "Ignored Exact Alias",
+        ignored: true,
+        assignedByActorId: bottle.createdByActorId,
+      },
+      {
+        bottleId: null,
+        name: "Unresolved Retained Alias",
+        assignedByActorId: bottle.createdByActorId,
+      },
+    ]);
+
+    const [assignedResults, ignoredResults, unresolvedResults] =
+      await Promise.all([
+        routerClient.bottles.list({ query: "Assigned General Alias" }),
+        routerClient.bottles.list({ query: "Ignored Exact Alias" }),
+        routerClient.bottles.list({ query: "Unresolved Retained Alias" }),
+      ]);
+
+    expect(assignedResults.results.map(({ id }) => id)).toEqual([bottle.id]);
+    expect(ignoredResults.results).toHaveLength(0);
+    expect(unresolvedResults.results).toHaveLength(0);
+  });
+
+  test("excludes a retired Bottle", async ({ fixtures }) => {
+    const retired = await fixtures.Bottle({ name: "Retired Bottle" });
+    const replacement = await fixtures.Bottle({ name: "Replacement Bottle" });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    const { results } = await routerClient.bottles.list({ sort: "name" });
+
+    expect(results.map((result) => result.id)).toEqual([replacement.id]);
+  });
+
+  test("keeps exact sibling Bottles distinct in list results", async ({
+    fixtures,
+  }) => {
+    const first = await fixtures.Bottle({ name: "Sibling Batch" });
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch Two",
+      releaseYear: 2026,
+    });
+
+    const { results } = await routerClient.bottles.list({
+      brand: first.brandId,
+      sort: "name",
+    });
+
+    expect(results.map((result) => result.id).sort((a, b) => a - b)).toEqual(
+      [first.id, second.id].sort((a, b) => a - b),
+    );
   });
 
   test("lists bottles with 'The' prefix", async ({ fixtures }) => {
@@ -240,55 +308,120 @@ describe("GET /bottles", () => {
     expect(results[0].id).toBe(bottle1.id);
   });
 
-  test("lists bottles with tag filter", async ({ fixtures }) => {
+  test("filters tags by direct Bottle identity", async ({ fixtures }) => {
     const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
     const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
-
-    // Create tastings with tags
     await fixtures.Tasting({
-      bottleId: bottle1.id,
+      bottleId: bottle2.id,
       tags: ["smoky", "peated"],
     });
     await fixtures.Tasting({
-      bottleId: bottle2.id,
-      tags: ["fruity", "sweet"],
+      bottleId: bottle1.id,
+      tags: ["retained-only"],
     });
 
-    const { results } = await routerClient.bottles.list({
-      tag: "smoky",
-    });
+    const [targetMatch, retainedMatch] = await Promise.all([
+      routerClient.bottles.list({ tag: "smoky" }),
+      routerClient.bottles.list({ tag: "retained-only" }),
+    ]);
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+    expect(targetMatch.results.map((result) => result.id)).toEqual([
+      bottle2.id,
+    ]);
+    expect(retainedMatch.results.map((result) => result.id)).toEqual([
+      bottle1.id,
+    ]);
   });
 
-  test("lists bottles with flight filter", async ({ fixtures }) => {
-    const flight = await fixtures.Flight({ name: "Test Flight" });
-    const bottle1 = await fixtures.Bottle({ name: "Flight Bottle" });
-    const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });
-
-    // Add bottle to flight using direct DB insert
+  test("filters flights by direct Bottle identity", async ({ fixtures }) => {
+    const flight = await fixtures.Flight({ name: "Exact target flight" });
+    const retainedBottle = await fixtures.Bottle({
+      name: "Flight member",
+    });
+    await fixtures.Bottle({
+      name: "Unrelated Bottle",
+    });
     await db.insert(flightBottles).values({
       flightId: flight.id,
-      bottleId: bottle1.id,
+      bottleId: retainedBottle.id,
     });
 
     const { results } = await routerClient.bottles.list({
       flight: flight.publicId,
+      sort: "name",
     });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toBe(bottle1.id);
+    expect(results.map((result) => result.id)).toEqual([retainedBottle.id]);
   });
 
-  test("returns empty results for invalid flight", async ({ fixtures }) => {
+  test("returns empty results for an unknown flight", async ({ fixtures }) => {
     await fixtures.Bottle({ name: "Some Bottle" });
 
-    const { results } = await routerClient.bottles.list({
-      flight: "invalid-flight-id",
+    const result = await routerClient.bottles.list({
+      flight: "unknown-flight",
+      cursor: 2,
     });
 
-    expect(results.length).toBe(0);
+    expect(result).toEqual({
+      results: [],
+      rel: {
+        nextCursor: null,
+        prevCursor: null,
+      },
+    });
+  });
+
+  test("paginates exact flight members using Bottle list ordering", async ({
+    fixtures,
+  }) => {
+    const members = await Promise.all(
+      Array.from({ length: 5 }, (_, index) =>
+        fixtures.Bottle({
+          name: `Flight Bottle ${index + 1}`,
+          totalTastings: index + 1,
+        }),
+      ),
+    );
+    await fixtures.Bottle({
+      name: "Outside flight",
+      totalTastings: 100,
+    });
+    const flight = await fixtures.Flight({
+      name: "Paginated flight",
+      bottles: members.map((bottle) => bottle.id),
+    });
+
+    const page1 = await routerClient.bottles.list({
+      flight: flight.publicId,
+      limit: 2,
+      cursor: 1,
+      sort: "-tastings",
+    });
+    const page2 = await routerClient.bottles.list({
+      flight: flight.publicId,
+      limit: 2,
+      cursor: 2,
+      sort: "-tastings",
+    });
+    const page3 = await routerClient.bottles.list({
+      flight: flight.publicId,
+      limit: 2,
+      cursor: 3,
+      sort: "-tastings",
+    });
+
+    expect(page1.results.map((result) => result.id)).toEqual([
+      members[4]!.id,
+      members[3]!.id,
+    ]);
+    expect(page1.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(page2.results.map((result) => result.id)).toEqual([
+      members[2]!.id,
+      members[1]!.id,
+    ]);
+    expect(page2.rel).toEqual({ nextCursor: 3, prevCursor: 1 });
+    expect(page3.results.map((result) => result.id)).toEqual([members[0]!.id]);
+    expect(page3.rel).toEqual({ nextCursor: null, prevCursor: 2 });
   });
 
   test("lists bottles with query matching brand and name", async ({

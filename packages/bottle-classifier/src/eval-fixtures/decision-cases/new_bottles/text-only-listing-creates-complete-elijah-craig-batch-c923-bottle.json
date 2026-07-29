@@ -1,0 +1,72 @@
+{
+  "id": "text-only-listing-creates-complete-elijah-craig-batch-c923-bottle",
+  "name": "text-only listing: creates complete Elijah Craig Barrel Proof Batch C923 Bottle from raw title text",
+  "input": {
+    "reference": {
+      "name": "Elijah Craig Barrel Proof Batch C923",
+      "url": "https://shop.example/products/elijah-craig-barrel-proof-batch-c923"
+    },
+    "initialCandidates": [
+      {
+        "alias": null,
+        "brand": "Elijah Craig",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Heaven Hill"],
+        "category": "bourbon",
+        "statedAge": 12,
+        "edition": null,
+        "caskStrength": true,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.94,
+        "source": ["exact"],
+        "bottleId": 620,
+        "fullName": "Elijah Craig Barrel Proof"
+      }
+    ]
+  },
+  "searchResponses": [
+    {
+      "when": ["elijah", "barrel proof"],
+      "results": [
+        {
+          "alias": null,
+          "brand": "Elijah Craig",
+          "bottler": null,
+          "series": null,
+          "distillery": ["Heaven Hill"],
+          "category": "bourbon",
+          "statedAge": 12,
+          "edition": null,
+          "caskStrength": true,
+          "singleCask": null,
+          "abv": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 0.94,
+          "source": ["exact"],
+          "bottleId": 620,
+          "fullName": "Elijah Craig Barrel Proof"
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "brand": {
+        "name": "Elijah Craig"
+      },
+      "name": "Barrel Proof",
+      "category": "bourbon",
+      "edition": "Batch C923",
+      "caskStrength": true
+    },
+    "summary": "Extract batch-level identity directly from the title and create one independently complete Elijah Craig Barrel Proof Batch C923 Bottle without inventing an age absent from the source."
+  }
+}

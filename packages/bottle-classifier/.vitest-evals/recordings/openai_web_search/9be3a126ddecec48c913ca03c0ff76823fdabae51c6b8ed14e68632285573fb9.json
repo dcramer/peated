@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:02:06.814Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:westlanddistillery.com/watchpostwhiskey.com Watchpost whiskey blend 42.5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:westlanddistillery.com/watchpostwhiskey.com Watchpost whiskey blend 42.5",
+    "summary": "Confirmed bottle-specific details for **Watchpost Whiskey**:\n\n- **Brand / bottler:** **Watchpost Whiskey**, blended by **Westland Distillery** in Seattle, Washington. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whiskey?utm_source=openai))\n- **Style:** **American Blended Whiskey**. ([watc",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/about",
+        "url": "https://www.watchpostwhiskey.com/pages/about",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/",
+        "url": "https://www.watchpostwhiskey.com/",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://cloud.news.westlanddistillery.com/watchpost",
+        "url": "https://cloud.news.westlanddistillery.com/watchpost",
+        "domain": "cloud.news.westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/products/cask-6659",
+        "url": "https://westlanddistillery.com/products/cask-6659",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9be3a126ddecec48c913ca03c0ff76823fdabae51c6b8ed14e68632285573fb9",
+    "mode": "auto"
+  }
+}

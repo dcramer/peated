@@ -1,23 +1,44 @@
+import {
+  BadgeCheckInputSchema,
+  BadgeCheckSchema,
+  BadgeSchema,
+} from "@peated/server/schemas";
 import { createTastingForBadge } from "../testHelpers";
-import { EveryTastingCheck } from "./everyTastingCheck";
+import {
+  EveryTastingCheck,
+  EveryTastingCheckConfigSchema,
+} from "./everyTastingCheck";
 
-describe("parseConfig", () => {
+describe("config schema", () => {
   test("valid params", async () => {
-    const badgeImpl = new EveryTastingCheck();
     const config = {};
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`{}`);
+    expect(
+      await EveryTastingCheckConfigSchema.parseAsync(config),
+    ).toMatchInlineSnapshot(`{}`);
   });
-});
 
-describe("track", () => {
-  test("tracks bottle", async ({ fixtures }) => {
-    const tasting = await createTastingForBadge(fixtures);
+  test("preserves arbitrary stored config", async () => {
+    const config = { legacy: { value: true } };
 
-    const badgeImpl = new EveryTastingCheck();
-    const config = {};
-    expect(badgeImpl.track(config, tasting)).toMatchInlineSnapshot(`
-      []
-    `);
+    const badge = BadgeSchema.parse({
+      id: 1,
+      name: "Any tasting",
+      checks: [{ type: "everyTasting", config }],
+    });
+
+    expect(badge.checks?.[0]?.config).toEqual(config);
+  });
+
+  test("preserves arbitrary input config and defaults missing config", () => {
+    const config = ["legacy", { value: true }];
+
+    expect(
+      BadgeCheckInputSchema.parse({ type: "everyTasting", config }).config,
+    ).toEqual(config);
+    expect(BadgeCheckSchema.parse({ type: "everyTasting" }).config).toEqual({});
+    expect(
+      BadgeCheckInputSchema.parse({ type: "everyTasting" }).config,
+    ).toEqual({});
   });
 });
 
@@ -26,7 +47,7 @@ describe("test", () => {
     const tasting = await createTastingForBadge(fixtures);
 
     const badgeImpl = new EveryTastingCheck();
-    const config = {};
+    const config = { ignored: true };
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 });

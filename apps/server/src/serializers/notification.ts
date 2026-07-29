@@ -2,20 +2,40 @@ import { eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
-import type { Follow, Notification, User } from "../db/schema";
-import { comments, follows, tastings, toasts, users } from "../db/schema";
+import type { Notification, User } from "../db/schema";
+import {
+  bottles,
+  comments,
+  follows,
+  tastings,
+  toasts,
+  users,
+} from "../db/schema";
 import { logError } from "../lib/log";
 import { type NotificationSchema } from "../schemas";
-import { TastingSerializer } from "./tasting";
+import { BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
+
+type SerializedNotification = z.infer<typeof NotificationSchema>;
+type FriendRequestRef = NonNullable<
+  Extract<SerializedNotification, { type: "friend_request" }>["ref"]
+>;
+type TastingRef = NonNullable<
+  Extract<SerializedNotification, { type: "toast" }>["ref"]
+>;
 
 type NotificationAttrs = {
   fromUser: ReturnType<(typeof UserSerializer)["item"]> | null;
-  ref:
-    | ReturnType<(typeof TastingSerializer)["item"]>
-    | ReturnType<(typeof FriendRequestReceipientSerializer)["item"]>
-    | null;
-};
+} & (
+  | {
+      type: "friend_request";
+      ref: FriendRequestRef | null;
+    }
+  | {
+      type: "toast" | "comment";
+      ref: TastingRef | null;
+    }
+);
 
 export const NotificationSerializer = serializer({
   name: "notification",
@@ -25,9 +45,9 @@ export const NotificationSerializer = serializer({
   ): Promise<Record<number, NotificationAttrs>> => {
     const fromUserIds = Array.from(
       new Set(
-        itemList
-          .filter((i) => Boolean(i.fromUserId))
-          .map<number>((i) => i.fromUserId as number),
+        itemList.flatMap((item) =>
+          item.fromUserId === null ? [] : [item.fromUserId],
+        ),
       ),
     );
 
@@ -47,17 +67,20 @@ export const NotificationSerializer = serializer({
       .filter((i) => i.type === "friend_request")
       .map((i) => i.objectId);
     const followList = followIdList.length
-      ? await db.select().from(follows).where(inArray(follows.id, followIdList))
+      ? await db
+          .select({
+            id: follows.id,
+            fromUserId: follows.fromUserId,
+            toUserId: follows.toUserId,
+            status: follows.status,
+          })
+          .from(follows)
+          .where(inArray(follows.id, followIdList))
       : [];
-    const followsById = Object.fromEntries(
-      (
-        await serialize(
-          FriendRequestReceipientSerializer,
-          followList,
-          currentUser,
-        )
-      ).map((data, index) => [followList[index].id, data]),
-    );
+    const followsById = new Map<number, (typeof followList)[number]>();
+    for (const follow of followList) {
+      followsById.set(follow.id, follow);
+    }
     if (followIdList.length !== followList.length) {
       logError("Failed to fetch all follow relations for notifications");
     }
@@ -68,22 +91,14 @@ export const NotificationSerializer = serializer({
     const toastTastingList = toastIdList.length
       ? await db
           .select({
-            toastId: toasts.id,
-            tasting: tastings,
+            objectId: toasts.id,
+            tastingId: tastings.id,
+            bottleId: tastings.bottleId,
           })
           .from(tastings)
           .innerJoin(toasts, eq(tastings.id, toasts.tastingId))
           .where(inArray(toasts.id, toastIdList))
       : [];
-    const toastsById = Object.fromEntries(
-      (
-        await serialize(
-          TastingSerializer,
-          toastTastingList.map(({ tasting }) => tasting),
-          currentUser,
-        )
-      ).map((data, index) => [toastTastingList[index].toastId, data]),
-    );
 
     const commentIdList = itemList
       .filter((i) => i.type === "comment")
@@ -91,46 +106,122 @@ export const NotificationSerializer = serializer({
     const commentTastingList = commentIdList.length
       ? await db
           .select({
-            commentId: comments.id,
-            tasting: tastings,
+            objectId: comments.id,
+            tastingId: tastings.id,
+            bottleId: tastings.bottleId,
           })
           .from(tastings)
           .innerJoin(comments, eq(tastings.id, comments.tastingId))
           .where(inArray(comments.id, commentIdList))
       : [];
-    const commentsById = Object.fromEntries(
-      (
-        await serialize(
-          TastingSerializer,
-          commentTastingList.map(({ tasting }) => tasting),
-          currentUser,
-        )
-      ).map((data, index) => [commentTastingList[index].commentId, data]),
+    const tastingReferenceList = [
+      ...toastTastingList.map((reference) => ({
+        ...reference,
+        type: "toast" as const,
+      })),
+      ...commentTastingList.map((reference) => ({
+        ...reference,
+        type: "comment" as const,
+      })),
+    ];
+    const directBottleReferences = tastingReferenceList.map((reference) => {
+      if (reference.bottleId === null) {
+        throw new Error(`Tasting ${reference.tastingId} has no Bottle.`);
+      }
+      return { ...reference, bottleId: reference.bottleId };
+    });
+    const bottleIds = Array.from(
+      new Set(directBottleReferences.map((reference) => reference.bottleId)),
     );
+    const bottleList = bottleIds.length
+      ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
+      : [];
+    const serializedBottleList = await serialize(
+      BottleSerializer,
+      bottleList,
+      currentUser,
+    );
+    const bottlesById = new Map(
+      serializedBottleList.map((bottle, index) => [
+        bottleList[index].id,
+        bottle,
+      ]),
+    );
+    const tastingRefsByKey: Record<string, TastingRef> = {};
+    directBottleReferences.forEach((reference) => {
+      const bottle = bottlesById.get(reference.bottleId);
+      if (!bottle) {
+        throw new Error(
+          `Tasting ${reference.tastingId} references missing Bottle ${reference.bottleId}.`,
+        );
+      }
+      tastingRefsByKey[`${reference.type}:${reference.objectId}`] = {
+        id: reference.tastingId,
+        bottle,
+      };
+    });
 
-    const getRef = (notification: Notification) => {
+    const getFriendRequestRef = (
+      notification: Notification,
+    ): FriendRequestRef | null => {
+      const follow = followsById.get(notification.objectId);
+      if (!follow) return null;
+
+      if (
+        follow.fromUserId !== notification.fromUserId ||
+        follow.toUserId !== notification.userId
+      ) {
+        logError("Notification friend request identity mismatch", {
+          notification: {
+            id: notification.id,
+            objectId: notification.objectId,
+            fromUserId: notification.fromUserId,
+            userId: notification.userId,
+          },
+          follow: {
+            id: follow.id,
+            fromUserId: follow.fromUserId,
+            toUserId: follow.toUserId,
+          },
+        });
+        return null;
+      }
+
+      return {
+        status: follow.status === "following" ? "friends" : follow.status,
+        userId: follow.fromUserId,
+      };
+    };
+
+    const getAttrs = (notification: Notification): NotificationAttrs => {
+      const fromUser = notification.fromUserId
+        ? fromUserById[notification.fromUserId]
+        : null;
+
       switch (notification.type) {
         case "friend_request":
-          return followsById[notification.objectId];
+          return {
+            type: notification.type,
+            fromUser,
+            ref: getFriendRequestRef(notification),
+          };
         case "toast":
-          return toastsById[notification.objectId];
+          return {
+            type: notification.type,
+            fromUser,
+            ref: tastingRefsByKey[`toast:${notification.objectId}`] ?? null,
+          };
         case "comment":
-          return commentsById[notification.objectId];
-        default:
-          return null;
+          return {
+            type: notification.type,
+            fromUser,
+            ref: tastingRefsByKey[`comment:${notification.objectId}`] ?? null,
+          };
       }
     };
 
     return Object.fromEntries(
-      itemList.map((item) => {
-        return [
-          item.id,
-          {
-            fromUser: item.fromUserId ? fromUserById[item.fromUserId] : null,
-            ref: getRef(item) || null,
-          },
-        ];
-      }),
+      itemList.map((item) => [item.id, getAttrs(item)]),
     );
   },
 
@@ -139,53 +230,20 @@ export const NotificationSerializer = serializer({
     attrs: NotificationAttrs,
     currentUser: User,
   ): z.infer<typeof NotificationSchema> => {
-    return {
+    const common = {
       id: item.id,
-      type: item.type,
       objectId: item.objectId,
       createdAt: item.createdAt.toISOString(),
       fromUser: attrs.fromUser,
-      ref: attrs.ref,
       read: item.read,
     };
-  },
-});
 
-export const FriendRequestReceipientSerializer = serializer({
-  name: "friendRequestReceipient",
-  attrs: async (itemList: Follow[], currentUser?: User) => {
-    const userList = await db
-      .select()
-      .from(users)
-      .where(
-        inArray(
-          users.id,
-          itemList.map((i) => i.fromUserId),
-        ),
-      );
-    const usersById = Object.fromEntries(
-      (await serialize(UserSerializer, userList, currentUser)).map(
-        (data, index) => [userList[index].id, data],
-      ),
-    );
-
-    return Object.fromEntries(
-      itemList.map((item) => {
-        return [
-          item.id,
-          {
-            user: usersById[item.fromUserId],
-          },
-        ];
-      }),
-    );
-  },
-  item: (item: Follow, attrs: Record<string, any>, currentUser?: User) => {
-    return {
-      id: attrs.user.id,
-      status: item.status === "following" ? "friends" : item.status,
-      createdAt: item.createdAt.toISOString(),
-      user: attrs.user,
-    };
+    switch (attrs.type) {
+      case "friend_request":
+        return { ...common, type: attrs.type, ref: attrs.ref };
+      case "toast":
+      case "comment":
+        return { ...common, type: attrs.type, ref: attrs.ref };
+    }
   },
 });

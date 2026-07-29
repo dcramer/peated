@@ -5,12 +5,25 @@ import {
   bottles,
   storePriceHistories,
   storePrices,
+  type StorePrice,
 } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
-import { upsertBottleAlias } from "@peated/server/lib/db";
 import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
+import { DatabaseError } from "pg";
+
+type StorePriceNormalizationUpdate = Pick<StorePrice, "name"> &
+  Partial<Pick<StorePrice, "bottleId">>;
+
+export function buildStorePriceNormalizationUpdate(
+  name: string,
+  bottleId: number | null,
+): StorePriceNormalizationUpdate {
+  return {
+    name,
+    ...(bottleId === null ? {} : { bottleId }),
+  };
+}
 
 const subcommand = program.command("prices");
 
@@ -35,13 +48,12 @@ subcommand
           isFullName: true,
         });
         if (price.name !== name) {
-          const values: Record<string, any> = {};
-          if (price.name !== name) values.name = name;
-
-          if (!price.bottleId) {
-            const bottleId = await findBottleId(price.name);
-            if (bottleId) price.bottleId = bottleId;
-          }
+          const discoveredBottleId =
+            price.bottleId === null ? await findBottleId(price.name) : null;
+          const values = buildStorePriceNormalizationUpdate(
+            name,
+            discoveredBottleId,
+          );
 
           console.log(`M: ${price.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
@@ -53,10 +65,17 @@ subcommand
                   .set(values)
                   .where(eq(storePrices.id, price.id));
               });
-            } catch (err: any) {
+            } catch (error) {
+              const databaseError =
+                error instanceof DatabaseError
+                  ? error
+                  : error instanceof Error &&
+                      error.cause instanceof DatabaseError
+                    ? error.cause
+                    : null;
               if (
-                err?.code === "23505" &&
-                err?.constraint === "store_price_unq_name"
+                databaseError?.code === "23505" &&
+                databaseError.constraint === "store_price_unq_name"
               ) {
                 await db.transaction(async (tx) => {
                   const [match] = await db
@@ -96,6 +115,8 @@ subcommand
                     .delete(storePrices)
                     .where(eq(storePrices.id, price.id));
                 });
+              } else {
+                throw error;
               }
             }
           }
@@ -105,28 +126,6 @@ subcommand
       offset += step;
     }
   });
-
-subcommand.command("backfill-aliases").action(async (options) => {
-  const step = 1000;
-  const systemActor = await getPeatedSystemActor();
-  const baseQuery = db.select().from(storePrices).orderBy(asc(storePrices.id));
-
-  let hasResults = true;
-  let offset = 0;
-  while (hasResults) {
-    hasResults = false;
-    const query = await baseQuery.offset(offset).limit(step);
-    for (const price of query) {
-      if (price.bottleId) {
-        await upsertBottleAlias(db, price.name, price.bottleId, null, {
-          assignedByActorId: systemActor.id,
-        });
-      }
-      hasResults = true;
-    }
-    offset += step;
-  }
-});
 
 subcommand.command("backfill-images").action(async (options) => {
   await db

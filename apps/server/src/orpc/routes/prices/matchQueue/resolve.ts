@@ -1,35 +1,36 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  DuplicateBottleAliasError,
+  ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
 import {
   applyApprovedStorePriceMatch,
   ignoreStorePriceMatchProposal,
   StorePriceMatchProposalAlreadyProcessingError,
+  StorePriceMatchProposalIdentityChangedError,
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,
 } from "@peated/server/lib/priceMatching";
+import { ActiveBottleSelectionError } from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { z } from "zod";
 
-const InputSchema = z
-  .object({
-    proposal: z.coerce.number(),
-    action: z.enum(["match", "ignore"]),
-    bottle: z.coerce.number().optional(),
-    release: z.coerce.number().nullable().optional(),
-  })
-  .superRefine((input, ctx) => {
-    if (input.action === "match" && !input.bottle) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["bottle"],
-        message: "Bottle is required when approving a match.",
-      });
-    }
-  });
+const InputSchema = z.discriminatedUnion("action", [
+  z
+    .object({
+      proposal: z.coerce.number().int().positive(),
+      action: z.literal("match"),
+      bottle: z.coerce.number().int().positive(),
+    })
+    .strict(),
+  z
+    .object({
+      proposal: z.coerce.number().int().positive(),
+      action: z.literal("ignore"),
+    })
+    .strict(),
+]);
 
 export default procedure
   .use(requireMod)
@@ -48,8 +49,7 @@ export default procedure
       if (input.action === "match") {
         await applyApprovedStorePriceMatch({
           proposalId: input.proposal,
-          bottleId: input.bottle!,
-          releaseId: input.release ?? null,
+          bottleId: input.bottle,
           reviewedById: context.user.id,
           actor: await getUserActor(context.user),
         });
@@ -78,7 +78,12 @@ export default procedure
           message: err.message,
         });
       }
-      if (err instanceof DuplicateBottleAliasError) {
+      if (err instanceof StorePriceMatchProposalIdentityChangedError) {
+        throw errors.CONFLICT({
+          message: err.message,
+        });
+      }
+      if (err instanceof ExactBottleAliasConflictError) {
         throw errors.CONFLICT({
           message: err.message,
         });
@@ -87,6 +92,9 @@ export default procedure
         throw errors.INTERNAL_SERVER_ERROR({
           message: err.message,
         });
+      }
+      if (err instanceof ActiveBottleSelectionError) {
+        throw errors.CONFLICT({ message: err.message, cause: err });
       }
       throw err;
     }

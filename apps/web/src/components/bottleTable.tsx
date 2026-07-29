@@ -1,19 +1,12 @@
 "use client";
 
 import { formatCategoryName } from "@peated/server/lib/format";
-import type {
-  Bottle,
-  BottleRelease,
-  CollectionBottle,
-  PagingRel,
-} from "@peated/server/types";
-import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
+import type { Bottle, CollectionBottle, PagingRel } from "@peated/server/types";
+import BottleStatusIcons, {
+  BottleStatusIndicators,
+} from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
-import {
-  formatBottleBottlingName,
-  getBottleBottlingPath,
-} from "../lib/bottlings";
 import classNames from "../lib/classNames";
 import BottleLink from "./bottleLink";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
@@ -23,7 +16,6 @@ import Table from "./table";
 type BottleRow = {
   bottle: Bottle;
   collectionBottle?: CollectionBottle;
-  release: BottleRelease | null;
   key: string;
 };
 
@@ -37,7 +29,6 @@ export default function BottleTable({
   renderCollectionBottleImage,
   renderCollectionBottleMeta,
   renderCollectionBottleActions,
-  conciseBottlingNames = false,
   hideLibraryStatus = false,
   showBottleStats = true,
   ...props
@@ -47,7 +38,6 @@ export default function BottleTable({
   renderCollectionBottleImage?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleMeta?: (item: CollectionBottle) => ReactNode;
   renderCollectionBottleActions?: (item: CollectionBottle) => ReactNode;
-  conciseBottlingNames?: boolean;
   hideLibraryStatus?: boolean;
   showBottleStats?: boolean;
 }) {
@@ -56,10 +46,9 @@ export default function BottleTable({
       ? {
           bottle: item.bottle,
           collectionBottle: item,
-          release: item.release ?? null,
           key: `collection-${item.id}`,
         }
-      : { bottle: item, release: null, key: `bottle-${item.id}` },
+      : { bottle: item, key: `bottle-${item.id}` },
   );
 
   return (
@@ -75,6 +64,7 @@ export default function BottleTable({
           sortDefaultOrder: "asc",
           className: showBottleStats ? "min-w-full sm:w-1/2" : "w-full",
           value: (item) => {
+            const { bottle } = item;
             const collectionImage =
               item.collectionBottle &&
               renderCollectionBottleImage?.(item.collectionBottle);
@@ -104,48 +94,35 @@ export default function BottleTable({
                   )}
                 >
                   <div className="flex min-w-0 flex-wrap items-center gap-x-1">
-                    {item.release ? (
-                      <Link
-                        href={getBottleBottlingPath(
-                          item.bottle.id,
-                          item.release.id,
-                        )}
-                        className="font-medium hover:underline"
-                        title={item.release.fullName}
-                      >
-                        {conciseBottlingNames
-                          ? formatBottleBottlingName(item.bottle, item.release)
-                          : item.release.fullName}
-                      </Link>
+                    <BottleLink
+                      bottle={bottle}
+                      className="font-medium hover:underline"
+                    >
+                      {bottle.fullName}
+                    </BottleLink>
+                    {item.collectionBottle ? (
+                      <BottleStatusIndicators
+                        hasTasted={item.collectionBottle.hasTasted}
+                        isLibrary={false}
+                      />
                     ) : (
-                      <BottleLink
-                        bottle={item.bottle}
-                        className="font-medium hover:underline"
-                      >
-                        {item.bottle.brand.shortName || item.bottle.brand.name}{" "}
-                        {item.bottle.name}
-                      </BottleLink>
+                      <BottleStatusIcons
+                        bottle={bottle}
+                        hideLibrary={hideLibraryStatus}
+                      />
                     )}
-                    <BottleStatusIcons
-                      bottle={item.bottle}
-                      hideLibrary={hideLibraryStatus}
-                    />
                     {collectionMeta}
-                    {!item.release && item.bottle.singleCask && (
-                      <SingleCaskChip />
-                    )}
-                    {item.release?.singleCask && <SingleCaskChip />}
+                    {bottle.singleCask && <SingleCaskChip />}
                   </div>
                   <div className="text-muted flex flex-col gap-y-1 text-sm">
-                    {item.bottle.category &&
-                      String(item.bottle.category) !== "other" && (
-                        <Link
-                          href={`/bottles/?category=${item.bottle.category}`}
-                          className="hover:underline"
-                        >
-                          {formatCategoryName(item.bottle.category)}
-                        </Link>
-                      )}
+                    {bottle.category && String(bottle.category) !== "other" && (
+                      <Link
+                        href={`/bottles/?category=${bottle.category}`}
+                        className="hover:underline"
+                      >
+                        {formatCategoryName(bottle.category)}
+                      </Link>
+                    )}
                   </div>
                 </div>
                 {mobileCollectionActions && (
@@ -169,7 +146,9 @@ export default function BottleTable({
               {
                 name: "rating",
                 value: (item: BottleRow) => (
-                  <SimpleRatingIndicator avgRating={item.bottle.avgRating} />
+                  <SimpleRatingIndicator
+                    avgRating={item.bottle.avgRating ?? null}
+                  />
                 ),
                 className: "sm:w-20",
                 sortDefaultOrder: "desc" as const,
@@ -177,13 +156,15 @@ export default function BottleTable({
               },
               {
                 name: "age",
-                value: (item: BottleRow) =>
-                  item.bottle.statedAge ? (
+                value: (item: BottleRow) => {
+                  const { statedAge } = item.bottle;
+                  return statedAge ? (
                     <Link
                       className="hover:underline"
-                      href={`/bottles/?age=${item.bottle.statedAge}`}
-                    >{`${item.bottle.statedAge} years`}</Link>
-                  ) : null,
+                      href={`/bottles/?age=${statedAge}`}
+                    >{`${statedAge} years`}</Link>
+                  ) : null;
+                },
                 className: "sm:w-24",
                 sortDefaultOrder: "desc" as const,
               },

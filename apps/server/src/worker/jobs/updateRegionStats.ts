@@ -1,13 +1,23 @@
 import { db } from "@peated/server/db";
 import {
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
   regions,
 } from "@peated/server/db/schema";
 import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 
-export default async ({ regionId }: { regionId: number }) => {
+export const UpdateRegionStatsJobArgsSchema = z
+  .object({
+    regionId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async function updateRegionStats(input: unknown) {
+  const { regionId } = UpdateRegionStatsJobArgsSchema.parse(input);
+
   await db
     .update(regions)
     .set({
@@ -32,7 +42,13 @@ export default async ({ regionId }: { regionId: number }) => {
             )
           ) AND ${entities.regionId} = ${regions.id}
         )
+        AND ${bottles.groupId} IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1
+          FROM ${bottleTombstones}
+          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
+        )
       )`,
     })
     .where(eq(regions.id, regionId));
-};
+}

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:37:18.722Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon barrel 4769 64.2 5 year"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Willett Family Estate Bottled Single Barrel Bourbon barrel 4769 64.2 5 year",
+    "summary": "I found bottle-specific evidence for **Willett Family Estate Bottled Single Barrel Bourbon barrel #4769** matching **5 years** and **64.2% ABV**. The strongest corroborated source is Whiskybase, which lists this exact combination: **Willett 05-year-old Family Estate Bottled Single Barrel Bourbon, 64.2% Vol., barrel 476",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84774/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://the-right-spirit.com/2019/08/30/comparison-willett-5-year-single-barrel-bourbon-willett-4-year-small-batch-rye/",
+        "url": "https://the-right-spirit.com/2019/08/30/comparison-willett-5-year-single-barrel-bourbon-willett-4-year-small-batch-rye/",
+        "domain": "the-right-spirit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.alabcboard.gov/sites/default/files/inline-files/January%202026%20Alabama%20Select%20Spirits_0.pdf",
+        "url": "https://www.alabcboard.gov/sites/default/files/inline-files/January%202026%20Alabama%20Select%20Spirits_0.pdf",
+        "domain": "alabcboard.gov",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.straightbourbon.com/community/topic/21698-willett-family-estate-single-barrel-release-spreadsheet/",
+        "url": "https://www.straightbourbon.com/community/topic/21698-willett-family-estate-single-barrel-release-spreadsheet/",
+        "domain": "straightbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/iqr5gm",
+        "url": "https://www.reddit.com/r/bourbon/comments/iqr5gm",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://alabcboard.gov/sites/default/files/inline-files/5-24%20Web_1.pdf",
+        "url": "https://alabcboard.gov/sites/default/files/inline-files/5-24%20Web_1.pdf",
+        "domain": "alabcboard.gov",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "36361310aab36fb62cdc44039a406ec1f9a07fba5b3c8f0e9c7f6b4c806faca1",
+    "mode": "auto"
+  }
+}

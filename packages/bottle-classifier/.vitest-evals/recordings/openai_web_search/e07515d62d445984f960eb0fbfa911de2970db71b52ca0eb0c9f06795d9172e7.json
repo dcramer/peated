@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:03:36.978Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Oaked bourbon official 90.4 proof"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Double Oaked bourbon official 90.4 proof",
+    "summary": "Yes — **Woodford Reserve Double Oaked** is officially bottled at **90.4 proof** (**45.2% ABV**) on Woodford Reserve’s own product page. It’s a **Kentucky Straight Bourbon Whiskey** finished in a **second, heavily toasted, lightly charred oak barrel**, which is the defining “double oaked” treatment. ([woodfordreserve.co",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/en-uk/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/en-uk/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/products/ship-to-store/woodford-reserve-double-oaked-bourbon",
+        "url": "https://www.abc.virginia.gov/products/ship-to-store/woodford-reserve-double-oaked-bourbon",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/?trust=yes",
+        "url": "https://shop.woodfordreserve.com/?trust=yes",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e07515d62d445984f960eb0fbfa911de2970db71b52ca0eb0c9f06795d9172e7",
+    "mode": "auto"
+  }
+}

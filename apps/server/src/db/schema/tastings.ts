@@ -26,8 +26,8 @@ export const servingStyleEnum = pgEnum("servingStyle", SERVING_STYLE_LIST);
 /**
  * User-authored tasting records.
  *
- * A tasting always points at a bottle and may optionally point at a canonical
- * release when the user knows the exact shared variant they had.
+ * Bottle identity is authoritative. releaseId is retained as historical
+ * migration evidence until separately approved cleanup.
  */
 export const tastings = pgTable(
   "tasting",
@@ -81,6 +81,10 @@ export const tastingsRelations = relations(tastings, ({ one }) => ({
   bottle: one(bottles, {
     fields: [tastings.bottleId],
     references: [bottles.id],
+  }),
+  release: one(bottleReleases, {
+    fields: [tastings.releaseId],
+    references: [bottleReleases.id],
   }),
   createdBy: one(users, {
     fields: [tastings.createdById],

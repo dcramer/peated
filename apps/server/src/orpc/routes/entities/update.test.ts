@@ -1,16 +1,16 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroups,
   bottles,
   changes,
   entities,
   entityAliases,
 } from "@peated/server/db/schema";
-import { getUserActor } from "@peated/server/lib/actors";
 import { omit } from "@peated/server/lib/filter";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 
 describe("PATCH /entities/:entity", () => {
   test("requires authentication", async () => {
@@ -226,62 +226,112 @@ describe("PATCH /entities/:entity", () => {
     expect(newEntity.type).toEqual(["distiller"]);
   });
 
-  test("name change updates bottles if brand", async ({ fixtures }) => {
+  test("brand name change rematerializes each group once while preserving exact identity", async ({
+    fixtures,
+  }) => {
     const entity = await fixtures.Entity({
       name: "Foo",
       type: ["brand", "distiller"],
     });
-    const bottle = await fixtures.Bottle({
+    const first = await fixtures.Bottle({
       brandId: entity.id,
-      name: "Bar",
+      name: "Core",
     });
-    expect(bottle.fullName).toEqual("Foo Bar");
-
-    const otherBottle = await fixtures.Bottle({
+    const second = await fixtures.BottleGroupMember({
+      groupId: first.groupId as number,
+      edition: "Batch Two",
+    });
+    const otherGroup = await fixtures.Bottle({
+      brandId: entity.id,
+      name: "Reserve",
+    });
+    const distillerOnlyBottle = await fixtures.Bottle({
       distillerIds: [entity.id],
+    });
+    const originalBottles = [first, second, otherGroup];
+    expect(new Set(originalBottles.map(({ groupId }) => groupId))).toEqual(
+      new Set([first.groupId, otherGroup.groupId]),
+    );
+
+    await db.insert(bottleAliases).values({
+      name: "New Foo Reserve",
+      bottleId: null,
+      releaseId: null,
+      assignedByActorId: otherGroup.createdByActorId,
     });
 
     const modUser = await fixtures.User({ mod: true });
     const data = await routerClient.entities.update(
       {
         entity: entity.id,
-        name: "Bar",
+        name: "New Foo",
       },
       { context: { user: modUser } },
     );
-
-    expect(data.id).toBeDefined();
 
     const [newEntity] = await db
       .select()
       .from(entities)
       .where(eq(entities.id, data.id));
+    expect(newEntity.name).toBe("New Foo");
 
-    expect(omit(entity, "name", "searchVector", "updatedAt")).toEqual(
-      omit(newEntity, "name", "searchVector", "updatedAt"),
+    const updatedBottles = await db
+      .select()
+      .from(bottles)
+      .where(
+        inArray(
+          bottles.id,
+          originalBottles.map(({ id }) => id),
+        ),
+      );
+    expect(updatedBottles).toHaveLength(3);
+    for (const original of originalBottles) {
+      const updated = updatedBottles.find(({ id }) => id === original.id);
+      expect(updated).toMatchObject({
+        id: original.id,
+        groupId: original.groupId,
+        brandId: entity.id,
+      });
+      expect(updated?.fullName).toMatch(/^New Foo /);
+
+      const aliases = await db
+        .select()
+        .from(bottleAliases)
+        .where(eq(bottleAliases.bottleId, original.id));
+      expect(aliases).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: original.fullName,
+            releaseId: null,
+          }),
+          expect.objectContaining({
+            name: updated?.fullName,
+            releaseId: null,
+          }),
+        ]),
+      );
+    }
+
+    const groups = await db
+      .select()
+      .from(bottleGroups)
+      .where(
+        inArray(bottleGroups.id, [
+          first.groupId as number,
+          otherGroup.groupId as number,
+        ]),
+      );
+    expect(groups.map(({ fullName }) => fullName)).toEqual(
+      expect.arrayContaining(["New Foo Core", "New Foo Reserve"]),
     );
-    expect(newEntity.name).toBe("Bar");
 
-    const [newBottle] = await db
+    const [unchangedDistillerBottle] = await db
       .select()
       .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-
-    expect(newBottle.name).toEqual(bottle.name);
-    expect(newBottle.fullName).toEqual("Bar Bar");
-
-    const [newAlias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.bottleId, bottle.id));
-    expect(newAlias.name).toEqual(newBottle.fullName);
-
-    const [newOtherBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, otherBottle.id));
-
-    expect(newOtherBottle.fullName).toEqual(otherBottle.fullName);
+      .where(eq(bottles.id, distillerOnlyBottle.id));
+    expect(unchangedDistillerBottle.fullName).toEqual(
+      distillerOnlyBottle.fullName,
+    );
   });
 
   test("short name change updates bottles if brand", async ({ fixtures }) => {
@@ -328,11 +378,17 @@ describe("PATCH /entities/:entity", () => {
     expect(newBottle.name).toEqual(bottle.name);
     expect(newBottle.fullName).toEqual("F Bar");
 
-    const [newAlias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.bottleId, bottle.id));
-    expect(newAlias.name).toEqual(newBottle.fullName);
+    const newAlias = await db.query.bottleAliases.findFirst({
+      where: and(
+        eq(bottleAliases.bottleId, bottle.id),
+        eq(bottleAliases.name, newBottle.fullName),
+      ),
+    });
+    expect(newAlias).toMatchObject({
+      name: newBottle.fullName,
+      bottleId: bottle.id,
+      releaseId: null,
+    });
 
     const [newOtherBottle] = await db
       .select()
@@ -470,7 +526,10 @@ describe("PATCH /entities/:entity", () => {
     const oldBottleAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "F Bar"),
     });
-    expect(oldBottleAlias).toBeUndefined();
+    expect(oldBottleAlias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
 
     const newBottleAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "FC Bar"),
@@ -520,7 +579,10 @@ describe("PATCH /entities/:entity", () => {
     const oldShortNameAlias = await db.query.bottleAliases.findFirst({
       where: eq(bottleAliases.name, "F Bar"),
     });
-    expect(oldShortNameAlias).toBeUndefined();
+    expect(oldShortNameAlias).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
 
     const oldEntityAlias = await db.query.entityAliases.findFirst({
       where: eq(entityAliases.name, "F"),
@@ -536,6 +598,55 @@ describe("PATCH /entities/:entity", () => {
       where: eq(entityAliases.name, "Foo"),
     });
     expect(canonicalEntityAlias?.entityId).toEqual(entity.id);
+  });
+
+  test("grouped alias collision rolls back the entity and every Bottle identity", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Original Brand",
+      type: ["brand"],
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: entity.id,
+      name: "Core",
+    });
+    const conflictingBottle = await fixtures.Bottle();
+    const conflictingAlias = await fixtures.BottleAlias({
+      bottleId: conflictingBottle.id,
+      name: "Renamed Brand Core",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const error = await waitError(
+      routerClient.entities.update(
+        { entity: entity.id, name: "Renamed Brand" },
+        { context: { user: modUser } },
+      ),
+    );
+    expect(error.message).toBe(
+      "Concrete Bottle identity conflicts with an existing Bottle.",
+    );
+
+    const unchangedEntity = await db.query.entities.findFirst({
+      where: eq(entities.id, entity.id),
+    });
+    const unchangedBottle = await db.query.bottles.findFirst({
+      where: eq(bottles.id, bottle.id),
+    });
+    const retainedConflict = await db.query.bottleAliases.findFirst({
+      where: eq(bottleAliases.name, conflictingAlias.name),
+    });
+    expect(unchangedEntity?.name).toBe("Original Brand");
+    expect(unchangedBottle?.fullName).toBe("Original Brand Core");
+    expect(retainedConflict).toMatchObject({
+      bottleId: conflictingBottle.id,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "Renamed Brand Core"),
+      }),
+    ).toEqual(retainedConflict);
   });
 
   test("sets descriptionSrc with description", async ({ fixtures }) => {
@@ -588,53 +699,5 @@ describe("PATCH /entities/:entity", () => {
       description: "Delicious Wood",
       descriptionSrc: "user",
     });
-  });
-
-  test("updates existing conflicting alias", async ({ fixtures }) => {
-    const entity = await fixtures.Entity();
-    const existingAlias = await fixtures.BottleAlias({
-      bottleId: null,
-      name: "Cool Cats Single Barrel Bourbon",
-    });
-    const existingBottle = await fixtures.Bottle({
-      brandId: entity.id,
-      name: "Single Barrel Bourbon",
-    });
-    const modUser = await fixtures.User({ mod: true });
-
-    expect(existingAlias.bottleId).toBeNull();
-
-    const data = await routerClient.entities.update(
-      {
-        entity: entity.id,
-        name: "Cool Cats",
-      },
-      { context: { user: modUser } },
-    );
-
-    expect(data.id).toBeDefined();
-
-    const [newEntity] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, data.id));
-
-    expect(newEntity.name).toEqual("Cool Cats");
-
-    const [newBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, existingBottle.id));
-    expect(newBottle.fullName).toEqual("Cool Cats Single Barrel Bourbon");
-
-    const [newAlias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.name, existingAlias.name));
-    expect(newAlias.name).toEqual("Cool Cats Single Barrel Bourbon");
-    expect(newAlias.bottleId).toEqual(newBottle.id);
-    expect(newAlias.assignedByActorId).toEqual(
-      (await getUserActor(modUser)).id,
-    );
   });
 });

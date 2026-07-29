@@ -1,4 +1,4 @@
-import type { Bottle, BottleRelease } from "@peated/server/types";
+import type { Bottle } from "@peated/server/types";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import type { ReactNode } from "react";
 
@@ -9,11 +9,10 @@ export type PendingImageRef = Pick<
   "id" | "imageUrl"
 >;
 
-export type BottleResolverTarget = {
+export type BottleResolverResult = {
   bottle: Bottle;
-  release: BottleRelease | null;
-  hasExactLibraryEntry: boolean;
-  exactLibraryEntryImageUrl?: string | null;
+  hasLibraryEntry: boolean;
+  libraryEntryImageUrl?: string | null;
   pendingImage: PendingImageRef | null;
   /** Blob preview ownership transfers to the resolver caller only after onResolve succeeds. */
   previewUrl: string | null;
@@ -32,10 +31,9 @@ export type BottleResolverMatchedAction = Exclude<
 >;
 
 export type BottleResolverMatchedActionsProps = {
-  bottleId: number;
-  releaseId: number | null;
-  hasExactLibraryEntry: boolean;
-  exactLibraryEntryImageUrl?: string | null;
+  bottle: Bottle;
+  hasLibraryEntry: boolean;
+  libraryEntryImageUrl?: string | null;
   pendingImage: PendingImageRef | null;
   loadingExactLibraryStatus: boolean;
   resolvingAction: BottleResolverMatchedAction | null;
@@ -50,7 +48,7 @@ export type BottleResolverCreateProposalActionsProps = {
 
 export type BottleResolverProps = {
   onResolve: (
-    target: BottleResolverTarget,
+    result: BottleResolverResult,
     action?: BottleResolverAction,
   ) => Promise<void> | void;
   searchHrefForQuery: (

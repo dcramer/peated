@@ -1,12 +1,16 @@
 import { db } from "@peated/server/db";
-import { collectionBottles, collections } from "@peated/server/db/schema";
+import {
+  bottles,
+  collectionBottles,
+  collections,
+} from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import { CollectionSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
-import { and, asc, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -22,7 +26,7 @@ export default procedure
   .input(
     z.object({
       user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-      bottle: z.coerce.number().optional(),
+      bottle: z.coerce.number().gte(1).optional(),
       cursor: z.coerce.number().gte(1).default(1),
       limit: z.coerce.number().gte(1).lte(100).default(25),
     }),
@@ -50,9 +54,24 @@ export default procedure
     const offset = (cursor - 1) * limit;
 
     const where = [sql`${collections.createdById} = ${user.id}`];
-    if (input.bottle) {
+    if (input.bottle !== undefined) {
+      const bottle = await db.query.bottles.findFirst({
+        where: eq(bottles.id, input.bottle),
+        columns: { id: true },
+      });
+      if (!bottle) {
+        throw errors.NOT_FOUND({
+          message: "Bottle not found.",
+        });
+      }
+
       where.push(
-        sql`EXISTS(SELECT 1 FROM ${collectionBottles} WHERE ${collectionBottles.bottleId} = ${input.bottle} AND ${collectionBottles.collectionId} = ${collections.id})`,
+        sql`EXISTS(
+          SELECT 1
+          FROM ${collectionBottles}
+          WHERE ${collectionBottles.collectionId} = ${collections.id}
+            AND ${collectionBottles.bottleId} = ${bottle.id}
+        )`,
       );
     }
 
@@ -62,7 +81,7 @@ export default procedure
       .where(and(...where))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(collections.name));
+      .orderBy(asc(collections.name), asc(collections.id));
 
     return {
       results: await serialize(

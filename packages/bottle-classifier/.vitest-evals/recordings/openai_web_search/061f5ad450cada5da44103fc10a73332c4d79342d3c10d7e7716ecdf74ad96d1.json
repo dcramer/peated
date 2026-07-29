@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:02:30.278Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie Quinta Ruban 14 year old 4th Edition Glenmorangie Quinta Ruban 14 year old"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie Quinta Ruban 14 year old 4th Edition Glenmorangie Quinta Ruban 14 year old",
+    "summary": "Here’s the bottle-specific ID for **Glenmorangie Quinta Ruban 14 Year Old – 4th Edition**:\n\n- **Producer / bottler:** Glenmorangie, official distillery bottling. ([glenmorangie.com](https://www.glenmorangie.com/en-us/products/the-quinta-ruban?utm_source=openai))\n- **Name:** **The Quinta Ruban 14 Years Old**. Glenmorang",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/162531/glenmorangie-14-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/162531/glenmorangie-14-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "url": "https://shop.whiskybase.com/us/glenmorangie-14-year-old.html",
+        "domain": "shop.whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/54/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/54/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "url": "https://www.glenmorangie.com/en-us/collections/core-expressions",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "url": "https://whiskyadvocate.com/glenmorangie-14-year-old-quinta-ruban",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "061f5ad450cada5da44103fc10a73332c4d79342d3c10d7e7716ecdf74ad96d1",
+    "mode": "auto"
+  }
+}

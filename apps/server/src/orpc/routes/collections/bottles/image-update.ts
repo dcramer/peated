@@ -16,11 +16,11 @@ import { CollectionBottleSchema } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
-  copyPendingImageForCollectionBottle,
-  findCollectionBottleWithTarget,
+  findCollectionBottleEntry,
   isLibraryCollection,
   serializeCollectionBottleEntry,
-} from "./imageHelpers";
+} from "./collectionBottleHelpers";
+import { copyPendingImageForCollectionBottle } from "./imageHelpers";
 
 async function findCollectionById(collectionId: number) {
   return await db.query.collections.findFirst({
@@ -83,7 +83,7 @@ export default procedure
       });
     }
 
-    const collectionBottle = await findCollectionBottleWithTarget({
+    const collectionBottle = await findCollectionBottleEntry({
       collectionBottleId: input.collectionBottle,
       collectionId: collection.id,
     });
@@ -114,7 +114,7 @@ export default procedure
       .set({ imageUrl })
       .where(eq(collectionBottles.id, collectionBottle.id));
 
-    const result = await findCollectionBottleWithTarget({
+    const result = await findCollectionBottleEntry({
       collectionBottleId: collectionBottle.id,
       collectionId: collection.id,
     });

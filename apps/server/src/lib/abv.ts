@@ -44,30 +44,3 @@ export function normalizePotentialProofLikeAbvFields<T extends MaybeWithAbv>(
     abv: normalizedAbv,
   };
 }
-
-export function normalizePotentialProofLikeDecision<
-  T extends {
-    proposedBottle?: MaybeWithAbv | null | undefined;
-    proposedRelease?: MaybeWithAbv | null | undefined;
-  },
->(decision: T): T {
-  const normalizedBottle = decision.proposedBottle
-    ? normalizePotentialProofLikeAbvFields(decision.proposedBottle)
-    : decision.proposedBottle;
-  const normalizedRelease = decision.proposedRelease
-    ? normalizePotentialProofLikeAbvFields(decision.proposedRelease)
-    : decision.proposedRelease;
-
-  if (
-    normalizedBottle === decision.proposedBottle &&
-    normalizedRelease === decision.proposedRelease
-  ) {
-    return decision;
-  }
-
-  return {
-    ...decision,
-    proposedBottle: normalizedBottle,
-    proposedRelease: normalizedRelease,
-  };
-}

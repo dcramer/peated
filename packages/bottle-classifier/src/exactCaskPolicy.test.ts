@@ -18,6 +18,9 @@ const baseExtractedIdentity: BottleExtractedDetails = {
   vintage_year: null,
   cask_strength: null,
   single_cask: true,
+  cask_type: null,
+  cask_size: null,
+  cask_fill: null,
   edition: null,
 };
 
@@ -31,6 +34,9 @@ const baseProposedBottle: NonNullable<
   statedAge: null,
   caskStrength: null,
   singleCask: true,
+  caskType: null,
+  caskSize: null,
+  caskFill: null,
   abv: null,
   vintageYear: null,
   releaseYear: null,
@@ -52,7 +58,6 @@ describe("inferBottleIdentityScope", () => {
         },
         proposedBottle: baseProposedBottle,
         extractedIdentity: baseExtractedIdentity,
-        hasReleaseIdentity: false,
         observation: {
           caskNumber: "123",
           barrelNumber: null,
@@ -75,7 +80,6 @@ describe("inferBottleIdentityScope", () => {
         },
         proposedBottle: baseProposedBottle,
         extractedIdentity: baseExtractedIdentity,
-        hasReleaseIdentity: false,
         observation: {
           caskNumber: "123",
           barrelNumber: null,
@@ -109,7 +113,6 @@ describe("inferBottleIdentityScope", () => {
           brand: "The Scotch Malt Whisky Society",
           expression: "6.71",
         },
-        hasReleaseIdentity: false,
         observation: null,
       }),
     ).toBe("exact_cask");
@@ -135,7 +138,6 @@ describe("inferBottleIdentityScope", () => {
           brand: "The Scotch Malt Whisky Society",
           expression: "Single Cask Bottling",
         },
-        hasReleaseIdentity: false,
         observation: null,
       }),
     ).toBe("product");
@@ -153,7 +155,6 @@ describe("inferBottleIdentityScope", () => {
           ...baseExtractedIdentity,
           expression: "Single Barrel",
         },
-        hasReleaseIdentity: false,
         observation: null,
       }),
     ).toBe("product");

@@ -10,8 +10,18 @@ import {
   storePrices,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { assignBottleAliasInTransaction } from "@peated/server/lib/bottleAliases";
-import { findBottleTarget } from "@peated/server/lib/bottleFinder";
+import {
+  assignBottleAliasInTransaction,
+  BottleAliasBottleInactiveError,
+  BottleAliasBottleNotFoundError,
+  BottleAliasBottleRetiredError,
+  finalizeBottleAliasAssignment,
+} from "@peated/server/lib/bottleAliases";
+import { findBottleAliasAssignment } from "@peated/server/lib/bottleFinder";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { chunked } from "@peated/server/lib/scraper";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -56,64 +66,119 @@ export default procedure
     await chunked(input.prices, 10, async (prices) => {
       return await Promise.all(
         prices.map(async (sp) => {
-          const [price] = await db.transaction(async (tx) => {
-            const { name } = normalizeBottle({ name: sp.name });
-            const aliasKey = normalizeBottleAliasKey(sp.name);
-            // New assignments use the deterministic key, but lookup still
-            // accepts legacy raw aliases created before alias keys existed.
-            const target =
-              (await findBottleTarget(aliasKey, tx)) ??
-              (aliasKey !== sp.name
-                ? await findBottleTarget(sp.name, tx)
-                : null);
-            const bottleId = target?.bottleId ?? null;
-            const releaseId = target?.releaseId ?? null;
+          const { price, aliasAssignment } = await db.transaction(
+            async (tx) => {
+              const { name } = normalizeBottle({ name: sp.name });
+              const aliasKey = normalizeBottleAliasKey(sp.name);
+              // New assignments use the deterministic key, but lookup still
+              // accepts legacy raw aliases created before alias keys existed.
+              let match = await findBottleAliasAssignment(aliasKey, tx);
+              if (!match && aliasKey !== sp.name) {
+                match = await findBottleAliasAssignment(sp.name, tx);
+              }
+              const bottleId = match?.bottleId ?? null;
+              if (bottleId !== null) {
+                try {
+                  await resolveActiveBottleIds(tx, [bottleId], {
+                    lock: "update",
+                  });
+                } catch (error) {
+                  if (!(error instanceof ActiveBottleSelectionError)) {
+                    throw error;
+                  }
+                  switch (error.reason) {
+                    case "missing":
+                      throw new BottleAliasBottleNotFoundError(error.bottleId);
+                    case "bottle_retired":
+                      throw new BottleAliasBottleRetiredError(
+                        error.bottleId,
+                        error.replacementBottleId,
+                      );
+                    case "unassigned":
+                      throw new BottleAliasBottleInactiveError(
+                        error.bottleId,
+                        error.reason,
+                      );
+                  }
+                }
+              }
 
-            // XXX: maybe we should constrain on URL?
-            const {
-              rows: [{ id: rawPriceId, imageUrl }],
-            } = await tx.execute<Pick<StorePrice, "id" | "imageUrl">>(sql`
-              INSERT INTO ${storePrices} (bottle_id, release_id, external_site_id, name, volume, price, currency, url)
-              VALUES (${bottleId}, ${releaseId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
+              // XXX: maybe we should constrain on URL?
+              // A concurrent conflict may add identity first, so only fill an
+              // unresolved row or reaffirm the same Bottle.
+              const {
+                rows: [
+                  { id: rawPriceId, imageUrl, bottleId: rawPersistedBottleId },
+                ],
+              } = await tx.execute<
+                Pick<StorePrice, "id" | "imageUrl" | "bottleId">
+              >(sql`
+              INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url)
+              VALUES (${bottleId}, ${site.id}, ${name}, ${sp.volume}, ${sp.price}, ${sp.currency}, ${sp.url})
               ON CONFLICT (external_site_id, LOWER(name), volume)
               DO UPDATE
-              SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
-                  release_id = COALESCE(excluded.release_id, ${storePrices.releaseId}),
+              SET bottle_id = CASE
+                    WHEN excluded.bottle_id IS NOT NULL
+                      AND (${storePrices.bottleId} IS NULL
+                        OR ${storePrices.bottleId} = excluded.bottle_id)
+                    THEN excluded.bottle_id
+                    ELSE ${storePrices.bottleId}
+                  END,
                   price = excluded.price,
                   currency = excluded.currency,
                   url = excluded.url,
                   updated_at = NOW()
-              RETURNING id, image_url as imageUrl
+              RETURNING id, image_url AS "imageUrl", bottle_id AS "bottleId"
             `);
-            const priceId = Number(rawPriceId);
-            const actor = await getUserActorForDatabase(tx, context.user);
+              const priceId = Number(rawPriceId);
+              const persistedBottleId =
+                rawPersistedBottleId === null
+                  ? null
+                  : Number(rawPersistedBottleId);
+              const hasAliasMatch =
+                bottleId !== null && persistedBottleId === bottleId;
+              const aliasAssignment = hasAliasMatch
+                ? await assignBottleAliasInTransaction(tx, {
+                    name: aliasKey,
+                    backfillNames: [name, sp.name],
+                    externalSiteId: site.id,
+                    volume: sp.volume,
+                    assignmentSource: "source_approved",
+                    assignedByActorId: (
+                      await getUserActorForDatabase(tx, context.user)
+                    ).id,
+                    bottleId,
+                    sourceAliasIdentity: match?.alias,
+                  })
+                : null;
 
-            await tx
-              .insert(storePriceHistories)
-              .values({
-                priceId: priceId,
-                price: sp.price,
-                currency: sp.currency,
-                volume: sp.volume,
-                date: sql`CURRENT_DATE`,
-              })
-              .onConflictDoNothing();
+              await tx
+                .insert(storePriceHistories)
+                .values({
+                  priceId: priceId,
+                  price: sp.price,
+                  currency: sp.currency,
+                  volume: sp.volume,
+                  date: sql`CURRENT_DATE`,
+                })
+                .onConflictDoNothing();
 
-            if (bottleId) {
-              await assignBottleAliasInTransaction(tx, {
-                name: aliasKey,
-                backfillNames: [name, sp.name],
-                bottleId,
-                releaseId,
-                externalSiteId: site.id,
-                volume: sp.volume,
-                assignmentSource: "source_approved",
-                assignedByActorId: actor.id,
-              });
-            }
+              return {
+                price: {
+                  id: priceId,
+                  imageUrl,
+                  hasAliasMatch,
+                },
+                aliasAssignment,
+              };
+            },
+          );
 
-            return [{ id: priceId, imageUrl, hasExactAliasTarget: !!target }];
-          });
+          if (aliasAssignment) {
+            await finalizeBottleAliasAssignment(aliasAssignment, {
+              price: { id: price.id, site: input.site, name: sp.name },
+            });
+          }
 
           if (!price.imageUrl && sp.imageUrl) {
             await pushJob("CapturePriceImage", {
@@ -122,7 +187,7 @@ export default procedure
             });
           }
 
-          if (!price.hasExactAliasTarget) {
+          if (!price.hasAliasMatch) {
             await pushUniqueJob("ResolveStorePriceBottle", {
               priceId: price.id,
             });

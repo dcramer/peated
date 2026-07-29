@@ -1,751 +1,228 @@
 import { db } from "@peated/server/db";
 import {
-  bottles,
-  entities,
-  pendingUploads,
+  bottleTags,
+  bottleTombstones,
   tastings,
 } from "@peated/server/db/schema";
-import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
-import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { routerClient } from "@peated/server/orpc/router";
-import mergeBottle from "@peated/server/worker/jobs/mergeBottle";
+import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+
+vi.mock("@peated/server/worker/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof workerClient>()),
+  pushJob: vi.fn().mockResolvedValue(undefined),
+}));
+
+const STATS_JOB_OPTIONS = {
+  delay: 5000,
+  removeOnComplete: true,
+  removeOnFail: false,
+};
 
 describe("POST /tastings", () => {
+  beforeEach(() => {
+    vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
+  });
+
   test("requires auth", async () => {
-    const err = await waitError(() =>
+    const error = await waitError(() =>
       routerClient.tastings.create({ bottle: 1 }),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("creates a new tasting with minimal params", async ({
+  test("creates a direct-Bottle Tasting and awards badges", async ({
     defaults,
     fixtures,
   }) => {
-    const entity = await fixtures.Entity({ type: ["brand", "distiller"] });
-    const bottle = await fixtures.Bottle({
-      brandId: entity.id,
-      distillerIds: [entity.id],
-    });
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: 1,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(1);
-    expect(tasting.notes).toBeNull();
-
-    const [newBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-    expect(newBottle.totalTastings).toBe(1);
-
-    const [newEntity] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, entity.id));
-    expect(newEntity.totalTastings).toBe(1);
-  });
-
-  test("creates a tasting using a merged bottle id", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const sourceBottle = await fixtures.Bottle();
-    const targetBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: sourceBottle.id });
-    const flight = await fixtures.Flight({ bottles: [sourceBottle.id] });
-
-    await mergeBottle({
-      fromBottleIds: [sourceBottle.id],
-      toBottleId: targetBottle.id,
-    });
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: sourceBottle.id,
-        release: release.id,
-        flight: flight.publicId,
-        rating: 2,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(targetBottle.id);
-    expect(tasting.releaseId).toEqual(release.id);
-    expect(tasting.flightId).toEqual(flight.id);
-  });
-
-  test("attaches a pending photo upload to the new tasting", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const pendingUpload = await createPendingImageUpload({
-      file: await fixtures.SampleSquareImage(),
-      createdById: defaults.user.id,
-      purpose: "photo_tasting_entry",
-      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
-    });
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        pendingImageId: pendingUpload.id,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.imageUrl).toContain("/uploads/tastings/");
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-    expect(tasting.imageUrl).toMatch(
-      /^\/uploads\/tastings\/tasting-\d+-pending-upload-.+\.webp$/,
-    );
-
-    const attachedUpload = await db.query.pendingUploads.findFirst({
-      where: eq(pendingUploads.id, pendingUpload.id),
-    });
-    expect(attachedUpload).toMatchObject({
-      status: "attached",
-      attachedToType: null,
-      attachedToId: null,
-    });
-  });
-
-  test("rejects an unusable pending photo upload before creating the tasting", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const pendingUpload = await createPendingImageUpload({
-      file: await fixtures.SampleSquareImage(),
-      createdById: defaults.user.id,
-      purpose: "avatar",
-      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
-    });
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          pendingImageId: pendingUpload.id,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Pending upload purpose mismatch.]`,
-    );
-
-    const tastingRows = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.bottleId, bottle.id));
-    expect(tastingRows).toHaveLength(0);
-  });
-
-  test("creates a new tasting with tags", async ({ defaults, fixtures }) => {
-    const tags = [
-      await fixtures.Tag({
-        name: "cherry",
-      }),
-      await fixtures.Tag({
-        name: "peat",
-      }),
-    ];
-
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: 1,
-        tags: [tags[0].name, tags[1].name],
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.tags).toEqual([tags[0].name, tags[1].name]);
-
-    const bTags = await db.query.bottleTags.findMany({
-      where: (bottleTags, { eq }) => eq(bottleTags.bottleId, tasting.bottleId),
-      orderBy: (bottleTags, { asc }) => asc(bottleTags.tag),
-    });
-    expect(bTags.length).toBe(2);
-    expect(bTags[0].tag).toBe(tags[0].name);
-    expect(bTags[0].count).toBe(1);
-    expect(bTags[1].tag).toBe(tags[1].name);
-    expect(bTags[1].count).toBe(1);
-  });
-
-  test("creates a new tasting with notes", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: 1,
-        notes: "hello world",
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.notes).toEqual("hello world");
-  });
-
-  test("creates a new tasting with empty rating", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toBeNull();
-  });
-
-  test("creates a new tasting with empty friends", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        friends: [],
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.friends).toEqual([]);
-  });
-
-  test("creates a new tasting with pass rating", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: -1,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(-1);
-  });
-
-  test("flight requires valid bottle", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const flight = await fixtures.Flight();
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          flight: flight.publicId,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify flight.]`);
-  });
-
-  test("creates a new tasting with flight", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const flight = await fixtures.Flight({ bottles: [bottle.id] });
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        flight: flight.publicId,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.flightId).toEqual(flight.id);
-  });
-
-  test("creates a new tasting with badge award", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const badge = await fixtures.Badge({
-      checks: [
-        {
-          type: "age",
-          config: {
-            minAge: 5,
-            maxAge: 10,
-          },
-        },
-      ],
-      name: "Consistency",
-      maxLevel: 10,
-      imageUrl: "/images/foobar.png",
-    });
-
     const bottle = await fixtures.Bottle({ statedAge: 5 });
+    await fixtures.Badge({
+      tracker: "bottle",
+      checks: [{ type: "age", config: { minAge: 5, maxAge: 10 } }],
+    });
 
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-      },
+    const result = await routerClient.tastings.create(
+      { bottle: bottle.id, rating: 1 },
       { context: { user: defaults.user } },
     );
 
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-
-    expect(data.awards).toBeDefined();
-    expect(data.awards.length).toEqual(1);
-    expect(data.awards[0].badge).toMatchObject({
-      id: 1,
-      imageUrl: expect.stringContaining("/images/foobar.png"),
-      maxLevel: 10,
-      name: "Consistency",
-    });
-  });
-
-  test("creates a new tasting with release", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
+    expect(result.tasting.bottle.id).toBe(bottle.id);
+    expect(result.awards).toHaveLength(1);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, result.tasting.id),
+        columns: {
+          bottleId: true,
+          rating: true,
+        },
+      }),
+    ).toEqual({
       bottleId: bottle.id,
+      rating: 1,
+    });
+    expect(result.tasting.bottle.fullName).toBe(bottle.fullName);
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
+      STATS_JOB_OPTIONS,
+    );
+  });
+
+  test("rejects missing, unassigned, and retired Bottles", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const unassigned = await fixtures.LegacyBottle();
+    const retired = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
     });
 
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        release: release.id,
-      },
+    for (const bottle of [999_999, unassigned.id, retired.id]) {
+      const error = await waitError(() =>
+        routerClient.tastings.create(
+          { bottle },
+          { context: { user: defaults.user } },
+        ),
+      );
+      expect(error).toMatchObject({
+        code: "BAD_REQUEST",
+        message: "Cannot identify bottle.",
+      });
+    }
+  });
+
+  test("returns the selected exact Bottle", async ({ defaults, fixtures }) => {
+    const firstBottle = await fixtures.Bottle({ name: "Tasting Family" });
+    if (firstBottle.groupId === null) {
+      throw new Error("Expected grouped Bottle fixture.");
+    }
+    const selectedBottle = await fixtures.BottleGroupMember({
+      groupId: firstBottle.groupId,
+      edition: "Batch 2",
+    });
+    const result = await routerClient.tastings.create(
+      { bottle: selectedBottle.id },
       { context: { user: defaults.user } },
     );
 
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.releaseId).toEqual(release.id);
+    expect(result.tasting.bottle).toMatchObject({
+      id: selectedBottle.id,
+      fullName: selectedBottle.fullName,
+    });
+    expect(result.tasting.bottle.id).not.toBe(firstBottle.id);
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, result.tasting.id),
+        columns: { bottleId: true },
+      }),
+    ).toEqual({ bottleId: selectedBottle.id });
   });
 
-  test("fails with invalid release", async ({ defaults, fixtures }) => {
+  test("accounts tags against the selected Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.Tag({ name: "caramel" });
+
+    await routerClient.tastings.create(
+      { bottle: bottle.id, tags: ["caramel"] },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      await db.query.bottleTags.findFirst({
+        where: (tags, { and, eq }) =>
+          and(eq(tags.bottleId, bottle.id), eq(tags.tag, "caramel")),
+      }),
+    ).toMatchObject({ count: 1 });
+  });
+
+  test("validates Flight membership by Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
     const bottle = await fixtures.Bottle();
     const otherBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: otherBottle.id });
+    const flight = await fixtures.Flight({ bottles: [bottle.id] });
 
-    const err = await waitError(() =>
+    const result = await routerClient.tastings.create(
+      { bottle: bottle.id, flight: flight.publicId },
+      { context: { user: defaults.user } },
+    );
+    expect(result.tasting.bottle.id).toBe(bottle.id);
+
+    const error = await waitError(() =>
       routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          release: release.id,
-        },
+        { bottle: otherBottle.id, flight: flight.publicId },
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Cannot identify flight.]`);
   });
 
-  test("fails with nonexistent release", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          release: 12345,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Cannot identify release.]`);
-  });
-
-  test("creates a new tasting with serving style and color", async ({
+  test("returns a conflict for a duplicate Bottle Tasting", async ({
     defaults,
     fixtures,
   }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        servingStyle: "neat",
-        color: 5,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.servingStyle).toEqual("neat");
-    expect(tasting.color).toEqual(5);
-  });
-
-  test("creates a new tasting with custom date", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const customDate = new Date(Date.now() - 1000 * 60 * 60 * 24); // 1 day ago
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        createdAt: customDate.toISOString(),
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.createdAt.toISOString()).toEqual(customDate.toISOString());
-  });
-
-  test("fails with date too far in past", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const oldDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 8); // 8 days ago
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          createdAt: oldDate.toISOString(),
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
-  });
-
-  test("fails with future date", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const futureDate = new Date(Date.now() + 1000 * 60 * 10); // 10 minutes in future
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          createdAt: futureDate.toISOString(),
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
-  });
-
-  test("fails with non-following friends", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const nonFriend = await fixtures.User();
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          friends: [nonFriend.id],
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`,
-    );
-  });
-
-  test("creates a new tasting with friends", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const friend = await fixtures.User();
-    await fixtures.Follow({
-      fromUserId: defaults.user.id,
-      toUserId: friend.id,
-    });
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        friends: [friend.id],
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.friends).toEqual([friend.id]);
-  });
-
-  test("prevents duplicate tastings", async ({ defaults, fixtures }) => {
     const bottle = await fixtures.Bottle();
     const createdAt = new Date().toISOString();
 
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        createdAt,
-        rating: 2,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const err = await waitError(() =>
-      routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          createdAt,
-          rating: 2,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
-  });
-
-  test("updates entity stats correctly", async ({ defaults, fixtures }) => {
-    const brand = await fixtures.Entity({ type: ["brand"] });
-    const distiller = await fixtures.Entity({ type: ["distiller"] });
-    const bottler = await fixtures.Entity({ type: ["bottler"] });
-
-    const bottle = await fixtures.Bottle({
-      brandId: brand.id,
-      bottlerId: bottler.id,
-      distillerIds: [distiller.id],
-    });
-
     await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: 2,
-      },
+      { bottle: bottle.id, createdAt },
       { context: { user: defaults.user } },
     );
-
-    const updatedBrand = await db.query.entities.findFirst({
-      where: eq(entities.id, brand.id),
-    });
-    const updatedDistiller = await db.query.entities.findFirst({
-      where: eq(entities.id, distiller.id),
-    });
-    const updatedBottler = await db.query.entities.findFirst({
-      where: eq(entities.id, bottler.id),
-    });
-
-    expect(updatedBrand?.totalTastings).toBe(1);
-    expect(updatedDistiller?.totalTastings).toBe(1);
-    expect(updatedBottler?.totalTastings).toBe(1);
-
-    const [updatedBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, bottle.id));
-    expect(updatedBottle.totalTastings).toBe(1);
-    expect(updatedBottle.avgRating).toBe(2);
-  });
-
-  test("creates a new tasting with both flight and release", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const flight = await fixtures.Flight({ bottles: [bottle.id] });
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        release: release.id,
-        flight: flight.publicId,
-        rating: 2,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.releaseId).toEqual(release.id);
-    expect(tasting.flightId).toEqual(flight.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(2);
-  });
-
-  test("creates a new tasting with color", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        rating: 2,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.bottleId).toEqual(bottle.id);
-    expect(tasting.createdById).toEqual(defaults.user.id);
-    expect(tasting.rating).toEqual(2);
-  });
-
-  test("creates a new tasting with serving style", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-
-    const data = await routerClient.tastings.create(
-      {
-        bottle: bottle.id,
-        servingStyle: "neat",
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(data.tasting.id).toBeDefined();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, data.tasting.id));
-
-    expect(tasting.servingStyle).toEqual("neat");
-  });
-
-  test("fails with non-following friend", async ({ defaults, fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const friend = await fixtures.User();
-
-    const err = await waitError(() =>
+    const error = await waitError(() =>
       routerClient.tastings.create(
-        {
-          bottle: bottle.id,
-          friends: [friend.id],
-        },
+        { bottle: bottle.id, createdAt },
         { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`,
-    );
+    expect(error).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
+  });
+
+  test("rolls back the Tasting when a tag aggregate write fails", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.Tag({ name: "caramel" });
+    await db.insert(bottleTags).values({
+      bottleId: bottle.id,
+      tag: "caramel",
+      count: 2_147_483_647,
+    });
+
+    await expect(
+      routerClient.tastings.create(
+        { bottle: bottle.id, tags: ["caramel"] },
+        { context: { user: defaults.user } },
+      ),
+    ).rejects.toThrow("integer out of range");
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: (tastings, { and, eq }) =>
+          and(
+            eq(tastings.bottleId, bottle.id),
+            eq(tastings.createdById, defaults.user.id),
+          ),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.bottleTags.findFirst({
+        where: (bottleTags, { and, eq }) =>
+          and(
+            eq(bottleTags.bottleId, bottle.id),
+            eq(bottleTags.tag, "caramel"),
+          ),
+        columns: { count: true },
+      }),
+    ).toEqual({ count: 2_147_483_647 });
   });
 });

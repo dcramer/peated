@@ -17,12 +17,12 @@ const InputSchema = z
   .object({
     site: ExternalSiteTypeEnum.optional(),
     bottle: z.coerce.number().gte(1).optional(),
-    release: z.coerce.number().gte(1).optional(),
     query: z.string().default(""),
     onlyUnknown: z.coerce.boolean().optional(),
     cursor: z.coerce.number().gte(1).default(1),
     limit: z.coerce.number().gte(1).lte(100).default(100),
   })
+  .strict()
   .default({
     query: "",
     cursor: 1,
@@ -46,7 +46,8 @@ export default procedure
     context,
     errors,
   }) {
-    const where: (SQL<unknown> | undefined)[] = [eq(reviews.hidden, false)];
+    const baseWhere: (SQL<unknown> | undefined)[] = [eq(reviews.hidden, false)];
+    const identityWhere: SQL<unknown>[] = [];
 
     if (input.site) {
       const site = await db.query.externalSites.findFirst({
@@ -58,23 +59,10 @@ export default procedure
           message: "Site not found.",
         });
       }
-      where.push(eq(reviews.externalSiteId, site.id));
+      baseWhere.push(eq(reviews.externalSiteId, site.id));
     }
 
-    if (input.onlyUnknown) {
-      where.push(isNull(reviews.bottleId));
-    }
-
-    if (input.bottle) {
-      where.push(eq(reviews.bottleId, input.bottle));
-    }
-
-    if (input.release) {
-      where.push(eq(reviews.releaseId, input.release));
-    }
-
-    const hasPublicScope =
-      input.bottle !== undefined || input.release !== undefined;
+    const hasPublicScope = input.bottle !== undefined;
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
 
     if (requiresModerator && !context.user?.admin && !context.user?.mod) {
@@ -88,15 +76,23 @@ export default procedure
       });
     }
 
+    if (input.onlyUnknown) {
+      identityWhere.push(isNull(reviews.bottleId));
+    }
+
+    if (input.bottle !== undefined) {
+      identityWhere.push(eq(reviews.bottleId, input.bottle));
+    }
+
     const offset = (cursor - 1) * limit;
     if (query) {
-      where.push(ilike(reviews.name, `%${query}%`));
+      baseWhere.push(ilike(reviews.name, `%${query}%`));
     }
 
     const results = await db
       .select()
       .from(reviews)
-      .where(where ? and(...where) : undefined)
+      .where(and(...baseWhere, ...identityWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(asc(reviews.name));
@@ -106,7 +102,7 @@ export default procedure
         ReviewSerializer,
         results.slice(0, limit),
         context.user,
-        [...(input.site ? ["site"] : []), ...(input.bottle ? ["bottle"] : [])],
+        input.site ? ["site"] : [],
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

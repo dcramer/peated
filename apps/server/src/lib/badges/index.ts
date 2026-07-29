@@ -3,37 +3,43 @@ import type { BadgeAward } from "@peated/server/db/schema";
 import {
   badgeAwards,
   badgeAwardTrackedObjects,
-  bottles,
-  bottlesToDistillers,
-  entities,
   tastingBadgeAwards,
   tastings,
   type Badge,
 } from "@peated/server/db/schema";
-import type { SQL } from "drizzle-orm";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import type { BadgeCheckType } from "../../types";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { logInfo } from "../log";
-import { getCheck } from "./checks";
+import { prepareBadgeCheck, type PreparedBadgeCheck } from "./checks";
 import { getFormula } from "./formula";
+import { loadBadgeTastings } from "./identity";
 import { getTracker } from "./trackers";
-import { type TastingWithRelations, type TrackedObject } from "./types";
+import type {
+  BadgeTasting,
+  PersistedBadgeTasting,
+  TrackedObject,
+} from "./types";
 
-// TODO(dcramer): at some point we'll want to cache this/optimize the db layer
-// but for now its probably fine
+const BADGE_RESCAN_BATCH_SIZE = 200;
+
+function prepareBadgeChecks(badge: Badge): PreparedBadgeCheck[] {
+  return badge.checks.map(prepareBadgeCheck);
+}
+
 export async function awardAllBadgeXp(
-  db: AnyDatabase,
-  tasting: TastingWithRelations,
+  database: AnyDatabase,
+  tasting: PersistedBadgeTasting,
 ) {
   const results: (BadgeAward & {
     prevLevel: number;
     badge: Badge;
   })[] = [];
+  const [hydratedTasting] = await loadBadgeTastings(database, [tasting]);
+  if (!hydratedTasting) throw new Error("Missing hydrated badge Tasting");
 
-  const badgeList = await db.query.badges.findMany();
+  const badgeList = await database.query.badges.findMany();
   for (const badge of badgeList) {
-    const award = await awardXp(db, tasting, badge);
+    const checks = prepareBadgeChecks(badge);
+    const award = await awardXp(database, hydratedTasting, badge, checks);
     if (award)
       results.push({
         ...award,
@@ -43,107 +49,46 @@ export async function awardAllBadgeXp(
   return results;
 }
 
-export async function rescanBadge(badge: Badge) {
-  // we need to identify any tastings that could qualify for this badge,
-  // make sure the tracked objects exist, and award xp/levels as needed
-  // the lazy way out is awardXp() on each tasting, but itll be slow
+export async function rescanBadge(
+  badge: Badge,
+  database: AnyDatabase = db,
+): Promise<void> {
+  const checks = prepareBadgeChecks(badge);
+  let afterId: number | null = null;
 
-  const checks = await Promise.all(
-    badge.checks.map(async ({ type, config }) => {
-      const impl = getCheck(type);
-      return {
-        impl,
-        type,
-        config: await impl.parseConfig(config),
-      };
-    }),
-  );
+  while (true) {
+    const tastingRows = await database
+      .select({
+        id: tastings.id,
+        createdById: tastings.createdById,
+        bottleId: tastings.bottleId,
+      })
+      .from(tastings)
+      .where(afterId === null ? undefined : gt(tastings.id, afterId))
+      .orderBy(tastings.id)
+      .limit(BADGE_RESCAN_BATCH_SIZE);
+    if (tastingRows.length === 0) break;
 
-  const where: SQL[] = [];
-  for (const { impl, config } of checks) {
-    where.push(...impl.buildWhereClause(config));
-  }
-
-  const brandT = alias(entities, "brand");
-  const bottlerT = alias(entities, "bottler");
-
-  const baseQuery = db
-    .select()
-    .from(tastings)
-    .innerJoin(bottles, eq(bottles.id, tastings.bottleId))
-    .innerJoin(brandT, eq(brandT.id, bottles.brandId))
-    .leftJoin(bottlerT, eq(bottlerT.id, bottles.bottlerId))
-    .where(where.length ? and(...where) : undefined)
-    .orderBy(tastings.id);
-
-  const distillerT = alias(entities, "distiller");
-  const baseDistillerQuery = db
-    .select()
-    .from(bottlesToDistillers)
-    .innerJoin(distillerT, eq(bottlesToDistillers.distillerId, distillerT.id));
-
-  // this query could be massively optimized to remove a ton of bandwidth use
-  let offset = 0;
-  let hasResults = true;
-  while (hasResults) {
-    const results = await baseQuery.limit(100).offset(offset);
-
-    if (!results.length) {
-      hasResults = false;
-      break;
-    }
-
-    // pull in distillers
-    const distillerQuery = await baseDistillerQuery.where(
-      inArray(
-        bottlesToDistillers.bottleId,
-        results.map(({ bottle }) => bottle.id),
-      ),
-    );
-
-    offset += results.length;
-
-    for (const { tasting, brand, bottler, bottle } of results) {
+    const hydratedTastings = await loadBadgeTastings(database, tastingRows);
+    for (const tasting of hydratedTastings) {
       logInfo("Backfilling badge XP for tasting {tastingId}", {
         extra: {
           tastingId: tasting.id,
         },
       });
-      await awardXp(
-        db,
-        {
-          ...tasting,
-          bottle: {
-            ...bottle,
-            brand,
-            bottler,
-            bottlesToDistillers: distillerQuery
-              .filter(
-                ({ bottle_distiller }) =>
-                  bottle_distiller.bottleId === bottle.id,
-              )
-              .map(({ bottle_distiller, distiller }) => ({
-                ...bottle_distiller,
-                distiller,
-              })),
-          },
-        },
-        badge,
-      );
+      await awardXp(database, tasting, badge, checks);
     }
+
+    afterId = tastingRows.at(-1)!.id;
+    if (tastingRows.length < BADGE_RESCAN_BATCH_SIZE) break;
   }
 }
 
-// TODO: make this type safe
-export async function checkBadgeConfig(type: BadgeCheckType, config: unknown) {
-  const impl = getCheck(type);
-  return await impl.parseConfig(config);
-}
-
 async function awardXp(
-  db: AnyDatabase,
-  tasting: TastingWithRelations,
+  database: AnyDatabase,
+  tasting: BadgeTasting,
   badge: Badge,
+  checks: PreparedBadgeCheck[],
 ) {
   logInfo("Checking badge {badgeId} for tasting {tastingId}", {
     extra: {
@@ -152,20 +97,9 @@ async function awardXp(
     },
   });
 
-  const checks = await Promise.all(
-    badge.checks.map(async ({ type, config }) => {
-      const impl = getCheck(type);
-      return {
-        impl,
-        type,
-        config: await impl.parseConfig(config),
-      };
-    }),
-  );
-
   const trackedObjects: TrackedObject[] = [];
   for (const check of checks) {
-    if (!check.impl.test(check.config, tasting)) {
+    if (!check.test(tasting)) {
       logInfo("Badge {badgeId} did not test successfully", {
         extra: {
           badgeId: badge.id,
@@ -193,8 +127,8 @@ async function awardXp(
     return;
   }
 
-  return await db.transaction(async (tx) => {
-    let [award] = await tx
+  return await database.transaction(async (tx) => {
+    const [initialAward] = await tx
       .insert(badgeAwards)
       .values({
         badgeId: badge.id,
@@ -210,6 +144,10 @@ async function awardXp(
         },
       })
       .returning();
+    if (!initialAward) {
+      throw new Error(`Unable to load badge award for badge ${badge.id}`);
+    }
+    let award = initialAward;
 
     let count = 0;
     for (const target of trackedObjects) {
@@ -224,7 +162,9 @@ async function awardXp(
       if (query.rowCount) {
         count += query.rowCount;
         if (query.rowCount > 1) {
-          throw new Error("wtf");
+          throw new Error(
+            `Tracked-object insert affected ${query.rowCount} rows for badge award ${award.id}`,
+          );
         }
       }
     }
@@ -248,13 +188,17 @@ async function awardXp(
       },
     });
 
-    [award] = await tx
+    const [updatedAward] = await tx
       .update(badgeAwards)
       .set({
         xp: sql`${badgeAwards.xp} + ${count}`,
       })
       .where(eq(badgeAwards.id, award.id))
       .returning();
+    if (!updatedAward) {
+      throw new Error(`Unable to update badge award ${award.id}`);
+    }
+    award = updatedAward;
 
     // The amount of XP for a given level is defined as:
     // 0.02 * LEVEL**2 + 0.5 * LEVEL + 4

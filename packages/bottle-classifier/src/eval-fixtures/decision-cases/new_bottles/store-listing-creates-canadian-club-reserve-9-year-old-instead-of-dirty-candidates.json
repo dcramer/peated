@@ -1,0 +1,79 @@
+{
+  "id": "store-listing-creates-canadian-club-reserve-9-year-old-instead-of-dirty-candidates",
+  "name": "store listing: creates Canadian Club Reserve 9-year-old instead of matching dirty candidates",
+  "input": {
+    "reference": {
+      "name": "Canadian Club 9-year-old Reserve Canadian Whisky",
+      "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113.html?utm=peated"
+    },
+    "extractedIdentity": {
+      "brand": "Canadian Club",
+      "bottler": null,
+      "expression": "Reserve",
+      "series": null,
+      "distillery": [],
+      "category": "blend",
+      "stated_age": 9,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "initialCandidates": [
+      {
+        "bottleId": 16913,
+        "alias": null,
+        "fullName": "Canadian Club Reserve 9-year-old Triple Aged Limited Edition",
+        "brand": "Canadian",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": 9,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["text"]
+      },
+      {
+        "bottleId": 17346,
+        "alias": null,
+        "fullName": "Canadian Club Reserve, 40% ABV",
+        "brand": "Canadian",
+        "bottler": null,
+        "series": null,
+        "distillery": [],
+        "category": "blend",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["text"]
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Reserve 9-year-old",
+      "brand": {
+        "name": "Canadian Club"
+      },
+      "category": "blend",
+      "statedAge": 9
+    },
+    "summary": "Create the independently correct Canadian Club Reserve 9-year-old Bottle instead of matching the unsupported Triple Aged Limited Edition row or age-less Reserve row."
+  }
+}

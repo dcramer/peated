@@ -1,4 +1,7 @@
 import config from "@peated/server/config";
+import { db } from "@peated/server/db";
+import { bottleGroups, bottleTombstones } from "@peated/server/db/schema";
+import { eq } from "drizzle-orm";
 import type { Transporter } from "nodemailer";
 import { createTransport } from "nodemailer";
 import type Mail from "nodemailer/lib/mailer";
@@ -69,6 +72,7 @@ describe("notifyComment", () => {
       createdById: author.id,
     });
     const comment = await fixtures.Comment({
+      tastingId: tasting.id,
       comment: "**An Comment** on _life_",
       createdById: author.id,
     });
@@ -79,7 +83,6 @@ describe("notifyComment", () => {
         createdBy: author,
         tasting: {
           ...tasting,
-          bottle,
           createdBy: author,
         },
       },
@@ -88,7 +91,7 @@ describe("notifyComment", () => {
     expect(outbox.length).toBe(0);
   });
 
-  test("constructs appropriate email", async ({ fixtures }) => {
+  test("renders the exact Bottle label", async ({ fixtures }) => {
     const otherAuthor = await fixtures.User({
       verified: true,
     });
@@ -97,11 +100,17 @@ describe("notifyComment", () => {
       verified: true,
     });
     const bottle = await fixtures.Bottle();
+    const groupLabel = "Distinct Exact Email Group Label";
+    await db
+      .update(bottleGroups)
+      .set({ fullName: groupLabel })
+      .where(eq(bottleGroups.id, bottle.groupId as number));
     const tasting = await fixtures.Tasting({
       bottleId: bottle.id,
       createdById: author.id,
     });
     const comment = await fixtures.Comment({
+      tastingId: tasting.id,
       comment: "**An Comment** on _life_",
       createdById: otherAuthor.id,
     });
@@ -112,7 +121,6 @@ describe("notifyComment", () => {
         createdBy: otherAuthor,
         tasting: {
           ...tasting,
-          bottle,
           createdBy: author,
         },
       },
@@ -122,6 +130,43 @@ describe("notifyComment", () => {
     const msg = outbox[0];
     expect(msg.to).toBe(author.email);
     expect(msg.subject).toBe("New Comment on Tasting");
+    expect(msg.html).toContain(bottle.fullName);
+    expect(msg.html).not.toContain(groupLabel);
+    expect(msg.text).toContain(bottle.fullName);
+    expect(msg.text).not.toContain(groupLabel);
+  });
+
+  test("rejects a retired Bottle", async ({ fixtures }) => {
+    const otherAuthor = await fixtures.User({ verified: true });
+    const author = await fixtures.User({
+      email: "joe@example.com",
+      verified: true,
+    });
+    const bottle = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: author.id,
+    });
+    const comment = await fixtures.Comment({
+      tastingId: tasting.id,
+      createdById: otherAuthor.id,
+    });
+    await db.insert(bottleTombstones).values({ bottleId: bottle.id });
+
+    await expect(
+      notifyComment({
+        comment: {
+          ...comment,
+          createdBy: otherAuthor,
+          tasting: { ...tasting, createdBy: author },
+        },
+        transport,
+      }),
+    ).rejects.toMatchObject({
+      reason: "bottle_retired",
+      bottleId: bottle.id,
+    });
+    expect(outbox).toHaveLength(0);
   });
 });
 

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:09:16.863Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Glenmorangie The Cadboll Estate Batch 2 15 year old"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Glenmorangie The Cadboll Estate Batch 2 15 year old",
+    "summary": "**Glenmorangie The Cadboll Estate Batch 2 15 Year Old** appears to be the **2021 second batch** of Glenmorangie’s **Cadboll Estate** series, an **official bottling** from the **Glenmorangie distillery** in the Highlands. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/185295/glenmorangie-15-year-old?langua",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/150158/glenmorangie-15-year-old?language=en",
+        "url": "https://www.whiskybase.com/whiskies/whisky/150158/glenmorangie-15-year-old?language=en",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Glenmorangie 15-year-old - Bewertungen und Rezensionen - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/185295/glenmorangie-15-year-old?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/407164",
+        "url": "https://www.whiskybase.com/market/whisky/407164",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2022/03/01/review-glenmorangie-the-cadboll-estate-15-years-old-2021/",
+        "url": "https://www.drinkhacker.com/2022/03/01/review-glenmorangie-the-cadboll-estate-15-years-old-2021/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "Tales from Tain - The Cadboll Estate\n – Glenmorangie",
+        "url": "https://www.glenmorangie.com/en-us/pages/tales-from-tain-the-cadboll-estate",
+        "domain": "glenmorangie.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wineenthusiast.com/buying-guide/glenmorangie-the-cadboll-estate-15-years-old/",
+        "url": "https://www.wineenthusiast.com/buying-guide/glenmorangie-the-cadboll-estate-15-years-old/",
+        "domain": "wineenthusiast.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "27f6ea28c6be192d6c32dd49b5a392bf9be53bde5dac3101f05a06d92cda056a",
+    "mode": "auto"
+  }
+}

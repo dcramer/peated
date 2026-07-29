@@ -1,5 +1,4 @@
 import Link from "@peated/web/components/link";
-import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
 
 import type { PagingRel, Review } from "@peated/server/types";
 import PaginationButtons from "../paginationButtons";
@@ -34,10 +33,7 @@ export default function ReviewTable({
         <tbody>
           {reviewList.map((review) => {
             return (
-              <tr
-                key={review.name}
-                className="border-b border-slate-800 text-sm"
-              >
+              <tr key={review.id} className="border-b border-slate-800 text-sm">
                 <td className="max-w-0 px-3 py-3">
                   <Link
                     href={review.url}
@@ -46,22 +42,12 @@ export default function ReviewTable({
                     {review.name}
                   </Link>
                   <div className="mt-2 space-x-2 text-xs">
-                    {review.release ? (
-                      <Link
-                        href={getBottleBottlingPath(
-                          review.release.bottleId,
-                          review.release.id,
-                        )}
-                        className="hover:underline"
-                      >
-                        [{review.release.id}] ({review.release.fullName})
-                      </Link>
-                    ) : review.bottle ? (
+                    {review.bottle ? (
                       <Link
                         href={`/bottles/${review.bottle.id}`}
-                        className="hover:underline"
+                        className="font-semibold hover:underline"
                       >
-                        [{review.bottle.id}] ({review.bottle.fullName})
+                        {review.bottle.fullName}
                       </Link>
                     ) : (
                       <em>No Bottle</em>

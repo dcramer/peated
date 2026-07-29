@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:19:34.329Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Maker's Mark Kentucky Straight Bourbon Whisky official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Maker's Mark Kentucky Straight Bourbon Whisky official",
+    "summary": "Official Maker’s Mark page here: ([makersmark.com](https://www.makersmark.com/en-us/bourbons?utm_source=openai))\n\nConfirmed from Maker’s Mark’s official site:\n\n- **Product:** Maker’s Mark Kentucky Straight Bourbon Whisky. ([makersmark.com](https://www.makersmark.com/en-us/bourbons?utm_source=openai))\n- **Producer/Bottl",
+    "results": [
+      {
+        "title": "https://www.makersmark.com/en-us/bourbons",
+        "url": "https://www.makersmark.com/en-us/bourbons",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/locate",
+        "url": "https://www.makersmark.com/en-us/locate",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/",
+        "url": "https://www.makersmark.com/en-us/",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/",
+        "url": "https://www.makersmark.com/",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/bourbons",
+        "url": "https://www.makersmark.com/bourbons",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.makersmark.com/en-us/distillery",
+        "url": "https://www.makersmark.com/en-us/distillery",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7069e332c4f5bb238236889daab287dc33c13b94d158fc90e99cc8e000363f8c",
+    "mode": "auto"
+  }
+}

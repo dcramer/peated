@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  index,
   pgTable,
   text,
   timestamp,
@@ -42,6 +43,7 @@ export const flightsRelations = relations(flights, ({ one, many }) => ({
 export type Flight = typeof flights.$inferSelect;
 export type NewFlight = typeof flights.$inferInsert;
 
+/** A Flight membership selects one Bottle; releaseId is legacy evidence. */
 export const flightBottles = pgTable(
   "flight_bottle",
   {
@@ -59,6 +61,8 @@ export const flightBottles = pgTable(
     unique()
       .on(table.flightId, table.bottleId, table.releaseId)
       .nullsNotDistinct(),
+    index("flight_bottle_bottle_idx").on(table.bottleId),
+    index("flight_bottle_release_idx").on(table.releaseId),
   ],
 );
 

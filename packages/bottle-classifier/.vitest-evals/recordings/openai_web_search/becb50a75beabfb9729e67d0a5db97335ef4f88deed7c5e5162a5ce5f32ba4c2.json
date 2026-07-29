@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:08:38.645Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost whisky Westland 42.5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost whisky Westland 42.5",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Watchpost Whiskey from Westland**, the **42.5% ABV** bottling:\n\n- **Brand / bottler:** **Watchpost Whiskey**, blended by the team at **Westland Distillery** in Seattle, Washington. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whisk",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "url": "https://www.watchpostwhiskey.com/products/watchpost-whiskey",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/298731/watchpost-08-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.watchpostwhiskey.com/pages/about",
+        "url": "https://www.watchpostwhiskey.com/pages/about",
+        "domain": "watchpostwhiskey.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/distillery/84307/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://directionsforme.org/product/249413",
+        "url": "https://directionsforme.org/product/249413",
+        "domain": "directionsforme.org",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "becb50a75beabfb9729e67d0a5db97335ef4f88deed7c5e5162a5ce5f32ba4c2",
+    "mode": "auto"
+  }
+}

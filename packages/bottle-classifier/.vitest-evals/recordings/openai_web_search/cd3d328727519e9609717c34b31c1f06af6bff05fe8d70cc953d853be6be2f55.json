@@ -1,0 +1,46 @@
+{
+  "writtenAt": "2026-07-26T23:42:30.102Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "High West High Country Batch No. 23J12 High Country single malt batch no"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "High West High Country Batch No. 23J12 High Country single malt batch no",
+    "summary": "Here’s the **bottle-specific evidence I could confirm** for **High West High Country American Single Malt, Batch No. 23J12**:\n\n- **Producer / bottler:** **High West** (Park City / Utah). High West’s official site lists **High Country American Single Malt®** as one of its limited releases. ([ship.highwest.com](https://s",
+    "results": [
+      {
+        "title": "ship.highwest.com",
+        "url": "https://ship.highwest.com/",
+        "domain": "ship.highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "gotoauction.com",
+        "url": "https://www.gotoauction.com/sales/view/1816781.html",
+        "domain": "gotoauction.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "totalwine.com",
+        "url": "https://www.totalwine.com/spirits/american-whiskey/american-single-malt/high-west-high-country-american-single-malt-whiskey/p/243597750",
+        "domain": "totalwine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "breakingbourbon.com",
+        "url": "https://www.breakingbourbon.com/review/high-west-high-country-american-single-malt-2022-release",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cd3d328727519e9609717c34b31c1f06af6bff05fe8d70cc953d853be6be2f55",
+    "mode": "auto"
+  }
+}

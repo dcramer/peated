@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
 import { storePriceHistories, storePrices } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { BottlePriceChangeSchema, listResponse } from "@peated/server/schemas";
+import { listResponse, PriceChangeSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { BottlePriceChangeSerializer } from "@peated/server/serializers/storePrice";
+import { PriceChangeSerializer } from "@peated/server/serializers/storePrice";
 import type { SQL } from "drizzle-orm";
 import { and, eq, ilike, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -20,7 +20,7 @@ const InputSchema = z
     limit: 100,
   });
 
-const OutputSchema = listResponse(BottlePriceChangeSchema);
+const OutputSchema = listResponse(PriceChangeSchema);
 
 export default procedure
   .route({
@@ -28,7 +28,7 @@ export default procedure
     path: "/price-changes",
     summary: "List price changes",
     description:
-      "Retrieve significant bottle price changes from the past week with search and pagination support",
+      "Retrieve significant price changes for Bottles from the past week with search and pagination support",
     operationId: "listPriceChanges",
   })
   .input(InputSchema)
@@ -38,14 +38,13 @@ export default procedure
 
     const minChange = 500; // $5
 
-    const where: SQL[] = [
-      isNotNull(storePrices.bottleId),
+    const baseWhere: SQL[] = [
       sql`${storePrices.updatedAt} > NOW() - interval '1 week'`,
       sql`${storePriceHistories.date} < DATE(${storePrices.updatedAt})`,
       sql`${storePriceHistories.date} > NOW() - interval '4 week'`,
     ];
     if (query) {
-      where.push(ilike(storePrices.name, `%${query}%`));
+      baseWhere.push(ilike(storePrices.name, `%${query}%`));
     }
 
     const results = await db
@@ -53,8 +52,6 @@ export default procedure
         id: sql<string>`${storePrices.bottleId}`,
         price: sql<string>`AVG(${storePrices.price})`,
         previousPrice: sql<string>`AVG(${storePriceHistories.price})`,
-        // force the type to fix nullable in default
-        bottleId: sql<string>`${storePrices.bottleId}`,
         // assume this never changes
         currency: storePrices.currency,
       })
@@ -63,7 +60,8 @@ export default procedure
         storePriceHistories,
         eq(storePriceHistories.priceId, storePrices.id),
       )
-      .where(and(...where))
+      // Unresolved listings cannot be presented as Bottle price changes.
+      .where(and(...baseWhere, isNotNull(storePrices.bottleId)))
       .groupBy(storePrices.bottleId, storePrices.currency)
       .having(
         sql`ABS(AVG(${storePriceHistories.price}) - AVG(${storePrices.price})) > ${minChange}`,
@@ -74,10 +72,12 @@ export default procedure
       .limit(limit + 1)
       .offset(offset);
 
+    const pageResults = results.slice(0, limit);
+
     return {
       results: await serialize(
-        BottlePriceChangeSerializer,
-        results.slice(0, limit),
+        PriceChangeSerializer,
+        pageResults,
         context.user,
       ),
       rel: {

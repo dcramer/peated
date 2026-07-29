@@ -12,8 +12,18 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { CollectionBottleInputSchema } from "@peated/server/schemas";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
+
+const CollectionBottleDeleteCommonInputSchema = z.object({
+  collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+  user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
+});
+
+const CollectionBottleDeleteInputSchema =
+  CollectionBottleDeleteCommonInputSchema.extend({
+    bottle: CollectionBottleInputSchema.shape.bottle,
+  }).strict();
 
 export default procedure
   .use(requireAuth)
@@ -21,18 +31,12 @@ export default procedure
   .route({
     method: "DELETE",
     path: "/users/{user}/collections/{collection}/bottles",
-    summary: "Remove bottle from collection",
+    summary: "Remove a Bottle from a collection",
     description:
-      "Remove a bottle (and optionally a specific release) from a user's collection. Requires authentication and ownership",
+      "Remove one Bottle membership from a user's collection. Requires authentication and ownership.",
     operationId: "removeBottleFromCollection",
   })
-  .input(
-    CollectionBottleInputSchema.extend({
-      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
-      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-      baseOnly: z.coerce.boolean().optional(),
-    }),
-  )
+  .input(CollectionBottleDeleteInputSchema)
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
     const user = await getUserFromId(db, input.user, context.user);
@@ -79,16 +83,12 @@ export default procedure
         .delete(collectionBottles)
         .where(
           and(
-            eq(collectionBottles.bottleId, input.bottle),
             eq(collectionBottles.collectionId, collection.id),
-            input.baseOnly
-              ? isNull(collectionBottles.releaseId)
-              : input.release
-                ? eq(collectionBottles.releaseId, input.release)
-                : undefined,
+            eq(collectionBottles.bottleId, input.bottle),
           ),
         )
         .returning();
+
       if (deleted.length) {
         await tx
           .update(collections)

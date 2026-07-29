@@ -1,8 +1,14 @@
 import { db } from "@peated/server/db";
-import { collectionBottles } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  collectionBottles,
+  collections,
+  tastings,
+} from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /users/:user", () => {
@@ -41,6 +47,12 @@ describe("GET /users/:user", () => {
       { context: { user: defaults.user } },
     );
     expect(data.id).toBe(defaults.user.id);
+  });
+
+  test("requires authentication for user:me", async () => {
+    const error = await waitError(routerClient.users.details({ user: "me" }));
+
+    expect(error).toMatchObject({ status: 401 });
   });
 
   test("get user by username", async ({ defaults }) => {
@@ -150,6 +162,168 @@ describe("GET /users/:user", () => {
       open: 1,
       sealed: 1,
     });
+    expect(data.stats.collected).toBe(5);
+  });
+
+  test("counts and deduplicates direct Bottle references", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const otherCollection = await fixtures.Collection({
+      name: "Other Collection",
+      createdById: defaults.user.id,
+    });
+    const firstBottle = await fixtures.Bottle();
+    if (firstBottle.groupId === null) {
+      throw new Error("Missing BottleGroup fixture");
+    }
+    const secondBottle = await fixtures.BottleGroupMember({
+      groupId: firstBottle.groupId,
+      edition: "Distinct profile member",
+    });
+    const emptyBottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
+    await fixtures.Tasting({
+      bottleId: firstBottle.id,
+      createdById: defaults.user.id,
+      createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    });
+    await Promise.all([
+      fixtures.Tasting({
+        bottleId: firstBottle.id,
+        createdById: defaults.user.id,
+        createdAt: new Date("2026-01-02T00:00:00.000Z"),
+      }),
+      fixtures.Tasting({
+        bottleId: secondBottle.id,
+        createdById: defaults.user.id,
+        createdAt: new Date("2026-01-03T00:00:00.000Z"),
+      }),
+    ]);
+    await db.insert(collectionBottles).values([
+      {
+        collectionId: library.id,
+        bottleId: firstBottle.id,
+        status: "open",
+      },
+      {
+        collectionId: library.id,
+        bottleId: secondBottle.id,
+        status: "sealed",
+      },
+      {
+        collectionId: library.id,
+        bottleId: emptyBottle.id,
+        status: "empty",
+      },
+      {
+        collectionId: otherCollection.id,
+        bottleId: otherBottle.id,
+        status: "open",
+      },
+      {
+        collectionId: otherCollection.id,
+        bottleId: firstBottle.id,
+        status: "empty",
+      },
+    ]);
+
+    const data = await routerClient.users.details(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.stats).toMatchObject({
+      tastings: 3,
+      bottles: 2,
+      collected: 4,
+      library: { total: 2, open: 1, sealed: 1 },
+    });
+  });
+
+  test("scans tasting and collection Bottles across batch boundaries", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await db.insert(tastings).values(
+      Array.from({ length: 201 }, (_, index) => ({
+        bottleId: bottle.id,
+        createdById: defaults.user.id,
+        createdAt: new Date(Date.UTC(2025, 0, 1, 0, 0, index)),
+      })),
+    );
+    const batchCollections = await db
+      .insert(collections)
+      .values(
+        Array.from({ length: 201 }, (_, index) => ({
+          name: `Batch Collection ${index}`,
+          createdById: defaults.user.id,
+        })),
+      )
+      .returning({ id: collections.id });
+    await db.insert(collectionBottles).values(
+      batchCollections.map((collection) => ({
+        collectionId: collection.id,
+        bottleId: bottle.id,
+        status: "empty" as const,
+      })),
+    );
+
+    const data = await routerClient.users.details(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data.stats).toMatchObject({
+      tastings: 201,
+      bottles: 1,
+      collected: 1,
+      library: { total: 0, open: 0, sealed: 0 },
+    });
+  });
+
+  test("fails closed when a tasting Bottle is retired", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: defaults.user.id,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const error = await waitError(
+      routerClient.users.details(
+        { user: defaults.user.id },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({ status: 409 });
+  });
+
+  test("preserves private profile detail visibility", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ private: true });
+
+    const data = await routerClient.users.details(
+      { user: user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({ id: user.id, private: true });
   });
 
   test("errors on invalid username", async () => {

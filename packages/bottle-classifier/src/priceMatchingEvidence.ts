@@ -42,6 +42,9 @@ const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "edition",
   "caskStrength",
   "singleCask",
+  "caskType",
+  "caskSize",
+  "caskFill",
   "abv",
   "vintageYear",
   "releaseYear",
@@ -112,15 +115,13 @@ export type AutomationTierInput = {
   // How web/source evidence affected the decision.
   webEvidence: WebEvidenceJudgment;
   // Match anchors ----------------------------------------------------------
-  // Whether a concrete existing bottle/release target was selected.
+  // Whether a concrete existing Bottle was selected.
   hasMatchTarget: boolean;
-  // The match reaffirms the reference's current bottle/release assignment.
+  // The match reaffirms the reference's current Bottle assignment.
   reaffirmsCurrentAssignment: boolean;
   // The match replaces a *different* current assignment (a correction, not a
   // verification candidate).
   replacesCurrentAssignment: boolean;
-  // A fresh (non-reaffirming) release-level match; never auto-verified.
-  matchesFreshReleaseTarget: boolean;
   // An exact accepted local alias resolved the reference.
   hasExactAliasAnchor: boolean;
   // A closed-form deterministic identity anchor (SMWS exact cask, exact_cask
@@ -140,11 +141,6 @@ function deriveMatchTier(input: AutomationTierInput): AutomationTier {
   // Replacing a different current assignment is a downstream correction, not an
   // existing-match verification.
   if (input.replacesCurrentAssignment) {
-    return "review";
-  }
-
-  // Fresh release-level matches are never auto-verified from evidence alone.
-  if (input.matchesFreshReleaseTarget) {
     return "review";
   }
 
@@ -213,24 +209,14 @@ export function deriveAutomationTier(
 
 // Maps the agent decision action enum onto the shared automation risk class.
 export function agentActionRiskClass(
-  action:
-    | "match"
-    | "create_bottle"
-    | "create_release"
-    | "create_bottle_and_release"
-    | "repair_parent_and_create_release"
-    | "repair_bottle"
-    | "no_match",
+  action: "match" | "create_bottle" | "repair_bottle" | "no_match",
 ): AutomationActionRiskClass {
   switch (action) {
     case "match":
       return "match";
     case "create_bottle":
-    case "create_release":
-    case "create_bottle_and_release":
       return "create";
     case "repair_bottle":
-    case "repair_parent_and_create_release":
       return "repair";
     default:
       return "none";
@@ -240,11 +226,7 @@ export function agentActionRiskClass(
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(
-      [
-        targetCandidate.alias,
-        targetCandidate.bottleFullName,
-        targetCandidate.fullName,
-      ]
+      [targetCandidate.alias, targetCandidate.fullName]
         .filter((value): value is string => Boolean(value))
         .map((value) => value.trim())
         .filter((value) => value.length > 0),
@@ -288,8 +270,6 @@ function targetHasDirtyParentStatedAgeConflict({
   if (
     !extractedLabel ||
     extractedLabel.stated_age === null ||
-    target.kind === "release" ||
-    target.releaseId !== null ||
     target.statedAge === null ||
     target.statedAge === extractedLabel.stated_age
   ) {
@@ -394,6 +374,9 @@ function extractedLabelLooksLikePlainAgeStatement(
     extractedLabel.vintage_year === null &&
     extractedLabel.cask_strength === null &&
     extractedLabel.single_cask === null &&
+    extractedLabel.cask_type === null &&
+    extractedLabel.cask_size === null &&
+    extractedLabel.cask_fill === null &&
     extractedLabel.abv === null
   );
 }
@@ -402,11 +385,12 @@ function bottleCandidateIsPlainAgeAutoVerificationTarget(
   target: BottleCandidate,
 ): boolean {
   return (
-    target.kind !== "release" &&
-    (target.releaseId ?? null) === null &&
     target.abv === null &&
     target.caskStrength !== true &&
     target.singleCask !== true &&
+    target.caskType === null &&
+    target.caskSize === null &&
+    target.caskFill === null &&
     targetLooksLikePlainAgeStatementBottle(target)
   );
 }
@@ -426,6 +410,9 @@ function extractedLabelCarriesUnsupportedSpecificity({
     Boolean(extractedLabel.edition && !target.edition) ||
     (extractedLabel.cask_strength === true && target.caskStrength === null) ||
     (extractedLabel.single_cask === true && target.singleCask === null) ||
+    (extractedLabel.cask_type !== null && target.caskType === null) ||
+    (extractedLabel.cask_size !== null && target.caskSize === null) ||
+    (extractedLabel.cask_fill !== null && target.caskFill === null) ||
     (extractedLabel.abv !== null && target.abv === null) ||
     (extractedLabel.vintage_year !== null && target.vintageYear === null) ||
     (extractedLabel.release_year !== null && target.releaseYear === null)
@@ -759,6 +746,20 @@ function buildExistingMatchSupportChecks({
     addCheckIfPresent(checks, "singleCask", label.single_cask, false);
   }
 
+  for (const [attribute, extractedValue, candidateValue] of [
+    ["caskType", label?.cask_type, target.caskType],
+    ["caskSize", label?.cask_size, target.caskSize],
+    ["caskFill", label?.cask_fill, target.caskFill],
+  ] as const) {
+    if (
+      extractedValue !== null &&
+      extractedValue !== undefined &&
+      candidateValue === extractedValue
+    ) {
+      addCheckIfPresent(checks, attribute, extractedValue, false);
+    }
+  }
+
   if (
     label &&
     label.abv !== null &&
@@ -819,6 +820,20 @@ function buildExistingMatchSupportChecks({
   if (extractedLabel?.single_cask === null && target.singleCask) {
     addCheckIfPresent(checks, "singleCask", true, true);
     differentiatingAttributes.add("singleCask");
+  }
+
+  for (const [attribute, extractedValue, candidateValue] of [
+    ["caskType", extractedLabel?.cask_type, target.caskType],
+    ["caskSize", extractedLabel?.cask_size, target.caskSize],
+    ["caskFill", extractedLabel?.cask_fill, target.caskFill],
+  ] as const) {
+    if (
+      (extractedValue === null || extractedValue === undefined) &&
+      candidateValue !== null
+    ) {
+      addCheckIfPresent(checks, attribute, candidateValue, true);
+      differentiatingAttributes.add(attribute);
+    }
   }
 
   if (extractedLabel?.abv === null && target.abv !== null) {
@@ -993,8 +1008,6 @@ export function isPlainAgeBottleMatchEligibleForVerification({
   return !candidates.some(
     (candidate) =>
       candidate.bottleId !== target.bottleId &&
-      candidate.kind !== "release" &&
-      (candidate.releaseId ?? null) === null &&
       candidateMatchesPlainAgeStructuredIdentity({
         candidate,
         extractedLabel,

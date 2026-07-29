@@ -8,7 +8,6 @@ const BrandRepairCandidateSchema = z.object({
     id: z.number(),
     fullName: z.string(),
     name: z.string(),
-    numReleases: z.number(),
     totalTastings: z.number().nullable(),
   }),
   currentBrand: z.object({
@@ -72,6 +71,4 @@ export default procedure
       }),
     }),
   )
-  .handler(async function ({ input }) {
-    return await getBrandRepairCandidates(input);
-  });
+  .handler(async ({ input }) => getBrandRepairCandidates(input));

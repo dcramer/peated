@@ -60,7 +60,6 @@ export default procedure
                 id: z.number(),
                 fullName: z.string(),
                 name: z.string(),
-                numReleases: z.number(),
                 totalTastings: z.number().nullable(),
               }),
               supportingReferences: z.array(SupportingReferenceSchema),
@@ -74,6 +73,4 @@ export default procedure
       }),
     }),
   )
-  .handler(async function ({ input }) {
-    return await getBrandRepairGroups(input);
-  });
+  .handler(async ({ input }) => getBrandRepairGroups(input));

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:23:20.799Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Macallan 18 Sherry Oak 1994 Vintage"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Macallan 18 Sherry Oak 1994 Vintage",
+    "summary": "The **Macallan 18 Sherry Oak 1994 Vintage** is generally the **official Macallan 18-year-old annual vintage release**, distilled in **1994**, bottled at **43% ABV**, and matured in **sherry oak casks**. Multiple bottle-specific listings and auction records identify it as a **700 ml** official bottling from Macallan’s v",
+    "results": [
+      {
+        "title": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "url": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-18-year-old-1994-sherry-oak-whisky/",
+        "domain": "masterofmalt.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/34741/macallan-1994",
+        "url": "https://www.whiskybase.com/whiskies/whisky/34741/macallan-1994",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/248873/macallan-1994",
+        "url": "https://www.whiskybase.com/whiskies/whisky/248873/macallan-1994",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/42433/macallan-1994",
+        "url": "https://www.whiskybase.com/whiskies/whisky/42433/macallan-1994",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/market/whisky/402970",
+        "url": "https://www.whiskybase.com/market/whisky/402970",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.scotchwhiskyauctions.com/auctions/73-the-42nd-auction/45400-macallan-18-year-old-1994/",
+        "url": "https://www.scotchwhiskyauctions.com/auctions/73-the-42nd-auction/45400-macallan-18-year-old-1994/",
+        "domain": "scotchwhiskyauctions.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "51289001d9c3748d0fd426bfefddd960946c53a78e736d30bc46d99a23cac4b4",
+    "mode": "auto"
+  }
+}

@@ -39,25 +39,17 @@
       "types": "./src/error.ts",
       "default": "./src/error.ts"
     },
-    "./legacyReleaseRepairIdentity": {
-      "types": "./src/legacyReleaseRepairIdentity.ts",
-      "default": "./src/legacyReleaseRepairIdentity.ts"
-    },
-    "./legacyReleaseRepairResolution": {
-      "types": "./src/legacyReleaseRepairResolution.ts",
-      "default": "./src/legacyReleaseRepairResolution.ts"
-    },
     "./releaseIdentity": {
       "types": "./src/releaseIdentity.ts",
       "default": "./src/releaseIdentity.ts"
     },
-    "./bottleSchemaRules": {
-      "types": "./src/bottleSchemaRules.ts",
-      "default": "./src/bottleSchemaRules.ts"
-    },
     "./bottleSchemaGuidance": {
       "types": "./src/bottleSchemaGuidance.ts",
       "default": "./src/bottleSchemaGuidance.ts"
+    },
+    "./openaiCompatibleConfig": {
+      "types": "./src/openaiCompatibleConfig.ts",
+      "default": "./src/openaiCompatibleConfig.ts"
     },
     "./smws": {
       "types": "./src/smws.ts",

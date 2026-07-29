@@ -12,18 +12,9 @@ type SeriesLike = {
   name: string;
 } | null;
 
-type BottleLike = NonNullable<
-  | QueueItem["currentBottle"]
-  | QueueItem["suggestedBottle"]
-  | QueueItem["parentBottle"]
->;
-
-type ReleaseLike = NonNullable<
-  QueueItem["currentRelease"] | QueueItem["suggestedRelease"]
->;
+type BottleLike = NonNullable<QueueItem["currentBottle"]>;
 
 type ProposedBottleLike = NonNullable<QueueItem["proposedBottle"]>;
-type ProposedReleaseLike = NonNullable<QueueItem["proposedRelease"]>;
 
 function serializeEntity(value: EntityLike | null) {
   if (!value) {
@@ -78,30 +69,6 @@ function serializeBottleIdentity(value: BottleLike | null) {
   };
 }
 
-function serializeReleaseIdentity(value: ReleaseLike | null) {
-  if (!value) {
-    return null;
-  }
-
-  return {
-    id: value.id,
-    bottleId: value.bottleId,
-    fullName: value.fullName,
-    name: value.name,
-    edition: value.edition,
-    statedAge: value.statedAge,
-    abv: value.abv,
-    caskStrength: value.caskStrength,
-    singleCask: value.singleCask,
-    vintageYear: value.vintageYear,
-    releaseYear: value.releaseYear,
-    caskType: value.caskType,
-    caskSize: value.caskSize,
-    caskFill: value.caskFill,
-    imageUrl: value.imageUrl,
-  };
-}
-
 function serializeProposedBottleDraft(value: ProposedBottleLike | null) {
   if (!value) {
     return null;
@@ -130,41 +97,15 @@ function serializeProposedBottleDraft(value: ProposedBottleLike | null) {
   };
 }
 
-function serializeProposedReleaseDraft(value: ProposedReleaseLike | null) {
-  if (!value) {
-    return null;
-  }
-
-  return {
-    edition: value.edition,
-    statedAge: value.statedAge,
-    abv: value.abv,
-    caskStrength: value.caskStrength,
-    singleCask: value.singleCask,
-    vintageYear: value.vintageYear,
-    releaseYear: value.releaseYear,
-    caskType: value.caskType,
-    caskSize: value.caskSize,
-    caskFill: value.caskFill,
-    imageUrl: value.imageUrl,
-  };
-}
-
 export function formatPriceMatchQueueLlmExport(item: QueueItem) {
   return JSON.stringify(
     {
-      schemaVersion: 1,
+      schemaVersion: 4,
       source: "peated.admin.match_queue",
       proposal: {
         id: item.id,
         status: item.status,
         proposalType: item.proposalType,
-        creationTarget: item.creationTarget,
-        currentBottleId: item.currentBottleId,
-        currentReleaseId: item.currentReleaseId,
-        suggestedBottleId: item.suggestedBottleId,
-        suggestedReleaseId: item.suggestedReleaseId,
-        parentBottleId: item.parentBottleId,
         confidence: item.confidence,
         modelConfidence: item.modelConfidence,
         model: item.model,
@@ -207,27 +148,16 @@ export function formatPriceMatchQueueLlmExport(item: QueueItem) {
           : null,
       },
       extractedIdentity: item.extractedLabel,
-      currentAssignment: {
-        bottle: serializeBottleIdentity(item.currentBottle),
-        release: serializeReleaseIdentity(item.currentRelease),
-      },
+      currentAssignment: serializeBottleIdentity(item.currentBottle),
       recommendation: {
         suggestedBottle: serializeBottleIdentity(item.suggestedBottle),
-        suggestedRelease: serializeReleaseIdentity(item.suggestedRelease),
-        parentBottle: serializeBottleIdentity(item.parentBottle),
-        proposedBottleDraft: serializeProposedBottleDraft(item.proposedBottle),
-        proposedReleaseDraft: serializeProposedReleaseDraft(
-          item.proposedRelease,
-        ),
+        proposedBottle: serializeProposedBottleDraft(item.proposedBottle),
       },
       artifacts: {
         localCandidates: item.candidateBottles.map((candidate) => ({
-          kind: candidate.kind ?? null,
           bottleId: candidate.bottleId,
-          releaseId: candidate.releaseId ?? null,
           alias: candidate.alias,
           fullName: candidate.fullName,
-          bottleFullName: candidate.bottleFullName ?? null,
           brand: candidate.brand,
           bottler: candidate.bottler,
           series: candidate.series,

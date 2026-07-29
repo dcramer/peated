@@ -159,7 +159,7 @@ function BrandRepairChangeSummary({
           <div className="mt-1 text-slate-300">
             If a bottle is attached to a source-brand series, the repair reuses
             or creates the matching target-brand series and reindexes affected
-            bottles and releases.
+            bottles.
           </div>
         </div>
       </div>
@@ -511,7 +511,7 @@ export default function Page() {
                       </Link>
                       <div className="mt-1 text-xs text-slate-400">
                         {formatTastingCount(sample.bottle.totalTastings)}{" "}
-                        tastings and {sample.bottle.numReleases} child releases
+                        tastings
                       </div>
                       <div className="mt-3 space-y-2">
                         {sample.supportingReferences.map((reference, index) => (
@@ -582,8 +582,7 @@ export default function Page() {
                   </Link>
                   <div className="mt-1 text-sm text-slate-400">
                     {formatTastingCount(candidate.bottle.totalTastings)}{" "}
-                    tastings and {candidate.bottle.numReleases} child releases
-                    on this bottle row.
+                    tastings on this Bottle.
                   </div>
                 </div>
 

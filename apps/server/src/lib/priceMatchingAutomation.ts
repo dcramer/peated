@@ -8,6 +8,12 @@ import {
   normalizeComparableText,
   textsOverlap,
 } from "@peated/bottle-classifier/identityEvidenceCore";
+import type {
+  BottleCandidate,
+  BottleExtractedDetails,
+  BottleSearchEvidence,
+  ProposedBottle,
+} from "@peated/bottle-classifier/internal/types";
 import {
   deriveAutomationTier,
   evaluateExistingMatchWebEvidence,
@@ -19,42 +25,26 @@ import {
 import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
 import type { StorePrice } from "@peated/server/db/schema";
 import type { StorePriceMatchAutomationAssessmentSchema } from "@peated/server/schemas";
-import {
-  type BottleCandidateSchema,
-  type BottleCreationTargetEnum,
-  type BottleEvidenceCheckSchema,
-  type BottleReferenceIdentitySchema,
-  type BottleSearchEvidenceSchema,
-  type ProposedBottleSchema,
-  type ProposedReleaseSchema,
-} from "@peated/server/schemas";
+import { type BottleEvidenceCheckSchema } from "@peated/server/schemas";
 import type { z } from "zod";
 
-type ExtractedBottleDetails = z.infer<typeof BottleReferenceIdentitySchema>;
-type PriceMatchCandidate = z.infer<typeof BottleCandidateSchema>;
-type ProposedBottle = z.infer<typeof ProposedBottleSchema>;
-type ProposedRelease = z.infer<typeof ProposedReleaseSchema>;
-type SearchEvidence = z.infer<typeof BottleSearchEvidenceSchema>;
+type ExtractedBottleDetails = BottleExtractedDetails;
+type PriceMatchCandidate = BottleCandidate;
+type SearchEvidence = BottleSearchEvidence;
 type EvidenceCheck = z.infer<typeof BottleEvidenceCheckSchema>;
 type MatchAction = "match_existing" | "correction" | "create_new" | "no_match";
 type MatchAttribute = EvidenceCheck["attribute"];
 type SourceTier = EvidenceCheck["matchedSourceTiers"][number];
-type MatchCreationTarget = z.infer<typeof BottleCreationTargetEnum>;
 type MatchIdentityScope = "product" | "exact_cask";
 
 type MatchAutomationInput = {
   action: MatchAction;
   modelConfidence: number | null;
-  price: Pick<StorePrice, "bottleId" | "name" | "url"> & {
-    releaseId?: number | null;
-  };
+  price: Pick<StorePrice, "bottleId" | "name" | "url">;
   suggestedBottleId: number | null;
-  suggestedReleaseId?: number | null;
   candidateBottles: PriceMatchCandidate[];
   extractedLabel: ExtractedBottleDetails | null;
   proposedBottle: ProposedBottle | null;
-  proposedRelease?: ProposedRelease | null;
-  creationTarget?: MatchCreationTarget | null;
   searchEvidence: SearchEvidence[];
   webEvidenceJudgment?: WebEvidenceJudgment;
 };
@@ -309,111 +299,8 @@ function compareCandidateValue(
   }
 }
 
-function hasMeaningfulExtractedReleaseValue(
-  value: string | number | boolean | null | undefined,
-): value is string | number | true {
-  if (typeof value === "string") {
-    return value.length > 0;
-  }
-
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  return value !== null && value !== undefined;
-}
-
-function bottleTargetRepresentsExtractedReleaseIdentity({
-  target,
-  attribute,
-  expectedValue,
-}: {
-  target: PriceMatchCandidate;
-  attribute: MatchAttribute;
-  expectedValue: string | number | boolean;
-}) {
-  if (compareCandidateValue(attribute, target, expectedValue)) {
-    return true;
-  }
-
-  return [target.alias, target.bottleFullName, target.fullName]
-    .filter((value): value is string => Boolean(value))
-    .some((value) =>
-      attributeMatchesText(attribute, String(expectedValue), value),
-    );
-}
-
-function listingCarriesReleaseIdentityBeyondBottle({
-  target,
-  extractedLabel,
-}: {
-  target: PriceMatchCandidate;
-  extractedLabel: ExtractedBottleDetails | null;
-}) {
-  const extractedReleaseAttributes = [
-    {
-      attribute: "edition" as const,
-      value: extractedLabel?.edition,
-    },
-    {
-      attribute: "statedAge" as const,
-      value: extractedLabel?.stated_age,
-    },
-    {
-      attribute: "abv" as const,
-      value: extractedLabel?.abv,
-    },
-    {
-      attribute: "releaseYear" as const,
-      value: extractedLabel?.release_year,
-    },
-    {
-      attribute: "vintageYear" as const,
-      value: extractedLabel?.vintage_year,
-    },
-    {
-      attribute: "caskType" as const,
-      value: extractedLabel?.cask_type,
-    },
-    {
-      attribute: "caskSize" as const,
-      value: extractedLabel?.cask_size,
-    },
-    {
-      attribute: "caskFill" as const,
-      value: extractedLabel?.cask_fill,
-    },
-    {
-      attribute: "caskStrength" as const,
-      value: extractedLabel?.cask_strength,
-    },
-    {
-      attribute: "singleCask" as const,
-      value: extractedLabel?.single_cask,
-    },
-  ];
-
-  return extractedReleaseAttributes.some(({ attribute, value }) => {
-    if (!hasMeaningfulExtractedReleaseValue(value)) {
-      return false;
-    }
-
-    return !bottleTargetRepresentsExtractedReleaseIdentity({
-      target,
-      attribute,
-      expectedValue: value,
-    });
-  });
-}
-
 function getCreateNewChecks(
-  {
-    proposedBottle,
-    proposedRelease,
-  }: {
-    proposedBottle: ProposedBottle | null;
-    proposedRelease: ProposedRelease | null;
-  },
+  proposedBottle: ProposedBottle | null,
   candidates: PriceMatchCandidate[],
 ) {
   const allChecks: EvidenceCheck[] = [];
@@ -456,33 +343,6 @@ function getCreateNewChecks(
       allChecks,
       "releaseYear",
       proposedBottle.releaseYear,
-      false,
-    );
-  }
-
-  if (proposedRelease) {
-    addCheckIfPresent(allChecks, "statedAge", proposedRelease.statedAge, false);
-    addCheckIfPresent(allChecks, "edition", proposedRelease.edition, false);
-    addCheckIfPresent(allChecks, "caskType", proposedRelease.caskType, false);
-    addCheckIfPresent(allChecks, "caskSize", proposedRelease.caskSize, false);
-    addCheckIfPresent(allChecks, "caskFill", proposedRelease.caskFill, false);
-    if (proposedRelease.caskStrength) {
-      addCheckIfPresent(allChecks, "caskStrength", true, false);
-    }
-    if (proposedRelease.singleCask) {
-      addCheckIfPresent(allChecks, "singleCask", true, false);
-    }
-    addCheckIfPresent(allChecks, "abv", proposedRelease.abv, false);
-    addCheckIfPresent(
-      allChecks,
-      "vintageYear",
-      proposedRelease.vintageYear,
-      false,
-    );
-    addCheckIfPresent(
-      allChecks,
-      "releaseYear",
-      proposedRelease.releaseYear,
       false,
     );
   }
@@ -543,18 +403,12 @@ function getProposedSmwsCode(
 }
 
 function isDeterministicSmwsExactCaskCreate({
-  creationTarget,
   price,
   proposedBottle,
 }: {
-  creationTarget: MatchCreationTarget | null;
   price: Pick<StorePrice, "name">;
   proposedBottle: ProposedBottle | null;
 }) {
-  if (creationTarget !== "bottle") {
-    return false;
-  }
-
   const sourceCode = parseSmwsReferenceName(price.name)?.code;
   if (!sourceCode) {
     return false;
@@ -729,7 +583,6 @@ function getExistingMatchAssessment({
   modelConfidence,
   price,
   suggestedBottleId,
-  suggestedReleaseId,
   candidateBottles,
   extractedLabel,
   searchEvidence,
@@ -738,7 +591,6 @@ function getExistingMatchAssessment({
   modelConfidence: number | null;
   price: Pick<StorePrice, "name" | "url">;
   suggestedBottleId: number | null;
-  suggestedReleaseId: number | null;
   candidateBottles: PriceMatchCandidate[];
   extractedLabel: ExtractedBottleDetails | null;
   searchEvidence: SearchEvidence[];
@@ -746,7 +598,6 @@ function getExistingMatchAssessment({
 }) {
   const target = getSuggestedMatchCandidate({
     suggestedBottleId,
-    suggestedReleaseId,
     candidateBottles,
   });
   if (!target) {
@@ -761,25 +612,12 @@ function getExistingMatchAssessment({
     };
   }
 
-  const automationBlockers: string[] = [];
-  if (
-    target.releaseId === null &&
-    listingCarriesReleaseIdentityBeyondBottle({
-      target,
-      extractedLabel,
-    })
-  ) {
-    automationBlockers.push(
-      "listing looks release-specific but the suggested target is only a bottle",
-    );
-  }
-
-  automationBlockers.push(
+  const automationBlockers: string[] = [
     ...getExistingMatchIdentityConflicts({
       target,
       extractedLabel,
     }),
-  );
+  ];
 
   const webEvidence = evaluateExistingMatchWebEvidence({
     sourceUrl: price.url,
@@ -818,27 +656,21 @@ function getExistingMatchAssessment({
 
 function getCreateNewScore({
   proposedBottle,
-  proposedRelease,
-  creationTarget,
   candidateBottles,
   searchEvidence,
   price,
   webEvidenceJudgment,
 }: {
   proposedBottle: ProposedBottle | null;
-  proposedRelease: ProposedRelease | null;
-  creationTarget: MatchCreationTarget | null;
   candidateBottles: PriceMatchCandidate[];
   searchEvidence: SearchEvidence[];
-  price: Pick<StorePrice, "bottleId" | "name" | "url"> & {
-    releaseId?: number | null;
-  };
+  price: Pick<StorePrice, "bottleId" | "name" | "url">;
   webEvidenceJudgment?: WebEvidenceJudgment;
 }) {
-  let score = creationTarget === "release" ? 24 : 30;
+  let score = 30;
   const automationBlockers: string[] = [];
 
-  if (creationTarget !== "release" && !proposedBottle?.category) {
+  if (!proposedBottle?.category) {
     automationBlockers.push("auto-create requires a concrete whisky category");
   }
 
@@ -860,61 +692,41 @@ function getCreateNewScore({
   if (proposedBottle?.category) {
     score += 4;
   }
-  if (
-    proposedBottle?.statedAge !== null ||
-    proposedRelease?.statedAge !== null
-  ) {
+  if (proposedBottle?.statedAge !== null) {
     score += 6;
   }
-  if (proposedBottle?.edition || proposedRelease?.edition) {
+  if (proposedBottle?.edition) {
     score += 8;
   }
-  if (proposedBottle?.caskType || proposedRelease?.caskType) {
+  if (proposedBottle?.caskType) {
     score += 8;
   }
-  if (proposedBottle?.caskSize || proposedRelease?.caskSize) {
+  if (proposedBottle?.caskSize) {
     score += 4;
   }
-  if (proposedBottle?.caskFill || proposedRelease?.caskFill) {
+  if (proposedBottle?.caskFill) {
     score += 4;
   }
-  if (proposedBottle?.caskStrength || proposedRelease?.caskStrength) {
+  if (proposedBottle?.caskStrength) {
     score += 5;
   }
-  if (proposedBottle?.singleCask || proposedRelease?.singleCask) {
+  if (proposedBottle?.singleCask) {
     score += 5;
   }
-  if (proposedBottle?.abv !== null || proposedRelease?.abv !== null) {
+  if (proposedBottle?.abv !== null) {
     score += 12;
   }
-  if (
-    proposedBottle?.vintageYear !== null ||
-    proposedRelease?.vintageYear !== null
-  ) {
+  if (proposedBottle?.vintageYear !== null) {
     score += 6;
   }
-  if (
-    proposedBottle?.releaseYear !== null ||
-    proposedRelease?.releaseYear !== null
-  ) {
+  if (proposedBottle?.releaseYear !== null) {
     score += 6;
   }
-  if (creationTarget === "release" && price.bottleId !== null) {
-    score += 8;
-  }
-  if (creationTarget === "bottle_and_release") {
-    score += 4;
-  }
-
   const { checks, differentiatingAttributes } = getCreateNewChecks(
-    {
-      proposedBottle,
-      proposedRelease,
-    },
+    proposedBottle,
     candidateBottles.slice(0, 3),
   );
   const deterministicSmwsExactCaskCreate = isDeterministicSmwsExactCaskCreate({
-    creationTarget,
     price,
     proposedBottle,
   });
@@ -1021,12 +833,9 @@ export function getStorePriceMatchAutomationAssessment({
   modelConfidence,
   price,
   suggestedBottleId,
-  suggestedReleaseId,
   candidateBottles,
   extractedLabel,
   proposedBottle,
-  proposedRelease,
-  creationTarget,
   searchEvidence,
   webEvidenceJudgment,
 }: MatchAutomationInput): StorePriceMatchAutomationAssessment {
@@ -1039,7 +848,6 @@ export function getStorePriceMatchAutomationAssessment({
       modelConfidence,
       price,
       suggestedBottleId,
-      suggestedReleaseId: suggestedReleaseId ?? null,
       candidateBottles,
       extractedLabel,
       searchEvidence,
@@ -1061,14 +869,9 @@ export function getStorePriceMatchAutomationAssessment({
     };
   }
 
-  if (
-    (action === "create_new" || action === "correction") &&
-    (proposedBottle || proposedRelease)
-  ) {
+  if ((action === "create_new" || action === "correction") && proposedBottle) {
     const createScore = getCreateNewScore({
       proposedBottle,
-      proposedRelease: proposedRelease ?? null,
-      creationTarget: creationTarget ?? null,
       candidateBottles,
       searchEvidence,
       price,
@@ -1090,7 +893,6 @@ export function getStorePriceMatchAutomationAssessment({
       modelConfidence,
       price,
       suggestedBottleId,
-      suggestedReleaseId: suggestedReleaseId ?? null,
       candidateBottles,
       extractedLabel,
       searchEvidence,
@@ -1127,11 +929,9 @@ export function getStorePriceMatchAutomationAssessment({
 
 function getSuggestedMatchCandidate({
   suggestedBottleId,
-  suggestedReleaseId,
   candidateBottles,
 }: {
   suggestedBottleId: number | null;
-  suggestedReleaseId: number | null;
   candidateBottles: PriceMatchCandidate[];
 }) {
   if (suggestedBottleId === null) {
@@ -1140,12 +940,7 @@ function getSuggestedMatchCandidate({
 
   return (
     candidateBottles.find(
-      (candidate) =>
-        candidate.bottleId === suggestedBottleId &&
-        (suggestedReleaseId !== null
-          ? (candidate.releaseId ?? null) === suggestedReleaseId
-          : (candidate.releaseId ?? null) === null ||
-            candidate.kind !== "release"),
+      (candidate) => candidate.bottleId === suggestedBottleId,
     ) ?? null
   );
 }
@@ -1162,10 +957,8 @@ function getSuggestedMatchCandidate({
 export function shouldVerifyStorePriceMatch(params: {
   action: MatchAction;
   currentBottleId: null | number;
-  currentReleaseId?: number | null;
   identityScope?: MatchIdentityScope | null;
   suggestedBottleId: number | null;
-  suggestedReleaseId: number | null;
   hasUnresolvedRisks: boolean;
   webEvidence?: WebEvidenceJudgment;
   automationBlockers: string[];
@@ -1175,10 +968,8 @@ export function shouldVerifyStorePriceMatch(params: {
     action,
     automationBlockers,
     currentBottleId,
-    currentReleaseId,
     identityScope,
     suggestedBottleId,
-    suggestedReleaseId,
     hasUnresolvedRisks,
     webEvidence,
     plainAgeBottleAutoVerifyEligible = false,
@@ -1202,7 +993,6 @@ export function shouldVerifyStorePriceMatch(params: {
   if (
     action === "match_existing" &&
     currentBottleId === null &&
-    (suggestedReleaseId ?? null) === null &&
     identityScope !== "exact_cask" &&
     plainAgeBottleAutoVerifyEligible
   ) {
@@ -1210,9 +1000,7 @@ export function shouldVerifyStorePriceMatch(params: {
   }
 
   const reaffirmsCurrentAssignment =
-    currentBottleId != null &&
-    suggestedBottleId === currentBottleId &&
-    (suggestedReleaseId ?? null) === (currentReleaseId ?? null);
+    currentBottleId != null && suggestedBottleId === currentBottleId;
 
   return (
     deriveAutomationTier({
@@ -1224,8 +1012,6 @@ export function shouldVerifyStorePriceMatch(params: {
       // A different current assignment means this is a correction, not a verify.
       replacesCurrentAssignment:
         currentBottleId != null && !reaffirmsCurrentAssignment,
-      matchesFreshReleaseTarget:
-        !reaffirmsCurrentAssignment && (suggestedReleaseId ?? null) !== null,
       hasExactAliasAnchor: false,
       // The exact-cask scope is the price-match deterministic anchor here; SMWS
       // exact-cask and the plain-age lane are handled above/upstream.

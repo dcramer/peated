@@ -1,10 +1,6 @@
-import { DEFAULT_BOTTLE_CREATION_TARGET } from "@peated/bottle-classifier/releaseIdentity";
+import { BottleCandidateSchema as ClassifierBottleCandidateSchema } from "@peated/bottle-classifier/internal/types";
 import { z } from "zod";
 import { CATEGORY_LIST } from "../constants";
-import {
-  BottleReleaseInputSchema,
-  BottleReleaseSchema,
-} from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import {
   CaskFillEnum,
@@ -38,125 +34,8 @@ export const ExtractedBottleDetailsSchema = z.object({
 });
 export const BottleReferenceIdentitySchema = ExtractedBottleDetailsSchema;
 
-const BottleReleaseTraitFieldEnum = z.enum([
-  "edition",
-  "statedAge",
-  "releaseYear",
-  "vintageYear",
-  "abv",
-  "singleCask",
-  "caskStrength",
-]);
-
-const PriceMatchCandidateReleaseSiblingSchema = z
-  .object({
-    releaseId: z.number().int(),
-    fullName: z.string(),
-    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
-    edition: z.string().trim().nullable().default(null),
-    statedAge: z.number().min(0).max(100).nullable().default(null),
-    releaseYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(new Date().getFullYear())
-      .nullable()
-      .default(null),
-    vintageYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(new Date().getFullYear())
-      .nullable()
-      .default(null),
-    abv: z.number().min(0).max(100).nullable().default(null),
-    singleCask: z.boolean().nullable().default(null),
-    caskStrength: z.boolean().nullable().default(null),
-  })
-  .strict();
-
-const PriceMatchCandidateBottleSiblingSchema = z
-  .object({
-    bottleId: z.number().int(),
-    fullName: z.string(),
-    traitFields: z.array(BottleReleaseTraitFieldEnum).default([]),
-    statedAge: z.number().min(0).max(100).nullable().default(null),
-    edition: z.string().trim().nullable().default(null),
-    releaseYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(new Date().getFullYear() + 1)
-      .nullable()
-      .default(null),
-    vintageYear: z
-      .number()
-      .int()
-      .gte(1800)
-      .lte(new Date().getFullYear())
-      .nullable()
-      .default(null),
-    abv: z.number().min(0).max(100).nullable().default(null),
-    singleCask: z.boolean().nullable().default(null),
-    caskStrength: z.boolean().nullable().default(null),
-  })
-  .strict();
-
-const PriceMatchCandidateFamilyContextSchema = z
-  .object({
-    parentBottleReleaseTraits: z.array(BottleReleaseTraitFieldEnum).default([]),
-    childReleaseCount: z.number().int().min(0).default(0),
-    siblingReleases: z
-      .array(PriceMatchCandidateReleaseSiblingSchema)
-      .default([]),
-    siblingBottles: z.array(PriceMatchCandidateBottleSiblingSchema).default([]),
-  })
-  .strict();
-
-export const PriceMatchCandidateSchema = z.object({
-  kind: z
-    .enum(["bottle", "release"])
-    .optional()
-    .describe(
-      "Internal candidate discriminator: `bottle` means a parent bottle candidate and `release` means a child bottle_release candidate.",
-    ),
-  bottleId: z.number().int(),
-  releaseId: z.number().int().nullable().optional(),
-  alias: z.string().nullable().default(null),
-  fullName: z.string(),
-  bottleFullName: z.string().nullable().optional(),
-  brand: z.string().nullable().default(null),
-  bottler: z.string().nullable().default(null),
-  series: z.string().nullable().default(null),
-  distillery: z.array(z.string()).default([]),
-  category: CategoryEnum.nullable().default(null),
-  statedAge: z.number().min(0).max(100).nullable().default(null),
-  edition: z.string().trim().nullable().default(null),
-  caskStrength: z.boolean().nullable().default(null),
-  singleCask: z.boolean().nullable().default(null),
-  abv: z.number().min(0).max(100).nullable().default(null),
-  vintageYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(new Date().getFullYear())
-    .nullable()
-    .default(null),
-  releaseYear: z
-    .number()
-    .int()
-    .gte(1800)
-    .lte(new Date().getFullYear())
-    .nullable()
-    .default(null),
-  caskType: CaskTypeEnum.nullable().default(null),
-  caskSize: CaskSizeEnum.nullable().default(null),
-  caskFill: CaskFillEnum.nullable().default(null),
-  score: z.number().nullable().default(null),
-  source: z.array(z.string()).default([]),
-  familyContext: PriceMatchCandidateFamilyContextSchema.nullable().optional(),
-});
-export const BottleCandidateSchema = PriceMatchCandidateSchema;
+export const PriceMatchCandidateSchema = ClassifierBottleCandidateSchema;
+export const BottleCandidateSchema = ClassifierBottleCandidateSchema;
 
 export const PriceMatchSearchResultSchema = z.object({
   title: z.string(),
@@ -247,12 +126,6 @@ export const StorePriceMatchProposalTypeEnum = z.enum([
   "correction",
   "no_match",
 ]);
-export const PriceMatchCreationTargetEnum = z.enum([
-  "bottle",
-  "release",
-  "bottle_and_release",
-]);
-export const BottleCreationTargetEnum = PriceMatchCreationTargetEnum;
 export const BottleIdentityScopeEnum = z.enum(["product", "exact_cask"]);
 
 export const StorePriceMatchQueueStateEnum = z.enum([
@@ -301,221 +174,48 @@ export const ProposedBottleSchema = z.object({
   bottler: ProposedEntityChoiceSchema.nullable().default(null),
 });
 
-export const ProposedReleaseSchema = BottleReleaseInputSchema.omit({
-  image: true,
+/**
+ * Persisted classifier repair drafts mark exact Bottle age ownership. Older
+ * correction rows omit the marker and retain their legacy shared-age meaning.
+ */
+export const StorePriceBottleRepairDraftSchema = ProposedBottleSchema.extend({
+  statedAgeScope: z.literal("exact").optional(),
 });
 
-const AgentProposedBottleSchema = ProposedBottleSchema.extend({
-  abv: z.number().nullable().default(null),
-});
+const StorePriceMatchDecisionBaseSchema = z
+  .object({
+    // Numeric confidence was removed from the classifier agent contract; this
+    // field is retained as nullable telemetry and is written null.
+    confidence: z.number().min(0).max(100).nullable().default(null),
+    rationale: z.string().nullable().default(null),
+    candidateBottleIds: z.array(z.number().int()).default([]),
+    identityScope: BottleIdentityScopeEnum.default("product"),
+    aliasScope: AliasScopeEnum.optional(),
+  })
+  .strict();
 
-const AgentProposedReleaseSchema = ProposedReleaseSchema.extend({
-  abv: z.number().nullable().default(null),
-});
-
-function validateCreateNewDecisionShape(
-  value: {
-    creationTarget?: z.infer<typeof PriceMatchCreationTargetEnum> | null;
-    parentBottleId?: number | null;
-    proposedBottle?: z.infer<typeof ProposedBottleSchema> | null;
-    proposedRelease?: z.infer<typeof ProposedReleaseSchema> | null;
-  },
-  ctx: z.RefinementCtx,
-) {
-  const creationTarget = value.creationTarget ?? DEFAULT_BOTTLE_CREATION_TARGET;
-  const parentBottleId = value.parentBottleId ?? null;
-  const proposedRelease = value.proposedRelease ?? null;
-
-  if (creationTarget === "bottle") {
-    if (!value.proposedBottle) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["proposedBottle"],
-        message: "Bottle creation requires a proposed bottle.",
-      });
-    }
-    if (parentBottleId !== null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["parentBottleId"],
-        message: "Bottle-only creation cannot include a parent bottle.",
-      });
-    }
-    if (proposedRelease) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["proposedRelease"],
-        message: "Bottle-only creation cannot include a proposed release.",
-      });
-    }
-    return;
-  }
-
-  if (creationTarget === "release") {
-    if (!parentBottleId) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["parentBottleId"],
-        message: "Release creation requires a parent bottle.",
-      });
-    }
-    if (!proposedRelease) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["proposedRelease"],
-        message: "Release creation requires a proposed release.",
-      });
-    }
-    if (value.proposedBottle) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["proposedBottle"],
-        message: "Release-only creation cannot include a proposed bottle.",
-      });
-    }
-    return;
-  }
-
-  if (!value.proposedBottle) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["proposedBottle"],
-      message: "Bottle-and-release creation requires a proposed bottle.",
-    });
-  }
-  if (!proposedRelease) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["proposedRelease"],
-      message: "Bottle-and-release creation requires a proposed release.",
-    });
-  }
-  if (parentBottleId !== null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["parentBottleId"],
-      message:
-        "Bottle-and-release creation cannot point at an existing parent bottle.",
-    });
-  }
-}
-
-const StorePriceMatchDecisionBaseSchema = z.object({
-  // Numeric confidence was removed from the classifier agent contract; this
-  // field is retained as nullable telemetry and is written null.
-  confidence: z.number().min(0).max(100).nullable().default(null),
-  rationale: z.string().nullable().default(null),
-  candidateBottleIds: z.array(z.number().int()).default([]),
-  identityScope: BottleIdentityScopeEnum.default("product"),
-  aliasScope: AliasScopeEnum.optional(),
-});
-
-const StorePriceMatchCreateNewDecisionSchema =
+export const StorePriceMatchDecisionSchema = z.discriminatedUnion("action", [
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("match_existing"),
+    suggestedBottleId: z.number().int(),
+    proposedBottle: z.null().default(null),
+  }),
+  StorePriceMatchDecisionBaseSchema.extend({
+    action: z.literal("correction"),
+    suggestedBottleId: z.number().int(),
+    proposedBottle: StorePriceBottleRepairDraftSchema.nullable().default(null),
+  }),
   StorePriceMatchDecisionBaseSchema.extend({
     action: z.literal("create_new"),
     suggestedBottleId: z.null().default(null),
-    suggestedReleaseId: z.null().optional(),
-    parentBottleId: z.number().int().nullable().optional(),
-    creationTarget: PriceMatchCreationTargetEnum.optional(),
-    proposedBottle: ProposedBottleSchema.nullable().default(null),
-    proposedRelease: ProposedReleaseSchema.nullable().optional(),
-  }).superRefine(validateCreateNewDecisionShape);
-
-export const StorePriceMatchDecisionSchema = z
-  .discriminatedUnion("action", [
-    StorePriceMatchDecisionBaseSchema.extend({
-      action: z.literal("match_existing"),
-      suggestedBottleId: z.number().int(),
-      suggestedReleaseId: z.number().int().nullable().optional(),
-      parentBottleId: z.null().optional(),
-      creationTarget: z.null().optional(),
-      proposedBottle: z.null().default(null),
-      proposedRelease: z.null().optional(),
-    }),
-    StorePriceMatchDecisionBaseSchema.extend({
-      action: z.literal("correction"),
-      suggestedBottleId: z.number().int(),
-      suggestedReleaseId: z.number().int().nullable().optional(),
-      parentBottleId: z.null().optional(),
-      creationTarget: z.null().optional(),
-      proposedBottle: ProposedBottleSchema.nullable().default(null),
-      proposedRelease: z.null().optional(),
-    }),
-    StorePriceMatchCreateNewDecisionSchema,
-    StorePriceMatchDecisionBaseSchema.extend({
-      action: z.literal("no_match"),
-      suggestedBottleId: z.null().default(null),
-      suggestedReleaseId: z.null().optional(),
-      parentBottleId: z.number().int().nullable().optional(),
-      creationTarget: z.null().optional(),
-      proposedBottle: ProposedBottleSchema.nullable().default(null),
-      proposedRelease: ProposedReleaseSchema.nullable().optional(),
-    }),
-  ])
-  .superRefine((value, ctx) => {
-    if (value.action !== "no_match") {
-      return;
-    }
-
-    // Plain no-match proposals are empty; compound parent repairs are
-    // review-only bundles and must preserve all drafts together.
-    const parentBottleId = value.parentBottleId ?? null;
-    const proposedBottle = value.proposedBottle ?? null;
-    const proposedRelease = value.proposedRelease ?? null;
-    const hasCompoundRepairDraft =
-      parentBottleId !== null ||
-      proposedBottle !== null ||
-      proposedRelease !== null;
-
-    if (!hasCompoundRepairDraft) {
-      return;
-    }
-
-    if (parentBottleId === null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["parentBottleId"],
-        message:
-          "Review-only parent repair proposals must include a parent bottle.",
-      });
-    }
-    if (!proposedBottle) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["proposedBottle"],
-        message:
-          "Review-only parent repair proposals must include a proposed bottle repair.",
-      });
-    }
-    if (!proposedRelease) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["proposedRelease"],
-        message:
-          "Review-only parent repair proposals must include a proposed release.",
-      });
-    }
-  });
-export const BottleClassificationDecisionSchema = StorePriceMatchDecisionSchema;
-
-export const StorePriceMatchAgentDecisionSchema =
+    proposedBottle: ProposedBottleSchema,
+  }),
   StorePriceMatchDecisionBaseSchema.extend({
-    action: z.enum(["match_existing", "correction", "create_new", "no_match"]),
-    suggestedBottleId: z.number().int().nullable().default(null),
-    suggestedReleaseId: z.number().int().nullable().default(null),
-    parentBottleId: z.number().int().nullable().default(null),
-    creationTarget: PriceMatchCreationTargetEnum.nullable().default(null),
-    proposedBottle: AgentProposedBottleSchema.nullable().default(null),
-    proposedRelease: AgentProposedReleaseSchema.nullable().default(null),
-  });
-export const BottleClassifierAgentDecisionSchema =
-  StorePriceMatchAgentDecisionSchema;
-
-export const StorePriceMatchAgentResponseSchema = z.object({
-  decision: StorePriceMatchAgentDecisionSchema,
-});
-export const BottleClassifierAgentResponseSchema =
-  StorePriceMatchAgentResponseSchema;
+    action: z.literal("no_match"),
+    suggestedBottleId: z.null().default(null),
+    proposedBottle: z.null().default(null),
+  }),
+]);
 
 export const StorePriceMatchProposalSchema = z.object({
   id: z.number(),
@@ -539,16 +239,9 @@ export const StorePriceMatchProposalSchema = z.object({
     StorePriceMatchAutomationAssessmentSchema.shape.differentiatingAttributes,
   webEvidenceChecks:
     StorePriceMatchAutomationAssessmentSchema.shape.webEvidenceChecks,
-  currentBottleId: z.number().nullable(),
-  currentReleaseId: z.number().nullable(),
-  suggestedBottleId: z.number().nullable(),
-  suggestedReleaseId: z.number().nullable(),
-  parentBottleId: z.number().nullable(),
-  creationTarget: PriceMatchCreationTargetEnum.nullable(),
   candidateBottles: z.array(PriceMatchCandidateSchema),
   extractedLabel: ExtractedBottleDetailsSchema.nullable(),
   proposedBottle: ProposedBottleSchema.nullable(),
-  proposedRelease: ProposedReleaseSchema.nullable(),
   searchEvidence: z.array(PriceMatchSearchEvidenceSchema),
   rationale: z.string().nullable(),
   model: z.string().nullable(),
@@ -568,10 +261,7 @@ export const StorePriceMatchQueueItemSchema =
       site: ExternalSiteSchema,
     }),
     currentBottle: BottleSchema.nullable(),
-    currentRelease: BottleReleaseSchema.nullable(),
     suggestedBottle: BottleSchema.nullable(),
-    suggestedRelease: BottleReleaseSchema.nullable(),
-    parentBottle: BottleSchema.nullable(),
   });
 
 export const StorePriceMatchQueueListResponse = z.object({

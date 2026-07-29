@@ -5,9 +5,15 @@ import {
 import { z } from "zod";
 import { SIMPLE_RATING_VALUES } from "../constants";
 import { BadgeAwardSchema } from "./badges";
-import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
-import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
+import {
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
+  CategoryEnum,
+  ServingStyleEnum,
+  zDatetime,
+} from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { UserSchema } from "./users";
 
@@ -24,12 +30,7 @@ export const TastingSchema = z.object({
     .nullable()
     .default(null)
     .describe("User's tasting notes and observations"),
-  bottle: BottleSchema.describe("The bottle that was tasted"),
-  release: BottleReleaseSchema.nullable()
-    .default(null)
-    .describe(
-      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
-    ),
+  bottle: BottleSchema.describe("Bottle that was tasted"),
   rating: z
     .union([
       z.literal(SIMPLE_RATING_VALUES.PASS),
@@ -86,21 +87,15 @@ export const TastingSchema = z.object({
   createdBy: UserSchema.readonly().describe("User who created this tasting"),
 });
 
-export const TastingInputSchema = TastingSchema.omit({
+export const TastingContentInputSchema = TastingSchema.omit({
   id: true,
+  bottle: true,
   awards: true,
   comments: true,
   toasts: true,
   hasToasted: true,
   createdBy: true,
 }).extend({
-  bottle: z.number().describe("ID of the bottle being tasted"),
-  release: z
-    .number()
-    .nullish()
-    .describe(
-      "The release of the bottle, if applicable. e.g. 'Ardbeg Supernova 2023'",
-    ),
   flight: z
     .string()
     .nullish()
@@ -120,6 +115,10 @@ export const TastingInputSchema = TastingSchema.omit({
     .default([])
     .describe("Array of friend user IDs who were present"),
 });
+
+export const TastingInputSchema = TastingContentInputSchema.extend({
+  bottle: z.number().int().positive().describe("Bottle being tasted"),
+}).strict();
 
 export const PhotoIdentificationSuggestedNextStepEnum = z.enum([
   "confirm_match",
@@ -155,17 +154,20 @@ export const PhotoIdentificationDiagnosticsSchema = z.object({
 });
 
 const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
-  bottleId: true,
-  releaseId: true,
-  bottleFullName: true,
   fullName: true,
 });
 
 const PhotoIdentificationProposedBottleSchema = z.object({
   name: z.string().trim().min(1),
   category: CategoryEnum.nullable(),
+  edition: z.string().nullable(),
   statedAge: z.number().nullable(),
   abv: z.number().nullable(),
+  caskStrength: z.boolean().nullable(),
+  singleCask: z.boolean().nullable(),
+  caskType: CaskTypeEnum.nullable(),
+  caskSize: CaskSizeEnum.nullable(),
+  caskFill: CaskFillEnum.nullable(),
   vintageYear: z.number().nullable(),
   releaseYear: z.number().nullable(),
   brand: z.object({
@@ -180,41 +182,16 @@ const PhotoIdentificationProposedBottleSchema = z.object({
   ),
 });
 
-const PhotoIdentificationProposedReleaseSchema = z.object({
-  edition: z.string().nullable(),
-  statedAge: z.number().nullable(),
-  abv: z.number().nullable(),
-  vintageYear: z.number().nullable(),
-  releaseYear: z.number().nullable(),
-});
-
 export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(
   "action",
   [
     z.object({
       action: z.literal("match"),
-      matchedBottleId: z.number().int(),
-      matchedReleaseId: z.number().int().nullable(),
+      matchedBottle: BottleSchema,
     }),
     z.object({
       action: z.literal("create_bottle"),
       proposedBottle: PhotoIdentificationProposedBottleSchema,
-    }),
-    z.object({
-      action: z.literal("create_release"),
-      parentBottleId: z.number().int(),
-      proposedRelease: PhotoIdentificationProposedReleaseSchema,
-    }),
-    z.object({
-      action: z.literal("create_bottle_and_release"),
-      proposedBottle: PhotoIdentificationProposedBottleSchema,
-      proposedRelease: PhotoIdentificationProposedReleaseSchema,
-    }),
-    z.object({
-      action: z.literal("repair_parent_and_create_release"),
-      parentBottleId: z.number().int(),
-      proposedBottle: PhotoIdentificationProposedBottleSchema,
-      proposedRelease: PhotoIdentificationProposedReleaseSchema,
     }),
     z.object({
       action: z.literal("repair_bottle"),

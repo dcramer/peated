@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
-import type { AnyDatabase } from "@peated/server/db";
+import type { AnyDatabase, AnyTransaction } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
 import * as dbSchema from "@peated/server/db/schema";
 import {
@@ -8,6 +8,8 @@ import {
   badgeAwards,
   badges,
   bottleAliases,
+  bottleGroupDistillers,
+  bottleGroups,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -41,6 +43,7 @@ import {
 } from "../../constants";
 import { getUserActorByIdForDatabase } from "../actors";
 import { createAccessToken, generatePasswordHash } from "../auth";
+import { materializeConcreteBottleForGroup } from "../concreteBottleIdentity";
 import { mapRows } from "../db";
 import { formatBottleName } from "../format";
 import { choose, random, sample } from "../rand";
@@ -371,16 +374,120 @@ export const EntityAlias = async (
   return result;
 };
 
-export const Bottle = async (
+/** Creates a BottleGroup within the caller's transaction. */
+const createBottleGroupFixture = async (
   {
     distillerIds = [],
     ...data
-  }: Partial<Omit<dbSchema.NewBottle, "id">> & {
-    distillerIds?: number[];
-  } = {},
-  db: AnyDatabase = dbConn,
-): Promise<dbSchema.Bottle> => {
+  }: Pick<
+    dbSchema.NewBottleGroup,
+    "fullName" | "name" | "brandId" | "createdByActorId"
+  > &
+    Partial<
+      Omit<
+        dbSchema.NewBottleGroup,
+        "id" | "fullName" | "name" | "brandId" | "createdByActorId"
+      >
+    > & {
+      distillerIds?: number[];
+    },
+  db: AnyTransaction,
+): Promise<dbSchema.BottleGroup> => {
+  const [group] = await db.insert(bottleGroups).values(data).returning();
+  if (!group) throw new Error("Unable to create BottleGroup fixture");
+
+  if (distillerIds.length) {
+    await db.insert(bottleGroupDistillers).values(
+      distillerIds.map((distillerId) => ({
+        groupId: group.id,
+        distillerId,
+      })),
+    );
+  }
+
+  return group;
+};
+
+/** Modern Bottles build a complete graph; legacy fixtures explicitly bypass it. */
+type BottleFixtureData = Partial<Omit<dbSchema.NewBottle, "id" | "groupId">> & {
+  distillerIds?: number[];
+};
+
+type BottleGroupMemberFixtureData = Partial<
+  Pick<
+    dbSchema.NewBottle,
+    | "statedAge"
+    | "edition"
+    | "abv"
+    | "singleCask"
+    | "caskStrength"
+    | "vintageYear"
+    | "releaseYear"
+    | "caskSize"
+    | "caskType"
+    | "caskFill"
+    | "description"
+    | "descriptionSrc"
+    | "imageUrl"
+    | "tastingNotes"
+    | "suggestedTags"
+    | "avgRating"
+    | "ratingStats"
+    | "totalTastings"
+    | "numReleases"
+    | "createdAt"
+    | "updatedAt"
+    | "createdByActorId"
+  >
+>;
+
+async function createBottleFixture(
+  rawData: BottleFixtureData = {},
+  db: AnyDatabase,
+  {
+    legacy,
+    groupId,
+  }: {
+    legacy: boolean;
+    groupId?: number;
+  },
+): Promise<dbSchema.Bottle> {
   return await db.transaction(async (tx) => {
+    const { distillerIds: requestedDistillerIds, ...inputData } = rawData;
+    let data = inputData;
+    let distillerIds = requestedDistillerIds ?? [];
+    let existingGroup: dbSchema.BottleGroup | null = null;
+
+    if (groupId !== undefined) {
+      existingGroup =
+        (await tx.query.bottleGroups.findFirst({
+          where: eq(bottleGroups.id, groupId),
+        })) ?? null;
+      if (!existingGroup) {
+        throw new Error(`BottleGroup fixture does not exist (${groupId})`);
+      }
+
+      if (requestedDistillerIds === undefined) {
+        distillerIds = (
+          await tx
+            .select({ distillerId: bottleGroupDistillers.distillerId })
+            .from(bottleGroupDistillers)
+            .where(eq(bottleGroupDistillers.groupId, groupId))
+        ).map(({ distillerId }) => distillerId);
+      }
+
+      data = {
+        statedAge: existingGroup.statedAge,
+        seriesId: existingGroup.seriesId,
+        category: existingGroup.category,
+        brandId: existingGroup.brandId,
+        bottlerId: existingGroup.bottlerId,
+        flavorProfile: existingGroup.flavorProfile,
+        createdByActorId: existingGroup.createdByActorId,
+        ...data,
+      };
+    }
+
     const brand = (
       data.brandId
         ? await tx.query.entities.findFirst({
@@ -395,12 +502,31 @@ export const Bottle = async (
           )
     ) as dbSchema.Entity;
 
-    const name = data.name ?? chooseBottleName();
-
-    const fullName = formatBottleName({
-      ...data,
-      name: `${brand.shortName || brand.name} ${name}`,
-    });
+    const baseName = data.name ?? chooseBottleName();
+    const materializedGroupFields = existingGroup
+      ? materializeConcreteBottleForGroup({
+          group: existingGroup,
+          exact: {
+            edition: data.edition ?? null,
+            statedAge: data.statedAge ?? null,
+            releaseYear: data.releaseYear ?? null,
+            vintageYear: data.vintageYear ?? null,
+            abv: data.abv ?? null,
+            singleCask: data.singleCask ?? null,
+            caskStrength: data.caskStrength ?? null,
+            caskType: data.caskType ?? null,
+            caskSize: data.caskSize ?? null,
+            caskFill: data.caskFill ?? null,
+          },
+        })
+      : null;
+    const name = materializedGroupFields?.name ?? baseName;
+    const fullName =
+      materializedGroupFields?.fullName ??
+      formatBottleName({
+        ...data,
+        name: `${brand.shortName || brand.name} ${baseName}`,
+      });
 
     const createdByActorId =
       data.createdByActorId ??
@@ -414,7 +540,31 @@ export const Bottle = async (
       fullName,
       brandId: brand.id,
       createdByActorId,
+      ...materializedGroupFields,
     };
+
+    if (!legacy && !existingGroup) {
+      bottleData.groupId = (
+        await createBottleGroupFixture(
+          {
+            fullName,
+            name,
+            statedAge: bottleData.statedAge,
+            seriesId: bottleData.seriesId,
+            category: bottleData.category,
+            brandId: brand.id,
+            bottlerId: bottleData.bottlerId,
+            flavorProfile: bottleData.flavorProfile,
+            totalBottles: 1,
+            createdByActorId,
+            distillerIds,
+          },
+          tx,
+        )
+      ).id;
+    } else if (existingGroup) {
+      bottleData.groupId = existingGroup.id;
+    }
 
     const distillerList = distillerIds.length
       ? await tx.query.entities.findMany({
@@ -451,6 +601,21 @@ export const Bottle = async (
 
     if (!bottle) throw new Error("Unable to create Bottle fixture");
 
+    if (!legacy) {
+      await tx
+        .update(bottleGroups)
+        .set(
+          existingGroup
+            ? {
+                representativeBottleId:
+                  existingGroup.representativeBottleId ?? bottle.id,
+                totalBottles: sql`${bottleGroups.totalBottles} + 1`,
+              }
+            : { representativeBottleId: bottle.id },
+        )
+        .where(eq(bottleGroups.id, bottle.groupId as number));
+    }
+
     if (distillerIds.length) {
       for (const d of distillerIds) {
         await tx.insert(bottlesToDistillers).values({
@@ -463,6 +628,7 @@ export const Bottle = async (
     await tx.insert(bottleAliases).values({
       bottleId: bottle.id,
       name: bottle.fullName,
+      assignmentSource: legacy ? "legacy" : "canonical",
       createdAt: bottle.createdAt,
       assignedByActorId: bottle.createdByActorId,
     });
@@ -479,7 +645,65 @@ export const Bottle = async (
 
     return bottle;
   });
+}
+
+/** Creates a complete singleton BottleGroup and Bottle graph. */
+export const Bottle = async (
+  data: BottleFixtureData = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.Bottle> => {
+  return await createBottleFixture(data, db, { legacy: false });
 };
+
+/**
+ * Creates a complete Bottle member inside an existing active group for tests
+ * that need an already-grouped graph without exercising creation authority.
+ */
+export const BottleGroupMember = async (
+  {
+    groupId,
+    ...data
+  }: BottleGroupMemberFixtureData & {
+    groupId: number;
+  },
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.Bottle> => {
+  return await createBottleFixture(data, db, { legacy: false, groupId });
+};
+
+/** Creates pre-flattening Bottle data without a group. */
+export const LegacyBottle = async (
+  data: BottleFixtureData = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.Bottle> => {
+  return await createBottleFixture(data, db, { legacy: true });
+};
+
+async function resolveFixtureBottleId(
+  {
+    bottleId,
+    releaseId,
+  }: {
+    bottleId?: number | null;
+    releaseId?: number | null;
+  },
+  db: AnyDatabase,
+): Promise<number | null> {
+  if (bottleId !== undefined) return bottleId;
+
+  if (releaseId != null) {
+    const release = await db.query.bottleReleases.findFirst({
+      where: eq(dbSchema.bottleReleases.id, releaseId),
+      columns: { bottleId: true },
+    });
+    if (!release) {
+      throw new Error(`BottleRelease fixture does not exist (${releaseId})`);
+    }
+    return release.bottleId;
+  }
+
+  return (await Bottle({}, db)).id;
+}
 
 export const BottleAlias = async (
   { ...data }: Partial<dbSchema.NewBottleAlias> = {},
@@ -490,14 +714,18 @@ export const BottleAlias = async (
       data.assignedByActorId ??
       (await getUserActorByIdForDatabase(tx, (await User({}, tx)).id)).id;
 
+    const bottleId = await resolveFixtureBottleId(data, tx);
+
     return await tx
       .insert(bottleAliases)
       .values({
-        bottleId: data.bottleId || (await Bottle({}, tx)).id,
-        // TODO: this is using the wrong brand name by default
-        name: `${toTitleCase(faker.word.noun())} ${chooseBottleName()}`,
-        createdAt: new Date(),
         ...data,
+        bottleId,
+        // TODO: this is using the wrong brand name by default
+        name:
+          data.name ??
+          `${toTitleCase(faker.word.noun())} ${chooseBottleName()}`,
+        createdAt: data.createdAt ?? new Date(),
         assignedByActorId,
       })
       .returning();
@@ -515,6 +743,10 @@ export const Tasting = async (
     for (let i = 0; i <= random(1, 5); i++) {
       tags.push((await TagOrExisting({}, tx)).name);
     }
+    const bottleId = await resolveFixtureBottleId(data, tx);
+    if (bottleId === null) {
+      throw new Error("Tasting fixture requires a Bottle");
+    }
     const [result] = await tx
       .insert(tastings)
       .values({
@@ -523,18 +755,18 @@ export const Tasting = async (
         tags: tags,
         createdAt: new Date(),
         ...data,
-        bottleId: data.bottleId || (await Bottle({}, tx)).id,
+        bottleId,
         createdById: data.createdById || (await User({}, tx)).id,
       })
       .returning();
 
     if (!result) throw new Error("Unable to create Tasting fixture");
 
-    for (const tag of result.tags) {
+    for (const tag of result.bottleId === null ? [] : result.tags) {
       await tx
         .insert(bottleTags)
         .values({
-          bottleId: result.bottleId,
+          bottleId: result.bottleId!,
           tag,
           count: 1,
         })
@@ -619,7 +851,7 @@ export const Flight = async (
       for (const bottleId of bottles) {
         await tx.insert(flightBottles).values({
           flightId: flight.id,
-          bottleId: bottleId,
+          bottleId,
         });
       }
     }
@@ -713,17 +945,22 @@ export const StorePrice = async (
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.StorePrice> => {
   return await db.transaction(async (tx) => {
+    const bottleId = await resolveFixtureBottleId(data, tx);
+
     if (!data.name) {
-      const bottle = data.bottleId
-        ? await tx.query.bottles.findFirst({
-            where: eq(bottles.id, data.bottleId),
-            with: { brand: true },
-          })
-        : await Bottle({}, tx);
-      if (!bottle) throw new Error("Unexpected");
-      // this lets us pass in something that should match, but hasnt
-      if (data.bottleId === undefined) data.bottleId = bottle.id;
-      data.name = bottle.fullName;
+      const bottle =
+        typeof bottleId === "number"
+          ? await tx.query.bottles.findFirst({
+              where: eq(bottles.id, bottleId),
+              with: { brand: true },
+            })
+          : null;
+      if (typeof bottleId === "number" && !bottle) {
+        throw new Error(`Bottle fixture does not exist (${bottleId})`);
+      }
+      data.name =
+        bottle?.fullName ??
+        `${toTitleCase(faker.word.noun())} ${chooseBottleName(true)}`;
     }
 
     if (!data.price)
@@ -741,15 +978,16 @@ export const StorePrice = async (
 
     if (data.hidden === undefined) data.hidden = false;
 
-    if (data.bottleId === undefined) data.bottleId = (await Bottle({}, tx)).id;
+    data.bottleId = bottleId;
 
     const { rows } = await tx.execute<dbSchema.StorePrice>(
       sql`
-        INSERT INTO ${storePrices} (bottle_id, external_site_id, name, volume, price, currency, url, hidden, image_url, updated_at)
-        VALUES (${data.bottleId}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url}, ${data.hidden}, ${data.imageUrl ?? null}, ${data.updatedAt || sql`NOW()`})
+        INSERT INTO ${storePrices} (bottle_id, release_id, external_site_id, name, volume, price, currency, url, hidden, image_url, updated_at)
+        VALUES (${data.bottleId}, ${data.releaseId ?? null}, ${data.externalSiteId}, ${data.name}, ${data.volume}, ${data.price}, ${data.currency}, ${data.url}, ${data.hidden}, ${data.imageUrl ?? null}, ${data.updatedAt || sql`NOW()`})
         ON CONFLICT (external_site_id, LOWER(name), volume)
         DO UPDATE
-        SET bottle_id = COALESCE(excluded.bottle_id, ${storePrices.bottleId}),
+        SET bottle_id = excluded.bottle_id,
+            release_id = excluded.release_id,
             price = excluded.price,
             currency = excluded.currency,
             url = excluded.url,
@@ -816,20 +1054,28 @@ export const Review = async (
         if (data.bottleId === undefined) data.bottleId = release.bottleId;
         data.name = release.fullName;
       } else {
-        const bottle = data.bottleId
-          ? await tx.query.bottles.findFirst({
-              where: eq(bottles.id, data.bottleId),
-              with: { brand: true },
-            })
-          : await Bottle({}, tx);
-        if (!bottle) throw new Error("Unexpected");
-        // this lets us pass in something that should match, but hasnt
-        if (data.bottleId === undefined) data.bottleId = bottle.id;
-        data.name = bottle.fullName;
+        const bottle =
+          typeof data.bottleId === "number"
+            ? await tx.query.bottles.findFirst({
+                where: eq(bottles.id, data.bottleId),
+                with: { brand: true },
+              })
+            : data.bottleId === undefined
+              ? await Bottle({}, tx)
+              : null;
+        if (typeof data.bottleId === "number" && !bottle) {
+          throw new Error(`Bottle fixture does not exist (${data.bottleId})`);
+        }
+        if (data.bottleId === undefined) data.bottleId = bottle?.id;
+        data.name =
+          bottle?.fullName ??
+          `${toTitleCase(faker.word.noun())} ${chooseBottleName(true)}`;
       }
     } else if (release && data.bottleId === undefined) {
       data.bottleId = release.bottleId;
     }
+
+    data.bottleId = await resolveFixtureBottleId(data, tx);
 
     return await tx
       .insert(reviews)
@@ -967,7 +1213,7 @@ export const BottleRelease = async (
       ? await tx.query.bottles.findFirst({
           where: (table, { eq }) => eq(table.id, data.bottleId as number),
         })
-      : await Bottle({}, tx);
+      : await LegacyBottle({}, tx);
 
     if (!bottle) throw new Error("Unable to find bottle");
 

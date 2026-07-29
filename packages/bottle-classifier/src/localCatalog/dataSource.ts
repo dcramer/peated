@@ -10,15 +10,11 @@ import {
 } from "../classifierTypes";
 import type { BottleReference } from "../contract";
 import { buildDefaultBottleSearchInput } from "../runtime/agentInput";
-import {
-  buildBottleCandidateFromCatalog,
-  buildReleaseCandidateFromCatalog,
-} from "./candidates";
+import { buildBottleCandidateFromCatalog } from "./candidates";
 import {
   LocalCatalogSchema,
   type LocalCatalog,
   type LocalCatalogBottle,
-  type LocalCatalogRelease,
 } from "./schema";
 
 function normalizeSearchText(value: string | null | undefined) {
@@ -69,54 +65,24 @@ function getBottleFullName(catalog: LocalCatalog, bottle: LocalCatalogBottle) {
   );
 }
 
-function getReleaseFullName({
-  catalog,
-  bottle,
-  release,
-}: {
-  catalog: LocalCatalog;
-  bottle: LocalCatalogBottle;
-  release: LocalCatalogRelease;
-}) {
-  return (
-    release.fullName ??
-    [getBottleFullName(catalog, bottle), release.edition]
-      .filter(Boolean)
-      .join(" ")
-      .trim()
-  );
-}
-
 function getAliasForCandidate(
   catalog: LocalCatalog,
   candidate: BottleCandidate,
 ) {
   return (
     catalog.aliases.find(
-      (alias) =>
-        !alias.ignored &&
-        alias.bottleId === candidate.bottleId &&
-        (candidate.releaseId === null
-          ? alias.releaseId === null
-          : alias.releaseId === candidate.releaseId),
+      (alias) => !alias.ignored && alias.bottleId === candidate.bottleId,
     )?.name ?? null
   );
 }
 
-function candidateKey(candidate: BottleCandidate) {
-  return candidate.releaseId === null
-    ? `bottle:${candidate.bottleId}`
-    : `release:${candidate.releaseId}`;
-}
-
 function mergeCandidates(candidates: BottleCandidate[]) {
-  const byKey = new Map<string, BottleCandidate>();
+  const byKey = new Map<number, BottleCandidate>();
 
   for (const candidate of candidates) {
-    const key = candidateKey(candidate);
-    const existing = byKey.get(key);
+    const existing = byKey.get(candidate.bottleId);
     if (!existing) {
-      byKey.set(key, candidate);
+      byKey.set(candidate.bottleId, candidate);
       continue;
     }
 
@@ -154,7 +120,6 @@ function scoreCandidate({
   const searchableText = [
     candidate.alias,
     candidate.fullName,
-    candidate.bottleFullName,
     candidate.brand,
     candidate.series,
     candidate.edition,
@@ -195,19 +160,29 @@ function scoreCandidate({
     score += 0.1;
   }
 
+  const exactTraitPairs = [
+    [args.edition, candidate.edition],
+    [args.abv, candidate.abv],
+    [args.cask_strength, candidate.caskStrength],
+    [args.single_cask, candidate.singleCask],
+    [args.cask_type, candidate.caskType],
+    [args.cask_size, candidate.caskSize],
+    [args.cask_fill, candidate.caskFill],
+    [args.vintage_year, candidate.vintageYear],
+    [args.release_year, candidate.releaseYear],
+  ] as const;
+  for (const [expected, actual] of exactTraitPairs) {
+    if (expected !== null && expected === actual) {
+      score += 0.1;
+    }
+  }
+
   if (
     args.currentBottleId !== null &&
     candidate.bottleId === args.currentBottleId
   ) {
     score += 0.25;
   }
-  if (
-    args.currentReleaseId !== null &&
-    candidate.releaseId === args.currentReleaseId
-  ) {
-    score += 0.25;
-  }
-
   return score;
 }
 
@@ -233,31 +208,6 @@ function buildBottleCandidate({
   });
 }
 
-function buildReleaseCandidate({
-  catalog,
-  bottle,
-  release,
-  alias = null,
-  score,
-  source,
-}: {
-  catalog: LocalCatalog;
-  bottle: LocalCatalogBottle;
-  release: LocalCatalogRelease;
-  alias?: string | null;
-  score: number;
-  source: Array<"exact" | "text" | "brand" | "vector" | "current">;
-}) {
-  return buildReleaseCandidateFromCatalog({
-    catalog,
-    bottle,
-    release,
-    alias,
-    score,
-    source,
-  });
-}
-
 function buildAllCandidates(catalog: LocalCatalog) {
   const candidates: BottleCandidate[] = [];
 
@@ -265,27 +215,6 @@ function buildAllCandidates(catalog: LocalCatalog) {
     const candidate = buildBottleCandidate({
       catalog,
       bottle,
-      alias: null,
-      score: 0,
-      source: ["vector"],
-    });
-    candidates.push({
-      ...candidate,
-      alias: getAliasForCandidate(catalog, candidate),
-    });
-  }
-
-  for (const release of catalog.releases) {
-    const bottle = catalog.bottles.find(
-      (entry) => entry.id === release.bottleId,
-    );
-    if (!bottle) {
-      continue;
-    }
-    const candidate = buildReleaseCandidate({
-      catalog,
-      bottle,
-      release,
       alias: null,
       score: 0,
       source: ["vector"],
@@ -319,26 +248,6 @@ function findExactAliasCandidates({
 
     const bottle = catalog.bottles.find((entry) => entry.id === alias.bottleId);
     if (!bottle) {
-      continue;
-    }
-
-    if (alias.releaseId !== null) {
-      const release = catalog.releases.find(
-        (entry) => entry.id === alias.releaseId,
-      );
-      if (!release) {
-        continue;
-      }
-      candidates.push(
-        buildReleaseCandidate({
-          catalog,
-          bottle,
-          release,
-          alias: alias.name,
-          score: 1,
-          source: ["exact"],
-        }),
-      );
       continue;
     }
 
@@ -397,31 +306,13 @@ function searchCatalogCandidates(
 function getCatalogCandidateById({
   catalog,
   bottleId,
-  releaseId,
 }: {
   catalog: LocalCatalog;
   bottleId: number;
-  releaseId: number | null;
 }) {
   const bottle = catalog.bottles.find((entry) => entry.id === bottleId);
   if (!bottle) {
     return null;
-  }
-
-  if (releaseId !== null) {
-    const release = catalog.releases.find(
-      (entry) => entry.id === releaseId && entry.bottleId === bottleId,
-    );
-    if (!release) {
-      return null;
-    }
-    return buildReleaseCandidate({
-      catalog,
-      bottle,
-      release,
-      score: 1,
-      source: ["current"],
-    });
   }
 
   return buildBottleCandidate({
@@ -520,8 +411,8 @@ export function createLocalCatalogDataSource(
         buildDefaultBottleSearchInput({ reference, extractedIdentity }),
       ),
     searchBottles: async (args) => searchCatalogCandidates(catalog, args),
-    getBottleCandidateById: async (bottleId, releaseId) =>
-      getCatalogCandidateById({ catalog, bottleId, releaseId }),
+    getBottleCandidateById: async (bottleId) =>
+      getCatalogCandidateById({ catalog, bottleId }),
     searchEntities: async (args) => searchCatalogEntities(catalog, args),
   };
 }

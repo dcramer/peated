@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:05:45.481Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Vol 3 whiskey bourbon Bootleg Series"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Vol 3 whiskey bourbon Bootleg Series",
+    "summary": "Heaven’s Door **Bootleg Series Volume III** is a **Kentucky straight bourbon whiskey** in the Heaven’s Door limited “Bootleg Series,” released as **Volume III (2021)**. The producer’s Bootleg Series page identifies Volume III as the 2021 edition. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series?utm_source=",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+        "url": "https://www.drinkhacker.com/2022/06/28/review-heavens-door-777-blend-and-bootleg-series-vol-iii/",
+        "domain": "drinkhacker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "url": "https://thewhiskeywash.com/reviews/whiskey-review-heavens-door-bootleg-series-vol-iii/",
+        "domain": "thewhiskeywash.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/whiskey-collection",
+        "url": "https://www.heavensdoor.com/whiskey-collection",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/home/",
+        "url": "https://www.heavensdoor.com/home/",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "2d257ed024dca8d8a00922f3fd6b50518ae5fb889484abcd0573f9999cf52940",
+    "mode": "auto"
+  }
+}

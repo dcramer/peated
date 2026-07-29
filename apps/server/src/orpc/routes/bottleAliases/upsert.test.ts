@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottles,
+  bottleTombstones,
   reviews,
   storePrices,
 } from "@peated/server/db/schema";
@@ -10,195 +10,252 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 
-// Mock the worker client
 vi.mock("@peated/server/worker/client");
 
-describe("POST /bottle-aliases", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-  });
+beforeEach(() => {
+  vi.resetAllMocks();
+});
 
-  test("creates a new bottle alias", async ({ fixtures }) => {
+describe("PUT /bottle-aliases", () => {
+  test("creates a direct Bottle alias with moderator provenance", async ({
+    fixtures,
+  }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: true });
     const actor = await getUserActor(user);
 
-    const result = await routerClient.bottleAliases.upsert(
-      {
-        bottle: bottle.id,
-        name: "New Alias",
-      },
-      { context: { user } },
-    );
+    await expect(
+      routerClient.bottleAliases.upsert(
+        { bottle: bottle.id, name: "New Direct Alias" },
+        { context: { user } },
+      ),
+    ).resolves.toEqual({});
 
-    expect(result).toEqual({});
-
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "New Alias"),
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "New Direct Alias"),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "human_approved",
+      assignedByActorId: actor.id,
     });
-
-    expect(alias).toBeDefined();
-    expect(alias?.bottleId).toBe(bottle.id);
-    expect(alias?.assignmentSource).toBe("human_approved");
-    expect(alias?.assignedByActorId).toBe(actor.id);
   });
 
-  test("updates store prices with matching name", async ({ fixtures }) => {
+  test("propagates the same Bottle id to unresolved matching consumers", async ({
+    fixtures,
+  }) => {
     const bottle = await fixtures.Bottle();
-    const storePrice = await fixtures.StorePrice({
-      name: "Test Alias",
-      bottleId: null,
-    });
+    const name = "Direct Propagation Alias";
+    const price = await fixtures.StorePrice({ name, bottleId: null });
+    const review = await fixtures.Review({ name, bottleId: null });
     const user = await fixtures.User({ mod: true });
 
     await routerClient.bottleAliases.upsert(
-      {
-        bottle: bottle.id,
-        name: "Test Alias",
-      },
+      { bottle: bottle.id, name },
       { context: { user } },
     );
 
-    const updatedStorePrice = await db.query.storePrices.findFirst({
-      where: eq(storePrices.id, storePrice.id),
-    });
-
-    expect(updatedStorePrice?.bottleId).toBe(bottle.id);
+    await expect(
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).resolves.toMatchObject({ bottleId: bottle.id });
+    await expect(
+      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).resolves.toMatchObject({ bottleId: bottle.id });
   });
 
-  test("updates reviews with matching name", async ({ fixtures }) => {
+  test("assigns an existing unresolved alias and reindexes it", async ({
+    fixtures,
+  }) => {
     const bottle = await fixtures.Bottle();
+    const actor = await getUserActor(await fixtures.User());
+    const [alias] = await db
+      .insert(bottleAliases)
+      .values({
+        name: "Existing Unresolved Alias",
+        bottleId: null,
+        assignedByActorId: actor.id,
+      })
+      .returning();
+    const user = await fixtures.User({ mod: true });
+
+    await routerClient.bottleAliases.upsert(
+      { bottle: bottle.id, name: alias!.name },
+      { context: { user } },
+    );
+
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, alias!.name),
+      }),
+    ).resolves.toMatchObject({
+      bottleId: bottle.id,
+      assignmentSource: "human_approved",
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleAlias", {
+      name: alias!.name,
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSearchVectors",
+      { bottleId: bottle.id },
+    );
+  });
+
+  test("does not overwrite consumers assigned to another Bottle", async ({
+    fixtures,
+  }) => {
+    const selected = await fixtures.Bottle();
+    const existing = await fixtures.Bottle();
+    const name = "Already Assigned Consumer";
+    const price = await fixtures.StorePrice({
+      name,
+      bottleId: existing.id,
+    });
     const review = await fixtures.Review({
-      name: "Test Alias",
-      bottleId: null,
+      name,
+      bottleId: existing.id,
     });
     const user = await fixtures.User({ mod: true });
 
     await routerClient.bottleAliases.upsert(
-      {
-        bottle: bottle.id,
-        name: "Test Alias",
-      },
+      { bottle: selected.id, name },
       { context: { user } },
     );
 
-    const updatedReview = await db.query.reviews.findFirst({
-      where: eq(reviews.id, review.id),
-    });
-
-    expect(updatedReview?.bottleId).toBe(bottle.id);
+    await expect(
+      db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).resolves.toMatchObject({ bottleId: existing.id });
+    await expect(
+      db.query.reviews.findFirst({ where: eq(reviews.id, review.id) }),
+    ).resolves.toMatchObject({ bottleId: existing.id });
   });
 
-  test("updates bottle image if store price has an image", async ({
+  test("fills a missing Bottle image from a matching price", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ imageUrl: null });
-    const storePrice = await fixtures.StorePrice({
-      name: "Test Alias",
+    await fixtures.StorePrice({
+      name: "Direct Image Alias",
       bottleId: null,
-      imageUrl: "https://example.com/image.jpg",
+      imageUrl: "https://example.com/direct-image.jpg",
     });
     const user = await fixtures.User({ mod: true });
 
     await routerClient.bottleAliases.upsert(
-      {
-        bottle: bottle.id,
-        name: "Test Alias",
-      },
+      { bottle: bottle.id, name: "Direct Image Alias" },
       { context: { user } },
     );
 
-    const updatedBottle = await db.query.bottles.findFirst({
-      where: eq(bottles.id, bottle.id),
+    await expect(
+      db.query.bottles.findFirst({
+        where: (bottles, { eq }) => eq(bottles.id, bottle.id),
+      }),
+    ).resolves.toMatchObject({
+      imageUrl: "https://example.com/direct-image.jpg",
     });
-
-    expect(updatedBottle?.imageUrl).toBe("https://example.com/image.jpg");
   });
 
-  test("throws NOT_FOUND for non-existent bottle", async ({ fixtures }) => {
+  test("rejects missing, inactive, and conflicting Bottles", async ({
+    fixtures,
+  }) => {
+    const existing = await fixtures.Bottle();
+    const inactive = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    await fixtures.BottleAlias({
+      bottleId: existing.id,
+      name: "Conflicting Direct Alias",
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: inactive.id,
+      newBottleId: replacement.id,
+    });
     const user = await fixtures.User({ mod: true });
 
-    const err = await waitError(
-      routerClient.bottleAliases.upsert(
-        {
-          bottle: 9999,
-          name: "Test Alias",
-        },
-        { context: { user } },
+    await expect(
+      waitError(
+        routerClient.bottleAliases.upsert(
+          { bottle: 2_147_483_647, name: "Missing Bottle Alias" },
+          { context: { user } },
+        ),
       ),
-    );
-
-    expect(err).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
+    ).resolves.toMatchObject({ status: 404, message: "Bottle not found." });
+    await expect(
+      waitError(
+        routerClient.bottleAliases.upsert(
+          { bottle: inactive.id, name: "Inactive Bottle Alias" },
+          { context: { user } },
+        ),
+      ),
+    ).resolves.toMatchObject({ status: 409 });
+    await expect(
+      waitError(
+        routerClient.bottleAliases.upsert(
+          { bottle: replacement.id, name: "conflicting direct alias" },
+          { context: { user } },
+        ),
+      ),
+    ).resolves.toMatchObject({
+      status: 409,
+      message:
+        'Cannot reserve exact Bottle alias "Conflicting Direct Alias": another_bottle.',
+    });
   });
 
-  test("requires mod permission", async ({ fixtures }) => {
+  test("rejects BottleGroup targeting and requires moderator access", async ({
+    fixtures,
+  }) => {
     const bottle = await fixtures.Bottle();
+    const moderator = await fixtures.User({ mod: true });
     const user = await fixtures.User({ mod: false });
 
-    const err = await waitError(
-      routerClient.bottleAliases.upsert(
-        {
-          bottle: bottle.id,
-          name: "Test Alias",
-        },
-        { context: { user } },
+    await expect(
+      waitError(
+        routerClient.bottleAliases.upsert(
+          {
+            bottle: bottle.id,
+            groupId: bottle.groupId,
+            name: "Group Target Alias",
+          } as never,
+          { context: { user: moderator } },
+        ),
       ),
-    );
+    ).resolves.toMatchObject({ status: 400 });
 
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    await expect(
+      waitError(
+        routerClient.bottleAliases.upsert(
+          { bottle: bottle.id, name: "Unauthorized Alias" },
+          { context: { user } },
+        ),
+      ),
+    ).resolves.toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("throws error for duplicate alias on different bottle", async ({
-    fixtures,
-  }) => {
-    const bottle1 = await fixtures.Bottle();
-    const bottle2 = await fixtures.Bottle();
-    await fixtures.BottleAlias({
-      bottleId: bottle1.id,
-      name: "Duplicate Alias",
-    });
-    const user = await fixtures.User({ mod: true });
-
-    const err = await waitError(
-      routerClient.bottleAliases.upsert(
-        {
-          bottle: bottle2.id,
-          name: "Duplicate Alias",
-        },
-        { context: { user } },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Duplicate alias found (1). Not implemented.]`,
-    );
-  });
-
-  test("does not fail after commit if search indexing enqueue fails", async ({
+  test("keeps the committed assignment when indexing is unavailable", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: true });
-
     vi.mocked(workerClient.pushUniqueJob).mockRejectedValueOnce(
       new Error("Queue unavailable"),
     );
 
-    const result = await routerClient.bottleAliases.upsert(
-      {
-        bottle: bottle.id,
-        name: "Queue Failure Alias",
-      },
-      { context: { user } },
-    );
-
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, "Queue Failure Alias"),
-    });
-
-    expect(result).toEqual({});
-    expect(alias?.bottleId).toBe(bottle.id);
+    await expect(
+      routerClient.bottleAliases.upsert(
+        { bottle: bottle.id, name: "Queue Failure Alias" },
+        { context: { user } },
+      ),
+    ).resolves.toEqual({});
+    await expect(
+      db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "Queue Failure Alias"),
+      }),
+    ).resolves.toMatchObject({ bottleId: bottle.id });
   });
 });

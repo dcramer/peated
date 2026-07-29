@@ -1,5 +1,35 @@
-import type { Entity, NewBottle } from "@peated/server/db/schema";
+import { db } from "@peated/server/db";
+import {
+  tastings,
+  type Entity,
+  type NewBottle,
+  type Tasting,
+} from "@peated/server/db/schema";
 import type * as Fixtures from "@peated/server/lib/test/fixtures";
+import { eq } from "drizzle-orm";
+import { loadBadgeTastings } from "./identity";
+import type { PersistedBadgeTasting } from "./types";
+
+async function hydrateBadgeTasting(tasting: Tasting) {
+  const [hydrated] = await loadBadgeTastings(db, [tasting]);
+  if (!hydrated) throw new Error("Missing hydrated badge Tasting fixture");
+  return hydrated;
+}
+
+export async function getPersistedBadgeTasting(
+  tastingId: number,
+): Promise<PersistedBadgeTasting> {
+  const tasting = await db.query.tastings.findFirst({
+    where: eq(tastings.id, tastingId),
+    columns: {
+      id: true,
+      createdById: true,
+      bottleId: true,
+    },
+  });
+  if (!tasting) throw new Error(`Missing Tasting fixture ${tastingId}`);
+  return tasting;
+}
 
 export async function createTastingForBadge(
   fixtures: typeof Fixtures,
@@ -27,19 +57,5 @@ export async function createTastingForBadge(
     bottleId: bottle.id,
     createdById: userId ?? undefined,
   });
-  return {
-    ...tasting,
-    bottle: {
-      ...bottle,
-      brand,
-      bottler: null,
-      bottlesToDistillers: distillers.length
-        ? distillers.map((d) => ({
-            bottleId: bottle.id,
-            distillerId: d.id,
-            distiller: d,
-          }))
-        : [],
-    },
-  };
+  return await hydrateBadgeTasting(tasting);
 }

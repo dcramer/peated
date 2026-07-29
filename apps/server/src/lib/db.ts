@@ -5,23 +5,10 @@ import { and, eq, getTableColumns, inArray, ne, sql } from "drizzle-orm";
 import type { PgTableWithColumns, TableConfig } from "drizzle-orm/pg-core";
 import { type z } from "zod";
 import type { AnyDatabase } from "../db";
-import type {
-  BottleAlias,
-  BottleAliasAssignmentSource,
-  Collection,
-  Entity,
-  EntityType,
-} from "../db/schema";
-import {
-  bottleAliases,
-  changes,
-  collections,
-  entities,
-  entityAliases,
-} from "../db/schema";
+import type { Collection, Entity, EntityType } from "../db/schema";
+import { changes, collections, entities, entityAliases } from "../db/schema";
 import { type EntityInputSchema, type EntitySchema } from "../schemas";
 import { type EntityInput } from "../types";
-import type { BottleAliasAssignmentOptions } from "./bottleAliases";
 import { getCatalogVerificationCreationMetadata } from "./catalogVerification";
 
 export type UpsertOutcome<T> =
@@ -29,6 +16,7 @@ export type UpsertOutcome<T> =
       id: number;
       result: T;
       created: boolean;
+      changed: boolean;
     }
   | undefined;
 
@@ -174,6 +162,10 @@ export async function findEntityByExactNameOrAlias(
   return entityByAlias?.entity ?? null;
 }
 
+/**
+ * A conditional update elects one role-adding caller; concurrent losers reload
+ * the winning row and report `changed: false`.
+ */
 async function mergeEntityTypeIfNeeded({
   db,
   entity,
@@ -182,18 +174,35 @@ async function mergeEntityTypeIfNeeded({
   db: AnyDatabase;
   entity: Entity;
   type?: EntityType;
-}): Promise<Entity> {
+}): Promise<{ result: Entity; changed: boolean }> {
   if (!type || entity.type.includes(type)) {
-    return entity;
+    return { result: entity, changed: false };
   }
 
   const [updatedEntity] = await db
     .update(entities)
-    .set({ type: [...entity.type, type] })
-    .where(eq(entities.id, entity.id))
+    .set({ type: sql`array_append(${entities.type}, ${type})` })
+    .where(
+      and(
+        eq(entities.id, entity.id),
+        sql`NOT (${type} = ANY(${entities.type}))`,
+      ),
+    )
     .returning();
 
-  return updatedEntity ?? { ...entity, type: [...entity.type, type] };
+  if (updatedEntity) {
+    return { result: updatedEntity, changed: true };
+  }
+
+  const currentEntity = await db.query.entities.findFirst({
+    where: (entities, { eq }) => eq(entities.id, entity.id),
+  });
+  if (!currentEntity) {
+    throw new Error(
+      `Entity ${entity.id} disappeared while adding the ${type} role.`,
+    );
+  }
+  return { result: currentEntity, changed: false };
 }
 
 /**
@@ -309,12 +318,17 @@ export const upsertEntity = async ({
       return undefined;
     }
 
-    const mergedResult = await mergeEntityTypeIfNeeded({
+    const merged = await mergeEntityTypeIfNeeded({
       db,
       entity: result,
       type,
     });
-    return { id: mergedResult.id, result: mergedResult, created: false };
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
   } else if (data.id === null) {
     data.id = undefined;
   }
@@ -327,12 +341,17 @@ export const upsertEntity = async ({
 
   const existingEntity = await findEntityByExactNameOrAlias(db, data.name);
   if (existingEntity) {
-    const mergedEntity = await mergeEntityTypeIfNeeded({
+    const merged = await mergeEntityTypeIfNeeded({
       db,
       entity: existingEntity,
       type,
     });
-    return { id: mergedEntity.id, result: mergedEntity, created: false };
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
   }
 
   const [result] = await db
@@ -371,18 +390,28 @@ export const upsertEntity = async ({
       entity: result,
     });
 
-    return { id: result.id, result, created: true };
+    return {
+      id: result.id,
+      result,
+      created: true,
+      changed: true,
+    };
   }
 
   const resultConflict = await findEntityByExactNameOrAlias(db, data.name);
 
   if (resultConflict) {
-    const mergedEntity = await mergeEntityTypeIfNeeded({
+    const merged = await mergeEntityTypeIfNeeded({
       db,
       entity: resultConflict,
       type,
     });
-    return { id: mergedEntity.id, result: mergedEntity, created: false };
+    return {
+      id: merged.result.id,
+      result: merged.result,
+      created: false,
+      changed: merged.changed,
+    };
   }
   throw new Error("We should never hit this case in upsert");
 };
@@ -468,77 +497,6 @@ async function getLegacyDefaultCollection(
       orderBy: (collections, { asc }) => asc(collections.id),
     })) || null
   );
-}
-
-/**
- * Upserts a bottle alias without stealing an existing target. Targeted aliases
- * default to legacy assertions unless explicit provenance is supplied.
- */
-export async function upsertBottleAlias(
-  db: AnyDatabase,
-  name: string,
-  bottleId: number | null = null,
-  releaseId: number | null = null,
-  options: BottleAliasAssignmentOptions,
-) {
-  const { assignmentSource, assignedByActorId } = options;
-  const hasExplicitAssignmentSource = assignmentSource !== undefined;
-  const nextAssignmentSource = assignmentSource ?? "legacy";
-  const nextAssignedByActorId = assignedByActorId;
-
-  // Preserve existing targets on conflicts. Explicit provenance may update an
-  // already-bound alias only when the incoming target is the same target.
-  const query =
-    bottleId || releaseId
-      ? await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_actor_id)
-      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedByActorId})
-      ON CONFLICT (LOWER(name))
-      DO UPDATE SET
-        bottle_id = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL
-            THEN EXCLUDED.bottle_id
-            ELSE ${bottleAliases.bottleId}
-          END,
-        release_id = CASE
-          WHEN ${bottleAliases.releaseId} IS NULL
-            THEN EXCLUDED.release_id
-            ELSE ${bottleAliases.releaseId}
-          END,
-        assignment_source = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${hasExplicitAssignmentSource}
-            AND ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
-            AND (
-              ${bottleAliases.releaseId} IS NULL
-              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
-            )
-          )
-            THEN EXCLUDED.assignment_source
-            ELSE ${bottleAliases.assignmentSource}
-          END,
-        assigned_by_actor_id = CASE
-          WHEN ${bottleAliases.bottleId} IS NULL OR (
-            ${bottleAliases.bottleId} IS NOT DISTINCT FROM EXCLUDED.bottle_id
-            AND (
-              ${bottleAliases.releaseId} IS NULL
-              OR ${bottleAliases.releaseId} IS NOT DISTINCT FROM EXCLUDED.release_id
-            )
-          )
-            THEN EXCLUDED.assigned_by_actor_id
-            ELSE ${bottleAliases.assignedByActorId}
-          END
-      RETURNING *`,
-        )
-      : await db.execute<BottleAlias>(
-          sql`INSERT INTO ${bottleAliases} (bottle_id, release_id, name, assignment_source, assigned_by_actor_id)
-      VALUES (${bottleId}, ${releaseId}, ${name}, ${nextAssignmentSource}, ${nextAssignedByActorId})
-      ON CONFLICT (LOWER(name))
-      DO UPDATE SET name = ${bottleAliases.name}
-      RETURNING *`,
-        );
-
-  return mapRows(query.rows, bottleAliases)[0];
 }
 
 export function mapRows<T extends TableConfig>(

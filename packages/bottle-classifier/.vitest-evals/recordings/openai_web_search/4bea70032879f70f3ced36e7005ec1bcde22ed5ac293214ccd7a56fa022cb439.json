@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:16:31.856Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Mars Komagatake 2022 edition 50% single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Mars Komagatake 2022 edition 50% single malt",
+    "summary": "Here’s the bottle-specific summary for **Mars Komagatake 2022 Edition Single Malt, 50% ABV**:\n\n- **Producer / bottler:** **Hombo Shuzo / Mars Whisky** official bottling. ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/?utm_source=openai))\n- **Distillery:** **Mars Komagatake Dis",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskeyful.com/reviews/mars-komagatake-2022-edition-single-malt-japanese-whisky",
+        "url": "https://whiskeyful.com/reviews/mars-komagatake-2022-edition-single-malt-japanese-whisky",
+        "domain": "whiskeyful.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+        "url": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://en.jpwhisky.net/komagatake-2022-edition-2-20135/",
+        "url": "https://en.jpwhisky.net/komagatake-2022-edition-2-20135/",
+        "domain": "en.jpwhisky.net",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.divingforpearlsblog.com/2025/03/mars-komagatake-2022-edition.html",
+        "url": "https://www.divingforpearlsblog.com/2025/03/mars-komagatake-2022-edition.html",
+        "domain": "divingforpearlsblog.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4bea70032879f70f3ced36e7005ec1bcde22ed5ac293214ccd7a56fa022cb439",
+    "mode": "auto"
+  }
+}

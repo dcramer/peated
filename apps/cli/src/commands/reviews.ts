@@ -1,11 +1,23 @@
 import { normalizeBottle } from "@peated/bottle-classifier/normalize";
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
-import { bottleAliases, reviews } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { reviews, type Review } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
-import { upsertBottleAlias } from "@peated/server/lib/db";
 import { asc, eq } from "drizzle-orm";
+import { DatabaseError } from "pg";
+
+type ReviewNormalizationUpdate = Pick<Review, "name"> &
+  Partial<Pick<Review, "bottleId">>;
+
+export function buildReviewNormalizationUpdate(
+  name: string,
+  bottleId: number | null,
+): ReviewNormalizationUpdate {
+  return {
+    name,
+    ...(bottleId === null ? {} : { bottleId }),
+  };
+}
 
 const subcommand = program.command("reviews");
 
@@ -27,13 +39,12 @@ subcommand
           isFullName: true,
         });
         if (review.name !== name) {
-          const values: Record<string, any> = {};
-          if (review.name !== name) values.name = name;
-
-          if (!review.bottleId) {
-            const bottleId = await findBottleId(review.name);
-            if (bottleId) review.bottleId = bottleId;
-          }
+          const discoveredBottleId =
+            review.bottleId === null ? await findBottleId(review.name) : null;
+          const values = buildReviewNormalizationUpdate(
+            name,
+            discoveredBottleId,
+          );
 
           console.log(`M: ${review.name} -> ${JSON.stringify(values)}`);
           if (!options.dryRun) {
@@ -45,12 +56,21 @@ subcommand
                   .set(values)
                   .where(eq(reviews.id, review.id));
               });
-            } catch (err: any) {
+            } catch (error) {
+              const databaseError =
+                error instanceof DatabaseError
+                  ? error
+                  : error instanceof Error &&
+                      error.cause instanceof DatabaseError
+                    ? error.cause
+                    : null;
               if (
-                err?.code === "23505" &&
-                err?.constraint === "review_unq_name"
+                databaseError?.code === "23505" &&
+                databaseError.constraint === "review_unq_name"
               ) {
                 await db.delete(reviews).where(eq(reviews.id, review.id));
+              } else {
+                throw error;
               }
             }
           }
@@ -60,33 +80,3 @@ subcommand
       offset += step;
     }
   });
-
-subcommand.command("backfill-aliases").action(async (options) => {
-  const step = 1000;
-  const systemActor = await getPeatedSystemActor();
-  const baseQuery = db.select().from(reviews).orderBy(asc(reviews.id));
-
-  let hasResults = true;
-  let offset = 0;
-  while (hasResults) {
-    hasResults = false;
-    const query = await baseQuery.offset(offset).limit(step);
-    for (const price of query) {
-      if (price.bottleId) {
-        await upsertBottleAlias(db, price.name, price.bottleId, null, {
-          assignedByActorId: systemActor.id,
-        });
-      } else {
-        await db
-          .insert(bottleAliases)
-          .values({
-            name: price.name,
-            assignedByActorId: systemActor.id,
-          })
-          .onConflictDoNothing();
-      }
-      hasResults = true;
-    }
-    offset += step;
-  }
-});

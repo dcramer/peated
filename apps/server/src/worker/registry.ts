@@ -5,8 +5,11 @@ import * as Sentry from "@sentry/node";
 import { applyJobActorContextToSentry } from "./context";
 import { type JobFunction } from "./types";
 
-// instrument a job with Sentry
-function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
+/**
+ * Keeps queue failure semantics and telemetry aligned: handler errors escape to
+ * BullMQ, while a Sentry flush is attempted after successful and failed runs.
+ */
+function instrumentedJob(jobName: string, jobFn: JobFunction) {
   const wrappedJob: JobFunction = async function wrappedJob(
     params,
     context = {},
@@ -15,78 +18,89 @@ function instrumentedJob<T>(jobName: string, jobFn: JobFunction) {
 
     const { traceContext } = context;
 
-    const rv = await Sentry.continueTrace(
-      {
-        sentryTrace: traceContext ? traceContext["sentry-trace"] : undefined,
-        baggage: traceContext?.baggage,
-      },
-      async () => {
-        return withActorContext(context.actor, async () => {
-          return Sentry.withIsolationScope(async (isolationScope) => {
-            applyJobActorContextToSentry(isolationScope, context.actor);
+    try {
+      return await Sentry.continueTrace(
+        {
+          sentryTrace: traceContext ? traceContext["sentry-trace"] : undefined,
+          baggage: traceContext?.baggage,
+        },
+        async () => {
+          return withActorContext(context.actor, async () => {
+            return Sentry.withIsolationScope(async (isolationScope) => {
+              applyJobActorContextToSentry(isolationScope, context.actor);
 
-            return Sentry.withScope(async function (scope) {
-              scope.setContext("job", {
-                name: jobName,
-                id: jobId,
+              return Sentry.withScope(async function (scope) {
+                scope.setContext("job", {
+                  name: jobName,
+                  id: jobId,
+                });
+                scope.setTransactionName(jobName);
+
+                return await Sentry.startSpan(
+                  {
+                    op: "consume default",
+                    name: `bullmq.${jobName.toLowerCase()}`,
+                  },
+                  async (span) => {
+                    span.setAttribute("messaging.operation.type", "process");
+                    span.setAttribute("messaging.operation.name", "consume");
+                    // Jobs registered here currently run on the default queue.
+                    span.setAttribute("messaging.destination.name", "default");
+                    span.setAttribute("messaging.message.id", jobId);
+                    span.setAttribute("messaging.system", "bullmq");
+
+                    logInfo("Running job {jobName} {jobId}", {
+                      extra: {
+                        jobName,
+                        jobId,
+                      },
+                    });
+                    const start = new Date().getTime();
+                    let success = false;
+                    try {
+                      await jobFn(params, context);
+                      success = true;
+                      span.setStatus({
+                        code: 1, // OK
+                      });
+                    } catch (e) {
+                      logError(e);
+                      span.setStatus({
+                        code: 2, // ERROR
+                      });
+                      throw e;
+                    } finally {
+                      const duration = new Date().getTime() - start;
+
+                      logInfo("Job {status} {jobName} {jobId}", {
+                        extra: {
+                          status: success ? "succeeded" : "failed",
+                          jobName,
+                          jobId,
+                          durationMs: duration,
+                        },
+                      });
+                    }
+                  },
+                );
               });
-              scope.setTransactionName(jobName);
-
-              // this is sentry's wrapper
-              return await Sentry.startSpan(
-                {
-                  op: "consume default",
-                  name: `bullmq.${jobName.toLowerCase()}`,
-                },
-                async (span) => {
-                  span.setAttribute("messaging.operation.type", "process");
-                  span.setAttribute("messaging.operation.name", "consume");
-                  // TODO: THIS IS WRONG - it should set from the worker itself but idk that
-                  // we have that data
-                  span.setAttribute("messaging.destination.name", "default");
-                  span.setAttribute("messaging.message.id", jobId);
-                  span.setAttribute("messaging.system", "bullmq");
-
-                  logInfo("Running job {jobName} {jobId}", {
-                    extra: {
-                      jobName,
-                      jobId,
-                    },
-                  });
-                  const start = new Date().getTime();
-                  let success = false;
-                  try {
-                    await jobFn(params, context);
-                    success = true;
-                    span.setStatus({
-                      code: 1, // OK
-                    });
-                  } catch (e) {
-                    logError(e);
-                    span.setStatus({
-                      code: 2, // ERROR
-                    });
-                  }
-
-                  const duration = new Date().getTime() - start;
-
-                  logInfo("Job {status} {jobName} {jobId}", {
-                    extra: {
-                      status: success ? "succeeded" : "failed",
-                      jobName,
-                      jobId,
-                      durationMs: duration,
-                    },
-                  });
-                },
-              );
             });
           });
+        },
+      );
+    } finally {
+      try {
+        await Sentry.flush(2000);
+      } catch (error) {
+        logError(error, {
+          extra: {
+            operation: "sentry.flush",
+            jobName,
+            jobId,
+          },
         });
-      },
-    );
-    await Sentry.flush(2000);
-    return rv;
+      }
+    }
   };
   return wrappedJob;
 }

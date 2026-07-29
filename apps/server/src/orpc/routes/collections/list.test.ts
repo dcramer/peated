@@ -1,81 +1,71 @@
+import { db } from "@peated/server/db";
+import { collectionBottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
 describe("GET /users/:user/collections", () => {
-  test("cannot list private without friend", async ({ defaults, fixtures }) => {
-    const otherUser = await fixtures.User({ private: true });
-
-    const err = await waitError(() =>
-      routerClient.collections.list(
-        {
-          user: otherUser.id,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: User's profile is private.]`);
-  });
-
-  test("can list private with friend", async ({ defaults, fixtures }) => {
-    const otherUser = await fixtures.User({ private: true });
-    await fixtures.Follow({
-      fromUserId: defaults.user.id,
-      toUserId: otherUser.id,
-      status: "following",
-    });
-
-    const { results } = await routerClient.collections.list(
-      {
-        user: otherUser.id,
-      },
-      { context: { user: defaults.user } },
+  test("requires authentication", async () => {
+    const error = await waitError(() =>
+      routerClient.collections.list({ user: "me" }),
     );
 
-    expect(results.length).toEqual(0);
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("can list public without friend", async ({ defaults, fixtures }) => {
-    const otherUser = await fixtures.User({ private: false });
-
-    const { results } = await routerClient.collections.list(
-      {
-        user: otherUser.id,
-      },
-      { context: { user: defaults.user } },
-    );
-
-    expect(results.length).toEqual(0);
-  });
-
-  test("only returns collections for requested user", async ({
+  test("rejects a private profile without friendship", async ({
     defaults,
     fixtures,
   }) => {
-    const otherUser = await fixtures.User({ private: false });
+    const user = await fixtures.User({ private: true });
 
-    // Create a collection for the requested user
-    const userCollection = await fixtures.Collection({
-      name: "User Collection",
-      createdById: otherUser.id,
-    });
+    const error = await waitError(() =>
+      routerClient.collections.list(
+        { user: user.id },
+        { context: { user: defaults.user } },
+      ),
+    );
 
-    // Create a collection for a different user
-    const otherUserCollection = await fixtures.Collection({
-      name: "Other User Collection",
+    expect(error).toMatchInlineSnapshot(`[Error: User's profile is private.]`);
+  });
+
+  test("filters collections by direct Bottle membership", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const selected = await fixtures.Bottle();
+    const other = await fixtures.Bottle();
+    const matching = await fixtures.Collection({
+      name: "Matching",
       createdById: defaults.user.id,
+      totalBottles: 1,
     });
+    const excluded = await fixtures.Collection({
+      name: "Excluded",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values([
+      { collectionId: matching.id, bottleId: selected.id },
+      { collectionId: excluded.id, bottleId: other.id },
+    ]);
 
-    const { results } = await routerClient.collections.list(
-      {
-        user: otherUser.id,
-      },
+    const response = await routerClient.collections.list(
+      { user: "me", bottle: selected.id },
       { context: { user: defaults.user } },
     );
 
-    expect(results.length).toEqual(1);
-    expect(results[0].id).toEqual(userCollection.id);
-    expect(results[0].name).toEqual("User Collection");
-    expect(results.some((c) => c.id === otherUserCollection.id)).toBe(false);
+    expect(response.results.map(({ id }) => id)).toEqual([matching.id]);
+  });
+
+  test("rejects an unknown Bottle filter", async ({ defaults }) => {
+    const error = await waitError(() =>
+      routerClient.collections.list(
+        { user: "me", bottle: Number.MAX_SAFE_INTEGER },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Bottle not found.]`);
   });
 });

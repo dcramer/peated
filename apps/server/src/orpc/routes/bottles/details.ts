@@ -14,7 +14,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceSerializer } from "@peated/server/serializers/storePrice";
-import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
 // Compose details as Bottle schema + extra fields to allow OpenAPI $ref via allOf
@@ -69,8 +69,8 @@ export default procedure
     const [lastPrice] = await db
       .select()
       .from(storePrices)
-      .where(and(eq(storePrices.bottleId, bottle.id)))
-      .orderBy(desc(storePrices.updatedAt))
+      .where(eq(storePrices.bottleId, bottle.id))
+      .orderBy(desc(storePrices.updatedAt), desc(storePrices.id))
       .limit(1);
 
     const [{ count: totalPeople }] = await db
@@ -81,7 +81,9 @@ export default procedure
       .where(eq(tastings.bottleId, bottle.id));
 
     return {
-      ...(await serialize(BottleSerializer, bottle, context.user)),
+      ...(await serialize(BottleSerializer, bottle, context.user, [], {
+        includeGroupSummary: true,
+      })),
       people: Number(totalPeople),
       lastPrice: lastPrice
         ? await serialize(StorePriceSerializer, lastPrice, context.user)

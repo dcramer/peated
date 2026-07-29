@@ -1,15 +1,15 @@
-import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   assignBottleAlias,
-  DuplicateBottleAliasError,
+  BottleAliasBottleInactiveError,
+  BottleAliasBottleNotFoundError,
+  BottleAliasBottleRetiredError,
+  ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleAliasSchema } from "@peated/server/schemas";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -22,20 +22,9 @@ export default procedure
       "Create or update a bottle alias and associate it with a bottle. Updates related prices and reviews. Requires moderator privileges",
     operationId: "upsertBottleAlias",
   })
-  .input(BottleAliasSchema)
+  .input(BottleAliasSchema.strict())
   .output(z.object({}))
   .handler(async function ({ input, context, errors }) {
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, input.bottle));
-
-    if (!bottle) {
-      throw errors.NOT_FOUND({
-        message: "Bottle not found.",
-      });
-    }
-
     try {
       const actor = await getUserActor(context.user);
       await assignBottleAlias(
@@ -52,10 +41,16 @@ export default procedure
         },
       );
     } catch (err) {
-      if (err instanceof DuplicateBottleAliasError) {
-        throw errors.CONFLICT({
-          message: err.message,
-        });
+      if (
+        err instanceof ExactBottleAliasConflictError ||
+        err instanceof BottleAliasBottleInactiveError ||
+        err instanceof BottleAliasBottleRetiredError
+      ) {
+        throw errors.CONFLICT({ message: err.message });
+      }
+
+      if (err instanceof BottleAliasBottleNotFoundError) {
+        throw errors.NOT_FOUND({ message: "Bottle not found." });
       }
 
       throw errors.INTERNAL_SERVER_ERROR({

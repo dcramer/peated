@@ -1,0 +1,72 @@
+{
+  "id": "store-listing-matches-exact-legacy-series-chapter-two-bottle",
+  "name": "store listing: matches the exact Legacy Series Chapter Two Bottle",
+  "input": {
+    "reference": {
+      "name": "Glengoyne The Legacy Series Chapter Two",
+      "url": "https://shop.example/products/glengoyne-legacy-series-chapter-two"
+    },
+    "extractedIdentity": {
+      "brand": "Glengoyne",
+      "bottler": null,
+      "expression": "The Legacy Series",
+      "series": null,
+      "distillery": ["Glengoyne"],
+      "category": "single_malt",
+      "stated_age": null,
+      "abv": 48,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Chapter Two"
+    },
+    "initialCandidates": [
+      {
+        "alias": null,
+        "brand": "Glengoyne",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glengoyne"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 48,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.96,
+        "source": ["exact"],
+        "bottleId": 2083,
+        "fullName": "Glengoyne The Legacy Series Chapter Two"
+      },
+      {
+        "alias": null,
+        "brand": "Glengoyne",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glengoyne"],
+        "category": "single_malt",
+        "statedAge": null,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": 48,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.91,
+        "source": ["text"],
+        "bottleId": 2460,
+        "fullName": "Glengoyne The Legacy Series Chapter One"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 2083,
+    "summary": "Match the independently complete Glengoyne Legacy Series Chapter Two Bottle instead of the Chapter One sibling."
+  }
+}

@@ -9,6 +9,7 @@ import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { buildConcreteBottleUpdateInput } from "./buildConcreteBottleUpdateInput";
 
 export default function Page(props: { params: Promise<{ bottleId: string }> }) {
   const params = use(props.params);
@@ -24,8 +25,10 @@ export default function Page(props: { params: Promise<{ bottleId: string }> }) {
 
 function BottleEditForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
-  const { data: bottle } = useSuspenseQuery(
-    orpc.bottles.details.queryOptions({ input: { bottle: Number(bottleId) } }),
+  const { data: context } = useSuspenseQuery(
+    orpc.bottles.editContext.queryOptions({
+      input: { bottle: Number(bottleId) },
+    }),
   );
   const router = useRouter();
   const bottleUpdateMutation = useMutation(
@@ -38,21 +41,24 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
 
   return (
     <BottleForm
-      onSubmit={async ({ image, ...data }) => {
+      onSubmit={async (value, meta) => {
+        const { image } = value;
         await bottleUpdateMutation.mutateAsync({
-          bottle: bottle.id,
-          image: image === null ? null : undefined,
-          ...data,
+          bottle: context.bottleId,
+          ...buildConcreteBottleUpdateInput(value, meta),
         });
 
         if (image) {
           try {
             await bottleImageUpdateMutation.mutateAsync({
-              bottle: bottle.id,
+              bottle: context.bottleId,
               file: await toBlob(image),
             });
           } catch (err) {
-            logError(err);
+            logError(err, {
+              context: "bottle_edit_image_upload",
+              extra: { bottleId: context.bottleId },
+            });
             flash(
               "There was an error uploading your image, but the bottle was saved.",
               "error",
@@ -62,8 +68,13 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
 
         router.push(`/bottles/${bottleId}`);
       }}
-      initialData={bottle}
-      showBottleReleaseDetails
+      initialData={{
+        ...context.shared,
+        ...context.exact,
+        statedAge: context.shared.statedAge,
+      }}
+      exactStatedAge={context.exact.statedAge}
+      sharedIdentityBottleCount={context.totalBottles}
       title="Edit Bottle"
     />
   );

@@ -15,7 +15,6 @@ import { db } from "../db";
 import {
   comments,
   users,
-  type Bottle,
   type Comment,
   type Tasting,
   type User,
@@ -23,13 +22,13 @@ import {
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signPayload } from "./auth";
 import { logError, logInfo } from "./log";
+import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
 
 let mailTransport: Transporter<SMTPTransport.SentMessageInfo>;
 
 type CommentWithRelations = Comment & {
   createdBy: User;
   tasting: Tasting & {
-    bottle: Bottle;
     createdBy: User;
   };
 };
@@ -93,6 +92,23 @@ export async function notifyComment({
   // dont notify self
   if (comment.createdById === comment.tasting.createdById) return;
 
+  if (comment.tasting.bottleId === null) {
+    throw new Error(`Tasting ${comment.tasting.id} has no Bottle`);
+  }
+  const bottle = await db.transaction(async (tx) => {
+    await resolveActiveBottleIds(tx, [comment.tasting.bottleId!]);
+    return tx.query.bottles.findFirst({
+      where: (bottles, { eq }) => eq(bottles.id, comment.tasting.bottleId!),
+      columns: { fullName: true },
+    });
+  });
+  if (!bottle) {
+    throw new Error(
+      `Tasting ${comment.tasting.id} references missing Bottle ${comment.tasting.bottleId}`,
+    );
+  }
+  const bottleFullName = bottle.fullName;
+
   const userIds =
     comment.createdById === comment.tasting.createdById
       ? []
@@ -133,7 +149,21 @@ export async function notifyComment({
   const commentUrl = `${config.URL_PREFIX}/tastings/${comment.tasting.id}#c_${comment.id}`;
 
   const html = await render(
-    NewCommentTemplate({ baseUrl: config.URL_PREFIX, comment }),
+    NewCommentTemplate({
+      baseUrl: config.URL_PREFIX,
+      comment: {
+        id: comment.id,
+        comment: comment.comment,
+        createdBy: {
+          username: comment.createdBy.username,
+          pictureUrl: comment.createdBy.pictureUrl,
+        },
+        tasting: {
+          id: comment.tasting.id,
+          bottleFullName,
+        },
+      },
+    }),
   );
 
   logInfo("Sending comment notification email for comment {commentId}", {
@@ -149,7 +179,7 @@ export async function notifyComment({
         ...getMailDefaults(),
         to: email,
         subject: "New Comment on Tasting",
-        text: `View this comment on Peated: ${commentUrl}\n\n${comment.comment}`,
+        text: `View this comment on Peated: ${commentUrl}\n\n${bottleFullName}\n\n${comment.comment}`,
         html,
       });
     } catch (err) {

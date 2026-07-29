@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T18:45:27.945Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye abv barrel proof rye"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye abv barrel proof rye",
+    "summary": "Wild Turkey **Rare Breed Rye** is a **barrel proof rye whiskey** bottled at **56.1% ABV (112.2 proof)**, according to Wild Turkey’s official product page. Wild Turkey also describes it as **uncut** and **non-chill filtered**. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+        "url": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wineenthusiast.com/buying-guide/wild-turkey-rare-breed-barrel-proof-rye/",
+        "url": "https://www.wineenthusiast.com/buying-guide/wild-turkey-rare-breed-barrel-proof-rye/",
+        "domain": "wineenthusiast.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "url": "https://distiller.com/spirits/wild-turkey-rare-breed-rye",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d77ef8475b62e8ff038fc78482f5bf0954e9605c2822421404c1559515ff3833",
+    "mode": "auto"
+  }
+}

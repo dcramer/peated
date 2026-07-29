@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleReleases,
-  bottles,
-  collectionBottles,
-} from "@peated/server/db/schema";
+import { bottles, collectionBottles } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
@@ -28,10 +24,6 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
     const bottle = await fixtures.Bottle({
       imageUrl: "/uploads/bottles/canonical.webp",
     });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      imageUrl: "/uploads/bottle-releases/canonical-release.webp",
-    });
     const libraryCollection = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
@@ -41,7 +33,6 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: release.id,
         imageUrl: "/uploads/collection-bottles/old.webp",
       })
       .returning();
@@ -63,7 +54,8 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
     );
 
     expect(result.id).toBe(entry.id);
-    expect(result.release?.id).toBe(release.id);
+    expect(result.bottle.id).toBe(bottle.id);
+    expect(result).not.toHaveProperty("target");
     expect(result.imageUrl).toContain("/uploads/collection-bottles/");
 
     const [updatedEntry] = await db
@@ -73,17 +65,52 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
     const canonicalBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
     });
-    const canonicalRelease = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, release.id),
-    });
 
     expect(updatedEntry.imageUrl).toMatch(
       /^\/uploads\/collection-bottles\/collection_bottle-\d+-pending-upload-.+\.webp$/,
     );
     expect(canonicalBottle?.imageUrl).toBe("/uploads/bottles/canonical.webp");
-    expect(canonicalRelease?.imageUrl).toBe(
-      "/uploads/bottle-releases/canonical-release.webp",
+  });
+
+  test("returns the Bottle after replacing its entry image", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const [entry] = await db
+      .insert(collectionBottles)
+      .values({
+        collectionId: libraryCollection.id,
+        bottleId: bottle.id,
+      })
+      .returning();
+    const pendingUpload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+      onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
+    });
+
+    const result = await routerClient.collections.bottles.imageUpdate(
+      {
+        user: "me",
+        collection: "library",
+        collectionBottle: entry.id,
+        pendingImageId: pendingUpload.id,
+      },
+      { context: { user: defaults.user } },
     );
+
+    expect(result).toMatchObject({
+      id: entry.id,
+      bottle: { id: bottle.id },
+    });
+    expect(result).not.toHaveProperty("target");
+    expect(result.imageUrl).toContain("/uploads/collection-bottles/");
   });
 
   test("rejects replacing another user's library entry image", async ({
@@ -101,7 +128,6 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
       .values({
         collectionId: otherLibraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
     const pendingUpload = await createPendingImageUpload({
@@ -142,7 +168,6 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
         imageUrl: "/uploads/collection-bottles/existing.webp",
       })
       .returning();
@@ -191,7 +216,6 @@ describe("PUT /users/:user/collections/:collection/bottles/:collectionBottle/ima
       .values({
         collectionId: defaultCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
     const pendingUpload = await createPendingImageUpload({

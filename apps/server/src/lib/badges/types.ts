@@ -1,18 +1,28 @@
-import type {
-  Bottle,
-  BottlesToDistillers,
-  Entity,
-  Tasting,
-} from "@peated/server/db/schema";
+import type { Entity, Tasting } from "@peated/server/db/schema";
+import type { Category } from "@peated/server/types";
 
-export type TastingWithRelations = Tasting & {
-  bottle: Bottle & {
-    brand: Entity;
-    bottler: Entity | null;
-    bottlesToDistillers: (BottlesToDistillers & {
-      distiller: Entity;
-    })[];
-  };
+export type PersistedBadgeTasting = Pick<
+  Tasting,
+  "id" | "createdById" | "bottleId"
+>;
+
+export type BadgeIdentityEntity = Pick<Entity, "id" | "countryId" | "regionId">;
+
+type BadgeIdentityBase = {
+  statedAge: number | null;
+  category: Category | null;
+  brand: BadgeIdentityEntity;
+  bottler: BadgeIdentityEntity | null;
+  distillers: BadgeIdentityEntity[];
+};
+
+export type BadgeIdentity = BadgeIdentityBase & {
+  kind: "bottle";
+  bottleId: number;
+};
+
+export type BadgeTasting = Pick<Tasting, "id" | "createdById"> & {
+  identity: BadgeIdentity;
 };
 
 export type TrackedObject = {

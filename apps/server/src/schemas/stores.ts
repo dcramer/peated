@@ -9,10 +9,10 @@ import { ExternalSiteSchema } from "./externalSites";
 export const StorePriceSchema = z.object({
   id: z.number().describe("Unique identifier for the store price"),
   name: z.string().describe("Name of the product as listed by the store"),
-  price: z.number().describe("Current price of the bottle"),
+  price: z.number().describe("Current price of the listing"),
   currency: CurrencyEnum.describe("Currency of the price"),
   url: z.string().describe("URL to the product page"),
-  volume: z.number().describe("Volume of the bottle in milliliters"),
+  volume: z.number().describe("Listed volume in milliliters"),
   site: ExternalSiteSchema.optional().describe(
     "External site where this price is listed",
   ),
@@ -32,6 +32,9 @@ export const StorePriceSchema = z.object({
     .boolean()
     .readonly()
     .describe("Whether this price listing is still valid"),
+  bottle: BottleSchema.nullable().describe(
+    "Bottle associated with this listing, or null when unresolved",
+  ),
 });
 
 export const StorePriceInputSchema = z.object({
@@ -40,14 +43,14 @@ export const StorePriceInputSchema = z.object({
     .trim()
     .min(1, "Required")
     .describe("Name of the product as listed by the store"),
-  price: z.number().describe("Current price of the bottle"),
+  price: z.number().describe("Current price of the listing"),
   currency: CurrencyEnum.describe("Currency of the price"),
   volume: z
     .number()
     .refine((val) => ALLOWED_VOLUMES.includes(val), {
       message: `Volume must be one of: ${ALLOWED_VOLUMES.join(", ")}`,
     })
-    .describe("Volume of the bottle in milliliters"),
+    .describe("Listed volume in milliliters"),
   url: z
     .string()
     .trim()
@@ -64,10 +67,16 @@ export const StorePriceInputSchema = z.object({
     .describe("Optional URL to the product image"),
 });
 
-export const BottlePriceChangeSchema = z.object({
-  id: z.number().describe("Unique identifier for the price change"),
-  price: z.number().describe("New price of the bottle"),
-  previousPrice: z.number().describe("Previous price of the bottle"),
-  currency: CurrencyEnum.describe("Currency of the prices"),
-  bottle: BottleSchema.nullable().describe("The bottle whose price changed"),
+export const PriceChangeSchema = z.object({
+  id: z.number().describe("Bottle identifier for the price change"),
+  price: z.number().describe("New average price for the Bottle"),
+  previousPrice: z.number().describe("Previous average price for the Bottle"),
+  currency: CurrencyEnum.describe("Currency of the Bottle prices"),
+  bottle: BottleSchema.describe("Bottle whose price changed"),
+  isLibrary: z
+    .boolean()
+    .describe("Whether the current user has this Bottle in their Library"),
+  hasTasted: z
+    .boolean()
+    .describe("Whether the current user has tasted this Bottle"),
 });

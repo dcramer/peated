@@ -6,9 +6,12 @@ import {
   BADGE_TRACKER_LIST,
 } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { BadgeCheckInputSchema } from "@peated/server/schemas";
-import { BadgeCheckSchema, BadgeInputSchema } from "@peated/server/schemas";
-import type { BadgeCheck, BadgeCheckType } from "@peated/server/types";
+import {
+  BadgeCheckInputSchema,
+  BadgeCheckSchema,
+  BadgeInputSchema,
+} from "@peated/server/schemas";
+import type { BadgeCheckType } from "@peated/server/types";
 import { type Badge } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -18,7 +21,7 @@ import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
-import type { z } from "zod";
+import { z } from "zod";
 import Button from "../button";
 import Form from "../form";
 import ImageField from "../imageField";
@@ -31,7 +34,36 @@ import EntityCheckConfigForm from "./badgeConfigForms/entityCheckConfigForm";
 import RegionCheckConfigForm from "./badgeConfigForms/regionCheckConfigForm";
 import AdminSidebar from "./sidebar";
 
-type FormSchemaType = z.infer<typeof BadgeInputSchema>;
+const BadgeFormInputSchema = BadgeInputSchema.extend({
+  checks: z
+    .array(BadgeCheckInputSchema)
+    .min(1, "At least one check is required.")
+    .superRefine((checks, context) => {
+      checks.forEach((check, index) => {
+        const result = BadgeCheckSchema.safeParse(check);
+        if (!result.success) {
+          result.error.issues.forEach((issue) => {
+            context.addIssue({ ...issue, path: [index, ...issue.path] });
+          });
+        }
+      });
+    }),
+});
+
+type FormSchemaType = z.infer<typeof BadgeFormInputSchema>;
+type BadgeCheckInput = z.infer<typeof BadgeCheckInputSchema>;
+type BadgeCheckItem = BadgeCheckInput & { id: number };
+
+function createBadgeCheckItem(
+  type: BadgeCheckType,
+  id: number,
+): BadgeCheckItem {
+  return { ...BadgeCheckInputSchema.parse({ type, config: {} }), id };
+}
+
+function withoutItemId({ id: _id, ...check }: BadgeCheckItem): BadgeCheckInput {
+  return check;
+}
 
 export default function BadgeForm({
   onSubmit,
@@ -43,8 +75,7 @@ export default function BadgeForm({
   edit = false,
 }: {
   onSubmit: SubmitHandler<
-    FormSchemaType & {
-      checks: BadgeCheck[];
+    z.infer<typeof BadgeInputSchema> & {
       image: HTMLCanvasElement | null;
     }
   >;
@@ -59,14 +90,14 @@ export default function BadgeForm({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
-    resolver: zodResolver(BadgeInputSchema),
+    resolver: zodResolver(BadgeFormInputSchema),
     defaultValues: initialData,
   });
 
   const [error, setError] = useState<string | undefined>();
   const [image, setImage] = useState<HTMLCanvasElement | null>(null);
   const [checks, setChecks] = useState<{
-    items: (z.infer<typeof BadgeCheckInputSchema> & { id: number })[];
+    items: BadgeCheckItem[];
     counter: number;
   }>({
     items: (initialData.checks || []).map((c, i) => ({ ...c, id: i })),
@@ -75,15 +106,10 @@ export default function BadgeForm({
 
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      const parsedChecks: BadgeCheck[] = [];
-      for (const check of checks.items) {
-        // TODO: handle errors
-        parsedChecks.push(BadgeCheckSchema.parse(check));
-      }
+      const parsedData = BadgeInputSchema.parse(data);
 
       await onSubmit({
-        ...data,
-        checks: parsedChecks,
+        ...parsedData,
         image,
       });
     } catch (err) {
@@ -190,6 +216,15 @@ export default function BadgeForm({
 
       <div className="mb-4 mt-4 border-y border-slate-800 sm:rounded sm:border">
         <Legend title="Checks" />
+        {errors.checks && (
+          <div className="px-5 pt-4">
+            <FormError
+              values={[
+                "Add at least one check and complete each check's required fields.",
+              ]}
+            />
+          </div>
+        )}
         <div className="mb-8 mt-4 flex flex-wrap items-center gap-2 px-5">
           <div className="font-bold">Add:</div>
           {BADGE_CHECK_TYPE_LIST.map((t) => {
@@ -202,28 +237,15 @@ export default function BadgeForm({
 
                   setChecks((value) => {
                     const counter = value.counter + 1;
+                    const items = [
+                      ...value.items,
+                      createBadgeCheckItem(t, counter),
+                    ];
 
-                    setValue("checks", [
-                      ...checks.items.map(({ type, config }) => ({
-                        type,
-                        config,
-                      })),
-                      {
-                        type: t,
-                        config: {},
-                      },
-                    ]);
+                    setValue("checks", items.map(withoutItemId));
 
                     return {
-                      ...value,
-                      items: [
-                        ...value.items,
-                        {
-                          id: counter,
-                          type: t,
-                          config: {},
-                        },
-                      ],
+                      items,
                       counter,
                     };
                   });
@@ -275,7 +297,7 @@ export default function BadgeForm({
                               "checks",
                               checks.items
                                 .filter((v) => v.id !== check.id)
-                                .map(({ type, config }) => ({ type, config })),
+                                .map(withoutItemId),
                             );
 
                             setChecks((value) => {
@@ -293,15 +315,15 @@ export default function BadgeForm({
                       </div>
                     </div>
                     {renderBadgeConfig({
-                      checkType: check.type,
-                      onChange: (data) => {
+                      check,
+                      onChange: (updatedCheck) => {
                         setValue(
                           "checks",
                           checks.items.map((c) => {
                             if (c.id === check.id) {
-                              return { type: c.type, config: data };
+                              return withoutItemId(updatedCheck);
                             }
-                            return { type: c.type, config: c.config };
+                            return withoutItemId(c);
                           }),
                         );
                         setChecks((value) => {
@@ -309,14 +331,13 @@ export default function BadgeForm({
                             ...value,
                             items: value.items.map((c) => {
                               if (c.id === check.id) {
-                                return { ...c, config: data };
+                                return updatedCheck;
                               }
                               return c;
                             }),
                           };
                         });
                       },
-                      initialData: check.config,
                     })}
                   </div>
                 </li>
@@ -330,37 +351,47 @@ export default function BadgeForm({
 }
 
 function renderBadgeConfig({
-  checkType,
-  initialData,
+  check,
   onChange,
 }: {
-  checkType: BadgeCheckType;
-  onChange: (data: Record<string, any>) => void;
-  initialData: Record<string, any>;
+  check: BadgeCheckItem;
+  onChange: (check: BadgeCheckItem) => void;
 }) {
-  switch (checkType) {
+  switch (check.type) {
     case "age":
       return (
-        <AgeCheckConfigForm onChange={onChange} initialData={initialData} />
+        <AgeCheckConfigForm
+          onChange={(config) => onChange({ ...check, config })}
+          initialData={check.config}
+        />
       );
     case "bottle":
       return (
-        <BottleCheckConfigForm onChange={onChange} initialData={initialData} />
+        <BottleCheckConfigForm
+          onChange={(config) => onChange({ ...check, config })}
+          initialData={check.config}
+        />
       );
     case "category":
       return (
         <CategoryCheckConfigForm
-          onChange={onChange}
-          initialData={initialData}
+          onChange={(config) => onChange({ ...check, config })}
+          initialData={check.config}
         />
       );
     case "entity":
       return (
-        <EntityCheckConfigForm onChange={onChange} initialData={initialData} />
+        <EntityCheckConfigForm
+          onChange={(config) => onChange({ ...check, config })}
+          initialData={check.config}
+        />
       );
     case "region":
       return (
-        <RegionCheckConfigForm onChange={onChange} initialData={initialData} />
+        <RegionCheckConfigForm
+          onChange={(config) => onChange({ ...check, config })}
+          initialData={check.config}
+        />
       );
     case "everyTasting":
       return;

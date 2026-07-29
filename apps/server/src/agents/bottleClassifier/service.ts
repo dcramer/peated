@@ -3,18 +3,19 @@ import type {
   BottleReference,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
-import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
+import {
+  BottleCandidateSchema,
+  createDecidedBottleClassification,
+} from "@peated/bottle-classifier/contract";
 import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
 import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
 import {
-  BottleCandidateSchema,
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
-  type BottleCandidate,
   type SearchEntitiesArgs,
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
-import { findBottleTarget } from "@peated/server/lib/bottleFinder";
+import { findBottleId } from "@peated/server/lib/bottleFinder";
 import {
   findBottleReferenceCandidates,
   getBottleCandidateById,
@@ -29,105 +30,6 @@ import { absoluteUrl } from "@peated/server/lib/urls";
 import { randomUUID } from "node:crypto";
 
 let bottleClassifier: ReturnType<typeof createBottleClassifier> | null = null;
-
-function withoutCaskFields(value: Record<string, unknown>) {
-  const {
-    caskType: _caskType,
-    caskSize: _caskSize,
-    caskFill: _caskFill,
-    ...rest
-  } = value;
-  return rest;
-}
-
-function withoutExtractedCaskFields<T extends object>(
-  value: T | null | undefined,
-) {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  const {
-    cask_type: _caskType,
-    cask_size: _caskSize,
-    cask_fill: _caskFill,
-    ...rest
-  } = value as T & {
-    cask_type?: unknown;
-    cask_size?: unknown;
-    cask_fill?: unknown;
-  };
-
-  return rest;
-}
-
-function withoutCaskTraitFields(value: unknown) {
-  return value !== "caskType" && value !== "caskSize" && value !== "caskFill";
-}
-
-function toClassifierCandidate(candidate: unknown): BottleCandidate {
-  const { familyContext, ...rest } = withoutCaskFields(
-    candidate as Record<string, unknown>,
-  );
-  const normalizedFamilyContext =
-    familyContext && typeof familyContext === "object"
-      ? {
-          ...(familyContext as Record<string, unknown>),
-          parentBottleReleaseTraits: (
-            ((familyContext as Record<string, unknown>)
-              .parentBottleReleaseTraits as unknown[]) ?? []
-          ).filter(withoutCaskTraitFields),
-          siblingReleases: (
-            ((familyContext as Record<string, unknown>)
-              .siblingReleases as unknown[]) ?? []
-          ).map((sibling) => {
-            const siblingRest = withoutCaskFields(
-              sibling as Record<string, unknown>,
-            );
-            return {
-              ...siblingRest,
-              traitFields: (
-                (siblingRest.traitFields as unknown[]) ?? []
-              ).filter(withoutCaskTraitFields),
-            };
-          }),
-          siblingBottles: (
-            ((familyContext as Record<string, unknown>)
-              .siblingBottles as unknown[]) ?? []
-          ).map((sibling) => {
-            const siblingRest = withoutCaskFields(
-              sibling as Record<string, unknown>,
-            );
-            return {
-              ...siblingRest,
-              traitFields: (
-                (siblingRest.traitFields as unknown[]) ?? []
-              ).filter(withoutCaskTraitFields),
-            };
-          }),
-        }
-      : familyContext;
-
-  return BottleCandidateSchema.parse({
-    ...rest,
-    familyContext: normalizedFamilyContext,
-  });
-}
-
-function toClassifierCandidates(candidates: unknown[]): BottleCandidate[] {
-  return candidates.map(toClassifierCandidate);
-}
-
-function withLegacyCaskIdentityDefaults<T extends object>(identity: T | null) {
-  return identity === null
-    ? null
-    : {
-        ...identity,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
-      };
-}
 
 async function searchBottleClassifierEntities(args: SearchEntitiesArgs) {
   const parsedArgs = SearchEntitiesArgsSchema.parse(args);
@@ -189,22 +91,15 @@ export function getBottleClassifier() {
     firecrawlApiUrl: config.FIRECRAWL_API_URL,
     adapters: {
       findInitialCandidates: async ({ reference, extractedIdentity }) =>
-        toClassifierCandidates(
-          await findBottleReferenceCandidates(
-            {
-              name: reference.name,
-              bottleId: reference.currentBottleId ?? null,
-              releaseId: reference.currentReleaseId ?? null,
-            },
-            withLegacyCaskIdentityDefaults(extractedIdentity),
-          ),
+        await findBottleReferenceCandidates(
+          {
+            name: reference.name,
+            bottleId: reference.currentBottleId ?? null,
+          },
+          extractedIdentity,
         ),
-      searchBottles: async (args) =>
-        toClassifierCandidates(await searchBottleCandidates(args)),
-      getBottleCandidateById: async (bottleId, releaseId) => {
-        const candidate = await getBottleCandidateById(bottleId, releaseId);
-        return candidate ? toClassifierCandidate(candidate) : null;
-      },
+      searchBottles: searchBottleCandidates,
+      getBottleCandidateById,
       searchEntities: searchBottleClassifierEntities,
     },
   });
@@ -236,15 +131,12 @@ async function identifyExactAliasReference({
 }: {
   input: ClassifyBottleReferenceInput;
 }): Promise<BottleClassificationResult | null> {
-  const target = await findBottleTarget(input.reference.name);
-  if (!target) {
+  const bottleId = await findBottleId(input.reference.name);
+  if (bottleId === null) {
     return null;
   }
 
-  const candidate = await getBottleCandidateById(
-    target.bottleId,
-    target.releaseId,
-  );
+  const candidate = await getBottleCandidateById(bottleId);
   if (!candidate) {
     return null;
   }
@@ -254,13 +146,12 @@ async function identifyExactAliasReference({
       action: "match",
       rationale:
         "Stored bottle alias exactly matched the extracted label reference.",
-      candidateBottleIds: [target.bottleId],
+      candidateBottleIds: [bottleId],
       identityScope: "product",
       observation: null,
       identityBasis: {
         bottleTraits: ["literal stored alias"],
-        releaseTraits:
-          target.releaseId === null ? [] : ["literal stored alias"],
+        releaseTraits: [],
         observationTraits: [],
         yearInterpretation: "none",
         siblingEvidence: "none",
@@ -274,20 +165,17 @@ async function identifyExactAliasReference({
         toolsUsed: ["initial_local_candidates"],
         webEvidence: "not_needed",
       },
-      matchedBottleId: target.bottleId,
-      matchedReleaseId: target.releaseId,
-      parentBottleId: null,
+      matchedBottleId: bottleId,
       proposedBottle: null,
-      proposedRelease: null,
     },
     artifacts: {
-      extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
+      extractedIdentity: input.extractedIdentity ?? null,
       imageEvidence: input.imageEvidence ?? null,
       candidates: [
-        {
-          ...toClassifierCandidate(candidate),
+        BottleCandidateSchema.parse({
+          ...candidate,
           source: Array.from(new Set([...candidate.source, "exact"])),
-        },
+        }),
       ],
       searchEvidence: [],
       resolvedEntities: [],
@@ -318,13 +206,10 @@ function createLocalIdentificationNoMatch(
         webEvidence: "not_used",
       },
       matchedBottleId: null,
-      matchedReleaseId: null,
-      parentBottleId: null,
       proposedBottle: null,
-      proposedRelease: null,
     },
     artifacts: {
-      extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
+      extractedIdentity: input.extractedIdentity ?? null,
       imageEvidence: input.imageEvidence ?? null,
       candidates: [],
       searchEvidence: [],
@@ -348,7 +233,6 @@ export async function identifyExistingBottleReference(
   const normalizedInput = {
     ...input,
     conversationId,
-    extractedIdentity: withoutExtractedCaskFields(input.extractedIdentity),
     reference,
   };
 

@@ -6,22 +6,21 @@ import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
 import TextField from "@peated/web/components/textField";
+import {
+  bottleToFlightOption,
+  flightMembershipChanged,
+  getFlightBottleIds,
+  type FlightBottleOption,
+} from "@peated/web/lib/flightForm";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import Form from "./form";
-import SelectField, { type Option } from "./selectField";
-
-const bottleToOption = (bottle: Bottle): Option => {
-  return {
-    id: bottle.id,
-    name: bottle.fullName,
-  };
-};
+import SelectField from "./selectField";
 
 type FormSchemaType = z.infer<typeof FlightInputSchema>;
 
@@ -35,12 +34,11 @@ export default function FlightForm({
     name?: string;
     description?: string | null;
     public?: boolean;
-    bottles?: Bottle[];
+    bottles?: { bottle: Bottle }[];
   };
   title: string;
 }) {
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -49,25 +47,32 @@ export default function FlightForm({
     defaultValues: {
       name: initialData.name,
       description: initialData.description,
-      bottles: initialData.bottles ? initialData.bottles.map((d) => d.id) : [],
     },
   });
 
   const [error, setError] = useState<string | undefined>();
 
+  const bottles = (initialData.bottles ?? []).map(({ bottle }) => bottle);
+  const initialBottleIds = getFlightBottleIds(bottles);
+  const [bottlesValue, setBottlesValue] = useState<FlightBottleOption[]>(
+    bottles.map(bottleToFlightOption),
+  );
+
   const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
     try {
-      await onSubmit(data);
+      const selectedBottleIds = bottlesValue.map(({ id }) => id);
+      await onSubmit({
+        ...data,
+        ...(flightMembershipChanged(initialBottleIds, selectedBottleIds)
+          ? { bottles: selectedBottleIds }
+          : {}),
+      });
     } catch (err) {
       setError(getFormErrorMessage(err));
     }
   };
 
   const orpc = useORPC();
-
-  const [bottlesValue, setBottlesValue] = useState<Option[]>(
-    initialData.bottles ? initialData.bottles.map(bottleToOption) : [],
-  );
 
   return (
     <FormScreen
@@ -101,31 +106,24 @@ export default function FlightForm({
             placeholder="e.g. 12-year-old"
           />
 
-          <Controller
-            name="bottles"
-            control={control}
-            render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
-                label="Bottles"
-                {...field}
-                error={errors.bottles}
-                onQuery={async (query) => {
-                  const { results } = await orpc.bottles.list.call({
-                    query,
-                  });
-                  return results;
-                }}
-                onResults={(results) =>
-                  results.map((r) => ({ id: r.id, name: r.fullName }))
-                }
-                onChange={(value) => {
-                  onChange(value.map((t: any) => t.id || t));
-                  setBottlesValue(value);
-                }}
-                value={bottlesValue}
-                multiple
-              />
-            )}
+          <SelectField<FlightBottleOption>
+            label="Bottles"
+            helpText="Choose the specific Bottles included in this flight."
+            error={errors.bottles}
+            onQuery={async (query) => {
+              const bottleList = await orpc.bottles.list.call({
+                query,
+                limit: 10,
+                sort: query ? "rank" : "-tastings",
+              });
+
+              return bottleList.results.map(bottleToFlightOption);
+            }}
+            onRenderOption={(option) => <span>{option.name}</span>}
+            onRenderChip={(option) => <span>{option.name}</span>}
+            onChange={setBottlesValue}
+            value={bottlesValue}
+            multiple
           />
         </Fieldset>
       </Form>

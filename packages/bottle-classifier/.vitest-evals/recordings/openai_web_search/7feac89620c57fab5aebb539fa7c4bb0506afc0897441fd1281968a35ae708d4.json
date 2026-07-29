@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:09:04.871Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Wild Turkey Rare Breed Rye rye whiskey barrel proof abv"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Wild Turkey Rare Breed Rye rye whiskey barrel proof abv",
+    "summary": "Wild Turkey **Rare Breed Rye** is bottled at **56.1% ABV**, which is **112.2 proof**. Wild Turkey describes it as a **barrel proof** rye whiskey, uncut and non-chill filtered. ([wildturkeybourbon.com](https://www.wildturkeybourbon.com/products/rare-breed-rye/?utm_source=openai))\n\nIf you want, I can also give you the re",
+    "results": [
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed-rye/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "url": "https://www.wildturkeybourbon.com/products/rare-breed/",
+        "domain": "wildturkeybourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+        "url": "https://www.abc.virginia.gov/products/rye/wild-turkey-rare-breed-rye?productSize=0",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "url": "https://www.camparigroup.com/en/news/2020-06-10/wild-turkeyr-debuts-rare-breed-rye",
+        "domain": "camparigroup.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wine.com/product/wild-turkey-rare-breed-barrel-proof-rye-whiskey/666641",
+        "url": "https://www.wine.com/product/wild-turkey-rare-breed-barrel-proof-rye-whiskey/666641",
+        "domain": "wine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.abc.virginia.gov/products/bourbon/wild-turkey-rare-breed-bourbon?productSize=0",
+        "url": "https://www.abc.virginia.gov/products/bourbon/wild-turkey-rare-breed-bourbon?productSize=0",
+        "domain": "abc.virginia.gov",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "7feac89620c57fab5aebb539fa7c4bb0506afc0897441fd1281968a35ae708d4",
+    "mode": "auto"
+  }
+}

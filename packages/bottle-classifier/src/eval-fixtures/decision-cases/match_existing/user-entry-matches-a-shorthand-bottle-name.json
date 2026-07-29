@@ -22,10 +22,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Springbank 10 Year Old",
         "brand": "Springbank",
         "bottler": null,
         "series": null,
@@ -50,10 +47,7 @@
       "when": ["springbank", "10"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Springbank 10 Year Old",
           "brand": "Springbank",
           "bottler": null,
           "series": null,

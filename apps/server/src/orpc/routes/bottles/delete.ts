@@ -18,6 +18,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { notEmpty } from "@peated/server/lib/filter";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { and, eq, gt, inArray, or, sql, type SQL } from "drizzle-orm";
@@ -36,6 +37,10 @@ function formatReferenceTypes(referenceTypes: string[]) {
   return `${referenceTypes.slice(0, -1).join(", ")}, and ${lastReferenceType}`;
 }
 
+/**
+ * Legacy hard-delete compatibility for pre-migration ungrouped Bottles.
+ * Grouped Bottle retirement requires the explicit destination owned by merge.
+ */
 export default procedure
   .use(requireAdmin)
   .route({
@@ -43,7 +48,7 @@ export default procedure
     path: "/bottles/{bottle}",
     summary: "Delete bottle",
     description:
-      "Permanently delete a bottle and create a tombstone record. Requires admin privileges",
+      "Permanently delete a pre-migration ungrouped bottle and create a tombstone record. Grouped bottles must be merged into an explicit destination. Requires admin privileges",
     spec: (spec) => ({
       ...spec,
       operationId: "deleteBottle",
@@ -62,6 +67,13 @@ export default procedure
     if (!bottle) {
       throw errors.NOT_FOUND({
         message: "Bottle not found.",
+      });
+    }
+
+    if (bottle.groupId !== null) {
+      throw errors.CONFLICT({
+        message:
+          "Grouped Bottles cannot be deleted directly. Merge this Bottle into an explicit destination Bottle instead.",
       });
     }
 
@@ -301,6 +313,16 @@ export default procedure
         }),
       ]);
       await tx.delete(bottles).where(eq(bottles.id, bottle.id));
+    });
+
+    logInfo("Legacy Bottle compatibility write", {
+      extra: {
+        event: "bottle.compatibility",
+        access: "write",
+        caller: "bottles.delete",
+        operation: "delete_legacy_ungrouped_bottle",
+        legacyBottleId: bottle.id,
+      },
     });
 
     return {};

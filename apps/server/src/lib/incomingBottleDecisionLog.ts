@@ -1,42 +1,30 @@
-import { db, type AnyDatabase } from "@peated/server/db";
+import type { AnyDatabase } from "@peated/server/db";
 import {
   incomingBottleDecisionLogs,
   type Actor,
   type IncomingBottleDecisionLog,
 } from "@peated/server/db/schema";
 
-export type IncomingBottleDecisionType = IncomingBottleDecisionLog["decision"];
+export type IncomingBottleDecisionType = Extract<
+  IncomingBottleDecisionLog["decision"],
+  "match_existing" | "create_bottle"
+>;
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
 export type IncomingBottleDecisionActor = Pick<Actor, "id" | "type" | "userId">;
 
+/** Audit decisions record the concrete Bottle effect, never a classifier verb. */
 export function getIncomingBottleDecisionFromResolutionSource(
   source: string,
+  { createdBottle }: { createdBottle: boolean },
 ): IncomingBottleDecisionType | null {
   switch (source) {
     case "classifier_match":
       return "match_existing";
     case "classifier_create_bottle":
-      return "create_bottle";
-    case "classifier_create_release":
-      return "create_release";
-    case "classifier_create_bottle_and_release":
-      return "create_bottle_and_release";
+      return createdBottle === false ? "match_existing" : "create_bottle";
     default:
       return null;
-  }
-}
-
-export function getIncomingBottleDecisionFromCreationTarget(
-  creationTarget: "bottle" | "release" | "bottle_and_release",
-): IncomingBottleDecisionType {
-  switch (creationTarget) {
-    case "bottle":
-      return "create_bottle";
-    case "release":
-      return "create_release";
-    case "bottle_and_release":
-      return "create_bottle_and_release";
   }
 }
 
@@ -64,9 +52,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     decision,
     actor,
     bottleId,
-    releaseId = null,
     createdBottle = false,
-    createdRelease = false,
     confidence = null,
     model = null,
     rationale = null,
@@ -81,9 +67,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     decision: IncomingBottleDecisionType;
     actor: IncomingBottleDecisionActor;
     bottleId: number;
-    releaseId?: number | null;
     createdBottle?: boolean;
-    createdRelease?: boolean;
     confidence?: number | null;
     model?: string | null;
     rationale?: string | null;
@@ -106,9 +90,7 @@ export async function recordIncomingBottleDecisionInTransaction(
       decision,
       actorId: actor.id,
       bottleId,
-      releaseId,
       createdBottle,
-      createdRelease,
       confidence,
       model,
       rationale,
@@ -123,12 +105,4 @@ export async function recordIncomingBottleDecisionInTransaction(
     .returning();
 
   return log ?? null;
-}
-
-export async function recordIncomingBottleDecision(
-  input: Parameters<typeof recordIncomingBottleDecisionInTransaction>[1],
-) {
-  return await db.transaction(async (tx) =>
-    recordIncomingBottleDecisionInTransaction(tx, input),
-  );
 }

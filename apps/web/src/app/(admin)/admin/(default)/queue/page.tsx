@@ -1,5 +1,7 @@
 "use client";
 
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import type { Bottle } from "@peated/server/types";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
@@ -9,7 +11,6 @@ import PaginationButtons from "@peated/web/components/paginationButtons";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import TextInput from "@peated/web/components/textInput";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
-import { getBottleBottlingPath } from "@peated/web/lib/bottlings";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { buildQueryString } from "@peated/web/lib/urls";
 import {
@@ -203,7 +204,6 @@ export default function Page() {
       proposal: item.id,
       action: "match",
       bottle: suggestedBottle.id,
-      release: item.suggestedRelease?.id ?? null,
     });
     await refreshQueueList();
     flash(
@@ -234,33 +234,23 @@ export default function Page() {
   }
 
   async function handleApplyCreateProposal(item: QueueItem): Promise<void> {
+    if (!item.proposedBottle) {
+      return;
+    }
+
     const created = await createBottleMutation.mutateAsync({
       proposal: item.id,
-      bottle: item.proposedBottle || undefined,
-      release: item.proposedRelease || undefined,
+      independentBottle: IndependentConcreteBottleCreateRouteInputSchema.parse(
+        item.proposedBottle,
+      ),
     });
     await refreshQueueList();
     flash(
       <div>
         Created{" "}
-        <Link href={`/bottles/${created.bottle.id}`} className="underline">
-          {created.bottle.fullName}
-        </Link>
-        {created.release ? (
-          <>
-            {" "}
-            and{" "}
-            <Link
-              href={getBottleBottlingPath(
-                created.bottle.id,
-                created.release.id,
-              )}
-              className="underline"
-            >
-              {created.release.fullName}
-            </Link>
-          </>
-        ) : null}{" "}
+        <Link href={`/bottles/${created.id}`} className="underline">
+          {created.fullName}
+        </Link>{" "}
         for <strong className="font-bold">{item.price.name}</strong>
       </div>,
     );
@@ -295,10 +285,7 @@ export default function Page() {
     );
   }
 
-  async function handleBottleSelection(bottle: {
-    fullName: string;
-    id: number;
-  }): Promise<void> {
+  async function handleBottleSelection(bottle: Bottle): Promise<void> {
     if (!selectedProposal) {
       return;
     }
@@ -342,10 +329,10 @@ export default function Page() {
       <div className="mb-6 space-y-4">
         <div className="rounded-xl border border-slate-800 bg-slate-950 px-4 py-4 text-sm text-slate-300">
           Review new or changed retailer listings here. Use this queue when the
-          listing is unmatched, misclassified, or needs a bottle or bottling
-          decision. If the underlying catalog bottle itself is wrong, switch to
-          one of the repair queues below instead of forcing the listing to carry
-          that cleanup.
+          listing is unmatched, misclassified, or needs a Bottle assignment. If
+          the underlying catalog bottle itself is wrong, switch to one of the
+          repair queues below instead of forcing the listing to carry that
+          cleanup.
         </div>
 
         <Form

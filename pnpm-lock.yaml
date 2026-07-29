@@ -213,6 +213,16 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+    devDependencies:
+      esbuild:
+        specifier: ^0.27.7
+        version: 0.27.7
+      vite:
+        specifier: 'catalog:'
+        version: 8.0.8(@types/node@24.13.2)(esbuild@0.27.7)(jiti@1.21.7)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.4(@opentelemetry/api@1.9.1)(@types/node@24.13.2)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(vite@8.0.8(@types/node@24.13.2)(esbuild@0.27.7)(jiti@1.21.7)(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0))
 
   apps/server:
     dependencies:

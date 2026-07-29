@@ -20,7 +20,7 @@ export default procedure
     path: "/prices",
     summary: "List store prices",
     description:
-      "Retrieve store prices with filtering by site, validity, and unknown bottles. Requires admin privileges",
+      "Retrieve store prices with filtering by site, validity, and unresolved catalog listings. Requires admin privileges",
     operationId: "listPrices",
   })
   .input(
@@ -46,7 +46,10 @@ export default procedure
     context,
     errors,
   }) {
-    const where: (SQL<unknown> | undefined)[] = [eq(storePrices.hidden, false)];
+    const baseWhere: (SQL<unknown> | undefined)[] = [
+      eq(storePrices.hidden, false),
+    ];
+    const identityWhere: SQL<unknown>[] = [];
 
     if (input.site) {
       const site = await db.query.externalSites.findFirst({
@@ -58,19 +61,19 @@ export default procedure
           message: "Site not found.",
         });
       }
-      where.push(eq(storePrices.externalSiteId, site.id));
+      baseWhere.push(eq(storePrices.externalSiteId, site.id));
     }
 
     if (input.onlyValid) {
-      where.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
+      baseWhere.push(sql`${storePrices.updatedAt} > NOW() - interval '1 week'`);
     }
 
     if (input.onlyUnknown) {
-      where.push(isNull(storePrices.bottleId));
+      identityWhere.push(isNull(storePrices.bottleId));
     }
 
     if (query) {
-      where.push(ilike(storePrices.name, `%${query}%`));
+      baseWhere.push(ilike(storePrices.name, `%${query}%`));
     }
 
     const offset = (cursor - 1) * limit;
@@ -78,7 +81,7 @@ export default procedure
     const results = await db
       .select()
       .from(storePrices)
-      .where(where ? and(...where) : undefined)
+      .where(and(...baseWhere, ...identityWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(

@@ -7,9 +7,18 @@ import {
 } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSearchVector } from "@peated/server/lib/search";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, sql } from "drizzle-orm";
+import { z } from "zod";
 
-export default async ({ bottleId }: { bottleId: number }) => {
+export const IndexBottleSearchVectorsJobArgsSchema = z
+  .object({
+    bottleId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async function indexBottleSearchVectors(input: unknown) {
+  const { bottleId } = IndexBottleSearchVectorsJobArgsSchema.parse(input);
+
   const bottle = await db.query.bottles.findFirst({
     where: (bottles, { eq }) => eq(bottles.id, bottleId),
   });
@@ -22,7 +31,12 @@ export default async ({ bottleId }: { bottleId: number }) => {
       name: bottleAliases.name,
     })
     .from(bottleAliases)
-    .where(eq(bottleAliases.bottleId, bottle.id));
+    .where(
+      and(
+        eq(bottleAliases.bottleId, bottle.id),
+        sql`${bottleAliases.ignored} IS NOT TRUE`,
+      ),
+    );
 
   const distillerList = await db
     .select({
@@ -65,4 +79,4 @@ export default async ({ bottleId }: { bottleId: number }) => {
       searchVector,
     })
     .where(eq(bottles.id, bottle.id));
-};
+}

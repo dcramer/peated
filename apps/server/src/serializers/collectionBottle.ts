@@ -1,64 +1,80 @@
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
-import type {
-  Bottle,
-  BottleRelease,
-  CollectionBottle,
-  User,
+import { db } from "../db";
+import {
+  bottles,
+  type CollectionBottle,
+  tastings,
+  type User,
 } from "../db/schema";
-import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type CollectionBottleSchema } from "../schemas";
+import type { BottleSchema } from "../schemas/bottles";
 import { BottleSerializer } from "./bottle";
-import { BottleReleaseSerializer } from "./bottleRelease";
 
 type CollectionBottleAttrs = {
-  bottle: ReturnType<(typeof BottleSerializer)["item"]>;
-  release: ReturnType<(typeof BottleReleaseSerializer)["item"]> | null;
+  bottle: z.infer<typeof BottleSchema>;
+  hasTasted: boolean;
 };
 
 export const CollectionBottleSerializer = serializer({
   name: "collectionBottle",
   attrs: async (
-    itemList: (CollectionBottle & {
-      bottle: Bottle;
-      release: BottleRelease | null;
-    })[],
+    itemList: CollectionBottle[],
     currentUser?: User,
   ): Promise<Record<number, CollectionBottleAttrs>> => {
-    const bottleList = itemList.map((i) => i.bottle);
-    const bottlesById = Object.fromEntries(
-      (await serialize(BottleSerializer, bottleList, currentUser)).map(
-        (data, index) => [bottleList[index].id, data],
-      ),
+    const bottleIds = [...new Set(itemList.map(({ bottleId }) => bottleId))];
+    const bottleRows = await db
+      .select()
+      .from(bottles)
+      .where(inArray(bottles.id, bottleIds));
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      bottleRows,
+      currentUser,
     );
-
-    const releaseList = itemList.map((i) => i.release).filter(notEmpty);
-    const releasesById = Object.fromEntries(
-      (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
-        (data, index) => [releaseList[index].id, data],
-      ),
+    const bottleById = new Map(
+      serializedBottles.map((bottle) => [bottle.id, bottle]),
+    );
+    const tastedBottleIds = new Set(
+      currentUser && bottleIds.length
+        ? (
+            await db
+              .selectDistinct({ bottleId: tastings.bottleId })
+              .from(tastings)
+              .where(
+                and(
+                  eq(tastings.createdById, currentUser.id),
+                  inArray(tastings.bottleId, bottleIds),
+                ),
+              )
+          ).map(({ bottleId }) => bottleId)
+        : [],
     );
     return Object.fromEntries(
       itemList.map((item) => {
+        const bottle = bottleById.get(item.bottleId);
+        if (!bottle) {
+          throw new Error(
+            `collection membership ${item.id} references missing Bottle ${item.bottleId}`,
+          );
+        }
         return [
           item.id,
           {
-            bottle: bottlesById[item.bottleId],
-            release: item.releaseId ? releasesById[item.releaseId] : null,
+            bottle,
+            hasTasted: tastedBottleIds.has(bottle.id),
           },
         ];
       }),
     );
   },
   item: (
-    item: CollectionBottle & {
-      bottle: Bottle;
-      release: BottleRelease | null;
-    },
+    item: CollectionBottle,
     attrs: CollectionBottleAttrs,
-    currentUser?: User,
+    _currentUser?: User,
   ): z.infer<typeof CollectionBottleSchema> => {
     return {
       id: item.id,
@@ -67,7 +83,7 @@ export const CollectionBottleSerializer = serializer({
         : null,
       status: item.status,
       bottle: attrs.bottle,
-      release: attrs.release,
+      hasTasted: attrs.hasTasted,
     };
   },
 });

@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:48:51.782Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "High West A Midwinter Night's Dram Act 12 Scene 9 49.3"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "High West A Midwinter Night's Dram Act 12 Scene 9 49.3",
+    "summary": "**High West A Midwinter Night’s Dram Act 12 Scene 9 — 49.3% ABV**\n\nConfirmed bottle-level traits I could verify:\n\n- **Producer/Bottler:** High West Whiskey / High West Distillery. ([highwest.com](https://highwest.com/products/a-midwinter-nights-dram?utm_source=openai))\n- **Expression:** **A Midwinter Night’s Dram, Act ",
+    "results": [
+      {
+        "title": "https://highwest.com/products/a-midwinter-nights-dram",
+        "url": "https://highwest.com/products/a-midwinter-nights-dram",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://vinepair.com/review/a-midwinter-nights-dram-act-12/",
+        "url": "https://vinepair.com/review/a-midwinter-nights-dram-act-12/",
+        "domain": "vinepair.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.wineenthusiast.com/buying-guide/high-west-a-midwinter-nights-dram-act-12/",
+        "url": "https://www.wineenthusiast.com/buying-guide/high-west-a-midwinter-nights-dram-act-12/",
+        "domain": "wineenthusiast.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/sn8ksa",
+        "url": "https://www.reddit.com/r/bourbon/comments/sn8ksa",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://goodspiritsnews.wordpress.com/2024/10/31/gsn-review-midwinter-nights-dram-act-12/",
+        "url": "https://goodspiritsnews.wordpress.com/2024/10/31/gsn-review-midwinter-nights-dram-act-12/",
+        "domain": "goodspiritsnews.wordpress.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/1eibrd4/review_345_high_west_a_midwinter_nights_dram_act/",
+        "url": "https://www.reddit.com/r/bourbon/comments/1eibrd4/review_345_high_west_a_midwinter_nights_dram_act/",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "e7165232ed32c0bb4b4bfe616ce582ec476d8e7d3efa90410a5833570b606d3e",
+    "mode": "auto"
+  }
+}

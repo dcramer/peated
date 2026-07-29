@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:56:38.232Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake 2022 limited edition 50% Mars Shinshu"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake 2022 limited edition 50% Mars Shinshu",
+    "summary": "Here’s the bottle-specific ID for **Mars Shinshu / Komagatake 2022 Edition 50%**:\n\n- **Full name:** **Single Malt KOMAGATAKE 2022 Edition** ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/?utm_source=openai))\n- **Producer / owner:** **Hombo Shuzo (Mars Whisky)** ([hombo.co.jp](",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/191/shinshu-mars",
+        "url": "https://www.whiskybase.com/whiskies/distillery/191/shinshu-mars",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/komagatake-2022?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "url": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "4105e5867dc97c68eb2caf6f7ad0dc92ab1e4449a2e01ee4b482c07958bed431",
+    "mode": "auto"
+  }
+}

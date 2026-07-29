@@ -1,4 +1,6 @@
-import { findBottleId } from "./bottleFinder";
+import { db } from "@peated/server/db";
+import { bottleTombstones } from "@peated/server/db/schema";
+import { findBottleAliasAssignment, findBottleId } from "./bottleFinder";
 
 describe("findBottleId", () => {
   test("matches exact", async ({ fixtures }) => {
@@ -41,6 +43,85 @@ describe("findBottleId", () => {
     });
     const result = await findBottleId("Something Silly");
     expect(result).toMatchInlineSnapshot(`1`);
+  });
+
+  test("returns a target- and release-free direct Bottle snapshot", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const evidenceBottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: evidenceBottle.id,
+    });
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      releaseId: release.id,
+      name: "Direct Alias With Evidence",
+    });
+
+    const result = await findBottleAliasAssignment(alias.name);
+
+    expect(result).toMatchObject({
+      alias: {
+        name: alias.name,
+        bottleId: bottle.id,
+        ignored: false,
+        assignmentSource: alias.assignmentSource,
+        assignedByActorId: alias.assignedByActorId,
+      },
+      bottleId: bottle.id,
+    });
+    expect(result?.alias).not.toHaveProperty("releaseId");
+  });
+
+  test("resolves a general alias to its retained Bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const alias = await fixtures.BottleAlias({
+      bottleId: bottle.id,
+      name: "General Bottle Alias",
+    });
+
+    await expect(findBottleAliasAssignment(alias.name)).resolves.toMatchObject({
+      alias: { bottleId: bottle.id },
+      bottleId: bottle.id,
+    });
+  });
+
+  test("excludes ignored aliases but preserves inactive direct assignments", async ({
+    fixtures,
+  }) => {
+    const ignored = await fixtures.Bottle();
+    const unassigned = await fixtures.LegacyBottle();
+    const retired = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    await fixtures.BottleAlias({
+      name: "Ignored Alias",
+      bottleId: ignored.id,
+      ignored: true,
+    });
+    await fixtures.BottleAlias({
+      name: "Unbound Alias",
+      bottleId: null,
+    });
+    await fixtures.BottleAlias({
+      name: "Unassigned Alias",
+      bottleId: unassigned.id,
+    });
+    await fixtures.BottleAlias({
+      name: "Retired Alias",
+      bottleId: retired.id,
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    await expect(findBottleId("Ignored Alias")).resolves.toBeNull();
+    await expect(findBottleId("Unbound Alias")).resolves.toBeNull();
+    await expect(findBottleId("Unassigned Alias")).resolves.toBe(unassigned.id);
+    await expect(findBottleId("Retired Alias")).resolves.toBe(retired.id);
   });
 
   test("prioritizes correct prefix", async ({ fixtures }) => {

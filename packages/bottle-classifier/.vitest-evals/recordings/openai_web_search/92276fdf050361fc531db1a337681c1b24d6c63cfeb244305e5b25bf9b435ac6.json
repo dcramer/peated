@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:56:45.101Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Canadian Club Reserve 9 year old Canadian whisky ReserveBar 40%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Canadian Club Reserve 9 year old Canadian whisky ReserveBar 40%",
+    "summary": "Confirmed bottle details for **Canadian Club Reserve 9 Year Old Canadian Whisky**:\n\n- **Brand/producer:** Canadian Club. The brand is produced by **Hiram Walker & Sons** in Canada, as reflected in bottle databases and retailer listings. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09",
+    "results": [
+      {
+        "title": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "url": "https://www.reservebar.com/products/canadian-club-9-year-old-reserve-canadian-whisky/GROUPING-49113",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.lcbo.com/en/canadian-club-reserve-311977",
+        "url": "https://www.lcbo.com/en/canadian-club-reserve-311977",
+        "domain": "lcbo.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "url": "https://whiskyadvocate.com/Canadian-Club-Reserve-9-year-old-Triple-Aged-40",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "url": "https://www.thewhiskyexchange.com/p/70887/canadian-club-reserve-9-year-old",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "url": "https://www.whiskybase.com/whiskies/whisky/75738/canadian-club-09-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.worthnotworth.com/best-whiskies-in-the-world/",
+        "url": "https://www.worthnotworth.com/best-whiskies-in-the-world/",
+        "domain": "worthnotworth.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "92276fdf050361fc531db1a337681c1b24d6c63cfeb244305e5b25bf9b435ac6",
+    "mode": "auto"
+  }
+}

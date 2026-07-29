@@ -11,14 +11,25 @@ import {
   type WebEvidenceJudgment,
 } from "./priceMatchingEvidence";
 
+export function exactEditionMarkersMatch(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): boolean {
+  const normalizeMarker = (value: string | null | undefined) =>
+    (value ?? "")
+      .toLowerCase()
+      .replace(/\b(?:no|number)\b\.?/g, " ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  return normalizeMarker(left) === normalizeMarker(right);
+}
+
 function getTargetNameVariants(targetCandidate: BottleCandidate): string[] {
   return Array.from(
     new Set(
-      [
-        targetCandidate.alias,
-        targetCandidate.bottleFullName,
-        targetCandidate.fullName,
-      ]
+      [targetCandidate.alias, targetCandidate.fullName]
         .filter((value): value is string => Boolean(value))
         .map((value) => value.trim())
         .filter((value) => value.length > 0),
@@ -62,6 +73,9 @@ export function extractedIdentityLooksLikePlainAgeStatementReference(
     extractedLabel.vintage_year === null &&
     extractedLabel.cask_strength === null &&
     extractedLabel.single_cask === null &&
+    extractedLabel.cask_type === null &&
+    extractedLabel.cask_size === null &&
+    extractedLabel.cask_fill === null &&
     extractedLabel.abv === null
   );
 }
@@ -242,10 +256,28 @@ export function getExistingMatchIdentityConflicts({
     conflicts.push("single_cask");
   }
 
+  for (const [extractedField, candidateField] of [
+    ["cask_type", "caskType"],
+    ["cask_size", "caskSize"],
+    ["cask_fill", "caskFill"],
+  ] as const) {
+    const extractedValue = extractedLabel?.[extractedField];
+    const candidateValue = targetCandidate[candidateField];
+    if (
+      extractedValue !== null &&
+      extractedValue !== undefined &&
+      candidateValue !== null &&
+      candidateValue !== undefined &&
+      extractedValue !== candidateValue
+    ) {
+      conflicts.push(extractedField);
+    }
+  }
+
   if (
     extractedLabel?.edition &&
     targetCandidate.edition &&
-    !textsOverlap(extractedLabel.edition, targetCandidate.edition)
+    !exactEditionMarkersMatch(extractedLabel.edition, targetCandidate.edition)
   ) {
     conflicts.push("edition");
   }

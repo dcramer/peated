@@ -1,35 +1,35 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  DuplicateBottleAliasError,
+  ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
-} from "@peated/server/lib/createBottle";
-import {
-  BottleReleaseAlreadyExistsError,
-  BottleReleaseCreateBadRequestError,
-} from "@peated/server/lib/createBottleRelease";
+} from "@peated/server/lib/createConcreteBottle";
+import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
 import {
   createBottleFromStorePriceMatchProposal,
   InvalidStorePriceMatchProposalTypeError,
   StorePriceMatchProposalAlreadyProcessingError,
+  StorePriceMatchProposalIdentityChangedError,
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,
 } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import {
-  BottleInputSchema,
-  BottleReleaseInputSchema,
-  BottleReleaseSchema,
-  BottleSchema,
-} from "@peated/server/schemas";
+import { BottleSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { z } from "zod";
+
+const IndependentInputSchema = z
+  .object({
+    proposal: z.coerce.number(),
+    independentBottle: IndependentConcreteBottleCreateRouteInputSchema,
+  })
+  .strict();
 
 export default procedure
   .use(requireMod)
@@ -41,49 +41,21 @@ export default procedure
       "Create a new bottle from a store price match proposal and approve the proposal in a single transaction. Requires moderator privileges",
     operationId: "createBottleFromPriceMatchQueueItem",
   })
-  .input(
-    z
-      .object({
-        proposal: z.coerce.number(),
-        bottle: BottleInputSchema.optional(),
-        release: BottleReleaseInputSchema.optional(),
-      })
-      .superRefine((input, ctx) => {
-        if (!input.bottle && !input.release) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["bottle"],
-            message: "Bottle or release input is required.",
-          });
-        }
-      }),
-  )
-  .output(
-    z.object({
-      bottle: BottleSchema,
-      release: BottleReleaseSchema.nullable(),
-    }),
-  )
+  .input(IndependentInputSchema)
+  .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
+      const actor = await getUserActor(context.user);
       const result = await createBottleFromStorePriceMatchProposal({
         proposalId: input.proposal,
-        input: input.bottle,
-        releaseInput: input.release,
+        concreteInput: buildIndependentConcreteBottleCreateInput(
+          input.independentBottle,
+        ),
         user: context.user,
-        actor: await getUserActor(context.user),
+        actor,
       });
 
-      return {
-        bottle: await serialize(BottleSerializer, result.bottle, context.user),
-        release: result.release
-          ? await serialize(
-              BottleReleaseSerializer,
-              result.release,
-              context.user,
-            )
-          : null,
-      };
+      return await serialize(BottleSerializer, result.bottle, context.user);
     } catch (err) {
       if (err instanceof UnknownStorePriceMatchProposalError) {
         throw errors.NOT_FOUND({
@@ -103,6 +75,10 @@ export default procedure
         });
       }
 
+      if (err instanceof StorePriceMatchProposalIdentityChangedError) {
+        throw errors.CONFLICT({ message: err.message });
+      }
+
       if (err instanceof InvalidStorePriceMatchProposalTypeError) {
         throw errors.BAD_REQUEST({
           message: err.message,
@@ -118,7 +94,7 @@ export default procedure
         });
       }
 
-      if (err instanceof DuplicateBottleAliasError) {
+      if (err instanceof ExactBottleAliasConflictError) {
         throw errors.CONFLICT({
           message: err.message,
         });
@@ -131,18 +107,6 @@ export default procedure
       }
 
       if (err instanceof BottleCreateBadRequestError) {
-        throw errors.BAD_REQUEST({
-          message: err.message,
-        });
-      }
-
-      if (err instanceof BottleReleaseAlreadyExistsError) {
-        throw errors.CONFLICT({
-          message: err.message,
-        });
-      }
-
-      if (err instanceof BottleReleaseCreateBadRequestError) {
         throw errors.BAD_REQUEST({
           message: err.message,
         });

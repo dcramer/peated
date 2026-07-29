@@ -1,11 +1,19 @@
 import { db } from "@peated/server/db";
-import { bottleReleases, bottles } from "@peated/server/db/schema";
+import {
+  bottleReleasePromotions,
+  bottleReleases,
+  bottleTombstones,
+  bottles,
+} from "@peated/server/db/schema";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { BottleReleaseSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
-import { and, asc, desc, eq, type SQL, sql } from "drizzle-orm";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
+import { and, asc, desc, eq, isNotNull, sql, type SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
+import { projectLegacyBottleRelease } from "./project-legacy-release";
 
 const SORT_OPTIONS = [
   "name",
@@ -25,6 +33,7 @@ const SORT_OPTIONS = [
 ] as const;
 
 const DEFAULT_SORT = "releaseYear";
+const promotedBottles = alias(bottles, "promoted_bottles");
 
 export default procedure
   .route({
@@ -64,77 +73,112 @@ export default procedure
       });
     }
 
+    logInfo("Legacy BottleRelease compatibility access", {
+      extra: {
+        event: "bottle_release.compatibility",
+        access: "read",
+        caller: "bottleReleases.list",
+        operation: "list_promoted_bottles",
+        legacyBottleId: bottle.id,
+      },
+    });
+
     const where: (SQL<unknown> | undefined)[] = [
       eq(bottleReleases.bottleId, bottle.id),
+      isNotNull(promotedBottles.groupId),
+      sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${promotedBottles.id})`,
     ];
 
     if (query) {
       where.push(
-        sql`${bottleReleases.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
+        sql`${promotedBottles.searchVector} @@ websearch_to_tsquery ('english', ${query})`,
       );
     }
 
     let orderBy: SQL<unknown>;
     switch (sort) {
       case "edition":
-        orderBy = asc(bottleReleases.edition);
+        orderBy = asc(promotedBottles.edition);
         break;
       case "-edition":
-        orderBy = desc(bottleReleases.edition);
+        orderBy = desc(promotedBottles.edition);
         break;
       case "name":
-        orderBy = asc(bottleReleases.name);
+        orderBy = asc(promotedBottles.name);
         break;
       case "-name":
-        orderBy = desc(bottleReleases.name);
+        orderBy = desc(promotedBottles.name);
         break;
       case "statedAge":
-        orderBy = sql`${bottleReleases.statedAge} ASC NULLS FIRST`;
+        orderBy = sql`${promotedBottles.statedAge} ASC NULLS FIRST`;
         break;
       case "-statedAge":
-        orderBy = sql`${bottleReleases.statedAge} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.statedAge} DESC NULLS LAST`;
         break;
       case "vintageYear":
-        orderBy = sql`${bottleReleases.vintageYear} ASC NULLS FIRST`;
+        orderBy = sql`${promotedBottles.vintageYear} ASC NULLS FIRST`;
         break;
       case "-vintageYear":
-        orderBy = sql`${bottleReleases.vintageYear} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.vintageYear} DESC NULLS LAST`;
         break;
       case "releaseYear":
-        orderBy = sql`${bottleReleases.releaseYear} ASC NULLS FIRST`;
+        orderBy = sql`${promotedBottles.releaseYear} ASC NULLS FIRST`;
         break;
       case "-releaseYear":
-        orderBy = sql`${bottleReleases.releaseYear} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.releaseYear} DESC NULLS LAST`;
         break;
       case "numTastings":
-        orderBy = asc(bottleReleases.totalTastings);
+        orderBy = asc(promotedBottles.totalTastings);
         break;
       case "-numTastings":
-        orderBy = desc(bottleReleases.totalTastings);
+        orderBy = desc(promotedBottles.totalTastings);
         break;
       case "avgRating":
-        orderBy = sql`${bottleReleases.avgRating} ASC NULLS LAST`;
+        orderBy = sql`${promotedBottles.avgRating} ASC NULLS LAST`;
         break;
       case "-avgRating":
-        orderBy = sql`${bottleReleases.avgRating} DESC NULLS LAST`;
+        orderBy = sql`${promotedBottles.avgRating} DESC NULLS LAST`;
         break;
       default:
-        orderBy = asc(bottleReleases.name);
+        orderBy = asc(promotedBottles.name);
     }
 
     const results = await db
-      .select()
+      .select({
+        releaseId: bottleReleases.id,
+        legacyBottleId: bottleReleases.bottleId,
+        bottle: promotedBottles,
+      })
       .from(bottleReleases)
+      .innerJoin(
+        bottleReleasePromotions,
+        eq(bottleReleasePromotions.releaseId, bottleReleases.id),
+      )
+      .innerJoin(
+        promotedBottles,
+        eq(promotedBottles.id, bottleReleasePromotions.promotedBottleId),
+      )
       .where(where ? and(...where) : undefined)
       .orderBy(orderBy, asc(bottleReleases.id))
       .limit(limit + 1)
       .offset(offset);
 
+    const page = results.slice(0, limit);
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      page.map(({ bottle }) => bottle),
+      context.user,
+    );
+
     return {
-      results: await serialize(
-        BottleReleaseSerializer,
-        results.slice(0, limit),
-        context.user ?? undefined,
+      results: page.map((result, index) =>
+        projectLegacyBottleRelease(
+          {
+            id: result.releaseId,
+            bottleId: result.legacyBottleId,
+          },
+          serializedBottles[index]!,
+        ),
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

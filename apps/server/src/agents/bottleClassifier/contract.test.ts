@@ -15,7 +15,6 @@ describe("bottleClassifier contract", () => {
         name: "Glenmorangie Quinta Ruban 14-year-old",
         url: "https://example.com/products/quinta-ruban",
         currentBottleId: null,
-        currentReleaseId: null,
       },
     });
 
@@ -47,10 +46,7 @@ describe("bottleClassifier contract", () => {
         identityScope: "product",
         observation: null,
         matchedBottleId: null,
-        matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: null,
-        proposedRelease: null,
       },
       artifacts: {
         candidates: [],

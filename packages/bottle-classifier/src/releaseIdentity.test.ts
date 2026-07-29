@@ -2,149 +2,12 @@ import { describe, expect, test } from "vitest";
 
 import {
   bottleMarketsStatedAge,
-  doesStoreListingAliasIdentifyRelease,
   formatCanonicalReleaseName,
-  getBottleLevelReleaseTraits,
-  getCanonicalReleaseAliasNames,
-  getReleaseObservationFacts,
   getResolvedReleaseIdentity,
-  hasBlockingBottleLevelReleaseTraits,
-  hasBottleLevelReleaseTraits,
   hasDirtyBottleLevelStatedAgeConflict,
-  hasExtractedReleaseIdentity,
-  isAddingBottleLevelReleaseTraits,
 } from "./releaseIdentity";
 
 describe("releaseIdentity", () => {
-  test("detects bottle-level release traits", () => {
-    expect(
-      hasBottleLevelReleaseTraits({
-        edition: null,
-        releaseYear: null,
-        vintageYear: null,
-        abv: null,
-        singleCask: null,
-        caskStrength: null,
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBottleLevelReleaseTraits({
-        edition: "Batch 24",
-      }),
-    ).toBe(true);
-
-    expect(
-      getBottleLevelReleaseTraits({
-        edition: "Batch 24",
-        releaseYear: null,
-        abv: 58.4,
-      }),
-    ).toEqual({
-      edition: "Batch 24",
-      abv: 58.4,
-    });
-  });
-
-  test("allows stable marketed parent traits, including hyphenated spellings, to be inherited by child releases", () => {
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Glendronach 1972 Single Cask",
-          fullName: "Glendronach 1972 Single Cask",
-          statedAge: 48,
-          singleCask: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 48,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Warehouse Single-Cask Archive",
-          fullName: "Warehouse Single-Cask Archive",
-          statedAge: 12,
-          singleCask: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 12,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Warehouse Cask-Strength Archive",
-          fullName: "Warehouse Cask-Strength Archive",
-          statedAge: 12,
-          caskStrength: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 12,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: null,
-          caskStrength: true,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      hasBlockingBottleLevelReleaseTraits({
-        bottle: {
-          name: "Warehouse Archive",
-          fullName: "Warehouse Archive",
-          statedAge: 48,
-          singleCask: true,
-        },
-        release: {
-          edition: "Batch 1",
-          statedAge: 48,
-          releaseYear: null,
-          vintageYear: null,
-          abv: null,
-          singleCask: true,
-          caskStrength: null,
-        },
-      }),
-    ).toBe(true);
-  });
-
-  test("returns only populated release observation facts", () => {
-    expect(
-      getReleaseObservationFacts({
-        edition: "Batch C923",
-        releaseYear: 2023,
-        statedAge: null,
-        abv: 62.4,
-        caskStrength: true,
-      }),
-    ).toEqual({
-      edition: "Batch C923",
-      releaseYear: 2023,
-      abv: 62.4,
-      caskStrength: true,
-    });
-  });
-
   test("tracks when the bottle itself markets its stated age", () => {
     expect(
       bottleMarketsStatedAge({
@@ -219,6 +82,136 @@ describe("releaseIdentity", () => {
     });
   });
 
+  test("does not duplicate exact age already marketed in the stable name", () => {
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Speyside 12-year-old",
+        bottleFullName: "Shieldaig Speyside 12-year-old",
+        bottleStatedAge: null,
+        release: {
+          edition: null,
+          statedAge: 12,
+          releaseYear: null,
+          vintageYear: null,
+          abv: null,
+          singleCask: null,
+          caskStrength: null,
+        },
+      }),
+    ).toEqual({
+      name: "Speyside 12-year-old",
+      fullName: "Shieldaig Speyside 12-year-old",
+    });
+  });
+
+  test("does not duplicate a release year already encoded by the edition", () => {
+    const release = getResolvedReleaseIdentity({
+      bottle: {
+        name: "Annual Selection",
+        fullName: "Example Annual Selection",
+        statedAge: null,
+      },
+      release: {
+        edition: "2022 Edition",
+        statedAge: null,
+        releaseYear: 2022,
+        vintageYear: null,
+        abv: null,
+        singleCask: null,
+        caskStrength: null,
+      },
+    });
+
+    expect(release).toMatchObject({
+      edition: "2022 Edition",
+      releaseYear: 2022,
+    });
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Annual Selection",
+        bottleFullName: "Example Annual Selection",
+        bottleStatedAge: null,
+        release,
+      }),
+    ).toEqual({
+      name: "Annual Selection - 2022 Edition",
+      fullName: "Example Annual Selection - 2022 Edition",
+    });
+  });
+
+  test("matches YEAR Edition case-insensitively for display deduplication", () => {
+    expect(
+      formatCanonicalReleaseName({
+        bottleName: "Annual Selection",
+        bottleFullName: "Example Annual Selection",
+        bottleStatedAge: null,
+        release: {
+          edition: "2022 EDITION",
+          statedAge: null,
+          releaseYear: 2022,
+          vintageYear: null,
+          abv: null,
+          singleCask: null,
+          caskStrength: null,
+        },
+      }),
+    ).toEqual({
+      name: "Annual Selection - 2022 EDITION",
+      fullName: "Example Annual Selection - 2022 EDITION",
+    });
+  });
+
+  test.each([
+    {
+      edition: "2021 Edition",
+      releaseYear: 2022,
+      expectedEdition: "2021 Edition",
+    },
+    {
+      edition: "Limited Edition",
+      releaseYear: 2022,
+      expectedEdition: "Limited Edition",
+    },
+    {
+      edition: "2022A Edition",
+      releaseYear: 2022,
+      expectedEdition: "2022A Edition",
+    },
+    {
+      edition: "Batch 2022",
+      releaseYear: 2022,
+      expectedEdition: "Batch 2022",
+    },
+    {
+      edition: "2022 Vintage",
+      releaseYear: 2022,
+      expectedEdition: "2022 Vintage",
+    },
+  ])(
+    "keeps release year separate from $edition",
+    ({ edition, releaseYear, expectedEdition }) => {
+      expect(
+        formatCanonicalReleaseName({
+          bottleName: "Annual Selection",
+          bottleFullName: "Example Annual Selection",
+          bottleStatedAge: null,
+          release: {
+            edition,
+            statedAge: null,
+            releaseYear,
+            vintageYear: null,
+            abv: null,
+            singleCask: null,
+            caskStrength: null,
+          },
+        }),
+      ).toEqual({
+        name: `Annual Selection - ${expectedEdition} - ${releaseYear} Release`,
+        fullName: `Example Annual Selection - ${expectedEdition} - ${releaseYear} Release`,
+      });
+    },
+  );
+
   test("does not duplicate inherited stable parent traits in release naming", () => {
     expect(
       formatCanonicalReleaseName({
@@ -242,94 +235,5 @@ describe("releaseIdentity", () => {
       name: "Glendronach 1972 Single Cask - Batch 1",
       fullName: "Glendronach 1972 Single Cask - Batch 1",
     });
-  });
-
-  test("detects extracted release identity from structured classifier output", () => {
-    expect(
-      hasExtractedReleaseIdentity({
-        edition: null,
-        stated_age: null,
-        abv: null,
-        release_year: null,
-        vintage_year: null,
-        cask_strength: null,
-        single_cask: null,
-      }),
-    ).toBe(false);
-
-    expect(
-      hasExtractedReleaseIdentity({
-        edition: "Batch 24",
-        stated_age: null,
-        abv: null,
-        release_year: null,
-        vintage_year: null,
-        cask_strength: null,
-        single_cask: null,
-      }),
-    ).toBe(true);
-  });
-
-  test("tracks when a write is adding bottle-level release traits", () => {
-    expect(
-      isAddingBottleLevelReleaseTraits({
-        current: {
-          edition: null,
-          abv: null,
-        },
-        next: {
-          edition: null,
-          abv: null,
-        },
-      }),
-    ).toBe(false);
-
-    expect(
-      isAddingBottleLevelReleaseTraits({
-        current: {
-          edition: null,
-          abv: null,
-        },
-        next: {
-          edition: "Batch 24",
-          abv: null,
-        },
-      }),
-    ).toBe(true);
-
-    expect(
-      isAddingBottleLevelReleaseTraits({
-        current: {
-          edition: "Batch 24",
-          abv: 58.4,
-        },
-        next: {
-          edition: "Batch 24",
-          abv: 58.4,
-        },
-      }),
-    ).toBe(false);
-  });
-
-  test("treats canonical release aliases as exact-name matches only", () => {
-    expect(
-      doesStoreListingAliasIdentifyRelease({
-        aliasName: "Lagavulin Distillers Edition - 2011 Release",
-        canonicalReleaseFullName: "Lagavulin Distillers Edition - 2011 Release",
-      }),
-    ).toBe(true);
-
-    expect(
-      doesStoreListingAliasIdentifyRelease({
-        aliasName: "Lagavulin Distillers Edition",
-        canonicalReleaseFullName: "Lagavulin Distillers Edition - 2011 Release",
-      }),
-    ).toBe(false);
-
-    expect(
-      getCanonicalReleaseAliasNames({
-        fullName: "Lagavulin Distillers Edition - 2011 Release",
-      }),
-    ).toEqual(["Lagavulin Distillers Edition - 2011 Release"]);
   });
 });

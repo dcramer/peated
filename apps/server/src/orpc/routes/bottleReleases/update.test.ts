@@ -1,666 +1,406 @@
-import type {
-  CASK_FILLS,
-  CASK_SIZE_IDS,
-  CASK_TYPE_IDS,
-} from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import { bottleReleases, changes } from "@peated/server/db/schema";
+import {
+  bottleAliases,
+  bottleGroups,
+  bottleReleasePromotions,
+  bottleReleases,
+  bottles,
+  changes,
+} from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import * as workerClient from "@peated/server/worker/client";
+import { and, asc, eq } from "drizzle-orm";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("PATCH /bottle-releases/:release", () => {
-  it("requires authentication", async () => {
-    const err = await waitError(
-      routerClient.bottleReleases.update({
-        release: 1,
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+async function promoteRelease(releaseId: number, promotedBottleId: number) {
+  await db.insert(bottleReleasePromotions).values({
+    releaseId,
+    promotedBottleId,
+  });
+}
+
+describe("PATCH /bottle-releases/{release}", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("requires moderator access", async ({ defaults }) => {
-    const err = await waitError(
-      routerClient.bottleReleases.update(
-        {
-          release: 1,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-  });
-
-  it("updates a release with new attributes", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "Test Bottle",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-      statedAge: null,
-    });
-
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 10,
-      abv: 46.0,
-      releaseYear: 2020,
-      vintageYear: 2010,
-    });
-
-    const data = {
-      release: release.id,
-      edition: "Batch 2",
-      statedAge: 12,
-      abv: 48.0,
-      releaseYear: 2021,
-      vintageYear: 2009,
-    };
-
-    const result = await routerClient.bottleReleases.update(data, {
-      context: { user: modUser },
-    });
-
-    // Verify key properties of the response
-    expect(result).toMatchObject({
-      bottleId: bottle.id,
-      statedAge: 12,
-      abv: 48.0,
-      releaseYear: 2021,
-      vintageYear: 2009,
-      edition: "Batch 2",
-      fullName:
-        "Ardbeg Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV",
-      name: "Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV",
-    });
-
-    // Verify the release was updated in the database
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-
-    expect(updatedRelease).toBeDefined();
-    expect(updatedRelease.bottleId).toBe(bottle.id);
-    expect(updatedRelease.edition).toBe("Batch 2");
-    expect(updatedRelease.statedAge).toBe(12);
-    expect(updatedRelease.abv).toBe(48.0);
-    expect(updatedRelease.releaseYear).toBe(2021);
-    expect(updatedRelease.vintageYear).toBe(2009);
-    expect(updatedRelease.fullName).toBe(
-      "Ardbeg Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV",
-    );
-    expect(updatedRelease.name).toBe(
-      "Test Bottle - Batch 2 - 12-year-old - 2021 Release - 2009 Vintage - 48.0% ABV",
-    );
-
-    // Verify change record was created
-    const [change] = await db
-      .select()
-      .from(changes)
-      .where(
-        and(
-          eq(changes.objectType, "bottle_release"),
-          eq(changes.objectId, release.id),
+  test("retains moderator-only access", async ({ defaults }) => {
+    for (const user of [null, defaults.user]) {
+      const error = await waitError(
+        routerClient.bottleReleases.update(
+          { release: 1 },
+          { context: { user } },
         ),
       );
-
-    expect(change).toBeDefined();
-    expect(change.type).toBe("update");
-    expect(change.displayName).toBe(updatedRelease.fullName);
+      expect(error).toMatchObject({ status: 401 });
+    }
   });
 
-  it("does not duplicate bottle age in the release name when the bottle already carries the age", async function ({
+  test("updates only the promoted exact Bottle through the canonical route", async ({
     fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({
-      name: "10",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-      statedAge: 10,
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 10,
-      abv: 46.0,
-      releaseYear: 2023,
-    });
-
-    const result = await routerClient.bottleReleases.update(
-      {
-        release: release.id,
-        edition: "Batch 2",
-      },
-      { context: { user: modUser } },
-    );
-
-    expect(result.fullName).toBe(
-      "Ardbeg 10 - Batch 2 - 2023 Release - 46.0% ABV",
-    );
-    expect(result.name).toBe("10 - Batch 2 - 2023 Release - 46.0% ABV");
-    expect(result.fullName).not.toContain("10-year-old - 10-year-old");
-  });
-
-  it("clears nullable release fields when null is provided", async function ({
-    fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({
-      name: "Test Bottle",
-      statedAge: null,
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle({
+      name: "Mapped Annual",
       statedAge: 12,
-      abv: 48.0,
-      releaseYear: 2021,
-      description: "Original description",
-      imageUrl: "https://example.com/release.png",
-      tastingNotes: {
-        nose: "Oak",
-        palate: "Vanilla",
-        finish: "Spice",
-      },
-    });
-
-    const result = await routerClient.bottleReleases.update(
-      {
-        release: release.id,
-        edition: null,
-        abv: null,
-        releaseYear: null,
-        description: null,
-        imageUrl: null,
-        tastingNotes: null,
-      },
-      { context: { user: modUser } },
-    );
-
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-
-    expect(result).toMatchObject({
-      edition: null,
-      abv: null,
-      releaseYear: null,
-      description: null,
-      imageUrl: null,
-      tastingNotes: null,
-    });
-    expect(updatedRelease).toMatchObject({
-      edition: null,
-      abv: null,
-      releaseYear: null,
-      description: null,
-      imageUrl: null,
-      tastingNotes: null,
-    });
-  });
-
-  it("rejects clearing inherited marketed parent traits from a child release", async function ({
-    fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({
-      name: "1972 Single-Cask",
-      brandId: (await fixtures.Entity({ name: "Glendronach" })).id,
-      statedAge: 48,
-      singleCask: true,
+      numReleases: 1,
     });
     const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 48,
-      singleCask: true,
-    });
-
-    const err = await waitError(
-      routerClient.bottleReleases.update(
-        {
-          release: release.id,
-          singleCask: null,
-        },
-        { context: { user: modUser } },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Bottle already stores specific release details on the parent record. A moderator must split or clear those bottle fields before adding child releases.]`,
-    );
-
-    const [unchangedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-    expect(unchangedRelease).toMatchObject({
-      id: release.id,
-      singleCask: true,
-      fullName: release.fullName,
-      name: release.name,
-    });
-  });
-
-  it("throws error if release not found", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const err = await waitError(
-      routerClient.bottleReleases.update(
-        {
-          release: 999999,
-        },
-        { context: { user: modUser } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
-  });
-
-  it("throws error if release statedAge differs from bottle statedAge", async function ({
-    fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      statedAge: 10,
-    });
-
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 10,
-      abv: 46.0,
-    });
-
-    const err = await waitError(
-      routerClient.bottleReleases.update(
-        {
-          release: release.id,
-          statedAge: 12, // Different from bottle's statedAge
-        },
-        { context: { user: modUser } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Release statedAge must match bottle's statedAge.]`,
-    );
-  });
-
-  it("throws error if a compact marketed bottle age conflicts with the release statedAge", async function ({
-    fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "10yo",
-      statedAge: 10,
-      brandId: (await fixtures.Entity({ name: "Springbank" })).id,
-    });
-
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 10,
-    });
-
-    const err = await waitError(
-      routerClient.bottleReleases.update(
-        {
-          release: release.id,
-          statedAge: 12,
-        },
-        { context: { user: modUser } },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Release statedAge must match bottle's statedAge.]`,
-    );
-  });
-
-  it("updates a release when the parent bottle only has a dirty structured statedAge", async function ({
-    fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "1978 Rare Cask Release",
-      statedAge: 40,
-      brandId: (await fixtures.Entity({ name: "Glenglassaugh" })).id,
-    });
-
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 40,
-    });
-
-    const result = await routerClient.bottleReleases.update(
-      {
-        release: release.id,
-        statedAge: 35,
-      },
-      { context: { user: modUser } },
-    );
-
-    expect(result).toMatchObject({
-      id: release.id,
-      statedAge: 35,
-      fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
-      name: "1978 Rare Cask Release - Batch 1 - 35-year-old",
-    });
-
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-    expect(updatedRelease).toMatchObject({
-      id: release.id,
-      statedAge: 35,
-      fullName: "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
-      name: "1978 Rare Cask Release - Batch 1 - 35-year-old",
-    });
-  });
-
-  it("throws error if release with same attributes exists", async function ({
-    fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "Test Bottle",
-      statedAge: null,
-    });
-
-    // Create initial release
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 10,
-      abv: 46.0,
-      releaseYear: 2020,
-      vintageYear: 2010,
-    });
-
-    // Create another release with different attributes
-    const release2 = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 2",
+      bottleId: parent.id,
+      edition: "Legacy Batch",
       statedAge: 12,
-      abv: 48.0,
-      releaseYear: 2021,
-      vintageYear: 2009,
+      abv: 55,
     });
-
-    // Try to update release2 to match release1's attributes
-    const err = await waitError(
-      routerClient.bottleReleases.update(
-        {
-          release: release2.id,
-          edition: "Batch 1",
-          statedAge: 10,
-          abv: 46.0,
-          releaseYear: 2020,
-          vintageYear: 2010,
-        },
-        { context: { user: modUser } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`,
-    );
-  });
-
-  it("updates cask information", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      abv: 46.0,
-    });
-
-    const data = {
-      release: release.id,
-      caskType: "bourbon" as (typeof CASK_TYPE_IDS)[number],
-      caskSize: "hogshead" as (typeof CASK_SIZE_IDS)[number],
-      caskFill: "1st_fill" as (typeof CASK_FILLS)[number],
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Mapped Batch",
+      abv: 55,
       singleCask: true,
       caskStrength: true,
-    };
-
-    const result = await routerClient.bottleReleases.update(data, {
-      context: { user: modUser },
-    });
-
-    expect(result.caskType).toBe("bourbon");
-    expect(result.caskSize).toBe("hogshead");
-    expect(result.caskFill).toBe("1st_fill");
-    expect(result.singleCask).toBe(true);
-    expect(result.caskStrength).toBe(true);
-
-    // Verify the release was updated in the database
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-
-    expect(updatedRelease.caskType).toBe("bourbon");
-    expect(updatedRelease.caskSize).toBe("hogshead");
-    expect(updatedRelease.caskFill).toBe("1st_fill");
-    expect(updatedRelease.singleCask).toBe(true);
-    expect(updatedRelease.caskStrength).toBe(true);
-  });
-
-  it("updates description and tasting notes", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      abv: 46.0,
-    });
-
-    const data = {
-      release: release.id,
-      description: "Updated description",
+      vintageYear: 2008,
+      releaseYear: 2020,
+      caskType: "bourbon",
+      caskSize: "hogshead",
+      caskFill: "refill",
+      description: "Original promoted description",
       tastingNotes: {
-        nose: "Updated nose",
-        palate: "Updated palate",
-        finish: "Updated finish",
+        nose: "Old nose",
+        palate: "Old palate",
+        finish: "Old finish",
       },
-    };
-
-    const result = await routerClient.bottleReleases.update(data, {
-      context: { user: modUser },
     });
-
-    expect(result.description).toBe("Updated description");
-    expect(result.tastingNotes).toEqual({
-      nose: "Updated nose",
-      palate: "Updated palate",
-      finish: "Updated finish",
+    const sibling = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Untouched Sibling",
+      abv: 46,
     });
+    await promoteRelease(release.id, promoted.id);
 
-    // Verify the release was updated in the database
-    const [updatedRelease] = await db
+    const [releaseBefore] = await db
       .select()
       .from(bottleReleases)
       .where(eq(bottleReleases.id, release.id));
+    const [promotionBefore] = await db
+      .select()
+      .from(bottleReleasePromotions)
+      .where(eq(bottleReleasePromotions.releaseId, release.id));
+    const [groupBefore] = await db
+      .select()
+      .from(bottleGroups)
+      .where(eq(bottleGroups.id, parent.groupId!));
+    const [parentBefore] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, parent.id));
+    const [siblingBefore] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, sibling.id));
+    vi.clearAllMocks();
 
-    expect(updatedRelease.description).toBe("Updated description");
-    expect(updatedRelease.tastingNotes).toEqual({
-      nose: "Updated nose",
-      palate: "Updated palate",
-      finish: "Updated finish",
+    const result = await routerClient.bottleReleases.update(
+      {
+        release: release.id,
+        edition: "Mapped Batch Updated",
+        abv: 0,
+        singleCask: false,
+        caskStrength: false,
+        description: null,
+        tastingNotes: null,
+      },
+      { context: { user: mod } },
+    );
+
+    expect(result).toMatchObject({
+      group: { id: parent.groupId },
+      id: promoted.id,
+      edition: "Mapped Batch Updated",
+      statedAge: 12,
+      abv: 0,
+      singleCask: false,
+      caskStrength: false,
+      vintageYear: 2008,
+      releaseYear: 2020,
+      caskType: "bourbon",
+      caskSize: "hogshead",
+      caskFill: "refill",
+      description: null,
+      tastingNotes: null,
     });
+    expect(result).not.toHaveProperty("kind");
+
+    const [updatedBottle] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, promoted.id));
+    expect(updatedBottle).toMatchObject({
+      id: promoted.id,
+      edition: "Mapped Batch Updated",
+      statedAge: 12,
+      abv: 0,
+      singleCask: false,
+      caskStrength: false,
+      vintageYear: 2008,
+      releaseYear: 2020,
+      caskType: "bourbon",
+      caskSize: "hogshead",
+      caskFill: "refill",
+      description: null,
+      tastingNotes: null,
+    });
+    expect(
+      await db
+        .select()
+        .from(bottleAliases)
+        .where(eq(bottleAliases.name, result.fullName)),
+    ).toEqual([
+      expect.objectContaining({
+        bottleId: promoted.id,
+        releaseId: null,
+        assignmentSource: "canonical",
+      }),
+    ]);
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "bottle"),
+            eq(changes.objectId, promoted.id),
+            eq(changes.type, "update"),
+          ),
+        ),
+    ).toEqual([
+      expect.objectContaining({
+        data: expect.objectContaining({ updateScope: "exact" }),
+      }),
+    ]);
+    expect(
+      await db
+        .select()
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "bottle_release"),
+            eq(changes.objectId, release.id),
+          ),
+        ),
+    ).toHaveLength(0);
+
+    expect(
+      await db
+        .select()
+        .from(bottleReleases)
+        .where(eq(bottleReleases.id, release.id)),
+    ).toEqual([releaseBefore]);
+    expect(
+      await db
+        .select()
+        .from(bottleReleasePromotions)
+        .where(eq(bottleReleasePromotions.releaseId, release.id)),
+    ).toEqual([promotionBefore]);
+    expect(
+      await db
+        .select()
+        .from(bottleGroups)
+        .where(eq(bottleGroups.id, parent.groupId!)),
+    ).toEqual([groupBefore]);
+    expect(
+      await db.select().from(bottles).where(eq(bottles.id, parent.id)),
+    ).toEqual([parentBefore]);
+    expect(
+      await db.select().from(bottles).where(eq(bottles.id, sibling.id)),
+    ).toEqual([siblingBefore]);
+
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+      bottleId: promoted.id,
+    });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      { name: result.fullName },
+    );
   });
 
-  it("throws error if release name matches bottle name", async function ({
+  test("rejects image URLs, preserves an omitted image, and clears explicit null", async ({
     fixtures,
-  }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "Test Bottle",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle({ name: "Image Parent" });
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Image Mapped",
     });
+    await promoteRelease(release.id, promoted.id);
+    await db
+      .update(bottles)
+      .set({ imageUrl: "https://example.com/original.jpg" })
+      .where(eq(bottles.id, promoted.id));
+    vi.clearAllMocks();
 
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-    });
-
-    const err = await waitError(
+    const unsupported = await waitError(
       routerClient.bottleReleases.update(
         {
           release: release.id,
-          edition: null,
-          abv: null,
-          releaseYear: null,
-          vintageYear: null,
+          imageUrl: "https://example.com/replacement.jpg",
         },
-        { context: { user: modUser } },
+        { context: { user: mod } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Release name cannot be the same as the bottle name.]`,
+    expect(unsupported).toMatchObject({ status: 400 });
+    expect(
+      await db
+        .select({ imageUrl: bottles.imageUrl })
+        .from(bottles)
+        .where(eq(bottles.id, promoted.id)),
+    ).toEqual([{ imageUrl: "https://example.com/original.jpg" }]);
+
+    const omitted = await routerClient.bottleReleases.update(
+      { release: release.id, description: "Image remains" },
+      { context: { user: mod } },
     );
+    expect(omitted.imageUrl).toBe("https://example.com/original.jpg");
+
+    const cleared = await routerClient.bottleReleases.update(
+      { release: release.id, imageUrl: null },
+      { context: { user: mod } },
+    );
+    expect(cleared.imageUrl).toBeNull();
+    expect(
+      await db
+        .select({ imageUrl: bottles.imageUrl })
+        .from(bottles)
+        .where(eq(bottles.id, promoted.id)),
+    ).toEqual([{ imageUrl: null }]);
+    expect(
+      await db
+        .select()
+        .from(bottleReleases)
+        .where(eq(bottleReleases.id, release.id)),
+    ).toEqual([release]);
   });
 
-  it("performs partial updates correctly", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "Test Bottle",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-      statedAge: null,
-    });
-
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      statedAge: 10,
-      abv: 46.0,
-      releaseYear: 2020,
-      vintageYear: 2010,
-    });
-
-    // Only update some fields
-    const data = {
-      release: release.id,
-      abv: 48.0,
-      releaseYear: 2021,
-    };
-
-    const result = await routerClient.bottleReleases.update(data, {
-      context: { user: modUser },
-    });
-
-    // Verify only specified fields were updated
-    expect(result.abv).toBe(48.0);
-    expect(result.releaseYear).toBe(2021);
-    // Verify other fields remained unchanged
-    expect(result.edition).toBe("Batch 1");
-    expect(result.statedAge).toBe(10);
-    expect(result.vintageYear).toBe(2010);
-
-    // Verify the release was updated in the database
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-
-    expect(updatedRelease.abv).toBe(48.0);
-    expect(updatedRelease.releaseYear).toBe(2021);
-    expect(updatedRelease.edition).toBe("Batch 1");
-    expect(updatedRelease.statedAge).toBe(10);
-    expect(updatedRelease.vintageYear).toBe(2010);
-  });
-
-  it("updates image URL", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      abv: 46.0,
-      releaseYear: null,
-      vintageYear: null,
-      statedAge: null,
-    });
-
-    const data = {
-      release: release.id,
-      imageUrl: "https://example.com/new-image.jpg",
-    };
-
-    const result = await routerClient.bottleReleases.update(data, {
-      context: { user: modUser },
-    });
-
-    expect(result.imageUrl).toBe("https://example.com/new-image.jpg");
-
-    // Verify the release was updated in the database
-    const [updatedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-
-    expect(updatedRelease.imageUrl).toBe("https://example.com/new-image.jpg");
-  });
-
-  it("rolls back transaction on error", async function ({ fixtures }) {
-    const modUser = await fixtures.User({ mod: true });
-
-    const bottle = await fixtures.Bottle({
-      name: "Test Bottle",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-    });
-
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 1",
-      abv: 46.0,
-    });
-
-    const release2 = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      edition: "Batch 2",
-      abv: 46.0,
-    });
-
-    // Try to update with invalid data that will cause a conflict
-    const err = await waitError(
+  test("returns not found when the legacy release does not exist", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const error = await waitError(
       routerClient.bottleReleases.update(
-        {
-          release: release2.id,
-          edition: "Batch 1", // Same as existing
-          abv: 46.0, // Same as existing
-          // This should trigger the duplicate check
-        },
-        { context: { user: modUser } },
+        { release: 999_999, edition: "Missing" },
+        { context: { user: mod } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: A release with these attributes already exists.]`,
-    );
+    expect(error).toMatchObject({ status: 404 });
+  });
 
-    // Verify the release was not changed
-    const [unchangedRelease] = await db
+  test("rejects a missing promotion mapping", async ({ fixtures }) => {
+    const mod = await fixtures.User({ mod: true });
+
+    const missingParent = await fixtures.Bottle({ name: "Missing Mapping" });
+    const missingRelease = await fixtures.BottleRelease({
+      bottleId: missingParent.id,
+    });
+
+    const bottlesBefore = await db
+      .select()
+      .from(bottles)
+      .orderBy(asc(bottles.id));
+    const changesBefore = await db
+      .select()
+      .from(changes)
+      .orderBy(asc(changes.id));
+
+    const error = await waitError(
+      routerClient.bottleReleases.update(
+        { release: missingRelease.id, edition: "Must not apply" },
+        { context: { user: mod } },
+      ),
+    );
+    expect(error).toMatchObject({ status: 409 });
+    expect(await db.select().from(bottles).orderBy(asc(bottles.id))).toEqual(
+      bottlesBefore,
+    );
+    expect(await db.select().from(changes).orderBy(asc(changes.id))).toEqual(
+      changesBefore,
+    );
+  });
+
+  test("propagates canonical identity conflicts and rolls back the update", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const parent = await fixtures.Bottle({ name: "Collision Parent" });
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "First Identity",
+    });
+    const conflicting = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Second Identity",
+    });
+    await promoteRelease(release.id, promoted.id);
+
+    const bottlesBefore = await db
+      .select()
+      .from(bottles)
+      .orderBy(asc(bottles.id));
+    const aliasesBefore = await db
+      .select()
+      .from(bottleAliases)
+      .orderBy(asc(bottleAliases.name));
+    const groupsBefore = await db
+      .select()
+      .from(bottleGroups)
+      .orderBy(asc(bottleGroups.id));
+    const changesBefore = await db
+      .select()
+      .from(changes)
+      .orderBy(asc(changes.id));
+    const releasesBefore = await db
       .select()
       .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
+      .orderBy(asc(bottleReleases.id));
+    const promotionsBefore = await db
+      .select()
+      .from(bottleReleasePromotions)
+      .orderBy(asc(bottleReleasePromotions.releaseId));
+    vi.clearAllMocks();
 
-    expect(unchangedRelease.edition).toBe("Batch 1");
-    expect(unchangedRelease.abv).toBe(46.0);
-    expect(unchangedRelease.fullName).toBe(release.fullName);
+    const conflict = await waitError(
+      routerClient.bottleReleases.update(
+        { release: release.id, edition: "Second Identity" },
+        { context: { user: mod } },
+      ),
+    );
+    expect(conflict).toMatchObject({
+      status: 409,
+      data: { bottle: conflicting.id },
+    });
+
+    expect(await db.select().from(bottles).orderBy(asc(bottles.id))).toEqual(
+      bottlesBefore,
+    );
+    expect(
+      await db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
+    ).toEqual(aliasesBefore);
+    expect(
+      await db.select().from(bottleGroups).orderBy(asc(bottleGroups.id)),
+    ).toEqual(groupsBefore);
+    expect(await db.select().from(changes).orderBy(asc(changes.id))).toEqual(
+      changesBefore,
+    );
+    expect(
+      await db.select().from(bottleReleases).orderBy(asc(bottleReleases.id)),
+    ).toEqual(releasesBefore);
+    expect(
+      await db
+        .select()
+        .from(bottleReleasePromotions)
+        .orderBy(asc(bottleReleasePromotions.releaseId)),
+    ).toEqual(promotionsBefore);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 });

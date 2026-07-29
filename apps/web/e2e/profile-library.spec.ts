@@ -1,43 +1,50 @@
-import { expect, type Locator, type Page, test } from "@playwright/test";
+import {
+  expect,
+  type Locator,
+  type Page,
+  type Request,
+  test,
+} from "@playwright/test";
 import { Buffer } from "node:buffer";
 
 import {
-  displayImageBottleId,
-  displayImageUrl,
+  bottleImageBottleId,
+  bottleImageUrl,
   existingBottle,
-  existingRelease,
   existingReleaseId,
+  legacyPromotedBottle,
+  legacyPromotedBottleId,
   testAccessToken,
   testUser,
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 test.describe("profile library", () => {
-  test("renders a bottle display image fallback on the detail page", async ({
+  test("renders a Bottle-owned image on the detail page", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
       accessToken: [
         testAccessToken,
-        "display-image",
+        "bottle-image",
         testInfo.project.name,
       ].join("-"),
     });
 
-    await page.goto(`/bottles/${displayImageBottleId}`, {
+    await page.goto(`/bottles/${bottleImageBottleId}`, {
       waitUntil: "commit",
     });
 
     await expect(
-      page.getByRole("heading", { name: "Lagavulin Display Image Reserve" }),
+      page.getByRole("heading", { name: "Lagavulin Bottle Image Reserve" }),
     ).toBeVisible();
-    const displayImage = page.locator(`img[src="${displayImageUrl}"]`);
+    const bottleImage = page.locator(`img[src="${bottleImageUrl}"]`);
 
     if (testInfo.project.name.includes("mobile")) {
-      await expect(displayImage).toHaveCount(1);
+      await expect(bottleImage).toHaveCount(1);
     } else {
-      await expect(displayImage).toBeVisible();
+      await expect(bottleImage).toBeVisible();
     }
 
     const schemaTexts = await page
@@ -45,10 +52,13 @@ test.describe("profile library", () => {
       .evaluateAll((scripts) =>
         scripts.map((script) => script.textContent ?? ""),
       );
-    expect(schemaTexts.some((text) => text.includes('"@type":"Product"'))).toBe(
-      true,
-    );
-    expect(schemaTexts.join("\n")).not.toContain(displayImageUrl);
+    const productSchema = schemaTexts
+      .map((text) => JSON.parse(text) as { "@type"?: string; image?: string })
+      .find((schema) => schema["@type"] === "Product");
+    expect(productSchema).toMatchObject({
+      "@type": "Product",
+      image: bottleImageUrl,
+    });
   });
 
   test("saves a bottle to Library with Favorites hidden", async ({
@@ -90,7 +100,15 @@ test.describe("profile library", () => {
     await expect(libraryButton).toBeEnabled();
     await expect(libraryButton).toHaveAttribute("aria-pressed", "false");
 
+    const createRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/create"),
+    );
     await libraryButton.click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createInput.bottle).toBe(bottleId);
+    expect(createInput).not.toHaveProperty("target");
+    expect(createInput).not.toHaveProperty("release");
     await expect(libraryButton).toHaveAttribute("aria-pressed", "true");
 
     await page.goto(`/users/${testUser.username}/library`, {
@@ -101,7 +119,7 @@ test.describe("profile library", () => {
     });
     await expect(
       page.getByRole("link", { name: savedBottleName }).first(),
-    ).toBeVisible();
+    ).toHaveAttribute("href", `/bottles/${bottleId}`);
     await expect(
       savedBottleRow.getByRole("img", { name: "In Library" }),
     ).toHaveCount(0);
@@ -153,7 +171,7 @@ test.describe("profile library", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("renders concise bottling names in Library", async ({
+  test("renders promoted Bottle names in Library", async ({
     context,
     page,
   }, testInfo) => {
@@ -170,7 +188,15 @@ test.describe("profile library", () => {
     await page.goto(
       `/addBottle?bottle=${existingBottle.id}&release=${existingReleaseId}&intent=library`,
     );
+    const createRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/create"),
+    );
     await page.getByRole("button", { name: "Add to Library" }).click();
+    const createInput = getRpcInput(await createRequestPromise);
+
+    expect(createInput.bottle).toBe(legacyPromotedBottleId);
+    expect(createInput).not.toHaveProperty("target");
+    expect(createInput).not.toHaveProperty("release");
     await expect(
       page.getByRole("heading", { name: "Added to Library" }),
     ).toBeVisible();
@@ -179,17 +205,15 @@ test.describe("profile library", () => {
       waitUntil: "commit",
     });
 
-    const conciseName = `${existingBottle.fullName} - ${existingRelease.edition} (${existingRelease.releaseYear})`;
-    const bottlingLink = page.getByRole("link", { name: conciseName });
+    const promotedBottleLink = page.getByRole("link", {
+      name: legacyPromotedBottle.fullName,
+    });
 
-    await expect(bottlingLink).toBeVisible();
-    await expect(bottlingLink).toHaveAttribute(
-      "title",
-      existingRelease.fullName,
+    await expect(promotedBottleLink).toBeVisible();
+    await expect(promotedBottleLink).toHaveAttribute(
+      "href",
+      `/bottles/${legacyPromotedBottleId}`,
     );
-    await expect(
-      page.getByRole("link", { name: existingRelease.fullName, exact: true }),
-    ).toHaveCount(0);
   });
 
   test("filters Library entries from the profile tab", async ({
@@ -368,7 +392,15 @@ test.describe("profile library", () => {
     await expect(
       page.getByRole("menuitem", { name: "Remove from Library" }),
     ).toBeVisible();
+    const deleteRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/collections/bottles/delete"),
+    );
     await page.getByRole("menuitem", { name: "Remove from Library" }).click();
+    const deleteInput = getRpcInput(await deleteRequestPromise);
+
+    expect(deleteInput.bottle).toBe(bottleId);
+    expect(deleteInput).not.toHaveProperty("target");
+    expect(deleteInput).not.toHaveProperty("release");
 
     await expect(savedBottleRow).toHaveCount(0);
     await expect(
@@ -404,4 +436,21 @@ async function expectNoHorizontalOverflow(page: Page) {
       { message: "page should not create horizontal overflow" },
     )
     .toBeLessThanOrEqual(1);
+}
+
+function getRpcInput(request: Request): Record<string, unknown> {
+  const postData = request.postData();
+  if (!postData) {
+    throw new Error("Expected the RPC request to contain JSON input.");
+  }
+
+  const envelope: unknown = JSON.parse(postData);
+  if (!isRecord(envelope) || !isRecord(envelope.json)) {
+    throw new Error("Expected the RPC request to use the JSON envelope.");
+  }
+  return envelope.json;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

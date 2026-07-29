@@ -1,8 +1,10 @@
+import type { Bottle } from "@peated/server/types";
 import Button from "@peated/web/components/button";
+import Link from "@peated/web/components/link";
 import { Camera, Check, Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { getMatchedCandidate, type PhotoIdentification } from "./helpers";
+import type { PhotoIdentification } from "./helpers";
 import {
   EvidencePills,
   FallbackActions,
@@ -185,8 +187,7 @@ export function PhotoNoMatchState({
 export function PhotoMatchCreateState({
   result,
   previewUrl,
-  matchedBottleId,
-  matchedReleaseId,
+  matchedBottle,
   renderMatchedResultActions,
   renderCreateProposalActions,
   createProposalLabel,
@@ -195,17 +196,16 @@ export function PhotoMatchCreateState({
   createPending,
   createActionLabel,
   resolvingAction,
-  hasExactLibraryEntry,
-  exactLibraryEntryImageUrl,
+  hasLibraryEntry,
+  libraryEntryImageUrl,
   pendingImage,
   loadingExactLibraryStatus,
-  onLoadTarget,
+  onLoadBottle,
   onAcceptCreateProposal,
 }: {
   result: PhotoIdentification;
   previewUrl: string | null;
-  matchedBottleId: number | null;
-  matchedReleaseId: number | null;
+  matchedBottle: Bottle | null;
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
@@ -218,51 +218,47 @@ export function PhotoMatchCreateState({
   createPending: boolean;
   createActionLabel: string;
   resolvingAction: BottleResolverAction | null;
-  hasExactLibraryEntry: boolean;
-  exactLibraryEntryImageUrl?: string | null;
+  hasLibraryEntry: boolean;
+  libraryEntryImageUrl?: string | null;
   pendingImage: PhotoIdentification["pendingImage"] | null;
   loadingExactLibraryStatus: boolean;
-  onLoadTarget: (
-    bottleId: number,
-    releaseId: number | null,
-    action?: BottleResolverMatchedAction,
-  ) => void;
+  onLoadBottle: (bottle: Bottle, action?: BottleResolverMatchedAction) => void;
   onAcceptCreateProposal: (
     result: PhotoIdentification,
     action: BottleResolverAction,
   ) => void;
 }) {
-  const matchedCandidate = getMatchedCandidate(result);
-
-  if (matchedBottleId) {
-    const matchedName =
-      matchedCandidate?.fullName ??
-      matchedCandidate?.bottleFullName ??
-      "Matched bottle";
-
+  if (matchedBottle) {
     return (
       <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
         <div className="space-y-5">
           <PhotoResultCard
             previewUrl={previewUrl}
-            title={matchedName}
+            title="Matched bottle"
             subtitle="Matched to existing bottle in Peated"
             fallbackIcon={<Check className="text-highlight h-6 w-6" />}
           >
-            <EvidencePills result={result} compact />
+            <div className="space-y-2">
+              <Link
+                href={`/bottles/${matchedBottle.id}`}
+                className="font-semibold text-white hover:underline"
+              >
+                {matchedBottle.fullName}
+              </Link>
+              <EvidencePills result={result} compact />
+            </div>
           </PhotoResultCard>
           {renderMatchedResultActions ? (
             renderMatchedResultActions({
-              bottleId: matchedBottleId,
-              releaseId: matchedReleaseId,
-              hasExactLibraryEntry,
-              exactLibraryEntryImageUrl,
+              bottle: matchedBottle,
+              hasLibraryEntry,
+              libraryEntryImageUrl,
               pendingImage,
               loadingExactLibraryStatus,
               resolvingAction:
                 resolvingAction === "create" ? null : resolvingAction,
               onResolve: (action) => {
-                onLoadTarget(matchedBottleId, matchedReleaseId, action);
+                onLoadBottle(matchedBottle, action);
               },
             })
           ) : (
@@ -271,7 +267,7 @@ export function PhotoMatchCreateState({
                 color="highlight"
                 fullWidth
                 disabled={Boolean(resolvingAction)}
-                onClick={() => onLoadTarget(matchedBottleId, matchedReleaseId)}
+                onClick={() => onLoadBottle(matchedBottle)}
               >
                 Continue
               </Button>

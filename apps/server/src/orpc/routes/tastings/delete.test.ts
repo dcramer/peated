@@ -2,60 +2,77 @@ import { db } from "@peated/server/db";
 import { bottleTags, tastings } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import * as workerClient from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("DELETE /tastings/:tasting", () => {
-  test("requires authentication", async () => {
-    const err = await waitError(() =>
-      routerClient.tastings.delete({ tasting: 1 }),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+vi.mock("@peated/server/worker/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof workerClient>()),
+  pushJob: vi.fn().mockResolvedValue(undefined),
+}));
+
+describe("DELETE /tastings/{tasting}", () => {
+  beforeEach(() => {
+    vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
   });
 
-  test("delete own tasting", async ({ defaults, fixtures }) => {
+  test("requires authentication", async () => {
+    const error = await waitError(() =>
+      routerClient.tastings.delete({ tasting: 1 }),
+    );
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+
+  test("deletes an owned Tasting using its direct Bottle", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({
+      bottleId: bottle.id,
       createdById: defaults.user.id,
-      tags: ["spiced", "caramel"],
+      tags: ["caramel"],
     });
 
     await routerClient.tastings.delete(
       { tasting: tasting.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, tasting.id),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.bottleTags.findFirst({
+        where: (tags, { and, eq }) =>
+          and(eq(tags.bottleId, bottle.id), eq(tags.tag, "caramel")),
+      }),
+    ).toMatchObject({ count: 0 });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "UpdateBottleStats",
+      { bottleId: bottle.id },
       {
-        context: { user: defaults.user },
+        delay: 5000,
+        removeOnComplete: true,
+        removeOnFail: false,
       },
     );
-
-    const [newTasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.id, tasting.id));
-    expect(newTasting).toBeUndefined();
-
-    const tags = await db
-      .select()
-      .from(bottleTags)
-      .where(eq(bottleTags.bottleId, tasting.bottleId));
-
-    expect(tags.length).toBe(2);
-    for (const tag of tags) {
-      expect(tag.count).toBe(0);
-    }
   });
 
-  test("cannot delete others tasting", async ({ defaults, fixtures }) => {
-    const user = await fixtures.User();
-    const tasting = await fixtures.Tasting({ createdById: user.id });
-
-    const err = await waitError(() =>
+  test("cannot delete another user's Tasting", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const tasting = await fixtures.Tasting();
+    const error = await waitError(
       routerClient.tastings.delete(
         { tasting: tasting.id },
-        {
-          context: { user: defaults.user },
-        },
+        { context: { user: defaults.user } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(
+    expect(error).toMatchInlineSnapshot(
       `[Error: Cannot delete another user's tasting.]`,
     );
   });

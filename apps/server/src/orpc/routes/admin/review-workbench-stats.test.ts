@@ -61,7 +61,7 @@ async function createProposalFixture(
     bottleId,
     storePrice,
   }: {
-    bottleId: number;
+    bottleId: number | null;
     storePrice: StorePriceFixtureFactory;
   },
 ) {
@@ -224,5 +224,59 @@ describe("GET /admin/review-workbench/stats", () => {
       hoursSince(oldestActionableEnteredQueueAt),
       0,
     );
+  });
+
+  test("counts only approved direct Bottle assignments as matched", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle();
+    const unrelatedBottle = await fixtures.Bottle();
+    const createdAt = daysAgoAt(0, 8);
+
+    await createProposalFixture(
+      { createdAt, status: "approved" },
+      {
+        bottleId: bottle.id,
+        storePrice: fixtures.StorePrice,
+      },
+    );
+    await createProposalFixture(
+      { createdAt, status: "approved" },
+      {
+        bottleId: unrelatedBottle.id,
+        storePrice: fixtures.StorePrice,
+      },
+    );
+    await createProposalFixture(
+      { createdAt, status: "approved" },
+      {
+        bottleId: null,
+        storePrice: fixtures.StorePrice,
+      },
+    );
+    await createProposalFixture(
+      {
+        createdAt,
+        enteredQueueAt: createdAt,
+        status: "approved",
+      },
+      {
+        bottleId: null,
+        storePrice: fixtures.StorePrice,
+      },
+    );
+
+    const result = await routerClient.admin.reviewWorkbenchStats(undefined, {
+      context: { user },
+    });
+
+    expect(result.snapshot.today).toMatchObject({
+      newListings: 4,
+      matchedSuccessfully: 2,
+      autoResolved: 2,
+      sentToQueue: 1,
+      queueApproved: 1,
+    });
   });
 });

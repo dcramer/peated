@@ -6,7 +6,6 @@ describe("toStorePriceMatchDecision", () => {
     const decision = toStorePriceMatchDecision({
       price: {
         bottleId: null,
-        releaseId: null,
       },
       candidates: [],
       decision: {
@@ -17,10 +16,7 @@ describe("toStorePriceMatchDecision", () => {
         aliasScope: "none",
         observation: null,
         matchedBottleId: 123,
-        matchedReleaseId: null,
-        parentBottleId: null,
         proposedBottle: null,
-        proposedRelease: null,
       },
     });
 

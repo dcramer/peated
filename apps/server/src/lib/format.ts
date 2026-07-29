@@ -1,7 +1,3 @@
-import {
-  formatCanonicalReleaseName,
-  type ReleaseIdentityInput,
-} from "@peated/bottle-classifier/releaseIdentity";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type {
   Category,
@@ -21,52 +17,6 @@ export function formatBottleName({
 } & Record<string, any>) {
   const bits = [name, edition].filter(Boolean);
   return bits.join(" - ");
-}
-
-export function formatReleaseName({
-  name, // bottle name / express name
-  edition,
-  abv,
-  statedAge,
-  releaseYear,
-  vintageYear,
-  singleCask,
-  caskStrength,
-  caskFill,
-  caskType,
-  caskSize,
-}: {
-  name?: string | null | undefined;
-  edition?: string | null | undefined;
-  abv?: number | null | undefined;
-  statedAge?: number | null | undefined;
-  releaseYear?: number | null | undefined;
-  vintageYear?: number | null | undefined;
-  singleCask?: boolean | null | undefined;
-  caskStrength?: boolean | null | undefined;
-  caskFill?: ReleaseIdentityInput["caskFill"] | undefined;
-  caskType?: ReleaseIdentityInput["caskType"] | undefined;
-  caskSize?: ReleaseIdentityInput["caskSize"] | undefined;
-}) {
-  // This legacy formatter is intentionally display-oriented. Canonical release
-  // writes must use formatCanonicalReleaseName with the parent bottle context.
-  return formatCanonicalReleaseName({
-    bottleName: name ?? "",
-    bottleFullName: name ?? "",
-    bottleStatedAge: null,
-    release: {
-      edition: edition ?? null,
-      statedAge: statedAge ?? null,
-      abv: abv ?? null,
-      releaseYear: releaseYear ?? null,
-      vintageYear: vintageYear ?? null,
-      singleCask: singleCask ?? null,
-      caskStrength: caskStrength ?? null,
-      caskFill: caskFill ?? null,
-      caskType: caskType ?? null,
-      caskSize: caskSize ?? null,
-    },
-  }).name;
 }
 
 export function formatCategoryName(

@@ -1,51 +1,18 @@
-import { db } from "@peated/server/db";
-import { reviews, storePrices } from "@peated/server/db/schema";
+import { syncBottleAliasConsumersForAliasChange } from "@peated/server/lib/bottleAliases";
 import { runJob } from "@peated/server/worker/client";
-import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 
-export default async ({ name }: { name: string }) => {
-  // sync any new matches
-  const alias = await db.query.bottleAliases.findFirst({
-    where: (bottleAliases, { eq }) =>
-      eq(sql`LOWER(${bottleAliases.name})`, name.toLowerCase()),
-  });
-  if (!alias) {
-    throw new Error(`Unknown bottle alias: ${name}`);
-  }
+/** Synchronizes unresolved direct-Bottle consumers before refreshing alias search. */
+export const OnBottleAliasChangeJobArgsSchema = z
+  .object({
+    name: z.string().min(1),
+  })
+  .strict();
 
-  if (alias.bottleId) {
-    const storePriceUpdate = alias.releaseId
-      ? db
-          .update(storePrices)
-          .set({
-            bottleId: alias.bottleId,
-            releaseId: alias.releaseId,
-          })
-          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()))
-      : db
-          .update(storePrices)
-          .set({
-            bottleId: alias.bottleId,
-          })
-          .where(eq(sql`LOWER(${storePrices.name})`, alias.name.toLowerCase()));
+export default async function onBottleAliasChange(input: unknown) {
+  const { name } = OnBottleAliasChangeJobArgsSchema.parse(input);
 
-    const reviewUpdate = alias.releaseId
-      ? db
-          .update(reviews)
-          .set({
-            bottleId: alias.bottleId,
-            releaseId: alias.releaseId,
-          })
-          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()))
-      : db
-          .update(reviews)
-          .set({
-            bottleId: alias.bottleId,
-          })
-          .where(eq(sql`LOWER(${reviews.name})`, alias.name.toLowerCase()));
-
-    await Promise.all([storePriceUpdate, reviewUpdate]);
-  }
+  await syncBottleAliasConsumersForAliasChange(name);
 
   await runJob("IndexBottleAlias", { name });
-};
+}

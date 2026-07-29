@@ -4,6 +4,16 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
+async function insertCollectionBottles(
+  values:
+    | typeof collectionBottles.$inferInsert
+    | (typeof collectionBottles.$inferInsert)[],
+) {
+  await db
+    .insert(collectionBottles)
+    .values(Array.isArray(values) ? values : [values]);
+}
+
 describe("GET /activity", () => {
   test("returns tastings and grouped collection additions", async ({
     fixtures,
@@ -17,11 +27,12 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: user.id,
     });
-    const [firstBottle, secondBottle] = await Promise.all([
+    const [firstBottle, secondBottle, thirdBottle] = await Promise.all([
       fixtures.Bottle(),
       fixtures.Bottle(),
+      fixtures.Bottle({ name: "Activity preview" }),
     ]);
-    await db.insert(collectionBottles).values([
+    await insertCollectionBottles([
       {
         collectionId: collection.id,
         bottleId: firstBottle.id,
@@ -31,6 +42,11 @@ describe("GET /activity", () => {
         collectionId: collection.id,
         bottleId: secondBottle.id,
         createdAt: new Date("2026-01-03T12:10:00Z"),
+      },
+      {
+        collectionId: collection.id,
+        bottleId: thirdBottle.id,
+        createdAt: new Date("2026-01-03T12:20:00Z"),
       },
     ]);
 
@@ -46,6 +62,9 @@ describe("GET /activity", () => {
       priority: "primary",
       tasting: {
         id: tasting.id,
+        bottle: {
+          id: tasting.bottleId,
+        },
       },
     });
     expect(result.results[1]).toMatchObject({
@@ -58,8 +77,15 @@ describe("GET /activity", () => {
         id: collection.id,
         href: `/users/${user.username}/library`,
       },
-      totalItems: 2,
+      totalItems: 3,
     });
+    const collectionItems =
+      result.results[1].type === "collection_add"
+        ? result.results[1].items
+        : [];
+    expect(collectionItems.map((item) => item.bottle.id)).toEqual(
+      expect.arrayContaining([firstBottle.id, secondBottle.id, thirdBottle.id]),
+    );
   });
 
   test("hides private users from anonymous global activity", async ({
@@ -79,7 +105,7 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: privateUser.id,
     });
-    await db.insert(collectionBottles).values({
+    await insertCollectionBottles({
       collectionId: privateCollection.id,
       bottleId: (await fixtures.Bottle()).id,
       createdAt: new Date("2026-01-03T12:45:00Z"),
@@ -117,7 +143,7 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: friend.id,
     });
-    await db.insert(collectionBottles).values({
+    await insertCollectionBottles({
       collectionId: collection.id,
       bottleId: (await fixtures.Bottle()).id,
       createdAt: new Date("2026-01-03T12:00:00Z"),
@@ -186,7 +212,7 @@ describe("GET /activity", () => {
       name: "Library",
       createdById: stranger.id,
     });
-    await db.insert(collectionBottles).values([
+    await insertCollectionBottles([
       {
         collectionId: friendCollection.id,
         bottleId: (await fixtures.Bottle()).id,
@@ -233,7 +259,7 @@ describe("GET /activity", () => {
       fixtures.Bottle(),
       fixtures.Bottle(),
     ]);
-    await db.insert(collectionBottles).values(
+    await insertCollectionBottles(
       bottles.map((bottle, index) => ({
         collectionId: collection.id,
         bottleId: bottle.id,
@@ -272,7 +298,7 @@ describe("GET /activity", () => {
         name: `Shelf ${i}`,
         createdById: user.id,
       });
-      await db.insert(collectionBottles).values({
+      await insertCollectionBottles({
         collectionId: collection.id,
         bottleId: (await fixtures.Bottle()).id,
         createdAt: new Date(`2026-01-03T1${i}:00:00Z`),

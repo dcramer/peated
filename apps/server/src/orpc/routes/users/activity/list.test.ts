@@ -4,6 +4,16 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
+async function insertCollectionBottles(
+  values:
+    | typeof collectionBottles.$inferInsert
+    | (typeof collectionBottles.$inferInsert)[],
+) {
+  await db
+    .insert(collectionBottles)
+    .values(Array.isArray(values) ? values : [values]);
+}
+
 describe("GET /users/:user/activity", () => {
   test("returns tastings as primary activity", async ({
     defaults,
@@ -77,7 +87,7 @@ describe("GET /users/:user/activity", () => {
       fixtures.Bottle(),
     ]);
 
-    await db.insert(collectionBottles).values(
+    await insertCollectionBottles(
       bottles.map((bottle, index) => ({
         collectionId: collection.id,
         bottleId: bottle.id,
@@ -105,6 +115,11 @@ describe("GET /users/:user/activity", () => {
       totalItems: 6,
     });
     expect(entry.type === "collection_add" ? entry.items : []).toHaveLength(4);
+    expect(
+      entry.type === "collection_add"
+        ? entry.items.every((item) => item.bottle.id > 0)
+        : false,
+    ).toBe(true);
   });
 
   test("keeps collection additions in separate time windows", async ({
@@ -120,7 +135,7 @@ describe("GET /users/:user/activity", () => {
       fixtures.Bottle(),
     ]);
 
-    await db.insert(collectionBottles).values([
+    await insertCollectionBottles([
       {
         collectionId: collection.id,
         bottleId: firstBottle.id,
@@ -183,7 +198,7 @@ describe("GET /users/:user/activity", () => {
       fixtures.Bottle(),
     ]);
 
-    await db.insert(collectionBottles).values([
+    await insertCollectionBottles([
       {
         collectionId: library.id,
         bottleId: libraryBottle.id,
@@ -219,7 +234,7 @@ describe("GET /users/:user/activity", () => {
     });
     const bottle = await fixtures.Bottle();
 
-    await db.insert(collectionBottles).values({
+    await insertCollectionBottles({
       collectionId: collection.id,
       bottleId: bottle.id,
       createdAt: new Date("2026-01-03T12:00:00Z"),
@@ -290,7 +305,7 @@ describe("GET /users/:user/activity", () => {
         createdById: defaults.user.id,
       });
       const bottle = await fixtures.Bottle();
-      await db.insert(collectionBottles).values({
+      await insertCollectionBottles({
         collectionId: collection.id,
         bottleId: bottle.id,
         createdAt: new Date(`2026-01-03T1${i}:00:00Z`),
@@ -325,7 +340,7 @@ describe("GET /users/:user/activity", () => {
         createdById: defaults.user.id,
       });
       const bottle = await fixtures.Bottle();
-      await db.insert(collectionBottles).values({
+      await insertCollectionBottles({
         collectionId: collection.id,
         bottleId: bottle.id,
         createdAt: new Date(`2026-01-03T1${i}:00:00Z`),
@@ -369,7 +384,7 @@ describe("GET /users/:user/activity", () => {
       createdById: defaults.user.id,
     });
     const bottle = await fixtures.Bottle();
-    await db.insert(collectionBottles).values({
+    await insertCollectionBottles({
       collectionId: collection.id,
       bottleId: bottle.id,
       createdAt: new Date("2026-01-03T12:00:00Z"),
@@ -402,7 +417,7 @@ describe("GET /users/:user/activity", () => {
       createdById: defaults.user.id,
     });
     const bottle = await fixtures.Bottle();
-    await db.insert(collectionBottles).values({
+    await insertCollectionBottles({
       collectionId: collection.id,
       bottleId: bottle.id,
       createdAt: new Date("2026-01-03T12:00:00Z"),

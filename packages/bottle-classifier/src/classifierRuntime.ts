@@ -110,7 +110,6 @@ export type BottleClassifierDataSource = {
   ) => Promise<BottleCandidate[]>;
   getBottleCandidateById?: (
     bottleId: number,
-    releaseId: number | null,
   ) => Promise<BottleCandidate | null>;
   searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
 };
@@ -220,10 +219,7 @@ function createLocalIdentificationNoMatch({
       webEvidence: "not_used",
     },
     matchedBottleId: null,
-    matchedReleaseId: null,
-    parentBottleId: null,
     proposedBottle: null,
-    proposedRelease: null,
   };
 }
 
@@ -257,23 +253,15 @@ function normalizeLocalIdentificationMatch(
 function hydratedCurrentBottleMatchesReference({
   currentBottle,
   bottleId,
-  releaseId,
 }: {
   currentBottle: BottleCandidate | null;
   bottleId: number;
-  releaseId: number | null;
 }): boolean {
-  if (!currentBottle || currentBottle.bottleId !== bottleId) {
-    return false;
-  }
-
-  return releaseId !== null
-    ? currentBottle.releaseId === releaseId
-    : currentBottle.releaseId === null || currentBottle.kind === "bottle";
+  return currentBottle?.bottleId === bottleId;
 }
 
 type BottleClassifierAgentRunState = {
-  candidateBottles: Map<string, BottleCandidate>;
+  candidateBottles: Map<number, BottleCandidate>;
   resolvedEntities: Map<number, EntityResolution>;
   searchEvidence: BottleClassificationArtifacts["searchEvidence"];
 };
@@ -354,7 +342,7 @@ function mergeSearchEvidence(
 }
 
 function sortedBottleCandidates(
-  candidateBottles: Map<string, BottleCandidate>,
+  candidateBottles: Map<number, BottleCandidate>,
 ) {
   return Array.from(candidateBottles.values()).sort(
     (left, right) => (right.score ?? 0) - (left.score ?? 0),
@@ -386,7 +374,7 @@ function mergeCandidateLists(
   existingCandidates: BottleCandidate[],
   nextCandidates: BottleCandidate[],
 ): BottleCandidate[] {
-  const candidatesByKey = new Map<string, BottleCandidate>();
+  const candidatesByKey = new Map<number, BottleCandidate>();
 
   for (const candidate of existingCandidates) {
     mergeBottleCandidate(candidatesByKey, candidate);
@@ -468,6 +456,9 @@ function extractedIdentityLooksWebInvestigable({
     extractedIdentity.edition !== null ||
     extractedIdentity.cask_strength === true ||
     extractedIdentity.single_cask === true ||
+    extractedIdentity.cask_type !== null ||
+    extractedIdentity.cask_size !== null ||
+    extractedIdentity.cask_fill !== null ||
     extractedIdentity.vintage_year !== null ||
     extractedIdentity.release_year !== null
   );
@@ -488,7 +479,6 @@ function shouldPreloadWebInvestigation({
     candidateExpansion === "open" &&
     artifacts.searchEvidence.length === 0 &&
     reference.currentBottleId == null &&
-    reference.currentReleaseId == null &&
     !artifacts.candidates.some((candidate) =>
       candidate.source.includes("exact"),
     ) &&
@@ -677,6 +667,9 @@ function buildNoMatchInvestigationQuery({
   if (extractedIdentity?.single_cask) {
     addSearchPart(parts, "single cask");
   }
+  addSearchPart(parts, extractedIdentity?.cask_type?.replace(/_/g, " "));
+  addSearchPart(parts, extractedIdentity?.cask_size?.replace(/_/g, " "));
+  addSearchPart(parts, extractedIdentity?.cask_fill?.replace(/_/g, " "));
   if (extractedIdentity?.abv != null) {
     addSearchPart(parts, `${extractedIdentity.abv}% ABV`);
   }
@@ -949,7 +942,7 @@ export async function prepareBottleClassifierAgentRun(
   const dataSource = getBottleClassifierDataSource(options);
   const state: BottleClassifierAgentRunState = {
     searchEvidence: [],
-    candidateBottles: new Map<string, BottleCandidate>(),
+    candidateBottles: new Map<number, BottleCandidate>(),
     resolvedEntities: new Map<number, EntityResolution>(),
   };
   const normalizedExtractedIdentity = extractedIdentity ?? null;
@@ -970,16 +963,9 @@ export async function prepareBottleClassifierAgentRun(
 
   const hydratedCurrentBottle = reference.currentBottleId
     ? dataSource.getBottleCandidateById
-      ? await dataSource.getBottleCandidateById(
-          reference.currentBottleId,
-          reference.currentReleaseId ?? null,
-        )
+      ? await dataSource.getBottleCandidateById(reference.currentBottleId)
       : (initialCandidates.find(
-          (candidate) =>
-            candidate.bottleId === reference.currentBottleId &&
-            (reference.currentReleaseId != null
-              ? candidate.releaseId === reference.currentReleaseId
-              : candidate.releaseId === null || candidate.kind === "bottle"),
+          (candidate) => candidate.bottleId === reference.currentBottleId,
         ) ?? null)
     : null;
   const currentBottle =
@@ -987,7 +973,6 @@ export async function prepareBottleClassifierAgentRun(
     hydratedCurrentBottleMatchesReference({
       currentBottle: hydratedCurrentBottle,
       bottleId: reference.currentBottleId,
-      releaseId: reference.currentReleaseId ?? null,
     })
       ? hydratedCurrentBottle
       : null;
@@ -1135,10 +1120,6 @@ export async function prepareBottleClassifierAgentRun(
         reference.currentBottleId == null
           ? "none"
           : `${reference.currentBottleId}`,
-      "bottle_classifier.current_release_id":
-        reference.currentReleaseId == null
-          ? "none"
-          : `${reference.currentReleaseId}`,
     },
     runOptions: {
       maxTurns: CLASSIFIER_MAX_TURNS,
@@ -1607,7 +1588,7 @@ export function createBottleClassifier(
             decision: {
               action: "no_match",
               rationale:
-                "Local identification found no existing bottle or release candidates.",
+                "Local identification found no existing Bottle candidates.",
               candidateBottleIds: [],
               identityScope: "product",
               observation: null,
@@ -1624,10 +1605,7 @@ export function createBottleClassifier(
                 webEvidence: "not_used",
               },
               matchedBottleId: null,
-              matchedReleaseId: null,
-              parentBottleId: null,
               proposedBottle: null,
-              proposedRelease: null,
             },
             artifacts,
           }),

@@ -5,5 +5,4 @@ export {
   type LocalCatalogAlias,
   type LocalCatalogBottle,
   type LocalCatalogEntity,
-  type LocalCatalogRelease,
 } from "./schema";

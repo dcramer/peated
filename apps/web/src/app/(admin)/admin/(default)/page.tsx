@@ -119,15 +119,6 @@ export default function Admin() {
   const entityAudits = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "entity-audits",
   )!;
-  const bottleNameRepairs = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "canon-repairs",
-  )!;
-  const bottleReleaseRepairs = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "release-repairs",
-  )!;
-  const ageRepairs = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "age-repairs",
-  )!;
 
   const queueQuery = useQuery(
     orpc.prices.matchQueue.list.queryOptions({
@@ -185,8 +176,9 @@ export default function Admin() {
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
               Incoming listings and catalog repairs use different tools. Start
               with the listing queue when retailer data is wrong or unmatched.
-              Switch to a repair queue when the bottle record itself needs to be
-              merged, split, or cleaned up.
+              Entity and brand repairs have dedicated queues. To merge exact
+              duplicate Bottles, use Merge Bottle from the Bottle page moderator
+              menu.
             </p>
 
             <div className="mt-4 grid gap-3 lg:grid-cols-2">
@@ -231,51 +223,6 @@ export default function Admin() {
                     className="font-medium text-white underline"
                   >
                     {brandRepairs.pageTitle}
-                  </Link>
-                  .
-                </div>
-              </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Duplicate bottle name
-                </div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Merge wording variants in{" "}
-                  <Link
-                    href={bottleNameRepairs.href}
-                    className="font-medium text-white underline"
-                  >
-                    {bottleNameRepairs.pageTitle}
-                  </Link>
-                  .
-                </div>
-              </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Bottle still contains release detail
-                </div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Split parent and child records in{" "}
-                  <Link
-                    href={bottleReleaseRepairs.href}
-                    className="font-medium text-white underline"
-                  >
-                    {bottleReleaseRepairs.pageTitle}
-                  </Link>
-                  .
-                </div>
-              </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Parent age is dirty
-                </div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Move release-specific ages in{" "}
-                  <Link
-                    href={ageRepairs.href}
-                    className="font-medium text-white underline"
-                  >
-                    {ageRepairs.pageTitle}
                   </Link>
                   .
                 </div>
@@ -351,30 +298,6 @@ export default function Admin() {
             summary={brandRepairs.summary}
             title={brandRepairs.pageTitle}
             whenToUse={brandRepairs.whenToUse}
-          />
-          <WorkbenchCard
-            detail="Open this queue to review the current merge candidates and pick the cleaner bottle name."
-            href={bottleNameRepairs.href}
-            hrefLabel="Open Bottle Name Repairs"
-            summary={bottleNameRepairs.summary}
-            title={bottleNameRepairs.pageTitle}
-            whenToUse={bottleNameRepairs.whenToUse}
-          />
-          <WorkbenchCard
-            detail="Open this queue to review the current parent and release split candidates."
-            href={bottleReleaseRepairs.href}
-            hrefLabel="Open Bottle / Release Repairs"
-            summary={bottleReleaseRepairs.summary}
-            title={bottleReleaseRepairs.pageTitle}
-            whenToUse={bottleReleaseRepairs.whenToUse}
-          />
-          <WorkbenchCard
-            detail="Open this queue to review parent bottles whose age should move onto a child release."
-            href={ageRepairs.href}
-            hrefLabel="Open Parent Age Repairs"
-            summary={ageRepairs.summary}
-            title={ageRepairs.pageTitle}
-            whenToUse={ageRepairs.whenToUse}
           />
         </section>
       </div>

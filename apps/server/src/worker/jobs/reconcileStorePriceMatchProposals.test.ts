@@ -87,6 +87,34 @@ describe("reconcileStorePriceMatchProposals", () => {
     expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
+  test("uses direct Bottle identity to identify unmatched rows", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const unresolved = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Unresolved listing",
+    });
+    const direct = await fixtures.StorePrice({
+      bottleId: bottle.id,
+      name: "Direct Bottle listing",
+    });
+    await agePrice(unresolved.id, 60);
+    await agePrice(direct.id, 60);
+
+    const result = await reconcileStorePriceMatchProposals();
+
+    expect(result).toEqual({ queuedCount: 1 });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: unresolved.id },
+    );
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
+      "ResolveStorePriceBottle",
+      { priceId: direct.id },
+    );
+  });
+
   test("honors the minimum age guard", async ({ fixtures }) => {
     const freshPrice = await fixtures.StorePrice({
       bottleId: null,

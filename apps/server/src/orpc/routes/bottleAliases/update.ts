@@ -1,14 +1,18 @@
 import { db } from "@peated/server/db";
-import { bottleAliases } from "@peated/server/db/schema";
+import { bottleAliases, bottles } from "@peated/server/db/schema";
+import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { eq, sql } from "drizzle-orm";
+import { pushJob, pushUniqueJob } from "@peated/server/worker/client";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
-const InputSchema = z.object({
-  alias: z.string(),
-  ignored: z.boolean().optional(),
-});
+const InputSchema = z
+  .object({
+    alias: z.string(),
+    ignored: z.boolean().optional(),
+  })
+  .strict();
 
 const OutputSchema = z.object({
   name: z.string(),
@@ -16,6 +20,7 @@ const OutputSchema = z.object({
 });
 
 export default procedure
+  .use(requireMod)
   .route({
     method: "PATCH",
     path: "/bottle-aliases/{alias}",
@@ -24,44 +29,118 @@ export default procedure
       "Update bottle alias properties such as ignored status. Requires moderator privileges",
     operationId: "updateBottleAlias",
   })
-  .use(requireMod)
   .input(InputSchema)
   .output(OutputSchema)
-  .handler(async function ({ input, context, errors }) {
+  .handler(async function ({ input, errors }) {
     const { alias: aliasName, ...data } = input;
 
-    const [alias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()));
+    const updateResult = await db.transaction(async (tx) => {
+      const [alias] = await tx
+        .select({
+          name: bottleAliases.name,
+          bottleId: bottleAliases.bottleId,
+          ignored: bottleAliases.ignored,
+          assignmentSource: bottleAliases.assignmentSource,
+          assignedByActorId: bottleAliases.assignedByActorId,
+          createdAt: bottleAliases.createdAt,
+        })
+        .from(bottleAliases)
+        .where(eq(sql`LOWER(${bottleAliases.name})`, aliasName.toLowerCase()))
+        .limit(1);
 
-    if (!alias) {
-      throw errors.NOT_FOUND({
-        message: "Alias not found.",
-      });
-    }
+      if (!alias) {
+        throw errors.NOT_FOUND({
+          message: "Alias not found.",
+        });
+      }
+      if (data.ignored === true && alias.bottleId !== null) {
+        const aliasBottleId = alias.bottleId;
+        const [bottle] = await tx
+          .select()
+          .from(bottles)
+          .where(eq(bottles.id, aliasBottleId))
+          .limit(1)
+          .for("update");
+        if (!bottle) {
+          throw errors.CONFLICT({
+            message: "Bottle Alias points to a missing Bottle.",
+          });
+        }
+        if (alias.name.toLowerCase() === bottle.fullName.toLowerCase()) {
+          throw errors.BAD_REQUEST({
+            message: "Cannot ignore canonical name",
+          });
+        }
+      }
 
-    if (Object.values(data).length === 0) {
+      if (Object.values(data).length === 0) {
+        return {
+          result: {
+            name: alias.name,
+            createdAt: alias.createdAt.toISOString(),
+          },
+          changed: false,
+          bottleId: alias.bottleId,
+        };
+      }
+
+      const [updatedAlias] = await tx
+        .update(bottleAliases)
+        .set({ ...data, embedding: null })
+        .where(
+          and(
+            eq(bottleAliases.name, alias.name),
+            sql`${bottleAliases.bottleId} IS NOT DISTINCT FROM ${alias.bottleId}`,
+            sql`${bottleAliases.ignored} IS NOT DISTINCT FROM ${alias.ignored}`,
+            sql`${bottleAliases.assignmentSource} IS NOT DISTINCT FROM ${alias.assignmentSource}`,
+            sql`${bottleAliases.assignedByActorId} IS NOT DISTINCT FROM ${alias.assignedByActorId}`,
+          ),
+        )
+        .returning({
+          name: bottleAliases.name,
+          bottleId: bottleAliases.bottleId,
+          createdAt: bottleAliases.createdAt,
+        });
+
+      if (!updatedAlias) {
+        throw errors.CONFLICT({
+          message:
+            "Bottle Alias changed while it was being updated. Retry the operation.",
+        });
+      }
+
       return {
-        name: alias.name,
-        createdAt: alias.createdAt.toISOString(),
+        result: {
+          name: updatedAlias.name,
+          createdAt: updatedAlias.createdAt.toISOString(),
+        },
+        changed: true,
+        bottleId: updatedAlias.bottleId,
       };
+    });
+
+    if (updateResult.changed) {
+      try {
+        await pushJob("IndexBottleAlias", { name: updateResult.result.name });
+      } catch (error) {
+        logError(error, {
+          bottleAlias: { name: updateResult.result.name },
+        });
+      }
+
+      if (updateResult.bottleId !== null) {
+        try {
+          await pushUniqueJob("IndexBottleSearchVectors", {
+            bottleId: updateResult.bottleId,
+          });
+        } catch (error) {
+          logError(error, {
+            bottleAlias: { name: updateResult.result.name },
+            bottle: { id: updateResult.bottleId },
+          });
+        }
+      }
     }
 
-    const [newAlias] = await db
-      .update(bottleAliases)
-      .set(data)
-      .where(eq(sql`LOWER(${bottleAliases.name})`, alias.name.toLowerCase()))
-      .returning();
-
-    if (!newAlias) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Failed to update alias.",
-      });
-    }
-
-    return {
-      name: newAlias.name,
-      createdAt: newAlias.createdAt.toISOString(),
-    };
+    return updateResult.result;
   });

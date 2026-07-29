@@ -1,11 +1,6 @@
 import { db } from "@peated/server/db";
-import type { Tasting } from "@peated/server/db/schema";
-import {
-  bottleTags,
-  bottles,
-  follows,
-  tastings,
-} from "@peated/server/db/schema";
+import type { NewTasting, Tasting } from "@peated/server/db/schema";
+import { bottleTags, follows, tastings } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -13,25 +8,44 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
 import { validateTags } from "@peated/server/orpc/validators/tags";
-import { TastingInputSchema, TastingSchema } from "@peated/server/schemas";
+import {
+  TastingContentInputSchema,
+  TastingSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { pushJob } from "@peated/server/worker/client";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
+import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 
-const InputSchema = z.object({
-  tasting: z.coerce.number(),
-  notes: TastingInputSchema.shape.notes.removeDefault().optional(),
-  rating: TastingInputSchema.shape.rating.removeDefault().optional(),
-  servingStyle: TastingInputSchema.shape.servingStyle
-    .removeDefault()
-    .optional(),
-  color: TastingInputSchema.shape.color.removeDefault().optional(),
-  friends: TastingInputSchema.shape.friends.removeDefault().optional(),
-  tags: TastingInputSchema.shape.tags.removeDefault().optional(),
-  image: TastingInputSchema.shape.image.optional(),
-});
+const InputSchema = z
+  .object({
+    tasting: z.coerce.number(),
+    notes: TastingContentInputSchema.shape.notes.removeDefault().optional(),
+    rating: TastingContentInputSchema.shape.rating.removeDefault().optional(),
+    servingStyle: TastingContentInputSchema.shape.servingStyle
+      .removeDefault()
+      .optional(),
+    color: TastingContentInputSchema.shape.color.removeDefault().optional(),
+    friends: TastingContentInputSchema.shape.friends.removeDefault().optional(),
+    tags: TastingContentInputSchema.shape.tags.removeDefault().optional(),
+    image: TastingContentInputSchema.shape.image.optional(),
+  })
+  .strict();
+
+type TastingUpdate = Partial<
+  Pick<
+    NewTasting,
+    | "notes"
+    | "rating"
+    | "servingStyle"
+    | "color"
+    | "friends"
+    | "tags"
+    | "imageUrl"
+  >
+>;
 
 export default procedure
   .use(requireAuth)
@@ -55,9 +69,6 @@ export default procedure
           eq(tastings.id, input.tasting),
           eq(tastings.createdById, context.user.id),
         ),
-      with: {
-        bottle: true,
-      },
     });
     if (!tasting) {
       throw errors.NOT_FOUND({
@@ -65,7 +76,7 @@ export default procedure
       });
     }
 
-    const tastingData: { [name: string]: any } = {};
+    const tastingData: TastingUpdate = {};
     if (input.notes !== undefined && input.notes !== tasting.notes) {
       tastingData.notes = input.notes;
     }
@@ -119,7 +130,28 @@ export default procedure
       tastingData.imageUrl = null;
     }
 
-    const newTasting = await db.transaction(async (tx) => {
+    const ratingChanged = tastingData.rating !== undefined;
+    const updated = await db.transaction(async (tx) => {
+      // Mutation and dispatch use the Bottle reference current after locking.
+      const [currentTasting] = await tx
+        .select()
+        .from(tastings)
+        .where(
+          and(
+            eq(tastings.id, tasting.id),
+            eq(tastings.createdById, context.user.id),
+          ),
+        )
+        .limit(1)
+        .for("update");
+      if (!currentTasting) return;
+
+      const needsBottle = ratingChanged || tastingData.tags !== undefined;
+      if (needsBottle && currentTasting.bottleId === null) {
+        throw errors.CONFLICT({
+          message: `Tasting ${currentTasting.id} has no Bottle.`,
+        });
+      }
       let newTasting: Tasting | undefined;
       try {
         newTasting = Object.values(tastingData).length
@@ -127,34 +159,24 @@ export default procedure
               await tx
                 .update(tastings)
                 .set(tastingData)
-                .where(eq(tastings.id, tasting.id))
+                .where(eq(tastings.id, currentTasting.id))
                 .returning()
             )[0]
-          : tasting;
-      } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "tasting_unq") {
+          : currentTasting;
+      } catch (error) {
+        if (isTastingIdentityConflict(error)) {
           throw errors.CONFLICT({
             message: "Tasting already exists.",
-            cause: err,
+            cause: error,
           });
         }
-        throw err;
+        throw error;
       }
       if (!newTasting) return;
 
-      // rating was updated
-      if (tastingData.rating !== undefined) {
-        await tx
-          .update(bottles)
-          .set({
-            avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
-          })
-          .where(eq(bottles.id, newTasting.bottleId));
-      }
-
       if (tastingData.tags !== undefined) {
-        // TODO: we're being lazy - db access could be optimized
-        for (const tag of tasting.tags) {
+        const bottleId = currentTasting.bottleId!;
+        for (const tag of currentTasting.tags) {
           await tx
             .update(bottleTags)
             .set({
@@ -162,7 +184,7 @@ export default procedure
             })
             .where(
               and(
-                eq(bottleTags.bottleId, tasting.bottleId),
+                eq(bottleTags.bottleId, bottleId),
                 eq(bottleTags.tag, tag),
                 gt(bottleTags.count, 0),
               ),
@@ -172,7 +194,7 @@ export default procedure
           await tx
             .insert(bottleTags)
             .values({
-              bottleId: newTasting.bottleId,
+              bottleId,
               tag,
               count: 1,
             })
@@ -185,18 +207,21 @@ export default procedure
         }
       }
 
-      return newTasting;
+      return {
+        tasting: newTasting,
+        statsBottleId: ratingChanged ? currentTasting.bottleId : null,
+      };
     });
 
-    if (!newTasting) {
+    if (!updated) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to update tasting.",
       });
     }
+    const { tasting: newTasting, statsBottleId } = updated;
 
-    // Update bottle stats if rating changed
-    if (tastingData.rating !== undefined) {
-      await pushJob("UpdateBottleStats", { bottleId: tasting.bottleId });
+    if (statsBottleId !== null) {
+      await dispatchTastingStatsRecompute(newTasting.id, statsBottleId);
     }
 
     return await serialize(TastingSerializer, newTasting, context.user);

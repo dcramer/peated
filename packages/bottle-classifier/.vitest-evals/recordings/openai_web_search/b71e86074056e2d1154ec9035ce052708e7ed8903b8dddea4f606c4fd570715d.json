@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:11:26.196Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey 45.2%"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Kentucky Straight Malt Whiskey 45.2%",
+    "summary": "Confirmed bottle details for **Woodford Reserve Kentucky Straight Malt Whiskey 45.2% ABV**:\n\n- **Producer / brand:** Woodford Reserve, part of Brown-Forman. ([iwsc.net](https://www.iwsc.net/results/detail/135687/woodford-reserve-kentucky-straight-malt-whiskey?utm_source=openai))\n- **Style / legal class:** **Kentucky St",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/81525/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/brand/81525/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/137791/woodford-reserve-distillers-select",
+        "url": "https://www.whiskybase.com/whiskies/whisky/137791/woodford-reserve-distillers-select",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/our-whiskey/product-locator/",
+        "url": "https://www.woodfordreserve.com/our-whiskey/product-locator/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/distillery/218/woodford-reserve?language=de",
+        "url": "https://www.whiskybase.com/whiskies/distillery/218/woodford-reserve?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/spirits",
+        "url": "https://shop.woodfordreserve.com/spirits",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/de/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/de/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "b71e86074056e2d1154ec9035ce052708e7ed8903b8dddea4f606c4fd570715d",
+    "mode": "auto"
+  }
+}

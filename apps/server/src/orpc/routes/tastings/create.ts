@@ -1,25 +1,23 @@
-import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
 import {
-  bottleReleases,
-  bottles,
   bottleTags,
-  bottleTombstones,
-  entities,
   flightBottles,
   flights,
   follows,
   tastings,
 } from "@peated/server/db/schema";
 import { awardAllBadgeXp } from "@peated/server/lib/badges";
-import { notEmpty } from "@peated/server/lib/filter";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToTasting,
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -38,21 +36,8 @@ import { TastingSerializer } from "@peated/server/serializers/tasting";
 import { pushJob } from "@peated/server/worker/client";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
-
-async function findTastingBottle(bottleId: number) {
-  return await db.query.bottles.findFirst({
-    where: eq(bottles.id, bottleId),
-    with: {
-      bottler: true,
-      brand: true,
-      bottlesToDistillers: {
-        with: {
-          distiller: true,
-        },
-      },
-    },
-  });
-}
+import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
+import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
 
 export default procedure
   .use(requireAuth)
@@ -73,35 +58,6 @@ export default procedure
     }),
   )
   .handler(async function ({ input, context, errors }) {
-    let bottle = await findTastingBottle(input.bottle);
-    if (!bottle) {
-      const tombstone = await db.query.bottleTombstones.findFirst({
-        where: eq(bottleTombstones.bottleId, input.bottle),
-      });
-      if (tombstone?.newBottleId) {
-        bottle = await findTastingBottle(tombstone.newBottleId);
-      }
-    }
-    if (!bottle) {
-      throw errors.BAD_REQUEST({
-        message: "Cannot identify bottle.",
-      });
-    }
-
-    if (input.release) {
-      const release = await db.query.bottleReleases.findFirst({
-        where: and(
-          eq(bottleReleases.id, input.release),
-          eq(bottleReleases.bottleId, bottle.id),
-        ),
-      });
-      if (!release) {
-        throw errors.BAD_REQUEST({
-          message: "Cannot identify release.",
-        });
-      }
-    }
-
     if (input.pendingImageId) {
       try {
         const pendingUpload = await getUsablePendingUpload({
@@ -121,33 +77,9 @@ export default procedure
       }
     }
 
-    let flight: Flight | null = null;
-    if (input.flight) {
-      const flightResults = await db
-        .select()
-        .from(flights)
-        .innerJoin(flightBottles, eq(flightBottles.flightId, flights.id))
-        .where(
-          and(
-            eq(flights.publicId, input.flight),
-            eq(flightBottles.bottleId, bottle.id),
-          ),
-        )
-        .limit(1);
-      if (flightResults.length !== 1) {
-        throw errors.BAD_REQUEST({
-          message: "Cannot identify flight.",
-        });
-      }
-      flight = flightResults[0].flight;
-    }
-
-    const data: NewTasting = {
-      bottleId: bottle.id,
-      releaseId: input.release || null,
+    const data: Omit<NewTasting, "bottleId"> = {
       notes: input.notes || null,
       rating: input.rating || null,
-      flightId: flight ? flight.id : null,
       servingStyle: input.servingStyle || null,
       color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],
@@ -177,61 +109,66 @@ export default procedure
       data.friends = input.friends;
     }
 
-    let [tasting, awards] = await db.transaction(async (tx) => {
-      let tasting: Tasting | undefined;
+    const created = await db.transaction(async (tx) => {
       try {
-        [tasting] = await tx.insert(tastings).values(data).returning();
-      } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "tasting_unq") {
-          throw errors.CONFLICT({
-            message: "Tasting already exists.",
-            cause: err,
+        await resolveActiveBottleIds(tx, [input.bottle]);
+      } catch (error) {
+        if (!(error instanceof ActiveBottleSelectionError)) throw error;
+        throw errors.BAD_REQUEST({
+          message: "Cannot identify bottle.",
+          cause: error,
+        });
+      }
+      const bottleId = input.bottle;
+
+      let flight: Flight | null = null;
+      if (input.flight) {
+        const flightResults = await tx
+          .select()
+          .from(flights)
+          .innerJoin(flightBottles, eq(flightBottles.flightId, flights.id))
+          .where(
+            and(
+              eq(flights.publicId, input.flight),
+              eq(flightBottles.bottleId, bottleId),
+            ),
+          )
+          .limit(1);
+        if (flightResults.length !== 1) {
+          throw errors.BAD_REQUEST({
+            message: "Cannot identify flight.",
           });
         }
-        throw err;
+        flight = flightResults[0].flight;
       }
-      if (!tasting) return [];
 
-      await tx
-        .update(bottles)
-        .set({
-          totalTastings: sql`${bottles.totalTastings} + 1`,
-          avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.rating} IS NOT NULL)`,
-        })
-        .where(eq(bottles.id, bottle.id));
-
-      if (tasting.releaseId) {
-        await tx
-          .update(bottleReleases)
-          .set({
-            totalTastings: sql`${bottleReleases.totalTastings} + 1`,
+      let tasting: Tasting | undefined;
+      try {
+        [tasting] = await tx
+          .insert(tastings)
+          .values({
+            ...data,
+            bottleId,
+            flightId: flight?.id ?? null,
           })
-          .where(eq(bottleReleases.id, tasting.releaseId));
+          .returning();
+      } catch (error) {
+        if (isTastingIdentityConflict(error)) {
+          throw errors.CONFLICT({
+            message: "Tasting already exists.",
+            cause: error,
+          });
+        }
+        throw error;
       }
+      if (!tasting) return null;
 
-      const distillerIds = bottle.bottlesToDistillers.map((d) => d.distillerId);
-
-      await Promise.all([
-        tx
-          .update(entities)
-          .set({ totalTastings: sql`${entities.totalTastings} + 1` })
-          .where(
-            inArray(
-              entities.id,
-              Array.from(
-                new Set(
-                  [bottle.brandId, ...distillerIds, bottle.bottlerId].filter(
-                    notEmpty,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ...tasting.tags.map((tag) =>
+      await Promise.all(
+        tasting.tags.map((tag) =>
           tx
             .insert(bottleTags)
             .values({
-              bottleId: bottle.id,
+              bottleId,
               tag,
               count: 1,
             })
@@ -242,12 +179,9 @@ export default procedure
               },
             }),
         ),
-      ]);
+      );
 
-      const awards = await awardAllBadgeXp(tx, {
-        ...tasting,
-        bottle,
-      });
+      const awards = await awardAllBadgeXp(tx, tasting);
 
       for (const award of awards) {
         Object.assign(award, {
@@ -255,14 +189,16 @@ export default procedure
         });
       }
 
-      return [tasting, awards];
+      return { tasting, awards, bottleId };
     });
 
-    if (!tasting) {
+    if (!created) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to create tasting.",
       });
     }
+    let { tasting } = created;
+    const { awards, bottleId } = created;
 
     if (input.pendingImageId) {
       try {
@@ -301,8 +237,7 @@ export default procedure
       }
     }
 
-    // Update bottle rating stats
-    await pushJob("UpdateBottleStats", { bottleId: bottle.id });
+    await dispatchTastingStatsRecompute(tasting.id, bottleId);
 
     return {
       tasting: await serialize(TastingSerializer, tasting, context.user),

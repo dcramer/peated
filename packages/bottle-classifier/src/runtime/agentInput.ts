@@ -47,7 +47,6 @@ export function buildAgentInput({
         url: reference.url ?? null,
         imageUrl: reference.imageUrl ?? null,
         currentBottleId: reference.currentBottleId ?? null,
-        currentReleaseId: reference.currentReleaseId ?? null,
       },
       candidateExpansion,
       currentBottle,
@@ -94,11 +93,13 @@ export function buildDefaultBottleSearchInput({
     abv: extractedIdentity?.abv ?? null,
     cask_strength: extractedIdentity?.cask_strength ?? null,
     single_cask: extractedIdentity?.single_cask ?? null,
+    cask_type: extractedIdentity?.cask_type ?? null,
+    cask_size: extractedIdentity?.cask_size ?? null,
+    cask_fill: extractedIdentity?.cask_fill ?? null,
     edition: extractedIdentity?.edition ?? null,
     vintage_year: extractedIdentity?.vintage_year ?? null,
     release_year: extractedIdentity?.release_year ?? null,
     currentBottleId: reference.currentBottleId ?? null,
-    currentReleaseId: reference.currentReleaseId ?? null,
     limit: DEFAULT_MATCH_CANDIDATE_LIMIT,
   });
 }

@@ -5,10 +5,6 @@ import type { Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
 import Link from "@peated/web/components/link";
-import {
-  getBottleBottlingPath,
-  getNewBottleBottlingPath,
-} from "@peated/web/lib/bottlings";
 import classNames from "@peated/web/lib/classNames";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { type ReactNode, useState } from "react";
@@ -29,9 +25,9 @@ type RepairChange = {
 };
 type RecommendationBottle = {
   fullName?: string;
-  brand: { name: string };
+  brand: { id: number | null; name: string };
   name: string;
-  series: { name: string } | null;
+  series: { id: number | null; name: string } | null;
   category: string | null;
   edition: string | null;
   statedAge: number | null;
@@ -43,26 +39,37 @@ type RecommendationBottle = {
   caskType: string | null;
   caskSize: string | null;
   caskFill: string | null;
-  distillers: Array<{ name: string }>;
-  bottler: { name: string } | null;
+  distillers: Array<{ id: number | null; name: string }>;
+  bottler: { id: number | null; name: string } | null;
 };
-type RecommendationRelease = {
-  id?: number;
-  bottleId?: number;
-  fullName?: string;
-  name?: string;
-  edition: string | null;
-  statedAge: number | null;
-  abv: number | null;
-  caskStrength: boolean | null;
-  singleCask: boolean | null;
-  vintageYear: number | null;
-  releaseYear: number | null;
-  caskType: string | null;
-  caskFill: string | null;
-  caskSize: string | null;
+type CurrentBottle = NonNullable<QueueItem["currentBottle"]>;
+type BottleReference = Pick<CurrentBottle, "id">;
+type RepairProposalItem = Pick<QueueItem, "proposalType" | "proposedBottle"> & {
+  currentBottle: BottleReference | null;
+  suggestedBottle: BottleReference | null;
 };
-
+type SuggestedBottleDecision = RepairProposalItem &
+  Pick<QueueItem, "status" | "isProcessing">;
+type RepairBottle = Pick<
+  CurrentBottle,
+  | "name"
+  | "category"
+  | "edition"
+  | "statedAge"
+  | "abv"
+  | "caskStrength"
+  | "singleCask"
+  | "vintageYear"
+  | "releaseYear"
+  | "caskType"
+  | "caskSize"
+  | "caskFill"
+> & {
+  brand: Pick<CurrentBottle["brand"], "id">;
+  series: Pick<NonNullable<CurrentBottle["series"]>, "id"> | null;
+  distillers: Array<Pick<CurrentBottle["distillers"][number], "id">>;
+  bottler: Pick<NonNullable<CurrentBottle["bottler"]>, "id"> | null;
+};
 type QueueItemCardProps = {
   isBusy: boolean;
   item: QueueItem;
@@ -252,84 +259,60 @@ function formatRepairValue(value: string | null): string {
   return value ?? "unknown";
 }
 
-function isRepairProposal(item: QueueItem): boolean {
+function formatExistingBottleValue(hasValue: boolean): string | null {
+  return hasValue ? "Existing Bottle value" : null;
+}
+
+export function isRepairProposal(item: RepairProposalItem): boolean {
   return (
     item.proposalType === "correction" &&
-    !!item.currentBottle &&
-    !!item.suggestedBottle &&
+    item.currentBottle !== null &&
+    item.suggestedBottle !== null &&
     item.currentBottle.id === item.suggestedBottle.id &&
-    !!item.proposedBottle &&
-    !item.proposedRelease
+    !!item.proposedBottle
   );
 }
 
-function getBottleTitle(bottle: RecommendationBottle): string {
-  return bottle.fullName ?? `${bottle.brand.name} ${bottle.name}`.trim();
+export function canApproveSuggestedBottle(
+  item: SuggestedBottleDecision,
+): boolean {
+  return (
+    item.status === "pending_review" &&
+    item.suggestedBottle !== null &&
+    !isRepairProposal(item) &&
+    !item.isProcessing
+  );
 }
 
-function getBottlingTitle(release: RecommendationRelease): string {
-  if (release.name) {
-    return release.name;
-  }
-
-  if (release.edition) {
-    return release.edition;
-  }
-
-  if (release.releaseYear !== null && release.vintageYear !== null) {
-    return `${release.releaseYear} Bottling (${release.vintageYear} Vintage)`;
-  }
-
-  if (release.releaseYear !== null) {
-    return `${release.releaseYear} Bottling`;
-  }
-
-  if (release.vintageYear !== null) {
-    return `${release.vintageYear} Vintage`;
-  }
-
-  if (release.statedAge !== null) {
-    return `${release.statedAge}-year-old bottling`;
-  }
-
-  if (release.singleCask) {
-    return "Single cask bottling";
-  }
-
-  if (release.caskStrength) {
-    return "Cask strength bottling";
-  }
-
-  return "Specific bottling";
+function getChoiceName(
+  choice: number | { name?: string | null } | null | undefined,
+): string | null {
+  return typeof choice === "object" && choice?.name ? choice.name : null;
 }
 
-function getBottleFields(bottle: RecommendationBottle): RecommendationField[] {
+function getConcreteBottleDraftFields(
+  bottle: NonNullable<QueueItem["proposedBottle"]>,
+): RecommendationField[] {
   const fields: RecommendationField[] = [
     {
       label: "Brand",
-      value: bottle.brand.name,
+      value: getChoiceName(bottle.brand) ?? "Selected brand",
     },
     {
       label: "Bottle Name",
-      value: bottle.name,
+      value: bottle.name ?? "Not specified",
     },
   ];
 
-  if (bottle.series) {
+  const seriesName = getChoiceName(bottle.series);
+  if (seriesName) {
     fields.push({
       label: "Series",
-      value: bottle.series.name,
+      value: seriesName,
     });
   }
 
-  if (bottle.edition) {
-    fields.push({
-      label: "Edition",
-      value: bottle.edition,
-    });
-  }
-
-  if (bottle.statedAge !== null) {
+  if (bottle.statedAge !== null && bottle.statedAge !== undefined) {
     fields.push({
       label: "Age",
       value: formatAge(bottle.statedAge),
@@ -343,78 +326,66 @@ function getBottleFields(bottle: RecommendationBottle): RecommendationField[] {
     });
   }
 
-  if (bottle.distillers.length > 0) {
+  const distillerNames =
+    bottle.distillers?.map(getChoiceName).filter((name) => name !== null) ?? [];
+  if (distillerNames.length > 0) {
     fields.push({
       label: "Distillery",
-      value: bottle.distillers.map((distiller) => distiller.name).join(", "),
+      value: distillerNames.join(", "),
       fullWidth: true,
     });
   }
 
-  if (bottle.bottler) {
+  const bottlerName = getChoiceName(bottle.bottler);
+  if (bottlerName) {
     fields.push({
       label: "Bottler",
-      value: bottle.bottler.name,
+      value: bottlerName,
       fullWidth: true,
     });
   }
-
-  return fields;
-}
-
-function getBottlingFields(
-  release: RecommendationRelease,
-): RecommendationField[] {
-  const fields: RecommendationField[] = [];
   const caskDetails = [
-    release.caskType,
-    release.caskFill,
-    release.caskSize,
+    bottle.caskType,
+    bottle.caskFill,
+    bottle.caskSize,
   ].filter(Boolean);
 
-  if (release.edition) {
+  if (bottle.edition) {
     fields.push({
       label: "Edition",
-      value: release.edition,
+      value: bottle.edition,
     });
   }
 
-  if (release.statedAge !== null) {
-    fields.push({
-      label: "Age",
-      value: formatAge(release.statedAge),
-    });
-  }
-
-  if (release.abv !== null) {
+  if (bottle.abv !== null && bottle.abv !== undefined) {
     fields.push({
       label: "ABV",
-      value: formatAbv(release.abv),
+      value: formatAbv(bottle.abv),
     });
   }
 
-  if (release.releaseYear !== null) {
+  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
     fields.push({
       label: "Release Year",
-      value: release.releaseYear,
+      value: bottle.releaseYear,
     });
   }
 
-  if (release.vintageYear !== null) {
+  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
     fields.push({
       label: "Vintage Year",
-      value: release.vintageYear,
+      value: bottle.vintageYear,
     });
   }
 
-  if (release.caskStrength) {
+  if (bottle.caskStrength) {
     fields.push({
       label: "Strength",
       value: "Cask strength",
     });
   }
 
-  if (release.singleCask) {
+  if (bottle.singleCask) {
     fields.push({
       label: "Cask Source",
       value: "Single cask",
@@ -432,8 +403,8 @@ function getBottlingFields(
   return fields;
 }
 
-function getBottleRepairChanges(
-  currentBottle: RecommendationBottle,
+export function getBottleRepairChanges(
+  currentBottle: RepairBottle,
   proposedBottle: RecommendationBottle,
 ): RepairChange[] {
   const changes: RepairChange[] = [];
@@ -458,34 +429,51 @@ function getBottleRepairChanges(
     });
   };
 
-  pushChange("Brand", currentBottle.brand.name, proposedBottle.brand.name);
+  if (currentBottle.brand.id !== proposedBottle.brand.id) {
+    pushChange(
+      "Brand",
+      formatExistingBottleValue(true),
+      proposedBottle.brand.name,
+    );
+  }
   pushChange("Bottle Name", currentBottle.name, proposedBottle.name);
-  pushChange(
-    "Series",
-    currentBottle.series?.name ?? null,
-    proposedBottle.series?.name ?? null,
-    proposedBottle.series !== null,
-  );
+  if (
+    proposedBottle.series !== null &&
+    currentBottle.series?.id !== proposedBottle.series.id
+  ) {
+    pushChange(
+      "Series",
+      formatExistingBottleValue(currentBottle.series !== null),
+      proposedBottle.series.name,
+    );
+  }
   pushChange(
     "Category",
     currentBottle.category,
     proposedBottle.category,
     proposedBottle.category !== null,
   );
-  pushChange(
-    "Distillery",
-    currentBottle.distillers.map((distiller) => distiller.name).join(", ") ||
-      null,
-    proposedBottle.distillers.map((distiller) => distiller.name).join(", ") ||
-      null,
-    proposedBottle.distillers.length > 0,
-  );
-  pushChange(
-    "Bottler",
-    currentBottle.bottler?.name ?? null,
-    proposedBottle.bottler?.name ?? null,
-    proposedBottle.bottler !== null,
-  );
+  if (
+    proposedBottle.distillers.length > 0 &&
+    currentBottle.distillers.map((distiller) => distiller.id).join(",") !==
+      proposedBottle.distillers.map((distiller) => distiller.id).join(",")
+  ) {
+    pushChange(
+      "Distillery",
+      formatExistingBottleValue(currentBottle.distillers.length > 0),
+      proposedBottle.distillers.map((distiller) => distiller.name).join(", "),
+    );
+  }
+  if (
+    proposedBottle.bottler !== null &&
+    currentBottle.bottler?.id !== proposedBottle.bottler.id
+  ) {
+    pushChange(
+      "Bottler",
+      formatExistingBottleValue(currentBottle.bottler !== null),
+      proposedBottle.bottler.name,
+    );
+  }
   pushChange(
     "Age",
     formatAge(currentBottle.statedAge),
@@ -601,6 +589,36 @@ function RecommendationSection({
   );
 }
 
+function BottleIdentitySection({
+  label,
+  bottle,
+  placeholder,
+}: {
+  label: string;
+  bottle: QueueItem["currentBottle"] | QueueItem["suggestedBottle"];
+  placeholder: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
+      <div className="text-muted text-[11px] font-semibold uppercase tracking-wide">
+        {label}
+      </div>
+      {bottle ? (
+        <div className="mt-1 text-sm text-white">
+          <Link
+            href={`/bottles/${bottle.id}`}
+            className="font-semibold underline"
+          >
+            {bottle.fullName}
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-1 text-sm text-slate-300">{placeholder}</div>
+      )}
+    </div>
+  );
+}
+
 function renderRecommendationOutcome(item: QueueItem): ReactNode {
   if (item.status === "errored") {
     return (
@@ -619,40 +637,17 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     );
   }
 
-  const bottle =
-    item.suggestedBottle ?? item.proposedBottle ?? item.parentBottle;
-  const bottleFields = bottle ? getBottleFields(bottle) : [];
-  const bottleHref =
-    item.suggestedBottle || item.parentBottle
-      ? `/bottles/${(item.suggestedBottle ?? item.parentBottle)?.id}`
-      : undefined;
-  const release = item.suggestedRelease ?? item.proposedRelease;
-  const releaseFields = release ? getBottlingFields(release) : [];
-  const releaseHref = item.suggestedRelease
-    ? getBottleBottlingPath(
-        item.suggestedRelease.bottleId,
-        item.suggestedRelease.id,
-      )
-    : undefined;
   const repairChanges =
     isRepairProposal(item) && item.currentBottle && item.proposedBottle
       ? getBottleRepairChanges(item.currentBottle, item.proposedBottle)
       : [];
 
-  if (!bottle && !release) {
-    return (
-      <div className="mt-2 text-sm text-slate-300">No strong suggestion.</div>
-    );
-  }
-
   if (isRepairProposal(item) && item.currentBottle && item.proposedBottle) {
     return (
       <div className="mt-3 space-y-3">
-        <RecommendationSection
+        <BottleIdentitySection
           label="Existing Bottle"
-          title={getBottleTitle(item.currentBottle)}
-          href={`/bottles/${item.currentBottle.id}`}
-          fields={getBottleFields(item.currentBottle)}
+          bottle={item.currentBottle}
           placeholder="No bottle identified"
         />
 
@@ -690,22 +685,32 @@ function renderRecommendationOutcome(item: QueueItem): ReactNode {
     );
   }
 
+  if (item.suggestedBottle) {
+    return (
+      <div className="mt-3">
+        <BottleIdentitySection
+          label="Suggested Assignment"
+          bottle={item.suggestedBottle}
+          placeholder="No safe existing Bottle suggested"
+        />
+      </div>
+    );
+  }
+
+  if (!item.proposedBottle) {
+    return (
+      <div className="mt-2 text-sm text-slate-300">
+        No safe existing Bottle suggested.
+      </div>
+    );
+  }
+
   return (
     <div className="mt-3 space-y-3">
       <RecommendationSection
-        label="Main Bottle"
-        title={bottle ? getBottleTitle(bottle) : null}
-        href={bottleHref}
-        fields={bottleFields}
-        placeholder="No bottle identified"
-      />
-
-      <RecommendationSection
-        label="Bottling"
-        title={release ? getBottlingTitle(release) : null}
-        href={releaseHref}
-        fields={releaseFields}
-        placeholder="No specific bottling identified"
+        label="Bottle Draft"
+        title={item.price.name}
+        fields={getConcreteBottleDraftFields(item.proposedBottle)}
       />
     </div>
   );
@@ -759,34 +764,17 @@ function getCreateProposalActions(
   item: QueueItem,
   returnTo: string,
 ): CreateProposalActions | null {
-  if (!item.proposedBottle && !item.proposedRelease) {
+  if (!item.proposedBottle) {
     return null;
   }
 
   const queryString = `proposal=${item.id}&returnTo=${encodeURIComponent(returnTo)}`;
 
-  switch (item.creationTarget) {
-    case "release":
-      return {
-        applyLabel: "Apply Bottling Draft",
-        editLabel: "Edit Bottling Draft",
-        editHref: item.parentBottle
-          ? `${getNewBottleBottlingPath(item.parentBottle.id)}?${queryString}`
-          : `/bottles/new?${queryString}`,
-      };
-    case "bottle_and_release":
-      return {
-        applyLabel: "Apply Create Draft",
-        editLabel: "Edit Create Draft",
-        editHref: `/bottles/new?${queryString}`,
-      };
-    default:
-      return {
-        applyLabel: "Apply Bottle Draft",
-        editLabel: "Edit Bottle Draft",
-        editHref: `/bottles/new?${queryString}`,
-      };
-  }
+  return {
+    applyLabel: "Apply Bottle Draft",
+    editLabel: "Edit Bottle Draft",
+    editHref: `/bottles/new?${queryString}`,
+  };
 }
 
 export default function QueueItemCard({
@@ -807,15 +795,11 @@ export default function QueueItemCard({
   const topCandidates = getTopCandidates(item);
   const repairProposal = isRepairProposal(item);
   const isProcessing = item.isProcessing;
-  const canApproveMatch =
-    item.status === "pending_review" &&
-    !!item.suggestedBottle &&
-    !repairProposal &&
-    !isProcessing;
+  const canApproveMatch = canApproveSuggestedBottle(item);
   const canCreateBottle =
     item.status === "pending_review" &&
     item.proposalType === "create_new" &&
-    (!!item.proposedBottle || !!item.proposedRelease) &&
+    !!item.proposedBottle &&
     !isProcessing;
   const canApplyRepair = item.status === "pending_review" && repairProposal;
   const createProposalActions = getCreateProposalActions(item, returnTo);
@@ -910,24 +894,11 @@ export default function QueueItemCard({
             </div>
           ) : null}
 
-          {item.currentBottle ? (
-            <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-sm">
-              <div className="text-muted text-xs font-semibold uppercase tracking-wide">
-                Current Bottle
-              </div>
-              <Link
-                href={`/bottles/${item.currentBottle.id}`}
-                className="mt-1 inline-block font-semibold text-white underline"
-              >
-                {item.currentBottle.fullName}
-              </Link>
-              {item.currentRelease ? (
-                <div className="mt-1 text-slate-300">
-                  Bottling: {item.currentRelease.fullName}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+          <BottleIdentitySection
+            label="Current Assignment"
+            bottle={item.currentBottle}
+            placeholder="No Bottle assigned"
+          />
 
           {extractedLabelSummary.length > 0 ? (
             <div className="space-y-2">

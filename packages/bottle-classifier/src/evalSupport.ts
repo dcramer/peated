@@ -3,23 +3,21 @@ import type {
   BottleClassifierDataSource,
   CreateBottleClassifierOptions,
 } from "./classifierRuntime";
-import {
-  DEFAULT_OPENAI_EVAL_MODEL,
-  DEFAULT_OPENAI_MODEL,
-  getStableOpenAISettings,
-} from "./openaiModelSettings";
+import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
+import { getStableOpenAISettings } from "./openaiModelSettings";
 
-export const evalClassifierModel =
-  process.env.OPENAI_MODEL ?? DEFAULT_OPENAI_MODEL;
-export const evalJudgeModel =
-  process.env.OPENAI_EVAL_MODEL ?? DEFAULT_OPENAI_EVAL_MODEL;
+const evalOpenAIConfig = resolveOpenAICompatibleConfig(process.env);
+
+export const evalClassifierModel = evalOpenAIConfig.model;
+export const evalJudgeModel = evalOpenAIConfig.evalModel;
+export const hasEvalOpenAICredentials = Boolean(evalOpenAIConfig.apiKey);
 
 export function createEvalOpenAIClient() {
   return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_HOST,
-    organization: process.env.OPENAI_ORGANIZATION,
-    project: process.env.OPENAI_PROJECT,
+    apiKey: evalOpenAIConfig.apiKey,
+    baseURL: evalOpenAIConfig.baseURL,
+    organization: evalOpenAIConfig.organization,
+    project: evalOpenAIConfig.project,
   });
 }
 

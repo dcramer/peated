@@ -1,9 +1,11 @@
 import { db } from "@peated/server/db";
-import { bottles, tastings } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import { procedure } from "@peated/server/orpc";
-import { sql } from "drizzle-orm";
 import { z } from "zod";
+import {
+  scanUserTastingBottles,
+  UserBottleReadIntegrityError,
+} from "./tasting-bottle-scan";
 
 export default procedure
   .route({
@@ -46,46 +48,58 @@ export default procedure
       });
     }
 
-    const results = await db.execute<{
-      flavor: string;
-      count: string;
-      score: string;
-    }>(
-      sql<{
-        flavor: string;
-        count: string;
-      }>`SELECT flavor, COUNT(flavor) as count, SUM(rating) as score
-    FROM (
-      SELECT ${bottles.flavorProfile} as flavor, ${tastings.rating} as rating
-      FROM ${bottles}
-      JOIN ${tastings} ON ${bottles.id} = ${tastings.bottleId}
-      WHERE ${tastings.createdById} = ${user.id}
-      AND ${bottles.flavorProfile} IS NOT NULL
-    ) as t
-    GROUP BY flavor
-    ORDER BY score DESC, count DESC
-    LIMIT 25`,
-    );
+    const byFlavor = new Map<
+      string,
+      { count: number; score: number; hasRating: boolean }
+    >();
+    let totalCount = 0;
+    let totalScore = 0;
 
-    const { count: totalCount, score: totalScore } = (
-      await db.execute<{ count: string; score: string }>(
-        sql<{
-          count: number;
-          score: number;
-        }>`SELECT COUNT(*) as count, SUM(${tastings.rating}) as score
-        FROM ${tastings}
-        WHERE ${tastings.createdById} = ${user.id}
-      `,
+    try {
+      for await (const rows of scanUserTastingBottles(user.id)) {
+        for (const { bottle, rating } of rows) {
+          totalCount += 1;
+          totalScore += rating ?? 0;
+
+          if (!bottle?.flavorProfile) continue;
+
+          const current = byFlavor.get(bottle.flavorProfile) ?? {
+            count: 0,
+            score: 0,
+            hasRating: false,
+          };
+          current.count += 1;
+          current.score += rating ?? 0;
+          current.hasRating ||= rating !== null;
+          byFlavor.set(bottle.flavorProfile, current);
+        }
+      }
+    } catch (error) {
+      if (error instanceof UserBottleReadIntegrityError) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
+    }
+
+    const results = Array.from(byFlavor, ([flavorProfile, stats]) => ({
+      flavorProfile,
+      count: stats.count,
+      score: stats.score,
+      hasRating: stats.hasRating,
+    }))
+      .sort(
+        (left, right) =>
+          Number(left.hasRating) - Number(right.hasRating) ||
+          right.score - left.score ||
+          right.count - left.count ||
+          left.flavorProfile.localeCompare(right.flavorProfile),
       )
-    ).rows[0];
+      .slice(0, 25)
+      .map(({ hasRating: _, ...result }) => result);
 
     return {
-      results: results.rows.map(({ flavor, count, score }) => ({
-        flavorProfile: flavor,
-        count: Number(count),
-        score: Number(score),
-      })),
-      totalScore: Number(totalScore),
-      totalCount: Number(totalCount),
+      results,
+      totalScore,
+      totalCount,
     };
   });

@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-07-26T23:15:26.292Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Maker's Mark Kentucky Straight Bourbon Whisky core release 45% bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Maker's Mark Kentucky Straight Bourbon Whisky core release 45% bourbon",
+    "summary": "Confirmed bottle details for **Maker’s Mark Kentucky Straight Bourbon Whisky core release (45% ABV)**:\n\n- **Brand / expression:** Maker’s Mark Kentucky Straight Bourbon Whisky, the brand’s standard/core bourbon expression. ([makersmark.com](https://www.makersmark.com/en-us/bourbons/makers-mark))\n- **Producer / bottler:",
+    "results": [
+      {
+        "title": "makersmark.com",
+        "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "makersmark.com",
+        "url": "https://www.makersmark.com/en-us/locate",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "makersmark.com",
+        "url": "https://www.makersmark.com/bourbons",
+        "domain": "makersmark.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "totalwine.com",
+        "url": "https://www.totalwine.com/spirits/bourbon/small-batch-bourbon/makers-mark-bourbon-whisky/p/3700750",
+        "domain": "totalwine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "reservebar.com",
+        "url": "https://www.reservebar.com/products/makers-mark-kentucky-straight-bourbon-whisky/GROUPING-33888",
+        "domain": "reservebar.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "61bb1df78fa3dcd92e214a5c9a12d511f1d9009bb30192c1eb0530f2337ff690",
+    "mode": "auto"
+  }
+}

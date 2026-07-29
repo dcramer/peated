@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:59:39.423Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Black Label Islay Origin 12 year old Johnnie Walker"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Black Label Islay Origin 12 year old Johnnie Walker",
+    "summary": "Here’s the bottle-specific ID I can confirm for **Johnnie Walker Black Label Islay Origin 12 Year Old**:\n\n- **Producer/brand:** Johnnie Walker, owned by Diageo. The general Black Label line is officially described by Johnnie Walker as a **12-year-old blended Scotch whisky**. ([johnniewalker.com](https://www.johnniewalk",
+    "results": [
+      {
+        "title": "Johnnie Walker Black Label | Johnnie Walker US",
+        "url": "https://www.johnniewalker.com/en-us/our-whisky/core-range/johnnie-walker-black-label",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.johnniewalker.com/cs-cz/whisky-guide/how-whisky-is-made",
+        "url": "https://www.johnniewalker.com/cs-cz/whisky-guide/how-whisky-is-made",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.johnniewalker.com/en-ca/our-whisky/core-range/johnnie-walker-black-label",
+        "url": "https://www.johnniewalker.com/en-ca/our-whisky/core-range/johnnie-walker-black-label",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.johnniewalker.com/ja-jp/our-whisky/core-range/johnnie-walker-black-label",
+        "url": "https://www.johnniewalker.com/ja-jp/our-whisky/core-range/johnnie-walker-black-label",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.johnniewalker.com/en/our-whisky/limited-editions/johnnie-walker-black-label-bold-steps-limited-edition",
+        "url": "https://www.johnniewalker.com/en/our-whisky/limited-editions/johnnie-walker-black-label-bold-steps-limited-edition",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.johnniewalker.com/es-cl/our-whisky/core-range/johnnie-walker-black-label",
+        "url": "https://www.johnniewalker.com/es-cl/our-whisky/core-range/johnnie-walker-black-label",
+        "domain": "johnniewalker.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "17ddebad9010c4d3b9506f33b70ffeb97b3c366b30cf9ae9a3df799590dae249",
+    "mode": "auto"
+  }
+}

@@ -1,4 +1,5 @@
 import type { BottleFormInitialData } from "@peated/web/components/bottleForm";
+import { buildBottleProposalDraft } from "@peated/web/lib/bottleProposalDraft";
 
 export function mergeCreateBottleInitialData({
   initialData,
@@ -17,16 +18,17 @@ export function mergeCreateBottleInitialData({
   bottler?: BottleFormInitialData["bottler"];
   series?: BottleFormInitialData["series"];
 }): BottleFormInitialData {
+  const draft = buildBottleProposalDraft({
+    sourceBottle: initialData,
+    proposedBottle: proposalData,
+  });
+
   return {
-    ...initialData,
-    ...(proposalData || {}),
-    name: proposalData?.name || initialData.name,
-    imageUrl: proposalImageUrl || initialData.imageUrl,
-    distillers: distiller
-      ? [distiller]
-      : proposalData?.distillers || initialData.distillers || [],
-    brand: brand || proposalData?.brand || initialData.brand,
-    bottler: bottler || proposalData?.bottler || initialData.bottler,
-    series: series || proposalData?.series || initialData.series,
+    ...draft,
+    imageUrl: proposalImageUrl ?? initialData.imageUrl,
+    distillers: distiller ? [distiller] : (draft.distillers ?? []),
+    brand: brand ?? draft.brand,
+    bottler: bottler ?? draft.bottler,
+    series: series ?? draft.series,
   };
 }

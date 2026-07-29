@@ -25,51 +25,98 @@ const OPENAI_WEB_SEARCH_RESPONSE_INCLUDES: ResponseIncludable[] = [
 ];
 const OPENAI_WEB_SEARCH_TOOL_DESCRIPTION =
   "Search live web evidence for decisive bottle or release traits after local search is insufficient. Keep queries narrow and judge results by source content, independence, specificity, and corroboration.";
+const MARKDOWN_HTTP_LINK_PATTERN =
+  /(?<!!)\[([^\]\r\n]+)\]\((https?:\/\/(?:[^\s()]|\([^\s()]*\))+)\)/g;
+
+type UnknownRecord = Record<string, unknown>;
+
+function asRecord(value: unknown): UnknownRecord | null {
+  return typeof value === "object" && value !== null
+    ? (value as UnknownRecord)
+    : null;
+}
+
+function getArrayProperty(
+  record: UnknownRecord | null,
+  key: string,
+): unknown[] {
+  const value = record?.[key];
+  return Array.isArray(value) ? value : [];
+}
+
+function getRecordProperty(
+  record: UnknownRecord | null,
+  key: string,
+): UnknownRecord | null {
+  return asRecord(record?.[key]);
+}
+
+function getStringProperty(
+  record: UnknownRecord | null,
+  key: string,
+): string | null {
+  const value = record?.[key];
+  return typeof value === "string" ? value : null;
+}
+
+function extractMarkdownHttpLinks(text: string) {
+  return Array.from(text.matchAll(MARKDOWN_HTTP_LINK_PATTERN), (match) => ({
+    title: match[1]?.trim() || null,
+    url: match[2] ?? null,
+  }));
+}
 
 export function extractOpenAISearchEvidence(
   query: string,
-  response: any,
+  response: unknown,
 ): BottleSearchEvidence {
-  const outputItems: any[] = Array.isArray(response?.output)
-    ? response.output
-    : [];
-  const messageTexts = outputItems
-    .filter((item: any): item is { content?: unknown[]; type: "message" } => {
-      return item?.type === "message";
-    })
-    .flatMap((item: { content?: unknown[] }) =>
-      Array.isArray(item.content)
-        ? item.content
-            .filter(
-              (
-                content: any,
-              ): content is { text?: string; type: "output_text" } =>
-                content?.type === "output_text",
-            )
-            .map((content: { text?: string }) => content.text?.trim())
-            .filter((value: string | undefined): value is string =>
-              Boolean(value),
-            )
-        : [],
-    );
+  const responseRecord = asRecord(response);
+  const outputItems = getArrayProperty(responseRecord, "output");
+  const messageTexts = outputItems.flatMap((outputItem) => {
+    const item = asRecord(outputItem);
+    if (getStringProperty(item, "type") !== "message") {
+      return [];
+    }
+
+    return getArrayProperty(item, "content").flatMap((contentItem) => {
+      const content = asRecord(contentItem);
+      if (getStringProperty(content, "type") !== "output_text") {
+        return [];
+      }
+
+      const text = getStringProperty(content, "text")?.trim();
+      return text ? [text] : [];
+    });
+  });
+  const outputText = getStringProperty(responseRecord, "output_text")?.trim();
+  const responseTexts = [outputText, ...messageTexts].filter(
+    (text): text is string => Boolean(text),
+  );
   const summary =
-    response.output_text?.trim().slice(0, 600) ||
+    outputText?.slice(0, 600) ||
     messageTexts.join(" ").trim().slice(0, 600) ||
     null;
   const resultsByUrl = new Map<
     string,
     BottleSearchEvidence["results"][number]
   >();
+  const citedResultUrls = new Set<string>();
 
   const mergeResult = ({
+    cited = false,
     title,
     url,
   }: {
+    cited?: boolean;
     title?: string | null;
     url: string | null | undefined;
   }) => {
     if (!url) {
       return;
+    }
+
+    if (cited) {
+      citedResultUrls.add(url);
     }
 
     const normalizedTitle = title?.trim() || url;
@@ -92,64 +139,76 @@ export function extractOpenAISearchEvidence(
     existing.description ??= null;
   };
 
-  for (const item of outputItems) {
-    if (item?.type === "message") {
-      for (const content of Array.isArray(item.content) ? item.content : []) {
-        if (content?.type !== "output_text") {
+  for (const outputItem of outputItems) {
+    const item = asRecord(outputItem);
+    const itemType = getStringProperty(item, "type");
+    if (itemType === "message") {
+      for (const contentItem of getArrayProperty(item, "content")) {
+        const content = asRecord(contentItem);
+        if (getStringProperty(content, "type") !== "output_text") {
           continue;
         }
 
-        for (const annotation of Array.isArray(content.annotations)
-          ? content.annotations
-          : []) {
-          if (annotation?.type !== "url_citation") {
+        for (const annotationItem of getArrayProperty(content, "annotations")) {
+          const annotation = asRecord(annotationItem);
+          if (getStringProperty(annotation, "type") !== "url_citation") {
             continue;
           }
 
           mergeResult({
-            title: annotation.title,
-            url: annotation.url,
+            cited: true,
+            title: getStringProperty(annotation, "title"),
+            url: getStringProperty(annotation, "url"),
           });
         }
       }
       continue;
     }
 
-    if (item?.type !== "web_search_call") {
+    if (itemType !== "web_search_call") {
       continue;
     }
 
-    if (item.action?.type === "search") {
-      for (const source of Array.isArray(item.action.sources)
-        ? item.action.sources
-        : []) {
-        if (source?.type !== "url") {
+    const action = getRecordProperty(item, "action");
+    const actionType = getStringProperty(action, "type");
+    if (actionType === "search") {
+      for (const sourceItem of getArrayProperty(action, "sources")) {
+        const source = asRecord(sourceItem);
+        if (getStringProperty(source, "type") !== "url") {
           continue;
         }
 
         mergeResult({
-          url: source.url,
+          url: getStringProperty(source, "url"),
         });
       }
       continue;
     }
 
-    if (
-      (item.action?.type === "open_page" ||
-        item.action?.type === "find_in_page") &&
-      typeof item.action.url === "string"
-    ) {
+    if (actionType === "open_page" || actionType === "find_in_page") {
       mergeResult({
-        url: item.action.url,
+        url: getStringProperty(action, "url"),
       });
     }
   }
 
+  // The Vercel AI Gateway can preserve citations only as Markdown links in
+  // response text, so recover those links before the summary is truncated.
+  for (const text of responseTexts) {
+    for (const link of extractMarkdownHttpLinks(text)) {
+      mergeResult({ ...link, cited: true });
+    }
+  }
+
+  const results = Array.from(resultsByUrl.values());
   return buildBottleSearchEvidence({
     provider: "openai",
     query,
     summary,
-    results: Array.from(resultsByUrl.values()),
+    results: [
+      ...results.filter((result) => citedResultUrls.has(result.url)),
+      ...results.filter((result) => !citedResultUrls.has(result.url)),
+    ],
   });
 }
 

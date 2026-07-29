@@ -3,9 +3,9 @@ import { use } from "react";
 
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { formatCategoryName } from "@peated/server/lib/format";
-import BottleLink from "@peated/web/components/bottleLink";
-import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
+import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
 import Button from "@peated/web/components/button";
+import FlightBottleIdentity from "@peated/web/components/flightBottleIdentity";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -24,14 +24,6 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
       },
     }),
   );
-  const { data: bottleList } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({
-      input: {
-        flight: flightId,
-      },
-    }),
-  );
-
   return (
     <>
       <div className="my-4 flex min-w-full flex-wrap gap-x-3 gap-y-4 p-3 sm:flex-nowrap sm:py-0">
@@ -60,33 +52,44 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
           <col className="hidden sm:w-2/6" />
         </colgroup>
         <tbody>
-          {bottleList.results.map((bottle) => {
+          {flight.bottles.map((flightBottle) => {
+            const { bottle } = flightBottle;
+            const tastingHref = getAddBottleHref({
+              bottleId: bottle.id,
+              flightId: flight.id,
+              intent: "tasting",
+            });
             return (
               <tr key={bottle.id} className="border-b border-slate-800">
-                <td className="group relative max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
-                  <BottleLink
-                    bottle={bottle}
-                    flightId={flight.id}
-                    className="absolute inset-0"
-                    withPanel
-                  />
-                  <div className="flex items-center gap-x-1 group-hover:underline">
-                    <div className="font-semibold">{bottle.fullName}</div>
-                    <BottleStatusIcons bottle={bottle} />
+                <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
+                  <div className="flex items-center gap-x-1">
+                    <FlightBottleIdentity
+                      bottle={bottle}
+                      flightId={flight.id}
+                    />
+                    <BottleStatusIndicators
+                      hasTasted={flightBottle.hasTasted}
+                      isLibrary={flightBottle.isLibrary}
+                    />
                   </div>
                   <div className="text-muted text-sm">
                     {formatCategoryName(bottle.category)}
                   </div>
+                  <div className="mt-3 sm:hidden">
+                    <Button
+                      color={flightBottle.hasTasted ? "default" : "highlight"}
+                      size="small"
+                      href={tastingHref}
+                    >
+                      Log Tasting
+                    </Button>
+                  </div>
                 </td>
                 <td className="hidden py-4 pl-3 pr-4 text-right text-sm sm:table-cell sm:pr-3">
                   <Button
-                    color={bottle.hasTasted ? "default" : "highlight"}
+                    color={flightBottle.hasTasted ? "default" : "highlight"}
                     size="small"
-                    href={getAddBottleHref({
-                      bottleId: bottle.id,
-                      flightId: flight.id,
-                      intent: "tasting",
-                    })}
+                    href={tastingHref}
                   >
                     Log Tasting
                   </Button>

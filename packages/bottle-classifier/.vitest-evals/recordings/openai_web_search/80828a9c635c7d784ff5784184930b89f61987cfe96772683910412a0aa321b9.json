@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:07:47.092Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Double Oaked bourbon official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Double Oaked bourbon official",
+    "summary": "Official bottle: **Woodford Reserve Double Oaked**. The official producer page is Woodford Reserve’s own “Double Oaked” page. ([woodfordreserve.com](https://www.woodfordreserve.com/whiskey/double-oaked/?utm_source=openai))\n\nConfirmed bottle details from official sources:\n- **Producer/brand:** Woodford Reserve, owned by",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "url": "https://shop.woodfordreserve.com/2026-double-double-oaked/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.brown-forman.com/brand/woodford-reserve",
+        "url": "https://www.brown-forman.com/brand/woodford-reserve",
+        "domain": "brown-forman.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://nutrition.brown-forman.com/en-us/woodford_reserve",
+        "url": "https://nutrition.brown-forman.com/en-us/woodford_reserve",
+        "domain": "nutrition.brown-forman.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/fall-in-love-double-oaked/",
+        "url": "https://www.woodfordreserve.com/fall-in-love-double-oaked/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "80828a9c635c7d784ff5784184930b89f61987cfe96772683910412a0aa321b9",
+    "mode": "auto"
+  }
+}

@@ -17,7 +17,6 @@ import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
 import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
-import BottleCard from "./bottleCard";
 import Button from "./button";
 import Counter from "./counter";
 import DefinitionList from "./definitionList";
@@ -27,6 +26,7 @@ import ServingStyleIcon from "./servingStyleIcon";
 import ShareButton from "./shareButton";
 import SimpleRatingDisplay from "./simpleRatingDisplay";
 import Tags from "./tags";
+import TastingBottleIdentity from "./tastingBottleIdentity";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
 
@@ -79,7 +79,6 @@ export default function TastingListItem({
   onToast?: (tasting: Tasting) => void;
   noCommentAction?: boolean;
 }) {
-  const { bottle, release } = tasting;
   const { user } = useAuth();
 
   const pathname = usePathname();
@@ -126,12 +125,7 @@ export default function TastingListItem({
 
       {!noBottle && (
         <div className="px-3 sm:px-5">
-          <BottleCard
-            color="inherit"
-            noGutter
-            bottle={bottle}
-            release={release}
-          />
+          <TastingBottleIdentity bottle={tasting.bottle} />
         </div>
       )}
 

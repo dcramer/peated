@@ -1,12 +1,12 @@
 export const BOTTLE_SCHEMA_RULES = {
   bottleIdentity:
-    "Bottle identity is the stable parent product and the default object for tasting, search, and collection. Brand, bottler, distillery, expression/name, series, category, and an age statement that is stable across the product belong here. When only one marketed form is known, the bottle may temporarily carry release-like traits until a reusable child release is warranted; once sibling evidence exists, those varying traits belong on child releases.",
-  releaseIdentity:
-    "Release identity is optional and only exists under a bottle when the differentiator should aggregate across users, searches, prices, and stats. Edition, ABV, vintage year, bottling/release year, release-specific age, single-cask, cask-strength, and cask details belong here when they distinguish siblings of a stable parent.",
+    "Every concrete marketed release is one independently complete Bottle. Its durable identity includes brand, bottler, distillery, expression/name, series, category, effective age, edition, ABV, vintage year, release year, single-cask, cask-strength, and other supported exact traits. The Bottle must remain correct and renderable without BottleGroup hydration.",
+  exactBottleIdentity:
+    "Edition, ABV, vintage year, bottling/release year, exact age, single-cask, cask-strength, and supported cask details distinguish one concrete Bottle from related Bottles. Preserve those facts on the complete Bottle; BottleGroup assignment is automatic downstream and is never selected by the classifier.",
   yearPolicy:
-    "Year fields are not interchangeable. `vintageYear` is a distillation year; `releaseYear` is a bottling or marketed release year. If the source gives a bare year, classify it from label wording, family pattern, and sibling evidence; if that evidence is weak, record the uncertainty instead of forcing a release.",
+    "Year fields are not interchangeable. `vintageYear` is a distillation year; `releaseYear` is a bottling or marketed release year. If the source gives a bare year, classify it from label wording, family pattern, and sibling evidence; if that evidence is weak, record the uncertainty instead of guessing the field.",
   observationPolicy:
-    "Exact source facts like cask numbers, bottle numbers, outturns, exclusives, and raw maturation wording should be preserved as observations first. Promote them to canonical release identity only when they are clearly part of the marketed release.",
+    "Exact source facts like cask numbers, bottle numbers, outturns, exclusives, and raw maturation wording should be preserved as observations first. Promote them to canonical Bottle identity only when they are clearly part of the marketed product.",
   aliasPolicy:
-    "Retailer listing aliases are bottle-level evidence unless they exactly match a canonical release alias.",
+    "Retailer listing aliases are evidence for the exact Bottle only when they safely identify that marketed product.",
 } as const;

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import { UserSchema } from "./users";
 
@@ -34,19 +33,25 @@ export const CollectionBottleSchema = z.object({
   status: CollectionBottleStatusSchema.nullable()
     .default(null)
     .describe("Bottle status for Library entries"),
-  bottle: BottleSchema.describe("The bottle in this collection"),
-  release: BottleReleaseSchema.nullish().describe(
-    "Specific release of the bottle, if applicable",
-  ),
+  bottle: BottleSchema.describe("Bottle referenced by this collection entry"),
+  hasTasted: z
+    .boolean()
+    .describe("Whether the current user has tasted this Bottle"),
 });
 
-export const CollectionBottleInputSchema = z.object({
-  bottle: z.number().describe("ID of the bottle to add to the collection"),
-  release: z
-    .number()
-    .nullish()
-    .describe("ID of the specific release, if applicable"),
+const collectionBottleStatusInputShape = {
   status: CollectionBottleStatusSchema.nullish().describe(
     "Optional bottle status for Library entries",
   ),
-});
+};
+
+export const CollectionBottleInputSchema = z
+  .object({
+    bottle: z
+      .number()
+      .int()
+      .positive()
+      .describe("Bottle selected for this collection action"),
+    ...collectionBottleStatusInputShape,
+  })
+  .strict();

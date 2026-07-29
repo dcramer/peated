@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 import {
-  canUseManualBottleCreate,
   getCreateBottlePrefill,
   getCreateNameSeed,
   type PhotoIdentification,
@@ -44,14 +43,20 @@ function buildPhotoResult(): PhotoIdentification {
     classification: {
       status: "classified",
       decision: {
-        action: "create_bottle_and_release",
+        action: "create_bottle",
         proposedBottle: {
           name: "Canonical Expression",
           category: "single_malt",
           statedAge: null,
-          abv: null,
+          edition: "2024 Edition",
+          abv: 48,
+          caskStrength: null,
+          singleCask: null,
+          caskType: null,
+          caskSize: null,
+          caskFill: null,
           vintageYear: null,
-          releaseYear: null,
+          releaseYear: 2024,
           brand: {
             id: 101,
             name: "Canonical Brand",
@@ -62,13 +67,6 @@ function buildPhotoResult(): PhotoIdentification {
               name: "Existing Distillery",
             },
           ],
-        },
-        proposedRelease: {
-          edition: "2024 Edition",
-          statedAge: null,
-          abv: 48,
-          vintageYear: null,
-          releaseYear: 2024,
         },
       },
       artifacts: {
@@ -86,7 +84,7 @@ function buildPhotoResult(): PhotoIdentification {
       },
       classification: {
         status: "classified",
-        action: "create_bottle_and_release",
+        action: "create_bottle",
         confidence: null,
         reason: null,
       },
@@ -110,6 +108,5 @@ describe("photo create prefill", () => {
       abv: 48,
       releaseYear: 2024,
     });
-    expect(canUseManualBottleCreate(result)).toBe(false);
   });
 });

@@ -1,13 +1,19 @@
 import { call, ORPCError } from "@orpc/server";
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
+import { buildConcreteBottleUpdatePatch } from "@peated/server/lib/flatConcreteBottleInput";
+import { logInfo } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
-import type { BottlePreviewResult } from "@peated/server/types";
+import { BottleSchema } from "@peated/server/schemas";
 
 import create from "./create";
 import update from "./update";
-import { bottleNormalize } from "./validation";
 
+/**
+ * Translation-only, measured legacy compatibility. All writes delegate to the
+ * concrete Bottle routes. Task 7.1 removes this adapter after supported callers
+ * use the canonical create and update operations.
+ */
 export default procedure
   .use(requireMod)
   .route({
@@ -21,30 +27,41 @@ export default procedure
       operationId: "upsertBottle",
     }),
   })
-  .input(BottleInputSchema)
+  .input(IndependentConcreteBottleCreateRouteInputSchema)
   .output(BottleSchema)
-  .handler(async function ({ input, context, errors }) {
-    const bottleData: BottlePreviewResult & Record<string, any> =
-      await bottleNormalize({ input, context });
-
-    if (!bottleData.name) {
-      throw errors.BAD_REQUEST({
-        message: "Invalid bottle name.",
-      });
-    }
-
+  .handler(async function ({ input, context }) {
     try {
-      return await call(create, input, { context });
+      const created = await call(create, input, { context });
+      logInfo("Legacy Bottle upsert compatibility write", {
+        extra: {
+          event: "bottle_upsert.compatibility",
+          access: "write",
+          caller: "bottles.upsert",
+          operation: "delegate_create",
+          bottleId: created.id,
+        },
+      });
+      return created;
     } catch (err) {
       if (err instanceof ORPCError && err.status === 409) {
-        return await call(
+        const updated = await call(
           update,
           {
-            ...input,
             bottle: err.data.bottle,
+            ...buildConcreteBottleUpdatePatch(input),
           },
           { context },
         );
+        logInfo("Legacy Bottle upsert compatibility write", {
+          extra: {
+            event: "bottle_upsert.compatibility",
+            access: "write",
+            caller: "bottles.upsert",
+            operation: "delegate_update",
+            bottleId: updated.id,
+          },
+        });
+        return updated;
       }
       throw err;
     }

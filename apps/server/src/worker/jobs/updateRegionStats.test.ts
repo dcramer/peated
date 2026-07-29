@@ -1,9 +1,11 @@
 import { db } from "@peated/server/db";
-import { regions } from "@peated/server/db/schema";
+import { bottleTombstones, regions } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateRegionStats from "./updateRegionStats";
 
-test("updates totalBottles", async ({ fixtures }) => {
+test("counts active independently complete Bottles once", async ({
+  fixtures,
+}) => {
   const region1 = await fixtures.Region({ name: "Region 1" });
   const region2 = await fixtures.Region({ name: "Region 2" });
 
@@ -31,6 +33,18 @@ test("updates totalBottles", async ({ fixtures }) => {
     name: "Bottle 4",
     distillerIds: [entity1.id, entity2.id],
   });
+  await fixtures.LegacyBottle({
+    name: "Unmigrated Region Bottle",
+    brandId: entity1.id,
+  });
+  const retiredBottle = await fixtures.Bottle({
+    name: "Retired Region Bottle",
+    brandId: entity1.id,
+  });
+  await db.insert(bottleTombstones).values({
+    bottleId: retiredBottle.id,
+    newBottleId: null,
+  });
 
   await updateRegionStats({ regionId: region1.id });
 
@@ -40,4 +54,15 @@ test("updates totalBottles", async ({ fixtures }) => {
     .where(eq(regions.id, region1.id));
   expect(newRegion1).toBeDefined();
   expect(newRegion1.totalBottles).toEqual(3);
+});
+
+test.each([
+  undefined,
+  {},
+  { regionId: 0 },
+  { regionId: 1.5 },
+  { regionId: "1" },
+  { regionId: 1, targetId: 2 },
+])("rejects malformed job input %#", async (input) => {
+  await expect(updateRegionStats(input)).rejects.toThrow();
 });

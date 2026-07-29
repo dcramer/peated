@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:23:01.398Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Octomore 13.1 Bruichladdich single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Octomore 13.1 Bruichladdich single malt",
+    "summary": "**Octomore 13.1** is a **Bruichladdich Distillery** release from the **Octomore** heavily peated Islay single malt range, and it was **distillery bottled** as part of the **Edition 13 series**, subtitled **“The Impossible Equation.”** ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/218659?utm_source=openai",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218659",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218659",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218640",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218640",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/229738",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/218640/octomore-edition-131-1373-ppm?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/nl/whiskies/whisky/218659",
+        "url": "https://www.whiskybase.com/nl/whiskies/whisky/218659",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/229738/octomore-edition-131-1373-ppm?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/229738/octomore-edition-131-1373-ppm?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "42ec62e3613dd5d8f760f76a6a507f991581f7457232788e37c84f68b212a6e5",
+    "mode": "auto"
+  }
+}

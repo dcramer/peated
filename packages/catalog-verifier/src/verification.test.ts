@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
 import {
+  CatalogVerificationFindingKindEnum,
+  CatalogVerificationResultSchema,
+  CatalogVerificationWorkstreamEnum,
   buildCatalogVerificationCreationMetadata,
   buildCatalogVerificationResult,
   getCatalogVerificationSkipReason,
@@ -7,6 +10,17 @@ import {
 } from "./verification";
 
 describe("catalog verifier policy", () => {
+  test("exposes only active verification workstreams and finding kinds", () => {
+    expect(CatalogVerificationWorkstreamEnum.options).toEqual([
+      "brand-repairs",
+      "entity-audits",
+    ]);
+    expect(CatalogVerificationFindingKindEnum.options).toEqual([
+      "brand_repair_candidate",
+      "entity_audit_candidate",
+    ]);
+  });
+
   test("runs verification for manual entries", () => {
     expect(shouldRunCatalogVerification("manual_entry")).toBe(true);
     expect(getCatalogVerificationSkipReason("manual_entry")).toBeNull();
@@ -64,5 +78,52 @@ describe("catalog verifier policy", () => {
       status: "flagged",
       source: "manual_entry",
     });
+  });
+
+  test("parses historical canon-repair findings without exposing them as active options", () => {
+    expect(
+      CatalogVerificationResultSchema.parse({
+        phase: "result",
+        source: "manual_entry",
+        status: "flagged",
+        reason: null,
+        findings: [
+          {
+            kind: "canon_repair_candidate",
+            summary: "Bottle wording may match another release.",
+            details: null,
+            workstream: "canon-repairs",
+          },
+        ],
+      }),
+    ).toMatchObject({
+      findings: [
+        {
+          kind: "canon_repair_candidate",
+          workstream: "canon-repairs",
+        },
+      ],
+    });
+  });
+
+  test("rejects historical canon-repair findings from the active result builder", () => {
+    const historicalFinding = {
+      kind: "canon_repair_candidate",
+      summary: "Bottle wording may match another release.",
+      details: null,
+      workstream: "canon-repairs",
+    } as const;
+
+    expect(() =>
+      buildCatalogVerificationResult({
+        source: "manual_entry",
+        status: "flagged",
+        reason: null,
+        findings: [
+          // @ts-expect-error Historical findings are readable but cannot be written.
+          historicalFinding,
+        ],
+      }),
+    ).toThrow();
   });
 });

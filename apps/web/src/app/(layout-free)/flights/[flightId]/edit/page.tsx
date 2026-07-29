@@ -22,12 +22,6 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
     }),
   );
 
-  const { data: bottles } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({
-      input: { flight: flightId },
-    }),
-  );
-
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -35,19 +29,12 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
     orpc.flights.update.mutationOptions({
       onSuccess: (data) => {
         if (!data) return;
-        // TODO: this might be wrong
-        queryClient.setQueryData(
-          orpc.flights.details.key({
+        return queryClient.invalidateQueries({
+          queryKey: orpc.flights.details.key({
             input: { flight: data.id },
           }),
-          (oldData: any) =>
-            oldData
-              ? {
-                  ...oldData,
-                  ...data,
-                }
-              : oldData,
-        );
+          exact: true,
+        });
       },
     }),
   );
@@ -65,7 +52,7 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
           },
         );
       }}
-      initialData={{ ...flight, bottles: bottles.results }}
+      initialData={flight}
       title="Edit Flight"
     />
   );

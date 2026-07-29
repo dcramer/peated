@@ -1,6 +1,8 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
+  bottleTombstones,
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
@@ -9,7 +11,11 @@ import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
+import pg from "pg";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 const pushJobMock = vi.hoisted(() => vi.fn());
@@ -29,7 +35,7 @@ vi.mock("@peated/server/worker/client", () => ({
 
 function buildClassification(
   decision: Record<string, unknown>,
-  artifacts: Record<string, unknown> = {},
+  candidates: Array<{ bottleId: number }> = [],
 ) {
   return {
     status: "classified" as const,
@@ -41,10 +47,9 @@ function buildClassification(
     },
     artifacts: {
       extractedIdentity: null,
-      candidates: [],
+      candidates,
       searchEvidence: [],
       resolvedEntities: [],
-      ...artifacts,
     },
   };
 }
@@ -52,18 +57,16 @@ function buildClassification(
 function buildCreateBottleDecision({
   brandName,
   bottleName,
-  category = "single_malt",
 }: {
   brandName: string;
   bottleName: string;
-  category?: "single_malt" | "bourbon" | "rye";
 }) {
   return buildClassification({
     action: "create_bottle",
     proposedBottle: {
       name: bottleName,
       series: null,
-      category,
+      category: "single_malt",
       edition: null,
       statedAge: null,
       caskStrength: null,
@@ -84,6 +87,32 @@ function buildCreateBottleDecision({
   });
 }
 
+async function findReviewByUrl(url: string) {
+  return await db.query.reviews.findFirst({
+    where: eq(reviews.url, url),
+  });
+}
+
+async function waitForSessionBlockedBy(
+  client: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1
+        FROM pg_stat_activity
+        WHERE $1 = ANY(pg_blocking_pids(pid))
+      ) AS blocked`,
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for Review conflict upsert lock.");
+}
+
 describe("POST /reviews", () => {
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
@@ -96,824 +125,671 @@ describe("POST /reviews", () => {
 
   test("requires admin", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const user = await fixtures.User({ mod: true });
+    const moderator = await fixtures.User({ mod: true });
 
-    const err = await waitError(() =>
+    const error = await waitError(() =>
       routerClient.reviews.create(
         {
           site: site.type,
-          name: "Bottle Name",
+          name: "Unauthorized Review Bottle",
           issue: "Default",
           rating: 89,
-          url: "https://example.com",
+          url: "https://example.com/reviews/unauthorized",
           category: "single_malt",
         },
-        { context: { user } },
+        { context: { user: moderator } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 
-  test("new review with new bottle no entity", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const adminUser = await fixtures.User({ admin: true });
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: "Bottle Name",
-        issue: "Default",
-        rating: 89,
-        url: "https://example.com",
-        category: "single_malt",
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review).toBeDefined();
-    expect(review?.bottleId).toBeNull();
-    expect(review?.name).toEqual("Bottle Name");
-    expect(review?.issue).toEqual("Default");
-    expect(review?.rating).toEqual(89);
-    expect(review?.url).toEqual("https://example.com");
-
-    const alias = await db.query.bottleAliases.findFirst({
-      where: (table, { eq }) => eq(table.name, "Bottle Name"),
-    });
-    expect(alias).toBeUndefined();
-  });
-
-  test("new review with classifier-backed bottle creation", async ({
+  test("stores an unresolved review without catalog identity", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const brand = await fixtures.Entity({ name: "Springbank" });
-    const adminUser = await fixtures.User({ admin: true });
-    const systemActor = await getPeatedSystemActor();
+    const admin = await fixtures.User({ admin: true });
+    const url = "https://example.com/reviews/unresolved";
 
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildCreateBottleDecision({
-        brandName: brand.name,
-        bottleName: "Bottle Name",
-      }),
-    );
-
-    const data = await routerClient.reviews.create(
+    const result = await routerClient.reviews.create(
       {
         site: site.type,
-        name: `${brand.name} Bottle Name`,
+        name: "Unresolved Review Bottle",
         issue: "Default",
         rating: 89,
-        url: "https://example.com",
+        url,
         category: "single_malt",
       },
-      { context: { user: adminUser } },
+      { context: { user: admin } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review).toBeDefined();
-    expect(review?.bottleId).toBeTruthy();
-    expect(review?.name).toEqual(`${brand.name} Bottle Name`);
-    expect(review?.issue).toEqual("Default");
-    expect(review?.rating).toEqual(89);
-    expect(review?.url).toEqual("https://example.com");
-
-    const bottle = await db.query.bottles.findFirst({
-      where: (table, { eq }) => eq(table.id, review!.bottleId as number),
-    });
-    expect(bottle).toBeDefined();
-    expect(bottle?.fullName).toEqual(`${brand.name} Bottle Name`);
-    expect(bottle?.name).toEqual("Bottle Name");
-    expect(bottle?.category).toEqual("single_malt");
-    expect(bottle?.brandId).toEqual(brand.id);
-
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, `${brand.name} Bottle Name`),
-    });
-    expect(alias).toMatchObject({
-      bottleId: bottle!.id,
-      assignmentSource: "classifier_approved",
-      assignedByActorId: systemActor.id,
-    });
-
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review!.id),
-      ),
-    });
-    expect(decisionLog).toMatchObject({
-      sourceKind: "review",
-      sourceId: review!.id,
-      externalSiteId: site.id,
-      decision: "create_bottle",
-      actorId: systemActor.id,
-      bottleId: bottle!.id,
+    expect(await findReviewByUrl(url)).toMatchObject({
+      id: result.id,
+      bottleId: null,
       releaseId: null,
-      createdBottle: true,
-      createdRelease: false,
-      confidence: null,
-      rationale: "test fixture",
-      metadata: expect.objectContaining({
-        initiatedByUserId: adminUser.id,
+      name: "Unresolved Review Bottle",
+      rating: 89,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, "Unresolved Review Bottle"),
       }),
-    });
-    expect(pushUniqueJobMock).toHaveBeenCalledWith("IndexBottleSearchVectors", {
-      bottleId: bottle!.id,
-    });
+    ).toBeUndefined();
   });
 
-  test("classifier-backed bottle creation reuses canonical entities by short name", async ({
+  test("writes an exact alias match directly to reviews.bottleId", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const brand = await fixtures.Entity({
-      name: "The Scotch Malt Whisky Society",
-      shortName: "SMWS",
-      type: ["brand", "bottler"],
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildCreateBottleDecision({
-        brandName: "SMWS",
-        bottleName: "72.123 Big moves and subtle details",
-      }),
-    );
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: "SMWS 72.123 Big moves and subtle details",
-        issue: "Default",
-        rating: 89,
-        url: "https://example.com/smws",
-        category: "single_malt",
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    const bottle = await db.query.bottles.findFirst({
-      where: (table, { eq }) => eq(table.id, review!.bottleId as number),
-    });
-
-    expect(bottle?.brandId).toEqual(brand.id);
-    expect(bottle?.bottlerId).toEqual(brand.id);
-
-    const duplicateBrand = await db.query.entities.findFirst({
-      where: (table, { eq }) => eq(table.name, "SMWS"),
-    });
-    expect(duplicateBrand).toBeUndefined();
-  });
-
-  test("new review can create a release under a classifier-selected parent", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
-      name: "Distillers Edition",
-      vintageYear: null,
-      releaseYear: null,
+      name: "Exact Review Bottle",
     });
-    const adminUser = await fixtures.User({ admin: true });
+    const url = "https://example.com/reviews/exact-bottle";
 
-    classifyBottleReferenceMock.mockResolvedValue(
-      buildClassification(
-        {
-          action: "create_release",
-          parentBottleId: bottle.id,
-          proposedRelease: {
-            edition: "2011 Release",
-            statedAge: null,
-            abv: null,
-            caskStrength: null,
-            singleCask: null,
-            vintageYear: null,
-            releaseYear: null,
-            caskType: null,
-            caskSize: null,
-            caskFill: null,
-            description: null,
-            tastingNotes: null,
-            imageUrl: null,
-          },
-        },
-        {
-          candidates: [
-            {
-              bottleId: bottle.id,
-              releaseId: null,
-              fullName: bottle.fullName,
-              bottleFullName: bottle.fullName,
-              alias: bottle.fullName,
-              brand: null,
-              bottler: null,
-              series: null,
-              distillery: [],
-              category: bottle.category,
-              statedAge: bottle.statedAge,
-              edition: null,
-              caskStrength: bottle.caskStrength,
-              singleCask: bottle.singleCask,
-              abv: bottle.abv,
-              vintageYear: bottle.vintageYear,
-              releaseYear: bottle.releaseYear,
-              caskType: bottle.caskType,
-              caskSize: bottle.caskSize,
-              caskFill: bottle.caskFill,
-            },
-          ],
-        },
-      ),
-    );
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: `${bottle.fullName} 2011 Release`,
-        issue: "Default",
-        rating: 89,
-        url: "https://example.com",
-        category: bottle.category,
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review?.bottleId).toEqual(bottle.id);
-    expect(review?.releaseId).toBeTruthy();
-
-    const release = await db.query.bottleReleases.findFirst({
-      where: (table, { eq }) => eq(table.id, review!.releaseId as number),
-    });
-    expect(release?.bottleId).toEqual(bottle.id);
-    expect(release?.edition).toEqual("2011 Release");
-
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review!.id),
-      ),
-    });
-    expect(decisionLog).toMatchObject({
-      decision: "create_release",
-      bottleId: bottle.id,
-      releaseId: release!.id,
-      createdBottle: false,
-      createdRelease: true,
-    });
-  });
-
-  test("new review with existing bottle", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "Delicious",
-      vintageYear: null,
-      releaseYear: null,
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    const data = await routerClient.reviews.create(
+    const result = await routerClient.reviews.create(
       {
         site: site.type,
         name: bottle.fullName,
         issue: "Default",
-        rating: 89,
-        url: "https://example.com",
+        rating: 91,
+        url,
         category: bottle.category,
       },
-      { context: { user: adminUser } },
+      { context: { user: admin } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review).toBeDefined();
-    expect(review?.bottleId).toEqual(bottle.id);
-    expect(review?.name).toEqual(bottle.fullName);
-    expect(review?.issue).toEqual("Default");
-    expect(review?.rating).toEqual(89);
-    expect(review?.url).toEqual("https://example.com");
-
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review!.id),
-      ),
-    });
-    expect(decisionLog).toBeUndefined();
-  });
-
-  test("new review uses identity-preserving alias keys before classifier", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: "Ardbeg 10 years old",
-        issue: "Default",
-        rating: 89,
-        url: "https://example.com/ardbeg-10",
-        category: bottle.category,
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review).toMatchObject({
+    expect(await findReviewByUrl(url)).toMatchObject({
+      id: result.id,
       bottleId: bottle.id,
       releaseId: null,
-      name: bottle.fullName,
     });
+    expect(result.bottle).toMatchObject({ id: bottle.id });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("new review falls back to existing raw aliases before classifier", async ({
+  test("resolves an identity-preserving alias key before the classifier", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ name: "Ardbeg" });
     const bottle = await fixtures.Bottle({
       name: "10-year-old",
-      brandId: (await fixtures.Entity({ name: "Ardbeg" })).id,
+      brandId: brand.id,
     });
     const rawName = "Ardbeg 10 years old";
-    const aliasKey = normalizeBottleAliasKey(rawName);
-    expect(aliasKey).not.toBe(rawName);
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      name: rawName,
-    });
-    const adminUser = await fixtures.User({ admin: true });
+    expect(normalizeBottleAliasKey(rawName)).toBe(bottle.fullName);
+    const url = "https://example.com/reviews/identity-preserving-alias";
 
-    const data = await routerClient.reviews.create(
+    await routerClient.reviews.create(
       {
         site: site.type,
         name: rawName,
         issue: "Default",
-        rating: 89,
-        url: "https://example.com/ardbeg-10-legacy",
+        rating: 91,
+        url,
         category: bottle.category,
       },
-      { context: { user: adminUser } },
+      { context: { user: admin } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(bottleAliases.name, aliasKey),
-    });
-
-    expect(review).toMatchObject({
+    expect(await findReviewByUrl(url)).toMatchObject({
       bottleId: bottle.id,
-      releaseId: null,
       name: bottle.fullName,
-    });
-    expect(alias).toMatchObject({
-      bottleId: bottle.id,
-      releaseId: null,
     });
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("new review does not use lossy normalized names as exact aliases", async ({
+  test("does not use a lossy display-normalized name as an exact alias", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
     const brand = await fixtures.Entity({ name: "Lagavulin" });
-    const bottle = await fixtures.Bottle({
+    const normalizedAliasBottle = await fixtures.Bottle({
       name: "Distillers Edition",
       brandId: brand.id,
     });
     const classifierBottle = await fixtures.Bottle({
-      name: "Distillers Edition 2011 Release",
+      name: "Classifier Selected Expression",
       brandId: brand.id,
     });
-    const adminUser = await fixtures.User({ admin: true });
-
+    const rawName = "Lagavulin Distillers Edition 2011 Release";
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
           action: "match",
           matchedBottleId: classifierBottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [classifierBottle.id],
         },
-        {
-          candidates: [
-            {
-              bottleId: classifierBottle.id,
-              releaseId: null,
-              fullName: classifierBottle.fullName,
-              bottleFullName: classifierBottle.fullName,
-              alias: classifierBottle.fullName,
-              brand: null,
-              bottler: null,
-              series: null,
-              distillery: [],
-              category: classifierBottle.category,
-              statedAge: classifierBottle.statedAge,
-              edition: null,
-              caskStrength: classifierBottle.caskStrength,
-              singleCask: classifierBottle.singleCask,
-              abv: classifierBottle.abv,
-              vintageYear: classifierBottle.vintageYear,
-              releaseYear: classifierBottle.releaseYear,
-              caskType: classifierBottle.caskType,
-              caskSize: classifierBottle.caskSize,
-              caskFill: classifierBottle.caskFill,
-            },
-          ],
-        },
+        [{ bottleId: classifierBottle.id }],
       ),
     );
+    const url = "https://example.com/reviews/lossy-display-normalization";
 
-    const data = await routerClient.reviews.create(
+    await routerClient.reviews.create(
       {
         site: site.type,
-        name: "Lagavulin Distillers Edition 2011 Release",
+        name: rawName,
         issue: "Default",
-        rating: 89,
-        url: "https://example.com/lagavulin-2011",
-        category: bottle.category,
+        rating: 92,
+        url,
+        category: classifierBottle.category,
       },
-      { context: { user: adminUser } },
+      { context: { user: admin } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review).toMatchObject({
+    expect(normalizedAliasBottle.fullName).not.toBe(
+      normalizeBottleAliasKey(rawName),
+    );
+    expect(await findReviewByUrl(url)).toMatchObject({
       bottleId: classifierBottle.id,
-      releaseId: null,
-      name: bottle.fullName,
+      name: normalizedAliasBottle.fullName,
     });
-    const alias = await db.query.bottleAliases.findFirst({
-      where: eq(
-        bottleAliases.name,
-        normalizeBottleAliasKey("Lagavulin Distillers Edition 2011 Release"),
-      ),
-    });
-    expect(alias).toMatchObject({
-      bottleId: classifierBottle.id,
-      releaseId: null,
-    });
+    expect(classifyBottleReferenceMock).toHaveBeenCalledOnce();
   });
 
-  test("new review can match an existing bottle through the classifier", async ({
+  test("uses a directly assigned Bottle alias", async ({ fixtures }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle({
+      name: "Direct Review Identity",
+    });
+    const aliasName = "Direct Review Alias";
+    await fixtures.BottleAlias({
+      name: aliasName,
+      bottleId: bottle.id,
+    });
+    const url = "https://example.com/reviews/direct-alias";
+
+    await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: "Default",
+        rating: 92,
+        url,
+        category: bottle.category,
+      },
+      { context: { user: admin } },
+    );
+
+    expect(await findReviewByUrl(url)).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+    });
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(aliasName)),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+    });
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("stores a classifier match as direct Bottle identity", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
     const bottle = await fixtures.Bottle({
-      name: "Bottle Name",
-      vintageYear: null,
-      releaseYear: null,
+      name: "Classifier Review Bottle",
     });
-    const adminUser = await fixtures.User({ admin: true });
-
+    const systemActor = await getPeatedSystemActor();
+    const reviewName = "Classifier Review Match";
+    const url = "https://example.com/reviews/classifier-match";
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
           action: "match",
           matchedBottleId: bottle.id,
-          matchedReleaseId: null,
           candidateBottleIds: [bottle.id],
         },
-        {
-          candidates: [
-            {
-              bottleId: bottle.id,
-              releaseId: null,
-              fullName: bottle.fullName,
-              bottleFullName: bottle.fullName,
-              alias: bottle.fullName,
-              brand: null,
-              bottler: null,
-              series: null,
-              distillery: [],
-              category: bottle.category,
-              statedAge: bottle.statedAge,
-              edition: null,
-              caskStrength: bottle.caskStrength,
-              singleCask: bottle.singleCask,
-              abv: bottle.abv,
-              vintageYear: bottle.vintageYear,
-              releaseYear: bottle.releaseYear,
-              caskType: bottle.caskType,
-              caskSize: bottle.caskSize,
-              caskFill: bottle.caskFill,
-            },
-          ],
-        },
+        [{ bottleId: bottle.id }],
       ),
     );
 
-    const data = await routerClient.reviews.create(
+    const result = await routerClient.reviews.create(
       {
         site: site.type,
-        name: `${bottle.fullName} review title`,
+        name: reviewName,
         issue: "Default",
-        rating: 89,
-        url: "https://example.com",
+        rating: 93,
+        url,
         category: bottle.category,
       },
-      { context: { user: adminUser } },
+      { context: { user: admin } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
+    expect(await findReviewByUrl(url)).toMatchObject({
+      id: result.id,
+      bottleId: bottle.id,
+      releaseId: null,
     });
-    expect(review?.bottleId).toEqual(bottle.id);
-    expect(review?.releaseId).toBeNull();
-
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review!.id),
-      ),
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      releaseId: null,
+      assignmentSource: "classifier_approved",
+      assignedByActorId: systemActor.id,
     });
-    expect(decisionLog).toMatchObject({
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, result.id),
+        ),
+      }),
+    ).toMatchObject({
       decision: "match_existing",
-      actorId: (await getPeatedSystemActor()).id,
       bottleId: bottle.id,
       releaseId: null,
       createdBottle: false,
-      createdRelease: false,
-      confidence: null,
-      metadata: expect.objectContaining({
-        initiatedByUserId: adminUser.id,
+    });
+  });
+
+  test("creates one complete Bottle for an approved classifier decision", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ name: "Created Review Brand" });
+    const url = "https://example.com/reviews/classifier-create";
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildCreateBottleDecision({
+        brandName: brand.name,
+        bottleName: "Created Review Bottle",
       }),
-    });
-  });
-
-  test("new review with existing release", async ({ fixtures }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "Cadboll Estate",
-      vintageYear: null,
-      releaseYear: null,
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      fullName: `${bottle.fullName} - Batch 4`,
-      name: `${bottle.name} - Batch 4`,
-      edition: "Batch 4",
-    });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: release.fullName,
-        issue: "Default",
-        rating: 89,
-        url: "https://example.com/batch-4",
-        category: bottle.category,
-      },
-      { context: { user: adminUser } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
+    const result = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: `${brand.name} Created Review Bottle`,
+        issue: "Default",
+        rating: 94,
+        url,
+        category: "single_malt",
+      },
+      { context: { user: admin } },
+    );
+
+    const review = await findReviewByUrl(url);
+    expect(review).toMatchObject({
+      id: result.id,
+      bottleId: expect.any(Number),
+      releaseId: null,
     });
-    expect(review).toBeDefined();
-    expect(review?.bottleId).toEqual(bottle.id);
-    expect(review?.releaseId).toEqual(release.id);
-    expect(data.bottle?.id).toEqual(bottle.id);
-    expect(data.release?.id).toEqual(release.id);
+    expect(
+      await db.query.bottles.findFirst({
+        where: (bottles, { eq }) => eq(bottles.id, review!.bottleId!),
+      }),
+    ).toMatchObject({
+      id: review!.bottleId,
+      brandId: brand.id,
+      name: "Created Review Bottle",
+      category: "single_malt",
+      groupId: expect.any(Number),
+    });
   });
 
-  test("preserves raw release alias text when normalization would strip release identity", async ({
+  test("rejects missing Bottle assignments and rolls back the review write", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "Calvados Cask Finished",
-      vintageYear: null,
-      releaseYear: null,
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      fullName: `${bottle.fullName} (2024 Release)`,
-      name: `${bottle.name} (2024 Release)`,
-      releaseYear: 2024,
-    });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: release.fullName,
-        issue: "Default",
-        rating: 91,
-        url: "https://example.com/2024-release",
-        category: bottle.category,
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
-    });
-    expect(review).toBeDefined();
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.name).toEqual(release.fullName);
-
-    const normalizedReleaseAlias = await db.query.bottleAliases.findFirst({
-      where: and(
-        eq(bottleAliases.name, bottle.fullName),
-        eq(bottleAliases.releaseId, release.id),
-      ),
-    });
-    expect(normalizedReleaseAlias).toBeUndefined();
-  });
-
-  test("preserves raw review name for classifier-resolved releases when normalization strips release identity", async ({
-    fixtures,
-  }) => {
-    const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "Calvados Cask Finished",
-      vintageYear: null,
-      releaseYear: null,
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      fullName: `${bottle.fullName} (2024 Release)`,
-      name: `${bottle.name} (2024 Release)`,
-      releaseYear: 2024,
-    });
-    const adminUser = await fixtures.User({ admin: true });
-
+    const admin = await fixtures.User({ admin: true });
+    const missingBottleId = 2_147_483_647;
+    const url = "https://example.com/reviews/missing-bottle";
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
           action: "match",
-          matchedBottleId: bottle.id,
-          matchedReleaseId: release.id,
-          candidateBottleIds: [bottle.id],
+          matchedBottleId: missingBottleId,
+          candidateBottleIds: [missingBottleId],
         },
+        [{ bottleId: missingBottleId }],
+      ),
+    );
+
+    const error = await waitError(() =>
+      routerClient.reviews.create(
         {
-          candidates: [
-            {
-              bottleId: bottle.id,
-              releaseId: release.id,
-              fullName: release.fullName,
-              bottleFullName: bottle.fullName,
-              alias: release.fullName,
-              brand: null,
-              bottler: null,
-              series: null,
-              distillery: [],
-              category: bottle.category,
-              statedAge: bottle.statedAge,
-              edition: release.edition,
-              caskStrength: release.caskStrength,
-              singleCask: release.singleCask,
-              abv: release.abv,
-              vintageYear: release.vintageYear,
-              releaseYear: release.releaseYear,
-              caskType: release.caskType,
-              caskSize: release.caskSize,
-              caskFill: release.caskFill,
-            },
-          ],
+          site: site.type,
+          name: "Missing Review Bottle",
+          issue: "Default",
+          rating: 89,
+          url,
+          category: "single_malt",
         },
+        { context: { user: admin } },
       ),
     );
 
-    const data = await routerClient.reviews.create(
-      {
-        site: site.type,
-        name: release.fullName,
-        issue: "Default",
-        rating: 91,
-        url: "https://example.com/2024-release-from-classifier",
-        category: bottle.category,
-      },
-      { context: { user: adminUser } },
-    );
-
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, data.id),
+    expect(error).toMatchObject({
+      code: "NOT_FOUND",
+      status: 404,
+      message: "Bottle not found.",
+      cause: expect.objectContaining({
+        name: "ActiveBottleSelectionError",
+        reason: "missing",
+        bottleId: missingBottleId,
+      }),
     });
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.name).toEqual(release.fullName);
-
-    const normalizedReleaseAlias = await db.query.bottleAliases.findFirst({
-      where: and(
-        eq(bottleAliases.name, bottle.fullName),
-        eq(bottleAliases.releaseId, release.id),
-      ),
-    });
-    expect(normalizedReleaseAlias).toBeUndefined();
+    expect(await findReviewByUrl(url)).toBeUndefined();
   });
 
-  test("updates an existing normalized review when a release alias later matches", async ({
+  test("rejects every inactive Bottle state and rolls back the review write", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting();
-    const bottle = await fixtures.Bottle({
-      name: "Calvados Cask Finished",
-      vintageYear: null,
-      releaseYear: null,
+    const admin = await fixtures.User({ admin: true });
+    const unassigned = await fixtures.LegacyBottle({
+      name: "Unassigned Review Bottle",
     });
-    const existingReview = await fixtures.Review({
+    const retired = await fixtures.Bottle({
+      name: "Retired Review Bottle",
+    });
+    const replacement = await fixtures.Bottle({
+      name: "Review Tombstone Replacement",
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+
+    for (const [bottle, reason] of [
+      [unassigned, "unassigned"],
+      [retired, "bottle_retired"],
+    ] as const) {
+      const url = `https://example.com/reviews/${reason}`;
+      const error = await waitError(() =>
+        routerClient.reviews.create(
+          {
+            site: site.type,
+            name: bottle.fullName,
+            issue: "Default",
+            rating: 89,
+            url,
+            category: bottle.category,
+          },
+          { context: { user: admin } },
+        ),
+      );
+
+      expect(error).toMatchObject({
+        code: "CONFLICT",
+        status: 409,
+        message:
+          reason === "bottle_retired"
+            ? `Bottle ${bottle.id} is retired.`
+            : `Bottle ${bottle.id} is not active.`,
+        cause: expect.objectContaining({
+          name: "ActiveBottleSelectionError",
+          reason,
+          bottleId: bottle.id,
+        }),
+      });
+      expect(await findReviewByUrl(url)).toBeUndefined();
+    }
+  });
+
+  test("rolls back the Review when a later alias claim fails", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const selectedBottle = await fixtures.Bottle({
+      name: "Rollback Destination Bottle",
+    });
+    const conflictingBottle = await fixtures.Bottle({
+      name: "Rollback Alias Owner",
+    });
+    const reviewName = "Rollback Review Assignment";
+    const retryUrl = "https://example.com/reviews/rollback-retry";
+    classifyBottleReferenceMock.mockImplementationOnce(async () => {
+      await fixtures.BottleAlias({
+        name: normalizeBottleAliasKey(reviewName),
+        bottleId: conflictingBottle.id,
+      });
+      return buildClassification(
+        {
+          action: "match",
+          matchedBottleId: selectedBottle.id,
+          candidateBottleIds: [selectedBottle.id],
+        },
+        [{ bottleId: selectedBottle.id }],
+      );
+    });
+
+    await expect(
+      routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue: "Default",
+          rating: 99,
+          url: retryUrl,
+          category: selectedBottle.category,
+        },
+        { context: { user: admin } },
+      ),
+    ).rejects.toThrow();
+
+    expect(await findReviewByUrl(retryUrl)).toBeUndefined();
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+      }),
+    ).toMatchObject({
+      bottleId: conflictingBottle.id,
+    });
+  });
+
+  test("a concurrent insert preserves its committed Bottle identity", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const committedBottle = await fixtures.Bottle({
+      name: "Concurrent Committed Bottle",
+    });
+    const incomingBottle = await fixtures.Bottle({
+      name: "Concurrent Incoming Bottle",
+    });
+    const reviewName = "Concurrent Review Assignment";
+    const issue = "Default";
+    const resultUrl = "https://example.com/reviews/concurrent-result";
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let creation: ReturnType<typeof routerClient.reviews.create> | undefined;
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: incomingBottle.id,
+          candidateBottleIds: [incomingBottle.id],
+        },
+        [{ bottleId: incomingBottle.id }],
+      ),
+    );
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `INSERT INTO "review"
+          ("bottle_id", "external_site_id", "name", "issue", "rating", "url")
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          committedBottle.id,
+          site.id,
+          reviewName,
+          issue,
+          82,
+          "https://example.com/reviews/concurrent-holder",
+        ],
+      );
+
+      creation = routerClient.reviews.create(
+        {
+          site: site.type,
+          name: reviewName,
+          issue,
+          rating: 96,
+          url: resultUrl,
+          category: incomingBottle.category,
+        },
+        { context: { user: admin } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+
+      const result = await creation;
+      expect(await findReviewByUrl(resultUrl)).toMatchObject({
+        id: result.id,
+        bottleId: committedBottle.id,
+        releaseId: null,
+        rating: 96,
+      });
+      expect(
+        await db.query.bottleAliases.findFirst({
+          where: eq(bottleAliases.name, normalizeBottleAliasKey(reviewName)),
+        }),
+      ).toBeUndefined();
+      expect(
+        await db.query.incomingBottleDecisionLogs.findFirst({
+          where: and(
+            eq(incomingBottleDecisionLogs.sourceKind, "review"),
+            eq(incomingBottleDecisionLogs.sourceId, result.id),
+          ),
+        }),
+      ).toBeUndefined();
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await creation?.catch(() => undefined);
+    }
+  });
+
+  test("an unresolved retry preserves an existing direct Bottle assignment", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle({
+      name: "Durable Review Bottle",
+    });
+    const reviewName = "Durable Unresolved Review";
+    const existing = await fixtures.Review({
       externalSiteId: site.id,
       bottleId: bottle.id,
       releaseId: null,
-      name: bottle.fullName,
-      issue: "Default",
-      rating: 88,
-      url: "https://example.com/original",
+      name: reviewName,
+      url: "https://example.com/reviews/durable-original",
     });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      fullName: `${bottle.fullName} (2024 Release)`,
-      name: `${bottle.name} (2024 Release)`,
-      releaseYear: 2024,
-    });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      releaseId: release.id,
-      name: release.fullName,
-    });
-    const adminUser = await fixtures.User({ admin: true });
 
-    const data = await routerClient.reviews.create(
+    const result = await routerClient.reviews.create(
       {
         site: site.type,
-        name: release.fullName,
-        issue: "Default",
-        rating: 91,
-        url: "https://example.com/2024-release",
+        name: reviewName,
+        issue: existing.issue,
+        rating: 97,
+        url: "https://example.com/reviews/durable-retry",
         category: bottle.category,
       },
-      { context: { user: adminUser } },
+      { context: { user: admin } },
     );
 
-    const review = await db.query.reviews.findFirst({
-      where: (table, { eq }) => eq(table.id, existingReview.id),
+    expect(
+      await findReviewByUrl("https://example.com/reviews/durable-retry"),
+    ).toMatchObject({
+      id: result.id,
+      bottleId: bottle.id,
+      releaseId: null,
+      rating: 97,
     });
-    expect(review).toBeDefined();
-    expect(review?.id).toEqual(existingReview.id);
-    expect(review?.releaseId).toEqual(release.id);
-    expect(review?.name).toEqual(release.fullName);
-    expect(review?.url).toEqual("https://example.com/2024-release");
-    expect(data.id).toEqual(existingReview.id);
-
-    const siteReviews = await db
-      .select({ id: reviews.id })
-      .from(reviews)
-      .where(eq(reviews.externalSiteId, site.id));
-    expect(siteReviews).toHaveLength(1);
   });
 
-  test("returns error for non-existent site", async ({ fixtures }) => {
-    const adminUser = await fixtures.User({ admin: true });
+  test("a conflicting resolved retry preserves a different durable Bottle", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const admin = await fixtures.User({ admin: true });
+    const durableBottle = await fixtures.Bottle({
+      name: "Durable Conflict Bottle",
+    });
+    const incomingBottle = await fixtures.Bottle({
+      name: "Incoming Conflict Bottle",
+    });
+    const aliasName = "Conflicting Resolved Review";
+    await fixtures.BottleAlias({
+      name: aliasName,
+      bottleId: incomingBottle.id,
+    });
+    const existing = await fixtures.Review({
+      externalSiteId: site.id,
+      bottleId: durableBottle.id,
+      releaseId: null,
+      name: aliasName,
+      url: "https://example.com/reviews/conflict-original",
+    });
 
-    const err = await waitError(() =>
+    const result = await routerClient.reviews.create(
+      {
+        site: site.type,
+        name: aliasName,
+        issue: existing.issue,
+        rating: 98,
+        url: "https://example.com/reviews/conflict-retry",
+        category: incomingBottle.category,
+      },
+      { context: { user: admin } },
+    );
+
+    expect(
+      await findReviewByUrl("https://example.com/reviews/conflict-retry"),
+    ).toMatchObject({
+      id: result.id,
+      bottleId: durableBottle.id,
+      releaseId: null,
+      rating: 98,
+    });
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, existing.id),
+        ),
+      }),
+    ).toBeUndefined();
+  });
+
+  test("rejects invalid site input", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+
+    const error = await waitError(() =>
       routerClient.reviews.create(
         {
-          site: "non-existent-site" as any, // force invalid type here
-          name: "Bottle Name",
+          site: "not-a-site" as never,
+          name: "Invalid Site Review",
           issue: "Default",
           rating: 89,
-          url: "https://example.com",
+          url: "https://example.com/reviews/invalid-site",
           category: "single_malt",
         },
-        { context: { user: adminUser } },
+        { context: { user: admin } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
   });
 });

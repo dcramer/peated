@@ -10,10 +10,7 @@ function buildBottleCandidate(
     Partial<BottleCandidate>,
 ): BottleCandidate {
   return {
-    kind: "bottle",
-    releaseId: null,
     alias: null,
-    bottleFullName: candidate.fullName,
     brand: null,
     bottler: null,
     series: null,
@@ -23,6 +20,9 @@ function buildBottleCandidate(
     edition: null,
     caskStrength: null,
     singleCask: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,
@@ -191,6 +191,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate,
@@ -241,6 +244,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate,
@@ -291,6 +297,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: "Batch 4",
         },
         targetCandidate,
@@ -341,6 +350,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate,
@@ -391,6 +403,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate,
@@ -431,7 +446,7 @@ describe("bottleClassificationEvidence", () => {
     ).toBe(false);
   });
 
-  test("treats a differing age as a hard conflict for dirty parent bottle candidates", () => {
+  test("treats a differing age as a hard conflict for dirty broader Bottle candidates", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 2457,
       fullName: "Glenglassaugh 1978 Rare Cask Release",
@@ -458,6 +473,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: "Batch 1",
         },
         targetCandidate,
@@ -465,7 +483,7 @@ describe("bottleClassificationEvidence", () => {
     ).toContain("stated_age");
   });
 
-  test("treats explicit strength, cask flag, and year mismatches as hard existing-match conflicts", () => {
+  test("treats explicit exact-trait mismatches as hard existing-match conflicts", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 347,
       fullName: "The Exclusive Malts Islay 2007 8-year-old 57.1%",
@@ -478,6 +496,9 @@ describe("bottleClassificationEvidence", () => {
       vintageYear: 2007,
       caskStrength: true,
       singleCask: true,
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
     });
 
     expect(
@@ -496,6 +517,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: 2008,
           cask_strength: false,
           single_cask: false,
+          cask_type: "bourbon",
+          cask_size: "barrel",
+          cask_fill: "refill",
           edition: null,
         },
         targetCandidate,
@@ -506,6 +530,9 @@ describe("bottleClassificationEvidence", () => {
       "release_year",
       "cask_strength",
       "single_cask",
+      "cask_type",
+      "cask_size",
+      "cask_fill",
     ]);
 
     expect(
@@ -524,11 +551,51 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate,
       }),
     ).toEqual([]);
+  });
+
+  test("treats a partial marketed edition marker as an existing-match conflict", () => {
+    const targetCandidate = buildBottleCandidate({
+      bottleId: 43397,
+      fullName: "High West A Midwinter Night's Dram Act 12",
+      brand: "High West",
+      category: "rye",
+      edition: "Act 12",
+      abv: 49.3,
+    });
+
+    expect(
+      getExistingMatchIdentityConflicts({
+        referenceName:
+          "High West A Midwinter Night's Dram Act 12 Scene 9 49.3% ABV",
+        extractedLabel: {
+          brand: "High West",
+          bottler: null,
+          expression: "A Midwinter Night's Dram",
+          series: "A Midwinter Night's Dram",
+          distillery: [],
+          category: "rye",
+          stated_age: null,
+          abv: 49.3,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: null,
+          single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
+          edition: "Act 12 Scene 9",
+        },
+        targetCandidate,
+      }),
+    ).toContain("edition");
   });
 
   test("does not treat the legacy generic spirit category as a hard existing-match conflict", () => {
@@ -548,12 +615,14 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate: buildBottleCandidate({
           bottleId: 13025,
           fullName: "Shibui Grain Select",
-          bottleFullName: "Shibui Grain Select",
           brand: "Shibui",
           category: "spirit",
           source: ["brand", "exact"],
@@ -566,7 +635,6 @@ describe("bottleClassificationEvidence", () => {
     const targetCandidate = buildBottleCandidate({
       bottleId: 10,
       fullName: "Springbank 10yo",
-      bottleFullName: "Springbank 10yo",
       brand: "Springbank",
       distillery: ["Springbank"],
       category: "single_malt",
@@ -590,6 +658,9 @@ describe("bottleClassificationEvidence", () => {
           vintage_year: null,
           cask_strength: null,
           single_cask: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           edition: null,
         },
         targetCandidate,

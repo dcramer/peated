@@ -1,9 +1,9 @@
 "use client";
 import { use } from "react";
 
-import BottleLink from "@peated/web/components/bottleLink";
 import { Distillers } from "@peated/web/components/bottleMetadata";
 import { ClientOnly } from "@peated/web/components/clientOnly";
+import FlightBottleIdentity from "@peated/web/components/flightBottleIdentity";
 import LayoutEmpty from "@peated/web/components/layoutEmpty";
 import QRCodeClient from "@peated/web/components/qrcode.client";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -23,12 +23,6 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
       input: { flight: flightId },
     }),
   );
-  const { data: bottleList } = useSuspenseQuery(
-    orpc.bottles.list.queryOptions({
-      input: { flight: flightId },
-    }),
-  );
-
   return (
     <LayoutEmpty fullWidth>
       <div className="w-full max-w-3xl flex-1 self-center">
@@ -48,21 +42,19 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
           <div className="w-full lg:w-8/12">
             <table className="min-w-full">
               <tbody>
-                {bottleList.results.map((bottle) => {
+                {flight.bottles.map((flightBottle) => {
+                  const { bottle } = flightBottle;
                   return (
                     <tr key={bottle.id} className="border-b border-slate-800">
-                      <td className="group relative max-w-0 py-4 pl-4 pr-3 sm:pl-3">
-                        <BottleLink
-                          bottle={bottle}
-                          flightId={flight.id}
-                          className="absolute inset-0"
-                          withPanel
-                        />
-                        <div className="flex items-center gap-x-1 text-2xl group-hover:underline">
-                          <div className="font-semibold">{bottle.fullName}</div>
+                      <td className="max-w-0 py-4 pl-4 pr-3 sm:pl-3">
+                        <div className="text-2xl">
+                          <FlightBottleIdentity
+                            bottle={bottle}
+                            flightId={flight.id}
+                          />
                         </div>
                         <div className="text-muted flex flex-row items-start space-x-1 truncate">
-                          <Distillers data={bottle} />
+                          <Distillers distillers={bottle.distillers} />
                         </div>
                         {bottle.description}
                       </td>

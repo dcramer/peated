@@ -1,7 +1,12 @@
 import { db } from "@peated/server/db";
-import { bottles, entities, tastings } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  bottles,
+  entities,
+  tastings,
+} from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { sql } from "drizzle-orm";
+import { and, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -34,7 +39,13 @@ export default procedure
       .select({
         totalBottles: sql<string>`COUNT(${bottles.id})`,
       })
-      .from(bottles);
+      .from(bottles)
+      .where(
+        and(
+          isNotNull(bottles.groupId),
+          sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+        ),
+      );
 
     const [{ totalEntities }] = await db
       .select({

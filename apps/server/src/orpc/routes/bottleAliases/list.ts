@@ -1,17 +1,8 @@
 import { db } from "@peated/server/db";
-import type { Bottle } from "@peated/server/db/schema";
 import { bottleAliases, bottles } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { listResponse } from "@peated/server/schemas";
-import {
-  and,
-  asc,
-  eq,
-  getTableColumns,
-  ilike,
-  isNull,
-  type SQL,
-} from "drizzle-orm";
+import { and, asc, eq, ilike, isNull, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
 const OutputSchema = listResponse(
@@ -41,6 +32,7 @@ export default procedure
         cursor: z.coerce.number().gte(1).default(1),
         limit: z.coerce.number().gte(1).lte(100).default(100),
       })
+      .strict()
       .default({
         query: "",
         cursor: 1,
@@ -52,14 +44,17 @@ export default procedure
     input: { cursor, query, limit, ...input },
     errors,
   }) {
-    const where: (SQL<unknown> | undefined)[] = [
-      eq(bottleAliases.ignored, false),
+    const where: SQL<unknown>[] = [
+      sql`${bottleAliases.ignored} IS DISTINCT FROM TRUE`,
     ];
 
-    let bottle: Bottle | null = null;
+    let bottle: { id: number; fullName: string } | null = null;
     if (input.bottle) {
       [bottle] = await db
-        .select()
+        .select({
+          id: bottles.id,
+          fullName: bottles.fullName,
+        })
         .from(bottles)
         .where(eq(bottles.id, input.bottle));
 
@@ -80,22 +75,24 @@ export default procedure
     }
 
     const offset = (cursor - 1) * limit;
-
-    const { embedding, ...columns } = getTableColumns(bottleAliases);
     const results = await db
-      .select(columns)
+      .select({
+        name: bottleAliases.name,
+        createdAt: bottleAliases.createdAt,
+        bottleId: bottleAliases.bottleId,
+      })
       .from(bottleAliases)
-      .where(where ? and(...where) : undefined)
+      .where(and(...where))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(asc(bottleAliases.name));
 
     return {
-      results: results.slice(0, limit).map((a) => ({
-        name: a.name,
-        createdAt: a.createdAt.toISOString(),
-        bottleId: a.bottleId,
-        isCanonical: bottle ? bottle.fullName == a.name : undefined,
+      results: results.slice(0, limit).map((alias) => ({
+        name: alias.name,
+        createdAt: alias.createdAt.toISOString(),
+        bottleId: alias.bottleId,
+        isCanonical: bottle ? bottle.fullName === alias.name : undefined,
       })),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

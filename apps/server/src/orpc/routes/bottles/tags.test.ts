@@ -1,4 +1,8 @@
+import { db } from "@peated/server/db";
+import { bottleTombstones } from "@peated/server/db/schema";
+import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /bottles/:bottle/tags", () => {
@@ -35,5 +39,70 @@ describe("GET /bottles/:bottle/tags", () => {
       { tag: "caramel", count: 2 },
       { tag: "solvent", count: 1 },
     ]);
+  });
+
+  test("counts tagged Tastings by their direct Bottle reference", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Selected Bottle" });
+    const otherBottle = await fixtures.Bottle({ name: "Other Bottle" });
+
+    await fixtures.Tasting({
+      bottleId: otherBottle.id,
+      tags: ["wrong-bottle"],
+    });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      tags: ["selected-a"],
+    });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      tags: ["selected-b"],
+    });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      tags: [],
+    });
+
+    const result = await routerClient.bottles.tags({ bottle: bottle.id });
+
+    expect(result.totalCount).toBe(2);
+  });
+
+  test("rejects a retired selected Bottle", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle({ name: "Selected Bottle" });
+    const replacement = await fixtures.Bottle({ name: "Replacement Bottle" });
+    await fixtures.Tasting({
+      bottleId: bottle.id,
+      tags: ["retired"],
+    });
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+
+    const error = await waitError(
+      routerClient.bottles.tags({ bottle: bottle.id }),
+    );
+
+    expect(error).toMatchObject({ status: 409 });
+  });
+
+  test("rejects a Bottle that is not assigned to a group", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.LegacyBottle();
+
+    const error = await waitError(
+      routerClient.bottles.tags({ bottle: bottle.id }),
+    );
+
+    expect(error).toMatchObject({ status: 409 });
+  });
+
+  test("preserves missing Bottle behavior", async () => {
+    await expect(
+      routerClient.bottles.tags({ bottle: 999_999_999 }),
+    ).rejects.toMatchObject({ status: 404 });
   });
 });

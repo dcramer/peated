@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:19:31.955Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Vol 3 whiskey bourbon"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Vol 3 whiskey bourbon",
+    "summary": "Heaven’s Door **Bootleg Series Volume III** is a **limited-release Kentucky bourbon** from Heaven’s Door Spirits, released in **2021** as the third annual entry in the Bootleg Series. It is a **13-year-old bourbon** that was **finished in Vino de Naranja casks**, and it was bottled at **121.2 proof (60.6% ABV)**. Break",
+    "results": [
+      {
+        "title": "https://www.heavensdoor.com/bootleg-series",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/home/",
+        "url": "https://www.heavensdoor.com/home/",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "url": "https://breakingbourbon.com/review/heavens-door-bootleg-series-volume-3",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/products/decadeseries3",
+        "url": "https://buy.heavensdoor.com/products/decadeseries3",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://buy.heavensdoor.com/collections/the-bootleg-series",
+        "url": "https://buy.heavensdoor.com/collections/the-bootleg-series",
+        "domain": "buy.heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavensdoor.com/post/best-bourbons-of-the-21st-century",
+        "url": "https://www.heavensdoor.com/post/best-bourbons-of-the-21st-century",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "42c2f6467ecf55d12d52a67bf68b64670a924182c63df927aa71f39d4e8f4ed8",
+    "mode": "auto"
+  }
+}

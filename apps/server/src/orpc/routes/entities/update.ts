@@ -2,27 +2,35 @@ import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import {
-  bottleAliases,
-  bottles,
+  bottleGroups,
   changes,
   countries,
   entities,
   regions,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import { ExactBottleAliasConflictError } from "@peated/server/lib/bottleAliases";
 import {
   DuplicateEntityAliasError,
   upsertEntityAliases,
 } from "@peated/server/lib/db";
 import { arraysEqual } from "@peated/server/lib/equals";
 import { logError } from "@peated/server/lib/log";
+import {
+  ConcreteBottleUpdateConflictError,
+  ConcreteBottleUpdateGraphError,
+  ConcreteBottleUpdateInputError,
+  finalizeConcreteBottleUpdate,
+  updateConcreteBottleInTransaction,
+  type ConcreteBottleUpdateFinalizationManifest,
+} from "@peated/server/lib/updateConcreteBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { EntityInputSchema, EntitySchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -41,6 +49,13 @@ const InputSchema = z.object({
   address: EntityInputSchema.shape.address.removeDefault().optional(),
   location: EntityInputSchema.shape.location.removeDefault().optional(),
 });
+
+class BottleGroupRepresentativeMissingError extends Error {
+  constructor(readonly groupId: number) {
+    super(`BottleGroup ${groupId} has no representative Bottle.`);
+    this.name = "BottleGroupRepresentativeMissingError";
+  }
+}
 
 export default procedure
   .use(requireMod)
@@ -162,111 +177,124 @@ export default procedure
     }
 
     const user = context.user;
-    const newEntity = await db.transaction(async (tx) => {
-      const actorId = (await getUserActorForDatabase(tx, user)).id;
-      let newEntity: Entity | undefined;
+    let updateResult: {
+      entity: Entity | undefined;
+      bottleUpdates: ConcreteBottleUpdateFinalizationManifest[];
+    };
+    try {
+      updateResult = await db.transaction(async (tx) => {
+        const actorId = (await getUserActorForDatabase(tx, user)).id;
+        let newEntity: Entity | undefined;
+        const bottleUpdates: ConcreteBottleUpdateFinalizationManifest[] = [];
 
-      try {
-        [newEntity] = await tx
-          .update(entities)
-          .set({
-            ...data,
-            updatedAt: sql`NOW()`,
-          })
-          .where(eq(entities.id, entity.id))
-          .returning();
-      } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
-          throw errors.CONFLICT({
-            message: "Entity with name already exists.",
-            cause: err,
-          });
-        }
-        throw err;
-      }
-      if (!newEntity) return;
-
-      if (data.name || data.shortName !== undefined) {
         try {
-          await upsertEntityAliases({
-            db: tx,
-            entity: newEntity,
-            previousEntity: entity,
-          });
-        } catch (err) {
-          if (err instanceof DuplicateEntityAliasError) {
+          [newEntity] = await tx
+            .update(entities)
+            .set({
+              ...data,
+              updatedAt: sql`NOW()`,
+            })
+            .where(eq(entities.id, entity.id))
+            .returning();
+        } catch (err: any) {
+          if (err?.code === "23505" && err?.constraint === "entity_name_unq") {
             throw errors.CONFLICT({
-              message: err.message,
+              message: "Entity with name already exists.",
               cause: err,
             });
           }
           throw err;
         }
-      }
-
-      if (data.name || data.shortName !== undefined) {
-        const previousBottlePrefix = entity.shortName || entity.name;
-        const nextBottlePrefix = newEntity.shortName || newEntity.name;
-
-        await tx
-          .update(bottles)
-          .set({
-            fullName: sql`${nextBottlePrefix} || ' ' || ${bottles.name}`,
-          })
-          .where(
-            and(
-              eq(bottles.brandId, newEntity.id),
-              ne(
-                bottles.fullName,
-                sql`${nextBottlePrefix} || ' ' || ${bottles.name}`,
-              ),
-            ),
-          );
-
-        // we do insert vs update to handle the ON CONFLICT scenario
-        await tx.execute(sql`
-            INSERT INTO ${bottleAliases} (name, bottle_id, assigned_by_actor_id)
-            SELECT ${bottles.fullName}, ${bottles.id}, ${actorId} FROM ${bottles}
-            WHERE ${bottles.brandId} = ${newEntity.id}
-            ON CONFLICT (LOWER(name))
-            DO UPDATE SET
-              bottle_id = excluded.bottle_id,
-              assigned_by_actor_id = excluded.assigned_by_actor_id
-            WHERE ${bottleAliases.bottleId} IS NULL
-        `);
-
-        if (
-          previousBottlePrefix.toLowerCase() !== nextBottlePrefix.toLowerCase()
-        ) {
-          await tx.execute(sql`
-              DELETE FROM ${bottleAliases}
-              WHERE ${bottleAliases.bottleId} IN (
-                SELECT ${bottles.id} FROM ${bottles}
-                 WHERE ${bottles.brandId} = ${newEntity.id}
-                   AND LOWER(${bottleAliases.name}) = LOWER(${previousBottlePrefix} || ' ' || ${bottles.name})
-              )
-          `);
+        if (!newEntity) {
+          return {
+            entity: undefined,
+            bottleUpdates,
+          };
         }
-      }
 
-      await tx.insert(changes).values({
-        objectType: "entity",
-        objectId: newEntity.id,
-        displayName: newEntity.name,
-        actorId,
-        type: "update",
-        data: {
-          ...data,
-        },
+        if (data.name || data.shortName !== undefined) {
+          try {
+            await upsertEntityAliases({
+              db: tx,
+              entity: newEntity,
+              previousEntity: entity,
+            });
+          } catch (err) {
+            if (err instanceof DuplicateEntityAliasError) {
+              throw errors.CONFLICT({
+                message: err.message,
+                cause: err,
+              });
+            }
+            throw err;
+          }
+        }
+
+        if (data.name || data.shortName !== undefined) {
+          const groups = await tx
+            .select({
+              id: bottleGroups.id,
+              representativeBottleId: bottleGroups.representativeBottleId,
+            })
+            .from(bottleGroups)
+            .where(eq(bottleGroups.brandId, newEntity.id))
+            .orderBy(asc(bottleGroups.id))
+            .for("update");
+
+          for (const group of groups) {
+            if (group.representativeBottleId === null) {
+              throw new BottleGroupRepresentativeMissingError(group.id);
+            }
+            bottleUpdates.push(
+              await updateConcreteBottleInTransaction(tx, {
+                bottleId: group.representativeBottleId,
+                input: { shared: { brand: newEntity.id } },
+                user,
+                actorId,
+                creationSource: "manual_entry",
+              }),
+            );
+          }
+        }
+
+        await tx.insert(changes).values({
+          objectType: "entity",
+          objectId: newEntity.id,
+          displayName: newEntity.name,
+          actorId,
+          type: "update",
+          data: {
+            ...data,
+          },
+        });
+
+        return {
+          entity: newEntity,
+          bottleUpdates,
+        };
       });
+    } catch (error) {
+      if (
+        error instanceof ConcreteBottleUpdateConflictError ||
+        error instanceof ConcreteBottleUpdateGraphError ||
+        error instanceof ConcreteBottleUpdateInputError ||
+        error instanceof ExactBottleAliasConflictError ||
+        error instanceof BottleGroupRepresentativeMissingError
+      ) {
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
+    }
 
-      return newEntity;
-    });
-
+    const newEntity = updateResult.entity;
     if (!newEntity) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Failed to update entity.",
       });
+    }
+
+    for (const bottleUpdate of updateResult.bottleUpdates) {
+      await finalizeConcreteBottleUpdate(bottleUpdate);
     }
 
     try {

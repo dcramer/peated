@@ -2,11 +2,16 @@
 
 The authoritative model lives in
 [Whisky Identity Model](../architecture/whisky-identity-model.md). This document
-focuses on extraction and normalization terms.
+defines extraction, normalization, and editing conventions for that model.
 
 ## Identity Layers
 
-Bottle identity:
+Every marketed release is one independently complete Bottle. Extraction may be
+partial and may identify both shared-expression and exact-release fields. A
+`create_bottle` decision must produce one complete Bottle proposal rather than
+a parent plus child release.
+
+BottleGroup shared editing fields:
 
 - `brand`
 - `bottler`
@@ -14,14 +19,15 @@ Bottle identity:
 - `expression`
 - `series`
 - `category`
-- `stated_age` only when stable across releases
+- `flavor_profile`
+- `stated_age` when invariant across the expression's releases
 
-Release identity:
+Exact Bottle fields:
 
 - `edition`
 - `release_year`
 - `vintage_year`
-- `stated_age` when release-specific
+- release-specific `stated_age`
 - `abv`
 - `single_cask`
 - `cask_strength`
@@ -29,169 +35,161 @@ Release identity:
 - `cask_type`
 - `cask_size`
 
-Single-known-release rule:
+Bottle `name`, `fullName`, brand/entity relationships, category, series,
+flavor profile, distillers, and effective stated age are durable exact-record
+data even when their editing authority is shared. An exact Bottle must remain
+correct and renderable without BottleGroup hydration.
 
-- When only one marketed form is known, release-like traits may temporarily live on the parent bottle.
-- Once canonical child releases exist, those release-like traits should not also remain on the parent bottle unless they are truly part of bottle identity.
+There is no single-known-release exception. A dated, batched, vintage, or
+otherwise specific marketed form is a Bottle from the start. Discovering a
+sibling later does not turn either Bottle into a parent or move its exact fields
+to another object. This release leaves independently created Bottles in
+singleton groups; automatic regrouping is a separate future capability.
 
-Tasting exact details:
+## Shared Editing Semantics
 
-- `edition`
-- `release_year`
-- `vintage_year`
-- `abv`
-- `single_cask`
-- `cask_strength`
-- `cask_number`
-- `bottle_number`
-- `outturn`
-- `exclusive_text`
-- `label_notes`
+Ordinary Bottle creation creates a singleton BottleGroup automatically. Input
+must not use a source Bottle, group id, normalized name, or BottleSeries as
+grouping authority.
 
-Observation-only by default:
+An exact edit updates only the selected Bottle. A shared edit must, in one
+transaction:
 
-- cask number
-- barrel number
-- bottle number
-- outturn
-- exclusive wording
-- uncommon raw maturation text
+1. update the BottleGroup's shared values;
+2. preserve every member's exact fields;
+3. regenerate and persist every member's complete Bottle identity;
+4. retain previous canonical exact names as exact aliases;
+5. roll back on any Bottle, alias, materialization, or audit failure.
+
+For age fan-out, a member's non-null age differing from the pre-edit group age
+is an exact override. Null or equal values inherit the shared age. Clearing an
+exact override materializes the current shared age; changing the shared age
+preserves only the differing overrides.
 
 ## Field Definitions
 
 - **brand**: The consumer-facing label brand.
 - **bottler**: A separately stated bottling house when different from `brand`.
-- **distillery**: An array of actual producing distilleries. Use `[]` when unknown.
-- **expression**: The core release name after removing producer, age, ABV, and generic style words.
-- **series**: A stable range or family, or `null`.
-- **edition**: A simple human-facing release descriptor such as `Batch 3`, `2024 Release`, or `S2B13`.
-- **category**: One of `blend`, `bourbon`, `rye`, `single_grain`, `single_malt`, or `single_pot_still`.
-- **stated_age**: The age in years as an integer, or `null` if there is no age statement.
-- **abv**: Alcohol by volume as a percentage, for example `43.0`.
-- **release_year**: The bottling or release year.
+- **distillery**: An array of actual producing distilleries. Use `[]` when
+  unknown.
+- **expression**: The shared product name after removing producer, age, ABV,
+  and generic style words.
+- **series**: A stable range or family, or `null`; never a batch code, release
+  year, or grouping key.
+- **edition**: A human-facing exact descriptor such as `Batch 3`,
+  `2024 Release`, or `S2B13`.
+- **category**: One of `blend`, `bourbon`, `rye`, `single_grain`,
+  `single_malt`, or `single_pot_still`.
+- **stated_age**: The label-stated age in years as an integer, or `null`.
+- **abv**: Alcohol by volume as a percentage, for example `46.3`.
+- **release_year**: The bottling or marketed release year, or `null`.
 - **vintage_year**: The distillation or vintage year, or `null`.
-- **cask_type**: The primary cask type or finish, or `null`.
-- **cask_strength**: `true` only when the label explicitly says cask strength, barrel proof, full proof, natural strength, or an equivalent phrase. Otherwise `null`.
-- **single_cask**: `true` only when the label explicitly says single cask, single barrel, or an equivalent phrase. Otherwise `null`.
+- **cask_type**: The primary maturation or finishing cask, or `null`.
+- **cask_strength**: `true` only when the source explicitly states cask,
+  barrel, full, natural, or equivalent strength; otherwise `null`.
+- **single_cask**: `true` only when the source explicitly states single cask,
+  single barrel, or an equivalent phrase; otherwise `null`.
 
 ## Label Components
 
-Treat a label or retailer title as a bundle of bottle-identity components:
+Treat a label or retailer title as a bundle of components:
 
-- **producer / bottler**: The top-level producer name that usually maps to `brand`.
-- **distillery**: The actual producing distillery or distilleries, which may differ from `brand` for independent bottlings.
-- **expression**: The core release name after removing producer, age, ABV, and generic style words.
-- **series**: The stable collection or range, such as `Private Selection` or `Distillers Edition`.
-- **edition**: A batch number, store-pick code, release code, or numbered edition such as `Batch 3`, `2021 Release`, or `S2B13`.
-- **category**: The normalized house category. If the whisky type is unclear, leave it `null` instead of forcing a broader fallback.
-- **age statement**: Numeric age, including abbreviations such as `12 Yr.` or `16yr`.
-- **cask descriptor**: Primary cask or finish wording such as `First Fill Bourbon` or `PX Cask Finish`.
-- **technical details**: ABV, vintage year, release year, plus explicit cask-strength and single-cask flags.
+- producer or bottler;
+- actual distillery or distilleries;
+- shared expression;
+- stable series;
+- exact edition, batch, store-pick code, or numbered release;
+- category and stated age;
+- cask description, ABV, vintage year, release year, and explicit strength or
+  single-cask flags.
 
-These are identity components:
+These details usually do not drive identity by themselves:
 
-- producer or bottler
-- distillery
-- expression
-- series
-- edition or store-pick code
-- age statement
-- cask finish
-- cask-strength and single-cask indicators
-- ABV, vintage year, and release year
+- volume and pack size;
+- gift sets, tins, glassware, and sampler bundles;
+- generic retailer SEO style words;
+- ratings, tasting notes, medals, pricing, shipping, and legal text.
 
-These are usually noise and should not drive matching on their own:
+Preserve exact cask or barrel number, bottle number, outturn, retailer-exclusive
+wording, label notes, and uncommon raw maturation wording as observations by
+default. Promote them to Bottle identity only with evidence that they define
+the marketed release or are required for recurring disambiguation.
 
-- volume and pack size such as `50ml`, `750ml`, `1L`, or `1.75L`
-- gift sets, tins, glassware, mugs, and sampler bundles
-- retailer SEO words such as `Scotch Whisky`, `Kentucky Bourbon Whisky`, or `American Whiskey` when they only restate the category
-- ratings blurbs, tasting notes, medals, and shelf-talker copy
-- pricing, shipping, and legal text
+## Extraction Rules
 
-These should usually be preserved as observations instead of forcing a canonical split:
+### Brand, Bottler, And Distillery
 
-- exact cask or barrel numbers
-- bottle counts or outturn
-- `store pick`, `exclusive`, `private barrel`, or similar merchandising text when it is not part of the marketed canonical release name
-- retailer-specific title suffixes
+- For an official distillery bottling, the brand is normally the distillery
+  name and `distillery` contains that entity.
+- For an independent bottling, use the consumer-facing bottler label as the
+  brand, record the separately stated bottler when appropriate, and list the
+  actual producer or producers as distilleries.
+- For a blend, list all known contributors. Use `[]` rather than guessing when
+  they are unknown.
+- Do not derive brand identity from a longest-prefix string match.
 
-## Release Year Rules
+### Age And Years
 
-- Extract `release_year` if it is explicitly labeled as bottling or release year.
-- If there is no explicit label, extract a standalone four-digit year near ABV, batch, or edition information.
-- Ignore unrelated dates such as distillery founding years or government warnings.
-- If multiple years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.
-- If no valid release year is present, set `release_year` to `null`.
+- Extract a stated age only when the source states it; do not calculate it from
+  vintage and release years.
+- Normalize a stated age to an integer and use `null` for no age statement.
+- Extract `vintage_year` for an explicitly identified distillation or vintage
+  year.
+- Extract `release_year` for an explicitly identified bottling or release year.
+  A standalone year near edition or ABV evidence may qualify when the source
+  context is unambiguous.
+- Ignore unrelated dates such as founding years and legal notices. If multiple
+  years are present, preserve their stated roles rather than guessing.
 
-## Normalization Guidelines
-
-### Brand vs. Distillery
-
-- If the whiskey is an official distillery bottling, `brand` is the distillery name and `distillery` contains that same name.
-- If the whiskey is a blend from multiple distilleries, `distillery` should list all known contributors.
-- If the distilleries are unknown, use `distillery: []`.
-- If the whiskey is an independent bottling, set `brand` to the bottler and `distillery` to the actual producer or producers.
-
-### Age Statements
-
-- Extract stated age as an integer.
-- If there is no age statement, use `null`.
-- When the age is part of the expression, format it as `"12-year-old"`.
-
-### ABV
-
-- Extract ABV as a decimal percentage, for example `"abv": 46.3`.
-
-### Series and Edition
+### Series And Edition
 
 - Extract a named stable family into `series`.
-- Extract a release label like `"Batch 3"` or `"2021 Release"` into `edition`.
-- Do not use `series` for one-off batch codes, annual years, or exact cask numbers.
+- Extract a release label such as `Batch 3`, `2021 Release`, or `S2B13` into
+  `edition`.
+- Do not use `series` for a one-off batch code, annual year, exact cask number,
+  or evidence that Bottles share a BottleGroup.
 
-### Cask Type
+### ABV And Cask Details
 
-- Extract any maturation or finishing cask into `cask_type`.
+- Extract ABV as a decimal percentage.
+- Extract canonical primary maturation or finish wording into `cask_type`.
+- Set cask-strength and single-cask flags only from explicit source language.
+- Preserve more granular or uncertain cask facts as BottleObservations.
 
 ### Uncertainty
 
-- If a component is ambiguous, prefer `null` or `[]` over guessing.
-- In extraction and matching, a missed component is safer than a false identity signal.
+- Prefer `null` or `[]` over guessing.
+- A missed optional component is safer than a false identity signal.
+- Do not discard uncertain source precision; retain it as observation evidence.
 
-### Multiple Distilleries
+## Matching Conventions
 
-- List all known distilleries for blends.
-- If the distilleries are unspecified, use `[]` rather than guessing.
-- For a single malt, `distillery` should contain one value.
+Compare exact Bottle candidates in this order: brand, distillery, expression,
+series, age, edition, category, cask details, single-cask and cask-strength
+flags, ABV, then year fields.
 
-### Edge Cases
+- Missing generic style words are weak evidence.
+- Conflicting age, edition, store-pick code, barrel description, or single-cask
+  status is strong evidence of different Bottles.
+- Evaluate brand and distillery separately for independent bottlings.
+- Bias toward `no_match` or review when decisive components are weak or
+  conflicting. A false exact match is worse than an unresolved listing.
+- Preserve observation evidence even when it is not strong enough to create or
+  distinguish a Bottle.
 
-- Correct obvious typos or near matches such as `"Ardbeg Supanova"` to `"Ardbeg Supernova"`.
-- If a year is present but ambiguous, use judgment but do not invent details.
-- For multiple dates like `"Distilled in 1998, Bottled in 2018"`, set `vintage_year: 1998` and `release_year: 2018`.
+Exact Bottle matching and BottleGroup grouping are separate decisions. A
+classifier or user-created Bottle does not select a group. Similarity may
+produce future grouping evidence, but it does not change membership in the
+current system. Only singleton creation and deterministic legacy migration
+establish group membership in this release.
 
-## Matching Heuristics
+## Consumer Bottle Selection
 
-- Compare candidate bottles in this order: producer, distillery, expression, series, age, edition, category, cask details, single-cask and cask-strength flags, then ABV and year fields.
-- Prefer bottle-level matches when bottle identity is clear but release identity is weak.
-- Missing generic style words like `single malt` are weak evidence.
-- Conflicting age statements, edition codes, store-pick codes, barrel descriptors, or single-cask indicators are strong evidence that two listings are different bottles.
-- For independent bottlings, evaluate `brand` and `distillery` separately.
-- Bias toward `no_match` or manual review when the decisive identity components are weak or conflicting. A false match is worse than an unresolved listing.
-- Preserve exact details as observations even when they are not strong enough to define a canonical release.
+When writing activity or catalog evidence:
 
-## Retailer Title Examples
-
-Reviewed on March 11, 2026:
-
-- [Total Wine: Grangestone Sherry Finish Scotch Whisky](https://www.totalwine.com/spirits/deals/scotch/single-malt/grangestone-sherry-finish-scotch-whisky/p/159826750?s=1203&igrules=true)
-  The title drops `single malt`, so the generic category words are less reliable than the producer and finish.
-- [Total Wine: Paul John Mithuna Indian Single Malt Whisky](https://www.totalwine.com/spirits/whiskey/indian-whisky/paul-john-mithuna-indian-single-malt-whisky/p/240707750?s=1203&igrules=true)
-  This is a single malt outside Scotch, so retailer navigation should not override the actual style.
-- [Astor Wines: Aberfeldy 12 Yr. Single Malt Scotch Whisky](https://www.astorwines.com/item/30667)
-  Age appears as `Yr.`, which should still normalize to `stated_age: 12`.
-- [Astor Wines: Ardbeg Uigeadail Single Malt Scotch Whisky](https://www.astorwines.com/item/15732)
-  The expression sits between the producer and generic style wording.
-- [ReserveBar: Maker's Mark Private Selection Kentucky Bourbon Whisky S2B13](https://www.reservebar.com/products/makers-mark-private-selection-kentucky-bourbon-whisky-s2b13/GROUPING-1258625.html)
-  The trailing code behaves like an edition or store-pick identifier and should not be discarded.
-- [ReserveBar: Michter's US\*1 American Whiskey](https://www.reservebar.com/products/michters-us1-american-whiskey/GROUPING-77812.html)
-  Punctuation-heavy range names such as `US*1` are part of the bottle identity and should be preserved.
+- select the independently complete Bottle when the marketed release is known;
+- select the retained general Bottle only when evidence identifies that
+  general expression;
+- otherwise preserve the consumer's supported unresolved state;
+- never use BottleGroup or its representative as consumer identity;
+- keep Bottle identity distinct from observation or collection-unit details.

@@ -1,7 +1,11 @@
 import { db } from "@peated/server/db";
-import { bottles, tastings } from "@peated/server/db/schema";
+import { tastings } from "@peated/server/db/schema";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -34,37 +38,37 @@ export default procedure
     }),
   )
   .handler(async function ({ input, errors }) {
-    const { limit, ...rest } = input;
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, rest.bottle));
+    try {
+      return await db.transaction(async (tx) => {
+        await resolveActiveBottleIds(tx, [input.bottle]);
 
-    if (!bottle) {
-      throw errors.NOT_FOUND({
-        message: "Bottle not found.",
+        const results = await tx.query.bottleTags.findMany({
+          where: (bottleTags, { eq }) => eq(bottleTags.bottleId, input.bottle),
+          orderBy: (bottleTags, { desc }) => desc(bottleTags.count),
+          limit: input.limit,
+        });
+        const [{ count }] = await tx
+          .select({ count: sql<string>`COUNT(*)` })
+          .from(tastings)
+          .where(
+            and(
+              eq(tastings.bottleId, input.bottle),
+              sql<boolean>`array_length(${tastings.tags}, 1) > 0`,
+            ),
+          );
+
+        return {
+          results: results.map(({ tag, count }) => ({ tag, count })),
+          totalCount: Number(count),
+        };
       });
+    } catch (error) {
+      if (error instanceof ActiveBottleSelectionError) {
+        if (error.reason === "missing") {
+          throw errors.NOT_FOUND({ message: error.message, cause: error });
+        }
+        throw errors.CONFLICT({ message: error.message, cause: error });
+      }
+      throw error;
     }
-
-    const results = await db.query.bottleTags.findMany({
-      where: (bottleTags, { eq }) => eq(bottleTags.bottleId, bottle.id),
-      orderBy: (bottleTags, { desc }) => desc(bottleTags.count),
-      limit,
-    });
-
-    // TODO: denormalize this into (num)tastings or similar in the tags table
-    const totalCount = (
-      await db.execute<{ count: string }>(
-        sql`SELECT COUNT(*) as count
-        FROM ${tastings}
-        WHERE ${tastings.bottleId} = ${bottle.id}
-        AND array_length(${tastings.tags}, 1) > 0
-      `,
-      )
-    ).rows[0].count;
-
-    return {
-      results: results.map(({ tag, count }) => ({ tag, count })),
-      totalCount: Number(totalCount),
-    };
   });

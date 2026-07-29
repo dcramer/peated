@@ -1,24 +1,20 @@
-import { inArray } from "drizzle-orm";
+import { and, inArray, sql } from "drizzle-orm";
 import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import {
-  bottleReleases,
   bottles,
+  bottleTombstones,
   externalSites,
-  type BottleRelease,
   type Review,
   type User,
 } from "../db/schema";
-import { notEmpty } from "../lib/filter";
-import { type ReviewSchema } from "../schemas";
+import { type BottleSchema, type ReviewSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
-import { BottleReleaseSerializer } from "./bottleRelease";
 import { ExternalSiteSerializer } from "./externalSite";
 
 type ReviewAttrs = {
-  bottle: ReturnType<(typeof BottleSerializer)["item"]> | null;
-  release: ReturnType<(typeof BottleReleaseSerializer)["item"]> | null;
+  bottle: z.infer<typeof BottleSchema> | null;
   site: ReturnType<(typeof ExternalSiteSerializer)["item"]>;
 };
 
@@ -29,30 +25,30 @@ export const ReviewSerializer = serializer({
     currentUser?: User,
   ): Promise<Record<string, ReviewAttrs>> => {
     const bottleIds = Array.from(
-      new Set(itemList.map((i) => i.bottleId).filter(notEmpty)),
+      new Set(
+        itemList.flatMap(({ bottleId }) =>
+          bottleId === null ? [] : [bottleId],
+        ),
+      ),
     );
     const bottleList = bottleIds.length
-      ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
-      : [];
-    const bottlesByRef = Object.fromEntries(
-      (await serialize(BottleSerializer, bottleList, currentUser)).map(
-        (data, index) => [bottleList[index].id, data],
-      ),
-    );
-
-    const releaseIds = Array.from(
-      new Set(itemList.map((i) => i.releaseId).filter(notEmpty)),
-    );
-    const releaseList = releaseIds.length
       ? await db
           .select()
-          .from(bottleReleases)
-          .where(inArray(bottleReleases.id, releaseIds))
+          .from(bottles)
+          .where(
+            and(
+              inArray(bottles.id, bottleIds),
+              sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+            ),
+          )
       : [];
-    const releasesByRef = Object.fromEntries(
-      (await serialize(BottleReleaseSerializer, releaseList, currentUser)).map(
-        (data, index) => [releaseList[index].id, data],
-      ),
+    const serializedBottles = await serialize(
+      BottleSerializer,
+      bottleList,
+      currentUser,
+    );
+    const bottlesById = new Map(
+      serializedBottles.map((bottle) => [bottle.id, bottle]),
     );
 
     const siteIds = Array.from(new Set(itemList.map((i) => i.externalSiteId)));
@@ -70,11 +66,19 @@ export const ReviewSerializer = serializer({
 
     return Object.fromEntries(
       itemList.map((item) => {
+        const bottle =
+          item.bottleId === null
+            ? null
+            : (bottlesById.get(item.bottleId) ?? null);
+        if (item.bottleId !== null && bottle === null) {
+          throw new Error(
+            `Review ${item.id} references missing Bottle ${item.bottleId}.`,
+          );
+        }
         return [
           item.id,
           {
-            bottle: item.bottleId ? bottlesByRef[item.bottleId] : null,
-            release: item.releaseId ? releasesByRef[item.releaseId] : null,
+            bottle,
             site: sitesByRef[item.externalSiteId],
           },
         ];
@@ -93,7 +97,6 @@ export const ReviewSerializer = serializer({
       rating: item.rating,
       url: item.url,
       bottle: attrs.bottle,
-      release: attrs.release,
       site: attrs.site,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),

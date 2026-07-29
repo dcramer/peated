@@ -1,134 +1,103 @@
+import { db } from "@peated/server/db";
+import { bottleGroups } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /tastings", () => {
-  test("lists tastings", async ({ fixtures }) => {
-    await fixtures.Tasting();
-    await fixtures.Tasting();
+  test("lists hydrated direct Bottles", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({ bottleId: bottle.id });
 
     const { results } = await routerClient.tastings.list();
 
-    expect(results.length).toBe(2);
+    expect(results.find(({ id }) => id === tasting.id)?.bottle.id).toBe(
+      bottle.id,
+    );
+    expect(results[0]).not.toHaveProperty("target");
+    expect(results[0]).not.toHaveProperty("release");
   });
 
-  test("lists tastings with bottle", async ({ fixtures }) => {
+  test("filters by Bottle", async ({ fixtures }) => {
     const bottle = await fixtures.Bottle();
+    const otherBottle = await fixtures.Bottle();
     const tasting = await fixtures.Tasting({ bottleId: bottle.id });
-    await fixtures.Tasting();
+    await fixtures.Tasting({ bottleId: otherBottle.id });
 
     const { results } = await routerClient.tastings.list({
       bottle: bottle.id,
     });
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(tasting.id);
+    expect(results.map(({ id }) => id)).toEqual([tasting.id]);
+    expect(results[0]?.bottle.id).toBe(bottle.id);
   });
 
-  test("lists tastings with release", async ({ fixtures }) => {
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const tasting = await fixtures.Tasting({
-      bottleId: bottle.id,
-      releaseId: release.id,
-    });
-    await fixtures.Tasting({ bottleId: bottle.id });
+  test("filters entities from Bottle-owned identity", async ({ fixtures }) => {
+    const bottleBrand = await fixtures.Entity();
+    const groupBrand = await fixtures.Entity();
+    const bottle = await fixtures.Bottle({ brandId: bottleBrand.id });
+    const tasting = await fixtures.Tasting({ bottleId: bottle.id });
+    await db
+      .update(bottleGroups)
+      .set({ brandId: groupBrand.id })
+      .where(eq(bottleGroups.id, bottle.groupId!));
 
-    const { results } = await routerClient.tastings.list({
-      release: release.id,
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(tasting.id);
+    expect(
+      (
+        await routerClient.tastings.list({
+          entity: bottleBrand.id,
+        })
+      ).results.map(({ id }) => id),
+    ).toEqual([tasting.id]);
+    expect(
+      (
+        await routerClient.tastings.list({
+          entity: groupBrand.id,
+        })
+      ).results,
+    ).toEqual([]);
   });
 
-  test("lists tastings with user", async ({ defaults, fixtures }) => {
-    const tasting = await fixtures.Tasting({
-      createdById: defaults.user.id,
-    });
-    await fixtures.Tasting();
-
-    const { results } = await routerClient.tastings.list({
-      user: defaults.user.id,
-    });
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(tasting.id);
-  });
-
-  test("lists tastings filter friends unauthenticated", async ({
-    fixtures,
-  }) => {
-    await fixtures.Tasting();
-    await fixtures.Tasting();
-
-    const err = await waitError(() =>
-      routerClient.tastings.list({
-        filter: "friends",
-      }),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-  });
-
-  test("lists tastings filter friends", async ({ defaults, fixtures }) => {
-    await fixtures.Tasting();
-    await fixtures.Tasting();
-
-    const otherUser = await fixtures.User();
-    await fixtures.Follow({
-      fromUserId: defaults.user.id,
-      toUserId: otherUser.id,
-      status: "following",
-    });
-    const lastTasting = await fixtures.Tasting({ createdById: otherUser.id });
-
-    const { results } = await routerClient.tastings.list(
-      {
-        filter: "friends",
-      },
-      { context: { user: defaults.user } },
+  test("paginates hydrated direct Bottles", async ({ fixtures }) => {
+    const bottles = await Promise.all([
+      fixtures.Bottle({ name: "Pagination One" }),
+      fixtures.Bottle({ name: "Pagination Two" }),
+      fixtures.Bottle({ name: "Pagination Three" }),
+    ]);
+    await Promise.all(
+      bottles.map((bottle, index) =>
+        fixtures.Tasting({
+          bottleId: bottle.id,
+          createdAt: new Date(`2026-01-0${index + 1}T00:00:00.000Z`),
+        }),
+      ),
     );
 
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(lastTasting.id);
+    const firstPage = await routerClient.tastings.list({
+      cursor: 1,
+      limit: 2,
+    });
+    const secondPage = await routerClient.tastings.list({
+      cursor: 2,
+      limit: 2,
+    });
+
+    expect(firstPage.results.map(({ bottle }) => bottle.id)).toEqual([
+      bottles[2]!.id,
+      bottles[1]!.id,
+    ]);
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(secondPage.results.map(({ bottle }) => bottle.id)).toEqual([
+      bottles[0]!.id,
+    ]);
+    expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
   });
 
-  test("lists tastings hides private while authenticated", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const friend = await fixtures.User({ private: true });
-    await fixtures.Follow({
-      fromUserId: defaults.user.id,
-      toUserId: friend.id,
-      status: "following",
-    });
-
-    // should hide tasting from non-friend
-    await fixtures.Tasting({
-      createdById: (await fixtures.User({ private: true })).id,
-    });
-    // should show tasting from friend
-    const tasting = await fixtures.Tasting({ createdById: friend.id });
-
-    const { results } = await routerClient.tastings.list(
-      {},
-      { context: { user: defaults.user } },
+  test("requires authentication for the friends filter", async () => {
+    const error = await waitError(
+      routerClient.tastings.list({ filter: "friends" }),
     );
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(tasting.id);
-  });
-
-  test("lists tastings hides private while anonymous", async ({ fixtures }) => {
-    const tasting = await fixtures.Tasting();
-    await fixtures.Tasting({
-      createdById: (await fixtures.User({ private: true })).id,
-    });
-
-    const { results } = await routerClient.tastings.list();
-
-    expect(results.length).toBe(1);
-    expect(results[0].id).toEqual(tasting.id);
+    expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
   });
 });

@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleReleases,
-  bottles,
-  collectionBottles,
-} from "@peated/server/db/schema";
+import { bottles, collectionBottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -25,10 +21,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
     const bottle = await fixtures.Bottle({
       imageUrl: "/uploads/bottles/canonical.webp",
     });
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      imageUrl: "/uploads/bottle-releases/canonical-release.webp",
-    });
     const libraryCollection = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
@@ -38,7 +30,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: release.id,
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();
@@ -62,15 +53,44 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
     const canonicalBottle = await db.query.bottles.findFirst({
       where: eq(bottles.id, bottle.id),
     });
-    const canonicalRelease = await db.query.bottleReleases.findFirst({
-      where: eq(bottleReleases.id, release.id),
-    });
 
     expect(updatedEntry.imageUrl).toBeNull();
     expect(canonicalBottle?.imageUrl).toBe("/uploads/bottles/canonical.webp");
-    expect(canonicalRelease?.imageUrl).toBe(
-      "/uploads/bottle-releases/canonical-release.webp",
+  });
+
+  test("returns the Bottle after removing its entry image", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const libraryCollection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const [entry] = await db
+      .insert(collectionBottles)
+      .values({
+        collectionId: libraryCollection.id,
+        bottleId: bottle.id,
+        imageUrl: "/uploads/collection-bottles/entry.webp",
+      })
+      .returning();
+
+    const result = await routerClient.collections.bottles.imageDelete(
+      {
+        user: "me",
+        collection: "library",
+        collectionBottle: entry.id,
+      },
+      { context: { user: defaults.user } },
     );
+
+    expect(result).toMatchObject({
+      id: entry.id,
+      imageUrl: null,
+      bottle: { id: bottle.id },
+    });
+    expect(result).not.toHaveProperty("target");
   });
 
   test("rejects removing another user's library entry image", async ({
@@ -88,7 +108,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
       .values({
         collectionId: otherLibraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();
@@ -131,7 +150,6 @@ describe("DELETE /users/:user/collections/:collection/bottles/:collectionBottle/
       .values({
         collectionId: defaultCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
         imageUrl: "/uploads/collection-bottles/entry.webp",
       })
       .returning();

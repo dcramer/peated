@@ -10,6 +10,7 @@
     "tastings": "tsx --require dotenv/config ./src/index.ts tastings",
     "mocks": "tsx --require dotenv/config ./src/bin/index.ts mocks",
     "users": "tsx --require dotenv/config ./src/bin/index.ts users",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,6 +31,11 @@
     "pg": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.7",
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "volta": {
     "extends": "../../package.json"

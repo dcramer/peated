@@ -31,11 +31,11 @@ export function candidateHasExactCaskCodeAnchor(
   candidate: BottleCandidate,
   anchor: string | null,
 ): boolean {
-  if (!anchor || candidate.releaseId !== null || candidate.kind === "release") {
+  if (!anchor) {
     return false;
   }
 
-  return [candidate.alias, candidate.bottleFullName, candidate.fullName].some(
+  return [candidate.alias, candidate.fullName].some(
     (value) => getExactCaskCodeAnchor(value) === anchor,
   );
 }

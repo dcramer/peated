@@ -4,7 +4,6 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { getProposalTargets } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { StorePriceMatchQueueListResponse } from "@peated/server/schemas";
@@ -30,7 +29,7 @@ export default procedure
   })
   .input(QueueListInputSchema)
   .output(StorePriceMatchQueueListResponse)
-  .handler(async function ({ input, context }) {
+  .handler(async function ({ input, context, errors }) {
     const offset = (input.cursor - 1) * input.limit;
     const baseWhere = getQueueBaseWhere(input);
     const queueWhere = getQueueWhere(input);
@@ -97,12 +96,13 @@ export default procedure
       },
     }));
 
-    const targets = await getProposalTargets(
-      queueRows.map((row) => row.proposal),
-    );
+    const results = await serializeQueueItems(queueRows, context, {
+      caller: "prices.matchQueue.list",
+      operation: "hydrate",
+    });
 
     return {
-      results: await serializeQueueItems(queueRows, targets, context),
+      results,
       rel: {
         nextCursor: hasNextPage ? input.cursor + 1 : null,
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,

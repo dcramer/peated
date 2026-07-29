@@ -1,10 +1,10 @@
 "use client";
 
 import { formatCategoryName } from "@peated/server/lib/format";
+import type { Bottle } from "@peated/server/types";
 import { type Currency } from "@peated/server/types";
 import BetaNotice from "@peated/web/components/betaNotice";
-import BottleLink from "@peated/web/components/bottleLink";
-import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
+import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
@@ -35,6 +35,40 @@ export function PriceChangesSkeleton() {
   );
 }
 
+export function PriceChangeIdentity({
+  bottle,
+  hasTasted,
+  isLibrary,
+}: {
+  bottle: Pick<Bottle, "id" | "fullName" | "category">;
+  hasTasted: boolean;
+  isLibrary: boolean;
+}) {
+  return (
+    <>
+      <div className="flex items-center space-x-1">
+        <Link
+          href={`/bottles/${bottle.id}`}
+          className="truncate hover:underline"
+        >
+          {bottle.fullName}
+        </Link>
+        <BottleStatusIndicators hasTasted={hasTasted} isLibrary={isLibrary} />
+      </div>
+      {!!bottle.category && (
+        <div className="text-muted text-sm">
+          <Link
+            href={`/bottles/?category=${bottle.category}`}
+            className="hover:underline"
+          >
+            {formatCategoryName(bottle.category)}
+          </Link>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function PriceChanges() {
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
@@ -52,30 +86,17 @@ export default function PriceChanges() {
           </colgroup>
           <tbody>
             {data.results.map((price) => {
-              const { bottle } = price;
-              if (!bottle) return null;
               return (
-                <tr key={price.id} className="border-b border-slate-800">
+                <tr
+                  key={`${price.id}:${price.currency}`}
+                  className="border-b border-slate-800"
+                >
                   <td className="max-w-0 py-2 pl-4 pr-3 text-sm sm:pl-3">
-                    <div className="flex items-center space-x-1">
-                      <BottleLink
-                        bottle={bottle}
-                        className="font-medium hover:underline"
-                      >
-                        {bottle.fullName}
-                      </BottleLink>
-                      <BottleStatusIcons bottle={bottle} />
-                    </div>
-                    {!!bottle.category && (
-                      <div className="text-muted text-sm">
-                        <Link
-                          href={`/bottles/?category=${bottle.category}`}
-                          className="hover:underline"
-                        >
-                          {formatCategoryName(bottle.category)}
-                        </Link>
-                      </div>
-                    )}
+                    <PriceChangeIdentity
+                      bottle={price.bottle}
+                      hasTasted={price.hasTasted}
+                      isLibrary={price.isLibrary}
+                    />
                   </td>
                   <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
                     <div className="text-muted flex flex-col items-end text-xs">

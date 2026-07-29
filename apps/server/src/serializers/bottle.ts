@@ -1,15 +1,15 @@
-import { and, asc, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
-import type { Bottle, Flight, User } from "../db/schema";
+import type { Bottle, User } from "../db/schema";
 import {
-  bottleReleases,
+  bottleGroupDistillers,
+  bottleGroups,
   bottleSeries,
   bottlesToDistillers,
   collectionBottles,
-  collections,
   entities,
   tastings,
 } from "../db/schema";
@@ -17,75 +17,85 @@ import { getReservedCollection, type ReservedCollectionSlug } from "../lib/db";
 import { notEmpty } from "../lib/filter";
 import { absoluteUrl } from "../lib/urls";
 import { type BottleSchema } from "../schemas";
+import type { BottleGroupV1 } from "../schemas/catalogIdentity";
 import { BottleSeriesSerializer } from "./bottleSeries";
+import { BottleGroupSummarySerializer } from "./catalogIdentity";
 import { EntitySerializer } from "./entity";
 
 type Attrs = {
   isFavorite: boolean;
   isLibrary: boolean;
   hasTasted: boolean;
-  numReleases: number;
+  group?: BottleGroupV1;
   brand: ReturnType<(typeof EntitySerializer)["item"]>;
   distillers: ReturnType<(typeof EntitySerializer)["item"]>[];
   bottler: ReturnType<(typeof EntitySerializer)["item"]> | null;
   series: ReturnType<(typeof BottleSeriesSerializer)["item"]> | null;
-  displayImageUrl: string | null;
 };
 
-type Context =
-  | {
-      flight?: Flight | null;
-    }
-  | undefined;
+export type BottleSerializerContext = {
+  includeGroupSummary?: boolean;
+};
 
 export const BottleSerializer = serializer({
   name: "bottle",
   attrs: async (
     itemList: Bottle[],
     currentUser?: User,
-    context?: Context,
+    context?: BottleSerializerContext,
   ): Promise<Record<number, Attrs>> => {
     const itemIds = itemList.map((t) => t.id);
-    const missingImageIds = itemList
-      .filter((item) => !item.imageUrl)
-      .map((item) => item.id);
-    const releaseCounts = itemIds.length
-      ? await db
-          .select({
-            bottleId: bottleReleases.bottleId,
-            count: sql<number>`COUNT(*)`,
-          })
-          .from(bottleReleases)
-          .where(inArray(bottleReleases.bottleId, itemIds))
-          .groupBy(bottleReleases.bottleId)
-      : [];
-    const releaseCountByBottleId = Object.fromEntries(
-      releaseCounts.map((row) => [row.bottleId, Number(row.count)]),
-    );
-    const releaseImageRows = missingImageIds.length
-      ? await db
-          .select({
-            bottleId: bottleReleases.bottleId,
-            imageUrl: bottleReleases.imageUrl,
-          })
-          .from(bottleReleases)
-          .where(
-            and(
-              inArray(bottleReleases.bottleId, missingImageIds),
-              isNotNull(bottleReleases.imageUrl),
-            ),
-          )
-          .orderBy(
-            asc(bottleReleases.bottleId),
-            desc(bottleReleases.totalTastings),
-            asc(bottleReleases.id),
-          )
-      : [];
-    const releaseImageByBottleId: Record<number, string> = {};
-    for (const row of releaseImageRows) {
-      // Rows are sorted so the first image per bottle is the best display fallback.
-      if (row.imageUrl && !releaseImageByBottleId[row.bottleId]) {
-        releaseImageByBottleId[row.bottleId] = row.imageUrl;
+    const groupByBottleId = new Map<number, BottleGroupV1>();
+    if (context?.includeGroupSummary) {
+      const groupIds = Array.from(
+        new Set(itemList.map(({ groupId }) => groupId).filter(notEmpty)),
+      );
+      const [groupList, groupDistillerList] = groupIds.length
+        ? await Promise.all([
+            db
+              .select()
+              .from(bottleGroups)
+              .where(inArray(bottleGroups.id, groupIds)),
+            db
+              .select()
+              .from(bottleGroupDistillers)
+              .where(inArray(bottleGroupDistillers.groupId, groupIds)),
+          ])
+        : [[], []];
+      const distillerIdsByGroupId = new Map<number, number[]>();
+      for (const { groupId, distillerId } of groupDistillerList) {
+        const distillerIds = distillerIdsByGroupId.get(groupId) ?? [];
+        distillerIds.push(distillerId);
+        distillerIdsByGroupId.set(groupId, distillerIds);
+      }
+      const groupSummaries = await serialize(
+        BottleGroupSummarySerializer,
+        groupList.map((group) => ({
+          ...group,
+          distillerIds: distillerIdsByGroupId.get(group.id) ?? [],
+        })),
+        undefined,
+        [],
+        {
+          actor: null,
+          permissions: { canReadCatalogIdentity: true },
+        },
+      );
+      const groupById = new Map(
+        groupList.map(
+          (group, index) => [group.id, groupSummaries[index]] as const,
+        ),
+      );
+
+      for (const item of itemList) {
+        const group =
+          item.groupId === null ? undefined : groupById.get(item.groupId);
+        if (!group) {
+          throw new Error(
+            `Bottle ${item.id} does not belong to an active BottleGroup.`,
+          );
+        }
+        groupByBottleId.set(item.id, group);
       }
     }
 
@@ -165,7 +175,7 @@ export const BottleSerializer = serializer({
                 eq(collectionBottles.collectionId, collection.id),
               ),
             )
-        ).map((r) => r.bottleId),
+        ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
       );
     };
 
@@ -174,24 +184,11 @@ export const BottleSerializer = serializer({
       getReservedCollectionBottleSet("library"),
     ]);
 
-    // identify bottles which have a tasting recorded for the current user
-    // note: this is contextual based on the query - if they're asking for a flight,
-    // said flight should be available in the context and this will reflect
-    // if they've recorded a tasting _in that context_
-    const tastedSet = currentUser
-      ? new Set(
-          (context?.flight
-            ? await db
-                .selectDistinct({ bottleId: tastings.bottleId })
-                .from(tastings)
-                .where(
-                  and(
-                    inArray(tastings.bottleId, itemIds),
-                    eq(tastings.flightId, context.flight.id),
-                    eq(tastings.createdById, currentUser.id),
-                  ),
-                )
-            : await db
+    const tastedSet =
+      currentUser && itemIds.length
+        ? new Set(
+            (
+              await db
                 .selectDistinct({ bottleId: tastings.bottleId })
                 .from(tastings)
                 .where(
@@ -200,9 +197,9 @@ export const BottleSerializer = serializer({
                     eq(tastings.createdById, currentUser.id),
                   ),
                 )
-          ).map((r) => r.bottleId),
-        )
-      : new Set();
+            ).flatMap(({ bottleId }) => (bottleId === null ? [] : [bottleId])),
+          )
+        : new Set();
 
     return Object.fromEntries(
       itemList.map((item) => {
@@ -212,31 +209,25 @@ export const BottleSerializer = serializer({
             isFavorite: favoriteSet.has(item.id),
             isLibrary: librarySet.has(item.id),
             hasTasted: tastedSet.has(item.id),
-            numReleases: releaseCountByBottleId[item.id] ?? 0,
+            group: groupByBottleId.get(item.id),
             brand: entitiesById[item.brandId],
             distillers: distillersByBottleId[item.id] || [],
             bottler: item.bottlerId ? entitiesById[item.bottlerId] : null,
             series: item.seriesId ? seriesById[item.seriesId] : null,
-            displayImageUrl:
-              item.imageUrl ?? releaseImageByBottleId[item.id] ?? null,
           },
         ];
       }),
     );
   },
 
-  item: (
-    item: Bottle,
-    attrs: Attrs,
-    currentUser?: User,
-    context?: Context,
-  ): z.infer<typeof BottleSchema> => {
+  item: (item: Bottle, attrs: Attrs): z.infer<typeof BottleSchema> => {
     return {
       id: item.id,
 
       // fullName is brand + name
       fullName: item.fullName,
       name: item.name,
+      ...(attrs.group ? { group: attrs.group } : {}),
 
       statedAge: item.statedAge,
 
@@ -265,14 +256,10 @@ export const BottleSerializer = serializer({
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
-      displayImageUrl: attrs.displayImageUrl
-        ? absoluteUrl(config.API_SERVER, attrs.displayImageUrl)
-        : null,
 
       avgRating: item.avgRating,
       ratingStats: item.ratingStats,
       totalTastings: item.totalTastings,
-      numReleases: attrs.numReleases,
 
       suggestedTags: item.suggestedTags,
       isFavorite: attrs.isFavorite,
@@ -280,7 +267,7 @@ export const BottleSerializer = serializer({
       hasTasted: attrs.hasTasted,
 
       createdAt: item.createdAt.toISOString(),
-      updatedAt: item.createdAt.toISOString(),
+      updatedAt: item.updatedAt.toISOString(),
     };
   },
 });

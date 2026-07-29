@@ -2,16 +2,16 @@ import type { z } from "zod";
 import { Region } from "../../test/fixtures";
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { RegionCheck } from "./regionCheck";
+import { RegionCheck, RegionCheckConfigSchema } from "./regionCheck";
 
-describe("parseConfig", () => {
+describe("config schema", () => {
   test("valid params", async () => {
-    const badgeImpl = new RegionCheck();
     const config = {
       country: 1,
       region: 1,
     };
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`
+    expect(await RegionCheckConfigSchema.parseAsync(config))
+      .toMatchInlineSnapshot(`
       {
         "country": 1,
         "region": 1,
@@ -20,11 +20,10 @@ describe("parseConfig", () => {
   });
 
   test("no country", async () => {
-    const badgeImpl = new RegionCheck();
     const config = {
       region: 1,
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(RegionCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -40,11 +39,11 @@ describe("parseConfig", () => {
   });
 
   test("no region", async () => {
-    const badgeImpl = new RegionCheck();
     const config = {
       country: 1,
     };
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`
+    expect(await RegionCheckConfigSchema.parseAsync(config))
+      .toMatchInlineSnapshot(`
       {
         "country": 1,
         "region": null,
@@ -70,7 +69,7 @@ describe("test", () => {
     const config = {
       country: region.countryId,
       region: region.id,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof RegionCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
@@ -90,8 +89,52 @@ describe("test", () => {
     const config = {
       country: region.countryId,
       region: null,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof RegionCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
+  });
+
+  test("treats a zero region as country-only for a brand", async ({
+    fixtures,
+  }) => {
+    const region = await fixtures.Region();
+    const brand = await fixtures.Entity({
+      countryId: region.countryId,
+      regionId: region.id,
+    });
+    const tasting = await createTastingForBadge(fixtures, {
+      distillers: [],
+      brand,
+    });
+
+    expect(
+      new RegionCheck().test({ country: region.countryId, region: 0 }, tasting),
+    ).toBe(true);
+  });
+
+  test("treats a zero region as country-only for a distiller", async ({
+    fixtures,
+  }) => {
+    const brandRegion = await fixtures.Region();
+    const distillerRegion = await fixtures.Region();
+    const brand = await fixtures.Entity({
+      countryId: brandRegion.countryId,
+      regionId: brandRegion.id,
+    });
+    const distiller = await fixtures.Entity({
+      countryId: distillerRegion.countryId,
+      regionId: distillerRegion.id,
+    });
+    const tasting = await createTastingForBadge(fixtures, {
+      brand,
+      distillers: [distiller],
+    });
+
+    expect(
+      new RegionCheck().test(
+        { country: distillerRegion.countryId, region: 0 },
+        tasting,
+      ),
+    ).toBe(true);
   });
 
   test("doesnt match bottle", async ({ fixtures }) => {
@@ -115,7 +158,46 @@ describe("test", () => {
     const config = {
       country: region2.countryId,
       region: region2.id,
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof RegionCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(false);
+  });
+
+  test("matches distillers but does not treat the bottler as origin", async ({
+    fixtures,
+  }) => {
+    const brandRegion = await fixtures.Region();
+    const distillerRegion = await fixtures.Region();
+    const bottlerRegion = await fixtures.Region();
+    const brand = await fixtures.Entity({
+      countryId: brandRegion.countryId,
+      regionId: brandRegion.id,
+    });
+    const distiller = await fixtures.Entity({
+      countryId: distillerRegion.countryId,
+      regionId: distillerRegion.id,
+    });
+    const bottler = await fixtures.Entity({
+      countryId: bottlerRegion.countryId,
+      regionId: bottlerRegion.id,
+    });
+    const tasting = await createTastingForBadge(fixtures, {
+      brand,
+      bottler,
+      distillers: [distiller],
+    });
+    const badgeImpl = new RegionCheck();
+
+    expect(
+      badgeImpl.test(
+        { country: distillerRegion.countryId, region: distillerRegion.id },
+        tasting,
+      ),
+    ).toBe(true);
+    expect(
+      badgeImpl.test(
+        { country: bottlerRegion.countryId, region: bottlerRegion.id },
+        tasting,
+      ),
+    ).toBe(false);
   });
 });

@@ -99,7 +99,6 @@
     "action": "match",
     "identityScope": "product",
     "matchedBottleId": 38004,
-    "matchedReleaseId": null,
     "suggestedNextStep": "confirm_match",
     "summary": "Match existing bottle 38004 with no release."
   },
@@ -124,7 +123,6 @@
         "releaseYear": 2011
       }
     ],
-    "releases": [],
     "aliases": [
       {
         "name": "Trestle Spirit of Eclipse",

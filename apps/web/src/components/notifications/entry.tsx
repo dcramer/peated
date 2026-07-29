@@ -4,7 +4,6 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
-import type { FriendRequestNotification } from "@peated/web/types";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";
@@ -61,11 +60,11 @@ export default function NotificationEntry({
               <NotificationEntryRef
                 notification={notification}
                 onArchive={onArchive}
-                onMarkRead={onMarkRead}
               />
             </div>
             <div className="flex min-h-full flex-shrink">
               <button
+                aria-label="Dismiss notification"
                 onClick={(e) => {
                   e.stopPropagation();
                   onArchive();
@@ -85,7 +84,9 @@ export default function NotificationEntry({
 const getLink = ({ notification }: { notification: Notification }) => {
   switch (notification.type) {
     case "friend_request":
-      return `/users/${notification.fromUser?.username}`;
+      return notification.fromUser
+        ? `/users/${notification.fromUser.username}`
+        : null;
     case "comment":
     case "toast":
       if (notification.ref) return `/tastings/${notification.ref.id}`;
@@ -95,18 +96,22 @@ const getLink = ({ notification }: { notification: Notification }) => {
   }
 };
 
-const getStatusMessage = ({ notification }: { notification: Notification }) => {
+export const getStatusMessage = ({
+  notification,
+}: {
+  notification: Notification;
+}) => {
   switch (notification.type) {
     case "friend_request":
       return <>sent you a friend request</>;
     case "toast":
       return (
         <>
-          toasted
-          {notification.ref && "bottle" in notification.ref ? (
+          toasted{" "}
+          {notification.ref ? (
             <Link
               href={`/tastings/${notification.ref.id}`}
-              className="mx-1 font-semibold"
+              className="font-semibold"
             >
               {notification.ref.bottle.fullName}
             </Link>
@@ -118,16 +123,16 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
     case "comment":
       return (
         <>
-          commented on
-          {notification.ref && "bottle" in notification.ref ? (
+          commented on{" "}
+          {notification.ref ? (
             <Link
               href={`/tastings/${notification.ref.id}`}
-              className="mx-1 font-semibold"
+              className="font-semibold"
             >
               {notification.ref.bottle.fullName}
             </Link>
           ) : (
-            " an unknown tasting"
+            "an unknown tasting"
           )}
         </>
       );
@@ -139,24 +144,14 @@ const getStatusMessage = ({ notification }: { notification: Notification }) => {
 const NotificationEntryRef = ({
   notification,
   onArchive,
-  onMarkRead,
 }: {
   notification: Notification;
   onArchive: () => void;
-  onMarkRead: () => void;
 }) => {
-  const props = {
-    notification,
-    onArchive,
-    onMarkRead,
-  };
   switch (notification.type) {
     case "friend_request":
       return (
-        <FriendRequestEntry
-          {...props}
-          notification={notification as FriendRequestNotification}
-        />
+        <FriendRequestEntry notification={notification} onArchive={onArchive} />
       );
     default:
       return null;

@@ -8,28 +8,19 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useORPC } from "../lib/orpc/context";
 import Button from "./button";
 
 type CollectionActionProps = {
   bottleId: number;
-  releaseId?: number | null;
   size?: "small" | "base";
   title?: string;
 };
 
-function getTitle({ baseOnly, title }: { baseOnly: boolean; title?: string }) {
-  return (
-    title ??
-    (baseOnly ? "Save Bottle to Library" : "Save Specific Bottling to Library")
-  );
-}
-
 function SavedCollectionActionAuthenticated({
   bottleId,
-  releaseId,
   size,
   title,
 }: CollectionActionProps) {
@@ -37,8 +28,7 @@ function SavedCollectionActionAuthenticated({
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const [isMounted, setIsMounted] = useState(false);
-  const baseOnly = releaseId == null;
-  const resolvedTitle = getTitle({ baseOnly, title });
+  const resolvedTitle = title ?? "Save Bottle to Library";
   const addToLibraryMutation = useMutation(
     orpc.collections.bottles.create.mutationOptions(),
   );
@@ -57,8 +47,6 @@ function SavedCollectionActionAuthenticated({
       user: "me",
       collection: "library",
       bottle: bottleId,
-      release: releaseId ?? undefined,
-      baseOnly,
     },
     select: (data) => data.results.length > 0,
   });
@@ -68,13 +56,7 @@ function SavedCollectionActionAuthenticated({
     isLoading = result.isLoading;
   } catch (err: unknown) {
     if (isORPCClientError(err) && err.name === "UNAUTHORIZED") {
-      return (
-        <SavedCollectionActionUnauthenticated
-          releaseId={releaseId}
-          size={size}
-          title={title}
-        />
-      );
+      return <SavedCollectionActionUnauthenticated size={size} title={title} />;
     }
     throw err;
   }
@@ -91,14 +73,11 @@ function SavedCollectionActionAuthenticated({
         await (isCollected
           ? removeFromLibraryMutation.mutateAsync({
               bottle: bottleId,
-              release: releaseId,
-              baseOnly,
               user: "me",
               collection: "library",
             })
           : addToLibraryMutation.mutateAsync({
               bottle: bottleId,
-              release: releaseId,
               user: "me",
               collection: "library",
             }));
@@ -146,11 +125,10 @@ function SavedCollectionActionAuthenticated({
 }
 
 function SavedCollectionActionUnauthenticated({
-  releaseId,
   size,
   title,
-}: Pick<CollectionActionProps, "releaseId" | "size" | "title">) {
-  const resolvedTitle = getTitle({ baseOnly: releaseId == null, title });
+}: Pick<CollectionActionProps, "size" | "title">) {
+  const resolvedTitle = title ?? "Save Bottle to Library";
 
   return (
     <Button
@@ -169,16 +147,17 @@ function SavedCollectionAction(props: CollectionActionProps) {
   const { user } = useAuth();
 
   if (!user) {
-    return <SavedCollectionActionUnauthenticated {...props} />;
+    return (
+      <SavedCollectionActionUnauthenticated
+        size={props.size}
+        title={props.title}
+      />
+    );
   }
 
   return <SavedCollectionActionAuthenticated {...props} />;
 }
 
-export function LibraryAction(props: CollectionActionProps) {
+export default function CollectionAction(props: CollectionActionProps) {
   return <SavedCollectionAction {...props} />;
-}
-
-export default function SavedCollectionActions(props: CollectionActionProps) {
-  return <LibraryAction {...props} />;
 }

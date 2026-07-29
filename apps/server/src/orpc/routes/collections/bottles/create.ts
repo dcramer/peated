@@ -1,11 +1,6 @@
 import { db } from "@peated/server/db";
 import type { CollectionBottle } from "@peated/server/db/schema";
-import {
-  bottleReleases,
-  bottles,
-  collectionBottles,
-  collections,
-} from "@peated/server/db/schema";
+import { collectionBottles, collections } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import {
   getReservedCollection,
@@ -14,6 +9,10 @@ import {
 } from "@peated/server/lib/db";
 import { logError } from "@peated/server/lib/log";
 import { PendingUploadError } from "@peated/server/lib/pendingUploads";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -23,15 +22,28 @@ import {
   CollectionBottleInputSchema,
   CollectionBottleSchema,
 } from "@peated/server/schemas";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
-  copyPendingImageForCollectionBottle,
-  findCollectionBottleWithTarget,
+  findCollectionBottleEntry,
   isLibraryCollection,
   serializeCollectionBottleEntry,
+} from "./collectionBottleHelpers";
+import {
+  copyPendingImageForCollectionBottle,
   validatePendingImageForCollectionBottle,
 } from "./imageHelpers";
+
+const CollectionBottleCreateCommonInputSchema = z.object({
+  collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
+  pendingImageId: z.string().trim().min(1).optional(),
+  user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
+});
+
+const CollectionBottleCreateInputSchema =
+  CollectionBottleCreateCommonInputSchema.extend(
+    CollectionBottleInputSchema.shape,
+  ).strict();
 
 export default procedure
   .use(requireAuth)
@@ -39,18 +51,12 @@ export default procedure
   .route({
     method: "POST",
     path: "/users/{user}/collections/{collection}/bottles",
-    summary: "Add bottle to collection",
+    summary: "Add a Bottle to a collection",
     description:
-      "Add a bottle (and optionally a specific release) to a user's collection. Requires authentication and ownership",
+      "Add one Bottle to a user's collection. Requires authentication and ownership.",
     operationId: "addBottleToCollection",
   })
-  .input(
-    CollectionBottleInputSchema.extend({
-      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
-      pendingImageId: z.string().trim().min(1).optional(),
-      user: z.union([z.literal("me"), z.coerce.number(), z.string()]),
-    }),
-  )
+  .input(CollectionBottleCreateInputSchema)
   .output(CollectionBottleSchema)
   .handler(async function ({ input, context, errors }) {
     const statusProvided = Object.hasOwn(input, "status");
@@ -88,30 +94,6 @@ export default procedure
       });
     }
 
-    const [bottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, input.bottle));
-    if (!bottle) {
-      throw errors.NOT_FOUND({
-        message: "Cannot find bottle.",
-      });
-    }
-
-    if (input.release) {
-      const release = await db.query.bottleReleases.findFirst({
-        where: and(
-          eq(bottleReleases.id, input.release),
-          eq(bottleReleases.bottleId, bottle.id),
-        ),
-      });
-      if (!release) {
-        throw errors.BAD_REQUEST({
-          message: "Cannot identify release.",
-        });
-      }
-    }
-
     if (input.pendingImageId) {
       if (!isLibraryCollection(collection)) {
         throw errors.BAD_REQUEST({
@@ -138,53 +120,76 @@ export default procedure
       });
     }
 
-    let collectionBottleResult:
-      | { collectionBottle: CollectionBottle; created: boolean }
-      | null
-      | undefined;
-    collectionBottleResult = await db.transaction(async (tx) => {
+    const collectionBottleResult = await db.transaction(async (tx) => {
+      let bottleId: number;
+      try {
+        [bottleId] = await resolveActiveBottleIds(tx, [input.bottle]);
+      } catch (error) {
+        if (!(error instanceof ActiveBottleSelectionError)) throw error;
+        if (error.reason === "missing") {
+          throw errors.NOT_FOUND({
+            message: "Cannot find bottle.",
+            cause: error,
+          });
+        }
+        throw errors.CONFLICT({
+          message: "Bottle is not ready for collection activity.",
+          cause: error,
+        });
+      }
+
+      const findMembership = async () => {
+        const memberships = await tx
+          .select()
+          .from(collectionBottles)
+          .where(
+            and(
+              eq(collectionBottles.collectionId, collection.id),
+              eq(collectionBottles.bottleId, bottleId),
+            ),
+          )
+          .orderBy(asc(collectionBottles.id))
+          .limit(2)
+          .for("update");
+        if (memberships.length > 1) {
+          throw errors.CONFLICT({
+            message: "Collection contains duplicate Bottle memberships.",
+          });
+        }
+        return memberships[0];
+      };
+
+      const existingMembership = await findMembership();
+      if (existingMembership) {
+        return { collectionBottle: existingMembership, created: false };
+      }
+
       const [createdCollectionBottle] = await tx
         .insert(collectionBottles)
         .values({
           collectionId: collection.id,
-          bottleId: bottle.id,
-          releaseId: input.release ?? null,
+          bottleId,
           status: statusProvided ? (input.status ?? null) : null,
         })
         .onConflictDoNothing()
         .returning();
 
-      let collectionBottle = createdCollectionBottle;
-      if (collectionBottle) {
+      let collectionBottle: CollectionBottle | undefined =
+        createdCollectionBottle;
+      if (!collectionBottle) {
+        collectionBottle = await findMembership();
+      } else {
         await tx
           .update(collections)
           .set({
             totalBottles: sql`${collections.totalBottles} + 1`,
           })
           .where(eq(collections.id, collection.id));
-        return { collectionBottle, created: true };
-      } else {
-        const [existingCollectionBottle] = await tx
-          .select()
-          .from(collectionBottles)
-          .where(
-            and(
-              eq(collectionBottles.collectionId, collection.id),
-              eq(collectionBottles.bottleId, bottle.id),
-              input.release != null
-                ? eq(collectionBottles.releaseId, input.release)
-                : isNull(collectionBottles.releaseId),
-            ),
-          )
-          .limit(1);
-        collectionBottle = existingCollectionBottle;
       }
 
-      if (!collectionBottle) {
-        return null;
-      }
-
-      return { collectionBottle, created: false };
+      return collectionBottle
+        ? { collectionBottle, created: Boolean(createdCollectionBottle) }
+        : null;
     });
 
     if (!collectionBottleResult) {
@@ -279,7 +284,7 @@ export default procedure
       }
     }
 
-    const result = await findCollectionBottleWithTarget({
+    const result = await findCollectionBottleEntry({
       collectionBottleId: collectionBottle.id,
       collectionId: collection.id,
     });

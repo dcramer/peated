@@ -1,93 +1,106 @@
 import { db } from "@peated/server/db";
-import { badgeAwards, tastingBadgeAwards } from "@peated/server/db/schema";
+import {
+  badgeAwards,
+  badgeAwardTrackedObjects,
+  bottleTombstones,
+  tastings,
+  users,
+} from "@peated/server/db/schema";
+import { eq } from "drizzle-orm";
 import { awardAllBadgeXp, rescanBadge } from ".";
-import { createTastingForBadge } from "./testHelpers";
 
-describe("rescanBadge", () => {
-  test("rescans age with new tastings", async ({ fixtures }) => {
-    const badge = await fixtures.Badge({
-      checks: [
-        {
-          type: "age",
-          config: {
-            minAge: 5,
-            maxAge: 5,
-          },
-        },
-      ],
+describe("direct-Bottle badge awarding", () => {
+  test("live award checks and tracks the Tasting Bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    await fixtures.Badge({
+      tracker: "bottle",
+      checks: [{ type: "everyTasting", config: {} }],
     });
+    const tasting = await fixtures.Tasting({ bottleId: bottle.id });
 
-    const user1 = await fixtures.User();
-    const tasting1 = await fixtures.Tasting({
-      bottleId: (
-        await fixtures.Bottle({
-          name: "A",
-          statedAge: 5,
+    expect(await awardAllBadgeXp(db, tasting)).toHaveLength(1);
+    expect(
+      await db
+        .select({
+          objectType: badgeAwardTrackedObjects.objectType,
+          objectId: badgeAwardTrackedObjects.objectId,
         })
-      ).id,
-      createdById: user1.id,
-    });
-
-    const user2 = await fixtures.User();
-    const tasting2 = await fixtures.Tasting({
-      bottleId: (
-        await fixtures.Bottle({
-          name: "B",
-          statedAge: 12,
-        })
-      ).id,
-      createdById: user2.id,
-    });
-
-    await rescanBadge(badge);
-
-    const awardList = await db.select().from(badgeAwards);
-    expect(awardList.length).toEqual(1);
-    expect(awardList[0].level).toEqual(0);
-    expect(awardList[0].xp).toEqual(1);
-    expect(awardList[0].badgeId).toEqual(badge.id);
-    expect(awardList[0].userId).toEqual(user1.id);
-
-    const tastingAwardList = await db.select().from(tastingBadgeAwards);
-    expect(tastingAwardList.length).toEqual(0);
-    // expect(tastingAwardList[0].tastingId).toEqual(tasting1.id);
-    // expect(tastingAwardList[0].awardId).toEqual(awardList[0].id);
-    // expect(tastingAwardList[0].level).toEqual(0);
+        .from(badgeAwardTrackedObjects),
+    ).toEqual([{ objectType: "bottle", objectId: bottle.id }]);
   });
 
-  test("rescans age with existing tastings", async ({ fixtures }) => {
+  test("rescan uses direct Bottle identity", async ({ fixtures }) => {
+    const bottle = await fixtures.Bottle();
     const badge = await fixtures.Badge({
-      checks: [
-        {
-          type: "age",
-          config: {
-            minAge: 5,
-            maxAge: 5,
-          },
-        },
-      ],
+      tracker: "bottle",
+      checks: [{ type: "everyTasting", config: {} }],
     });
-
-    const tasting1 = await createTastingForBadge(fixtures, {
-      name: "A",
-      statedAge: 5,
-    });
-
-    const initial = await awardAllBadgeXp(db, tasting1);
-    expect(initial.length).toEqual(1);
+    await fixtures.Tasting({ bottleId: bottle.id });
+    await fixtures.Tasting({ bottleId: bottle.id });
 
     await rescanBadge(badge);
 
-    const awardList = await db.select().from(badgeAwards);
-    expect(awardList.length).toEqual(1);
-    expect(awardList[0].level).toEqual(0);
-    expect(awardList[0].xp).toEqual(1);
-    expect(awardList[0].badgeId).toEqual(badge.id);
+    expect(
+      await db
+        .select({ id: badgeAwards.id })
+        .from(badgeAwards)
+        .where(eq(badgeAwards.badgeId, badge.id)),
+    ).toHaveLength(2);
+  });
 
-    const tastingAwardList = await db.select().from(tastingBadgeAwards);
-    expect(tastingAwardList.length).toEqual(0);
-    // expect(tastingAwardList[0].tastingId).toEqual(tasting1.id);
-    // expect(tastingAwardList[0].awardId).toEqual(awardList[0].id);
-    // expect(tastingAwardList[0].level).toEqual(0);
+  test("rescans across the ascending-id batch boundary", async ({
+    fixtures,
+  }) => {
+    const badge = await fixtures.Badge({
+      tracker: "bottle",
+      checks: [{ type: "everyTasting", config: {} }],
+    });
+    const bottle = await fixtures.Bottle();
+    const batchUsers = await db
+      .insert(users)
+      .values(
+        Array.from({ length: 201 }, (_, index) => ({
+          username: `badge-batch-${index}`,
+          email: `badge-batch-${index}@example.com`,
+          verified: true,
+          termsAcceptedAt: new Date(),
+        })),
+      )
+      .returning({ id: users.id });
+    const startedAt = Date.now();
+    await db.insert(tastings).values(
+      batchUsers.map(({ id }, index) => ({
+        bottleId: bottle.id,
+        createdById: id,
+        createdAt: new Date(startedAt + index),
+      })),
+    );
+
+    await rescanBadge(badge);
+
+    expect(
+      await db
+        .select({ id: badgeAwards.id })
+        .from(badgeAwards)
+        .where(eq(badgeAwards.badgeId, badge.id)),
+    ).toHaveLength(201);
+  });
+
+  test("fails closed when a Tasting Bottle is retired", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const tasting = await fixtures.Tasting({ bottleId: bottle.id });
+
+    await db.insert(bottleTombstones).values({
+      bottleId: bottle.id,
+      newBottleId: replacement.id,
+    });
+    await expect(awardAllBadgeXp(db, tasting)).rejects.toThrow(
+      `references inactive Bottle ${bottle.id}`,
+    );
   });
 });

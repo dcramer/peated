@@ -1,14 +1,17 @@
 {
   "id": "heavens-door-bootleg-vol-3",
   "referenceName": "Heaven's Door Bootleg Vol 3 Whiskey",
-  "expectedBottleName": "Heaven's Door Bootleg Series",
-  "summary": "Treat Heaven's Door Bootleg Vol 3 as the Bootleg Series parent plus a numbered child release instead of keeping Vol 3 in the bottle identity.",
+  "expectedBottleName": "Heaven's Door Bootleg Series 13-year-old",
+  "expectedBottleNames": [
+    "Heaven's Door Bootleg Series 13-year-old",
+    "Heaven's Door Bootleg Series"
+  ],
+  "summary": "Treat Heaven's Door Bootleg Vol 3 as one complete Bottle with Volume III as its exact edition; reviewed web evidence may enrich it with the marketed 13-year-old age, but the source does not require that optional field.",
   "peatedBottleIds": [44067],
   "expected": {
     "handlingStrategy": "classifier_required",
-    "classifierExpectation": "bottle_plus_release",
-    "deterministicReleaseExpectation": "none",
-    "releaseIdentity": {
+    "classifierExpectation": "bottle",
+    "exactBottleIdentity": {
       "edition": "Volume III"
     }
   }

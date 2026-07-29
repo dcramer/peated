@@ -32,7 +32,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     const systemActor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
     const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const price = await fixtures.StorePrice({
       bottleId: null,
       externalSiteId: site.id,
@@ -56,8 +55,10 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         decision: "match_existing",
         actorId: userActor.id,
         bottleId: bottle.id,
-        releaseId: release.id,
         confidence: 87,
+        model: "decision-model",
+        rationale: "Matched by exact identity.",
+        metadata: { evidence: "review" },
         createdAt: new Date("2026-03-09T10:00:00.000Z"),
       },
       {
@@ -82,6 +83,10 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     expect(result.results).toHaveLength(2);
     expect("actorType" in result.results[0]).toBe(false);
     expect("actorUser" in result.results[0]).toBe(false);
+    expect(result.results[0].bottle).toEqual({
+      id: bottle.id,
+      fullName: bottle.fullName,
+    });
     expect(result.results[0]).toMatchObject({
       sourceKind: "store_price",
       sourceId: price.id,
@@ -96,7 +101,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         id: bottle.id,
         fullName: bottle.fullName,
       },
-      release: null,
       createdBottle: true,
       confidence: 92,
     });
@@ -110,12 +114,57 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         key: String(actorUser.id),
         displayName: actorUser.username,
       },
-      release: {
-        id: release.id,
-        fullName: release.fullName,
+      bottle: {
+        id: bottle.id,
       },
       confidence: 87,
+      model: "decision-model",
+      rationale: "Matched by exact identity.",
+      metadata: { evidence: "review" },
     });
+    expect("target" in result.results[0]).toBe(false);
+    expect("release" in result.results[0]).toBe(false);
+  });
+
+  test("uses Bottle identity while retaining legacy decision evidence", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const actor = await getPeatedSystemActor();
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle();
+    const evidenceBottle = await fixtures.Bottle();
+    const release = await fixtures.BottleRelease({
+      bottleId: evidenceBottle.id,
+    });
+
+    await db.insert(incomingBottleDecisionLogs).values({
+      sourceKind: "store_price",
+      sourceId: 105,
+      externalSiteId: site.id,
+      name: "Historical release decision",
+      decision: "create_release",
+      actorId: actor.id,
+      bottleId: bottle.id,
+      releaseId: release.id,
+      createdRelease: true,
+    });
+
+    const result = await routerClient.admin.incomingBottleDecisions(undefined, {
+      context: { user: admin },
+    });
+
+    expect(result.results).toEqual([
+      expect.objectContaining({
+        decision: "create_release",
+        createdRelease: true,
+        bottle: expect.objectContaining({ id: bottle.id }),
+      }),
+    ]);
+    expect(JSON.stringify(result.results[0])).not.toContain(
+      evidenceBottle.fullName,
+    );
+    expect("target" in result.results[0]).toBe(false);
   });
 
   test("filters by actor type", async ({ fixtures }) => {
@@ -161,5 +210,66 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         displayName: "Peated",
       },
     });
+  });
+
+  test("filters by source and preserves deterministic pagination order", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const actor = await getPeatedSystemActor();
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle();
+    const [olderReview, newerReview] = await db
+      .insert(incomingBottleDecisionLogs)
+      .values([
+        {
+          sourceKind: "review",
+          sourceId: 201,
+          externalSiteId: site.id,
+          name: "Older review decision",
+          decision: "match_existing",
+          actorId: actor.id,
+          bottleId: bottle.id,
+          createdAt: new Date("2026-03-09T10:00:00.000Z"),
+        },
+        {
+          sourceKind: "review",
+          sourceId: 202,
+          externalSiteId: site.id,
+          name: "Newer review decision",
+          decision: "match_existing",
+          actorId: actor.id,
+          bottleId: bottle.id,
+          createdAt: new Date("2026-03-09T11:00:00.000Z"),
+        },
+      ])
+      .returning();
+    await db.insert(incomingBottleDecisionLogs).values({
+      sourceKind: "store_price",
+      sourceId: 203,
+      externalSiteId: site.id,
+      name: "Excluded price decision",
+      decision: "match_existing",
+      actorId: actor.id,
+      bottleId: bottle.id,
+      createdAt: new Date("2026-03-09T12:00:00.000Z"),
+    });
+    if (!olderReview || !newerReview) {
+      throw new Error("Missing decision fixtures");
+    }
+
+    const firstPage = await routerClient.admin.incomingBottleDecisions(
+      { sourceKind: "review", limit: 1, cursor: 1 },
+      { context: { user: admin } },
+    );
+    const secondPage = await routerClient.admin.incomingBottleDecisions(
+      { sourceKind: "review", limit: 1, cursor: 2 },
+      { context: { user: admin } },
+    );
+
+    expect(firstPage.results.map(({ id }) => id)).toEqual([newerReview.id]);
+    expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
+    expect(secondPage.results.map(({ id }) => id)).toEqual([olderReview.id]);
+    expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
   });
 });

@@ -11,6 +11,7 @@ import {
   deriveAutomationTier,
   getExistingMatchIdentityConflicts,
   hasSupportiveWebEvidenceForExistingMatch,
+  isPlainAgeBottleMatchEligibleForVerification,
 } from "./priceMatchingEvidence";
 
 function buildExtractedLabel(
@@ -29,6 +30,9 @@ function buildExtractedLabel(
     vintage_year: null,
     cask_strength: null,
     single_cask: null,
+    cask_type: null,
+    cask_size: null,
+    cask_fill: null,
     edition: null,
     ...overrides,
   };
@@ -39,10 +43,7 @@ function buildBottleCandidate(
     Partial<BottleCandidate>,
 ): BottleCandidate {
   return {
-    kind: "bottle",
-    releaseId: null,
     alias: null,
-    bottleFullName: candidate.fullName,
     brand: null,
     bottler: null,
     series: null,
@@ -52,6 +53,9 @@ function buildBottleCandidate(
     edition: null,
     caskStrength: null,
     singleCask: null,
+    caskType: null,
+    caskSize: null,
+    caskFill: null,
     abv: null,
     vintageYear: null,
     releaseYear: null,
@@ -74,6 +78,62 @@ function buildSearchEvidence(
 }
 
 describe("priceMatchingEvidence", () => {
+  test("keeps cask-specific references and targets out of plain-age verification", () => {
+    const target = buildBottleCandidate({
+      bottleId: 1,
+      fullName: "Example Distillery 10-year-old",
+      brand: "Example Distillery",
+      statedAge: 10,
+    });
+    const extractedLabel = buildExtractedLabel({
+      expression: null,
+      stated_age: 10,
+      abv: null,
+    });
+    const input = {
+      target,
+      candidates: [target],
+      extractedLabel,
+      referenceName: "Example Distillery 10-year-old",
+    };
+
+    expect(isPlainAgeBottleMatchEligibleForVerification(input)).toBe(true);
+
+    for (const caskSpecificLabel of [
+      { cask_type: "oloroso" as const },
+      { cask_size: "hogshead" as const },
+      { cask_fill: "1st_fill" as const },
+    ]) {
+      expect(
+        isPlainAgeBottleMatchEligibleForVerification({
+          ...input,
+          extractedLabel: {
+            ...extractedLabel,
+            ...caskSpecificLabel,
+          },
+        }),
+      ).toBe(false);
+    }
+
+    for (const caskSpecificTarget of [
+      { caskType: "oloroso" as const },
+      { caskSize: "hogshead" as const },
+      { caskFill: "1st_fill" as const },
+    ]) {
+      const candidate = {
+        ...target,
+        ...caskSpecificTarget,
+      };
+      expect(
+        isPlainAgeBottleMatchEligibleForVerification({
+          ...input,
+          target: candidate,
+          candidates: [candidate],
+        }),
+      ).toBe(false);
+    }
+  });
+
   test("treats agent-supported external evidence as support when it validates an omitted canonical trait", () => {
     const supported = hasSupportiveWebEvidenceForExistingMatch({
       sourceUrl: "https://shop.example/wild-turkey-rare-breed-rye",
@@ -260,7 +320,6 @@ describe("priceMatchingEvidence", () => {
         target: buildBottleCandidate({
           bottleId: 13025,
           fullName: "Shibui Grain Select",
-          bottleFullName: "Shibui Grain Select",
           brand: "Shibui",
           category: "spirit",
           source: ["brand", "exact"],
@@ -288,7 +347,6 @@ function buildTierInput(
     hasMatchTarget: true,
     reaffirmsCurrentAssignment: false,
     replacesCurrentAssignment: false,
-    matchesFreshReleaseTarget: false,
     hasExactAliasAnchor: false,
     hasDeterministicAnchor: false,
     hasPrimaryLabelOrImageEvidence: false,
@@ -300,10 +358,7 @@ describe("agentActionRiskClass", () => {
   test.each([
     ["match", "match"],
     ["create_bottle", "create"],
-    ["create_release", "create"],
-    ["create_bottle_and_release", "create"],
     ["repair_bottle", "repair"],
-    ["repair_parent_and_create_release", "repair"],
     ["no_match", "none"],
   ] as const)("maps %s to %s", (action, expected) => {
     expect(agentActionRiskClass(action)).toBe(expected);
@@ -358,17 +413,6 @@ describe("deriveAutomationTier", () => {
         deriveAutomationTier(
           buildTierInput({
             replacesCurrentAssignment: true,
-            hasDeterministicAnchor: true,
-          }),
-        ),
-      ).toBe("review");
-    });
-
-    test("fresh release-level match routes to review", () => {
-      expect(
-        deriveAutomationTier(
-          buildTierInput({
-            matchesFreshReleaseTarget: true,
             hasDeterministicAnchor: true,
           }),
         ),

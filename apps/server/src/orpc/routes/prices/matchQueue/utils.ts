@@ -1,13 +1,18 @@
 import { normalizeProposedBottleDraft } from "@peated/bottle-classifier/bottleCreationDrafts";
+import {
+  BottleCandidateSchema as ClassifierBottleCandidateSchema,
+  BottleExtractedDetailsSchema as ClassifierBottleExtractedDetailsSchema,
+  type BottleCandidate,
+} from "@peated/bottle-classifier/internal/types";
 import { db } from "@peated/server/db";
 import {
+  bottles,
   type Bottle,
-  type BottleRelease,
   type ExternalSite,
   type StorePrice,
   type StorePriceMatchProposal,
-  storePriceMatchProposals,
 } from "@peated/server/db/schema";
+import { logWarn } from "@peated/server/lib/log";
 import { hasActiveStorePriceMatchProposalProcessingLease } from "@peated/server/lib/priceMatching";
 import { getStorePriceMatchAutomationAssessment } from "@peated/server/lib/priceMatchingAutomation";
 import { type Context } from "@peated/server/orpc/context";
@@ -16,16 +21,14 @@ import {
   PriceMatchCandidateSchema,
   PriceMatchSearchEvidenceSchema,
   ProposedBottleSchema,
-  ProposedReleaseSchema,
   StorePriceMatchAutomationAssessmentSchema,
   StorePriceMatchProposalSchema,
   StorePriceMatchQueueItemSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { BottleReleaseSerializer } from "@peated/server/serializers/bottleRelease";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
-import { eq } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 
 type QueueRow = {
   isProcessing?: boolean;
@@ -40,15 +43,80 @@ type StructuredAutomationIssue = {
   path?: unknown;
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Historical queue snapshots can contain BottleRelease candidates. They are
+ * audit evidence, not current identity: omit release candidates and translate
+ * old Bottle candidates into the strict direct-Bottle output shape.
+ */
+function normalizeStoredPriceMatchCandidates(
+  value: unknown,
+  proposalId: number,
+) {
+  const candidates = Array.isArray(value) ? value : [];
+  const normalized: BottleCandidate[] = [];
+  let discarded = Array.isArray(value) ? 0 : 1;
+  let translated = 0;
+
+  for (const candidate of candidates) {
+    const direct = PriceMatchCandidateSchema.safeParse(candidate);
+    if (direct.success) {
+      normalized.push(direct.data);
+      continue;
+    }
+    if (
+      !isRecord(candidate) ||
+      candidate.kind === "release" ||
+      typeof candidate.releaseId === "number"
+    ) {
+      discarded += 1;
+      continue;
+    }
+
+    const translatedCandidate = { ...candidate };
+    delete translatedCandidate.kind;
+    delete translatedCandidate.releaseId;
+    delete translatedCandidate.bottleFullName;
+    if (isRecord(translatedCandidate.familyContext)) {
+      const siblingBottles = translatedCandidate.familyContext.siblingBottles;
+      if (Array.isArray(siblingBottles)) {
+        translatedCandidate.familyContext = { siblingBottles };
+      } else {
+        delete translatedCandidate.familyContext;
+      }
+    }
+
+    const parsed = PriceMatchCandidateSchema.safeParse(translatedCandidate);
+    if (parsed.success) {
+      normalized.push(parsed.data);
+      translated += 1;
+    } else {
+      discarded += 1;
+    }
+  }
+
+  if (translated > 0 || discarded > 0) {
+    logWarn("Normalized legacy price-match candidate evidence", {
+      extra: {
+        proposalId,
+        translatedCandidates: translated,
+        discardedCandidates: discarded,
+      },
+    });
+  }
+
+  return normalized;
+}
+
 function normalizeStoredProposedBottle(
   proposedBottle: unknown,
 ): ReturnType<typeof ProposedBottleSchema.parse> {
-  return {
-    ...normalizeProposedBottleDraft(ProposedBottleSchema.parse(proposedBottle)),
-    caskType: null,
-    caskSize: null,
-    caskFill: null,
-  };
+  return normalizeProposedBottleDraft(
+    ProposedBottleSchema.parse(proposedBottle),
+  );
 }
 
 function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
@@ -64,101 +132,6 @@ function getPersistedAutomationAssessment(proposal: StorePriceMatchProposal) {
   );
 
   return parsedAssessment.success ? parsedAssessment.data : null;
-}
-
-function buildAutomationAssessmentFromProposal(
-  proposal: StorePriceMatchProposal,
-  price: StorePrice & { externalSite: ExternalSite },
-) {
-  const candidateBottles = PriceMatchCandidateSchema.array().parse(
-    proposal.candidateBottles,
-  );
-  const extractedLabel = proposal.extractedLabel
-    ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
-    : null;
-  const normalizedProposedBottle = proposal.proposedBottle
-    ? normalizeStoredProposedBottle(proposal.proposedBottle)
-    : null;
-  const proposedRelease = proposal.proposedRelease
-    ? ProposedReleaseSchema.parse(proposal.proposedRelease)
-    : null;
-  const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
-    proposal.searchEvidence,
-  );
-
-  return {
-    candidateBottles,
-    extractedLabel,
-    normalizedProposedBottle,
-    proposedRelease,
-    searchEvidence,
-    automationAssessment: getStorePriceMatchAutomationAssessment({
-      action: proposal.proposalType,
-      modelConfidence: proposal.confidence,
-      price,
-      suggestedBottleId: proposal.suggestedBottleId,
-      suggestedReleaseId: proposal.suggestedReleaseId,
-      candidateBottles,
-      extractedLabel,
-      proposedBottle: normalizedProposedBottle,
-      proposedRelease,
-      creationTarget: proposal.creationTarget,
-      searchEvidence,
-    }),
-  };
-}
-
-async function backfillLegacyAutomationAssessments(rows: QueueRow[]) {
-  const rowsToBackfill = rows.flatMap((row) => {
-    if (getPersistedAutomationAssessment(row.proposal)) {
-      return [];
-    }
-
-    const legacyAssessment = buildAutomationAssessmentFromProposal(
-      row.proposal,
-      row.price,
-    ).automationAssessment;
-
-    return [
-      {
-        row,
-        legacyAssessment,
-      },
-    ];
-  });
-
-  if (!rowsToBackfill.length) {
-    return rows;
-  }
-
-  await Promise.all(
-    rowsToBackfill.map(({ row, legacyAssessment }) =>
-      db
-        .update(storePriceMatchProposals)
-        .set({
-          automationAssessment: legacyAssessment,
-        })
-        .where(eq(storePriceMatchProposals.id, row.proposal.id)),
-    ),
-  );
-
-  return rows.map((row) => {
-    const backfilledRow = rowsToBackfill.find(
-      ({ row: candidateRow }) => candidateRow.proposal.id === row.proposal.id,
-    );
-
-    if (!backfilledRow) {
-      return row;
-    }
-
-    return {
-      ...row,
-      proposal: {
-        ...row.proposal,
-        automationAssessment: backfilledRow.legacyAssessment,
-      },
-    };
-  });
 }
 
 function humanizeAutomationIssuePath(path: unknown): string | null {
@@ -233,18 +206,32 @@ function getAutomationBlockersFromError(error: string): string[] {
 
 export async function serializeQueueItems(
   rows: QueueRow[],
-  {
-    bottleList,
-    releaseList,
-  }: {
-    bottleList: Bottle[];
-    releaseList: BottleRelease[];
-  },
   context: Context,
+  readContext: {
+    caller: string;
+    operation: string;
+  },
 ) {
-  // Legacy proposals created before the snapshot column existed get a
-  // one-time backfill the first time the admin queue reads them.
-  const normalizedRows = await backfillLegacyAutomationAssessments(rows);
+  void readContext;
+  const bottleIds = Array.from(
+    new Set(
+      rows.flatMap(({ proposal }) =>
+        [proposal.currentBottleId, proposal.suggestedBottleId].filter(
+          (id): id is number => id !== null,
+        ),
+      ),
+    ),
+  );
+  const bottleList: Bottle[] = bottleIds.length
+    ? await db.query.bottles.findMany({
+        where: inArray(bottles.id, bottleIds),
+        with: {
+          brand: true,
+          bottler: true,
+          series: true,
+        },
+      })
+    : [];
   const bottlesById = Object.fromEntries(
     (
       await serialize(BottleSerializer, bottleList, context.user, [
@@ -253,20 +240,15 @@ export async function serializeQueueItems(
       ])
     ).map((item, index) => [bottleList[index].id, item]),
   );
-  const releasesById = Object.fromEntries(
-    (await serialize(BottleReleaseSerializer, releaseList, context.user)).map(
-      (item, index) => [releaseList[index].id, item],
-    ),
-  );
 
   const prices = await serialize(
     StorePriceWithSiteSerializer,
-    normalizedRows.map((row) => row.price),
+    rows.map((row) => row.price),
     context.user,
   );
 
-  return normalizedRows.map((row, index) =>
-    StorePriceMatchQueueItemSchema.parse({
+  return rows.map((row, index) => {
+    return StorePriceMatchQueueItemSchema.parse({
       ...serializeProposal(row.proposal, {
         isProcessing: row.isProcessing,
         price: row.price,
@@ -275,20 +257,11 @@ export async function serializeQueueItems(
       currentBottle: row.proposal.currentBottleId
         ? (bottlesById[row.proposal.currentBottleId] ?? null)
         : null,
-      currentRelease: row.proposal.currentReleaseId
-        ? (releasesById[row.proposal.currentReleaseId] ?? null)
-        : null,
       suggestedBottle: row.proposal.suggestedBottleId
         ? (bottlesById[row.proposal.suggestedBottleId] ?? null)
         : null,
-      suggestedRelease: row.proposal.suggestedReleaseId
-        ? (releasesById[row.proposal.suggestedReleaseId] ?? null)
-        : null,
-      parentBottle: row.proposal.parentBottleId
-        ? (bottlesById[row.proposal.parentBottleId] ?? null)
-        : null,
-    }),
-  );
+    });
+  });
 }
 
 export function serializeProposal(
@@ -301,8 +274,9 @@ export function serializeProposal(
     price?: StorePrice & { externalSite: ExternalSite };
   } = {},
 ) {
-  const candidateBottles = PriceMatchCandidateSchema.array().parse(
+  const candidateBottles = normalizeStoredPriceMatchCandidates(
     proposal.candidateBottles,
+    proposal.id,
   );
   const extractedLabel = proposal.extractedLabel
     ? ExtractedBottleDetailsSchema.parse(proposal.extractedLabel)
@@ -310,26 +284,24 @@ export function serializeProposal(
   const normalizedProposedBottle = proposal.proposedBottle
     ? normalizeStoredProposedBottle(proposal.proposedBottle)
     : null;
-  const proposedRelease = proposal.proposedRelease
-    ? ProposedReleaseSchema.parse(proposal.proposedRelease)
-    : null;
   const searchEvidence = PriceMatchSearchEvidenceSchema.array().parse(
     proposal.searchEvidence,
   );
+  const classifierCandidates =
+    ClassifierBottleCandidateSchema.array().safeParse(candidateBottles);
+  const classifierExtractedLabel =
+    ClassifierBottleExtractedDetailsSchema.nullable().safeParse(extractedLabel);
   const automationAssessment =
     getPersistedAutomationAssessment(proposal) ??
-    (price
+    (price && classifierCandidates.success && classifierExtractedLabel.success
       ? getStorePriceMatchAutomationAssessment({
           action: proposal.proposalType,
           modelConfidence: proposal.confidence,
           price,
           suggestedBottleId: proposal.suggestedBottleId,
-          suggestedReleaseId: proposal.suggestedReleaseId,
-          candidateBottles,
-          extractedLabel,
+          candidateBottles: classifierCandidates.data,
+          extractedLabel: classifierExtractedLabel.data,
           proposedBottle: normalizedProposedBottle,
-          proposedRelease,
-          creationTarget: proposal.creationTarget,
           searchEvidence,
         })
       : {
@@ -363,16 +335,9 @@ export function serializeProposal(
       automationAssessment.plainAgeBottleAutoVerifyEligible,
     differentiatingAttributes: automationAssessment.differentiatingAttributes,
     webEvidenceChecks: automationAssessment.webEvidenceChecks,
-    currentBottleId: proposal.currentBottleId,
-    currentReleaseId: proposal.currentReleaseId,
-    suggestedBottleId: proposal.suggestedBottleId,
-    suggestedReleaseId: proposal.suggestedReleaseId,
-    parentBottleId: proposal.parentBottleId,
-    creationTarget: proposal.creationTarget,
     candidateBottles,
     extractedLabel,
     proposedBottle: normalizedProposedBottle,
-    proposedRelease,
     searchEvidence,
     rationale: proposal.rationale,
     model: proposal.model,

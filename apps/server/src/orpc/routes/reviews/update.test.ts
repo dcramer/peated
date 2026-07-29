@@ -1,191 +1,361 @@
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
-  externalSites,
+  bottleTombstones,
   incomingBottleDecisionLogs,
   reviews,
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, eq } from "drizzle-orm";
+import pg from "pg";
 import { describe, expect, test } from "vitest";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  client: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1
+        FROM pg_stat_activity
+        WHERE $1 = ANY(pg_blocking_pids(pid))
+      ) AS blocked`,
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for review update lock.");
+}
 
 describe("PATCH /reviews/:review", () => {
   test("requires mod role", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
     const review = await fixtures.Review();
 
-    const err = await waitError(
+    await expect(
       routerClient.reviews.update(
         { review: review.id, hidden: true },
         { context: { user } },
       ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+    ).rejects.toThrow("Unauthorized.");
   });
 
-  test("updates hidden status to true", async ({ fixtures }) => {
+  test("hidden-only updates preserve Bottle and release evidence", async ({
+    fixtures,
+  }) => {
     const user = await fixtures.User({ mod: true });
-    const review = await fixtures.Review({ hidden: false });
+    const bottle = await fixtures.Bottle();
+    const evidenceBottle = await fixtures.LegacyBottle();
+    const evidenceRelease = await fixtures.BottleRelease({
+      bottleId: evidenceBottle.id,
+    });
+    const review = await fixtures.Review({
+      bottleId: bottle.id,
+      releaseId: evidenceRelease.id,
+      hidden: false,
+    });
 
-    const newReviewData = await routerClient.reviews.update(
+    const response = await routerClient.reviews.update(
       { review: review.id, hidden: true },
       { context: { user } },
     );
 
-    const [updatedReview] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.id, review.id));
-    expect(updatedReview.hidden).toBe(true);
-  });
-
-  test("updates hidden status to false", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
-    const review = await fixtures.Review({ hidden: true });
-
-    const newReviewData = await routerClient.reviews.update(
-      { review: review.id, hidden: false },
-      { context: { user } },
-    );
-
-    const [updatedReview] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.id, review.id));
-    expect(updatedReview.hidden).toBe(false);
-  });
-
-  test("reuses the same implicit external site across review fixtures", async ({
-    fixtures,
-  }) => {
-    const firstReview = await fixtures.Review();
-    const secondReview = await fixtures.Review();
-
-    expect(secondReview.externalSiteId).toBe(firstReview.externalSiteId);
-
-    const allSites = await db.select().from(externalSites);
-    expect(allSites).toHaveLength(1);
-  });
-
-  test("assigns a release and infers the parent bottle", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
       bottleId: bottle.id,
-      fullName: `${bottle.fullName} - Batch 4`,
-      name: `${bottle.name} - Batch 4`,
-      edition: "Batch 4",
+      releaseId: evidenceRelease.id,
+      hidden: true,
     });
-    const review = await fixtures.Review({ bottleId: null, releaseId: null });
+    expect(response.bottle?.id).toBe(bottle.id);
+  });
 
-    const newReviewData = await routerClient.reviews.update(
-      { review: review.id, release: release.id },
+  test("assigns an independently valid Bottle and preserves historical evidence", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const previousBottle = await fixtures.Bottle();
+    const nextBottle = await fixtures.Bottle();
+    const evidenceRelease = await fixtures.BottleRelease({
+      bottleId: previousBottle.id,
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: evidenceRelease.id,
+    });
+
+    const response = await routerClient.reviews.update(
+      { review: review.id, bottle: nextBottle.id },
       { context: { user } },
     );
 
-    const [updatedReview] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.id, review.id));
-    expect(updatedReview.bottleId).toBe(bottle.id);
-    expect(updatedReview.releaseId).toBe(release.id);
-    expect(newReviewData.bottle?.id).toBe(bottle.id);
-    expect(newReviewData.release?.id).toBe(release.id);
-
-    const decisionLog = await db.query.incomingBottleDecisionLogs.findFirst({
-      where: and(
-        eq(incomingBottleDecisionLogs.sourceKind, "review"),
-        eq(incomingBottleDecisionLogs.sourceId, review.id),
-      ),
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: nextBottle.id,
+      releaseId: evidenceRelease.id,
     });
-    expect(decisionLog).toMatchObject({
+    expect(response.bottle?.id).toBe(nextBottle.id);
+
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: and(
+          eq(incomingBottleDecisionLogs.sourceKind, "review"),
+          eq(incomingBottleDecisionLogs.sourceId, review.id),
+        ),
+      }),
+    ).toMatchObject({
       decision: "match_existing",
-      bottleId: bottle.id,
-      releaseId: release.id,
-      createdBottle: false,
-      createdRelease: false,
+      bottleId: nextBottle.id,
+      releaseId: null,
     });
   });
 
-  test("clears release when changing the bottle without an explicit release", async ({
+  test("explicit unassignment preserves historical evidence", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
-    const otherBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      fullName: `${bottle.fullName} - Batch 4`,
-      name: `${bottle.name} - Batch 4`,
-      edition: "Batch 4",
-    });
+    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
     const review = await fixtures.Review({
       bottleId: bottle.id,
       releaseId: release.id,
     });
 
-    const newReviewData = await routerClient.reviews.update(
-      { review: review.id, bottle: otherBottle.id },
+    const response = await routerClient.reviews.update(
+      { review: review.id, bottle: null },
       { context: { user } },
     );
 
-    const [updatedReview] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.id, review.id));
-    expect(updatedReview.bottleId).toBe(otherBottle.id);
-    expect(updatedReview.releaseId).toBeNull();
-    expect(newReviewData.bottle?.id).toBe(otherBottle.id);
-    expect(newReviewData.release).toBeNull();
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: null,
+      releaseId: release.id,
+    });
+    expect(response.bottle).toBeNull();
   });
 
-  test("rejects mismatched bottle and release updates", async ({
+  test("rejects a missing Bottle without partial updates", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle();
-    const otherBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({ bottleId: bottle.id });
-    const review = await fixtures.Review({ bottleId: null, releaseId: null });
-
-    const err = await waitError(
-      routerClient.reviews.update(
-        {
-          review: review.id,
-          bottle: otherBottle.id,
-          release: release.id,
-        },
-        { context: { user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(
-      `[Error: Release does not belong to the selected bottle.]`,
-    );
-  });
-
-  test("returns NOT_FOUND for non-existent review", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
-
-    const err = await waitError(
-      routerClient.reviews.update(
-        { review: 999999, hidden: true },
-        { context: { user } },
-      ),
-    );
-    expect(err).toMatchInlineSnapshot(`[Error: Review not found.]`);
-  });
-
-  test("returns existing review if no data is sent", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
     const review = await fixtures.Review({ hidden: false });
 
-    const newReviewData = await routerClient.reviews.update(
-      { review: review.id }, // no actual update data (hidden is optional)
+    const error = await waitError(
+      routerClient.reviews.update(
+        { review: review.id, bottle: 999_999, hidden: true },
+        { context: { user } },
+      ),
+    );
+    expect(error.message).toBe("Bottle not found.");
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: review.bottleId,
+      releaseId: review.releaseId,
+      hidden: false,
+    });
+  });
+
+  test("rejects a retired Bottle without partial updates", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const retiredBottle = await fixtures.Bottle();
+    const review = await fixtures.Review({ hidden: false });
+    await db.insert(bottleTombstones).values({
+      bottleId: retiredBottle.id,
+      newBottleId: null,
+    });
+
+    const error = await waitError(
+      routerClient.reviews.update(
+        { review: review.id, bottle: retiredBottle.id, hidden: true },
+        { context: { user } },
+      ),
+    );
+    expect(error.message).toBe(`Bottle ${retiredBottle.id} is retired.`);
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: review.bottleId,
+      hidden: false,
+    });
+  });
+
+  test("rejects a group-less Bottle without partial updates", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const selectedBottle = await fixtures.LegacyBottle();
+    const review = await fixtures.Review({ hidden: false });
+
+    const error = await waitError(
+      routerClient.reviews.update(
+        { review: review.id, bottle: selectedBottle.id, hidden: true },
+        { context: { user } },
+      ),
+    );
+    expect(error.message).toBe(`Bottle ${selectedBottle.id} is not active.`);
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: review.bottleId,
+      releaseId: review.releaseId,
+      hidden: false,
+    });
+  });
+
+  test("hidden-only updates retain an identity changed while waiting for the Review", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const originalBottle = await fixtures.Bottle();
+    const concurrentBottle = await fixtures.Bottle();
+    const review = await fixtures.Review({
+      bottleId: originalBottle.id,
+      hidden: false,
+    });
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let update: ReturnType<typeof routerClient.reviews.update> | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `UPDATE "review" SET "bottle_id" = $1 WHERE "id" = $2`,
+        [concurrentBottle.id, review.id],
+      );
+
+      update = routerClient.reviews.update(
+        { review: review.id, hidden: true },
+        { context: { user } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+      await update;
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await update?.catch(() => undefined);
+    }
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: concurrentBottle.id,
+      hidden: true,
+    });
+  });
+
+  test("locks a selected Bottle before the Review and preserves concurrent evidence", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const selectedBottle = await fixtures.Bottle();
+    const concurrentBottle = await fixtures.Bottle();
+    const concurrentRelease = await fixtures.BottleRelease({
+      bottleId: concurrentBottle.id,
+    });
+    const review = await fixtures.Review({
+      bottleId: null,
+      releaseId: null,
+      hidden: false,
+    });
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let update: ReturnType<typeof routerClient.reviews.update> | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(
+        `UPDATE "bottle" SET "updated_at" = "updated_at" WHERE "id" = $1`,
+        [selectedBottle.id],
+      );
+
+      update = routerClient.reviews.update(
+        { review: review.id, bottle: selectedBottle.id, hidden: true },
+        { context: { user } },
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query(
+        `UPDATE "review" SET "bottle_id" = $1, "release_id" = $2 WHERE "id" = $3`,
+        [concurrentBottle.id, concurrentRelease.id, review.id],
+      );
+      await client.query("COMMIT");
+      committed = true;
+      await update;
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await update?.catch(() => undefined);
+    }
+
+    expect(
+      await db.query.reviews.findFirst({
+        where: eq(reviews.id, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: selectedBottle.id,
+      releaseId: concurrentRelease.id,
+      hidden: true,
+    });
+  });
+
+  test("returns NOT_FOUND for a nonexistent review", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+
+    await expect(
+      routerClient.reviews.update(
+        { review: 999_999, hidden: true },
+        { context: { user } },
+      ),
+    ).rejects.toThrow("Review not found.");
+  });
+
+  test("returns the existing Review when no changes are sent", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const review = await fixtures.Review();
+
+    const response = await routerClient.reviews.update(
+      { review: review.id },
       { context: { user } },
     );
 
-    expect(newReviewData.id).toBe(review.id);
+    expect(response.id).toBe(review.id);
+    expect(response.bottle?.id).toBe(review.bottleId);
   });
 });

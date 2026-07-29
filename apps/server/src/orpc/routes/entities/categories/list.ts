@@ -1,11 +1,13 @@
 import { db } from "@peated/server/db";
 import {
+  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { eq, sql } from "drizzle-orm";
+import { CategoryEnum } from "@peated/server/schemas";
+import { and, asc, eq, isNotNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -27,7 +29,7 @@ export default procedure
       results: z.array(
         z.object({
           count: z.number(),
-          category: z.string().nullable(),
+          category: CategoryEnum.nullable(),
         }),
       ),
       totalCount: z.number(),
@@ -35,7 +37,7 @@ export default procedure
   )
   .handler(async function ({ input, errors }) {
     const [entity] = await db
-      .select()
+      .select({ id: entities.id })
       .from(entities)
       .where(eq(entities.id, input.entity));
 
@@ -45,26 +47,37 @@ export default procedure
       });
     }
 
-    // TODO: denormalize this into (num)tastings or similar in the tags table
-    const results = (
-      await db.execute<{
-        count: string;
-        category: string | null;
-      }>(
-        sql`SELECT COUNT(*) as count, category
-              FROM ${bottles}
-              WHERE ${bottles.brandId} = ${entity.id}
-                 OR ${bottles.bottlerId} = ${entity.id}
-                 OR EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.bottleId} = ${bottles.id} AND ${bottlesToDistillers.distillerId} = ${entity.id})
-              GROUP BY ${bottles.category}`,
+    const rows = await db
+      .select({
+        category: bottles.category,
+        count: sql<string>`COUNT(*)`,
+      })
+      .from(bottles)
+      .where(
+        and(
+          isNotNull(bottles.groupId),
+          sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+          or(
+            eq(bottles.brandId, entity.id),
+            eq(bottles.bottlerId, entity.id),
+            sql`EXISTS(
+              SELECT FROM ${bottlesToDistillers}
+              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+                AND ${bottlesToDistillers.distillerId} = ${entity.id}
+            )`,
+          ),
+        ),
       )
-    ).rows;
+      .groupBy(bottles.category)
+      .orderBy(asc(bottles.category));
+
+    const results = rows.map(({ count, category }) => ({
+      count: Number(count),
+      category,
+    }));
 
     return {
-      results: results.map(({ count, category }) => ({
-        count: Number(count),
-        category,
-      })),
-      totalCount: entity.totalBottles,
+      results,
+      totalCount: results.reduce((total, { count }) => total + count, 0),
     };
   });

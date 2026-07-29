@@ -1,10 +1,10 @@
 import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
-import type { Flight } from "@peated/server/db/schema";
 import {
   bottleAliases,
   bottles,
   bottlesToDistillers,
+  bottleTombstones,
   entities,
   flightBottles,
   flights,
@@ -19,7 +19,17 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  getTableColumns,
+  inArray,
+  isNotNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import { z } from "zod";
 
 const DEFAULT_SORT = "-tastings";
@@ -85,6 +95,7 @@ export default procedure
             .where(
               and(
                 eq(sql`LOWER(${bottleAliases.name})`, query.toLowerCase()),
+                sql`${bottleAliases.ignored} IS NOT TRUE`,
                 isNotNull(bottleAliases.bottleId),
               ),
             )
@@ -95,6 +106,9 @@ export default procedure
       : [];
 
     const where: (SQL<unknown> | undefined)[] = [];
+    where.push(
+      sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+    );
 
     if (query) {
       where.push(
@@ -157,10 +171,9 @@ export default procedure
       );
     }
 
-    let flight: Flight | null = null;
     if (rest.flight) {
-      [flight] = await db
-        .select()
+      const [flight] = await db
+        .select({ id: flights.id })
         .from(flights)
         .where(eq(flights.publicId, rest.flight));
       if (!flight) {
@@ -227,7 +240,7 @@ export default procedure
     }
 
     const results = await db
-      .select({ bottles })
+      .select({ ...getTableColumns(bottles) })
       .from(bottles)
       .innerJoin(entities, eq(entities.id, bottles.brandId))
       .where(where ? and(...where) : undefined)
@@ -248,12 +261,10 @@ export default procedure
     return {
       results: await serialize(
         BottleSerializer,
-        results.slice(0, limit).map((r) => r.bottles),
+        results.slice(0, limit),
         context.user,
         ["description", "tastingNotes"],
-        {
-          flight,
-        },
+        { includeGroupSummary: true },
       ),
       rel: {
         nextCursor: results.length > limit ? cursor + 1 : null,

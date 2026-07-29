@@ -8,10 +8,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Ardbeg Uigeadail",
         "brand": "Ardbeg",
         "bottler": null,
         "series": null,
@@ -36,10 +33,7 @@
       "when": ["ardbeg", "uigeadail"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Ardbeg Uigeadail",
           "brand": "Ardbeg",
           "bottler": null,
           "series": null,

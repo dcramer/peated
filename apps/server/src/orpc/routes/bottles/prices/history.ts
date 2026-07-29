@@ -39,7 +39,7 @@ export default procedure
       ),
     }),
   )
-  .handler(async function ({ input, context, errors }) {
+  .handler(async function ({ input, errors }) {
     const [bottle] = await db
       .select()
       .from(bottles)
@@ -51,6 +51,12 @@ export default procedure
       });
     }
 
+    const baseWhere = [
+      eq(storePrices.bottleId, bottle.id),
+      eq(storePrices.currency, input.currency),
+      sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
+    ];
+
     const results = await db
       .select({
         date: storePriceHistories.date,
@@ -60,13 +66,7 @@ export default procedure
       })
       .from(storePriceHistories)
       .innerJoin(storePrices, eq(storePriceHistories.priceId, storePrices.id))
-      .where(
-        and(
-          eq(storePrices.currency, input.currency),
-          eq(storePrices.bottleId, bottle.id),
-          sql`${storePrices.updatedAt} > NOW() - interval '1 year'`,
-        ),
-      )
+      .where(and(...baseWhere))
       .groupBy(storePriceHistories.date)
       .orderBy(desc(storePriceHistories.date));
 

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { BottleReleaseSchema } from "./bottleReleases";
 import { BottleSchema } from "./bottles";
 import { CategoryEnum } from "./common";
 import { ExternalSiteSchema, ExternalSiteTypeEnum } from "./externalSites";
@@ -12,12 +11,9 @@ export const ReviewSchema = z.object({
   site: ExternalSiteSchema.optional().describe(
     "External site where the review was published",
   ),
-  bottle: BottleSchema.nullish()
-    .default(null)
-    .describe("Bottle this review is associated with"),
-  release: BottleReleaseSchema.nullish()
-    .default(null)
-    .describe("Release this review is associated with"),
+  bottle: BottleSchema.nullable().describe(
+    "Bottle associated with the review, or null when unresolved",
+  ),
   createdAt: z
     .string()
     .datetime()

@@ -1,17 +1,6 @@
 import { db } from "@peated/server/db";
-import type {
-  Bottle,
-  BottleRelease,
-  Collection,
-  CollectionBottle,
-  Tasting,
-  User,
-} from "@peated/server/db/schema";
-import {
-  bottleReleases,
-  bottles,
-  collectionBottles,
-} from "@peated/server/db/schema";
+import type { Collection, Tasting, User } from "@peated/server/db/schema";
+import { collectionBottles } from "@peated/server/db/schema";
 import { getReservedCollection } from "@peated/server/lib/db";
 import { serialize } from "@peated/server/serializers";
 import { CollectionSerializer } from "@peated/server/serializers/collection";
@@ -26,17 +15,6 @@ import { and, desc, eq, sql } from "drizzle-orm";
 
 export const COLLECTION_PREVIEW_LIMIT = 4;
 export const SECONDARY_ENTRY_LIMIT_WITH_PRIMARY = 2;
-
-type CollectionBottleWithTarget = CollectionBottle & {
-  bottle: Bottle;
-  release: BottleRelease | null;
-};
-
-type CollectionAddSourceRow = {
-  collectionBottle: CollectionBottle;
-  bottle: Bottle;
-  release: BottleRelease | null;
-};
 
 export type CollectionAddGroup = {
   collection: Collection;
@@ -236,23 +214,6 @@ async function serializeCollectionForActivity({
   };
 }
 
-async function serializeCollectionBottlePreview(
-  rows: CollectionAddSourceRow[],
-  currentUser?: User | null,
-) {
-  return await serialize(
-    CollectionBottleSerializer,
-    rows.map(
-      ({ collectionBottle, bottle, release }): CollectionBottleWithTarget => ({
-        ...collectionBottle,
-        bottle,
-        release,
-      }),
-    ),
-    currentUser,
-  );
-}
-
 /** Serializes grouped collection additions with actor, destination, and previews. */
 export async function serializeCollectionAddEntries({
   groups,
@@ -289,17 +250,8 @@ export async function serializeCollectionAddEntries({
     }
 
     const previewRows = await db
-      .select({
-        collectionBottle: collectionBottles,
-        bottle: bottles,
-        release: bottleReleases,
-      })
+      .select()
       .from(collectionBottles)
-      .innerJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
-      .leftJoin(
-        bottleReleases,
-        eq(bottleReleases.id, collectionBottles.releaseId),
-      )
       .where(
         and(
           eq(collectionBottles.collectionId, group.collection.id),
@@ -318,7 +270,11 @@ export async function serializeCollectionAddEntries({
       windowEnd: group.windowEnd.toISOString(),
       createdBy,
       collection,
-      items: await serializeCollectionBottlePreview(previewRows, currentUser),
+      items: await serialize(
+        CollectionBottleSerializer,
+        previewRows,
+        currentUser,
+      ),
       totalItems: group.totalItems,
     });
   }

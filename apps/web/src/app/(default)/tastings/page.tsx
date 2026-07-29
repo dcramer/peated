@@ -2,10 +2,12 @@
 
 import type { Inputs } from "@peated/server/orpc/router";
 import Glyph from "@peated/web/assets/glyph.svg";
-import BottleTable from "@peated/web/components/bottleTable";
 import EmbeddedLogin from "@peated/web/components/embeddedLogin";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import SimpleHeader from "@peated/web/components/simpleHeader";
+import SimpleRatingIndicator from "@peated/web/components/simpleRatingIndicator";
+import Table from "@peated/web/components/table";
+import TastingBottleIdentity from "@peated/web/components/tastingBottleIdentity";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -56,9 +58,41 @@ function TastingList() {
       <SimpleHeader>Tastings</SimpleHeader>
 
       {data.results.length > 0 ? (
-        <BottleTable
-          bottleList={data.results.map((t) => t.bottle)}
+        <Table
+          items={data.results}
+          primaryKey={(tasting) => String(tasting.id)}
           rel={data.rel}
+          columns={[
+            {
+              name: "name",
+              title: "Bottle",
+              className: "min-w-full sm:w-1/2",
+              value: (tasting) => (
+                <TastingBottleIdentity bottle={tasting.bottle} compact />
+              ),
+            },
+            {
+              name: "tastings",
+              value: (tasting) => tasting.bottle.totalTastings.toLocaleString(),
+              className: "sm:w-24",
+            },
+            {
+              name: "rating",
+              value: (tasting) => (
+                <SimpleRatingIndicator avgRating={tasting.bottle.avgRating} />
+              ),
+              className: "sm:w-20",
+              align: "center",
+            },
+            {
+              name: "age",
+              value: (tasting) => {
+                const age = tasting.bottle.statedAge;
+                return age ? `${age} years` : null;
+              },
+              className: "sm:w-24",
+            },
+          ]}
         />
       ) : (
         <EmptyActivity href="/addBottle?intent=tasting">

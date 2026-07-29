@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:33:37.576Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old official batch release ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old official batch release ABV",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** official bottlings are **46.2% ABV**. Ardbeg’s official archive/product pages show this for Batch 1, and current official pages continue the same expression line for later batches. ([ardbeg.com](https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARD",
+    "results": [
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-6-1107205.html",
+        "url": "https://www.ardbeg.com/en-gb/ardbeg-19-year-old-traigh-bhan-batch-6-1107205.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%201-2019ARDTB1.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "url": "https://www.ardbeg.com/en-gb/Ardbeg%20Traigh%20Bhan%2019%20Years%20Old%20Batch%202-2020ARDTB2.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/aboutardbeg/archive.html",
+        "url": "https://www.ardbeg.com/en-gb/aboutardbeg/archive.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/whisky/",
+        "url": "https://www.ardbeg.com/whisky/",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "52d78e179d5eece3a20b3bf87b8b96ee0d849c171b7eb4f0a2f010e18195e224",
+    "mode": "auto"
+  }
+}

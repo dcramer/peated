@@ -298,6 +298,31 @@ export const storePriceMatchAttemptsRelations = relations(
       fields: [storePriceMatchAttempts.reviewedById],
       references: [users.id],
     }),
+    currentBottle: one(bottles, {
+      fields: [storePriceMatchAttempts.currentBottleId],
+      references: [bottles.id],
+      relationName: "store_price_match_attempt_current_bottle",
+    }),
+    currentRelease: one(bottleReleases, {
+      fields: [storePriceMatchAttempts.currentReleaseId],
+      references: [bottleReleases.id],
+      relationName: "store_price_match_attempt_current_release",
+    }),
+    suggestedBottle: one(bottles, {
+      fields: [storePriceMatchAttempts.suggestedBottleId],
+      references: [bottles.id],
+      relationName: "store_price_match_attempt_suggested_bottle",
+    }),
+    suggestedRelease: one(bottleReleases, {
+      fields: [storePriceMatchAttempts.suggestedReleaseId],
+      references: [bottleReleases.id],
+      relationName: "store_price_match_attempt_suggested_release",
+    }),
+    parentBottle: one(bottles, {
+      fields: [storePriceMatchAttempts.parentBottleId],
+      references: [bottles.id],
+      relationName: "store_price_match_attempt_parent_bottle",
+    }),
   }),
 );
 

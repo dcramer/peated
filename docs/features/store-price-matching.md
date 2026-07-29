@@ -1,6 +1,7 @@
 # Store Price Matching
 
-This document describes how store prices are resolved to bottles and releases.
+This document describes how store prices are resolved to independently complete
+Bottles.
 
 Authoritative policy lives in:
 
@@ -9,28 +10,33 @@ Authoritative policy lives in:
 - [Bottle Creation And Alias System](../architecture/bottle-creation-alias-system.md)
 - [Bottle Classifier](../architecture/bottle-classifier.md)
 
-Price matching is one consumer of the generic bottle-reference classifier. It
+Price matching is one consumer of the shared bottle-reference classifier. It
 adds store-price persistence, queueing, moderation, and automation policy around
 that classifier boundary.
 
 ## Local Contract
 
-- `store_price.bottleId` is required when a listing is matched.
-- `store_price.releaseId` is optional precision under that bottle.
-- If bottle identity is clear but release identity is weak, match the bottle and
-  leave `releaseId = null`.
+- A non-null `store_price.bottleId` is the authoritative catalog identity.
+  The retained `releaseId` column is migration evidence only until its
+  separately approved schema-removal gate.
+- Known expression identity whose exact Bottle is uncertain may use the retained
+  general Bottle. It never uses BottleGroup or substitutes a representative.
+- A durable Bottle assignment is never downgraded or reconstructed from
+  conflicting historical fields. Null `bottleId` is the explicit unresolved
+  state.
 - Preserve exact source facts as `bottle_observation` before promoting them into
-  canonical release identity.
-- Retailer listing aliases stay bottle-level unless the accepted alias key
-  already belongs to a canonical release alias.
+  canonical Bottle identity, using the same Bottle selected by approval.
+- Assigned listing aliases propagate the same Bottle id to StorePrices with the
+  same site, listing name, and volume. They do not retarget cross-volume
+  proposals.
 
 ## Goal
 
 For each `store_price`, the matcher should decide one of four outcomes:
 
 1. The current assignment is already correct.
-2. The price should match an existing bottle or existing release.
-3. The price should create a new bottle, a new release under an existing bottle, or both.
+2. The price should match an existing Bottle.
+3. The price should create or safely reuse an independent concrete Bottle.
 4. There is no safe match.
 
 The system persists one `store_price_match_proposal` row per `store_price`.
@@ -53,7 +59,9 @@ This system covers:
 - trusted SMWS auto-resolution
 - moderator approve / ignore / create flows
 
-This system does not keep a durable per-attempt history. Retrying a proposal overwrites the existing proposal row for that `store_price`.
+The system retains one current proposal per `store_price` and a durable
+`store_price_match_attempt` history. Moderation writes its outcome to the
+approved proposal's latest attempt without overwriting older attempts.
 
 ## Lifecycle
 
@@ -64,8 +72,10 @@ This system does not keep a durable per-attempt history. Retrying a proposal ove
 - normalizes the incoming listing name
 - builds the deterministic alias key from the listing name
 - does an exact alias lookup for that accepted key
-- if an exact alias exists, pre-fills `bottleId` and, when the alias is canonical to a release, `releaseId`
-- enqueues `ResolveStorePriceBottle` only when no exact alias target exists
+- if an assigned alias exists, writes its authoritative `bottleId`
+- allows a general alias to resolve only to the retained general Bottle
+- enqueues `ResolveStorePriceBottle` only when no accepted direct Bottle alias
+  assignment exists
 - optionally enqueues `CapturePriceImage`
 
 ### 2. Matching evaluation
@@ -77,8 +87,9 @@ Evaluation order:
 1. trusted SMWS fast path
 2. extract structured identity from image or text
 3. auto-ignore obvious non-whisky rows plus clearly non-single-bottle listings such as multipacks, gift sets, sampler bundles, and damaged-condition sale listings
-4. build local bottle and release candidates
-5. ask the generic bottle classifier for bottle-centric actions (`match`, `repair_bottle`, `create_bottle`, `create_release`, `create_bottle_and_release`, `repair_parent_and_create_release`, or `no_match`)
+4. build local concrete Bottle candidates
+5. ask the shared bottle classifier for Bottle-centric actions (`match`,
+   `repair_bottle`, `create_bottle`, or `no_match`)
 6. map and sanitize classifier output against real candidates and resolved entities
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
@@ -90,16 +101,23 @@ Every approved bottle-reference match writes one `bottle_observation` keyed by `
 
 That observation stores:
 
+- the Bottle selected by approval
 - the store title and source URL
 - the parsed extracted identity
 - the proposal type and creation target
-- normalized release facts when they exist
+- normalized exact Bottle facts when they exist
 
-This keeps exact source detail without forcing new public fields into the normal bottle or release entry flow.
+This keeps exact source detail without forcing new public fields into the normal
+Bottle entry flow.
 
 ## Candidate Generation
 
-Candidate search is release-aware. Results are keyed by `(bottleId, releaseId)` rather than collapsing everything to `bottleId`.
+Candidate search presents independently complete Bottles, keyed by `bottleId`.
+Accepted aliases resolve directly to their Bottle; unassigned and ignored
+aliases do not produce Bottle candidates. Retained release ids and
+BottleRelease rows are not classifier candidate inputs; migration and bounded
+compatibility routes resolve them through the durable promotion mapping before
+entering Bottle-native logic.
 
 Sources:
 
@@ -107,14 +125,14 @@ Sources:
 - `exact`
 - `vector`
 - `text`
-- `release_text`
 - `brand`
 
 Important behavior:
 
-- exact alias matches may target a bottle or a release
-- release search vectors can surface sibling releases independently
-- release metadata is used in scoring and automation, not just the candidate name
+- exact alias matches select a concrete Bottle
+- sibling concrete Bottles can surface independently
+- exact Bottle metadata is used in scoring and automation, not just the
+  candidate name
 
 ## Extraction
 
@@ -141,14 +159,14 @@ The extractor should prefer missing values over invented certainty.
 
 ## Classifier Contract
 
-Store-price matching is a consumer of the generic bottle classifier, not the
+Store-price matching is a consumer of the shared Bottle classifier, not the
 owner of bottle-identity policy. The older `priceMatching*` helper names remain
 only as compatibility shims around the canonical bottle-classifier modules.
 
 The classifier receives:
 
-- generic bottle reference metadata
-- the current matched bottle / release, if present
+- bottle-reference metadata
+- the current Bottle, if present
 - extracted identity
 - initial local candidates
 
@@ -172,27 +190,21 @@ When `status = classified`, the decision must be one of:
 - `match`
 - `repair_bottle`
 - `create_bottle`
-- `create_release`
-- `create_bottle_and_release`
-- `repair_parent_and_create_release`
 - `no_match`
 
 Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
 - `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; the proposed bottle draft is a sparse repair draft and unknown fields must not clear existing bottle facts
-- `matchedReleaseId`, when present, must be a known candidate release id
-- `parentBottleId`, when present for release creation, must be a known candidate bottle id
-- `repair_parent_and_create_release` must include a known-candidate
-  `parentBottleId`, a parent repair draft in `proposedBottle`, and a child
-  release draft in `proposedRelease`
-- `repair_parent_and_create_release` means the classifier found a supported
-  child release but the local parent must be repaired first; price matching
-  currently records this as a review-safe unresolved/no-match proposal rather
-  than persisting a compound repair-and-create operation
+- classifier decisions carry Bottle ids only; they do not expose a legacy
+  release-id picker
+- `create_bottle` carries one complete marketed Bottle draft, including exact
+  Bottle traits; it never chooses a parent Bottle or BottleGroup
 - `identityScope` is reviewed as `product | exact_cask`
 - Unsupported novelty flavored-whiskey or whiskey-liqueur products should end in classifier-driven `no_match`, but a flavor-adjacent noun in the title is not enough to exclude a bottle by itself
-- When re-evaluation auto-ignores a bundle or damaged-condition listing, price matching should also clear any stale `store_price.bottleId` / `releaseId` assignment instead of leaving the old match attached
+- When re-evaluation auto-ignores a bundle or damaged-condition listing, price
+  matching clears the stale `store_price.bottleId` and retained `releaseId`
+  rather than preserving a conflicting identity pair
 
 ## Proposal Types
 
@@ -201,15 +213,32 @@ Additional rules:
 - `create_new`
 - `no_match`
 
-`no_match` may carry a complete review-only parent repair plus release draft
-when the classifier returned `repair_parent_and_create_release`; the row remains
-unresolved because price matching cannot yet apply that compound operation.
+New proposals emit `create_new` with one complete `proposedBottle`. Live writers
+clear the historical release ids, parent id, `creationTarget`, and
+`proposedRelease` columns. Immutable attempt rows may retain those values as
+audit evidence, but a release-shaped current proposal must be reclassified
+before approval; it is not translated into a live picker choice.
 
-`create_new` may target:
+### Correction repair compatibility
 
-- `bottle`
-- `release`
-- `bottle_and_release`
+`proposedBottle` on a same-bottle correction remains a sparse compatibility
+draft. Live classifier correction producers persist `statedAgeScope: exact`.
+With that marker, a non-null `statedAge` is an exact edit for only the selected
+Bottle. Historical unmarked proposals retain their original shared-age
+interpretation, and approval applies that value through the canonical
+BottleGroup update service so it atomically rematerializes every concrete
+Bottle in the group.
+
+Required name and brand, non-null series, category, and bottler, and non-empty
+distillers are shared catalog edits. Non-null edition, ABV, single-cask and
+cask-strength flags, vintage and release years, and canonical cask size, type,
+and fill are exact edits for only the selected Bottle.
+
+Null fields and empty distillers mean unknown and preserve existing catalog
+facts; marked and unmarked null age never clears or changes either scope. False
+and zero remain explicit values. After pending historical correction proposals
+are drained or migrated, separately approved cleanup removes the marker and
+unmarked shared-age fallback together.
 
 ## Statuses
 
@@ -220,36 +249,36 @@ unresolved because price matching cannot yet apply that compound operation.
 - `errored`
 
 `verified` is driven by automation policy on top of the classifier result.
-For existing-match proposals, that policy should stay thin:
+The shared code-derived tier is `auto | review`; it never reads a
+model-supplied numeric score. It maps the action to a match/create/repair risk class, forces
+review for unresolved risks, and evaluates structured evidence and explicit
+identity anchors. Proposal-specific deterministic blockers may narrow an
+`auto` result further but cannot upgrade a `review` result.
 
-- deterministic blockers must be empty
-- the classifier confidence must clear the shared verification threshold
-- reaffirming the current bottle/release assignment uses a lower threshold because the risk is lower; today that threshold is `80`
-- new unmatched matches only verify at the higher bottle-only threshold; today that threshold is `96`
-- an unassigned `correction` that only assigns an existing bottle may verify at
-  the same high bottle-only threshold, but any proposed bottle repair fields
-  remain review-only and must not be applied by that assignment
-- the classifier should be the layer that decides when listing-title
-  reaffirmation, official confirmation, or agent-reviewed corroborating web
-  evidence justifies the `96+` confidence band
-
-Evidence such as exact aliases, retailer titles, official pages, or
-agent-reviewed corroborating web confirmation should raise or lower classifier
-confidence upstream rather than creating separate downstream verify heuristics.
+An unassigned correction that only assigns an existing Bottle may be eligible
+for automatic assignment when the match tier and downstream blockers allow it.
+Any proposed Bottle repair fields remain review-only and must not be applied by
+that assignment.
 
 ## Automation
 
-Automation is schema-first:
+Automation is schema-first and code-derived:
 
-- bottle and release confidence are not the same thing
-- existing-match verification should come from classifier confidence plus deterministic blockers, not a second layer of retailer/title/exact-match heuristics
-- release-specific automation requires explicit validation of the release traits
+- every unresolved model risk forces `review`
+- an existing match requires a concrete Bottle, must not replace a different
+  current assignment, and needs an explicit anchor such as reaffirmed current
+  identity, deterministic exact identity, an accepted exact alias, primary
+  label/image evidence, or supportive reviewed evidence
+- create and repair actions require supportive reviewed evidence, a
+  deterministic identity anchor, or primary label/image evidence
 - originating retailer evidence is never decisive for differentiating traits
+- downstream policy may impose additional deterministic blockers for a
+  particular write path
 
-Important rule:
-
-- if bottle confidence is high and release confidence is not, persist the bottle and keep `releaseId = null`
-- unmatched release-level matches should not auto-verify from confidence alone
+Classifier eval fixtures assert this behavior with
+`expected.expectedTier: auto | review`. `expected.verifyEligible` is retained
+only for deliberate downstream compatibility assertions about existing-match
+verification; it is not the primary automation contract.
 
 ### Trusted SMWS fast path
 
@@ -262,16 +291,15 @@ SMWS remains a deterministic path:
 
 ### Auto-create
 
-Auto-create may create:
-
-- a bottle
-- a release under an existing bottle
-- a bottle plus a release
+Auto-create receives one complete `proposedBottle`. It creates an independently
+complete Bottle in an automatic singleton group and creates no BottleRelease.
+A safe duplicate may be reused only when its canonical `fullName` exactly
+matches and the Bottle is active.
 
 Auto-create only proceeds when:
 
-- the proposed target is schema-valid
-- decisive bottle / release traits are internally consistent
+- the proposed Bottle is schema-valid
+- decisive Bottle identity traits are internally consistent
 - high-trust or acceptable medium-trust evidence validates the differentiating traits
 - unsupported or unvalidated identity traits do not remain
 
@@ -280,33 +308,60 @@ Auto-create only proceeds when:
 Moderators can:
 
 - approve an existing match
+- apply a same-bottle correction repair
 - ignore a proposal
-- create a bottle
-- create a release
-- create a bottle and release together
+- approve complete Bottle create-new input
 
-Default moderation should stay bottle-first. Release creation is optional precision, not a requirement for approval.
+The route accepts one complete Bottle input, creates or safely reuses one
+independently complete Bottle, and returns that Bottle directly. It has no
+staged response wrapper and writes no BottleRelease. A non-null legacy image URL
+is rejected because image creation must use the canonical upload boundary.
 
-Current UI limitation:
+Applying a correction commits its canonical shared/exact Bottle update and
+proposal approval in one database transaction. Canonical update jobs run only
+after that transaction commits. The correction path retains its Bottle response
+for the current queue UI, but it does not maintain a separate Bottle updater or
+mutate staged legacy BottleRelease rows. Repair is available only when the
+proposal's current and suggested identities are the same non-null active
+concrete Bottle; that Bottle id is locked and revalidated before the update
+commits.
 
-- automatic release suggestions are supported
-- manual override is still bottle-first in the queue and does not yet expose a full existing-release picker
+The moderation queue renders current and suggested Bottles independently or an
+explicit unknown state. Approval submits one Bottle id. A general-expression
+suggestion is approvable only when it identifies the retained general Bottle;
+it never selects a representative. The manual override searches complete
+existing Bottles and submits the selected Bottle id without a second resolver.
+Retained BottleRelease identity is staged compatibility evidence, not a picker
+choice or assignment authority.
+
+## Price Presentation
+
+Price reads and changes render the assigned independently complete Bottle.
+Bottle-specific price lists and history include only rows assigned to that
+Bottle. Unresolved prices remain unresolved; BottleGroup is not a display or
+activity identity.
 
 ## Alias Behavior
 
 Approving a price proposal does two separate things:
 
-1. updates the matched `store_price` rows for the same site / listing / volume
-2. stores a reusable alias for the accepted listing key
+1. assigns the authoritative Bottle id to matching `store_price` rows for the
+   same site / listing name / volume
+2. stores a reusable Bottle alias for the accepted listing key
 
 Schema-first alias rule:
 
-- price listing aliases should stay bottle-level unless the accepted listing key is exactly a canonical release alias
-- canonical release aliases should be created from the release record itself
+- every assigned alias resolves directly to one Bottle id
+- a general expression alias resolves to the retained general Bottle and never
+  selects the representative Bottle
+- no BottleGroup alias identity or second resolver remains
+- matching propagation preserves the same site / listing name / volume scope
+  and does not retarget cross-volume proposals
 
-This prevents a retailer-specific title from globally turning into an exact release alias.
+This prevents a retailer-specific title from globally choosing an arbitrary
+exact Bottle.
 
 ## Known Gaps
 
-- queue manual override still needs an explicit existing-release selector
-- alias embeddings and canonical release alias maintenance should continue to be audited when release naming rules evolve
+- alias embeddings and canonical exact-Bottle alias maintenance should continue
+  to be audited when Bottle naming rules evolve

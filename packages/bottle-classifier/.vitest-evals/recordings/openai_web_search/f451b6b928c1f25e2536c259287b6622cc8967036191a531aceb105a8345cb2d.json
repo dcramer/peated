@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-26T23:12:57.153Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon product batch naming"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength Barrel Proof bourbon product batch naming",
+    "summary": "Elijah Craig **Cask Strength / Barrel Proof** batch names use a simple code:\n\n- **First letter** = which release of the year  \n  - **A** = 1st release  \n  - **B** = 2nd release  \n  - **C** = 3rd release  \n- **Next digit** = release month  \n  - typically **1 = January**, **5 = May**, **9 = September**\n- **Last two digit",
+    "results": [
+      {
+        "title": "heavenhilldistillery.com",
+        "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+        "domain": "heavenhilldistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "gobourbon.com",
+        "url": "https://www.gobourbon.com/elijah-craig-and-larceny-barrel-proof-codes/",
+        "domain": "gobourbon.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "bourbinsane.com",
+        "url": "https://www.bourbinsane.com/elijah-craig-barrel-proof-batch-list/",
+        "domain": "bourbinsane.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "distiller.com",
+        "url": "https://distiller.com/spirits/elijah-craig-barrel-proof-bourbon",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskyadvocate.com",
+        "url": "https://whiskyadvocate.com/Elijah-Craig-Barrel-Proof-s-First-Batch-of-the-Year",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "breakingbourbon.com",
+        "url": "https://www.breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+        "domain": "breakingbourbon.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f451b6b928c1f25e2536c259287b6622cc8967036191a531aceb105a8345cb2d",
+    "mode": "auto"
+  }
+}

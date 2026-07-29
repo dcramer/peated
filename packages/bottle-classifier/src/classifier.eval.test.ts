@@ -17,7 +17,12 @@ import {
   prepareBottleClassifierAgentRun,
   type PreparedBottleClassifierAgentRun,
 } from "./classifierRuntime";
-import type { BottleCandidate } from "./classifierTypes";
+import type {
+  BottleCandidate,
+  CaskFill,
+  CaskSize,
+  CaskType,
+} from "./classifierTypes";
 import {
   BottleClassificationResultSchema,
   ClassifyBottleReferenceInputSchema,
@@ -25,7 +30,10 @@ import {
   createDecidedBottleClassification,
   type BottleClassificationResult,
 } from "./contract";
-import { createEvalClassifierOptions } from "./evalSupport";
+import {
+  createEvalClassifierOptions,
+  hasEvalOpenAICredentials,
+} from "./evalSupport";
 import { createLocalCatalogDataSource } from "./localCatalog";
 import {
   agentActionRiskClass,
@@ -62,17 +70,15 @@ type SearchFixtureCase = {
 function collectKnownCandidates(
   testCase: SearchFixtureCase,
 ): BottleCandidate[] {
-  const knownCandidates = new Map<string, BottleCandidate>();
+  const knownCandidates = new Map<number, BottleCandidate>();
 
   for (const candidate of testCase.input.initialCandidates ?? []) {
-    const key = `${candidate.bottleId}:${candidate.releaseId ?? "bottle"}`;
-    knownCandidates.set(key, candidate);
+    knownCandidates.set(candidate.bottleId, candidate);
   }
 
   for (const response of testCase.searchResponses ?? []) {
     for (const candidate of response.results) {
-      const key = `${candidate.bottleId}:${candidate.releaseId ?? "bottle"}`;
-      knownCandidates.set(key, candidate);
+      knownCandidates.set(candidate.bottleId, candidate);
     }
   }
 
@@ -106,11 +112,8 @@ function getDerivedAutomationTier(
 
   const decision = result.decision;
   const currentBottleId = testCase.input.reference.currentBottleId ?? null;
-  const currentReleaseId = testCase.input.reference.currentReleaseId ?? null;
   const reaffirmsCurrentAssignment =
-    currentBottleId != null &&
-    decision.matchedBottleId === currentBottleId &&
-    (decision.matchedReleaseId ?? null) === (currentReleaseId ?? null);
+    currentBottleId != null && decision.matchedBottleId === currentBottleId;
 
   return deriveAutomationTier({
     actionRiskClass: agentActionRiskClass(decision.action),
@@ -122,10 +125,6 @@ function getDerivedAutomationTier(
     reaffirmsCurrentAssignment,
     replacesCurrentAssignment:
       currentBottleId != null && !reaffirmsCurrentAssignment,
-    matchesFreshReleaseTarget:
-      !reaffirmsCurrentAssignment &&
-      decision.action === "match" &&
-      (decision.matchedReleaseId ?? null) !== null,
     hasExactAliasAnchor: false,
     hasDeterministicAnchor: decision.identityScope === "exact_cask",
     // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
@@ -162,9 +161,6 @@ function getDerivedSuggestedNextStep(
     case "match":
       return tier === "auto" ? "confirm_match" : "manual_search";
     case "create_bottle":
-    case "create_release":
-    case "create_bottle_and_release":
-    case "repair_parent_and_create_release":
       return tier === "auto" ? "confirm_create" : "manual_search";
     case "repair_bottle":
       return "needs_review";
@@ -273,20 +269,12 @@ function getNormalizationBottleIdentity(
     return null;
   }
 
-  const matchedCandidate =
-    result.decision.matchedReleaseId !== null
-      ? result.artifacts.candidates.find(
-          (candidate) =>
-            candidate.releaseId === result.decision.matchedReleaseId,
-        )
-      : result.artifacts.candidates.find((candidate) =>
-          result.decision.action === "create_release"
-            ? candidate.bottleId === result.decision.parentBottleId
-            : candidate.bottleId === result.decision.matchedBottleId,
-        );
+  const matchedCandidate = result.artifacts.candidates.find(
+    (candidate) => candidate.bottleId === result.decision.matchedBottleId,
+  );
 
   if (matchedCandidate) {
-    return matchedCandidate.bottleFullName ?? matchedCandidate.fullName;
+    return matchedCandidate.fullName;
   }
 
   if (!result.decision.proposedBottle) {
@@ -296,45 +284,92 @@ function getNormalizationBottleIdentity(
   return getProposedBottleIdentityText(result.decision.proposedBottle);
 }
 
-function getNormalizationReleaseIdentity(result: BottleClassificationResult): {
+function getNormalizationExactBottleIdentity(
+  result: BottleClassificationResult,
+): {
   edition: string | null;
   releaseYear: number | null;
   vintageYear: number | null;
+  caskType: CaskType | null;
+  caskSize: CaskSize | null;
+  caskFill: CaskFill | null;
 } | null {
   if (result.status !== "classified") {
     return null;
   }
 
-  if (result.decision.proposedRelease) {
-    return {
-      edition: result.decision.proposedRelease.edition,
-      releaseYear: result.decision.proposedRelease.releaseYear,
-      vintageYear: result.decision.proposedRelease.vintageYear,
+  if (result.decision.proposedBottle) {
+    const exactIdentity = {
+      edition: result.decision.proposedBottle.edition,
+      releaseYear: result.decision.proposedBottle.releaseYear,
+      vintageYear: result.decision.proposedBottle.vintageYear,
+      caskType: result.decision.proposedBottle.caskType,
+      caskSize: result.decision.proposedBottle.caskSize,
+      caskFill: result.decision.proposedBottle.caskFill,
     };
+
+    return Object.values(exactIdentity).some((value) => value !== null)
+      ? exactIdentity
+      : null;
   }
 
-  const matchedRelease =
-    result.decision.matchedReleaseId !== null
-      ? result.artifacts.candidates.find(
-          (candidate) =>
-            candidate.releaseId === result.decision.matchedReleaseId,
-        )
-      : null;
-  if (!matchedRelease) {
+  const matchedCandidate = result.artifacts.candidates.find(
+    (candidate) => candidate.bottleId === result.decision.matchedBottleId,
+  );
+  if (!matchedCandidate) {
     return null;
   }
 
   return {
-    edition: matchedRelease.edition,
-    releaseYear: matchedRelease.releaseYear,
-    vintageYear: matchedRelease.vintageYear,
+    edition: matchedCandidate.edition,
+    releaseYear: matchedCandidate.releaseYear,
+    vintageYear: matchedCandidate.vintageYear,
+    caskType: matchedCandidate.caskType,
+    caskSize: matchedCandidate.caskSize,
+    caskFill: matchedCandidate.caskFill,
   };
 }
 
-function releaseIdentityMatches(
-  actual: ReturnType<typeof getNormalizationReleaseIdentity>,
+function formatNormalizationBottleActual(
+  result: BottleClassificationResult,
+): string {
+  if (result.status !== "classified") {
+    return JSON.stringify({ status: result.status });
+  }
+
+  const exactIdentity = getNormalizationExactBottleIdentity(result);
+  if (result.decision.proposedBottle) {
+    return JSON.stringify({
+      source: "proposed",
+      action: result.decision.action,
+      identity: getProposedBottleIdentityText(result.decision.proposedBottle),
+      exactIdentity,
+      proposedBottle: result.decision.proposedBottle,
+    });
+  }
+
+  const matchedBottle = result.artifacts.candidates.find(
+    (candidate) => candidate.bottleId === result.decision.matchedBottleId,
+  );
+  return JSON.stringify({
+    source: "matched",
+    action: result.decision.action,
+    matchedBottleId: result.decision.matchedBottleId,
+    identity: matchedBottle?.fullName ?? null,
+    exactIdentity,
+    matchedBottle: matchedBottle
+      ? {
+          bottleId: matchedBottle.bottleId,
+          fullName: matchedBottle.fullName,
+        }
+      : null,
+  });
+}
+
+function exactBottleIdentityMatches(
+  actual: ReturnType<typeof getNormalizationExactBottleIdentity>,
   expected: NonNullable<
-    RealWorldNewBottleEvalCase["expected"]["releaseIdentity"]
+    RealWorldNewBottleEvalCase["expected"]["exactBottleIdentity"]
   >,
 ): boolean {
   if (actual === null) {
@@ -360,6 +395,18 @@ function releaseIdentityMatches(
     "vintageYear" in expected &&
     actual.vintageYear !== expected.vintageYear
   ) {
+    return false;
+  }
+
+  if ("caskType" in expected && actual.caskType !== expected.caskType) {
+    return false;
+  }
+
+  if ("caskSize" in expected && actual.caskSize !== expected.caskSize) {
+    return false;
+  }
+
+  if ("caskFill" in expected && actual.caskFill !== expected.caskFill) {
     return false;
   }
 
@@ -432,24 +479,6 @@ function evaluateDecisionShape(
   ) {
     failures.push(
       `matchedBottleId expected ${expected.matchedBottleId} but got ${result.decision.matchedBottleId}`,
-    );
-  }
-
-  if (
-    expected.matchedReleaseId !== undefined &&
-    result.decision.matchedReleaseId !== expected.matchedReleaseId
-  ) {
-    failures.push(
-      `matchedReleaseId expected ${expected.matchedReleaseId} but got ${result.decision.matchedReleaseId}`,
-    );
-  }
-
-  if (
-    expected.parentBottleId !== undefined &&
-    result.decision.parentBottleId !== expected.parentBottleId
-  ) {
-    failures.push(
-      `parentBottleId expected ${expected.parentBottleId} but got ${result.decision.parentBottleId}`,
     );
   }
 
@@ -531,16 +560,6 @@ function evaluateDecisionShape(
     }
   }
 
-  if (
-    expected.proposedRelease !== undefined &&
-    !deepContainsSubset(
-      result.decision.proposedRelease,
-      expected.proposedRelease,
-    )
-  ) {
-    failures.push("proposedRelease missing expected fields");
-  }
-
   return getShapeVerdict(failures);
 }
 
@@ -570,6 +589,24 @@ function evaluateNormalizationShape(
     return getShapeVerdict(failures);
   }
 
+  const actualBottle = formatNormalizationBottleActual(result);
+  if (
+    expectation.action !== undefined &&
+    result.decision.action !== expectation.action
+  ) {
+    failures.push(
+      `action expected ${expectation.action} but got ${result.decision.action}; actual finalized Bottle ${actualBottle}`,
+    );
+  }
+  if (
+    expectation.matchedBottleId !== undefined &&
+    result.decision.matchedBottleId !== expectation.matchedBottleId
+  ) {
+    failures.push(
+      `matchedBottleId expected ${expectation.matchedBottleId} but got ${result.decision.matchedBottleId}; actual finalized Bottle ${actualBottle}`,
+    );
+  }
+
   const bottleIdentity = getNormalizationBottleIdentity(result);
   const expectedBottleNames = testCase.expectedBottleNames ?? [
     testCase.expectedBottleName,
@@ -580,11 +617,11 @@ function evaluateNormalizationShape(
     )
   ) {
     failures.push(
-      `bottle identity expected ${expectedBottleNames.join(" or ")} but got ${bottleIdentity ?? "missing"}`,
+      `bottle identity expected ${expectedBottleNames.join(" or ")}; actual finalized Bottle ${actualBottle}`,
     );
   }
 
-  const releaseIdentity = getNormalizationReleaseIdentity(result);
+  const exactBottleIdentity = getNormalizationExactBottleIdentity(result);
 
   if (classifierExpectations.includes("exact_cask")) {
     if (result.decision.identityScope !== "exact_cask") {
@@ -593,47 +630,29 @@ function evaluateNormalizationShape(
       );
     }
 
-    if (releaseIdentity !== null) {
-      failures.push("exact_cask expected no child release identity");
-    }
-
     return getShapeVerdict(failures);
   }
 
-  if (classifierExpectations.includes("bottle_plus_release")) {
-    const hasReleaseAction =
-      result.decision.action === "create_release" ||
-      result.decision.action === "create_bottle_and_release" ||
-      result.decision.matchedReleaseId !== null;
-
-    if (!hasReleaseAction && classifierExpectations.includes("bottle")) {
-      return getShapeVerdict(failures);
-    }
-
+  const exactIdentityOptions =
+    expectation.exactBottleIdentities ??
+    (expectation.exactBottleIdentity !== null
+      ? [expectation.exactBottleIdentity]
+      : []);
+  if (exactIdentityOptions.length > 0) {
     if (result.decision.identityScope !== "product") {
       failures.push(
         `identityScope expected product but got ${result.decision.identityScope}`,
       );
     }
 
-    if (!hasReleaseAction) {
-      failures.push("expected a release match or release creation action");
-    }
-
-    const releaseIdentityOptions =
-      expectation.releaseIdentities ??
-      (expectation.releaseIdentity !== null
-        ? [expectation.releaseIdentity]
-        : []);
-
-    if (releaseIdentityOptions.length === 0) {
-      failures.push("fixture missing expected release identity");
-    } else if (
-      !releaseIdentityOptions.some((expectedReleaseIdentity) =>
-        releaseIdentityMatches(releaseIdentity, expectedReleaseIdentity),
+    if (
+      !exactIdentityOptions.some((expectedExactIdentity) =>
+        exactBottleIdentityMatches(exactBottleIdentity, expectedExactIdentity),
       )
     ) {
-      failures.push("release identity did not match expected edition/year");
+      failures.push(
+        `exact Bottle identity expected one of ${JSON.stringify(exactIdentityOptions)}; actual finalized Bottle ${actualBottle}`,
+      );
     }
 
     return getShapeVerdict(failures);
@@ -643,15 +662,6 @@ function evaluateNormalizationShape(
     failures.push(
       `identityScope expected product but got ${result.decision.identityScope}`,
     );
-  }
-
-  if (
-    result.decision.action === "create_release" ||
-    result.decision.action === "create_bottle_and_release" ||
-    result.decision.matchedReleaseId !== null ||
-    releaseIdentity !== null
-  ) {
-    failures.push("bottle fixture should not create or match a child release");
   }
 
   return getShapeVerdict(failures);
@@ -668,24 +678,15 @@ function buildClassifierAdapters(testCase: ClassifierScenarioEvalCase) {
     return createLocalCatalogDataSource(testCase.testCase.localCatalog);
   }
 
-  // Legacy and captured fixtures still use flattened candidate/search
-  // responses. Keep them on the agent's local-search tool path instead of a
-  // searchless harness so replayed workflows still reflect agent behavior.
+  // Captured fixtures use Bottle candidate/search responses. Keep them on the
+  // local-search tool path so replayed workflows still reflect agent behavior.
   const knownCandidates = collectKnownCandidates(testCase.testCase);
 
   return {
     searchBottles: buildSearchBottlesAdapter(testCase.testCase),
-    getBottleCandidateById: async (
-      bottleId: number,
-      releaseId: number | null,
-    ) =>
-      knownCandidates.find(
-        (candidate) =>
-          candidate.bottleId === bottleId &&
-          (releaseId !== null
-            ? candidate.releaseId === releaseId
-            : candidate.releaseId === null),
-      ) ?? null,
+    getBottleCandidateById: async (bottleId: number) =>
+      knownCandidates.find((candidate) => candidate.bottleId === bottleId) ??
+      null,
   };
 }
 
@@ -865,9 +866,6 @@ const classifierHarness = openaiAgentsHarness<
   output: ({ result }) => {
     return toJsonValue(result) ?? null;
   },
-  // vitest-evals strict replay intentionally fails when a prompt/tool change
-  // makes a new web-search call. Record those new tool results with:
-  // VITEST_EVALS_REPLAY_MODE=record pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
   // The harness rejects replay policies for tools absent from the prepared
   // agent, so keep this aligned with Firecrawl-vs-OpenAI tool selection.
   toolReplay: {
@@ -923,11 +921,6 @@ const SCENARIO_CONFIG: Array<{
     scenario: "corrections",
     threshold: 1,
   },
-  {
-    label: "parent repair releases",
-    scenario: "parent_repair_releases",
-    threshold: 1,
-  },
 ];
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
@@ -939,7 +932,7 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
   describeEval(
     label,
     {
-      skipIf: () => !process.env.OPENAI_API_KEY,
+      skipIf: () => !hasEvalOpenAICredentials,
       harness: classifierHarness,
       judges: [ClassifierExpectationJudge],
       judgeThreshold: threshold,

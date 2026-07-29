@@ -15,6 +15,22 @@ import type { SQL } from "drizzle-orm";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
+const InputSchema = z
+  .object({
+    bottle: z.coerce.number().int().positive().optional(),
+    entity: z.coerce.number().optional(),
+    user: z.union([z.coerce.number(), z.literal("me"), z.string()]).optional(),
+    filter: z.enum(["global", "friends", "local"]).default("global"),
+    cursor: z.coerce.number().gte(1).default(1),
+    limit: z.coerce.number().gte(1).lte(100).default(25),
+  })
+  .strict()
+  .default({
+    filter: "global",
+    cursor: 1,
+    limit: 25,
+  });
+
 export default procedure
   .route({
     method: "GET",
@@ -24,25 +40,7 @@ export default procedure
       "Retrieve tastings with filtering by bottle, entity, user, and privacy settings. Supports pagination",
     operationId: "listTastings",
   })
-  .input(
-    z
-      .object({
-        bottle: z.coerce.number().gte(1).optional(),
-        release: z.coerce.number().gte(1).optional(),
-        entity: z.coerce.number().optional(),
-        user: z
-          .union([z.coerce.number(), z.literal("me"), z.string()])
-          .optional(),
-        filter: z.enum(["global", "friends", "local"]).default("global"),
-        cursor: z.coerce.number().gte(1).default(1),
-        limit: z.coerce.number().gte(1).lte(100).default(25),
-      })
-      .default({
-        filter: "global",
-        cursor: 1,
-        limit: 25,
-      }),
-  )
+  .input(InputSchema)
   // TODO(response-envelope): helper enables later switch to { data, meta }
   .output(listResponse(TastingSchema))
   .handler(async function ({
@@ -52,28 +50,24 @@ export default procedure
   }) {
     const offset = (cursor - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [];
-    if (input.bottle) {
-      where.push(eq(tastings.bottleId, input.bottle));
-    }
+    const baseWhere: (SQL<unknown> | undefined)[] = [];
+    const bottleWhere: SQL<unknown>[] = [];
 
-    if (input.release) {
-      where.push(eq(tastings.releaseId, input.release));
+    if (input.bottle !== undefined) {
+      bottleWhere.push(eq(tastings.bottleId, input.bottle));
     }
 
     if (input.entity) {
-      where.push(
-        sql`EXISTS(
-          SELECT FROM ${bottles}
-          WHERE (${bottles.brandId} = ${input.entity}
-             OR ${bottles.bottlerId} = ${input.entity}
-             OR EXISTS(
-              SELECT FROM ${bottlesToDistillers}
-              WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
-                AND ${bottlesToDistillers.distillerId} = ${input.entity}
-             )) AND ${bottles.id} = ${tastings.bottleId}
-          )`,
-      );
+      bottleWhere.push(sql`EXISTS(
+        SELECT FROM ${bottles}
+        WHERE (${bottles.brandId} = ${input.entity}
+          OR ${bottles.bottlerId} = ${input.entity}
+          OR EXISTS(
+            SELECT FROM ${bottlesToDistillers}
+            WHERE ${bottlesToDistillers.bottleId} = ${bottles.id}
+              AND ${bottlesToDistillers.distillerId} = ${input.entity}
+          )) AND ${bottles.id} = ${tastings.bottleId}
+      )`);
     }
 
     if (input.user) {
@@ -89,7 +83,7 @@ export default procedure
         }
       }
 
-      where.push(eq(tastings.createdById, selectedUser.id));
+      baseWhere.push(eq(tastings.createdById, selectedUser.id));
     }
 
     const limitPrivate = input.filter !== "friends";
@@ -97,13 +91,13 @@ export default procedure
       if (!context.user) {
         throw errors.UNAUTHORIZED();
       }
-      where.push(
+      baseWhere.push(
         sql`${tastings.createdById} IN (SELECT ${follows.toUserId} FROM ${follows} WHERE ${follows.fromUserId} = ${context.user.id} AND ${follows.status} = 'following')`,
       );
     }
 
     if (limitPrivate) {
-      where.push(
+      baseWhere.push(
         or(
           eq(users.private, false),
           ...(context.user
@@ -122,7 +116,7 @@ export default procedure
       .select({ tastings })
       .from(tastings)
       .innerJoin(users, eq(users.id, tastings.createdById))
-      .where(where ? and(...where) : undefined)
+      .where(and(...baseWhere, ...bottleWhere))
       .limit(limit + 1)
       .offset(offset)
       .orderBy(desc(tastings.createdAt));

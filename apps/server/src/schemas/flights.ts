@@ -15,7 +15,23 @@ export const FlightSchema = z.object({
   createdBy: UserSchema.optional().describe("User who created this flight"),
 });
 
-export const FlightInputSchema = z.object({
+export const FlightBottleSchema = z.object({
+  bottle: BottleSchema.describe("Bottle included in the flight"),
+  hasTasted: z
+    .boolean()
+    .describe("Whether the current user has tasted this Bottle in the flight"),
+  isLibrary: z
+    .boolean()
+    .describe("Whether the current user has this Bottle in their Library"),
+});
+
+export const FlightDetailsSchema = FlightSchema.extend({
+  bottles: z
+    .array(FlightBottleSchema)
+    .describe("Ordered Bottles and flight-specific viewer state"),
+});
+
+const FlightCommonInputSchema = z.object({
   name: z.string().trim().min(1, "Required").describe("Name of the flight"),
   description: z
     .string()
@@ -27,16 +43,11 @@ export const FlightInputSchema = z.object({
     .default(false)
     .optional()
     .describe("Whether the flight is publicly visible"),
+});
+
+export const FlightInputSchema = FlightCommonInputSchema.extend({
   bottles: z
-    .array(z.number())
+    .array(z.number().int().positive())
     .optional()
-    .describe("Array of bottle IDs to include in the flight"),
-});
-
-export const FlightBottleSchema = z.object({
-  bottle: BottleSchema.describe("The bottle in this flight"),
-});
-
-export const FlightBottleInputSchema = z.object({
-  bottle: z.number().describe("ID of the bottle to add to the flight"),
-});
+    .describe("Bottle IDs to include in the flight"),
+}).strict();

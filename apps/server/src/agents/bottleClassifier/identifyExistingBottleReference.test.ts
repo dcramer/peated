@@ -33,6 +33,9 @@ describe("identifyExistingBottleReference", () => {
         abv: null,
         release_year: null,
         vintage_year: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
         cask_strength: null,
         single_cask: null,
         edition: null,
@@ -44,18 +47,24 @@ describe("identifyExistingBottleReference", () => {
       decision: {
         action: "match",
         matchedBottleId: bottle.id,
-        matchedReleaseId: null,
       },
       artifacts: {
         candidates: [
           {
             bottleId: bottle.id,
-            releaseId: null,
             source: expect.arrayContaining(["exact"]),
           },
         ],
       },
     });
+    if (result.status !== "classified") {
+      throw new Error("Expected an exact alias classification.");
+    }
+    expect(result.decision).not.toHaveProperty("matchedReleaseId");
+    expect(result.decision).not.toHaveProperty("parentBottleId");
+    expect(result.decision).not.toHaveProperty("proposedRelease");
+    expect(result.artifacts.candidates[0]).not.toHaveProperty("releaseId");
+    expect(result.artifacts.candidates[0]).not.toHaveProperty("kind");
   });
 
   test("can skip exact alias preflight for synthesized references", async ({
@@ -84,6 +93,9 @@ describe("identifyExistingBottleReference", () => {
           abv: null,
           release_year: null,
           vintage_year: null,
+          cask_type: null,
+          cask_size: null,
+          cask_fill: null,
           cask_strength: null,
           single_cask: null,
           edition: null,
@@ -99,7 +111,6 @@ describe("identifyExistingBottleReference", () => {
       decision: {
         action: "no_match",
         matchedBottleId: null,
-        matchedReleaseId: null,
       },
     });
   });

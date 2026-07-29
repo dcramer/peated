@@ -1,6 +1,6 @@
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import {
@@ -8,8 +8,7 @@ import {
   type AddBottleRouteIntent,
   type PendingImageRouteState,
 } from "@peated/web/lib/addBottle";
-import { formatBottlingCountLabel } from "@peated/web/lib/bottlings";
-import { type ReactNode } from "react";
+import { getReleaseFamilyHref } from "@peated/web/lib/releaseFamily";
 import Join from "../join";
 export type BottleResult = {
   type: "bottle";
@@ -59,17 +58,13 @@ export default function BottleResultRow({
   addBottleIntent?: AddBottleRouteIntent;
   pendingImage?: PendingImageRouteState | null;
 }) {
-  const metadata: ReactNode[] = [];
-  if (bottle.distillers.length)
-    metadata.push(
-      <span>
-        <Join divider=", ">
-          {bottle.distillers.map((d) => (
-            <span key={d.id}>{d.name}</span>
-          ))}
-        </Join>
-      </span>,
-    );
+  const distillerMetadata = bottle.distillers.length ? (
+    <Join divider=", ">
+      {bottle.distillers.map((distiller) => (
+        <span key={distiller.id}>{distiller.name}</span>
+      ))}
+    </Join>
+  ) : undefined;
 
   return (
     <>
@@ -86,32 +81,24 @@ export default function BottleResultRow({
             })}
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            <div className="flex flex-col gap-x-2 sm:flex-row sm:items-center">
-              <span>{bottle.fullName}</span>
-              {bottle.numReleases > 0 && (
-                <span className="text-muted text-sm">
-                  {formatBottlingCountLabel(bottle.numReleases)}
-                </span>
-              )}
-            </div>
+            <span>{bottle.fullName}</span>
           </Link>
           <BottleStatusIcons bottle={bottle} />
         </div>
-        <div className="text-muted mt-1 flex gap-x-1 truncate text-sm leading-5">
-          {metadata.length ? (
-            <Join divider={<>&middot;</>}>{metadata}</Join>
-          ) : null}
-        </div>
-      </div>
-      <div className="flex items-center gap-x-4">
-        <div className="hidden sm:flex sm:flex-col sm:items-end">
-          <div className="text-muted leading-6">
-            {bottle.category && formatCategoryName(bottle.category)}
+        <BottleExactMetadata
+          bottle={bottle}
+          leadingContent={distillerMetadata}
+        />
+        {bottle.group && bottle.group.totalBottles > 1 ? (
+          <div className="mt-1 text-xs">
+            <Link
+              href={getReleaseFamilyHref(bottle.id)}
+              className="text-muted relative z-10 hover:underline"
+            >
+              {bottle.group.totalBottles.toLocaleString()} related releases
+            </Link>
           </div>
-          <div className="text-muted mt-1 text-sm leading-5">
-            {bottle.statedAge ? `${bottle.statedAge} years` : null}
-          </div>
-        </div>
+        ) : null}
       </div>
     </>
   );

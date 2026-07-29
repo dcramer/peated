@@ -8,10 +8,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Isle of Jura 12-year-old Single Malt Scotch Whisky",
         "brand": "Jura",
         "bottler": null,
         "series": null,
@@ -30,10 +27,7 @@
         "fullName": "Isle of Jura 12-year-old Single Malt Scotch Whisky"
       },
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Jura Elixir",
         "brand": "Jura",
         "bottler": null,
         "series": null,
@@ -58,10 +52,7 @@
       "when": ["jura", "12"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Isle of Jura 12-year-old Single Malt Scotch Whisky",
           "brand": "Jura",
           "bottler": null,
           "series": null,
@@ -80,10 +71,7 @@
           "fullName": "Isle of Jura 12-year-old Single Malt Scotch Whisky"
         },
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Jura Elixir",
           "brand": "Jura",
           "bottler": null,
           "series": null,

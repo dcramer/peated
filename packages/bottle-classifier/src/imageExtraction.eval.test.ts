@@ -2,7 +2,11 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 import type { BottleExtractedDetails } from "./classifierTypes";
-import { createEvalOpenAIClient, evalClassifierModel } from "./evalSupport";
+import {
+  createEvalOpenAIClient,
+  evalClassifierModel,
+  hasEvalOpenAICredentials,
+} from "./evalSupport";
 import { createWhiskyLabelExtractor } from "./extractor";
 import {
   IMAGE_EXTRACTION_EVAL_CASES,
@@ -110,7 +114,7 @@ function assertExtractionExpectation(
   }
 }
 
-describe.skipIf(!process.env.OPENAI_API_KEY)("image extraction evals", () => {
+describe.skipIf(!hasEvalOpenAICredentials)("image extraction evals", () => {
   const extractor = createWhiskyLabelExtractor({
     client: createEvalOpenAIClient(),
     model: evalClassifierModel,

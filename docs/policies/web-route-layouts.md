@@ -10,9 +10,9 @@ their parent workflow.
 - Put nested detail routes under the parent App Router layout when users expect
   parent navigation, tabs, headers, or sidebars to remain present.
 - Keep parent tabs active for nested routes that belong to that tab.
-- Prefer scoped data for nested detail pages. For example, a bottling page
-  should show release-scoped reviews and tastings instead of only parent bottle
-  activity.
+- Prefer scoped data for nested detail pages. For example, a nested account
+  settings page should load and present only the settings owned by that
+  subsection rather than unrelated account activity.
 - Verify changed user-facing routes at desktop and mobile widths before
   finalizing layout work.
 - Use layout-free route groups only for intentionally standalone screens.

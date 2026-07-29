@@ -1,14 +1,18 @@
+import { IndependentConcreteBottleCreateRouteInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 import {
   BottleAlreadyExistsError,
   BottleCreateBadRequestError,
-  createBottle,
-} from "@peated/server/lib/createBottle";
+  createConcreteBottle,
+} from "@peated/server/lib/createConcreteBottle";
+import { buildIndependentConcreteBottleCreateInput } from "@peated/server/lib/flatConcreteBottleInput";
 import { procedure } from "@peated/server/orpc";
 import {
   requireTosAccepted,
   requireVerified,
 } from "@peated/server/orpc/middleware/auth";
-import { BottleInputSchema, BottleSchema } from "@peated/server/schemas";
+import { BottleSchema } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { BottleSerializer } from "@peated/server/serializers/bottle";
 
 export default procedure
   .use(requireVerified)
@@ -24,14 +28,21 @@ export default procedure
       operationId: "createBottle",
     }),
   })
-  .input(BottleInputSchema)
+  .input(IndependentConcreteBottleCreateRouteInputSchema)
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     try {
-      return await createBottle({
-        input,
+      const result = await createConcreteBottle({
         context,
+        input: buildIndependentConcreteBottleCreateInput(input),
       });
+      return await serialize(
+        BottleSerializer,
+        result.bottle,
+        context.user,
+        [],
+        { includeGroupSummary: true },
+      );
     } catch (err) {
       if (err instanceof BottleAlreadyExistsError) {
         throw errors.CONFLICT({

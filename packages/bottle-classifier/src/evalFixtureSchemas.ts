@@ -4,6 +4,9 @@ import {
   AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
+  CaskFillEnum,
+  CaskSizeEnum,
+  CaskTypeEnum,
   CategoryEnum,
 } from "./classifierTypes";
 import {
@@ -115,20 +118,11 @@ export const evalFixtureProvenanceSchema = z
 export const classifierEvalExpectationSchema = z.object({
   status: z.enum(["ignored", "classified"]),
   action: z
-    .enum([
-      "match",
-      "create_bottle",
-      "create_release",
-      "create_bottle_and_release",
-      "repair_parent_and_create_release",
-      "no_match",
-    ])
+    .enum(["match", "create_bottle", "repair_bottle", "no_match"])
     .optional(),
   identityScope: z.enum(["product", "exact_cask"]).optional(),
   aliasScope: AliasScopeEnum.optional(),
   matchedBottleId: z.number().int().nullable().optional(),
-  matchedReleaseId: z.number().int().nullable().optional(),
-  parentBottleId: z.number().int().nullable().optional(),
   proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
   proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
   proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
@@ -136,7 +130,6 @@ export const classifierEvalExpectationSchema = z.object({
     .array(z.number().int().positive())
     .min(1)
     .optional(),
-  proposedRelease: z.record(z.string(), z.unknown()).nullable().optional(),
   expectedTier: z.enum(["auto", "review"]).optional(),
   verifyEligible: z.boolean().optional(),
   suggestedNextStep: z
@@ -165,6 +158,21 @@ export const classifierEvalFixtureSchema = z
   })
   .strict()
   .superRefine((value, ctx) => {
+    const initialCandidateIds = new Set<number>();
+    for (const [
+      candidateIndex,
+      candidate,
+    ] of value.input.initialCandidates?.entries() ?? []) {
+      if (initialCandidateIds.has(candidate.bottleId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate initial candidate Bottle id ${candidate.bottleId}.`,
+          path: ["input", "initialCandidates", candidateIndex, "bottleId"],
+        });
+      }
+      initialCandidateIds.add(candidate.bottleId);
+    }
+
     if (value.localCatalog !== undefined) {
       if (value.input.initialCandidates !== undefined) {
         ctx.addIssue({
@@ -223,27 +231,29 @@ export const classifierEvalFixtureSchema = z
     if (
       value.localCatalog !== undefined &&
       value.input.initialCandidates === undefined &&
-      value.localCatalog.bottles.length === 0 &&
-      value.localCatalog.releases.length === 0
+      value.localCatalog.bottles.length === 0
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "`production_miss` localCatalog fixtures must include at least one local bottle or release row.",
+          "`production_miss` localCatalog fixtures must include at least one local Bottle.",
         path: ["localCatalog"],
       });
     }
   });
 
-export const bottleNormalizationReleaseIdentitySchema = z
+export const bottleNormalizationExactBottleIdentitySchema = z
   .object({
     edition: z.string().nullable().optional(),
     releaseYear: z.number().int().nullable().optional(),
     vintageYear: z.number().int().nullable().optional(),
+    caskType: CaskTypeEnum.nullable().optional(),
+    caskSize: CaskSizeEnum.nullable().optional(),
+    caskFill: CaskFillEnum.nullable().optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {
-    message: "`releaseIdentity` must encode at least one required field.",
+    message: "`exactBottleIdentity` must encode at least one required field.",
   });
 
 export const bottleNormalizationExpectationSchema = z
@@ -253,64 +263,31 @@ export const bottleNormalizationExpectationSchema = z
       "classifier_required",
       "block_if_uncertain",
     ]),
-    classifierExpectation: z.enum([
-      "bottle",
-      "bottle_plus_release",
-      "exact_cask",
-      "review_required",
-    ]),
+    classifierExpectation: z.enum(["bottle", "exact_cask", "review_required"]),
     classifierExpectations: z
-      .array(
-        z.enum([
-          "bottle",
-          "bottle_plus_release",
-          "exact_cask",
-          "review_required",
-        ]),
-      )
+      .array(z.enum(["bottle", "exact_cask", "review_required"]))
       .min(1)
       .optional(),
-    deterministicReleaseExpectation: z.enum(["none", "strong_release_marker"]),
-    releaseIdentity: bottleNormalizationReleaseIdentitySchema.nullable(),
-    releaseIdentities: z
-      .array(bottleNormalizationReleaseIdentitySchema)
+    action: z
+      .enum(["match", "create_bottle", "repair_bottle", "no_match"])
+      .optional(),
+    matchedBottleId: z.number().int().nullable().optional(),
+    exactBottleIdentity:
+      bottleNormalizationExactBottleIdentitySchema.nullable(),
+    exactBottleIdentities: z
+      .array(bottleNormalizationExactBottleIdentitySchema)
       .min(1)
       .optional(),
   })
   .superRefine((value, ctx) => {
-    const classifierExpectations = value.classifierExpectations ?? [
-      value.classifierExpectation,
-    ];
-    const expectsRelease = classifierExpectations.includes(
-      "bottle_plus_release",
-    );
-    const hasReleaseIdentity =
-      value.releaseIdentity !== null || value.releaseIdentities !== undefined;
-
-    if (expectsRelease && !hasReleaseIdentity) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "`bottle_plus_release` fixtures must declare `releaseIdentity`.",
-      });
-    }
-
-    if (!expectsRelease && hasReleaseIdentity) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Only `bottle_plus_release` fixtures may declare `releaseIdentity`.",
-      });
-    }
-
     if (
-      value.handlingStrategy !== "deterministic_safe" &&
-      value.deterministicReleaseExpectation !== "none"
+      value.exactBottleIdentity !== null &&
+      value.exactBottleIdentities !== undefined
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "Only `deterministic_safe` fixtures may opt into deterministic release repair.",
+          "Use either `exactBottleIdentity` or `exactBottleIdentities`, not both.",
       });
     }
 
@@ -322,6 +299,14 @@ export const bottleNormalizationExpectationSchema = z
         code: z.ZodIssueCode.custom,
         message:
           "`block_if_uncertain` fixtures must use `review_required` classifier expectation.",
+      });
+    }
+
+    if (value.matchedBottleId !== undefined && value.action !== "match") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "`matchedBottleId` requires `action = match`.",
+        path: ["matchedBottleId"],
       });
     }
   });
@@ -345,95 +330,6 @@ export const realWorldNewBottleFixtureSchema = z
 
 export type RealWorldNewBottleFixture = z.infer<
   typeof realWorldNewBottleFixtureSchema
->;
-
-export const legacyReleaseRepairParentCandidateSchema = z
-  .object({
-    abv: z.number().min(0).max(100).nullable(),
-    category: CategoryEnum.nullable(),
-    caskStrength: z.boolean().nullable(),
-    edition: z.string().nullable(),
-    fullName: z.string().min(1),
-    id: z.number().int().positive(),
-    releaseYear: z.number().int().nullable(),
-    singleCask: z.boolean().nullable(),
-    statedAge: z.number().int().min(0).max(100).nullable(),
-    totalTastings: z.number().int().min(0).nullable(),
-    vintageYear: z.number().int().nullable(),
-  })
-  .strict();
-
-export const legacyReleaseRepairBlockedReasonSchema = z.enum([
-  "classifier_ignored",
-  "classifier_exact_cask",
-  "classifier_outside_parent_set",
-  "classifier_dirty_parent_candidate",
-  "classifier_unresolved_parent_decision",
-]);
-
-export const legacyReleaseRepairResolutionExpectationSchema = z
-  .object({
-    blockedReason: legacyReleaseRepairBlockedReasonSchema.optional(),
-    parentBottleId: z.number().int().positive().optional(),
-    resolution: z.enum([
-      "allow_create_parent",
-      "blocked",
-      "reuse_existing_parent",
-    ]),
-    summary: z.string().min(1),
-  })
-  .superRefine((value, ctx) => {
-    if (
-      value.resolution === "reuse_existing_parent" &&
-      value.parentBottleId === undefined
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "`reuse_existing_parent` fixtures must declare `parentBottleId`.",
-      });
-    }
-
-    if (
-      value.resolution !== "reuse_existing_parent" &&
-      value.parentBottleId !== undefined
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Only `reuse_existing_parent` fixtures may declare `parentBottleId`.",
-      });
-    }
-
-    if (value.resolution === "blocked" && value.blockedReason === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "`blocked` fixtures must declare `blockedReason`.",
-      });
-    }
-
-    if (value.resolution !== "blocked" && value.blockedReason !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Only `blocked` fixtures may declare `blockedReason`.",
-      });
-    }
-  });
-
-export const legacyReleaseRepairResolutionEvalFixtureSchema = z
-  .object({
-    id: z.string().min(1),
-    name: z.string().min(1),
-    referenceName: z.string().min(1),
-    extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
-    initialCandidates: z.array(BottleCandidateSchema).optional(),
-    reviewedParentRows: z.array(legacyReleaseRepairParentCandidateSchema),
-    expected: legacyReleaseRepairResolutionExpectationSchema,
-  })
-  .strict();
-
-export type LegacyReleaseRepairResolutionEvalFixture = z.infer<
-  typeof legacyReleaseRepairResolutionEvalFixtureSchema
 >;
 
 export function listFixtureFiles(dir: string): string[] {

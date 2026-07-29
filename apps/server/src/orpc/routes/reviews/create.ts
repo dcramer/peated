@@ -3,7 +3,7 @@ import {
   normalizeBottleAliasKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { externalSites, reviews } from "@peated/server/db/schema";
+import { externalSites, reviews, storePrices } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
   assignBottleAliasInTransaction,
@@ -17,6 +17,10 @@ import {
   shouldRecordIncomingBottleDecision,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError } from "@peated/server/lib/log";
+import {
+  ActiveBottleSelectionError,
+  resolveActiveBottleIds,
+} from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { ReviewInputSchema, ReviewSchema } from "@peated/server/schemas";
@@ -61,7 +65,6 @@ export default procedure
         url: input.url,
         imageUrl: null,
         currentBottleId: null,
-        currentReleaseId: null,
       },
       aliasLookupNames: [aliasKey, rawName],
       extractedIdentity: {
@@ -79,43 +82,94 @@ export default procedure
         },
       });
     }
-    const bottleId = resolution.bottleId;
-    const releaseId = resolution.releaseId;
-    const reviewName =
-      resolution.releaseId != null && rawName !== normalizedName
-        ? rawName
-        : normalizedName;
-    const reviewNameCandidates = Array.from(
-      new Set([reviewName.toLowerCase(), normalizedName.toLowerCase()]),
-    );
+    const resolvedAssignment = resolution.assignment;
+    const bottleId = resolvedAssignment?.bottleId ?? null;
+    const reviewName = normalizedName;
+    const reviewNameCandidates = [reviewName.toLowerCase()];
 
     const { review, aliasAssignment } = await db.transaction(async (tx) => {
-      const existingReview =
-        (await tx.query.reviews.findFirst({
-          where: and(
-            eq(reviews.externalSiteId, site.id),
-            eq(reviews.url, input.url),
+      if (bottleId !== null) {
+        try {
+          await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+        } catch (error) {
+          if (!(error instanceof ActiveBottleSelectionError)) throw error;
+          if (error.reason === "missing") {
+            throw errors.NOT_FOUND({
+              message: "Bottle not found.",
+              cause: error,
+            });
+          }
+          throw errors.CONFLICT({
+            message:
+              error.reason === "bottle_retired"
+                ? `Bottle ${bottleId} is retired.`
+                : `Bottle ${bottleId} is not active.`,
+            cause: error,
+          });
+        }
+        const aliasLookupNames = Array.from(
+          new Set(
+            [aliasKey, reviewName, rawName].map((name) => name.toLowerCase()),
           ),
-        })) ??
-        (await tx.query.reviews.findFirst({
-          where: and(
-            eq(reviews.externalSiteId, site.id),
-            eq(reviews.issue, input.issue),
-            or(
-              ...reviewNameCandidates.map((name) =>
-                eq(sql`LOWER(${reviews.name})`, name),
+        );
+        await tx
+          .select({ id: storePrices.id })
+          .from(storePrices)
+          .where(
+            and(
+              eq(storePrices.externalSiteId, site.id),
+              or(
+                ...aliasLookupNames.map((name) =>
+                  eq(sql`LOWER(${storePrices.name})`, name),
+                ),
               ),
             ),
-          ),
-        }));
+          )
+          .for("update");
+      }
+      // Preserve or replace identity only from the Review version locked after
+      // the Bottle and matching StorePrices. Alias synchronization uses that
+      // same consumer order, avoiding StorePrice/Review lock inversion.
+      let [existingReview] = await tx
+        .select()
+        .from(reviews)
+        .where(
+          and(eq(reviews.externalSiteId, site.id), eq(reviews.url, input.url)),
+        )
+        .limit(1)
+        .for("update");
+      if (!existingReview) {
+        [existingReview] = await tx
+          .select()
+          .from(reviews)
+          .where(
+            and(
+              eq(reviews.externalSiteId, site.id),
+              eq(reviews.issue, input.issue),
+              or(
+                ...reviewNameCandidates.map((name) =>
+                  eq(sql`LOWER(${reviews.name})`, name),
+                ),
+              ),
+            ),
+          )
+          .limit(1)
+          .for("update");
+      }
 
       let review;
       if (existingReview) {
+        const incomingIdentityIsAuthoritative =
+          bottleId !== null &&
+          (existingReview.bottleId === null ||
+            existingReview.bottleId === bottleId);
+        const identity = incomingIdentityIsAuthoritative
+          ? { bottleId }
+          : { bottleId: existingReview.bottleId };
         [review] = await tx
           .update(reviews)
           .set({
-            bottleId: bottleId ?? existingReview.bottleId,
-            releaseId: releaseId ?? existingReview.releaseId,
+            ...identity,
             name: reviewName,
             rating: input.rating,
             url: input.url,
@@ -125,12 +179,18 @@ export default procedure
           .returning();
       } else {
         const { rows } = await tx.execute(
-          sql`INSERT INTO ${reviews} (bottle_id, release_id, external_site_id, name, issue, rating, url)
-              VALUES (${bottleId}, ${releaseId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
+          // A concurrent conflict may add identity first, so only fill an
+          // unresolved row or reaffirm the same Bottle.
+          sql`INSERT INTO ${reviews} (bottle_id, external_site_id, name, issue, rating, url)
+              VALUES (${bottleId}, ${site.id}, ${reviewName}, ${input.issue}, ${input.rating}, ${input.url})
               ON CONFLICT (external_site_id, LOWER(name), issue)
               DO UPDATE
-              SET bottle_id = COALESCE(excluded.bottle_id, ${reviews.bottleId}),
-                  release_id = COALESCE(excluded.release_id, ${reviews.releaseId}),
+              SET bottle_id = CASE
+                    WHEN excluded.bottle_id IS NOT NULL
+                      AND (${reviews.bottleId} IS NULL OR ${reviews.bottleId} = excluded.bottle_id)
+                    THEN excluded.bottle_id
+                    ELSE ${reviews.bottleId}
+                  END,
                   rating = excluded.rating,
                   url = excluded.url,
                   updated_at = NOW()
@@ -140,30 +200,31 @@ export default procedure
         [review] = mapRows(rows, reviews);
       }
 
-      if (!bottleId) return { review, aliasAssignment: null };
+      const appliedIncomingIdentity = review.bottleId === bottleId;
+      if (!bottleId || !appliedIncomingIdentity) {
+        return { review, aliasAssignment: null };
+      }
 
-      const aliasAssignment =
-        resolution.source !== "exact_alias"
-          ? await assignBottleAliasInTransaction(tx, {
-              bottleId,
-              releaseId,
-              name: aliasKey,
-              backfillNames: [reviewName, rawName],
-              externalSiteId: site.id,
-              assignmentSource: "classifier_approved",
-              assignedByActorId: systemActor.id,
-            })
-          : await assignBottleAliasInTransaction(tx, {
-              bottleId,
-              releaseId,
-              name: aliasKey,
-              backfillNames: [reviewName, rawName],
-              externalSiteId: site.id,
-              assignedByActorId: systemActor.id,
-            });
+      const assignmentSource =
+        resolution.source === "exact_alias"
+          ? undefined
+          : ("classifier_approved" as const);
+      const aliasInput = {
+        name: aliasKey,
+        backfillNames: [reviewName, rawName],
+        externalSiteId: site.id,
+        assignmentSource,
+        assignedByActorId: systemActor.id,
+      };
+      const aliasAssignment = await assignBottleAliasInTransaction(tx, {
+        bottleId,
+        sourceAliasIdentity: resolution.sourceAliasIdentity,
+        ...aliasInput,
+      });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,
+        { createdBottle: resolution.createdBottle },
       );
       if (
         decision !== null &&
@@ -182,14 +243,17 @@ export default procedure
           decision,
           actor: systemActor,
           bottleId,
-          releaseId,
           createdBottle: resolution.createdBottle,
-          createdRelease: resolution.createdRelease,
           confidence: resolution.confidence,
           model: resolution.model,
           rationale: resolution.rationale,
           metadata: {
             resolutionSource: resolution.source,
+            ...(resolution.classifierEvidence
+              ? {
+                  classifierEvidence: resolution.classifierEvidence,
+                }
+              : {}),
             issue: input.issue,
             initiatedByUserId: context.user!.id,
           },

@@ -2,13 +2,8 @@ import type { CatalogVerificationFinding } from "@peated/catalog-verifier";
 import { db } from "@peated/server/db";
 import { bottles, entities } from "@peated/server/db/schema";
 import { findBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
-import { getCanonRepairCandidates } from "@peated/server/lib/canonRepairCandidates";
-import { getDirtyParentAgeRepairCandidates } from "@peated/server/lib/dirtyParentAgeRepairCandidates";
 import { getEntityClassificationReference } from "@peated/server/lib/entityAuditCandidates";
-import { getLegacyReleaseRepairCandidates } from "@peated/server/lib/legacyReleaseRepairCandidates";
 import { eq } from "drizzle-orm";
-
-const EXACT_LOOKUP_LIMIT = 100;
 
 export async function getBottleCatalogVerificationFindings({
   bottleId,
@@ -29,32 +24,10 @@ export async function getBottleCatalogVerificationFindings({
     throw new Error(`Unknown bottle: ${bottleId}`);
   }
 
-  const [
-    brandRepairResults,
-    canonRepairResults,
-    releaseRepairResults,
-    ageRepairResults,
-  ] = await Promise.all([
-    findBrandRepairCandidates({
-      currentBrandId: bottle.brandId ?? undefined,
-      query: bottle.fullName,
-    }),
-    getCanonRepairCandidates({
-      query: bottle.fullName,
-      cursor: 1,
-      limit: EXACT_LOOKUP_LIMIT,
-    }),
-    getLegacyReleaseRepairCandidates({
-      query: bottle.fullName,
-      cursor: 1,
-      limit: EXACT_LOOKUP_LIMIT,
-    }),
-    getDirtyParentAgeRepairCandidates({
-      query: bottle.fullName,
-      cursor: 1,
-      limit: EXACT_LOOKUP_LIMIT,
-    }),
-  ]);
+  const brandRepairResults = await findBrandRepairCandidates({
+    currentBrandId: bottle.brandId ?? undefined,
+    query: bottle.fullName,
+  });
 
   const findings: CatalogVerificationFinding[] = [];
 
@@ -70,44 +43,6 @@ export async function getBottleCatalogVerificationFindings({
         .slice(0, 3)
         .join(" | "),
       workstream: "brand-repairs",
-    });
-  }
-
-  const canonRepair = canonRepairResults.results.find(
-    (candidate) => candidate.bottle.id === bottleId,
-  );
-  if (canonRepair) {
-    findings.push({
-      kind: "canon_repair_candidate",
-      summary: `Bottle looks like a wording variant of ${canonRepair.targetBottle.fullName}.`,
-      details: null,
-      workstream: "canon-repairs",
-    });
-  }
-
-  const releaseRepair = releaseRepairResults.results.find(
-    (candidate) => candidate.legacyBottle.id === bottleId,
-  );
-  if (releaseRepair) {
-    findings.push({
-      kind: "release_repair_candidate",
-      summary:
-        "Bottle name still carries release-level identity and likely needs a parent/release split.",
-      details: releaseRepair.proposedParent.fullName,
-      workstream: "release-repairs",
-    });
-  }
-
-  const ageRepair = ageRepairResults.results.find(
-    (candidate) => candidate.bottle.id === bottleId,
-  );
-  if (ageRepair) {
-    findings.push({
-      kind: "age_repair_candidate",
-      summary:
-        "Bottle-level stated age conflicts with child releases and should move onto a release record.",
-      details: ageRepair.targetRelease.fullName,
-      workstream: "age-repairs",
     });
   }
 

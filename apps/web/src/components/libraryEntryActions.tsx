@@ -6,7 +6,8 @@ import {
   ChevronDownIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/react/20/solid";
-import type { CollectionBottle, PagingRel } from "@peated/server/types";
+import type { Outputs } from "@peated/server/orpc/router";
+import type { CollectionBottle } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import { ImageModal } from "@peated/web/components/imageModal";
 import {
@@ -19,11 +20,52 @@ import classNames from "@peated/web/lib/classNames";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type QueryClient,
+  type QueryKey,
+} from "@tanstack/react-query";
 import { ImagePlus } from "lucide-react";
 import { useRef, useState } from "react";
 
 const PENDING_UPLOAD_PURPOSE = "photo_tasting_entry";
+
+type CollectionBottleList = Outputs["collections"]["bottles"]["list"];
+
+/** Replaces a globally unique collection entry in every list under the route prefix. */
+export function replaceCollectionBottleInListCaches(
+  queryClient: QueryClient,
+  queryKey: QueryKey,
+  updatedEntry: CollectionBottleList["results"][number],
+) {
+  queryClient.setQueriesData<CollectionBottleList>({ queryKey }, (current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      results: current.results.map((item) =>
+        item.id === updatedEntry.id ? updatedEntry : item,
+      ),
+    };
+  });
+}
+
+/** Removes a globally unique collection entry from every list under the route prefix. */
+export function removeCollectionBottleFromListCaches(
+  queryClient: QueryClient,
+  queryKey: QueryKey,
+  entryId: number,
+) {
+  queryClient.setQueriesData<CollectionBottleList>({ queryKey }, (current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      results: current.results.filter((item) => item.id !== entryId),
+    };
+  });
+}
 
 function useLibraryEntryMutations({
   entry,
@@ -59,9 +101,10 @@ function useLibraryEntryMutations({
       user: "me",
       collection: "library",
       bottle: entry.bottle.id,
-      release: entry.release?.id ?? undefined,
-      baseOnly: entry.release == null,
     },
+  });
+  const collectionBottleListQueryKey = orpc.collections.bottles.list.key({
+    type: "query",
   });
   const isBusy =
     pendingUploadMutation.isPending ||
@@ -70,60 +113,19 @@ function useLibraryEntryMutations({
     statusUpdateMutation.isPending;
 
   function updateCachedEntry(updatedEntry: CollectionBottle) {
-    queryClient.setQueryData<{
-      results: CollectionBottle[];
-      rel: PagingRel;
-    }>(listQueryKey, (current) => {
-      if (!current) return current;
-
-      return {
-        ...current,
-        results: current.results.map((item) =>
-          item.id === updatedEntry.id ? updatedEntry : item,
-        ),
-      };
-    });
-    queryClient.setQueriesData<{
-      results: CollectionBottle[];
-      rel: PagingRel;
-    }>(
-      {
-        predicate: (query) => {
-          const queryKey = JSON.stringify(query.queryKey);
-          return (
-            queryKey.includes("collections") &&
-            queryKey.includes("bottles") &&
-            queryKey.includes("list") &&
-            queryKey.includes("library") &&
-            queryKey.includes(username)
-          );
-        },
-      },
-      (current) => {
-        if (!current) return current;
-
-        return {
-          ...current,
-          results: current.results.map((item) =>
-            item.id === updatedEntry.id ? updatedEntry : item,
-          ),
-        };
-      },
+    replaceCollectionBottleInListCaches(
+      queryClient,
+      collectionBottleListQueryKey,
+      updatedEntry,
     );
   }
 
   function removeCachedEntry() {
-    queryClient.setQueryData<{
-      results: CollectionBottle[];
-      rel: PagingRel;
-    }>(listQueryKey, (current) => {
-      if (!current) return current;
-
-      return {
-        ...current,
-        results: current.results.filter((item) => item.id !== entry.id),
-      };
-    });
+    removeCollectionBottleFromListCaches(
+      queryClient,
+      collectionBottleListQueryKey,
+      entry.id,
+    );
   }
 
   async function replaceImage(file: File) {
@@ -194,8 +196,6 @@ function useLibraryEntryMutations({
     try {
       await entryDeleteMutation.mutateAsync({
         bottle: entry.bottle.id,
-        release: entry.release?.id ?? null,
-        baseOnly: entry.release == null,
         user: "me",
         collection: "library",
       });
@@ -230,25 +230,26 @@ function useLibraryEntryMutations({
 
 export function LibraryEntryThumbnail({ entry }: { entry: CollectionBottle }) {
   const [imageOpen, setImageOpen] = useState(false);
+  const bottleLabel = entry.bottle.fullName;
 
   return entry.imageUrl ? (
     <div className="h-12 w-12 shrink-0">
       <button
         type="button"
         className="h-12 w-12 overflow-hidden rounded border border-slate-800 bg-slate-900"
-        aria-label={`View image for ${entry.bottle.fullName}`}
+        aria-label={`View image for ${bottleLabel}`}
         onClick={() => setImageOpen(true)}
       >
         <img
           src={entry.imageUrl}
-          alt={`Photo of ${entry.bottle.fullName}`}
+          alt={`Photo of ${bottleLabel}`}
           className="h-full w-full object-cover"
         />
       </button>
       <ImageModal
         image={entry.imageUrl}
-        alt={`Photo of ${entry.bottle.fullName}`}
-        title={`Photo of ${entry.bottle.fullName}`}
+        alt={`Photo of ${bottleLabel}`}
+        title={`Photo of ${bottleLabel}`}
         open={imageOpen}
         setOpen={setImageOpen}
       />
@@ -269,7 +270,8 @@ export function LibraryEntryImage({
       username,
     });
   const [imageOpen, setImageOpen] = useState(false);
-  const imageAlt = `Photo of ${entry.bottle.fullName}`;
+  const bottleLabel = entry.bottle.fullName;
+  const imageAlt = `Photo of ${bottleLabel}`;
 
   return (
     <div className="min-w-0 shrink-0">
@@ -278,8 +280,8 @@ export function LibraryEntryImage({
         className="flex h-12 w-12 items-center justify-center overflow-hidden rounded border border-slate-800 bg-slate-900 disabled:opacity-60"
         aria-label={
           entry.imageUrl
-            ? `View image for ${entry.bottle.fullName}`
-            : `Add image for ${entry.bottle.fullName}`
+            ? `View image for ${bottleLabel}`
+            : `Add image for ${bottleLabel}`
         }
         disabled={isBusy}
         onClick={() => {
@@ -325,7 +327,7 @@ export function LibraryEntryImage({
         type="file"
         accept="image/*"
         className="hidden"
-        aria-label={`Edit image for ${entry.bottle.fullName}`}
+        aria-label={`Edit image for ${bottleLabel}`}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (file) {
@@ -421,6 +423,7 @@ export default function LibraryEntryActions({
     entry,
     username,
   });
+  const bottleLabel = entry.bottle.fullName;
 
   return (
     <div className="min-w-0 shrink-0">
@@ -478,7 +481,7 @@ export default function LibraryEntryActions({
         type="file"
         accept="image/*"
         className="hidden"
-        aria-label={`Edit image for ${entry.bottle.fullName}`}
+        aria-label={`Edit image for ${bottleLabel}`}
         onChange={(event) => {
           const file = event.currentTarget.files?.[0];
           if (file) void replaceImage(file);

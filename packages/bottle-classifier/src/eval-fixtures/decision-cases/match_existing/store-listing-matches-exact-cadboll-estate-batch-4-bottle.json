@@ -1,0 +1,91 @@
+{
+  "id": "store-listing-matches-exact-cadboll-estate-batch-4-bottle",
+  "name": "store listing: matches the exact flattened Cadboll Estate Batch 4 Bottle",
+  "input": {
+    "reference": {
+      "name": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)",
+      "url": "https://shop.example/products/cadboll-estate-batch-4"
+    },
+    "extractedIdentity": {
+      "brand": "Glenmorangie",
+      "bottler": null,
+      "expression": "The Cadboll Estate",
+      "series": null,
+      "distillery": ["Glenmorangie"],
+      "category": "single_malt",
+      "stated_age": 15,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Batch 4"
+    },
+    "initialCandidates": [
+      {
+        "alias": null,
+        "brand": "Glenmorangie",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glenmorangie"],
+        "category": "single_malt",
+        "statedAge": 15,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["exact"],
+        "bottleId": 661,
+        "fullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 4)"
+      },
+      {
+        "alias": null,
+        "brand": "Glenmorangie",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glenmorangie"],
+        "category": "single_malt",
+        "statedAge": 15,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.91,
+        "source": ["text"],
+        "bottleId": 660,
+        "fullName": "Glenmorangie 15-year-old The Cadboll Estate"
+      },
+      {
+        "alias": null,
+        "brand": "Glenmorangie",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glenmorangie"],
+        "category": "single_malt",
+        "statedAge": 15,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.86,
+        "source": ["text"],
+        "bottleId": 662,
+        "fullName": "Glenmorangie The Cadboll Estate 15-year-old (Batch 2)"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 661,
+    "summary": "Match the independently complete Cadboll Estate Batch 4 Bottle instead of the broader Cadboll Estate Bottle or Batch 2 sibling."
+  }
+}

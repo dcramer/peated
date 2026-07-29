@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:24:09.307Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Woodford Reserve Kentucky Straight Malt whiskey 45.2 official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Woodford Reserve Kentucky Straight Malt whiskey 45.2 official",
+    "summary": "**Woodford Reserve Kentucky Straight Malt Whiskey** is an **official Woodford Reserve core expression** bottled at **45.2% ABV (90.4 proof)**. On Woodford Reserve’s official product page, it’s described as a **Kentucky Straight Malt Whiskey** made with **51% malt** and **aged in new charred oak barrels**. ([woodfordres",
+    "results": [
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "url": "https://www.woodfordreserve.com/whiskey/malt-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/historic-barrel-entry/",
+        "url": "https://www.woodfordreserve.com/whiskey/historic-barrel-entry/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+        "url": "https://shop.woodfordreserve.com/distillery-series-12-year-old-american-single-malt-whiskey/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/our-whiskey/product-locator/",
+        "url": "https://www.woodfordreserve.com/our-whiskey/product-locator/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://shop.woodfordreserve.com/distillery-series-blended-malt/",
+        "url": "https://shop.woodfordreserve.com/distillery-series-blended-malt/",
+        "domain": "shop.woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.woodfordreserve.com/whiskey/straight-bourbon-whiskey/",
+        "url": "https://www.woodfordreserve.com/whiskey/straight-bourbon-whiskey/",
+        "domain": "woodfordreserve.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "48da4de8472f19fd46d202e196235f8d8210db17e62e0406026b122af9e9bad8",
+    "mode": "auto"
+  }
+}

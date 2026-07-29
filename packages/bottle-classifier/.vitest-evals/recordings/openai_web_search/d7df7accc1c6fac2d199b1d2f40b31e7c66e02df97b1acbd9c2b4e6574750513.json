@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:11:07.185Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Shieldaig Speyside 30 year old single malt"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Shieldaig Speyside 30 year old single malt",
+    "summary": "Here’s the bottle-specific evidence I could confirm for **Shieldaig Speyside 30 Year Old Single Malt**:\n\n- **Brand/label:** Shieldaig ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old))\n- **Style:** **Single Malt Scotch Whisky**, labeled **Speyside** on the Shieldaig brand listin",
+    "results": [
+      {
+        "title": "Shieldaig 30-year-old - Ratings and reviews - Whiskybase",
+        "url": "https://www.whiskybase.com/whiskies/whisky/198422/shieldaig-30-year-old",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/brand/85214/whiskies",
+        "url": "https://www.whiskybase.com/whiskies/brand/85214/whiskies",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.totalwine.com/spirits/scotch/single-malt/c/000887?aty=1%2C1%2C0%2C0&pageSize=24&price=-30-to-40&sort=expert-ratings&viewall=true",
+        "url": "https://www.totalwine.com/spirits/scotch/single-malt/c/000887?aty=1%2C1%2C0%2C0&pageSize=24&price=-30-to-40&sort=expert-ratings&viewall=true",
+        "domain": "totalwine.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://distiller.com/spirits/shieldaig-islay-single-malt",
+        "url": "https://distiller.com/spirits/shieldaig-islay-single-malt",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyauction.com/item/3560827",
+        "url": "https://whiskyauction.com/item/3560827",
+        "domain": "whiskyauction.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskeybidders.com/whiskey/caperdonich-30-year-old-speyside-single-malt-small-batch-release/197207",
+        "url": "https://www.whiskeybidders.com/whiskey/caperdonich-30-year-old-speyside-single-malt-small-batch-release/197207",
+        "domain": "whiskeybidders.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "d7df7accc1c6fac2d199b1d2f40b31e7c66e02df97b1acbd9c2b4e6574750513",
+    "mode": "auto"
+  }
+}

@@ -1,10 +1,9 @@
+import config from "@peated/server/config";
 import { createOpenAIClient } from "@peated/server/lib/openaiClient";
-
-const EMBEDDING_MODEL = "text-embedding-3-large";
 
 export async function getOpenAIEmbedding(input: string): Promise<number[]> {
   const response = await createOpenAIClient().embeddings.create({
-    model: EMBEDDING_MODEL,
+    model: config.OPENAI_EMBEDDING_MODEL,
     input,
   });
 

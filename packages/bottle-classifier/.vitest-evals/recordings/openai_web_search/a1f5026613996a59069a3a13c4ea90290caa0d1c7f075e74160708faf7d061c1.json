@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:45:27.602Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 year old release batches ABV Batch 1 Batch 2"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 year old release batches ABV Batch 1 Batch 2",
+    "summary": "Both **Ardbeg Traigh Bhan 19 Year Old Batch 1** and **Batch 2** were bottled at **46.2% ABV**. Ardbeg’s archive page for Batch 2 identifies it as the annual limited-batch 19-year-old release, and multiple bottle-specific secondary references corroborate the ABV and batch coding for both early releases. ([ardbeg.com](ht",
+    "results": [
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/179473/ardbeg-traigh-bhan-batch-2",
+        "url": "https://www.whiskybase.com/whiskies/whisky/179473/ardbeg-traigh-bhan-batch-2",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/179473/ardbeg-traigh-bhan-batch-2?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/179473/ardbeg-traigh-bhan-batch-2?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/nl/whiskies/whisky/164727/ardbeg-traigh-bhan-batch-2",
+        "url": "https://www.whiskybase.com/nl/whiskies/whisky/164727/ardbeg-traigh-bhan-batch-2",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan-batch-1?language=de",
+        "url": "https://www.whiskybase.com/whiskies/whisky/131177/ardbeg-traigh-bhan-batch-1?language=de",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/147151/traigh-bhan-batch-1?language=nl",
+        "url": "https://www.whiskybase.com/whiskies/whisky/147151/traigh-bhan-batch-1?language=nl",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/147151/traigh-bhan-batch-1?language=zh-CN",
+        "url": "https://www.whiskybase.com/whiskies/whisky/147151/traigh-bhan-batch-1?language=zh-CN",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a1f5026613996a59069a3a13c4ea90290caa0d1c7f075e74160708faf7d061c1",
+    "mode": "auto"
+  }
+}

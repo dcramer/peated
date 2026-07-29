@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:22:22.962Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "High West A Midwinter Night's Dram Act 10 Scene 4 49.3"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "High West A Midwinter Night's Dram Act 10 Scene 4 49.3",
+    "summary": "**High West A Midwinter Night’s Dram — Act 10, Scene 4**\n\nConfirmed bottle traits:\n\n- **Producer:** High West Distillery, Park City, Utah. ([highwest.com](https://highwest.com/pages/product-information?utm_source=openai))\n- **Expression:** **A Midwinter Night’s Dram**, the limited-release, port-finished **straight rye ",
+    "results": [
+      {
+        "title": "https://highwest.com/pages/a-midwinter-nights-dram",
+        "url": "https://highwest.com/pages/a-midwinter-nights-dram",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://highwest.com/products/a-midwinter-nights-dram",
+        "url": "https://highwest.com/products/a-midwinter-nights-dram",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://highwest.com/pages/product-information",
+        "url": "https://highwest.com/pages/product-information",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/195819a",
+        "url": "https://www.reddit.com/r/bourbon/comments/195819a",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/yrlyvn",
+        "url": "https://www.reddit.com/r/bourbon/comments/yrlyvn",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.scotchwhiskyauctions.com/auctions/194-the-149th-auction/694761-high-west-a-midwinter-nights-dram-act-10-scene-4-75cl/",
+        "url": "https://www.scotchwhiskyauctions.com/auctions/194-the-149th-auction/694761-high-west-a-midwinter-nights-dram-act-10-scene-4-75cl/",
+        "domain": "scotchwhiskyauctions.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "edba8847a24dc458d1c8292eec927a752f7ac37a30f7e5f0409cef90a63068cb",
+    "mode": "auto"
+  }
+}

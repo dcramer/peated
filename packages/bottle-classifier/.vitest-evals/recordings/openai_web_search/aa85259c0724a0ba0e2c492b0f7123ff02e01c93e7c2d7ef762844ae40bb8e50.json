@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T17:35:58.278Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:westlanddistillery.com Watchpost Whiskey 42.5 blend American whiskey"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:westlanddistillery.com Watchpost Whiskey 42.5 blend American whiskey",
+    "summary": "On Westland’s official product page, **Watchpost Whiskey** is identified as a **blended whiskey** from Westland’s new Watchpost brand, not an American single malt. The page says the blend components are **Westland Five-Malt Mashbill whiskey aged in new oak and PX casks** plus **MGP grain/light whiskey aged in ex-bourbo",
+    "results": [
+      {
+        "title": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/collections/american-single-malt-whiskey",
+        "url": "https://westlanddistillery.com/collections/american-single-malt-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/pages/flagship-info",
+        "url": "https://westlanddistillery.com/pages/flagship-info",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/products/375ml-flagship-american-single-malt-whiskey",
+        "url": "https://westlanddistillery.com/products/375ml-flagship-american-single-malt-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/collections/national-products/products/westland-american-single-malt-flagship",
+        "url": "https://westlanddistillery.com/collections/national-products/products/westland-american-single-malt-flagship",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://westlanddistillery.com/products/garryana-10",
+        "url": "https://westlanddistillery.com/products/garryana-10",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "aa85259c0724a0ba0e2c492b0f7123ff02e01c93e7c2d7ef762844ae40bb8e50",
+    "mode": "auto"
+  }
+}

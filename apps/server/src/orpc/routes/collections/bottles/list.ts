@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleReleases,
   bottles,
   bottlesToDistillers,
   collectionBottles,
@@ -21,9 +20,9 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
-import { isLibraryCollection } from "./imageHelpers";
+import { isLibraryCollection } from "./collectionBottleHelpers";
 
 export default procedure
   .route({
@@ -35,21 +34,24 @@ export default procedure
     operationId: "listCollectionBottles",
   })
   .input(
-    z.object({
-      collection: z.union([z.enum(reservedCollectionSlugs), z.coerce.number()]),
-      user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
-      query: z.coerce.string().default(""),
-      brand: z.coerce.number().nullish(),
-      distiller: z.coerce.number().nullish(),
-      bottle: z.coerce.number().optional(),
-      release: z.coerce.number().optional(),
-      baseOnly: z.coerce.boolean().optional(),
-      status: z
-        .union([CollectionBottleStatusSchema, z.literal("unset")])
-        .optional(),
-      cursor: z.coerce.number().gte(1).default(1),
-      limit: z.coerce.number().gte(1).lte(100).default(25),
-    }),
+    z
+      .object({
+        collection: z.union([
+          z.enum(reservedCollectionSlugs),
+          z.coerce.number(),
+        ]),
+        user: z.union([z.literal("me"), z.string(), z.coerce.number()]),
+        query: z.coerce.string().default(""),
+        brand: z.coerce.number().nullish(),
+        distiller: z.coerce.number().nullish(),
+        bottle: z.number().int().positive().optional(),
+        status: z
+          .union([CollectionBottleStatusSchema, z.literal("unset")])
+          .optional(),
+        cursor: z.coerce.number().gte(1).default(1),
+        limit: z.coerce.number().gte(1).lte(100).default(25),
+      })
+      .strict(),
   )
   // TODO(response-envelope): use helper to enable later switch to { data, meta }
   .output(listResponse(CollectionBottleSchema))
@@ -116,79 +118,52 @@ export default procedure
 
     const offset = (cursor - 1) * limit;
 
-    const where: (SQL<unknown> | undefined)[] = [
+    const baseWhere: (SQL<unknown> | undefined)[] = [
       eq(collectionBottles.collectionId, collection.id),
     ];
     if (input.query) {
-      // Match exact aliases alongside the bottle search vector for catalog parity.
-      const exactAliasBottleIds = (
-        await db
-          .selectDistinct({ bottleId: bottleAliases.bottleId })
-          .from(bottleAliases)
-          .where(
-            and(
-              eq(sql`LOWER(${bottleAliases.name})`, input.query.toLowerCase()),
-              isNotNull(bottleAliases.bottleId),
-            ),
-          )
-      )
-        .map((row) => row.bottleId)
-        .filter((bottleId): bottleId is number => bottleId !== null);
-
-      where.push(
-        or(
-          sql`${bottles.searchVector} @@ websearch_to_tsquery ('english', ${input.query})`,
-          exactAliasBottleIds.length
-            ? inArray(bottles.id, exactAliasBottleIds)
-            : undefined,
-        ),
+      baseWhere.push(
+        sql`EXISTS(
+          SELECT FROM ${bottleAliases}
+          WHERE ${bottleAliases.bottleId} = ${collectionBottles.bottleId}
+            AND LOWER(${bottleAliases.name}) = ${input.query.toLowerCase()}
+        ) OR ${bottles.searchVector} @@ websearch_to_tsquery ('english', ${input.query})`,
       );
     }
     if (input.brand) {
-      where.push(eq(bottles.brandId, input.brand));
+      baseWhere.push(eq(bottles.brandId, input.brand));
     }
     if (input.distiller) {
-      where.push(
-        sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${input.distiller} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`,
-      );
+      baseWhere.push(sql`EXISTS(
+        SELECT FROM ${bottlesToDistillers}
+        WHERE ${bottlesToDistillers.distillerId} = ${input.distiller}
+          AND ${bottlesToDistillers.bottleId} = ${collectionBottles.bottleId}
+      )`);
     }
-    if (input.bottle) {
-      where.push(eq(collectionBottles.bottleId, input.bottle));
-    }
-    if (input.baseOnly) {
-      where.push(isNull(collectionBottles.releaseId));
-    } else if (input.release) {
-      where.push(eq(collectionBottles.releaseId, input.release));
+    if (input.bottle !== undefined) {
+      baseWhere.push(eq(collectionBottles.bottleId, input.bottle));
     }
     if (input.status === "unset") {
-      where.push(isNull(collectionBottles.status));
+      baseWhere.push(isNull(collectionBottles.status));
     } else if (input.status) {
-      where.push(eq(collectionBottles.status, input.status));
+      baseWhere.push(eq(collectionBottles.status, input.status));
     }
 
     const results = await db
-      .select({ collectionBottles, bottle: bottles, release: bottleReleases })
+      .select({ collectionBottles })
       .from(collectionBottles)
-      .where(where ? and(...where) : undefined)
-      .innerJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
-      .leftJoin(
-        bottleReleases,
-        eq(bottleReleases.id, collectionBottles.releaseId),
-      )
+      .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
+      .where(and(...baseWhere))
       .limit(limit + 1)
       .offset(offset)
-      .orderBy(asc(bottles.fullName));
+      .orderBy(asc(bottles.fullName), asc(collectionBottles.id));
 
     return {
       results: await serialize(
         CollectionBottleSerializer,
         results
           .slice(0, limit)
-          .map(({ collectionBottles, bottle, release }) => ({
-            ...collectionBottles,
-            release,
-            bottle,
-          })),
+          .map(({ collectionBottles }) => collectionBottles),
         context.user,
       ),
       rel: {

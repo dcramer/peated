@@ -23,12 +23,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 16442,
-        "releaseId": null,
         "alias": null,
         "fullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
-        "bottleFullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
         "brand": "Masterson's",
         "bottler": null,
         "series": null,
@@ -45,12 +42,9 @@
         "source": ["text"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44029,
-        "releaseId": null,
         "alias": "Masterson's 10-year-old Rye",
         "fullName": "Masterson's 10-year-old Rye",
-        "bottleFullName": "Masterson's 10-year-old Rye",
         "brand": "Masterson's",
         "bottler": null,
         "series": null,
@@ -67,12 +61,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "release",
-        "bottleId": 44029,
-        "releaseId": 220,
+        "bottleId": -220,
         "alias": "Masterson's 10-year-old Rye (batch PSF3)",
         "fullName": "Masterson's 10-year-old Rye - Batch PSF3",
-        "bottleFullName": "Masterson's 10-year-old Rye",
         "brand": "Masterson's",
         "bottler": null,
         "series": null,
@@ -89,12 +80,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44029,
-        "releaseId": 221,
+        "bottleId": -221,
         "alias": "Masterson's 10-year-old Rye (batch PSH3)",
         "fullName": "Masterson's 10-year-old Rye - Batch PSH3",
-        "bottleFullName": "Masterson's 10-year-old Rye",
         "brand": "Masterson's",
         "bottler": null,
         "series": null,
@@ -111,12 +99,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44029,
-        "releaseId": 219,
+        "bottleId": -219,
         "alias": "Masterson's 10-year-old Rye (batch PSA3)",
         "fullName": "Masterson's 10-year-old Rye - Batch PSA3",
-        "bottleFullName": "Masterson's 10-year-old Rye",
         "brand": "Masterson's",
         "bottler": null,
         "series": null,
@@ -139,12 +124,9 @@
       "when": ["masterson", "french", "oak"],
       "results": [
         {
-          "kind": "bottle",
           "bottleId": 16442,
-          "releaseId": null,
           "alias": null,
           "fullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
-          "bottleFullName": "Masterson's 10-year-old Straight Rye French Oak Finish (Barrel F2-038)",
           "brand": "Masterson's",
           "bottler": null,
           "series": null,
@@ -176,7 +158,7 @@
       "releaseId": null,
       "createsBottle": true,
       "createsRelease": false,
-      "summary": "Create a clean Masterson's 10-year-old Straight Rye French Oak Finish bottle for the store price. Do not redirect to the plain Masterson's 10-year-old Rye bottle 44029 or its batch-coded child releases; do not match the narrower Barrel F2-038 bottle 16442."
+      "summary": "Create a complete Masterson's 10-year-old Straight Rye French Oak Finish Bottle for the store price. Do not redirect to the plain Masterson's 10-year-old Rye Bottle 44029 or its batch-coded legacy candidates; do not match the narrower Barrel F2-038 Bottle 16442."
     },
     "notes": "Caskers search results list Masterson's 10 Year Old Straight Rye Whiskey and Masterson's 10 Year Old Rye Whiskey Barrel Finished in French Oak as separate product pages, so the French Oak wording is not merely an optional title suffix for the plain rye candidate. The existing Barrel F2-038 bottle is narrower than the observed store listing, so the correct current DB outcome is a clean French Oak bottle creation."
   },
@@ -185,7 +167,6 @@
     "action": "create_bottle",
     "identityScope": "product",
     "matchedBottleId": null,
-    "matchedReleaseId": null,
     "proposedBottle": {
       "brand": {
         "name": "Masterson's"

@@ -61,6 +61,7 @@ describe("POST /bottles/:bottle/apply-brand-repair", () => {
     expect(result).toMatchObject({
       bottleId: bottle.id,
       distilleryAdded: true,
+      groupId: bottle.groupId,
       status: "applied",
     });
 

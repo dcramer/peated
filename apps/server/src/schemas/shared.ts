@@ -18,6 +18,7 @@ export const ObjectTypeEnum = z
     "toast",
     "comment",
     "bottle",
+    "bottle_group",
     "bottle_release",
     "bottle_series",
     "entity",

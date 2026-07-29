@@ -1,9 +1,8 @@
 import { getUserActor } from "@peated/server/lib/actors";
 import {
-  DuplicateBottleAliasError,
+  ExactBottleAliasConflictError,
   FailedToSaveBottleAliasError,
 } from "@peated/server/lib/bottleAliases";
-import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import {
   applyStorePriceBottleRepairFromProposal,
   InvalidStorePriceMatchProposalTypeError,
@@ -12,6 +11,11 @@ import {
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,
 } from "@peated/server/lib/priceMatching";
+import {
+  ConcreteBottleUpdateConflictError,
+  ConcreteBottleUpdateGraphError,
+  ConcreteBottleUpdateInputError,
+} from "@peated/server/lib/updateConcreteBottle";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleSchema } from "@peated/server/schemas";
@@ -75,16 +79,38 @@ export default procedure
         });
       }
 
-      if (err instanceof BottleAlreadyExistsError) {
-        throw errors.CONFLICT({
+      if (err instanceof ConcreteBottleUpdateInputError) {
+        throw errors.BAD_REQUEST({
           message: err.message,
-          data: {
-            bottle: err.bottleId,
-          },
         });
       }
 
-      if (err instanceof DuplicateBottleAliasError) {
+      if (
+        err instanceof ConcreteBottleUpdateGraphError &&
+        err.code === "not_found"
+      ) {
+        throw errors.NOT_FOUND({
+          message: err.message,
+        });
+      }
+
+      if (err instanceof ConcreteBottleUpdateGraphError) {
+        throw errors.CONFLICT({
+          message: err.message,
+        });
+      }
+
+      if (err instanceof ConcreteBottleUpdateConflictError) {
+        throw errors.CONFLICT({
+          message: err.message,
+          data:
+            err.conflictingBottleId === null
+              ? undefined
+              : { bottle: err.conflictingBottleId },
+        });
+      }
+
+      if (err instanceof ExactBottleAliasConflictError) {
         throw errors.CONFLICT({
           message: err.message,
         });

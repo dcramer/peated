@@ -1,15 +1,15 @@
 import type { z } from "zod";
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { CategoryCheck } from "./categoryCheck";
+import { CategoryCheck, CategoryCheckConfigSchema } from "./categoryCheck";
 
-describe("parseConfig", () => {
+describe("config schema", () => {
   test("valid params", async () => {
-    const badgeImpl = new CategoryCheck();
     const config = {
       category: ["single_malt"],
     };
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`
+    expect(await CategoryCheckConfigSchema.parseAsync(config))
+      .toMatchInlineSnapshot(`
       {
         "category": [
           "single_malt",
@@ -19,11 +19,10 @@ describe("parseConfig", () => {
   });
 
   test("no category", async () => {
-    const badgeImpl = new CategoryCheck();
     const config = {
       category: [],
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(CategoryCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -41,11 +40,10 @@ describe("parseConfig", () => {
   });
 
   test("invalid category", async () => {
-    const badgeImpl = new CategoryCheck();
     const config = {
       category: ["foo"],
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(CategoryCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -79,7 +77,7 @@ describe("test", () => {
     const badgeImpl = new CategoryCheck();
     const config = {
       category: ["single_malt"],
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof CategoryCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
@@ -91,7 +89,7 @@ describe("test", () => {
     const badgeImpl = new CategoryCheck();
     const config = {
       category: ["bourbon"],
-    } satisfies z.infer<(typeof badgeImpl)["schema"]>;
+    } satisfies z.infer<typeof CategoryCheckConfigSchema>;
     expect(badgeImpl.test(config, tasting)).toEqual(false);
   });
 });

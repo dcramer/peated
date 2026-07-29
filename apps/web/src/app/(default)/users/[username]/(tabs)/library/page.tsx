@@ -80,7 +80,6 @@ function UserLibraryTable({ username }: { username: string }) {
           <BottleTable
             bottleList={bottles.results}
             rel={bottles.rel}
-            conciseBottlingNames
             hideLibraryStatus
             showBottleStats={false}
             renderCollectionBottleImage={(entry) =>

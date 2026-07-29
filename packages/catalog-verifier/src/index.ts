@@ -16,4 +16,5 @@ export {
   type CatalogVerificationResult,
   type CatalogVerificationStatus,
   type CatalogVerificationWorkstream,
+  type PersistedCatalogVerificationResult,
 } from "./verification";

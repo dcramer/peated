@@ -33,7 +33,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 
@@ -62,6 +61,8 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .where(eq(collectionBottles.id, entry.id));
 
     expect(updated.id).toBe(entry.id);
+    expect(updated.bottle.id).toBe(bottle.id);
+    expect(updated).not.toHaveProperty("target");
     expect(updated.status).toBe("empty");
     expect(cleared.id).toBe(entry.id);
     expect(cleared.status).toBeNull();
@@ -80,7 +81,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: libraryCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 
@@ -115,7 +115,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: collection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 
@@ -154,7 +153,6 @@ describe("PATCH /users/:user/collections/:collection/bottles/:collectionBottle",
       .values({
         collectionId: otherCollection.id,
         bottleId: bottle.id,
-        releaseId: null,
       })
       .returning();
 

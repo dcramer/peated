@@ -2,152 +2,176 @@
 
 This is the source of truth for how Peated models whisky identity.
 
-Deterministic name cleanup is governed by
+Deterministic name cleanup is governed by the
 [Bottle Normalization Contract](./bottle-normalization-contract.md).
 
-## Core Objects
+## Identity Objects
 
-- `bottle`: the stable parent product most users rate, search, and collect.
-- `bottle_release`: optional precision under a bottle when a user cares about a specific batch, vintage, annual release, or other marketed variant.
-- `bottle_observation`: internal store-price evidence tied to a bottle or release. This is where exact listing facts live before they are promoted into canonical identity.
+- **Bottle** is one concrete marketed release. It has its own stable identity
+  and durably stores every field needed to search, render, and understand that
+  release without loading its BottleGroup.
+- **BottleGroup** relates releases of the same expression. It owns the shared
+  editing scope, representative relationship, and member-derived aggregate
+  statistics. Ordinary Bottle creation creates a singleton group, and the
+  legacy migration creates deterministic family groups. Users never choose or
+  manage groups.
+- **BottleSeries** is a broader named range that can contain distinct
+  expressions. Series membership is organizational context, not evidence that
+  two Bottles belong to the same BottleGroup.
+- **BottleObservation** is source evidence from a listing, label, or other
+  observation. It may preserve facts more specific or less certain than the
+  canonical Bottle identity.
+
+Collection membership describes a user's physical unit, status, and image. It
+does not create another catalog identity layer.
+
+## Core Invariants
+
+- Every marketed release is a Bottle, including a dated, batched, annual,
+  vintage, or single-cask product.
+- Every Bottle is independently complete and belongs to exactly one
+  BottleGroup.
+- Every assigned alias and activity-bearing record references one Bottle id.
+  BottleGroup is never a fallback consumer identity.
+- A general expression alias points to the retained general Bottle, not the
+  group's representative Bottle.
+- Ordinary creation atomically creates a complete Bottle and a singleton
+  BottleGroup. “Add a similar bottle” only prefills a new Bottle draft; it does
+  not reuse the source Bottle's group.
+- Semantic grouping happens outside ordinary creation. Similar names, a shared
+  brand, or a shared BottleSeries may suggest a relationship but do not prove
+  same-expression identity. This release does not ship an automatic regrouping
+  service; independently created Bottles remain in their singleton groups.
+
+There is no parent-versus-release creation decision and no `repair_parent`
+workflow. Discovering another release does not change an existing Bottle's
+identity.
 
 ## Field Ownership
 
-Bottle identity:
+BottleGroup owns shared editing semantics for:
 
-- `brand`
-- `bottler`
-- `distillery`
-- `name` / expression
-- `series`
-- `category`
-- `statedAge` only when it is stable across every canonical release
+- the shared expression name;
+- brand, bottler, distillers, category, series, and flavor profile;
+- stated age when it is invariant across the expression's releases;
+- representative selection and aggregate statistics.
 
-Release identity:
+Every Bottle durably materializes those shared values as part of its complete
+exact identity and additionally owns:
 
-- `edition`
-- `releaseYear`
-- `vintageYear`
-- `statedAge` when it is release-specific
-- `abv`
-- `singleCask`
-- `caskStrength`
-- `caskFill`
-- `caskType`
-- `caskSize`
+- its complete marketed `name` and `fullName`;
+- edition or batch;
+- release and vintage years;
+- effective stated age;
+- ABV, single-cask, and cask-strength flags;
+- canonical cask size, type, and fill;
+- exact aliases, content, images, activity, and statistics.
 
-Year semantics:
+This duplication is intentional. BottleGroup is the authority for shared
+edits, while Bottle remains the authority for exact reads.
 
-- `vintageYear` is the distillation year.
-- `releaseYear` is the bottling year or marketed annual release year.
-- A bare year is ambiguous until label wording, official evidence, or sibling
-  structure explains it. Do not infer a child release solely because any year is
-  present.
-- Do not compute or infer `statedAge` from vintage and bottling years unless the
-  source states the age.
+Observation-only facts by default include exact cask or barrel number, bottle
+number, outturn, retailer-exclusive wording, label notes, and unmodeled
+maturation details. Promote one of these facts into Bottle identity only when
+it is part of the marketed release or is needed for recurring canonical
+disambiguation.
 
-Observation-only facts by default:
+## Shared And Exact Edits
 
-- cask number
-- barrel number
-- bottle number
-- outturn
-- market or store-exclusive wording
-- unmodeled maturation wording
-- retailer title fragments that are not part of the marketed canonical name
+An exact edit changes only the selected Bottle. A shared edit updates the
+BottleGroup and atomically rematerializes every member Bottle's complete
+identity while preserving each member's exact fields.
 
-## Naming Rules
+A shared edit that changes a name or prefix regenerates every member's
+canonical exact name. Previous canonical exact names remain aliases for their
+Bottles. Name or alias collisions, incomplete member updates, or audit failures
+roll back the entire shared edit.
 
-- A bottle name identifies the expression relative to its brand and must remain
-  distinct from that brand after identity-preserving normalization. A generic
-  category or style descriptor is valid only when supported by the source and
-  chosen through classifier or manual judgment; otherwise the identity remains
-  unresolved. Exact brand/name equality may be rejected structurally.
+`Bottle.statedAge` stores the effective age. A non-null value that differs from
+the group's current age is an exact override; null or an equal value inherits
+the group age. Shared-age edits preserve differing exact overrides and
+materialize the new shared age on every other member.
+
+This release has no manual or dormant group merge/split service. Any future
+automatic regrouping system must be a separately reviewed change that preserves
+Bottle ids and consumer references, rematerializes shared fields
+transactionally, recomputes affected group aggregates, and records an auditable
+before/after result.
+
+## Exact Bottle Merge
+
+Exact Bottle merge is the only operation that retires a duplicate Bottle and
+repoints consumer Bottle ids. A moderator selects an explicit surviving Bottle;
+consumer rows, assigned aliases, release-promotion mappings, and tombstones
+converge on that Bottle in one canonical operation. BottleGroup is never the
+merge destination and a representative Bottle is never selected implicitly.
+
+## BottleGroup Versus BottleSeries
+
+BottleGroup membership means “marketed releases of the same expression.”
+BottleSeries means “related products in the same range.”
+
+- Springbank 12 Cask Strength Batch 23 and Batch 24 can be two Bottles in one
+  BottleGroup.
+- Macallan 18 annual releases can be separate Bottles in one BottleGroup when
+  they are marketed as annual versions of the same expression.
+- Octomore 13.1 and 13.3 are distinct expressions in separate BottleGroups,
+  even if they share a BottleSeries.
+
+BottleSeries does not aggregate ratings and is never sufficient grouping
+authority.
+
+## Naming And Entity Boundaries
 
 - `brand` is the consumer-facing label brand.
-- `bottler` is only for a separately stated bottling house when it differs from `brand`.
-- `distillery` is the actual producer or producers.
+- `bottler` is a separately stated bottling house when it differs from the
+  brand.
+- `distillery` identifies the actual producer or producers.
 - `series` is a stable range or family, not a batch code or release year.
-- `edition` is the simple human-facing release descriptor. Use it for values like `Batch 24`, `2024 Release`, or `S2B13`.
+- `edition` is a human-facing release descriptor such as `Batch 24`,
+  `2024 Release`, or `S2B13`.
+- `vintageYear` is the distillation year. `releaseYear` is the bottling or
+  marketed release year. A bare year is ambiguous until source evidence gives
+  it meaning.
+- Do not infer `statedAge` from vintage and release years unless the source
+  states the age.
 
-## Brand And Entity Boundary
+Brand identity is not a longest-prefix match. Distillery, bottler, owner,
+importer, and parent-company names may appear in source text without becoming
+the brand. Canonical names and aliases are evidence, but stale or
+source-specific strings cannot prove an entity repair by themselves.
 
-- Brand identity is not the longest leading string match. It is the consumer-facing label that should appear in the canonical bottle name.
-- Distillery, bottler, parent company, importer, and owner names may appear in source text, aliases, or marketing copy without becoming the bottle brand.
-- `fullName` and aliases are derived reference strings. They are useful evidence, but they can be stale or source-specific and must not prove a brand repair by themselves.
-- A proposed brand repair must be valid after applying it: the resulting bottle and release names should still describe the marketed bottle without duplicated, missing, or stale brand text.
-- Do not automate brand moves where the only difference is a generic product/entity suffix or prefix such as `Bourbon`, `Whiskey`, `Whisky`, `Distillery`, `House`, or `Company`. Those cases are brand-vs-product-vs-entity ambiguity and belong in classifier or manual review.
-- Examples: `Yamazaki 12-year-old` stays brand `Yamazaki` even when aliases mention owner `Suntory`; `Belle Meade` should not automatically move to `Belle Meade Bourbon` just because the full bottle name starts with those words.
+Do not automate brand moves where the only difference is a generic suffix or
+prefix such as `Whisky`, `Bourbon`, `Distillery`, `House`, or `Company`.
+Those are brand-versus-product-versus-entity questions that require semantic
+evidence.
 
-## Canonicalization Rules
+## Matching And Canonicalization
 
-- Create separate bottles when the marketed expression itself changes.
-- Create releases when the parent expression is stable and the differentiator is a variant of that expression.
-- Preserve exact source facts as observations first. Do not force a canonical release split just because a retailer page mentions a cask number or similar exact detail.
-- Promote an observation fact into canonical release identity only when it is clearly part of the marketed release or moderators decide it is needed for recurring disambiguation.
-- Classification is intentionally model-led for semantic boundaries. Code may
-  enforce structurally safe validation, but it should not encode brand- or
-  family-specific bottle-versus-release rules.
+Resolve the exact marketed Bottle first. Use exact label facts, authoritative
+sources, aliases, and nearby catalog entries as evidence. Missing optional
+attributes do not make a clear exact identity unresolved, while conflicting
+age, edition, year, cask, or single-cask facts are strong evidence of distinct
+Bottles.
 
-## Single Known Release Rule
+Grouping is a separate decision. Same-expression evidence may relate exact
+Bottles through a BottleGroup, but uncertain grouping leaves each Bottle in its
+singleton group. A BottleObservation preserves useful source precision without
+forcing either a new Bottle or a group change.
 
-- If the only currently known marketed form is a single dated, batched, or otherwise specific version and there is no clear reusable parent expression yet, it may live on `bottle` initially.
-- If a second sibling later appears and the shared parent expression becomes clear, split the record into a parent `bottle` plus child `bottle_release` rows and move release-specific traits there.
-- If the year or code is itself the stable marketed product identity rather than optional precision, keep it at the bottle layer instead of forcing a child release.
-- Sibling evidence may come from existing child releases, multiple legacy bottle
-  rows that share a stable family, or authoritative sources that describe a
-  recurring batch/vintage/annual release program. That evidence should inform
-  the classifier; it should not bypass classifier judgment.
+SMWS codes are exact identity anchors when printed or when deterministically
+composed from an SMWS distillery number and single-cask number visible on the
+label. A code must not invent a missing component or subtitle.
 
-## Precision Layers
+## Activity Identity
 
-- `release` is shared canon. It is the reusable identity that multiple tastings, prices, and pages should point to.
-- `bottle_observation` is internal evidence. Today it preserves exact facts from approved store-price listings.
+Tastings, reviews, collection entries, flights, prices, aliases, observations,
+and similar consumers reference one Bottle id. Assigned aliases resolve
+directly to that Bottle with no BottleGroup alias identity and no second
+resolver. A general expression alias may reference the retained general Bottle;
+otherwise an uncertain source remains unresolved.
 
-If a detail should aggregate across users, searches, and stats, it belongs in `bottle_release`. If it is exact but not yet canonical, preserve it as evidence first rather than forcing a new shared object.
-
-## Simple Input Rule
-
-Default entry should stay bottle-first with optional release details.
-
-Normal user input should focus on:
-
-- bottle identity
-- optional `edition`
-- optional `vintageYear`
-- optional `releaseYear`
-- optional `abv`
-- optional `singleCask`
-- optional `caskStrength`
-
-## Worked Examples
-
-- `Aberfeldy 12`: one bottle, no release required.
-- `Macallan 18` with annual vintages: one bottle, separate releases by vintage year.
-- `Springbank 12 Cask Strength Batch 24`: one bottle, release carries `edition = Batch 24`.
-- `Maker's Mark Private Selection S2B13`: one bottle, release carries `edition = S2B13`; any more exact barrel data stays in observations unless it becomes canonical.
-- `Mystery Distillery 1990 Release`: if `1990` is the only known marketed form and no reusable parent expression is established yet, one bottle is acceptable. If a `1991 Release` later appears under the same parent expression, split into one bottle plus `1990` and `1991` releases.
-- `Octomore 13.1` vs `Octomore 13.3`: separate bottles under a shared range because drinkers generally treat them as different expressions.
-- `SMWS 6.53`: the SMWS code is the exact-cask bottle identity; different subtitles or retailer names can still be the same bottle/code, and additional wording stays in observations.
-- `SMWS 95.71 Prepare for Winter`: the exact-cask code `95.71`
-  deterministically anchors matching, while `Prepare for Winter` is a
-  source-backed title to preserve in the bottle display/create proposal when it
-  is visible or extracted. The code may roughly derive the distillery from the
-  SMWS code table, but it must not invent or correct the title.
-- `SMWS 1.285` on a replica/anniversary label that prints only `Distillery No.
-1` and `Single Cask No. 285`: the code `1.285` may be composed
-  deterministically from those two labeled components and then anchors matching
-  exactly like a printed code. Composition requires the SMWS anchor plus both
-  components; it never fabricates a missing component or a subtitle.
-
-## Matching Rule
-
-- Resolve the source bottle family and exact release/bottling details first.
-- Use Peated DB search as prior-art evidence for whether that exact target
-  already exists and how nearby items are modeled.
-- Match bottle-first when bottle identity is clear and release identity is weak.
-- Match or create a release only when the differentiating traits are explicit
-  enough to survive canonicalization.
-- Preserve the rest as observations so precision is not lost.
-- Do not route a clear identity to manual search merely because the matched
-  catalog row is missing optional attributes or exposes repair/enrichment work.
+Bottle statistics include only activity assigned to that Bottle. BottleGroup
+statistics derive from raw activity on current member Bottle ids, counted once;
+the group owns no direct activity. Presentation may use a representative
+Bottle, but representation never changes consumer identity.

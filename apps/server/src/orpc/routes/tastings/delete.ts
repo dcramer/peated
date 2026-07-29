@@ -1,8 +1,6 @@
 import { db } from "@peated/server/db";
 import {
-  bottleReleases,
   bottleTags,
-  bottles,
   notifications,
   tastingBadgeAwards,
   tastings,
@@ -13,9 +11,9 @@ import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
-import { pushJob } from "@peated/server/worker/client";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
 
 export default procedure
   .use(requireAuth)
@@ -48,7 +46,35 @@ export default procedure
       });
     }
 
-    await db.transaction(async (tx) => {
+    const deleted = await db.transaction(async (tx) => {
+      // Cleanup and dispatch use the Bottle reference current after locking.
+      const [lockedTasting] = await tx
+        .select()
+        .from(tastings)
+        .where(eq(tastings.id, input.tasting))
+        .limit(1)
+        .for("update");
+      if (!lockedTasting) {
+        throw errors.NOT_FOUND({
+          message: "Tasting not found.",
+        });
+      }
+      if (
+        lockedTasting.createdById !== context.user.id &&
+        !context.user.admin
+      ) {
+        throw errors.FORBIDDEN({
+          message: "Cannot delete another user's tasting.",
+        });
+      }
+
+      if (lockedTasting.bottleId === null) {
+        throw errors.CONFLICT({
+          message: `Tasting ${lockedTasting.id} has no Bottle.`,
+        });
+      }
+      const bottleId = lockedTasting.bottleId;
+
       await Promise.all([
         tx
           .delete(notifications)
@@ -57,18 +83,18 @@ export default procedure
               eq(notifications.type, "toast"),
               inArray(
                 notifications.objectId,
-                sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${tasting.id})`,
+                sql`(SELECT ${toasts.id} FROM ${toasts} WHERE ${toasts.tastingId} = ${lockedTasting.id})`,
               ),
             ),
           ),
 
-        tx.delete(toasts).where(eq(toasts.tastingId, tasting.id)),
+        tx.delete(toasts).where(eq(toasts.tastingId, lockedTasting.id)),
 
         tx
           .delete(tastingBadgeAwards)
-          .where(eq(tastingBadgeAwards.tastingId, tasting.id)),
+          .where(eq(tastingBadgeAwards.tastingId, lockedTasting.id)),
 
-        ...tasting.tags.map((tag) =>
+        ...lockedTasting.tags.map((tag) =>
           tx
             .update(bottleTags)
             .set({
@@ -76,39 +102,21 @@ export default procedure
             })
             .where(
               and(
-                eq(bottleTags.bottleId, tasting.bottleId),
+                eq(bottleTags.bottleId, bottleId),
                 eq(bottleTags.tag, tag),
                 gt(bottleTags.count, 0),
               ),
             ),
         ),
-
-        tx
-          .update(bottles)
-          .set({
-            totalTastings: sql`${bottles.totalTastings} - 1`,
-            avgRating: sql`(SELECT AVG(${tastings.rating}) FROM ${tastings} WHERE ${bottles.id} = ${tastings.bottleId} AND ${tastings.id} != ${tasting.id})`,
-          })
-          .where(eq(bottles.id, tasting.bottleId)),
-
-        tasting.releaseId
-          ? tx
-              .update(bottleReleases)
-              .set({
-                totalTastings: sql`${bottleReleases.totalTastings} - 1`,
-              })
-              .where(eq(bottleReleases.id, tasting.releaseId))
-          : undefined,
       ]);
 
       // TODO: delete the image from storage
       // TODO: update badge qualifiers
-      // TODO: update entities.totalTastings
-      await tx.delete(tastings).where(eq(tastings.id, tasting.id));
+      await tx.delete(tastings).where(eq(tastings.id, lockedTasting.id));
+      return { tasting: lockedTasting, bottleId };
     });
 
-    // Update bottle stats after deletion
-    await pushJob("UpdateBottleStats", { bottleId: tasting.bottleId });
+    await dispatchTastingStatsRecompute(deleted.tasting.id, deleted.bottleId);
 
     return {};
   });

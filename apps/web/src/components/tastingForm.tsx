@@ -3,17 +3,7 @@
 import { SERVING_STYLE_LIST } from "@peated/server/constants";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { TastingSchema } from "@peated/server/schemas";
-import { TastingInputSchema } from "@peated/server/schemas";
-import type {
-  Bottle,
-  BottleRelease,
-  Paginated,
-  ServingStyle,
-  SuggestedTag,
-  Tag,
-  User,
-} from "@peated/server/types";
-import BottleCard from "@peated/web/components/bottleCard";
+import type { ServingStyle, User } from "@peated/server/types";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
 import FormScreen from "@peated/web/components/formScreen";
@@ -24,20 +14,46 @@ import SimpleRatingInput from "@peated/web/components/simpleRatingInput";
 import TextAreaField from "@peated/web/components/textAreaField";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  buildTastingCreateFormSubmission,
+  buildTastingEditFormSubmission,
+  buildTastingTagOptions,
+  TastingFormFieldsSchema,
+  type TastingCreateFormSubmitData,
+  type TastingEditFormSubmitData,
+  type TastingFormFields,
+  type TastingFormImage,
+  type TastingTagOptionData,
+  type TastingTagSuggestion,
+} from "@peated/web/lib/tastingForm";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
-import { formatBottlingName } from "../lib/bottlings";
-import Button from "./button";
 import ColorField from "./colorField";
 import Form from "./form";
 import NoResultsFoundEntry from "./selectField/noResultsFoundEntry";
 import ServingStyleIcon from "./servingStyleIcon";
+import TastingBottleIdentity from "./tastingBottleIdentity";
 
-type FormSchemaType = z.infer<typeof TastingInputSchema>;
-type ImageValue = HTMLCanvasElement | File | null | undefined;
+export type {
+  TastingCreateFormSubmitData,
+  TastingEditFormSubmitData,
+} from "@peated/web/lib/tastingForm";
+
+type TastingCreateFormProps = {
+  mode?: "create";
+  onSubmit: SubmitHandler<TastingCreateFormSubmitData>;
+  initialData: Partial<z.infer<typeof TastingSchema>> &
+    Pick<z.infer<typeof TastingSchema>, "bottle">;
+};
+
+type TastingEditFormProps = {
+  mode: "edit";
+  onSubmit: SubmitHandler<TastingEditFormSubmitData>;
+  initialData: z.infer<typeof TastingSchema>;
+};
 
 function formatServingStyle(style: ServingStyle) {
   return toTitleCase(style);
@@ -55,53 +71,23 @@ const userToOption = (user: User): Option => {
   };
 };
 
-type ReleaseOption = BottleRelease & Option;
-
-function toReleaseOption(
-  release: Partial<z.infer<typeof TastingSchema>>["release"],
-): ReleaseOption | undefined {
-  if (!release) {
-    return undefined;
-  }
-
-  return {
-    ...release,
-    id: release.id,
-    name: formatBottlingName(release) || release.fullName,
-  };
-}
-
-export default function TastingForm({
-  onSubmit,
-  errorMessage,
-  initialData,
-  showReleasePickerDefault = false,
-  title,
-  suggestedTags,
-}: {
-  onSubmit: SubmitHandler<
-    Omit<FormSchemaType, "image"> & {
-      image: ImageValue;
-    }
-  >;
-  errorMessage?: string;
-  initialData: Partial<z.infer<typeof TastingSchema>> & {
-    bottle: Bottle;
-  };
-  showReleasePickerDefault?: boolean;
-  title: string;
-  suggestedTags: Paginated<SuggestedTag>;
-}) {
+export default function TastingForm(
+  props: {
+    errorMessage?: string;
+    title: string;
+    suggestedTags: { results: TastingTagSuggestion[] };
+  } & (TastingCreateFormProps | TastingEditFormProps),
+) {
+  const { errorMessage, title, suggestedTags } = props;
+  const initialData = props.initialData;
   const {
     control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormSchemaType>({
-    resolver: zodResolver(TastingInputSchema),
+  } = useForm<TastingFormFields>({
+    resolver: zodResolver(TastingFormFieldsSchema),
     defaultValues: {
-      bottle: initialData.bottle.id,
-      release: initialData.release?.id,
       rating: initialData.rating,
       notes: initialData.notes,
       tags: initialData.tags,
@@ -112,22 +98,26 @@ export default function TastingForm({
   });
 
   const [error, setError] = useState<string | undefined>();
-  const [image, setImage] = useState<ImageValue>();
+  const [image, setImage] = useState<TastingFormImage>();
   const [friendsValue, setFriendsValue] = useState<Option[]>(
     initialData.friends ? initialData.friends.map(userToOption) : [],
   );
-  const [showReleasePicker, setShowReleasePicker] = useState(
-    showReleasePickerDefault || Boolean(initialData.release),
-  );
-  const [releaseValue, setReleaseValue] = useState<ReleaseOption | undefined>(
-    toReleaseOption(initialData.release),
-  );
-
   const orpc = useORPC();
-
-  const onSubmitHandler: SubmitHandler<FormSchemaType> = async (data) => {
+  const onSubmitHandler: SubmitHandler<TastingFormFields> = async (data) => {
     try {
-      await onSubmit({ ...data, image });
+      if (props.mode === "edit") {
+        await props.onSubmit(
+          buildTastingEditFormSubmission({ fields: data, image }),
+        );
+      } else {
+        await props.onSubmit(
+          buildTastingCreateFormSubmission({
+            fields: data,
+            image,
+            bottleId: props.initialData.bottle.id,
+          }),
+        );
+      }
     } catch (err) {
       setError(
         getFormErrorMessage(err, {
@@ -137,14 +127,12 @@ export default function TastingForm({
     }
   };
 
-  type TagOption = Option & { count: number; tag: Tag };
+  type TagOption = Option & TastingTagOptionData;
 
-  const tagOptions = suggestedTags.results.map((t) => ({
-    id: t.tag.name,
-    name: toTitleCase(t.tag.name),
-    count: t.count,
-    tag: t.tag,
-  }));
+  const tagOptions: TagOption[] = buildTastingTagOptions(
+    suggestedTags.results,
+    initialData.tags ?? [],
+  ).map((option) => ({ ...option, name: toTitleCase(option.id) }));
 
   return (
     <FormScreen
@@ -153,11 +141,7 @@ export default function TastingForm({
       saveDisabled={isSubmitting}
     >
       <div className="lg:mb-8 lg:p-0">
-        <BottleCard
-          bottle={initialData.bottle}
-          release={initialData.release}
-          color="highlight"
-        />
+        <TastingBottleIdentity bottle={props.initialData.bottle} />
       </div>
 
       {(error || errorMessage) && (
@@ -169,76 +153,6 @@ export default function TastingForm({
         isSubmitting={isSubmitting}
       >
         <Fieldset>
-          <Controller
-            name="release"
-            control={control}
-            render={({ field: { onChange, ref, ...field } }) =>
-              showReleasePicker ? (
-                <div className="space-y-3">
-                  <SelectField<ReleaseOption>
-                    {...field}
-                    error={errors.release}
-                    label="Specific Bottling"
-                    helpText="Optional. Use this only when you're tasting an exact batch, pick, single cask, or other known bottling."
-                    placeholder="e.g. Batch 24, store pick, single cask"
-                    onQuery={async (query) => {
-                      const { results } = await orpc.bottleReleases.list.call({
-                        bottle: initialData.bottle.id,
-                        query,
-                        limit: 25,
-                        sort: "name",
-                      });
-
-                      return results
-                        .map((release) => ({
-                          ...release,
-                          id: release.id,
-                          name: formatBottlingName(release) || release.fullName,
-                        }))
-                        .sort((a, b) => a.name.localeCompare(b.name));
-                    }}
-                    onChange={(value) => {
-                      onChange(value?.id ?? null);
-                      setReleaseValue(value);
-                    }}
-                    value={releaseValue}
-                  />
-                  {(!showReleasePickerDefault || releaseValue) && (
-                    <Button
-                      size="small"
-                      type="button"
-                      onClick={() => {
-                        onChange(null);
-                        setReleaseValue(undefined);
-                        if (!showReleasePickerDefault) {
-                          setShowReleasePicker(false);
-                        }
-                      }}
-                    >
-                      Use main bottle
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="rounded border border-slate-800 bg-slate-950/40 p-4">
-                  <div className="text-sm font-medium">Specific Bottling</div>
-                  <div className="text-muted mt-1 text-sm">
-                    Default to the main bottle unless you care about an exact
-                    batch, pick, or single cask.
-                  </div>
-                  <div className="mt-3">
-                    <Button
-                      size="small"
-                      onClick={() => setShowReleasePicker(true)}
-                    >
-                      Choose Specific Bottling
-                    </Button>
-                  </div>
-                </div>
-              )
-            }
-          />
-
           <Controller
             name="rating"
             control={control}
@@ -267,22 +181,24 @@ export default function TastingForm({
                   return options.filter(
                     (o) =>
                       o.name.toLowerCase().includes(query.toLowerCase()) ||
-                      o.tag.tagCategory
+                      o.tag?.tagCategory
                         .toLowerCase()
-                        .includes(query.toLowerCase()),
+                        .includes(query.toLowerCase()) === true,
                   );
                 }}
                 onRenderOption={(option) => {
                   return (
                     <div className="flex flex-col items-start">
                       <div>{option.name}</div>
-                      <div className="text-muted font-normal">
-                        {toTitleCase(option.tag.tagCategory)}
-                      </div>
+                      {option.tag && (
+                        <div className="text-muted font-normal">
+                          {toTitleCase(option.tag.tagCategory)}
+                        </div>
+                      )}
                     </div>
                   );
                 }}
-                onChange={(value) => onChange(value.map((t: any) => t.id))}
+                onChange={(value) => onChange(value.map((tag) => tag.id))}
                 value={
                   value ? tagOptions.filter((o) => value?.includes(o.id)) : []
                 }
@@ -360,7 +276,7 @@ export default function TastingForm({
             name="friends"
             control={control}
             render={({ field: { onChange, value, ref, ...field } }) => (
-              <SelectField
+              <SelectField<Option>
                 {...field}
                 onQuery={async (query) => {
                   const { results } = await orpc.friends.list.call({
@@ -378,7 +294,7 @@ export default function TastingForm({
                 helpText="The people you're enjoying this tasting with."
                 placeholder="e.g. Bob Dylan"
                 onChange={(value) => {
-                  onChange(value.map((t: any) => t.id || t));
+                  onChange(value.map((friend) => friend.id));
                   setFriendsValue(value);
                 }}
                 emptyListItem={(query) => {

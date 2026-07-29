@@ -56,6 +56,7 @@ export default defineConfig({
     fileParallelism: false,
     env: {
       ...pickDefinedEnv([
+        "AI_GATEWAY_API_KEY",
         "OPENAI_API_KEY",
         "OPENAI_HOST",
         "OPENAI_ORGANIZATION",

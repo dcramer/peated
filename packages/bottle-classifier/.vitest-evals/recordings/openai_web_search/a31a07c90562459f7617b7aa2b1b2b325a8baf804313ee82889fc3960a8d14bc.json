@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:22:18.375Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof product batch naming"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Elijah Craig Cask Strength bourbon Barrel Proof product batch naming",
+    "summary": "Elijah Craig **Barrel Proof / Cask Strength batch names** use a simple code:\n\n**`[Letter][Month][Year]`**\n\nExample: **B524**\n- **B** = the **second batch/release of the year**\n- **5** = released in **May**\n- **24** = **2024**\n\nSo the letters mean:\n- **A** = first release of the year\n- **B** = second release\n- **C** = t",
+    "results": [
+      {
+        "title": "https://elijahcraig.com/barrel-proof",
+        "url": "https://elijahcraig.com/barrel-proof",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/barrel-proof-rye",
+        "url": "https://elijahcraig.com/barrel-proof-rye",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://elijahcraig.com/introducing-elijah-craig-barrel-proof-rye",
+        "url": "https://elijahcraig.com/introducing-elijah-craig-barrel-proof-rye",
+        "domain": "elijahcraig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.heavenhill.com/press-detail.php?postid=heaven-hill-distillery-announces-larceny-barrel-proof-series-nationwide",
+        "url": "https://www.heavenhill.com/press-detail.php?postid=heaven-hill-distillery-announces-larceny-barrel-proof-series-nationwide",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhill.com/news-and-notes/heaven-hill-distilleries-offers-limited-edition-elijah-craig-barrel-proof-bourbon-to-select-markets-nationwide/",
+        "url": "https://heavenhill.com/news-and-notes/heaven-hill-distilleries-offers-limited-edition-elijah-craig-barrel-proof-bourbon-to-select-markets-nationwide/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://heavenhill.com/news-and-notes/heaven-hill-distillery-announces-bernheim-barrel-proof-kentucky-straight-wheat-whiskey/",
+        "url": "https://heavenhill.com/news-and-notes/heaven-hill-distillery-announces-bernheim-barrel-proof-kentucky-straight-wheat-whiskey/",
+        "domain": "heavenhill.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a31a07c90562459f7617b7aa2b1b2b325a8baf804313ee82889fc3960a8d14bc",
+    "mode": "auto"
+  }
+}

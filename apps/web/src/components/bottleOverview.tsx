@@ -180,17 +180,13 @@ export default function BottleOverview({
                   </DefinitionList.Details>
                 </>
               )}
-              <DefinitionList.Term>Bottlings</DefinitionList.Term>
-              <DefinitionList.Details>
-                {formatBottlingSummary(bottle.numReleases)}
-              </DefinitionList.Details>
             </DefinitionList>
           </div>
           <div className="hidden w-64 lg:block">
-            {bottle.displayImageUrl ? (
+            {bottle.imageUrl ? (
               <div className="flex w-full justify-center rounded border border-slate-900 bg-white p-3 opacity-80">
                 <img
-                  src={bottle.displayImageUrl}
+                  src={bottle.imageUrl}
                   className="block max-w-full rounded"
                   aria-hidden="true"
                 />
@@ -208,14 +204,6 @@ export default function BottleOverview({
       </div>
     </>
   );
-}
-
-function formatBottlingSummary(numReleases: number) {
-  if (!numReleases) {
-    return <em>none tracked yet</em>;
-  }
-
-  return `${numReleases} bottling${numReleases === 1 ? "" : "s"} tracked`;
 }
 
 function YesNo({ value }: { value: boolean | null | undefined }) {

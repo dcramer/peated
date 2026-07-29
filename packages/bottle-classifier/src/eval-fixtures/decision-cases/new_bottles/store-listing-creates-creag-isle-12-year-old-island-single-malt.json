@@ -25,12 +25,9 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
         "bottleId": 41268,
-        "releaseId": null,
         "alias": "Caisteal Chamuis 12-year-old",
         "fullName": "Caisteal Chamuis 12-year-old",
-        "bottleFullName": "Caisteal Chamuis 12-year-old",
         "brand": "Caisteal Chamuis",
         "bottler": "Caisteal Chamuis",
         "series": null,
@@ -47,12 +44,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "release",
-        "bottleId": 44028,
-        "releaseId": 218,
+        "bottleId": -218,
         "alias": "Kilchoman 12-year-old Feis Ile 2020",
         "fullName": "Kilchoman Feis Ile - 2020 - 12-year-old",
-        "bottleFullName": "Kilchoman Feis Ile",
         "brand": "Kilchoman",
         "bottler": null,
         "series": null,
@@ -69,12 +63,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "bottle",
         "bottleId": 43911,
-        "releaseId": null,
         "alias": "Shieldaig The Classic 12-year-old",
         "fullName": "Shieldaig The Classic 12-year-old",
-        "bottleFullName": "Shieldaig The Classic 12-year-old",
         "brand": "Shieldaig",
         "bottler": null,
         "series": null,
@@ -91,12 +82,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 12810,
-        "releaseId": null,
         "alias": "Octomore 12.1",
         "fullName": "Octomore 12.1",
-        "bottleFullName": "Octomore 12.1",
         "brand": "Bruichladdich Octomore",
         "bottler": null,
         "series": null,
@@ -113,12 +101,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 13277,
-        "releaseId": null,
         "alias": "BenRiach The Smoky Twelve",
         "fullName": "BenRiach The Smoky Twelve",
-        "bottleFullName": "BenRiach The Smoky Twelve",
         "brand": "BenRiach",
         "bottler": "BenRiach",
         "series": null,
@@ -135,12 +120,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 1851,
-        "releaseId": null,
         "alias": "Octomore 12.2",
         "fullName": "Octomore 12.2",
-        "bottleFullName": "Octomore 12.2",
         "brand": "Bruichladdich Octomore",
         "bottler": "Bruichladdich",
         "series": null,
@@ -157,12 +139,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "release",
-        "bottleId": 44164,
-        "releaseId": 395,
+        "bottleId": -395,
         "alias": "The Balvenie Signature 12-year-old",
         "fullName": "The Balvenie Signature 12-year-old - Batch 1",
-        "bottleFullName": "The Balvenie Signature 12-year-old",
         "brand": "The Balvenie",
         "bottler": null,
         "series": null,
@@ -179,12 +158,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44005,
-        "releaseId": null,
         "alias": "Laphroaig Cask Strength",
         "fullName": "Laphroaig Cask Strength",
-        "bottleFullName": "Laphroaig Cask Strength",
         "brand": "Laphroaig",
         "bottler": "Laphroaig",
         "series": null,
@@ -201,12 +177,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 12995,
-        "releaseId": null,
         "alias": "Bruichladdich Islay Barley (2012)",
         "fullName": "Bruichladdich Islay Barley",
-        "bottleFullName": "Bruichladdich Islay Barley",
         "brand": "Bruichladdich",
         "bottler": "Bruichladdich",
         "series": null,
@@ -223,12 +196,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 11838,
-        "releaseId": null,
         "alias": "Bushmills 12-year-old",
         "fullName": "Bushmills 12-year-old Marsala Cask",
-        "bottleFullName": "Bushmills 12-year-old Marsala Cask",
         "brand": "Bushmills",
         "bottler": null,
         "series": null,
@@ -245,12 +215,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44028,
-        "releaseId": null,
         "alias": "Kilchoman Feis Ile",
         "fullName": "Kilchoman Feis Ile",
-        "bottleFullName": "Kilchoman Feis Ile",
         "brand": "Kilchoman",
         "bottler": null,
         "series": null,
@@ -267,12 +234,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "release",
-        "bottleId": 44028,
-        "releaseId": 329,
+        "bottleId": -329,
         "alias": "Kilchoman Feis Ile - 9-year-old",
         "fullName": "Kilchoman Feis Ile - 9-year-old",
-        "bottleFullName": "Kilchoman Feis Ile",
         "brand": "Kilchoman",
         "bottler": null,
         "series": null,
@@ -289,12 +253,9 @@
         "source": ["vector", "release"]
       },
       {
-        "kind": "bottle",
         "bottleId": 13276,
-        "releaseId": null,
         "alias": "BenRiach The Original Twelve",
         "fullName": "BenRiach The Original Twelve",
-        "bottleFullName": "BenRiach The Original Twelve",
         "brand": "BenRiach",
         "bottler": "BenRiach",
         "series": null,
@@ -311,12 +272,9 @@
         "source": ["vector"]
       },
       {
-        "kind": "bottle",
         "bottleId": 44175,
-        "releaseId": null,
         "alias": "Shieldaig Speyside",
         "fullName": "Shieldaig Speyside",
-        "bottleFullName": "Shieldaig Speyside",
         "brand": "Shieldaig",
         "bottler": null,
         "series": null,
@@ -359,13 +317,13 @@
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
-      "name": "12-year-old Island Single Malt",
       "brand": {
         "name": "Creag Isle"
       },
       "category": "single_malt",
       "statedAge": 12
     },
+    "proposedBottleNameIncludes": ["Island", "12-year-old"],
     "summary": "Create the distinct Creag Isle 12-year-old Island Single Malt product; none of the local candidates share the Creag Isle brand and independent evidence confirms the bottle."
   }
 }

@@ -3,6 +3,8 @@ import config from "@peated/server/config";
 import { FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  bottleGroups,
+  bottleReleases,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -22,7 +24,6 @@ const queueEntityCreationVerificationMock = vi.hoisted(() => vi.fn());
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
 
 vi.mock("@peated/server/worker/client", () => ({
-  pushJob: vi.fn(),
   pushUniqueJob: vi.fn(),
 }));
 
@@ -55,17 +56,119 @@ describe("POST /bottles", () => {
     config.OPENAI_API_KEY = undefined;
   });
 
-  test("requires authentication", async () => {
-    const err = await waitError(
-      routerClient.bottles.create(
-        {
-          name: "Delicious Wood",
-          brand: 1,
-        },
-        { context: { user: null } },
-      ),
+  test("requires authentication, verification, and accepted terms without writes", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity();
+    const unverifiedUser = await fixtures.User({ verified: false });
+    const noTermsUser = await fixtures.User({ termsAcceptedAt: null });
+    const graphBefore = {
+      bottles: await db.select().from(bottles),
+      groups: await db.select().from(bottleGroups),
+    };
+    const cases = [
+      ["unauthenticated", null, 401],
+      ["unverified", unverifiedUser, 401],
+      ["terms not accepted", noTermsUser, 403],
+    ] as const;
+
+    for (const [label, user, status] of cases) {
+      const error = await waitError(
+        routerClient.bottles.create(
+          {
+            name: `Denied Bottle ${label}`,
+            brand: brand.id,
+          },
+          { context: { user } },
+        ),
+      );
+      expect(error, label).toMatchObject({ status });
+    }
+
+    expect(await db.select().from(bottles)).toEqual(graphBefore.bottles);
+    expect(await db.select().from(bottleGroups)).toEqual(graphBefore.groups);
+  });
+
+  test("rejects invalid numeric fields at the route boundary", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity();
+    const cases = [
+      ["fractional age", { statedAge: 12.5 }],
+      ["fractional vintage year", { vintageYear: 2010.5 }],
+      ["nonpositive brand id", { brand: 0 }],
+      ["nonpositive bottler id", { bottler: -1 }],
+      ["nonpositive distiller id", { distillers: [0] }],
+      ["nonpositive series id", { series: 0 }],
+    ] as const;
+
+    for (const [label, invalid] of cases) {
+      const input = {
+        name: "Boundary Guard",
+        brand: brand.id,
+        ...invalid,
+      } as Parameters<typeof routerClient.bottles.create>[0];
+      const err = await waitError(
+        routerClient.bottles.create(input, {
+          context: { user: defaults.user },
+        }),
+      );
+
+      expect(err.message, label).toBe("Input validation failed");
+    }
+    expect(await db.select().from(bottles)).toHaveLength(0);
+  });
+
+  test("rejects unsupported image input", async ({ fixtures, defaults }) => {
+    const brand = await fixtures.Entity();
+    const cases = [
+      ["image", { image: null }],
+      ["imageUrl", { imageUrl: "https://example.com/bottle.jpg" }],
+    ] as const;
+
+    for (const [label, unsupported] of cases) {
+      const input = {
+        name: "Unsupported Image Input",
+        brand: brand.id,
+        ...unsupported,
+      } as Parameters<typeof routerClient.bottles.create>[0];
+      const err = await waitError(
+        routerClient.bottles.create(input, {
+          context: { user: defaults.user },
+        }),
+      );
+
+      expect(err.message, label).toBe("Input validation failed");
+    }
+    expect(await db.select().from(bottles)).toHaveLength(0);
+  });
+
+  test("persists and returns exact tasting notes", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const brand = await fixtures.Entity();
+    const tastingNotes = {
+      nose: "Orange peel",
+      palate: "Toasted malt",
+      finish: "Dry oak",
+    };
+    const data = await routerClient.bottles.create(
+      {
+        name: "Tasting Notes Release",
+        brand: brand.id,
+        tastingNotes,
+      },
+      { context: { user: defaults.user } },
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+
+    expect(data.tastingNotes).toEqual(tastingNotes);
+    const [bottle] = await db
+      .select({ tastingNotes: bottles.tastingNotes })
+      .from(bottles)
+      .where(eq(bottles.id, data.id));
+    expect(bottle.tastingNotes).toEqual(tastingNotes);
   });
 
   test("creates a new bottle with minimal params", async ({
@@ -81,23 +184,73 @@ describe("POST /bottles", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.id).toBeDefined();
+    expect(data).toMatchObject({
+      id: expect.any(Number),
+      name: "Delicious Wood",
+      group: {
+        id: expect.any(Number),
+        name: "Delicious Wood",
+        brandId: brand.id,
+        representativeBottleId: expect.any(Number),
+        totalBottles: 1,
+      },
+    });
+    expect(data.group!.representativeBottleId).toBe(data.id);
+    expect(data).not.toHaveProperty("kind");
 
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, data.id));
-    expect(bottle.name).toEqual("Delicious Wood");
-    expect(bottle.brandId).toBeDefined();
-    expect(bottle.statedAge).toBeNull();
+    expect(bottle).toMatchObject({
+      id: data.id,
+      groupId: data.group!.id,
+      name: "Delicious Wood",
+      fullName: `${brand.name} Delicious Wood`,
+      brandId: brand.id,
+      bottlerId: null,
+      seriesId: null,
+      category: null,
+      flavorProfile: null,
+      statedAge: null,
+      edition: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+    });
+
+    const [group] = await db
+      .select()
+      .from(bottleGroups)
+      .where(eq(bottleGroups.id, data.group!.id));
+    expect(group).toMatchObject({
+      id: bottle.groupId,
+      name: bottle.name,
+      fullName: bottle.fullName,
+      brandId: bottle.brandId,
+      bottlerId: bottle.bottlerId,
+      seriesId: bottle.seriesId,
+      category: bottle.category,
+      flavorProfile: bottle.flavorProfile,
+      statedAge: bottle.statedAge,
+      representativeBottleId: bottle.id,
+      totalBottles: 1,
+    });
+
+    expect(await db.select().from(bottleReleases)).toHaveLength(0);
+
     const distillers = await db
       .select()
       .from(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(0);
-    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: bottle.id,
     });
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "OnBottleAliasChange",
+      { name: bottle.fullName },
+    );
     expect(queueBottleCreationVerificationMock).toHaveBeenCalledWith({
       bottleId: bottle.id,
       creationSource: "manual_entry",
@@ -134,26 +287,86 @@ describe("POST /bottles", () => {
 
     const data = await routerClient.bottles.create(
       {
-        name: "Delicious Wood 12-year-old",
+        name: "Delicious Wood",
         brand: brand.id,
         bottler: distiller.id,
         distillers: [distiller.id],
+        category: "single_malt",
         statedAge: 12,
         flavorProfile: FLAVOR_PROFILES[0],
+        edition: "Batch 7",
+        abv: 57.1,
+        singleCask: true,
+        caskStrength: true,
+        vintageYear: 2010,
+        releaseYear: 2024,
+        caskSize: "hogshead",
+        caskType: "bourbon",
+        caskFill: "1st_fill",
+        description: "A complete concrete release.",
+        descriptionSrc: "user",
       },
       { context: { user: defaults.user } },
     );
 
     expect(data.id).toBeDefined();
+    expect(data.group).toMatchObject({
+      name: "Delicious Wood",
+      brandId: brand.id,
+      bottlerId: distiller.id,
+      distillerIds: [distiller.id],
+      category: "single_malt",
+      statedAge: 12,
+      flavorProfile: FLAVOR_PROFILES[0],
+      representativeBottleId: data.id,
+      totalBottles: 1,
+    });
 
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, data.id));
-    expect(bottle.name).toEqual("Delicious Wood 12-year-old");
-    expect(bottle.brandId).toEqual(brand.id);
-    expect(bottle.statedAge).toEqual(12);
-    expect(bottle.flavorProfile).toEqual(FLAVOR_PROFILES[0]);
+    expect(bottle).toMatchObject({
+      groupId: data.group!.id,
+      name: "Delicious Wood - Batch 7 - 2024 Release - 2010 Vintage - 57.1% ABV - Single Cask - Cask Strength - Bourbon Cask - Hogshead - 1st Fill",
+      brandId: brand.id,
+      bottlerId: distiller.id,
+      category: "single_malt",
+      statedAge: 12,
+      flavorProfile: FLAVOR_PROFILES[0],
+      edition: "Batch 7",
+      abv: 57.1,
+      singleCask: true,
+      caskStrength: true,
+      vintageYear: 2010,
+      releaseYear: 2024,
+      caskSize: "hogshead",
+      caskType: "bourbon",
+      caskFill: "1st_fill",
+      description: "A complete concrete release.",
+      descriptionSrc: "user",
+    });
+    expect(data).toMatchObject({
+      id: bottle.id,
+      name: bottle.name,
+      brand: { id: bottle.brandId },
+      bottler: { id: bottle.bottlerId },
+      distillers: [{ id: distiller.id }],
+      category: bottle.category,
+      series: null,
+      flavorProfile: bottle.flavorProfile,
+      edition: bottle.edition,
+      statedAge: bottle.statedAge,
+      abv: bottle.abv,
+      singleCask: bottle.singleCask,
+      caskStrength: bottle.caskStrength,
+      vintageYear: bottle.vintageYear,
+      releaseYear: bottle.releaseYear,
+      caskSize: bottle.caskSize,
+      caskType: bottle.caskType,
+      caskFill: bottle.caskFill,
+      description: bottle.description,
+    });
     expect(bottle.createdByActorId).toBe(
       (await getUserActor(defaults.user)).id,
     );
@@ -266,7 +479,7 @@ describe("POST /bottles", () => {
     expect(brand.createdByActorId).toBe((await getUserActor(defaults.user)).id);
     expect(brand.countryId).toEqual(country.id);
     expect(brand.regionId).toEqual(region.id);
-    expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: brand.id,
     });
     expect(queueEntityCreationVerificationMock).toHaveBeenCalledWith({
@@ -634,7 +847,7 @@ describe("POST /bottles", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("updates statedAge bottle w/ age signal", async ({
+  test("preserves marketed age wording without inferring structured statedAge", async ({
     defaults,
     fixtures,
   }) => {
@@ -649,13 +862,21 @@ describe("POST /bottles", () => {
       },
       { context: { user: defaults.user } },
     );
-    expect(data.id).toBeDefined();
+    expect(data).toMatchObject({
+      name: "Delicious Wood 12-year-old",
+      fullName: `${brand.name} Delicious Wood 12-year-old`,
+      statedAge: null,
+    });
 
     const [bottle] = await db
       .select()
       .from(bottles)
       .where(eq(bottles.id, data.id));
-    expect(bottle.statedAge).toEqual(12);
+    expect(bottle).toMatchObject({
+      name: "Delicious Wood 12-year-old",
+      fullName: `${brand.name} Delicious Wood 12-year-old`,
+      statedAge: null,
+    });
   });
 
   test("removes duplicated brand name", async ({ defaults, fixtures }) => {
@@ -701,76 +922,6 @@ describe("POST /bottles", () => {
       .where(eq(bottlesToDistillers.bottleId, data.id));
     expect(dList.length).toEqual(1);
     expect(dList[0].distillerId).toEqual(distiller.id);
-  });
-
-  test("saves cask information", async ({ defaults, fixtures }) => {
-    const brand = await fixtures.Entity();
-
-    const data = await routerClient.bottles.create(
-      {
-        name: "Old Whisky",
-        brand: brand.id,
-        caskType: "bourbon",
-        caskSize: "hogshead",
-        caskFill: "1st_fill",
-      },
-      { context: { user: await fixtures.User({ mod: true }) } },
-    );
-
-    expect(data.id).toBeDefined();
-
-    const [newBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, data.id));
-
-    expect(newBottle.caskType).toEqual("bourbon");
-    expect(newBottle.caskSize).toEqual("hogshead");
-    expect(newBottle.caskFill).toEqual("1st_fill");
-  });
-
-  test("saves vintage information", async ({ defaults, fixtures }) => {
-    const brand = await fixtures.Entity();
-
-    const data = await routerClient.bottles.create(
-      {
-        name: "Old Whisky",
-        brand: brand.id,
-        vintageYear: 2024,
-      },
-      { context: { user: await fixtures.User({ mod: true }) } },
-    );
-
-    expect(data.id).toBeDefined();
-
-    const [newBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, data.id));
-
-    expect(newBottle.vintageYear).toEqual(2024);
-  });
-
-  test("saves release year", async ({ defaults, fixtures }) => {
-    const brand = await fixtures.Entity();
-
-    const data = await routerClient.bottles.create(
-      {
-        name: "Old Whisky",
-        brand: brand.id,
-        releaseYear: 2024,
-      },
-      { context: { user: await fixtures.User({ mod: true }) } },
-    );
-
-    expect(data.id).toBeDefined();
-
-    const [newBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, data.id));
-
-    expect(newBottle.releaseYear).toEqual(2024);
   });
 
   test("creates a bottle with an existing series", async ({
@@ -858,6 +1009,10 @@ describe("POST /bottles", () => {
     expect(change).toBeDefined();
     expect(change.type).toEqual("add");
     expect(change.displayName).toEqual(`${brand.name} Limited Edition`);
+    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      "IndexBottleSeriesSearchVectors",
+      { seriesId: newSeries.id },
+    );
   });
 
   test("rejects invalid series ID", async ({ defaults, fixtures }) => {

@@ -5,15 +5,23 @@ import { useSearchParams } from "next/navigation";
 import { buildQueryString } from "../lib/urls";
 import Button from "./button";
 
-export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
+export default function PaginationButtons({
+  rel,
+  cursorParam = "cursor",
+  ariaLabel = "Pagination",
+}: {
+  rel?: PagingRel | null;
+  cursorParam?: string;
+  ariaLabel?: string;
+}) {
   const searchParams = useSearchParams();
 
-  if (!rel) return null;
+  if (!rel || (!rel.prevCursor && !rel.nextCursor)) return null;
 
   return (
     <nav
       className="flex items-center justify-between py-3"
-      aria-label="Pagination"
+      aria-label={ariaLabel}
     >
       <div className="flex flex-auto justify-between gap-x-2 sm:justify-end">
         <Button
@@ -21,7 +29,7 @@ export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
             rel.prevCursor
               ? {
                   search: buildQueryString(searchParams, {
-                    cursor: rel.prevCursor,
+                    [cursorParam]: rel.prevCursor,
                   }),
                 }
               : undefined
@@ -35,7 +43,7 @@ export default function PaginationButtons({ rel }: { rel?: PagingRel | null }) {
             rel.nextCursor
               ? {
                   search: buildQueryString(searchParams, {
-                    cursor: rel.nextCursor,
+                    [cursorParam]: rel.nextCursor,
                   }),
                 }
               : undefined

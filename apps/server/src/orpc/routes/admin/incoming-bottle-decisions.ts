@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   actors,
-  bottleReleases,
   bottles,
   externalSites,
   incomingBottleDecisionLogs,
@@ -60,12 +59,6 @@ const IncomingBottleDecisionListResponseSchema = z.object({
         id: z.number(),
         fullName: z.string(),
       }),
-      release: z
-        .object({
-          id: z.number(),
-          fullName: z.string(),
-        })
-        .nullable(),
       createdBottle: z.boolean(),
       createdRelease: z.boolean(),
       confidence: z.number().nullable(),
@@ -108,19 +101,15 @@ export default procedure
       .select({
         log: incomingBottleDecisionLogs,
         externalSite: externalSites,
-        bottle: {
-          id: bottles.id,
-          fullName: bottles.fullName,
-        },
-        release: {
-          id: bottleReleases.id,
-          fullName: bottleReleases.fullName,
-        },
         actor: {
           id: actors.id,
           type: actors.type,
           key: actors.key,
           displayName: actors.displayName,
+        },
+        bottle: {
+          id: bottles.id,
+          fullName: bottles.fullName,
         },
       })
       .from(incomingBottleDecisionLogs)
@@ -128,12 +117,8 @@ export default procedure
         externalSites,
         eq(externalSites.id, incomingBottleDecisionLogs.externalSiteId),
       )
-      .innerJoin(bottles, eq(bottles.id, incomingBottleDecisionLogs.bottleId))
-      .leftJoin(
-        bottleReleases,
-        eq(bottleReleases.id, incomingBottleDecisionLogs.releaseId),
-      )
       .innerJoin(actors, eq(actors.id, incomingBottleDecisionLogs.actorId))
+      .innerJoin(bottles, eq(bottles.id, incomingBottleDecisionLogs.bottleId))
       .where(where.length ? and(...where) : undefined)
       .orderBy(
         desc(incomingBottleDecisionLogs.createdAt),
@@ -143,37 +128,34 @@ export default procedure
       .offset(offset);
 
     const hasNextPage = rows.length > input.limit;
+    const page = rows.slice(0, input.limit);
 
     return {
-      results: rows.slice(0, input.limit).map((row) => ({
-        id: row.log.id,
-        sourceKind: row.log.sourceKind,
-        sourceId: row.log.sourceId,
-        proposalId: row.log.proposalId,
-        externalSite: {
-          id: row.externalSite.id,
-          name: row.externalSite.name,
-          type: row.externalSite.type,
-        },
-        name: row.log.name,
-        url: row.log.url,
-        decision: row.log.decision,
-        actor: row.actor,
-        bottle: row.bottle,
-        release: row.release?.id
-          ? {
-              id: row.release.id,
-              fullName: row.release.fullName!,
-            }
-          : null,
-        createdBottle: row.log.createdBottle,
-        createdRelease: row.log.createdRelease,
-        confidence: row.log.confidence,
-        model: row.log.model,
-        rationale: row.log.rationale,
-        metadata: row.log.metadata,
-        createdAt: row.log.createdAt.toISOString(),
-      })),
+      results: page.map((row) => {
+        return {
+          id: row.log.id,
+          sourceKind: row.log.sourceKind,
+          sourceId: row.log.sourceId,
+          proposalId: row.log.proposalId,
+          externalSite: {
+            id: row.externalSite.id,
+            name: row.externalSite.name,
+            type: row.externalSite.type,
+          },
+          name: row.log.name,
+          url: row.log.url,
+          decision: row.log.decision,
+          actor: row.actor,
+          bottle: row.bottle,
+          createdBottle: row.log.createdBottle,
+          createdRelease: row.log.createdRelease,
+          confidence: row.log.confidence,
+          model: row.log.model,
+          rationale: row.log.rationale,
+          metadata: row.log.metadata,
+          createdAt: row.log.createdAt.toISOString(),
+        };
+      }),
       rel: {
         nextCursor: hasNextPage ? input.cursor + 1 : null,
         prevCursor: input.cursor > 1 ? input.cursor - 1 : null,

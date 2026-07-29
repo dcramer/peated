@@ -1,0 +1,55 @@
+{
+  "id": "store-listing-age-mismatch-rejects-incomplete-bottle-without-cask-identity",
+  "name": "store listing: age mismatch rejects an incomplete Bottle without cask identity",
+  "input": {
+    "reference": {
+      "name": "Glenglassaugh 1978 Rare Cask Release (Batch 1) 35-year-old",
+      "url": "https://shop.example/products/glenglassaugh-rare-cask-batch-1"
+    },
+    "extractedIdentity": {
+      "brand": "Glenglassaugh",
+      "bottler": null,
+      "expression": "1978 Rare Cask Release",
+      "series": null,
+      "distillery": ["Glenglassaugh"],
+      "category": "single_malt",
+      "stated_age": 35,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Batch 1"
+    },
+    "initialCandidates": [
+      {
+        "alias": null,
+        "brand": "Glenglassaugh",
+        "bottler": null,
+        "series": null,
+        "distillery": ["Glenglassaugh"],
+        "category": "single_malt",
+        "statedAge": 40,
+        "edition": null,
+        "caskStrength": null,
+        "singleCask": null,
+        "abv": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 0.95,
+        "source": ["exact"],
+        "bottleId": 2457,
+        "fullName": "Glenglassaugh 1978 Rare Cask Release"
+      }
+    ]
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": null,
+    "expectedTier": "review",
+    "summary": "Reject Bottle creation because web evidence shows Batch 1 refers to cask-specific 35-year-old Bottles while the source lacks the exact cask identity and the only local row conflicts on age."
+  }
+}

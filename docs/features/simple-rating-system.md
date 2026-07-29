@@ -2,151 +2,104 @@
 
 ## Overview
 
-Peated has implemented a new simplified rating system to replace the traditional 5-star rating scale. This whisky-themed system reduces cognitive load while maintaining meaningful feedback about user preferences.
+Peated's current tasting rating is a three-point whisky-themed choice. The
+system keeps the decision quick while preserving an unrated tasting as a valid
+record.
 
-**Important**: The 5-star rating system has been deprecated. Existing 5-star ratings are preserved in the `rating_legacy` field, and all new tastings use the simplified Pass/Sip/Savor system.
+Each tasting rates one selected, independently complete Bottle. Users never
+rate a BottleGroup or an unspecified release family. A related-release page may
+display a group summary derived from member Bottle activity, but it still
+creates no group-owned tasting.
 
-## The Three-Point Scale
+## The Scale
 
-### 🚫 Pass (-1)
+### Pass (`-1`)
 
-**"Would not drink again"**
+Would not drink again.
 
-- Indicates a negative experience
-- The whisky didn't meet expectations
-- User would decline if offered again
+### Sip (`1`)
 
-### 🥃 Sip (1)
+Enjoyable; would have occasionally.
 
-**"Enjoyable, would have occasionally"**
+### Savor (`2`)
 
-- Positive experience
-- Good whisky worth trying
-- Would happily accept if offered
-- Might order at a bar
+Excellent; would seek out.
 
-### 🥃🥃 Savor (2)
+### No rating (`null`)
 
-**"Excellent, would seek out"**
+The tasting is recorded without a rating.
 
-- Exceptional experience
-- Whisky worth pursuing
-- Would purchase a bottle
-- Would recommend to others
+## Recording A Tasting
 
-## Why We're Adding This System
+1. The user selects a Bottle.
+2. The tasting form keeps that Bottle fixed.
+3. The user chooses Pass, Sip, Savor, or leaves the tasting unrated.
+4. The server validates the active Bottle and stores its `bottleId` with the
+   tasting.
 
-### User Benefits
+The form does not submit BottleGroup identity, a representative Bottle, or a
+Bottle/BottleRelease pair.
 
-1. **Faster Decisions**: No agonizing over 3.5 vs 3.75 stars
-2. **Clearer Intent**: Each rating has distinct meaning
-3. **Mobile-Friendly**: Easy to tap on small screens
-4. **More Ratings**: Simplified systems see 200%+ increase in engagement (Netflix case study)
+## Rating Summaries
 
-### Platform Benefits
+### Bottle Summary
 
-1. **Better Recommendations**: Clearer positive/negative signals
-2. **Improved Analytics**: Easier to identify crowd favorites
-3. **Social Features**: "85% would savor" is more meaningful than "4.2 stars"
+A Bottle summary uses only tastings assigned directly to that Bottle.
+Related-release activity is not folded into the Bottle's own score.
 
-## How It Works
+### Related-Release Summary
 
-### For New Tastings
+A BottleGroup summary queries raw tastings across its active member Bottle ids
+and counts each row once. It does not:
 
-1. When creating a tasting, users see three whisky-themed rating options
-2. Users select their choice: Pass 🚫, Sip 🥃, or Savor 🥃🥃
-3. The selection is highlighted and saved with numerical values (-1, 1, 2)
+- own generic or direct group tastings;
+- choose the representative as an activity destination; or
+- sum materialized Bottle totals.
 
-### For Existing Tastings
+The group summary is presentation for “similar bottles” or “other releases,”
+not another rating identity.
 
-- All existing 5-star ratings are preserved in `rating_legacy` field
-- Legacy ratings were automatically converted using thresholds:
-  - Pass (-1): rating ≤ 2.0
-  - Sip (1): rating > 2.0 and ≤ 4.0
-  - Savor (2): rating > 4.0
+### Counts
 
-### Display Examples
+- `totalTastings` includes rated and unrated tastings.
+- Pass/Sip/Savor counts, percentages, and the average use rated tastings only.
+- A Bottle or group with no rated tastings has zero percentages and a null
+  average.
 
-#### Individual Tasting
+## Historical Ratings
 
-```
-Ardbeg Corryvreckan
-🥃🥃 Savor
-"Intense peat bomb with complex maritime notes..."
-```
+The migration to Pass/Sip/Savor preserved the original five-star value in
+`rating_legacy` and converted the active rating:
 
-#### Bottle Overview
+- `<= 2.0` became Pass;
+- `> 2.0` and `<= 4.0` became Sip;
+- `> 4.0` became Savor.
 
-```
-Lagavulin 16
-⭐⭐⭐⭐½ 4.3 (847 ratings)
-🥃 78% would sip or savor (234 simple ratings)
-```
+Current tasting writes use only Pass/Sip/Savor. The retained legacy value is
+historical data, not a second live rating choice.
 
-#### Distribution Display
+## User Interface
 
-```
-Pass:  ▓▓░░░░░░░░ 15%
-Sip:   ▓▓▓▓▓░░░░░ 45%
-Savor: ▓▓▓▓░░░░░░ 40%
-```
+- `SimpleRatingInput` provides the tasting-form selector.
+- `SimpleRatingDisplay` renders one tasting's choice.
+- `SimpleRatingStats` renders aggregate distribution and percentages.
+- Bottle lists may use the stored average for sorting or a compact indicator.
+- Bottle pages show Bottle-owned statistics; related-release pages may show the
+  member-derived group summary separately.
 
-## User Experience Flow
+## Identity And Migration Notes
 
-### Creating a Tasting
+- `tasting.bottleId` is authoritative.
+- A retained `releaseId` column may exist temporarily as migration evidence,
+  but live rating reads, writes, and aggregates ignore it.
+- Parent-only historical tastings remain on the retained general Bottle.
+- Release-specific historical tastings move to the Bottle recorded by the
+  durable release-promotion mapping.
+- BottleRelease cleanup remains backup- and approval-gated; it is not required
+  for direct-Bottle rating behavior.
 
-1. User selects bottle and enters tasting details
-2. Sees "Rating" section with toggle
-3. Default shows based on user's last preference
-4. Can switch between systems before saving
+## Accessibility
 
-### Viewing Ratings
-
-- Bottle pages show both rating types if available
-- List views display primary rating (most ratings)
-- Filters support both systems
-
-### Search and Discovery
-
-- Can filter by minimum simple rating
-- Sort by simple rating average
-- "Highly Savored" badge for 80%+ savor rate
-
-## Implementation Details
-
-### Database Schema
-
-- **Tastings table**: `rating` column changed to smallint (-1, 1, 2), `rating_legacy` preserves original values
-- **Bottles table**: `ratingStats` JSONB field stores distribution statistics
-- **Automatic migration**: Existing ratings converted using defined thresholds
-
-### Components
-
-- **SimpleRatingInput**: Interactive rating selector for tasting forms
-- **SimpleRatingStats**: Visual distribution display with percentages and bars
-- **SimpleRatingDisplay**: Consistent rating display with icons and labels
-- **SimpleRatingFilter**: Bottle list filtering by rating level
-
-## FAQs
-
-**Q: Will my old ratings be converted?**
-A: Your existing 5-star ratings will be preserved and remain visible. We'll offer an optional tool to convert them to the new system if you wish.
-
-**Q: Can I still use the 5-star system?**
-A: During the transition period, yes. However, we're deprecating 5-star ratings in favor of the simpler system.
-
-**Q: How does this affect bottle rankings?**
-A: During transition, bottles will show both rating types. Eventually, rankings will be based solely on the new system.
-
-**Q: Why are you deprecating 5-star ratings?**
-A: Our research shows simplified systems increase engagement by 200%+ and provide clearer signals for recommendations.
-
-**Q: What if I'm neutral about a whisky?**
-A: You can choose not to rate, or use "Sip" for acceptable but unremarkable whiskies.
-
-## Future Enhancements
-
-- **Contextual Ratings**: "Would sip neat, would savor with water"
-- **Occasion Tags**: "Daily sipper" vs "Special occasion savor"
-- **Price Context**: "Would savor at $50, would sip at $100"
-- **Recommendation Weights**: Savor ratings influence recommendations more strongly
+Rating controls must expose text labels and selected state without relying on
+emoji or color alone. Keyboard and screen-reader users must be able to choose
+or clear a rating.

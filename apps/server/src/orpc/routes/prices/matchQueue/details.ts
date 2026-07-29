@@ -4,7 +4,6 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { getProposalTargets } from "@peated/server/lib/priceMatching";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -58,7 +57,6 @@ export default procedure
       });
     }
 
-    const targets = await getProposalTargets([row.proposal]);
     const [result] = await serializeQueueItems(
       [
         {
@@ -70,8 +68,11 @@ export default procedure
           },
         },
       ],
-      targets,
       context,
+      {
+        caller: "prices.matchQueue.details",
+        operation: "hydrate",
+      },
     );
 
     return result;

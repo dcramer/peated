@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:00:58.593Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Traigh Bhan 19 Year Old batch release edition ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Traigh Bhan 19 Year Old batch release edition ABV",
+    "summary": "Ardbeg **Traigh Bhan 19 Year Old** is an annual **small-batch** release, and the **edition/batch number matters** because each batch is labeled separately. Across the official Ardbeg pages I found, the **ABV is 46.2%** for the Traigh Bhan batches surfaced, including **Batch 2**, **Batch 3**, and **Batch 6**. ([ardbeg.c",
+    "results": [
+      {
+        "title": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "url": "https://www.ardbeg.com/Ardbeg%2019%20Years%20Old%20Traigh%20Bhan%20Batch%203-1092734.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/aboutardbeg/archive.html",
+        "url": "https://www.ardbeg.com/aboutardbeg/archive.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/de-de/aboutardbeg/history.html",
+        "url": "https://www.ardbeg.com/de-de/aboutardbeg/history.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/en-gb/Shop/Limited%20Editions/",
+        "url": "https://www.ardbeg.com/en-gb/Shop/Limited%20Editions/",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com/de-de/ardbeg-19-year-old-traigh-bhan-batch-6-1107207.html",
+        "url": "https://www.ardbeg.com/de-de/ardbeg-19-year-old-traigh-bhan-batch-6-1107207.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.ardbeg.com.hk/products/ardbeg-19-years-old-traigh-bhan-batch-7",
+        "url": "https://www.ardbeg.com.hk/products/ardbeg-19-years-old-traigh-bhan-batch-7",
+        "domain": "ardbeg.com.hk",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "bcdf3ec21273fd23e15af6fa42a7415d5203d078902ccff0c60e615dedf37766",
+    "mode": "auto"
+  }
+}

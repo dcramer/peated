@@ -8,10 +8,7 @@
     },
     "initialCandidates": [
       {
-        "kind": "bottle",
-        "releaseId": null,
         "alias": null,
-        "bottleFullName": "Wild Turkey Rare Breed Barrel Proof",
         "brand": "Wild Turkey",
         "bottler": null,
         "series": "Rare Breed",
@@ -36,10 +33,7 @@
       "when": ["wild turkey", "rare breed", "rye"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
           "brand": "Wild Turkey",
           "bottler": null,
           "series": "Rare Breed",
@@ -63,10 +57,7 @@
       "when": ["rare breed", "rye", "barrel proof"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
           "brand": "Wild Turkey",
           "bottler": null,
           "series": "Rare Breed",
@@ -90,10 +81,7 @@
       "when": ["rare breed", "rye", "cask_strength"],
       "results": [
         {
-          "kind": "bottle",
-          "releaseId": null,
           "alias": null,
-          "bottleFullName": "Wild Turkey Rare Breed Rye Barrel Proof",
           "brand": "Wild Turkey",
           "bottler": null,
           "series": "Rare Breed",

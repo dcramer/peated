@@ -2,27 +2,53 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { formatColor } from "@peated/server/lib/format";
 import { logError, logWarn } from "@peated/server/lib/log";
+import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { z } from "zod";
 
 if (!config.DISCORD_WEBHOOK) {
   logWarn("DISCORD_WEBHOOK is not configured", {});
 }
 
-export default async function ({ tastingId }: { tastingId: number }) {
+export const NotifyDiscordOnTastingJobArgsSchema = z
+  .object({
+    tastingId: z.number().int().positive(),
+  })
+  .strict();
+
+export default async function notifyDiscordOnTasting(input: unknown) {
+  const { tastingId } = NotifyDiscordOnTastingJobArgsSchema.parse(input);
+
   if (!config.DISCORD_WEBHOOK) {
     return;
   }
 
-  const tasting = await db.query.tastings.findFirst({
-    where: (tastings, { eq }) => eq(tastings.id, tastingId),
-    with: {
-      createdBy: true,
-      bottle: true,
-    },
+  const tasting = await db.transaction(async (tx) => {
+    const selected = await tx.query.tastings.findFirst({
+      where: (tastings, { eq }) => eq(tastings.id, tastingId),
+      with: {
+        createdBy: true,
+      },
+    });
+    if (!selected) {
+      throw new Error(`Unknown tasting: ${tastingId}`);
+    }
+    const bottleId = selected.bottleId;
+    if (bottleId === null) {
+      throw new Error(`Tasting ${tastingId} has no Bottle`);
+    }
+    await resolveActiveBottleIds(tx, [bottleId]);
+    const bottle = await tx.query.bottles.findFirst({
+      where: (bottles, { eq }) => eq(bottles.id, bottleId),
+      columns: { fullName: true },
+    });
+    if (!bottle) {
+      throw new Error(
+        `Tasting ${tastingId} references missing Bottle ${bottleId}`,
+      );
+    }
+    return { ...selected, bottle };
   });
-  if (!tasting) {
-    throw new Error(`Unknown tasting: ${tastingId}`);
-  }
 
   // TODO: pretty sure we're mismatched timezones on db + server, and need normalization
   // move db to UTC (if its not, or if its not storing tzinfo), and then run all these checks

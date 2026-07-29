@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T16:43:36.708Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Komagatake Limited Edition 2022 50% single malt Mars"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Komagatake Limited Edition 2022 50% single malt Mars",
+    "summary": "**Komagatake Limited Edition 2022 50% Single Malt Mars** appears to be the bottle officially named **Single Malt KOMAGATAKE 2022 Edition** from **Mars Whisky / Hombo Shuzo**. ([hombo.co.jp](https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/?utm_source=openai))\n\nConfirmed bottle-specific details",
+    "results": [
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "url": "https://www.hombo.co.jp/en/2024/topics/20240321-export/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "url": "https://www.hombo.co.jp/product/mars-singlemalt-komagatake-2022-edition/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/165119/komagatake",
+        "url": "https://www.whiskybase.com/whiskies/whisky/165119/komagatake",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/215617/mars-komagatake-2022",
+        "url": "https://www.whiskybase.com/whiskies/whisky/215617/mars-komagatake-2022",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-ipa-cask-finish-bottled-in-2022/",
+        "url": "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-ipa-cask-finish-bottled-in-2022/",
+        "domain": "hombo.co.jp",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "efb43a2bb5487a2c24f89c7824a4486c807599cd161c298cbc0ba7235c1f5e03",
+    "mode": "auto"
+  }
+}

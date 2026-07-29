@@ -1,8 +1,11 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleGroups,
+  bottleReleasePromotions,
   bottleReleases,
   bottles,
+  bottleTombstones,
   changes,
   collectionBottles,
   flightBottles,
@@ -11,133 +14,219 @@ import {
 } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { and, eq } from "drizzle-orm";
-import { describe, expect, it } from "vitest";
+import * as workerClient from "@peated/server/worker/client";
+import { asc, eq } from "drizzle-orm";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-describe("DELETE /bottle-releases/:release", () => {
-  it("deletes a bottle release and updates related records", async function ({
+async function promoteRelease(releaseId: number, promotedBottleId: number) {
+  await db.insert(bottleReleasePromotions).values({
+    releaseId,
+    promotedBottleId,
+  });
+}
+
+async function snapshotCatalogGraph() {
+  const [
+    groups,
+    bottleRows,
+    releases,
+    promotions,
+    aliases,
+    collectionRows,
+    flightRows,
+    tastingRows,
+    reviewRows,
+    changeRows,
+    bottleRetirements,
+  ] = await Promise.all([
+    db.select().from(bottleGroups).orderBy(asc(bottleGroups.id)),
+    db.select().from(bottles).orderBy(asc(bottles.id)),
+    db.select().from(bottleReleases).orderBy(asc(bottleReleases.id)),
+    db
+      .select()
+      .from(bottleReleasePromotions)
+      .orderBy(asc(bottleReleasePromotions.releaseId)),
+    db.select().from(bottleAliases).orderBy(asc(bottleAliases.name)),
+    db.select().from(collectionBottles).orderBy(asc(collectionBottles.id)),
+    db.select().from(flightBottles).orderBy(asc(flightBottles.flightId)),
+    db.select().from(tastings).orderBy(asc(tastings.id)),
+    db.select().from(reviews).orderBy(asc(reviews.id)),
+    db.select().from(changes).orderBy(asc(changes.id)),
+    db.select().from(bottleTombstones).orderBy(asc(bottleTombstones.bottleId)),
+  ]);
+
+  return {
+    groups,
+    bottles: bottleRows,
+    releases,
+    promotions,
+    aliases,
+    collections: collectionRows,
+    flights: flightRows,
+    tastings: tastingRows,
+    reviews: reviewRows,
+    changes: changeRows,
+    bottleTombstones: bottleRetirements,
+  };
+}
+
+describe("DELETE /bottle-releases/{release}", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("retains admin-only access", async ({ defaults, fixtures }) => {
+    const mod = await fixtures.User({ mod: true });
+
+    for (const user of [null, defaults.user, mod]) {
+      const error = await waitError(
+        routerClient.bottleReleases.delete(
+          { release: 1 },
+          { context: { user } },
+        ),
+      );
+      expect(error).toMatchObject({ status: 401 });
+    }
+  });
+
+  test("returns not found when the retained release does not exist", async ({
     fixtures,
-  }) {
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const error = await waitError(
+      routerClient.bottleReleases.delete(
+        { release: 999_999 },
+        { context: { user: admin } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Release not found.]`);
+  });
+
+  test("rejects a missing promotion mapping without writes", async ({
+    fixtures,
+  }) => {
     const admin = await fixtures.User({ admin: true });
 
-    const release = await fixtures.BottleRelease();
+    const missingParent = await fixtures.Bottle({ name: "Delete Missing" });
+    const missingRelease = await fixtures.BottleRelease({
+      bottleId: missingParent.id,
+    });
 
-    // Set initial numReleases count
-    await db
-      .update(bottles)
-      .set({ numReleases: 1 })
-      .where(eq(bottles.id, release.bottleId));
+    const before = await snapshotCatalogGraph();
+    vi.clearAllMocks();
 
-    // Create related records
+    const error = await waitError(
+      routerClient.bottleReleases.delete(
+        { release: missingRelease.id },
+        { context: { user: admin } },
+      ),
+    );
+    expect(error).toMatchObject({ status: 409 });
+
+    expect(await snapshotCatalogGraph()).toEqual(before);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("requires an explicit merge and leaves the complete mapped graph unchanged", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const parent = await fixtures.Bottle({ name: "Delete Parent" });
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Delete Exact",
+    });
+    await promoteRelease(release.id, promoted.id);
+
     await db.insert(bottleAliases).values({
+      name: "Delete Retained Alias",
+      bottleId: promoted.id,
       releaseId: release.id,
-      name: "Test Alias",
-      bottleId: release.bottleId,
       assignedByActorId: release.createdByActorId,
     });
-
     await db.insert(collectionBottles).values({
-      releaseId: release.id,
       collectionId: (await fixtures.Collection()).id,
-      bottleId: release.bottleId,
+      bottleId: promoted.id,
+      releaseId: release.id,
     });
-
     await db.insert(flightBottles).values({
-      releaseId: release.id,
       flightId: (await fixtures.Flight()).id,
-      bottleId: release.bottleId,
-    });
-
-    await fixtures.Tasting({
-      bottleId: release.bottleId,
+      bottleId: promoted.id,
       releaseId: release.id,
     });
-
+    await fixtures.Tasting({
+      bottleId: promoted.id,
+      releaseId: release.id,
+    });
     await fixtures.Review({
-      bottleId: release.bottleId,
+      bottleId: promoted.id,
       releaseId: release.id,
       name: release.fullName,
     });
 
-    // Delete the release
-    await routerClient.bottleReleases.delete(
-      { release: release.id },
-      {
-        context: { user: admin },
-      },
-    );
+    const before = await snapshotCatalogGraph();
+    vi.clearAllMocks();
 
-    // Verify the release is deleted
-    const [deletedRelease] = await db
-      .select()
-      .from(bottleReleases)
-      .where(eq(bottleReleases.id, release.id));
-    expect(deletedRelease).toBeUndefined();
-
-    // Verify related records are updated
-    const [alias] = await db
-      .select()
-      .from(bottleAliases)
-      .where(eq(bottleAliases.bottleId, release.bottleId));
-    expect(alias.releaseId).toBeNull();
-
-    const [collectionBottle] = await db
-      .select()
-      .from(collectionBottles)
-      .where(eq(collectionBottles.bottleId, release.bottleId));
-    expect(collectionBottle.releaseId).toBeNull();
-
-    const [flightBottle] = await db
-      .select()
-      .from(flightBottles)
-      .where(eq(flightBottles.bottleId, release.bottleId));
-    expect(flightBottle.releaseId).toBeNull();
-
-    const [tasting] = await db
-      .select()
-      .from(tastings)
-      .where(eq(tastings.bottleId, release.bottleId));
-    expect(tasting.releaseId).toBeNull();
-
-    const [review] = await db
-      .select()
-      .from(reviews)
-      .where(eq(reviews.bottleId, release.bottleId));
-    expect(review.releaseId).toBeNull();
-
-    // Verify change record is created
-    const [change] = await db
-      .select()
-      .from(changes)
-      .where(
-        and(
-          eq(changes.objectId, release.id),
-          eq(changes.objectType, "bottle_release"),
-        ),
-      );
-    expect(change).toBeDefined();
-    expect(change.type).toBe("delete");
-    expect(change.displayName).toBe(release.fullName);
-
-    // Verify numReleases was decremented
-    const [updatedBottle] = await db
-      .select()
-      .from(bottles)
-      .where(eq(bottles.id, release.bottleId));
-    expect(updatedBottle.numReleases).toBe(0);
-  });
-
-  it("throws error if release not found", async function ({ fixtures }) {
-    const admin = await fixtures.User({ admin: true });
-
-    const err = await waitError(() =>
+    const error = await waitError(
       routerClient.bottleReleases.delete(
-        { release: 999999 },
-        {
-          context: { user: admin },
-        },
+        { release: release.id },
+        { context: { user: admin } },
       ),
     );
-    expect(err).toMatchInlineSnapshot(`[Error: Release not found.]`);
+
+    expect(error).toMatchObject({
+      status: 409,
+      message: `BottleRelease ${release.id} maps to Bottle ${promoted.id}; merge that Bottle into an explicit destination instead.`,
+    });
+    expect(await snapshotCatalogGraph()).toEqual(before);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
+  });
+
+  test("requires merging the coherent survivor after an exact Bottle merge", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const parent = await fixtures.Bottle({ name: "Delete Merge Parent" });
+    const release = await fixtures.BottleRelease({ bottleId: parent.id });
+    const promoted = await fixtures.BottleGroupMember({
+      groupId: parent.groupId as number,
+      edition: "Delete Merge Source",
+    });
+    const survivor = await fixtures.Bottle({ name: "Delete Merge Survivor" });
+    await promoteRelease(release.id, promoted.id);
+
+    await routerClient.bottles.merge(
+      {
+        bottle: promoted.id,
+        other: survivor.id,
+        direction: "mergeInto",
+      },
+      { context: { user: admin } },
+    );
+    const promotion = await db.query.bottleReleasePromotions.findFirst({
+      where: eq(bottleReleasePromotions.releaseId, release.id),
+    });
+    expect(promotion).toMatchObject({ promotedBottleId: survivor.id });
+    const before = await snapshotCatalogGraph();
+    vi.clearAllMocks();
+
+    const error = await waitError(
+      routerClient.bottleReleases.delete(
+        { release: release.id },
+        { context: { user: admin } },
+      ),
+    );
+
+    expect(error).toMatchObject({
+      status: 409,
+      message: `BottleRelease ${release.id} maps to Bottle ${survivor.id}; merge that Bottle into an explicit destination instead.`,
+    });
+    expect(await snapshotCatalogGraph()).toEqual(before);
+    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 });

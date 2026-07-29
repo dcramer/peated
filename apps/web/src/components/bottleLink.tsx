@@ -47,7 +47,7 @@ export default function BottleLink({
           {() => (
             <BottlePanel
               tastingPath={tastingPath}
-              bottle={bottle}
+              bottleId={bottle.id}
               open={open}
               onClose={() => {
                 setOpen(false);

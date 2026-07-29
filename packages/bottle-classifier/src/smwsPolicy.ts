@@ -70,7 +70,6 @@ export function candidateLooksSmws(candidate: BottleCandidate): boolean {
     isSmwsIdentityAnchor(candidate.brand) ||
     isSmwsIdentityAnchor(candidate.bottler) ||
     textLooksSmws(candidate.alias) ||
-    textLooksSmws(candidate.bottleFullName) ||
     textLooksSmws(candidate.fullName)
   );
 }
@@ -330,6 +329,9 @@ function buildSmwsExactCaskBottleDraft({
     statedAge: extractedIdentity?.stated_age ?? null,
     caskStrength: extractedIdentity?.cask_strength ?? null,
     singleCask: true,
+    caskType: extractedIdentity?.cask_type ?? null,
+    caskSize: extractedIdentity?.cask_size ?? null,
+    caskFill: extractedIdentity?.cask_fill ?? null,
     abv: extractedIdentity?.abv ?? null,
     vintageYear: extractedIdentity?.vintage_year ?? null,
     releaseYear: extractedIdentity?.release_year ?? null,
@@ -447,10 +449,7 @@ export function maybeResolveSmwsExactCaskCodeDecision({
       identityScope: "exact_cask",
       observation,
       matchedBottleId: existingTarget.bottleId,
-      matchedReleaseId: null,
-      parentBottleId: null,
       proposedBottle: null,
-      proposedRelease: null,
     };
   }
 
@@ -474,10 +473,7 @@ export function maybeResolveSmwsExactCaskCodeDecision({
     identityScope: "exact_cask",
     observation,
     matchedBottleId: null,
-    matchedReleaseId: null,
-    parentBottleId: null,
     proposedBottle,
-    proposedRelease: null,
   };
 }
 
@@ -549,10 +545,7 @@ export function resolveSmwsExactCaskReference({
       identityBasis,
       confidenceBasis,
       matchedBottleId: existingTarget.bottleId,
-      matchedReleaseId: null,
-      parentBottleId: null,
       proposedBottle: null,
-      proposedRelease: null,
     });
   }
 
@@ -566,13 +559,10 @@ export function resolveSmwsExactCaskReference({
     identityBasis,
     confidenceBasis,
     matchedBottleId: null,
-    matchedReleaseId: null,
-    parentBottleId: null,
     proposedBottle: buildSmwsExactCaskBottleDraft({
       artifacts,
       code: smwsCode,
       reference,
     }),
-    proposedRelease: null,
   });
 }

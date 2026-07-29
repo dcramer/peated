@@ -1,14 +1,14 @@
 import waitError from "../../test/waitError";
 import { createTastingForBadge } from "../testHelpers";
-import { BottleCheck } from "./bottleCheck";
+import { BottleCheck, BottleCheckConfigSchema } from "./bottleCheck";
 
-describe("parseConfig", () => {
+describe("config schema", () => {
   test("valid params", async () => {
-    const badgeImpl = new BottleCheck();
     const config = {
       bottle: [1],
     };
-    expect(await badgeImpl.parseConfig(config)).toMatchInlineSnapshot(`
+    expect(await BottleCheckConfigSchema.parseAsync(config))
+      .toMatchInlineSnapshot(`
       {
         "bottle": [
           1,
@@ -18,11 +18,10 @@ describe("parseConfig", () => {
   });
 
   test("no bottleId", async () => {
-    const badgeImpl = new BottleCheck();
     const config = {
       bottle: [],
     };
-    const err = await waitError(badgeImpl.parseConfig(config));
+    const err = await waitError(BottleCheckConfigSchema.parseAsync(config));
     expect(err).toMatchInlineSnapshot(`
       [ZodError: [
         {
@@ -43,20 +42,26 @@ describe("parseConfig", () => {
 describe("test", () => {
   test("matches bottle", async ({ fixtures }) => {
     const tasting = await createTastingForBadge(fixtures, { statedAge: 5 });
+    if (tasting.identity.kind !== "bottle") {
+      throw new Error("Expected an exact Bottle fixture");
+    }
 
     const badgeImpl = new BottleCheck();
     const config = {
-      bottle: [tasting.bottle.id],
+      bottle: [tasting.identity.bottleId],
     };
     expect(badgeImpl.test(config, tasting)).toEqual(true);
   });
 
   test("doesnt match bottle", async ({ fixtures }) => {
     const tasting = await createTastingForBadge(fixtures, { statedAge: 10 });
+    if (tasting.identity.kind !== "bottle") {
+      throw new Error("Expected an exact Bottle fixture");
+    }
 
     const badgeImpl = new BottleCheck();
     const config = {
-      bottle: [tasting.bottle.id + 1],
+      bottle: [tasting.identity.bottleId + 1],
     };
     expect(badgeImpl.test(config, tasting)).toEqual(false);
   });

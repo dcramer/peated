@@ -1,5 +1,8 @@
+import { db } from "@peated/server/db";
+import { bottleAliases } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
 describe("GET /search", () => {
@@ -19,6 +22,14 @@ describe("GET /search", () => {
     expect(results.length).toBe(2);
     expect(
       results.some((r) => r.type === "bottle" && r.ref.id === bottle.id),
+    ).toBeTruthy();
+    expect(
+      results.some(
+        (r) =>
+          r.type === "bottle" &&
+          r.ref.id === bottle.id &&
+          r.ref.group?.id === bottle.groupId,
+      ),
     ).toBeTruthy();
     expect(
       results.some((r) => r.type === "entity" && r.ref.id === entity.id),
@@ -125,6 +136,39 @@ describe("GET /search", () => {
     });
 
     expect(results).toHaveLength(0);
+  });
+
+  test("searches only active Bottles and directly assigned aliases", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Canonical Search Bottle" });
+    const retainedBottle = await fixtures.Bottle({ name: "Retained Pair" });
+    const retainedRelease = await fixtures.BottleRelease({
+      bottleId: retainedBottle.id,
+    });
+    await fixtures.LegacyBottle({ name: "Legacy Search Orphan" });
+    await db.insert(bottleAliases).values({
+      bottleId: retainedBottle.id,
+      releaseId: retainedRelease.id,
+      name: "Authoritative Search Alias",
+      assignedByActorId: bottle.createdByActorId,
+    });
+
+    const [aliasSearch, legacySearch] = await Promise.all([
+      routerClient.search({
+        query: "Authoritative Search Alias",
+        include: ["bottles"],
+      }),
+      routerClient.search({
+        query: "Legacy Search Orphan",
+        include: ["bottles"],
+      }),
+    ]);
+
+    expect(aliasSearch.results).toMatchObject([
+      { type: "bottle", ref: { id: retainedBottle.id } },
+    ]);
+    expect(legacySearch.results).toHaveLength(0);
   });
 
   test("throws error for invalid include parameter", async () => {

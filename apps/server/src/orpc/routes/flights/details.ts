@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
-import { FlightSchema, detailsResponse } from "@peated/server/schemas";
+import { FlightDetailsSchema, detailsResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
-import { FlightSerializer } from "@peated/server/serializers/flight";
+import { FlightDetailsSerializer } from "@peated/server/serializers/flight";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -20,7 +20,7 @@ export default procedure
   })
   .input(z.object({ flight: z.string() }))
   // TODO(response-envelope): wrap in { data } by updating detailsResponse() at cutover
-  .output(detailsResponse(FlightSchema))
+  .output(detailsResponse(FlightDetailsSchema))
   .handler(async function ({ input, context, errors }) {
     const { flight: flightId } = input;
 
@@ -34,5 +34,5 @@ export default procedure
       });
     }
 
-    return await serialize(FlightSerializer, flight, context.user);
+    return await serialize(FlightDetailsSerializer, flight, context.user);
   });

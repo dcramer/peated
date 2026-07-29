@@ -1,0 +1,60 @@
+{
+  "writtenAt": "2026-07-18T19:03:50.957Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "High West A Midwinter Night's Dram Act 10 Scene 4 49.3% 2022"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "High West A Midwinter Night's Dram Act 10 Scene 4 49.3% 2022",
+    "summary": "Here’s the bottle-specific ID I can confirm for **High West A Midwinter Night’s Dram Act 10 Scene 4, 49.3%, 2022**:\n\n- **Producer / bottler:** **High West Distillery**. High West’s official product page identifies A Midwinter Night’s Dram as a High West release. ([highwest.com](https://highwest.com/pages/a-midwinter-ni",
+    "results": [
+      {
+        "title": "https://highwest.com/pages/a-midwinter-nights-dram",
+        "url": "https://highwest.com/pages/a-midwinter-nights-dram",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.whiskybase.com/whiskies/whisky/220305/high-west-a-midwinter-nights-dram",
+        "url": "https://www.whiskybase.com/whiskies/whisky/220305/high-west-a-midwinter-nights-dram",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://highwest.com/products/a-midwinter-nights-dram",
+        "url": "https://highwest.com/products/a-midwinter-nights-dram",
+        "domain": "highwest.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/195819a",
+        "url": "https://www.reddit.com/r/bourbon/comments/195819a",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.reddit.com/r/bourbon/comments/yrlyvn",
+        "url": "https://www.reddit.com/r/bourbon/comments/yrlyvn",
+        "domain": "reddit.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Act-10-Scene-4-49-3",
+        "url": "https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Act-10-Scene-4-49-3",
+        "domain": "whiskyadvocate.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "65f05926d54aa06f834cbd65fadcdab3ba335a89d36b860c5454b00a7293fce3",
+    "mode": "auto"
+  }
+}

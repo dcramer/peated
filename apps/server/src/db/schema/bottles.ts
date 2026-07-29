@@ -1,10 +1,12 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   bigint,
   bigserial,
   boolean,
   check,
   doublePrecision,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -14,6 +16,7 @@ import {
   smallint,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -37,6 +40,32 @@ type TastingNotes = {
   finish: string;
 };
 
+type RatingStats = {
+  pass: number;
+  sip: number;
+  savor: number;
+  total: number;
+  avg: number | null;
+  percentage: {
+    pass: number;
+    sip: number;
+    savor: number;
+  };
+};
+
+const DEFAULT_RATING_STATS: RatingStats = {
+  pass: 0,
+  sip: 0,
+  savor: 0,
+  total: 0,
+  avg: null,
+  percentage: {
+    pass: 0,
+    sip: 0,
+    savor: 0,
+  },
+};
+
 const OBSERVATION_SOURCE_TYPES = ["store_price"] as const;
 export const BOTTLE_ALIAS_ASSIGNMENT_SOURCES = [
   "legacy",
@@ -51,7 +80,6 @@ export const bottleAliasAssignmentSourceEnum = pgEnum(
   "bottle_alias_assignment_source",
   BOTTLE_ALIAS_ASSIGNMENT_SOURCES,
 );
-
 /**
  * Represents a series of bottles from a brand.
  * A series groups related bottles together and contains shared characteristics.
@@ -94,45 +122,25 @@ export type BottleSeries = typeof bottleSeries.$inferSelect;
 export type NewBottleSeries = typeof bottleSeries.$inferInsert;
 
 /**
- * Represents the stable parent product from a brand.
- * This is the default identity object that most users taste, search, and collect.
- * Child releases are optional and only used when a reusable marketed distinction
- * should aggregate separately across users, prices, and stats.
+ * Represents one independently complete marketed release.
  *
- * A bottle may temporarily carry release-like traits when only one marketed
- * form is known, or when older data predates an explicit release split. Once
- * sibling evidence establishes a reusable parent, varying vintage, bottling
- * year, ABV, edition, and cask traits belong on bottle_release rows.
- *
- * Some fields (description, imageUrl, etc.) are materialized from child
- * releases when they exist.
- *
- * Examples:
- * 1. Ardbeg Supernova
- *    - Brand: Ardbeg
- *    - Series: Supernova
- *    - Can have child releases such as 2019 Release or later annual releases
- *
- * 2. Macallan 18
- *    - Brand: Macallan
- *    - Series: 18-year-old
- *    - Can have child releases by vintage year (1993, 1994, etc.)
- *
- * 3. Octomore 13.1
- *    - One bottle
- *    - `13.1` is part of the bottle identity, not a child release
+ * Shared BottleGroup edits are durably materialized here so exact reads never
+ * depend on group hydration. Release-specific identity, content, and aggregate
+ * state also belong directly to this row.
  */
 export const bottles = pgTable(
   "bottle",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
+    groupId: bigint("group_id", { mode: "number" }).references(
+      (): AnyPgColumn => bottleGroups.id,
+    ),
     // canonical name including brand
     fullName: varchar("full_name", { length: 255 }).notNull(),
     // canonical name excluding brand
     name: varchar("name", { length: 255 }).notNull(),
 
-    // statedAge is only present on the expression level if its always the same across any release
-    // and when it is present, it will be included in the canonical expression name
+    // Effective stated age for this exact marketed Bottle.
     statedAge: smallint("stated_age"),
 
     // a NULL series represents a "core bottling"
@@ -151,9 +159,7 @@ export const bottles = pgTable(
     ),
     flavorProfile: flavorProfileEnum("flavor_profile"),
 
-    // Legacy or single-known-release traits can remain on bottle. Once a
-    // reusable child release boundary is clear, new canonical release data
-    // should prefer bottle_release.
+    // Exact marketed-release identity.
     edition: varchar("edition", { length: 255 }),
     abv: doublePrecision("abv"),
     singleCask: boolean("single_cask"),
@@ -164,7 +170,7 @@ export const bottles = pgTable(
     caskType: varchar("cask_type", { length: 255, enum: CASK_TYPE_IDS }),
     caskFill: varchar("cask_fill", { length: 255, enum: CASK_FILLS }),
 
-    // Materialized fields from child releases
+    // Exact content and aggregate state.
     description: text("description"),
     descriptionSrc: contentSourceEnum("description_src"),
     imageUrl: text("image_url"),
@@ -175,34 +181,13 @@ export const bottles = pgTable(
       .notNull(),
     avgRating: doublePrecision("avg_rating"),
     ratingStats: jsonb("rating_stats")
-      .default({
-        pass: 0,
-        sip: 0,
-        savor: 0,
-        total: 0,
-        avg: null,
-        percentage: {
-          pass: 0,
-          sip: 0,
-          savor: 0,
-        },
-      })
+      .default(DEFAULT_RATING_STATS)
       .notNull()
-      .$type<{
-        pass: number;
-        sip: number;
-        savor: number;
-        total: number;
-        avg: number | null;
-        percentage: {
-          pass: number;
-          sip: number;
-          savor: number;
-        };
-      }>(),
+      .$type<RatingStats>(),
     totalTastings: bigint("total_tastings", { mode: "number" })
       .default(0)
       .notNull(),
+    // Retained legacy compatibility state; new reads use BottleGroup totals.
     numReleases: bigint("num_releases", { mode: "number" })
       .default(0)
       .notNull(),
@@ -216,6 +201,8 @@ export const bottles = pgTable(
       .notNull(),
   },
   (table) => [
+    unique("bottle_id_group_id_unq").on(table.id, table.groupId),
+    index("bottle_group_idx").on(table.groupId),
     index("bottle_search_idx").using("gin", table.searchVector),
     index("bottle_brand_idx").on(table.brandId),
     index("bottle_bottler_idx").on(table.bottlerId),
@@ -232,7 +219,100 @@ export const bottles = pgTable(
 export type Bottle = typeof bottles.$inferSelect;
 export type NewBottle = typeof bottles.$inferInsert;
 
+/**
+ * Owns the shared identity prefix, aggregate statistics, and editing semantics.
+ * Member Bottles own their exact presentation and durably materialize shared
+ * values; a representative never substitutes for an exact Bottle identity.
+ */
+export const bottleGroups = pgTable(
+  "bottle_group",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    statedAge: smallint("stated_age"),
+    seriesId: bigint("series_id", { mode: "number" }).references(
+      () => bottleSeries.id,
+    ),
+    category: categoryEnum("category"),
+    brandId: bigint("brand_id", { mode: "number" })
+      .references(() => entities.id)
+      .notNull(),
+    bottlerId: bigint("bottler_id", { mode: "number" }).references(
+      () => entities.id,
+    ),
+    flavorProfile: flavorProfileEnum("flavor_profile"),
+    representativeBottleId: bigint("representative_bottle_id", {
+      mode: "number",
+    }),
+    avgRating: doublePrecision("avg_rating"),
+    ratingStats: jsonb("rating_stats")
+      .default(DEFAULT_RATING_STATS)
+      .notNull()
+      .$type<RatingStats>(),
+    totalTastings: bigint("total_tastings", { mode: "number" })
+      .default(0)
+      .notNull(),
+    totalBottles: bigint("total_bottles", { mode: "number" })
+      .default(0)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    })
+      .references(() => actors.id)
+      .notNull(),
+  },
+  (table) => [
+    index("bottle_group_brand_idx").on(table.brandId),
+    index("bottle_group_bottler_idx").on(table.bottlerId),
+    index("bottle_group_series_idx").on(table.seriesId),
+    index("bottle_group_category_idx").on(table.category),
+    index("bottle_group_representative_bottle_idx").on(
+      table.representativeBottleId,
+    ),
+    index("bottle_group_created_by_actor_idx").on(table.createdByActorId),
+    check(
+      "bottle_group_stated_age_check",
+      sql`${table.statedAge} IS NULL OR (${table.statedAge} >= 0 AND ${table.statedAge} <= 100)`,
+    ),
+    foreignKey({
+      columns: [table.representativeBottleId, table.id],
+      foreignColumns: [bottles.id, bottles.groupId],
+      name: "bottle_group_representative_membership_fk",
+    }),
+  ],
+);
+
+export type BottleGroup = typeof bottleGroups.$inferSelect;
+export type NewBottleGroup = typeof bottleGroups.$inferInsert;
+
+export const bottleGroupDistillers = pgTable(
+  "bottle_group_distiller",
+  {
+    groupId: bigint("group_id", { mode: "number" })
+      .references(() => bottleGroups.id)
+      .notNull(),
+    distillerId: bigint("distiller_id", { mode: "number" })
+      .references(() => entities.id)
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.groupId, table.distillerId] })],
+);
+
+export type BottleGroupDistiller = typeof bottleGroupDistillers.$inferSelect;
+export type NewBottleGroupDistiller = typeof bottleGroupDistillers.$inferInsert;
+
 export const bottlesRelations = relations(bottles, ({ one, many }) => ({
+  group: one(bottleGroups, {
+    fields: [bottles.groupId],
+    references: [bottleGroups.id],
+    relationName: "bottle_group_members",
+  }),
+  representativeForGroups: many(bottleGroups, {
+    relationName: "bottle_group_representative_bottle",
+  }),
   brand: one(entities, {
     fields: [bottles.brandId],
     references: [entities.id],
@@ -264,6 +344,7 @@ export const bottleSeriesRelations = relations(
     bottles: many(bottles, {
       relationName: "series",
     }),
+    bottleGroups: many(bottleGroups),
     createdByActor: one(actors, {
       fields: [bottleSeries.createdByActorId],
       references: [actors.id],
@@ -271,34 +352,57 @@ export const bottleSeriesRelations = relations(
   }),
 );
 
+export const bottleGroupsRelations = relations(
+  bottleGroups,
+  ({ one, many }) => ({
+    brand: one(entities, {
+      fields: [bottleGroups.brandId],
+      references: [entities.id],
+      relationName: "bottle_group_brand",
+    }),
+    bottler: one(entities, {
+      fields: [bottleGroups.bottlerId],
+      references: [entities.id],
+      relationName: "bottle_group_bottler",
+    }),
+    series: one(bottleSeries, {
+      fields: [bottleGroups.seriesId],
+      references: [bottleSeries.id],
+    }),
+    representativeBottle: one(bottles, {
+      fields: [bottleGroups.representativeBottleId],
+      references: [bottles.id],
+      relationName: "bottle_group_representative_bottle",
+    }),
+    createdByActor: one(actors, {
+      fields: [bottleGroups.createdByActorId],
+      references: [actors.id],
+    }),
+    bottles: many(bottles, {
+      relationName: "bottle_group_members",
+    }),
+    distillers: many(bottleGroupDistillers),
+  }),
+);
+
+export const bottleGroupDistillersRelations = relations(
+  bottleGroupDistillers,
+  ({ one }) => ({
+    group: one(bottleGroups, {
+      fields: [bottleGroupDistillers.groupId],
+      references: [bottleGroups.id],
+    }),
+    distiller: one(entities, {
+      fields: [bottleGroupDistillers.distillerId],
+      references: [entities.id],
+    }),
+  }),
+);
+
 /**
- * Represents a shared canonical release under a parent bottle.
- *
- * Use this table when the distinction should aggregate across users, searches,
- * prices, and stats. Release rows carry the typed identity traits that are not
- * stable on the parent bottle, such as edition, distillation/vintage year,
- * bottling/release year, release-specific age, ABV, and cask traits.
- *
- * If a detail is exact but not yet strong enough to justify a canonical split,
- * preserve it in bottle_observation first.
- *
- * Examples:
- * 1. Ardbeg Supernova 2019 Release
- *    - Bottle: Ardbeg Supernova
- *    - Release Year: 2019
- *    - ABV: 53.8%
- *    - Release-specific details: ppm, cask types, etc.
- *
- * 2. Springbank 12 Cask Strength Batch 24
- *    - Bottle: Springbank 12 Cask Strength
- *    - Edition: Batch 24
- *    - ABV: 57.2%
- *    - Release-specific details: batch label, exact ABV
- *
- * 3. Maker's Mark Private Selection S2B13
- *    - Bottle: Maker's Mark Private Selection
- *    - Edition: S2B13
- *    - Release-specific details: pick code and other marketed variation
+ * Legacy compatibility schema retained for the staged migration.
+ * Canonical marketed releases are Bottle rows; OpenSpec tasks 9.6 and 9.7
+ * remove this table after its remaining compatibility readers and writers.
  */
 export const bottleReleases = pgTable(
   "bottle_release",
@@ -383,10 +487,50 @@ export type BottleRelease = typeof bottleReleases.$inferSelect;
 export type NewBottleRelease = typeof bottleReleases.$inferInsert;
 
 /**
- * Store-listing evidence attached to a bottle or bottle_release.
+ * Retains one audited mapping per legacy release throughout compatibility.
+ * Exact Bottle merges may make multiple legacy releases converge on one Bottle.
+ */
+export const bottleReleasePromotions = pgTable(
+  "bottle_release_promotion",
+  {
+    releaseId: bigint("release_id", { mode: "number" })
+      .references(() => bottleReleases.id)
+      .primaryKey(),
+    promotedBottleId: bigint("promoted_bottle_id", {
+      mode: "number",
+    })
+      .references(() => bottles.id)
+      .notNull(),
+  },
+  (table) => [
+    index("bottle_release_promotion_bottle_idx").on(table.promotedBottleId),
+  ],
+);
+
+export const bottleReleasePromotionsRelations = relations(
+  bottleReleasePromotions,
+  ({ one }) => ({
+    legacyRelease: one(bottleReleases, {
+      fields: [bottleReleasePromotions.releaseId],
+      references: [bottleReleases.id],
+    }),
+    promotedBottle: one(bottles, {
+      fields: [bottleReleasePromotions.promotedBottleId],
+      references: [bottles.id],
+    }),
+  }),
+);
+
+export type BottleReleasePromotion =
+  typeof bottleReleasePromotions.$inferSelect;
+export type NewBottleReleasePromotion =
+  typeof bottleReleasePromotions.$inferInsert;
+
+/**
+ * Store-listing evidence attached to a Bottle.
  *
- * Today this table is populated from approved store-price matches. It keeps
- * exact listing facts without forcing them into canonical bottle/release rows.
+ * The release id is retained only as historical migration evidence. Listing
+ * facts remain separate from canonical Bottle fields.
  */
 export const bottleObservations = pgTable(
   "bottle_observation",

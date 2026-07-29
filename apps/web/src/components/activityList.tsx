@@ -3,10 +3,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
-import {
-  formatBottlingName,
-  getBottleBottlingPath,
-} from "@peated/web/lib/bottlings";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";
@@ -48,33 +44,19 @@ function CollectionLink({ activity }: { activity: CollectionAddActivity }) {
 }
 
 function getCollectionItemHref(item: CollectionAddItem) {
-  if (item.release) {
-    return getBottleBottlingPath(item.bottle.id, item.release.id);
-  }
   return `/bottles/${item.bottle.id}`;
 }
 
 function getCollectionItemTitle(item: CollectionAddItem) {
-  return item.release?.fullName ?? item.bottle.fullName;
+  return item.bottle.fullName;
 }
 
 function getCollectionItemDetail(item: CollectionAddItem) {
-  if (item.release) {
-    const bottlingName = formatBottlingName(item.release);
-    return bottlingName && bottlingName !== item.release.fullName
-      ? bottlingName
-      : item.bottle.fullName;
-  }
-
   return item.bottle.category ? formatCategoryName(item.bottle.category) : null;
 }
 
 function CollectionItemImage({ item }: { item: CollectionAddItem }) {
-  const imageUrl =
-    item.imageUrl ??
-    item.release?.imageUrl ??
-    item.bottle.displayImageUrl ??
-    item.bottle.imageUrl;
+  const imageUrl = item.imageUrl ?? item.bottle.imageUrl;
 
   if (!imageUrl) {
     return null;
@@ -94,17 +76,19 @@ function CollectionItemImage({ item }: { item: CollectionAddItem }) {
 
 function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
   const detail = getCollectionItemDetail(item);
+  const href = getCollectionItemHref(item);
+  const title = getCollectionItemTitle(item);
 
   return (
     <li className="flex min-w-0 items-center gap-x-3 px-3 py-2">
       <CollectionItemImage item={item} />
       <div className="min-w-0 flex-1">
         <Link
-          href={getCollectionItemHref(item)}
+          href={href}
           className="block truncate text-sm font-semibold text-white hover:underline"
-          title={getCollectionItemTitle(item)}
+          title={title}
         >
-          {getCollectionItemTitle(item)}
+          {title}
         </Link>
         {detail ? (
           <div className="text-muted truncate text-xs">{detail}</div>

@@ -1,0 +1,1 @@
+ALTER TABLE "bottle_group" ADD CONSTRAINT "bottle_group_representative_membership_fk" FOREIGN KEY ("representative_bottle_id","id") REFERENCES "public"."bottle"("id","group_id") ON DELETE no action ON UPDATE no action;

@@ -54,6 +54,7 @@ export const collectionBottleStatusEnum = pgEnum("collection_bottle_status", [
   "empty",
 ]);
 
+/** A collection membership selects one Bottle; releaseId is legacy evidence. */
 export const collectionBottles = pgTable(
   "collection_bottle",
   {
@@ -90,6 +91,10 @@ export const collectionBottlesRelations = relations(
     bottle: one(bottles, {
       fields: [collectionBottles.bottleId],
       references: [bottles.id],
+    }),
+    release: one(bottleReleases, {
+      fields: [collectionBottles.releaseId],
+      references: [bottleReleases.id],
     }),
   }),
 );
