@@ -7,11 +7,10 @@ import SingleCaskChip from "./singleCaskChip";
 
 export type TastingBottleIdentitySource = Pick<
   Bottle,
-  "id" | "fullName" | "singleCask"
+  "id" | "fullName" | "name" | "singleCask"
 > &
   BottleExactMetadataSource & {
     brand: Pick<Bottle["brand"], "name" | "shortName">;
-    group?: Pick<NonNullable<Bottle["group"]>, "name">;
   };
 
 export default function TastingBottleIdentity({
@@ -21,9 +20,7 @@ export default function TastingBottleIdentity({
   bottle: TastingBottleIdentitySource;
   variant?: "inline" | "panel";
 }) {
-  const displayName = bottle.group
-    ? `${bottle.brand.shortName || bottle.brand.name} ${bottle.group.name}`
-    : bottle.fullName;
+  const displayName = `${bottle.brand.shortName || bottle.brand.name} ${bottle.name}`;
 
   if (variant === "inline") {
     return (
