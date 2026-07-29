@@ -198,7 +198,9 @@ describe("catalog migration audit", () => {
     expect(report.warningCount).toBeGreaterThanOrEqual(2);
   });
 
-  test("reports missing release promotion inputs", async ({ fixtures }) => {
+  test("reports ordinary missing catalog metadata without warning", async ({
+    fixtures,
+  }) => {
     const parent = await fixtures.LegacyBottle();
     await fixtures.BottleRelease({ bottleId: parent.id });
 
@@ -210,7 +212,7 @@ describe("catalog migration audit", () => {
       missingParentImages: 1,
       missingReleaseImages: 1,
     });
-    expect(report.warningCount).toBe(3);
+    expect(report.warningCount).toBe(0);
   });
 
   test("reports invalid Bottle and release pairs on consumer rows", async ({

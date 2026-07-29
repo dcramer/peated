@@ -58,9 +58,7 @@ export const flightBottles = pgTable(
     ),
   },
   (table) => [
-    unique()
-      .on(table.flightId, table.bottleId, table.releaseId)
-      .nullsNotDistinct(),
+    unique().on(table.flightId, table.bottleId),
     index("flight_bottle_bottle_idx").on(table.bottleId),
     index("flight_bottle_release_idx").on(table.releaseId),
   ],

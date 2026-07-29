@@ -400,7 +400,7 @@ describe("exact Bottle merges", () => {
     });
   });
 
-  test("normalizes staged release-aware memberships to one direct Bottle row", async ({
+  test("normalizes colliding direct memberships to one Bottle row", async ({
     fixtures,
   }) => {
     const actor = await getUserActor(await fixtures.User({ mod: true }));
@@ -415,19 +415,11 @@ describe("exact Bottle merges", () => {
       bottleId: evidenceParent.id,
       edition: "Source A",
     });
-    const sourceEvidenceB = await fixtures.BottleRelease({
-      bottleId: evidenceParent.id,
-      edition: "Source B",
-    });
     const destinationEvidenceA = await fixtures.BottleRelease({
       bottleId: evidenceParent.id,
       edition: "Destination A",
     });
-    const destinationEvidenceB = await fixtures.BottleRelease({
-      bottleId: evidenceParent.id,
-      edition: "Destination B",
-    });
-    const collection = await fixtures.Collection({ totalBottles: 4 });
+    const collection = await fixtures.Collection({ totalBottles: 2 });
     const flight = await fixtures.Flight();
 
     await db.insert(collectionBottles).values([
@@ -439,18 +431,8 @@ describe("exact Bottle merges", () => {
       },
       {
         collectionId: collection.id,
-        bottleId: source.id,
-        releaseId: sourceEvidenceB.id,
-      },
-      {
-        collectionId: collection.id,
         bottleId: destination.id,
         releaseId: destinationEvidenceA.id,
-      },
-      {
-        collectionId: collection.id,
-        bottleId: destination.id,
-        releaseId: destinationEvidenceB.id,
         imageUrl: "https://example.com/destination.jpg",
       },
     ]);
@@ -462,18 +444,8 @@ describe("exact Bottle merges", () => {
       },
       {
         flightId: flight.id,
-        bottleId: source.id,
-        releaseId: sourceEvidenceB.id,
-      },
-      {
-        flightId: flight.id,
         bottleId: destination.id,
         releaseId: destinationEvidenceA.id,
-      },
-      {
-        flightId: flight.id,
-        bottleId: destination.id,
-        releaseId: destinationEvidenceB.id,
       },
     ]);
 
@@ -637,64 +609,6 @@ describe("exact Bottle merges", () => {
         where: eq(bottleTombstones.bottleId, source.id),
       }),
     ).toBeUndefined();
-  });
-
-  test("rejects duplicate projected tasting keys entirely among source rows", async ({
-    fixtures,
-  }) => {
-    const actor = await getUserActor(await fixtures.User({ mod: true }));
-    const source = await fixtures.Bottle({ name: "Source Collision" });
-    const destination = await fixtures.Bottle({
-      name: "Collision Destination",
-    });
-    const evidenceParent = await fixtures.LegacyBottle({
-      name: "Tasting Evidence",
-    });
-    const firstRelease = await fixtures.BottleRelease({
-      bottleId: evidenceParent.id,
-      edition: "First",
-    });
-    const secondRelease = await fixtures.BottleRelease({
-      bottleId: evidenceParent.id,
-      edition: "Second",
-    });
-    const user = await fixtures.User();
-    const createdAt = new Date("2026-03-02T00:00:00.000Z");
-    const first = await fixtures.Tasting({
-      bottleId: source.id,
-      releaseId: firstRelease.id,
-      createdById: user.id,
-      createdAt,
-    });
-    const second = await fixtures.Tasting({
-      bottleId: source.id,
-      releaseId: secondRelease.id,
-      createdById: user.id,
-      createdAt,
-    });
-
-    await expect(
-      db.transaction((tx) =>
-        mergeConcreteBottlesInTransaction(tx, {
-          sourceBottleId: source.id,
-          destinationBottleId: destination.id,
-          actorId: actor.id,
-        }),
-      ),
-    ).rejects.toEqual(
-      new ConcreteBottleMergeConflictError("consumer_conflict"),
-    );
-    expect(
-      await db
-        .select({ id: tastings.id, bottleId: tastings.bottleId })
-        .from(tastings)
-        .where(inArray(tastings.id, [first.id, second.id])),
-    ).toEqual(
-      expect.arrayContaining([
-        { id: first.id, bottleId: source.id },
-        { id: second.id, bottleId: source.id },
-      ]),
-    );
   });
 
   test("rejects a Bottle that still owns legacy releases", async ({

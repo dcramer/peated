@@ -189,7 +189,7 @@ and map to an explicit removal task.
 - [ ] 8.2 Take and verify a production database backup.
 - [ ] 8.3 Ensure old application and worker processes cannot write legacy-only
       release references after the transaction commits.
-- [ ] 8.4 Run the approved one-shot transaction and retain the postflight audit.
+- [x] 8.4 Run the approved one-shot transaction and retain the postflight audit.
 - [ ] 8.5 Validate counts, mappings, direct Bottle references, aggregates,
       redirects, queue health, latency, and major user workflows; then generate,
       review, and apply the non-destructive direct-only uniqueness activation

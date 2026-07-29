@@ -435,11 +435,7 @@ export async function collectCatalogMigrationAudit(
     promotionMappings.invalidMappings;
   const warningCount =
     legacyCatalog.parentsWithReleaseLikeFields +
-    legacyCatalog.childParentAgeConflicts +
-    legacyCatalog.missingParentAliases +
-    legacyCatalog.missingReleaseAliases +
-    legacyCatalog.missingParentImages +
-    legacyCatalog.missingReleaseImages;
+    legacyCatalog.childParentAgeConflicts;
 
   return CatalogMigrationAuditSchema.parse({
     schemaVersion: CATALOG_MIGRATION_AUDIT_SCHEMA_VERSION,

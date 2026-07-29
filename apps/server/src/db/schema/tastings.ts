@@ -67,9 +67,11 @@ export const tastings = pgTable(
       .notNull(),
   },
   (table) => [
-    unique("tasting_unq")
-      .on(table.bottleId, table.releaseId, table.createdById, table.createdAt)
-      .nullsNotDistinct(),
+    unique("tasting_unq").on(
+      table.bottleId,
+      table.createdById,
+      table.createdAt,
+    ),
     index("tasting_bottle_idx").on(table.bottleId),
     index("tasting_release_idx").on(table.releaseId),
     index("tasting_flight_idx").on(table.flightId),
