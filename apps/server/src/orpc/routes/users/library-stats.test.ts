@@ -1,8 +1,8 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
-  bottleReleases,
   bottleTombstones,
+  bottles,
   bottlesToDistillers,
   collectionBottles,
 } from "@peated/server/db/schema";
@@ -279,30 +279,27 @@ describe("GET /users/:user/library/stats", () => {
       statedAge: null,
       distillerIds: [],
     });
-    const compatibilityReleases = await db
-      .insert(bottleReleases)
+    const additionalCompatibilityBottles = await db
+      .insert(bottles)
       .values(
         Array.from({ length: 197 }, (_, index) => ({
-          bottleId: compatibilityBottle.id,
-          fullName: `Library batch compatibility release ${index}`,
-          name: `Batch compatibility release ${index}`,
+          groupId: compatibilityBottle.groupId,
+          fullName: `Library batch Bottle ${index}`,
+          name: `Batch Bottle ${index}`,
+          brandId: compatibilityBottle.brandId,
           createdByActorId: compatibilityBottle.createdByActorId,
         })),
       )
-      .returning({ id: bottleReleases.id });
+      .returning({ id: bottles.id });
     await db.insert(collectionBottles).values(
-      compatibilityReleases.map((release) => ({
-        collectionId: library.id,
-        bottleId: compatibilityBottle.id,
-        releaseId: release.id,
-        status: "open" as const,
-      })),
+      [compatibilityBottle, ...additionalCompatibilityBottles].map(
+        (bottle) => ({
+          collectionId: library.id,
+          bottleId: bottle.id,
+          status: "open" as const,
+        }),
+      ),
     );
-    await db.insert(collectionBottles).values({
-      collectionId: library.id,
-      bottleId: compatibilityBottle.id,
-      status: "open",
-    });
 
     const distillerA = await fixtures.Entity({ name: "Batch Distillery A" });
     const distillerB = await fixtures.Entity({ name: "Batch Distillery B" });

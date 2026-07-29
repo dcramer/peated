@@ -73,9 +73,7 @@ export const collectionBottles = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    unique()
-      .on(table.collectionId, table.bottleId, table.releaseId)
-      .nullsNotDistinct(),
+    unique().on(table.collectionId, table.bottleId),
     index("collection_bottle_bottle_idx").on(table.bottleId),
     index("collection_bottle_release_idx").on(table.releaseId),
   ],
