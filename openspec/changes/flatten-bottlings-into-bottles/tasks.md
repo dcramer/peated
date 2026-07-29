@@ -173,6 +173,8 @@ and map to an explicit removal task.
       self-contained.
 - [x] 7.16 Group literal same-name legacy parents deterministically without
       merging Bottle identities or creating ambiguous canonical aliases.
+- [x] 7.17 Claim unresolved exact aliases during retained-parent and promoted
+      Bottle canonicalization instead of treating them as collisions.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

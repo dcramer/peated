@@ -147,7 +147,9 @@ affected source and destination groups without retargeting consumer rows.
 
 Exact aliases point directly to Bottle. A general expression alias may point to
 the retained general Bottle. Alias propagation reuses that Bottle id for prices
-and reviews.
+and reviews. During the one-shot migration, a non-ignored alias with neither a
+Bottle nor BottleRelease owner is unresolved rather than conflicting; an exact
+canonical claim assigns it to the retained or promoted Bottle transactionally.
 
 Prices, observations, proposals, attempts, classifier decisions, photo flows,
 activity notifications, badges, analytics, cache keys, and queue payloads all

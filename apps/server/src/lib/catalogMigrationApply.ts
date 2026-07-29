@@ -592,15 +592,17 @@ async function buildFamilyPlans(
         alias.releaseId === null && alias.bottleId !== null
           ? groupKeyByParentId.get(alias.bottleId)
           : undefined;
+      const unassigned = alias.bottleId === null && alias.releaseId === null;
       const owned =
-        releaseId === null
+        unassigned ||
+        (releaseId === null
           ? alias.releaseId === null &&
             (alias.bottleId === parentId ||
               ((parentCountByGroupKey.get(groupKey) ?? 0) > 1 &&
                 aliasParentGroupKey === groupKey))
           : (alias.releaseId === releaseId &&
               (alias.bottleId === parentId || alias.bottleId === null)) ||
-            (alias.releaseId === null && alias.bottleId === parentId);
+            (alias.releaseId === null && alias.bottleId === parentId));
       if (!owned || alias.ignored === true) {
         throw new CatalogMigrationApplyError("alias_collision", {
           name,

@@ -39,6 +39,67 @@ async function approvedInput(): Promise<CatalogMigrationApplyInput> {
 }
 
 describe("applyCatalogMigration", () => {
+  test("claims unresolved canonical aliases for retained and promoted Bottles", async ({
+    fixtures,
+  }) => {
+    const parent = await fixtures.LegacyBottle({
+      name: "Unresolved Alias Family",
+    });
+    const release = await fixtures.BottleRelease({
+      bottleId: parent.id,
+      fullName: `${parent.fullName} 2026`,
+      name: `${parent.name} 2026`,
+    });
+    await db.delete(bottleAliases).where(eq(bottleAliases.bottleId, parent.id));
+    await Promise.all([
+      fixtures.BottleAlias({
+        bottleId: null,
+        releaseId: null,
+        name: parent.fullName,
+        assignedByActorId: parent.createdByActorId,
+      }),
+      fixtures.BottleAlias({
+        bottleId: null,
+        releaseId: null,
+        name: release.fullName,
+        assignedByActorId: release.createdByActorId,
+      }),
+    ]);
+    const input = await approvedInput();
+
+    expect(input.candidate.audit.blockingIssueCount).toBe(0);
+
+    const result = await applyCatalogMigration(input);
+    const mapping = await db.query.bottleReleasePromotions.findFirst({
+      where: eq(bottleReleasePromotions.releaseId, release.id),
+    });
+    const aliases = await db
+      .select({
+        name: bottleAliases.name,
+        bottleId: bottleAliases.bottleId,
+        releaseId: bottleAliases.releaseId,
+        assignmentSource: bottleAliases.assignmentSource,
+      })
+      .from(bottleAliases)
+      .where(inArray(bottleAliases.name, [parent.fullName, release.fullName]))
+      .orderBy(asc(bottleAliases.name));
+
+    expect(result.status).toBe("applied");
+    expect(mapping?.promotedBottleId).not.toBeNull();
+    expect(aliases).toEqual(
+      [
+        { name: parent.fullName, bottleId: parent.id },
+        { name: release.fullName, bottleId: mapping?.promotedBottleId },
+      ]
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((alias) => ({
+          ...alias,
+          releaseId: null,
+          assignmentSource: "canonical",
+        })),
+    );
+  });
+
   test("groups literal duplicate legacy parents without merging their Bottle identities", async ({
     fixtures,
   }) => {
