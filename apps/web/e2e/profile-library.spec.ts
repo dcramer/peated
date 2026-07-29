@@ -17,6 +17,53 @@ import {
 import { signIn } from "./session";
 
 test.describe("profile library", () => {
+  test("stretches the age profile to match the distillery card", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: [
+        testAccessToken,
+        "library-insights",
+        testInfo.project.name,
+      ].join("-"),
+    });
+
+    await page.goto(`/users/${testUser.username}/library`, {
+      waitUntil: "commit",
+    });
+
+    const ageCard = page
+      .getByRole("heading", { name: "Age profile" })
+      .locator("xpath=../..");
+    const distilleryCard = page
+      .getByRole("heading", { name: "Top distilleries" })
+      .locator("xpath=../..");
+    const ageChart = ageCard.locator("[data-age-profile-chart]");
+
+    await expect(ageCard).toBeVisible();
+    await expect(distilleryCard).toBeVisible();
+    await expect(ageChart).toBeVisible();
+
+    if (!testInfo.project.name.includes("mobile")) {
+      const [ageCardBox, distilleryCardBox, ageChartBox] = await Promise.all([
+        ageCard.boundingBox(),
+        distilleryCard.boundingBox(),
+        ageChart.boundingBox(),
+      ]);
+
+      expect(ageCardBox).not.toBeNull();
+      expect(distilleryCardBox).not.toBeNull();
+      expect(ageChartBox).not.toBeNull();
+      expect(
+        Math.abs(ageCardBox!.height - distilleryCardBox!.height),
+      ).toBeLessThan(2);
+      expect(ageChartBox!.height).toBeGreaterThan(140);
+    }
+
+    await expectNoHorizontalOverflow(page);
+  });
+
   test("renders a Bottle-owned image on the detail page", async ({
     context,
     page,
@@ -124,6 +171,15 @@ test.describe("profile library", () => {
     await expect(
       page.getByText("No library bottles recorded yet."),
     ).toHaveCount(0);
+
+    const statusButton = savedBottleRow.locator(
+      'button[data-status="unset"]:visible',
+    );
+    await statusButton.click();
+    await page.getByRole("menuitem", { name: "Sealed" }).click();
+    await expect(
+      savedBottleRow.locator('button[data-status="sealed"]:visible'),
+    ).toBeVisible();
 
     await page.goto("/library", {
       waitUntil: "commit",

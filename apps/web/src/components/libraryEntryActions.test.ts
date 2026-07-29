@@ -1,8 +1,11 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import { QueryClient, type QueryKey } from "@tanstack/react-query";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import {
+  LibraryEntryStatusMenu,
   removeCollectionBottleFromListCaches,
   replaceCollectionBottleInListCaches,
 } from "./libraryEntryActions";
@@ -215,5 +218,26 @@ describe("Library entry list caches", () => {
     expect(updatedFirstList?.rel).toBe(firstList.rel);
     expect(updatedFilteredList?.rel).toBe(filteredList.rel);
     expect(queryClient.getQueryData(unrelatedQueryKey)).toBe(unrelatedData);
+  });
+});
+
+describe("Library entry status menu", () => {
+  it("renders the current status as a compact semantic control", () => {
+    const html = renderToStaticMarkup(
+      createElement(LibraryEntryStatusMenu, {
+        value: "sealed",
+        disabled: false,
+        onChange: () => {},
+      }),
+    );
+
+    expect(html).toContain("Sealed");
+    expect(html).toContain('data-status="sealed"');
+    expect(html).toContain("rounded-full");
+    expect(html).toContain("border-emerald");
+    expect(html).toContain("bg-emerald");
+    expect(html).toContain(
+      'aria-label="Change bottle status, current status Sealed"',
+    );
   });
 });

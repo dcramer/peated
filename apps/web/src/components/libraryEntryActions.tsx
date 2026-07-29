@@ -344,7 +344,7 @@ export function LibraryEntryStatus({ entry }: { entry: CollectionBottle }) {
   return <CollectionBottleStatusLabel status={entry.status} />;
 }
 
-function LibraryEntryStatusMenu({
+export function LibraryEntryStatusMenu({
   value,
   disabled,
   onChange,
@@ -361,8 +361,14 @@ function LibraryEntryStatusMenu({
       <MenuButton
         type="button"
         disabled={disabled}
+        data-status={value ?? "unset"}
         aria-label={`Change bottle status, current status ${label}`}
-        className="text-muted inline-flex h-7 items-center gap-1 text-xs font-medium transition-colors hover:text-white disabled:cursor-auto disabled:opacity-70"
+        className={classNames(
+          "focus-visible:outline-peated inline-flex h-7 min-w-20 items-center justify-between gap-1.5 rounded-full border px-2.5 text-xs font-semibold shadow-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-auto disabled:opacity-70",
+          currentMeta
+            ? currentMeta.labelClassName
+            : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-600 hover:text-white",
+        )}
       >
         {label}
         <ChevronDownIcon className="h-3.5 w-3.5" aria-hidden="true" />

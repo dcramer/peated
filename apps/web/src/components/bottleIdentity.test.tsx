@@ -1,7 +1,10 @@
 import type { Bottle } from "@peated/server/types";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import BottleIdentity, { getRelativeBottleIdentity } from "./bottleIdentity";
+import BottleIdentity, {
+  getAbsoluteBottleTitle,
+  getRelativeBottleIdentity,
+} from "./bottleIdentity";
 
 function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
   return {
@@ -73,6 +76,70 @@ describe("BottleIdentity", () => {
     expect(html).not.toContain(">12 years<");
     expect(html).not.toContain(">Cask strength</span>");
     expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
+  });
+
+  it("moves canonical metadata out of ungrouped Library headlines", () => {
+    const bottle = makeBottle({
+      name: "Whiskyland - Chapter Thirty Three - 52-year-old - 2026 Release - 1973 Vintage - 53.2% ABV",
+      fullName:
+        "Decadent Drinks Whiskyland - Chapter Thirty Three - 52-year-old - 2026 Release - 1973 Vintage - 53.2% ABV",
+      group: undefined,
+      edition: "Chapter Thirty Three",
+      statedAge: 52,
+      releaseYear: 2026,
+      vintageYear: 1973,
+      abv: 53.2,
+      caskStrength: false,
+    });
+    const html = renderToStaticMarkup(
+      <BottleIdentity bottle={bottle} mode="absolute" />,
+    );
+
+    expect(getAbsoluteBottleTitle(bottle)).toBe(
+      "Whiskyland - Chapter Thirty Three",
+    );
+    expect(html).toContain(">Whiskyland - Chapter Thirty Three</a>");
+    expect(html).toContain(">52 years</span>");
+    expect(html).toContain(">2026 release</span>");
+    expect(html).toContain(">1973 vintage</span>");
+    expect(html).toContain(">53.2% ABV</span>");
+  });
+
+  it("strips canonical cask traits while preserving the product and edition", () => {
+    expect(
+      getAbsoluteBottleTitle(
+        makeBottle({
+          name: "Glenrothes - Individual Cask Release - 23-year-old - 2021 Release - 1997 Vintage - Single Cask - Cask Strength",
+          group: undefined,
+          edition: "Individual Cask Release",
+          statedAge: 23,
+          releaseYear: 2021,
+          vintageYear: 1997,
+          abv: null,
+          singleCask: true,
+          caskStrength: true,
+        }),
+      ),
+    ).toBe("Glenrothes - Individual Cask Release");
+  });
+
+  it("keeps metadata-only names as the absolute headline", () => {
+    const bottle = makeBottle({
+      name: "21-year-old",
+      group: undefined,
+      edition: null,
+      statedAge: 21,
+      releaseYear: null,
+      abv: null,
+      caskStrength: false,
+    });
+    const html = renderToStaticMarkup(
+      <BottleIdentity bottle={bottle} mode="absolute" />,
+    );
+
+    expect(getAbsoluteBottleTitle(bottle)).toBe("21-year-old");
+    expect(html).toContain(">21-year-old</a>");
+    expect(html).not.toContain(">21 years</span>");
   });
 
   it("uses every modeled exact branch before falling back to the name", () => {

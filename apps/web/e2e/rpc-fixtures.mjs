@@ -32,20 +32,26 @@ export const testUser = {
   },
 };
 
-export const emptyLibraryStats = {
-  total: 0,
-  distillers: [],
+export const libraryInsightsStats = {
+  total: 76,
+  distillers: [
+    { id: 101, name: "Laphroaig", count: 8 },
+    { id: 102, name: "Caol Ila", count: 4 },
+    { id: 103, name: "Highland Park", count: 3 },
+    { id: 104, name: "Woodinville Whiskey Co.", count: 3 },
+    { id: 105, name: "Ardbeg", count: 2 },
+  ],
   age: {
-    knownCount: 0,
-    median: null,
-    oldest: null,
+    knownCount: 54,
+    median: 15.5,
+    oldest: 52,
     buckets: [
-      { id: "under10", label: "Under 10", count: 0 },
-      { id: "from10To12", label: "10–12", count: 0 },
-      { id: "from13To17", label: "13–17", count: 0 },
-      { id: "from18To24", label: "18–24", count: 0 },
-      { id: "atLeast25", label: "25+", count: 0 },
-      { id: "unstated", label: "Unstated", count: 0 },
+      { id: "under10", label: "Under 10", count: 13 },
+      { id: "from10To12", label: "10–12", count: 6 },
+      { id: "from13To17", label: "13–17", count: 11 },
+      { id: "from18To24", label: "18–24", count: 12 },
+      { id: "atLeast25", label: "25+", count: 12 },
+      { id: "unstated", label: "Unstated", count: 22 },
     ],
   },
   categories: [],

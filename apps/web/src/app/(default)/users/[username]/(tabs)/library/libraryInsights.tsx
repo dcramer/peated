@@ -81,7 +81,7 @@ function InsightCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded border border-slate-800 bg-slate-950/70 p-3">
+    <section className="flex h-full flex-col rounded border border-slate-800 bg-slate-950/70 p-3">
       <div className="mb-3 flex min-h-8 items-start justify-between gap-3">
         <h2 className="text-sm font-semibold text-white">{title}</h2>
         {detail ? (
@@ -117,7 +117,11 @@ function AgeDistribution({ stats }: { stats: LibraryStats }) {
 
   return (
     <InsightCard title="Age profile" detail={detail}>
-      <div className="grid h-28 grid-cols-6 gap-1" aria-hidden="true">
+      <div
+        className="grid min-h-28 flex-1 grid-cols-6 gap-1"
+        data-age-profile-chart
+        aria-hidden="true"
+      >
         {stats.age.buckets.map((bucket) => (
           <div key={bucket.id} className="flex min-w-0 flex-col items-center">
             <span className="text-muted mb-1 h-4 text-[10px] tabular-nums">

@@ -21,7 +21,6 @@ import {
   createdTastingId,
   destinationBottleGroup,
   destinationBottleGroupId,
-  emptyLibraryStats,
   emptyList,
   exactMatchedBottle,
   exactMatchedBottleId,
@@ -34,6 +33,7 @@ import {
   flightBottleFixture,
   flightBottleFixtureId,
   groupedBottleDetails,
+  libraryInsightsStats,
   missingBottleId,
   photoTastingNotes,
   priceChangeList,
@@ -760,11 +760,10 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(response, testUser);
         return true;
       }
-
       sendRpcError(response, "Unexpected user details payload");
       return true;
     case "users/libraryStats":
-      sendRpcResponse(response, emptyLibraryStats);
+      sendRpcResponse(response, libraryInsightsStats);
       return true;
     case "users/badgeList":
       sendRpcResponse(response, emptyList);
