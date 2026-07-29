@@ -507,8 +507,67 @@ async function buildFamilyPlans(
   const aliasByName = new Map(
     aliases.map((alias) => [claimKey(alias.name), alias]),
   );
+  const groupParentByParentId = new Map(
+    state.bottles.map((parent) => [parent.id, parent.id]),
+  );
+  const findGroupParent = (parentId: number): number => {
+    const groupParentId = groupParentByParentId.get(parentId);
+    if (groupParentId === undefined) return parentId;
+    if (groupParentId === parentId) return groupParentId;
+    const rootParentId = findGroupParent(groupParentId);
+    groupParentByParentId.set(parentId, rootParentId);
+    return rootParentId;
+  };
+  const unionParentGroups = (leftParentId: number, rightParentId: number) => {
+    const leftRoot = findGroupParent(leftParentId);
+    const rightRoot = findGroupParent(rightParentId);
+    if (leftRoot === rightRoot) return;
+    const [representativeId, joinedId] = [leftRoot, rightRoot].sort(
+      (left, right) => left - right,
+    );
+    groupParentByParentId.set(joinedId, representativeId);
+  };
+  const parentIdsByLiteralName = new Map<string, number[]>();
+  const parentIdsByCanonicalName = new Map<string, number[]>();
+  for (const parent of state.bottles) {
+    const literalKey = claimKey(parent.fullName);
+    const literalParentIds = parentIdsByLiteralName.get(literalKey) ?? [];
+    literalParentIds.push(parent.id);
+    parentIdsByLiteralName.set(literalKey, literalParentIds);
+    for (const name of canonicalNames(parent.fullName)) {
+      const key = claimKey(name);
+      const canonicalParentIds = parentIdsByCanonicalName.get(key) ?? [];
+      canonicalParentIds.push(parent.id);
+      parentIdsByCanonicalName.set(key, canonicalParentIds);
+    }
+  }
+  for (const parentIds of parentIdsByLiteralName.values()) {
+    const [firstParentId, ...duplicateParentIds] = parentIds;
+    if (firstParentId === undefined) continue;
+    for (const duplicateParentId of duplicateParentIds) {
+      unionParentGroups(firstParentId, duplicateParentId);
+    }
+  }
+  for (const alias of aliases) {
+    if (
+      alias.ignored === true ||
+      alias.releaseId !== null ||
+      alias.bottleId === null ||
+      !parentById.has(alias.bottleId)
+    ) {
+      continue;
+    }
+    for (const matchingParentId of parentIdsByCanonicalName.get(
+      claimKey(alias.name),
+    ) ?? []) {
+      unionParentGroups(alias.bottleId, matchingParentId);
+    }
+  }
   const groupKeyByParentId = new Map(
-    state.bottles.map((parent) => [parent.id, claimKey(parent.fullName)]),
+    state.bottles.map((parent) => [
+      parent.id,
+      `parent:${findGroupParent(parent.id)}`,
+    ]),
   );
   const parentCountByGroupKey = new Map<string, number>();
   for (const groupKey of groupKeyByParentId.values()) {

@@ -175,6 +175,8 @@ and map to an explicit removal task.
       merging Bottle identities or creating ambiguous canonical aliases.
 - [x] 7.17 Claim unresolved exact aliases during retained-parent and promoted
       Bottle canonicalization instead of treating them as collisions.
+- [x] 7.18 Group legacy parents connected by assigned exact aliases while
+      preserving both Bottle identities and the existing alias assignment.
 
 ## 8. Production Migration And Later Destructive Cleanup
 

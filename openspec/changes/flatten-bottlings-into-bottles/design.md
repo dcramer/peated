@@ -98,12 +98,13 @@ For a legacy family:
 - the release-to-Bottle mapping remains durable for redirects and old API
   translation.
 
-Legacy parents with the same case-insensitive complete canonical name share one
+Legacy parents with the same case-insensitive complete canonical name, or whose
+canonical name is an active exact alias of another legacy parent, share one
 migration-created BottleGroup. The oldest Bottle id is the deterministic
-representative, every duplicate parent remains an active Bottle, and each
-parent's promoted releases join that shared group. Because an exact alias can
-have only one Bottle owner, the migration does not create or reassign ambiguous
-parent canonical aliases for these shared-name members.
+representative, every linked parent remains an active Bottle, and each parent's
+promoted releases join that shared group. Because an exact alias can have only
+one Bottle owner, the migration preserves the existing assignment and does not
+create or reassign ambiguous parent canonical aliases for these members.
 
 The parent is not synthetic migration debris and is not automatically deleted.
 A later explicit Bottle merge may retire it only if product review establishes
