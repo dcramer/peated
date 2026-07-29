@@ -8,10 +8,12 @@ import { ClientOnly } from "./clientOnly";
 export default function ShareButton({
   title,
   url,
+  className,
   ...props
 }: {
   title?: string;
   url?: string;
+  className?: string;
 }) {
   return (
     <ClientOnly>
@@ -20,6 +22,7 @@ export default function ShareButton({
         return (
           <Button
             icon={<ShareIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />}
+            className={className}
             onClick={() => {
               if (navigator.share) {
                 navigator

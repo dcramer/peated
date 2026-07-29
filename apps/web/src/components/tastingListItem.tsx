@@ -7,7 +7,11 @@ import {
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 import { COLOR_SCALE } from "@peated/server/constants";
-import { formatColor, formatServingStyle } from "@peated/server/lib/format";
+import {
+  formatCategoryName,
+  formatColor,
+  formatServingStyle,
+} from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -15,8 +19,10 @@ import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
+import classNames from "../lib/classNames";
 import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
+import BottleMetadata from "./bottleMetadata";
 import Button from "./button";
 import Counter from "./counter";
 import DefinitionList from "./definitionList";
@@ -29,6 +35,9 @@ import Tags from "./tags";
 import TastingBottleIdentity from "./tastingBottleIdentity";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
+
+const tastingActionClassName =
+  "inline-flex h-9 items-center justify-center gap-x-1.5 rounded px-2 text-sm font-medium text-muted transition-colors hover:bg-slate-800 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated disabled:cursor-default disabled:opacity-60";
 
 function ImageWithSkeleton({
   src,
@@ -124,8 +133,19 @@ export default function TastingListItem({
       </div>
 
       {!noBottle && (
-        <div className="px-3 sm:px-5">
-          <TastingBottleIdentity bottle={tasting.bottle} variant="inline" />
+        <div className="flex items-start justify-between gap-x-4 px-3 sm:px-5">
+          <div className="min-w-0 text-sm">
+            <TastingBottleIdentity bottle={tasting.bottle} variant="inline" />
+            <BottleMetadata data={tasting.bottle} />
+          </div>
+          <div className="text-muted hidden shrink-0 text-right text-sm sm:block">
+            {tasting.bottle.category && (
+              <div>{formatCategoryName(tasting.bottle.category)}</div>
+            )}
+            {tasting.bottle.statedAge !== null && (
+              <div>Aged {tasting.bottle.statedAge} years</div>
+            )}
+          </div>
         </div>
       )}
 
@@ -229,12 +249,18 @@ export default function TastingListItem({
         </ul>
       )}
 
-      <aside className="flex items-center space-x-3 px-3 pb-3 lg:px-5 lg:pb-5">
+      <aside className="flex items-center gap-x-1 px-1 pb-2 lg:px-3">
         <Button
           icon={
             <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
           }
           active={hasToasted}
+          aria-label="Toast this tasting"
+          aria-pressed={hasToasted}
+          className={classNames(
+            tastingActionClassName,
+            hasToasted && "text-highlight",
+          )}
           disabled={!canToast}
           onClick={
             canToast
@@ -268,6 +294,8 @@ export default function TastingListItem({
                 aria-hidden="true"
               />
             }
+            aria-label={`View ${tasting.comments.toLocaleString()} comments`}
+            className={tastingActionClassName}
             href={`/tastings/${tasting.id}`}
           >
             {tasting.comments.toLocaleString()}
@@ -276,10 +304,15 @@ export default function TastingListItem({
         <ShareButton
           title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
           url={`/tastings/${tasting.id}`}
+          className={tastingActionClassName}
         />
         {(user?.admin || isTaster) && (
           <Menu as="div" className="menu">
-            <MenuButton as={Button}>
+            <MenuButton
+              as={Button}
+              aria-label="More tasting actions"
+              className={tastingActionClassName}
+            >
               <EllipsisVerticalIcon className="h-5 w-5" />
             </MenuButton>
             <MenuItems className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">
