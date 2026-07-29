@@ -23,19 +23,19 @@ export default async function Layout({
       {user && !user.verified && <PendingVerificationAlert />}
       <div className="flex w-full">
         <div className="flex-1 overflow-hidden lg:w-8/12">
-          <Tabs fullWidth border noMargin>
-            {user && (
+          {user && (
+            <Tabs fullWidth border noMargin>
               <TabItem as={Link} href="/activity/friends" controlled>
                 Friends
               </TabItem>
-            )}
-            <TabItem as={Link} href="/" controlled>
-              Global
-            </TabItem>
-            {/* <TabItem href="/activity/local" controlled>
+              <TabItem as={Link} href="/" controlled>
+                Global
+              </TabItem>
+              {/* <TabItem href="/activity/local" controlled>
           Local
         </TabItem> */}
-          </Tabs>
+            </Tabs>
+          )}
           {children}
         </div>
         <div className="ml-4 hidden w-4/12 lg:block">
