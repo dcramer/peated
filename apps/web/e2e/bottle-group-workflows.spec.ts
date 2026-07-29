@@ -1,4 +1,4 @@
-import { expect, type Page, test, type TestInfo } from "@playwright/test";
+import { expect, test, type TestInfo } from "@playwright/test";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
@@ -11,57 +11,67 @@ import {
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
-test.describe("Similar bottles", () => {
-  test("renders shared identity, aggregate stats, and related Bottles", async ({
-    page,
-  }) => {
+test.describe("Bottle releases", () => {
+  test("renders exact release identity and ratings", async ({ page }) => {
     await page.goto(`/bottles/${bottleGroupRepresentative.id}/releases`);
 
-    const groupHeading = page.getByRole("heading", {
-      level: 1,
-      name: bottleGroup.fullName,
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: bottleGroupRepresentative.fullName,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", {
+        name: `Releases (${bottleGroup.totalBottles})`,
+      }),
+    ).toBeVisible();
+    const releases = page.getByRole("region", {
+      name: "Releases",
     });
-    await expect(groupHeading).toBeVisible();
-    await expect(groupHeading.locator("a")).toHaveCount(0);
+    await expect(releases).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Release family actions" }),
     ).toHaveCount(0);
     await expect(page.locator('a[href$="/releases/merge"]')).toHaveCount(0);
     await expect(page.locator('a[href$="/releases/split"]')).toHaveCount(0);
-    await expect(groupStatistic(page, "Tastings")).toHaveText("37");
-    await expect(groupStatistic(page, "Similar bottles")).toHaveText("3");
-    await expect(groupStatistic(page, "Ratings")).toHaveText("9");
-    await expect(
-      page.getByRole("heading", { level: 2, name: "Similar bottles" }),
-    ).toBeVisible();
 
     for (const bottle of bottleGroupMembers) {
       await expect(
-        page.getByRole("link", { name: bottle.fullName }),
-      ).toHaveAttribute("href", `/bottles/${bottle.id}`);
+        releases.locator(`a[href="/bottles/${bottle.id}"]`),
+      ).toHaveAttribute("title", bottle.fullName);
     }
-    const representativeItem = page.getByRole("listitem").filter({
-      has: page.getByRole("link", {
-        name: bottleGroupRepresentative.fullName,
-      }),
+    const representativeLink = releases.locator(
+      `a[href="/bottles/${bottleGroupRepresentative.id}"]`,
+    );
+    await expect(representativeLink).toHaveAttribute("aria-current", "page");
+    const representativeItem = releases.getByRole("listitem").filter({
+      has: page.locator(`a[href="/bottles/${bottleGroupRepresentative.id}"]`),
     });
+    await expect(representativeItem.getByText("Cask 42")).toBeVisible();
     await expect(representativeItem.getByText("55.1% ABV")).toBeVisible();
     await expect(representativeItem.getByText("2005 vintage")).toBeVisible();
     await expect(representativeItem.getByText("2022 release")).toBeVisible();
     await expect(representativeItem.getByText("Single cask")).toBeVisible();
     await expect(representativeItem.getByText("Cask strength")).toBeVisible();
+    await expect(releases.getByText("0 ratings")).toHaveCount(3);
     await expectNoHorizontalOverflow(page);
 
     await page.goto(`/bottles/${bottleGroupMember.id}/releases`);
-    await expect(groupHeading).toBeVisible();
-    for (const bottle of bottleGroupMembers) {
-      await expect(
-        page.getByRole("link", { name: bottle.fullName }),
-      ).toHaveAttribute("href", `/bottles/${bottle.id}`);
-    }
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: bottleGroupMember.fullName,
+      }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("region", { name: "Releases" })
+        .locator(`a[href="/bottles/${bottleGroupMember.id}"]`),
+    ).toHaveAttribute("aria-current", "page");
   });
 
-  test("links exact Bottle and search views to the related release family", async ({
+  test("links exact Bottle and search views to release actions", async ({
     context,
     page,
   }, testInfo) => {
@@ -71,10 +81,14 @@ test.describe("Similar bottles", () => {
 
     await page.goto(`/bottles/${groupedBottleDetails.id}`);
     await expect(
-      page.getByRole("link", { name: "View all 3 releases" }),
+      page.getByRole("link", {
+        name: `Releases (${bottleGroup.totalBottles})`,
+      }),
     ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/releases`);
+
+    await page.getByRole("button", { name: "More bottle actions" }).click();
     await expect(
-      page.getByRole("link", { name: "Add a similar bottle" }),
+      page.getByRole("menuitem", { name: "Add a similar bottle" }),
     ).toHaveAttribute("href", `/bottles/${groupedBottleDetails.id}/addRelease`);
 
     await page.goto("/search?q=Lagavulin");
@@ -84,10 +98,6 @@ test.describe("Similar bottles", () => {
     await expectNoHorizontalOverflow(page);
   });
 });
-
-function groupStatistic(page: Page, label: string) {
-  return page.getByText(label, { exact: true }).locator("..").locator("dd");
-}
 
 function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
   return [

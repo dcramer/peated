@@ -69,8 +69,6 @@ test.describe("profile library", () => {
       existingBottle.id +
       (testInfo.project.name.includes("mobile") ? 100_000 : 0) +
       (Date.now() % 100_000);
-    const savedBottleName = `${existingBottle.brand.name} 16-year-old ${bottleId}`;
-
     await signIn(context, {
       accessToken: [
         testAccessToken,
@@ -111,12 +109,11 @@ test.describe("profile library", () => {
     await page.goto(`/users/${testUser.username}/library`, {
       waitUntil: "commit",
     });
-    const savedBottleRow = page.locator("tr").filter({
-      hasText: savedBottleName,
-    });
-    await expect(
-      page.getByRole("link", { name: savedBottleName }).first(),
-    ).toHaveAttribute("href", `/bottles/${bottleId}`);
+    const savedBottleRow = libraryBottleRow(page, bottleId);
+    await expect(libraryBottleLink(page, bottleId)).toHaveAttribute(
+      "href",
+      `/bottles/${bottleId}`,
+    );
     await expect(
       savedBottleRow.getByRole("img", { name: "In Library" }),
     ).toHaveCount(0);
@@ -135,9 +132,7 @@ test.describe("profile library", () => {
     await expect(
       page.getByRole("heading", { name: testUser.username }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: savedBottleName }).first(),
-    ).toBeVisible();
+    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
     if (!testInfo.project.name.includes("mobile")) {
       await expect(
         page.getByRole("columnheader", { name: "Bottle" }),
@@ -147,7 +142,7 @@ test.describe("profile library", () => {
       ).toHaveCount(0);
       await expect(
         page.getByRole("columnheader", { name: "Rating" }),
-      ).toHaveCount(0);
+      ).toBeVisible();
       await expect(page.getByRole("columnheader", { name: "Age" })).toHaveCount(
         0,
       );
@@ -157,9 +152,7 @@ test.describe("profile library", () => {
       waitUntil: "commit",
     });
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
-    await expect(page.getByRole("link", { name: savedBottleName })).toHaveCount(
-      1,
-    );
+    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
     await page.goto("/favorites", { waitUntil: "commit" });
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
     await expect(
@@ -178,8 +171,6 @@ test.describe("profile library", () => {
       600_000 +
       (testInfo.project.name.includes("mobile") ? 100_000 : 0) +
       (Date.now() % 100_000);
-    const savedBottleName = `${existingBottle.brand.name} 16-year-old ${bottleId}`;
-
     await signIn(context, {
       accessToken: [
         testAccessToken,
@@ -202,9 +193,7 @@ test.describe("profile library", () => {
     await page.goto(`/users/${testUser.username}/library?cursor=2`, {
       waitUntil: "commit",
     });
-    await expect(
-      page.getByRole("link", { name: savedBottleName }).first(),
-    ).toBeVisible();
+    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
 
     await page.getByRole("searchbox", { name: "Search library" }).fill("zzzz");
     await page.getByRole("button", { name: "Search" }).click();
@@ -215,9 +204,7 @@ test.describe("profile library", () => {
 
     await page.getByRole("button", { name: "Clear filters" }).click();
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
-    await expect(
-      page.getByRole("link", { name: savedBottleName }).first(),
-    ).toBeVisible();
+    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
 
     await page.goto(`/users/${testUser.username}/library?cursor=2`, {
       waitUntil: "commit",
@@ -237,9 +224,7 @@ test.describe("profile library", () => {
       }),
     ).toBeVisible();
     await expect(page.getByPlaceholder("Search brand")).toHaveCount(0);
-    await expect(
-      page.getByRole("link", { name: savedBottleName }).first(),
-    ).toBeVisible();
+    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
   });
 
   test("lets the owner edit the image and remove a Library entry", async ({
@@ -271,9 +256,7 @@ test.describe("profile library", () => {
     await page.goto(`/users/${testUser.username}/library`, {
       waitUntil: "commit",
     });
-    const savedBottleRow = page.locator("tr").filter({
-      hasText: savedBottleName,
-    });
+    const savedBottleRow = libraryBottleRow(page, bottleId);
 
     await expect(
       savedBottleRow.getByRole("button", { name: "Bottle options" }),
@@ -323,10 +306,8 @@ test.describe("profile library", () => {
       waitUntil: "commit",
     });
     await expect(
-      page
-        .getByRole("link", { name: savedBottleName })
-        .filter({ visible: true }),
-    ).toHaveCount(1);
+      libraryBottleLink(page, bottleId).filter({ visible: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Bottle options" }),
     ).toHaveCount(0);
@@ -401,6 +382,16 @@ function getRpcInput(request: Request): Record<string, unknown> {
     throw new Error("Expected the RPC request to use the JSON envelope.");
   }
   return envelope.json;
+}
+
+function libraryBottleLink(page: Page, bottleId: number) {
+  return page.locator(`a[href="/bottles/${bottleId}"]`).first();
+}
+
+function libraryBottleRow(page: Page, bottleId: number) {
+  return page.locator("tr").filter({
+    has: page.locator(`a[href="/bottles/${bottleId}"]`),
+  });
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

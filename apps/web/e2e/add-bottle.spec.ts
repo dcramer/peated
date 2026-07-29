@@ -730,7 +730,7 @@ test.describe("add bottle flow", () => {
     await page.getByRole("link", { name: "View Library" }).click();
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
     await expect(
-      page.getByRole("link", { name: existingBottle.fullName }),
+      page.locator(`a[href="/bottles/${existingBottle.id}"]`).first(),
     ).toBeVisible();
 
     await page.goto("/addBottle");
