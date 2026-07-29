@@ -81,7 +81,7 @@ export class BottleAliasBottleRetiredError extends Error {
 
 export type BottleAliasBottleInactiveReason = Extract<
   ActiveBottleRejectionReason,
-  "unassigned" | "group_retired"
+  "unassigned"
 >;
 
 export class BottleAliasBottleInactiveError extends Error {

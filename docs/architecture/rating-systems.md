@@ -83,7 +83,7 @@ Sibling Bottles and group totals do not contribute.
 
 `recomputeBottleGroupStats(groupId)`:
 
-1. rejects missing or retired groups;
+1. rejects missing groups;
 2. loads the group's active, non-retired member Bottle ids;
 3. queries raw tastings across those Bottle ids once;
 4. overwrites the group's aggregate fields and active `totalBottles`.

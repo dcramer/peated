@@ -3,7 +3,6 @@ import type { z } from "zod";
 import { serialize, serializer } from ".";
 import { db } from "../db";
 import {
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   externalSites,
@@ -40,7 +39,6 @@ export const ReviewSerializer = serializer({
             and(
               inArray(bottles.id, bottleIds),
               sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-              sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
             ),
           )
       : [];

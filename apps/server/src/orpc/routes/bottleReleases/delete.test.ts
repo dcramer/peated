@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroups,
-  bottleGroupTombstones,
   bottleReleasePromotions,
   bottleReleases,
   bottles,
@@ -39,7 +38,6 @@ async function snapshotCatalogGraph() {
     reviewRows,
     changeRows,
     bottleRetirements,
-    groupRetirements,
   ] = await Promise.all([
     db.select().from(bottleGroups).orderBy(asc(bottleGroups.id)),
     db.select().from(bottles).orderBy(asc(bottles.id)),
@@ -55,10 +53,6 @@ async function snapshotCatalogGraph() {
     db.select().from(reviews).orderBy(asc(reviews.id)),
     db.select().from(changes).orderBy(asc(changes.id)),
     db.select().from(bottleTombstones).orderBy(asc(bottleTombstones.bottleId)),
-    db
-      .select()
-      .from(bottleGroupTombstones)
-      .orderBy(asc(bottleGroupTombstones.groupId)),
   ]);
 
   return {
@@ -73,7 +67,6 @@ async function snapshotCatalogGraph() {
     reviews: reviewRows,
     changes: changeRows,
     bottleTombstones: bottleRetirements,
-    groupTombstones: groupRetirements,
   };
 }
 

@@ -1,8 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-} from "@peated/server/db/schema";
+import { bottleTombstones } from "@peated/server/db/schema";
 import { findBottleAliasAssignment, findBottleId } from "./bottleFinder";
 
 describe("findBottleId", () => {
@@ -98,9 +95,7 @@ describe("findBottleId", () => {
     const ignored = await fixtures.Bottle();
     const unassigned = await fixtures.LegacyBottle();
     const retired = await fixtures.Bottle();
-    const groupRetired = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const groupReplacement = await fixtures.Bottle();
     await fixtures.BottleAlias({
       name: "Ignored Alias",
       bottleId: ignored.id,
@@ -118,27 +113,15 @@ describe("findBottleId", () => {
       name: "Retired Alias",
       bottleId: retired.id,
     });
-    await fixtures.BottleAlias({
-      name: "Retired Group Alias",
-      bottleId: groupRetired.id,
-    });
     await db.insert(bottleTombstones).values({
       bottleId: retired.id,
       newBottleId: replacement.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: groupRetired.groupId!,
-      newGroupId: groupReplacement.groupId!,
-      createdByActorId: groupRetired.createdByActorId,
     });
 
     await expect(findBottleId("Ignored Alias")).resolves.toBeNull();
     await expect(findBottleId("Unbound Alias")).resolves.toBeNull();
     await expect(findBottleId("Unassigned Alias")).resolves.toBe(unassigned.id);
     await expect(findBottleId("Retired Alias")).resolves.toBe(retired.id);
-    await expect(findBottleId("Retired Group Alias")).resolves.toBe(
-      groupRetired.id,
-    );
   });
 
   test("prioritizes correct prefix", async ({ fixtures }) => {

@@ -1,15 +1,10 @@
 import {
   BOTTLE_GROUP_BOTTLE_SORT_OPTIONS,
   BottleGroupNotFoundError,
-  BottleGroupRetiredError,
   listBottleGroupBottles,
 } from "@peated/server/lib/bottleGroupReads";
 import { procedure } from "@peated/server/orpc";
-import {
-  BottleGroupReplacementDataSchema,
-  BottleSchema,
-  listResponse,
-} from "@peated/server/schemas";
+import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { z } from "zod";
 
 export default procedure
@@ -46,15 +41,6 @@ export default procedure
     } catch (error) {
       if (error instanceof BottleGroupNotFoundError) {
         throw errors.NOT_FOUND({ message: error.message, cause: error });
-      }
-      if (error instanceof BottleGroupRetiredError) {
-        throw errors.CONFLICT({
-          message: error.message,
-          cause: error,
-          data: BottleGroupReplacementDataSchema.parse({
-            replacementGroupId: error.newGroupId,
-          }),
-        });
       }
       throw error;
     }

@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -27,7 +26,6 @@ import { z } from "zod";
 const activeBottleConditions = and(
   isNotNull(bottles.groupId),
   sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-  sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
 );
 
 export default procedure

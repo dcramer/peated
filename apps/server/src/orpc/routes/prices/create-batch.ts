@@ -95,7 +95,6 @@ export default procedure
                         error.replacementBottleId,
                       );
                     case "unassigned":
-                    case "group_retired":
                       throw new BottleAliasBottleInactiveError(
                         error.bottleId,
                         error.reason,

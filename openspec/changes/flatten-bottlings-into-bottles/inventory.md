@@ -45,8 +45,7 @@ Remove:
 Retain:
 
 - BottleGroup and group distillers;
-- `Bottle.groupId`, representative membership, aggregate fields, and required
-  group tombstones;
+- `Bottle.groupId`, representative membership, and aggregate fields;
 - Bottle tombstones used for exact Bottle merge;
 - durable BottleRelease promotion mapping;
 - direct consumer `bottleId` foreign keys;

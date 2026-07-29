@@ -21,7 +21,6 @@ import type {
 import {
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -763,17 +762,12 @@ export async function updateConcreteBottleInTransaction(
     throw new ConcreteBottleUpdateExpectedBottleStateError(bottleId);
   }
 
-  const [groupTombstone] = await tx
-    .select({ id: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(eq(bottleGroupTombstones.groupId, groupId))
-    .limit(1);
   const [bottleTombstone] = await tx
     .select({ id: bottleTombstones.bottleId })
     .from(bottleTombstones)
     .where(eq(bottleTombstones.bottleId, bottleId))
     .limit(1);
-  if (groupTombstone || bottleTombstone) {
+  if (bottleTombstone) {
     throw new ConcreteBottleUpdateGraphError("retired", bottleId, groupId);
   }
 

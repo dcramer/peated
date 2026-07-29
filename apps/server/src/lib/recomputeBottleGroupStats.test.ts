@@ -3,7 +3,6 @@ import { db } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   tastings,
@@ -145,7 +144,7 @@ describe("BottleGroup statistics recomputation", () => {
     });
   });
 
-  test("rejects missing, retired, and groups without active members", async ({
+  test("rejects missing groups and groups without active members", async ({
     fixtures,
   }) => {
     const missingError = await waitError(recomputeBottleGroupStats(999_999));
@@ -153,19 +152,6 @@ describe("BottleGroup statistics recomputation", () => {
     expect(missingError).toMatchObject({ code: "not_found", groupId: 999_999 });
 
     const destination = await fixtures.Bottle();
-    const retiredGroupId = 999_998;
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupId,
-      newGroupId: destination.groupId as number,
-      createdByActorId: destination.createdByActorId,
-    });
-    await expect(
-      recomputeBottleGroupStats(retiredGroupId),
-    ).rejects.toMatchObject({
-      code: "retired",
-      groupId: retiredGroupId,
-    });
-
     const onlyMember = await fixtures.Bottle();
     await db.insert(bottleTombstones).values({
       bottleId: onlyMember.id,

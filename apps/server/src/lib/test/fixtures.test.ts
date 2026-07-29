@@ -4,7 +4,6 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottlesToDistillers,
   changes,
   flightBottles,
@@ -148,22 +147,6 @@ describe("catalog identity fixtures", () => {
     expect(memberDistillers).toEqual([
       { bottleId: member.id, distillerId: distiller.id },
     ]);
-
-    const destination = await fixtures.Bottle();
-    await db.insert(bottleGroupTombstones).values({
-      groupId: first.groupId as number,
-      newGroupId: destination.groupId as number,
-      createdByActorId: first.createdByActorId,
-    });
-
-    await expect(
-      fixtures.BottleGroupMember({
-        groupId: first.groupId as number,
-        edition: "Rejected Batch",
-      }),
-    ).rejects.toThrow(
-      `BottleGroup fixture is retired (${first.groupId as number})`,
-    );
   });
 
   test("StorePrice preserves an explicitly unresolved Bottle", async ({

@@ -1,7 +1,6 @@
 import type { AnyTransaction } from "@peated/server/db";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   type Bottle,
@@ -142,18 +141,6 @@ async function assertFamilyGraph(
     throw new CatalogMigrationStatsIntegrityError("invalid_catalog_graph", {
       groupId: family.groupId,
       reason: "group_not_found",
-    });
-  }
-
-  const [groupTombstone] = await tx
-    .select({ groupId: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(eq(bottleGroupTombstones.groupId, family.groupId))
-    .limit(1);
-  if (groupTombstone) {
-    throw new CatalogMigrationStatsIntegrityError("unexpected_tombstone", {
-      groupId: family.groupId,
-      objectType: "bottle_group",
     });
   }
 

@@ -5,7 +5,6 @@ import type { Bottle } from "@peated/server/db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottleTombstones,
@@ -161,17 +160,7 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
     .leftJoin(bottleSeries, eq(bottleSeries.id, bottleGroups.seriesId))
     .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .leftJoin(
-      bottleGroupTombstones,
-      eq(bottleGroupTombstones.groupId, bottles.groupId),
-    )
-    .where(
-      and(
-        eq(bottles.id, bottleId),
-        isNull(bottleTombstones.bottleId),
-        isNull(bottleGroupTombstones.groupId),
-      ),
-    )
+    .where(and(eq(bottles.id, bottleId), isNull(bottleTombstones.bottleId)))
     .limit(1);
   if (!owned) {
     throw new Error(

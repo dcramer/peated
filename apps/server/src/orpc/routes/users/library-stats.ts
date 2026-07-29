@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -282,15 +281,10 @@ export default procedure
               statedAge: bottles.statedAge,
             },
             retiredBottleId: bottleTombstones.bottleId,
-            retiredGroupId: bottleGroupTombstones.groupId,
           })
           .from(collectionBottles)
           .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
           .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-          .leftJoin(
-            bottleGroupTombstones,
-            eq(bottleGroupTombstones.groupId, bottles.groupId),
-          )
           .where(
             and(
               eq(collectionBottles.collectionId, library.id),

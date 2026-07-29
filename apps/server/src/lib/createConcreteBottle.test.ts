@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroupDistillers,
-  bottleGroupTombstones,
   bottleGroups,
   bottleTombstones,
   bottles,
@@ -524,7 +523,6 @@ describe("concrete Bottle creation", () => {
     const actor = await getUserActor(defaults.user);
     const context = contextFor(defaults.user);
     const replacement = await fixtures.Bottle();
-    const groupReplacement = await fixtures.Bottle();
     const scenarios = [
       {
         reason: "bottle_retired",
@@ -534,18 +532,6 @@ describe("concrete Bottle creation", () => {
           await db.insert(bottleTombstones).values({
             bottleId: bottle.bottle.id,
             newBottleId: replacement.id,
-          });
-        },
-      },
-      {
-        reason: "group_retired",
-        retire: async (
-          bottle: Awaited<ReturnType<typeof createConcreteBottle>>,
-        ) => {
-          await db.insert(bottleGroupTombstones).values({
-            groupId: bottle.group.id,
-            newGroupId: groupReplacement.groupId!,
-            createdByActorId: bottle.bottle.createdByActorId,
           });
         },
       },

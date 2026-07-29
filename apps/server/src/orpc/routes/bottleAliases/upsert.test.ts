@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottleTombstones,
   reviews,
   storePrices,
@@ -162,14 +161,12 @@ describe("PUT /bottle-aliases", () => {
     });
   });
 
-  test("rejects missing, inactive, retired-group, and conflicting Bottles", async ({
+  test("rejects missing, inactive, and conflicting Bottles", async ({
     fixtures,
   }) => {
     const existing = await fixtures.Bottle();
     const inactive = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
-    const retiredGroupMember = await fixtures.Bottle();
-    const groupReplacement = await fixtures.Bottle();
     await fixtures.BottleAlias({
       bottleId: existing.id,
       name: "Conflicting Direct Alias",
@@ -177,11 +174,6 @@ describe("PUT /bottle-aliases", () => {
     await db.insert(bottleTombstones).values({
       bottleId: inactive.id,
       newBottleId: replacement.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupMember.groupId!,
-      newGroupId: groupReplacement.groupId!,
-      createdByActorId: retiredGroupMember.createdByActorId,
     });
     const user = await fixtures.User({ mod: true });
 
@@ -201,20 +193,6 @@ describe("PUT /bottle-aliases", () => {
         ),
       ),
     ).resolves.toMatchObject({ status: 409 });
-    await expect(
-      waitError(
-        routerClient.bottleAliases.upsert(
-          {
-            bottle: retiredGroupMember.id,
-            name: "Retired Group Bottle Alias",
-          },
-          { context: { user } },
-        ),
-      ),
-    ).resolves.toMatchObject({
-      status: 409,
-      message: `Bottle ${retiredGroupMember.id} belongs to a retired BottleGroup.`,
-    });
     await expect(
       waitError(
         routerClient.bottleAliases.upsert(

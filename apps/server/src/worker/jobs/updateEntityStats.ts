@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -51,11 +50,6 @@ export default async (input: unknown) => {
             WHERE ${bottleTombstones.bottleId} = ${bottles.id}
           )
           AND ${bottles.groupId} IS NOT NULL
-          AND NOT EXISTS (
-            SELECT 1
-            FROM ${bottleGroupTombstones}
-            WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId}
-          )
         )`,
         totalTastings: sql<string>`(
           SELECT COUNT(*)
@@ -78,11 +72,6 @@ export default async (input: unknown) => {
             WHERE ${bottleTombstones.bottleId} = ${bottles.id}
           )
           AND ${bottles.groupId} IS NOT NULL
-          AND NOT EXISTS (
-            SELECT 1
-            FROM ${bottleGroupTombstones}
-            WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId}
-          )
         )`,
         updatedAt: sql`NOW()`,
       })

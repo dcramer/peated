@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   flightBottles,
@@ -262,41 +261,6 @@ describe("POST /flights", () => {
     await expect(
       db.query.flights.findFirst({
         where: eq(flights.name, "Retired Bottle flight"),
-      }),
-    ).resolves.toBeUndefined();
-  });
-
-  test("rejects a Bottle in a retired BottleGroup", async ({ fixtures }) => {
-    const user = await fixtures.User();
-    const bottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    if (bottle.groupId === null || replacement.groupId === null) {
-      throw new Error("BottleGroup fixtures not found.");
-    }
-    await db.insert(bottleGroupTombstones).values({
-      groupId: bottle.groupId,
-      newGroupId: replacement.groupId,
-      createdByActorId: bottle.createdByActorId,
-    });
-
-    const error = await waitError(() =>
-      routerClient.flights.create(
-        {
-          name: "Retired BottleGroup flight",
-          bottles: [bottle.id],
-        },
-        { context: { user } },
-      ),
-    );
-
-    expect(error).toMatchObject({
-      code: "BAD_REQUEST",
-      message:
-        "One or more Bottles are missing or not ready for Flight activity.",
-    });
-    await expect(
-      db.query.flights.findFirst({
-        where: eq(flights.name, "Retired BottleGroup flight"),
       }),
     ).resolves.toBeUndefined();
   });

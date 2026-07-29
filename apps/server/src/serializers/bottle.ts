@@ -7,7 +7,6 @@ import type { Bottle, User } from "../db/schema";
 import {
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottleSeries,
   bottlesToDistillers,
   collectionBottles,
@@ -51,26 +50,18 @@ export const BottleSerializer = serializer({
       const groupIds = Array.from(
         new Set(itemList.map(({ groupId }) => groupId).filter(notEmpty)),
       );
-      const [groupList, groupDistillerList, groupTombstoneList] =
-        groupIds.length
-          ? await Promise.all([
-              db
-                .select()
-                .from(bottleGroups)
-                .where(inArray(bottleGroups.id, groupIds)),
-              db
-                .select()
-                .from(bottleGroupDistillers)
-                .where(inArray(bottleGroupDistillers.groupId, groupIds)),
-              db
-                .select({ groupId: bottleGroupTombstones.groupId })
-                .from(bottleGroupTombstones)
-                .where(inArray(bottleGroupTombstones.groupId, groupIds)),
-            ])
-          : [[], [], []];
-      const retiredGroupIds = new Set(
-        groupTombstoneList.map(({ groupId }) => groupId),
-      );
+      const [groupList, groupDistillerList] = groupIds.length
+        ? await Promise.all([
+            db
+              .select()
+              .from(bottleGroups)
+              .where(inArray(bottleGroups.id, groupIds)),
+            db
+              .select()
+              .from(bottleGroupDistillers)
+              .where(inArray(bottleGroupDistillers.groupId, groupIds)),
+          ])
+        : [[], []];
       const distillerIdsByGroupId = new Map<number, number[]>();
       for (const { groupId, distillerId } of groupDistillerList) {
         const distillerIds = distillerIdsByGroupId.get(groupId) ?? [];
@@ -91,10 +82,8 @@ export const BottleSerializer = serializer({
         },
       );
       const groupById = new Map(
-        groupList.flatMap((group, index) =>
-          retiredGroupIds.has(group.id)
-            ? []
-            : [[group.id, groupSummaries[index]] as const],
+        groupList.map(
+          (group, index) => [group.id, groupSummaries[index]] as const,
         ),
       );
 

@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   collectionBottles,
@@ -510,45 +509,6 @@ describe("POST /users/:user/collections/:collection/bottles", () => {
     await db.insert(bottleTombstones).values({
       bottleId: bottle.id,
       newBottleId: replacement.id,
-    });
-
-    const error = await waitError(() =>
-      routerClient.collections.bottles.create(
-        {
-          user: "me",
-          collection: collection.id,
-          bottle: bottle.id,
-        },
-        { context: { user: defaults.user } },
-      ),
-    );
-
-    expect(error).toMatchInlineSnapshot(
-      `[Error: Bottle is not ready for collection activity.]`,
-    );
-    expect(
-      await db.query.collectionBottles.findFirst({
-        where: eq(collectionBottles.collectionId, collection.id),
-      }),
-    ).toBeUndefined();
-  });
-
-  test("rejects a Bottle in a retired BottleGroup", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    const collection = await fixtures.Collection({
-      createdById: defaults.user.id,
-    });
-    if (bottle.groupId === null || replacement.groupId === null) {
-      throw new Error("BottleGroup fixtures not found.");
-    }
-    await db.insert(bottleGroupTombstones).values({
-      groupId: bottle.groupId,
-      newGroupId: replacement.groupId,
-      createdByActorId: bottle.createdByActorId,
     });
 
     const error = await waitError(() =>

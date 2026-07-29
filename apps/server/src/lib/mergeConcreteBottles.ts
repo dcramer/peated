@@ -10,7 +10,6 @@ import {
   bottleFlavorProfiles,
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottleObservations,
   bottleReleasePromotions,
   bottleReleases,
@@ -436,14 +435,6 @@ export async function mergeConcreteBottlesInTransaction(
         .for("update")
     : [];
   const groupById = new Map(groups.map((group) => [group.id, group]));
-  const retiredGroups = groupIds.length
-    ? await tx
-        .select()
-        .from(bottleGroupTombstones)
-        .where(inArray(bottleGroupTombstones.groupId, groupIds))
-        .orderBy(asc(bottleGroupTombstones.groupId))
-        .for("update")
-    : [];
   const lockedMembers = groupIds.length
     ? await tx
         .select()
@@ -538,20 +529,6 @@ export async function mergeConcreteBottlesInTransaction(
       !sourceGroup ? sourceBottleId : destinationBottleId,
     );
   }
-  if (
-    retiredGroups.some(
-      ({ groupId }) =>
-        groupId === destinationGroupId || groupId === sourceGroupId,
-    )
-  ) {
-    throw new ConcreteBottleMergeGraphError(
-      "invalid_catalog_graph",
-      retiredGroups.some(({ groupId }) => groupId === destinationGroupId)
-        ? destinationBottleId
-        : sourceBottleId,
-    );
-  }
-
   const sourceMembers = lockedMembers.filter(
     ({ groupId }) => groupId === sourceGroupId,
   );
@@ -764,15 +741,6 @@ export async function mergeConcreteBottlesInTransaction(
   await tx.delete(bottles).where(eq(bottles.id, sourceBottleId));
 
   if (crossGroup && sourceSingleton) {
-    await tx
-      .update(bottleGroupTombstones)
-      .set({ newGroupId: destinationGroupId })
-      .where(eq(bottleGroupTombstones.newGroupId, sourceGroupId));
-    await tx.insert(bottleGroupTombstones).values({
-      groupId: sourceGroupId,
-      newGroupId: destinationGroupId,
-      createdByActorId: actorId,
-    });
     await tx
       .delete(bottleGroupDistillers)
       .where(eq(bottleGroupDistillers.groupId, sourceGroupId));

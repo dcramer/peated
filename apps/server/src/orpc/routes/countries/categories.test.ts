@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroupDistillers,
-  bottleGroupTombstones,
   bottleGroups,
   bottleTombstones,
 } from "@peated/server/db/schema";
@@ -164,29 +163,14 @@ describe("GET /countries/categories", () => {
       category: "rye",
       distillerIds: [countryDistiller.id],
     });
-    const retiredGroupBottle = await fixtures.Bottle({
-      category: "single_grain",
-      distillerIds: [countryDistiller.id],
-    });
     const destinationBottle = await fixtures.Bottle({
       category: "spirit",
       distillerIds: [otherDistiller.id],
     });
-    if (
-      retiredGroupBottle.groupId === null ||
-      destinationBottle.groupId === null
-    ) {
-      throw new Error("Expected grouped Bottle fixtures");
-    }
 
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId,
-      newGroupId: destinationBottle.groupId,
-      createdByActorId: retiredGroupBottle.createdByActorId,
     });
     await db
       .update(bottleGroups)

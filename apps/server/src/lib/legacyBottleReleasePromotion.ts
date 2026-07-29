@@ -1,7 +1,6 @@
 import type { AnyDatabase } from "@peated/server/db";
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleReleasePromotions,
   bottleReleases,
   bottles,
@@ -121,17 +120,11 @@ export async function resolveLegacyBottleReleasePromotion(
     );
   }
 
-  const [bottleTombstone, groupTombstone] = await Promise.all([
-    database.query.bottleTombstones.findFirst({
-      where: eq(bottleTombstones.bottleId, promotedBottle.id),
-      columns: { bottleId: true },
-    }),
-    database.query.bottleGroupTombstones.findFirst({
-      where: eq(bottleGroupTombstones.groupId, promotedBottle.groupId),
-      columns: { groupId: true },
-    }),
-  ]);
-  if (bottleTombstone || groupTombstone) {
+  const bottleTombstone = await database.query.bottleTombstones.findFirst({
+    where: eq(bottleTombstones.bottleId, promotedBottle.id),
+    columns: { bottleId: true },
+  });
+  if (bottleTombstone) {
     throw new LegacyBottleReleasePromotionError(
       "promoted_bottle_unavailable",
       `Promoted Bottle ${promotion.promotedBottleId} is unavailable.`,

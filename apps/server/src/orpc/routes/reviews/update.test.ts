@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   incomingBottleDecisionLogs,
   reviews,
@@ -234,11 +233,6 @@ describe("PATCH /reviews/:review", () => {
     const selectedBottle = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
     const review = await fixtures.Review({ hidden: false });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: selectedBottle.groupId!,
-      newGroupId: replacement.groupId!,
-      createdByActorId: selectedBottle.createdByActorId,
-    });
 
     const error = await waitError(
       routerClient.reviews.update(

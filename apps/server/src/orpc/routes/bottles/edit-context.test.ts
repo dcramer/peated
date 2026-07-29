@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -231,25 +230,6 @@ describe("GET /bottles/{bottle}/edit-context", () => {
       ),
     );
     expect(retiredError).toMatchObject({ status: 409 });
-
-    const retiredGroup = await fixtures.Bottle({
-      name: "Retired Group Edit Context",
-    });
-    const replacementGroup = await fixtures.Bottle({
-      name: "Replacement Group Edit Context",
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroup.groupId as number,
-      newGroupId: replacementGroup.groupId as number,
-      createdByActorId: retiredGroup.createdByActorId,
-    });
-    const retiredGroupError = await waitError(
-      routerClient.bottles.editContext(
-        { bottle: retiredGroup.id },
-        { context: { user: mod } },
-      ),
-    );
-    expect(retiredGroupError).toMatchObject({ status: 409 });
 
     const missingGroup = await fixtures.LegacyBottle({
       name: "Missing Group Edit Context",

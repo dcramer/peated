@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   collectionBottles,
   collections,
@@ -326,11 +325,6 @@ describe("GET /users/:user", () => {
       collectionId: collection.id,
       bottleId: bottle.id,
       status: "sealed",
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: bottle.groupId!,
-      newGroupId: replacement.groupId!,
-      createdByActorId: bottle.createdByActorId,
     });
 
     const error = await waitError(

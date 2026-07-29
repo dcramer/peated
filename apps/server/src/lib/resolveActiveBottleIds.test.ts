@@ -1,8 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-} from "@peated/server/db/schema";
+import { bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { expect, test } from "vitest";
 import {
@@ -45,25 +42,10 @@ test("rejects every inactive Bottle state", async ({ fixtures }) => {
     newBottleId: bottleReplacement.id,
   });
 
-  const retiredGroupMember = await fixtures.Bottle();
-  const groupReplacement = await fixtures.Bottle();
-  if (
-    retiredGroupMember.groupId === null ||
-    groupReplacement.groupId === null
-  ) {
-    throw new Error("BottleGroup fixtures not found.");
-  }
-  await db.insert(bottleGroupTombstones).values({
-    groupId: retiredGroupMember.groupId,
-    newGroupId: groupReplacement.groupId,
-    createdByActorId: retiredGroupMember.createdByActorId,
-  });
-
   const scenarios = [
     { bottleId: Number.MAX_SAFE_INTEGER, reason: "missing" },
     { bottleId: unassigned.id, reason: "unassigned" },
     { bottleId: retired.id, reason: "bottle_retired" },
-    { bottleId: retiredGroupMember.id, reason: "group_retired" },
   ] as const;
 
   for (const scenario of scenarios) {

@@ -2,7 +2,6 @@ import { CATEGORY_LIST, FLAVOR_PROFILES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottles,
   bottlesToDistillers,
   bottleTombstones,
@@ -109,7 +108,6 @@ export default procedure
     const where: (SQL<unknown> | undefined)[] = [];
     where.push(
       sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-      sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
     );
 
     if (query) {

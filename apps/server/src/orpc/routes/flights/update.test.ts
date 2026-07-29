@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   flightBottles,
@@ -325,54 +324,6 @@ describe("PATCH /flights/:flight", () => {
       expect.objectContaining({
         flightId: flight.id,
         bottleId: bottle.id,
-      }),
-    ]);
-  });
-
-  test("retired BottleGroup replacement rolls back metadata and memberships", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const retainedBottle = await fixtures.Bottle();
-    const retiredGroupBottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    const flight = await fixtures.Flight({ bottles: [retainedBottle.id] });
-    if (retiredGroupBottle.groupId === null || replacement.groupId === null) {
-      throw new Error("BottleGroup fixtures not found.");
-    }
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId,
-      newGroupId: replacement.groupId,
-      createdByActorId: retiredGroupBottle.createdByActorId,
-    });
-
-    const error = await waitError(() =>
-      routerClient.flights.update(
-        {
-          flight: flight.publicId,
-          name: "Should not persist",
-          bottles: [retiredGroupBottle.id],
-        },
-        { context: { user } },
-      ),
-    );
-
-    expect(error).toMatchObject({
-      code: "BAD_REQUEST",
-      message:
-        "One or more Bottles are missing or not ready for Flight activity.",
-    });
-    await expect(
-      db.query.flights.findFirst({ where: eq(flights.id, flight.id) }),
-    ).resolves.toMatchObject({ name: flight.name });
-    await expect(
-      db.query.flightBottles.findMany({
-        where: eq(flightBottles.flightId, flight.id),
-      }),
-    ).resolves.toEqual([
-      expect.objectContaining({
-        flightId: flight.id,
-        bottleId: retainedBottle.id,
       }),
     ]);
   });

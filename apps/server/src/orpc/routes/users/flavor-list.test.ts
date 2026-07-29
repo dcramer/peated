@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottleTombstones,
   tastings,
 } from "@peated/server/db/schema";
@@ -163,11 +162,6 @@ describe("GET /users/:user/flavors", () => {
     await fixtures.Tasting({
       bottleId: bottle.id,
       createdById: defaults.user.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: bottle.groupId!,
-      newGroupId: replacement.groupId!,
-      createdByActorId: bottle.createdByActorId,
     });
 
     const error = await waitError(

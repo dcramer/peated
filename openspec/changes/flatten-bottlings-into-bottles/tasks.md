@@ -158,7 +158,7 @@ and map to an explicit removal task.
       writer; use the representative Bottle for relationship presentation.
 - [x] 7.10 Simplify the durable BottleRelease promotion record to committed
       release-to-Bottle identity without checkpoint lifecycle state.
-- [ ] 7.11 Remove BottleGroup tombstones and retired-group branches; preserve
+- [x] 7.11 Remove BottleGroup tombstones and retired-group branches; preserve
       user-facing retirement through canonical Bottle tombstones.
 - [ ] 7.12 Regenerate the unreleased additive migration once from the corrected
       schema and rerun focused schema, migration, API, and web verification.

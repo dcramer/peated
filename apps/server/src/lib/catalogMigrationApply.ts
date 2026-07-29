@@ -213,7 +213,6 @@ async function lockMigrationTables(tx: AnyTransaction): Promise<void> {
       bottle_flavor_profile,
       bottle_group,
       bottle_group_distiller,
-      bottle_group_tombstone,
       bottle_observation,
       bottle_release,
       bottle_release_promotion,

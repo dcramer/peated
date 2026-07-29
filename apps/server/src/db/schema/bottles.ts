@@ -304,29 +304,6 @@ export const bottleGroupDistillers = pgTable(
 export type BottleGroupDistiller = typeof bottleGroupDistillers.$inferSelect;
 export type NewBottleGroupDistiller = typeof bottleGroupDistillers.$inferInsert;
 
-export const bottleGroupTombstones = pgTable(
-  "bottle_group_tombstone",
-  {
-    groupId: bigint("bottle_group_id", { mode: "number" }).primaryKey(),
-    newGroupId: bigint("new_bottle_group_id", { mode: "number" })
-      .references(() => bottleGroups.id)
-      .notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    createdByActorId: bigint("created_by_actor_id", { mode: "number" })
-      .references(() => actors.id)
-      .notNull(),
-  },
-  (table) => [
-    index("bottle_group_tombstone_new_group_idx").on(table.newGroupId),
-    index("bottle_group_tombstone_created_by_actor_idx").on(
-      table.createdByActorId,
-    ),
-  ],
-);
-
-export type BottleGroupTombstone = typeof bottleGroupTombstones.$inferSelect;
-export type NewBottleGroupTombstone = typeof bottleGroupTombstones.$inferInsert;
-
 export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   group: one(bottleGroups, {
     fields: [bottles.groupId],
@@ -418,20 +395,6 @@ export const bottleGroupDistillersRelations = relations(
     distiller: one(entities, {
       fields: [bottleGroupDistillers.distillerId],
       references: [entities.id],
-    }),
-  }),
-);
-
-export const bottleGroupTombstonesRelations = relations(
-  bottleGroupTombstones,
-  ({ one }) => ({
-    newGroup: one(bottleGroups, {
-      fields: [bottleGroupTombstones.newGroupId],
-      references: [bottleGroups.id],
-    }),
-    createdByActor: one(actors, {
-      fields: [bottleGroupTombstones.createdByActorId],
-      references: [actors.id],
     }),
   }),
 );

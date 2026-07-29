@@ -3,7 +3,6 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottleReleases,
   bottles,
   bottleSeries,
@@ -136,12 +135,6 @@ test("merge duplicate bottle", async ({ fixtures }) => {
     .where(eq(bottles.id, bottleB.id));
   expect(newBottleB).toBeDefined();
   expect(newBottleB.name).toEqual("Duplicate");
-  expect(
-    await db
-      .select()
-      .from(bottleGroupTombstones)
-      .where(eq(bottleGroupTombstones.groupId, bottleA.groupId!)),
-  ).toEqual([expect.objectContaining({ newGroupId: bottleB.groupId })]);
 });
 
 test("preflights exact batch duplicates from BottleGroup authority", async ({

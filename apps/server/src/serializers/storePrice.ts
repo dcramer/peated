@@ -1,5 +1,4 @@
 import {
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   collectionBottles,
@@ -50,7 +49,6 @@ async function loadStorePriceBottleAttrs(
           and(
             inArray(bottles.id, bottleIds),
             sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-            sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
           ),
         )
     : [];
@@ -193,7 +191,6 @@ export const PriceChangeSerializer = serializer({
             and(
               inArray(bottles.id, bottleIds),
               sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-              sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
             ),
           )
       : [];

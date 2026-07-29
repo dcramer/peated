@@ -3,7 +3,6 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   type User,
@@ -96,36 +95,17 @@ export class BottleGroupNotFoundError extends Error {
   }
 }
 
-export class BottleGroupRetiredError extends Error {
-  constructor(
-    public readonly groupId: number,
-    public readonly newGroupId: number,
-  ) {
-    super(`Bottle group is retired (groupId=${groupId}).`);
-  }
-}
-
 async function loadActiveBottleGroup(groupId: number, database: AnyDatabase) {
-  const [result] = await database
-    .select({
-      group: bottleGroups,
-      newGroupId: bottleGroupTombstones.newGroupId,
-    })
+  const [group] = await database
+    .select()
     .from(bottleGroups)
-    .leftJoin(
-      bottleGroupTombstones,
-      eq(bottleGroupTombstones.groupId, bottleGroups.id),
-    )
     .where(eq(bottleGroups.id, groupId))
     .limit(1);
 
-  if (!result) {
+  if (!group) {
     throw new BottleGroupNotFoundError(groupId);
   }
-  if (result.newGroupId !== null) {
-    throw new BottleGroupRetiredError(groupId, result.newGroupId);
-  }
-  return result.group;
+  return group;
 }
 
 /** Loads one active BottleGroup as relationship and aggregate context. */

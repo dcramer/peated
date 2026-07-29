@@ -1,10 +1,5 @@
 import { db, type AnyDatabase } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottles,
-  bottleTombstones,
-  tastings,
-} from "@peated/server/db/schema";
+import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
 import { and, asc, eq, gt } from "drizzle-orm";
 
 const TASTING_BOTTLE_SCAN_BATCH_SIZE = 200;
@@ -24,7 +19,6 @@ export type JoinedUserBottleRead = {
   storedBottleId: number | null;
   bottle: UserBottleRead | null;
   retiredBottleId: number | null;
-  retiredGroupId: number | null;
 };
 
 export class UserBottleReadIntegrityError extends Error {
@@ -39,7 +33,6 @@ export function readJoinedUserBottle({
   storedBottleId,
   bottle,
   retiredBottleId,
-  retiredGroupId,
 }: JoinedUserBottleRead): UserBottleRead | null {
   if (storedBottleId === null) return null;
   if (!bottle) {
@@ -52,7 +45,7 @@ export function readJoinedUserBottle({
       `Bottle ${bottle.id} has no BottleGroup.`,
     );
   }
-  if (retiredBottleId !== null || retiredGroupId !== null) {
+  if (retiredBottleId !== null) {
     throw new UserBottleReadIntegrityError(
       `Consumer references retired Bottle ${bottle.id}.`,
     );
@@ -84,15 +77,10 @@ export async function* scanUserTastingBottles(
           statedAge: bottles.statedAge,
         },
         retiredBottleId: bottleTombstones.bottleId,
-        retiredGroupId: bottleGroupTombstones.groupId,
       })
       .from(tastings)
       .leftJoin(bottles, eq(bottles.id, tastings.bottleId))
       .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-      .leftJoin(
-        bottleGroupTombstones,
-        eq(bottleGroupTombstones.groupId, bottles.groupId),
-      )
       .where(
         and(
           eq(tastings.createdById, userId),

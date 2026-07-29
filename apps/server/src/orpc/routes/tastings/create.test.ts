@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleTags,
   bottleTombstones,
   tastings,
@@ -122,34 +121,6 @@ describe("POST /tastings", () => {
         columns: { bottleId: true },
       }),
     ).toEqual({ bottleId: selectedBottle.id });
-  });
-
-  test("rejects a Bottle in a retired BottleGroup", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    if (bottle.groupId === null || replacement.groupId === null) {
-      throw new Error("BottleGroup fixtures not found.");
-    }
-    await db.insert(bottleGroupTombstones).values({
-      groupId: bottle.groupId,
-      newGroupId: replacement.groupId,
-      createdByActorId: bottle.createdByActorId,
-    });
-
-    const error = await waitError(() =>
-      routerClient.tastings.create(
-        { bottle: bottle.id },
-        { context: { user: defaults.user } },
-      ),
-    );
-
-    expect(error).toMatchObject({
-      code: "BAD_REQUEST",
-      message: "Cannot identify bottle.",
-    });
   });
 
   test("accounts tags against the selected Bottle", async ({

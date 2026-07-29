@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   changes,
@@ -57,7 +56,6 @@ async function aggregateCollectionStats(userId: number) {
           statedAge: bottles.statedAge,
         },
         retiredBottleId: bottleTombstones.bottleId,
-        retiredGroupId: bottleGroupTombstones.groupId,
         status: collectionBottles.status,
         collectionName: collections.name,
       })
@@ -68,10 +66,6 @@ async function aggregateCollectionStats(userId: number) {
       )
       .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
       .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-      .leftJoin(
-        bottleGroupTombstones,
-        eq(bottleGroupTombstones.groupId, bottles.groupId),
-      )
       .where(
         and(
           eq(collections.createdById, userId),

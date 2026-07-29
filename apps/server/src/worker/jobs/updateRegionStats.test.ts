@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-  regions,
-} from "@peated/server/db/schema";
+import { bottleTombstones, regions } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateRegionStats from "./updateRegionStats";
 
@@ -45,22 +41,9 @@ test("counts active independently complete Bottles once", async ({
     name: "Retired Region Bottle",
     brandId: entity1.id,
   });
-  const retiredGroupBottle = await fixtures.Bottle({
-    name: "Retired Region Group Bottle",
-    brandId: entity1.id,
-  });
-  const replacementGroupBottle = await fixtures.Bottle({
-    name: "Replacement Region Group Bottle",
-    brandId: entity3.id,
-  });
   await db.insert(bottleTombstones).values({
     bottleId: retiredBottle.id,
     newBottleId: null,
-  });
-  await db.insert(bottleGroupTombstones).values({
-    groupId: retiredGroupBottle.groupId!,
-    newGroupId: replacementGroupBottle.groupId!,
-    createdByActorId: retiredGroupBottle.createdByActorId,
   });
 
   await updateRegionStats({ regionId: region1.id });

@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottles,
-  bottleTombstones,
-} from "@peated/server/db/schema";
+import { bottles, bottleTombstones } from "@peated/server/db/schema";
 import { getBrandRepairCandidates } from "@peated/server/lib/brandRepairCandidates";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -165,9 +161,7 @@ describe("GET /bottles/brand-repair-candidates", () => {
     );
   });
 
-  test("filters alias evidence for retired Bottles and groups", async ({
-    fixtures,
-  }) => {
+  test("filters alias evidence for retired Bottles", async ({ fixtures }) => {
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
       type: ["brand"],
@@ -181,35 +175,16 @@ describe("GET /bottles/brand-repair-candidates", () => {
       brandId: currentBrand.id,
       name: "Retired Bottle Evidence",
     });
-    const retiredGroupBottle = await fixtures.Bottle({
-      brandId: currentBrand.id,
-      name: "Retired Group Evidence",
-    });
     const destinationBottle = await fixtures.Bottle({
       name: "Active Destination",
     });
-    if (
-      retiredGroupBottle.groupId === null ||
-      destinationBottle.groupId === null
-    ) {
-      throw new Error("Expected grouped Bottle fixtures");
-    }
     await fixtures.BottleAlias({
       bottleId: retiredBottle.id,
       name: "Canadian Club Retired Bottle Evidence",
     });
-    await fixtures.BottleAlias({
-      bottleId: retiredGroupBottle.id,
-      name: "Canadian Club Retired Group Evidence",
-    });
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId,
-      newGroupId: destinationBottle.groupId,
-      createdByActorId: retiredGroupBottle.createdByActorId,
     });
 
     const { results } = await routerClient.bottles.brandRepairCandidates(
@@ -246,19 +221,9 @@ describe("GET /bottles/brand-repair-candidates", () => {
       brandId: currentBrand.id,
       name: "Retired Bottle Scan Evidence",
     });
-    const retiredGroupBottle = await fixtures.Bottle({
-      brandId: currentBrand.id,
-      name: "Retired Group Scan Evidence",
-    });
     const destinationBottle = await fixtures.Bottle({
       name: "Scan Destination",
     });
-    if (
-      retiredGroupBottle.groupId === null ||
-      destinationBottle.groupId === null
-    ) {
-      throw new Error("Expected grouped Bottle fixtures");
-    }
     await fixtures.BottleAlias({
       bottleId: activeBottle.id,
       name: "Canadian Club Active Scan Evidence",
@@ -271,18 +236,9 @@ describe("GET /bottles/brand-repair-candidates", () => {
       bottleId: retiredBottle.id,
       name: "Canadian Club Retired Bottle Scan Evidence",
     });
-    await fixtures.BottleAlias({
-      bottleId: retiredGroupBottle.id,
-      name: "Canadian Club Retired Group Scan Evidence",
-    });
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId,
-      newGroupId: destinationBottle.groupId,
-      createdByActorId: retiredGroupBottle.createdByActorId,
     });
 
     const [unfiltered, currentBrandFiltered] = await Promise.all([

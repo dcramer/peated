@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottleReleasePromotions,
   bottleTombstones,
   reviews,
@@ -139,16 +138,9 @@ describe("exact Bottle alias reservation", () => {
     const retired = await fixtures.Bottle();
     const replacement = await fixtures.Bottle();
     const unassigned = await fixtures.LegacyBottle();
-    const retiredGroupMember = await fixtures.Bottle();
-    const groupReplacement = await fixtures.Bottle();
     await db.insert(bottleTombstones).values({
       bottleId: retired.id,
       newBottleId: replacement.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupMember.groupId!,
-      newGroupId: groupReplacement.groupId!,
-      createdByActorId: retiredGroupMember.createdByActorId,
     });
 
     await expect(
@@ -180,21 +172,6 @@ describe("exact Bottle alias reservation", () => {
     await expect(
       db.transaction((tx) =>
         reserveExactBottleAliasInTransaction(tx, {
-          name: "Retired Group Bottle Alias",
-          bottleId: retiredGroupMember.id,
-          assignmentSource: "canonical",
-          assignedByActorId: retiredGroupMember.createdByActorId,
-        }),
-      ),
-    ).rejects.toMatchObject({
-      name: "BottleAliasBottleInactiveError",
-      reason: "group_retired",
-      message: `Bottle ${retiredGroupMember.id} belongs to a retired BottleGroup.`,
-    });
-
-    await expect(
-      db.transaction((tx) =>
-        reserveExactBottleAliasInTransaction(tx, {
           name: "Missing Bottle Alias",
           bottleId: 2_147_483_647,
           assignmentSource: "canonical",
@@ -208,7 +185,7 @@ describe("exact Bottle alias reservation", () => {
         .select({ name: bottleAliases.name })
         .from(bottleAliases)
         .where(
-          sql`${bottleAliases.name} IN ('Retired Bottle Alias', 'Unassigned Bottle Alias', 'Retired Group Bottle Alias', 'Missing Bottle Alias')`,
+          sql`${bottleAliases.name} IN ('Retired Bottle Alias', 'Unassigned Bottle Alias', 'Missing Bottle Alias')`,
         ),
     ).resolves.toEqual([]);
   });

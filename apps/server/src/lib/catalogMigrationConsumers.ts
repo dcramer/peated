@@ -392,12 +392,10 @@ async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
         WHEN parent.id IS NULL
           OR parent.group_id IS NULL
           OR parent_tombstone.bottle_id IS NOT NULL
-          OR parent_group_tombstone.bottle_group_id IS NOT NULL
           THEN 'parent_inactive'
         WHEN promoted.id IS NULL
           OR promoted.group_id IS NULL
           OR promoted_tombstone.bottle_id IS NOT NULL
-          OR promoted_group_tombstone.bottle_group_id IS NOT NULL
           THEN 'promoted_inactive'
         ELSE 'group_mismatch'
       END AS reason,
@@ -412,20 +410,14 @@ async function assertPromotionGraph(tx: AnyTransaction): Promise<void> {
       ON parent_tombstone.bottle_id = parent.id
     LEFT JOIN bottle_tombstone promoted_tombstone
       ON promoted_tombstone.bottle_id = promoted.id
-    LEFT JOIN bottle_group_tombstone parent_group_tombstone
-      ON parent_group_tombstone.bottle_group_id = parent.group_id
-    LEFT JOIN bottle_group_tombstone promoted_group_tombstone
-      ON promoted_group_tombstone.bottle_group_id = promoted.group_id
     WHERE promotion.release_id IS NULL
        OR promotion.promoted_bottle_id = release.bottle_id
        OR parent.id IS NULL
        OR parent.group_id IS NULL
        OR parent_tombstone.bottle_id IS NOT NULL
-       OR parent_group_tombstone.bottle_group_id IS NOT NULL
        OR promoted.id IS NULL
        OR promoted.group_id IS NULL
        OR promoted_tombstone.bottle_id IS NOT NULL
-       OR promoted_group_tombstone.bottle_group_id IS NOT NULL
        OR parent.group_id IS DISTINCT FROM promoted.group_id
     ORDER BY release.id
     LIMIT 1

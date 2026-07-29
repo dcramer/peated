@@ -2,7 +2,6 @@ import { SIMPLE_RATING_VALUES } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   tastings,
@@ -129,7 +128,7 @@ describe("Bottle statistics recomputation", () => {
     });
   });
 
-  test("rejects missing, retired, unmigrated, and retired-group Bottles", async ({
+  test("rejects missing, retired, and unmigrated Bottles", async ({
     fixtures,
   }) => {
     const missingId = 9_999_991;
@@ -155,24 +154,5 @@ describe("Bottle statistics recomputation", () => {
       code: "unmigrated",
       bottleId: unmigrated.id,
     });
-
-    const invalid = await fixtures.Bottle({ totalTastings: 17 });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: invalid.groupId as number,
-      newGroupId: replacement.groupId as number,
-      createdByActorId: invalid.createdByActorId,
-    });
-    const before = await db.query.bottles.findFirst({
-      where: eq(bottles.id, invalid.id),
-    });
-    const error = await waitError(recomputeBottleStats(invalid.id));
-    expect(error).toBeInstanceOf(BottleStatsIntegrityError);
-    expect(error).toMatchObject({
-      code: "invalid_catalog_graph",
-      bottleId: invalid.id,
-    });
-    await expect(
-      db.query.bottles.findFirst({ where: eq(bottles.id, invalid.id) }),
-    ).resolves.toEqual(before);
   });
 });

@@ -157,8 +157,11 @@ Keep:
 - `bottle.groupId`;
 - durable BottleRelease-to-Bottle promotion mapping containing only the legacy
   release id and its non-null promoted Bottle id;
-- BottleGroup tombstone/redirect support where required;
 - legacy BottleRelease tables and columns until cleanup approval.
+
+Bottle retirement remains addressable through Bottle tombstones. BottleGroups
+are derived relationship records: an empty group may be deleted, but it does
+not create a separate user-facing retirement or redirect identity.
 
 Remove before release:
 

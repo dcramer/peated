@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   entities,
@@ -84,8 +83,6 @@ function bottleSearchSourceWhere(source: BottleAliasSearchSource) {
       ON ${entities.id} = ${bottles.brandId}
     LEFT JOIN ${bottleTombstones}
       ON ${bottleTombstones.bottleId} = ${bottles.id}
-    LEFT JOIN ${bottleGroupTombstones}
-      ON ${bottleGroupTombstones.groupId} = ${bottles.groupId}
     WHERE ${bottles.id} = ${source.bottle.id}
       AND ${bottles.groupId} IS NOT DISTINCT FROM ${source.bottle.groupId}
       AND ${bottles.brandId} IS NOT DISTINCT FROM ${source.bottle.brandId}
@@ -103,7 +100,6 @@ function bottleSearchSourceWhere(source: BottleAliasSearchSource) {
       AND ${entities.shortName} IS NOT DISTINCT FROM ${source.brand.shortName}
       AND ${bottles.groupId} IS NOT NULL
       AND ${bottleTombstones.bottleId} IS NULL
-      AND ${bottleGroupTombstones.groupId} IS NULL
   )`;
 }
 
@@ -184,16 +180,11 @@ async function loadActiveBottleAliasSearchSource(
     .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
     .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .leftJoin(
-      bottleGroupTombstones,
-      eq(bottleGroupTombstones.groupId, bottles.groupId),
-    )
     .where(
       and(
         eq(bottles.id, alias.bottleId),
         isNotNull(bottles.groupId),
         isNull(bottleTombstones.bottleId),
-        isNull(bottleGroupTombstones.groupId),
       ),
     )
     .limit(1);

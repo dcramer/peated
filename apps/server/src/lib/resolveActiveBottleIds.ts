@@ -1,16 +1,11 @@
 import type { AnyTransaction } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottles,
-  bottleTombstones,
-} from "@peated/server/db/schema";
+import { bottles, bottleTombstones } from "@peated/server/db/schema";
 import { asc, inArray } from "drizzle-orm";
 
 export type ActiveBottleRejectionReason =
   | "missing"
   | "unassigned"
-  | "bottle_retired"
-  | "group_retired";
+  | "bottle_retired";
 
 export class ActiveBottleSelectionError extends Error {
   constructor(
@@ -48,12 +43,10 @@ export async function resolveActiveBottleIds(
       ids.find((id) => !selectedIds.has(id))!,
     );
   }
-  const groupIds = new Set<number>();
   for (const { id, groupId } of selectedBottles) {
     if (groupId === null) {
       throw new ActiveBottleSelectionError("unassigned", id);
     }
-    groupIds.add(groupId);
   }
 
   const retiredBottles = await tx
@@ -70,20 +63,6 @@ export async function resolveActiveBottleIds(
       "bottle_retired",
       retiredBottle.bottleId,
       retiredBottle.replacementBottleId,
-    );
-  }
-
-  const retiredGroups = await tx
-    .select({ groupId: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(inArray(bottleGroupTombstones.groupId, [...groupIds]))
-    .limit(1);
-  const retiredGroup = retiredGroups[0];
-  if (retiredGroup) {
-    throw new ActiveBottleSelectionError(
-      "group_retired",
-      selectedBottles.find(({ groupId }) => groupId === retiredGroup.groupId)!
-        .id,
     );
   }
 

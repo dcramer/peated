@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   entities,
@@ -117,25 +116,7 @@ describe("indexBottleAlias", () => {
       bottleId: retiredBottle.id,
       newBottleId: replacementBottle.id,
     });
-    const retiredGroupBottle = await fixtures.Bottle();
-    const replacementGroupBottle = await fixtures.Bottle();
-    const retiredGroupAlias = await fixtures.BottleAlias({
-      name: "Retired Group Alias",
-      bottleId: retiredGroupBottle.id,
-      embedding: EMBEDDING,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId!,
-      newGroupId: replacementGroupBottle.groupId!,
-      createdByActorId: retiredGroupBottle.createdByActorId,
-    });
-    const aliases = [
-      ignoredAlias,
-      unboundAlias,
-      unassignedAlias,
-      retiredAlias,
-      retiredGroupAlias,
-    ];
+    const aliases = [ignoredAlias, unboundAlias, unassignedAlias, retiredAlias];
 
     for (const alias of aliases) {
       await indexBottleAlias({ name: alias.name });

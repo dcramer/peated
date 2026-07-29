@@ -2,7 +2,6 @@ import { db, type AnyTransaction } from "@peated/server/db";
 import type { BottleGroup } from "@peated/server/db/schema";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
 } from "@peated/server/db/schema";
@@ -11,7 +10,6 @@ import { asc, eq, inArray } from "drizzle-orm";
 
 export type BottleGroupStatsIntegrityErrorCode =
   | "not_found"
-  | "retired"
   | "invalid_catalog_graph";
 
 export class BottleGroupStatsIntegrityError extends Error {
@@ -45,15 +43,6 @@ export async function recomputeBottleGroupStatsInTransaction(
     .where(eq(bottleGroups.id, groupId))
     .limit(1)
     .for("update");
-  const [tombstone] = await tx
-    .select({ groupId: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(eq(bottleGroupTombstones.groupId, groupId))
-    .limit(1);
-
-  if (tombstone) {
-    throw new BottleGroupStatsIntegrityError("retired", groupId);
-  }
   if (!group) {
     throw new BottleGroupStatsIntegrityError("not_found", groupId);
   }

@@ -1,10 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-  entities,
-  tastings,
-} from "@peated/server/db/schema";
+import { bottleTombstones, entities, tastings } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq, sql } from "drizzle-orm";
 
@@ -40,19 +35,9 @@ describe("GET /stats", () => {
     });
     const legacyBottle = await fixtures.LegacyBottle();
     const retiredBottle = await fixtures.Bottle();
-    const retiredGroupBottle = await fixtures.Bottle();
-    if (retiredGroupBottle.groupId === null) {
-      throw new Error("Expected grouped Bottle fixtures");
-    }
-
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: activeBottle.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId,
-      newGroupId: activeBottle.groupId,
-      createdByActorId: retiredGroupBottle.createdByActorId,
     });
 
     const data = await routerClient.stats();

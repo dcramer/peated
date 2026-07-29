@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroups,
-  bottleGroupTombstones,
-  bottleTombstones,
-} from "@peated/server/db/schema";
+import { bottleGroups, bottleTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -130,53 +126,6 @@ describe("GET /bottles/:bottle/similar", () => {
       bottle: source.id,
     });
     await db.insert(bottleTombstones).values({ bottleId: source.id });
-    const sourceError = await waitError(
-      routerClient.bottles.similar({ bottle: source.id }),
-    );
-
-    expect(results).toHaveLength(0);
-    expect(sourceError).toMatchObject({
-      status: 404,
-      message: "Bottle not found.",
-    });
-  });
-
-  test("excludes retired BottleGroups as sources and results", async ({
-    fixtures,
-  }) => {
-    const brand = await fixtures.Entity({ name: "Group Tombstone Brand" });
-    const distiller = await fixtures.Entity({
-      name: "Group Tombstone Distiller",
-    });
-    const source = await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [distiller.id],
-      name: "Retired Group Bottle",
-    });
-    const retiredResult = await fixtures.Bottle({
-      brandId: brand.id,
-      distillerIds: [distiller.id],
-      name: source.name,
-      edition: "Retired Group Result",
-    });
-    const destination = await fixtures.Bottle({
-      name: "Active Group Destination",
-    });
-    const destinationGroupId = requireGroupId(destination.groupId);
-    await db.insert(bottleGroupTombstones).values({
-      groupId: requireGroupId(retiredResult.groupId),
-      newGroupId: destinationGroupId,
-      createdByActorId: retiredResult.createdByActorId,
-    });
-
-    const { results } = await routerClient.bottles.similar({
-      bottle: source.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: requireGroupId(source.groupId),
-      newGroupId: destinationGroupId,
-      createdByActorId: source.createdByActorId,
-    });
     const sourceError = await waitError(
       routerClient.bottles.similar({ bottle: source.id }),
     );

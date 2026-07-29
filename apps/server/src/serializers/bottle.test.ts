@@ -4,7 +4,6 @@ import { serialize } from ".";
 import { db } from "../db";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -13,7 +12,6 @@ import {
   entities,
   users,
 } from "../db/schema";
-import { getUserActor } from "../lib/actors";
 import { RESERVED_COLLECTIONS } from "../lib/db";
 import { BottleSchema } from "../schemas";
 import { BottleSerializer } from "./bottle";
@@ -337,26 +335,6 @@ describe("BottleSerializer", () => {
     });
     expect(BottleSchema.safeParse(result).success).toBe(true);
     expect(result).not.toHaveProperty("group");
-
-    await expect(
-      serialize(BottleSerializer, [bottle], undefined, [], {
-        includeGroupSummary: true,
-      }),
-    ).rejects.toThrow(
-      `Bottle ${bottle.id} does not belong to an active BottleGroup.`,
-    );
-  });
-
-  it("rejects retired BottleGroup enrichment", async ({ fixtures }) => {
-    const user = await fixtures.User();
-    const bottle = await fixtures.Bottle();
-    const replacement = await fixtures.Bottle();
-    const actor = await getUserActor(user);
-    await db.insert(bottleGroupTombstones).values({
-      groupId: bottle.groupId!,
-      newGroupId: replacement.groupId!,
-      createdByActorId: actor.id,
-    });
 
     await expect(
       serialize(BottleSerializer, [bottle], undefined, [], {

@@ -3,7 +3,6 @@ import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   changes,
@@ -112,9 +111,7 @@ test("rejects an unassigned Bottle before invoking AI", async ({
   expect(getStructuredResponse).not.toHaveBeenCalled();
 });
 
-test("rejects Bottle and BottleGroup tombstones before invoking AI", async ({
-  fixtures,
-}) => {
+test("rejects a Bottle tombstone before invoking AI", async ({ fixtures }) => {
   const retiredBottle = await fixtures.Bottle();
   const bottleDestination = await fixtures.Bottle();
   await db.insert(bottleTombstones).values({
@@ -122,25 +119,11 @@ test("rejects Bottle and BottleGroup tombstones before invoking AI", async ({
     newBottleId: bottleDestination.id,
   });
 
-  const retiredGroupBottle = await fixtures.Bottle();
-  const groupDestinationBottle = await fixtures.Bottle();
-  if (
-    retiredGroupBottle.groupId === null ||
-    groupDestinationBottle.groupId === null
-  ) {
-    throw new Error("Expected grouped Bottle fixtures");
-  }
-  await db.insert(bottleGroupTombstones).values({
-    groupId: retiredGroupBottle.groupId,
-    newGroupId: groupDestinationBottle.groupId,
-    createdByActorId: retiredGroupBottle.createdByActorId,
-  });
-
-  for (const bottleId of [retiredBottle.id, retiredGroupBottle.id]) {
-    await expect(generateBottleDetails({ bottleId })).rejects.toThrow(
-      `Bottle ${bottleId} does not belong to an active BottleGroup.`,
-    );
-  }
+  await expect(
+    generateBottleDetails({ bottleId: retiredBottle.id }),
+  ).rejects.toThrow(
+    `Bottle ${retiredBottle.id} does not belong to an active BottleGroup.`,
+  );
   expect(getStructuredResponse).not.toHaveBeenCalled();
 });
 

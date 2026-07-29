@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -48,11 +47,6 @@ export default async function updateRegionStats(input: unknown) {
           SELECT 1
           FROM ${bottleTombstones}
           WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
-        AND NOT EXISTS (
-          SELECT 1
-          FROM ${bottleGroupTombstones}
-          WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId}
         )
       )`,
     })

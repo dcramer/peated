@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-  countries,
-} from "@peated/server/db/schema";
+import { bottleTombstones, countries } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateCountryStats from "./updateCountryStats";
 
@@ -33,22 +29,9 @@ test("counts active independently complete Bottles once", async ({
     name: "Retired Country Bottle",
     brandId: entity1.id,
   });
-  const retiredGroupBottle = await fixtures.Bottle({
-    name: "Retired Country Group Bottle",
-    brandId: entity1.id,
-  });
-  const replacementGroupBottle = await fixtures.Bottle({
-    name: "Replacement Country Group Bottle",
-    brandId: entity3.id,
-  });
   await db.insert(bottleTombstones).values({
     bottleId: retiredBottle.id,
     newBottleId: null,
-  });
-  await db.insert(bottleGroupTombstones).values({
-    groupId: retiredGroupBottle.groupId!,
-    newGroupId: replacementGroupBottle.groupId!,
-    createdByActorId: retiredGroupBottle.createdByActorId,
   });
 
   await updateCountryStats({ countryId: country1.id });

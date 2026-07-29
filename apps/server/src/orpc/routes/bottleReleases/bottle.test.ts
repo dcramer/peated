@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import type { Bottle, BottleRelease, User } from "@peated/server/db/schema";
 import {
-  bottleGroupTombstones,
   bottleReleasePromotions,
   bottleTombstones,
   bottles,
@@ -171,40 +170,6 @@ describe("GET /bottle-releases/{release}/bottle", () => {
     await db.insert(bottleTombstones).values({
       bottleId: promoted.id,
       newBottleId: replacement.id,
-    });
-
-    const error = await waitError(
-      routerClient.bottleReleases.bottle({
-        bottle: parent.id,
-        release: release.id,
-      }),
-    );
-
-    expect(error).toMatchObject({
-      status: 409,
-      message: `Promoted Bottle ${promoted.id} is unavailable.`,
-    });
-  });
-
-  test("returns conflict when the promoted BottleGroup is retired", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const parent = await fixtures.Bottle({ name: "Retired Group Parent" });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promoted = await promoteRelease({
-      parent,
-      release,
-      user: defaults.user,
-      edition: "Retired Group Edition",
-    });
-    const replacement = await fixtures.Bottle({
-      name: "Retired Group Replacement",
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: promoted.groupId as number,
-      newGroupId: replacement.groupId as number,
-      createdByActorId: promoted.createdByActorId,
     });
 
     const error = await waitError(

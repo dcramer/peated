@@ -10,7 +10,6 @@ import {
   bottleAliases,
   bottleGroupDistillers,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleSeries,
   bottlesToDistillers,
@@ -466,14 +465,6 @@ async function createBottleFixture(
         })) ?? null;
       if (!existingGroup) {
         throw new Error(`BottleGroup fixture does not exist (${groupId})`);
-      }
-
-      const tombstone = await tx.query.bottleGroupTombstones.findFirst({
-        where: eq(bottleGroupTombstones.groupId, groupId),
-        columns: { groupId: true },
-      });
-      if (tombstone) {
-        throw new Error(`BottleGroup fixture is retired (${groupId})`);
       }
 
       if (requestedDistillerIds === undefined) {

@@ -17,7 +17,6 @@ test("fails closed when a stored Bottle has no BottleGroup", () => {
         statedAge: null,
       },
       retiredBottleId: null,
-      retiredGroupId: null,
     }),
   ).toThrow(new UserBottleReadIntegrityError("Bottle 42 has no BottleGroup."));
 });

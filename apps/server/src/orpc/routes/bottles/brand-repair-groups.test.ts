@@ -19,7 +19,7 @@ describe("GET /bottles/brand-repair-groups", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
-    const bottle = await fixtures.Bottle({ name: "Retired Group Candidate" });
+    const bottle = await fixtures.Bottle({ name: "Retired Bottle Candidate" });
     await db.insert(bottleTombstones).values({
       bottleId: bottle.id,
       newBottleId: null,

@@ -2,7 +2,6 @@ import { normalizeString } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   entities,
@@ -202,7 +201,6 @@ function activeBottleConditions(bottle: {
   return and(
     isNotNull(bottle.groupId),
     sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottle.id})`,
-    sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottle.groupId})`,
   );
 }
 

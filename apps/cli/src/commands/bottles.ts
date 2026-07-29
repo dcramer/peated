@@ -3,7 +3,6 @@ import { db } from "@peated/server/db";
 import {
   bottleAliases,
   bottleGroups,
-  bottleGroupTombstones,
   bottles,
   bottleTombstones,
   entities,
@@ -59,14 +58,9 @@ subcommand
       .from(bottles)
       .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
       .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-      .leftJoin(
-        bottleGroupTombstones,
-        eq(bottleGroupTombstones.groupId, bottleGroups.id),
-      )
       .where(
         and(
           isNull(bottleTombstones.bottleId),
-          isNull(bottleGroupTombstones.groupId),
           bottleIds.length
             ? inArray(bottles.id, bottleIds)
             : options.onlyMissing
@@ -133,14 +127,9 @@ subcommand
         .from(bottles)
         .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
         .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-        .leftJoin(
-          bottleGroupTombstones,
-          eq(bottleGroupTombstones.groupId, bottleGroups.id),
-        )
         .where(
           and(
             isNull(bottleTombstones.bottleId),
-            isNull(bottleGroupTombstones.groupId),
             requestedBottleIds.length
               ? inArray(bottles.id, requestedBottleIds)
               : undefined,

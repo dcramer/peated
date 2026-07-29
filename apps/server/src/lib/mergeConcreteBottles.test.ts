@@ -4,7 +4,6 @@ import {
   bottleAliases,
   bottleFlavorProfiles,
   bottleGroups,
-  bottleGroupTombstones,
   bottleObservations,
   bottleReleasePromotions,
   bottleReleases,
@@ -225,11 +224,6 @@ describe("exact Bottle merges", () => {
         where: eq(bottleTombstones.bottleId, source.id),
       }),
     ).toMatchObject({ newBottleId: destination.id });
-    expect(
-      await db.query.bottleGroupTombstones.findFirst({
-        where: eq(bottleGroupTombstones.groupId, sourceGroupId),
-      }),
-    ).toMatchObject({ newGroupId: destinationGroupId });
     expect(
       await db.query.bottleGroups.findFirst({
         where: eq(bottleGroups.id, sourceGroupId),
@@ -548,11 +542,6 @@ describe("exact Bottle merges", () => {
       representativeBottleId: destination.id,
       totalBottles: 1,
     });
-    expect(
-      await db.query.bottleGroupTombstones.findFirst({
-        where: eq(bottleGroupTombstones.groupId, source.groupId!),
-      }),
-    ).toBeUndefined();
   });
 
   test("selects a deterministic surviving representative for a cross-group merge", async ({

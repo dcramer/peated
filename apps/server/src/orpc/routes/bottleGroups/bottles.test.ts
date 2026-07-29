@@ -1,5 +1,3 @@
-import { db } from "@peated/server/db";
-import { bottleGroupTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
@@ -63,31 +61,5 @@ describe("GET /bottle-groups/:group/bottles", () => {
     );
 
     expect(error.message).toBe("Bottle group not found (groupId=999999).");
-  });
-
-  test("preserves the replacement for a retired group", async ({
-    fixtures,
-  }) => {
-    const source = await fixtures.Bottle({ name: "Retired Related Bottles" });
-    const destination = await fixtures.Bottle({
-      name: "Active Related Bottles",
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: source.groupId as number,
-      newGroupId: destination.groupId as number,
-      createdByActorId: source.createdByActorId,
-    });
-
-    const error = await waitError(
-      routerClient.bottleGroups.bottles({
-        group: source.groupId as number,
-      }),
-    );
-
-    expect(error).toMatchObject({
-      status: 409,
-      message: `Bottle group is retired (groupId=${source.groupId}).`,
-      data: { replacementGroupId: destination.groupId },
-    });
   });
 });

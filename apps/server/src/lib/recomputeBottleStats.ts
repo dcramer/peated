@@ -1,10 +1,6 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle } from "@peated/server/db/schema";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-  bottles,
-} from "@peated/server/db/schema";
+import { bottleTombstones, bottles } from "@peated/server/db/schema";
 import { aggregateBottleActivityStatsInTransaction } from "@peated/server/lib/recomputeBottleActivityStats";
 import { eq } from "drizzle-orm";
 
@@ -67,15 +63,6 @@ export async function recomputeBottleStatsInTransaction(
   }
   if (bottle.groupId === null) {
     throw new BottleStatsIntegrityError("unmigrated", bottleId);
-  }
-
-  const [retiredGroup] = await tx
-    .select({ groupId: bottleGroupTombstones.groupId })
-    .from(bottleGroupTombstones)
-    .where(eq(bottleGroupTombstones.groupId, bottle.groupId))
-    .limit(1);
-  if (retiredGroup) {
-    throw new BottleStatsIntegrityError("invalid_catalog_graph", bottleId);
   }
 
   const stats = await aggregateBottleActivityStatsInTransaction(tx, [bottleId]);

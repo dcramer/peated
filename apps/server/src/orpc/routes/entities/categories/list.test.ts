@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottleGroupDistillers,
-  bottleGroupTombstones,
   bottleGroups,
   bottleTombstones,
 } from "@peated/server/db/schema";
@@ -132,12 +131,6 @@ describe("GET /entities/:entity/categories", () => {
       distillerIds: [entity.id],
       category: "single_grain",
     });
-    const retiredGroupBottle = await fixtures.Bottle({
-      name: "Retired Group Identity",
-      brandId: entity.id,
-      distillerIds: [entity.id],
-      category: "single_pot_still",
-    });
     const destinationBottle = await fixtures.Bottle({
       name: "Retirement Destination Identity",
       brandId: otherEntity.id,
@@ -146,7 +139,6 @@ describe("GET /entities/:entity/categories", () => {
     });
     if (
       groupOnlyBottle.groupId === null ||
-      retiredGroupBottle.groupId === null ||
       destinationBottle.groupId === null
     ) {
       throw new Error("Expected grouped Bottle fixtures");
@@ -185,11 +177,6 @@ describe("GET /entities/:entity/categories", () => {
     await db.insert(bottleTombstones).values({
       bottleId: retiredBottle.id,
       newBottleId: destinationBottle.id,
-    });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupBottle.groupId,
-      newGroupId: destinationBottle.groupId,
-      createdByActorId: retiredGroupBottle.createdByActorId,
     });
 
     const data = await routerClient.entities.categories.list({

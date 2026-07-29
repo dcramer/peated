@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleReleasePromotions,
   bottleReleases,
   bottleTombstones,
@@ -95,16 +94,10 @@ test("rejects every inactive Bottle before persisting a resolution", async ({
 }) => {
   const unassigned = await fixtures.LegacyBottle();
   const retired = await fixtures.Bottle();
-  const retiredGroupMember = await fixtures.Bottle();
   const replacement = await fixtures.Bottle();
   await db.insert(bottleTombstones).values({
     bottleId: retired.id,
     newBottleId: replacement.id,
-  });
-  await db.insert(bottleGroupTombstones).values({
-    groupId: retiredGroupMember.groupId!,
-    newGroupId: replacement.groupId!,
-    createdByActorId: retiredGroupMember.createdByActorId,
   });
 
   const context = { caller: "test", operation: "persist" };
@@ -137,15 +130,6 @@ test("rejects every inactive Bottle before persisting a resolution", async ({
       ),
     ),
   ).rejects.toThrow(`Bottle ${retired.id} is retired.`);
-  await expect(
-    db.transaction((tx) =>
-      lockBottleReferenceResolutionAssignmentInTransaction(
-        tx,
-        directResolution(retiredGroupMember.id),
-        context,
-      ),
-    ),
-  ).rejects.toThrow(`Bottle ${retiredGroupMember.id} is not active`);
 });
 
 describe("resolveBottleReferenceTarget", () => {

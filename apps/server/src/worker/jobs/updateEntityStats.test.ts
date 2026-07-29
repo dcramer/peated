@@ -1,9 +1,5 @@
 import { db } from "@peated/server/db";
-import {
-  bottleGroupTombstones,
-  bottleTombstones,
-  entities,
-} from "@peated/server/db/schema";
+import { bottleTombstones, entities } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import updateEntityStats from "./updateEntityStats";
 
@@ -104,7 +100,7 @@ test("counts exact Bottles in the same group independently", async ({
   });
 });
 
-test("excludes Bottle- and group-tombstoned members and their tastings", async ({
+test("excludes Bottle-tombstoned members and their tastings", async ({
   fixtures,
 }) => {
   const entity = await fixtures.Entity({ name: "Active Entity" });
@@ -116,25 +112,15 @@ test("excludes Bottle- and group-tombstoned members and their tastings", async (
     name: "Retired Bottle Expression",
     brandId: entity.id,
   });
-  const retiredGroupBottle = await fixtures.Bottle({
-    name: "Retired Group Expression",
-    brandId: entity.id,
-  });
   const destination = await fixtures.Bottle({
     name: "Tombstone Destination Expression",
   });
   await fixtures.Tasting({ bottleId: activeBottle.id });
   await fixtures.Tasting({ bottleId: retiredBottle.id });
-  await fixtures.Tasting({ bottleId: retiredGroupBottle.id });
 
   await db.insert(bottleTombstones).values({
     bottleId: retiredBottle.id,
     newBottleId: destination.id,
-  });
-  await db.insert(bottleGroupTombstones).values({
-    groupId: requireBottleGroupId(retiredGroupBottle),
-    newGroupId: requireBottleGroupId(destination),
-    createdByActorId: retiredGroupBottle.createdByActorId,
   });
 
   await updateEntityStats({ entityId: entity.id });

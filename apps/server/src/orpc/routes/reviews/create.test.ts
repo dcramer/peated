@@ -2,7 +2,6 @@ import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   bottleAliases,
-  bottleGroupTombstones,
   bottleTombstones,
   incomingBottleDecisionLogs,
   reviews,
@@ -495,9 +494,6 @@ describe("POST /reviews", () => {
     const retired = await fixtures.Bottle({
       name: "Retired Review Bottle",
     });
-    const retiredGroupMember = await fixtures.Bottle({
-      name: "Retired Group Review Bottle",
-    });
     const replacement = await fixtures.Bottle({
       name: "Review Tombstone Replacement",
     });
@@ -505,16 +501,10 @@ describe("POST /reviews", () => {
       bottleId: retired.id,
       newBottleId: replacement.id,
     });
-    await db.insert(bottleGroupTombstones).values({
-      groupId: retiredGroupMember.groupId!,
-      newGroupId: replacement.groupId!,
-      createdByActorId: retiredGroupMember.createdByActorId,
-    });
 
     for (const [bottle, reason] of [
       [unassigned, "unassigned"],
       [retired, "bottle_retired"],
-      [retiredGroupMember, "group_retired"],
     ] as const) {
       const url = `https://example.com/reviews/${reason}`;
       const error = await waitError(() =>

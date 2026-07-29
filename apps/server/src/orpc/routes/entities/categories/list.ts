@@ -1,6 +1,5 @@
 import { db } from "@peated/server/db";
 import {
-  bottleGroupTombstones,
   bottleTombstones,
   bottles,
   bottlesToDistillers,
@@ -58,7 +57,6 @@ export default procedure
         and(
           isNotNull(bottles.groupId),
           sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-          sql`NOT EXISTS(SELECT FROM ${bottleGroupTombstones} WHERE ${bottleGroupTombstones.groupId} = ${bottles.groupId})`,
           or(
             eq(bottles.brandId, entity.id),
             eq(bottles.bottlerId, entity.id),
