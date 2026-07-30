@@ -155,7 +155,7 @@ export function LibraryFilters({
             </div>
           </form>
 
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0">
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:w-auto sm:shrink-0">
             <LibraryEntityFilter
               label="Brand"
               icon={BrandIcon}
@@ -189,7 +189,7 @@ export function LibraryFilters({
               title="Clear filters"
               aria-label="Clear filters"
               loading={loading}
-              className="sm:shrink-0"
+              className="self-end sm:shrink-0 sm:self-auto"
             />
           )}
         </div>
@@ -242,7 +242,7 @@ function LibraryStatusFilter({
         value={value}
         onChange={(event) => onChange(event.currentTarget.value || undefined)}
         className={classNames(
-          "h-10 w-full rounded border bg-slate-900 px-3 text-sm shadow-sm",
+          "h-10 w-full rounded border bg-slate-900 px-2 text-sm shadow-sm sm:px-3",
           value
             ? "border-highlight/60 text-white"
             : "border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white",
@@ -281,46 +281,50 @@ function LibraryEntityFilter({
   const [open, setOpen] = useState(false);
 
   return (
-    <>
-      <div className="relative min-w-0 sm:w-44">
+    <div className="relative min-w-0 sm:w-44">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={classNames(
+          "flex h-10 w-full min-w-0 items-center gap-1 rounded border px-2 text-left text-sm shadow-sm sm:gap-2 sm:px-3",
+          value
+            ? "border-highlight/60 bg-slate-900 text-white"
+            : "border-slate-800 bg-slate-900 text-slate-300 hover:border-slate-700 hover:text-white",
+          loading ? "animate-pulse" : "",
+        )}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+      >
+        <Icon
+          className="text-muted hidden h-4 w-4 shrink-0 sm:block"
+          aria-hidden="true"
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate sm:hidden">
+            {value?.name ?? label}
+          </span>
+          <span className="hidden text-[11px] font-semibold uppercase leading-3 text-slate-500 sm:block">
+            {label}
+          </span>
+          <span className="hidden truncate leading-5 sm:block">
+            {value?.name ?? placeholder}
+          </span>
+        </span>
+        <ChevronDownIcon className="text-muted h-4 w-4 shrink-0" />
+      </button>
+      {value && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
-          className={classNames(
-            "flex h-10 w-full min-w-0 items-center gap-2 rounded border px-3 text-left text-sm shadow-sm",
-            value
-              ? "border-highlight/60 bg-slate-900 text-white"
-              : "border-slate-800 bg-slate-900 text-slate-300 hover:border-slate-700 hover:text-white",
-            loading ? "animate-pulse" : "",
-          )}
-          aria-haspopup="dialog"
-          aria-expanded={open}
+          onClick={(event) => {
+            event.stopPropagation();
+            onClear();
+          }}
+          className="absolute right-8 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+          aria-label={`Clear ${label.toLowerCase()} filter`}
         >
-          <Icon className="text-muted h-4 w-4 shrink-0" aria-hidden="true" />
-          <span className="min-w-0 flex-1">
-            <span className="block text-[11px] font-semibold uppercase leading-3 text-slate-500">
-              {label}
-            </span>
-            <span className="block truncate leading-5">
-              {value?.name ?? placeholder}
-            </span>
-          </span>
-          <ChevronDownIcon className="text-muted h-4 w-4 shrink-0" />
+          <XMarkIcon className="h-4 w-4" />
         </button>
-        {value && (
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onClear();
-            }}
-            className="absolute right-8 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
-            aria-label={`Clear ${label.toLowerCase()} filter`}
-          >
-            <XMarkIcon className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+      )}
       <SelectDialog<Option>
         open={open}
         setOpen={setOpen}
@@ -346,7 +350,7 @@ function LibraryEntityFilter({
           </div>
         )}
       />
-    </>
+    </div>
   );
 }
 
