@@ -32,6 +32,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
   `pnpm --filter @peated/bottle-classifier evals`.
 - Backend testing policy: `docs/development/backend-testing.md`
 - Frontend testing policy: `docs/development/frontend-testing.md`
+- Frontend E2E tests assert user behavior and browser-only interactions, not exhaustive rendering or copy; use manual or agent-based QA for visual presentation.
 - Before opening a PR, run targeted tests/typechecks/lint for the touched surface; PR CI is the required full-repo `pnpm test` gate
 - Classifier/repair changes: preserve `docs/architecture/whisky-identity-model.md`; brand/entity identity is not prefix matching
 - Production-miss classifier evals must verify the real bottle online, state the exact Peated DB outcome, and encode that provenance in the fixture; do not substitute a generalized pretend case for the observed bottle.
