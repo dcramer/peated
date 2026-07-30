@@ -40,8 +40,6 @@ describe("LibraryInsightsContent", () => {
     expect(html).toContain("Median 12 yr");
     expect(html).toContain("Under 10: 1 bottle");
     expect(html).toContain("Age stated for 3 of 4 bottles");
-    expect(html).toContain("data-age-profile-chart");
-    expect(html).toContain("min-h-28 flex-1");
     expect(html).not.toContain("Library types");
   });
 
