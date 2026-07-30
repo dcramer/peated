@@ -18,9 +18,7 @@ export default function UserProfilePage(props: {
 
   return (
     <div className="space-y-8 px-3 py-2 lg:px-0">
-      <section>
-        <UserBadgeList userId={userId} />
-      </section>
+      <UserBadgeList userId={userId} />
 
       <UserTastingInsights userId={userId} />
 

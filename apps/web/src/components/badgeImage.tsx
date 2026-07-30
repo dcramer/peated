@@ -1,3 +1,5 @@
+"use client";
+
 import { type Badge } from "@peated/server/types";
 import classNames from "../lib/classNames";
 
@@ -36,17 +38,31 @@ export default function BadgeImage({
   if (!badge.imageUrl)
     return <PlaceholderBadgeImage size={size} isMaxLevel={isMaxLevel} />;
   return (
-    <img
-      src={badge.imageUrl}
-      alt={badge.name}
-      className={classNames(
-        "rounded",
-        isMaxLevel ? "ring-highlight ring-1 ring-inset" : "",
-      )}
+    <span
+      className="relative inline-block shrink-0"
       style={{
         width: size,
         height: size,
       }}
-    />
+    >
+      <span className="absolute inset-0">
+        <PlaceholderBadgeImage size={size} isMaxLevel={isMaxLevel} />
+      </span>
+      <img
+        src={badge.imageUrl}
+        alt=""
+        className={classNames(
+          "relative rounded",
+          isMaxLevel ? "ring-highlight ring-1 ring-inset" : "",
+        )}
+        style={{
+          width: size,
+          height: size,
+        }}
+        onError={(event) => {
+          event.currentTarget.hidden = true;
+        }}
+      />
+    </span>
   );
 }
