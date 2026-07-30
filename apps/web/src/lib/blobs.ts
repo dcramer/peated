@@ -5,7 +5,9 @@ const IMAGE_BLOB_QUALITY = 0.9;
 const MAX_IMAGE_EDGE = 1600;
 
 export const toBlob = async (canvas: HTMLCanvasElement): Promise<Blob> => {
-  const p = new pica();
+  // Pica's generated worker can throw before posting a response on Mobile
+  // Safari, leaving its resize promise pending indefinitely.
+  const p = new pica({ features: ["js", "wasm"] });
   const scale = Math.min(
     MAX_IMAGE_EDGE / canvas.width,
     MAX_IMAGE_EDGE / canvas.height,
