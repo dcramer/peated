@@ -50,7 +50,7 @@ export function LibraryInsightsContent({
 
   return (
     <div
-      className={`mb-4 grid grid-cols-1 gap-3 px-3 sm:px-0 ${cardCount > 1 ? "lg:grid-cols-2" : ""}`}
+      className={`mb-4 grid grid-cols-1 gap-3 ${cardCount > 1 ? "lg:grid-cols-2" : ""}`}
     >
       {showDistillers ? (
         <InsightCard title="Top distilleries">
@@ -80,7 +80,7 @@ export function LibraryInsightsContent({
 
 function LibraryInsightsSkeleton() {
   return (
-    <div className="mb-4 grid grid-cols-1 gap-3 px-3 sm:px-0 lg:grid-cols-2">
+    <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
       <InsightCardSkeleton />
       <InsightCardSkeleton />
     </div>

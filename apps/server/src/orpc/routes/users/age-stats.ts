@@ -36,7 +36,9 @@ export function buildAgeStats(ages: number[], unstatedCount: number): AgeStats {
   return {
     knownCount: ages.length,
     median: median(ages),
-    oldest: ages.length ? Math.max(...ages) : null,
+    oldest: ages.length
+      ? ages.reduce((oldest, age) => Math.max(oldest, age))
+      : null,
     buckets: [
       {
         id: "under10",

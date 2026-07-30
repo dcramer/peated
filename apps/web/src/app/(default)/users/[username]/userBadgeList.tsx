@@ -4,9 +4,11 @@ import type { Outputs } from "@peated/server/orpc/router";
 import BadgeImage from "@peated/web/components/badgeImage";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
+import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 type BadgeAward = Outputs["users"]["badgeList"]["results"][number];
 
@@ -74,7 +76,7 @@ export function UserBadgeAwards({ awards }: { awards: BadgeAward[] }) {
   );
 }
 
-export function UserBadgeList({ userId }: { userId: number }) {
+function UserBadgeListContent({ userId }: { userId: number }) {
   const orpc = useORPC();
   const { data: awardList } = useSuspenseQuery(
     orpc.users.badgeList.queryOptions({
@@ -85,4 +87,59 @@ export function UserBadgeList({ userId }: { userId: number }) {
   );
 
   return <UserBadgeAwards awards={awardList.results} />;
+}
+
+function UserBadgeListSkeleton() {
+  return (
+    <section aria-labelledby="achievements-loading-heading">
+      <div className="mb-3">
+        <h2
+          id="achievements-loading-heading"
+          className="text-lg font-semibold text-white"
+        >
+          Achievements
+        </h2>
+        <p className="text-muted mt-1 text-sm">
+          Milestones earned through their tastings.
+        </p>
+      </div>
+      <div className="scrollbar-none grid auto-cols-[6.5rem] grid-flow-col gap-2 overflow-x-auto pb-1 lg:grid-flow-row lg:grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] lg:overflow-visible">
+        {Array.from({ length: INITIAL_BADGE_COUNT }, (_, index) => (
+          <div
+            key={index}
+            className="h-36 animate-pulse rounded bg-slate-900"
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function UserBadgeListError() {
+  return (
+    <section aria-labelledby="achievements-error-heading">
+      <h2
+        id="achievements-error-heading"
+        className="mb-3 text-lg font-semibold text-white"
+      >
+        Achievements
+      </h2>
+      <div className="text-muted rounded border border-slate-800 bg-slate-950/70 p-4 text-sm">
+        Achievements could not be loaded.
+      </div>
+    </section>
+  );
+}
+
+export function UserBadgeList({ userId }: { userId: number }) {
+  return (
+    <ErrorBoundary
+      fallback={<UserBadgeListError />}
+      onError={(error) => logError(error, { context: "profile_achievements" })}
+    >
+      <Suspense fallback={<UserBadgeListSkeleton />}>
+        <UserBadgeListContent userId={userId} />
+      </Suspense>
+    </ErrorBoundary>
+  );
 }
