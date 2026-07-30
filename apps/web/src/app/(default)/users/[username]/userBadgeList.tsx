@@ -36,6 +36,11 @@ export function UserBadgeList({ userId }: { userId: number }) {
               <Link
                 href={`/badges/${award.badge.id}`}
                 className="absolute inset-0"
+                aria-label={`${award.badge.name}, ${
+                  award.level > 0
+                    ? `level ${award.level.toLocaleString()}`
+                    : "discovered"
+                }`}
               />
               <BadgeImage badge={award.badge} level={award.level} />
               <div className="text-muted text-xs">

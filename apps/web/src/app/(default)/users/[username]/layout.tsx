@@ -167,9 +167,8 @@ export default async function Layout(props: {
               as={Link}
               href={`/users/${user.username}/library`}
               controlled
-              count={user.stats.library.total}
             >
-              Library
+              Library ({user.stats.library.total.toLocaleString()})
             </TabItem>
           </Tabs>
           {children}
