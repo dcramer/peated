@@ -1,6 +1,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
-import type { ConcreteBottleV1 } from "@peated/server/schemas";
+import type { BottleGroupV1, ConcreteBottleV1 } from "@peated/server/schemas";
 import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
 
@@ -16,10 +16,14 @@ export type BottleExactMetadataSource = Pick<
   | "caskFill"
   | "caskType"
   | "caskSize"
->;
+> & {
+  edition?: ConcreteBottleV1["edition"];
+  group?: Partial<Pick<BottleGroupV1, "statedAge">>;
+};
 
 export type BottleExactMetadataKey =
   | "category"
+  | "edition"
   | "age"
   | "abv"
   | "vintage"
@@ -80,31 +84,79 @@ export function getBottleExactMetadata(
   return metadata;
 }
 
+function getBottleReleaseSummary(
+  bottle: BottleExactMetadataSource,
+): MetadataItem[] {
+  if (!bottle.group) return [];
+
+  const metadata: MetadataItem[] = [];
+
+  if (bottle.edition) {
+    metadata.push({ key: "edition", content: bottle.edition });
+  }
+  if (
+    bottle.statedAge !== null &&
+    bottle.statedAge !== bottle.group.statedAge
+  ) {
+    metadata.push({ key: "age", content: `${bottle.statedAge} years` });
+  }
+  if (bottle.vintageYear !== null) {
+    metadata.push({
+      key: "vintage",
+      content: `${bottle.vintageYear} vintage`,
+    });
+  }
+  if (bottle.releaseYear !== null) {
+    metadata.push({
+      key: "release",
+      content: `${bottle.releaseYear} release`,
+    });
+  }
+
+  const caskDetails = [bottle.caskType, bottle.caskSize]
+    .filter((value): value is NonNullable<typeof value> => value !== null)
+    .map(toTitleCase)
+    .join(" ");
+  if (caskDetails) {
+    metadata.push({ key: "cask-details", content: `${caskDetails} cask` });
+  }
+  if (bottle.abv !== null) {
+    metadata.push({ key: "abv", content: `${bottle.abv.toFixed(1)}% ABV` });
+  }
+
+  return metadata.slice(0, 3);
+}
+
 export default function BottleExactMetadata({
   bottle,
   className,
   exclude = [],
   leadingContent,
+  variant = "full",
 }: {
   bottle: BottleExactMetadataSource;
   className?: string;
   exclude?: BottleExactMetadataKey[];
   leadingContent?: ReactNode;
+  variant?: "full" | "summary";
 }) {
   const excluded = new Set(exclude);
-  const metadata = getBottleExactMetadata(bottle).filter(
-    ({ key }) => !excluded.has(key),
-  );
-  const items: { key: string; content: ReactNode }[] =
+  const metadata = (
+    variant === "summary"
+      ? getBottleReleaseSummary(bottle)
+      : getBottleExactMetadata(bottle)
+  ).filter(({ key }) => !excluded.has(key));
+  const items: MetadataItem[] =
     leadingContent !== undefined
-      ? [{ key: "leading", content: leadingContent }, ...metadata]
+      ? [{ key: "edition", content: leadingContent }, ...metadata]
       : metadata;
   if (!items.length) return null;
 
   return (
     <div
       className={classNames(
-        "text-muted mt-1 flex flex-wrap text-sm leading-5",
+        "text-muted mt-1 text-sm leading-5",
+        variant === "summary" ? "block truncate" : "flex flex-wrap",
         className,
       )}
     >

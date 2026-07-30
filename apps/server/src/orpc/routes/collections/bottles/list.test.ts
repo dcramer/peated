@@ -55,6 +55,9 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results[0]?.bottle).toMatchObject({
       id: first.id,
       fullName: first.fullName,
+      group: {
+        id: first.groupId,
+      },
     });
     expect(response.results[0]).not.toHaveProperty("target");
   });

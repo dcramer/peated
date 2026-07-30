@@ -17,6 +17,7 @@ export type Column<T extends Record<string, any>> = {
   align?: "left" | "right" | "center" | "default";
   title?: string;
   className?: string;
+  cellClassName?: string;
   value?: (item: T) => ReactElement | string | null | false;
   hidden?: boolean;
 };
@@ -161,6 +162,7 @@ export default function Table<
                       key={col.name}
                       className={classNames(
                         "group relative items-center gap-x-2 p-3",
+                        col.cellClassName,
                         colN !== 0 ? "hidden sm:table-cell" : "table-cell",
                         colAlign === "left"
                           ? "text-left"

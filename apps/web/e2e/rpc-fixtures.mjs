@@ -342,6 +342,30 @@ export function buildBottleGroup({
   };
 }
 
+/** @type {ConcreteFixtureBottle} */
+const homeBottleWithoutGroup = {
+  ...buildBottle({
+    id: 50_000,
+    name: "Single Cask 4-year-old - 55.8% ABV - Pedro Ximenez Cask",
+  }),
+  fullName: "Lagavulin Single Cask 4-year-old - 55.8% ABV - Pedro Ximenez Cask",
+  statedAge: 4,
+  abv: 55.8,
+  singleCask: true,
+  caskStrength: true,
+  caskType: "pedro_ximenez",
+  imageUrl: "http://127.0.0.1:4999/uploads/home-bottle.png",
+};
+
+export const homeBottle = {
+  ...homeBottleWithoutGroup,
+  group: buildBottleGroup({
+    bottle: homeBottleWithoutGroup,
+    fullName: "Lagavulin Single Cask 4-year-old",
+    name: "Single Cask 4-year-old",
+  }),
+};
+
 export const bottleGroupId = 50_001;
 export const destinationBottleGroupId = 50_002;
 

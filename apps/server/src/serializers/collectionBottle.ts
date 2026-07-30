@@ -34,6 +34,8 @@ export const CollectionBottleSerializer = serializer({
       BottleSerializer,
       bottleRows,
       currentUser,
+      [],
+      { includeGroupSummary: true },
     );
     const bottleById = new Map(
       serializedBottles.map((bottle) => [bottle.id, bottle]),

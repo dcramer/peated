@@ -35,6 +35,7 @@ import {
   flightBottleFixtureId,
   groupedBottleDetails,
   libraryInsightsStats,
+  homeBottle,
   missingBottleId,
   moderatorUser,
   photoTastingNotes,
@@ -1780,6 +1781,7 @@ function withCollectionStatus(request, bottle) {
 }
 
 function getMockBottle(request, bottleId) {
+  if (bottleId === homeBottle.id) return homeBottle;
   if (bottleId === existingBottleId) {
     if (getAccessToken(request).includes("add-another-release")) {
       return addAnotherReleaseSourceBottle;

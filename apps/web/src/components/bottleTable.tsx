@@ -34,6 +34,7 @@ export default function BottleTable({
   showBottleStats = true,
   showRatingSummary = false,
   identityMode = "legacy",
+  compactIdentity = false,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
   bottleList: (Bottle | CollectionBottle)[];
@@ -45,6 +46,7 @@ export default function BottleTable({
   showBottleStats?: boolean;
   showRatingSummary?: boolean;
   identityMode?: "legacy" | "absolute";
+  compactIdentity?: boolean;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
     "bottle" in item
@@ -72,6 +74,7 @@ export default function BottleTable({
             : showBottleStats
               ? "min-w-full sm:w-1/2"
               : "w-full",
+          cellClassName: compactIdentity ? "max-w-0" : undefined,
           value: (item) => {
             const { bottle } = item;
             const categoryName = bottle.category
@@ -118,7 +121,11 @@ export default function BottleTable({
                 {collectionImage}
                 <div className="flex min-w-0 flex-1 flex-col justify-center">
                   {identityMode === "absolute" ? (
-                    <BottleIdentity bottle={bottle} mode="absolute" />
+                    <BottleIdentity
+                      bottle={bottle}
+                      mode="absolute"
+                      metadataVariant={compactIdentity ? "summary" : "full"}
+                    />
                   ) : (
                     <div className="flex min-w-0 flex-wrap items-center gap-x-1">
                       <BottleLink

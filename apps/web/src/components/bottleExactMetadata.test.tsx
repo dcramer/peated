@@ -25,6 +25,7 @@ describe("BottleExactMetadata", () => {
     );
     const text = html.replace(/<[^>]*>/g, "");
 
+    expect(html).toContain("flex-wrap");
     expect(text).toBe(
       "Lagavulin·Single Malt·21 years·55.1% ABV·2004 vintage·2025 release·Single cask·Cask strength·1st Fill Oloroso Hogshead cask",
     );
@@ -49,6 +50,56 @@ describe("BottleExactMetadata", () => {
           caskSize: null,
         }}
       />,
+    );
+
+    expect(html).toBe("");
+  });
+
+  it("summarizes only the highest-value release identifiers", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata
+        bottle={{
+          ...exactBottle,
+          edition: "Batch 24",
+          group: { statedAge: 21 },
+        }}
+        variant="summary"
+      />,
+    );
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(html).toContain("block truncate");
+    expect(html).not.toContain("flex-wrap");
+    expect(text).toBe("Batch 24·2004 vintage·2025 release");
+    expect(text).not.toContain("21 years");
+    expect(text).not.toContain("Single cask");
+    expect(text).not.toContain("Cask strength");
+    expect(text).not.toContain("Single Malt");
+  });
+
+  it("uses cask and ABV when they are the useful differentiators", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata
+        bottle={{
+          ...exactBottle,
+          statedAge: 4,
+          vintageYear: null,
+          releaseYear: null,
+          caskType: "pedro_ximenez",
+          caskSize: null,
+          group: { statedAge: 4 },
+        }}
+        variant="summary"
+      />,
+    );
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text).toBe("Pedro Ximenez cask·55.1% ABV");
+  });
+
+  it("omits a release summary when the full Bottle name is already shown", () => {
+    const html = renderToStaticMarkup(
+      <BottleExactMetadata bottle={exactBottle} variant="summary" />,
     );
 
     expect(html).toBe("");
