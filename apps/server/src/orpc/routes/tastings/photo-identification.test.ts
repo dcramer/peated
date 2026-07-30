@@ -12,7 +12,6 @@ import {
 import type * as pendingUploadsModule from "@peated/server/lib/pendingUploads";
 import type * as photoIdentificationModule from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
-import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
@@ -243,32 +242,28 @@ async function identifyCreateProposal({
 }
 
 async function countRows() {
-  const [bottleRows, releaseRows, tastingRows] = await Promise.all([
+  const [bottleRows, tastingRows] = await Promise.all([
     db.select({ id: bottles.id }).from(bottles),
-    db.select({ id: bottleReleases.id }).from(bottleReleases),
     db.select({ id: tastings.id }).from(tastings),
   ]);
 
   return {
     bottles: bottleRows.length,
-    releases: releaseRows.length,
     tastings: tastingRows.length,
   };
 }
 
 async function countCatalogRows() {
-  const [bottleRows, groupRows, aliasRows, releaseRows] = await Promise.all([
+  const [bottleRows, groupRows, aliasRows] = await Promise.all([
     db.select({ id: bottles.id }).from(bottles),
     db.select({ id: bottleGroups.id }).from(bottleGroups),
     db.select({ name: bottleAliases.name }).from(bottleAliases),
-    db.select({ id: bottleReleases.id }).from(bottleReleases),
   ]);
 
   return {
     bottles: bottleRows.length,
     groups: groupRows.length,
     aliases: aliasRows.length,
-    releases: releaseRows.length,
   };
 }
 

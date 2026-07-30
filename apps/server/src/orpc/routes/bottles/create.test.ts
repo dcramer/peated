@@ -12,7 +12,6 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import type * as catalogVerificationModule from "@peated/server/lib/catalogVerification";
-import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import * as workerClient from "@peated/server/worker/client";
@@ -236,8 +235,6 @@ describe("POST /bottles", () => {
       representativeBottleId: bottle.id,
       totalBottles: 1,
     });
-
-    expect(await db.select().from(bottleReleases)).toHaveLength(0);
 
     const distillers = await db
       .select()

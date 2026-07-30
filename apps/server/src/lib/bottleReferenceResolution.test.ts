@@ -6,10 +6,6 @@ import {
   resolveBottleReferenceTarget,
   type BottleReferenceResolution,
 } from "@peated/server/lib/bottleReferenceResolution";
-import {
-  bottleReleasePromotions,
-  bottleReleases,
-} from "@peated/server/lib/test/legacyCatalogSchema";
 import { eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
@@ -223,52 +219,9 @@ describe("resolveBottleReferenceTarget", () => {
     const user = await fixtures.User({ admin: true });
     const actor = await getUserActor(user);
     const parent = await fixtures.Bottle({ name: "Grouped Alias Parent" });
-    await fixtures.BottleRelease({ bottleId: parent.id });
     const alias = await fixtures.BottleAlias({
       bottleId: parent.id,
       name: "Grouped Parent Alias",
-    });
-    const result = await resolveBottleReferenceTarget({
-      reference: {
-        name: alias.name,
-        url: null,
-        imageUrl: null,
-        currentBottleId: null,
-      },
-      aliasLookupNames: [alias.name],
-      createdByActorId: actor.id,
-      user,
-    });
-
-    expect(result).toMatchObject({
-      assignment: {
-        kind: "direct_bottle",
-        bottleId: parent.id,
-      },
-      source: "exact_alias",
-    });
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-  });
-
-  test("uses the Bottle directly assigned to a promoted release alias", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ admin: true });
-    const actor = await getUserActor(user);
-    const parent = await fixtures.LegacyBottle({
-      name: "Promoted Alias Parent",
-    });
-    const release = await fixtures.BottleRelease({ bottleId: parent.id });
-    const promotedBottle = await fixtures.Bottle({
-      name: "Promoted Alias Bottle",
-    });
-    await db.insert(bottleReleasePromotions).values({
-      releaseId: release.id,
-      promotedBottleId: promotedBottle.id,
-    });
-    const alias = await fixtures.BottleAlias({
-      bottleId: parent.id,
-      name: "Promoted Release Alias",
     });
     const result = await resolveBottleReferenceTarget({
       reference: {
@@ -521,7 +474,6 @@ describe("resolveBottleReferenceTarget", () => {
       id: assignment.bottleId,
       groupId: created!.groupId,
     });
-    expect(await db.select().from(bottleReleases)).toEqual([]);
   });
 
   test("reuses existing SMWS bottles by code when a classifier create omits the subtitle", async ({

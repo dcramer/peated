@@ -10,7 +10,6 @@ import {
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
-import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, asc, eq, inArray } from "drizzle-orm";

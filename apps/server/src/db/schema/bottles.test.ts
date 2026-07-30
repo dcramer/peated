@@ -1,4 +1,3 @@
-import { bottleReleasePromotions } from "@peated/server/lib/test/legacyCatalogSchema";
 import { eq } from "drizzle-orm";
 import { db } from "../index";
 import { bottleAliases, bottleGroups, bottles } from "./bottles";
@@ -90,40 +89,5 @@ describe("BottleGroup membership constraints", () => {
     await expect(
       db.delete(bottles).where(eq(bottles.id, bottle.id)),
     ).rejects.toThrow(/bottle_group_representative_membership_fk/);
-  });
-});
-
-describe("BottleRelease promotion constraints", () => {
-  test("allows multiple legacy releases to map to one promoted Bottle", async ({
-    fixtures,
-  }) => {
-    const promotedBottle = await fixtures.Bottle();
-    const firstRelease = await fixtures.BottleRelease({
-      bottleId: promotedBottle.id,
-      edition: "Promotion Mapping One",
-    });
-    const secondRelease = await fixtures.BottleRelease({
-      bottleId: promotedBottle.id,
-      edition: "Promotion Mapping Two",
-    });
-
-    await db.insert(bottleReleasePromotions).values([
-      {
-        releaseId: firstRelease.id,
-        promotedBottleId: promotedBottle.id,
-      },
-      {
-        releaseId: secondRelease.id,
-        promotedBottleId: promotedBottle.id,
-      },
-    ]);
-
-    const otherPromotedBottle = await fixtures.Bottle();
-    await expect(
-      db.insert(bottleReleasePromotions).values({
-        releaseId: firstRelease.id,
-        promotedBottleId: otherPromotedBottle.id,
-      }),
-    ).rejects.toThrow(/bottle_release_promotion_pkey/);
   });
 });

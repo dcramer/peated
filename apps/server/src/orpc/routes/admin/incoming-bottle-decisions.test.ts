@@ -126,18 +126,13 @@ describe("GET /admin/incoming-bottle-decisions", () => {
     expect("release" in result.results[0]).toBe(false);
   });
 
-  test("uses Bottle identity while retaining legacy decision evidence", async ({
+  test("uses Bottle identity for historical decision kinds", async ({
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
     const actor = await getPeatedSystemActor();
     const site = await fixtures.ExternalSiteOrExisting();
     const bottle = await fixtures.Bottle();
-    const evidenceBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: evidenceBottle.id,
-    });
-
     await db.insert(incomingBottleDecisionLogs).values({
       sourceKind: "store_price",
       sourceId: 105,
@@ -160,9 +155,6 @@ describe("GET /admin/incoming-bottle-decisions", () => {
         bottle: expect.objectContaining({ id: bottle.id }),
       }),
     ]);
-    expect(JSON.stringify(result.results[0])).not.toContain(
-      evidenceBottle.fullName,
-    );
     expect("target" in result.results[0]).toBe(false);
   });
 

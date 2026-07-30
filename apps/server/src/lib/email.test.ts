@@ -99,7 +99,11 @@ describe("notifyComment", () => {
       email: "joe@example.com",
       verified: true,
     });
-    const bottle = await fixtures.Bottle();
+    const brand = await fixtures.Entity({ name: "Exact Email Brand" });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Exact Email Bottle",
+    });
     const groupLabel = "Distinct Exact Email Group Label";
     await db
       .update(bottleGroups)

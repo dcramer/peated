@@ -20,43 +20,11 @@ describe("GET /bottles/:bottle", () => {
     const bottle = await fixtures.Bottle({
       imageUrl: "https://example.com/bottle.png",
     });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      imageUrl: "https://example.com/release.png",
-    });
-
     const data = await routerClient.bottles.details({
       bottle: bottle.id,
     });
 
     expect(data.imageUrl).toBe("https://example.com/bottle.png");
-    expect("displayImageUrl" in data).toBe(false);
-  });
-
-  test("does not fall back to a retained Bottling image", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle({
-      imageUrl: null,
-    });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      name: `${bottle.name} Release A`,
-      imageUrl: "https://example.com/release-a.png",
-      totalTastings: 1,
-    });
-    await fixtures.BottleRelease({
-      bottleId: bottle.id,
-      name: `${bottle.name} Release B`,
-      imageUrl: "https://example.com/release-b.png",
-      totalTastings: 5,
-    });
-
-    const data = await routerClient.bottles.details({
-      bottle: bottle.id,
-    });
-
-    expect(data.imageUrl).toBeNull();
     expect("displayImageUrl" in data).toBe(false);
   });
 

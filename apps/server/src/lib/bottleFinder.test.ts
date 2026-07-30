@@ -49,10 +49,6 @@ describe("findBottleId", () => {
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const evidenceBottle = await fixtures.Bottle();
-    const release = await fixtures.BottleRelease({
-      bottleId: evidenceBottle.id,
-    });
     const alias = await fixtures.BottleAlias({
       bottleId: bottle.id,
       name: "Direct Alias With Evidence",

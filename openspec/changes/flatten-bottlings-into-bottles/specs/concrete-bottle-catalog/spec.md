@@ -76,7 +76,9 @@ display promoted and newly created Bottles in the same way as any other Bottle.
 ### Requirement: Legacy bottling identity is retired from public interfaces
 
 The system SHALL retain an auditable mapping from every migrated BottleRelease
-to its promoted Bottle while exposing only canonical Bottle interfaces.
+to its promoted Bottle through migration validation, then remove that mapping
+with separately approved cleanup while exposing only canonical Bottle
+interfaces.
 
 #### Scenario: Request a retired nested bottling URL
 
@@ -109,8 +111,8 @@ with an explicitly selected surviving Bottle.
 ### Requirement: BottleRelease cleanup is separately approved
 
 The system SHALL stop producing BottleRelease rows before removing public
-routes and schemas, and SHALL separately gate destructive removal of legacy
-tables, columns, migration-only jobs, and retained audit support.
+routes and schemas. It SHALL retire migration-only jobs and retained audit
+support separately from the destructive removal of legacy tables and columns.
 
 The system SHALL deploy an application revision that no longer models or
 accesses those legacy database objects before a later migration physically
@@ -140,3 +142,21 @@ as inert audit data but SHALL NOT appear in current change feeds.
   revision
 - **AND** the read-only pre-drop audit can still inspect the physical legacy
   objects
+
+#### Scenario: Physical cleanup deploy
+
+- **WHEN** the detached revision is fully deployed and destructive cleanup is
+  approved
+- **THEN** the generated migration removes BottleRelease tables, promotion and
+  repair tables, consumer release columns, and migration-only enum types
+- **AND** historical change records may keep their inert object type
+
+#### Scenario: Reversible support cleanup
+
+- **WHEN** the detached revision is fully deployed and required migration audit
+  evidence has been retained
+- **THEN** migration-only CLI, schemas, libraries, and test fixtures may be
+  removed
+- **AND** no table or column cleanup DDL is generated
+- **AND** the physical legacy objects remain available for a later separately
+  approved cleanup

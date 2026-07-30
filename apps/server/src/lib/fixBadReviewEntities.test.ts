@@ -221,9 +221,6 @@ describe("fixBadReviewEntities", () => {
     const stagedParent = await fixtures.Bottle({
       name: "Unpromoted Match Parent",
     });
-    const stagedRelease = await fixtures.BottleRelease({
-      bottleId: stagedParent.id,
-    });
     const site = await fixtures.ExternalSiteOrExisting();
     const [review] = await db
       .insert(reviews)
@@ -247,7 +244,7 @@ describe("fixBadReviewEntities", () => {
           candidates: [
             {
               bottleId: stagedParent.id,
-              fullName: stagedRelease.fullName,
+              fullName: stagedParent.fullName,
               bottleFullName: stagedParent.fullName,
             },
           ],

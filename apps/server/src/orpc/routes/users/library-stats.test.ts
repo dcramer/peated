@@ -359,7 +359,7 @@ describe("GET /users/:user/library/stats", () => {
     });
   });
 
-  test("uses the stored Bottle even when legacy release evidence remains", async ({
+  test("uses the stored Bottle instead of another group member", async ({
     defaults,
     fixtures,
   }) => {
@@ -374,10 +374,6 @@ describe("GET /users/:user/library/stats", () => {
       category: "rye",
       statedAge: 50,
       distillerIds: [parentDistiller.id],
-    });
-    const release = await fixtures.BottleRelease({
-      bottleId: parent.id,
-      statedAge: 40,
     });
     const promoted = await fixtures.BottleGroupMember({
       groupId: parent.groupId as number,

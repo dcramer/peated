@@ -7,7 +7,6 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { normalizeBottleAliasKey } from "@peated/server/lib/normalize";
-import { bottleReleases } from "@peated/server/lib/test/legacyCatalogSchema";
 import createMissingBottles from "@peated/server/worker/jobs/createMissingBottles";
 import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -260,7 +259,6 @@ describe("createMissingBottles", () => {
         issue: review.issue,
       }),
     });
-    expect(await db.select().from(bottleReleases)).toEqual([]);
   });
 
   test("only visits unresolved reviews once per run", async ({ fixtures }) => {
