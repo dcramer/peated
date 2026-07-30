@@ -41,14 +41,36 @@ export default async function Layout({
         </div>
         <div className="ml-4 hidden w-4/12 lg:block">
           {!user && (
-            <div className="flex flex-col items-center rounded p-4 ring-1 ring-inset ring-slate-800">
-              <p className="text-muted mb-4 text-sm">
-                Create a profile to record tastings, build your bottle library,
-                and more.
-              </p>
-              <Button color="primary" href="/login" size="small">
-                Sign Up or Login
-              </Button>
+            <div className="relative isolate overflow-hidden rounded border border-slate-700 bg-slate-950 p-5 shadow-lg shadow-black/20">
+              <img
+                src="/assets/homepage-onboarding-illustration.webp"
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover object-right"
+              />
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/5"
+                aria-hidden="true"
+              />
+
+              <div className="relative z-10 max-w-[68%]">
+                <h2 className="text-xl font-bold leading-tight text-white">
+                  Taste. Track. Discover.
+                </h2>
+                <p className="mt-2 text-sm text-slate-300">
+                  Build your library and remember every great dram.
+                </p>
+                <div className="mt-4 flex items-center gap-x-3">
+                  <Button color="highlight" href="/register" size="small">
+                    Join Peated
+                  </Button>
+                  <Link
+                    href="/login"
+                    className="text-xs font-semibold text-slate-300 hover:text-white hover:underline"
+                  >
+                    Log in
+                  </Link>
+                </div>
+              </div>
             </div>
           )}
           <div className={user ? "pt-7" : "mt-8"}>
