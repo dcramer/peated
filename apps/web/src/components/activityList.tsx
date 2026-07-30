@@ -85,7 +85,7 @@ function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
       <div className="min-w-0 flex-1">
         <Link
           href={href}
-          className="block truncate text-sm font-semibold text-white hover:underline"
+          className="line-clamp-2 text-sm font-semibold text-white hover:underline sm:line-clamp-1"
           title={title}
         >
           {title}
