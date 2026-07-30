@@ -4,7 +4,6 @@ import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import LibraryEntryActions, {
   LibraryEntryImage,
-  LibraryEntryStatus,
   LibraryEntryThumbnail,
 } from "@peated/web/components/libraryEntryActions";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -88,9 +87,6 @@ function UserLibraryTable({ username }: { username: string }) {
               ) : (
                 <LibraryEntryThumbnail entry={entry} />
               )
-            }
-            renderCollectionBottleMeta={(entry) =>
-              canEditLibrary ? null : <LibraryEntryStatus entry={entry} />
             }
             renderCollectionBottleActions={
               canEditLibrary
