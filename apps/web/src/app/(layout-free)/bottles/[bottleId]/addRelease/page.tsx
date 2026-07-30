@@ -61,7 +61,7 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
 
   if (proposalId && proposalQuery.isLoading) return <Spinner />;
   if (!sourceBottle.group) {
-    throw new Error("Adding a similar Bottle requires a BottleGroup summary.");
+    throw new Error("Adding a similar Bottle requires source Bottle details.");
   }
 
   const initialData = {
@@ -75,8 +75,8 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
 
   return (
     <BottleForm
-      title="Add a similar bottle"
-      saveLabel="Create Bottle"
+      title="Add a Similar Bottle"
+      saveLabel="Add Bottle"
       returnTo={returnTo}
       initialData={initialData}
       onSubmit={async ({ image, ...data }) => {

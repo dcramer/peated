@@ -1,6 +1,7 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { ConcreteBottleV1 } from "@peated/server/schemas";
+import classNames from "@peated/web/lib/classNames";
 import type { ReactNode } from "react";
 
 export type BottleExactMetadataSource = Pick<
@@ -81,10 +82,12 @@ export function getBottleExactMetadata(
 
 export default function BottleExactMetadata({
   bottle,
+  className,
   exclude = [],
   leadingContent,
 }: {
   bottle: BottleExactMetadataSource;
+  className?: string;
   exclude?: BottleExactMetadataKey[];
   leadingContent?: ReactNode;
 }) {
@@ -99,7 +102,12 @@ export default function BottleExactMetadata({
   if (!items.length) return null;
 
   return (
-    <div className="text-muted mt-1 flex flex-wrap text-sm leading-5">
+    <div
+      className={classNames(
+        "text-muted mt-1 flex flex-wrap text-sm leading-5",
+        className,
+      )}
+    >
       {items.map(({ key, content }, index) => (
         <span key={key} className="inline-flex whitespace-nowrap">
           {index ? <span className="mx-1.5">&middot;</span> : null}

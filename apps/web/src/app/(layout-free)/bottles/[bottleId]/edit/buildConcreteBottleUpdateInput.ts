@@ -9,18 +9,29 @@ type ExactPatch = NonNullable<ConcreteBottleUpdateInput["exact"]>;
 
 /**
  * Partitions only dirty fields rendered by the live form into sparse
- * shared/exact patches. The two stated-age controls preserve their distinct
- * shared and Bottle-specific ownership; non-rendered tasting notes stay untouched.
+ * shared/exact patches. The edit context keeps stated-age ownership internal
+ * while the form presents one effective value.
  */
 export function buildConcreteBottleUpdateInput(
   value: BottleFormSubmitValue,
   { dirtyFields }: BottleFormSubmitMeta,
+  {
+    statedAgeScope = "shared",
+  }: {
+    statedAgeScope?: "shared" | "exact";
+  } = {},
 ): ConcreteBottleUpdateInput {
   const shared: SharedPatch = {};
   const exact: ExactPatch = {};
 
   if (dirtyFields.has("name")) shared.name = value.name;
-  if (dirtyFields.has("statedAge")) shared.statedAge = value.statedAge;
+  if (dirtyFields.has("statedAge")) {
+    if (statedAgeScope === "exact") {
+      exact.statedAge = value.statedAge;
+    } else {
+      shared.statedAge = value.statedAge;
+    }
+  }
   if (dirtyFields.has("series")) shared.series = value.series;
   if (dirtyFields.has("category")) shared.category = value.category;
   if (dirtyFields.has("brand")) shared.brand = value.brand;
@@ -31,9 +42,6 @@ export function buildConcreteBottleUpdateInput(
   }
 
   if (dirtyFields.has("edition")) exact.edition = value.edition;
-  if (dirtyFields.has("exactStatedAge")) {
-    exact.statedAge = value.exactStatedAge ?? null;
-  }
   if (dirtyFields.has("abv")) exact.abv = value.abv;
   if (dirtyFields.has("singleCask")) exact.singleCask = value.singleCask;
   if (dirtyFields.has("caskStrength")) {

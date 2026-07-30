@@ -274,8 +274,8 @@ function CreateBottleForm() {
         }
       }}
       initialData={initialData}
-      title="Create Bottle"
-      saveLabel="Create Bottle"
+      title="Add Bottle"
+      saveLabel="Add Bottle"
       returnTo={returnTo}
     />
   );
