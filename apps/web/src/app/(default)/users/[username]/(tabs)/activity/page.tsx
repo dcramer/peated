@@ -11,6 +11,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const fetchCache = "default-no-store";
 
+const MAX_ACTIVITY_PAGES = 10;
+
 export default function UserActivityPage(props: {
   params: Promise<{ username: string }>;
 }) {
@@ -21,6 +23,7 @@ export default function UserActivityPage(props: {
     queryFn: async () => {
       const results = [];
       let cursor: number | undefined;
+      let fetchedPageCount = 0;
 
       do {
         const page = await orpc.users.activity.list.call({
@@ -28,9 +31,14 @@ export default function UserActivityPage(props: {
           limit: 10,
           cursor,
         });
+        fetchedPageCount += 1;
         results.push(...filterFavoriteActivity(page.results));
         cursor = page.rel?.nextCursor ?? undefined;
-      } while (results.length < 10 && cursor);
+      } while (
+        results.length < 10 &&
+        cursor &&
+        fetchedPageCount < MAX_ACTIVITY_PAGES
+      );
 
       return results.slice(0, 10);
     },
