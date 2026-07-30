@@ -7,11 +7,7 @@ import {
   HandThumbUpIcon,
 } from "@heroicons/react/24/outline";
 import { COLOR_SCALE } from "@peated/server/constants";
-import {
-  formatCategoryName,
-  formatColor,
-  formatServingStyle,
-} from "@peated/server/lib/format";
+import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Tasting } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -22,7 +18,6 @@ import { getAuthRedirect } from "../lib/auth";
 import classNames from "../lib/classNames";
 import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
-import BottleMetadata from "./bottleMetadata";
 import Button from "./button";
 import Counter from "./counter";
 import DefinitionList from "./definitionList";
@@ -133,19 +128,8 @@ export default function TastingListItem({
       </div>
 
       {!noBottle && (
-        <div className="flex items-start justify-between gap-x-4 px-3 sm:px-5">
-          <div className="min-w-0 text-sm">
-            <TastingBottleIdentity bottle={tasting.bottle} variant="inline" />
-            <BottleMetadata data={tasting.bottle} />
-          </div>
-          <div className="text-muted hidden shrink-0 text-right text-sm sm:block">
-            {tasting.bottle.category && (
-              <div>{formatCategoryName(tasting.bottle.category)}</div>
-            )}
-            {tasting.bottle.statedAge !== null && (
-              <div>Aged {tasting.bottle.statedAge} years</div>
-            )}
-          </div>
+        <div className="px-3 sm:px-5">
+          <TastingBottleIdentity bottle={tasting.bottle} variant="inline" />
         </div>
       )}
 
