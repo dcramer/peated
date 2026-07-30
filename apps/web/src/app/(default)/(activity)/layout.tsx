@@ -41,7 +41,7 @@ export default async function Layout({
         </div>
         <div className="ml-4 hidden w-4/12 lg:block">
           {!user && (
-            <div className="relative isolate overflow-hidden rounded border border-slate-700 bg-slate-950 p-5 shadow-lg shadow-black/20">
+            <div className="relative isolate overflow-hidden border border-slate-700 bg-slate-950 p-5 shadow-lg shadow-black/20">
               <img
                 src="/assets/homepage-onboarding-illustration.webp"
                 alt=""
