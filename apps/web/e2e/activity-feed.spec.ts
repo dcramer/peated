@@ -26,7 +26,9 @@ test.describe("activity feed", () => {
   test("fills profile activity after hiding a Favorites-only page", async ({
     page,
   }) => {
-    await page.goto(`/users/${testUser.username}`, { waitUntil: "commit" });
+    await page.goto(`/users/${testUser.username}/activity`, {
+      waitUntil: "commit",
+    });
 
     await expect(page.getByText(tastingNotes)).toBeVisible();
     await expect(page.getByText("Personal Favorites")).toHaveCount(0);

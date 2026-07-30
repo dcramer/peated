@@ -17,7 +17,7 @@ import {
 import { signIn } from "./session";
 
 test.describe("profile library", () => {
-  test("stretches the age profile to match the distillery card", async ({
+  test("stretches bottle ages to match the distillery card", async ({
     context,
     page,
   }, testInfo) => {
@@ -29,12 +29,12 @@ test.describe("profile library", () => {
       ].join("-"),
     });
 
-    await page.goto(`/users/${testUser.username}/library`, {
+    await page.goto(`/users/${testUser.username}`, {
       waitUntil: "commit",
     });
 
     const ageCard = page
-      .getByRole("heading", { name: "Age profile" })
+      .getByRole("heading", { name: "Bottle ages" })
       .locator("xpath=../..");
     const distilleryCard = page
       .getByRole("heading", { name: "Top distilleries" })

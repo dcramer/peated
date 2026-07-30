@@ -35,7 +35,11 @@ export default function AgeInsightCard({
 
   return (
     <InsightCard title={title} detail={detail}>
-      <div className="grid h-28 grid-cols-6 gap-1" aria-hidden="true">
+      <div
+        className="grid min-h-28 flex-1 grid-cols-6 gap-1"
+        data-age-profile-chart
+        aria-hidden="true"
+      >
         {age.buckets.map((bucket) => (
           <div key={bucket.id} className="flex min-w-0 flex-col items-center">
             <span className="text-muted mb-1 h-4 text-[10px] tabular-nums">

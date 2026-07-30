@@ -82,7 +82,7 @@ export function InsightCard({
   return (
     <section
       className={classNames(
-        "rounded border border-slate-800 bg-slate-950/70 p-3",
+        "flex h-full flex-col rounded border border-slate-800 bg-slate-950/70 p-3",
         className,
       )}
     >
