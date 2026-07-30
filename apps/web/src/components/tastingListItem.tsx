@@ -257,6 +257,7 @@ export default function TastingListItem({
           active={hasToasted}
           aria-label="Toast this tasting"
           aria-pressed={hasToasted}
+          unstyled
           className={classNames(
             tastingActionClassName,
             hasToasted && "text-highlight",
@@ -295,6 +296,7 @@ export default function TastingListItem({
               />
             }
             aria-label={`View ${tasting.comments.toLocaleString()} comments`}
+            unstyled
             className={tastingActionClassName}
             href={`/tastings/${tasting.id}`}
           >
@@ -304,6 +306,7 @@ export default function TastingListItem({
         <ShareButton
           title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
           url={`/tastings/${tasting.id}`}
+          unstyled
           className={tastingActionClassName}
         />
         {(user?.admin || isTaster) && (
@@ -311,6 +314,7 @@ export default function TastingListItem({
             <MenuButton
               as={Button}
               aria-label="More tasting actions"
+              unstyled
               className={tastingActionClassName}
             >
               <EllipsisVerticalIcon className="h-5 w-5" />
