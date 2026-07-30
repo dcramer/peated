@@ -38,6 +38,7 @@ import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import type { TastingTagSuggestion } from "@peated/web/lib/tastingForm";
+import { uploadTastingImageAfterSave } from "@peated/web/lib/tastingImageUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -943,17 +944,23 @@ function AddBottleFlowContent() {
       throw new Error("Tasting was not returned after save.");
     }
 
-    const imageFile =
-      image instanceof File ? image : image ? await toBlob(image) : null;
-
-    if (imageFile) {
+    if (image) {
       try {
-        await tastingImageUpdateMutation.mutateAsync({
-          tasting: tasting.id,
-          file: imageFile,
+        await uploadTastingImageAfterSave({
+          prepare: async () =>
+            image instanceof File ? image : await toBlob(image),
+          upload: async (imageFile) => {
+            await tastingImageUpdateMutation.mutateAsync({
+              tasting: tasting.id,
+              file: imageFile,
+            });
+          },
         });
       } catch (err) {
-        logError(err);
+        logError(err, {
+          context: "tasting_image_upload_after_create",
+          extra: { tastingId: tasting.id },
+        });
         flash(
           "There was an error uploading your image, but the tasting was saved.",
           "error",

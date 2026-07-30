@@ -13,6 +13,11 @@ import {
 } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
+const testImage = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
+  "base64",
+);
+
 test.describe("log tasting", () => {
   test("preserves query params when redirecting legacy bottle tasting links", async ({
     context,
@@ -64,9 +69,14 @@ test.describe("log tasting", () => {
     await expect(page.getByTitle(existingBottle.fullName)).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(tastingNotes);
+    await uploadTastingImage(page);
     const createRequestPromise = waitForTastingCreate(page);
+    const imageRequestPromise = page.waitForRequest((request) =>
+      request.url().includes("/rpc/tastings/imageUpdate"),
+    );
     await page.getByRole("button", { name: "Save" }).click();
     const createInput = getRpcInput(await createRequestPromise);
+    await imageRequestPromise;
 
     expect(createInput.bottle).toBe(existingBottle.id);
     expect(createInput).not.toHaveProperty("target");
@@ -74,6 +84,30 @@ test.describe("log tasting", () => {
 
     await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
     await expectNoHorizontalOverflow(page);
+  });
+
+  test("finishes saving when tasting image upload fails", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: `${testAccessToken}-tasting-image-failure-${testInfo.project.name}`,
+    });
+
+    await page.goto(`/bottles/${existingBottle.id}/addTasting`);
+    await page.getByRole("button", { name: "Log Tasting" }).click();
+    await page.getByRole("button", { name: "Savor" }).click();
+    await page.getByLabel("Comments").fill(tastingNotes);
+    await uploadTastingImage(page);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(
+      page.getByText(
+        "There was an error uploading your image, but the tasting was saved.",
+      ),
+    ).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/tastings/${createdTastingId}$`));
   });
 
   test("logs a tasting from a matched bottle photo", async ({
@@ -177,16 +211,24 @@ async function uploadLabel(page: Page) {
     await page.locator('input[type="file"]').setInputFiles({
       name: `label-${attempt}.png`,
       mimeType: "image/png",
-      buffer: Buffer.from(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=",
-        "base64",
-      ),
+      buffer: testImage,
     });
 
     if (await requestPromise) return;
   }
 
   throw new Error("Photo identification request was not sent.");
+}
+
+async function uploadTastingImage(page: Page) {
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "tasting.png",
+    mimeType: "image/png",
+    buffer: testImage,
+  });
+  await expect(page.getByRole("heading", { name: "Crop Image" })).toBeVisible();
+  await page.getByRole("dialog").getByRole("button", { name: "Save" }).click();
+  await expect(page.getByAltText("uploaded image")).toBeVisible();
 }
 
 function waitForTastingCreate(page: Page) {

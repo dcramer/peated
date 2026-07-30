@@ -761,6 +761,17 @@ async function handleRpcRequest({ request, response, url }) {
       );
       return true;
     case "tastings/imageUpdate":
+      if (getAccessToken(request).includes("tasting-image-failure")) {
+        sendRpcError(response, "Forced tasting image upload failure.");
+        return true;
+      }
+      if (
+        input?.tasting !== createdTastingId ||
+        input.__mockHasUploadFile !== true
+      ) {
+        sendRpcError(response, "Unexpected tasting image update payload.");
+        return true;
+      }
       sendRpcResponse(response, {
         imageUrl: "http://127.0.0.1:4999/uploads/tasting.webp",
       });
