@@ -4,6 +4,7 @@ import ai from "./ai";
 import auth from "./auth";
 import badges from "./badges";
 import bottleAliases from "./bottleAliases";
+import bottleBarcodes from "./bottleBarcodes";
 import bottleGroups from "./bottleGroups";
 import bottles from "./bottles";
 import bottleSeries from "./bottleSeries";
@@ -40,6 +41,7 @@ export interface Router {
   badges: typeof badges;
   bottles: typeof bottles;
   bottleAliases: typeof bottleAliases;
+  bottleBarcodes: typeof bottleBarcodes;
   bottleGroups: typeof bottleGroups;
   bottleSeries: typeof bottleSeries;
   changes: typeof changes;
@@ -76,6 +78,7 @@ export default {
   badges,
   bottles,
   bottleAliases,
+  bottleBarcodes,
   bottleGroups,
   bottleSeries,
   changes,

@@ -327,6 +327,7 @@ export const bottlesRelations = relations(bottles, ({ one, many }) => ({
   }),
   bottlesToDistillers: many(bottlesToDistillers),
   observations: many(bottleObservations),
+  barcodes: many(bottleBarcodes),
   createdByActor: one(actors, {
     fields: [bottles.createdByActorId],
     references: [actors.id],
@@ -458,6 +459,54 @@ export const bottleObservationsRelations = relations(
 
 export type BottleObservation = typeof bottleObservations.$inferSelect;
 export type NewBottleObservation = typeof bottleObservations.$inferInsert;
+
+/**
+ * Canonical retail package identifiers for an exact Bottle.
+ *
+ * Source claims and conflicts remain observations; this table only contains
+ * accepted mappings that are safe for deterministic barcode lookup.
+ */
+export const bottleBarcodes = pgTable(
+  "bottle_barcode",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    bottleId: bigint("bottle_id", { mode: "number" })
+      .references(() => bottles.id, { onDelete: "cascade" })
+      .notNull(),
+    value: varchar("value", { length: 14 }).notNull(),
+    gtin14: varchar("gtin14", { length: 14 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    createdByActorId: bigint("created_by_actor_id", {
+      mode: "number",
+    })
+      .references(() => actors.id)
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("bottle_barcode_gtin14_unq").on(table.gtin14),
+    index("bottle_barcode_bottle_idx").on(table.bottleId),
+    index("bottle_barcode_created_by_actor_idx").on(table.createdByActorId),
+    check(
+      "bottle_barcode_value_check",
+      sql`${table.value} ~ '^[0-9]+$' AND char_length(${table.value}) IN (8, 12, 13, 14)`,
+    ),
+    check("bottle_barcode_gtin14_check", sql`${table.gtin14} ~ '^[0-9]{14}$'`),
+  ],
+);
+
+export const bottleBarcodesRelations = relations(bottleBarcodes, ({ one }) => ({
+  bottle: one(bottles, {
+    fields: [bottleBarcodes.bottleId],
+    references: [bottles.id],
+  }),
+  createdByActor: one(actors, {
+    fields: [bottleBarcodes.createdByActorId],
+    references: [actors.id],
+  }),
+}));
+
+export type BottleBarcode = typeof bottleBarcodes.$inferSelect;
+export type NewBottleBarcode = typeof bottleBarcodes.$inferInsert;
 
 export const bottlesToDistillers = pgTable(
   "bottle_distiller",
