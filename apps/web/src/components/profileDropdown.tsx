@@ -14,7 +14,11 @@ import { Fragment, useRef } from "react";
 import LogoutButton from "./logoutButton";
 import UserAvatar from "./userAvatar";
 
-export function ProfileDropdown() {
+export function ProfileDropdown({
+  bottleChecksAvailable,
+}: {
+  bottleChecksAvailable: boolean;
+}) {
   const { user } = useAuth();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -22,7 +26,7 @@ export function ProfileDropdown() {
   if (!user) return null;
 
   return (
-    <Menu as="div" className="menu hidden sm:block">
+    <Menu as="div" className="menu">
       {({ open }) => (
         <>
           <MenuButton
@@ -65,11 +69,18 @@ export function ProfileDropdown() {
                   <LogoutButton />
                 </MenuItem>
               </div>
-              {user.admin && (
+              {(user.mod || user.admin) && (
                 <div>
-                  <MenuItem>
-                    <Link href={`/admin`}>Admin</Link>
-                  </MenuItem>
+                  {bottleChecksAvailable ? (
+                    <MenuItem>
+                      <Link href="/bottle-checks">Bottle Checks</Link>
+                    </MenuItem>
+                  ) : null}
+                  {user.admin ? (
+                    <MenuItem>
+                      <Link href={`/admin`}>Admin</Link>
+                    </MenuItem>
+                  ) : null}
                 </div>
               )}
             </MenuItems>

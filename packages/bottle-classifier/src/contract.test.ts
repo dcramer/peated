@@ -133,8 +133,12 @@ describe("bottle-classifier contract", () => {
     });
 
     expect(isIgnoredBottleClassification(ignored)).toBe(true);
+    expect(ignored.proposedOperations).toEqual([]);
+    expect(ignored.findings).toEqual([]);
     expect(BottleClassificationResultSchema.parse(classified)).toMatchObject({
       status: "classified",
+      proposedOperations: [],
+      findings: [],
       artifacts: {
         imageEvidence: {
           sourceImageId: "pending-upload-1",

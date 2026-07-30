@@ -186,10 +186,15 @@ type ExpectedSeries = Pick<
   BottleSeries,
   "id" | "brandId" | "name" | "fullName" | "description"
 >;
+export type ConcreteBottleUpdateExpectedEntityState = Pick<
+  Entity,
+  "id" | "name" | "shortName" | "type"
+>;
 
 export type ConcreteBottleUpdateExpectedSharedState = {
   group: Pick<BottleGroup, (typeof expectedGroupKeys)[number]>;
   distillerIds: number[];
+  referencedEntities: ConcreteBottleUpdateExpectedEntityState[];
   series: ExpectedSeries | null;
   referencedSeries: ExpectedSeries[];
 };
@@ -224,11 +229,13 @@ export function concreteBottleUpdateExpectedSelectedBottleState(
 export function concreteBottleUpdateExpectedSharedState({
   group,
   distillerIds,
+  referencedEntities = [],
   referencedSeries = [],
   series,
 }: {
   group: BottleGroup;
   distillerIds: number[];
+  referencedEntities?: ConcreteBottleUpdateExpectedEntityState[];
   referencedSeries?: BottleSeries[];
   series: BottleSeries | null;
 }): ConcreteBottleUpdateExpectedSharedState {
@@ -237,6 +244,14 @@ export function concreteBottleUpdateExpectedSharedState({
       expectedGroupKeys.map((key) => [key, group[key]]),
     ) as ConcreteBottleUpdateExpectedSharedState["group"],
     distillerIds: [...distillerIds].sort((left, right) => left - right),
+    referencedEntities: referencedEntities
+      .map(({ id, name, shortName, type }) => ({
+        id,
+        name,
+        shortName,
+        type: [...type].sort() as Entity["type"],
+      }))
+      .sort((left, right) => left.id - right.id),
     series: series
       ? {
           id: series.id,
@@ -848,10 +863,37 @@ export async function updateConcreteBottleInTransaction(
         const expected = expectedSeriesById.get(series.id);
         return !expected || !sameExpectedSeries(series, expected);
       });
+    const currentReferencedEntities = expectedSharedState.referencedEntities
+      .length
+      ? await tx
+          .select({
+            id: entities.id,
+            name: entities.name,
+            shortName: entities.shortName,
+            type: entities.type,
+          })
+          .from(entities)
+          .where(
+            inArray(
+              entities.id,
+              expectedSharedState.referencedEntities.map(({ id }) => id),
+            ),
+          )
+          .orderBy(asc(entities.id))
+          .for("share")
+      : [];
+    const referencedEntitiesChanged =
+      JSON.stringify(
+        currentReferencedEntities.map((entity) => ({
+          ...entity,
+          type: [...entity.type].sort(),
+        })),
+      ) !== JSON.stringify(expectedSharedState.referencedEntities);
     if (
       groupChanged ||
       !sameValues(currentGroupDistillerIds, expectedSharedState.distillerIds) ||
-      seriesChanged
+      seriesChanged ||
+      referencedEntitiesChanged
     ) {
       throw new ConcreteBottleUpdateExpectedStateError(groupId);
     }

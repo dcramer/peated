@@ -9,12 +9,13 @@ import {
 /**
  * Reviewed public classifier boundary.
  *
- * Keep this surface small. Callers should get a fully reviewed identity
- * decision from here rather than reaching into the raw agent/runtime internals.
+ * Keep this surface small. Callers should get a validated reference decision
+ * or Bottle audit from here rather than reaching into raw agent internals.
  */
 export type BottleClassifier = Pick<
   InternalBottleClassifier,
   | "classifyBottleReference"
+  | "auditBottle"
   | "identifyExistingBottleReference"
   | "extractBottleReferenceIdentity"
 >;
@@ -31,7 +32,7 @@ export type { BottleClassifierAdapters, BottleClassifierDataSource };
 /**
  * Creates the reviewed bottle classifier.
  *
- * The returned object exposes only the stable classify/extract entrypoints. Raw
+ * The returned object exposes only the stable check/extract entrypoints. Raw
  * agent orchestration and test-only hooks stay behind internal subpaths.
  */
 export function createBottleClassifier(

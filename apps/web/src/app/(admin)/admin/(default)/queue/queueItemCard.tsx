@@ -8,6 +8,7 @@ import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { type ReactNode, useState } from "react";
+import LinkedBottleChecks from "./linkedBottleChecks";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 
 export type QueueItem =
@@ -282,6 +283,12 @@ export function canApproveSuggestedBottle(
     !isRepairProposal(item) &&
     !item.isProcessing
   );
+}
+
+export function isPrimaryDecisionComplete(
+  item: Pick<QueueItem, "status">,
+): boolean {
+  return ["approved", "ignored", "verified"].includes(item.status);
 }
 
 function getChoiceName(
@@ -796,6 +803,7 @@ export default function QueueItemCard({
   const repairProposal = isRepairProposal(item);
   const isProcessing = item.isProcessing;
   const canApproveMatch = canApproveSuggestedBottle(item);
+  const primaryDecisionComplete = isPrimaryDecisionComplete(item);
   const canCreateBottle =
     item.status === "pending_review" &&
     item.proposalType === "create_new" &&
@@ -1171,6 +1179,15 @@ export default function QueueItemCard({
               Retry lease is active. Review actions return when the retry
               finishes or the lease expires.
             </div>
+          ) : primaryDecisionComplete ? (
+            <div className="rounded-lg border border-emerald-900 bg-emerald-950/30 px-3 py-3 text-sm text-emerald-100">
+              <div className="text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                Primary decision complete
+              </div>
+              <div className="mt-2">
+                Supplemental Bottle check work remains below.
+              </div>
+            </div>
           ) : (
             <>
               {canApproveMatch ? (
@@ -1268,6 +1285,7 @@ export default function QueueItemCard({
           )}
         </aside>
       </div>
+      <LinkedBottleChecks checkIds={item.bottleCheckIds} />
     </article>
   );
 }

@@ -3,6 +3,7 @@ import {
   getCatalogVerificationSkipReason,
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
+import { runPostUserCreationBottleAudit } from "@peated/server/agents/bottleClassifier/auditBottle";
 import config from "@peated/server/config";
 import { recordCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
 import {
@@ -21,6 +22,10 @@ export const VerifyBottleCreationJobArgsSchema = z
 export type VerifyBottleCreationJobArgs = z.infer<
   typeof VerifyBottleCreationJobArgsSchema
 >;
+
+function getBottleCreationEventKey(bottleId: number) {
+  return `bottle_created:${bottleId}`;
+}
 
 export default async function verifyBottleCreation(input: unknown) {
   const { bottleId, creationSource } =
@@ -47,6 +52,14 @@ export default async function verifyBottleCreation(input: unknown) {
         reason: getCatalogVerificationSkipReason(creationSource),
         findings: [],
       },
+    });
+    return;
+  }
+
+  if (config.BOTTLE_CHECK_SHADOW_GENERATION) {
+    await runPostUserCreationBottleAudit({
+      bottleId,
+      backgroundEventKey: getBottleCreationEventKey(bottleId),
     });
     return;
   }

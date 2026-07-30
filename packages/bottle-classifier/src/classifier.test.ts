@@ -20,7 +20,7 @@ import { buildBottleCandidate } from "./evalFixtureBuilders";
 
 type ReasoningResult = {
   decision: BottleClassifierAgentDecisionInput;
-  artifacts: BottleClassificationArtifacts;
+  artifacts: Parameters<typeof buildBottleClassificationArtifacts>[0];
 };
 
 function createReliableSearchEvidence({
@@ -111,7 +111,15 @@ function createTestClassifier({
         extractFromText:
           extractFromText ??
           (async () => extractedIdentityFromText ?? extractedIdentity),
-        runBottleClassifierAgent,
+        runBottleClassifierAgent: runBottleClassifierAgent
+          ? async (input) => {
+              const result = await runBottleClassifierAgent(input);
+              return {
+                ...result,
+                artifacts: buildBottleClassificationArtifacts(result.artifacts),
+              };
+            }
+          : undefined,
       },
     }),
     searchBottles,

@@ -1,7 +1,45 @@
 import { resolveOpenAICompatibleConfig } from "@peated/bottle-classifier/openaiCompatibleConfig";
 import { tmpdir } from "node:os";
 
+type Environment = Readonly<Record<string, string | undefined>>;
+
+function parseDisabledByDefaultFlag(
+  name: string,
+  value: string | undefined,
+): boolean {
+  if (value === undefined || value === "") return false;
+
+  switch (value.trim().toLowerCase()) {
+    case "1":
+    case "true":
+      return true;
+    case "0":
+    case "false":
+      return false;
+    default:
+      throw new Error(`${name} must be one of: 1, true, 0, false`);
+  }
+}
+
+export function resolveBottleCheckFeatureFlags(environment: Environment) {
+  return {
+    BOTTLE_CHECK_SHADOW_GENERATION: parseDisabledByDefaultFlag(
+      "BOTTLE_CHECK_SHADOW_GENERATION",
+      environment.BOTTLE_CHECK_SHADOW_GENERATION,
+    ),
+    BOTTLE_CHECK_MODERATOR_VISIBILITY: parseDisabledByDefaultFlag(
+      "BOTTLE_CHECK_MODERATOR_VISIBILITY",
+      environment.BOTTLE_CHECK_MODERATOR_VISIBILITY,
+    ),
+    BOTTLE_CHECK_EXECUTION: parseDisabledByDefaultFlag(
+      "BOTTLE_CHECK_EXECUTION",
+      environment.BOTTLE_CHECK_EXECUTION,
+    ),
+  };
+}
+
 const openAIConfig = resolveOpenAICompatibleConfig(process.env);
+const bottleCheckFeatureFlags = resolveBottleCheckFeatureFlags(process.env);
 
 export default {
   ENV:
@@ -92,6 +130,8 @@ export default {
   CATALOG_VERIFICATION_AUTOMATION_SAMPLE_RATE: Number(
     process.env.CATALOG_VERIFICATION_AUTOMATION_SAMPLE_RATE || "0.1",
   ),
+
+  ...bottleCheckFeatureFlags,
 
   DISCORD_WEBHOOK: process.env.DISCORD_WEBHOOK,
 };

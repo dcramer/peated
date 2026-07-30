@@ -3,6 +3,8 @@ export {
   extractFirecrawlSearchEvidence,
   runFirecrawlWebSearch,
 } from "./firecrawlWebSearch";
+export { createGetBottleContextTool } from "./getBottleContext";
+export { createGetEntityContextTool } from "./getEntityContext";
 export {
   createOpenAIWebSearchTool,
   runBottleWebEvidenceSearch,

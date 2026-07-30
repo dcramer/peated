@@ -7,7 +7,7 @@ instead of redoing identity reasoning.
 
 ## Contract
 
-The package has three distinct contracts:
+The package has four distinct contracts:
 
 - `extractBottleReferenceIdentity(...)`: reads bottle identity facts from image
   or text. It does not decide whether the facts are canonical Peated identity.
@@ -18,6 +18,9 @@ The package has three distinct contracts:
 - `classifyBottleReference(...)`: full reviewed classification. It can match,
   create, repair, or decline after considering local candidates, entity
   resolution, and web evidence when required.
+- `auditBottle(...)`: checks one existing Bottle and returns a summary,
+  proposed operations, and non-executable findings. It does not return another
+  identity decision.
 
 `classifyBottleReference(...)` accepts a generic reference:
 
@@ -47,6 +50,109 @@ manages grouping automatically. The classifier never selects a BottleGroup.
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
 policy.
+
+## Bottle Checks
+
+A Bottle check is one immutable classifier result created for a server-owned
+intent:
+
+- `resolve_reference` identifies a Bottle from a listing or other external
+  reference. Its existing structured decision remains the primary result.
+- `audit_bottle` reviews an existing Bottle from a moderator request or a
+  sampled post-user-creation job. Its result is a narrative summary, proposed
+  operations, and findings; it has no redundant structured conclusion.
+
+A proposed operation is an agent suggestion with a typed input, rationale, and
+evidence references. V1 supports exactly four:
+
+- `update_bottle`
+- `merge_bottles`
+- `update_entity`
+- `merge_entities`
+
+The agent has bounded read-only Bottle, BottleGroup, Entity, local-search, and
+focused web-evidence tools. It cannot mutate the catalog. Proposals may refer
+only to inspected resources and collected evidence. Unsupported or unresolved
+work remains a finding instead of becoming an invented operation.
+
+The server prepares each proposal independently as a review operation. A review
+operation adds the live diff, bounded impact, warnings, state token, and either
+`pending_review` or a mechanical blocking reason. One blocked proposal does not
+hide valid siblings, and operations are independent rather than an ordered
+plan.
+
+Supplemental proposed operations always require explicit moderator approval.
+This remains true for a high-confidence result and for checks created after an
+end-user save. Only the existing primary add-Bottle classification may
+auto-apply under its established policy. Approval locks and revalidates the
+operation; relevant drift makes it stale. Only failed operations may be
+retried, using the same operation id and reconciliation before redispatch.
+Blocked or stale work needs manual correction or a new check. A closed check is
+immutable.
+
+Generation, moderator visibility, and execution are controlled separately by
+`BOTTLE_CHECK_SHADOW_GENERATION`, `BOTTLE_CHECK_MODERATOR_VISIBILITY`, and
+`BOTTLE_CHECK_EXECUTION`. All three default off. Post-user-creation audits run
+after the Bottle save commits and never delay or roll back that save.
+
+### BottleGroup Findings
+
+V1 has no BottleGroup operation. A suspected grouping problem is a
+`bottle_group` finding unless an exact duplicate can be resolved by
+`merge_bottles`.
+
+The reviewed Laphroaig Càirdeas 2022 production miss demonstrates that
+boundary: merge malformed Bottle `39096` into Warehouse 1 Bottle `45146`, while
+leaving generic Bottle `44288` unchanged. It does not justify regrouping. The
+`audit-unresolved-island-reserve` eval demonstrates the finding shape, but is
+synthetic and therefore is not evidence for a group mutation.
+
+Track real moderator-reviewed `bottle_group` findings before designing a
+follow-up. If they demonstrate a recurring need, propose only the smallest
+required regroup or group-merge operation. That separate change must preserve
+Bottle ids, all Bottle consumers and aliases, shared-field rematerialization,
+representatives, aggregates, and auditable before/after history. It must not add
+move, merge, and split operations merely for symmetry.
+
+### Measurement And Rollout
+
+Keep reference-decision accuracy separate from audit operation and finding
+precision. Before enabling execution broadly, measure:
+
+- intent accuracy and schema-valid output;
+- exact proposed operations and missing operations, with harmful extras
+  weighted most heavily;
+- reviewer rejection/correction and time to disposition;
+- stale, failed, retry, and reconciliation outcomes;
+- model cost, latency, and tool calls.
+
+Intent is selected by the server entrypoint, not inferred by the model.
+“Intent accuracy” therefore means that eval fixtures exercise the intended
+entrypoint and durable checks retain that intent; it is not a second classifier
+score.
+
+Classifier evals provide the offline decision, operation, finding, cost,
+latency, and tool-use measures. Durable check and operation timestamps,
+statuses, and structured reasons provide the review and execution inputs.
+Broad execution remains off until those runtime inputs are aggregated and a
+reviewed rollout explicitly defines an acceptable precision and operational
+failure bar. A schema existing in the database is not itself a measurement
+gate.
+
+Run `pnpm cli classifier rollout-report --days 30` for the durable rollout
+inputs. A rejected proposal counts as a reviewer correction, and review time
+runs from check completion to operation review. Stale and failure rates use all
+operations that reached approval or execution as their denominator; blocked,
+pending, and rejected proposals are not execution attempts. The report includes
+measurement coverage so missing telemetry is visible rather than treated as
+zero.
+
+Audit agent runs persist request/token usage, agent latency, and tool-call
+counts in `modelMetadata`. Token usage plus the stored model is the durable cost
+input; the report does not invent a dollar estimate when no versioned pricing
+source was recorded. Reference-resolution runtime coverage and dollar cost are
+still explicit rollout gaps. Broad execution therefore remains gated until
+those gaps and acceptable rollout bars are resolved.
 
 ## Correctness Bar
 
@@ -278,6 +384,8 @@ entities, and live web evidence:
 
 - `search_bottles`: local Peated Bottle candidates
 - `search_entities`: local Peated brand, distillery, and bottler entities
+- `get_bottle_context`: bounded identity context for one inspected Bottle
+- `get_entity_context`: bounded identity context for one inspected Entity
 - `firecrawl_web_search`: configured default live web evidence search with
   scraped page excerpts
 - `openai_web_search`: no-Firecrawl fallback web evidence search

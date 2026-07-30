@@ -1,13 +1,18 @@
 import type {
+  AuditBottleInput,
   BottleClassificationResult,
   BottleReference,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
 import {
+  AuditBottleInputSchema,
   BottleCandidateSchema,
   createDecidedBottleClassification,
 } from "@peated/bottle-classifier/contract";
-import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
+import type {
+  BottleCheckRunOptions,
+  RunBottleClassifierAgentInput,
+} from "@peated/bottle-classifier/internal/runtime";
 import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
 import {
   EntityResolutionSchema,
@@ -28,6 +33,10 @@ import {
 } from "@peated/server/lib/openaiClient";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { randomUUID } from "node:crypto";
+import {
+  getBottleClassifierContext,
+  getEntityClassifierContext,
+} from "./contextAdapters";
 
 let bottleClassifier: ReturnType<typeof createBottleClassifier> | null = null;
 
@@ -100,6 +109,8 @@ export function getBottleClassifier() {
         ),
       searchBottles: searchBottleCandidates,
       getBottleCandidateById,
+      getBottleContext: getBottleClassifierContext,
+      getEntityContext: getEntityClassifierContext,
       searchEntities: searchBottleClassifierEntities,
     },
   });
@@ -109,6 +120,7 @@ export function getBottleClassifier() {
 
 export async function classifyBottleReference(
   input: ClassifyBottleReferenceInput,
+  options?: BottleCheckRunOptions,
 ) {
   const reference = normalizeReferenceForClassifier(input.reference);
   const conversationId = buildReferenceConversationId(
@@ -118,12 +130,34 @@ export async function classifyBottleReference(
   );
 
   return await withReferenceConversation(conversationId, async () => {
-    return await getBottleClassifier().classifyBottleReference({
-      ...input,
-      reference,
-      conversationId,
-    });
+    return await getBottleClassifier().classifyBottleReference(
+      {
+        ...input,
+        reference,
+        conversationId,
+      },
+      options,
+    );
   });
+}
+
+export async function runBottleAudit(
+  input: AuditBottleInput,
+  options?: BottleCheckRunOptions,
+) {
+  const parsedInput = AuditBottleInputSchema.parse(input);
+  const conversationId = `bottle_audit:${parsedInput.bottleId}`;
+
+  return await withReferenceConversation(conversationId, async () => {
+    return await getBottleClassifier().runBottleAudit(parsedInput, options);
+  });
+}
+
+export async function auditBottle(
+  input: AuditBottleInput,
+  options?: BottleCheckRunOptions,
+) {
+  return (await runBottleAudit(input, options)).result;
 }
 
 async function identifyExactAliasReference({

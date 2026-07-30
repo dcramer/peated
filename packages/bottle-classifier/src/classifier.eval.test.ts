@@ -1,6 +1,19 @@
 import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
 import { createJudge, describeEval, type JudgeContext } from "vitest-evals";
 import { toJsonValue, type JsonValue } from "vitest-evals/harness";
+import {
+  AUDIT_BOTTLE_EVAL_CASES,
+  buildAuditEvalBottleContext,
+} from "./auditBottle.eval.fixtures";
+import {
+  scoreBottleCheckGrounding,
+  scoreBottleCheckSemanticOutput,
+} from "./bottleCheckEvalScoring";
+import {
+  BottleContextSchema,
+  EntityContextSchema,
+  type EntityContext,
+} from "./bottleContextContract";
 import type {
   ClassifierEvalCase,
   SearchResponseFixture,
@@ -14,7 +27,9 @@ import {
   collectInitialResolvedEntities,
   createBottleClassifier,
   finalizeBottleClassifierReasoningResult,
+  prepareBottleAuditAgentRun,
   prepareBottleClassifierAgentRun,
+  type PreparedBottleAuditAgentRun,
   type PreparedBottleClassifierAgentRun,
 } from "./classifierRuntime";
 import type {
@@ -22,14 +37,19 @@ import type {
   CaskFill,
   CaskSize,
   CaskType,
+  EntityResolution,
 } from "./classifierTypes";
 import {
+  AuditBottleResultSchema,
   BottleClassificationResultSchema,
   ClassifyBottleReferenceInputSchema,
   buildBottleClassificationArtifacts,
+  createAuditBottleResult,
   createDecidedBottleClassification,
+  type AuditBottleResult,
   type BottleClassificationResult,
 } from "./contract";
+import type { AuditBottleEvalFixture } from "./evalFixtureSchemas";
 import {
   createEvalClassifierOptions,
   hasEvalOpenAICredentials,
@@ -794,15 +814,21 @@ async function prepareScenarioClassifierRun(
     deterministicResult,
     classifyAgentResult: async (result) => {
       const reasoning = agentRun.getReasoningResult(result);
-      const { decision, artifacts: reasoningArtifacts } =
-        await finalizeBottleClassifierReasoningResult({
-          reference: parsedInput.reference,
-          reasoning,
-        });
+      const {
+        decision,
+        proposedOperations,
+        findings,
+        artifacts: reasoningArtifacts,
+      } = await finalizeBottleClassifierReasoningResult({
+        reference: parsedInput.reference,
+        reasoning,
+      });
 
       return BottleClassificationResultSchema.parse(
         createDecidedBottleClassification({
           decision,
+          proposedOperations,
+          findings,
           artifacts: reasoningArtifacts,
         }),
       );
@@ -829,7 +855,7 @@ const classifierHarness = openaiAgentsHarness<
   PreparedBottleClassifierAgentRun["agent"],
   ClassifierScenarioEvalCase,
   PreparedBottleClassifierAgentRun["runner"],
-  BottleClassificationResult,
+  unknown,
   unknown,
   JsonValue
 >({
@@ -861,10 +887,15 @@ const classifierHarness = openaiAgentsHarness<
       stream: false,
     });
 
-    return preparedRun.classifyAgentResult(result);
+    return result;
   },
-  output: ({ result }) => {
-    return toJsonValue(result) ?? null;
+  output: async ({ input, result }) => {
+    const preparedRun = await getPreparedClassifierRun(input);
+    const classification = preparedRun.deterministicResult
+      ? BottleClassificationResultSchema.parse(result)
+      : await preparedRun.classifyAgentResult(result);
+
+    return toJsonValue(classification) ?? null;
   },
   // The harness rejects replay policies for tools absent from the prepared
   // agent, so keep this aligned with Firecrawl-vs-OpenAI tool selection.
@@ -874,6 +905,187 @@ const classifierHarness = openaiAgentsHarness<
       : { openai_web_search: true }),
   },
 });
+
+function auditEntityContext(entity: EntityResolution): EntityContext {
+  return EntityContextSchema.parse({
+    entityId: entity.entityId,
+    name: entity.name,
+    shortName: entity.shortName,
+    roles: entity.type,
+    website: null,
+    country: null,
+    region: null,
+    yearEstablished: null,
+    aliases: entity.alias ? [entity.alias] : [],
+    relatedBottles: [],
+  });
+}
+
+function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
+  const {
+    currentBottle,
+    inspectedBottles,
+    inspectedEntities,
+    inspectedSeries,
+  } = testCase.input.context;
+  const bottleContexts = new Map(
+    [currentBottle, ...inspectedBottles].map((candidate) => [
+      candidate.bottleId,
+      buildAuditEvalBottleContext(
+        candidate,
+        inspectedEntities,
+        inspectedSeries,
+      ),
+    ]),
+  );
+  const entityContexts = new Map(
+    inspectedEntities.map((entity) => [
+      entity.entityId,
+      auditEntityContext(entity),
+    ]),
+  );
+
+  return createEvalClassifierOptions({
+    searchBottles: async () => [currentBottle, ...inspectedBottles],
+    getBottleCandidateById: async (bottleId) =>
+      [currentBottle, ...inspectedBottles].find(
+        (candidate) => candidate.bottleId === bottleId,
+      ) ?? null,
+    getBottleContext: async (bottleId) => bottleContexts.get(bottleId) ?? null,
+    searchEntities: async () => inspectedEntities,
+    getEntityContext: async (entityId) => entityContexts.get(entityId) ?? null,
+  });
+}
+
+type PreparedAuditEvalRun = {
+  agentRun: PreparedBottleAuditAgentRun;
+  getResult: (result: unknown) => AuditBottleResult;
+};
+
+const preparedAuditRuns = new WeakMap<
+  AuditBottleEvalFixture,
+  PreparedAuditEvalRun
+>();
+
+function getPreparedAuditRun(
+  testCase: AuditBottleEvalFixture,
+): PreparedAuditEvalRun {
+  const existing = preparedAuditRuns.get(testCase);
+  if (existing) {
+    return existing;
+  }
+
+  const options = createAuditEvalClassifierOptions(testCase);
+  const currentBottleContext = buildAuditEvalBottleContext(
+    testCase.input.context.currentBottle,
+    testCase.input.context.inspectedEntities,
+    testCase.input.context.inspectedSeries,
+  );
+  const { imageSources: _imageSources, ...currentBottleContextFields } =
+    currentBottleContext;
+  const agentRun = prepareBottleAuditAgentRun(options, {
+    audit: testCase.input.audit,
+    availableOperations: [
+      "update_bottle",
+      "merge_bottles",
+      "update_entity",
+      "merge_entities",
+    ],
+    currentBottleContext: BottleContextSchema.parse({
+      ...currentBottleContextFields,
+      publicImages: [],
+    }),
+    conversationId: `bottle_audit_eval:${testCase.id}`,
+    searchEvidence: testCase.input.context.searchEvidence,
+  });
+  const prepared = {
+    agentRun,
+    getResult: (result: unknown) =>
+      createAuditBottleResult({
+        ...agentRun.getOutput(result),
+        artifacts: agentRun.getArtifacts(),
+      }),
+  };
+  preparedAuditRuns.set(testCase, prepared);
+  return prepared;
+}
+
+const auditHarness = openaiAgentsHarness<
+  PreparedBottleAuditAgentRun["agent"],
+  AuditBottleEvalFixture,
+  PreparedBottleAuditAgentRun["runner"],
+  unknown,
+  unknown,
+  JsonValue
+>({
+  name: "bottle-auditor",
+  agent: ({ input }) => getPreparedAuditRun(input).agentRun.agent,
+  runner: ({ input }) => getPreparedAuditRun(input).agentRun.runner,
+  runOptions: ({ input }) => ({
+    ...getPreparedAuditRun(input).agentRun.runOptions,
+    stream: false,
+  }),
+  run: async ({ agent, input, runner, runOptions }) => {
+    if (!runner) {
+      throw new Error("Bottle audit eval runner was not prepared.");
+    }
+    const prepared = getPreparedAuditRun(input);
+    return await runner.run(agent, prepared.agentRun.input, {
+      ...runOptions,
+      stream: false,
+    });
+  },
+  output: ({ input, result }) =>
+    toJsonValue(getPreparedAuditRun(input).getResult(result)) ?? null,
+  toolReplay: {
+    ...(process.env.FIRECRAWL_API_KEY
+      ? { firecrawl_web_search: true }
+      : { openai_web_search: true }),
+  },
+});
+
+type AuditJudgeContext = JudgeContext<
+  AuditBottleEvalFixture,
+  JsonValue,
+  typeof auditHarness
+>;
+
+function scoreAuditSemanticOutput(
+  input: AuditBottleEvalFixture,
+  output: unknown,
+) {
+  return scoreBottleCheckSemanticOutput(
+    input.expected,
+    AuditBottleResultSchema.parse(output),
+  );
+}
+
+const AuditGroundingJudge = createJudge<AuditJudgeContext>(
+  "AuditGroundingJudge",
+  ({ input, run }) => {
+    const score = scoreBottleCheckGrounding(
+      AuditBottleResultSchema.parse(run.output),
+      input.input.audit.note === undefined ? [] : ["audit.note"],
+    );
+    return { score: score.score, metadata: score };
+  },
+);
+
+const AuditOperationExpectationJudge = createJudge<AuditJudgeContext>(
+  "AuditOperationExpectationJudge",
+  ({ input, run }) => {
+    const score = scoreAuditSemanticOutput(input, run.output).operations;
+    return { score: score.score, metadata: score };
+  },
+);
+
+const AuditFindingExpectationJudge = createJudge<AuditJudgeContext>(
+  "AuditFindingExpectationJudge",
+  ({ input, run }) => {
+    const score = scoreAuditSemanticOutput(input, run.output).findings;
+    return { score: score.score, metadata: score };
+  },
+);
 
 type ClassifierJudgeContext = JudgeContext<
   ClassifierScenarioEvalCase,
@@ -897,6 +1109,48 @@ const ClassifierExpectationJudge = createJudge<ClassifierJudgeContext>(
           verdict.failures.join("; ") || "All expected fields matched.",
         failures: verdict.failures,
       },
+    };
+  },
+);
+
+function scoreScenarioSemanticOutput(
+  input: ClassifierScenarioEvalCase,
+  result: BottleClassificationResult,
+) {
+  const expected =
+    input.kind === "decision"
+      ? input.testCase.expected
+      : { proposedOperations: [], findings: [] };
+  const actual =
+    result.status === "classified"
+      ? result
+      : { proposedOperations: [], findings: [] };
+
+  return scoreBottleCheckSemanticOutput(expected, actual);
+}
+
+const OperationExpectationJudge = createJudge<ClassifierJudgeContext>(
+  "OperationExpectationJudge",
+  ({ input, run }) => {
+    const result = parseClassificationRunOutput(run.output);
+    const score = scoreScenarioSemanticOutput(input, result).operations;
+
+    return {
+      score: score.score,
+      metadata: score,
+    };
+  },
+);
+
+const FindingExpectationJudge = createJudge<ClassifierJudgeContext>(
+  "FindingExpectationJudge",
+  ({ input, run }) => {
+    const result = parseClassificationRunOutput(run.output);
+    const score = scoreScenarioSemanticOutput(input, result).findings;
+
+    return {
+      score: score.score,
+      metadata: score,
     };
   },
 );
@@ -934,7 +1188,11 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     {
       skipIf: () => !hasEvalOpenAICredentials,
       harness: classifierHarness,
-      judges: [ClassifierExpectationJudge],
+      judges: [
+        ClassifierExpectationJudge,
+        OperationExpectationJudge,
+        FindingExpectationJudge,
+      ],
       judgeThreshold: threshold,
     },
     (it) => {
@@ -944,3 +1202,27 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     },
   );
 }
+
+describeEval(
+  "bottle audits",
+  {
+    skipIf: () => !hasEvalOpenAICredentials,
+    harness: auditHarness,
+    judges: [
+      AuditGroundingJudge,
+      AuditOperationExpectationJudge,
+      AuditFindingExpectationJudge,
+    ],
+    judgeThreshold: 1,
+  },
+  (it) => {
+    it.for(
+      AUDIT_BOTTLE_EVAL_CASES.map((testCase) => ({
+        name: testCase.name,
+        testCase,
+      })),
+    )("$name", async ({ testCase }, { run }) => {
+      await run(testCase);
+    });
+  },
+);

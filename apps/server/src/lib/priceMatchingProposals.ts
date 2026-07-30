@@ -1,6 +1,8 @@
 import type {
+  BottleClassificationResult,
   CandidateExpansionMode,
   ClassifyBottleReferenceInput,
+  ProposedOperationType,
 } from "@peated/bottle-classifier/contract";
 import {
   BottleCandidateSchema,
@@ -34,6 +36,12 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
+import {
+  getAvailableBottleCheckOperations,
+  type BottleCheckOperationCapabilities,
+} from "@peated/server/lib/bottleCheckAvailableOperations";
+import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import { prepareProposals } from "@peated/server/lib/bottleOperationReview";
 import {
   buildBottleInputFromProposedBottle,
   buildClassifierConcreteBottleInput,
@@ -98,6 +106,13 @@ type StorePriceMatchDecision = z.infer<typeof StorePriceMatchDecisionSchema>;
 type StorePriceMatchProposalForReview = StorePriceMatchProposal & {
   price: StorePrice;
 };
+
+const STORE_PRICE_BOTTLE_CHECK_CAPABILITIES = {
+  update_bottle: true,
+  merge_bottles: true,
+  update_entity: true,
+  merge_entities: true,
+} as const satisfies BottleCheckOperationCapabilities;
 
 async function getPriceMatchWriteActorForDatabase(
   tx: AnyDatabase,
@@ -716,6 +731,104 @@ async function recordStorePriceMatchAttempt({
   return attempt;
 }
 
+function getStorePriceOperationCapabilities(
+  operationTypes: ProposedOperationType[],
+) {
+  const availableOperations = new Set(operationTypes);
+  return {
+    update_bottle: availableOperations.has("update_bottle"),
+    merge_bottles: availableOperations.has("merge_bottles"),
+    update_entity: availableOperations.has("update_entity"),
+    merge_entities: availableOperations.has("merge_entities"),
+  } satisfies BottleCheckOperationCapabilities;
+}
+
+function getCollectedStorePriceSourceFields({
+  input,
+  result,
+}: {
+  input: ClassifyBottleReferenceInput;
+  result: BottleClassificationResult;
+}) {
+  const sourceFields = new Set<string>();
+  for (const [field, value] of Object.entries(input.reference)) {
+    if (value !== null && value !== undefined) {
+      sourceFields.add(`reference.${field}`);
+    }
+  }
+  for (const [field, value] of Object.entries(
+    result.artifacts.extractedIdentity ?? {},
+  )) {
+    if (value !== null && value !== undefined) {
+      sourceFields.add(field);
+    }
+  }
+  for (const field of Object.keys(
+    result.artifacts.imageEvidence?.fieldCandidates ?? {},
+  )) {
+    sourceFields.add(field);
+  }
+  return [...sourceFields];
+}
+
+async function tryPersistStorePriceBottleCheck({
+  attemptId,
+  classificationInput,
+  classification,
+  availableOperations,
+  price,
+  proposal,
+}: {
+  attemptId: number;
+  classificationInput: ClassifyBottleReferenceInput;
+  classification: BottleClassificationResult;
+  availableOperations: ProposedOperationType[];
+  price: StorePrice;
+  proposal: StorePriceMatchProposal;
+}) {
+  try {
+    const preparedProposals = await prepareProposals({
+      proposals: classification.proposedOperations,
+      artifacts: classification.artifacts,
+      capabilities: getStorePriceOperationCapabilities(availableOperations),
+      sourceFields: getCollectedStorePriceSourceFields({
+        input: classificationInput,
+        result: classification,
+      }),
+      protectedBottleIds:
+        proposal.suggestedBottleId === null ? [] : [proposal.suggestedBottleId],
+    });
+
+    await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "store_price",
+      sourceId: price.id,
+      input: classificationInput,
+      result: classification,
+      storePrice: {
+        kind: "attempt",
+        attemptId,
+      },
+      model: proposal.model,
+      operations: preparedProposals,
+    });
+  } catch (error) {
+    logError(error, {
+      price: {
+        id: price.id,
+        name: price.name,
+      },
+      proposal: {
+        id: proposal.id,
+      },
+      extra: {
+        attemptId,
+        phase: "persist_store_price_bottle_check",
+      },
+    });
+  }
+}
+
 async function markLatestStorePriceMatchAttemptFinalInTransaction(
   tx: AnyDatabase,
   {
@@ -1230,11 +1343,13 @@ export async function resolveStorePriceMatchProposal(
   {
     candidateExpansion = "open",
     force = false,
+    generateBottleCheck = false,
     processingToken,
     reuseExistingExtraction = false,
   }: {
     candidateExpansion?: CandidateExpansionMode;
     force?: boolean;
+    generateBottleCheck?: boolean;
     processingToken?: string;
     reuseExistingExtraction?: boolean;
   } = {},
@@ -1287,6 +1402,11 @@ export async function resolveStorePriceMatchProposal(
   let extractedLabel: ExtractedBottleDetails | null = null;
   let candidates: PriceMatchCandidate[] = [];
   let searchEvidence: SearchEvidence[] = [];
+  const shouldGenerateBottleCheck =
+    generateBottleCheck && config.BOTTLE_CHECK_SHADOW_GENERATION;
+  const availableOperations = shouldGenerateBottleCheck
+    ? getAvailableBottleCheckOperations(STORE_PRICE_BOTTLE_CHECK_CAPABILITIES)
+    : [];
   try {
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.
@@ -1308,7 +1428,9 @@ export async function resolveStorePriceMatchProposal(
         parseStoredExtractedLabel(existingProposal);
     }
 
-    const classification = await classifyBottleReference(classificationInput);
+    const classification = await classifyBottleReference(classificationInput, {
+      availableOperations,
+    });
 
     extractedLabel = parseClassifierExtractedLabel(
       classification.artifacts.extractedIdentity,
@@ -1328,13 +1450,13 @@ export async function resolveStorePriceMatchProposal(
           expectedProcessingToken: processingToken,
           tx,
         });
-      return await db.transaction(async (tx) => {
+      const ignoredResult = await db.transaction(async (tx) => {
         const proposal = await upsertIgnoredProposal(tx);
-        await recordStorePriceMatchAttempt({ proposal, tx });
+        const attempt = await recordStorePriceMatchAttempt({ proposal, tx });
         if (
           !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
         ) {
-          return proposal;
+          return { proposal, attempt };
         }
 
         if (price.bottleId !== null) {
@@ -1344,8 +1466,19 @@ export async function resolveStorePriceMatchProposal(
           });
         }
 
-        return proposal;
+        return { proposal, attempt };
       });
+      if (shouldGenerateBottleCheck) {
+        await tryPersistStorePriceBottleCheck({
+          attemptId: ignoredResult.attempt.id,
+          classificationInput,
+          classification,
+          availableOperations,
+          price,
+          proposal: ignoredResult.proposal,
+        });
+      }
+      return ignoredResult.proposal;
     }
 
     const classifierDecision = normalizeClassifierDecisionForPriceMatching(
@@ -1389,6 +1522,16 @@ export async function resolveStorePriceMatchProposal(
       proposal,
       automationAssessment,
     });
+    if (shouldGenerateBottleCheck) {
+      await tryPersistStorePriceBottleCheck({
+        attemptId: attempt.id,
+        classificationInput,
+        classification,
+        availableOperations,
+        price,
+        proposal,
+      });
+    }
 
     const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
       decision,

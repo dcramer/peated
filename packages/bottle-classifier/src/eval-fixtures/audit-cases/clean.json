@@ -1,0 +1,31 @@
+{
+  "id": "audit-clean-north-channel-12",
+  "name": "audit: a well-formed Bottle needs no catalog changes",
+  "scenario": "clean",
+  "input": {
+    "audit": {
+      "bottleId": 50101,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 50101,
+        "fullName": "North Channel 12-year-old",
+        "brand": "North Channel",
+        "distillery": ["North Channel"],
+        "category": "single_malt",
+        "statedAge": 12,
+        "abv": 46
+      }
+    }
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Generalized synthetic audit case; all names and ids are fictional."
+  },
+  "expected": {
+    "summary": "The audited Bottle is internally consistent and no catalog changes are supported.",
+    "proposedOperations": [],
+    "findings": []
+  }
+}

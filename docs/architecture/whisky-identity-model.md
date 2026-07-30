@@ -98,6 +98,15 @@ Bottle ids and consumer references, rematerializes shared fields
 transactionally, recomputes affected group aggregates, and records an auditable
 before/after result.
 
+Bottle checks may report a non-executable `bottle_group` finding, but they
+cannot move or merge groups. An exact duplicate remains a Bottle merge: for the
+reviewed Laphroaig Càirdeas 2022 case, malformed Bottle `39096` merges into
+Warehouse 1 Bottle `45146` while generic Bottle `44288` remains unchanged.
+That case does not authorize a grouping operation. A separate follow-up may
+define the smallest regroup or group-merge operation only after real reviewed
+findings demonstrate the need. It must also preserve aliases, representatives,
+and auditable history in addition to the invariants above.
+
 ## Exact Bottle Merge
 
 Exact Bottle merge is the only operation that retires a duplicate Bottle and

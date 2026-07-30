@@ -6,7 +6,12 @@ import {
   type BottleSearchEvidence,
   type EntityResolution,
 } from "../classifierTypes";
-import type { BottleReference } from "../contract";
+import type {
+  AuditBottleInput,
+  BottleContext,
+  BottleReference,
+  ProposedOperationType,
+} from "../contract";
 import type { ImageBottleEvidence } from "../imageEvidence";
 
 const DEFAULT_MATCH_CANDIDATE_LIMIT = 15;
@@ -22,6 +27,7 @@ export function buildAgentInput({
   searchEvidence = [],
   resolvedEntities = [],
   investigationHint = null,
+  availableOperations = [],
 }: {
   reference: BottleReference;
   extractedIdentity: BottleExtractedDetails | null;
@@ -33,6 +39,7 @@ export function buildAgentInput({
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
   investigationHint?: string | null;
+  availableOperations?: ProposedOperationType[];
 }): string {
   /**
    * The model should see the raw reference, extracted identity, photo evidence,
@@ -48,6 +55,7 @@ export function buildAgentInput({
         imageUrl: reference.imageUrl ?? null,
         currentBottleId: reference.currentBottleId ?? null,
       },
+      availableOperations,
       candidateExpansion,
       currentBottle,
       extractedIdentity,
@@ -63,6 +71,36 @@ export function buildAgentInput({
         results: resolvedEntities,
       },
       investigationHint,
+    },
+    null,
+    2,
+  );
+}
+
+export function buildAuditBottleAgentInput({
+  audit,
+  currentBottleContext,
+  availableOperations = [],
+  searchEvidence = [],
+}: {
+  audit: AuditBottleInput;
+  currentBottleContext: BottleContext;
+  availableOperations?: ProposedOperationType[];
+  searchEvidence?: BottleSearchEvidence[];
+}): string {
+  return JSON.stringify(
+    {
+      intent: "audit_bottle",
+      availableOperations,
+      audit: {
+        bottleId: audit.bottleId,
+        origin: audit.origin,
+        note: audit.note ?? null,
+      },
+      currentBottleContext,
+      webEvidence: {
+        results: searchEvidence,
+      },
     },
     null,
     2,

@@ -1,5 +1,15 @@
 import { z } from "zod";
 import {
+  FindingSchema,
+  ProposedOperationsSchema,
+  type Finding,
+  type ProposedOperation,
+} from "./bottleCheckContract";
+import {
+  BottleContextSchema,
+  EntityContextSchema,
+} from "./bottleContextContract";
+import {
   BottleCandidateSchema,
   BottleClassificationDecisionSchema,
   BottleExtractedDetailsSchema,
@@ -8,6 +18,86 @@ import {
 } from "./classifierTypes";
 import { ImageBottleEvidenceSchema } from "./imageEvidence";
 
+export {
+  AuditBottleInputSchema,
+  AuditBottleOriginSchema,
+  BottleCheckIntentSchema,
+  BottleExactPatchSchema,
+  BottleSharedPatchSchema,
+  BottleUpdatePatchSchema,
+  createProposedOperationsSchema,
+  DEFAULT_MAX_PROPOSED_OPERATIONS,
+  EntityIdentityPatchSchema,
+  EvidenceRefSchema,
+  FindingSchema,
+  MergeBottlesOperationSchema,
+  MergeEntitiesOperationSchema,
+  PROPOSED_OPERATION_TYPES,
+  ProposedEntityChoiceSchema,
+  ProposedEntityDraftSchema,
+  ProposedOperationSchema,
+  ProposedOperationsSchema,
+  ProposedOperationTypeSchema,
+  UpdateBottleOperationSchema,
+  UpdateEntityOperationSchema,
+} from "./bottleCheckContract";
+export type {
+  AuditBottleInput,
+  AuditBottleOrigin,
+  BottleCheckIntent,
+  BottleExactPatch,
+  BottleSharedPatch,
+  BottleUpdatePatch,
+  EntityIdentityPatch,
+  EvidenceRef,
+  Finding,
+  MergeBottlesOperation,
+  MergeEntitiesOperation,
+  ProposedEntityChoice,
+  ProposedEntityDraft,
+  ProposedOperation,
+  ProposedOperationType,
+  UpdateBottleOperation,
+  UpdateEntityOperation,
+} from "./bottleCheckContract";
+export {
+  BottleContextAliasSchema,
+  BottleContextEntityRefSchema,
+  BottleContextExactSchema,
+  BottleContextImageSourceSchema,
+  BottleContextObservationSchema,
+  BottleContextPublicImageSchema,
+  BottleContextSchema,
+  BottleContextSeriesRefSchema,
+  BottleContextSharedSchema,
+  BottleContextSiblingSchema,
+  BottleContextSourceSchema,
+  EntityContextBottleSampleSchema,
+  EntityContextSchema,
+  MAX_BOTTLE_CONTEXT_ALIASES,
+  MAX_BOTTLE_CONTEXT_IMAGES,
+  MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH,
+  MAX_BOTTLE_CONTEXT_OBSERVATION_TEXT_LENGTH,
+  MAX_BOTTLE_CONTEXT_OBSERVATIONS,
+  MAX_BOTTLE_CONTEXT_SIBLINGS,
+  MAX_ENTITY_CONTEXT_ALIASES,
+  MAX_ENTITY_CONTEXT_BOTTLES,
+} from "./bottleContextContract";
+export type {
+  BottleContext,
+  BottleContextAlias,
+  BottleContextEntityRef,
+  BottleContextExact,
+  BottleContextImageSource,
+  BottleContextObservation,
+  BottleContextPublicImage,
+  BottleContextSeriesRef,
+  BottleContextShared,
+  BottleContextSibling,
+  BottleContextSource,
+  EntityContext,
+  EntityContextBottleSample,
+} from "./bottleContextContract";
 export { BottleCandidateSchema } from "./classifierTypes";
 export {
   ImageBottleEvidenceConflictSchema,
@@ -104,6 +194,8 @@ export const BottleClassificationArtifactsSchema = z
     candidates: z.array(BottleCandidateSchema).default([]),
     searchEvidence: z.array(BottleSearchEvidenceSchema).default([]),
     resolvedEntities: z.array(EntityResolutionSchema).default([]),
+    bottleContexts: z.array(BottleContextSchema).default([]),
+    entityContexts: z.array(EntityContextSchema).default([]),
   })
   .strict();
 
@@ -124,6 +216,8 @@ export const IgnoredBottleClassificationResultSchema = z
   .object({
     status: z.literal("ignored"),
     reason: z.string().min(1),
+    proposedOperations: z.tuple([]).default([]),
+    findings: z.array(FindingSchema).default([]),
     artifacts: BottleClassificationArtifactsSchema,
   })
   .strict();
@@ -132,6 +226,8 @@ export const DecidedBottleClassificationResultSchema = z
   .object({
     status: z.literal("classified"),
     decision: BottleClassificationDecisionSchema,
+    proposedOperations: ProposedOperationsSchema.default([]),
+    findings: z.array(FindingSchema).default([]),
     artifacts: BottleClassificationArtifactsSchema,
   })
   .strict();
@@ -140,6 +236,15 @@ export const BottleClassificationResultSchema = z.discriminatedUnion("status", [
   IgnoredBottleClassificationResultSchema,
   DecidedBottleClassificationResultSchema,
 ]);
+
+export const AuditBottleResultSchema = z
+  .object({
+    summary: z.string().trim().min(1),
+    proposedOperations: ProposedOperationsSchema.default([]),
+    findings: z.array(FindingSchema).default([]),
+    artifacts: BottleClassificationArtifactsSchema,
+  })
+  .strict();
 
 export type BottleReference = z.infer<typeof BottleReferenceSchema>;
 export type BottleClassificationArtifacts = z.infer<
@@ -165,6 +270,7 @@ export type DecidedBottleClassificationResult = z.infer<
 export type BottleClassificationResult = z.infer<
   typeof BottleClassificationResultSchema
 >;
+export type AuditBottleResult = z.infer<typeof AuditBottleResultSchema>;
 
 export function buildBottleClassificationArtifacts(
   artifacts: Partial<BottleClassificationArtifacts>,
@@ -175,34 +281,64 @@ export function buildBottleClassificationArtifacts(
     candidates: [],
     searchEvidence: [],
     resolvedEntities: [],
+    bottleContexts: [],
+    entityContexts: [],
     ...artifacts,
   });
 }
 
 export function createIgnoredBottleClassification({
   reason,
+  findings = [],
   artifacts,
 }: {
   reason: string;
+  findings?: Finding[];
   artifacts: Partial<BottleClassificationArtifacts>;
 }): IgnoredBottleClassificationResult {
   return IgnoredBottleClassificationResultSchema.parse({
     status: "ignored",
     reason,
+    findings,
     artifacts: buildBottleClassificationArtifacts(artifacts),
   });
 }
 
 export function createDecidedBottleClassification({
   decision,
+  proposedOperations = [],
+  findings = [],
   artifacts,
 }: {
   decision: z.infer<typeof BottleClassificationDecisionSchema>;
+  proposedOperations?: ProposedOperation[];
+  findings?: Finding[];
   artifacts: Partial<BottleClassificationArtifacts>;
 }): DecidedBottleClassificationResult {
   return DecidedBottleClassificationResultSchema.parse({
     status: "classified",
     decision,
+    proposedOperations,
+    findings,
+    artifacts: buildBottleClassificationArtifacts(artifacts),
+  });
+}
+
+export function createAuditBottleResult({
+  summary,
+  proposedOperations = [],
+  findings = [],
+  artifacts,
+}: {
+  summary: string;
+  proposedOperations?: ProposedOperation[];
+  findings?: Finding[];
+  artifacts: Partial<BottleClassificationArtifacts>;
+}): AuditBottleResult {
+  return AuditBottleResultSchema.parse({
+    summary,
+    proposedOperations,
+    findings,
     artifacts: buildBottleClassificationArtifacts(artifacts),
   });
 }

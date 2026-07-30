@@ -4,8 +4,11 @@ import {
   BottleExtractedDetailsSchema as ClassifierBottleExtractedDetailsSchema,
   type BottleCandidate,
 } from "@peated/bottle-classifier/internal/types";
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
+  bottleChecks,
+  bottleOperations,
   bottles,
   type Bottle,
   type ExternalSite,
@@ -28,7 +31,8 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
-import { inArray } from "drizzle-orm";
+import { desc, inArray } from "drizzle-orm";
+import { SUPPLEMENTAL_WORK_STATUSES } from "./filters";
 
 type QueueRow = {
   isProcessing?: boolean;
@@ -42,6 +46,95 @@ type StructuredAutomationIssue = {
   message?: unknown;
   path?: unknown;
 };
+
+type LinkedBottleCheck = {
+  id: number;
+  output: Record<string, unknown> | null;
+  closedAt: Date | null;
+  storePriceMatchProposalId: number | null;
+};
+
+function checkHasFindings(check: LinkedBottleCheck): boolean {
+  return (
+    Array.isArray(check.output?.findings) && check.output.findings.length > 0
+  );
+}
+
+async function getLinkedBottleCheckIds(
+  proposals: StorePriceMatchProposal[],
+): Promise<Map<number, number[]>> {
+  if (!config.BOTTLE_CHECK_MODERATOR_VISIBILITY || proposals.length === 0) {
+    return new Map();
+  }
+
+  const proposalIds = proposals.map(({ id }) => id);
+  const checks = await db
+    .select({
+      id: bottleChecks.id,
+      output: bottleChecks.output,
+      closedAt: bottleChecks.closedAt,
+      storePriceMatchProposalId: bottleChecks.storePriceMatchProposalId,
+    })
+    .from(bottleChecks)
+    .where(inArray(bottleChecks.storePriceMatchProposalId, proposalIds))
+    .orderBy(desc(bottleChecks.createdAt), desc(bottleChecks.id));
+  if (checks.length === 0) {
+    return new Map();
+  }
+
+  const operations = await db
+    .select({
+      checkId: bottleOperations.checkId,
+      status: bottleOperations.status,
+    })
+    .from(bottleOperations)
+    .where(
+      inArray(
+        bottleOperations.checkId,
+        checks.map(({ id }) => id),
+      ),
+    );
+  const supplementalWorkStatuses = new Set<string>(SUPPLEMENTAL_WORK_STATUSES);
+  const checksWithSupplementalWork = new Set(
+    operations
+      .filter(({ status }) => supplementalWorkStatuses.has(status))
+      .map(({ checkId }) => checkId),
+  );
+  const checksByProposalId = Map.groupBy(
+    checks.filter(
+      (
+        check,
+      ): check is LinkedBottleCheck & {
+        storePriceMatchProposalId: number;
+      } => check.storePriceMatchProposalId !== null,
+    ),
+    ({ storePriceMatchProposalId }) => storePriceMatchProposalId,
+  );
+
+  return new Map(
+    proposals.map((proposal) => {
+      const openChecks = (checksByProposalId.get(proposal.id) ?? []).filter(
+        ({ closedAt }) => closedAt === null,
+      );
+      const supplementalChecks = openChecks.filter(
+        (check) =>
+          checkHasFindings(check) || checksWithSupplementalWork.has(check.id),
+      );
+      const primaryNeedsDisposition =
+        proposal.status === "pending_review" || proposal.status === "errored";
+      const visibleChecks = primaryNeedsDisposition
+        ? [openChecks[0], ...supplementalChecks]
+        : supplementalChecks;
+
+      return [
+        proposal.id,
+        Array.from(
+          new Set(visibleChecks.flatMap((check) => (check ? [check.id] : []))),
+        ),
+      ];
+    }),
+  );
+}
 
 /**
  * Stored queue snapshots are untrusted JSON. Only current direct-Bottle
@@ -178,6 +271,9 @@ export async function serializeQueueItems(
   },
 ) {
   void readContext;
+  const linkedBottleCheckIds = await getLinkedBottleCheckIds(
+    rows.map(({ proposal }) => proposal),
+  );
   const bottleIds = Array.from(
     new Set(
       rows.flatMap(({ proposal }) =>
@@ -225,6 +321,7 @@ export async function serializeQueueItems(
       suggestedBottle: row.proposal.suggestedBottleId
         ? (bottlesById[row.proposal.suggestedBottleId] ?? null)
         : null,
+      bottleCheckIds: linkedBottleCheckIds.get(row.proposal.id) ?? [],
     });
   });
 }

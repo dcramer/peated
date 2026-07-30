@@ -16,6 +16,10 @@
 - Agent output must be structured.
 - Code must validate agent output before use.
 - Model proposes; code gates persistence, permissions, and irreversible actions.
+- Keep an agent proposal separate from its server-owned review operation.
+  Preparation adds current-state preview, impact, permissions, and retry state;
+  it must not rewrite the proposal or hide valid siblings because one proposal
+  is blocked.
 - Tools must be narrow, typed, single-purpose, and structured.
 - Side-effect tools must be idempotent or behind an approval or automation gate.
 - Runtime must bound turns, retries, tool calls, cost, and no-progress loops.
@@ -36,6 +40,16 @@
 
 - Bottle classifier decides concrete Bottle identity; it does not assign
   BottleGroups.
+- Bottle checks use the server-owned `resolve_reference` or `audit_bottle`
+  intent. Reference resolution retains its structured identity decision; an
+  audit returns a summary, proposed operations, and findings without a second
+  structured conclusion.
+- Bottle-check operations are limited to `update_bottle`, `merge_bottles`,
+  `update_entity`, and `merge_entities`. They are independent suggestions, not
+  an ordered plan or a generic workflow language.
+- Supplemental operations always require explicit moderator approval. Only the
+  existing end-user add-Bottle primary decision may auto-apply under its
+  established policy.
 - Supported classifier actions are `match`, `create_bottle`, `repair_bottle`,
   and `no_match`.
 - Existing-bottle identification and full canonical classification are separate
@@ -46,6 +60,9 @@
   BottleGroup.
 - BottleGroup assignment happens automatically downstream, outside classifier
   and manual identity intervention.
+- A suspected BottleGroup issue remains a non-executable finding. Add a
+  regrouping operation only in a separate change supported by real reviewed
+  cases and a canonical mutation service.
 - Price matching owns persistence.
 - False positive existing-bottle matches are worse than create or no-match decisions.
 - New bottle creation may be more permissive when sampling or review gates

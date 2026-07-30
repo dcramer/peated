@@ -1,0 +1,107 @@
+{
+  "id": "audit-entity-maintenance-cedar-bend",
+  "name": "audit: update a related distiller and merge a duplicate bottler",
+  "scenario": "entity_operations",
+  "input": {
+    "audit": {
+      "bottleId": 50401,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 50401,
+        "fullName": "Cedar Bend Orchard Finish",
+        "brand": "Cedar Bend",
+        "bottler": "River Gate Bottling",
+        "distillery": ["Cedar Bend Distillery"],
+        "category": "single_malt",
+        "edition": "Orchard Finish"
+      },
+      "inspectedEntities": [
+        {
+          "entityId": 5401,
+          "name": "Cedar Bend",
+          "type": ["brand"]
+        },
+        {
+          "entityId": 5402,
+          "name": "Cedar Bend Distillery",
+          "type": ["distiller"]
+        },
+        {
+          "entityId": 5403,
+          "name": "River Gate Bottlers",
+          "type": ["bottler"]
+        },
+        {
+          "entityId": 5404,
+          "name": "River Gate Bottling",
+          "type": ["bottler"]
+        }
+      ],
+      "searchEvidence": [
+        {
+          "provider": "openai",
+          "query": "Cedar Bend Distillery official",
+          "results": [
+            {
+              "title": "Cedar Bend Distillery",
+              "url": "https://cedar-bend.example",
+              "domain": "cedar-bend.example",
+              "description": "Official distillery site.",
+              "extraSnippets": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Generalized synthetic Entity-operation case; all names, ids, and URLs are fictional."
+  },
+  "expected": {
+    "summary": "The related distiller is missing its official website and the bottler has a duplicate Entity.",
+    "proposedOperations": [
+      {
+        "type": "update_entity",
+        "input": {
+          "entityId": 5402,
+          "patch": {
+            "website": "https://cedar-bend.example"
+          }
+        },
+        "rationale": "The inspected official site belongs to the related distiller.",
+        "evidenceRefs": [
+          {
+            "kind": "entity",
+            "entityId": 5402
+          },
+          {
+            "kind": "web_result",
+            "url": "https://cedar-bend.example"
+          }
+        ]
+      },
+      {
+        "type": "merge_entities",
+        "input": {
+          "sourceEntityId": 5403,
+          "destinationEntityId": 5404
+        },
+        "rationale": "The two inspected bottler Entities represent the same company and the destination uses the canonical name.",
+        "evidenceRefs": [
+          {
+            "kind": "entity",
+            "entityId": 5403
+          },
+          {
+            "kind": "entity",
+            "entityId": 5404
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

@@ -33,6 +33,7 @@ export async function enqueueStorePriceMatchRetry({
     await pushUniqueJob("ResolveStorePriceBottle", {
       priceId,
       force: true,
+      generateBottleCheck: true,
       processingToken: lease.processingToken,
     });
 

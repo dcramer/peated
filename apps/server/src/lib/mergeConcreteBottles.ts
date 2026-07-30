@@ -368,6 +368,169 @@ async function repointBottleConsumers(
 }
 
 /**
+ * Locks every row represented by the Bottle-merge state token. New dependent
+ * rows are blocked by the parent Bottle locks, so preparation remains stable
+ * until the caller executes or rolls back.
+ */
+export async function lockConcreteBottleMergeDependencies(
+  tx: AnyTransaction,
+  {
+    sourceBottleId,
+    destinationBottleId,
+  }: {
+    sourceBottleId: number;
+    destinationBottleId: number;
+  },
+) {
+  validateMergeInput(sourceBottleId, destinationBottleId);
+  const bottleIds = [sourceBottleId, destinationBottleId].sort(
+    (left, right) => left - right,
+  );
+  const discovered = await tx
+    .select({ id: bottles.id, groupId: bottles.groupId })
+    .from(bottles)
+    .where(inArray(bottles.id, bottleIds))
+    .orderBy(asc(bottles.id));
+  const groupIds = uniqueSorted(discovered.map(({ groupId }) => groupId));
+  const groups = groupIds.length
+    ? await tx
+        .select({ id: bottleGroups.id })
+        .from(bottleGroups)
+        .where(inArray(bottleGroups.id, groupIds))
+        .orderBy(asc(bottleGroups.id))
+        .for("update")
+    : [];
+  const members = groups.length
+    ? await tx
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(
+          inArray(
+            bottles.groupId,
+            groups.map(({ id }) => id),
+          ),
+        )
+        .orderBy(asc(bottles.id))
+        .for("update")
+    : [];
+  const memberIds = members.map(({ id }) => id);
+
+  await tx
+    .select()
+    .from(bottleTombstones)
+    .where(inArray(bottleTombstones.bottleId, bottleIds))
+    .orderBy(asc(bottleTombstones.bottleId))
+    .for("update");
+  if (memberIds.length) {
+    await tx
+      .select()
+      .from(bottlesToDistillers)
+      .where(inArray(bottlesToDistillers.bottleId, memberIds))
+      .orderBy(
+        asc(bottlesToDistillers.bottleId),
+        asc(bottlesToDistillers.distillerId),
+      )
+      .for("update");
+  }
+  if (groupIds.length) {
+    await tx
+      .select()
+      .from(bottleGroupDistillers)
+      .where(inArray(bottleGroupDistillers.groupId, groupIds))
+      .orderBy(
+        asc(bottleGroupDistillers.groupId),
+        asc(bottleGroupDistillers.distillerId),
+      )
+      .for("update");
+  }
+  await tx
+    .select()
+    .from(bottleAliases)
+    .where(inArray(bottleAliases.bottleId, bottleIds))
+    .orderBy(asc(bottleAliases.name))
+    .for("update");
+  await tx
+    .select()
+    .from(tastings)
+    .where(inArray(tastings.bottleId, bottleIds))
+    .orderBy(asc(tastings.id))
+    .for("update");
+  await tx
+    .select()
+    .from(collectionBottles)
+    .where(inArray(collectionBottles.bottleId, bottleIds))
+    .orderBy(asc(collectionBottles.collectionId), asc(collectionBottles.id))
+    .for("update");
+  await tx
+    .select()
+    .from(flightBottles)
+    .where(inArray(flightBottles.bottleId, bottleIds))
+    .orderBy(asc(flightBottles.flightId), asc(flightBottles.bottleId))
+    .for("update");
+  await tx
+    .select()
+    .from(reviews)
+    .where(inArray(reviews.bottleId, bottleIds))
+    .orderBy(asc(reviews.id))
+    .for("update");
+  await tx
+    .select()
+    .from(storePrices)
+    .where(inArray(storePrices.bottleId, bottleIds))
+    .orderBy(asc(storePrices.id))
+    .for("update");
+  await tx
+    .select()
+    .from(bottleObservations)
+    .where(inArray(bottleObservations.bottleId, bottleIds))
+    .orderBy(asc(bottleObservations.id))
+    .for("update");
+  await tx
+    .select()
+    .from(incomingBottleDecisionLogs)
+    .where(inArray(incomingBottleDecisionLogs.bottleId, bottleIds))
+    .orderBy(asc(incomingBottleDecisionLogs.id))
+    .for("update");
+  await tx
+    .select()
+    .from(storePriceMatchProposals)
+    .where(
+      or(
+        inArray(storePriceMatchProposals.currentBottleId, bottleIds),
+        inArray(storePriceMatchProposals.suggestedBottleId, bottleIds),
+      ),
+    )
+    .orderBy(asc(storePriceMatchProposals.id))
+    .for("update");
+  await tx
+    .select()
+    .from(storePriceMatchAttempts)
+    .where(
+      or(
+        inArray(storePriceMatchAttempts.currentBottleId, bottleIds),
+        inArray(storePriceMatchAttempts.suggestedBottleId, bottleIds),
+      ),
+    )
+    .orderBy(asc(storePriceMatchAttempts.id))
+    .for("update");
+  await tx
+    .select()
+    .from(bottleTags)
+    .where(inArray(bottleTags.bottleId, bottleIds))
+    .orderBy(asc(bottleTags.bottleId), asc(bottleTags.tag))
+    .for("update");
+  await tx
+    .select()
+    .from(bottleFlavorProfiles)
+    .where(inArray(bottleFlavorProfiles.bottleId, bottleIds))
+    .orderBy(
+      asc(bottleFlavorProfiles.bottleId),
+      asc(bottleFlavorProfiles.flavorProfile),
+    )
+    .for("update");
+}
+
+/**
  * Commits one exact duplicate merge inside the caller-owned transaction. The
  * returned manifest must only be finalized after the outermost commit.
  */

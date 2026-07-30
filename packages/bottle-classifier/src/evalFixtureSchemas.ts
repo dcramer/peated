@@ -1,15 +1,25 @@
 import { readdirSync } from "node:fs";
 import { z } from "zod";
 import {
+  AuditBottleInputSchema,
+  FindingSchema,
+  ProposedOperationsSchema,
+} from "./bottleCheckContract";
+import { listBottleCheckOperationTargets } from "./bottleCheckEvalScoring";
+import { BottleContextSeriesRefSchema } from "./bottleContextContract";
+import {
   AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
+  BottleSearchEvidenceSchema,
   CaskFillEnum,
   CaskSizeEnum,
   CaskTypeEnum,
   CategoryEnum,
+  EntityResolutionSchema,
 } from "./classifierTypes";
 import {
+  AuditBottleResultSchema,
   BottleReferenceSchema,
   CandidateExpansionModeSchema,
 } from "./contract";
@@ -135,6 +145,11 @@ export const classifierEvalExpectationSchema = z.object({
   suggestedNextStep: z
     .enum(["confirm_match", "confirm_create", "manual_search", "needs_review"])
     .optional(),
+  proposedOperations: ProposedOperationsSchema.default([]),
+  findings: z.array(FindingSchema).default([]),
+  operationPreparation: z
+    .enum(["immediate", "after_primary"])
+    .default("immediate"),
   summary: z.string().min(1),
 });
 
@@ -206,11 +221,11 @@ export const classifierEvalFixtureSchema = z
       });
     }
 
-    if (value.input.extractedIdentity == null) {
+    if (value.input.extractedIdentity === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "`production_miss` fixtures must preserve the observed extracted identity.",
+          "`production_miss` fixtures must preserve the observed extracted identity, including an explicit null result.",
         path: ["input", "extractedIdentity"],
       });
     }
@@ -241,6 +256,167 @@ export const classifierEvalFixtureSchema = z
       });
     }
   });
+
+export const auditBottleEvalScenarioSchema = z.enum([
+  "clean",
+  "bottle_update",
+  "bottle_merge",
+  "entity_operations",
+  "unresolved",
+  "adversarial",
+]);
+
+const auditBottleEvalContextSchema = z
+  .object({
+    currentBottle: BottleCandidateSchema,
+    inspectedBottles: z.array(BottleCandidateSchema).default([]),
+    inspectedEntities: z.array(EntityResolutionSchema).default([]),
+    inspectedSeries: z.array(BottleContextSeriesRefSchema).default([]),
+    searchEvidence: z.array(BottleSearchEvidenceSchema).default([]),
+  })
+  .strict();
+
+export function normalizeAuditFixtureSeriesName(name: string) {
+  return name.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+export const auditBottleEvalFixtureSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    scenario: auditBottleEvalScenarioSchema,
+    input: z
+      .object({
+        audit: AuditBottleInputSchema,
+        context: auditBottleEvalContextSchema,
+      })
+      .strict(),
+    provenance: evalFixtureProvenanceSchema,
+    expected: AuditBottleResultSchema.omit({ artifacts: true }),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      value.input.audit.bottleId !== value.input.context.currentBottle.bottleId
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Audit subject and current Bottle ids must match.",
+        path: ["input", "context", "currentBottle", "bottleId"],
+      });
+    }
+
+    const bottleIds = new Set([value.input.context.currentBottle.bottleId]);
+    for (const [
+      index,
+      bottle,
+    ] of value.input.context.inspectedBottles.entries()) {
+      if (bottleIds.has(bottle.bottleId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate inspected Bottle id ${bottle.bottleId}.`,
+          path: ["input", "context", "inspectedBottles", index, "bottleId"],
+        });
+      }
+      bottleIds.add(bottle.bottleId);
+    }
+
+    const entityIds = new Set<number>();
+    for (const [
+      index,
+      entity,
+    ] of value.input.context.inspectedEntities.entries()) {
+      if (entityIds.has(entity.entityId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate inspected Entity id ${entity.entityId}.`,
+          path: ["input", "context", "inspectedEntities", index, "entityId"],
+        });
+      }
+      entityIds.add(entity.entityId);
+    }
+
+    const fixtureBottleSeriesNames = new Set(
+      [
+        value.input.context.currentBottle,
+        ...value.input.context.inspectedBottles,
+      ].flatMap(({ series }) =>
+        series === null ? [] : [normalizeAuditFixtureSeriesName(series)],
+      ),
+    );
+    const seriesIds = new Set<number>();
+    const seriesNames = new Set<string>();
+    for (const [
+      index,
+      series,
+    ] of value.input.context.inspectedSeries.entries()) {
+      if (seriesIds.has(series.seriesId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate inspected BottleSeries id ${series.seriesId}.`,
+          path: ["input", "context", "inspectedSeries", index, "seriesId"],
+        });
+      }
+      seriesIds.add(series.seriesId);
+
+      const normalizedName = normalizeAuditFixtureSeriesName(series.name);
+      if (seriesNames.has(normalizedName)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate inspected BottleSeries name ${series.name}.`,
+          path: ["input", "context", "inspectedSeries", index, "name"],
+        });
+      }
+      seriesNames.add(normalizedName);
+
+      if (!fixtureBottleSeriesNames.has(normalizedName)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Inspected BottleSeries ${series.name} is not referenced by any fixture Bottle.`,
+          path: ["input", "context", "inspectedSeries", index, "name"],
+        });
+      }
+    }
+
+    for (const [
+      operationIndex,
+      operation,
+    ] of value.expected.proposedOperations.entries()) {
+      for (const target of listBottleCheckOperationTargets(operation)) {
+        const inspected =
+          target.kind === "bottle"
+            ? bottleIds.has(target.id)
+            : target.kind === "entity"
+              ? entityIds.has(target.id)
+              : seriesIds.has(target.id);
+        if (inspected) {
+          continue;
+        }
+
+        const label =
+          target.kind === "bottle"
+            ? "Bottle"
+            : target.kind === "entity"
+              ? "Entity"
+              : "BottleSeries";
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Expected operation references uninspected ${label} id ${target.id}.`,
+          path: [
+            "expected",
+            "proposedOperations",
+            operationIndex,
+            "input",
+            ...target.path,
+          ],
+        });
+      }
+    }
+  });
+
+export type AuditBottleEvalFixture = z.infer<
+  typeof auditBottleEvalFixtureSchema
+>;
 
 export const bottleNormalizationExactBottleIdentitySchema = z
   .object({

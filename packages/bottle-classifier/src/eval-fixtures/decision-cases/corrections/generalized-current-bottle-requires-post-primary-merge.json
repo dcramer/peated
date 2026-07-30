@@ -1,0 +1,73 @@
+{
+  "id": "generalized-current-bottle-requires-post-primary-merge",
+  "name": "current assignment: match the correct Bottle before preparing the duplicate merge",
+  "input": {
+    "reference": {
+      "name": "Silver Fen Ember Finish",
+      "url": "https://shop.example/products/silver-fen-ember-finish",
+      "currentBottleId": 50701
+    },
+    "extractedIdentity": {
+      "brand": "Silver Fen",
+      "expression": "Ember Finish",
+      "category": "single_malt",
+      "abv": 50.5,
+      "edition": "Ember Finish"
+    },
+    "initialCandidates": [
+      {
+        "bottleId": 50701,
+        "fullName": "Silver Fen",
+        "brand": "Silver Fen",
+        "distillery": ["Silver Fen"],
+        "category": "single_malt"
+      },
+      {
+        "bottleId": 50702,
+        "fullName": "Silver Fen Ember Finish",
+        "brand": "Silver Fen",
+        "distillery": ["Silver Fen"],
+        "category": "single_malt",
+        "edition": "Ember Finish",
+        "abv": 50.5
+      }
+    ]
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Generalized synthetic correction case. The supplemental merge is intentionally prepared only after the primary match chooses its destination."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 50702,
+    "proposedOperations": [
+      {
+        "type": "merge_bottles",
+        "input": {
+          "sourceBottleId": 50701,
+          "destinationBottleId": 50702
+        },
+        "rationale": "The current generic assignment is the duplicate and the selected complete Bottle is the canonical destination.",
+        "evidenceRefs": [
+          {
+            "kind": "source",
+            "field": "name"
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 50701
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 50702
+          }
+        ]
+      }
+    ],
+    "findings": [],
+    "operationPreparation": "after_primary",
+    "summary": "The reference matches the complete Ember Finish Bottle; only after that decision should the generic current Bottle be prepared as the merge source."
+  }
+}

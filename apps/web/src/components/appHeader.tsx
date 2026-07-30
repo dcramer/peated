@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import useAuth from "@peated/web/hooks/useAuth";
+import useBottleCheckCapabilities from "@peated/web/hooks/useBottleCheckCapabilities";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getAuthRedirect } from "../lib/auth";
 import { Modal } from "./modal";
@@ -15,6 +16,7 @@ import UserAvatar from "./userAvatar";
 
 export default function AppHeader() {
   const { user } = useAuth();
+  const bottleCheckCapabilities = useBottleCheckCapabilities();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -63,14 +65,9 @@ export default function AppHeader() {
           <div className="hidden sm:block">
             <NotificationsPanel />
           </div>
-          <div className="block sm:hidden">
-            <NavLink href={`/users/${user.username}`}>
-              <div className="h-8 w-8">
-                <UserAvatar user={user} />
-              </div>
-            </NavLink>
-          </div>
-          <ProfileDropdown />
+          <ProfileDropdown
+            bottleChecksAvailable={bottleCheckCapabilities.bottleChecks}
+          />
         </div>
       ) : (
         <div className="mflex items-center gap-x-2">

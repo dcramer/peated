@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
+import type { BottleContext } from "../bottleContextContract";
 import type { BottleCandidate } from "../classifierTypes";
-import { buildAgentInput } from "./agentInput";
+import { buildAgentInput, buildAuditBottleAgentInput } from "./agentInput";
 
 function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
   return {
@@ -25,6 +26,39 @@ function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
     score: 1,
     source: ["exact"],
     ...candidate,
+  };
+}
+
+function buildBottleContext(): BottleContext {
+  return {
+    bottleId: 45146,
+    fullName: "Laphroaig Càirdeas 2022 Warehouse 1",
+    groupId: 320,
+    shared: {
+      name: "Càirdeas",
+      statedAge: null,
+      series: { seriesId: 71, name: "Càirdeas" },
+      category: "single_malt",
+      brand: { entityId: 9, name: "Laphroaig" },
+      distillers: [{ entityId: 9, name: "Laphroaig" }],
+      bottler: null,
+    },
+    exact: {
+      edition: "Warehouse 1",
+      statedAge: null,
+      abv: 52.2,
+      singleCask: false,
+      caskStrength: true,
+      vintageYear: null,
+      releaseYear: 2022,
+      caskSize: null,
+      caskType: null,
+      caskFill: null,
+    },
+    siblings: [],
+    aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
+    observations: [],
+    publicImages: [],
   };
 }
 
@@ -71,10 +105,12 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
+        availableOperations: ["merge_bottles"],
       }),
     );
 
     expect(input.localSearch).not.toHaveProperty("familyContextSummary");
+    expect(input.availableOperations).toEqual(["merge_bottles"]);
     expect(input.localSearch.candidates[0].familyContext).toEqual({
       siblingBottles: [
         {
@@ -153,5 +189,45 @@ describe("buildAgentInput", () => {
     expect(input.imageEvidence.fieldCandidates.expression.value).toBe(
       "Uigeadail",
     );
+  });
+});
+
+describe("buildAuditBottleAgentInput", () => {
+  test("serializes server-owned audit context without a reference envelope", () => {
+    const input = JSON.parse(
+      buildAuditBottleAgentInput({
+        audit: {
+          bottleId: 45146,
+          origin: "moderator",
+          note: "Review the Brand assignment; this text is context only.",
+        },
+        currentBottleContext: buildBottleContext(),
+        availableOperations: ["update_bottle", "merge_entities"],
+      }),
+    );
+
+    expect(input).toMatchObject({
+      intent: "audit_bottle",
+      availableOperations: ["update_bottle", "merge_entities"],
+      audit: {
+        bottleId: 45146,
+        origin: "moderator",
+        note: "Review the Brand assignment; this text is context only.",
+      },
+      currentBottleContext: {
+        bottleId: 45146,
+        groupId: 320,
+        exact: {
+          releaseYear: 2022,
+        },
+        aliases: [
+          {
+            name: "Laphroaig Cairdeas 2022",
+            ignored: false,
+          },
+        ],
+      },
+    });
+    expect(input).not.toHaveProperty("reference");
   });
 });

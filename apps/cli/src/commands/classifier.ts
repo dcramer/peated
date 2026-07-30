@@ -1,6 +1,7 @@
 import program from "@peated/cli/program";
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier";
 import { ClassifyBottleReferenceInputSchema } from "@peated/server/agents/bottleClassifier/contract";
+import { getBottleCheckRolloutReport } from "@peated/server/lib/bottleCheckRolloutReport";
 import { readFile } from "fs/promises";
 import { basename, extname } from "path";
 
@@ -96,4 +97,30 @@ subcommand
     const result = await classifyBottleReference(input);
 
     console.log(JSON.stringify(result, null, 2));
+  });
+
+subcommand
+  .command("rollout-report")
+  .description("Report Bottle-check review, execution, and model measurements")
+  .option("--days <days>", "lookback window in days", "30")
+  .action(async (options) => {
+    const days = Number(options.days);
+    if (!Number.isInteger(days) || days <= 0) {
+      throw new Error("--days must be a positive integer");
+    }
+
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const report = await getBottleCheckRolloutReport({ since });
+
+    console.log(
+      JSON.stringify(
+        {
+          since: since.toISOString(),
+          generatedAt: new Date().toISOString(),
+          ...report,
+        },
+        null,
+        2,
+      ),
+    );
   });
