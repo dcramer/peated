@@ -103,6 +103,32 @@ function UserLibraryTable({ username }: { username: string }) {
               <Button href={libraryHref}>Clear filters</Button>
             </div>
           </EmptyActivity>
+        ) : canEditLibrary ? (
+          <div className="relative mx-3 min-h-56 overflow-hidden border border-slate-800 bg-slate-950 px-6 py-8 sm:mx-0 sm:px-10 sm:py-10">
+            <img
+              src="/assets/empty-library-illustration.webp"
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover object-right"
+            />
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/5"
+              aria-hidden="true"
+            />
+            <div className="relative z-10 max-w-[65%] sm:max-w-sm">
+              <h2 className="text-xl font-bold text-white">
+                Build your bottle library
+              </h2>
+              <p className="text-muted mt-2 text-sm">
+                Track what you own, what you&apos;ve finished, and what you want
+                to try next.
+              </p>
+              <div className="mt-5">
+                <Button color="highlight" href="/addBottle">
+                  Add your first bottle
+                </Button>
+              </div>
+            </div>
+          </div>
         ) : (
           <EmptyActivity>No library bottles recorded yet.</EmptyActivity>
         )}

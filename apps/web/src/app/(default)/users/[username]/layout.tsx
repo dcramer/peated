@@ -116,16 +116,16 @@ export default async function Layout(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mb-3 flex min-w-full flex-wrap gap-y-4 lg:flex-nowrap lg:gap-x-6">
-        <div className="flex w-full justify-center lg:w-auto lg:justify-start">
-          <UserAvatar user={user} size={132} />
+      <div className="mb-4 grid min-w-full grid-cols-[80px_minmax(0,1fr)] items-center gap-x-4 gap-y-4 px-3 pt-4 lg:mb-8 lg:flex lg:flex-nowrap lg:gap-x-0 lg:px-0 lg:pt-0">
+        <div className="h-20 w-20 lg:h-[150px] lg:w-[150px] lg:shrink-0">
+          <UserAvatar user={user} />
         </div>
-        <div className="flex w-full flex-col justify-center gap-y-3 px-4 lg:w-auto lg:flex-auto lg:gap-y-1 lg:px-0">
-          <h1 className="self-center text-3xl font-semibold leading-normal text-white lg:self-start">
-            {user.username}
-          </h1>
-          <div className="text-muted flex flex-col items-center gap-x-2 gap-y-2 self-center lg:flex-row lg:self-start">
-            <div>
+        <div className="contents lg:flex lg:w-auto lg:flex-auto lg:flex-col lg:justify-center lg:gap-y-2 lg:px-4">
+          <div className="min-w-0 self-center lg:self-start">
+            <h1 className="break-words text-2xl font-semibold leading-tight text-white lg:text-4xl lg:leading-normal">
+              {user.username}
+            </h1>
+            <div className="text-muted mt-2 flex items-center gap-x-2 lg:mt-0">
               {user.admin ? (
                 <Chip size="small" color="highlight">
                   Admin
@@ -137,7 +137,7 @@ export default async function Layout(props: {
               ) : null}
             </div>
           </div>
-          <ul className="mx-auto grid w-full max-w-lg grid-cols-4 divide-x divide-slate-800 lg:mx-0">
+          <ul className="col-span-2 grid grid-cols-4 divide-x divide-slate-800 border-y border-slate-800 py-3 lg:flex lg:border-0 lg:py-0">
             <ProfileStat
               href={`/users/${user.username}/activity`}
               label="Tastings"
@@ -155,7 +155,7 @@ export default async function Layout(props: {
             />
           </ul>
         </div>
-        <div className="flex w-full flex-col items-center justify-center lg:w-auto lg:items-end">
+        <div className="col-span-2 flex flex-col items-center justify-center lg:w-auto lg:items-end">
           {currentUser && (
             <div className="flex gap-x-2">
               {user.id !== currentUser.id ? (

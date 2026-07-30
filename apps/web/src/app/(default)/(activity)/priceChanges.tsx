@@ -3,7 +3,6 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import { type Currency } from "@peated/server/types";
-import BetaNotice from "@peated/web/components/betaNotice";
 import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
@@ -30,9 +29,7 @@ function PriceDelta({
 }
 
 export function PriceChangesSkeleton() {
-  return (
-    <div className="mb-8 animate-pulse bg-slate-800" style={{ height: 200 }} />
-  );
+  return <div className="animate-pulse bg-slate-800" style={{ height: 200 }} />;
 }
 
 export function PriceChangeIdentity({
@@ -76,8 +73,7 @@ export default function PriceChanges() {
   );
 
   return (
-    <div className="mb-8">
-      <BetaNotice>This is a work in progress.</BetaNotice>
+    <div>
       {data.results.length ? (
         <table className="my-2 min-w-full text-sm">
           <colgroup>
@@ -124,9 +120,7 @@ export default function PriceChanges() {
           </tbody>
         </table>
       ) : (
-        <p className="text-muted mb-8 text-center text-sm">
-          No price history found.
-        </p>
+        <p className="text-muted px-3 text-sm">No price history found.</p>
       )}
     </div>
   );

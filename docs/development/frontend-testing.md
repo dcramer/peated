@@ -1,8 +1,10 @@
 # Frontend Testing
 
 Frontend tests should be cheap to run locally and clear about what they prove.
-Use fast Vitest coverage for component structure and Playwright for browser-only
-behavior such as layout, responsive rendering, Suspense streaming, and overflow.
+Use fast Vitest coverage for deterministic component contracts and Playwright
+for user workflows or interactions that require a real browser. Use manual or
+agent-based QA for visual hierarchy, copy quality, spacing, color, artwork, and
+the overall appearance of responsive layouts.
 
 ## Commands
 
@@ -37,10 +39,22 @@ pnpm test:e2e:install
 
 - Use Vitest for deterministic component contracts: rendered fallback shape,
   accessible roles, props, and route loading component output.
-- Use Playwright when the browser matters: CSS layout, responsive states,
-  streamed loading UI, page overflow, focus behavior, or navigation.
+- Use Playwright to prove a user-visible behavior: a workflow completes,
+  navigation reaches the right destination, a mutation changes state, a filter
+  changes results, access boundaries hold, or a browser-only interaction works.
+- Add breakpoint-specific Playwright coverage only when responsive behavior
+  changes the interaction or available workflow. Do not rerun the same contract
+  at multiple sizes solely to verify presentation.
+- Do not use Playwright to lock down general copy, decorative rendering, DOM
+  structure, element counts, individual icons or labels, card composition, or
+  pixel geometry unless that exact output is the product contract.
+- Verify visual hierarchy, spacing, color, artwork, content quality, and broad
+  responsive appearance through manual QA or agent-browser screenshots.
+- Prefer the fewest assertions that prove the material outcome. Avoid repeating
+  lower-level component or API contracts inside an end-to-end workflow.
 - For user-facing web route/layout changes, run the related Vitest coverage and
-  `pnpm test:e2e` checks that cover the changed workflow.
+  targeted `pnpm test:e2e` checks only when the changed workflow has a browser
+  behavior to prove.
 - Before opening a PR, run targeted tests/typechecks/lint for the touched web
   surface. Use `pnpm test:all` when the change has broad UI or routing impact;
   otherwise PR CI is the required full-repo validation gate.
@@ -81,6 +95,9 @@ web server is already running with the API pointed at a compatible test target.
   only when the behavior under test requires them.
 - Do not mock or suppress logging. Logs should remain visible to test output;
   assert user-visible behavior or state changes instead of logger calls.
+- Keep layout assertions narrow and intentional. A shared shell may warrant a
+  dedicated overflow or focus test; ordinary page composition belongs in
+  manual or agent-based visual QA.
 - Keep Playwright output under `apps/web/.playwright`; it is ignored by git.
 - When a Playwright failure is not obvious from the terminal, run
   `pnpm test:e2e:report` and inspect the retained trace.

@@ -21,7 +21,7 @@ export function NewBottlesSkeleton() {
     </tr>
   );
   return (
-    <table className="mb-4 min-w-full">
+    <table className="min-w-full">
       <tbody>
         <Row />
         <Row />
@@ -45,7 +45,7 @@ export default function NewBottles() {
   );
 
   return (
-    <table className="mb-4 min-w-full">
+    <table className="min-w-full">
       <tbody>
         {newBottleList &&
           newBottleList.results.map((bottle) => {

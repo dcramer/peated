@@ -15,6 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 import { getAuthRedirect } from "../lib/auth";
+import classNames from "../lib/classNames";
 import { useORPC } from "../lib/orpc/context";
 import BadgeImage from "./badgeImage";
 import Button from "./button";
@@ -29,6 +30,9 @@ import Tags from "./tags";
 import TastingBottleIdentity from "./tastingBottleIdentity";
 import TimeSince from "./timeSince";
 import UserAvatar from "./userAvatar";
+
+const tastingActionClassName =
+  "inline-flex h-9 items-center justify-center gap-x-1.5 rounded px-2 text-sm font-medium text-muted transition-colors hover:bg-slate-800 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated disabled:cursor-default disabled:opacity-60";
 
 function ImageWithSkeleton({
   src,
@@ -99,7 +103,7 @@ export default function TastingListItem({
   const totalToasts =
     tasting.toasts + (hasToasted && !tasting.hasToasted ? 1 : 0);
 
-  const canToast = !hasToasted && !isTaster && user;
+  const canToast = Boolean(user && !hasToasted && !isTaster);
 
   return (
     <li className="-mt-1 flex flex-col gap-y-4 overflow-hidden border border-slate-800 bg-gradient-to-r from-slate-950 to-slate-900">
@@ -156,7 +160,7 @@ export default function TastingListItem({
         tasting.rating ||
         tasting.tags.length > 0) && (
         <div className="text-muted px-3 text-sm sm:px-5">
-          <DefinitionList className="grid-cols grid grid-cols-2 sm:grid-cols-2">
+          <DefinitionList className="grid-cols mb-0 grid grid-cols-2 gap-y-2 sm:grid-cols-2 [&>div>dd]:mb-0">
             {tasting.rating && (
               <div>
                 <DefinitionList.Term>Rating</DefinitionList.Term>
@@ -229,13 +233,20 @@ export default function TastingListItem({
         </ul>
       )}
 
-      <aside className="flex items-center space-x-3 px-3 pb-3 lg:px-5 lg:pb-5">
+      <aside className="flex items-center gap-x-1 px-1 pb-2 lg:px-3">
         <Button
           icon={
             <HandThumbUpIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
           }
           active={hasToasted}
-          disabled={!canToast}
+          aria-label="Toast this tasting"
+          aria-pressed={hasToasted}
+          unstyled
+          className={classNames(
+            tastingActionClassName,
+            hasToasted && "text-highlight",
+          )}
+          disabled={hasToasted || isTaster}
           onClick={
             canToast
               ? () => {
@@ -260,7 +271,7 @@ export default function TastingListItem({
           <Counter value={totalToasts} />
         </Button>
 
-        {user && !noCommentAction && (
+        {!noCommentAction && (
           <Button
             icon={
               <ChatBubbleLeftRightIcon
@@ -268,6 +279,9 @@ export default function TastingListItem({
                 aria-hidden="true"
               />
             }
+            aria-label={`View ${tasting.comments.toLocaleString()} comments`}
+            unstyled
+            className={tastingActionClassName}
             href={`/tastings/${tasting.id}`}
           >
             {tasting.comments.toLocaleString()}
@@ -276,10 +290,17 @@ export default function TastingListItem({
         <ShareButton
           title={`${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`}
           url={`/tastings/${tasting.id}`}
+          unstyled
+          className={tastingActionClassName}
         />
         {(user?.admin || isTaster) && (
           <Menu as="div" className="menu">
-            <MenuButton as={Button}>
+            <MenuButton
+              as={Button}
+              aria-label="More tasting actions"
+              unstyled
+              className={tastingActionClassName}
+            >
               <EllipsisVerticalIcon className="h-5 w-5" />
             </MenuButton>
             <MenuItems className="absolute inset-x-0 bottom-10 right-0 z-40 w-44 origin-bottom-right">

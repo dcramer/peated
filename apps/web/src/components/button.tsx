@@ -18,6 +18,7 @@ type BaseProps = {
   active?: boolean;
   fullWidth?: boolean;
   fullHeight?: boolean;
+  unstyled?: boolean;
   className?: string;
   title?: string;
   "aria-label"?: string;
@@ -48,9 +49,11 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       size = "base",
       fullWidth = false,
       fullHeight = false,
+      unstyled = false,
       disabled = false,
       loading = false,
       active = false,
+      className,
       ...props
     },
     ref,
@@ -105,15 +108,17 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
       return (
         <Link
           className={classNames(
-            defaultClassName,
-            colorClassName,
-            icon ? "inline-flex items-center gap-x-1.5" : "",
-            size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm",
-            fullWidth ? "w-full" : "",
-            fullHeight ? "h-full" : "",
-            disabled ? "cursor-auto" : "cursor-pointer",
-            loading ? "animate-pulse" : "",
-            textColor,
+            !unstyled && defaultClassName,
+            !unstyled && colorClassName,
+            !unstyled && (icon ? "inline-flex items-center gap-x-1.5" : ""),
+            !unstyled &&
+              (size === "small" ? "px-3 py-2 text-xs" : "px-3 py-2 text-sm"),
+            !unstyled && (fullWidth ? "w-full" : ""),
+            !unstyled && (fullHeight ? "h-full" : ""),
+            !unstyled && (disabled ? "cursor-auto" : "cursor-pointer"),
+            !unstyled && (loading ? "animate-pulse" : ""),
+            !unstyled && textColor,
+            className,
           )}
           href={href}
           {...props}
@@ -127,14 +132,16 @@ const Button = forwardRef<null | HTMLButtonElement | typeof Link, Props>(
     return (
       <button
         className={classNames(
-          defaultClassName,
-          colorClassName,
-          icon ? "inline-flex items-center gap-x-1.5" : "",
-          size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm",
-          fullWidth ? "w-full" : "",
-          disabled ? "cursor-auto" : "cursor-pointer",
-          loading ? "animate-pulse" : "",
-          textColor,
+          !unstyled && defaultClassName,
+          !unstyled && colorClassName,
+          !unstyled && (icon ? "inline-flex items-center gap-x-1.5" : ""),
+          !unstyled &&
+            (size === "small" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"),
+          !unstyled && (fullWidth ? "w-full" : ""),
+          !unstyled && (disabled ? "cursor-auto" : "cursor-pointer"),
+          !unstyled && (loading ? "animate-pulse" : ""),
+          !unstyled && textColor,
+          className,
         )}
         disabled={disabled}
         type={type || "button"}

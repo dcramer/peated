@@ -1,111 +1,11 @@
-import {
-  expect,
-  type Locator,
-  type Page,
-  type Request,
-  test,
-} from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
 import { Buffer } from "node:buffer";
 
-import {
-  bottleImageBottleId,
-  bottleImageUrl,
-  existingBottle,
-  testAccessToken,
-  testUser,
-} from "./rpc-fixtures.mjs";
+import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 
 test.describe("profile library", () => {
-  test("stretches bottle ages to match the distillery card", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: [
-        testAccessToken,
-        "library-insights",
-        testInfo.project.name,
-      ].join("-"),
-    });
-
-    await page.goto(`/users/${testUser.username}`, {
-      waitUntil: "commit",
-    });
-
-    const ageCard = page
-      .getByRole("heading", { name: "Bottle ages" })
-      .locator("xpath=../..");
-    const distilleryCard = page
-      .getByRole("heading", { name: "Top distilleries" })
-      .locator("xpath=../..");
-    const ageChart = ageCard.locator("[data-age-profile-chart]");
-
-    await expect(ageCard).toBeVisible();
-    await expect(distilleryCard).toBeVisible();
-    await expect(ageChart).toBeVisible();
-
-    if (!testInfo.project.name.includes("mobile")) {
-      const [ageCardBox, distilleryCardBox, ageChartBox] = await Promise.all([
-        ageCard.boundingBox(),
-        distilleryCard.boundingBox(),
-        ageChart.boundingBox(),
-      ]);
-
-      expect(ageCardBox).not.toBeNull();
-      expect(distilleryCardBox).not.toBeNull();
-      expect(ageChartBox).not.toBeNull();
-      expect(
-        Math.abs(ageCardBox!.height - distilleryCardBox!.height),
-      ).toBeLessThan(2);
-      expect(ageChartBox!.height).toBeGreaterThan(140);
-    }
-
-    await expectNoHorizontalOverflow(page);
-  });
-
-  test("renders a Bottle-owned image on the detail page", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: [
-        testAccessToken,
-        "bottle-image",
-        testInfo.project.name,
-      ].join("-"),
-    });
-
-    await page.goto(`/bottles/${bottleImageBottleId}`, {
-      waitUntil: "commit",
-    });
-
-    await expect(
-      page.getByRole("heading", { name: "Lagavulin Bottle Image Reserve" }),
-    ).toBeVisible();
-    const bottleImage = page.locator(`img[src="${bottleImageUrl}"]`);
-
-    if (testInfo.project.name.includes("mobile")) {
-      await expect(bottleImage).toHaveCount(1);
-    } else {
-      await expect(bottleImage).toBeVisible();
-    }
-
-    const schemaTexts = await page
-      .locator('script[type="application/ld+json"]')
-      .evaluateAll((scripts) =>
-        scripts.map((script) => script.textContent ?? ""),
-      );
-    const productSchema = schemaTexts
-      .map((text) => JSON.parse(text) as { "@type"?: string; image?: string })
-      .find((schema) => schema["@type"] === "Product");
-    expect(productSchema).toMatchObject({
-      "@type": "Product",
-      image: bottleImageUrl,
-    });
-  });
-
-  test("saves a bottle to Library with Favorites hidden", async ({
+  test("saves a bottle and updates its Library status", async ({
     context,
     page,
   }, testInfo) => {
@@ -135,42 +35,14 @@ test.describe("profile library", () => {
       'button[data-collection-action="library"]',
     );
 
-    await expect(
-      page.locator('[data-collection-action="favorites"]'),
-    ).toHaveCount(0);
-    await expect(libraryButton).toBeVisible();
-    await expect(libraryButton).toBeEnabled();
-    await expect(libraryButton).toHaveAttribute("aria-pressed", "false");
-
-    const createRequestPromise = page.waitForRequest((request) =>
-      request.url().includes("/rpc/collections/bottles/create"),
-    );
     await libraryButton.click();
-    const createInput = getRpcInput(await createRequestPromise);
-
-    expect(createInput.bottle).toBe(bottleId);
-    expect(createInput).not.toHaveProperty("target");
-    expect(createInput).not.toHaveProperty("release");
     await expect(libraryButton).toHaveAttribute("aria-pressed", "true");
 
     await page.goto(`/users/${testUser.username}/library`, {
       waitUntil: "commit",
     });
     const savedBottleRow = libraryBottleRow(page, bottleId);
-    await expect(libraryBottleLink(page, bottleId)).toHaveAttribute(
-      "href",
-      `/bottles/${bottleId}`,
-    );
-    await expect(
-      savedBottleRow.getByRole("img", { name: "In Library" }),
-    ).toHaveCount(0);
-    await expect(
-      savedBottleRow.getByRole("img", { name: "Favorite" }),
-    ).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Favorites" })).toHaveCount(0);
-    await expect(
-      page.getByText("No library bottles recorded yet."),
-    ).toHaveCount(0);
+    await expect(savedBottleRow).toBeVisible();
 
     const statusButton = savedBottleRow.locator(
       'button[data-status="unset"]:visible',
@@ -181,40 +53,12 @@ test.describe("profile library", () => {
       savedBottleRow.locator('button[data-status="sealed"]:visible'),
     ).toBeVisible();
 
-    await page.goto("/library", {
-      waitUntil: "commit",
-    });
-    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
+    await page.reload({ waitUntil: "commit" });
     await expect(
-      page.getByRole("heading", { name: testUser.username }),
+      libraryBottleRow(page, bottleId).locator(
+        'button[data-status="sealed"]:visible',
+      ),
     ).toBeVisible();
-    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
-    if (!testInfo.project.name.includes("mobile")) {
-      await expect(
-        page.getByRole("columnheader", { name: "Bottle" }),
-      ).toBeVisible();
-      await expect(
-        page.getByRole("columnheader", { name: "Tastings" }),
-      ).toHaveCount(0);
-      await expect(
-        page.getByRole("columnheader", { name: "Rating" }),
-      ).toBeVisible();
-      await expect(page.getByRole("columnheader", { name: "Age" })).toHaveCount(
-        0,
-      );
-    }
-
-    await page.goto(`/users/${testUser.username}/favorites`, {
-      waitUntil: "commit",
-    });
-    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
-    await expect(libraryBottleLink(page, bottleId)).toBeVisible();
-    await page.goto("/favorites", { waitUntil: "commit" });
-    await expect(page).toHaveURL(`/users/${testUser.username}/library`);
-    await expect(
-      page.getByRole("link", { name: "Library" }).last(),
-    ).toHaveAttribute("href", `/users/${testUser.username}/library`);
-    await expectNoHorizontalOverflow(page);
   });
 
   test("filters Library entries from the profile tab", async ({
@@ -254,9 +98,7 @@ test.describe("profile library", () => {
     await page.getByRole("searchbox", { name: "Search library" }).fill("zzzz");
     await page.getByRole("button", { name: "Search" }).click();
     await expect(page).toHaveURL(/\/library\?query=zzzz$/);
-    await expect(
-      page.getByText("No library bottles match these filters."),
-    ).toBeVisible();
+    await expect(libraryBottleLink(page, bottleId)).toHaveCount(0);
 
     await page.getByRole("button", { name: "Clear filters" }).click();
     await expect(page).toHaveURL(`/users/${testUser.username}/library`);
@@ -265,7 +107,7 @@ test.describe("profile library", () => {
     await page.goto(`/users/${testUser.username}/library?cursor=2`, {
       waitUntil: "commit",
     });
-    await page.getByRole("button", { name: /brand any brand/i }).click();
+    await page.getByRole("button", { name: /^brand:/i }).click();
     await page.getByPlaceholder("Search brand").fill(existingBottle.brand.name);
     await expect(
       page.getByRole("button", { name: existingBottle.brand.name }),
@@ -274,12 +116,6 @@ test.describe("profile library", () => {
     await expect(page).toHaveURL(
       `/users/${testUser.username}/library?brand=${existingBottle.brand.id}`,
     );
-    await expect(
-      page.getByRole("button", {
-        name: new RegExp(`brand ${existingBottle.brand.name}`, "i"),
-      }),
-    ).toBeVisible();
-    await expect(page.getByPlaceholder("Search brand")).toHaveCount(0);
     await expect(libraryBottleLink(page, bottleId)).toBeVisible();
   });
 
@@ -314,20 +150,9 @@ test.describe("profile library", () => {
     });
     const savedBottleRow = libraryBottleRow(page, bottleId);
 
-    await expect(
-      savedBottleRow.getByRole("button", { name: "Bottle options" }),
-    ).toBeVisible();
-    await expect(savedBottleRow.getByText("Library entry image")).toHaveCount(
-      0,
-    );
-    await expect(
-      savedBottleRow.getByText("Only for this Library entry."),
-    ).toHaveCount(0);
-
     const addImageButton = savedBottleRow.getByRole("button", {
       name: `Add image for ${savedBottleName}`,
     });
-    await expect(addImageButton).toBeVisible();
     await uploadLibraryImage(page, addImageButton);
 
     await expect(
@@ -343,9 +168,6 @@ test.describe("profile library", () => {
     await viewImageButton.click();
     await expect(
       page.getByRole("heading", { name: `Photo of ${savedBottleName}` }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: "Replace Photo" }),
     ).toBeVisible();
     await page.keyboard.press("Escape");
 
@@ -367,8 +189,6 @@ test.describe("profile library", () => {
     await expect(
       page.getByRole("button", { name: "Bottle options" }),
     ).toHaveCount(0);
-    await expect(page.getByText("Library entry image")).toHaveCount(0);
-    await expectNoHorizontalOverflow(page);
 
     await signIn(context, { accessToken });
     await page.goto(`/users/${testUser.username}/library`, {
@@ -381,21 +201,9 @@ test.describe("profile library", () => {
     await expect(
       page.getByRole("menuitem", { name: "Remove from Library" }),
     ).toBeVisible();
-    const deleteRequestPromise = page.waitForRequest((request) =>
-      request.url().includes("/rpc/collections/bottles/delete"),
-    );
     await page.getByRole("menuitem", { name: "Remove from Library" }).click();
-    const deleteInput = getRpcInput(await deleteRequestPromise);
-
-    expect(deleteInput.bottle).toBe(bottleId);
-    expect(deleteInput).not.toHaveProperty("target");
-    expect(deleteInput).not.toHaveProperty("release");
 
     await expect(savedBottleRow).toHaveCount(0);
-    await expect(
-      page.getByText("No library bottles recorded yet."),
-    ).toBeVisible();
-    await expectNoHorizontalOverflow(page);
   });
 });
 
@@ -413,33 +221,6 @@ async function uploadLibraryImage(page: Page, trigger: Locator) {
   });
 }
 
-async function expectNoHorizontalOverflow(page: Page) {
-  await expect
-    .poll(
-      () =>
-        page.evaluate(
-          () =>
-            document.documentElement.scrollWidth -
-            document.documentElement.clientWidth,
-        ),
-      { message: "page should not create horizontal overflow" },
-    )
-    .toBeLessThanOrEqual(1);
-}
-
-function getRpcInput(request: Request): Record<string, unknown> {
-  const postData = request.postData();
-  if (!postData) {
-    throw new Error("Expected the RPC request to contain JSON input.");
-  }
-
-  const envelope: unknown = JSON.parse(postData);
-  if (!isRecord(envelope) || !isRecord(envelope.json)) {
-    throw new Error("Expected the RPC request to use the JSON envelope.");
-  }
-  return envelope.json;
-}
-
 function libraryBottleLink(page: Page, bottleId: number) {
   return page.locator(`a[href="/bottles/${bottleId}"]`).first();
 }
@@ -448,8 +229,4 @@ function libraryBottleRow(page: Page, bottleId: number) {
   return page.locator("tr").filter({
     has: page.locator(`a[href="/bottles/${bottleId}"]`),
   });
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }

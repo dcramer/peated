@@ -1,10 +1,9 @@
 "use client";
 
 import type { Inputs } from "@peated/server/orpc/router";
-import Glyph from "@peated/web/assets/glyph.svg";
 import BottleTable from "@peated/web/components/bottleTable";
+import Button from "@peated/web/components/button";
 import EmbeddedLogin from "@peated/web/components/embeddedLogin";
-import EmptyActivity from "@peated/web/components/emptyActivity";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import useAuth from "@peated/web/hooks/useAuth";
@@ -61,14 +60,31 @@ function TastingList() {
           rel={data.rel}
         />
       ) : (
-        <EmptyActivity href="/addBottle?intent=tasting">
-          <Glyph className="h-16 w-16" />
-
-          <div className="mt-4 font-semibold">What are you drinking?</div>
-          <div className="mt-2 block">
-            Get started by recording your first tasting notes.
+        <div className="relative mx-3 min-h-56 overflow-hidden border border-slate-800 bg-slate-950 px-6 py-8 sm:mx-0 sm:px-10 sm:py-10">
+          <img
+            src="/assets/empty-tastings-illustration.webp"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-right"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-950/5"
+            aria-hidden="true"
+          />
+          <div className="relative z-10 max-w-[65%] sm:max-w-sm">
+            <h2 className="text-xl font-bold text-white">
+              Start your tasting journal
+            </h2>
+            <p className="text-muted mt-2 text-sm">
+              Capture the bottle, your rating, and the notes you want to
+              remember.
+            </p>
+            <div className="mt-5">
+              <Button color="highlight" href="/addBottle?intent=tasting">
+                Record your first tasting
+              </Button>
+            </div>
           </div>
-        </EmptyActivity>
+        </div>
       )}
     </>
   );
