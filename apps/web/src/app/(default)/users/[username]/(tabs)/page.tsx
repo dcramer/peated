@@ -29,6 +29,9 @@ export default function UserProfilePage(props: {
           <h2 id="library-heading" className="text-lg font-semibold text-white">
             Library
           </h2>
+          <p className="text-muted mt-1 text-sm">
+            A snapshot of the bottles currently in their library.
+          </p>
         </div>
         <LibraryInsights username={username} />
       </section>

@@ -12,6 +12,7 @@ import { procedure } from "@peated/server/orpc";
 import { CategoryEnum } from "@peated/server/schemas";
 import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
+import { AgeStatsSchema, buildAgeStats } from "./age-stats";
 import {
   readJoinedUserBottle,
   type UserBottleRead,
@@ -19,19 +20,6 @@ import {
 } from "./tasting-bottle-scan";
 
 const LIBRARY_STATS_BATCH_SIZE = 200;
-
-const AgeBucketSchema = z.object({
-  id: z.enum([
-    "under10",
-    "from10To12",
-    "from13To17",
-    "from18To24",
-    "atLeast25",
-    "unstated",
-  ]),
-  label: z.string(),
-  count: z.number(),
-});
 
 const LibraryStatsSchema = z.object({
   total: z.number(),
@@ -42,12 +30,7 @@ const LibraryStatsSchema = z.object({
       count: z.number(),
     }),
   ),
-  age: z.object({
-    knownCount: z.number(),
-    median: z.number().nullable(),
-    oldest: z.number().nullable(),
-    buckets: z.array(AgeBucketSchema),
-  }),
+  age: AgeStatsSchema,
   categories: z.array(
     z.object({
       category: CategoryEnum,
@@ -61,7 +44,6 @@ type LibraryStats = z.infer<typeof LibraryStatsSchema>;
 type LibraryStatsAccumulator = {
   total: number;
   ages: number[];
-  oldestAge: number | null;
   categoryCounts: Map<Category, number>;
   distillerCounts: Map<number, number>;
   unstatedAgeCount: number;
@@ -95,7 +77,6 @@ function createLibraryStatsAccumulator(): LibraryStatsAccumulator {
   return {
     total: 0,
     ages: [],
-    oldestAge: null,
     categoryCounts: new Map(),
     distillerCounts: new Map(),
     unstatedAgeCount: 0,
@@ -118,10 +99,6 @@ function accumulateLibraryStats(
       accumulator.unstatedAgeCount += 1;
     } else {
       accumulator.ages.push(bottle.statedAge);
-      accumulator.oldestAge =
-        accumulator.oldestAge === null
-          ? bottle.statedAge
-          : Math.max(accumulator.oldestAge, bottle.statedAge);
     }
     if (bottle.category !== null) {
       incrementCount(accumulator.categoryCounts, bottle.category);
@@ -130,16 +107,6 @@ function accumulateLibraryStats(
       incrementCount(accumulator.distillerCounts, distillerId);
     }
   }
-}
-
-function median(values: number[]): number | null {
-  if (values.length === 0) return null;
-
-  const sorted = values.toSorted((left, right) => left - right);
-  const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? (sorted[middle - 1]! + sorted[middle]!) / 2
-    : sorted[middle]!;
 }
 
 async function finalizeLibraryStats(
@@ -185,46 +152,7 @@ async function finalizeLibraryStats(
   return {
     total: accumulator.total,
     distillers,
-    age: {
-      knownCount: accumulator.ages.length,
-      median: median(accumulator.ages),
-      oldest: accumulator.oldestAge,
-      buckets: [
-        {
-          id: "under10",
-          label: "Under 10",
-          count: accumulator.ages.filter((age) => age < 10).length,
-        },
-        {
-          id: "from10To12",
-          label: "10–12",
-          count: accumulator.ages.filter((age) => age >= 10 && age <= 12)
-            .length,
-        },
-        {
-          id: "from13To17",
-          label: "13–17",
-          count: accumulator.ages.filter((age) => age >= 13 && age <= 17)
-            .length,
-        },
-        {
-          id: "from18To24",
-          label: "18–24",
-          count: accumulator.ages.filter((age) => age >= 18 && age <= 24)
-            .length,
-        },
-        {
-          id: "atLeast25",
-          label: "25+",
-          count: accumulator.ages.filter((age) => age >= 25).length,
-        },
-        {
-          id: "unstated",
-          label: "Unstated",
-          count: accumulator.unstatedAgeCount,
-        },
-      ],
-    },
+    age: buildAgeStats(accumulator.ages, accumulator.unstatedAgeCount),
     categories,
   };
 }

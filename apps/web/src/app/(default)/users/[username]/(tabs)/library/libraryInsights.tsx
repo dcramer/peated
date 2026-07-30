@@ -2,6 +2,7 @@
 
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
+import AgeInsightCard from "@peated/web/components/ageInsightCard";
 import {
   InsightCard,
   InsightCardSkeleton,
@@ -15,77 +16,6 @@ import { useEffect } from "react";
 type LibraryStats = Outputs["users"]["libraryStats"];
 
 const MINIMUM_AGE_SAMPLE = 3;
-
-function formatBottleCount(count: number) {
-  return `${count.toLocaleString()} ${count === 1 ? "bottle" : "bottles"}`;
-}
-
-function formatAge(age: number) {
-  return Number.isInteger(age) ? age.toLocaleString() : age.toFixed(1);
-}
-
-function AgeDistribution({ stats }: { stats: LibraryStats }) {
-  const largestCount = Math.max(
-    ...stats.age.buckets.map((bucket) => bucket.count),
-    1,
-  );
-  const detail = [
-    stats.age.median !== null
-      ? `Median ${formatAge(stats.age.median)} yr`
-      : null,
-    stats.age.oldest !== null
-      ? `Oldest ${formatAge(stats.age.oldest)} yr`
-      : null,
-  ]
-    .filter((value): value is string => value !== null)
-    .join(" · ");
-
-  return (
-    <InsightCard title="Age profile" detail={detail}>
-      <div
-        className="grid min-h-28 flex-1 grid-cols-6 gap-1"
-        data-age-profile-chart
-        aria-hidden="true"
-      >
-        {stats.age.buckets.map((bucket) => (
-          <div key={bucket.id} className="flex min-w-0 flex-col items-center">
-            <span className="text-muted mb-1 h-4 text-[10px] tabular-nums">
-              {bucket.count ? bucket.count.toLocaleString() : ""}
-            </span>
-            <div className="flex min-h-0 w-full flex-1 items-end justify-center">
-              <div
-                className={
-                  bucket.id === "unstated"
-                    ? "w-3/5 rounded-t bg-slate-600"
-                    : "bg-highlight w-3/5 rounded-t"
-                }
-                style={{
-                  height: bucket.count
-                    ? `${Math.max(10, (bucket.count / largestCount) * 100)}%`
-                    : 0,
-                }}
-              />
-            </div>
-            <span className="mt-1 min-h-7 text-center text-[10px] leading-3 text-slate-400">
-              {bucket.label}
-            </span>
-          </div>
-        ))}
-      </div>
-      <ul className="sr-only">
-        {stats.age.buckets.map((bucket) => (
-          <li key={bucket.id}>
-            {bucket.label}: {formatBottleCount(bucket.count)}
-          </li>
-        ))}
-      </ul>
-      <p className="text-muted mt-1 text-[11px]">
-        Age stated for {stats.age.knownCount.toLocaleString()} of{" "}
-        {stats.total.toLocaleString()} bottles
-      </p>
-    </InsightCard>
-  );
-}
 
 function CategoryDistribution({ stats }: { stats: LibraryStats }) {
   return (
@@ -135,7 +65,14 @@ export function LibraryInsightsContent({
           />
         </InsightCard>
       ) : null}
-      {showAge ? <AgeDistribution stats={stats} /> : null}
+      {showAge ? (
+        <AgeInsightCard
+          age={stats.age}
+          title="Bottle ages"
+          total={stats.total}
+          unit="bottle"
+        />
+      ) : null}
       {showCategories ? <CategoryDistribution stats={stats} /> : null}
     </div>
   );

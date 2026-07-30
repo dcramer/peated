@@ -1,11 +1,13 @@
 "use client";
 
 import { formatFlavorProfile } from "@peated/server/lib/format";
+import AgeInsightCard from "@peated/web/components/ageInsightCard";
 import {
   InsightCard,
   InsightCardSkeleton,
   RankedInsightBars,
 } from "@peated/web/components/insightCard";
+import classNames from "@peated/web/lib/classNames";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQueries } from "@tanstack/react-query";
@@ -14,7 +16,7 @@ import { ErrorBoundary } from "react-error-boundary";
 
 function UserTastingInsightsContent({ userId }: { userId: number }) {
   const orpc = useORPC();
-  const [regionsQuery, flavorsQuery] = useSuspenseQueries({
+  const [regionsQuery, flavorsQuery, statsQuery] = useSuspenseQueries({
     queries: [
       orpc.users.regionList.queryOptions({
         input: { user: userId },
@@ -22,13 +24,20 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
       orpc.users.flavorList.queryOptions({
         input: { user: userId },
       }),
+      orpc.users.tastingStats.queryOptions({
+        input: { user: userId },
+      }),
     ],
   });
 
   const regions = regionsQuery.data.results;
   const flavors = flavorsQuery.data.results;
+  const stats = statsQuery.data;
+  const showAge = stats.age.knownCount >= 3;
+  const cardCount =
+    Number(regions.length > 0) + Number(flavors.length > 0) + Number(showAge);
 
-  if (!regions.length && !flavors.length) return null;
+  if (!cardCount) return null;
 
   return (
     <section aria-labelledby="tastings-heading">
@@ -38,9 +47,18 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
       >
         Tastings
       </h2>
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      <p className="text-muted -mt-2 mb-3 text-sm">
+        Patterns across the bottles they’ve tasted.
+      </p>
+      <div
+        className={classNames(
+          "grid grid-cols-1 gap-3",
+          cardCount === 2 && "lg:grid-cols-2",
+          cardCount >= 3 && "lg:grid-cols-3",
+        )}
+      >
         {regions.length ? (
-          <InsightCard title="Top regions" className="only:lg:col-span-2">
+          <InsightCard title="Top regions">
             <RankedInsightBars
               unit="tasting"
               items={regions.map((item) => ({
@@ -57,7 +75,7 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
           </InsightCard>
         ) : null}
         {flavors.length ? (
-          <InsightCard title="Top flavors" className="only:lg:col-span-2">
+          <InsightCard title="Top flavors">
             <RankedInsightBars
               unit="tasting"
               items={flavors.map((item) => ({
@@ -70,6 +88,14 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
               }))}
             />
           </InsightCard>
+        ) : null}
+        {showAge ? (
+          <AgeInsightCard
+            age={stats.age}
+            title="Ages tasted"
+            total={stats.total}
+            unit="tasting"
+          />
         ) : null}
       </div>
     </section>

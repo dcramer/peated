@@ -36,7 +36,7 @@ describe("LibraryInsightsContent", () => {
     expect(html).toContain("Top distilleries");
     expect(html).toContain("Example Distillery");
     expect(html).toContain("Example Distillery: 3 bottles");
-    expect(html).toContain("Age profile");
+    expect(html).toContain("Bottle ages");
     expect(html).toContain("Median 12 yr");
     expect(html).toContain("Under 10: 1 bottle");
     expect(html).toContain("Age stated for 3 of 4 bottles");
