@@ -12,7 +12,6 @@ function formValue(
   return {
     name: "Springbank 12 Cask Strength",
     statedAge: 12,
-    exactStatedAge: null,
     series: null,
     category: "single_malt",
     brand: 1,
@@ -43,7 +42,7 @@ function submitMeta(
 }
 
 describe("buildConcreteBottleUpdateInput", () => {
-  test("omits both scopes when neither stated-age control is dirty", () => {
+  test("omits both scopes when the age field is not dirty", () => {
     expect(
       buildConcreteBottleUpdateInput(
         formValue({ statedAge: 18 }),
@@ -58,20 +57,22 @@ describe("buildConcreteBottleUpdateInput", () => {
     ).toEqual({ exact: { edition: "Batch 24", abv: 57.2 } });
   });
 
-  test("routes the Bottle-specific age to the exact patch", () => {
+  test("routes an exact-owned age without exposing a second form field", () => {
     expect(
       buildConcreteBottleUpdateInput(
-        formValue({ exactStatedAge: 15 }),
-        submitMeta("exactStatedAge"),
+        formValue({ statedAge: 15 }),
+        submitMeta("statedAge"),
+        { statedAgeScope: "exact" },
       ),
     ).toEqual({ exact: { statedAge: 15 } });
   });
 
-  test("clears the Bottle-specific override without changing shared age", () => {
+  test("clears an exact-owned age without changing shared values", () => {
     expect(
       buildConcreteBottleUpdateInput(
-        formValue({ statedAge: 12, exactStatedAge: null }),
-        submitMeta("exactStatedAge"),
+        formValue({ statedAge: null }),
+        submitMeta("statedAge"),
+        { statedAgeScope: "exact" },
       ),
     ).toEqual({ exact: { statedAge: null } });
   });
@@ -97,7 +98,6 @@ describe("buildConcreteBottleUpdateInput", () => {
           bottler: 7,
           flavorProfile: "deep_rich_dried_fruit",
           singleCask: true,
-          exactStatedAge: 15,
           vintageYear: 2012,
           caskSize: "hogshead",
           caskType: "oloroso",
@@ -113,7 +113,6 @@ describe("buildConcreteBottleUpdateInput", () => {
           "bottler",
           "flavorProfile",
           "edition",
-          "exactStatedAge",
           "abv",
           "singleCask",
           "caskStrength",
@@ -139,7 +138,6 @@ describe("buildConcreteBottleUpdateInput", () => {
       },
       exact: {
         edition: "Batch 24",
-        statedAge: 15,
         abv: 57.2,
         singleCask: true,
         caskStrength: true,

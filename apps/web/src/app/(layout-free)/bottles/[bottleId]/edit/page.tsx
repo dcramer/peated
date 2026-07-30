@@ -45,7 +45,10 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
         const { image } = value;
         await bottleUpdateMutation.mutateAsync({
           bottle: context.bottleId,
-          ...buildConcreteBottleUpdateInput(value, meta),
+          ...buildConcreteBottleUpdateInput(value, meta, {
+            statedAgeScope:
+              context.exact.statedAge === null ? "shared" : "exact",
+          }),
         });
 
         if (image) {
@@ -71,11 +74,10 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
       initialData={{
         ...context.shared,
         ...context.exact,
-        statedAge: context.shared.statedAge,
+        statedAge: context.exact.statedAge ?? context.shared.statedAge,
       }}
-      exactStatedAge={context.exact.statedAge}
-      sharedIdentityBottleCount={context.totalBottles}
       title="Edit Bottle"
+      saveLabel="Save Changes"
     />
   );
 }

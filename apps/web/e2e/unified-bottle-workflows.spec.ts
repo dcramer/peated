@@ -108,18 +108,18 @@ test.describe("unified Bottle workflows", () => {
     );
 
     await expect(
-      page.getByRole("heading", { name: "Add a similar bottle" }),
+      page.getByRole("heading", { name: "Add a Similar Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("Bottle Name", { exact: true })).toHaveValue(
       createdBottleName,
     );
     await expect(
       page.getByText(testBrand.name, { exact: true }).first(),
     ).toBeVisible();
-    await expect(page.getByLabel("Stated Age")).toHaveValue(
+    await expect(page.getByLabel("Age Statement")).toHaveValue(
       String(anotherReleaseSourceBottle.statedAge),
     );
-    await expect(page.getByLabel("Edition / Label")).toHaveValue(
+    await expect(page.getByLabel("Edition or Batch")).toHaveValue(
       "First Fill Oloroso",
     );
     await expect(page.getByLabel("Release Year")).toHaveValue("2026");
@@ -128,7 +128,7 @@ test.describe("unified Bottle workflows", () => {
     const createRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/prices/matchQueue/createBottle"),
     );
-    await page.getByRole("button", { name: "Create Bottle" }).click();
+    await page.getByRole("button", { name: "Add Bottle" }).click();
     const input = getRpcInput(await createRequestPromise);
 
     expect(Object.keys(input).sort()).toEqual([
@@ -158,7 +158,7 @@ test.describe("unified Bottle workflows", () => {
     await expect(page).toHaveURL(new RegExp(`${returnTo}$`));
   });
 
-  test("renders shared and exact Bottle edit ownership", async ({
+  test("keeps exact age ownership behind the unified Bottle form", async ({
     context,
     page,
   }, testInfo) => {
@@ -172,35 +172,25 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("heading", { name: "Edit Bottle" }),
     ).toBeVisible();
-    await expect(page.getByLabel("Bottle", { exact: true })).toHaveValue(
+    await expect(page.getByLabel("Bottle Name", { exact: true })).toHaveValue(
       unifiedBottleEditContext.shared.name,
     );
-    await expect(page.getByLabel("Shared Stated Age")).toHaveValue(
-      String(unifiedBottleEditContext.shared.statedAge),
-    );
-    await expect(page.getByLabel("Bottle-specific Stated Age")).toHaveValue(
+    await expect(page.getByLabel("Age Statement")).toHaveValue(
       String(unifiedBottleEditContext.exact.statedAge),
     );
-    const showsPreviewMetadata = (page.viewportSize()?.width ?? 0) >= 640;
-    const initialPreviewAge = page.getByText(
-      `Aged ${unifiedBottleEditContext.exact.statedAge} years`,
-      { exact: true },
+    await expect(page.getByLabel("Shared Stated Age")).toHaveCount(0);
+    await expect(page.getByLabel("Bottle-specific Stated Age")).toHaveCount(0);
+    const preview = page.getByRole("region", { name: "Bottle preview" });
+    await expect(preview).toContainText(
+      `${unifiedBottleEditContext.exact.statedAge} years`,
     );
-    await expect(initialPreviewAge).toHaveText(
-      `Aged ${unifiedBottleEditContext.exact.statedAge} years`,
-    );
-    if (showsPreviewMetadata) {
-      await expect(initialPreviewAge).toBeVisible();
-    } else {
-      await expect(initialPreviewAge).toBeHidden();
-    }
-    await expect(page.getByLabel("Edition / Label")).toHaveValue(
+    await expect(page.getByLabel("Edition or Batch")).toHaveValue(
       unifiedBottleEditContext.exact.edition,
     );
-    await expect(page.getByLabel("ABV")).toHaveValue(
+    await expect(page.getByLabel("Alcohol (ABV)")).toHaveValue(
       String(unifiedBottleEditContext.exact.abv),
     );
-    await expect(page.getByLabel("Vintage Year")).toHaveValue(
+    await expect(page.getByLabel("Distillation Year")).toHaveValue(
       String(unifiedBottleEditContext.exact.vintageYear),
     );
     await expect(page.getByLabel("Release Year")).toHaveValue(
@@ -208,42 +198,31 @@ test.describe("unified Bottle workflows", () => {
     );
     await expect(
       page.getByRole("group", { name: "Release family details" }),
-    ).toContainText(
-      "Changes here update all 3 Bottles in this release family.",
-    );
+    ).toHaveCount(0);
     await expect(
       page.getByRole("group", { name: "Exact Bottle details" }),
-    ).toBeVisible();
-    const preview = page.getByRole("region", { name: "Bottle preview" });
+    ).toHaveCount(0);
     await expect(preview).toContainText("Cask 42");
     await expect(preview).toContainText("55.1% ABV");
-    await expect(preview).toContainText("2023 Release");
-    await expect(preview).toContainText("2004 Vintage");
+    await expect(preview).toContainText("2023 release");
+    await expect(preview).toContainText("2004 vintage");
     await expect(page.getByText("Edit Bottling", { exact: true })).toHaveCount(
       0,
     );
 
-    await page.getByLabel("Edition / Label").fill("Cask 43");
+    await page.getByLabel("Edition or Batch").fill("Cask 43");
     await expect(preview).toContainText("Cask 43");
     await expect(preview).not.toContainText("Cask 42");
-    await page.getByLabel("Shared Stated Age").fill("19");
-    await page.getByLabel("Bottle-specific Stated Age").fill("22");
-    const updatedPreviewAge = page.getByText("Aged 22 years", { exact: true });
-    await expect(updatedPreviewAge).toHaveText("Aged 22 years");
-    if (showsPreviewMetadata) {
-      await expect(updatedPreviewAge).toBeVisible();
-    } else {
-      await expect(updatedPreviewAge).toBeHidden();
-    }
+    await page.getByLabel("Age Statement").fill("22");
+    await expect(preview).toContainText("22 years");
 
     const updateRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/update"),
     );
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByRole("button", { name: "Save Changes" }).click();
     const updateInput = getRpcInput(await updateRequestPromise);
     expect(updateInput).toEqual({
       bottle: existingBottleId,
-      shared: { statedAge: 19 },
       exact: { edition: "Cask 43", statedAge: 22 },
     });
     await expectNoHorizontalOverflow(page);
