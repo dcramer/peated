@@ -81,12 +81,12 @@ export default async function Layout(props: {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mb-4 flex min-w-full flex-wrap gap-y-4 lg:mb-8 lg:flex-nowrap">
+      <div className="mb-3 flex min-w-full flex-wrap gap-y-4 lg:flex-nowrap lg:gap-x-6">
         <div className="flex w-full justify-center lg:w-auto lg:justify-start">
-          <UserAvatar user={user} size={150} />
+          <UserAvatar user={user} size={132} />
         </div>
-        <div className="flex w-full flex-col justify-center gap-y-4 px-4 lg:w-auto lg:flex-auto lg:gap-y-2">
-          <h3 className="self-center text-4xl font-semibold leading-normal text-white lg:self-start">
+        <div className="flex w-full flex-col justify-center gap-y-3 px-4 lg:w-auto lg:flex-auto lg:gap-y-1 lg:px-0">
+          <h3 className="self-center text-3xl font-semibold leading-normal text-white lg:self-start">
             {user.username}
           </h3>
           <div className="text-muted flex flex-col items-center gap-x-2 gap-y-2 self-center lg:flex-row lg:self-start">
@@ -109,13 +109,13 @@ export default async function Layout(props: {
               </span>
               <span className="text-muted text-sm">Tastings</span>
             </div>
-            <div className="mb-4 px-3 text-center">
+            <div className="px-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.bottles.toLocaleString()}
               </span>
               <span className="text-muted text-sm">Bottles</span>
             </div>
-            <div className="mb-4 px-3 text-center">
+            <div className="px-3 text-center">
               <span className="block text-xl font-bold uppercase tracking-wide text-white">
                 {user.stats.library.total.toLocaleString()}
               </span>
@@ -154,7 +154,7 @@ export default async function Layout(props: {
       ) : (
         <ProfileProvider userId={user.id}>
           <div className="hidden lg:block">
-            <Tabs fullWidth border>
+            <Tabs border>
               <TabItem as={Link} href={`/users/${user.username}`} controlled>
                 Activity
               </TabItem>
