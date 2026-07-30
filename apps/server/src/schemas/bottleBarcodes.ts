@@ -1,0 +1,34 @@
+import { normalizeGtin } from "@peated/server/lib/gtin";
+import { z } from "zod";
+import { BottleSchema } from "./bottles";
+
+export const GtinSchema = z
+  .string()
+  .min(1)
+  .transform((input, context) => {
+    try {
+      return normalizeGtin(input).value;
+    } catch (error) {
+      context.addIssue({
+        code: "custom",
+        message:
+          error instanceof Error ? error.message : "Barcode is not valid.",
+      });
+      return z.NEVER;
+    }
+  })
+  .describe("A valid GTIN-8, GTIN-12, GTIN-13, or GTIN-14 barcode");
+
+export const BottleBarcodeSchema = z.object({
+  id: z.number().readonly(),
+  bottle: z.number().readonly(),
+  value: z.string().readonly(),
+  createdAt: z.string().datetime().readonly(),
+});
+
+export const BottleBarcodeLookupSchema = z.object({
+  barcode: BottleBarcodeSchema,
+  bottle: BottleSchema,
+});
+
+export type BottleBarcodeApi = z.infer<typeof BottleBarcodeSchema>;

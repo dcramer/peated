@@ -7,6 +7,7 @@ import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
   bottleAliases,
+  bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroupDistillers,
   bottleGroups,
@@ -328,6 +329,7 @@ async function repointBottleConsumers(
     ["reviews", reviews, reviews.bottleId],
     ["storePrices", storePrices, storePrices.bottleId],
     ["bottleObservations", bottleObservations, bottleObservations.bottleId],
+    ["bottleBarcodes", bottleBarcodes, bottleBarcodes.bottleId],
     [
       "incomingBottleDecisionLogs",
       incomingBottleDecisionLogs,

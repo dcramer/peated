@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
@@ -11,6 +12,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
+import { getUserActor } from "@peated/server/lib/actors";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -225,6 +227,7 @@ describe("DELETE /bottles/:bottle", () => {
     fixtures,
   }) => {
     const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
     const bottle = await fixtures.LegacyBottle();
     const price = await fixtures.StorePrice({ bottleId: bottle.id });
     const review = await fixtures.Review({
@@ -247,6 +250,12 @@ describe("DELETE /bottles/:bottle", () => {
       sourceType: "store_price",
       sourceKey: `store_price:${price.id}`,
       sourceName: price.name,
+    });
+    await db.insert(bottleBarcodes).values({
+      bottleId: bottle.id,
+      value: "96385074",
+      gtin14: "00000096385074",
+      createdByActorId: actor.id,
     });
 
     const [proposal] = await db
@@ -289,6 +298,9 @@ describe("DELETE /bottles/:bottle", () => {
     const deletedObservation = await db.query.bottleObservations.findFirst({
       where: (table, { eq }) => eq(table.sourceKey, `store_price:${price.id}`),
     });
+    const deletedBarcode = await db.query.bottleBarcodes.findFirst({
+      where: eq(bottleBarcodes.bottleId, bottle.id),
+    });
 
     expect(updatedPrice?.bottleId).toBeNull();
     expect(updatedReview?.bottleId).toBeNull();
@@ -308,5 +320,6 @@ describe("DELETE /bottles/:bottle", () => {
     );
     expect(remainingFlavorProfiles).toHaveLength(0);
     expect(deletedObservation).toBeUndefined();
+    expect(deletedBarcode).toBeUndefined();
   });
 });

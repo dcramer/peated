@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
   bottleAliases,
+  bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroups,
   bottleObservations,
@@ -110,6 +111,15 @@ describe("exact Bottle merges", () => {
         sourceType: "store_price",
         sourceKey: "store_price:merge",
         sourceName: "Merge observation",
+      })
+      .returning();
+    const [barcode] = await db
+      .insert(bottleBarcodes)
+      .values({
+        bottleId: source.id,
+        value: "96385074",
+        gtin14: "00000096385074",
+        createdByActorId: actor.id,
       })
       .returning();
     const [proposal] = await db
@@ -238,6 +248,11 @@ describe("exact Bottle merges", () => {
     expect(
       await db.query.bottleObservations.findFirst({
         where: eq(bottleObservations.id, observation!.id),
+      }),
+    ).toMatchObject({ bottleId: destination.id });
+    expect(
+      await db.query.bottleBarcodes.findFirst({
+        where: eq(bottleBarcodes.id, barcode!.id),
       }),
     ).toMatchObject({ bottleId: destination.id });
     expect(
