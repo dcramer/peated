@@ -61,7 +61,7 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
           <InsightCard title="Top regions">
             <RankedInsightBars
               unit="tasting"
-              items={regions.map((item) => ({
+              items={regions.slice(0, 10).map((item) => ({
                 id: item.region
                   ? `${item.country.slug}/${item.region.slug}`
                   : item.country.slug,
