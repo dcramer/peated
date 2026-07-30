@@ -122,16 +122,16 @@ export default async function Layout(props: {
         </div>
         <div className="contents lg:flex lg:w-auto lg:flex-auto lg:flex-col lg:justify-center lg:gap-y-2 lg:px-4">
           <div className="min-w-0 self-center lg:self-start">
-            <h1 className="break-words text-2xl font-semibold leading-tight text-white lg:text-4xl lg:leading-normal">
+            <h1 className="break-words text-center text-2xl font-semibold leading-tight text-white lg:text-left lg:text-4xl lg:leading-normal">
               {user.username}
             </h1>
-            <div className="text-muted mt-2 flex items-center gap-x-2 lg:mt-0">
+            <div className="text-muted mt-2 flex items-center justify-center gap-x-2 lg:mt-0 lg:justify-start">
               {user.admin ? (
-                <Chip size="small" color="highlight">
+                <Chip as="span" size="small" color="highlight">
                   Admin
                 </Chip>
               ) : user.mod ? (
-                <Chip size="small" color="highlight">
+                <Chip as="span" size="small" color="highlight">
                   Moderator
                 </Chip>
               ) : null}

@@ -2,6 +2,7 @@ import http from "node:http";
 
 import {
   addAnotherReleaseSourceBottle,
+  adminUser,
   anotherReleaseSourceBottle,
   bottleGroup,
   bottleGroupId,
@@ -35,6 +36,7 @@ import {
   groupedBottleDetails,
   libraryInsightsStats,
   missingBottleId,
+  moderatorUser,
   photoTastingNotes,
   priceChangeList,
   priceSite,
@@ -771,6 +773,19 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(response, testUser);
         return true;
       }
+      if (input?.user === adminUser.id || input?.user === adminUser.username) {
+        sendRpcResponse(response, adminUser);
+        return true;
+      }
+
+      if (
+        input?.user === moderatorUser.id ||
+        input?.user === moderatorUser.username
+      ) {
+        sendRpcResponse(response, moderatorUser);
+        return true;
+      }
+
       sendRpcError(response, "Unexpected user details payload");
       return true;
     case "users/libraryStats":

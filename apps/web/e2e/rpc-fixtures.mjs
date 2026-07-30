@@ -32,6 +32,34 @@ export const testUser = {
   },
 };
 
+export const adminUser = {
+  ...testUser,
+  id: 9102,
+  username: "admin-review",
+  email: "admin-review@example.com",
+  admin: true,
+  stats: {
+    ...testUser.stats,
+    tastings: 225,
+    bottles: 206,
+    library: {
+      total: 78,
+      open: 12,
+      sealed: 66,
+    },
+    contributions: 70,
+  },
+};
+
+export const moderatorUser = {
+  ...adminUser,
+  id: 9103,
+  username: "moderator-review",
+  email: "moderator-review@example.com",
+  admin: false,
+  mod: true,
+};
+
 export const libraryInsightsStats = {
   total: 76,
   distillers: [
