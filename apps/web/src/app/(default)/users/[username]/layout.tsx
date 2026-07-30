@@ -10,7 +10,6 @@ import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import { type ReactNode } from "react";
 import type { ProfilePage, WithContext } from "schema-dts";
 import FriendButton from "./friendButton";
-import { formatLibraryTabLabel } from "./libraryTabLabel";
 import LogoutButton from "./logoutButton";
 import ModActions from "./modActions";
 import { ProfileProvider } from "./profileContext";
@@ -153,21 +152,26 @@ export default async function Layout(props: {
         <EmptyActivity>This users profile is private.</EmptyActivity>
       ) : (
         <ProfileProvider userId={user.id}>
-          <div className="hidden lg:block">
-            <Tabs border>
-              <TabItem as={Link} href={`/users/${user.username}`} controlled>
-                Activity
-              </TabItem>
-              <TabItem
-                as={Link}
-                href={`/users/${user.username}/library`}
-                controlled
-                desktopOnly
-              >
-                {formatLibraryTabLabel(user.stats.library)}
-              </TabItem>
-            </Tabs>
-          </div>
+          <Tabs border aria-label={`${user.username}'s profile`}>
+            <TabItem as={Link} href={`/users/${user.username}`} controlled>
+              Profile
+            </TabItem>
+            <TabItem
+              as={Link}
+              href={`/users/${user.username}/activity`}
+              controlled
+            >
+              Activity
+            </TabItem>
+            <TabItem
+              as={Link}
+              href={`/users/${user.username}/library`}
+              controlled
+              count={user.stats.library.total}
+            >
+              Library
+            </TabItem>
+          </Tabs>
           {children}
         </ProfileProvider>
       )}

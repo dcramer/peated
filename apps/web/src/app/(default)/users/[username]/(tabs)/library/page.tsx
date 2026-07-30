@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { use, useTransition } from "react";
 import { useProfileUserId } from "../../profileContext";
 import { LibraryFilters } from "./libraryFilters";
-import LibraryInsights from "./libraryInsights";
 
 export default function UserLibrary(props: {
   params: Promise<{ username: string }>;
@@ -56,7 +55,6 @@ function UserLibraryTable({ username }: { username: string }) {
 
   return (
     <>
-      <LibraryInsights username={username} />
       <LibraryFilters
         loading={isPending}
         onNavigate={(href) => {
