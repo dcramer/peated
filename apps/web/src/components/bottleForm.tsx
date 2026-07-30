@@ -20,7 +20,6 @@ import {
 } from "@peated/server/lib/format";
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Entity, FlavorProfile } from "@peated/server/types";
-import Collapsable from "@peated/web/components/collapsable";
 import EntityField from "@peated/web/components/entityField";
 import Fieldset from "@peated/web/components/fieldset";
 import FormError from "@peated/web/components/formError";
@@ -464,242 +463,233 @@ export default function BottleForm({
             )}
           </button>
 
-          <Collapsable open={moreDetailsOpen}>
-            <div
-              id="more-bottle-details"
-              aria-hidden={!moreDetailsOpen}
-              inert={!moreDetailsOpen ? true : undefined}
-            >
-              <TextField
-                {...register("edition")}
-                error={errors.edition}
-                type="text"
-                label="Edition or Batch"
-                helpText="An edition, batch, or label shown on the bottle."
-                placeholder="e.g. Batch 24"
-              />
+          <div id="more-bottle-details" hidden={!moreDetailsOpen}>
+            <TextField
+              {...register("edition")}
+              error={errors.edition}
+              type="text"
+              label="Edition or Batch"
+              helpText="An edition, batch, or label shown on the bottle."
+              placeholder="e.g. Batch 24"
+            />
 
-              <Controller
-                name="series"
-                control={control}
-                render={({ field: { onChange, value, ref, ...field } }) => (
-                  <SeriesField
-                    {...field}
-                    error={errors.series}
-                    label="Series"
-                    helpText="The series this bottle belongs to, if any."
-                    placeholder="e.g. A Midwinter Night's Dram"
-                    brand={brandValue?.id ? Number(brandValue.id) : 0}
-                    disabled={!brandValue}
-                    canCreate
-                    onChange={(value) => {
-                      onChange(value?.id ?? value ?? null);
-                      setSeriesValue(value);
-                    }}
-                    value={seriesValue}
-                  />
-                )}
-              />
-
-              <TextField
-                {...register("releaseYear", {
-                  setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-                })}
-                error={errors.releaseYear}
-                type="number"
-                label="Release Year"
-                placeholder="e.g. 2024"
-                helpText="The year this bottle was released."
-              />
-
-              <TextField
-                {...register("vintageYear", {
-                  setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
-                })}
-                error={errors.vintageYear}
-                type="number"
-                label="Distillation Year"
-                placeholder="e.g. 1986"
-                helpText="The year the spirit was distilled."
-              />
-
-              <BooleanField
-                control={control}
-                label="Single Cask"
-                helpText="Shown as a single-cask bottling on the label."
-                name="singleCask"
-              />
-
-              <BooleanField
-                control={control}
-                label="Cask Strength"
-                helpText="Shown as cask strength on the label."
-                name="caskStrength"
-              />
-
-              <Controller
-                name="caskFill"
-                control={control}
-                render={({ field: { onChange, value, ref, ...field } }) => (
-                  <SelectField
-                    {...field}
-                    error={errors.caskFill}
-                    label="Cask Fill"
-                    placeholder="e.g. 1st Fill"
-                    simple
-                    options={caskFillList}
-                    onChange={(value) => onChange(value?.id)}
-                    value={
-                      value
-                        ? caskFillList.find((item) => item.id === value)
-                        : undefined
-                    }
-                  />
-                )}
-              />
-
-              <Controller
-                name="caskType"
-                control={control}
-                render={({ field: { onChange, value, ref, ...field } }) => (
-                  <SelectField
-                    {...field}
-                    error={errors.caskType}
-                    label="Cask Type"
-                    placeholder="e.g. Bourbon"
-                    simple
-                    options={caskTypeList}
-                    onChange={(value) => onChange(value?.id)}
-                    value={
-                      value
-                        ? caskTypeList.find((item) => item.id === value)
-                        : undefined
-                    }
-                  />
-                )}
-              />
-
-              <Controller
-                name="caskSize"
-                control={control}
-                render={({ field: { onChange, value, ref, ...field } }) => (
-                  <SelectField
-                    {...field}
-                    error={errors.caskSize}
-                    label="Cask Size"
-                    placeholder="e.g. Hogshead"
-                    simple
-                    options={caskSizeList}
-                    onChange={(value) => onChange(value?.id)}
-                    value={
-                      value
-                        ? caskSizeList.find((item) => item.id === value)
-                        : undefined
-                    }
-                  />
-                )}
-              />
-
-              <Controller
-                name="flavorProfile"
-                control={control}
-                render={({ field: { onChange, value, ref, ...field } }) => (
-                  <SelectField
-                    {...field}
-                    error={errors.flavorProfile}
-                    placeholder="The flavor profile of the spirit."
-                    suggestedOptions={[]}
-                    label="Flavor Profile"
-                    onRenderOption={(option) => {
-                      const classes = classesForProfile(
-                        option.id as FlavorProfile,
-                      );
-                      return (
-                        <div className="flex flex-col items-start justify-start gap-y-2 text-left">
-                          <h4
-                            className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
-                          >
-                            {option.name}
-                          </h4>
-                          <div className="text-muted text-sm font-normal">
-                            {notesForProfile(option.id as FlavorProfile)}
-                          </div>
-                        </div>
-                      );
-                    }}
-                    options={flavorProfileList}
-                    onChange={(value) => onChange(value?.id)}
-                    value={
-                      value
-                        ? {
-                            id: value,
-                            name: formatFlavorProfile(value),
-                          }
-                        : undefined
-                    }
-                  />
-                )}
-              />
-
-              {canUseBottleLookup && (
-                <div className="flex justify-end px-4 py-4">
-                  <Button
-                    color="primary"
-                    onClick={async () => {
-                      const result =
-                        await generateDataMutation.mutateAsync(getValues());
-
-                      if (!result) return;
-                      const currentValues = getValues();
-                      if (result.description && !currentValues.description) {
-                        setValue("description", result.description, {
-                          shouldDirty: true,
-                        });
-                        setValue("descriptionSrc", "generated", {
-                          shouldDirty: true,
-                        });
-                      }
-
-                      if (
-                        result.flavorProfile &&
-                        !currentValues.flavorProfile
-                      ) {
-                        setValue(
-                          "flavorProfile",
-                          result.flavorProfile as FlavorProfile,
-                          { shouldDirty: true },
-                        );
-                      }
-                    }}
-                    disabled={generateDataMutation.isPending}
-                    icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
-                  >
-                    Suggest Description &amp; Flavor [Beta]
-                  </Button>
-                </div>
+            <Controller
+              name="series"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SeriesField
+                  {...field}
+                  error={errors.series}
+                  label="Series"
+                  helpText="The series this bottle belongs to, if any."
+                  placeholder="e.g. A Midwinter Night's Dram"
+                  brand={brandValue?.id ? Number(brandValue.id) : 0}
+                  disabled={!brandValue}
+                  canCreate
+                  onChange={(value) => {
+                    onChange(value?.id ?? value ?? null);
+                    setSeriesValue(value);
+                  }}
+                  value={seriesValue}
+                />
               )}
+            />
 
-              <ImageField
-                name="image"
-                label="Catalog Image"
-                value={imageUrl}
-                onChange={(value) => setImage(value)}
-                noEditor
-              />
+            <TextField
+              {...register("releaseYear", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.releaseYear}
+              type="number"
+              label="Release Year"
+              placeholder="e.g. 2024"
+              helpText="The year this bottle was released."
+            />
 
-              <TextAreaField
-                {...register("description", {
-                  setValueAs: (v) => (v === "" || !v ? null : v),
-                  onChange: () => {
-                    setValue("descriptionSrc", "user", { shouldDirty: true });
-                  },
-                })}
-                error={errors.description}
-                label="Description"
-                rows={8}
-              />
-            </div>
-          </Collapsable>
+            <TextField
+              {...register("vintageYear", {
+                setValueAs: (v) => (v === "" || !v ? null : parseInt(v, 10)),
+              })}
+              error={errors.vintageYear}
+              type="number"
+              label="Distillation Year"
+              placeholder="e.g. 1986"
+              helpText="The year the spirit was distilled."
+            />
+
+            <BooleanField
+              control={control}
+              label="Single Cask"
+              helpText="Shown as a single-cask bottling on the label."
+              name="singleCask"
+            />
+
+            <BooleanField
+              control={control}
+              label="Cask Strength"
+              helpText="Shown as cask strength on the label."
+              name="caskStrength"
+            />
+
+            <Controller
+              name="caskFill"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.caskFill}
+                  label="Cask Fill"
+                  placeholder="e.g. 1st Fill"
+                  simple
+                  options={caskFillList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? caskFillList.find((item) => item.id === value)
+                      : undefined
+                  }
+                />
+              )}
+            />
+
+            <Controller
+              name="caskType"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.caskType}
+                  label="Cask Type"
+                  placeholder="e.g. Bourbon"
+                  simple
+                  options={caskTypeList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? caskTypeList.find((item) => item.id === value)
+                      : undefined
+                  }
+                />
+              )}
+            />
+
+            <Controller
+              name="caskSize"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.caskSize}
+                  label="Cask Size"
+                  placeholder="e.g. Hogshead"
+                  simple
+                  options={caskSizeList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? caskSizeList.find((item) => item.id === value)
+                      : undefined
+                  }
+                />
+              )}
+            />
+
+            <Controller
+              name="flavorProfile"
+              control={control}
+              render={({ field: { onChange, value, ref, ...field } }) => (
+                <SelectField
+                  {...field}
+                  error={errors.flavorProfile}
+                  placeholder="The flavor profile of the spirit."
+                  suggestedOptions={[]}
+                  label="Flavor Profile"
+                  onRenderOption={(option) => {
+                    const classes = classesForProfile(
+                      option.id as FlavorProfile,
+                    );
+                    return (
+                      <div className="flex flex-col items-start justify-start gap-y-2 text-left">
+                        <h4
+                          className={`${classes.bg} ${classes.bgHover} rounded px-2 py-1`}
+                        >
+                          {option.name}
+                        </h4>
+                        <div className="text-muted text-sm font-normal">
+                          {notesForProfile(option.id as FlavorProfile)}
+                        </div>
+                      </div>
+                    );
+                  }}
+                  options={flavorProfileList}
+                  onChange={(value) => onChange(value?.id)}
+                  value={
+                    value
+                      ? {
+                          id: value,
+                          name: formatFlavorProfile(value),
+                        }
+                      : undefined
+                  }
+                />
+              )}
+            />
+
+            {canUseBottleLookup && (
+              <div className="flex justify-end px-4 py-4">
+                <Button
+                  color="primary"
+                  onClick={async () => {
+                    const result =
+                      await generateDataMutation.mutateAsync(getValues());
+
+                    if (!result) return;
+                    const currentValues = getValues();
+                    if (result.description && !currentValues.description) {
+                      setValue("description", result.description, {
+                        shouldDirty: true,
+                      });
+                      setValue("descriptionSrc", "generated", {
+                        shouldDirty: true,
+                      });
+                    }
+
+                    if (result.flavorProfile && !currentValues.flavorProfile) {
+                      setValue(
+                        "flavorProfile",
+                        result.flavorProfile as FlavorProfile,
+                        { shouldDirty: true },
+                      );
+                    }
+                  }}
+                  disabled={generateDataMutation.isPending}
+                  icon={<BoltIcon className="-ml-0.5 h-4 w-4" />}
+                >
+                  Suggest Description &amp; Flavor [Beta]
+                </Button>
+              </div>
+            )}
+
+            <ImageField
+              name="image"
+              label="Catalog Image"
+              value={imageUrl}
+              onChange={(value) => setImage(value)}
+              noEditor
+            />
+
+            <TextAreaField
+              {...register("description", {
+                setValueAs: (v) => (v === "" || !v ? null : v),
+                onChange: () => {
+                  setValue("descriptionSrc", "user", { shouldDirty: true });
+                },
+              })}
+              error={errors.description}
+              label="Description"
+              rows={8}
+            />
+          </div>
         </Fieldset>
       </Form>
     </FormScreen>
