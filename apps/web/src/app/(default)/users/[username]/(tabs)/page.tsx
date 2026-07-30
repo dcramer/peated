@@ -1,8 +1,7 @@
 "use client";
 import { use } from "react";
 
-import UserFlavorDistributionChart from "@peated/web/components/userFlavorDistributionChart";
-import UserLocationChart from "@peated/web/components/userLocationChart";
+import UserTastingInsights from "@peated/web/components/userTastingInsights";
 import { useProfileUserId } from "../profileContext";
 import { UserBadgeList } from "../userBadgeList";
 import LibraryInsights from "./library/libraryInsights";
@@ -23,20 +22,7 @@ export default function UserProfilePage(props: {
         <UserBadgeList userId={userId} />
       </section>
 
-      <section aria-labelledby="tastings-heading">
-        <div className="mb-3">
-          <h2
-            id="tastings-heading"
-            className="text-lg font-semibold text-white"
-          >
-            Tastings
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <UserLocationChart userId={userId} />
-          <UserFlavorDistributionChart userId={userId} />
-        </div>
-      </section>
+      <UserTastingInsights userId={userId} />
 
       <section aria-labelledby="library-heading">
         <div className="mb-3">
