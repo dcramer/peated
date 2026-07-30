@@ -53,6 +53,7 @@ export default function SearchPanel({
   const { user } = useAuth();
   const qs = useSearchParams();
   const intent = qs.get("intent");
+  const searchType = qs.get("type");
   const addBottleIntent = getAddBottleIntent(intent);
   const pendingImage = getPendingImageFromParams(qs);
   // The empty ?tasting flag is the legacy direct shortcut; intent=tasting keeps the Add Bottle resolver.
@@ -72,13 +73,15 @@ export default function SearchPanel({
 
   const orpc = useORPC();
 
-  const isUserQuery = query.indexOf("@") !== -1 && user;
+  const isUserQuery =
+    (searchType === "users" || query.indexOf("@") !== -1) && user;
 
   const unsafe_onQuery = useCallback(
     async (query: string) => {
       setState("loading");
 
-      const isUserQuery = query.indexOf("@") !== -1 && user;
+      const isUserQuery =
+        (searchType === "users" || query.indexOf("@") !== -1) && user;
 
       const include: ("bottles" | "entities" | "users")[] = [];
       if (directToTasting || addBottleIntent || !isUserQuery)
@@ -102,7 +105,7 @@ export default function SearchPanel({
       setState("ready");
       setInitialState("ready");
     },
-    [addBottleIntent, directToTasting, user],
+    [addBottleIntent, directToTasting, searchType, user],
   );
 
   // TODO: handle errors
@@ -137,6 +140,7 @@ export default function SearchPanel({
               if (addBottleIntent) {
                 params.set("intent", addBottleIntent);
               }
+              if (searchType) params.set("type", searchType);
               if (pendingImage?.id)
                 params.set("pendingImageId", pendingImage.id);
               if (pendingImage?.imageUrl) {
