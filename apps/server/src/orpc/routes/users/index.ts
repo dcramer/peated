@@ -8,6 +8,7 @@ import libraryStats from "./library-stats";
 import list from "./list";
 import regionList from "./region-list";
 import tagList from "./tag-list";
+import tastingStats from "./tasting-stats";
 import update from "./update";
 
 export default base.tag("users").router({
@@ -21,4 +22,5 @@ export default base.tag("users").router({
   libraryStats,
   regionList,
   tagList,
+  tastingStats,
 });

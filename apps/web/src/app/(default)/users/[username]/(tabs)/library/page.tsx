@@ -4,7 +4,6 @@ import Button from "@peated/web/components/button";
 import EmptyActivity from "@peated/web/components/emptyActivity";
 import LibraryEntryActions, {
   LibraryEntryImage,
-  LibraryEntryStatus,
   LibraryEntryThumbnail,
 } from "@peated/web/components/libraryEntryActions";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -16,7 +15,6 @@ import { useRouter } from "next/navigation";
 import { use, useTransition } from "react";
 import { useProfileUserId } from "../../profileContext";
 import { LibraryFilters } from "./libraryFilters";
-import LibraryInsights from "./libraryInsights";
 
 export default function UserLibrary(props: {
   params: Promise<{ username: string }>;
@@ -56,7 +54,6 @@ function UserLibraryTable({ username }: { username: string }) {
 
   return (
     <>
-      <LibraryInsights username={username} />
       <LibraryFilters
         loading={isPending}
         onNavigate={(href) => {
@@ -90,9 +87,6 @@ function UserLibraryTable({ username }: { username: string }) {
               ) : (
                 <LibraryEntryThumbnail entry={entry} />
               )
-            }
-            renderCollectionBottleMeta={(entry) =>
-              canEditLibrary ? null : <LibraryEntryStatus entry={entry} />
             }
             renderCollectionBottleActions={
               canEditLibrary
