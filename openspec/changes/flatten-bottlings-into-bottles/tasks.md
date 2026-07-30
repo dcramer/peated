@@ -200,8 +200,11 @@ explicit removal task and must not become a second business-logic system.
       foreign-key removal needed to keep canonical Bottle merges/deletes
       operational, retire migration writers, and retain the read-only pre-drop
       audit and inert historical change records.
-- [ ] 8.9 Only after the detached application and workers are fully deployed,
-      separate backup and explicit approval, generate and apply cleanup that
-      removes BottleRelease tables/columns and retained audit support.
-- [x] 8.10 Run and retain the final zero-legacy audit and full repository test
+- [x] 8.9 After the detached application and workers are fully deployed and
+      required audit evidence is retained, remove migration-only CLI, schemas,
+      libraries, and test fixtures without generating destructive cleanup DDL.
+- [ ] 8.10 Only after a separate backup and explicit approval, generate and
+      apply cleanup that removes BottleRelease tables, columns, and
+      migration-only enum types.
+- [ ] 8.11 Run and retain the final zero-legacy audit and full repository test
       gate before cleanup release.

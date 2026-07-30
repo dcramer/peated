@@ -251,21 +251,23 @@ parent/release pair after `bottleId` is repointed; rollback to the old
 application therefore uses the verified database backup rather than mixed-mode
 reads.
 
-Cleanup uses a two-deploy contract. The first deploy removes legacy foreign-key
+Cleanup uses a staged contract. The first deploy removes legacy foreign-key
 constraints that would otherwise block canonical Bottle merges/deletes, then
 removes the legacy tables and columns from the application-owned Drizzle schema
 and all normal runtime paths. It does not drop tables or columns. A raw-SQL,
 read-only audit remains available during this interval, and historical change
-rows remain stored but are excluded from current feeds. Only after every API
-and worker process runs the detached revision may a later, separately approved
-migration physically drop the legacy database objects.
+rows remain stored but are excluded from current feeds.
+
+After the detached revision is fully deployed and the required audit evidence
+is retained, a reversible code-only cleanup removes the audit CLI, schemas,
+libraries, and pre-cleanup test fixtures. It still generates no table or column
+cleanup DDL. Only a later, separately approved migration may physically drop
+the legacy database objects.
 
 The cleanup migration removes the BottleRelease tables, promotion and repair
 tables, consumer release columns, proposal/attempt migration evidence, and
-migration-only enum types. The same release removes the retained audit CLI,
-schemas, libraries, and pre-cleanup test fixtures. Historical change rows keep
-their original object type as inert data and remain excluded from current
-feeds.
+migration-only enum types. Historical change rows keep their original object
+type as inert data and remain excluded from current feeds.
 
 Destructive cleanup requires:
 

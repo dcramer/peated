@@ -215,10 +215,15 @@ the same validated Bottle id when identity is known.
 
 ## Retired BottleRelease Identity
 
-BottleRelease is not part of live creation, public identity, or the physical
-application schema. Legacy releases were promoted to independently complete
-Bottles before the promotion mapping, legacy pair columns, migration-only
-writers, and retained audit support were removed.
+BottleRelease is not part of live creation, public identity, or the
+application-owned runtime schema. Legacy releases were promoted to independently
+complete Bottles before migration-only writers and retained audit support were
+removed.
+
+Legacy tables and columns may remain physically present after that reversible
+code cleanup. A later, separately approved migration removes them only after
+backup verification; current application and worker code does not model, read,
+or write them.
 
 Historical change records may retain `bottle_release` as inert audit vocabulary,
 but current feeds exclude those records. New architecture must not add a second
