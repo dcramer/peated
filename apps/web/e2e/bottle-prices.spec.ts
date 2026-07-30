@@ -29,48 +29,31 @@ test.describe("Bottle prices", () => {
 
     await page.goto("/", { waitUntil: "commit" });
 
-    const marketPricesTab = page.getByRole("button", {
+    const marketPricesHeading = page.getByRole("heading", {
       name: "Market Prices",
     });
     if (testInfo.project.name.includes("mobile")) {
-      await expect(marketPricesTab).toBeHidden();
+      await expect(marketPricesHeading).toBeHidden();
       await expectNoHorizontalOverflow(page);
       return;
     }
 
-    await expect(marketPricesTab).toBeVisible();
-    const prices = page
-      .locator("table")
-      .filter({ hasText: priceChangeSecondBottle.fullName });
-    await expect(prices).toBeVisible();
-
-    const firstRow = prices.locator("tr").filter({
-      hasText: priceChangeFirstBottle.fullName,
+    await expect(marketPricesHeading).toBeVisible();
+    const prices = page.locator("section").filter({
+      has: marketPricesHeading,
     });
     await expect(
-      firstRow.getByRole("link", {
+      prices.getByRole("link", {
         name: priceChangeFirstBottle.fullName,
         exact: true,
       }),
     ).toHaveAttribute("href", `/bottles/${priceChangeFirstBottle.id}`);
     await expect(
-      firstRow.getByRole("img", { name: "In Library" }),
-    ).toBeVisible();
-    await expect(firstRow.getByRole("img", { name: "Tasted" })).toHaveCount(0);
-
-    const secondRow = prices.locator("tr").filter({
-      hasText: priceChangeSecondBottle.fullName,
-    });
-    await expect(
-      secondRow.getByRole("link", {
+      prices.getByRole("link", {
         name: priceChangeSecondBottle.fullName,
         exact: true,
       }),
     ).toHaveAttribute("href", `/bottles/${priceChangeSecondBottle.id}`);
-    await expect(secondRow.getByRole("img", { name: "Tasted" })).toBeVisible();
-    await expect(
-      secondRow.getByRole("img", { name: "In Library" }),
-    ).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
   });
 

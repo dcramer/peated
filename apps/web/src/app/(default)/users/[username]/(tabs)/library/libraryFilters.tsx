@@ -294,6 +294,7 @@ function LibraryEntityFilter({
         )}
         aria-haspopup="dialog"
         aria-expanded={open}
+        aria-label={`${label}: ${value?.name ?? placeholder}`}
       >
         <Icon
           className="text-muted hidden h-4 w-4 shrink-0 sm:block"
