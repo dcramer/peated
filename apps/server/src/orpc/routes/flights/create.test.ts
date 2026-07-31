@@ -99,9 +99,10 @@ describe("POST /flights", () => {
     fixtures,
   }) => {
     const user = await fixtures.User();
+    const brand = await fixtures.Entity({ name: "Flight Ordering Brand" });
     const laterBottle = await fixtures.Bottle({
+      brandId: brand.id,
       name: "Zulu release",
-      fullName: "Zulu release",
     });
     if (laterBottle.groupId === null) {
       throw new Error("Bottle group fixture not found");
@@ -113,7 +114,7 @@ describe("POST /flights", () => {
         brandId: laterBottle.brandId,
         createdByActorId: laterBottle.createdByActorId,
         name: "Alpha release",
-        fullName: "Alpha release",
+        fullName: `${brand.name} Alpha release`,
       })
       .returning();
     if (!firstBottle) throw new Error("Same-group Bottle fixture not found");
