@@ -263,6 +263,7 @@ jobs:
   e2e:
     name: "test / web e2e"
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.e2e == 'true' || needs.changes.outputs.repo == 'true'
     steps:

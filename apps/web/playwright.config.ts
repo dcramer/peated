@@ -11,6 +11,8 @@ export default defineConfig({
   testDir: "./e2e",
   outputDir: ".playwright/test-results",
   timeout: 60_000,
+  globalTimeout: process.env.CI ? 12 * 60_000 : undefined,
+  maxFailures: process.env.CI ? 5 : 0,
   fullyParallel: true,
   workers: 2,
   forbidOnly: !!process.env.CI,
