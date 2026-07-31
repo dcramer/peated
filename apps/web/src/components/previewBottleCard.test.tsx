@@ -29,12 +29,12 @@ describe("PreviewBottleCard", () => {
     expect(html).toContain("Springbank");
     expect(html).toContain("12-year-old");
     expect(html).toContain("Batch 24");
-    expect(html).toContain("12 years");
+    expect(html).not.toContain("12 years");
     expect(html).toContain("2025");
     expect(html).toContain("2013");
     expect(html).toContain("57.2% ABV");
     expect(html).toContain("Single Cask");
-    expect(html).toContain("Cask strength");
+    expect(html).not.toContain("Cask strength");
     expect(html).toContain("1st Fill Oloroso Hogshead cask");
     expect(html).toContain("uppercase");
     expect(html).toContain("bg-highlight");

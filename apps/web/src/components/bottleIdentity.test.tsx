@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import BottleIdentity, {
   getAbsoluteBottleTitle,
+  getMetadataExpressedByTitle,
   getRelativeBottleIdentity,
 } from "./bottleIdentity";
 
@@ -42,7 +43,7 @@ describe("BottleIdentity", () => {
     expect(html).toContain("Batch 24");
     expect(html).toContain("57.2% ABV");
     expect(html).toContain("2023 release");
-    expect(html).toContain("Cask strength");
+    expect(html).not.toContain(">Cask strength</span>");
     expect(html).toContain('aria-current="page"');
     expect(html).toContain('title="Currently viewing"');
     expect(html).toContain("bg-orange-400");
@@ -76,6 +77,29 @@ describe("BottleIdentity", () => {
     expect(html).not.toContain(">12 years<");
     expect(html).not.toContain(">Cask strength</span>");
     expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
+  });
+
+  it("does not use exact age as a subtitle when the family title includes it", () => {
+    const html = renderToStaticMarkup(
+      <BottleIdentity
+        bottle={makeBottle({
+          group: {
+            ...makeBottle().group!,
+            name: "Single Cask 4-year-old",
+            fullName: "Springbank Single Cask 4-year-old",
+            statedAge: null,
+          },
+          edition: null,
+          statedAge: 4,
+          singleCask: true,
+        })}
+        mode="absolute"
+      />,
+    );
+
+    expect(html).toContain("Single Cask 4-year-old");
+    expect(html).not.toContain(">4 years<");
+    expect(html).not.toContain(">Single cask<");
   });
 
   it("moves canonical metadata out of ungrouped Library headlines", () => {
@@ -121,6 +145,21 @@ describe("BottleIdentity", () => {
         }),
       ),
     ).toBe("Glenrothes - Individual Cask Release");
+  });
+
+  it("keeps cask details when a title only expresses part of the cask", () => {
+    const bottle = makeBottle({
+      caskFill: "1st_fill",
+      caskType: "bourbon",
+      caskSize: "hogshead",
+    });
+
+    expect(getMetadataExpressedByTitle(bottle, "Bourbon Cask")).not.toContain(
+      "cask-details",
+    );
+    expect(
+      getMetadataExpressedByTitle(bottle, "1st Fill Bourbon Hogshead Cask"),
+    ).toContain("cask-details");
   });
 
   it("keeps metadata-only names as the absolute headline", () => {

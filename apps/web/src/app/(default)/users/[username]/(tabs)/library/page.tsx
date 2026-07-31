@@ -78,7 +78,6 @@ function UserLibraryTable({ username }: { username: string }) {
             bottleList={bottles.results}
             rel={bottles.rel}
             hideLibraryStatus
-            identityMode="absolute"
             showRatingSummary
             showBottleStats={false}
             compactIdentity

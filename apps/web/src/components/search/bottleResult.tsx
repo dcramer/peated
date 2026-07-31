@@ -1,7 +1,12 @@
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
-import { BottleLabel } from "@peated/web/components/bottleIdentity";
+import {
+  BottleLabel,
+  getAbsoluteBottleTitle,
+  getBottleMetadataExclusions,
+  getDistinctBottleDistillers,
+} from "@peated/web/components/bottleIdentity";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import {
@@ -59,13 +64,18 @@ export default function BottleResultRow({
   addBottleIntent?: AddBottleRouteIntent;
   pendingImage?: PendingImageRouteState | null;
 }) {
-  const distillerMetadata = bottle.distillers.length ? (
+  const distillers = getDistinctBottleDistillers(bottle);
+  const distillerMetadata = distillers.length ? (
     <Join divider=", ">
-      {bottle.distillers.map((distiller) => (
+      {distillers.map((distiller) => (
         <span key={distiller.id}>{distiller.name}</span>
       ))}
     </Join>
   ) : undefined;
+  const metadataExclude = getBottleMetadataExclusions(
+    bottle,
+    getAbsoluteBottleTitle(bottle),
+  );
 
   return (
     <>
@@ -89,6 +99,7 @@ export default function BottleResultRow({
         <BottleExactMetadata
           bottle={bottle}
           leadingContent={distillerMetadata}
+          exclude={[...metadataExclude]}
         />
         {bottle.group && bottle.group.totalBottles > 1 ? (
           <div className="mt-1 text-xs">

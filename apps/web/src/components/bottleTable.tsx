@@ -8,10 +8,8 @@ import BottleStatusIcons, {
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
 import BottleIdentity from "./bottleIdentity";
-import BottleLink from "./bottleLink";
 import BottleRatingSummary from "./bottleRatingSummary";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
-import SingleCaskChip from "./singleCaskChip";
 import Table from "./table";
 
 type BottleRow = {
@@ -33,7 +31,6 @@ export default function BottleTable({
   hideLibraryStatus = false,
   showBottleStats = true,
   showRatingSummary = false,
-  identityMode = "legacy",
   compactIdentity = false,
   ...props
 }: Omit<ComponentProps<typeof Table>, "items" | "rel" | "columns"> & {
@@ -45,7 +42,6 @@ export default function BottleTable({
   hideLibraryStatus?: boolean;
   showBottleStats?: boolean;
   showRatingSummary?: boolean;
-  identityMode?: "legacy" | "absolute";
   compactIdentity?: boolean;
 }) {
   const rows: BottleRow[] = bottleList.map((item) =>
@@ -85,9 +81,8 @@ export default function BottleTable({
               !compactIdentity &&
               categoryName &&
               String(bottle.category) !== "other" &&
-              (identityMode === "legacy" ||
-                categoryName.toLocaleLowerCase() !==
-                  identityTitle.toLocaleLowerCase());
+              categoryName.toLocaleLowerCase() !==
+                identityTitle.toLocaleLowerCase();
             const collectionImage =
               item.collectionBottle &&
               renderCollectionBottleImage?.(item.collectionBottle);
@@ -121,43 +116,20 @@ export default function BottleTable({
               <div className="flex min-w-0 items-start gap-3">
                 {collectionImage}
                 <div className="flex min-w-0 flex-1 flex-col justify-center">
-                  {identityMode === "absolute" ? (
-                    <BottleIdentity
-                      bottle={bottle}
-                      mode="absolute"
-                      metadataVariant={compactIdentity ? "summary" : "full"}
-                    />
-                  ) : (
-                    <div className="flex min-w-0 flex-wrap items-center gap-x-1">
-                      <BottleLink
-                        bottle={bottle}
-                        className="font-medium hover:underline"
-                      >
-                        {bottle.fullName}
-                      </BottleLink>
-                    </div>
-                  )}
-                  {identityMode === "absolute" ? (
-                    <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
-                      {statusIndicators}
-                      {collectionMeta}
-                      {collectionMeta && categoryLink ? (
-                        <span aria-hidden="true">&middot;</span>
-                      ) : null}
-                      {categoryLink}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-1">
-                        {statusIndicators}
-                        {collectionMeta}
-                        {bottle.singleCask ? <SingleCaskChip /> : null}
-                      </div>
-                      <div className="text-muted flex flex-col gap-y-1 text-sm">
-                        {categoryLink}
-                      </div>
-                    </>
-                  )}
+                  <BottleIdentity
+                    bottle={bottle}
+                    mode="absolute"
+                    metadataVariant={compactIdentity ? "summary" : "full"}
+                    showBrand={!props.groupBy}
+                  />
+                  <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
+                    {statusIndicators}
+                    {collectionMeta}
+                    {collectionMeta && categoryLink ? (
+                      <span aria-hidden="true">&middot;</span>
+                    ) : null}
+                    {categoryLink}
+                  </div>
                 </div>
                 {showRatingSummary ? (
                   <BottleRatingSummary
