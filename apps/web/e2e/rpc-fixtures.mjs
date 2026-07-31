@@ -629,6 +629,7 @@ export function buildCollection({
  *   notes?: string,
  *   rating?: number,
  *   tags?: string[],
+ *   awards?: import("@peated/server/types").BadgeAward[],
  * }} [options]
  */
 export function buildTasting({
@@ -637,6 +638,7 @@ export function buildTasting({
   notes = tastingNotes,
   rating = 2,
   tags = /** @type {string[]} */ ([]),
+  awards = /** @type {import("@peated/server/types").BadgeAward[]} */ ([]),
 } = {}) {
   return {
     id,
@@ -648,7 +650,7 @@ export function buildTasting({
     color: null,
     servingStyle: null,
     friends: [],
-    awards: [],
+    awards,
     comments: 0,
     toasts: 0,
     hasToasted: false,
@@ -657,14 +659,42 @@ export function buildTasting({
   };
 }
 
+export const homeAwards = [
+  {
+    id: 51_001,
+    xp: 1,
+    level: 0,
+    badge: {
+      id: 52_001,
+      name: "Luck of the Irish",
+      maxLevel: 25,
+      imageUrl: null,
+    },
+    createdAt: timestamp,
+  },
+  {
+    id: 51_002,
+    xp: 1,
+    level: 0,
+    badge: {
+      id: 52_002,
+      name: "Pot Still Pioneer",
+      maxLevel: 25,
+      imageUrl: null,
+    },
+    createdAt: timestamp,
+  },
+];
+
 export function buildActivity({
   tasting = buildTasting({
-    bottle: {
-      ...existingBottle,
-      isFavorite: true,
-    },
+    bottle: homeBottle,
+    awards: homeAwards,
   }),
-  collectionBottle = buildCollectionBottle({ id: 9701 }),
+  collectionBottle = buildCollectionBottle({
+    id: 9701,
+    bottle: /** @type {CollectionBottle["bottle"]} */ (homeBottle),
+  }),
 } = {}) {
   return {
     results: [

@@ -44,7 +44,9 @@ test("library shows only useful release details on one line", async ({
   await expect(
     row.getByRole("link", { name: homeBottle.group.name, exact: true }),
   ).toBeVisible();
-  await expect(row.getByText(homeBottle.brand.name, { exact: true })).toBeVisible();
+  await expect(
+    row.getByText(homeBottle.brand.name, { exact: true }),
+  ).toBeVisible();
 
   const metadata = row.locator(".text-muted.mt-1.block.truncate");
   await expect(metadata).toBeVisible();

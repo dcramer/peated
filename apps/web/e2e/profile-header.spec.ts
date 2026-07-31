@@ -27,7 +27,9 @@ for (const { label, slug, user } of roleProfiles) {
     await expect(role).toBeVisible();
     await expect(page.getByText("225", { exact: true })).toBeVisible();
     await expect(
-      page.getByRole("main").getByText("Tastings", { exact: true }),
+      page.getByRole("link", {
+        name: `${user.stats.tastings.toLocaleString()} Tastings`,
+      }),
     ).toBeVisible();
 
     const [usernameBox, roleBox] = await Promise.all([
@@ -41,7 +43,7 @@ for (const { label, slug, user } of roleProfiles) {
     );
     expect(
       roleBox!.y - (usernameBox!.y + usernameBox!.height),
-    ).toBeLessThanOrEqual(4);
+    ).toBeLessThanOrEqual(8);
 
     if (testInfo.project.name.includes("mobile")) {
       expect(

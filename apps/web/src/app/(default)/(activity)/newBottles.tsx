@@ -4,6 +4,7 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import BottleLink from "@peated/web/components/bottleLink";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
+import { getBottleDisplayName } from "@peated/web/lib/bottleDisplayName";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -57,7 +58,7 @@ export default function NewBottles() {
                       bottle={bottle}
                       className="font-medium hover:underline"
                     >
-                      {`${bottle.brand.shortName || bottle.brand.name} ${bottle.name}`}
+                      {getBottleDisplayName(bottle)}
                     </BottleLink>
                     <BottleStatusIcons bottle={bottle} />
                   </div>

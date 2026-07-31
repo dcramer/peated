@@ -86,6 +86,9 @@ describe("GET /activity", () => {
     expect(collectionItems.map((item) => item.bottle.id)).toEqual(
       expect.arrayContaining([firstBottle.id, secondBottle.id, thirdBottle.id]),
     );
+    expect(collectionItems.every((item) => item.bottle.group?.fullName)).toBe(
+      true,
+    );
   });
 
   test("hides private users from anonymous global activity", async ({

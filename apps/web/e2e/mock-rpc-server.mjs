@@ -34,8 +34,8 @@ import {
   flightBottleFixture,
   flightBottleFixtureId,
   groupedBottleDetails,
-  libraryInsightsStats,
   homeBottle,
+  libraryInsightsStats,
   missingBottleId,
   moderatorUser,
   photoTastingNotes,
@@ -483,6 +483,17 @@ async function handleRpcRequest({ request, response, url }) {
       if (getAccessToken(request).includes("exact-bottle-merge")) {
         sendRpcResponse(response, {
           results: [existingBottle, exactMergeOtherBottle],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
+      if (
+        !getAccessToken(request).includes("flight-bottles") &&
+        input?.limit === 10 &&
+        input?.sort === "-created"
+      ) {
+        sendRpcResponse(response, {
+          results: [homeBottle, existingBottle],
           rel: { nextCursor: null, prevCursor: null },
         });
         return true;

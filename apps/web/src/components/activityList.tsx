@@ -3,6 +3,7 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
+import { getBottleDisplayName } from "@peated/web/lib/bottleDisplayName";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";
@@ -47,8 +48,8 @@ function getCollectionItemHref(item: CollectionAddItem) {
   return `/bottles/${item.bottle.id}`;
 }
 
-function getCollectionItemTitle(item: CollectionAddItem) {
-  return item.bottle.fullName;
+function getCollectionItemDisplayName(item: CollectionAddItem) {
+  return getBottleDisplayName(item.bottle);
 }
 
 function getCollectionItemDetail(item: CollectionAddItem) {
@@ -77,7 +78,7 @@ function CollectionItemImage({ item }: { item: CollectionAddItem }) {
 function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
   const detail = getCollectionItemDetail(item);
   const href = getCollectionItemHref(item);
-  const title = getCollectionItemTitle(item);
+  const displayName = getCollectionItemDisplayName(item);
 
   return (
     <li className="flex min-w-0 items-center gap-x-3 px-3 py-2">
@@ -85,10 +86,10 @@ function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
       <div className="min-w-0 flex-1">
         <Link
           href={href}
-          className="line-clamp-2 text-sm font-semibold text-white hover:underline sm:line-clamp-1"
-          title={title}
+          className="block truncate text-sm font-semibold text-white hover:underline"
+          title={item.bottle.fullName}
         >
-          {title}
+          {displayName}
         </Link>
         {detail ? (
           <div className="text-muted truncate text-xs">{detail}</div>

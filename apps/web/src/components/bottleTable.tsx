@@ -82,6 +82,7 @@ export default function BottleTable({
               : null;
             const identityTitle = bottle.group?.name ?? bottle.name;
             const showCategory =
+              !compactIdentity &&
               categoryName &&
               String(bottle.category) !== "other" &&
               (identityMode === "legacy" ||

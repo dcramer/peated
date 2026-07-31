@@ -150,7 +150,7 @@ export default function TastingListItem({
       )}
 
       {!!tasting.notes && (
-        <div className="prose prose-invert -my-1 max-w-none px-3 text-sm sm:px-5">
+        <div className="prose prose-invert prose-p:my-0 -my-2 max-w-none px-3 text-sm sm:px-5">
           <Markdown content={tasting.notes} noLinks />
         </div>
       )}
@@ -210,13 +210,13 @@ export default function TastingListItem({
       )}
 
       {!!tasting.awards.length && (
-        <ul className="flex flex-col gap-y-2 sm:px-3">
+        <ul className="flex flex-col sm:px-3">
           {tasting.awards.map((award) => {
             return (
               <li
                 key={award.id}
                 title={award.badge.name}
-                className="group relative flex items-center gap-x-1 rounded px-2 py-2 text-sm"
+                className="group relative flex items-center gap-x-1 rounded px-2 py-1 text-sm"
               >
                 <Link
                   href={`/badges/${award.badge.id}`}
