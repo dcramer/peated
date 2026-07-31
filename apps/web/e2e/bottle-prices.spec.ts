@@ -34,7 +34,7 @@ test.describe("Bottle prices", () => {
     });
     await prices
       .getByRole("link", {
-        name: priceChangeFirstBottle.fullName,
+        name: priceChangeFirstBottle.group.name,
         exact: true,
       })
       .click();

@@ -24,7 +24,7 @@ test.describe("Flight bottles", () => {
     for (const bottle of [existingBottle, exactSearchBottle]) {
       const bottleRow = page.getByRole("row").filter({
         has: page.getByRole("link", {
-          name: bottle.fullName,
+          name: bottle.name,
           exact: true,
         }),
       });
@@ -73,13 +73,13 @@ test.describe("Flight bottles", () => {
     );
     await expect(
       page.getByRole("link", {
-        name: existingBottle.fullName,
+        name: existingBottle.name,
         exact: true,
       }),
     ).toBeVisible();
     await expect(
       page.getByRole("link", {
-        name: exactSearchBottle.fullName,
+        name: exactSearchBottle.name,
         exact: true,
       }),
     ).toBeVisible();

@@ -4,6 +4,7 @@ import { Buffer } from "node:buffer";
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
   createdTastingId,
+  destinationBottleGroup,
   existingBottle,
   failingTastingNotes,
   photoTastingNotes,
@@ -29,7 +30,9 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Add Bottle" }),
     ).toBeVisible();
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      getBottleIdentityLink(page, destinationBottleGroup.name),
+    ).toBeVisible();
     await expect(
       page
         .locator("main section")
@@ -103,7 +106,9 @@ test.describe("log tasting", () => {
 
     await uploadLabel(page);
 
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      getBottleIdentityLink(page, existingBottle.group.name),
+    ).toBeVisible();
     await expect(
       page.getByText("Matched to existing bottle in Peated"),
     ).toBeVisible();
@@ -115,7 +120,7 @@ test.describe("log tasting", () => {
     await expect(
       page
         .locator("main section")
-        .filter({ hasText: existingBottle.fullName })
+        .filter({ hasText: "Matched to existing bottle in Peated" })
         .getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
 
@@ -124,7 +129,12 @@ test.describe("log tasting", () => {
     await expect(
       page.getByRole("heading", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 4,
+        name: existingBottle.fullName,
+      }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(photoTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
@@ -149,10 +159,17 @@ test.describe("log tasting", () => {
 
     await uploadLabel(page);
 
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      getBottleIdentityLink(page, existingBottle.group.name),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Log Tasting" }).click();
 
-    await expect(page.getByText(existingBottle.fullName)).toBeVisible();
+    await expect(
+      page.getByRole("heading", {
+        level: 4,
+        name: existingBottle.fullName,
+      }),
+    ).toBeVisible();
     await page.getByRole("button", { name: "Savor" }).click();
     await page.getByLabel("Comments").fill(failingTastingNotes);
     await page.getByRole("button", { name: "Save" }).click();
@@ -169,6 +186,10 @@ test.describe("log tasting", () => {
     await expectNoHorizontalOverflow(page);
   });
 });
+
+function getBottleIdentityLink(page: Page, name: string) {
+  return page.getByRole("main").getByRole("link", { name, exact: true });
+}
 
 async function uploadLabel(page: Page) {
   await expect(

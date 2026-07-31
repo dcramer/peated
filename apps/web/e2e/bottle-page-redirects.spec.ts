@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import {
+  destinationBottleGroup,
   exactMatchedBottleId,
   existingBottleId,
   missingBottleId,
@@ -13,7 +14,7 @@ test.describe("Bottle page redirects", () => {
   test("renders an active Bottle without redirecting", async ({ page }) => {
     await page.goto(`/bottles/${existingBottleId}`);
     await expect(
-      page.getByRole("heading", { name: "Lagavulin 16-year-old" }),
+      page.getByRole("heading", { name: destinationBottleGroup.fullName }),
     ).toBeVisible();
   });
 
