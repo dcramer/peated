@@ -40,8 +40,9 @@ describe("BottleHeader", () => {
     expect(text).toContain("Lagavulin21");
     expect(text).not.toContain(bottle.fullName);
     expect(text).toContain(
-      "Distillers Edition·Single Malt·21 years·55.1% ABV·2025 release·Cask strength",
+      "Distillers Edition·Single Malt·21 years·55.1% ABV·2025 release",
     );
+    expect(text).not.toContain("Cask strength");
     expect(html).toContain(`title="${bottle.fullName}"`);
   });
 
@@ -71,5 +72,93 @@ describe("BottleHeader", () => {
 
     expect(text.match(/Distillers Edition/g)).toHaveLength(1);
     expect(text).toContain("2025 release");
+  });
+
+  it("keeps repeated identity fields out of a single-cask header", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Pōkeno Double Bourbon Cask 3-year-old",
+      name: "Double Bourbon Cask 3-year-old",
+      group: { name: "Double Bourbon Cask 3-year-old" },
+      brand: { id: 7, name: "Pōkeno", shortName: null },
+      distillers: [{ id: 7, name: "Pōkeno" }],
+      edition: null,
+      category: "single_malt",
+      statedAge: 3,
+      abv: 56,
+      vintageYear: null,
+      releaseYear: null,
+      singleCask: true,
+      caskStrength: true,
+      caskFill: null,
+      caskType: "bourbon",
+      caskSize: null,
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text.match(/Pōkeno/g)).toHaveLength(1);
+    expect(text.match(/Single Cask/g)).toHaveLength(1);
+    expect(text).not.toContain("3 years");
+    expect(text).not.toContain("Bourbon cask");
+    expect(text).toContain("Single Malt·56.0% ABV");
+    expect(text).not.toContain("Cask strength");
+    expect(text).not.toContain("Distilled at");
+  });
+
+  it("retains distinct distiller attribution", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Compass Box Orchard House",
+      name: "Orchard House",
+      group: { name: "Orchard House" },
+      brand: { id: 7, name: "Compass Box", shortName: null },
+      distillers: [{ id: 8, name: "Clynelish" }],
+      edition: null,
+      category: "blend",
+      statedAge: null,
+      abv: 46,
+      vintageYear: null,
+      releaseYear: null,
+      singleCask: false,
+      caskStrength: false,
+      caskFill: null,
+      caskType: null,
+      caskSize: null,
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text).toContain("Distilled atClynelish");
+  });
+
+  it("does not add a chip when Single Cask is already in the title", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Pōkeno Single Cask 4-year-old",
+      name: "Single Cask 4-year-old",
+      group: { name: "Single Cask 4-year-old" },
+      brand: { id: 7, name: "Pōkeno", shortName: null },
+      distillers: [],
+      edition: null,
+      category: null,
+      statedAge: 4,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      singleCask: true,
+      caskStrength: false,
+      caskFill: null,
+      caskType: null,
+      caskSize: null,
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text.match(/Single Cask/g)).toHaveLength(1);
+    expect(html).not.toContain('title="Single cask"');
   });
 });

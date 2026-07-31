@@ -19,7 +19,7 @@ export default function BottleFullHeader({
     <div className="w-full p-3 lg:py-0">
       <BottleHeader bottle={bottle} />
 
-      <div className="my-8 flex flex-col justify-center gap-2 sm:flex-row lg:justify-start">
+      <div className="mb-5 mt-4 flex flex-col justify-center gap-2 sm:flex-row lg:justify-start">
         <div className="flex flex-grow justify-center gap-4 gap-x-2 lg:justify-start">
           <Suspense
             fallback={

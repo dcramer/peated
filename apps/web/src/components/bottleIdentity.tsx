@@ -1,7 +1,6 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
-import { getBottleLabel } from "@peated/web/lib/bottleLabel";
 import classNames from "@peated/web/lib/classNames";
 import type { MouseEventHandler, ReactNode } from "react";
 import BottleExactMetadata, {
@@ -33,12 +32,12 @@ export function BottleLabel({
   bottle,
   className,
 }: {
-  bottle: Pick<BottleIdentitySource, "fullName" | "name" | "brand" | "group">;
+  bottle: BottleIdentitySource;
   className?: string;
 }) {
   return (
     <span title={bottle.fullName} className={className}>
-      {getBottleLabel(bottle)}
+      {getAbsoluteBottleLabel(bottle)}
     </span>
   );
 }
@@ -87,7 +86,7 @@ export function getAbsoluteBottleTitle(bottle: BottleIdentitySource) {
   const titleSegments = bottle.name.split(" - ");
 
   while (
-    titleSegments.length &&
+    titleSegments.length > 1 &&
     metadataSegments.has(
       titleSegments[titleSegments.length - 1]!.toLocaleLowerCase(),
     )
@@ -96,6 +95,29 @@ export function getAbsoluteBottleTitle(bottle: BottleIdentitySource) {
   }
 
   return titleSegments.length ? titleSegments.join(" - ") : bottle.name;
+}
+
+export function getAbsoluteBottleLabel(bottle: BottleIdentitySource) {
+  const brandName = bottle.brand.shortName || bottle.brand.name;
+  return `${brandName} ${getAbsoluteBottleTitle(bottle)}`;
+}
+
+export function getDistinctBottleDistillers({
+  brand,
+  distillers,
+}: {
+  brand: Pick<Bottle["brand"], "name" | "shortName">;
+  distillers: Pick<Bottle["distillers"][number], "id" | "name">[];
+}) {
+  const brandNames = new Set(
+    [brand.name, brand.shortName]
+      .filter((name): name is string => Boolean(name))
+      .map((name) => name.toLocaleLowerCase()),
+  );
+
+  return distillers.filter(
+    (distiller) => !brandNames.has(distiller.name.toLocaleLowerCase()),
+  );
 }
 
 function getEditionMetadataDuplicates(
@@ -135,12 +157,31 @@ function getEditionMetadataDuplicates(
   return duplicates;
 }
 
-function getMetadataExpressedByTitle(
-  bottle: BottleIdentitySource,
+export function getMetadataExpressedByTitle(
+  bottle: Pick<
+    BottleIdentitySource,
+    | "edition"
+    | "statedAge"
+    | "abv"
+    | "vintageYear"
+    | "releaseYear"
+    | "singleCask"
+    | "caskStrength"
+    | "caskFill"
+    | "caskType"
+    | "caskSize"
+  >,
   title: string,
 ): BottleExactMetadataKey[] {
   const normalizedTitle = title.toLocaleLowerCase();
   const duplicates: BottleExactMetadataKey[] = [];
+
+  if (
+    bottle.edition &&
+    normalizedTitle.includes(bottle.edition.toLocaleLowerCase())
+  ) {
+    duplicates.push("edition");
+  }
 
   if (
     bottle.statedAge !== null &&
@@ -176,7 +217,33 @@ function getMetadataExpressedByTitle(
   if (bottle.caskStrength && normalizedTitle.includes("cask strength")) {
     duplicates.push("cask-strength");
   }
+  const caskDetails = [
+    bottle.caskFill,
+    bottle.caskType,
+    bottle.caskSize,
+  ].filter((value): value is NonNullable<typeof value> => value !== null);
+  if (
+    caskDetails.length > 0 &&
+    caskDetails.every((value) =>
+      normalizedTitle.includes(toTitleCase(value).toLocaleLowerCase()),
+    )
+  ) {
+    duplicates.push("cask-details");
+  }
   return duplicates;
+}
+
+export function getBottleMetadataExclusions(
+  bottle: Parameters<typeof getMetadataExpressedByTitle>[0],
+  displayedIdentity: string,
+) {
+  const exclusions = new Set(
+    getMetadataExpressedByTitle(bottle, displayedIdentity),
+  );
+
+  if (bottle.abv !== null) exclusions.add("cask-strength");
+
+  return exclusions;
 }
 
 /**
@@ -216,11 +283,11 @@ export function getRelativeBottleIdentity(
   if (bottle.singleCask) {
     return { label: "Single cask", excludeMetadata: ["single-cask"] };
   }
-  if (bottle.caskStrength) {
-    return { label: "Cask strength", excludeMetadata: ["cask-strength"] };
-  }
   if (bottle.abv !== null) {
     return { label: formatAbv(bottle.abv), excludeMetadata: ["abv"] };
+  }
+  if (bottle.caskStrength) {
+    return { label: "Cask strength", excludeMetadata: ["cask-strength"] };
   }
   return { label: bottle.name, excludeMetadata: [], fallback: true };
 }
@@ -263,6 +330,7 @@ export default function BottleIdentity({
   href,
   className,
   linkClassName,
+  showBrand = true,
 }: {
   bottle: BottleIdentitySource;
   mode?: "absolute" | "relative";
@@ -273,27 +341,34 @@ export default function BottleIdentity({
   href?: string;
   className?: string;
   linkClassName?: string;
+  showBrand?: boolean;
 }) {
   const relativeIdentity = getRelativeBottleIdentity(bottle);
   const isAbsolute = mode === "absolute";
   const title = isAbsolute
     ? getAbsoluteBottleTitle(bottle)
     : relativeIdentity.label;
+  const titleMetadata = getBottleMetadataExclusions(bottle, title);
   const leadingContent =
-    isAbsolute && bottle.group && !relativeIdentity.fallback
+    isAbsolute &&
+    bottle.group &&
+    !relativeIdentity.fallback &&
+    !relativeIdentity.excludeMetadata.some((key) => titleMetadata.has(key))
       ? relativeIdentity.label
       : undefined;
   const displayedLeadingContent =
     metadataVariant === "summary" ? undefined : leadingContent;
-  const titleMetadata = isAbsolute
-    ? getMetadataExpressedByTitle(bottle, title)
-    : [];
+  const metadataExclude = titleMetadata;
+  if (!isAbsolute || displayedLeadingContent) {
+    relativeIdentity.excludeMetadata.forEach((key) => metadataExclude.add(key));
+  }
+  metadataExclude.add("category");
 
   return (
     <div className={classNames("min-w-0", className)}>
-      {isAbsolute ? (
+      {isAbsolute && showBrand ? (
         <div className="text-muted truncate text-xs font-medium uppercase tracking-wide">
-          {bottle.brand.name}
+          {bottle.brand.shortName || bottle.brand.name}
         </div>
       ) : null}
       <div className="flex min-w-0 flex-wrap items-center gap-x-2">
@@ -321,13 +396,7 @@ export default function BottleIdentity({
       <BottleExactMetadata
         bottle={bottle}
         variant={metadataVariant}
-        exclude={[
-          "category",
-          ...titleMetadata,
-          ...(!isAbsolute || displayedLeadingContent
-            ? relativeIdentity.excludeMetadata
-            : []),
-        ]}
+        exclude={[...metadataExclude]}
         leadingContent={displayedLeadingContent}
       />
     </div>

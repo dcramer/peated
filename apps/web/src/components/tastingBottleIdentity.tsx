@@ -1,43 +1,21 @@
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
+import {
+  type BottleIdentitySource,
+  getAbsoluteBottleLabel,
+  getBottleMetadataExclusions,
+  getDistinctBottleDistillers,
+  getRelativeBottleIdentity,
+} from "@peated/web/components/bottleIdentity";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import Join from "./join";
 import SingleCaskChip from "./singleCaskChip";
 
-export type TastingBottleIdentitySource = Pick<
-  Bottle,
-  | "id"
-  | "fullName"
-  | "edition"
-  | "releaseYear"
-  | "vintageYear"
-  | "singleCask"
-  | "category"
-  | "statedAge"
-  | "isLibrary"
-  | "hasTasted"
-> & {
-  brand: Pick<Bottle["brand"], "name" | "shortName">;
-  distillers: Pick<Bottle["distillers"][number], "id" | "name">[];
-  group?: Pick<NonNullable<Bottle["group"]>, "name">;
-};
-
-function getExactBottleLabel(
-  bottle: TastingBottleIdentitySource,
-  displayName: string,
-) {
-  if (bottle.edition) {
-    return `${bottle.edition}${bottle.releaseYear ? ` (${bottle.releaseYear})` : ""}${bottle.vintageYear ? ` (${bottle.vintageYear} Vintage)` : ""}`;
-  }
-  if (bottle.releaseYear) return `${bottle.releaseYear} Bottling`;
-  if (bottle.vintageYear) return `${bottle.vintageYear} Vintage`;
-
-  const prefix = `${displayName} - `;
-  return bottle.fullName.startsWith(prefix)
-    ? bottle.fullName.slice(prefix.length)
-    : null;
-}
+export type TastingBottleIdentitySource = BottleIdentitySource &
+  Pick<Bottle, "isLibrary" | "hasTasted"> & {
+    distillers: Pick<Bottle["distillers"][number], "id" | "name">[];
+  };
 
 export default function TastingBottleIdentity({
   bottle,
@@ -46,13 +24,20 @@ export default function TastingBottleIdentity({
   bottle: TastingBottleIdentitySource;
   variant?: "inline" | "panel";
 }) {
-  const displayName = bottle.group
-    ? `${bottle.brand.shortName || bottle.brand.name} ${bottle.group.name}`
-    : bottle.fullName;
-  const exactBottleLabel = getExactBottleLabel(bottle, displayName);
-  const showSingleCaskChip =
-    bottle.singleCask &&
-    !/\bsingle[\s-]+cask\b/i.test(`${displayName} ${exactBottleLabel ?? ""}`);
+  const displayName = getAbsoluteBottleLabel(bottle);
+  const relativeIdentity = getRelativeBottleIdentity(bottle);
+  const exactBottleLabel =
+    bottle.group && !relativeIdentity.fallback ? relativeIdentity.label : null;
+  const distinctDistillers = getDistinctBottleDistillers(bottle);
+  const inlineSingleCaskChip =
+    bottle.singleCask && !/\bsingle[\s-]+cask\b/i.test(displayName);
+  const panelSingleCaskChip =
+    inlineSingleCaskChip &&
+    !/\bsingle[\s-]+cask\b/i.test(exactBottleLabel ?? "");
+  const metadataExclude = getBottleMetadataExclusions(
+    bottle,
+    `${displayName} ${exactBottleLabel ?? ""}`,
+  );
 
   if (variant === "inline") {
     return (
@@ -69,7 +54,7 @@ export default function TastingBottleIdentity({
                 </Link>
               </h4>
               <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-              {showSingleCaskChip && <SingleCaskChip />}
+              {inlineSingleCaskChip && <SingleCaskChip />}
             </div>
           </div>
         </div>
@@ -88,22 +73,22 @@ export default function TastingBottleIdentity({
               </Link>
             </h4>
             <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-            {!exactBottleLabel && showSingleCaskChip && <SingleCaskChip />}
+            {!exactBottleLabel && panelSingleCaskChip && <SingleCaskChip />}
           </div>
         </div>
         <div className="flex flex-row gap-x-1 text-sm">
           {exactBottleLabel ? (
             <div className="flex flex-wrap items-center gap-2">
               <span>{exactBottleLabel}</span>
-              {showSingleCaskChip && <SingleCaskChip />}
+              {panelSingleCaskChip && <SingleCaskChip />}
             </div>
           ) : null}
-          {!!(exactBottleLabel && bottle.distillers.length) && (
+          {!!(exactBottleLabel && distinctDistillers.length) && (
             <div>&middot;</div>
           )}
-          {bottle.distillers.length ? (
+          {distinctDistillers.length ? (
             <Join divider=", ">
-              {bottle.distillers.map((distiller) => (
+              {distinctDistillers.map((distiller) => (
                 <Link
                   key={distiller.id}
                   href={`/entities/${distiller.id}`}
@@ -127,7 +112,11 @@ export default function TastingBottleIdentity({
             </Link>
           ) : null}
         </div>
-        <div>{bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}</div>
+        <div>
+          {bottle.statedAge && !metadataExclude.has("age")
+            ? `Aged ${bottle.statedAge} years`
+            : null}
+        </div>
       </div>
     </div>
   );

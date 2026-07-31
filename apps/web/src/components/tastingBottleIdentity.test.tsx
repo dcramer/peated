@@ -7,20 +7,28 @@ import TastingBottleIdentity, {
 
 const bottle = {
   id: 42,
-  fullName: "Lagavulin 21 - 2025 Release - 55.1% ABV - Single Cask - Cask 42",
+  fullName:
+    "Lagavulin 21-year-old - 2025 Release - 55.1% ABV - Single Cask - Cask Strength",
+  name: "21-year-old - 2025 Release - 55.1% ABV - Single Cask - Cask Strength",
   brand: {
     name: "Lagavulin",
     shortName: null,
   },
   group: {
-    name: "21",
+    name: "21-year-old",
+    statedAge: 21,
   },
   edition: "2025 Release",
   category: "single_malt",
   statedAge: 21,
+  abv: 55.1,
   vintageYear: 2004,
   releaseYear: 2025,
   singleCask: true,
+  caskStrength: true,
+  caskFill: null,
+  caskType: null,
+  caskSize: null,
   distillers: [{ id: 7, name: "Lagavulin Distillery" }],
   isLibrary: true,
   hasTasted: true,
@@ -35,13 +43,15 @@ describe("TastingBottleIdentity", () => {
 
     expect(html).toContain('href="/bottles/42"');
     expect(html).toContain(
-      'title="Lagavulin 21 - 2025 Release - 55.1% ABV - Single Cask - Cask 42"',
+      'title="Lagavulin 21-year-old - 2025 Release - 55.1% ABV - Single Cask - Cask Strength"',
     );
-    expect(text).toContain("Lagavulin 21");
-    expect(text).toContain("2025 Release (2025) (2004 Vintage)");
+    expect(text).toContain("Lagavulin 21-year-old");
+    expect(text).toContain("2025 Release");
+    expect(text.match(/2025 Release/g)).toHaveLength(1);
+    expect(text).not.toContain("2004 Vintage");
     expect(text).toContain("·Lagavulin Distillery");
     expect(text).toContain("Single Malt");
-    expect(text).toContain("Aged 21 years");
+    expect(text).not.toContain("Aged 21 years");
     expect(html).toContain("bg-highlight");
     expect(html).toContain("p-4");
     expect(html).toContain("text-black");
@@ -59,8 +69,8 @@ describe("TastingBottleIdentity", () => {
     );
     expect(html).not.toContain("border-slate-800");
     expect(html).not.toContain("bg-slate-950");
-    expect(text).toContain("Lagavulin 21");
-    expect(text).not.toContain("Lagavulin 21 - 2025 Release");
+    expect(text).toContain("Lagavulin 21-year-old");
+    expect(text).not.toContain("Lagavulin 21-year-old - 2025 Release");
     expect(text).not.toContain("2025 Release");
     expect(text).not.toContain("Lagavulin Distillery");
     expect(text).not.toContain("Single Malt");
@@ -76,7 +86,7 @@ describe("TastingBottleIdentity", () => {
       <TastingBottleIdentity
         bottle={{
           ...bottle,
-          group: { name: "Single Cask 21" },
+          group: { name: "Single Cask 21", statedAge: 21 },
         }}
         variant="inline"
       />,
@@ -88,7 +98,7 @@ describe("TastingBottleIdentity", () => {
   });
 
   it.each(["inline", "panel"] as const)(
-    "falls back to the exact Bottle name in the %s variant",
+    "falls back to a concise absolute Bottle name in the %s variant",
     (variant) => {
       const html = renderToStaticMarkup(
         <TastingBottleIdentity
@@ -98,8 +108,9 @@ describe("TastingBottleIdentity", () => {
       );
 
       expect(html).toContain('href="/bottles/42"');
-      expect(html).toContain(
-        "Lagavulin 21 - 2025 Release - 55.1% ABV - Single Cask - Cask 42",
+      expect(html).toContain("Lagavulin 21-year-old");
+      expect(html).not.toContain(
+        ">Lagavulin 21-year-old - 2025 Release - 55.1% ABV - Single Cask - Cask Strength<",
       );
     },
   );

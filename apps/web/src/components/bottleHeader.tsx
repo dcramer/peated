@@ -1,12 +1,16 @@
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottleExactMetadata, {
-  type BottleExactMetadataKey,
   hasBottleExactMetadata,
 } from "@peated/web/components/bottleExactMetadata";
+import {
+  getAbsoluteBottleLabel,
+  getAbsoluteBottleTitle,
+  getBottleMetadataExclusions,
+  getDistinctBottleDistillers,
+} from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
-import { getBottleLabel } from "@peated/web/lib/bottleLabel";
-import BottleMetadata from "./bottleMetadata";
+import { Distillers } from "./bottleMetadata";
 import PageHeader from "./pageHeader";
 import SingleCaskChip from "./singleCaskChip";
 
@@ -19,19 +23,27 @@ export default function BottleHeader({
   href?: string;
   compact?: boolean;
 }) {
-  const label = getBottleLabel(bottle);
-  const expressionName = bottle.group?.name || bottle.name;
-  const metadataExclude: BottleExactMetadataKey[] = [];
+  const label = getAbsoluteBottleLabel(bottle);
+  const expressionName = getAbsoluteBottleTitle(bottle);
+  const metadataExclude = getBottleMetadataExclusions(bottle, expressionName);
+  const distinctDistillers = getDistinctBottleDistillers(bottle);
+  const showSingleCaskChip =
+    bottle.singleCask && !metadataExclude.has("single-cask");
 
-  if (bottle.singleCask) metadataExclude.push("single-cask");
+  if (showSingleCaskChip) metadataExclude.add("single-cask");
   if (
     bottle.edition &&
     expressionName
       .toLocaleLowerCase()
       .includes(bottle.edition.toLocaleLowerCase())
   ) {
-    metadataExclude.push("edition");
+    metadataExclude.add("edition");
   }
+  const metadataKeys = [...metadataExclude];
+  const hasIdentityDetails =
+    showSingleCaskChip ||
+    hasBottleExactMetadata(bottle, metadataKeys) ||
+    distinctDistillers.length > 0;
 
   return (
     <PageHeader
@@ -61,18 +73,25 @@ export default function BottleHeader({
               {expressionName}
             </div>
           )}
-          {bottle.singleCask && <SingleCaskChip />}
         </div>
       }
       titleExtra={
-        <BottleMetadata
-          data={bottle}
-          className="text-muted w-full truncate text-center lg:text-left"
-        />
-      }
-      metadata={
-        hasBottleExactMetadata(bottle, metadataExclude) ? (
-          <BottleExactMetadata bottle={bottle} exclude={metadataExclude} />
+        hasIdentityDetails ? (
+          <div className="flex max-w-full flex-col items-center lg:items-start">
+            <BottleExactMetadata
+              bottle={bottle}
+              exclude={metadataKeys}
+              leadingContent={
+                showSingleCaskChip ? <SingleCaskChip /> : undefined
+              }
+              className="justify-center lg:justify-start"
+            />
+            {distinctDistillers.length ? (
+              <div className="text-muted mt-1 text-sm">
+                <Distillers distillers={distinctDistillers} />
+              </div>
+            ) : null}
+          </div>
         ) : null
       }
     />
