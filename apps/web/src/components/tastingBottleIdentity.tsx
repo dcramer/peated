@@ -2,7 +2,6 @@ import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
-import classNames from "../lib/classNames";
 import Join from "./join";
 import SingleCaskChip from "./singleCaskChip";
 
@@ -51,14 +50,35 @@ export default function TastingBottleIdentity({
     ? `${bottle.brand.shortName || bottle.brand.name} ${bottle.group.name}`
     : bottle.fullName;
   const exactBottleLabel = getExactBottleLabel(bottle, displayName);
+  const showSingleCaskChip =
+    bottle.singleCask &&
+    !/\bsingle[\s-]+cask\b/i.test(`${displayName} ${exactBottleLabel ?? ""}`);
+
+  if (variant === "inline") {
+    return (
+      <div className="flex items-center space-x-2 overflow-hidden sm:space-x-3 sm:rounded">
+        <div className="flex-1 overflow-hidden">
+          <div className="flex w-full items-center gap-x-1 font-bold">
+            <div className="space-x-1">
+              <h4 className="inline font-bold" title={bottle.fullName}>
+                <Link
+                  href={`/bottles/${bottle.id}`}
+                  className="hover:underline"
+                >
+                  {displayName}
+                </Link>
+              </h4>
+              <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
+              {showSingleCaskChip && <SingleCaskChip />}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={classNames(
-        "flex items-center space-x-2 overflow-hidden sm:space-x-3 sm:rounded",
-        variant === "panel" ? "bg-highlight p-4 text-black lg:p-5" : "",
-      )}
-    >
+    <div className="bg-highlight flex items-center space-x-2 overflow-hidden p-4 text-black sm:space-x-3 sm:rounded lg:p-5">
       <div className="flex-1 overflow-hidden">
         <div className="flex w-full items-center gap-x-1 font-bold">
           <div className="space-x-1">
@@ -68,19 +88,14 @@ export default function TastingBottleIdentity({
               </Link>
             </h4>
             <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-            {!exactBottleLabel && bottle.singleCask && <SingleCaskChip />}
+            {!exactBottleLabel && showSingleCaskChip && <SingleCaskChip />}
           </div>
         </div>
-        <div
-          className={classNames(
-            "flex flex-row gap-x-1 text-sm",
-            variant === "inline" ? "text-muted" : "",
-          )}
-        >
+        <div className="flex flex-row gap-x-1 text-sm">
           {exactBottleLabel ? (
             <div className="flex flex-wrap items-center gap-2">
               <span>{exactBottleLabel}</span>
-              {bottle.singleCask && <SingleCaskChip />}
+              {showSingleCaskChip && <SingleCaskChip />}
             </div>
           ) : null}
           {!!(exactBottleLabel && bottle.distillers.length) && (
@@ -101,12 +116,7 @@ export default function TastingBottleIdentity({
           ) : null}
         </div>
       </div>
-      <div
-        className={classNames(
-          variant === "inline" ? "text-muted" : "",
-          "hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex",
-        )}
-      >
+      <div className="hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex">
         <div className="max-w-full truncate">
           {bottle.category ? (
             <Link

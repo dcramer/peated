@@ -2,6 +2,7 @@ import http from "node:http";
 
 import {
   addAnotherReleaseSourceBottle,
+  adminUser,
   anotherReleaseSourceBottle,
   bottleGroup,
   bottleGroupId,
@@ -33,8 +34,10 @@ import {
   flightBottleFixture,
   flightBottleFixtureId,
   groupedBottleDetails,
+  homeBottle,
   libraryInsightsStats,
   missingBottleId,
+  moderatorUser,
   photoTastingNotes,
   priceChangeList,
   priceSite,
@@ -484,6 +487,17 @@ async function handleRpcRequest({ request, response, url }) {
         });
         return true;
       }
+      if (
+        !getAccessToken(request).includes("flight-bottles") &&
+        input?.limit === 10 &&
+        input?.sort === "-created"
+      ) {
+        sendRpcResponse(response, {
+          results: [homeBottle, existingBottle],
+          rel: { nextCursor: null, prevCursor: null },
+        });
+        return true;
+      }
       if (!getAccessToken(request).includes("flight-bottles")) return false;
       sendRpcResponse(response, {
         results: [existingBottle, exactSearchBottle],
@@ -771,6 +785,19 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcResponse(response, testUser);
         return true;
       }
+      if (input?.user === adminUser.id || input?.user === adminUser.username) {
+        sendRpcResponse(response, adminUser);
+        return true;
+      }
+
+      if (
+        input?.user === moderatorUser.id ||
+        input?.user === moderatorUser.username
+      ) {
+        sendRpcResponse(response, moderatorUser);
+        return true;
+      }
+
       sendRpcError(response, "Unexpected user details payload");
       return true;
     case "users/libraryStats":
@@ -1765,6 +1792,7 @@ function withCollectionStatus(request, bottle) {
 }
 
 function getMockBottle(request, bottleId) {
+  if (bottleId === homeBottle.id) return homeBottle;
   if (bottleId === existingBottleId) {
     if (getAccessToken(request).includes("add-another-release")) {
       return addAnotherReleaseSourceBottle;

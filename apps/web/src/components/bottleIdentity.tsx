@@ -235,10 +235,12 @@ export default function BottleIdentity({
   bottle,
   mode,
   current = false,
+  metadataVariant = "full",
 }: {
   bottle: BottleIdentitySource;
   mode: "absolute" | "relative";
   current?: boolean;
+  metadataVariant?: "full" | "summary";
 }) {
   const relativeIdentity = getRelativeBottleIdentity(bottle);
   const isAbsolute = mode === "absolute";
@@ -249,6 +251,8 @@ export default function BottleIdentity({
     isAbsolute && bottle.group && !relativeIdentity.fallback
       ? relativeIdentity.label
       : undefined;
+  const displayedLeadingContent =
+    metadataVariant === "summary" ? undefined : leadingContent;
   const titleMetadata = isAbsolute
     ? getMetadataExpressedByTitle(bottle, title)
     : [];
@@ -278,14 +282,15 @@ export default function BottleIdentity({
       </div>
       <BottleExactMetadata
         bottle={bottle}
+        variant={metadataVariant}
         exclude={[
           "category",
           ...titleMetadata,
-          ...(!isAbsolute || leadingContent
+          ...(!isAbsolute || displayedLeadingContent
             ? relativeIdentity.excludeMetadata
             : []),
         ]}
-        leadingContent={leadingContent}
+        leadingContent={displayedLeadingContent}
       />
     </div>
   );

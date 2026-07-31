@@ -1,14 +1,21 @@
 import { expect, test } from "@playwright/test";
 
 import { expectNoHorizontalOverflow } from "./assertions";
-import { existingBottle, tastingNotes, testUser } from "./rpc-fixtures.mjs";
+import { homeBottle, tastingNotes, testUser } from "./rpc-fixtures.mjs";
 
 test.describe("activity feed", () => {
   test("renders tasting and Library addition activity", async ({ page }) => {
     await page.goto("/", { waitUntil: "commit" });
 
+    const tastingActivity = page
+      .locator("li")
+      .filter({ hasText: tastingNotes })
+      .first();
     await expect(
-      page.getByRole("link", { name: existingBottle.fullName }).first(),
+      tastingActivity.getByRole("link", {
+        name: homeBottle.group.fullName,
+        exact: true,
+      }),
     ).toBeVisible();
     await expect(page.getByText(tastingNotes)).toBeVisible();
     const collectionAddRow = page.locator("li").filter({

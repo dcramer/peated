@@ -55,6 +55,9 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results[0]?.bottle).toMatchObject({
       id: first.id,
       fullName: first.fullName,
+      group: {
+        id: first.groupId,
+      },
     });
     expect(response.results[0]).not.toHaveProperty("target");
   });
@@ -87,6 +90,36 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results.map(({ bottle }) => bottle.id)).toEqual([
       selected.id,
     ]);
+  });
+
+  test("returns legacy ungrouped Bottles from Library", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.LegacyBottle({
+      name: "Legacy Library Bottle",
+    });
+    const collection = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+      totalBottles: 1,
+    });
+    await db.insert(collectionBottles).values({
+      collectionId: collection.id,
+      bottleId: bottle.id,
+    });
+
+    const response = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results).toHaveLength(1);
+    expect(response.results[0]?.bottle).toMatchObject({
+      id: bottle.id,
+      fullName: bottle.fullName,
+    });
+    expect(response.results[0]?.bottle).not.toHaveProperty("group");
   });
 
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {

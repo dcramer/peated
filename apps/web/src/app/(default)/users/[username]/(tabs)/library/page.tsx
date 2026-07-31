@@ -81,6 +81,7 @@ function UserLibraryTable({ username }: { username: string }) {
             identityMode="absolute"
             showRatingSummary
             showBottleStats={false}
+            compactIdentity
             renderCollectionBottleImage={(entry) =>
               canEditLibrary ? (
                 <LibraryEntryImage entry={entry} username={username} />

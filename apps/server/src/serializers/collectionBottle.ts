@@ -30,11 +30,21 @@ export const CollectionBottleSerializer = serializer({
       .select()
       .from(bottles)
       .where(inArray(bottles.id, bottleIds));
-    const serializedBottles = await serialize(
-      BottleSerializer,
-      bottleRows,
-      currentUser,
-    );
+    const [groupedBottles, legacyBottles] = await Promise.all([
+      serialize(
+        BottleSerializer,
+        bottleRows.filter(({ groupId }) => groupId !== null),
+        currentUser,
+        [],
+        { includeGroupSummary: true },
+      ),
+      serialize(
+        BottleSerializer,
+        bottleRows.filter(({ groupId }) => groupId === null),
+        currentUser,
+      ),
+    ]);
+    const serializedBottles = [...groupedBottles, ...legacyBottles];
     const bottleById = new Map(
       serializedBottles.map((bottle) => [bottle.id, bottle]),
     );

@@ -32,6 +32,34 @@ export const testUser = {
   },
 };
 
+export const adminUser = {
+  ...testUser,
+  id: 9102,
+  username: "admin-review",
+  email: "admin-review@example.com",
+  admin: true,
+  stats: {
+    ...testUser.stats,
+    tastings: 225,
+    bottles: 206,
+    library: {
+      total: 78,
+      open: 12,
+      sealed: 66,
+    },
+    contributions: 70,
+  },
+};
+
+export const moderatorUser = {
+  ...adminUser,
+  id: 9103,
+  username: "moderator-review",
+  email: "moderator-review@example.com",
+  admin: false,
+  mod: true,
+};
+
 export const libraryInsightsStats = {
   total: 76,
   distillers: [
@@ -314,6 +342,30 @@ export function buildBottleGroup({
   };
 }
 
+/** @type {ConcreteFixtureBottle} */
+const homeBottleWithoutGroup = {
+  ...buildBottle({
+    id: 50_000,
+    name: "Single Cask 4-year-old - 55.8% ABV - Pedro Ximenez Cask",
+  }),
+  fullName: "Lagavulin Single Cask 4-year-old - 55.8% ABV - Pedro Ximenez Cask",
+  statedAge: 4,
+  abv: 55.8,
+  singleCask: true,
+  caskStrength: true,
+  caskType: "pedro_ximenez",
+  imageUrl: "http://127.0.0.1:4999/uploads/home-bottle.png",
+};
+
+export const homeBottle = {
+  ...homeBottleWithoutGroup,
+  group: buildBottleGroup({
+    bottle: homeBottleWithoutGroup,
+    fullName: "Lagavulin Single Cask 4-year-old",
+    name: "Single Cask 4-year-old",
+  }),
+};
+
 export const bottleGroupId = 50_001;
 export const destinationBottleGroupId = 50_002;
 
@@ -577,6 +629,7 @@ export function buildCollection({
  *   notes?: string,
  *   rating?: number,
  *   tags?: string[],
+ *   awards?: import("@peated/server/types").BadgeAward[],
  * }} [options]
  */
 export function buildTasting({
@@ -585,6 +638,7 @@ export function buildTasting({
   notes = tastingNotes,
   rating = 2,
   tags = /** @type {string[]} */ ([]),
+  awards = /** @type {import("@peated/server/types").BadgeAward[]} */ ([]),
 } = {}) {
   return {
     id,
@@ -596,7 +650,7 @@ export function buildTasting({
     color: null,
     servingStyle: null,
     friends: [],
-    awards: [],
+    awards,
     comments: 0,
     toasts: 0,
     hasToasted: false,
@@ -605,14 +659,42 @@ export function buildTasting({
   };
 }
 
+export const homeAwards = [
+  {
+    id: 51_001,
+    xp: 1,
+    level: 0,
+    badge: {
+      id: 52_001,
+      name: "Luck of the Irish",
+      maxLevel: 25,
+      imageUrl: null,
+    },
+    createdAt: timestamp,
+  },
+  {
+    id: 51_002,
+    xp: 1,
+    level: 0,
+    badge: {
+      id: 52_002,
+      name: "Pot Still Pioneer",
+      maxLevel: 25,
+      imageUrl: null,
+    },
+    createdAt: timestamp,
+  },
+];
+
 export function buildActivity({
   tasting = buildTasting({
-    bottle: {
-      ...existingBottle,
-      isFavorite: true,
-    },
+    bottle: homeBottle,
+    awards: homeAwards,
   }),
-  collectionBottle = buildCollectionBottle({ id: 9701 }),
+  collectionBottle = buildCollectionBottle({
+    id: 9701,
+    bottle: /** @type {CollectionBottle["bottle"]} */ (homeBottle),
+  }),
 } = {}) {
   return {
     results: [
