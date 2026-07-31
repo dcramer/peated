@@ -1,6 +1,7 @@
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottleExactMetadata, {
+  type BottleExactMetadataKey,
   hasBottleExactMetadata,
 } from "@peated/web/components/bottleExactMetadata";
 import Link from "@peated/web/components/link";
@@ -19,7 +20,18 @@ export default function BottleHeader({
   compact?: boolean;
 }) {
   const label = getBottleLabel(bottle);
-  const metadataExclude = bottle.singleCask ? (["single-cask"] as const) : [];
+  const expressionName = bottle.group?.name || bottle.name;
+  const metadataExclude: BottleExactMetadataKey[] = [];
+
+  if (bottle.singleCask) metadataExclude.push("single-cask");
+  if (
+    bottle.edition &&
+    expressionName
+      .toLocaleLowerCase()
+      .includes(bottle.edition.toLocaleLowerCase())
+  ) {
+    metadataExclude.push("edition");
+  }
 
   return (
     <PageHeader
@@ -46,7 +58,7 @@ export default function BottleHeader({
               >
                 {bottle.brand.shortName || bottle.brand.name}
               </Link>
-              {bottle.group?.name || bottle.name}
+              {expressionName}
             </div>
           )}
           {bottle.singleCask && <SingleCaskChip />}

@@ -44,4 +44,32 @@ describe("BottleHeader", () => {
     );
     expect(html).toContain(`title="${bottle.fullName}"`);
   });
+
+  it("does not repeat an edition already expressed by the title", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Lagavulin Distillers Edition - 2025 Release",
+      name: "Distillers Edition - 2025 Release",
+      group: { name: "Distillers Edition" },
+      brand: { id: 7, name: "Lagavulin", shortName: null },
+      distillers: [],
+      edition: "Distillers Edition",
+      category: "single_malt",
+      statedAge: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: 2025,
+      singleCask: null,
+      caskStrength: null,
+      caskFill: null,
+      caskType: null,
+      caskSize: null,
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text.match(/Distillers Edition/g)).toHaveLength(1);
+    expect(text).toContain("2025 release");
+  });
 });
