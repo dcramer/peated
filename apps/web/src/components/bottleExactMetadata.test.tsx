@@ -7,6 +7,7 @@ import BottleExactMetadata, {
 
 const exactBottle = {
   category: "single_malt",
+  edition: "2025 Release",
   statedAge: 21,
   abv: 55.1,
   vintageYear: 2004,
@@ -27,7 +28,7 @@ describe("BottleExactMetadata", () => {
 
     expect(html).toContain("flex-wrap");
     expect(text).toBe(
-      "Lagavulin·Single Malt·21 years·55.1% ABV·2004 vintage·2025 release·Single cask·Cask strength·1st Fill Oloroso Hogshead cask",
+      "Lagavulin·2025 Release·Single Malt·21 years·55.1% ABV·2004 vintage·Single cask·Cask strength·1st Fill Oloroso Hogshead cask",
     );
     expect(html.match(/class="inline-flex whitespace-nowrap"/g)).toHaveLength(
       9,
@@ -66,6 +67,7 @@ describe("BottleExactMetadata", () => {
       <BottleExactMetadata
         bottle={{
           category: null,
+          edition: null,
           statedAge: null,
           abv: null,
           vintageYear: null,
@@ -109,6 +111,7 @@ describe("BottleExactMetadata", () => {
       <BottleExactMetadata
         bottle={{
           ...exactBottle,
+          edition: null,
           statedAge: 4,
           vintageYear: null,
           releaseYear: null,

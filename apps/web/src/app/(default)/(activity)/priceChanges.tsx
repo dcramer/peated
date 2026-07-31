@@ -1,10 +1,10 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
-import type { Bottle } from "@peated/server/types";
 import { type Currency } from "@peated/server/types";
+import BottleIdentity, {
+  type BottleIdentitySource,
+} from "@peated/web/components/bottleIdentity";
 import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
-import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
 import classNames from "@peated/web/lib/classNames";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -37,32 +37,19 @@ export function PriceChangeIdentity({
   hasTasted,
   isLibrary,
 }: {
-  bottle: Pick<Bottle, "id" | "fullName" | "category">;
+  bottle: BottleIdentitySource;
   hasTasted: boolean;
   isLibrary: boolean;
 }) {
   return (
-    <>
-      <div className="flex items-center space-x-1">
-        <Link
-          href={`/bottles/${bottle.id}`}
-          className="truncate hover:underline"
-        >
-          {bottle.fullName}
-        </Link>
+    <BottleIdentity
+      bottle={bottle}
+      mode="absolute"
+      metadataVariant="summary"
+      trailingContent={
         <BottleStatusIndicators hasTasted={hasTasted} isLibrary={isLibrary} />
-      </div>
-      {!!bottle.category && (
-        <div className="text-muted text-sm">
-          <Link
-            href={`/bottles/?category=${bottle.category}`}
-            className="hover:underline"
-          >
-            {formatCategoryName(bottle.category)}
-          </Link>
-        </div>
-      )}
-    </>
+      }
+    />
   );
 }
 

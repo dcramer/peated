@@ -42,6 +42,10 @@ export function getBottleExactMetadata(
 ): MetadataItem[] {
   const metadata: MetadataItem[] = [];
 
+  if (bottle.edition) {
+    metadata.push({ key: "edition", content: bottle.edition });
+  }
+
   if (bottle.category) {
     metadata.push({
       key: "category",
@@ -81,7 +85,25 @@ export function getBottleExactMetadata(
     metadata.push({ key: "cask-details", content: `${caskDetails} cask` });
   }
 
-  return metadata;
+  const seenLabels = new Set<string>();
+  return metadata.filter(({ content }) => {
+    if (typeof content !== "string") return true;
+
+    const label = content.trim().toLowerCase();
+    if (seenLabels.has(label)) return false;
+
+    seenLabels.add(label);
+    return true;
+  });
+}
+
+export function hasBottleExactMetadata(
+  bottle: BottleExactMetadataSource,
+  exclude: readonly BottleExactMetadataKey[] = [],
+) {
+  return getBottleExactMetadata(bottle).some(
+    ({ key }) => !exclude.includes(key),
+  );
 }
 
 function getBottleReleaseSummary(
@@ -136,7 +158,7 @@ export default function BottleExactMetadata({
 }: {
   bottle: BottleExactMetadataSource;
   className?: string;
-  exclude?: BottleExactMetadataKey[];
+  exclude?: readonly BottleExactMetadataKey[];
   leadingContent?: ReactNode;
   variant?: "full" | "summary";
 }) {

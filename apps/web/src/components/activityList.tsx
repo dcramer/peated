@@ -1,9 +1,8 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
+import BottleIdentity from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
-import { getBottleDisplayName } from "@peated/web/lib/bottleDisplayName";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import TastingListItem from "./tastingListItem";
@@ -44,18 +43,6 @@ function CollectionLink({ activity }: { activity: CollectionAddActivity }) {
   );
 }
 
-function getCollectionItemHref(item: CollectionAddItem) {
-  return `/bottles/${item.bottle.id}`;
-}
-
-function getCollectionItemDisplayName(item: CollectionAddItem) {
-  return getBottleDisplayName(item.bottle);
-}
-
-function getCollectionItemDetail(item: CollectionAddItem) {
-  return item.bottle.category ? formatCategoryName(item.bottle.category) : null;
-}
-
 function CollectionItemImage({ item }: { item: CollectionAddItem }) {
   const imageUrl = item.imageUrl ?? item.bottle.imageUrl;
 
@@ -76,24 +63,15 @@ function CollectionItemImage({ item }: { item: CollectionAddItem }) {
 }
 
 function CollectionPreviewItem({ item }: { item: CollectionAddItem }) {
-  const detail = getCollectionItemDetail(item);
-  const href = getCollectionItemHref(item);
-  const displayName = getCollectionItemDisplayName(item);
-
   return (
     <li className="flex min-w-0 items-center gap-x-3 px-3 py-2">
       <CollectionItemImage item={item} />
-      <div className="min-w-0 flex-1">
-        <Link
-          href={href}
-          className="block truncate text-sm font-semibold text-white hover:underline"
-          title={item.bottle.fullName}
-        >
-          {displayName}
-        </Link>
-        {detail ? (
-          <div className="text-muted truncate text-xs">{detail}</div>
-        ) : null}
+      <div className="min-w-0 flex-1 text-sm">
+        <BottleIdentity
+          bottle={item.bottle}
+          mode="absolute"
+          metadataVariant="summary"
+        />
       </div>
     </li>
   );

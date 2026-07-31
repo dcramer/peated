@@ -3,6 +3,7 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
 import BadgeImage from "@peated/web/components/badgeImage";
+import BottleIdentity from "@peated/web/components/bottleIdentity";
 import BottleResolver, {
   type BottleResolverAction,
   type BottleResolverCreateProposalActionsProps,
@@ -143,14 +144,12 @@ function BottlePanel({
             className="h-24 w-24 shrink-0 rounded object-cover"
           />
         )}
-        <div className="min-w-0 flex-1">
-          <Link
-            href={getViewBottleHref(bottle)}
-            className="font-semibold text-white hover:underline"
-          >
-            {bottle.fullName}
-          </Link>
-        </div>
+        <BottleIdentity
+          bottle={bottle}
+          href={getViewBottleHref(bottle)}
+          className="min-w-0 flex-1"
+          linkClassName="font-semibold text-white hover:underline"
+        />
       </div>
     </section>
   );
@@ -167,14 +166,12 @@ function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
             className="h-24 w-24 shrink-0 rounded object-cover"
           />
         )}
-        <div className="min-w-0 flex-1">
-          <Link
-            href={getViewBottleHref(entry.bottle)}
-            className="font-semibold text-white hover:underline"
-          >
-            {entry.bottle.fullName}
-          </Link>
-        </div>
+        <BottleIdentity
+          bottle={entry.bottle}
+          href={getViewBottleHref(entry.bottle)}
+          className="min-w-0 flex-1"
+          linkClassName="font-semibold text-white hover:underline"
+        />
       </div>
     </section>
   );
