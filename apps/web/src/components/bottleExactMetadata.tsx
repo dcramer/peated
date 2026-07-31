@@ -146,9 +146,9 @@ export default function BottleExactMetadata({
       ? getBottleReleaseSummary(bottle)
       : getBottleExactMetadata(bottle)
   ).filter(({ key }) => !excluded.has(key));
-  const items: MetadataItem[] =
+  const items: Array<MetadataItem | { key: "leading"; content: ReactNode }> =
     leadingContent !== undefined
-      ? [{ key: "edition", content: leadingContent }, ...metadata]
+      ? [{ key: "leading", content: leadingContent }, ...metadata]
       : metadata;
   if (!items.length) return null;
 

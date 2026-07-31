@@ -88,8 +88,10 @@ export const BottleSerializer = serializer({
       );
 
       for (const item of itemList) {
-        const group =
-          item.groupId === null ? undefined : groupById.get(item.groupId);
+        if (item.groupId === null) {
+          continue;
+        }
+        const group = groupById.get(item.groupId);
         if (!group) {
           throw new Error(
             `Bottle ${item.id} does not belong to an active BottleGroup.`,

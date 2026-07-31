@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import BottleExactMetadata, {
   type BottleExactMetadataSource,
@@ -32,6 +32,33 @@ describe("BottleExactMetadata", () => {
     expect(html.match(/class="inline-flex whitespace-nowrap"/g)).toHaveLength(
       9,
     );
+  });
+
+  it("renders leading content alongside an edition without duplicate keys", () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      const html = renderToStaticMarkup(
+        <BottleExactMetadata
+          bottle={{
+            ...exactBottle,
+            edition: "Distillers Edition",
+            group: { statedAge: exactBottle.statedAge },
+          }}
+          leadingContent="Lagavulin"
+          variant="summary"
+        />,
+      );
+      const text = html.replace(/<[^>]*>/g, "");
+
+      expect(text).toContain("Lagavulin");
+      expect(text).toContain("Distillers Edition");
+      expect(consoleError).not.toHaveBeenCalled();
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 
   it("omits absent optional metadata without empty separators", () => {
