@@ -310,7 +310,9 @@ operation-specific live state.
 
 Evidence references SHALL use a discriminated union for a source field, Bottle
 id, Entity id, or web-result URL. Freeform evidence-reference
-strings SHALL NOT be accepted.
+strings SHALL NOT be accepted. Source fields SHALL use exact serialized input
+paths: `reference.<field>`, `extractedIdentity.<field>`,
+`imageEvidence.fieldCandidates.<field>`, or `audit.note`.
 
 #### Scenario: Model cites a web result
 

@@ -3,10 +3,14 @@ import { z } from "zod";
 import {
   AuditBottleInputSchema,
   FindingSchema,
+  ProposedOperationTypeSchema,
   ProposedOperationsSchema,
 } from "./bottleCheckContract";
 import { listBottleCheckOperationTargets } from "./bottleCheckEvalScoring";
-import { BottleContextSeriesRefSchema } from "./bottleContextContract";
+import {
+  BottleContextSeriesRefSchema,
+  BottleContextSourceSchema,
+} from "./bottleContextContract";
 import {
   AliasScopeEnum,
   BottleCandidateSchema,
@@ -147,11 +151,16 @@ export const classifierEvalExpectationSchema = z.object({
     .optional(),
   proposedOperations: ProposedOperationsSchema.default([]),
   findings: z.array(FindingSchema).default([]),
-  operationPreparation: z
-    .enum(["immediate", "after_primary"])
-    .default("immediate"),
   summary: z.string().min(1),
 });
+
+const classifierEvalContextSchema = z
+  .object({
+    inspectedBottleIds: z.array(z.number().int().positive()).default([]),
+    inspectedEntities: z.array(EntityResolutionSchema).default([]),
+    inspectedSeries: z.array(BottleContextSeriesRefSchema).default([]),
+  })
+  .strict();
 
 export const classifierEvalFixtureSchema = z
   .object({
@@ -168,6 +177,12 @@ export const classifierEvalFixtureSchema = z
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
     localCatalog: LocalCatalogSchema.optional(),
+    availableOperations: z.array(ProposedOperationTypeSchema).default([]),
+    context: classifierEvalContextSchema.default({
+      inspectedBottleIds: [],
+      inspectedEntities: [],
+      inspectedSeries: [],
+    }),
     provenance: evalFixtureProvenanceSchema.optional(),
     expected: classifierEvalExpectationSchema,
   })
@@ -186,6 +201,63 @@ export const classifierEvalFixtureSchema = z
         });
       }
       initialCandidateIds.add(candidate.bottleId);
+    }
+
+    const availableOperationTypes = new Set(value.availableOperations);
+    for (const [
+      operationIndex,
+      operation,
+    ] of value.expected.proposedOperations.entries()) {
+      if (!availableOperationTypes.has(operation.type)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Expected operation type ${operation.type} is not available to the classifier.`,
+          path: ["expected", "proposedOperations", operationIndex, "type"],
+        });
+      }
+    }
+
+    const inspectedBottleIds = new Set(value.context.inspectedBottleIds);
+    const inspectedEntityIds = new Set(
+      value.context.inspectedEntities.map(({ entityId }) => entityId),
+    );
+    const inspectedSeriesIds = new Set(
+      value.context.inspectedSeries.map(({ seriesId }) => seriesId),
+    );
+
+    for (const [
+      operationIndex,
+      operation,
+    ] of value.expected.proposedOperations.entries()) {
+      for (const target of listBottleCheckOperationTargets(operation)) {
+        const inspected =
+          target.kind === "bottle"
+            ? inspectedBottleIds.has(target.id)
+            : target.kind === "entity"
+              ? inspectedEntityIds.has(target.id)
+              : inspectedSeriesIds.has(target.id);
+        if (inspected) {
+          continue;
+        }
+
+        const label =
+          target.kind === "bottle"
+            ? "Bottle"
+            : target.kind === "entity"
+              ? "Entity"
+              : "BottleSeries";
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Expected operation references uninspected ${label} id ${target.id}.`,
+          path: [
+            "expected",
+            "proposedOperations",
+            operationIndex,
+            "input",
+            ...target.path,
+          ],
+        });
+      }
     }
 
     if (value.localCatalog !== undefined) {
@@ -270,6 +342,7 @@ const auditBottleEvalContextSchema = z
   .object({
     currentBottle: BottleCandidateSchema,
     inspectedBottles: z.array(BottleCandidateSchema).default([]),
+    bottleContexts: z.array(BottleContextSourceSchema).optional(),
     inspectedEntities: z.array(EntityResolutionSchema).default([]),
     inspectedSeries: z.array(BottleContextSeriesRefSchema).default([]),
     searchEvidence: z.array(BottleSearchEvidenceSchema).default([]),
@@ -319,6 +392,28 @@ export const auditBottleEvalFixtureSchema = z
         });
       }
       bottleIds.add(bottle.bottleId);
+    }
+
+    if (value.input.context.bottleContexts !== undefined) {
+      const expectedBottleIds = [...bottleIds].sort(
+        (left, right) => left - right,
+      );
+      const contextBottleIds = value.input.context.bottleContexts
+        .map(({ bottleId }) => bottleId)
+        .sort((left, right) => left - right);
+      if (
+        expectedBottleIds.length !== contextBottleIds.length ||
+        expectedBottleIds.some(
+          (bottleId, index) => bottleId !== contextBottleIds[index],
+        )
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Explicit Bottle contexts must exactly cover the current and inspected Bottle ids.",
+          path: ["input", "context", "bottleContexts"],
+        });
+      }
     }
 
     const entityIds = new Set<number>();

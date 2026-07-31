@@ -1,7 +1,11 @@
 import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 
-import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
+import {
+  AUDIT_BOTTLE_EVAL_CASES,
+  buildAuditEvalBottleContext,
+  getAuditEvalBottleContexts,
+} from "./auditBottle.eval.fixtures";
 import type { ProposedOperation } from "./bottleCheckContract";
 import {
   scoreBottleCheckGrounding,
@@ -152,31 +156,28 @@ describe("Bottle-check eval scoring", () => {
     });
   });
 
-  test("treats a reversed post-primary merge as both missing and harmful", () => {
+  test("treats a reversed current-to-matched merge as both missing and harmful", () => {
     const fixture = EVAL_CASES.find(
       (candidate) =>
         candidate.fixtureId ===
-        "generalized-current-bottle-requires-post-primary-merge",
+        "generalized-current-bottle-merges-into-selected-match",
     );
     expect(fixture).toBeDefined();
-    expect(fixture!.expected.operationPreparation).toBe("after_primary");
-
     const expectedMerge = fixture!.expected.proposedOperations[0];
     expect(expectedMerge?.type).toBe("merge_bottles");
     if (expectedMerge?.type !== "merge_bottles") {
       throw new Error("Expected the correction fixture to contain a merge.");
     }
 
+    const reversedMerge: ProposedOperation = {
+      ...expectedMerge,
+      input: {
+        sourceBottleId: expectedMerge.input.destinationBottleId,
+        destinationBottleId: expectedMerge.input.sourceBottleId,
+      },
+    };
     const score = scoreBottleCheckSemanticOutput(fixture!.expected, {
-      proposedOperations: [
-        {
-          ...expectedMerge,
-          input: {
-            sourceBottleId: expectedMerge.input.destinationBottleId,
-            destinationBottleId: expectedMerge.input.sourceBottleId,
-          },
-        },
-      ],
+      proposedOperations: [reversedMerge],
       findings: [],
     });
 
@@ -359,6 +360,73 @@ describe("Bottle-check eval scoring", () => {
         },
         ["audit.note"],
       ),
+    );
+  });
+
+  test("grounds the production-derived Càirdeas merge in inspected Bottle contexts and official evidence", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
+    const candidates = [
+      fixture!.input.context.currentBottle,
+      ...fixture!.input.context.inspectedBottles,
+    ];
+    const contextSources = getAuditEvalBottleContexts(fixture!);
+    const artifacts = BottleClassificationArtifactsSchema.parse({
+      candidates,
+      bottleContexts: contextSources.map(
+        ({ imageSources: _imageSources, ...context }) => {
+          return { ...context, publicImages: [] };
+        },
+      ),
+      searchEvidence: fixture!.input.context.searchEvidence,
+    });
+
+    expect(contextSources).toMatchObject([
+      {
+        bottleId: 39096,
+        groupId: 9433,
+        shared: {
+          name: "Cairdeas - 15-year-old",
+          statedAge: 15,
+        },
+        exact: { vintageYear: 2022, releaseYear: null },
+        siblings: [{ bottleId: 802 }],
+        aliases: [],
+        observations: [],
+        imageSources: [
+          {
+            source: { kind: "tasting", tastingId: 223 },
+          },
+        ],
+      },
+      {
+        bottleId: 45146,
+        groupId: 18105,
+        shared: { name: "Càirdeas", statedAge: null },
+        exact: {
+          edition: "Warehouse 1",
+          abv: 52.2,
+          vintageYear: null,
+          releaseYear: 2022,
+        },
+        siblings: [{ bottleId: 44288 }],
+      },
+      {
+        bottleId: 44288,
+        groupId: 18105,
+        shared: { name: "Càirdeas", statedAge: null },
+        siblings: [{ bottleId: 45146 }],
+      },
+    ]);
+    expectGrounded(
+      scoreBottleCheckGrounding({
+        artifacts,
+        proposedOperations: fixture!.expected.proposedOperations,
+        findings: fixture!.expected.findings,
+      }),
     );
   });
 

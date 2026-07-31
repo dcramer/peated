@@ -5271,6 +5271,102 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
+  test("runs the classifier agent for supplemental operations after a deterministic match", async () => {
+    const currentBottle = buildBottleCandidate({
+      bottleId: 6504,
+      fullName: "SMWS Sauna Smoke",
+      brand: "SMWS",
+      bottler: "The Scotch Malt Whisky Society",
+      distillery: ["Kyrö"],
+      category: "rye",
+      singleCask: true,
+    });
+    const matchedBottle = buildBottleCandidate({
+      bottleId: 6505,
+      alias: "SMWS RW6.5 Appley ever after",
+      fullName: "SMWS RW6.5 Appley ever after",
+      brand: "SMWS",
+      bottler: "The Scotch Malt Whisky Society",
+      distillery: ["Kyrö"],
+      category: "rye",
+      singleCask: true,
+      score: 0.99,
+      source: ["exact"],
+    });
+    const runBottleClassifierAgent = vi.fn(
+      async ({ initialCandidates }: RunBottleClassifierAgentInput) => ({
+        decision: {
+          action: "match" as const,
+          rationale:
+            "The closed SMWS code identifies the complete existing Bottle.",
+          candidateBottleIds: [6504, 6505],
+          identityScope: "exact_cask" as const,
+          observation: {
+            selector: "Sauna Smoke",
+            caskNumber: "RW6.5",
+          },
+          matchedBottleId: 6505,
+          proposedBottle: null,
+        },
+        proposedOperations: [
+          {
+            type: "merge_bottles" as const,
+            input: {
+              sourceBottleId: 6504,
+              destinationBottleId: 6505,
+            },
+            rationale:
+              "The incomplete current Bottle duplicates the code-identified Bottle.",
+            evidenceRefs: [
+              { kind: "bottle" as const, bottleId: 6504 },
+              { kind: "bottle" as const, bottleId: 6505 },
+            ],
+          },
+        ],
+        findings: [],
+        artifacts: buildBottleClassificationArtifacts({
+          candidates: initialCandidates,
+        }),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference(
+      {
+        reference: {
+          name: "SMWS RW6.5 Sauna Smoke",
+          currentBottleId: 6504,
+        },
+        initialCandidates: [currentBottle, matchedBottle],
+      },
+      { availableOperations: ["merge_bottles"] },
+    );
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        availableOperations: ["merge_bottles"],
+      }),
+    );
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: 6505,
+      },
+      proposedOperations: [
+        {
+          type: "merge_bottles",
+          input: {
+            sourceBottleId: 6504,
+            destinationBottleId: 6505,
+          },
+        },
+      ],
+    });
+  });
+
   test("keeps bare SMWS code references anchored to the code", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({

@@ -665,6 +665,7 @@ const BOTTLE_CHECK_SHARED_INSTRUCTIONS = [
     "Judge web evidence by product specificity, independence, and corroboration rather than domain familiarity.",
     "Prefer an explicit unresolved finding or conservative result over inventing identity, relationships, ids, or unsupported catalog changes.",
     "`availableOperations` in the input is exhaustive. Propose only listed operation types; when it is empty, return no proposed operations and use findings for relevant non-executable issues.",
+    "Source evidence refs use exact dotted input paths: `reference.name`, `extractedIdentity.brand`, `imageEvidence.fieldCandidates.abv`, or `audit.note`.",
     "The classifier is read-only. It may return typed proposals but cannot mutate, approve, dispatch, or apply catalog changes.",
   ]),
 ].join("\n");

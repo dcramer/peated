@@ -455,7 +455,7 @@ describe("price match queue", () => {
           {
             scope: "other",
             summary: "No further action is required.",
-            evidenceRefs: [{ kind: "source", field: "name" }],
+            evidenceRefs: [{ kind: "source", field: "reference.name" }],
           },
         ],
       },

@@ -60,6 +60,10 @@ describe("Bottle check instructions", () => {
     expect(instructions).toContain(
       "Every operation and finding must cite typed evidence",
     );
+    expect(instructions).toContain(
+      "Source evidence refs use exact dotted input paths",
+    );
+    expect(instructions).toContain("`imageEvidence.fieldCandidates.abv`");
     expect(instructions).toContain("The available tools are read-only.");
     expect(instructions).toContain(
       "Do not include approval state, permissions, previews, state tokens",

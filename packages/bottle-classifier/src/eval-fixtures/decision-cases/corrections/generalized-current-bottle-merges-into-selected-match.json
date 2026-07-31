@@ -1,6 +1,6 @@
 {
-  "id": "generalized-current-bottle-requires-post-primary-merge",
-  "name": "current assignment: match the correct Bottle before preparing the duplicate merge",
+  "id": "generalized-current-bottle-merges-into-selected-match",
+  "name": "current assignment: match the correct Bottle and merge the duplicate",
   "input": {
     "reference": {
       "name": "Silver Fen Ember Finish",
@@ -33,9 +33,13 @@
       }
     ]
   },
+  "availableOperations": ["merge_bottles"],
+  "context": {
+    "inspectedBottleIds": [50701, 50702]
+  },
   "provenance": {
     "source": "synthetic",
-    "notes": "Generalized synthetic correction case. The supplemental merge is intentionally prepared only after the primary match chooses its destination."
+    "notes": "Generalized synthetic correction case. The current generic Bottle is the merge source and the selected exact Bottle is the destination in the same proposed batch."
   },
   "expected": {
     "status": "classified",
@@ -53,7 +57,7 @@
         "evidenceRefs": [
           {
             "kind": "source",
-            "field": "name"
+            "field": "reference.name"
           },
           {
             "kind": "bottle",
@@ -67,7 +71,6 @@
       }
     ],
     "findings": [],
-    "operationPreparation": "after_primary",
-    "summary": "The reference matches the complete Ember Finish Bottle; only after that decision should the generic current Bottle be prepared as the merge source."
+    "summary": "Match the complete Ember Finish Bottle and propose merging the generic current Bottle into that selected match."
   }
 }

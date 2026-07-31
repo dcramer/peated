@@ -284,12 +284,14 @@ function sourceFieldsForCheck(check: BottleCheck): string[] {
     for (const [field, value] of Object.entries(
       artifacts.data.extractedIdentity ?? {},
     )) {
-      if (value !== null && value !== undefined) sourceFields.add(field);
+      if (value !== null && value !== undefined) {
+        sourceFields.add(`extractedIdentity.${field}`);
+      }
     }
     for (const field of Object.keys(
       artifacts.data.imageEvidence?.fieldCandidates ?? {},
     )) {
-      sourceFields.add(field);
+      sourceFields.add(`imageEvidence.fieldCandidates.${field}`);
     }
   }
 

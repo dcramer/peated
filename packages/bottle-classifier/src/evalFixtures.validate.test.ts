@@ -5,6 +5,7 @@ import { describe, expect, test } from "vitest";
 import {
   AUDIT_BOTTLE_EVAL_CASES,
   buildAuditEvalBottleContext,
+  getAuditEvalBottleContexts,
 } from "./auditBottle.eval.fixtures";
 import {
   auditBottleEvalFixtureSchema,
@@ -86,12 +87,13 @@ describe("eval fixture validation", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  test("keeps a small, synthetic audit corpus covering each supported scenario", () => {
-    expect(AUDIT_BOTTLE_EVAL_CASES).toHaveLength(6);
+  test("keeps a small audit corpus covering each supported scenario", () => {
+    expect(AUDIT_BOTTLE_EVAL_CASES).toHaveLength(7);
     expect(
       AUDIT_BOTTLE_EVAL_CASES.map((fixture) => fixture.scenario).sort(),
     ).toEqual([
       "adversarial",
+      "bottle_merge",
       "bottle_merge",
       "bottle_update",
       "clean",
@@ -102,10 +104,113 @@ describe("eval fixture validation", () => {
       new Set(AUDIT_BOTTLE_EVAL_CASES.map((fixture) => fixture.id)).size,
     ).toBe(AUDIT_BOTTLE_EVAL_CASES.length);
     expect(
-      AUDIT_BOTTLE_EVAL_CASES.every(
+      AUDIT_BOTTLE_EVAL_CASES.filter(
         (fixture) => fixture.provenance.source === "synthetic",
       ),
-    ).toBe(true);
+    ).toHaveLength(6);
+    expect(
+      AUDIT_BOTTLE_EVAL_CASES.filter(
+        (fixture) => fixture.provenance.source === "curated_regression",
+      ),
+    ).toHaveLength(1);
+  });
+
+  test("keeps the production-derived Càirdeas audit bounded and explicit about its DB outcome", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
+    expect(fixture?.provenance.source).toBe("curated_regression");
+    expect(fixture?.input.audit.bottleId).toBe(39096);
+    expect(
+      fixture?.input.context.inspectedBottles.map(({ bottleId }) => bottleId),
+    ).toEqual([45146, 44288]);
+    expect(fixture?.input.context.searchEvidence).toHaveLength(1);
+    expect(
+      getAuditEvalBottleContexts(fixture!).map(({ bottleId, groupId }) => ({
+        bottleId,
+        groupId,
+      })),
+    ).toEqual([
+      { bottleId: 39096, groupId: 9433 },
+      { bottleId: 45146, groupId: 18105 },
+      { bottleId: 44288, groupId: 18105 },
+    ]);
+    expect(fixture?.input.context.bottleContexts?.[0]).toMatchObject({
+      shared: {
+        name: "Cairdeas - 15-year-old",
+        statedAge: 15,
+      },
+      exact: {
+        vintageYear: 2022,
+        releaseYear: null,
+      },
+      siblings: [{ bottleId: 802 }],
+      aliases: [],
+      observations: [],
+      imageSources: [
+        {
+          source: { kind: "tasting", tastingId: 223 },
+          url: "https://api.peated.com/uploads/tastings-dryhjq9r8lutxhl4r96lf9fp.webp",
+        },
+      ],
+    });
+    expect(
+      fixture?.input.context.searchEvidence[0]?.results.map(({ url }) => url),
+    ).toEqual([
+      "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+      "https://www.laphroaig.com/en-gb/whisky-stories/cairdeas-expressions",
+    ]);
+    expect(fixture?.expected.proposedOperations).toMatchObject([
+      {
+        type: "merge_bottles",
+        input: {
+          sourceBottleId: 39096,
+          destinationBottleId: 45146,
+        },
+      },
+    ]);
+    expect(fixture?.expected.findings).toEqual([]);
+    expect(fixture?.provenance.dbOutcome).toMatchObject({
+      bottleId: 45146,
+      createsBottle: false,
+      createsRelease: false,
+    });
+    expect(fixture?.provenance.dbOutcome?.summary).toContain(
+      "Leave generic Càirdeas Bottle 44288 unchanged.",
+    );
+    expect(fixture?.provenance.dbOutcome?.summary).toContain("tasting 223");
+  });
+
+  test("requires explicit audit contexts to cover exactly the fixture Bottles", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
+
+    const result = auditBottleEvalFixtureSchema.safeParse({
+      ...fixture,
+      input: {
+        ...fixture!.input,
+        context: {
+          ...fixture!.input.context,
+          bottleContexts: fixture!.input.context.bottleContexts?.slice(0, 2),
+        },
+      },
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message:
+            "Explicit Bottle contexts must exactly cover the current and inspected Bottle ids.",
+          path: ["input", "context", "bottleContexts"],
+        }),
+      );
+    }
   });
 
   test("covers the supported Bottle and Entity operations without adding audit-only variants", () => {
@@ -558,6 +663,47 @@ describe("eval fixture validation", () => {
         path: ["input", "initialCandidates", 1, "bottleId"],
         message: "Duplicate initial candidate Bottle id 1.",
       });
+    }
+  });
+
+  test("requires expected operations to be enabled and their targets inspectable", () => {
+    const fixture = classifierEvalFixtureSchema.parse(
+      JSON.parse(
+        readFileSync(
+          `${decisionFixtureDir}/corrections/generalized-current-bottle-merges-into-selected-match.json`,
+          "utf8",
+        ),
+      ),
+    );
+
+    const disabled = classifierEvalFixtureSchema.safeParse({
+      ...fixture,
+      availableOperations: [],
+    });
+    expect(disabled.success).toBe(false);
+    if (!disabled.success) {
+      expect(disabled.error.issues).toContainEqual(
+        expect.objectContaining({
+          message:
+            "Expected operation type merge_bottles is not available to the classifier.",
+        }),
+      );
+    }
+
+    const uninspected = classifierEvalFixtureSchema.safeParse({
+      ...fixture,
+      context: {
+        ...fixture.context,
+        inspectedBottleIds: [50702],
+      },
+    });
+    expect(uninspected.success).toBe(false);
+    if (!uninspected.success) {
+      expect(uninspected.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: "Expected operation references uninspected Bottle id 50701.",
+        }),
+      );
     }
   });
 

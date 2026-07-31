@@ -52,8 +52,8 @@
       update/merge, findings, and unresolved cases.
 - [x] 2.7 Add generalized and negative fixtures with different products, ids,
       Entity roles, unrelated Entity cleanup, prompt-injection evidence,
-      uninspected targets, primary/operation contradictions, and post-primary
-      re-preparation.
+      uninspected targets, primary/operation contradictions, and
+      current-to-selected-match operation correlation.
 - [x] 2.8 Report reference-decision accuracy separately from exact operation and
       finding precision/recall, weighting harmful or unrelated extras most heavily.
 

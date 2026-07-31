@@ -1,0 +1,70 @@
+{
+  "id": "deterministic-primary-match-still-proposes-supplemental-merge",
+  "name": "current assignment: deterministic primary match still proposes the supplemental merge",
+  "input": {
+    "reference": {
+      "name": "SMWS RW6.5 Sauna Smoke",
+      "url": "https://shop.example/products/smws-rw6-5-sauna-smoke",
+      "currentBottleId": 6504
+    },
+    "initialCandidates": [
+      {
+        "bottleId": 6504,
+        "fullName": "SMWS Sauna Smoke",
+        "brand": "SMWS",
+        "bottler": "The Scotch Malt Whisky Society",
+        "distillery": ["Kyrö"],
+        "category": "rye",
+        "singleCask": true
+      },
+      {
+        "bottleId": 6505,
+        "alias": "SMWS RW6.5 Appley ever after",
+        "fullName": "SMWS RW6.5 Appley ever after",
+        "brand": "SMWS",
+        "bottler": "The Scotch Malt Whisky Society",
+        "distillery": ["Kyrö"],
+        "category": "rye",
+        "singleCask": true,
+        "score": 0.99,
+        "source": ["exact"]
+      }
+    ]
+  },
+  "availableOperations": ["merge_bottles"],
+  "context": {
+    "inspectedBottleIds": [6504, 6505]
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Synthetic contract case: the closed SMWS code resolves the primary Bottle deterministically, while enabled supplemental operations still require the classifier agent to inspect and propose retiring the malformed current duplicate."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 6505,
+    "proposedOperations": [
+      {
+        "type": "merge_bottles",
+        "input": {
+          "sourceBottleId": 6504,
+          "destinationBottleId": 6505
+        },
+        "rationale": "The malformed current Bottle and the complete exact-code Bottle represent the same SMWS cask, so retain the complete exact-code record.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 6504
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 6505
+          }
+        ]
+      }
+    ],
+    "findings": [],
+    "summary": "Keep the deterministic exact-code match as the primary result and propose merging the malformed current duplicate into it."
+  }
+}

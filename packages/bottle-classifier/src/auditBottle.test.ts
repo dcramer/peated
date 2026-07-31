@@ -308,7 +308,7 @@ describe("auditBottle", () => {
               {
                 scope: "series",
                 summary: "The related Series needs a workflow outside v1.",
-                evidenceRefs: [{ kind: "source", field: "series" }],
+                evidenceRefs: [{ kind: "source", field: "reference.name" }],
               },
             ],
             artifacts: buildBottleClassificationArtifacts({}),

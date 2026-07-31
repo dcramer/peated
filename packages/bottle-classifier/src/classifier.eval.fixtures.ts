@@ -19,12 +19,20 @@ export type ClassifierEvalExpectation = z.infer<
   typeof classifierEvalExpectationSchema
 >;
 
+export type ClassifierEvalContext = z.infer<
+  typeof classifierEvalFixtureSchema
+>["context"];
+
 export type ClassifierEvalCase = {
   fixtureId: string;
   name: string;
   input: ClassifyBottleReferenceInput;
   localCatalog?: LocalCatalog;
   searchResponses?: SearchResponseFixture[];
+  availableOperations: z.infer<
+    typeof classifierEvalFixtureSchema
+  >["availableOperations"];
+  context: ClassifierEvalContext;
   expected: ClassifierEvalExpectation;
 };
 
@@ -43,6 +51,8 @@ function loadFixtureFiles(): ClassifierEvalCase[] {
       input: fixture.input,
       localCatalog: fixture.localCatalog,
       searchResponses: fixture.searchResponses,
+      availableOperations: fixture.availableOperations,
+      context: fixture.context,
       expected: fixture.expected,
     };
   });

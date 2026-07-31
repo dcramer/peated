@@ -410,13 +410,13 @@ function getCollectedSourceFields(
     input.result.artifacts.extractedIdentity ?? {},
   )) {
     if (value !== null && value !== undefined) {
-      sourceFields.add(field);
+      sourceFields.add(`extractedIdentity.${field}`);
     }
   }
   for (const field of Object.keys(
     input.result.artifacts.imageEvidence?.fieldCandidates ?? {},
   )) {
-    sourceFields.add(field);
+    sourceFields.add(`imageEvidence.fieldCandidates.${field}`);
   }
   return [...sourceFields];
 }

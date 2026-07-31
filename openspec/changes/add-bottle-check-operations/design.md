@@ -220,9 +220,12 @@ type ProposedOperation = z.infer<typeof ProposedOperationSchema>;
 ```
 
 Each operation schema owns its literal `type`, typed `input`, `rationale`, and
-at least one entry in `evidenceRefs`. Web URLs and existing target ids must appear in the
-runtime's collected artifacts. The design does not add a second evidence-id
-system or trust model claims about which records were inspected.
+at least one entry in `evidenceRefs`. Source refs use exact serialized input
+paths: `reference.<field>`, `extractedIdentity.<field>`,
+`imageEvidence.fieldCandidates.<field>`, or `audit.note`. Web URLs and existing
+target ids must appear in the runtime's collected artifacts. The design does
+not add a second evidence-id system or trust model claims about which records
+were inspected.
 
 The model output contains the intent-specific decision or summary, proposed
 operations, and findings. Runtime code attaches collected artifacts and model

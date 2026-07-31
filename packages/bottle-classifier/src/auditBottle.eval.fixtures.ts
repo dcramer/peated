@@ -110,6 +110,23 @@ export function buildAuditEvalBottleContext(
   });
 }
 
+export function getAuditEvalBottleContexts(fixture: AuditBottleEvalFixture) {
+  if (fixture.input.context.bottleContexts !== undefined) {
+    return fixture.input.context.bottleContexts;
+  }
+
+  return [
+    fixture.input.context.currentBottle,
+    ...fixture.input.context.inspectedBottles,
+  ].map((candidate) =>
+    buildAuditEvalBottleContext(
+      candidate,
+      fixture.input.context.inspectedEntities,
+      fixture.input.context.inspectedSeries,
+    ),
+  );
+}
+
 function loadAuditBottleEvalFixtures(): AuditBottleEvalFixture[] {
   return listFixtureFiles(fixtureDir).map((filename) =>
     auditBottleEvalFixtureSchema.parse(

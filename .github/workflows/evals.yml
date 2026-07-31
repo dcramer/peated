@@ -88,4 +88,16 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @peated/bottle-classifier evals
+      - name: Run classifier evals
+        run: >-
+          pnpm --filter @peated/bottle-classifier evals --
+          --reporter=vitest-evals/reporter
+          --reporter=json
+          --outputFile.json=vitest-results.json
+
+      - name: Upload classifier eval report
+        if: ${{ always() && hashFiles('packages/bottle-classifier/vitest-results.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottle-classifier-eval-report
+          path: packages/bottle-classifier/vitest-results.json

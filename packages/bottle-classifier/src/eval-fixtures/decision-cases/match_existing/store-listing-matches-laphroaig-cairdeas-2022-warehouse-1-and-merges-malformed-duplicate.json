@@ -342,6 +342,10 @@
       }
     ]
   },
+  "availableOperations": ["merge_bottles"],
+  "context": {
+    "inspectedBottleIds": [39096, 45146]
+  },
   "provenance": {
     "source": "production_miss",
     "verifiedSourceUrls": [

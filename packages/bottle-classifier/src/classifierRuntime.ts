@@ -462,7 +462,7 @@ function bottleContextToCandidate(context: BottleContext): BottleCandidate {
   });
 }
 
-function createBottleContextLoader({
+export function createBottleContextLoader({
   dataSource,
   options,
 }: {
@@ -1852,7 +1852,7 @@ export function createBottleClassifier(
         reference: parsedInput.reference,
         artifacts,
       });
-      if (deterministicDecision) {
+      if (deterministicDecision && availableOperations.length === 0) {
         return BottleClassificationResultSchema.parse(
           createDecidedBottleClassification({
             decision: deterministicDecision,
