@@ -140,6 +140,8 @@ export const NotificationSerializer = serializer({
       BottleSerializer,
       bottleList,
       currentUser,
+      [],
+      { includeGroupSummary: true },
     );
     const bottlesById = new Map(
       serializedBottleList.map((bottle, index) => [

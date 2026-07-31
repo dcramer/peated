@@ -1,4 +1,5 @@
 import type { Bottle } from "@peated/server/types";
+import BottleIdentity from "@peated/web/components/bottleIdentity";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import { Camera, Check, Plus, Search } from "lucide-react";
@@ -239,12 +240,10 @@ export function PhotoMatchCreateState({
             fallbackIcon={<Check className="text-highlight h-6 w-6" />}
           >
             <div className="space-y-2">
-              <Link
-                href={`/bottles/${matchedBottle.id}`}
-                className="font-semibold text-white hover:underline"
-              >
-                {matchedBottle.fullName}
-              </Link>
+              <BottleIdentity
+                bottle={matchedBottle}
+                linkClassName="font-semibold text-white hover:underline"
+              />
               <EvidencePills result={result} compact />
             </div>
           </PhotoResultCard>

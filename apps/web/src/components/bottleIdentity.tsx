@@ -1,18 +1,18 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
-import type { ReactNode } from "react";
+import { getBottleLabel } from "@peated/web/lib/bottleLabel";
+import classNames from "@peated/web/lib/classNames";
+import type { MouseEventHandler, ReactNode } from "react";
 import BottleExactMetadata, {
   type BottleExactMetadataKey,
 } from "./bottleExactMetadata";
 
-type BottleIdentitySource = Pick<
+export type BottleIdentitySource = Pick<
   Bottle,
   | "id"
   | "fullName"
   | "name"
-  | "group"
-  | "brand"
   | "edition"
   | "category"
   | "statedAge"
@@ -24,7 +24,24 @@ type BottleIdentitySource = Pick<
   | "caskFill"
   | "caskType"
   | "caskSize"
->;
+> & {
+  brand: Pick<Bottle["brand"], "name" | "shortName">;
+  group?: Pick<NonNullable<Bottle["group"]>, "name" | "statedAge">;
+};
+
+export function BottleLabel({
+  bottle,
+  className,
+}: {
+  bottle: Pick<BottleIdentitySource, "fullName" | "name" | "brand" | "group">;
+  className?: string;
+}) {
+  return (
+    <span title={bottle.fullName} className={className}>
+      {getBottleLabel(bottle)}
+    </span>
+  );
+}
 
 type RelativeIdentity = {
   label: string;
@@ -87,7 +104,7 @@ function getEditionMetadataDuplicates(
   const edition = bottle.edition?.toLocaleLowerCase();
   if (!edition) return [];
 
-  const duplicates: BottleExactMetadataKey[] = [];
+  const duplicates: BottleExactMetadataKey[] = ["edition"];
   if (
     bottle.vintageYear !== null &&
     edition.includes(String(bottle.vintageYear)) &&
@@ -213,18 +230,23 @@ function BottleIdentityLink({
   children,
   className,
   current,
+  onClick,
+  href,
 }: {
   bottle: BottleIdentitySource;
   children: ReactNode;
   className?: string;
   current?: boolean;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  href?: string;
 }) {
   return (
     <Link
-      href={`/bottles/${bottle.id}`}
+      href={href ?? `/bottles/${bottle.id}`}
       title={bottle.fullName}
       aria-current={current ? "page" : undefined}
       className={className}
+      onClick={onClick}
     >
       {children}
     </Link>
@@ -233,14 +255,24 @@ function BottleIdentityLink({
 
 export default function BottleIdentity({
   bottle,
-  mode,
+  mode = "absolute",
   current = false,
   metadataVariant = "full",
+  onClick,
+  trailingContent,
+  href,
+  className,
+  linkClassName,
 }: {
   bottle: BottleIdentitySource;
-  mode: "absolute" | "relative";
+  mode?: "absolute" | "relative";
   current?: boolean;
   metadataVariant?: "full" | "summary";
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  trailingContent?: ReactNode;
+  href?: string;
+  className?: string;
+  linkClassName?: string;
 }) {
   const relativeIdentity = getRelativeBottleIdentity(bottle);
   const isAbsolute = mode === "absolute";
@@ -258,7 +290,7 @@ export default function BottleIdentity({
     : [];
 
   return (
-    <div className="min-w-0">
+    <div className={classNames("min-w-0", className)}>
       {isAbsolute ? (
         <div className="text-muted truncate text-xs font-medium uppercase tracking-wide">
           {bottle.brand.name}
@@ -268,10 +300,16 @@ export default function BottleIdentity({
         <BottleIdentityLink
           bottle={bottle}
           current={current}
-          className="break-words font-semibold hover:underline"
+          onClick={onClick}
+          href={href}
+          className={classNames(
+            "break-words font-semibold hover:underline",
+            linkClassName,
+          )}
         >
           {title}
         </BottleIdentityLink>
+        {trailingContent}
         {current ? (
           <span
             className="h-2 w-2 shrink-0 rounded-full bg-orange-400"

@@ -1,7 +1,11 @@
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
+import BottleExactMetadata, {
+  type BottleExactMetadataKey,
+  hasBottleExactMetadata,
+} from "@peated/web/components/bottleExactMetadata";
 import Link from "@peated/web/components/link";
+import { getBottleLabel } from "@peated/web/lib/bottleLabel";
 import BottleMetadata from "./bottleMetadata";
 import PageHeader from "./pageHeader";
 import SingleCaskChip from "./singleCaskChip";
@@ -15,6 +19,20 @@ export default function BottleHeader({
   href?: string;
   compact?: boolean;
 }) {
+  const label = getBottleLabel(bottle);
+  const expressionName = bottle.group?.name || bottle.name;
+  const metadataExclude: BottleExactMetadataKey[] = [];
+
+  if (bottle.singleCask) metadataExclude.push("single-cask");
+  if (
+    bottle.edition &&
+    expressionName
+      .toLocaleLowerCase()
+      .includes(bottle.edition.toLocaleLowerCase())
+  ) {
+    metadataExclude.push("edition");
+  }
+
   return (
     <PageHeader
       icon={BottleIcon}
@@ -22,18 +40,25 @@ export default function BottleHeader({
       title={
         <div className="flex flex-wrap items-center gap-2">
           {href ? (
-            <Link href={href} className="hover:underline">
-              {bottle.fullName}
+            <Link
+              href={href}
+              title={bottle.fullName}
+              className="hover:underline"
+            >
+              {label}
             </Link>
           ) : (
-            <div className="flex flex-wrap items-center gap-2">
+            <div
+              title={bottle.fullName}
+              className="flex flex-wrap items-center gap-2"
+            >
               <Link
                 href={`/entities/${bottle.brand.id}`}
                 className="hover:underline"
               >
                 {bottle.brand.shortName || bottle.brand.name}
               </Link>
-              {bottle.name}
+              {expressionName}
             </div>
           )}
           {bottle.singleCask && <SingleCaskChip />}
@@ -46,25 +71,9 @@ export default function BottleHeader({
         />
       }
       metadata={
-        (bottle.category || bottle.statedAge) && (
-          <div className="text-muted flex w-full min-w-[150px] flex-col items-center justify-center gap-x-1 lg:w-auto lg:items-end">
-            <div>
-              {bottle.category && (
-                <Link
-                  href={`/bottles?category=${encodeURIComponent(
-                    bottle.category,
-                  )}`}
-                  className="hover:underline"
-                >
-                  {formatCategoryName(bottle.category)}
-                </Link>
-              )}
-            </div>
-            <div>
-              {bottle.statedAge ? `Aged ${bottle.statedAge} years` : null}
-            </div>
-          </div>
-        )
+        hasBottleExactMetadata(bottle, metadataExclude) ? (
+          <BottleExactMetadata bottle={bottle} exclude={metadataExclude} />
+        ) : null
       }
     />
   );

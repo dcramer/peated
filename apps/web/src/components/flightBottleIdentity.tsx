@@ -3,9 +3,9 @@
 import type { Bottle } from "@peated/server/types";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { useState } from "react";
+import BottleIdentity from "./bottleIdentity";
 import BottlePanel from "./bottlePanel";
 import { ClientOnly } from "./clientOnly";
-import Link from "./link";
 
 export default function FlightBottleIdentity({
   bottle,
@@ -18,16 +18,15 @@ export default function FlightBottleIdentity({
 
   return (
     <>
-      <Link
-        href={`/bottles/${bottle.id}`}
-        className="font-semibold hover:underline"
+      <BottleIdentity
+        bottle={bottle}
+        mode="absolute"
+        metadataVariant="summary"
         onClick={(event) => {
           event.preventDefault();
           setOpen(true);
         }}
-      >
-        {bottle.fullName}
-      </Link>
+      />
       {open && (
         <ClientOnly>
           {() => (

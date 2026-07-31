@@ -113,8 +113,9 @@ describe("BottleResultRow", () => {
     expect(html).toContain('href="/bottles/42/releases"');
     expect(html).toContain("relative z-10");
     expect(text).toContain("3 related releases");
-    expect(text).toContain(exactBottle.fullName);
-    expect(text).toContain("Lagavulin·Single Malt·16 years");
+    expect(text).toContain(group.fullName);
+    expect(text).not.toContain(exactBottle.fullName);
+    expect(text).toContain("Lagavulin·Distillers Edition·Single Malt·16 years");
     expect(text).toContain("16 years·43.0% ABV");
     expect(text).toContain("2008 vintage·2024 release");
     expect(text).toContain("Single cask·Cask strength");

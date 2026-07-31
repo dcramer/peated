@@ -1,6 +1,7 @@
 import type { Bottle } from "@peated/server/types";
 import BottleIcon from "@peated/web/assets/bottle.svg";
 import BottleExactMetadata from "@peated/web/components/bottleExactMetadata";
+import { BottleLabel } from "@peated/web/components/bottleIdentity";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import {
@@ -81,7 +82,7 @@ export default function BottleResultRow({
             })}
           >
             <span className="absolute inset-x-0 -top-px bottom-0" />
-            <span>{bottle.fullName}</span>
+            <BottleLabel bottle={bottle} />
           </Link>
           <BottleStatusIcons bottle={bottle} />
         </div>

@@ -1,10 +1,7 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
-import BottleLink from "@peated/web/components/bottleLink";
+import BottleIdentity from "@peated/web/components/bottleIdentity";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
-import Link from "@peated/web/components/link";
-import { getBottleDisplayName } from "@peated/web/lib/bottleDisplayName";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -53,25 +50,12 @@ export default function NewBottles() {
             return (
               <tr key={bottle.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-2 pl-4 pr-4 text-sm sm:pl-3">
-                  <div className="flex items-center space-x-1">
-                    <BottleLink
-                      bottle={bottle}
-                      className="font-medium hover:underline"
-                    >
-                      {getBottleDisplayName(bottle)}
-                    </BottleLink>
-                    <BottleStatusIcons bottle={bottle} />
-                  </div>
-                  <div className="text-muted flex gap-x-1 text-sm">
-                    {bottle.category && (
-                      <Link
-                        href={`/bottles/?category=${bottle.category}`}
-                        className="hover:underline"
-                      >
-                        {formatCategoryName(bottle.category)}
-                      </Link>
-                    )}
-                  </div>
+                  <BottleIdentity
+                    bottle={bottle}
+                    mode="absolute"
+                    metadataVariant="summary"
+                    trailingContent={<BottleStatusIcons bottle={bottle} />}
+                  />
                 </td>
               </tr>
             );
