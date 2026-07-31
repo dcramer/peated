@@ -313,18 +313,12 @@ describe("BottleSerializer", () => {
     expect(result).not.toHaveProperty("numReleases");
   });
 
-  it("omits group enrichment for legacy ungrouped Bottles", async ({
+  it("serializes independently without a group unless enrichment is requested", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.LegacyBottle({ name: "Missing Group" });
 
-    const [result] = await serialize(
-      BottleSerializer,
-      [bottle],
-      undefined,
-      [],
-      { includeGroupSummary: true },
-    );
+    const [result] = await serialize(BottleSerializer, [bottle]);
 
     expect(result).toMatchObject({
       id: bottle.id,
@@ -333,22 +327,11 @@ describe("BottleSerializer", () => {
     });
     expect(BottleSchema.safeParse(result).success).toBe(true);
     expect(result).not.toHaveProperty("group");
-  });
-
-  it("rejects group enrichment when a referenced group is missing", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.LegacyBottle({ name: "Missing Group" });
-    const missingGroupId = 999_999;
 
     await expect(
-      serialize(
-        BottleSerializer,
-        [{ ...bottle, groupId: missingGroupId }],
-        undefined,
-        [],
-        { includeGroupSummary: true },
-      ),
+      serialize(BottleSerializer, [bottle], undefined, [], {
+        includeGroupSummary: true,
+      }),
     ).rejects.toThrow(
       `Bottle ${bottle.id} does not belong to an active BottleGroup.`,
     );
