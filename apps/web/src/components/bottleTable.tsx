@@ -7,7 +7,7 @@ import BottleStatusIcons, {
 } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
-import BottleIdentity from "./bottleIdentity";
+import BottleIdentity, { getAbsoluteBottleTitle } from "./bottleIdentity";
 import BottleRatingSummary from "./bottleRatingSummary";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
 import Table from "./table";
@@ -76,7 +76,7 @@ export default function BottleTable({
             const categoryName = bottle.category
               ? formatCategoryName(bottle.category)
               : null;
-            const identityTitle = bottle.group?.name ?? bottle.name;
+            const identityTitle = getAbsoluteBottleTitle(bottle);
             const showCategory =
               !compactIdentity &&
               categoryName &&
