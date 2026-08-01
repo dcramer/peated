@@ -15,6 +15,7 @@ type AddBottleRouteOptions = {
   flightId?: string | null;
   pendingImageId?: string | null;
   pendingImageUrl?: string | null;
+  resultSource?: "created";
   intent?: AddBottleRouteIntent;
 };
 
@@ -35,6 +36,7 @@ export function getAddBottleHref({
   flightId,
   pendingImageId,
   pendingImageUrl,
+  resultSource,
   intent = "addBottle",
 }: AddBottleRouteOptions) {
   const params = new URLSearchParams();
@@ -43,6 +45,7 @@ export function getAddBottleHref({
   if (flightId) params.set("flight", flightId);
   if (pendingImageId) params.set("pendingImageId", pendingImageId);
   if (pendingImageUrl) params.set("pendingImageUrl", pendingImageUrl);
+  if (resultSource) params.set("resultSource", resultSource);
   params.set("intent", intent);
 
   return `/addBottle?${params.toString()}`;

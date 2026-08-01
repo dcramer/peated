@@ -148,7 +148,9 @@ test.describe("create bottle", () => {
     }
 
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=tasting$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=tasting$`,
+      ),
     );
     await expect(
       page.getByRole("heading", { name: "Add Bottle" }),
@@ -172,7 +174,9 @@ test.describe("create bottle", () => {
     await submitCreateBottle(page);
 
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=tasting$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=tasting$`,
+      ),
     );
     await expect(
       page.getByRole("heading", { name: "Add Bottle" }),
@@ -214,11 +218,16 @@ test.describe("create bottle", () => {
     await submitCreateBottle(page);
 
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=addBottle$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=addBottle$`,
+      ),
     );
     await expect(
-      page.getByRole("heading", { name: "Bottle found" }),
+      page.getByRole("heading", { name: "Bottle created" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Add a similar bottle" }),
+    ).toBeHidden();
     await expect(getBottleIdentityLink(page, createdBottleName)).toBeVisible();
   });
 
@@ -242,10 +251,12 @@ test.describe("create bottle", () => {
     expect(libraryInput).not.toHaveProperty("release");
 
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=library$`,
+      ),
     );
     await expect(
-      page.getByRole("heading", { name: "Bottle found" }),
+      page.getByRole("heading", { name: "Bottle created" }),
     ).toBeVisible();
     await expect(getBottleIdentityLink(page, createdBottleName)).toBeVisible();
     await expect(
@@ -270,7 +281,9 @@ test.describe("create bottle", () => {
     await submitCreateBottle(page);
 
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=library$`,
+      ),
     );
     await expect(
       page.getByText(
@@ -311,7 +324,9 @@ test.describe("create bottle", () => {
     expect(libraryInput).not.toHaveProperty("target");
     expect(libraryInput).not.toHaveProperty("release");
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=library$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=library$`,
+      ),
     );
     await expect(page.getByText("First Fill Oloroso").first()).toBeVisible();
     await expect(
@@ -348,6 +363,7 @@ test.describe("create bottle", () => {
     const createdUrl = new URL(page.url());
     expect(createdUrl.searchParams.get("bottle")).toBe(String(createdBottleId));
     expect(createdUrl.searchParams.get("intent")).toBe("addBottle");
+    expect(createdUrl.searchParams.get("resultSource")).toBe("created");
     expect(createdUrl.searchParams.get("release")).toBeNull();
     expect(createdUrl.searchParams.get("pendingImageId")).toBeNull();
     expect(createdUrl.searchParams.get("pendingImageUrl")).toBeNull();
@@ -370,7 +386,9 @@ test.describe("create bottle", () => {
     await page.getByRole("button", { name: "Add Bottle" }).click();
 
     await expect(page).toHaveURL(
-      new RegExp(`/addBottle\\?bottle=${createdBottleId}&intent=addBottle$`),
+      new RegExp(
+        `/addBottle\\?bottle=${createdBottleId}&resultSource=created&intent=addBottle$`,
+      ),
     );
     await expect(
       page.getByText(
@@ -1381,6 +1399,7 @@ test.describe("add bottle flow", () => {
     expect(createdUrl.pathname).toBe("/addBottle");
     expect(createdUrl.searchParams.get("bottle")).toBe(String(createdBottleId));
     expect(createdUrl.searchParams.get("intent")).toBe("addBottle");
+    expect(createdUrl.searchParams.get("resultSource")).toBe("created");
     expect(createdUrl.searchParams.get("pendingImageId")).toBe(
       "playwright-photo-upload",
     );
@@ -1388,8 +1407,11 @@ test.describe("add bottle flow", () => {
       pendingScanImageUrl,
     );
     await expect(
-      page.getByRole("heading", { name: "Bottle found" }),
+      page.getByRole("heading", { name: "Bottle created" }),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Add a similar bottle" }),
+    ).toBeHidden();
     await expect(page.getByAltText("Selected bottle label")).toHaveAttribute(
       "src",
       pendingScanImageUrl,
