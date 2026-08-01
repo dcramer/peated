@@ -8,9 +8,12 @@ import {
   DecidedBottleClassificationResultSchema,
   getBottleCheckSourceEvidencePaths,
   IgnoredBottleClassificationResultSchema,
+  type BottleClassificationArtifacts,
+  type EvidenceRef,
 } from "@peated/bottle-classifier";
 import { db, type AnyConnection, type AnyDatabase } from "@peated/server/db";
 import {
+  bottleCheckCloseReasonEnum,
   bottleChecks,
   bottleOperations,
   storePriceMatchAttempts,
@@ -42,6 +45,38 @@ import { z } from "zod";
 export { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleCheckSchemaVersion";
 
 const NonEmptyTextSchema = z.string().trim().min(1);
+
+function assertFindingContextEvidenceRefs(
+  artifacts: BottleClassificationArtifacts,
+  evidenceRefs: readonly EvidenceRef[],
+) {
+  const inspectedBottleIds = new Set(
+    artifacts.bottleContexts.map(({ bottleId }) => bottleId),
+  );
+  const inspectedEntityIds = new Set(
+    artifacts.entityContexts.map(({ entityId }) => entityId),
+  );
+
+  for (const evidenceRef of evidenceRefs) {
+    if (
+      evidenceRef.kind === "bottle" &&
+      !inspectedBottleIds.has(evidenceRef.bottleId)
+    ) {
+      throw new Error(
+        `Finding Bottle evidence must reference an inspected Bottle context: ${evidenceRef.bottleId}.`,
+      );
+    }
+    if (
+      evidenceRef.kind === "entity" &&
+      !inspectedEntityIds.has(evidenceRef.entityId)
+    ) {
+      throw new Error(
+        `Finding Entity evidence must reference an inspected Entity context: ${evidenceRef.entityId}.`,
+      );
+    }
+  }
+}
+
 const PositiveIdSchema = z.number().int().positive();
 
 type JsonValue =
@@ -63,10 +98,9 @@ const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
   ]),
 );
 
-export const BottleCheckCloseReasonSchema = z.enum([
-  "dismissed",
-  "resolved_manually",
-]);
+export const BottleCheckCloseReasonSchema = z.enum(
+  bottleCheckCloseReasonEnum.enumValues,
+);
 
 export const CloseBottleCheckInputSchema = z
   .object({
@@ -421,6 +455,9 @@ export async function createBottleCheck(
       );
     }
   }
+  const findingEvidenceRefs = input.result.findings.flatMap(
+    ({ evidenceRefs }) => evidenceRefs,
+  );
   const evidenceSource = {
     ...input,
     artifacts: input.result.artifacts,
@@ -428,11 +465,10 @@ export async function createBottleCheck(
   const sourceFields = getBottleCheckSourceEvidencePaths(evidenceSource);
   assertCollectedEvidenceRefs({
     artifacts: input.result.artifacts,
-    evidenceRefs: input.result.findings.flatMap(
-      ({ evidenceRefs }) => evidenceRefs,
-    ),
+    evidenceRefs: findingEvidenceRefs,
     sourceFields,
   });
+  assertFindingContextEvidenceRefs(input.result.artifacts, findingEvidenceRefs);
   const artifacts = input.result.artifacts;
   const output = buildPersistedBottleCheckOutput(input);
   const subject = getSubject(input);

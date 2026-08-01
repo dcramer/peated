@@ -45,6 +45,9 @@ export type BottleProposalCollector = {
   getMissingEvidence: (
     evidenceRefs: readonly EvidenceRef[],
   ) => EvidenceRef | null;
+  getUninspectedEvidence: (
+    evidenceRefs: readonly EvidenceRef[],
+  ) => EvidenceRef | null;
   record: (proposal: unknown) => ProposalRecordResult;
 };
 
@@ -174,10 +177,21 @@ export function createBottleProposalCollector({
   const getMissingEvidence = (evidenceRefs: readonly EvidenceRef[]) =>
     evidenceRefs.find((evidence) => !evidenceWasCollected(evidence, context)) ??
     null;
+  const getUninspectedEvidence = (evidenceRefs: readonly EvidenceRef[]) =>
+    evidenceRefs.find((evidence) => {
+      if (evidence.kind === "bottle") {
+        return !context.isBottleInspected(evidence.bottleId);
+      }
+      if (evidence.kind === "entity") {
+        return !context.isEntityInspected(evidence.entityId);
+      }
+      return false;
+    }) ?? null;
 
   return {
     getProposals: () => [...proposals],
     getMissingEvidence,
+    getUninspectedEvidence,
     record: (rawProposal) => {
       const parsed = ProposedOperationSchema.safeParse(rawProposal);
       if (!parsed.success) {

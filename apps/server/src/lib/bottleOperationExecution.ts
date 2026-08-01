@@ -14,56 +14,17 @@ import {
   finalizeEntityUpdate,
   updateEntityInTransaction,
 } from "@peated/server/lib/updateEntity";
+import {
+  BottleOperationExecutionResultSchema,
+  type BottleOperationExecutionResult,
+} from "@peated/server/schemas/bottleOperationResults";
 import { dispatchEntityMergeOperation } from "@peated/server/worker/entityMerge";
-import { z } from "zod";
 
-const PositiveIdSchema = z.number().int().positive();
-
-export const BottleOperationExecutionResultSchema = z.discriminatedUnion(
-  "type",
-  [
-    z
-      .object({
-        type: z.literal("update_bottle"),
-        status: z.literal("applied"),
-        bottleId: PositiveIdSchema,
-        groupId: PositiveIdSchema,
-        changed: z.boolean(),
-      })
-      .strict(),
-    z
-      .object({
-        type: z.literal("merge_bottles"),
-        status: z.literal("applied"),
-        sourceBottleId: PositiveIdSchema,
-        destinationBottleId: PositiveIdSchema,
-        changed: z.boolean(),
-      })
-      .strict(),
-    z
-      .object({
-        type: z.literal("update_entity"),
-        status: z.literal("applied"),
-        entityId: PositiveIdSchema,
-        changed: z.boolean(),
-      })
-      .strict(),
-    z
-      .object({
-        type: z.literal("merge_entities"),
-        status: z.literal("applying"),
-        operationId: PositiveIdSchema,
-        sourceEntityId: PositiveIdSchema,
-        destinationEntityId: PositiveIdSchema,
-        approvingModeratorId: PositiveIdSchema,
-      })
-      .strict(),
-  ],
-);
-
-export type BottleOperationExecutionResult = z.infer<
-  typeof BottleOperationExecutionResultSchema
->;
+export {
+  BottleOperationExecutionResultSchema,
+  PersistedBottleOperationExecutionResultSchema,
+  type BottleOperationExecutionResult,
+} from "@peated/server/schemas/bottleOperationResults";
 
 export type BottleOperationExecution = {
   result: BottleOperationExecutionResult;

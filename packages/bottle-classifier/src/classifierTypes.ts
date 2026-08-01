@@ -529,7 +529,7 @@ export const BottleClassifierAgentDecisionSchema = z
           "Decision action.",
           "match: an existing Bottle safely covers the marketed identity; set matchedBottleId.",
           "repair_bottle: existing bottle is the right identity but needs bottle-level field repair; set matchedBottleId and proposedBottle.",
-          "create_bottle: create one independently complete concrete bottle; set proposedBottle only, including every marketed release trait needed to identify it.",
+          "create_bottle: create one independently complete Bottle; set proposedBottle only, including every marketed release trait needed to identify it.",
           "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
         ].join(" "),
       ),
@@ -547,7 +547,7 @@ export const BottleClassifierAgentDecisionSchema = z
     proposedBottle: AgentProposedBottleSchema.nullable()
       .default(null)
       .describe(
-        "Required for create_bottle and repair_bottle. A create draft describes one independently complete concrete bottle, including every supported marketed release trait; unknown optional fields may remain null.",
+        "Required for create_bottle and repair_bottle. A create draft describes one independently complete Bottle, including every supported marketed release trait; unknown optional fields may remain null.",
       ),
   })
   .strict();

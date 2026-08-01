@@ -1,5 +1,6 @@
 import type { ProposedOperation } from "@peated/bottle-classifier";
 import { buildBottleClassificationArtifacts } from "@peated/bottle-classifier/contract";
+import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
@@ -236,6 +237,10 @@ describe("Bottle Check review action routes", () => {
   }) => {
     const moderator = await fixtures.User({ mod: true });
     const bottle = await fixtures.Bottle();
+    const bottleContext = await getBottleClassifierContext(bottle.id);
+    if (!bottleContext) throw new Error("Expected Bottle context.");
+    const { imageSources: _imageSources, ...bottleContextFields } =
+      bottleContext;
     const created = await createBottleCheck({
       intent: "audit_bottle",
       input: { bottleId: bottle.id, origin: "moderator" },
@@ -250,30 +255,7 @@ describe("Bottle Check review action routes", () => {
           },
         ],
         artifacts: buildBottleClassificationArtifacts({
-          candidates: [
-            {
-              bottleId: bottle.id,
-              alias: null,
-              fullName: bottle.fullName,
-              brand: null,
-              bottler: null,
-              series: null,
-              distillery: [],
-              category: null,
-              statedAge: null,
-              edition: null,
-              caskStrength: null,
-              singleCask: null,
-              caskType: null,
-              caskSize: null,
-              caskFill: null,
-              abv: null,
-              vintageYear: null,
-              releaseYear: null,
-              score: null,
-              source: [],
-            },
-          ],
+          bottleContexts: [{ ...bottleContextFields, publicImages: [] }],
         }),
       },
     });

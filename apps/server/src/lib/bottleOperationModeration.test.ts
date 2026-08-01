@@ -254,6 +254,38 @@ describe("Bottle operation moderation", () => {
     ).toEqual({ status: "pending_review" });
   });
 
+  test("does not rebuild live previews for applying operations", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ name: "Applying Entity" });
+    const bottle = await fixtures.Bottle();
+    const created = await createPreparedCheck({
+      bottleId: bottle.id,
+      proposals: [updateEntityProposal(entity.id, "Applied Entity")],
+      inspectedEntities: [entity],
+    });
+    const operation = created.check.operations[0]!;
+    await db
+      .update(bottleOperations)
+      .set({ status: "applying" })
+      .where(eq(bottleOperations.id, operation.id));
+    const applyingCheck = await db.query.bottleChecks.findFirst({
+      where: eq(bottleChecks.id, created.check.id),
+      with: { operations: true },
+    });
+    if (!applyingCheck) throw new Error("Expected persisted Bottle check.");
+
+    await expect(
+      prepareBottleCheckReviewOperations(applyingCheck),
+    ).resolves.toEqual([
+      {
+        operationId: operation.id,
+        review: null,
+        approvalReady: false,
+      },
+    ]);
+  });
+
   test("rejects an unauthorized batch without changing any operation", async ({
     fixtures,
   }) => {

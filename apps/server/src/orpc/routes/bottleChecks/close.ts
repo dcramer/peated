@@ -8,7 +8,8 @@ import {
 } from "@peated/server/lib/bottleChecks";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleCheckResponseSchema, serializeBottleCheck } from "./schemas";
+import { BottleCheckResponseSchema } from "@peated/server/schemas/bottleChecks";
+import { serializeBottleCheck } from "@peated/server/serializers/bottleCheck";
 
 const InputSchema = CloseBottleCheckInputSchema.omit({ checkId: true }).extend({
   check: CloseBottleCheckInputSchema.shape.checkId,

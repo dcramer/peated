@@ -5,7 +5,8 @@ import {
 import config from "@peated/server/config";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleCheckResponseSchema, serializeBottleCheck } from "./schemas";
+import { BottleCheckResponseSchema } from "@peated/server/schemas/bottleChecks";
+import { serializeBottleCheck } from "@peated/server/serializers/bottleCheck";
 
 const InputSchema = ModeratorBottleAuditInputSchema.omit({
   bottleId: true,

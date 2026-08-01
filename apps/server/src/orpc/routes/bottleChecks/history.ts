@@ -2,8 +2,9 @@ import config from "@peated/server/config";
 import { getBottleCheckHistory } from "@peated/server/lib/bottleChecks";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
+import { BottleCheckResponseSchema } from "@peated/server/schemas/bottleChecks";
+import { serializeBottleCheck } from "@peated/server/serializers/bottleCheck";
 import { z } from "zod";
-import { BottleCheckResponseSchema, serializeBottleCheck } from "./schemas";
 
 export default procedure
   .use(requireMod)

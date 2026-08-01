@@ -67,6 +67,11 @@ jobs:
             echo "- will_run: $should_run"
           } >> "$GITHUB_STEP_SUMMARY"
 
+          if [[ "$evals_requested" == "true" && "$openai_ready" != "true" ]]; then
+            echo "::error::The trigger-evals label requires OPENAI_API_KEY."
+            exit 1
+          fi
+
   evals:
     name: "evals / classifier"
     needs: gate

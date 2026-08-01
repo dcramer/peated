@@ -1,7 +1,4 @@
-import {
-  EntityContextSchema,
-  MergeEntitiesOperationSchema,
-} from "@peated/bottle-classifier";
+import { MergeEntitiesOperationSchema } from "@peated/bottle-classifier";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type { User } from "@peated/server/db/schema";
 import {
@@ -23,43 +20,18 @@ import {
   isOperationPreparationFailure,
   prepareOperationForExecution,
 } from "@peated/server/lib/bottleOperationReview";
+import {
+  EntityMergeOperationExecutionResultSchema,
+  MergeEntitiesDispatchExecutionResultSchema,
+  type EntityMergeOperationExecutionResult,
+} from "@peated/server/schemas/bottleOperationResults";
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
-import { z } from "zod";
 
-const PositiveIdSchema = z.number().int().positive();
-
-export const EntityMergeOperationExecutionResultSchema = z
-  .object({
-    type: z.literal("merge_entities"),
-    sourceEntityId: PositiveIdSchema,
-    destinationEntityId: PositiveIdSchema,
-    destinationRoles: EntityContextSchema.shape.roles,
-    approvingModeratorId: PositiveIdSchema,
-    reconciled: z.boolean(),
-    execution: z
-      .object({
-        kind: z.literal("worker"),
-        name: z.literal("MergeEntity"),
-      })
-      .strict(),
-  })
-  .strict();
-
-const EntityMergeOperationDispatchResultSchema = z
-  .object({
-    type: z.literal("merge_entities"),
-    status: z.literal("applying"),
-    operationId: PositiveIdSchema,
-    sourceEntityId: PositiveIdSchema,
-    destinationEntityId: PositiveIdSchema,
-    approvingModeratorId: PositiveIdSchema,
-  })
-  .strict();
-
-export type EntityMergeOperationExecutionResult = z.infer<
-  typeof EntityMergeOperationExecutionResultSchema
->;
+export {
+  EntityMergeOperationExecutionResultSchema,
+  type EntityMergeOperationExecutionResult,
+} from "@peated/server/schemas/bottleOperationResults";
 
 export class EntityMergeOperationExecutionError extends Error {
   constructor(
@@ -211,7 +183,7 @@ export async function loadEntityMergeOperation({
     }
     result = parsedResult.data;
   } else if (operation.status === "applying" || operation.result !== null) {
-    const parsedDispatch = EntityMergeOperationDispatchResultSchema.safeParse(
+    const parsedDispatch = MergeEntitiesDispatchExecutionResultSchema.safeParse(
       operation.result,
     );
     if (!parsedDispatch.success) {

@@ -537,5 +537,13 @@ export function assertFindingsUseCollectedEvidence(
         `Finding ${findingIndex} cites evidence that was not collected: ${JSON.stringify(missingEvidence)}.`,
       );
     }
+    const uninspectedEvidence = proposalCollector.getUninspectedEvidence(
+      finding.evidenceRefs,
+    );
+    if (uninspectedEvidence) {
+      throw new Error(
+        `Finding ${findingIndex} cites Bottle or Entity evidence that was not inspected: ${JSON.stringify(uninspectedEvidence)}.`,
+      );
+    }
   }
 }

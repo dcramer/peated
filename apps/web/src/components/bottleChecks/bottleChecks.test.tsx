@@ -306,7 +306,12 @@ describe("Bottle Check review components", () => {
     const applied = renderToStaticMarkup(
       <OperationCard
         operation={operation("applied", {
-          result: { entityId: 42, updated: true },
+          result: {
+            type: "update_entity",
+            status: "applied",
+            entityId: 42,
+            changed: true,
+          },
         })}
         review={null}
       />,

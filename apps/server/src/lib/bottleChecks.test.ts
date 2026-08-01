@@ -550,12 +550,14 @@ describe("Bottle check persistence", () => {
     expect(history).toEqual([]);
   });
 
-  test("persists findings only when every evidence reference was collected", async ({
+  test("persists findings only when resource evidence was inspected", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
+    const entity = await fixtures.Entity();
     const collectedUrl = "https://example.com/collected-bottle-evidence";
     const artifacts = {
+      ...(await bottleArtifacts(bottle.id)),
       candidates: [
         {
           bottleId: bottle.id,
@@ -589,6 +591,49 @@ describe("Bottle check persistence", () => {
         }),
       ),
     ).resolves.toMatchObject({ created: true });
+
+    await expect(
+      createBottleCheck(
+        auditCheckInput({
+          artifacts: {
+            candidates: [
+              {
+                bottleId: bottle.id,
+                fullName: bottle.fullName,
+              },
+            ],
+          },
+          bottleId: bottle.id,
+          summary: "Uninspected Bottle evidence.",
+          findings: [
+            {
+              scope: "bottle",
+              summary: "A candidate alone does not support a finding.",
+              evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
+            },
+          ],
+        }),
+      ),
+    ).rejects.toThrow("must reference an inspected Bottle context");
+
+    await expect(
+      createBottleCheck(
+        auditCheckInput({
+          artifacts: {
+            resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+          },
+          bottleId: bottle.id,
+          summary: "Uninspected Entity evidence.",
+          findings: [
+            {
+              scope: "entity",
+              summary: "A resolved Entity alone does not support a finding.",
+              evidenceRefs: [{ kind: "entity", entityId: entity.id }],
+            },
+          ],
+        }),
+      ),
+    ).rejects.toThrow("must reference an inspected Entity context");
 
     await expect(
       createBottleCheck(
@@ -650,6 +695,7 @@ describe("Bottle check persistence", () => {
 
     const findingCheck = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(findingBottle.id),
         bottleId: findingBottle.id,
         summary: "Finding only.",
         findings: [
@@ -717,6 +763,7 @@ describe("Bottle check persistence", () => {
     );
     const closedCheck = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(closedBottle.id),
         bottleId: closedBottle.id,
         summary: "Closed finding.",
         findings: [
@@ -809,6 +856,7 @@ describe("Bottle check persistence", () => {
     const bottle = await fixtures.Bottle();
     const created = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(bottle.id),
         bottleId: bottle.id,
         summary: "Finding needs acknowledgement.",
         findings: [
@@ -863,6 +911,7 @@ describe("Bottle check persistence", () => {
     const bottle = await fixtures.Bottle();
     const created = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(bottle.id),
         bottleId: bottle.id,
         summary: "Concurrent finding.",
         findings: [
@@ -1058,6 +1107,7 @@ describe("Bottle check persistence", () => {
     const user = await fixtures.User({ mod: false, admin: false });
     const created = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(bottle.id),
         bottleId: bottle.id,
         summary: "Finding.",
         findings: [

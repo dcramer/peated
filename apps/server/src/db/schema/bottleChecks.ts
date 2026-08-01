@@ -1,4 +1,10 @@
-import type { ProposedOperation } from "@peated/bottle-classifier";
+import {
+  AuditBottleOriginSchema,
+  BottleCheckIntentSchema,
+  type AuditBottleOrigin,
+  type BottleCheckIntent,
+  type ProposedOperation,
+} from "@peated/bottle-classifier/contract";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -17,15 +23,24 @@ import { bottles } from "./bottles";
 import { storePriceMatchAttempts, storePriceMatchProposals } from "./stores";
 import { users } from "./users";
 
-export const bottleCheckIntentEnum = pgEnum("bottle_check_intent", [
-  "resolve_reference",
-  "audit_bottle",
-]);
+const bottleCheckIntentValues = BottleCheckIntentSchema.options as [
+  BottleCheckIntent,
+  ...BottleCheckIntent[],
+];
+const bottleCheckOriginValues = AuditBottleOriginSchema.options as [
+  AuditBottleOrigin,
+  ...AuditBottleOrigin[],
+];
 
-export const bottleCheckOriginEnum = pgEnum("bottle_check_origin", [
-  "moderator",
-  "post_user_creation",
-]);
+export const bottleCheckIntentEnum = pgEnum(
+  "bottle_check_intent",
+  bottleCheckIntentValues,
+);
+
+export const bottleCheckOriginEnum = pgEnum(
+  "bottle_check_origin",
+  bottleCheckOriginValues,
+);
 
 export const bottleCheckCloseReasonEnum = pgEnum("bottle_check_close_reason", [
   "dismissed",

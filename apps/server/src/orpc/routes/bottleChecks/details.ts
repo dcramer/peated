@@ -3,12 +3,12 @@ import { getBottleCheckForReview } from "@peated/server/lib/bottleChecks";
 import { prepareBottleCheckReviewOperations } from "@peated/server/lib/bottleOperationModeration";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { z } from "zod";
+import { BottleCheckDetailsResponseSchema } from "@peated/server/schemas/bottleChecks";
 import {
-  BottleCheckDetailsResponseSchema,
   serializeBottleCheck,
   serializeReviewOperation,
-} from "./schemas";
+} from "@peated/server/serializers/bottleCheck";
+import { z } from "zod";
 
 export default procedure
   .use(requireMod)

@@ -6,7 +6,7 @@ import {
 } from "@peated/server/lib/bottleOperationModeration";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleOperationActionResponseSchema } from "./schemas";
+import { BottleOperationActionResponseSchema } from "@peated/server/schemas/bottleChecks";
 
 const InputSchema = BottleOperationRejectionInputSchema.safeExtend({
   check: RejectBottleOperationsInputSchema.shape.checkId,

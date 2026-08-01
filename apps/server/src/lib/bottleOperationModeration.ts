@@ -1,4 +1,7 @@
-import { ProposedOperationSchema } from "@peated/bottle-classifier";
+import {
+  DEFAULT_MAX_PROPOSED_OPERATIONS,
+  ProposedOperationSchema,
+} from "@peated/bottle-classifier";
 import config from "@peated/server/config";
 import {
   db,
@@ -56,7 +59,6 @@ import { z } from "zod";
 
 const PositiveIdSchema = z.number().int().positive();
 const NonEmptyNoteSchema = z.string().trim().min(1).max(2000);
-const MAX_SELECTED_OPERATIONS = 50;
 
 export const BottleOperationRejectionReasonSchema = z.enum(
   bottleOperationRejectionReasonEnum.enumValues,
@@ -69,7 +71,7 @@ export const BottleOperationStatusSchema = z.enum(
 export const SelectedBottleOperationIdsSchema = z
   .array(PositiveIdSchema)
   .min(1)
-  .max(MAX_SELECTED_OPERATIONS)
+  .max(DEFAULT_MAX_PROPOSED_OPERATIONS)
   .refine((ids) => new Set(ids).size === ids.length, {
     message: "Operation ids must be unique.",
   });
@@ -352,7 +354,11 @@ export async function prepareBottleCheckReviewOperations(
   );
   return await Promise.all(
     check.operations.map(async (operation) => {
-      if (operation.status === "applied" || operation.status === "rejected") {
+      if (
+        operation.status === "applied" ||
+        operation.status === "rejected" ||
+        operation.status === "applying"
+      ) {
         return {
           operationId: operation.id,
           review: null,

@@ -2,6 +2,7 @@ export * from "./actors";
 export * from "./auth";
 export * from "./badges";
 export * from "./bottleBarcodes";
+export * from "./bottleOperationResults";
 export * from "./bottles";
 export * from "./bottleSeries";
 export * from "./catalogIdentity";

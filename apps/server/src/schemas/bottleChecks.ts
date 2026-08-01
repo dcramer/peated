@@ -7,12 +7,8 @@ import {
   BottleCheckCloseReasonSchema,
   PersistedAuditBottleCheckOutputSchema,
   PersistedReferenceBottleCheckOutputSchema,
-  type BottleCheckWithOperations,
 } from "@peated/server/lib/bottleChecks";
-import {
-  BOTTLE_CHECK_SCHEMA_VERSION,
-  isSupportedBottleCheckSchemaVersion,
-} from "@peated/server/lib/bottleCheckSchemaVersion";
+import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
   BottleOperationActionResultSchema,
   BottleOperationRejectionReasonSchema,
@@ -20,15 +16,15 @@ import {
 } from "@peated/server/lib/bottleOperationModeration";
 import {
   BlockedReviewOperationSchema,
+  PreparationErrorSchema,
   ReviewBottleMergeSchema,
   ReviewBottleUpdateSchema,
   ReviewEntityMergeSchema,
   ReviewEntityUpdateSchema,
-  type ReviewOperation,
 } from "@peated/server/lib/bottleOperationReviewSchemas";
+import { PersistedBottleOperationExecutionResultSchema } from "@peated/server/schemas/bottleOperationResults";
 import { z } from "zod";
 
-const JsonObjectSchema = z.record(z.string(), z.unknown());
 const DateTimeSchema = z.string().datetime();
 
 export const BottleOperationResponseSchema = z
@@ -36,13 +32,13 @@ export const BottleOperationResponseSchema = z
     id: z.number(),
     checkId: z.number(),
     proposal: ProposedOperationSchema,
-    preparationError: JsonObjectSchema.nullable(),
+    preparationError: PreparationErrorSchema.nullable(),
     status: BottleOperationStatusSchema,
     reviewedById: z.number().nullable(),
     reviewedAt: DateTimeSchema.nullable(),
     rejectionReason: BottleOperationRejectionReasonSchema.nullable(),
     reviewerNote: z.string().nullable(),
-    result: JsonObjectSchema.nullable(),
+    result: PersistedBottleOperationExecutionResultSchema.nullable(),
     error: z.string().nullable(),
     executionStartedAt: DateTimeSchema.nullable(),
     executionCompletedAt: DateTimeSchema.nullable(),
@@ -113,9 +109,7 @@ const UnsupportedBottleCheckResponseSchema = z
     schemaVersion: z
       .number()
       .int()
-      .refine((value) => {
-        return value !== BOTTLE_CHECK_SCHEMA_VERSION;
-      }),
+      .refine((value) => value !== BOTTLE_CHECK_SCHEMA_VERSION),
     canClose: z.boolean(),
     operationCount: z.number().int().nonnegative(),
     operations: z.tuple([]),
@@ -134,7 +128,7 @@ const PreparedReviewOperationResponseSchema = z.discriminatedUnion("type", [
   ReviewEntityMergeSchema.omit({ stateToken: true }),
 ]);
 
-const ReviewOperationResponseSchema = z.union([
+export const ReviewOperationResponseSchema = z.union([
   BlockedReviewOperationSchema,
   PreparedReviewOperationResponseSchema,
 ]);
@@ -159,84 +153,3 @@ export const BottleCheckDetailsResponseSchema = z
     ),
   })
   .strict();
-
-export function serializeReviewOperation(
-  review: ReviewOperation | null,
-): z.infer<typeof ReviewOperationResponseSchema> | null {
-  if (!review || review.status === "blocked") return review;
-  const { stateToken: _stateToken, ...response } = review;
-  return PreparedReviewOperationResponseSchema.parse(response);
-}
-
-function serializeDate(value: Date | null): string | null {
-  return value?.toISOString() ?? null;
-}
-
-function serializeBottleOperation(
-  operation: BottleCheckWithOperations["operations"][number],
-) {
-  return BottleOperationResponseSchema.parse({
-    id: operation.id,
-    checkId: operation.checkId,
-    proposal: operation.proposal,
-    preparationError: operation.preparationError,
-    status: operation.status,
-    reviewedById: operation.reviewedById,
-    reviewedAt: serializeDate(operation.reviewedAt),
-    rejectionReason: operation.rejectionReason,
-    reviewerNote: operation.reviewerNote,
-    result: operation.result,
-    error: operation.error,
-    executionStartedAt: serializeDate(operation.executionStartedAt),
-    executionCompletedAt: serializeDate(operation.executionCompletedAt),
-    createdAt: operation.createdAt.toISOString(),
-    updatedAt: operation.updatedAt.toISOString(),
-  });
-}
-
-export function serializeBottleCheck(check: BottleCheckWithOperations) {
-  const common = {
-    id: check.id,
-    intent: check.intent,
-    origin: check.origin,
-    sourceKind: check.sourceKind,
-    sourceId: check.sourceId,
-    bottleId: check.bottleId,
-    model: check.model,
-    error: check.error,
-    storePriceMatchProposalId: check.storePriceMatchProposalId,
-    storePriceMatchAttemptId: check.storePriceMatchAttemptId,
-    closedById: check.closedById,
-    closeReason: check.closeReason,
-    closeNote: check.closeNote,
-    createdAt: check.createdAt.toISOString(),
-    completedAt: serializeDate(check.completedAt),
-    closedAt: serializeDate(check.closedAt),
-  };
-
-  if (!isSupportedBottleCheckSchemaVersion(check)) {
-    return UnsupportedBottleCheckResponseSchema.parse({
-      ...common,
-      schemaSupported: false,
-      schemaVersion: check.schemaVersion,
-      canClose:
-        check.closedAt === null &&
-        !check.operations.some(({ status }) => status === "applying"),
-      operationCount: check.operations.length,
-      operations: [],
-    });
-  }
-
-  const output =
-    check.intent === "audit_bottle"
-      ? PersistedAuditBottleCheckOutputSchema.parse(check.output)
-      : PersistedReferenceBottleCheckOutputSchema.parse(check.output);
-
-  return SupportedBottleCheckResponseSchema.parse({
-    ...common,
-    schemaSupported: true,
-    schemaVersion: check.schemaVersion,
-    output,
-    operations: check.operations.map(serializeBottleOperation),
-  });
-}
