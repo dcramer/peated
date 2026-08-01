@@ -52,9 +52,16 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expect(
     nonReadyOperation.getByText("Rejected", { exact: true }),
   ).toBeVisible();
+  const actionResults = page.getByRole("region", {
+    name: "Operation results",
+  });
+  const rejectionResult = actionResults
+    .getByRole("listitem")
+    .filter({ hasText: "Operation #702" });
   await expect(
-    page.getByText("Operation #702 rejected", { exact: false }),
+    rejectionResult.getByText("Operation #702", { exact: true }),
   ).toBeVisible();
+  await expect(rejectionResult.getByText(/^rejected$/i)).toBeVisible();
   await expect(
     readyOperation.getByRole("checkbox", { name: "Select" }),
   ).toBeVisible();
@@ -73,9 +80,13 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expect(
     nonReadyOperation.getByText("Rejected", { exact: true }),
   ).toBeVisible();
+  const approvalResult = actionResults
+    .getByRole("listitem")
+    .filter({ hasText: "Operation #701" });
   await expect(
-    page.getByText("Operation #701 applied", { exact: false }),
+    approvalResult.getByText("Operation #701", { exact: true }),
   ).toBeVisible();
+  await expect(approvalResult.getByText(/^applied$/i)).toBeVisible();
   await expect(page.getByRole("checkbox", { name: "Select" })).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 });
