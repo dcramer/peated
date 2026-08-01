@@ -954,6 +954,30 @@ const lagavulinDistillersEdition2023AutumnCandidate: BottleCandidate = {
 };
 
 describe("createBottleClassifier", () => {
+  test("passes explicit GPT-5 reasoning effort to the semantic agent", async () => {
+    const preparedRun = await prepareBottleClassifierAgentRun(
+      {
+        client: {} as OpenAI,
+        model: "openai/gpt-5.6-luna",
+        reasoningEffort: "high",
+        maxSearchQueries: 2,
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+        },
+      },
+      {
+        reference: { name: "Ardbeg Uigeadail" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+    );
+
+    expect(preparedRun.agent.modelSettings).toMatchObject({
+      parallelToolCalls: false,
+      reasoning: { effort: "high" },
+    });
+  });
+
   test("uses Firecrawl web search instead of OpenAI web search when configured", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {

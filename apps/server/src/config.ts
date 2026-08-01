@@ -96,6 +96,7 @@ export default {
   OPENAI_EMBEDDING_MODEL: openAIConfig.embeddingModel,
   OPENAI_HOST: openAIConfig.baseURL,
   OPENAI_MODEL: openAIConfig.model,
+  OPENAI_REASONING_EFFORT: openAIConfig.reasoningEffort,
   OPENAI_ORGANIZATION:
     openAIConfig.organization ||
     (openAIConfig.provider === "openai"

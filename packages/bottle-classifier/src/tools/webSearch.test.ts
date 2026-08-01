@@ -655,7 +655,8 @@ describe("bottleClassifier web search tools", () => {
 
   test("requests OpenAI web search sources in the response payload", () => {
     const request = buildOpenAIWebSearchRequest({
-      model: "gpt-5.4",
+      model: "openai/gpt-5.6-luna",
+      reasoningEffort: "high",
       query: "lagavulin distillers edition 2023",
       instructions: "Search the web.",
     });
@@ -663,7 +664,20 @@ describe("bottleClassifier web search tools", () => {
     expect(request).toEqual(
       expect.objectContaining({
         include: ["web_search_call.action.sources"],
+        reasoning: { effort: "high" },
       }),
     );
+  });
+
+  test("keeps custom OpenAI-compatible web search requests stable", () => {
+    const request = buildOpenAIWebSearchRequest({
+      model: "custom-model",
+      reasoningEffort: "high",
+      query: "lagavulin distillers edition 2023",
+      instructions: "Search the web.",
+    });
+
+    expect(request).toMatchObject({ temperature: 0 });
+    expect(request).not.toHaveProperty("reasoning");
   });
 });

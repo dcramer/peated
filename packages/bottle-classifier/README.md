@@ -181,7 +181,12 @@ URLs; public image URLs are passed through as image references.
 Live eval commands:
 
 ```bash
+# Baseline: provider-default reasoning effort
 pnpm evals
+
+# Compare GPT-5.6 Luna at an explicit effort
+OPENAI_MODEL=gpt-5.6-luna OPENAI_REASONING_EFFORT=high pnpm evals
+
 pnpm --filter @peated/bottle-classifier evals
 pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
 ```
@@ -195,7 +200,13 @@ files overriding earlier ones. Shell-provided env vars still take precedence.
 precedence when both are set. With the gateway, `OPENAI_MODEL` defaults to
 `openai/gpt-5.4` and `OPENAI_EVAL_MODEL` defaults to
 `openai/gpt-5-mini`; direct OpenAI defaults omit the provider prefix. Override
-either if you want a different cost or quality tradeoff. `FIRECRAWL_API_KEY`
+either if you want a different cost or quality tradeoff.
+`OPENAI_REASONING_EFFORT` accepts `none`, `low`, `medium`, `high`, or `xhigh` for
+GPT-5 models. When it is unset, the classifier omits the setting and uses the
+provider default; GPT-5.6 currently defaults to `medium`. Reasoning tokens are
+included in output-token usage and billed as output tokens. The eval metadata
+and visible usage annotation record the resolved effort for repeatable
+comparisons. `FIRECRAWL_API_KEY`
 enables live web evidence search;
 `FIRECRAWL_API_URL` can override the default Firecrawl API host.
 

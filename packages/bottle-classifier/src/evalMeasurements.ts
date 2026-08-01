@@ -1,14 +1,17 @@
 import type { JsonValue, UsageSummary } from "vitest-evals/harness";
 import { getEvalRunCostMetadata } from "./evalCost";
+import type { OpenAIReasoningEffort } from "./openaiModelSettings";
 import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
 
 export function buildEvalHarnessMeasurements({
   model,
   modelMetadata,
+  reasoningEffort,
   totalMs,
 }: {
   model: string;
   modelMetadata: BottleClassifierRunMetadata | null;
+  reasoningEffort?: OpenAIReasoningEffort;
   totalMs: number;
 }) {
   const costMetadata = modelMetadata
@@ -26,6 +29,7 @@ export function buildEvalHarnessMeasurements({
           toolCalls: modelMetadata.toolCalls.count,
           metadata: {
             ...costMetadata,
+            reasoningEffort: reasoningEffort ?? "provider_default",
             requests: modelMetadata.usage.requests,
             ...(modelMetadata.usage.cachedInputTokens === undefined
               ? {}
@@ -52,8 +56,10 @@ export function formatEvalUsageAnnotation(
   const metadata = usage?.metadata;
   const estimate = metadata?.estimatedAgentLoopCostUsd;
   const coverage = metadata?.costCoverage ?? "usage_unavailable";
+  const reasoningEffort = metadata?.reasoningEffort ?? "provider_default";
+  const reasoningSummary = `effort ${String(reasoningEffort).replace("_", " ")}`;
   if (coverage === "usage_unavailable") {
-    return "usage unavailable · agent loop only";
+    return `usage unavailable | ${reasoningSummary} · agent loop only`;
   }
 
   const inputTokens = usage?.inputTokens ?? 0;
@@ -61,8 +67,8 @@ export function formatEvalUsageAnnotation(
   const tokenSummary = `input ${inputTokens.toLocaleString("en-US")} tok | output ${outputTokens.toLocaleString("en-US")} tok`;
 
   if (typeof estimate === "number") {
-    return `${tokenSummary} | est. $${estimate.toFixed(6)} · agent loop only`;
+    return `${tokenSummary} | ${reasoningSummary} | est. $${estimate.toFixed(6)} · agent loop only`;
   }
 
-  return `${tokenSummary} | cost unavailable (unsupported model) · agent loop only`;
+  return `${tokenSummary} | ${reasoningSummary} | cost unavailable (unsupported model) · agent loop only`;
 }

@@ -3,6 +3,11 @@ import {
   buildEvalHarnessMeasurements,
   formatEvalUsageAnnotation,
 } from "./evalMeasurements";
+import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
+import {
+  getStableOpenAISettings,
+  resolveOpenAIReasoningEffort,
+} from "./openaiModelSettings";
 import { getBottleClassifierRunMetadata } from "./runtime/runMetadata";
 
 describe("eval harness measurements", () => {
@@ -71,7 +76,7 @@ describe("eval harness measurements", () => {
       pricingModel: "gpt-5.6-luna",
     });
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "input 1,000,000 tok | output 100,000 tok | est. $0.320000 · agent loop only",
+      "input 1,000,000 tok | output 100,000 tok | effort provider default | est. $0.320000 · agent loop only",
     );
   });
 
@@ -129,7 +134,7 @@ describe("eval harness measurements", () => {
       "estimatedAgentLoopCostUsd",
     );
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "input 100 tok | output 20 tok | cost unavailable (unsupported model) · agent loop only",
+      "input 100 tok | output 20 tok | effort provider default | cost unavailable (unsupported model) · agent loop only",
     );
   });
 
@@ -150,7 +155,7 @@ describe("eval harness measurements", () => {
       "estimatedAgentLoopCostUsd",
     );
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "usage unavailable · agent loop only",
+      "usage unavailable | effort provider default · agent loop only",
     );
   });
 
@@ -172,7 +177,43 @@ describe("eval harness measurements", () => {
     });
 
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "input 1,000 tok | output 100 tok | est. $0.004000 · agent loop only",
+      "input 1,000 tok | output 100 tok | effort provider default | est. $0.004000 · agent loop only",
+    );
+  });
+
+  test("carries configured effort through runtime settings and eval metadata", () => {
+    const config = resolveOpenAICompatibleConfig({
+      OPENAI_MODEL: "gpt-5.6-luna",
+      OPENAI_REASONING_EFFORT: "high",
+    });
+    const reasoningEffort = resolveOpenAIReasoningEffort(
+      config.model,
+      config.reasoningEffort,
+    );
+    const measurements = buildEvalHarnessMeasurements({
+      model: config.model,
+      reasoningEffort,
+      modelMetadata: {
+        agentDurationMs: 10,
+        usage: {
+          requests: 1,
+          inputTokens: 100,
+          outputTokens: 20,
+          totalTokens: 120,
+        },
+        toolCalls: { count: 0, names: [] },
+      },
+      totalMs: 12,
+    });
+
+    expect(getStableOpenAISettings(config.model, reasoningEffort)).toEqual({
+      reasoning: { effort: "high" },
+    });
+    expect(measurements.usage?.metadata).toMatchObject({
+      reasoningEffort: "high",
+    });
+    expect(formatEvalUsageAnnotation(measurements.usage)).toContain(
+      "effort high",
     );
   });
 });

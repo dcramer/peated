@@ -92,6 +92,7 @@ export function getBottleClassifier() {
   bottleClassifier = createBottleClassifier({
     client,
     model: config.OPENAI_MODEL,
+    reasoningEffort: config.OPENAI_REASONING_EFFORT,
     maxSearchQueries: config.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES,
     firecrawlApiKey: config.FIRECRAWL_API_KEY,
     firecrawlApiUrl: config.FIRECRAWL_API_URL,

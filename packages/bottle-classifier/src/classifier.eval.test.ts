@@ -57,6 +57,7 @@ import {
 import {
   createEvalClassifierOptions,
   evalClassifierModel,
+  evalClassifierReasoningEffort,
   hasEvalOpenAICredentials,
 } from "./evalSupport";
 import { createLocalCatalogDataSource } from "./localCatalog";
@@ -822,6 +823,7 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
       ...buildEvalHarnessMeasurements({
         model: evalClassifierModel,
         modelMetadata,
+        reasoningEffort: evalClassifierReasoningEffort,
         totalMs: performance.now() - startedAt,
       }),
     };
@@ -910,6 +912,7 @@ const auditHarness = createHarness<AuditBottleEvalFixture, JsonValue>({
       ...buildEvalHarnessMeasurements({
         model: evalClassifierModel,
         modelMetadata,
+        reasoningEffort: evalClassifierReasoningEffort,
         totalMs: performance.now() - startedAt,
       }),
     };

@@ -5,6 +5,7 @@ import type { BottleExtractedDetails } from "./classifierTypes";
 import {
   createEvalOpenAIClient,
   evalClassifierModel,
+  evalClassifierReasoningEffort,
   hasEvalOpenAICredentials,
 } from "./evalSupport";
 import { createWhiskyLabelExtractor } from "./extractor";
@@ -118,6 +119,7 @@ describe.skipIf(!hasEvalOpenAICredentials)("image extraction evals", () => {
   const extractor = createWhiskyLabelExtractor({
     client: createEvalOpenAIClient(),
     model: evalClassifierModel,
+    reasoningEffort: evalClassifierReasoningEffort,
   });
 
   test.for(IMAGE_EXTRACTION_EVAL_CASES)("$name", async (testCase) => {

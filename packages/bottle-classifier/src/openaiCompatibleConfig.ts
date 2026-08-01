@@ -1,6 +1,8 @@
 import {
   DEFAULT_OPENAI_EVAL_MODEL,
   DEFAULT_OPENAI_MODEL,
+  parseOpenAIReasoningEffort,
+  type OpenAIReasoningEffort,
 } from "./openaiModelSettings";
 
 const OPENAI_BASE_URL = "https://api.openai.com/v1";
@@ -15,7 +17,8 @@ type OpenAICompatibleEnvKey =
   | "OPENAI_HOST"
   | "OPENAI_MODEL"
   | "OPENAI_ORGANIZATION"
-  | "OPENAI_PROJECT";
+  | "OPENAI_PROJECT"
+  | "OPENAI_REASONING_EFFORT";
 
 export type OpenAICompatibleConfig = {
   apiKey: string | undefined;
@@ -26,6 +29,7 @@ export type OpenAICompatibleConfig = {
   organization: string | undefined;
   project: string | undefined;
   provider: "openai" | "vercel-ai-gateway";
+  reasoningEffort: OpenAIReasoningEffort | undefined;
 };
 
 function gatewayModel(model: string): string {
@@ -72,5 +76,8 @@ export function resolveOpenAICompatibleConfig(
       ? undefined
       : nonEmpty(envValue(env, "OPENAI_PROJECT")),
     provider: usesGateway ? "vercel-ai-gateway" : "openai",
+    reasoningEffort: parseOpenAIReasoningEffort(
+      envValue(env, "OPENAI_REASONING_EFFORT"),
+    ),
   };
 }

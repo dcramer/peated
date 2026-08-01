@@ -51,7 +51,10 @@ import {
   buildBottleLocalIdentifierInstructions,
 } from "./instructions";
 import { startAgentSpan, type AgentSpanAttributes } from "./observability";
-import { getStableOpenAISettings } from "./openaiModelSettings";
+import {
+  getStableOpenAISettings,
+  type OpenAIReasoningEffort,
+} from "./openaiModelSettings";
 import {
   finalizeBottleReferenceClassification,
   getAutoIgnoreBottleReferenceReason,
@@ -224,6 +227,7 @@ export type BottleClassifierAdapters = BottleClassifierDataSource;
 type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   maxSearchQueries: number;
   firecrawlApiKey?: string | null;
   firecrawlApiUrl?: string | null;
@@ -796,6 +800,7 @@ async function collectNoMatchWebInvestigationArtifacts({
     : await runBottleWebEvidenceSearch({
         client: options.client,
         model: options.model,
+        reasoningEffort: options.reasoningEffort,
         query,
         budget,
         executeWebSearch: options.executeWebSearch,
@@ -971,7 +976,7 @@ export async function prepareBottleClassifierAgentRun(
     model: options.model,
     modelSettings: {
       parallelToolCalls: false,
-      ...getStableOpenAISettings(options.model),
+      ...getStableOpenAISettings(options.model, options.reasoningEffort),
     },
     outputType,
     tools,
@@ -1126,7 +1131,7 @@ export function prepareBottleAuditAgentRun(
     model: options.model,
     modelSettings: {
       parallelToolCalls: false,
-      ...getStableOpenAISettings(options.model),
+      ...getStableOpenAISettings(options.model, options.reasoningEffort),
     },
     outputType: BottleAuditAgentOutputType,
     tools: createBottleCheckTools({
@@ -1195,6 +1200,7 @@ export function createBottleClassifier(
   const extractor = createWhiskyLabelExtractor({
     client: options.client,
     model: options.model,
+    reasoningEffort: options.reasoningEffort,
   });
 
   const extractFromImage = async (imageUrlOrBase64: string) =>

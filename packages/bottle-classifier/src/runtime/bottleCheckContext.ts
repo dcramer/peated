@@ -11,6 +11,7 @@ import {
   type BottleExtractedDetails,
 } from "../classifierTypes";
 import { createWhiskyLabelExtractor } from "../extractor";
+import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 
 type BottleContextLoaderDataSource = {
   getBottleContext?: (bottleId: number) => Promise<BottleContextSource | null>;
@@ -19,6 +20,7 @@ type BottleContextLoaderDataSource = {
 type BottleContextLoaderOptions = {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   overrides?: {
     extractFromImage?: (
       imageUrlOrBase64: string,
@@ -68,6 +70,7 @@ export function createBottleContextLoader({
   const extractor = createWhiskyLabelExtractor({
     client: options.client,
     model: options.model,
+    reasoningEffort: options.reasoningEffort,
   });
   const extractFromImage = async (imageUrl: string) =>
     options.overrides?.extractFromImage

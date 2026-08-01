@@ -24,6 +24,7 @@ import {
   type Finding,
 } from "../contract";
 import type { ImageBottleEvidence } from "../imageEvidence";
+import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 import type {
   BottleProposalCollector,
   BottleWebSearchExecutor,
@@ -82,6 +83,7 @@ type BottleClassifierToolObserver = (event: BottleClassifierToolEvent) => void;
 type BottleCheckRuntimeOptions = {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   firecrawlApiKey?: string | null;
   firecrawlApiUrl?: string | null;
   executeWebSearch?: BottleWebSearchExecutor;
@@ -441,6 +443,7 @@ export function createBottleCheckTools({
           createOpenAIWebSearchTool({
             client: options.client,
             model: options.model,
+            reasoningEffort: options.reasoningEffort,
             budget: webSearchBudget,
             executeWebSearch: options.executeWebSearch,
             onEvidence: (evidence) => {

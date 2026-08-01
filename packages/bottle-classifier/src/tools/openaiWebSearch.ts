@@ -9,7 +9,10 @@ import {
   type BottleSearchEvidence,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
-import { getStableOpenAISettings } from "../openaiModelSettings";
+import {
+  getStableOpenAISettings,
+  type OpenAIReasoningEffort,
+} from "../openaiModelSettings";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
@@ -219,12 +222,14 @@ export function extractOpenAISearchEvidence(
 export function createOpenAIWebSearchTool({
   client,
   model,
+  reasoningEffort,
   budget,
   onEvidence,
   executeWebSearch,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
   executeWebSearch?: BottleWebSearchExecutor;
@@ -242,6 +247,7 @@ export function createOpenAIWebSearchTool({
           await runBottleWebEvidenceSearch({
             client,
             model,
+            reasoningEffort,
             budget,
             query: args.query,
             onEvidence,
@@ -255,6 +261,7 @@ export function createOpenAIWebSearchTool({
 export async function runBottleWebEvidenceSearch({
   client,
   model,
+  reasoningEffort,
   query,
   budget,
   onEvidence,
@@ -262,6 +269,7 @@ export async function runBottleWebEvidenceSearch({
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
@@ -280,6 +288,7 @@ export async function runBottleWebEvidenceSearch({
       await runBottleWebEvidenceSearchAfterBudget({
         client,
         model,
+        reasoningEffort,
         query,
         budget,
         onEvidence: hydrateEvidence,
@@ -297,12 +306,14 @@ export async function runBottleWebEvidenceSearch({
 async function runBottleWebEvidenceSearchAfterBudget({
   client,
   model,
+  reasoningEffort,
   query,
   budget,
   onEvidence,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
@@ -311,6 +322,7 @@ async function runBottleWebEvidenceSearchAfterBudget({
     const primaryEvidence = await runOpenAIWebSearch({
       client,
       model,
+      reasoningEffort,
       query,
       instructions:
         "Find bottle-specific evidence. Prefer specific, corroborated sources over copied snippets or retailer SEO. Summarize confirmed traits such as producer, bottler, age, ABV, edition, cask, vintage, or release year.",
@@ -325,6 +337,7 @@ async function runBottleWebEvidenceSearchAfterBudget({
         supplementalEvidence = await runOpenAIWebSearch({
           client,
           model,
+          reasoningEffort,
           query,
           instructions:
             "Find additional corroborating sources on different domains when possible. Summarize any confirmed proof, ABV, strength, or release traits.",
@@ -368,11 +381,13 @@ async function runBottleWebEvidenceSearchAfterBudget({
 
 export function buildOpenAIWebSearchRequest({
   model,
+  reasoningEffort,
   query,
   instructions,
   extraContext = null,
 }: {
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   instructions: string;
   extraContext?: string | null;
@@ -393,19 +408,21 @@ export function buildOpenAIWebSearchRequest({
       },
     ],
     tools: [{ type: "web_search" }],
-    ...getStableOpenAISettings(model),
+    ...getStableOpenAISettings(model, reasoningEffort),
   };
 }
 
 export async function runOpenAIWebSearch({
   client,
   model,
+  reasoningEffort,
   query,
   instructions,
   extraContext = null,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   instructions: string;
   extraContext?: string | null;
@@ -413,6 +430,7 @@ export async function runOpenAIWebSearch({
   const response = await client.responses.create(
     buildOpenAIWebSearchRequest({
       model,
+      reasoningEffort,
       query,
       instructions,
       extraContext,

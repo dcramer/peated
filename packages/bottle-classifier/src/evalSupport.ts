@@ -4,11 +4,18 @@ import type {
   CreateBottleClassifierOptions,
 } from "./classifierRuntime";
 import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
-import { getStableOpenAISettings } from "./openaiModelSettings";
+import {
+  getStableOpenAISettings,
+  resolveOpenAIReasoningEffort,
+} from "./openaiModelSettings";
 
 const evalOpenAIConfig = resolveOpenAICompatibleConfig(process.env);
 
 export const evalClassifierModel = evalOpenAIConfig.model;
+export const evalClassifierReasoningEffort = resolveOpenAIReasoningEffort(
+  evalClassifierModel,
+  evalOpenAIConfig.reasoningEffort,
+);
 export const evalJudgeModel = evalOpenAIConfig.evalModel;
 export const hasEvalOpenAICredentials = Boolean(evalOpenAIConfig.apiKey);
 
@@ -27,6 +34,7 @@ export function createEvalClassifierOptions(
   return {
     client: createEvalOpenAIClient(),
     model: evalClassifierModel,
+    reasoningEffort: evalClassifierReasoningEffort,
     maxSearchQueries: Number(
       process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
     ),
