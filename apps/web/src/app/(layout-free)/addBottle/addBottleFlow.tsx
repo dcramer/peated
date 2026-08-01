@@ -325,7 +325,7 @@ function MatchedOutcomeActions({
       href={getAddSimilarBottlePath(bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add a similar bottle
+      Add Similar
     </OutcomeButton>
   );
   const actionButtons =
@@ -468,7 +468,7 @@ function OutcomeSelection({
       href={getAddSimilarBottlePath(selection.bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add a similar bottle
+      Add Similar
     </OutcomeButton>
   );
   const actionButtons =

@@ -225,9 +225,7 @@ test.describe("create bottle", () => {
     await expect(
       page.getByRole("heading", { name: "Bottle created" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Add a similar bottle" }),
-    ).toBeHidden();
+    await expect(page.getByRole("link", { name: "Add Similar" })).toBeHidden();
     await expect(getBottleIdentityLink(page, createdBottleName)).toBeVisible();
   });
 
@@ -509,7 +507,7 @@ test.describe("add bottle flow", () => {
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
     await expect(
-      page.getByRole("link", { name: "Add a similar bottle" }),
+      page.getByRole("link", { name: "Add Similar" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}/addRelease`);
     await expect(
       page.getByRole("link", { name: "Search Bottles" }),
@@ -724,9 +722,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Add a similar bottle" }),
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Add Similar" })).toBeVisible();
     await expect(
       page.getByRole("link", { name: "View Bottle" }),
     ).toHaveAttribute("href", `/bottles/${existingBottle.id}`);
@@ -1409,9 +1405,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("heading", { name: "Bottle created" }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "Add a similar bottle" }),
-    ).toBeHidden();
+    await expect(page.getByRole("link", { name: "Add Similar" })).toBeHidden();
     await expect(page.getByAltText("Selected bottle label")).toHaveAttribute(
       "src",
       pendingScanImageUrl,
