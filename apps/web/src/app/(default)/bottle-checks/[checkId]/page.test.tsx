@@ -163,8 +163,6 @@ function details(
       sourceKind: null,
       sourceId: null,
       bottleId: 44,
-      subjectKey: "audit_bottle:bottle:44",
-      backgroundEventKey: null,
       schemaSupported: true,
       schemaVersion: 1,
       output: {
@@ -242,7 +240,6 @@ describe("Bottle Check detail execution rollout", () => {
       sourceKind: "store_price",
       sourceId: "510",
       bottleId: null,
-      subjectKey: "resolve_reference:store_price:510",
       output: {
         status: "classified",
         decision: {
@@ -274,7 +271,6 @@ describe("Bottle Check detail execution rollout", () => {
       sourceKind: "store_price",
       sourceId: "510",
       bottleId: null,
-      subjectKey: "resolve_reference:store_price:510",
       output: {
         status: "ignored",
         reason: "The listing needs moderator review.",

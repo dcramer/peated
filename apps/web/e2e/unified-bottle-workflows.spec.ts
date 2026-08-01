@@ -139,6 +139,8 @@ test.describe("unified Bottle workflows", () => {
     expect(details.check).not.toHaveProperty("inputSnapshot");
     expect(details.check).not.toHaveProperty("artifacts");
     expect(details.check).not.toHaveProperty("modelMetadata");
+    expect(details.check).not.toHaveProperty("subjectKey");
+    expect(details.check).not.toHaveProperty("backgroundEventKey");
     expect(details.check.output.decision).toMatchObject({
       aliasScope: null,
       identityBasis: null,

@@ -238,8 +238,6 @@ export function createBottleCheckMock({
         sourceKind: "store_price",
         sourceId: "9912",
         bottleId: null,
-        subjectKey: "resolve_reference:store_price:9912",
-        backgroundEventKey: null,
         schemaVersion: 1,
         schemaSupported: true,
         output: {
@@ -430,8 +428,6 @@ export function createBottleCheckMock({
         sourceKind: null,
         sourceId: null,
         bottleId: existingBottleId,
-        subjectKey: `audit_bottle:bottle:${existingBottleId}`,
-        backgroundEventKey: null,
         schemaVersion: 1,
         schemaSupported: true,
         output: {
@@ -488,8 +484,6 @@ export function createBottleCheckMock({
       sourceKind: null,
       sourceId: null,
       bottleId: existingBottleId,
-      subjectKey: `audit_bottle:bottle:${existingBottleId}`,
-      backgroundEventKey: null,
       schemaVersion: 1,
       schemaSupported: true,
       output: {

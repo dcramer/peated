@@ -14,6 +14,10 @@ describe("getBottleClassifierRunMetadata", () => {
             usage: {
               requests: 3,
               inputTokens: 100,
+              inputTokensDetails: [
+                { cached_tokens: 40 },
+                { cached_tokens: 20 },
+              ],
               outputTokens: 20,
               totalTokens: 120,
             },
@@ -39,6 +43,7 @@ describe("getBottleClassifierRunMetadata", () => {
       usage: {
         requests: 3,
         inputTokens: 100,
+        cachedInputTokens: 60,
         outputTokens: 20,
         totalTokens: 120,
       },

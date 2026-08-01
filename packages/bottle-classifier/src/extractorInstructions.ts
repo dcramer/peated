@@ -246,37 +246,6 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     ],
   },
   {
-    source: "Generic Retailer",
-    label: "Glenmorangie Quinta Ruban 14-year-old",
-    notes: [
-      "If the marketed Bottle identity is clear and the only local candidate adds an unsupported marker such as `4th Edition`, prefer `create_bottle` instead of falsely matching the specific edition.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Wild Turkey Rare Breed Rye",
-    notes: [
-      "Retailer titles can omit canonical traits such as `Barrel Proof` even when that trait belongs to the marketed bottle.",
-      "Use web evidence to validate the omitted trait, then rerun local bottle search with the enriched structured fields before deciding.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Elijah Craig Cask Strength",
-    notes: [
-      "Retailer shorthand can omit the canonical family wording when the official bottle is marketed under a different stable name.",
-      "If reliable web evidence shows the family is `Barrel Proof`, match or create the canonical family instead of inventing a separate `Cask Strength` bottle.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Four Roses Single Barrel Barrel Strength",
-    notes: [
-      "Generic strength wording appended to an already complete family name is not enough to invent a new canonical bottle or release by itself.",
-      "If local and web evidence do not establish a real barrel-strength family, prefer `no_match` over creating a speculative new bottle.",
-    ],
-  },
-  {
     source: "Official",
     label: "Octomore 13.1",
     notes: [

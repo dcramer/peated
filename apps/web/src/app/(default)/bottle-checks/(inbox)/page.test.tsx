@@ -11,8 +11,6 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
     sourceKind: null,
     sourceId: null,
     bottleId: 45146,
-    subjectKey: "audit_bottle:bottle:45146",
-    backgroundEventKey: "bottle_created:45146",
     schemaSupported: true,
     schemaVersion: 1,
     output: {

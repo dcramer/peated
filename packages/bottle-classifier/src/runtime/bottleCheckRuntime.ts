@@ -454,14 +454,17 @@ export function createBottleCheckTools({
 }
 
 export function createRunProposalCollector({
+  maxProposals,
   sourceFields,
   state,
 }: {
+  maxProposals: number;
   sourceFields: readonly string[];
   state: BottleClassifierAgentRunState;
 }) {
   const sourceFieldSet = new Set(sourceFields);
   return createBottleProposalCollector({
+    maxProposals,
     context: {
       hasBottleEvidence: (bottleId) => {
         if (

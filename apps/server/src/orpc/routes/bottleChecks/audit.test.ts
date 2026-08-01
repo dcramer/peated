@@ -112,6 +112,8 @@ test("Bottle audit persists and returns a clean moderator check", async ({
   expect(result).not.toHaveProperty("inputSnapshot");
   expect(result).not.toHaveProperty("artifacts");
   expect(result).not.toHaveProperty("modelMetadata");
+  expect(result).not.toHaveProperty("subjectKey");
+  expect(result).not.toHaveProperty("backgroundEventKey");
   expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
     bottleId: bottle.id,
     origin: "moderator",

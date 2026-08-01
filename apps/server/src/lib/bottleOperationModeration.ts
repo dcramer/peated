@@ -8,7 +8,9 @@ import {
 } from "@peated/server/db";
 import {
   bottleChecks,
+  bottleOperationRejectionReasonEnum,
   bottleOperations,
+  bottleOperationStatusEnum,
   bottles,
   bottleTombstones,
   entities,
@@ -56,23 +58,13 @@ const PositiveIdSchema = z.number().int().positive();
 const NonEmptyNoteSchema = z.string().trim().min(1).max(2000);
 const MAX_SELECTED_OPERATIONS = 50;
 
-export const BottleOperationRejectionReasonSchema = z.enum([
-  "wrong_target",
-  "wrong_change",
-  "insufficient_evidence",
-  "resolved_manually",
-  "other",
-]);
+export const BottleOperationRejectionReasonSchema = z.enum(
+  bottleOperationRejectionReasonEnum.enumValues,
+);
 
-export const BottleOperationStatusSchema = z.enum([
-  "blocked",
-  "pending_review",
-  "rejected",
-  "applying",
-  "applied",
-  "stale",
-  "failed",
-]);
+export const BottleOperationStatusSchema = z.enum(
+  bottleOperationStatusEnum.enumValues,
+);
 
 export const SelectedBottleOperationIdsSchema = z
   .array(PositiveIdSchema)

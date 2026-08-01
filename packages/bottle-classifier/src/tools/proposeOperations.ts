@@ -248,12 +248,20 @@ function withOperationType(type: ProposedOperation["type"], args: unknown) {
     : { type };
 }
 
+const PROPOSAL_RESULT_DESCRIPTION =
+  "Returns `{ status: recorded | updated, proposalIndex }` when saved, or `{ status: rejected, reason }`; a rejected proposal was not recorded, so fix the stated reason before retrying.";
+
+function proposalToolDescription(description: string) {
+  return `${description} ${PROPOSAL_RESULT_DESCRIPTION}`;
+}
+
 export function createBottleProposalTools(collector: BottleProposalCollector) {
   return [
     tool({
       name: "propose_update_bottle",
-      description:
+      description: proposalToolDescription(
         "Record a read-only proposal to update one inspected Bottle. Use only after investigating the Bottle and collecting every cited piece of evidence. This does not mutate or approve catalog data.",
+      ),
       parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,
       execute: (args) =>
@@ -261,16 +269,18 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
     }),
     tool({
       name: "propose_merge_bottles",
-      description:
+      description: proposalToolDescription(
         "Record a read-only proposal to retire one inspected duplicate Bottle into an inspected canonical survivor. Before calling, inspect both records and collect direct authoritative external product evidence of exact equivalence when available; cite that web result. Catalog agreement, an audit note, search rank, or an attached label alone is insufficient. This does not mutate or approve catalog data.",
+      ),
       parameters: MergeBottlesProposalArgsSchema,
       execute: (args) =>
         collector.record(withOperationType("merge_bottles", args)),
     }),
     tool({
       name: "propose_update_entity",
-      description:
+      description: proposalToolDescription(
         "Record a read-only proposal to update one inspected Entity directly involved in representing the checked Bottle. Use only after collecting every cited piece of evidence. This does not mutate or approve catalog data.",
+      ),
       parameters: nonStrictJsonSchema(UpdateEntityProposalArgsSchema),
       strict: false,
       execute: (args) =>
@@ -278,8 +288,9 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
     }),
     tool({
       name: "propose_merge_entities",
-      description:
+      description: proposalToolDescription(
         "Record a read-only proposal to retire one inspected duplicate Entity into an inspected canonical survivor directly related to the checked Bottle. This does not mutate or approve catalog data.",
+      ),
       parameters: MergeEntitiesProposalArgsSchema,
       execute: (args) =>
         collector.record(withOperationType("merge_entities", args)),

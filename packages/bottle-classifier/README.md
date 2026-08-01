@@ -206,7 +206,9 @@ production. The harness records model usage and real tool events, and replays
 replays `openai_web_search`.
 
 Reported token usage covers the measured agent loop only; extraction and
-pre-agent web-search model usage are not currently aggregated. Total timing is
+pre-agent web-search model usage are not currently aggregated. Cached input
+tokens are included only when the provider supplies that detail, and rollout
+reporting exposes coverage separately from the cache-token rate. Total timing is
 wall-clock time for the complete production entrypoint.
 
 Replay recordings default to the package-local upstream-style

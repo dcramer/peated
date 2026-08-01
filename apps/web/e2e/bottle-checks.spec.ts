@@ -34,6 +34,8 @@ test("disposes non-ready and live-ready operations independently", async ({
   expect(details.check).not.toHaveProperty("inputSnapshot");
   expect(details.check).not.toHaveProperty("artifacts");
   expect(details.check).not.toHaveProperty("modelMetadata");
+  expect(details.check).not.toHaveProperty("subjectKey");
+  expect(details.check).not.toHaveProperty("backgroundEventKey");
   for (const operation of details.check.operations) {
     expect(operation).not.toHaveProperty("stateToken");
   }

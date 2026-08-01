@@ -53,8 +53,6 @@ export const BottleOperationResponseSchema = z
 
 const CommonBottleCheckResponseFields = {
   id: z.number(),
-  subjectKey: z.string(),
-  backgroundEventKey: z.string().nullable(),
   model: z.string().nullable(),
   error: z.string().nullable(),
   storePriceMatchProposalId: z.number().nullable(),
@@ -204,8 +202,6 @@ export function serializeBottleCheck(check: BottleCheckWithOperations) {
     sourceKind: check.sourceKind,
     sourceId: check.sourceId,
     bottleId: check.bottleId,
-    subjectKey: check.subjectKey,
-    backgroundEventKey: check.backgroundEventKey,
     model: check.model,
     error: check.error,
     storePriceMatchProposalId: check.storePriceMatchProposalId,

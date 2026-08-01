@@ -152,22 +152,25 @@ failure bar. A schema existing in the database is not itself a measurement
 gate.
 
 Run `pnpm cli classifier rollout-report --days 30` for the durable rollout
-inputs. The report counts accepted and rejected proposals separately. A
-rejection counts as a proposal correction only for `wrong_target`,
-`wrong_change`, or `insufficient_evidence`; manual resolution and other
-rejections remain rejection outcomes without being relabeled. Review time runs
-from check completion to operation review. Stale and failure rates use all
-operations that reached approval or execution as their denominator; blocked,
-pending, and rejected proposals are not execution attempts. The report includes
-measurement coverage, and malformed persisted telemetry fails reporting instead
-of being treated as zero.
+inputs. The report counts accepted and rejected proposals separately and labels
+`wrong_target`, `wrong_change`, and `insufficient_evidence` as quality
+rejections; it does not claim that a rejected proposal was corrected. Counts are
+broken down by check intent, origin, and operation type. Review time runs from
+check completion to operation review. Stale and failure rates use all operations
+that reached approval or execution as their denominator; blocked, pending, and
+rejected proposals are not execution attempts. The report includes measurement
+coverage, and malformed persisted telemetry fails reporting instead of being
+treated as zero.
 
-Audit agent runs persist request/token usage, agent latency, and tool-call
-counts in `modelMetadata`. Token usage plus the stored model is the durable cost
-input; the report does not invent a dollar estimate when no versioned pricing
-source was recorded. Reference-resolution runtime coverage and dollar cost are
-still explicit rollout gaps. Broad execution therefore remains gated until
-those gaps and acceptable rollout bars are resolved.
+Audit agent runs persist agent-loop request/token usage, cache-token detail when
+the provider supplies it, agent latency, and tool-call counts in `modelMetadata`.
+Cache coverage is reported separately so missing provider detail is not treated
+as a cache miss. Agent-loop token usage plus the stored model is the durable cost
+input; extraction and pre-agent search usage are outside that measurement. The
+report does not invent a dollar estimate when no versioned pricing source was
+recorded. Reference-resolution runtime coverage and dollar cost are still
+explicit rollout gaps. Broad execution therefore remains gated until those gaps
+and acceptable rollout bars are resolved.
 
 ## Correctness Bar
 

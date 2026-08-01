@@ -372,8 +372,6 @@ describe("Bottle Check review components", () => {
       sourceKind: null,
       sourceId: null,
       bottleId: 44,
-      subjectKey: "audit_bottle:bottle:44",
-      backgroundEventKey: null,
       schemaSupported: true,
       schemaVersion: 1,
       output: {

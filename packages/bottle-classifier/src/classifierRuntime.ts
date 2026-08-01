@@ -108,6 +108,8 @@ export type {
 } from "./runtime/bottleCheckRuntime";
 
 const CLASSIFIER_MAX_TURNS = 8;
+// Parallel tool calls are disabled, and the agent needs one final-output turn.
+const CLASSIFIER_MAX_PROPOSED_OPERATIONS = CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
 const WHISKY_REFERENCE_PATTERN =
   /\b(whisk(?:e)?y|single malt|single grain|single pot still|bourbon|rye|scotch|malt whisk(?:e)?y)\b/i;
@@ -937,6 +939,7 @@ export async function prepareBottleClassifierAgentRun(
   const proposalCollector =
     instructionMode === "classification"
       ? createRunProposalCollector({
+          maxProposals: CLASSIFIER_MAX_PROPOSED_OPERATIONS,
           sourceFields: getBottleCheckSourceEvidencePaths({
             intent: "resolve_reference",
             input: { reference },
@@ -1106,6 +1109,7 @@ export function prepareBottleAuditAgentRun(
   };
   const webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
   const proposalCollector = createRunProposalCollector({
+    maxProposals: CLASSIFIER_MAX_PROPOSED_OPERATIONS,
     sourceFields: getBottleCheckSourceEvidencePaths({
       intent: "audit_bottle",
       input: audit,

@@ -27,8 +27,10 @@ describe("Bottle check instructions", () => {
     const audit = buildBottleAuditInstructions();
 
     expect(reference).toContain("Reference Resolution Intent:");
-    expect(reference).toContain("`match`:");
-    expect(reference).toContain("`create_bottle`:");
+    expect(reference).toContain("Use `repair_bottle` only");
+    expect(reference).toContain(
+      "When no candidate matches, create one complete Bottle",
+    );
     expect(audit).toContain("Existing Bottle Audit Intent:");
     expect(audit).toContain(
       "Do not return a reference match/create/repair decision",

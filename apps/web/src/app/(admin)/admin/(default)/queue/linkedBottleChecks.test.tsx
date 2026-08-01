@@ -14,8 +14,6 @@ test("renders a linked Bottle check as a read-only review link", () => {
       sourceKind: "store_price",
       sourceId: "510",
       bottleId: null,
-      subjectKey: "resolve_reference:store_price:510",
-      backgroundEventKey: null,
       schemaSupported: true,
       schemaVersion: 1,
       output: {

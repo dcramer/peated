@@ -9,6 +9,7 @@ export const BottleClassifierRunMetadataSchema = z
       .object({
         requests: NonnegativeIntegerSchema,
         inputTokens: NonnegativeIntegerSchema,
+        cachedInputTokens: NonnegativeIntegerSchema.optional(),
         outputTokens: NonnegativeIntegerSchema,
         totalTokens: NonnegativeIntegerSchema,
       })
@@ -39,6 +40,25 @@ function numberProperty(value: unknown, property: string): number {
     : 0;
 }
 
+function cachedInputTokens(usage: unknown): number | undefined {
+  const details = objectProperty(usage, "inputTokensDetails");
+  const entries = Array.isArray(details) ? details : details ? [details] : [];
+  let measured = false;
+  let total = 0;
+
+  for (const entry of entries) {
+    const value =
+      objectProperty(entry, "cached_tokens") ??
+      objectProperty(entry, "cachedTokens");
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+      measured = true;
+      total += value;
+    }
+  }
+
+  return measured ? Math.round(total) : undefined;
+}
+
 function stringProperty(value: unknown, property: string): string | null {
   const candidate = objectProperty(value, property);
   return typeof candidate === "string" ? candidate : null;
@@ -59,6 +79,7 @@ export function getBottleClassifierRunMetadata({
     objectProperty(objectProperty(result, "state"), "usage") ??
     objectProperty(objectProperty(result, "runContext"), "usage") ??
     objectProperty(result, "usage");
+  const measuredCachedInputTokens = cachedInputTokens(usage);
   const toolNames: string[] = [];
   let toolCallCount = 0;
   const newItems = objectProperty(result, "newItems");
@@ -84,6 +105,9 @@ export function getBottleClassifierRunMetadata({
     usage: {
       requests: numberProperty(usage, "requests"),
       inputTokens: numberProperty(usage, "inputTokens"),
+      ...(measuredCachedInputTokens === undefined
+        ? {}
+        : { cachedInputTokens: measuredCachedInputTokens }),
       outputTokens: numberProperty(usage, "outputTokens"),
       totalTokens: numberProperty(usage, "totalTokens"),
     },

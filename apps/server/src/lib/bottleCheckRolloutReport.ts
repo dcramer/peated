@@ -1,9 +1,13 @@
-import { BottleClassifierRunMetadataSchema } from "@peated/bottle-classifier";
+import {
+  BottleClassifierRunMetadataSchema,
+  type ProposedOperationType,
+} from "@peated/bottle-classifier";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { bottleChecks } from "@peated/server/db/schema";
 import { gte } from "drizzle-orm";
 
 type RolloutOperation = {
+  type: ProposedOperationType;
   status:
     | "blocked"
     | "pending_review"
@@ -24,6 +28,7 @@ type RolloutOperation = {
 
 export type BottleCheckRolloutRow = {
   intent: "resolve_reference" | "audit_bottle";
+  origin: "source" | "moderator" | "post_user_creation";
   schemaVersion: number;
   model: string | null;
   modelMetadata: unknown;
@@ -47,32 +52,38 @@ export type BottleCheckRolloutReport = {
   checks: {
     total: number;
     byIntent: CountByKey;
+    byOrigin: CountByKey;
     bySchemaVersion: CountByKey;
   };
   review: {
     reviewedOperations: number;
     acceptedOperations: number;
     rejectedOperations: number;
-    correctedOperations: number;
+    qualityRejections: number;
     acceptanceRate: number | null;
     rejectionRate: number | null;
-    correctionRate: number | null;
+    qualityRejectionRate: number | null;
     averageReviewTimeMs: number | null;
     rejectionReasons: CountByKey;
   };
   execution: {
     operations: number;
+    byOperationType: CountByKey;
     attemptedOperations: number;
     staleOperations: number;
     staleRate: number | null;
     failedOperations: number;
     failureRate: number | null;
   };
-  model: {
+  agentLoop: {
     measuredRuns: number;
     latencyCoverage: number;
+    cacheDetailRuns: number;
+    cacheDetailCoverage: number;
     averageAgentLatencyMs: number | null;
     totalInputTokens: number;
+    totalCachedInputTokens: number;
+    cachedInputTokenRate: number | null;
     totalOutputTokens: number;
     totalTokens: number;
     totalToolCalls: number;
@@ -92,7 +103,9 @@ export function buildBottleCheckRolloutReport(
   rows: BottleCheckRolloutRow[],
 ): BottleCheckRolloutReport {
   const byIntent: CountByKey = {};
+  const byOrigin: CountByKey = {};
   const bySchemaVersion: CountByKey = {};
+  const byOperationType: CountByKey = {};
   const rejectionReasons: CountByKey = {};
   const reviewTimesMs: number[] = [];
   const latenciesMs: number[] = [];
@@ -101,16 +114,19 @@ export function buildBottleCheckRolloutReport(
   let reviewedOperations = 0;
   let acceptedOperations = 0;
   let rejectedOperations = 0;
-  let correctedOperations = 0;
+  let qualityRejections = 0;
   let staleOperations = 0;
   let failedOperations = 0;
   let measuredRuns = 0;
   let totalInputTokens = 0;
+  let cacheDetailRuns = 0;
+  let cacheMeasuredInputTokens = 0;
+  let totalCachedInputTokens = 0;
   let totalOutputTokens = 0;
   let totalTokens = 0;
   let totalToolCalls = 0;
   const usageByModel: UsageByModel = {};
-  const correctionReasons = new Set([
+  const qualityRejectionReasons = new Set([
     "wrong_target",
     "wrong_change",
     "insufficient_evidence",
@@ -118,6 +134,7 @@ export function buildBottleCheckRolloutReport(
 
   for (const row of rows) {
     increment(byIntent, row.intent);
+    increment(byOrigin, row.origin);
     increment(bySchemaVersion, String(row.schemaVersion));
 
     const modelMetadata =
@@ -141,6 +158,11 @@ export function buildBottleCheckRolloutReport(
       modelUsage.toolCalls += modelMetadata.toolCalls.count;
       latenciesMs.push(modelMetadata.agentDurationMs);
       totalInputTokens += modelMetadata.usage.inputTokens;
+      if (modelMetadata.usage.cachedInputTokens !== undefined) {
+        cacheDetailRuns += 1;
+        cacheMeasuredInputTokens += modelMetadata.usage.inputTokens;
+        totalCachedInputTokens += modelMetadata.usage.cachedInputTokens;
+      }
       totalOutputTokens += modelMetadata.usage.outputTokens;
       totalTokens += modelMetadata.usage.totalTokens;
       totalToolCalls += modelMetadata.toolCalls.count;
@@ -148,6 +170,7 @@ export function buildBottleCheckRolloutReport(
 
     for (const operation of row.operations) {
       operationCount += 1;
+      increment(byOperationType, operation.type);
       if (
         operation.status === "applying" ||
         operation.status === "applied" ||
@@ -169,9 +192,9 @@ export function buildBottleCheckRolloutReport(
         rejectedOperations += 1;
         if (
           operation.rejectionReason &&
-          correctionReasons.has(operation.rejectionReason)
+          qualityRejectionReasons.has(operation.rejectionReason)
         ) {
-          correctedOperations += 1;
+          qualityRejections += 1;
         }
         increment(rejectionReasons, operation.rejectionReason ?? "unspecified");
       } else {
@@ -192,16 +215,17 @@ export function buildBottleCheckRolloutReport(
     checks: {
       total: rows.length,
       byIntent,
+      byOrigin,
       bySchemaVersion,
     },
     review: {
       reviewedOperations,
       acceptedOperations,
       rejectedOperations,
-      correctedOperations,
+      qualityRejections,
       acceptanceRate: ratio(acceptedOperations, reviewedOperations),
       rejectionRate: ratio(rejectedOperations, reviewedOperations),
-      correctionRate: ratio(correctedOperations, reviewedOperations),
+      qualityRejectionRate: ratio(qualityRejections, reviewedOperations),
       averageReviewTimeMs:
         reviewTimesMs.length === 0
           ? null
@@ -211,21 +235,29 @@ export function buildBottleCheckRolloutReport(
     },
     execution: {
       operations: operationCount,
+      byOperationType,
       attemptedOperations,
       staleOperations,
       staleRate: ratio(staleOperations, attemptedOperations),
       failedOperations,
       failureRate: ratio(failedOperations, attemptedOperations),
     },
-    model: {
+    agentLoop: {
       measuredRuns,
       latencyCoverage: ratio(latenciesMs.length, rows.length) ?? 0,
+      cacheDetailRuns,
+      cacheDetailCoverage: ratio(cacheDetailRuns, measuredRuns) ?? 0,
       averageAgentLatencyMs:
         latenciesMs.length === 0
           ? null
           : latenciesMs.reduce((sum, value) => sum + value, 0) /
             latenciesMs.length,
       totalInputTokens,
+      totalCachedInputTokens,
+      cachedInputTokenRate: ratio(
+        totalCachedInputTokens,
+        cacheMeasuredInputTokens,
+      ),
       totalOutputTokens,
       totalTokens,
       totalToolCalls,
@@ -245,6 +277,7 @@ export async function getBottleCheckRolloutReport({
     where: gte(bottleChecks.createdAt, since),
     columns: {
       intent: true,
+      origin: true,
       schemaVersion: true,
       model: true,
       modelMetadata: true,
@@ -253,6 +286,7 @@ export async function getBottleCheckRolloutReport({
     with: {
       operations: {
         columns: {
+          proposal: true,
           status: true,
           reviewedAt: true,
           rejectionReason: true,
@@ -261,5 +295,14 @@ export async function getBottleCheckRolloutReport({
     },
   });
 
-  return buildBottleCheckRolloutReport(rows);
+  return buildBottleCheckRolloutReport(
+    rows.map((row) => ({
+      ...row,
+      origin: row.origin ?? "source",
+      operations: row.operations.map(({ proposal, ...operation }) => ({
+        ...operation,
+        type: proposal.type,
+      })),
+    })),
+  );
 }

@@ -54,6 +54,11 @@ describe("Bottle proposal tools", () => {
       false,
       true,
     ]);
+    for (const proposalTool of tools) {
+      expect(proposalTool.description).toContain("recorded | updated");
+      expect(proposalTool.description).toContain("status: rejected");
+      expect(proposalTool.description).toContain("reason");
+    }
 
     const mergeTool = tools.find(
       ({ name }) => name === "propose_merge_bottles",
