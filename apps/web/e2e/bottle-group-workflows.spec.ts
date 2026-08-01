@@ -18,7 +18,7 @@ test.describe("Bottle releases", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: `${bottleGroup.fullName} Single Cask`,
+        name: bottleGroup.fullName,
       }),
     ).toBeVisible();
     await expect(

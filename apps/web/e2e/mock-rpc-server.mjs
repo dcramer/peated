@@ -1160,6 +1160,7 @@ function buildLinkedStorePriceCheckDetails({ approved }) {
       subjectKey: "resolve_reference:store_price:9912",
       backgroundEventKey: null,
       schemaVersion: 1,
+      schemaSupported: true,
       inputSnapshot: {
         reference: {
           id: 9912,
@@ -1382,6 +1383,7 @@ function buildBottleCheckDetails({ approved, rejected }) {
       subjectKey: `audit_bottle:bottle:${existingBottleId}`,
       backgroundEventKey: null,
       schemaVersion: 1,
+      schemaSupported: true,
       inputSnapshot: {
         bottleId: existingBottleId,
         origin: "moderator",
