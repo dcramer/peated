@@ -96,9 +96,11 @@ test.describe("unified Bottle workflows", () => {
   test("keeps one Incoming Listing while its linked Bottle check needs disposition", async ({
     context,
     page,
+    request,
   }, testInfo) => {
+    const accessToken = uniqueAccessToken(testInfo, "queue-linked-check");
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "queue-linked-check"),
+      accessToken,
       user: { ...testUser, admin: true, mod: true },
     });
 
@@ -120,9 +122,34 @@ test.describe("unified Bottle workflows", () => {
       page.getByText("Primary decision complete", { exact: true }),
     ).toBeVisible();
 
+    const detailsResponse = await request.post(
+      `${mockApiServer}/rpc/bottleChecks/details`,
+      {
+        data: { json: { check: 92 } },
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    expect(detailsResponse.ok()).toBe(true);
+    const details = (await detailsResponse.json()).json;
+
     await page
       .getByText("Supplemental Bottle check (1)", { exact: true })
       .click();
+
+    expect(details.check).not.toHaveProperty("inputSnapshot");
+    expect(details.check).not.toHaveProperty("artifacts");
+    expect(details.check).not.toHaveProperty("modelMetadata");
+    expect(details.check.output.decision).toMatchObject({
+      aliasScope: null,
+      identityBasis: null,
+      confidenceBasis: null,
+    });
+    for (const operation of details.check.operations) {
+      expect(operation).not.toHaveProperty("stateToken");
+    }
+    for (const operation of details.reviewOperations) {
+      expect(operation.review).not.toHaveProperty("stateToken");
+    }
     await expect(
       page.getByText(
         "The store listing is matched; one duplicate Bottle still needs moderator disposition.",
@@ -382,6 +409,10 @@ function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
     `r${testInfo.retry}`,
   ].join("-");
 }
+
+const mockApiServer =
+  process.env.PLAYWRIGHT_API_SERVER ??
+  `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT ?? 4999}`;
 
 function requireBaseURL(baseURL: string | undefined): string {
   if (!baseURL) {

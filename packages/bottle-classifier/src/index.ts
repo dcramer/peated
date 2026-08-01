@@ -1,5 +1,6 @@
 export { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 export {
+  BottleClassifierRunMetadataSchema,
   createBottleClassifier,
   type BottleClassifier,
   type BottleClassifierAdapters,

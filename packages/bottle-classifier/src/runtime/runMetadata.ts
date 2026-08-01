@@ -1,16 +1,30 @@
-export type BottleClassifierRunMetadata = {
-  agentDurationMs: number;
-  usage: {
-    requests: number;
-    inputTokens: number;
-    outputTokens: number;
-    totalTokens: number;
-  };
-  toolCalls: {
-    count: number;
-    names: string[];
-  };
-};
+import { z } from "zod";
+
+const NonnegativeIntegerSchema = z.number().int().nonnegative();
+
+export const BottleClassifierRunMetadataSchema = z
+  .object({
+    agentDurationMs: NonnegativeIntegerSchema,
+    usage: z
+      .object({
+        requests: NonnegativeIntegerSchema,
+        inputTokens: NonnegativeIntegerSchema,
+        outputTokens: NonnegativeIntegerSchema,
+        totalTokens: NonnegativeIntegerSchema,
+      })
+      .strict(),
+    toolCalls: z
+      .object({
+        count: NonnegativeIntegerSchema,
+        names: z.array(z.string().trim().min(1)),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type BottleClassifierRunMetadata = z.infer<
+  typeof BottleClassifierRunMetadataSchema
+>;
 
 function objectProperty(value: unknown, property: string): unknown {
   return value && typeof value === "object"
@@ -65,7 +79,7 @@ export function getBottleClassifierRunMetadata({
     }
   }
 
-  return {
+  return BottleClassifierRunMetadataSchema.parse({
     agentDurationMs: Math.max(0, Math.round(durationMs)),
     usage: {
       requests: numberProperty(usage, "requests"),
@@ -77,5 +91,5 @@ export function getBottleClassifierRunMetadata({
       count: toolCallCount,
       names: toolNames,
     },
-  };
+  });
 }

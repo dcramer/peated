@@ -15,7 +15,6 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
     backgroundEventKey: "bottle_created:45146",
     schemaSupported: true,
     schemaVersion: 1,
-    inputSnapshot: {},
     output: {
       summary: "One catalog correction needs review.",
       findings: [
@@ -26,9 +25,7 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
         },
       ],
     },
-    artifacts: {},
     model: null,
-    modelMetadata: null,
     error: null,
     storePriceMatchProposalId: null,
     storePriceMatchAttemptId: null,
@@ -51,7 +48,6 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
           rationale: "The label names Warehouse 1.",
           evidenceRefs: [{ kind: "bottle", bottleId: 45146 }],
         },
-        stateToken: {},
         preparationError: null,
         status: "pending_review",
         reviewedById: null,

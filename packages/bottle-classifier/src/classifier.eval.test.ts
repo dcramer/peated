@@ -100,7 +100,9 @@ function collectKnownCandidates(
   return Array.from(knownCandidates.values());
 }
 
-function buildSearchBottlesAdapter(testCase: SearchFixtureCase) {
+function buildSearchBottlesAdapter(
+  testCase: Pick<SearchFixtureCase, "searchResponses">,
+) {
   return async (args: Record<string, unknown>) => {
     const haystack = JSON.stringify(args).toLowerCase();
     const matchedResponse = (testCase.searchResponses ?? []).find((response) =>
@@ -878,15 +880,26 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
       auditEntityContext(entity),
     ]),
   );
+  const entitySearch = createLocalCatalogDataSource({
+    entities: inspectedEntities.map((entity) => ({
+      id: entity.entityId,
+      name: entity.name,
+      shortName: entity.shortName,
+      aliases: entity.alias ? [entity.alias] : [],
+      type: entity.type,
+    })),
+    bottles: [],
+    aliases: [],
+  }).searchEntities;
 
   return createEvalClassifierOptions({
-    searchBottles: async () => [currentBottle, ...inspectedBottles],
+    searchBottles: buildSearchBottlesAdapter(testCase),
     getBottleCandidateById: async (bottleId) =>
       [currentBottle, ...inspectedBottles].find(
         (candidate) => candidate.bottleId === bottleId,
       ) ?? null,
     getBottleContext: async (bottleId) => bottleContexts.get(bottleId) ?? null,
-    searchEntities: async () => inspectedEntities,
+    searchEntities: entitySearch,
     getEntityContext: async (entityId) => entityContexts.get(entityId) ?? null,
   });
 }

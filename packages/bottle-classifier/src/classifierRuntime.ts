@@ -9,21 +9,10 @@ import { randomUUID } from "node:crypto";
 import type OpenAI from "openai";
 import { z } from "zod";
 import { normalizePotentialProofLikeDecision } from "./abv";
+import type { BottleContext, EntityContext } from "./bottleContextContract";
 import {
-  BottleContextSchema,
-  BottleContextSourceSchema,
-  EntityContextSchema,
-  type BottleContext,
-  type BottleContextSource,
-  type EntityContext,
-} from "./bottleContextContract";
-import {
-  BottleCandidateSchema,
   BottleClassifierAgentDecisionSchema,
-  BottleSearchEvidenceSchema,
-  EntityResolutionSchema,
   type BottleCandidate,
-  type BottleCandidateSearchInput,
   type BottleClassificationDecision,
   type BottleClassifierAgentDecision,
   type BottleClassifierAgentDecisionInput,
@@ -52,7 +41,6 @@ import {
   type ClassifyBottleReferenceInput,
   type Finding,
   type ProposedOperation,
-  type ProposedOperationType,
 } from "./contract";
 import { BottleClassificationError } from "./error";
 import { createWhiskyLabelExtractor } from "./extractor";
@@ -74,6 +62,25 @@ import {
   buildDefaultBottleSearchInput,
 } from "./runtime/agentInput";
 import {
+  bottleContextToCandidate,
+  createBottleContextLoader,
+} from "./runtime/bottleCheckContext";
+import {
+  assertFindingsUseCollectedEvidence,
+  buildAgentArtifacts,
+  createBottleCheckTools,
+  createRunProposalCollector,
+  getAgentFinalOutput,
+  mergeRunResultToolArtifacts,
+  mergeSearchEvidence,
+  observeRunnerTools,
+  sortedBottleCandidates,
+  sortedResolvedEntities,
+  type BottleClassifierAgentRunState,
+  type BottleClassifierDataSource,
+  type BottleClassifierToolEvent,
+} from "./runtime/bottleCheckRuntime";
+import {
   mergeBottleCandidate,
   mergeResolvedEntity,
 } from "./runtime/candidates";
@@ -86,22 +93,19 @@ import {
   getBottleClassifierRunMetadata,
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
-import type { BottleProposalCollector, BottleWebSearchExecutor } from "./tools";
+import type { BottleWebSearchExecutor } from "./tools";
 import {
-  createBottleProposalCollector,
-  createBottleProposalTools,
   createBottleWebSearchBudget,
-  createFirecrawlWebSearchTool,
-  createGetBottleContextTool,
-  createGetEntityContextTool,
-  createOpenAIWebSearchTool,
-  createSearchBottlesTool,
-  createSearchEntitiesTool,
   executeBottleWebSearchInvocation,
   runBottleWebEvidenceSearch,
   runFirecrawlWebSearch,
 } from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
+export { createBottleContextLoader } from "./runtime/bottleCheckContext";
+export type {
+  BottleClassifierDataSource,
+  BottleClassifierToolEvent,
+} from "./runtime/bottleCheckRuntime";
 
 const CLASSIFIER_MAX_TURNS = 8;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
@@ -213,39 +217,7 @@ export type RunBottleClassifierAgentInput = {
   instructionMode?: "classification" | "local_identification";
 };
 
-export type BottleClassifierDataSource = {
-  findInitialCandidates?: (args: {
-    reference: BottleReference;
-    extractedIdentity: BottleExtractedDetails | null;
-  }) => Promise<BottleCandidate[]>;
-  searchBottles: (
-    args: BottleCandidateSearchInput,
-  ) => Promise<BottleCandidate[]>;
-  getBottleCandidateById?: (
-    bottleId: number,
-  ) => Promise<BottleCandidate | null>;
-  getBottleContext?: (bottleId: number) => Promise<BottleContextSource | null>;
-  getEntityContext?: (entityId: number) => Promise<EntityContext | null>;
-  searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
-};
-
 export type BottleClassifierAdapters = BottleClassifierDataSource;
-
-export type BottleClassifierToolEvent =
-  | {
-      type: "tool_call";
-      phase: "agent" | "preload";
-      id: string;
-      name: string;
-      arguments: unknown;
-    }
-  | {
-      type: "tool_result";
-      phase: "agent" | "preload";
-      toolCallId: string;
-      name: string;
-      result: unknown;
-    };
 
 type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
@@ -411,14 +383,6 @@ function hydratedCurrentBottleMatchesReference({
   return currentBottle?.bottleId === bottleId;
 }
 
-type BottleClassifierAgentRunState = {
-  candidateBottles: Map<number, BottleCandidate>;
-  resolvedEntities: Map<number, EntityResolution>;
-  searchEvidence: BottleClassificationArtifacts["searchEvidence"];
-  bottleContexts: Map<number, BottleContext>;
-  entityContexts: Map<number, EntityContext>;
-};
-
 function getBottleClassifierDataSource(
   options: CreateBottleClassifierOptions,
 ): BottleClassifierDataSource {
@@ -470,129 +434,6 @@ function buildClassifierConversationId(
   return `${prefix}:${id}`;
 }
 
-function mergeSearchEvidence(
-  searchEvidence: BottleClassificationArtifacts["searchEvidence"],
-  evidence: BottleClassificationArtifacts["searchEvidence"][number],
-) {
-  const evidenceKey = JSON.stringify({
-    provider: evidence.provider,
-    query: evidence.query,
-    urls: evidence.results.map((result) => result.url),
-  });
-  const hasExistingEvidence = searchEvidence.some(
-    (candidate) =>
-      JSON.stringify({
-        provider: candidate.provider,
-        query: candidate.query,
-        urls: candidate.results.map((result) => result.url),
-      }) === evidenceKey,
-  );
-
-  if (!hasExistingEvidence) {
-    searchEvidence.push(evidence);
-  }
-}
-
-function sortedBottleCandidates(
-  candidateBottles: Map<number, BottleCandidate>,
-) {
-  return Array.from(candidateBottles.values()).sort(
-    (left, right) => (right.score ?? 0) - (left.score ?? 0),
-  );
-}
-
-function sortedResolvedEntities(
-  resolvedEntities: Map<number, EntityResolution>,
-) {
-  return Array.from(resolvedEntities.values()).sort(
-    (left, right) => (right.score ?? 0) - (left.score ?? 0),
-  );
-}
-
-function bottleContextToCandidate(context: BottleContext): BottleCandidate {
-  return BottleCandidateSchema.parse({
-    bottleId: context.bottleId,
-    alias: null,
-    fullName: context.fullName,
-    brand: context.shared.brand.name,
-    bottler: context.shared.bottler?.name ?? null,
-    series: context.shared.series?.name ?? null,
-    distillery: context.shared.distillers.map(({ name }) => name),
-    category: context.shared.category,
-    statedAge: context.exact.statedAge ?? context.shared.statedAge,
-    edition: context.exact.edition,
-    caskStrength: context.exact.caskStrength,
-    singleCask: context.exact.singleCask,
-    caskType: context.exact.caskType,
-    caskSize: context.exact.caskSize,
-    caskFill: context.exact.caskFill,
-    abv: context.exact.abv,
-    vintageYear: context.exact.vintageYear,
-    releaseYear: context.exact.releaseYear,
-    score: 1,
-    source: ["context"],
-  });
-}
-
-export function createBottleContextLoader({
-  dataSource,
-  options,
-}: {
-  dataSource: BottleClassifierDataSource;
-  options: CreateBottleClassifierOptions;
-}) {
-  if (!dataSource.getBottleContext) {
-    return null;
-  }
-  const getBottleContext = dataSource.getBottleContext;
-
-  const extractor = createWhiskyLabelExtractor({
-    client: options.client,
-    model: options.model,
-  });
-  const extractFromImage = async (imageUrl: string) =>
-    options.overrides?.extractFromImage
-      ? await options.overrides.extractFromImage(imageUrl)
-      : await extractor.extractFromImage(imageUrl);
-
-  return async (bottleId: number): Promise<BottleContext | null> => {
-    const rawContext = await getBottleContext(bottleId);
-    if (!rawContext) {
-      return null;
-    }
-    const { imageSources, ...context } =
-      BottleContextSourceSchema.parse(rawContext);
-    const publicImages = await Promise.all(
-      imageSources.map(async (imageSource) => {
-        let extractedIdentity: BottleExtractedDetails | null = null;
-        try {
-          extractedIdentity = await extractFromImage(imageSource.url);
-        } catch {
-          extractedIdentity = null;
-        }
-        const sourceImageId =
-          imageSource.source.kind === "bottle"
-            ? `bottle:${bottleId}`
-            : `tasting:${imageSource.source.tastingId}`;
-
-        return {
-          ...imageSource,
-          labelEvidence: {
-            sourceImageId,
-            model: options.model,
-            extractedIdentity,
-          },
-        };
-      }),
-    );
-
-    return BottleContextSchema.parse({
-      ...context,
-      publicImages,
-    });
-  };
-}
-
 function mergeSearchEvidenceList(
   existingSearchEvidence: BottleSearchEvidence[],
   nextSearchEvidence: BottleSearchEvidence[],
@@ -620,30 +461,6 @@ function mergeCandidateLists(
   }
 
   return sortedBottleCandidates(candidatesByKey);
-}
-
-function buildAgentArtifacts({
-  extractedIdentity,
-  imageEvidence,
-  state,
-}: {
-  extractedIdentity: BottleExtractedDetails | null;
-  imageEvidence: ImageBottleEvidence | null;
-  state: BottleClassifierAgentRunState;
-}) {
-  return buildBottleClassificationArtifacts({
-    extractedIdentity,
-    imageEvidence,
-    searchEvidence: state.searchEvidence,
-    candidates: sortedBottleCandidates(state.candidateBottles),
-    resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
-    bottleContexts: Array.from(state.bottleContexts.values()).sort(
-      (left, right) => left.bottleId - right.bottleId,
-    ),
-    entityContexts: Array.from(state.entityContexts.values()).sort(
-      (left, right) => left.entityId - right.entityId,
-    ),
-  });
 }
 
 function hasUsableOpenAIResponsesClient(client: OpenAI): boolean {
@@ -1048,380 +865,6 @@ export async function finalizeBottleClassifierAgentResult({
   };
 }
 
-function parseJsonIfPossible(value: string): unknown {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return value;
-  }
-}
-
-function getObjectProperty(value: unknown, propertyName: string) {
-  return value && typeof value === "object"
-    ? (value as Record<string, unknown>)[propertyName]
-    : undefined;
-}
-
-function stringProperty(value: unknown, propertyName: string) {
-  const property = getObjectProperty(value, propertyName);
-  return typeof property === "string" ? property : undefined;
-}
-
-function normalizeToolOutputValue(value: unknown): unknown {
-  if (typeof value === "string") {
-    return parseJsonIfPossible(value);
-  }
-
-  if (value && typeof value === "object") {
-    const outputType = stringProperty(value, "type");
-    const text = stringProperty(value, "text");
-    if (outputType === "text" && text !== undefined) {
-      return parseJsonIfPossible(text);
-    }
-  }
-
-  return value;
-}
-
-function observeRunnerTools(
-  runner: Runner,
-  observer: CreateBottleClassifierOptions["observeToolEvent"],
-) {
-  if (!observer) {
-    return;
-  }
-
-  runner.on("agent_tool_start", (_context, _agent, tool, { toolCall }) => {
-    const callId =
-      stringProperty(toolCall, "callId") ?? stringProperty(toolCall, "id");
-    if (!callId) {
-      return;
-    }
-
-    observer({
-      type: "tool_call",
-      phase: "agent",
-      id: callId,
-      name: tool.name,
-      arguments: normalizeToolOutputValue(
-        stringProperty(toolCall, "arguments"),
-      ),
-    });
-  });
-  runner.on(
-    "agent_tool_end",
-    (_context, _agent, tool, result, { toolCall }) => {
-      const callId =
-        stringProperty(toolCall, "callId") ?? stringProperty(toolCall, "id");
-      if (!callId) {
-        return;
-      }
-
-      observer({
-        type: "tool_result",
-        phase: "agent",
-        toolCallId: callId,
-        name: tool.name,
-        result: normalizeToolOutputValue(result),
-      });
-    },
-  );
-}
-
-function mergeToolOutputArtifacts({
-  state,
-  toolName,
-  output,
-}: {
-  state: BottleClassifierAgentRunState;
-  toolName: string | undefined;
-  output: unknown;
-}) {
-  const normalizedOutput = normalizeToolOutputValue(output);
-
-  if (toolName === "search_bottles") {
-    const results = getObjectProperty(normalizedOutput, "results");
-    if (!Array.isArray(results)) {
-      return;
-    }
-
-    for (const candidate of results) {
-      mergeBottleCandidate(
-        state.candidateBottles,
-        BottleCandidateSchema.parse(candidate),
-      );
-    }
-    return;
-  }
-
-  if (toolName === "search_entities") {
-    const results = getObjectProperty(normalizedOutput, "results");
-    if (!Array.isArray(results)) {
-      return;
-    }
-
-    for (const result of results) {
-      mergeResolvedEntity(
-        state.resolvedEntities,
-        EntityResolutionSchema.parse(result),
-      );
-    }
-    return;
-  }
-
-  if (toolName === "get_bottle_context") {
-    const parsedContext = BottleContextSchema.nullable().safeParse(
-      getObjectProperty(normalizedOutput, "context"),
-    );
-    if (parsedContext.success && parsedContext.data) {
-      state.bottleContexts.set(parsedContext.data.bottleId, parsedContext.data);
-      mergeBottleCandidate(
-        state.candidateBottles,
-        bottleContextToCandidate(parsedContext.data),
-      );
-    }
-    return;
-  }
-
-  if (toolName === "get_entity_context") {
-    const parsedContext = EntityContextSchema.nullable().safeParse(
-      getObjectProperty(normalizedOutput, "context"),
-    );
-    if (parsedContext.success && parsedContext.data) {
-      state.entityContexts.set(parsedContext.data.entityId, parsedContext.data);
-    }
-    return;
-  }
-
-  if (toolName === "openai_web_search" || toolName === "firecrawl_web_search") {
-    const evidence = BottleSearchEvidenceSchema.safeParse(normalizedOutput);
-    if (evidence.success) {
-      mergeSearchEvidence(state.searchEvidence, evidence.data);
-    }
-  }
-}
-
-function mergeRunResultToolArtifacts(
-  state: BottleClassifierAgentRunState,
-  result: unknown,
-) {
-  const newItems = getObjectProperty(result, "newItems");
-  if (!Array.isArray(newItems)) {
-    return;
-  }
-
-  for (const item of newItems) {
-    if (stringProperty(item, "type") !== "tool_call_output_item") {
-      continue;
-    }
-
-    const rawItem = getObjectProperty(item, "rawItem");
-    mergeToolOutputArtifacts({
-      state,
-      toolName: stringProperty(rawItem, "name") ?? stringProperty(item, "name"),
-      output:
-        getObjectProperty(item, "output") ??
-        getObjectProperty(rawItem, "output"),
-    });
-  }
-}
-
-function getAgentFinalOutput(result: unknown) {
-  return getObjectProperty(result, "finalOutput");
-}
-
-function createBottleCheckTools({
-  allowCandidateExpansion,
-  dataSource,
-  options,
-  proposalCollector,
-  state,
-  webSearchBudget,
-}: {
-  allowCandidateExpansion: boolean;
-  dataSource: BottleClassifierDataSource;
-  options: CreateBottleClassifierOptions;
-  proposalCollector: BottleProposalCollector | null;
-  state: BottleClassifierAgentRunState;
-  webSearchBudget: BottleWebSearchBudget;
-}) {
-  const proposalTools = proposalCollector
-    ? createBottleProposalTools(proposalCollector)
-    : [];
-  const allowContextInspection = proposalCollector !== null;
-  const useFirecrawlWebSearch =
-    allowCandidateExpansion && !!options.firecrawlApiKey;
-  const loadBottleContext = allowContextInspection
-    ? createBottleContextLoader({
-        dataSource,
-        options,
-      })
-    : null;
-  return [
-    ...(allowCandidateExpansion
-      ? [
-          createSearchBottlesTool({
-            searchBottles: dataSource.searchBottles,
-            onResults: (results) => {
-              for (const candidate of results) {
-                mergeBottleCandidate(state.candidateBottles, candidate);
-              }
-            },
-          }),
-        ]
-      : []),
-    ...(allowCandidateExpansion && dataSource.searchEntities
-      ? [
-          createSearchEntitiesTool({
-            searchEntities: dataSource.searchEntities,
-            onResults: (results) => {
-              for (const result of results) {
-                mergeResolvedEntity(state.resolvedEntities, result);
-              }
-            },
-          }),
-        ]
-      : []),
-    ...(loadBottleContext
-      ? [
-          createGetBottleContextTool({
-            getBottleContext: async (bottleId) =>
-              state.bottleContexts.get(bottleId) ??
-              (await loadBottleContext(bottleId)),
-            onContext: (context) => {
-              state.bottleContexts.set(context.bottleId, context);
-              mergeBottleCandidate(
-                state.candidateBottles,
-                bottleContextToCandidate(context),
-              );
-            },
-          }),
-        ]
-      : []),
-    ...(allowContextInspection && dataSource.getEntityContext
-      ? [
-          createGetEntityContextTool({
-            getEntityContext: dataSource.getEntityContext,
-            onContext: (context) => {
-              state.entityContexts.set(context.entityId, context);
-            },
-          }),
-        ]
-      : []),
-    ...(allowCandidateExpansion && options.firecrawlApiKey
-      ? [
-          createFirecrawlWebSearchTool({
-            apiKey: options.firecrawlApiKey,
-            apiUrl: options.firecrawlApiUrl ?? undefined,
-            budget: webSearchBudget,
-            executeWebSearch: options.executeWebSearch,
-            onEvidence: (evidence) => {
-              mergeSearchEvidence(state.searchEvidence, evidence);
-            },
-          }),
-        ]
-      : []),
-    ...(allowCandidateExpansion && !useFirecrawlWebSearch
-      ? [
-          createOpenAIWebSearchTool({
-            client: options.client,
-            model: options.model,
-            budget: webSearchBudget,
-            executeWebSearch: options.executeWebSearch,
-            onEvidence: (evidence) => {
-              mergeSearchEvidence(state.searchEvidence, evidence);
-            },
-          }),
-        ]
-      : []),
-    ...proposalTools,
-  ];
-}
-
-function createRunProposalCollector({
-  sourceFields,
-  state,
-}: {
-  sourceFields: readonly string[];
-  state: BottleClassifierAgentRunState;
-}) {
-  const sourceFieldSet = new Set(sourceFields);
-  return createBottleProposalCollector({
-    context: {
-      hasBottleEvidence: (bottleId) => {
-        if (
-          state.candidateBottles.has(bottleId) ||
-          state.bottleContexts.has(bottleId)
-        ) {
-          return true;
-        }
-        for (const candidate of state.candidateBottles.values()) {
-          if (
-            candidate.familyContext?.siblingBottles.some(
-              (sibling) => sibling.bottleId === bottleId,
-            )
-          ) {
-            return true;
-          }
-        }
-        for (const context of state.bottleContexts.values()) {
-          if (
-            context.siblings.some((sibling) => sibling.bottleId === bottleId)
-          ) {
-            return true;
-          }
-        }
-        return Array.from(state.entityContexts.values()).some((context) =>
-          context.relatedBottles.some((bottle) => bottle.bottleId === bottleId),
-        );
-      },
-      hasEntityEvidence: (entityId) => {
-        if (
-          state.resolvedEntities.has(entityId) ||
-          state.entityContexts.has(entityId)
-        ) {
-          return true;
-        }
-        return Array.from(state.bottleContexts.values()).some(
-          (context) =>
-            context.shared.brand.entityId === entityId ||
-            context.shared.distillers.some(
-              (distiller) => distiller.entityId === entityId,
-            ) ||
-            context.shared.bottler?.entityId === entityId,
-        );
-      },
-      hasSourceEvidence: (field) => sourceFieldSet.has(field),
-      hasWebEvidence: (url) =>
-        state.searchEvidence.some((evidence) =>
-          evidence.results.some((result) => result.url === url),
-        ),
-      isBottleInspected: (bottleId) => state.bottleContexts.has(bottleId),
-      isEntityInspected: (entityId) => state.entityContexts.has(entityId),
-      isSeriesInspected: (seriesId) =>
-        Array.from(state.bottleContexts.values()).some(
-          (context) => context.shared.series?.seriesId === seriesId,
-        ),
-    },
-  });
-}
-
-function assertFindingsUseCollectedEvidence(
-  findings: readonly Finding[],
-  proposalCollector: BottleProposalCollector,
-) {
-  for (const [findingIndex, finding] of findings.entries()) {
-    const missingEvidence = proposalCollector.getMissingEvidence(
-      finding.evidenceRefs,
-    );
-    if (missingEvidence) {
-      throw new Error(
-        `Finding ${findingIndex} cites evidence that was not collected: ${JSON.stringify(missingEvidence)}.`,
-      );
-    }
-  }
-}
-
 export async function prepareBottleClassifierAgentRun(
   options: CreateBottleClassifierOptions,
   {
@@ -1489,12 +932,7 @@ export async function prepareBottleClassifierAgentRun(
   const instructions =
     instructionMode === "local_identification"
       ? buildBottleLocalIdentifierInstructions()
-      : buildBottleClassifierInstructions({
-          maxSearchQueries: options.maxSearchQueries,
-          hasBottleSearch: allowCandidateExpansion,
-          hasEntitySearch:
-            allowCandidateExpansion && !!dataSource.searchEntities,
-        });
+      : buildBottleClassifierInstructions();
 
   const proposalCollector =
     instructionMode === "classification"

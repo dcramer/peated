@@ -189,6 +189,10 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         },
       },
     ]);
+    expect(details.reviewOperations[0]?.review).not.toHaveProperty(
+      "stateToken",
+    );
+    expect(details.check.operations[0]).not.toHaveProperty("stateToken");
 
     expect(
       await routerClient.bottleChecks.approveSelected(

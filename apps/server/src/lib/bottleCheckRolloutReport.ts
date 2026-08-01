@@ -1,3 +1,4 @@
+import { BottleClassifierRunMetadataSchema } from "@peated/bottle-classifier";
 import { db, type AnyDatabase } from "@peated/server/db";
 import { bottleChecks } from "@peated/server/db/schema";
 import { gte } from "drizzle-orm";
@@ -25,7 +26,7 @@ export type BottleCheckRolloutRow = {
   intent: "resolve_reference" | "audit_bottle";
   schemaVersion: number;
   model: string | null;
-  modelMetadata: Record<string, unknown> | null;
+  modelMetadata: unknown;
   completedAt: Date | null;
   operations: RolloutOperation[];
 };
@@ -50,7 +51,11 @@ export type BottleCheckRolloutReport = {
   };
   review: {
     reviewedOperations: number;
+    acceptedOperations: number;
+    rejectedOperations: number;
     correctedOperations: number;
+    acceptanceRate: number | null;
+    rejectionRate: number | null;
     correctionRate: number | null;
     averageReviewTimeMs: number | null;
     rejectionReasons: CountByKey;
@@ -79,26 +84,6 @@ function increment(counts: CountByKey, key: string): void {
   counts[key] = (counts[key] ?? 0) + 1;
 }
 
-function objectProperty(
-  value: Record<string, unknown> | null,
-  property: string,
-): Record<string, unknown> | null {
-  const candidate = value?.[property];
-  return candidate && typeof candidate === "object" && !Array.isArray(candidate)
-    ? (candidate as Record<string, unknown>)
-    : null;
-}
-
-function finiteNumber(
-  value: Record<string, unknown> | null,
-  property: string,
-): number | null {
-  const candidate = value?.[property];
-  return typeof candidate === "number" && Number.isFinite(candidate)
-    ? candidate
-    : null;
-}
-
 function ratio(numerator: number, denominator: number): number | null {
   return denominator === 0 ? null : numerator / denominator;
 }
@@ -114,6 +99,8 @@ export function buildBottleCheckRolloutReport(
   let operationCount = 0;
   let attemptedOperations = 0;
   let reviewedOperations = 0;
+  let acceptedOperations = 0;
+  let rejectedOperations = 0;
   let correctedOperations = 0;
   let staleOperations = 0;
   let failedOperations = 0;
@@ -123,14 +110,21 @@ export function buildBottleCheckRolloutReport(
   let totalTokens = 0;
   let totalToolCalls = 0;
   const usageByModel: UsageByModel = {};
+  const correctionReasons = new Set([
+    "wrong_target",
+    "wrong_change",
+    "insufficient_evidence",
+  ]);
 
   for (const row of rows) {
     increment(byIntent, row.intent);
     increment(bySchemaVersion, String(row.schemaVersion));
 
-    const usage = objectProperty(row.modelMetadata, "usage");
-    const toolCalls = objectProperty(row.modelMetadata, "toolCalls");
-    if (row.modelMetadata) {
+    const modelMetadata =
+      row.modelMetadata === null
+        ? null
+        : BottleClassifierRunMetadataSchema.parse(row.modelMetadata);
+    if (modelMetadata) {
       measuredRuns += 1;
       const model = row.model ?? "unknown";
       const modelUsage = (usageByModel[model] ??= {
@@ -141,20 +135,16 @@ export function buildBottleCheckRolloutReport(
         toolCalls: 0,
       });
       modelUsage.runs += 1;
-      modelUsage.inputTokens += finiteNumber(usage, "inputTokens") ?? 0;
-      modelUsage.outputTokens += finiteNumber(usage, "outputTokens") ?? 0;
-      modelUsage.totalTokens += finiteNumber(usage, "totalTokens") ?? 0;
-      modelUsage.toolCalls += finiteNumber(toolCalls, "count") ?? 0;
+      modelUsage.inputTokens += modelMetadata.usage.inputTokens;
+      modelUsage.outputTokens += modelMetadata.usage.outputTokens;
+      modelUsage.totalTokens += modelMetadata.usage.totalTokens;
+      modelUsage.toolCalls += modelMetadata.toolCalls.count;
+      latenciesMs.push(modelMetadata.agentDurationMs);
+      totalInputTokens += modelMetadata.usage.inputTokens;
+      totalOutputTokens += modelMetadata.usage.outputTokens;
+      totalTokens += modelMetadata.usage.totalTokens;
+      totalToolCalls += modelMetadata.toolCalls.count;
     }
-
-    const durationMs = finiteNumber(row.modelMetadata, "agentDurationMs");
-    if (durationMs !== null) {
-      latenciesMs.push(durationMs);
-    }
-    totalInputTokens += finiteNumber(usage, "inputTokens") ?? 0;
-    totalOutputTokens += finiteNumber(usage, "outputTokens") ?? 0;
-    totalTokens += finiteNumber(usage, "totalTokens") ?? 0;
-    totalToolCalls += finiteNumber(toolCalls, "count") ?? 0;
 
     for (const operation of row.operations) {
       operationCount += 1;
@@ -172,20 +162,28 @@ export function buildBottleCheckRolloutReport(
       if (operation.status === "failed") {
         failedOperations += 1;
       }
-      if (operation.reviewedAt) {
-        reviewedOperations += 1;
-        if (row.completedAt) {
-          reviewTimesMs.push(
-            Math.max(
-              0,
-              operation.reviewedAt.getTime() - row.completedAt.getTime(),
-            ),
-          );
-        }
-      }
+      if (!operation.reviewedAt) continue;
+
+      reviewedOperations += 1;
       if (operation.status === "rejected") {
-        correctedOperations += 1;
+        rejectedOperations += 1;
+        if (
+          operation.rejectionReason &&
+          correctionReasons.has(operation.rejectionReason)
+        ) {
+          correctedOperations += 1;
+        }
         increment(rejectionReasons, operation.rejectionReason ?? "unspecified");
+      } else {
+        acceptedOperations += 1;
+      }
+      if (row.completedAt) {
+        reviewTimesMs.push(
+          Math.max(
+            0,
+            operation.reviewedAt.getTime() - row.completedAt.getTime(),
+          ),
+        );
       }
     }
   }
@@ -198,7 +196,11 @@ export function buildBottleCheckRolloutReport(
     },
     review: {
       reviewedOperations,
+      acceptedOperations,
+      rejectedOperations,
       correctedOperations,
+      acceptanceRate: ratio(acceptedOperations, reviewedOperations),
+      rejectionRate: ratio(rejectedOperations, reviewedOperations),
       correctionRate: ratio(correctedOperations, reviewedOperations),
       averageReviewTimeMs:
         reviewTimesMs.length === 0

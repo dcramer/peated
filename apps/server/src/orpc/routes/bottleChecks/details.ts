@@ -7,6 +7,7 @@ import { z } from "zod";
 import {
   BottleCheckDetailsResponseSchema,
   serializeBottleCheck,
+  serializeReviewOperation,
 } from "./schemas";
 
 export default procedure
@@ -27,8 +28,12 @@ export default procedure
     if (!check) {
       throw errors.NOT_FOUND({ message: "Bottle check not found." });
     }
+    const reviewOperations = await prepareBottleCheckReviewOperations(check);
     return {
       check: serializeBottleCheck(check),
-      reviewOperations: await prepareBottleCheckReviewOperations(check),
+      reviewOperations: reviewOperations.map((operation) => ({
+        ...operation,
+        review: serializeReviewOperation(operation.review),
+      })),
     };
   });

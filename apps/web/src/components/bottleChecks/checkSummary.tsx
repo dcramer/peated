@@ -1,42 +1,24 @@
-import type { EvidenceRef } from "@peated/bottle-classifier";
+import type { Finding } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 
 export type BottleCheck = Outputs["bottleChecks"]["list"]["results"][number];
 
-type Finding = {
-  evidenceRefs?: EvidenceRef[];
-  scope?: unknown;
-  summary?: unknown;
-};
-
 export function getBottleCheckFindings(check: BottleCheck): Finding[] {
-  if (!check.schemaSupported) return [];
-  const findings = check.output?.findings;
-  return Array.isArray(findings)
-    ? findings.filter(
-        (finding): finding is Finding =>
-          typeof finding === "object" && finding !== null,
-      )
-    : [];
+  return check.schemaSupported ? check.output.findings : [];
 }
 
 export function getBottleCheckSummary(check: BottleCheck): string {
   if (!check.schemaSupported) {
     return `This check uses unsupported schema version ${check.schemaVersion}.`;
   }
-  if (typeof check.output?.summary === "string") return check.output.summary;
-  if (typeof check.output?.reason === "string") return check.output.reason;
-  const decision = check.output?.decision;
-  if (
-    typeof decision === "object" &&
-    decision !== null &&
-    "rationale" in decision &&
-    typeof decision.rationale === "string"
-  ) {
-    return decision.rationale;
-  }
-  return check.error || "Bottle check needs review.";
+  if (check.intent === "audit_bottle") return check.output.summary;
+  if (check.output.status === "ignored") return check.output.reason;
+  return (
+    check.output.decision.rationale ??
+    check.error ??
+    "Bottle check needs review."
+  );
 }
 
 const UNRESOLVED_OPERATION_STATUSES = new Set([

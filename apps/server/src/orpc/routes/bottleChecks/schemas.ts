@@ -5,6 +5,8 @@ import {
 } from "@peated/bottle-classifier";
 import {
   BottleCheckCloseReasonSchema,
+  PersistedAuditBottleCheckOutputSchema,
+  PersistedReferenceBottleCheckOutputSchema,
   type BottleCheckWithOperations,
 } from "@peated/server/lib/bottleChecks";
 import {
@@ -16,7 +18,14 @@ import {
   BottleOperationRejectionReasonSchema,
   BottleOperationStatusSchema,
 } from "@peated/server/lib/bottleOperationModeration";
-import { ReviewOperationSchema } from "@peated/server/lib/bottleOperationReviewSchemas";
+import {
+  BlockedReviewOperationSchema,
+  ReviewBottleMergeSchema,
+  ReviewBottleUpdateSchema,
+  ReviewEntityMergeSchema,
+  ReviewEntityUpdateSchema,
+  type ReviewOperation,
+} from "@peated/server/lib/bottleOperationReviewSchemas";
 import { z } from "zod";
 
 const JsonObjectSchema = z.record(z.string(), z.unknown());
@@ -27,7 +36,6 @@ export const BottleOperationResponseSchema = z
     id: z.number(),
     checkId: z.number(),
     proposal: ProposedOperationSchema,
-    stateToken: JsonObjectSchema.nullable(),
     preparationError: JsonObjectSchema.nullable(),
     status: BottleOperationStatusSchema,
     reviewedById: z.number().nullable(),
@@ -43,13 +51,8 @@ export const BottleOperationResponseSchema = z
   })
   .strict();
 
-const BottleCheckResponseFields = {
+const CommonBottleCheckResponseFields = {
   id: z.number(),
-  intent: BottleCheckIntentSchema,
-  origin: AuditBottleOriginSchema.nullable(),
-  sourceKind: z.string().nullable(),
-  sourceId: z.string().nullable(),
-  bottleId: z.number().nullable(),
   subjectKey: z.string(),
   backgroundEventKey: z.string().nullable(),
   model: z.string().nullable(),
@@ -64,22 +67,50 @@ const BottleCheckResponseFields = {
   closedAt: DateTimeSchema.nullable(),
 } as const;
 
-const SupportedBottleCheckResponseSchema = z
+const SupportedBottleCheckResponseFields = {
+  ...CommonBottleCheckResponseFields,
+  schemaSupported: z.literal(true),
+  schemaVersion: z.literal(BOTTLE_CHECK_SCHEMA_VERSION),
+  operations: z.array(BottleOperationResponseSchema),
+} as const;
+
+const SupportedAuditBottleCheckResponseSchema = z
   .object({
-    ...BottleCheckResponseFields,
-    schemaSupported: z.literal(true),
-    schemaVersion: z.literal(BOTTLE_CHECK_SCHEMA_VERSION),
-    inputSnapshot: JsonObjectSchema,
-    output: JsonObjectSchema.nullable(),
-    artifacts: JsonObjectSchema.nullable(),
-    modelMetadata: JsonObjectSchema.nullable(),
-    operations: z.array(BottleOperationResponseSchema),
+    ...SupportedBottleCheckResponseFields,
+    intent: z.literal(BottleCheckIntentSchema.enum.audit_bottle),
+    origin: AuditBottleOriginSchema,
+    sourceKind: z.null(),
+    sourceId: z.null(),
+    bottleId: z.number().nullable(),
+    output: PersistedAuditBottleCheckOutputSchema,
   })
   .strict();
 
+const SupportedReferenceBottleCheckResponseSchema = z
+  .object({
+    ...SupportedBottleCheckResponseFields,
+    intent: z.literal(BottleCheckIntentSchema.enum.resolve_reference),
+    origin: z.null(),
+    sourceKind: z.string(),
+    sourceId: z.string(),
+    bottleId: z.null(),
+    output: PersistedReferenceBottleCheckOutputSchema,
+  })
+  .strict();
+
+const SupportedBottleCheckResponseSchema = z.discriminatedUnion("intent", [
+  SupportedAuditBottleCheckResponseSchema,
+  SupportedReferenceBottleCheckResponseSchema,
+]);
+
 const UnsupportedBottleCheckResponseSchema = z
   .object({
-    ...BottleCheckResponseFields,
+    ...CommonBottleCheckResponseFields,
+    intent: BottleCheckIntentSchema,
+    origin: AuditBottleOriginSchema.nullable(),
+    sourceKind: z.string().nullable(),
+    sourceId: z.string().nullable(),
+    bottleId: z.number().nullable(),
     schemaSupported: z.literal(false),
     schemaVersion: z
       .number()
@@ -93,10 +124,22 @@ const UnsupportedBottleCheckResponseSchema = z
   })
   .strict();
 
-export const BottleCheckResponseSchema = z.discriminatedUnion(
-  "schemaSupported",
-  [SupportedBottleCheckResponseSchema, UnsupportedBottleCheckResponseSchema],
-);
+export const BottleCheckResponseSchema = z.union([
+  SupportedBottleCheckResponseSchema,
+  UnsupportedBottleCheckResponseSchema,
+]);
+
+const PreparedReviewOperationResponseSchema = z.discriminatedUnion("type", [
+  ReviewBottleUpdateSchema.omit({ stateToken: true }),
+  ReviewBottleMergeSchema.omit({ stateToken: true }),
+  ReviewEntityUpdateSchema.omit({ stateToken: true }),
+  ReviewEntityMergeSchema.omit({ stateToken: true }),
+]);
+
+const ReviewOperationResponseSchema = z.union([
+  BlockedReviewOperationSchema,
+  PreparedReviewOperationResponseSchema,
+]);
 
 export const BottleOperationActionResponseSchema = z
   .object({
@@ -111,7 +154,7 @@ export const BottleCheckDetailsResponseSchema = z
       z
         .object({
           operationId: z.number().int().positive(),
-          review: ReviewOperationSchema.nullable(),
+          review: ReviewOperationResponseSchema.nullable(),
           approvalReady: z.boolean(),
         })
         .strict(),
@@ -119,8 +162,38 @@ export const BottleCheckDetailsResponseSchema = z
   })
   .strict();
 
+export function serializeReviewOperation(
+  review: ReviewOperation | null,
+): z.infer<typeof ReviewOperationResponseSchema> | null {
+  if (!review || review.status === "blocked") return review;
+  const { stateToken: _stateToken, ...response } = review;
+  return PreparedReviewOperationResponseSchema.parse(response);
+}
+
 function serializeDate(value: Date | null): string | null {
   return value?.toISOString() ?? null;
+}
+
+function serializeBottleOperation(
+  operation: BottleCheckWithOperations["operations"][number],
+) {
+  return BottleOperationResponseSchema.parse({
+    id: operation.id,
+    checkId: operation.checkId,
+    proposal: operation.proposal,
+    preparationError: operation.preparationError,
+    status: operation.status,
+    reviewedById: operation.reviewedById,
+    reviewedAt: serializeDate(operation.reviewedAt),
+    rejectionReason: operation.rejectionReason,
+    reviewerNote: operation.reviewerNote,
+    result: operation.result,
+    error: operation.error,
+    executionStartedAt: serializeDate(operation.executionStartedAt),
+    executionCompletedAt: serializeDate(operation.executionCompletedAt),
+    createdAt: operation.createdAt.toISOString(),
+    updatedAt: operation.updatedAt.toISOString(),
+  });
 }
 
 export function serializeBottleCheck(check: BottleCheckWithOperations) {
@@ -158,21 +231,16 @@ export function serializeBottleCheck(check: BottleCheckWithOperations) {
     });
   }
 
+  const output =
+    check.intent === "audit_bottle"
+      ? PersistedAuditBottleCheckOutputSchema.parse(check.output)
+      : PersistedReferenceBottleCheckOutputSchema.parse(check.output);
+
   return SupportedBottleCheckResponseSchema.parse({
     ...common,
     schemaSupported: true,
     schemaVersion: check.schemaVersion,
-    inputSnapshot: check.inputSnapshot,
-    output: check.output,
-    artifacts: check.artifacts,
-    modelMetadata: check.modelMetadata,
-    operations: check.operations.map((operation) => ({
-      ...operation,
-      reviewedAt: serializeDate(operation.reviewedAt),
-      executionStartedAt: serializeDate(operation.executionStartedAt),
-      executionCompletedAt: serializeDate(operation.executionCompletedAt),
-      createdAt: operation.createdAt.toISOString(),
-      updatedAt: operation.updatedAt.toISOString(),
-    })),
+    output,
+    operations: check.operations.map(serializeBottleOperation),
   });
 }

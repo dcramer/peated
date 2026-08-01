@@ -34,7 +34,6 @@ function operation(
         { kind: "web_result", url: "https://example.com/evidence" },
       ],
     },
-    stateToken: {},
     preparationError: null,
     status,
     reviewedById: null,
@@ -86,7 +85,6 @@ const entityReview = {
     },
     warnings: [{ code: "role_union", message: "Roles will be preserved." }],
   },
-  stateToken: {},
 } as BottleOperationReview;
 
 describe("Bottle Check review components", () => {
@@ -128,6 +126,20 @@ describe("Bottle Check review components", () => {
     expect(subject).toContain("Store price #510");
     expect(subject).not.toContain("Deleted Bottle");
     expect(origin).toBe("");
+  });
+
+  it("labels an audit whose Bottle has been deleted", () => {
+    const check = {
+      bottleId: null,
+      intent: "audit_bottle",
+      origin: "moderator",
+      sourceKind: null,
+      sourceId: null,
+    } as ComponentProps<typeof BottleCheckSubject>["check"];
+
+    expect(
+      renderToStaticMarkup(<BottleCheckSubject check={check} />),
+    ).toContain("Deleted Bottle");
   });
 
   it("labels closed checks by disposition and preserves unsupported operation counts", () => {
@@ -219,7 +231,6 @@ describe("Bottle Check review components", () => {
         entityCreations: [],
         warnings: [],
       },
-      stateToken: {},
     } as unknown as BottleOperationReview;
 
     const html = renderToStaticMarkup(
@@ -365,14 +376,11 @@ describe("Bottle Check review components", () => {
       backgroundEventKey: null,
       schemaSupported: true,
       schemaVersion: 1,
-      inputSnapshot: {},
       output: {
         summary: "The Bottle is supported.",
         findings: [],
       },
-      artifacts: {},
       model: null,
-      modelMetadata: null,
       error: null,
       storePriceMatchProposalId: null,
       storePriceMatchAttemptId: null,
@@ -385,13 +393,7 @@ describe("Bottle Check review components", () => {
       operations: [],
     } satisfies ComponentProps<typeof CheckResult>["check"];
     const clean = renderToStaticMarkup(<CheckResult check={baseCheck} />);
-    const {
-      artifacts: _artifacts,
-      inputSnapshot: _inputSnapshot,
-      modelMetadata: _modelMetadata,
-      output: _output,
-      ...safeBaseCheck
-    } = baseCheck;
+    const { output: _output, ...safeBaseCheck } = baseCheck;
     const unsupported = renderToStaticMarkup(
       <CheckResult
         check={{

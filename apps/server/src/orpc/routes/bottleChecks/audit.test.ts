@@ -109,6 +109,9 @@ test("Bottle audit persists and returns a clean moderator check", async ({
     },
     operations: [],
   });
+  expect(result).not.toHaveProperty("inputSnapshot");
+  expect(result).not.toHaveProperty("artifacts");
+  expect(result).not.toHaveProperty("modelMetadata");
   expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
     bottleId: bottle.id,
     origin: "moderator",
@@ -148,4 +151,42 @@ test("Bottle history returns clean audits outside the actionable inbox", async (
 
   expect(history.results.map(({ id }) => id)).toEqual([created.id]);
   expect(inbox.results).toEqual([]);
+});
+
+test("Bottle details preserve an audit with a deleted Bottle reference", async ({
+  fixtures,
+}) => {
+  config.BOTTLE_CHECK_MODERATOR_VISIBILITY = true;
+  config.BOTTLE_CHECK_SHADOW_GENERATION = true;
+  const bottle = await fixtures.Bottle();
+  const moderator = await fixtures.User({ mod: true });
+  vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+    result: cleanAuditResult(),
+    modelMetadata: null,
+  });
+
+  const created = await routerClient.bottleChecks.audit(
+    { bottle: bottle.id },
+    { context: { user: moderator } },
+  );
+  await db
+    .update(bottleChecks)
+    .set({ bottleId: null })
+    .where(eq(bottleChecks.id, created.id));
+
+  const details = await routerClient.bottleChecks.details(
+    { check: created.id },
+    { context: { user: moderator } },
+  );
+
+  expect(details.check).toMatchObject({
+    id: created.id,
+    intent: "audit_bottle",
+    bottleId: null,
+    output: {
+      summary: "The Bottle identity and catalog fields are supported.",
+      findings: [],
+    },
+  });
+  expect(details.reviewOperations).toEqual([]);
 });

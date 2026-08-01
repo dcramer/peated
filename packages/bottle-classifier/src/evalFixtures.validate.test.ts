@@ -110,6 +110,12 @@ describe("eval fixture validation", () => {
     expect(
       fixture?.input.context.inspectedBottles.map(({ bottleId }) => bottleId),
     ).toEqual([45146, 44288, 802]);
+    expect(fixture?.searchResponses).toMatchObject([
+      {
+        when: ["laphroaig"],
+        results: [{ bottleId: 45146 }, { bottleId: 44288 }, { bottleId: 802 }],
+      },
+    ]);
     expect(
       fixture!.input.context.bottleContexts.map(({ bottleId, groupId }) => ({
         bottleId,

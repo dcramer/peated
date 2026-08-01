@@ -61,15 +61,6 @@ vi.mock("@peated/web/lib/orpc/context", () => ({
   }),
 }));
 
-function entityStateToken() {
-  return {
-    entityId: 42,
-    fields: { name: "Wrong Brand" },
-    referencedCountry: null,
-    referencedRegion: null,
-  };
-}
-
 function operation(
   status: Operation["status"],
   overrides: Partial<Operation> = {},
@@ -86,7 +77,6 @@ function operation(
       rationale: "The inspected evidence supports this change.",
       evidenceRefs: [{ kind: "entity", entityId: 42 }],
     },
-    stateToken: entityStateToken(),
     preparationError: null,
     status,
     reviewedById: null,
@@ -156,7 +146,6 @@ function reviewForOperation(operation: Operation): ReviewOperation {
       },
       warnings: [],
     },
-    stateToken: entityStateToken(),
   };
 }
 
@@ -178,7 +167,6 @@ function details(
       backgroundEventKey: null,
       schemaSupported: true,
       schemaVersion: 1,
-      inputSnapshot: {},
       output: {
         summary: "Review the proposed catalog work.",
         findings: [
@@ -189,9 +177,7 @@ function details(
           },
         ],
       },
-      artifacts: {},
       model: "test-model",
-      modelMetadata: null,
       error: null,
       storePriceMatchProposalId: null,
       storePriceMatchAttemptId: null,
@@ -203,7 +189,7 @@ function details(
       closedAt: null,
       operations,
       ...checkOverrides,
-    },
+    } as Extract<Details["check"], { schemaSupported: true }>,
     reviewOperations: operations.map((operation) => ({
       operationId: operation.id,
       review:

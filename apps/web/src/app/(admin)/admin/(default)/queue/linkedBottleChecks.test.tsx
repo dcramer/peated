@@ -18,7 +18,6 @@ test("renders a linked Bottle check as a read-only review link", () => {
       backgroundEventKey: null,
       schemaSupported: true,
       schemaVersion: 1,
-      inputSnapshot: {},
       output: {
         status: "classified",
         decision: {
@@ -32,9 +31,7 @@ test("renders a linked Bottle check as a read-only review link", () => {
         },
         findings: [],
       },
-      artifacts: {},
       model: "test-model",
-      modelMetadata: null,
       error: null,
       storePriceMatchProposalId: 12,
       storePriceMatchAttemptId: 13,

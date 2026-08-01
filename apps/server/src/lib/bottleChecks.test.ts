@@ -92,12 +92,36 @@ function auditCheckInput({
     backgroundEventKey,
     model: "test-model",
     modelMetadata: {
-      provider: "test",
+      agentDurationMs: 10,
+      usage: {
+        requests: 1,
+        inputTokens: 8,
+        outputTokens: 2,
+        totalTokens: 10,
+      },
+      toolCalls: { count: 0, names: [] },
     },
   };
 }
 
 describe("Bottle check persistence", () => {
+  test("rejects malformed classifier run metadata before persistence", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const input = auditCheckInput({
+      bottleId: bottle.id,
+      summary: "The Bottle is supported.",
+    });
+
+    await expect(
+      createBottleCheck({
+        ...input,
+        modelMetadata: { agentDurationMs: 10 },
+      }),
+    ).rejects.toThrow();
+  });
+
   test("sanitizes inline images and stores output and artifacts once", async () => {
     const inlineImage = `data:image/jpeg;base64,${Buffer.from(
       "not really an image",

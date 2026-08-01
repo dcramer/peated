@@ -3,9 +3,11 @@ import {
   AuditBottleOriginSchema,
   AuditBottleResultSchema,
   BottleClassificationResultSchema,
+  BottleClassifierRunMetadataSchema,
   ClassifyBottleReferenceInputSchema,
-  FindingSchema,
+  DecidedBottleClassificationResultSchema,
   getBottleCheckSourceEvidencePaths,
+  IgnoredBottleClassificationResultSchema,
 } from "@peated/bottle-classifier";
 import { db, type AnyConnection, type AnyDatabase } from "@peated/server/db";
 import {
@@ -61,8 +63,6 @@ const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
   ]),
 );
 
-const JsonObjectSchema = z.record(z.string(), JsonValueSchema);
-
 export const BottleCheckCloseReasonSchema = z.enum([
   "dismissed",
   "resolved_manually",
@@ -88,11 +88,30 @@ export const ListActionableBottleChecksInputSchema = z
     limit: 50,
   });
 
-const PersistedBottleCheckOutputSchema = z
-  .object({
-    findings: z.array(FindingSchema),
-  })
-  .passthrough();
+export const PersistedAuditBottleCheckOutputSchema =
+  AuditBottleResultSchema.omit({
+    proposedOperations: true,
+    artifacts: true,
+  });
+
+export const PersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
+  "status",
+  [
+    IgnoredBottleClassificationResultSchema.omit({
+      proposedOperations: true,
+      artifacts: true,
+    }),
+    DecidedBottleClassificationResultSchema.omit({
+      proposedOperations: true,
+      artifacts: true,
+    }),
+  ],
+);
+
+export const PersistedBottleCheckOutputSchema = z.union([
+  PersistedAuditBottleCheckOutputSchema,
+  PersistedReferenceBottleCheckOutputSchema,
+]);
 
 const StorePriceAttemptLinkSchema = z
   .object({
@@ -103,7 +122,7 @@ const StorePriceAttemptLinkSchema = z
 const CommonCreateFields = {
   backgroundEventKey: NonEmptyTextSchema.max(255).optional(),
   model: NonEmptyTextSchema.nullable().optional(),
-  modelMetadata: JsonObjectSchema.nullable().optional(),
+  modelMetadata: BottleClassifierRunMetadataSchema.nullable().optional(),
 } as const;
 
 const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
@@ -127,6 +146,19 @@ const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
     })
     .strict(),
 ]);
+
+function buildPersistedBottleCheckOutput(
+  input: z.infer<typeof CreateBottleCheckInputSchema>,
+) {
+  const {
+    artifacts: _artifacts,
+    proposedOperations: _proposedOperations,
+    ...output
+  } = input.result;
+  return input.intent === "audit_bottle"
+    ? PersistedAuditBottleCheckOutputSchema.parse(output)
+    : PersistedReferenceBottleCheckOutputSchema.parse(output);
+}
 
 const BottleCheckSubjectSchema = z.discriminatedUnion("intent", [
   z
@@ -402,23 +434,7 @@ export async function createBottleCheck(
     sourceFields,
   });
   const artifacts = input.result.artifacts;
-  const output =
-    input.intent === "audit_bottle"
-      ? {
-          summary: input.result.summary,
-          findings: input.result.findings,
-        }
-      : input.result.status === "ignored"
-        ? {
-            status: input.result.status,
-            reason: input.result.reason,
-            findings: input.result.findings,
-          }
-        : {
-            status: input.result.status,
-            decision: input.result.decision,
-            findings: input.result.findings,
-          };
+  const output = buildPersistedBottleCheckOutput(input);
   const subject = getSubject(input);
   const subjectKey = buildSubjectKey(subject);
 

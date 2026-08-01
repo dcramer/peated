@@ -203,8 +203,7 @@ export default function Page() {
         (check.operations.some(({ status }) =>
           ["blocked", "stale", "failed"].includes(status),
         ) ||
-          (Array.isArray(check.output?.findings) &&
-            check.output.findings.length > 0)));
+          check.output.findings.length > 0));
   const canReject =
     selected.size > 0 &&
     (rejectionReason !== "other" || rejectionNote.trim().length > 0);

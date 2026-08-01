@@ -1,7 +1,7 @@
 import type OpenAI from "openai";
 import { z } from "zod";
 import { BottleExtractedDetailsSchema } from "./classifierTypes";
-import { buildWhiskyLabelExtractorInstructions } from "./instructions";
+import { buildWhiskyLabelExtractorInstructions } from "./extractorInstructions";
 import { getStableOpenAISettings } from "./openaiModelSettings";
 
 const ResponseSchema = z.object({

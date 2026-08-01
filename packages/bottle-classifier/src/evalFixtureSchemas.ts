@@ -380,6 +380,7 @@ export const auditBottleEvalFixtureSchema = z
         context: auditBottleEvalContextSchema,
       })
       .strict(),
+    searchResponses: z.array(searchResponseFixtureSchema).optional(),
     provenance: evalFixtureProvenanceSchema,
     requireExpectedOperationEvidence: z.boolean().default(false),
     expected: AuditBottleResultSchema.omit({ artifacts: true }),
@@ -409,6 +410,26 @@ export const auditBottleEvalFixtureSchema = z
         });
       }
       bottleIds.add(bottle.bottleId);
+    }
+
+    for (const [responseIndex, response] of (
+      value.searchResponses ?? []
+    ).entries()) {
+      for (const [resultIndex, bottle] of response.results.entries()) {
+        if (!bottleIds.has(bottle.bottleId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Audit search response references uninspected Bottle id ${bottle.bottleId}.`,
+            path: [
+              "searchResponses",
+              responseIndex,
+              "results",
+              resultIndex,
+              "bottleId",
+            ],
+          });
+        }
+      }
     }
 
     validateExplicitBottleContextCoverage({

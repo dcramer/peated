@@ -1,6 +1,10 @@
 import http from "node:http";
 
 import {
+  bottleCheckCapabilities,
+  createBottleCheckMock,
+} from "./mock-rpc/bottle-checks.mjs";
+import {
   addAnotherReleaseSourceBottle,
   adminUser,
   anotherReleaseSourceBottle,
@@ -70,15 +74,16 @@ const mockUploadImage = Buffer.from(
 const collectionStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
-const approvedBottleCheckTokens = new Set();
-const rejectedBottleCheckTokens = new Set();
-const completedBottleAuditTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
 
-const linkedStorePriceCheckId = 92;
-const linkedStorePriceOperationId = 703;
-const linkedStorePriceDistillersEdition2023BottleId = 9313;
+const bottleCheckMock = createBottleCheckMock({
+  exactMatchedBottleId,
+  exactMergeOtherBottle,
+  existingBottle,
+  testBrand,
+  testUser,
+});
 
 const server = http.createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
@@ -125,144 +130,27 @@ process.on("SIGTERM", () => {
 async function handleRpcRequest({ request, response, url }) {
   const path = url.pathname.replace(/^\/rpc\/?/, "");
   const input = await readRpcInput(request, url);
+  const bottleCheckResult = bottleCheckMock.handleRpcRequest({
+    path,
+    input,
+    token: getAccessToken(request),
+  });
+  if (bottleCheckResult?.type === "error") {
+    sendRpcError(response, bottleCheckResult.message);
+    return true;
+  }
+  if (bottleCheckResult?.type === "response") {
+    sendRpcResponse(response, bottleCheckResult.value);
+    return true;
+  }
 
   switch (path) {
     case "root":
       sendRpcResponse(response, {
         version: "playwright",
-        capabilities: {
-          bottleAudits: true,
-          bottleCheckExecution: true,
-          bottleChecks: true,
-        },
+        capabilities: bottleCheckCapabilities,
       });
       return true;
-    case "bottleChecks/history": {
-      const token = getAccessToken(request);
-      if (!token.includes("bottle-audit")) {
-        sendRpcResponse(response, { results: [] });
-        return true;
-      }
-      if (Number(input?.bottle) !== existingBottleId) {
-        sendRpcError(response, "Unexpected Bottle history payload");
-        return true;
-      }
-      sendRpcResponse(response, {
-        results: completedBottleAuditTokens.has(token)
-          ? [buildModeratorAuditCheck()]
-          : [],
-      });
-      return true;
-    }
-    case "bottleChecks/audit": {
-      const token = getAccessToken(request);
-      if (
-        !token.includes("bottle-audit") ||
-        input?.bottle !== existingBottleId ||
-        input?.note !== "Verify the label and catalog identity."
-      ) {
-        sendRpcError(response, "Unexpected Bottle audit payload");
-        return true;
-      }
-      completedBottleAuditTokens.add(token);
-      sendRpcResponse(response, buildModeratorAuditCheck());
-      return true;
-    }
-    case "bottleChecks/details": {
-      const token = getAccessToken(request);
-      if (token.includes("bottle-audit") && Number(input?.check) === 93) {
-        sendRpcResponse(response, {
-          check: buildModeratorAuditCheck(),
-          reviewOperations: [],
-        });
-        return true;
-      }
-      if (
-        token.includes("queue-linked-check") &&
-        Number(input?.check) === linkedStorePriceCheckId
-      ) {
-        sendRpcResponse(
-          response,
-          buildLinkedStorePriceCheckDetails({
-            approved: approvedBottleCheckTokens.has(token),
-          }),
-        );
-        return true;
-      }
-      if (
-        !token.includes("bottle-check-review") ||
-        Number(input?.check) !== 91
-      ) {
-        return false;
-      }
-      sendRpcResponse(
-        response,
-        buildBottleCheckDetails({
-          approved: approvedBottleCheckTokens.has(token),
-          rejected: rejectedBottleCheckTokens.has(token),
-        }),
-      );
-      return true;
-    }
-    case "bottleChecks/approveSelected": {
-      const token = getAccessToken(request);
-      if (
-        token.includes("queue-linked-check") &&
-        input?.check === linkedStorePriceCheckId &&
-        Array.isArray(input?.operationIds) &&
-        input.operationIds.length === 1 &&
-        input.operationIds[0] === linkedStorePriceOperationId
-      ) {
-        approvedBottleCheckTokens.add(token);
-        sendRpcResponse(response, {
-          results: [
-            {
-              operationId: linkedStorePriceOperationId,
-              status: "applied",
-              error: null,
-            },
-          ],
-        });
-        return true;
-      }
-      if (
-        !token.includes("bottle-check-review") ||
-        input?.check !== 91 ||
-        !Array.isArray(input?.operationIds) ||
-        input.operationIds.length !== 1 ||
-        input.operationIds[0] !== 701
-      ) {
-        sendRpcError(response, "Unexpected Bottle Check approval payload");
-        return true;
-      }
-      approvedBottleCheckTokens.add(token);
-      sendRpcResponse(response, {
-        results: [{ operationId: 701, status: "applied", error: null }],
-      });
-      return true;
-    }
-    case "bottleChecks/rejectSelected": {
-      const token = getAccessToken(request);
-      if (!token.includes("bottle-check-review")) {
-        return false;
-      }
-      if (
-        input?.check !== 91 ||
-        !Array.isArray(input?.operationIds) ||
-        input.operationIds.length !== 1 ||
-        input.operationIds[0] !== 702 ||
-        input.reason !== "wrong_change" ||
-        input.note !== undefined
-      ) {
-        sendRpcError(response, "Unexpected Bottle Check rejection payload");
-        return true;
-      }
-      rejectedBottleCheckTokens.add(token);
-      sendRpcResponse(response, {
-        results: [{ operationId: 702, status: "rejected", error: null }],
-      });
-      return true;
-    }
     case "activity/list":
       sendRpcResponse(
         response,
@@ -426,9 +314,13 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "prices/matchQueue/list": {
       const token = getAccessToken(request);
-      if (token.includes("queue-linked-check")) {
+      if (bottleCheckMock.isLinkedStorePriceRequest(token)) {
         sendRpcResponse(response, {
-          results: [buildLinkedStorePriceQueueProposal()],
+          results: [
+            bottleCheckMock.buildLinkedStorePriceQueueProposal(
+              buildDirectBottleProposal(),
+            ),
+          ],
           rel: { nextCursor: null, prevCursor: null },
           stats: {
             actionableCount: 1,
@@ -455,7 +347,7 @@ async function handleRpcRequest({ request, response, url }) {
     case "prices/matchQueue/activeRetryRun":
       if (
         !getAccessToken(request).includes("queue-direct-bottle") &&
-        !getAccessToken(request).includes("queue-linked-check")
+        !bottleCheckMock.isLinkedStorePriceRequest(getAccessToken(request))
       ) {
         return false;
       }
@@ -1051,457 +943,6 @@ async function handleRpcRequest({ request, response, url }) {
   }
 }
 
-function buildLinkedStorePriceCheckDetails({ approved }) {
-  const timestamp = "2026-07-30T00:00:00.000Z";
-  const digest = "0".repeat(64);
-  const proposal = {
-    type: "merge_bottles",
-    input: {
-      sourceBottleId: exactMergeOtherBottleId,
-      destinationBottleId: existingBottleId,
-    },
-    rationale:
-      "The inspected listing matched the canonical Bottle, while this second inspected Bottle is an exact duplicate.",
-    evidenceRefs: [
-      { kind: "bottle", bottleId: exactMergeOtherBottleId },
-      { kind: "bottle", bottleId: existingBottleId },
-    ],
-  };
-  const exact = {
-    edition: null,
-    statedAge: null,
-    abv: null,
-    singleCask: null,
-    caskStrength: null,
-    vintageYear: null,
-    releaseYear: null,
-    caskSize: null,
-    caskType: null,
-    caskFill: null,
-  };
-  const brand = {
-    kind: "existing",
-    entityId: testBrand.id,
-    name: testBrand.name,
-    shortName: testBrand.shortName,
-    roles: testBrand.type,
-  };
-  const source = {
-    bottleId: exactMergeOtherBottleId,
-    groupId: 301,
-    fullName: exactMergeOtherBottle.fullName,
-    shared: {
-      name: exactMergeOtherBottle.name,
-      statedAge: null,
-      seriesId: null,
-      category: "single_malt",
-      brand,
-      distillers: [brand],
-      bottler: null,
-    },
-    exact,
-  };
-  const destination = {
-    bottleId: existingBottleId,
-    groupId: 302,
-    fullName: existingBottle.fullName,
-    shared: {
-      name: existingBottle.name,
-      statedAge: null,
-      seriesId: null,
-      category: "single_malt",
-      brand,
-      distillers: [brand],
-      bottler: null,
-    },
-    exact,
-  };
-  const stateToken = {
-    source: {
-      bottleId: source.bottleId,
-      groupId: source.groupId,
-      fullName: source.fullName,
-      shared: {
-        name: source.shared.name,
-        statedAge: source.shared.statedAge,
-        seriesId: source.shared.seriesId,
-        category: source.shared.category,
-        brandId: testBrand.id,
-        distillerIds: [testBrand.id],
-        bottlerId: null,
-      },
-      exact,
-      aliasDigest: digest,
-      tombstoneDestinationBottleId: null,
-    },
-    destination: {
-      bottleId: destination.bottleId,
-      groupId: destination.groupId,
-      fullName: destination.fullName,
-      shared: {
-        name: destination.shared.name,
-        statedAge: destination.shared.statedAge,
-        seriesId: destination.shared.seriesId,
-        category: destination.shared.category,
-        brandId: testBrand.id,
-        distillerIds: [testBrand.id],
-        bottlerId: null,
-      },
-      exact,
-      aliasDigest: digest,
-      tombstoneDestinationBottleId: null,
-    },
-    relationshipDigest: digest,
-  };
-  const operation = {
-    id: linkedStorePriceOperationId,
-    checkId: linkedStorePriceCheckId,
-    proposal,
-    stateToken,
-    preparationError: null,
-    status: approved ? "applied" : "pending_review",
-    reviewedById: approved ? testUser.id : null,
-    reviewedAt: approved ? timestamp : null,
-    rejectionReason: null,
-    reviewerNote: null,
-    result: approved
-      ? {
-          type: "merge_bottles",
-          status: "applied",
-          sourceBottleId: exactMergeOtherBottleId,
-          destinationBottleId: existingBottleId,
-          changed: true,
-        }
-      : null,
-    error: null,
-    executionStartedAt: approved ? timestamp : null,
-    executionCompletedAt: approved ? timestamp : null,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  };
-
-  return {
-    check: {
-      id: linkedStorePriceCheckId,
-      intent: "resolve_reference",
-      origin: null,
-      sourceKind: "store_price",
-      sourceId: "9912",
-      bottleId: null,
-      subjectKey: "resolve_reference:store_price:9912",
-      backgroundEventKey: null,
-      schemaVersion: 1,
-      schemaSupported: true,
-      inputSnapshot: {
-        reference: {
-          id: 9912,
-          name: "Playwright Store duplicate listing",
-        },
-      },
-      output: {
-        status: "classified",
-        decision: {
-          action: "match",
-          rationale:
-            "The store listing is matched; one duplicate Bottle still needs moderator disposition.",
-          candidateBottleIds: [existingBottleId],
-          identityScope: "product",
-          observation: null,
-          matchedBottleId: existingBottleId,
-          proposedBottle: null,
-        },
-        findings: [
-          {
-            scope: "bottle_group",
-            summary:
-              "The surviving 2023 and 2024 Distillers Edition Bottles share the same stable expression but appear split across separate Bottle groups.",
-            evidenceRefs: [
-              {
-                kind: "bottle",
-                bottleId: linkedStorePriceDistillersEdition2023BottleId,
-              },
-              { kind: "bottle", bottleId: exactMatchedBottleId },
-            ],
-          },
-        ],
-      },
-      artifacts: {},
-      model: "playwright-model",
-      modelMetadata: null,
-      error: null,
-      storePriceMatchProposalId: 9911,
-      storePriceMatchAttemptId: 9914,
-      closedById: null,
-      closeReason: null,
-      closeNote: null,
-      createdAt: timestamp,
-      completedAt: timestamp,
-      closedAt: null,
-      operations: [operation],
-    },
-    reviewOperations: [
-      {
-        operationId: linkedStorePriceOperationId,
-        approvalReady: !approved,
-        review: approved
-          ? null
-          : {
-              id: linkedStorePriceOperationId,
-              type: "merge_bottles",
-              status: "pending_review",
-              proposal,
-              preview: {
-                source,
-                destination,
-                outcome: {
-                  retiredBottleId: exactMergeOtherBottleId,
-                  survivorBottleId: existingBottleId,
-                  tombstoneDestinationBottleId: existingBottleId,
-                },
-                consumers: {
-                  tastings: 1,
-                  reviews: 0,
-                  storePrices: 1,
-                  observations: 0,
-                  collectionMemberships: 0,
-                  flightMemberships: 0,
-                  aliases: 1,
-                },
-                membershipCollisions: {
-                  collections: 0,
-                  flights: 0,
-                },
-                warnings: [],
-              },
-              stateToken,
-            },
-      },
-    ],
-  };
-}
-
-function buildBottleCheckDetails({ approved, rejected }) {
-  const timestamp = "2026-07-30T00:00:00.000Z";
-  const entityStateToken = (entityId, name) => ({
-    entityId,
-    fields: { name },
-    referencedCountry: null,
-    referencedRegion: null,
-  });
-  const readyStateToken = entityStateToken(42, "Wrong Brand");
-  const preparedDriftedStateToken = entityStateToken(43, "Second Wrong Brand");
-  const liveDriftedStateToken = entityStateToken(
-    43,
-    "Second Brand Changed Elsewhere",
-  );
-  const operations = [
-    {
-      id: 701,
-      checkId: 91,
-      proposal: {
-        type: "update_entity",
-        input: {
-          entityId: 42,
-          patch: { name: "Correct Brand" },
-        },
-        rationale: "Rename the inspected Brand from current evidence.",
-        evidenceRefs: [{ kind: "entity", entityId: 42 }],
-      },
-      stateToken: readyStateToken,
-      preparationError: null,
-      status: approved ? "applied" : "pending_review",
-      reviewedById: approved ? testUser.id : null,
-      reviewedAt: approved ? timestamp : null,
-      rejectionReason: null,
-      reviewerNote: null,
-      result: approved
-        ? {
-            type: "update_entity",
-            status: "applied",
-            entityId: 42,
-            changed: true,
-          }
-        : null,
-      error: null,
-      executionStartedAt: approved ? timestamp : null,
-      executionCompletedAt: approved ? timestamp : null,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    },
-    {
-      id: 702,
-      checkId: 91,
-      proposal: {
-        type: "update_entity",
-        input: {
-          entityId: 43,
-          patch: { name: "Second Correct Brand" },
-        },
-        rationale: "Review the second inspected Brand independently.",
-        evidenceRefs: [{ kind: "entity", entityId: 43 }],
-      },
-      stateToken: preparedDriftedStateToken,
-      preparationError: null,
-      status: rejected ? "rejected" : "pending_review",
-      reviewedById: rejected ? testUser.id : null,
-      reviewedAt: rejected ? timestamp : null,
-      rejectionReason: rejected ? "wrong_change" : null,
-      reviewerNote: null,
-      result: null,
-      error: null,
-      executionStartedAt: null,
-      executionCompletedAt: null,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    },
-  ];
-  const entityReview = ({
-    id,
-    entityId,
-    beforeName,
-    afterName,
-    stateToken,
-  }) => ({
-    id,
-    type: "update_entity",
-    status: "pending_review",
-    proposal: operations.find((operation) => operation.id === id).proposal,
-    preview: {
-      before: {
-        entityId,
-        name: beforeName,
-        shortName: null,
-        roles: ["brand"],
-        website: null,
-        location: { country: null, region: null },
-        yearEstablished: null,
-      },
-      after: {
-        entityId,
-        name: afterName,
-        shortName: null,
-        roles: ["brand"],
-        website: null,
-        location: { country: null, region: null },
-        yearEstablished: null,
-      },
-      changedFields: ["name"],
-      impact: {
-        bottles: 1,
-        brandGroups: 1,
-        bottlerGroups: 0,
-        distillerGroups: 0,
-        series: 0,
-        aliases: 0,
-      },
-      warnings: [],
-    },
-    stateToken,
-  });
-
-  return {
-    check: {
-      id: 91,
-      intent: "audit_bottle",
-      origin: "moderator",
-      sourceKind: null,
-      sourceId: null,
-      bottleId: existingBottleId,
-      subjectKey: `audit_bottle:bottle:${existingBottleId}`,
-      backgroundEventKey: null,
-      schemaVersion: 1,
-      schemaSupported: true,
-      inputSnapshot: {
-        bottleId: existingBottleId,
-        origin: "moderator",
-      },
-      output: {
-        summary: "Review two independent Entity corrections.",
-        findings: [],
-      },
-      artifacts: {},
-      model: "playwright-model",
-      modelMetadata: null,
-      error: null,
-      storePriceMatchProposalId: null,
-      storePriceMatchAttemptId: null,
-      closedById: null,
-      closeReason: null,
-      closeNote: null,
-      createdAt: timestamp,
-      completedAt: timestamp,
-      closedAt: null,
-      operations,
-    },
-    reviewOperations: [
-      {
-        operationId: 701,
-        approvalReady: !approved,
-        review: approved
-          ? null
-          : entityReview({
-              id: 701,
-              entityId: 42,
-              beforeName: "Wrong Brand",
-              afterName: "Correct Brand",
-              stateToken: readyStateToken,
-            }),
-      },
-      {
-        operationId: 702,
-        approvalReady: false,
-        review: rejected
-          ? null
-          : entityReview({
-              id: 702,
-              entityId: 43,
-              beforeName: "Second Brand Changed Elsewhere",
-              afterName: "Second Correct Brand",
-              stateToken: liveDriftedStateToken,
-            }),
-      },
-    ],
-  };
-}
-
-function buildModeratorAuditCheck() {
-  const timestamp = "2026-07-30T00:00:00.000Z";
-  return {
-    id: 93,
-    intent: "audit_bottle",
-    origin: "moderator",
-    sourceKind: null,
-    sourceId: null,
-    bottleId: existingBottleId,
-    subjectKey: `audit_bottle:bottle:${existingBottleId}`,
-    backgroundEventKey: null,
-    schemaVersion: 1,
-    schemaSupported: true,
-    inputSnapshot: {
-      bottleId: existingBottleId,
-      origin: "moderator",
-      note: "Verify the label and catalog identity.",
-    },
-    output: {
-      summary: "The Bottle identity is supported by the inspected evidence.",
-      findings: [],
-    },
-    artifacts: {},
-    model: "playwright-model",
-    modelMetadata: null,
-    error: null,
-    storePriceMatchProposalId: null,
-    storePriceMatchAttemptId: null,
-    closedById: null,
-    closeReason: null,
-    closeNote: null,
-    createdAt: timestamp,
-    completedAt: timestamp,
-    closedAt: null,
-    operations: [],
-  };
-}
-
 /**
  * Collection state is isolated by access token so parallel browser projects can
  * mutate Favorites and Library independently against one mock RPC server.
@@ -1976,27 +1417,6 @@ function buildDirectBottleQueueProposal() {
       id: 9912,
       name: `${anotherReleaseSourceBottle.fullName} ${directBottleQueueEdition}`,
     },
-  };
-}
-
-function buildLinkedStorePriceQueueProposal() {
-  const proposal = buildDirectBottleProposal();
-
-  return {
-    ...proposal,
-    id: 9911,
-    status: "approved",
-    proposalType: "match_existing",
-    proposedBottle: null,
-    bottleCheckIds: [linkedStorePriceCheckId],
-    price: {
-      ...proposal.price,
-      id: 9912,
-      name: "Playwright Store matched listing with supplemental work",
-      bottle: existingBottle,
-    },
-    currentBottle: existingBottle,
-    suggestedBottle: existingBottle,
   };
 }
 

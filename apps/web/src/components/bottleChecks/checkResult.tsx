@@ -57,26 +57,18 @@ export default function CheckResult({
           <h3 className="text-sm font-semibold text-white">Findings</h3>
           <div className="mt-3 space-y-3">
             {findings.map((finding, index) => {
-              const scope =
-                typeof finding.scope === "string" ? finding.scope : "other";
-              const summary =
-                typeof finding.summary === "string"
-                  ? finding.summary
-                  : "Review this finding.";
-              const evidence =
-                "evidenceRefs" in finding && Array.isArray(finding.evidenceRefs)
-                  ? finding.evidenceRefs
-                  : [];
               return (
                 <article
                   className="rounded border border-slate-800 bg-slate-900/60 p-4"
-                  key={`${scope}:${summary}:${index}`}
+                  key={`${finding.scope}:${finding.summary}:${index}`}
                 >
                   <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    {scope.replaceAll("_", " ")}
+                    {finding.scope.replaceAll("_", " ")}
                   </div>
-                  <p className="mt-2 text-sm text-slate-200">{summary}</p>
-                  <EvidenceList evidence={evidence} />
+                  <p className="mt-2 text-sm text-slate-200">
+                    {finding.summary}
+                  </p>
+                  <EvidenceList evidence={finding.evidenceRefs} />
                 </article>
               );
             })}

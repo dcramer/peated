@@ -29,7 +29,10 @@ export type CreateBottleClassifierOptions =
       : never
     : never;
 
-export type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
+export {
+  BottleClassifierRunMetadataSchema,
+  type BottleClassifierRunMetadata,
+} from "./runtime/runMetadata";
 export type {
   BottleClassifierAdapters,
   BottleClassifierDataSource,

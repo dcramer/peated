@@ -13,11 +13,33 @@ import { signIn } from "./session";
 test("disposes non-ready and live-ready operations independently", async ({
   context,
   page,
+  request,
 }, testInfo) => {
+  const accessToken = uniqueAccessToken(testInfo);
   await signIn(context, {
-    accessToken: uniqueAccessToken(testInfo),
+    accessToken,
     user: { ...testUser, mod: true },
   });
+
+  const detailsResponse = await request.post(
+    `${mockApiServer}/rpc/bottleChecks/details`,
+    {
+      data: { json: { check: 91 } },
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+  expect(detailsResponse.ok()).toBe(true);
+  const details = (await detailsResponse.json()).json;
+
+  expect(details.check).not.toHaveProperty("inputSnapshot");
+  expect(details.check).not.toHaveProperty("artifacts");
+  expect(details.check).not.toHaveProperty("modelMetadata");
+  for (const operation of details.check.operations) {
+    expect(operation).not.toHaveProperty("stateToken");
+  }
+  for (const operation of details.reviewOperations) {
+    expect(operation.review).not.toHaveProperty("stateToken");
+  }
 
   await page.goto("/bottle-checks/91");
 
@@ -168,3 +190,7 @@ function uniqueAccessToken(testInfo: TestInfo, suffix = "bottle-check-review") {
     `r${testInfo.retry}`,
   ].join("-");
 }
+
+const mockApiServer =
+  process.env.PLAYWRIGHT_API_SERVER ??
+  `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT ?? 4999}`;

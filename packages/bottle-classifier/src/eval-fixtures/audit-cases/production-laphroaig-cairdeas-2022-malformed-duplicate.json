@@ -292,6 +292,39 @@
       ]
     }
   },
+  "searchResponses": [
+    {
+      "when": ["laphroaig"],
+      "results": [
+        {
+          "bottleId": 45146,
+          "fullName": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
+          "brand": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "edition": "Warehouse 1",
+          "abv": 52.2,
+          "releaseYear": 2022
+        },
+        {
+          "bottleId": 44288,
+          "fullName": "Laphroaig Càirdeas",
+          "brand": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt"
+        },
+        {
+          "bottleId": 802,
+          "fullName": "Laphroaig Cairdeas - 15-year-old",
+          "brand": "Laphroaig",
+          "bottler": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "statedAge": 15
+        }
+      ]
+    }
+  ],
   "provenance": {
     "source": "curated_regression",
     "verifiedSourceUrls": [

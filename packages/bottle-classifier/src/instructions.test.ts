@@ -12,9 +12,7 @@ function sharedPrefix(instructions: string, intentHeader: string) {
 
 describe("Bottle check instructions", () => {
   test("shares the stable identity and proposal policy across intents", () => {
-    const reference = buildBottleClassifierInstructions({
-      maxSearchQueries: 2,
-    });
+    const reference = buildBottleClassifierInstructions();
     const audit = buildBottleAuditInstructions();
 
     expect(
@@ -25,9 +23,7 @@ describe("Bottle check instructions", () => {
   });
 
   test("keeps intent outputs and mutation authority separate", () => {
-    const reference = buildBottleClassifierInstructions({
-      maxSearchQueries: 2,
-    });
+    const reference = buildBottleClassifierInstructions();
     const audit = buildBottleAuditInstructions();
 
     expect(reference).toContain("Reference Resolution Intent:");
@@ -41,6 +37,26 @@ describe("Bottle check instructions", () => {
       expect(instructions).toContain("proposal tools");
       expect(instructions).toMatch(/do not mutate|read-only/);
     }
+  });
+
+  test("keeps the reference prompt compact without dropping core boundaries", () => {
+    const reference = buildBottleClassifierInstructions();
+
+    expect(reference.length).toBeLessThan(28_000);
+    for (const rule of [
+      "Every marketed release is one independently complete Bottle",
+      "Once reviewed evidence establishes equivalence",
+      "Do not include proposed operations in the final structured output",
+      "Use an evidenced canonical `proposedBottle.name`",
+      "actual `toolsUsed`",
+    ]) {
+      expect(reference).toContain(rule);
+    }
+    expect(
+      reference.match(
+        /Every marketed release is one independently complete Bottle; BottleGroup assignment is automatic downstream\./g,
+      ),
+    ).toHaveLength(1);
   });
 
   test("asks image extraction to inspect the complete readable label", () => {

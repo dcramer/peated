@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { getBottleClassifierRunMetadata } from "./runMetadata";
+import {
+  BottleClassifierRunMetadataSchema,
+  getBottleClassifierRunMetadata,
+} from "./runMetadata";
 
 describe("getBottleClassifierRunMetadata", () => {
   test("extracts aggregate usage and tool calls from a native agent result", () => {
@@ -65,5 +68,19 @@ describe("getBottleClassifierRunMetadata", () => {
         names: [],
       },
     });
+  });
+
+  test("rejects incomplete persisted run metadata", () => {
+    expect(() =>
+      BottleClassifierRunMetadataSchema.parse({
+        agentDurationMs: 10,
+        usage: {
+          inputTokens: 4,
+          outputTokens: 2,
+          totalTokens: 6,
+        },
+        toolCalls: { count: 1, names: [] },
+      }),
+    ).toThrow();
   });
 });

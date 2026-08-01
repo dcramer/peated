@@ -25,11 +25,15 @@ describe("buildBottleCheckRolloutReport", () => {
         modelMetadata: {
           agentDurationMs: 500,
           usage: {
+            requests: 1,
             inputTokens: 100,
             outputTokens: 20,
             totalTokens: 120,
           },
-          toolCalls: { count: 2 },
+          toolCalls: {
+            count: 2,
+            names: ["get_bottle_context", "propose_update_bottle"],
+          },
         },
         operations: [
           {
@@ -68,7 +72,11 @@ describe("buildBottleCheckRolloutReport", () => {
       },
       review: {
         reviewedOperations: 2,
+        acceptedOperations: 1,
+        rejectedOperations: 1,
         correctedOperations: 1,
+        acceptanceRate: 0.5,
+        rejectionRate: 0.5,
         correctionRate: 0.5,
         averageReviewTimeMs: 180_000,
         rejectionReasons: { wrong_change: 1 },
@@ -105,6 +113,8 @@ describe("buildBottleCheckRolloutReport", () => {
   test("uses null rates when a cohort has no denominator", () => {
     expect(buildBottleCheckRolloutReport([])).toMatchObject({
       review: {
+        acceptanceRate: null,
+        rejectionRate: null,
         correctionRate: null,
         averageReviewTimeMs: null,
       },
@@ -117,5 +127,69 @@ describe("buildBottleCheckRolloutReport", () => {
         averageAgentLatencyMs: null,
       },
     });
+  });
+
+  test("separates rejection from an explicit proposal correction", () => {
+    const report = buildBottleCheckRolloutReport([
+      row({
+        operations: [
+          {
+            status: "rejected",
+            reviewedAt: new Date("2026-07-01T00:01:00.000Z"),
+            rejectionReason: "resolved_manually",
+          },
+        ],
+      }),
+    ]);
+
+    expect(report.review).toMatchObject({
+      reviewedOperations: 1,
+      acceptedOperations: 0,
+      rejectedOperations: 1,
+      correctedOperations: 0,
+      acceptanceRate: 0,
+      rejectionRate: 1,
+      correctionRate: 0,
+    });
+  });
+
+  test("derives every review outcome from the reviewed cohort", () => {
+    const report = buildBottleCheckRolloutReport([
+      row({
+        operations: [
+          {
+            status: "rejected",
+            reviewedAt: null,
+            rejectionReason: "wrong_change",
+          },
+        ],
+      }),
+    ]);
+
+    expect(report.review).toEqual({
+      reviewedOperations: 0,
+      acceptedOperations: 0,
+      rejectedOperations: 0,
+      correctedOperations: 0,
+      acceptanceRate: null,
+      rejectionRate: null,
+      correctionRate: null,
+      averageReviewTimeMs: null,
+      rejectionReasons: {},
+    });
+  });
+
+  test("rejects malformed persisted model metadata", () => {
+    expect(() =>
+      buildBottleCheckRolloutReport([
+        row({
+          modelMetadata: {
+            agentDurationMs: 10,
+            usage: { totalTokens: 12 },
+            toolCalls: { count: 1 },
+          },
+        }),
+      ]),
+    ).toThrow();
   });
 });

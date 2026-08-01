@@ -152,12 +152,15 @@ failure bar. A schema existing in the database is not itself a measurement
 gate.
 
 Run `pnpm cli classifier rollout-report --days 30` for the durable rollout
-inputs. A rejected proposal counts as a reviewer correction, and review time
-runs from check completion to operation review. Stale and failure rates use all
+inputs. The report counts accepted and rejected proposals separately. A
+rejection counts as a proposal correction only for `wrong_target`,
+`wrong_change`, or `insufficient_evidence`; manual resolution and other
+rejections remain rejection outcomes without being relabeled. Review time runs
+from check completion to operation review. Stale and failure rates use all
 operations that reached approval or execution as their denominator; blocked,
 pending, and rejected proposals are not execution attempts. The report includes
-measurement coverage so missing telemetry is visible rather than treated as
-zero.
+measurement coverage, and malformed persisted telemetry fails reporting instead
+of being treated as zero.
 
 Audit agent runs persist request/token usage, agent latency, and tool-call
 counts in `modelMetadata`. Token usage plus the stored model is the durable cost
