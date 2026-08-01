@@ -46,27 +46,23 @@ export function buildEvalHarnessMeasurements({
   };
 }
 
-export function formatEvalCostAnnotation(
+export function formatEvalUsageAnnotation(
   usage: UsageSummary | undefined,
 ): string {
   const metadata = usage?.metadata;
   const estimate = metadata?.estimatedAgentLoopCostUsd;
   const coverage = metadata?.costCoverage ?? "usage_unavailable";
-  const coverageNote =
-    coverage === "cached_input_unreported_assumed_uncached"
-      ? "cached input estimated as standard input"
-      : coverage === "cache_write_unreported_assumed_standard_input"
-        ? "cache writes estimated as standard input"
-        : coverage === "cache_details_unreported_assumed_standard_input"
-          ? "cache details estimated as standard input"
-          : null;
-
-  if (typeof estimate === "number") {
-    const estimateText = `$${estimate.toFixed(6)} estimated agent loop only`;
-    return coverageNote ? `${estimateText} (${coverageNote})` : estimateText;
+  if (coverage === "usage_unavailable") {
+    return "usage unavailable · agent loop only";
   }
 
-  return coverage === "unsupported_model"
-    ? "Agent-loop cost unavailable (unsupported model)"
-    : "Agent-loop cost unavailable (usage unavailable)";
+  const inputTokens = usage?.inputTokens ?? 0;
+  const outputTokens = usage?.outputTokens ?? 0;
+  const tokenSummary = `input ${inputTokens.toLocaleString("en-US")} tok | output ${outputTokens.toLocaleString("en-US")} tok`;
+
+  if (typeof estimate === "number") {
+    return `${tokenSummary} | est. $${estimate.toFixed(6)} · agent loop only`;
+  }
+
+  return `${tokenSummary} | cost unavailable (unsupported model) · agent loop only`;
 }

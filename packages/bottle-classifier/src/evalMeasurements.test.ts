@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   buildEvalHarnessMeasurements,
-  formatEvalCostAnnotation,
+  formatEvalUsageAnnotation,
 } from "./evalMeasurements";
 import { getBottleClassifierRunMetadata } from "./runtime/runMetadata";
 
@@ -35,6 +35,7 @@ describe("eval harness measurements", () => {
         model: "gpt-5.6-terra",
         inputTokens: 1_000_000,
         outputTokens: 100_000,
+        totalTokens: 1_100_000,
         metadata: {
           scope: "agent_loop_only",
           costCoverage: "priced_model_tokens",
@@ -69,8 +70,8 @@ describe("eval harness measurements", () => {
       estimatedAgentLoopCostUsd: 0.32,
       pricingModel: "gpt-5.6-luna",
     });
-    expect(formatEvalCostAnnotation(measurements.usage)).toBe(
-      "$0.320000 estimated agent loop only (cache details estimated as standard input)",
+    expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
+      "input 1,000,000 tok | output 100,000 tok | est. $0.320000 · agent loop only",
     );
   });
 
@@ -127,8 +128,8 @@ describe("eval harness measurements", () => {
     expect(measurements.usage?.metadata).not.toHaveProperty(
       "estimatedAgentLoopCostUsd",
     );
-    expect(formatEvalCostAnnotation(measurements.usage)).toBe(
-      "Agent-loop cost unavailable (unsupported model)",
+    expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
+      "input 100 tok | output 20 tok | cost unavailable (unsupported model) · agent loop only",
     );
   });
 
@@ -148,8 +149,8 @@ describe("eval harness measurements", () => {
     expect(measurements.usage?.metadata).not.toHaveProperty(
       "estimatedAgentLoopCostUsd",
     );
-    expect(formatEvalCostAnnotation(measurements.usage)).toBe(
-      "Agent-loop cost unavailable (usage unavailable)",
+    expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
+      "usage unavailable · agent loop only",
     );
   });
 
@@ -170,8 +171,8 @@ describe("eval harness measurements", () => {
       totalMs: 12,
     });
 
-    expect(formatEvalCostAnnotation(measurements.usage)).toBe(
-      "$0.004000 estimated agent loop only",
+    expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
+      "input 1,000 tok | output 100 tok | est. $0.004000 · agent loop only",
     );
   });
 });

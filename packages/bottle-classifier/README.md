@@ -207,13 +207,15 @@ replays `openai_web_search`.
 
 Reported token usage and estimated USD cost cover the measured agent loop only.
 The estimate uses the dated standard, short-context OpenAI rates recorded in the
-harness metadata and exposes it as a `cost` annotation on each eval result.
+harness metadata. The native eval summary shows total tokens, while one `usage`
+annotation shows input tokens, output tokens, and estimated USD for each result.
 Extraction, separate web-search response tokens and tool fees, pre-agent work,
 long-context pricing, alternate service tiers, and regional adjustments are not
 included. Unknown models or unavailable usage omit the estimate rather than
-reporting zero. Missing cache-token detail is priced as standard input and
-labeled as an assumption. Total timing is wall-clock time for the complete
-production entrypoint.
+reporting zero. Cache detail remains in structured usage metadata for pricing
+accuracy rather than adding noise to the visible summary. Missing cache-token
+detail is priced as standard input. Total timing is wall-clock time for the
+complete production entrypoint.
 
 Replay recordings default to the package-local upstream-style
 `packages/bottle-classifier/.vitest-evals/recordings/` directory via

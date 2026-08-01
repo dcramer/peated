@@ -52,7 +52,7 @@ import {
 import type { AuditBottleEvalFixture } from "./evalFixtureSchemas";
 import {
   buildEvalHarnessMeasurements,
-  formatEvalCostAnnotation,
+  formatEvalUsageAnnotation,
 } from "./evalMeasurements";
 import {
   createEvalClassifierOptions,
@@ -1093,7 +1093,7 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     (it) => {
       it.for(cases)("$name", async ({ testCase }, { run, annotate }) => {
         const result = await run(testCase);
-        await annotate(formatEvalCostAnnotation(result.usage), "cost");
+        await annotate(formatEvalUsageAnnotation(result.usage), "usage");
 
         await expect(result).toSatisfyJudge(OperationExpectationJudge, {
           threshold: null,
@@ -1126,7 +1126,7 @@ describeEval(
       })),
     )("$name", async ({ testCase }, { run, annotate }) => {
       const result = await run(testCase);
-      await annotate(formatEvalCostAnnotation(result.usage), "cost");
+      await annotate(formatEvalUsageAnnotation(result.usage), "usage");
     });
   },
 );
