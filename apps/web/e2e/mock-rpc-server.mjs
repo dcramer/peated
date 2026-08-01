@@ -127,12 +127,6 @@ async function handleRpcRequest({ request, response, url }) {
 
   switch (path) {
     case "":
-      if (
-        !getAccessToken(request).includes("bottle-check-review") &&
-        !getAccessToken(request).includes("queue-linked-check")
-      ) {
-        return false;
-      }
       sendRpcResponse(response, {
         version: "playwright",
         capabilities: {

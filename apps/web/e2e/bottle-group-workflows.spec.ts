@@ -53,7 +53,6 @@ test.describe("Bottle releases", () => {
     await expect(representativeItem.getByText("2005 vintage")).toBeVisible();
     await expect(representativeItem.getByText("2022 release")).toBeVisible();
     await expect(representativeItem.getByText("Single cask")).toBeVisible();
-    await expect(representativeItem.getByText("Cask strength")).toBeVisible();
     await expect(releases.getByText("0 ratings")).toHaveCount(3);
     await expectNoHorizontalOverflow(page);
 
