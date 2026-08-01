@@ -51,6 +51,10 @@ import {
 } from "./contract";
 import type { AuditBottleEvalFixture } from "./evalFixtureSchemas";
 import {
+  buildEvalHarnessMeasurements,
+  formatEvalCostAnnotation,
+} from "./evalMeasurements";
+import {
   createEvalClassifierOptions,
   evalClassifierModel,
   hasEvalOpenAICredentials,
@@ -62,7 +66,6 @@ import {
   type AutomationTier,
 } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
-import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
 
 type ClassifiedBottleClassificationResult = Extract<
   BottleClassificationResult,
@@ -791,35 +794,6 @@ function createEvalRuntime() {
   };
 }
 
-function buildHarnessMeasurements(
-  modelMetadata: BottleClassifierRunMetadata | null,
-  totalMs: number,
-) {
-  return {
-    usage: modelMetadata
-      ? {
-          provider: "openai",
-          model: evalClassifierModel,
-          inputTokens: modelMetadata.usage.inputTokens,
-          outputTokens: modelMetadata.usage.outputTokens,
-          totalTokens: modelMetadata.usage.totalTokens,
-          toolCalls: modelMetadata.toolCalls.count,
-          metadata: {
-            scope: "agent_loop_only",
-            requests: modelMetadata.usage.requests,
-            toolNames: modelMetadata.toolCalls.names,
-          },
-        }
-      : undefined,
-    timings: {
-      totalMs,
-      ...(modelMetadata
-        ? { metadata: { agentDurationMs: modelMetadata.agentDurationMs } }
-        : {}),
-    },
-  };
-}
-
 const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   name: "bottle-classifier",
   run: async ({ input }) => {
@@ -845,7 +819,11 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
         ...evalRuntime.toolEvents,
         { type: "message", role: "assistant", content: output },
       ],
-      ...buildHarnessMeasurements(modelMetadata, performance.now() - startedAt),
+      ...buildEvalHarnessMeasurements({
+        model: evalClassifierModel,
+        modelMetadata,
+        totalMs: performance.now() - startedAt,
+      }),
     };
   },
 });
@@ -929,7 +907,11 @@ const auditHarness = createHarness<AuditBottleEvalFixture, JsonValue>({
         ...evalRuntime.toolEvents,
         { type: "message", role: "assistant", content: output },
       ],
-      ...buildHarnessMeasurements(modelMetadata, performance.now() - startedAt),
+      ...buildEvalHarnessMeasurements({
+        model: evalClassifierModel,
+        modelMetadata,
+        totalMs: performance.now() - startedAt,
+      }),
     };
   },
 });
@@ -1109,8 +1091,9 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
       judgeThreshold: threshold,
     },
     (it) => {
-      it.for(cases)("$name", async ({ testCase }, { run }) => {
+      it.for(cases)("$name", async ({ testCase }, { run, annotate }) => {
         const result = await run(testCase);
+        await annotate(formatEvalCostAnnotation(result.usage), "cost");
 
         await expect(result).toSatisfyJudge(OperationExpectationJudge, {
           threshold: null,
@@ -1141,8 +1124,9 @@ describeEval(
         name: testCase.name,
         testCase,
       })),
-    )("$name", async ({ testCase }, { run }) => {
-      await run(testCase);
+    )("$name", async ({ testCase }, { run, annotate }) => {
+      const result = await run(testCase);
+      await annotate(formatEvalCostAnnotation(result.usage), "cost");
     });
   },
 );

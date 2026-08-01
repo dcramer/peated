@@ -10,6 +10,7 @@ export const BottleClassifierRunMetadataSchema = z
         requests: NonnegativeIntegerSchema,
         inputTokens: NonnegativeIntegerSchema,
         cachedInputTokens: NonnegativeIntegerSchema.optional(),
+        cacheWriteTokens: NonnegativeIntegerSchema.optional(),
         outputTokens: NonnegativeIntegerSchema,
         totalTokens: NonnegativeIntegerSchema,
       })
@@ -40,16 +41,17 @@ function numberProperty(value: unknown, property: string): number {
     : 0;
 }
 
-function cachedInputTokens(usage: unknown): number | undefined {
+function inputTokenDetail(usage: unknown, keys: string[]): number | undefined {
   const details = objectProperty(usage, "inputTokensDetails");
   const entries = Array.isArray(details) ? details : details ? [details] : [];
   let measured = false;
   let total = 0;
 
   for (const entry of entries) {
-    const value =
-      objectProperty(entry, "cached_tokens") ??
-      objectProperty(entry, "cachedTokens");
+    const value = keys.reduce<unknown>(
+      (found, key) => found ?? objectProperty(entry, key),
+      undefined,
+    );
     if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
       measured = true;
       total += value;
@@ -79,7 +81,14 @@ export function getBottleClassifierRunMetadata({
     objectProperty(objectProperty(result, "state"), "usage") ??
     objectProperty(objectProperty(result, "runContext"), "usage") ??
     objectProperty(result, "usage");
-  const measuredCachedInputTokens = cachedInputTokens(usage);
+  const measuredCachedInputTokens = inputTokenDetail(usage, [
+    "cached_tokens",
+    "cachedTokens",
+  ]);
+  const measuredCacheWriteTokens = inputTokenDetail(usage, [
+    "cache_write_tokens",
+    "cacheWriteTokens",
+  ]);
   const toolNames: string[] = [];
   let toolCallCount = 0;
   const newItems = objectProperty(result, "newItems");
@@ -108,6 +117,9 @@ export function getBottleClassifierRunMetadata({
       ...(measuredCachedInputTokens === undefined
         ? {}
         : { cachedInputTokens: measuredCachedInputTokens }),
+      ...(measuredCacheWriteTokens === undefined
+        ? {}
+        : { cacheWriteTokens: measuredCacheWriteTokens }),
       outputTokens: numberProperty(usage, "outputTokens"),
       totalTokens: numberProperty(usage, "totalTokens"),
     },

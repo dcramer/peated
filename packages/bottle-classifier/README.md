@@ -205,11 +205,15 @@ production. The harness records model usage and real tool events, and replays
 `firecrawl_web_search` when `FIRECRAWL_API_KEY` enables that tool; otherwise it
 replays `openai_web_search`.
 
-Reported token usage covers the measured agent loop only; extraction and
-pre-agent web-search model usage are not currently aggregated. Cached input
-tokens are included only when the provider supplies that detail, and rollout
-reporting exposes coverage separately from the cache-token rate. Total timing is
-wall-clock time for the complete production entrypoint.
+Reported token usage and estimated USD cost cover the measured agent loop only.
+The estimate uses the dated standard, short-context OpenAI rates recorded in the
+harness metadata and exposes it as a `cost` annotation on each eval result.
+Extraction, separate web-search response tokens and tool fees, pre-agent work,
+long-context pricing, alternate service tiers, and regional adjustments are not
+included. Unknown models or unavailable usage omit the estimate rather than
+reporting zero. Missing cache-token detail is priced as standard input and
+labeled as an assumption. Total timing is wall-clock time for the complete
+production entrypoint.
 
 Replay recordings default to the package-local upstream-style
 `packages/bottle-classifier/.vitest-evals/recordings/` directory via

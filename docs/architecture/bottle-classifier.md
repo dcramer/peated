@@ -166,11 +166,15 @@ Audit agent runs persist agent-loop request/token usage, cache-token detail when
 the provider supplies it, agent latency, and tool-call counts in `modelMetadata`.
 Cache coverage is reported separately so missing provider detail is not treated
 as a cache miss. Agent-loop token usage plus the stored model is the durable cost
-input; extraction and pre-agent search usage are outside that measurement. The
-report does not invent a dollar estimate when no versioned pricing source was
-recorded. Reference-resolution runtime coverage and dollar cost are still
-explicit rollout gaps. Broad execution therefore remains gated until those gaps
-and acceptable rollout bars are resolved.
+input; extraction and pre-agent search usage are outside that measurement. Live
+evals estimate agent-loop cost from a dated standard, short-context pricing
+table and label unsupported models, unavailable usage, and missing cache detail
+explicitly. Separate web-search response tokens and tool fees, alternate
+service tiers, long-context pricing, and regional adjustments remain outside
+the estimate. The durable report still does not invent a dollar estimate when
+no versioned pricing source was recorded. Reference-resolution runtime coverage
+and durable dollar cost are explicit rollout gaps. Broad execution therefore
+remains gated until those gaps and acceptable rollout bars are resolved.
 
 ## Correctness Bar
 
