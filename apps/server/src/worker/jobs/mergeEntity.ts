@@ -127,24 +127,11 @@ async function performEntityMerge({
     },
   });
 
-  const [toEntity] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, toEntityId));
-  if (!toEntity) {
-    if (!operation) {
-      logWarn("Merge target entity not found", { extra: { toEntityId } });
-      return;
-    }
-  }
-
-  const mutationUser =
-    operation?.approvingModerator ?? (await getAutomationModeratorUser());
   const bottleMergeManifests: ConcreteBottleMergeFinalizationManifest[] = [];
   const bottleUpdateManifests: ConcreteBottleUpdateFinalizationManifest[] = [];
   let completedOperationResult: ReturnType<typeof buildOperationResult> | null =
     null;
-  let performedMutation = operation === null;
+  let performedMutation = false;
 
   await db.transaction(async (tx) => {
     if (operation) {
@@ -211,28 +198,33 @@ async function performEntityMerge({
       ) {
         return;
       }
-
-      performedMutation = true;
-    }
-    if (!toEntity) {
-      throw new EntityMergeOperationExecutionError(
-        `Destination Entity ${toEntityId} was not found.`,
-        operation?.operationId ?? 0,
-      );
     }
 
-    const actor = operation
-      ? await getUserActorForDatabase(tx, operation.approvingModerator)
-      : await getPeatedSystemActorForDatabase(tx);
     const mergeEntityRows = await tx
-      .select({ id: entities.id, type: entities.type })
+      .select()
       .from(entities)
       .where(inArray(entities.id, [toEntityId, ...fromEntityIds]))
       .orderBy(asc(entities.id))
       .for("update");
-    const destinationRolesBefore = sortedUniqueEntityRoles([
-      mergeEntityRows.find(({ id }) => id === toEntityId)?.type ?? [],
-    ]);
+    const toEntity = mergeEntityRows.find(({ id }) => id === toEntityId);
+    if (!toEntity) {
+      if (operation) {
+        throw new EntityMergeOperationExecutionError(
+          `Destination Entity ${toEntityId} was not found.`,
+          operation.operationId,
+        );
+      }
+      logWarn("Merge target entity not found", { extra: { toEntityId } });
+      return;
+    }
+    performedMutation = true;
+
+    const mutationUser =
+      operation?.approvingModerator ?? (await getAutomationModeratorUser(tx));
+    const actor = operation
+      ? await getUserActorForDatabase(tx, operation.approvingModerator)
+      : await getPeatedSystemActorForDatabase(tx);
+    const destinationRolesBefore = sortedUniqueEntityRoles([toEntity.type]);
     const destinationRolesAfter = sortedUniqueEntityRoles(
       mergeEntityRows.map(({ type }) => type),
     );
@@ -575,7 +567,7 @@ async function performEntityMerge({
     }
   });
 
-  if (operation && !performedMutation) {
+  if (!performedMutation) {
     return completedOperationResult;
   }
 

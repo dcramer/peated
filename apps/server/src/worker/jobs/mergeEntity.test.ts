@@ -1,5 +1,6 @@
 import type { MergeEntitiesOperation } from "@peated/bottle-classifier";
 import { db } from "@peated/server/db";
+import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
   actors,
   bottleChecks,
@@ -19,9 +20,69 @@ import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { and, eq, inArray } from "drizzle-orm";
-import { beforeEach, expect } from "vitest";
+import pg from "pg";
+import { beforeEach, expect, vi } from "vitest";
 import mergeEntity from "./mergeEntity";
+
+const { Client } = pg;
+type NodePgClient = InstanceType<typeof Client>;
+
+async function waitForSessionBlockedBy(
+  client: NodePgClient,
+  blockerPid: number,
+): Promise<void> {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const result = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1
+         FROM pg_stat_activity
+         WHERE datname = current_database()
+           AND $1 = ANY(pg_blocking_pids(pid))
+       ) AS blocked`,
+      [blockerPid],
+    );
+    if (result.rows[0]?.blocked) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for Entity merge lock.");
+}
+
+async function deleteDestinationWhileMergeWaits(
+  destinationEntityId: number,
+  runMerge: () => Promise<unknown>,
+): Promise<void> {
+  const blocker = new Client(getPostgresConnectionConfig());
+  let committed = false;
+  let mergeRun: Promise<unknown> | undefined;
+
+  await blocker.connect();
+  try {
+    await blocker.query("BEGIN");
+    const blockerPid = (
+      await blocker.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+    ).rows[0]!.pid;
+    await blocker.query(`DELETE FROM "entity_alias" WHERE "entity_id" = $1`, [
+      destinationEntityId,
+    ]);
+    await blocker.query(`DELETE FROM "entity" WHERE "id" = $1`, [
+      destinationEntityId,
+    ]);
+
+    mergeRun = runMerge();
+    await waitForSessionBlockedBy(blocker, blockerPid);
+
+    await blocker.query("COMMIT");
+    committed = true;
+    await mergeRun;
+  } finally {
+    if (!committed) await blocker.query("ROLLBACK");
+    await blocker.end();
+    await mergeRun?.catch(() => undefined);
+  }
+}
 
 function contextFor(user: Parameters<typeof getUserActor>[0]) {
   return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
@@ -291,6 +352,94 @@ test("merge A into B", async ({ fixtures }) => {
     .from(entityTombstones)
     .where(eq(entityTombstones.entityId, entityA.id));
   expect(tombstone.newEntityId).toEqual(newEntityB.id);
+});
+
+test("preserves the source when the locked destination is deleted", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({
+    name: "Missing Destination Source",
+    type: ["brand"],
+  });
+  const destination = await fixtures.Entity({
+    name: "Missing Destination Target",
+  });
+  const bottle = await fixtures.Bottle({ brandId: source.id });
+
+  vi.mocked(pushUniqueJob).mockClear();
+  await deleteDestinationWhileMergeWaits(destination.id, () =>
+    mergeEntity({
+      fromEntityIds: [source.id],
+      toEntityId: destination.id,
+    }),
+  );
+
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, source.id),
+    }),
+  ).toMatchObject({
+    id: source.id,
+    name: source.name,
+    type: source.type,
+  });
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+  ).toMatchObject({ brandId: source.id });
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, source.id),
+    }),
+  ).toBeUndefined();
+  expect(pushUniqueJob).not.toHaveBeenCalled();
+});
+
+test("stales an operation when its locked destination is deleted", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({
+    name: "Deleted Operation Destination Source",
+  });
+  const destination = await fixtures.Entity({
+    name: "Deleted Operation Destination Target",
+  });
+  const bottle = await fixtures.Bottle({ brandId: source.id });
+  const moderator = await fixtures.User({ mod: true });
+  const operation = await createApplyingEntityMergeOperation({
+    approvingModeratorId: moderator.id,
+    bottleId: bottle.id,
+    sourceEntityId: source.id,
+    destinationEntityId: destination.id,
+  });
+
+  vi.mocked(pushUniqueJob).mockClear();
+  await deleteDestinationWhileMergeWaits(destination.id, () =>
+    mergeEntity({
+      operationId: operation.id,
+      approvingModeratorId: moderator.id,
+    }),
+  );
+
+  expect(
+    await db.query.bottleOperations.findFirst({
+      where: eq(bottleOperations.id, operation.id),
+    }),
+  ).toMatchObject({
+    status: "stale",
+    error: "Relevant catalog state changed before the Entity merge worker ran.",
+  });
+  expect(
+    await db.query.entities.findFirst({ where: eq(entities.id, source.id) }),
+  ).toMatchObject({ id: source.id, name: source.name, type: source.type });
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
+  ).toMatchObject({ brandId: source.id });
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, source.id),
+    }),
+  ).toBeUndefined();
+  expect(pushUniqueJob).not.toHaveBeenCalled();
 });
 
 test("merge A from B", async ({ fixtures }) => {

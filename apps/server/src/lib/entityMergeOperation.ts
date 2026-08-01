@@ -53,17 +53,19 @@ export type LoadedEntityMergeOperation = {
   result: EntityMergeOperationExecutionResult | null;
 };
 
-export async function loadEntityMergeOperation({
-  operationId,
-  approvingModeratorId,
-  database = db,
-  lock = false,
-}: {
+type LoadEntityMergeOperationInput = {
   operationId: number;
   approvingModeratorId: number;
-  database?: AnyDatabase;
-  lock?: boolean;
-}): Promise<LoadedEntityMergeOperation> {
+} & (
+  | { lock: true; database: AnyTransaction }
+  | { lock?: false; database?: AnyDatabase }
+);
+
+export async function loadEntityMergeOperation(
+  input: LoadEntityMergeOperationInput,
+): Promise<LoadedEntityMergeOperation> {
+  const { operationId, approvingModeratorId, lock = false } = input;
+  const database = input.database ?? db;
   const [operationReference] = await database
     .select({ checkId: bottleOperations.checkId })
     .from(bottleOperations)

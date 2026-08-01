@@ -1,6 +1,7 @@
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { db } from "@peated/server/db";
 import {
+  bottleAliases,
   bottleGroups,
   collectionBottles,
   entities,
@@ -599,6 +600,65 @@ describe("Bottle operation review preparation", () => {
     );
     expect(noOp).not.toHaveProperty("preview");
     expect(noOp).not.toHaveProperty("stateToken");
+  });
+
+  test("allows an unassigned alias but blocks an alias owned by another Bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({
+      name: "Alias Claim Review",
+      edition: null,
+    });
+    const aliasOwner = await fixtures.Bottle({
+      name: "Assigned Alias Owner",
+    });
+    const operation = {
+      id: 31,
+      proposal: {
+        type: "update_bottle",
+        input: {
+          bottleId: bottle.id,
+          patch: { exact: { edition: "Claimable Edition" } },
+        },
+        rationale: "The inspected evidence confirms this edition.",
+        evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
+      },
+    } as const;
+    const context = {
+      artifacts: artifacts({
+        bottleContexts: [await bottleContext(bottle.id)],
+      }),
+    };
+    const initial = await prepareOperation({ operation, ...context });
+    if (initial.status === "blocked" || initial.type !== "update_bottle") {
+      throw new Error("Expected the Bottle update to prepare.");
+    }
+    const desiredFullName = initial.preview.after.fullName;
+    await fixtures.BottleAlias({
+      bottleId: null,
+      name: desiredFullName,
+    });
+
+    await expect(prepareOperation({ operation, ...context })).resolves.toEqual(
+      expect.objectContaining({
+        status: "pending_review",
+        type: "update_bottle",
+      }),
+    );
+
+    await db
+      .update(bottleAliases)
+      .set({ bottleId: aliasOwner.id })
+      .where(eq(bottleAliases.name, desiredFullName));
+
+    await expect(prepareOperation({ operation, ...context })).resolves.toEqual(
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({
+          code: "identity_collision",
+        }),
+      }),
+    );
   });
 
   test("state tokens ignore unrelated counters and timestamps", async ({

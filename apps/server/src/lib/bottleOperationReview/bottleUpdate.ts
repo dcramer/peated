@@ -25,7 +25,7 @@ import {
   concreteBottleUpdateExpectedSelectedBottleState,
   concreteBottleUpdateExpectedSharedState,
 } from "@peated/server/lib/updateConcreteBottle";
-import { and, asc, count, eq, or, sql } from "drizzle-orm";
+import { and, asc, count, eq, isNotNull, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
   MAX_OPERATION_PREVIEW_IDS,
@@ -363,14 +363,12 @@ async function requireNoBottleIdentityCollision({
     .where(
       and(
         eq(sql`LOWER(${bottleAliases.name})`, desiredFullName.toLowerCase()),
+        isNotNull(bottleAliases.bottleId),
         allowedBottleIds.length
-          ? or(
-              sql`${bottleAliases.bottleId} IS NULL`,
-              sql`${bottleAliases.bottleId} NOT IN (${sql.join(
-                allowedBottleIds.map((id) => sql`${id}`),
-                sql`, `,
-              )})`,
-            )
+          ? sql`${bottleAliases.bottleId} NOT IN (${sql.join(
+              allowedBottleIds.map((id) => sql`${id}`),
+              sql`, `,
+            )})`
           : undefined,
       ),
     )
