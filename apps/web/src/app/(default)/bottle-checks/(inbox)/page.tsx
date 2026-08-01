@@ -46,7 +46,7 @@ export function BottleCheckRow({ check }: { check: BottleCheck }) {
     <tr>
       <td className="px-4 py-4 align-top">
         <BottleCheckSubject check={check} />
-        <div className="mt-1 text-xs text-slate-500">
+        <div className="mt-1 text-xs text-slate-400">
           {check.origin === "post_user_creation"
             ? "New Bottle audit"
             : "Moderator audit"}
@@ -79,6 +79,27 @@ export function BottleCheckRow({ check }: { check: BottleCheck }) {
         </Link>
       </td>
     </tr>
+  );
+}
+
+export function BottleCheckEmptyState({
+  clearHref,
+  filtered,
+}: {
+  clearHref: string;
+  filtered: boolean;
+}) {
+  if (!filtered) {
+    return <EmptyActivity>No Bottle checks need attention.</EmptyActivity>;
+  }
+
+  return (
+    <EmptyActivity>
+      <div className="flex flex-col items-center gap-3">
+        <div>No Bottle checks match this filter.</div>
+        <Button href={clearHref}>Clear filter</Button>
+      </div>
+    </EmptyActivity>
   );
 }
 
@@ -135,16 +156,17 @@ export default function Page() {
             <table className="min-w-full divide-y divide-slate-800">
               <thead className="bg-slate-900/70">
                 <tr>
-                  {["Bottle", "Audit", "State", "Created", ""].map(
-                    (heading) => (
-                      <th
-                        key={heading}
-                        className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400"
-                      >
-                        {heading}
-                      </th>
-                    ),
-                  )}
+                  {["Bottle", "Audit", "State", "Created"].map((heading) => (
+                    <th
+                      key={heading}
+                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400"
+                    >
+                      {heading}
+                    </th>
+                  ))}
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -156,7 +178,10 @@ export default function Page() {
           </div>
         </div>
       ) : (
-        <EmptyActivity>No Bottle checks need attention.</EmptyActivity>
+        <BottleCheckEmptyState
+          clearHref={pathname}
+          filtered={origin !== null}
+        />
       )}
 
       <PaginationButtons rel={data.rel} />

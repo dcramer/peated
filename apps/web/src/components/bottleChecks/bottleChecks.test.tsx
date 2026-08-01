@@ -167,6 +167,72 @@ describe("Bottle Check review components", () => {
     expect(html).not.toContain("Select");
   });
 
+  it("labels Bottle diff fields for moderator review", () => {
+    const bottleOperation = {
+      ...operation("pending_review"),
+      proposal: {
+        type: "update_bottle",
+        input: {
+          bottleId: 44,
+          patch: {
+            exact: {
+              edition: "Warehouse 1",
+              abv: 52.2,
+              releaseYear: 2022,
+              caskType: "bourbon",
+            },
+          },
+        },
+        rationale: "The release details are present on the label.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 44 }],
+      },
+    } as BottleOperation;
+    const review = {
+      id: bottleOperation.id,
+      type: "update_bottle",
+      status: "pending_review",
+      proposal: bottleOperation.proposal,
+      preview: {
+        before: {
+          exact: {
+            edition: null,
+            abv: null,
+            releaseYear: null,
+            caskType: null,
+          },
+        },
+        after: {
+          exact: {
+            edition: "Warehouse 1",
+            abv: 52.2,
+            releaseYear: 2022,
+            caskType: "bourbon",
+          },
+        },
+        changedFields: [
+          "exact.edition",
+          "exact.abv",
+          "exact.releaseYear",
+          "exact.caskType",
+        ],
+        affectedBottles: { total: 1, sampleIds: [44], truncated: false },
+        entityCreations: [],
+        warnings: [],
+      },
+      stateToken: {},
+    } as unknown as BottleOperationReview;
+
+    const html = renderToStaticMarkup(
+      <OperationCard operation={bottleOperation} review={review} />,
+    );
+
+    expect(html).toContain(">Edition</td>");
+    expect(html).toContain(">ABV</td>");
+    expect(html).toContain(">Release year</td>");
+    expect(html).toContain(">Cask type</td>");
+    expect(html).not.toContain("exact.edition");
+  });
+
   it("keeps a non-ready pending operation selectable for rejection", () => {
     const html = renderToStaticMarkup(
       <OperationCard

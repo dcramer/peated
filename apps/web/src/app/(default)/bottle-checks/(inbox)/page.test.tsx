@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, test } from "vitest";
-import { BottleCheckRow } from "./page";
+import { describe, expect, test } from "vitest";
+import { BottleCheckEmptyState, BottleCheckRow } from "./page";
 
 test("Bottle Checks renders one inbox row per actionable check", () => {
   const check = {
@@ -81,4 +81,25 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
   expect(html).toContain("1 operation");
   expect(html).toContain("1 finding");
   expect(html).toContain('href="/bottle-checks/51"');
+});
+
+describe("Bottle Checks empty states", () => {
+  test("offers to clear an empty filter", () => {
+    const html = renderToStaticMarkup(
+      <BottleCheckEmptyState clearHref="/bottle-checks" filtered />,
+    );
+
+    expect(html).toContain("No Bottle checks match this filter.");
+    expect(html).toContain('href="/bottle-checks"');
+    expect(html).toContain("Clear filter");
+  });
+
+  test("keeps the unfiltered inbox message concise", () => {
+    const html = renderToStaticMarkup(
+      <BottleCheckEmptyState clearHref="/bottle-checks" filtered={false} />,
+    );
+
+    expect(html).toContain("No Bottle checks need attention.");
+    expect(html).not.toContain("Clear filter");
+  });
 });

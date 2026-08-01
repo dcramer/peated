@@ -18,6 +18,7 @@ import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
+import useAuth from "@peated/web/hooks/useAuth";
 import useBottleCheckCapabilities from "@peated/web/hooks/useBottleCheckCapabilities";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -52,6 +53,7 @@ export default function Page() {
   const { checkId } = useParams<{ checkId: string }>();
   const checkNumber = Number(checkId);
   const orpc = useORPC();
+  const { user } = useAuth();
   const { bottleCheckExecution } = useBottleCheckCapabilities();
   const queryClient = useQueryClient();
   const detailsOptions = orpc.bottleChecks.details.queryOptions({
@@ -208,9 +210,10 @@ export default function Page() {
     (rejectionReason !== "other" || rejectionNote.trim().length > 0);
   const isStorePriceReference =
     check.intent === "resolve_reference" && check.sourceKind === "store_price";
-  const parentPage = isStorePriceReference
-    ? { name: "Incoming Listings", href: "/admin/queue" }
-    : { name: "Bottle Checks", href: "/bottle-checks" };
+  const parentPage =
+    isStorePriceReference && user?.admin
+      ? { name: "Incoming Listings", href: "/admin/queue" }
+      : { name: "Bottle Checks", href: "/bottle-checks" };
 
   return (
     <>

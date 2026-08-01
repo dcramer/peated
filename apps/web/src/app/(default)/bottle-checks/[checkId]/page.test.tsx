@@ -11,6 +11,7 @@ type ReviewOperation = NonNullable<
 
 const testState = vi.hoisted(() => ({
   details: null as unknown,
+  user: { admin: true, mod: false },
 }));
 
 vi.mock("next/navigation", () => ({
@@ -34,6 +35,10 @@ vi.mock("@peated/web/hooks/useBottleCheckCapabilities", () => ({
     bottleCheckExecution: false,
     bottleChecks: true,
   }),
+}));
+
+vi.mock("@peated/web/hooks/useAuth", () => ({
+  default: () => ({ user: testState.user }),
 }));
 
 vi.mock("@peated/web/lib/orpc/context", () => ({
@@ -213,6 +218,7 @@ function details(
 describe("Bottle Check detail execution rollout", () => {
   beforeEach(() => {
     testState.details = details([]);
+    testState.user = { admin: true, mod: false };
   });
 
   test("omits execution controls while keeping pending rejection available", () => {
@@ -272,5 +278,28 @@ describe("Bottle Check detail execution rollout", () => {
     expect(html).toContain("Incoming Listings");
     expect(html).toContain("Reference result");
     expect(html).not.toContain('href="/bottle-checks"');
+  });
+
+  test("returns moderator-only store-price reviews to Bottle Checks", () => {
+    testState.user = { admin: false, mod: true };
+    testState.details = details([], {
+      intent: "resolve_reference",
+      origin: null,
+      sourceKind: "store_price",
+      sourceId: "510",
+      bottleId: null,
+      subjectKey: "resolve_reference:store_price:510",
+      output: {
+        status: "ignored",
+        reason: "The listing needs moderator review.",
+        findings: [],
+      },
+    });
+
+    const html = renderToStaticMarkup(<Page />);
+
+    expect(html).toContain('href="/bottle-checks"');
+    expect(html).toContain("Bottle Checks");
+    expect(html).not.toContain('href="/admin/queue"');
   });
 });

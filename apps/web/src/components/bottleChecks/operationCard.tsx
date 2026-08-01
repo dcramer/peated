@@ -28,6 +28,22 @@ const OPERATION_LABELS: Record<BottleOperation["proposal"]["type"], string> = {
   merge_entities: "Merge Entities",
 };
 
+const BOTTLE_FIELD_LABELS: Record<string, string> = {
+  "exact.edition": "Edition",
+  "exact.abv": "ABV",
+  "exact.releaseYear": "Release year",
+};
+
+function formatFieldLabel(field: string): string {
+  const name = field.split(".").at(-1) ?? field;
+  const words = name.replaceAll(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+function formatBottleFieldLabel(field: string): string {
+  return BOTTLE_FIELD_LABELS[field] ?? formatFieldLabel(field);
+}
+
 function formatValue(value: unknown): string {
   if (value === null) return "None";
   if (value === undefined) return "—";
@@ -104,10 +120,12 @@ function FieldDiff({
   after,
   before,
   fields,
+  labelField = formatFieldLabel,
 }: {
   after: unknown;
   before: unknown;
   fields: string[];
+  labelField?: (field: string) => string;
 }) {
   return (
     <div className="mt-3 overflow-x-auto">
@@ -122,7 +140,9 @@ function FieldDiff({
         <tbody className="divide-y divide-slate-800">
           {fields.map((field) => (
             <tr key={field}>
-              <td className="py-2 pr-4 font-medium text-slate-300">{field}</td>
+              <td className="py-2 pr-4 font-medium text-slate-300">
+                {labelField(field)}
+              </td>
               <td className="py-2 pr-4 text-slate-400">
                 {formatValue(getPath(before, field))}
               </td>
@@ -157,6 +177,7 @@ function Preview({ review }: { review: BottleOperationReview }) {
             after={review.preview.after}
             before={review.preview.before}
             fields={review.preview.changedFields}
+            labelField={formatBottleFieldLabel}
           />
           <ImpactList
             values={{
