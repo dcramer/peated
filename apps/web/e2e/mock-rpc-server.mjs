@@ -126,7 +126,7 @@ async function handleRpcRequest({ request, response, url }) {
   const input = await readRpcInput(request, url);
 
   switch (path) {
-    case "":
+    case "root":
       sendRpcResponse(response, {
         version: "playwright",
         capabilities: {
