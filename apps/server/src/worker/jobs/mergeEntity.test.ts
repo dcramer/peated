@@ -16,10 +16,7 @@ import {
 } from "@peated/server/db/schema";
 import type { getUserActor } from "@peated/server/lib/actors";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
-import {
-  prepareOperation,
-  prepareProposals,
-} from "@peated/server/lib/bottleOperationReview";
+import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
 import { and, eq, inArray } from "drizzle-orm";
@@ -81,15 +78,6 @@ async function createApplyingEntityMergeOperation({
       relatedBottles: [],
     })),
   };
-  const [prepared] = await prepareProposals({
-    proposals: [proposal],
-    artifacts,
-  });
-  if (!prepared || prepared.status === "blocked") {
-    throw new Error(
-      `Expected Entity merge operation preparation to succeed: ${JSON.stringify({ inspectedEntities, prepared })}`,
-    );
-  }
   const created = storePrice
     ? await createBottleCheck({
         intent: "resolve_reference",
@@ -110,8 +98,7 @@ async function createApplyingEntityMergeOperation({
           findings: [],
           artifacts,
         },
-        storePrice: { kind: "attempt", attemptId: storePrice.attemptId },
-        operations: [prepared],
+        storePrice: { attemptId: storePrice.attemptId },
       })
     : await createBottleCheck({
         intent: "audit_bottle",
@@ -125,9 +112,13 @@ async function createApplyingEntityMergeOperation({
           findings: [],
           artifacts,
         },
-        operations: [prepared],
       });
   const operation = created.check.operations[0]!;
+  if (operation.status === "blocked") {
+    throw new Error(
+      `Expected Entity merge operation preparation to succeed: ${JSON.stringify({ inspectedEntities, operation })}`,
+    );
+  }
 
   const [applying] = await db
     .update(bottleOperations)

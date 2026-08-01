@@ -1,9 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import {
-  AUDIT_BOTTLE_EVAL_CASES,
-  getAuditEvalBottleContexts,
-} from "./auditBottle.eval.fixtures";
+import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import type { Finding, ProposedOperation } from "./bottleCheckContract";
 import {
   scoreBottleCheckGrounding,
@@ -113,7 +110,10 @@ function scoreRequiredWebEvidence(expectedUrl: string, actualUrl: string) {
     searchEvidence: [
       {
         query: "official source",
-        results: [{ title: "Official", url: actualUrl }],
+        results: [
+          { title: "Expected source", url: expectedUrl },
+          { title: "Actual citation", url: actualUrl },
+        ],
       },
     ],
   });
@@ -151,13 +151,27 @@ describe("Bottle-check eval scoring", () => {
   });
 
   test("reports operation precision and recall separately and heavily penalizes extras", () => {
-    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (candidate) => candidate.scenario === "entity_operations",
-    );
-    expect(fixture).toBeDefined();
+    const expectedOperations: ProposedOperation[] = [
+      {
+        type: "update_entity",
+        input: { entityId: 10, patch: { name: "Updated Entity" } },
+        rationale: "Update the inspected Entity.",
+        evidenceRefs: [{ kind: "entity", entityId: 10 }],
+      },
+      {
+        type: "merge_entities",
+        input: { sourceEntityId: 20, destinationEntityId: 10 },
+        rationale: "Merge the inspected duplicate Entity.",
+        evidenceRefs: [
+          { kind: "entity", entityId: 20 },
+          { kind: "entity", entityId: 10 },
+        ],
+      },
+    ];
 
-    const missingScore = scoreBottleCheckSemanticOutput(fixture!.expected, {
-      proposedOperations: fixture!.expected.proposedOperations.slice(0, 1),
+    const expected = { proposedOperations: expectedOperations, findings: [] };
+    const missingScore = scoreBottleCheckSemanticOutput(expected, {
+      proposedOperations: expectedOperations.slice(0, 1),
       findings: [],
     });
     expect(missingScore.operations).toMatchObject({
@@ -176,11 +190,8 @@ describe("Bottle-check eval scoring", () => {
       rationale: "Unrelated cleanup must be penalized.",
       evidenceRefs: [{ kind: "entity", entityId: 9999 }],
     };
-    const extraScore = scoreBottleCheckSemanticOutput(fixture!.expected, {
-      proposedOperations: [
-        ...fixture!.expected.proposedOperations,
-        extraOperation,
-      ],
+    const extraScore = scoreBottleCheckSemanticOutput(expected, {
+      proposedOperations: [...expectedOperations, extraOperation],
       findings: [],
     });
     expect(extraScore.operations).toMatchObject({
@@ -285,7 +296,7 @@ describe("Bottle-check eval scoring", () => {
     const fixture = EVAL_CASES.find(
       (candidate) =>
         candidate.fixtureId ===
-        "generalized-current-bottle-merges-into-selected-match",
+        "store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate",
     );
     expect(fixture).toBeDefined();
     const expectedMerge = fixture!.expected.proposedOperations[0];
@@ -422,43 +433,6 @@ describe("Bottle-check eval scoring", () => {
     );
   });
 
-  test("grounds the production-derived Càirdeas merge in inspected Bottle contexts and official evidence", () => {
-    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      ({ id }) =>
-        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
-    );
-    expect(fixture).toBeDefined();
-    const candidates = [
-      fixture!.input.context.currentBottle,
-      ...fixture!.input.context.inspectedBottles,
-    ];
-    const contextSources = getAuditEvalBottleContexts(fixture!);
-    const artifacts = BottleClassificationArtifactsSchema.parse({
-      candidates,
-      bottleContexts: contextSources.map(
-        ({ imageSources: _imageSources, ...context }) => {
-          return { ...context, publicImages: [] };
-        },
-      ),
-      searchEvidence: fixture!.input.context.searchEvidence,
-    });
-    expect(fixture!.requireExpectedOperationEvidence).toBe(true);
-
-    expectGrounded(
-      scoreBottleCheckGrounding(
-        {
-          artifacts,
-          proposedOperations: fixture!.expected.proposedOperations,
-          findings: fixture!.expected.findings,
-        },
-        [],
-        fixture!.requireExpectedOperationEvidence
-          ? fixture!.expected.proposedOperations
-          : undefined,
-      ),
-    );
-  });
-
   test.each([
     {
       name: "Bottle reference",
@@ -524,6 +498,36 @@ describe("Bottle-check eval scoring", () => {
         missingEvidenceRefs: [testCase.missingEvidenceRef],
       },
     ]);
+  });
+
+  test("does not turn an omitted expected operation into a grounding failure", () => {
+    const expectedOperation: ProposedOperation = {
+      type: "merge_bottles",
+      input: { sourceBottleId: 1, destinationBottleId: 2 },
+      rationale: "The records are exact duplicates.",
+      evidenceRefs: [
+        { kind: "bottle", bottleId: 1 },
+        { kind: "bottle", bottleId: 2 },
+        { kind: "web_result", url: "https://example.com/source" },
+      ],
+    };
+    const actual = {
+      artifacts: BottleClassificationArtifactsSchema.parse({}),
+      proposedOperations: [],
+      findings: [],
+    };
+
+    expectGrounded(scoreBottleCheckGrounding(actual, [], [expectedOperation]));
+    expect(
+      scoreBottleCheckSemanticOutput(
+        { proposedOperations: [expectedOperation], findings: [] },
+        actual,
+      ).operations,
+    ).toMatchObject({
+      score: 0,
+      recall: 0,
+      missingCount: 1,
+    });
   });
 
   test.each([

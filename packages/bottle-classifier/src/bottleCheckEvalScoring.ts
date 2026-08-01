@@ -414,9 +414,13 @@ export function scoreBottleCheckGrounding(
       const actualOperation = actual.proposedOperations.find(
         (operation) => operationKey(operation) === expectedKey,
       );
+      if (!actualOperation) {
+        return [];
+      }
+
       const missingEvidenceRefs = expectedOperation.evidenceRefs.filter(
         (expectedEvidenceRef) =>
-          !actualOperation?.evidenceRefs.some((actualEvidenceRef) =>
+          !actualOperation.evidenceRefs.some((actualEvidenceRef) =>
             requiredEvidenceMatches(expectedEvidenceRef, actualEvidenceRef),
           ),
       );

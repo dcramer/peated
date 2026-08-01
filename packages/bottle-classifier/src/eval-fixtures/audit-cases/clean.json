@@ -16,7 +16,47 @@
         "category": "single_malt",
         "statedAge": 12,
         "abv": 46
-      }
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 50101,
+          "fullName": "North Channel 12-year-old",
+          "groupId": 50101,
+          "shared": {
+            "name": "North Channel 12-year-old",
+            "statedAge": 12,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 501011,
+              "name": "North Channel"
+            },
+            "distillers": [
+              {
+                "entityId": 501011,
+                "name": "North Channel"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": 46,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
+        }
+      ]
     }
   },
   "provenance": {

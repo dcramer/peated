@@ -3,7 +3,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import ActionResults, { runActionWithCanonicalRefresh } from "./actionResults";
 import CheckResult from "./checkResult";
-import { BottleCheckOrigin, BottleCheckSubject } from "./checkSummary";
+import {
+  type BottleCheck,
+  BottleCheckOrigin,
+  BottleCheckSubject,
+  getBottleCheckOperationCount,
+  getBottleCheckState,
+} from "./checkSummary";
 import OperationCard, {
   type BottleOperation,
   type BottleOperationReview,
@@ -28,7 +34,6 @@ function operation(
         { kind: "web_result", url: "https://example.com/evidence" },
       ],
     },
-    resolvedEvidenceRefs: [{ kind: "entity", entityId: 42 }],
     stateToken: {},
     preparationError: null,
     status,
@@ -38,7 +43,6 @@ function operation(
     reviewerNote: null,
     result: null,
     error: null,
-    preparedAt: "2026-07-30T00:00:00.000Z",
     executionStartedAt: null,
     executionCompletedAt: null,
     createdAt: "2026-07-30T00:00:00.000Z",
@@ -124,6 +128,23 @@ describe("Bottle Check review components", () => {
     expect(subject).toContain("Store price #510");
     expect(subject).not.toContain("Deleted Bottle");
     expect(origin).toBe("");
+  });
+
+  it("labels closed checks by disposition and preserves unsupported operation counts", () => {
+    const closed = {
+      closedAt: "2026-07-30T12:00:00.000Z",
+      closeReason: "resolved_manually",
+    } as BottleCheck;
+    const unsupported = {
+      schemaSupported: false,
+      operationCount: 3,
+    } as BottleCheck;
+
+    expect(getBottleCheckState(closed)).toBe("Resolved manually");
+    expect(getBottleCheckOperationCount(unsupported)).toBe(3);
+    expect(
+      getBottleCheckOperationCount(unsupported, { unresolvedOnly: true }),
+    ).toBe(3);
   });
 
   it("renders a read-only resource preview with links, evidence, impact, and warnings", () => {

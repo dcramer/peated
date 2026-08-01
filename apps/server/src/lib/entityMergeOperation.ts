@@ -389,28 +389,6 @@ export async function revalidateApplyingEntityMergeOperation({
   return false;
 }
 
-export async function markEntityMergeOperationStarted({
-  operationId,
-  approvingModeratorId,
-}: {
-  operationId: number;
-  approvingModeratorId: number;
-}) {
-  await db
-    .update(bottleOperations)
-    .set({
-      executionStartedAt: sql`COALESCE(${bottleOperations.executionStartedAt}, NOW())`,
-      updatedAt: sql`NOW()`,
-    })
-    .where(
-      and(
-        eq(bottleOperations.id, operationId),
-        eq(bottleOperations.status, "applying"),
-        eq(bottleOperations.reviewedById, approvingModeratorId),
-      ),
-    );
-}
-
 export async function markEntityMergeOperationApplied({
   database,
   result,

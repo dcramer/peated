@@ -32,9 +32,10 @@ const moderator = {
   private: false,
   mod: true,
 } satisfies User;
+const admin = { ...moderator, admin: true, mod: false } satisfies User;
 
 describe("ProfileDropdown", () => {
-  test("keeps Bottle Checks available in the mobile user menu", () => {
+  test("keeps Bottle Checks available in the mobile moderator menu", () => {
     const html = renderToStaticMarkup(
       <AuthProvider user={moderator}>
         <ProfileDropdown bottleChecksAvailable />
@@ -48,7 +49,7 @@ describe("ProfileDropdown", () => {
 
   test("hides Bottle Checks when the capability is unavailable", () => {
     const html = renderToStaticMarkup(
-      <AuthProvider user={moderator}>
+      <AuthProvider user={admin}>
         <ProfileDropdown bottleChecksAvailable={false} />
       </AuthProvider>,
     );

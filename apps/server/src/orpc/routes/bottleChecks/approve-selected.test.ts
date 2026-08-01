@@ -13,7 +13,6 @@ import {
 } from "@peated/server/db/schema";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { approveBottleOperations } from "@peated/server/lib/bottleOperationModeration";
-import { prepareProposals } from "@peated/server/lib/bottleOperationReview";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -30,9 +29,7 @@ async function createStorePriceUpdateEntityCheck({
   entity: { id: number; name: string };
   nextName: string;
   price: { id: number; name: string };
-  storePrice:
-    | { kind: "attempt"; attemptId: number }
-    | { kind: "proposal"; proposalId: number };
+  storePrice: { attemptId: number };
 }) {
   const proposal: ProposedOperation = {
     type: "update_entity",
@@ -60,10 +57,6 @@ async function createStorePriceUpdateEntityCheck({
       },
     ],
   };
-  const [prepared] = await prepareProposals({
-    proposals: [proposal],
-    artifacts,
-  });
   return await createBottleCheck({
     intent: "resolve_reference",
     sourceKind: "store_price",
@@ -84,7 +77,6 @@ async function createStorePriceUpdateEntityCheck({
       artifacts,
     },
     storePrice,
-    operations: [prepared!],
   });
 }
 
@@ -166,10 +158,6 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         },
       ],
     };
-    const [prepared] = await prepareProposals({
-      proposals: [proposal],
-      artifacts,
-    });
     const created = await createBottleCheck({
       intent: "audit_bottle",
       input: { bottleId: bottle.id, origin: "moderator" },
@@ -179,7 +167,6 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         findings: [],
         artifacts,
       },
-      operations: [prepared!],
     });
     const operation = created.check.operations[0]!;
 
@@ -275,11 +262,17 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         relatedBottles: [],
       })),
     };
-    const prepared = await prepareProposals({
-      proposals,
-      artifacts,
+    const created = await createBottleCheck({
+      intent: "audit_bottle",
+      input: { bottleId: bottle.id, origin: "moderator" },
+      result: {
+        summary: "The Entity proposals conflict.",
+        proposedOperations: proposals,
+        findings: [],
+        artifacts,
+      },
     });
-    expect(prepared).toEqual([
+    expect(created.check.operations).toEqual([
       expect.objectContaining({
         status: "blocked",
         preparationError: expect.objectContaining({
@@ -293,17 +286,6 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         }),
       }),
     ]);
-    const created = await createBottleCheck({
-      intent: "audit_bottle",
-      input: { bottleId: bottle.id, origin: "moderator" },
-      result: {
-        summary: "The Entity proposals conflict.",
-        proposedOperations: proposals,
-        findings: [],
-        artifacts,
-      },
-      operations: prepared,
-    });
     const operationIds = created.check.operations.map(({ id }) => id);
 
     expect(
@@ -359,7 +341,7 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       entity,
       nextName: "Primary Gate After",
       price,
-      storePrice: { kind: "attempt", attemptId: primaryAttempt!.id },
+      storePrice: { attemptId: primaryAttempt!.id },
     });
     const operation = created.check.operations[0]!;
 
@@ -501,11 +483,6 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         await inspectedBottleContext(originalTarget.id),
       ],
     };
-    const [prepared] = await prepareProposals({
-      proposals: [proposal],
-      artifacts,
-      protectedBottleIds: [originalTarget.id],
-    });
     const created = await createBottleCheck({
       intent: "resolve_reference",
       sourceKind: "store_price",
@@ -523,8 +500,7 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
         findings: [],
         artifacts,
       },
-      storePrice: { kind: "attempt", attemptId: originalAttempt!.id },
-      operations: [prepared!],
+      storePrice: { attemptId: originalAttempt!.id },
     });
     const operation = created.check.operations[0]!;
 
@@ -584,7 +560,7 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       entity,
       nextName: "Deleted Link After",
       price,
-      storePrice: { kind: "attempt", attemptId: primaryAttempt!.id },
+      storePrice: { attemptId: primaryAttempt!.id },
     });
     const operation = created.check.operations[0]!;
 
@@ -631,65 +607,6 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     ).toMatchObject({ name: "Deleted Link Before" });
   });
 
-  test("previews proposal-only compatibility checks without allowing execution", async ({
-    fixtures,
-  }) => {
-    const moderator = await fixtures.User({ mod: true });
-    const entity = await fixtures.Entity({ name: "Proposal Link Before" });
-    const price = await fixtures.StorePrice({
-      bottleId: null,
-      name: "Proposal Link Listing",
-    });
-    const [primaryProposal] = await db
-      .insert(storePriceMatchProposals)
-      .values({
-        priceId: price.id,
-        proposalType: "no_match",
-        status: "ignored",
-      })
-      .returning();
-    const created = await createStorePriceUpdateEntityCheck({
-      entity,
-      nextName: "Proposal Link After",
-      price,
-      storePrice: { kind: "proposal", proposalId: primaryProposal!.id },
-    });
-    const operation = created.check.operations[0]!;
-
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
-      { context: { user: moderator } },
-    );
-    expect(details.reviewOperations).toMatchObject([
-      {
-        operationId: operation.id,
-        approvalReady: false,
-        review: { status: "pending_review", type: "update_entity" },
-      },
-    ]);
-    expect(
-      await routerClient.bottleChecks.approveSelected(
-        { check: created.check.id, operationIds: [operation.id] },
-        { context: { user: moderator } },
-      ),
-    ).toMatchObject({
-      results: [
-        {
-          operationId: operation.id,
-          status: "pending_review",
-          error: expect.stringContaining(
-            "primary store-price decision is complete",
-          ),
-        },
-      ],
-    });
-    expect(
-      await db.query.entities.findFirst({
-        where: eq(entities.id, entity.id),
-      }),
-    ).toMatchObject({ name: "Proposal Link Before" });
-  });
-
   test("fails closed when the linked attempt no longer matches the check proposal and price", async ({
     fixtures,
   }) => {
@@ -733,7 +650,7 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       entity,
       nextName: "Mismatched Link After",
       price,
-      storePrice: { kind: "attempt", attemptId: primaryAttempt!.id },
+      storePrice: { attemptId: primaryAttempt!.id },
     });
     const operation = created.check.operations[0]!;
 
@@ -804,7 +721,7 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       entity,
       nextName: "Retry Gate After",
       price,
-      storePrice: { kind: "attempt", attemptId: primaryAttempt!.id },
+      storePrice: { attemptId: primaryAttempt!.id },
     });
     const operation = created.check.operations[0]!;
     await db
@@ -875,7 +792,7 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       entity,
       nextName: "Concurrent Gate After",
       price,
-      storePrice: { kind: "attempt", attemptId: primaryAttempt!.id },
+      storePrice: { attemptId: primaryAttempt!.id },
     });
     const operation = created.check.operations[0]!;
     const concurrentPool = new pg.Pool({

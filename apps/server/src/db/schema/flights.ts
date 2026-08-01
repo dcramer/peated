@@ -53,10 +53,13 @@ export const flightBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
   },
   (table) => [
     unique().on(table.flightId, table.bottleId),
     index("flight_bottle_bottle_idx").on(table.bottleId),
+    index("flight_bottle_release_idx").on(table.legacyReleaseId),
   ],
 );
 

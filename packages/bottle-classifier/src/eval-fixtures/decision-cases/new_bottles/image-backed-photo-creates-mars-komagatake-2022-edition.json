@@ -27,8 +27,10 @@
     "source": "production_miss",
     "verifiedSourceUrls": [
       "https://www.hombo.co.jp/en/product/mars-singlemalt-komagatake-2022-edition/",
+      "https://www.hombo.co.jp/en/2023/visiting/20231225-visiting-mars-komagatake-distillery/",
       "https://api.peated.com/v1/bottles/44298",
       "https://api.peated.com/v1/entities/1953",
+      "https://api.peated.com/v1/entities/1953/aliases",
       "https://api.peated.com/v1/entities/238555"
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/mars-komagatake-2022-edition.webp",
@@ -63,7 +65,7 @@
         "notes": "The nearby Mars Komagatake Limited Edition row is the 2019 annual bottling, not the photographed 2022 Edition."
       }
     ],
-    "notes": "The exact observed extraction is preserved above. At classification time no Mars Komagatake parent bottle existed, while Mars, Komagatake, and Shinshu already existed as entities. The label prints Mars Shinshu Distillery, and the official producer evidence supports reusing the existing Shinshu distiller candidate rather than creating a new entity from the longer printed form. Production entity 1953 separately identifies Komagatake as the current name for the same facility; this regression follows the reported create-flow expectation that the existing Shinshu candidate be selected. The checked-in label and official producer page establish Mars as the consumer brand, Komagatake as the stable expression, single malt as the category, and 2022 Edition as the annual bottling. Bottle 44298 is recorded only as the subsequent production outcome and is not present in the fixture catalog."
+    "notes": "The exact observed extraction is preserved above. At classification time no Mars Komagatake Bottle existed, while Mars, Komagatake, and Shinshu already existed as entities. Hombo's official notice establishes that Mars Shinshu Distillery was renamed Mars Komagatake Distillery effective March 1, 2024. Production Entity 1953 is the canonical Komagatake row and owns the exact Mars Shinshu Distillery alias; Entity 238555 is a later duplicate with no aliases. The observed production flow incorrectly used Entity 238555 for Bottle 44298, so this regression requires reusing Entity 1953 rather than repeating that bad outcome or creating another entity from the printed historical name. The checked-in label and official product page establish Mars as the consumer brand, Komagatake as the stable expression, single malt as the category, and 2022 Edition as the annual bottling. Bottle 44298 is recorded only as the subsequent production outcome and is not present in the fixture catalog."
   },
   "expected": {
     "status": "classified",
@@ -80,9 +82,9 @@
       "releaseYear": 2022,
       "abv": 50
     },
-    "proposedBottleDistillerIdOneOf": [1953, 238555],
+    "proposedBottleDistillerIdOneOf": [1953],
     "suggestedNextStep": "confirm_create",
-    "summary": "Create one independently complete Mars Komagatake 2022 Edition Bottle with the existing Mars and Shinshu entities; classification does not create a broader Bottle or select a group."
+    "summary": "Create one independently complete Mars Komagatake 2022 Edition Bottle with the existing Mars brand and canonical Komagatake distiller; classification does not create a broader Bottle or select a group."
   },
   "localCatalog": {
     "entities": [
@@ -94,6 +96,11 @@
       {
         "id": 1953,
         "name": "Komagatake",
+        "aliases": [
+          "Mars Shinshu Distillery",
+          "Mars Shinshu",
+          "Mars Komagatake"
+        ],
         "type": ["brand", "distiller"]
       },
       {

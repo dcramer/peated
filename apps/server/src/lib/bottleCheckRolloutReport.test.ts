@@ -30,7 +30,6 @@ describe("buildBottleCheckRolloutReport", () => {
             totalTokens: 120,
           },
           toolCalls: { count: 2 },
-          estimatedCostUsd: 0.004,
         },
         operations: [
           {
@@ -99,8 +98,6 @@ describe("buildBottleCheckRolloutReport", () => {
             toolCalls: 2,
           },
         },
-        costCoverage: 0.5,
-        totalEstimatedCostUsd: 0.004,
       },
     });
   });
@@ -118,8 +115,6 @@ describe("buildBottleCheckRolloutReport", () => {
       model: {
         latencyCoverage: 0,
         averageAgentLatencyMs: null,
-        costCoverage: 0,
-        totalEstimatedCostUsd: null,
       },
     });
   });

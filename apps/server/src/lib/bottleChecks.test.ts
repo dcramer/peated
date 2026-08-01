@@ -1,4 +1,5 @@
 import type { Finding, ProposedOperation } from "@peated/bottle-classifier";
+import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import * as schema from "@peated/server/db/schema";
@@ -7,6 +8,8 @@ import {
   bottleChecks,
   bottleOperations,
   bottles,
+  storePriceMatchAttempts,
+  storePriceMatchProposals,
 } from "@peated/server/db/schema";
 import {
   BottleCheckAlreadyClosedError,
@@ -18,14 +21,9 @@ import {
   getBottleCheckHistory,
   listActionableBottleChecks,
 } from "@peated/server/lib/bottleChecks";
-import {
-  BottleUpdateStateTokenSchema,
-  type PreparedProposalResultSchema,
-} from "@peated/server/lib/bottleOperationReviewSchemas";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import type { z } from "zod";
 
 function updateBottleProposal(
   bottleId: number,
@@ -46,20 +44,13 @@ function updateBottleProposal(
   };
 }
 
-function updateBottleStateToken(
-  bottle: { groupId: number | null; id: number },
-  exact?: { edition?: string | null },
-) {
-  if (bottle.groupId === null) {
-    throw new Error("Expected a concrete Bottle fixture.");
-  }
-  return BottleUpdateStateTokenSchema.parse({
-    bottleId: bottle.id,
-    groupId: bottle.groupId,
-    exact,
-    referencedEntities: [],
-    referencedSeries: [],
-  });
+async function bottleArtifacts(bottleId: number) {
+  const context = await getBottleClassifierContext(bottleId);
+  if (!context) throw new Error(`Missing Bottle context for ${bottleId}`);
+  const { imageSources: _imageSources, ...fields } = context;
+  return {
+    bottleContexts: [{ ...fields, publicImages: [] }],
+  };
 }
 
 function auditCheckInput({
@@ -75,7 +66,7 @@ function auditCheckInput({
   backgroundEventKey?: string;
   bottleId: number;
   findings?: Finding[];
-  operations?: Array<z.infer<typeof PreparedProposalResultSchema>>;
+  operations?: Array<{ proposal: ProposedOperation } & Record<string, unknown>>;
   origin?: "moderator" | "post_user_creation";
   summary: string;
 }) {
@@ -98,7 +89,6 @@ function auditCheckInput({
         ],
       },
     },
-    operations,
     backgroundEventKey,
     model: "test-model",
     modelMetadata: {
@@ -115,7 +105,7 @@ describe("Bottle check persistence", () => {
 
     const result = await createBottleCheck({
       intent: "resolve_reference",
-      sourceKind: "store_price",
+      sourceKind: "test_reference",
       sourceId: 11828042,
       input: {
         reference: {
@@ -135,7 +125,6 @@ describe("Bottle check persistence", () => {
           resolvedEntities: [],
         },
       },
-      operations: [],
       model: "test-model",
     });
 
@@ -169,189 +158,210 @@ describe("Bottle check persistence", () => {
     });
   });
 
-  test("inserts pending and blocked operations atomically", async ({
+  test("requires the exact store-price attempt and derives its proposal link", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({ name: "Exact attempt listing" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        proposalType: "no_match",
+        status: "ignored",
+      })
+      .returning();
+    const [attempt] = await db
+      .insert(storePriceMatchAttempts)
+      .values({
+        priceId: price.id,
+        proposalId: proposal!.id,
+        proposalType: "no_match",
+        initialStatus: "ignored",
+        finalStatus: "ignored",
+      })
+      .returning();
+
+    const result = await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "store_price",
+      sourceId: price.id,
+      input: { reference: { id: price.id, name: price.name } },
+      result: {
+        status: "ignored",
+        reason: "Not one Bottle.",
+        proposedOperations: [],
+        findings: [],
+        artifacts: {},
+      },
+      storePrice: { attemptId: attempt!.id },
+    });
+
+    expect(result.check).toMatchObject({
+      storePriceMatchAttemptId: attempt!.id,
+      storePriceMatchProposalId: proposal!.id,
+    });
+  });
+
+  test("derives primary Bottle protection from the exact store-price attempt", async ({
+    fixtures,
+  }) => {
+    const primary = await fixtures.Bottle({ name: "Primary match" });
+    const duplicate = await fixtures.Bottle({ name: "Malformed duplicate" });
+    const price = await fixtures.StorePrice({
+      name: "Protected match listing",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        proposalType: "match_existing",
+        status: "pending_review",
+        suggestedBottleId: primary.id,
+      })
+      .returning();
+    const [attempt] = await db
+      .insert(storePriceMatchAttempts)
+      .values({
+        priceId: price.id,
+        proposalId: proposal!.id,
+        proposalType: "match_existing",
+        initialStatus: "pending_review",
+        suggestedBottleId: primary.id,
+      })
+      .returning();
+    const primaryArtifacts = await bottleArtifacts(primary.id);
+    const duplicateArtifacts = await bottleArtifacts(duplicate.id);
+    const mergeProposal = {
+      type: "merge_bottles" as const,
+      input: {
+        sourceBottleId: primary.id,
+        destinationBottleId: duplicate.id,
+      },
+      rationale: "The inspected Bottles are exact duplicates.",
+      evidenceRefs: [
+        { kind: "bottle" as const, bottleId: primary.id },
+        { kind: "bottle" as const, bottleId: duplicate.id },
+      ],
+    };
+
+    const result = await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "store_price",
+      sourceId: price.id,
+      input: { reference: { id: price.id, name: price.name } },
+      result: {
+        status: "classified",
+        decision: {
+          action: "match",
+          matchedBottleId: primary.id,
+          proposedBottle: null,
+          rationale: "The listing matches the primary Bottle.",
+          candidateBottleIds: [primary.id, duplicate.id],
+        },
+        proposedOperations: [mergeProposal],
+        findings: [],
+        artifacts: {
+          bottleContexts: [
+            ...primaryArtifacts.bottleContexts,
+            ...duplicateArtifacts.bottleContexts,
+          ],
+        },
+      },
+      storePrice: { attemptId: attempt!.id },
+    });
+
+    expect(result.check.operations).toEqual([
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({
+          code: "direct_conflict",
+        }),
+      }),
+    ]);
+  });
+
+  test("rejects missing and mismatched store-price attempts", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({ name: "Expected listing" });
+    const otherPrice = await fixtures.StorePrice({ name: "Other listing" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: otherPrice.id,
+        proposalType: "no_match",
+        status: "ignored",
+      })
+      .returning();
+    const [attempt] = await db
+      .insert(storePriceMatchAttempts)
+      .values({
+        priceId: otherPrice.id,
+        proposalId: proposal!.id,
+        proposalType: "no_match",
+        initialStatus: "ignored",
+        finalStatus: "ignored",
+      })
+      .returning();
+    const input = {
+      intent: "resolve_reference" as const,
+      sourceKind: "store_price",
+      sourceId: price.id,
+      input: { reference: { id: price.id, name: price.name } },
+      result: {
+        status: "ignored" as const,
+        reason: "Not one Bottle.",
+        proposedOperations: [],
+        findings: [],
+        artifacts: {},
+      },
+    };
+
+    await expect(createBottleCheck(input)).rejects.toThrow(
+      "require the exact match attempt",
+    );
+    await expect(
+      createBottleCheck({
+        ...input,
+        storePrice: { attemptId: attempt!.id },
+      }),
+    ).rejects.toThrow("does not belong to price");
+  });
+
+  test("prepares and inserts proposed operations at the persistence boundary", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const pendingProposal = updateBottleProposal(
-      bottle.id,
-      "Warehouse 1 Release",
-    );
-    const blockedProposal = updateBottleProposal(
-      bottle.id,
-      "Unsupported Release",
-    );
+    const proposal = updateBottleProposal(bottle.id, "Warehouse 1 Release");
 
     const result = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(bottle.id),
         bottleId: bottle.id,
-        summary: "Two possible corrections.",
+        summary: "One possible correction.",
         operations: [
           {
-            status: "pending_review",
-            proposal: pendingProposal,
-            resolvedEvidenceRefs: pendingProposal.evidenceRefs,
-            stateToken: updateBottleStateToken(bottle, { edition: null }),
-          },
-          {
-            status: "blocked",
-            proposal: blockedProposal,
-            preparationError: {
-              code: "invalid_current_state",
-              message: "The exact change cannot be prepared.",
-            },
+            proposal,
           },
         ],
       }),
     );
 
-    expect(result.check.operations).toHaveLength(2);
-    expect(
-      result.check.operations
-        .map(({ status }) => status)
-        .sort((left, right) => left.localeCompare(right)),
-    ).toEqual(["blocked", "pending_review"]);
-
-    const pending = result.check.operations.find(
-      ({ status }) => status === "pending_review",
-    );
-    expect(pending).toMatchObject({
+    expect(result.check.operations).toEqual([
+      expect.objectContaining({
+        proposal,
+        status: "pending_review",
+        preparationError: null,
+      }),
+    ]);
+    expect(result.check.operations[0]).toMatchObject({
       stateToken: {
         bottleId: bottle.id,
         exact: {
           edition: null,
         },
       },
-      resolvedEvidenceRefs: pendingProposal.evidenceRefs,
-      preparationError: null,
     });
-
-    const blocked = result.check.operations.find(
-      ({ status }) => status === "blocked",
-    );
-    expect(blocked).toMatchObject({
-      stateToken: null,
-      resolvedEvidenceRefs: null,
-      preparationError: {
-        code: "invalid_current_state",
-        message: "The exact change cannot be prepared.",
-      },
-    });
-  });
-
-  test("rejects resolved evidence references that do not exactly match the proposal", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const otherBottle = await fixtures.Bottle();
-    const proposal = updateBottleProposal(bottle.id, "Warehouse 1 Release");
-
-    await expect(
-      createBottleCheck(
-        auditCheckInput({
-          bottleId: bottle.id,
-          summary: "One possible correction.",
-          operations: [
-            {
-              status: "pending_review",
-              proposal,
-              resolvedEvidenceRefs: [
-                { kind: "bottle", bottleId: otherBottle.id },
-              ],
-              stateToken: updateBottleStateToken(bottle, { edition: null }),
-            },
-          ],
-        }),
-      ),
-    ).rejects.toThrow(
-      "Persisted resolved evidence references must exactly match the proposal.",
-    );
-
-    expect(
-      await getBottleCheckHistory({
-        intent: "audit_bottle",
-        bottleId: bottle.id,
-      }),
-    ).toEqual([]);
-  });
-
-  test("rejects serialized state tokens before persistence", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const proposal = updateBottleProposal(bottle.id, "Warehouse 1 Release");
-    const input = auditCheckInput({
-      bottleId: bottle.id,
-      summary: "One possible correction.",
-    });
-
-    await expect(
-      createBottleCheck({
-        ...input,
-        result: {
-          ...input.result,
-          proposedOperations: [proposal],
-        },
-        operations: [
-          {
-            status: "pending_review",
-            proposal,
-            resolvedEvidenceRefs: proposal.evidenceRefs,
-            stateToken: JSON.stringify({
-              bottleId: bottle.id,
-              exact: {
-                edition: null,
-              },
-            }),
-          },
-        ],
-      }),
-    ).rejects.toThrow();
-
-    expect(
-      await getBottleCheckHistory({
-        intent: "audit_bottle",
-        bottleId: bottle.id,
-      }),
-    ).toEqual([]);
-  });
-
-  test("rejects state tokens beyond the structural bounds", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const proposal = updateBottleProposal(bottle.id, "Warehouse 1 Release");
-    const input = auditCheckInput({
-      bottleId: bottle.id,
-      summary: "One possible correction.",
-    });
-
-    await expect(
-      createBottleCheck({
-        ...input,
-        result: {
-          ...input.result,
-          proposedOperations: [proposal],
-        },
-        operations: [
-          {
-            status: "pending_review",
-            proposal,
-            resolvedEvidenceRefs: proposal.evidenceRefs,
-            stateToken: {
-              affectedIds: Array.from({ length: 101 }, (_, index) => index + 1),
-            },
-          },
-        ],
-      }),
-    ).rejects.toThrow();
-
-    expect(
-      await getBottleCheckHistory({
-        intent: "audit_bottle",
-        bottleId: bottle.id,
-      }),
-    ).toEqual([]);
   });
 
   test("deduplicates concurrent background retries by event key", async ({
@@ -397,14 +407,12 @@ describe("Bottle check persistence", () => {
     const firstProposal = updateBottleProposal(bottle.id, "First Review");
     const first = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(bottle.id),
         bottleId: bottle.id,
         summary: "First moderator review.",
         operations: [
           {
-            status: "pending_review",
             proposal: firstProposal,
-            resolvedEvidenceRefs: firstProposal.evidenceRefs,
-            stateToken: updateBottleStateToken(bottle, { edition: null }),
           },
         ],
       }),
@@ -635,14 +643,12 @@ describe("Bottle check persistence", () => {
     );
     const pendingCheck = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(pendingBottle.id),
         bottleId: pendingBottle.id,
         summary: "Pending operation.",
         operations: [
           {
-            status: "pending_review",
             proposal: pendingProposal,
-            resolvedEvidenceRefs: pendingProposal.evidenceRefs,
-            stateToken: updateBottleStateToken(pendingBottle),
           },
         ],
       }),
@@ -657,12 +663,7 @@ describe("Bottle check persistence", () => {
         summary: "Blocked operation.",
         operations: [
           {
-            status: "blocked",
             proposal: blockedProposal,
-            preparationError: {
-              code: "invalid_current_state",
-              message: "Cannot prepare the operation.",
-            },
           },
         ],
       }),
@@ -670,14 +671,12 @@ describe("Bottle check persistence", () => {
     const doneProposal = updateBottleProposal(doneBottle.id, "Done Release");
     const doneCheck = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(doneBottle.id),
         bottleId: doneBottle.id,
         summary: "Completed operation.",
         operations: [
           {
-            status: "pending_review",
             proposal: doneProposal,
-            resolvedEvidenceRefs: doneProposal.evidenceRefs,
-            stateToken: updateBottleStateToken(doneBottle),
           },
         ],
       }),
@@ -755,14 +754,12 @@ describe("Bottle check persistence", () => {
     const proposal = updateBottleProposal(bottle.id, "Review Release");
     const created = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(bottle.id),
         bottleId: bottle.id,
         summary: "Review this operation.",
         operations: [
           {
-            status: "pending_review",
             proposal,
-            resolvedEvidenceRefs: proposal.evidenceRefs,
-            stateToken: updateBottleStateToken(bottle),
           },
         ],
       }),
@@ -912,25 +909,11 @@ describe("Bottle check persistence", () => {
       const proposal = updateBottleProposal(bottle.id, `${status} Release`);
       const created = await createBottleCheck(
         auditCheckInput({
+          artifacts:
+            status === "blocked" ? undefined : await bottleArtifacts(bottle.id),
           bottleId: bottle.id,
           summary: `${status} operation.`,
-          operations: [
-            status === "blocked"
-              ? {
-                  status: "blocked",
-                  proposal,
-                  preparationError: {
-                    code: "invalid_current_state",
-                    message: "Cannot prepare the operation.",
-                  },
-                }
-              : {
-                  status: "pending_review",
-                  proposal,
-                  resolvedEvidenceRefs: proposal.evidenceRefs,
-                  stateToken: updateBottleStateToken(bottle),
-                },
-          ],
+          operations: [{ proposal }],
         }),
       );
       if (status !== "blocked") {
@@ -964,14 +947,12 @@ describe("Bottle check persistence", () => {
       const proposal = updateBottleProposal(bottle.id, `${status} Release`);
       const created = await createBottleCheck(
         auditCheckInput({
+          artifacts: await bottleArtifacts(bottle.id),
           bottleId: bottle.id,
           summary: `${status} operation.`,
           operations: [
             {
-              status: "pending_review",
               proposal,
-              resolvedEvidenceRefs: proposal.evidenceRefs,
-              stateToken: updateBottleStateToken(bottle),
             },
           ],
         }),
@@ -1014,14 +995,12 @@ describe("Bottle check persistence", () => {
     const proposal = updateBottleProposal(doneBottle.id, "Applied Release");
     const done = await createBottleCheck(
       auditCheckInput({
+        artifacts: await bottleArtifacts(doneBottle.id),
         bottleId: doneBottle.id,
         summary: "Applied.",
         operations: [
           {
-            status: "pending_review",
             proposal,
-            resolvedEvidenceRefs: proposal.evidenceRefs,
-            stateToken: updateBottleStateToken(doneBottle),
           },
         ],
       }),

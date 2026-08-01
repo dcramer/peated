@@ -24,7 +24,7 @@ export const BottleWebSearchErrorSchema = z.object({
 });
 
 const MAX_BOTTLE_SEARCH_RESULTS = 6;
-const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 320;
+export const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 600;
 const MAX_BOTTLE_SEARCH_TITLE_CHARS = 160;
 const MAX_BOTTLE_SEARCH_DESCRIPTION_CHARS = 220;
 const MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS = 1;
@@ -200,7 +200,7 @@ export function mergeBottleSearchEvidence({
     ),
   )
     .join(" ")
-    .slice(0, 600);
+    .slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS);
 
   return buildBottleSearchEvidence({
     provider,

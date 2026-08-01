@@ -14,7 +14,6 @@ import {
   AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
-  BottleSearchEvidenceSchema,
   CaskFillEnum,
   CaskSizeEnum,
   CaskTypeEnum,
@@ -214,7 +213,6 @@ export const classifierEvalFixtureSchema = z
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
     localCatalog: LocalCatalogSchema.optional(),
-    requireExpectedOperationEvidence: z.boolean().default(false),
     context: classifierEvalContextSchema.default({
       inspectedBottleIds: [],
       inspectedEntities: [],
@@ -360,29 +358,16 @@ export const classifierEvalFixtureSchema = z
     }
   });
 
-export const auditBottleEvalScenarioSchema = z.enum([
-  "clean",
-  "bottle_update",
-  "bottle_merge",
-  "entity_operations",
-  "unresolved",
-  "adversarial",
-]);
+export const auditBottleEvalScenarioSchema = z.enum(["clean", "bottle_merge"]);
 
 const auditBottleEvalContextSchema = z
   .object({
     currentBottle: BottleCandidateSchema,
     inspectedBottles: z.array(BottleCandidateSchema).default([]),
-    bottleContexts: z.array(BottleContextSourceSchema).optional(),
+    bottleContexts: z.array(BottleContextSourceSchema),
     inspectedEntities: z.array(EntityResolutionSchema).default([]),
-    inspectedSeries: z.array(BottleContextSeriesRefSchema).default([]),
-    searchEvidence: z.array(BottleSearchEvidenceSchema).default([]),
   })
   .strict();
-
-export function normalizeAuditFixtureSeriesName(name: string) {
-  return name.trim().replace(/\s+/g, " ").toLowerCase();
-}
 
 export const auditBottleEvalFixtureSchema = z
   .object({
@@ -450,47 +435,11 @@ export const auditBottleEvalFixtureSchema = z
       entityIds.add(entity.entityId);
     }
 
-    const fixtureBottleSeriesNames = new Set(
-      [
-        value.input.context.currentBottle,
-        ...value.input.context.inspectedBottles,
-      ].flatMap(({ series }) =>
-        series === null ? [] : [normalizeAuditFixtureSeriesName(series)],
+    const seriesIds = new Set(
+      value.input.context.bottleContexts.flatMap(({ shared }) =>
+        shared.series ? [shared.series.seriesId] : [],
       ),
     );
-    const seriesIds = new Set<number>();
-    const seriesNames = new Set<string>();
-    for (const [
-      index,
-      series,
-    ] of value.input.context.inspectedSeries.entries()) {
-      if (seriesIds.has(series.seriesId)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Duplicate inspected BottleSeries id ${series.seriesId}.`,
-          path: ["input", "context", "inspectedSeries", index, "seriesId"],
-        });
-      }
-      seriesIds.add(series.seriesId);
-
-      const normalizedName = normalizeAuditFixtureSeriesName(series.name);
-      if (seriesNames.has(normalizedName)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Duplicate inspected BottleSeries name ${series.name}.`,
-          path: ["input", "context", "inspectedSeries", index, "name"],
-        });
-      }
-      seriesNames.add(normalizedName);
-
-      if (!fixtureBottleSeriesNames.has(normalizedName)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Inspected BottleSeries ${series.name} is not referenced by any fixture Bottle.`,
-          path: ["input", "context", "inspectedSeries", index, "name"],
-        });
-      }
-    }
 
     for (const [
       operationIndex,

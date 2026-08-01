@@ -72,8 +72,6 @@ export type BottleCheckRolloutReport = {
     totalTokens: number;
     totalToolCalls: number;
     usageByModel: UsageByModel;
-    costCoverage: number;
-    totalEstimatedCostUsd: number | null;
   };
 };
 
@@ -113,7 +111,6 @@ export function buildBottleCheckRolloutReport(
   const rejectionReasons: CountByKey = {};
   const reviewTimesMs: number[] = [];
   const latenciesMs: number[] = [];
-  const estimatedCostsUsd: number[] = [];
   let operationCount = 0;
   let attemptedOperations = 0;
   let reviewedOperations = 0;
@@ -158,14 +155,6 @@ export function buildBottleCheckRolloutReport(
     totalOutputTokens += finiteNumber(usage, "outputTokens") ?? 0;
     totalTokens += finiteNumber(usage, "totalTokens") ?? 0;
     totalToolCalls += finiteNumber(toolCalls, "count") ?? 0;
-
-    const estimatedCostUsd = finiteNumber(
-      row.modelMetadata,
-      "estimatedCostUsd",
-    );
-    if (estimatedCostUsd !== null) {
-      estimatedCostsUsd.push(estimatedCostUsd);
-    }
 
     for (const operation of row.operations) {
       operationCount += 1;
@@ -239,11 +228,6 @@ export function buildBottleCheckRolloutReport(
       totalTokens,
       totalToolCalls,
       usageByModel,
-      costCoverage: ratio(estimatedCostsUsd.length, rows.length) ?? 0,
-      totalEstimatedCostUsd:
-        estimatedCostsUsd.length === 0
-          ? null
-          : estimatedCostsUsd.reduce((sum, value) => sum + value, 0),
     },
   };
 }

@@ -90,14 +90,21 @@ classifier.auditBottle({
 });
 ```
 
-The entrypoint selects the server-owned persisted intent:
-`resolve_reference` or `audit_bottle`. Callers do not migrate to a universal
-public command object. The two entrypoints may share an internal discriminated
-`BottleCheckInput` when that reduces duplication.
+The entrypoint selects the server-owned intent: `resolve_reference` or
+`audit_bottle`. Callers do not migrate to a universal public command object.
+The two entrypoints may share an internal discriminated `BottleCheckInput` when
+that reduces duplication.
 
 `BottleReference` retains source metadata such as store price, user submission,
 or photo. Audit `origin` records what started the audit. Intent describes the
 job; source or origin describes why this check exists.
+
+Selecting an intent does not itself persist the classifier result. V1 creates
+durable `resolve_reference` checks from store-price retries and durable audits
+from the moderator and post-user-creation audit entrypoints. Photo and other
+generic reference consumers still receive the classifier result but do not
+persist or surface its supplemental proposals; expanding reference source kinds
+is a later rollout step.
 
 The server assembles the input, intent, and origin before the agent runs. The
 model cannot switch an audit into a reference-resolution task or use freeform
@@ -532,8 +539,8 @@ When the invoking workflow automatically applies a primary create or repair,
 supplemental operations are prepared only after that mutation commits. In
 reviewed workflows they may be previewed immediately, but cannot be applied
 until the exact store-price attempt linked to the check has an `approved` or
-`ignored` final status. A missing attempt, mismatched proposal or price link, or
-proposal-only compatibility link fails closed for execution. Preview and
+`ignored` final status. A store-price check without that exact attempt, or with
+a mismatched proposal or price link, is rejected at persistence. Preview and
 approval then prepare again against resulting current state.
 
 ### Decision: Persist one check and its operations
@@ -559,8 +566,9 @@ batch boundary becomes a small shared check record:
 `bottle_operation`
 
 - id and check id;
-- strictly parsed proposal, plus resolved evidence references and a server-owned
-  state token after successful preparation;
+- strictly parsed proposal, whose validated evidence references remain its
+  single evidence source, plus a server-owned state token after successful
+  preparation;
 - concrete preparation error when blocked;
 - `blocked | pending_review | rejected | applying | applied | stale | failed`;
 - reviewer and review timestamp;
@@ -718,6 +726,15 @@ cannot enumerate every supported proposal and every proposal requires human
 approval. For audits, exact repair is the completion contract. Production
 fixtures retain the real input, catalog state, verified online evidence,
 expected intent-specific result, and exact Peated operations.
+
+The initial semantic audit corpus stays deliberately evidence-honest and
+small: one synthetic clean/no-op case, plus one curated audit variant derived
+from the verified Laphroaig Càirdeas production reference miss. The audit
+fixture records that it is derived rather than claiming a second observed
+production failure. We do not invent semantic repair cases merely to enumerate
+the operation union. Bottle/Entity operation-shape breadth, invalid
+combinations, grounding failures, and cross-operation conflicts belong in
+deterministic contract and policy tests plus server integration tests.
 
 ### Decision: BottleGroup repair is a planned follow-up
 

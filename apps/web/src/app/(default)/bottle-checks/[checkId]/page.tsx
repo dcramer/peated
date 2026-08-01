@@ -206,12 +206,17 @@ export default function Page() {
   const canReject =
     selected.size > 0 &&
     (rejectionReason !== "other" || rejectionNote.trim().length > 0);
+  const isStorePriceReference =
+    check.intent === "resolve_reference" && check.sourceKind === "store_price";
+  const parentPage = isStorePriceReference
+    ? { name: "Incoming Listings", href: "/admin/queue" }
+    : { name: "Bottle Checks", href: "/bottle-checks" };
 
   return (
     <>
       <Breadcrumbs
         pages={[
-          { name: "Bottle Checks", href: "/bottle-checks" },
+          parentPage,
           {
             name: `Check #${check.id}`,
             href: `/bottle-checks/${check.id}`,
@@ -235,7 +240,14 @@ export default function Page() {
       </div>
 
       <div className="space-y-5">
-        <CheckResult check={check} />
+        <CheckResult
+          check={check}
+          title={
+            check.intent === "resolve_reference"
+              ? "Reference result"
+              : "Audit result"
+          }
+        />
 
         {check.schemaSupported && check.operations.length > 0 ? (
           <section>

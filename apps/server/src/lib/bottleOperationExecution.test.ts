@@ -17,7 +17,6 @@ import {
 import {
   prepareOperation,
   prepareOperationForExecution,
-  prepareProposals,
 } from "@peated/server/lib/bottleOperationReview";
 import * as workerClient from "@peated/server/worker/client";
 import { and, desc, eq } from "drizzle-orm";
@@ -103,16 +102,6 @@ async function persistApplyingOperation({
   };
   proposal: ProposedOperation;
 }) {
-  const [prepared] = await prepareProposals({
-    proposals: [proposal],
-    ...context,
-  });
-  if (!prepared || prepared.status === "blocked") {
-    throw new Error(
-      `Expected operation preparation to succeed: ${JSON.stringify(prepared)}`,
-    );
-  }
-
   const created = await createBottleCheck({
     intent: "audit_bottle",
     input: {
@@ -125,10 +114,14 @@ async function persistApplyingOperation({
       findings: [],
       artifacts: context.artifacts,
     },
-    operations: [prepared],
     model: "test-model",
   });
   const operation = created.check.operations[0]!;
+  if (operation.status === "blocked") {
+    throw new Error(
+      `Expected operation preparation to succeed: ${JSON.stringify(operation)}`,
+    );
+  }
   const [applying] = await db
     .update(bottleOperations)
     .set({

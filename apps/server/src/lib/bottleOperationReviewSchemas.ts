@@ -18,7 +18,6 @@ const PositiveIdSchema = z.number().int().positive();
 const NonEmptyTextSchema = z.string().trim().min(1);
 
 export const PreparationErrorCodeSchema = z.enum([
-  "operation_disabled",
   "target_not_inspected",
   "evidence_not_found",
   "resource_not_found",
@@ -468,7 +467,6 @@ const PreparedBottleUpdateProposalSchema = z
   .object({
     status: z.literal("pending_review"),
     proposal: UpdateBottleOperationSchema,
-    resolvedEvidenceRefs: UpdateBottleOperationSchema.shape.evidenceRefs,
     stateToken: BottleUpdateStateTokenSchema,
   })
   .strict();
@@ -477,7 +475,6 @@ const PreparedBottleMergeProposalSchema = z
   .object({
     status: z.literal("pending_review"),
     proposal: MergeBottlesOperationSchema,
-    resolvedEvidenceRefs: MergeBottlesOperationSchema.shape.evidenceRefs,
     stateToken: BottleMergeStateTokenSchema,
   })
   .strict();
@@ -486,7 +483,6 @@ const PreparedEntityUpdateProposalSchema = z
   .object({
     status: z.literal("pending_review"),
     proposal: UpdateEntityOperationSchema,
-    resolvedEvidenceRefs: UpdateEntityOperationSchema.shape.evidenceRefs,
     stateToken: EntityUpdateStateTokenSchema,
   })
   .strict();
@@ -495,7 +491,6 @@ const PreparedEntityMergeProposalSchema = z
   .object({
     status: z.literal("pending_review"),
     proposal: MergeEntitiesOperationSchema,
-    resolvedEvidenceRefs: MergeEntitiesOperationSchema.shape.evidenceRefs,
     stateToken: EntityMergeStateTokenSchema,
   })
   .strict();

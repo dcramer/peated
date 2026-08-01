@@ -3,15 +3,65 @@
   "name": "text-only SMWS listing: creates an exact-cask bottle when the code is missing locally",
   "input": {
     "reference": {
-      "name": "SMWS RW6.5 Sauna Smoke",
-      "url": "https://vault.example/products/smws-rw6-5-sauna-smoke"
-    },
-    "initialCandidates": []
+      "name": "SMWS RW6.5 Appley ever after",
+      "url": "https://smws.com/appley-ever-after/"
+    }
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 127,
+        "name": "Kyrö",
+        "type": ["distiller"]
+      }
+    ],
+    "bottles": [],
+    "aliases": []
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://smws.com/appley-ever-after/",
+      "https://api.peated.com/v1/bottles/43260"
+    ],
+    "notes": "Re-verified July 31, 2026. The official SMWS product page identifies cask RW6.5 as Appley ever after. This is a controlled missing-local-Bottle variant: the real SMWS and Kyrö entities remain available while the Bottle catalog is empty. It intentionally tests exact-cask creation and does not describe current production, where Peated Bottle 43260 exists."
   },
   "expected": {
     "status": "classified",
     "action": "create_bottle",
     "identityScope": "exact_cask",
+    "proposedBottle": {
+      "name": "RW6.5 Appley ever after",
+      "brand": {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society"
+      },
+      "bottler": {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society"
+      },
+      "distillers": [
+        {
+          "id": 127,
+          "name": "Kyrö"
+        }
+      ],
+      "category": "rye",
+      "statedAge": 6,
+      "abv": 56,
+      "releaseYear": 2024,
+      "singleCask": true,
+      "caskStrength": null,
+      "caskType": null,
+      "caskSize": "barrel",
+      "caskFill": "1st_fill"
+    },
     "summary": "Extract the SMWS code from raw title text and create the exact-cask bottle when no safe local candidate exists."
   }
 }

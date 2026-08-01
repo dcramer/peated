@@ -81,7 +81,6 @@ function operation(
       rationale: "The inspected evidence supports this change.",
       evidenceRefs: [{ kind: "entity", entityId: 42 }],
     },
-    resolvedEvidenceRefs: [{ kind: "entity", entityId: 42 }],
     stateToken: entityStateToken(),
     preparationError: null,
     status,
@@ -91,7 +90,6 @@ function operation(
     reviewerNote: null,
     result: null,
     error: status === "failed" ? "Worker unavailable." : null,
-    preparedAt: "2026-07-30T00:00:00.000Z",
     executionStartedAt: null,
     executionCompletedAt: null,
     createdAt: "2026-07-30T00:00:00.000Z",
@@ -110,7 +108,7 @@ function reviewForOperation(operation: Operation): ReviewOperation {
       status: "blocked",
       proposal: operation.proposal,
       preparationError: {
-        code: "operation_disabled",
+        code: "invalid_current_state",
         message: "The operation is blocked.",
       },
     };
@@ -157,7 +155,12 @@ function reviewForOperation(operation: Operation): ReviewOperation {
   };
 }
 
-function details(operations: Operation[]): Details {
+function details(
+  operations: Operation[],
+  checkOverrides: Partial<
+    Extract<Details["check"], { schemaSupported: true }>
+  > = {},
+): Details {
   return {
     check: {
       id: 9,
@@ -194,6 +197,7 @@ function details(operations: Operation[]): Details {
       completedAt: "2026-07-30T00:00:00.000Z",
       closedAt: null,
       operations,
+      ...checkOverrides,
     },
     reviewOperations: operations.map((operation) => ({
       operationId: operation.id,
@@ -237,5 +241,36 @@ describe("Bottle Check detail execution rollout", () => {
     expect(html).toContain("Reject selected");
     expect(html).toContain("Select");
     expect(html).toContain("Close check");
+  });
+
+  test("returns store-price references to Incoming Listings", () => {
+    testState.details = details([], {
+      intent: "resolve_reference",
+      origin: null,
+      sourceKind: "store_price",
+      sourceId: "510",
+      bottleId: null,
+      subjectKey: "resolve_reference:store_price:510",
+      output: {
+        status: "classified",
+        decision: {
+          action: "match",
+          rationale: "The listing matched an existing Bottle.",
+          candidateBottleIds: [44],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: 44,
+          proposedBottle: null,
+        },
+        findings: [],
+      },
+    });
+
+    const html = renderToStaticMarkup(<Page />);
+
+    expect(html).toContain('href="/admin/queue"');
+    expect(html).toContain("Incoming Listings");
+    expect(html).toContain("Reference result");
+    expect(html).not.toContain('href="/bottle-checks"');
   });
 });

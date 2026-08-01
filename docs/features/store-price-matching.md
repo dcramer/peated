@@ -204,7 +204,7 @@ When `status = classified`, the decision must be one of:
 Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
-- `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; the proposed bottle draft is a sparse repair draft and unknown fields must not clear existing bottle facts
+- `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; `proposedBottle` is the full canonical repair draft, and the price-matching adapter must not treat null or unknown values as sparse clears. Sparse field changes belong to supplemental `update_bottle` operations
 - classifier decisions carry Bottle ids only; they do not expose a legacy
   release-id picker
 - `create_bottle` carries one complete marketed Bottle draft, including exact

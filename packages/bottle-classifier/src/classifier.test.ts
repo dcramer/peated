@@ -1,7 +1,6 @@
 import { Runner } from "@openai/agents";
 import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
-import { buildAuditEvalBottleContext } from "./auditBottle.eval.fixtures";
 import {
   createBottleClassifier,
   prepareBottleClassifierAgentRun,
@@ -185,16 +184,6 @@ function createTestClassifier({
     }),
     searchBottles,
   };
-}
-
-function buildTestBottleContext(candidate: BottleCandidate) {
-  const { imageSources: _imageSources, ...context } =
-    buildAuditEvalBottleContext(candidate, [], []);
-  return { ...context, publicImages: [] };
-}
-
-function buildTestBottleContextSource(candidate: BottleCandidate) {
-  return buildAuditEvalBottleContext(candidate, [], []);
 }
 
 const wildTurkeyRareBreedRyeIdentity: BottleExtractedDetails = {

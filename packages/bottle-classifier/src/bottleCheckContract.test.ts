@@ -5,7 +5,6 @@ import {
   AuditBottleResultSchema,
   BottleOperationEntityChoiceSchema,
   BottleSharedPatchSchema,
-  createProposedOperationsSchema,
   EvidenceRefSchema,
   FindingSchema,
   ProposedOperationSchema,
@@ -317,30 +316,5 @@ describe("bottle check public contract", () => {
     expect(result.proposedOperations).toEqual([]);
     expect(result.findings).toEqual([]);
     expect("outcome" in result).toBe(false);
-  });
-
-  test("uses a configurable ceiling only as runaway-output protection", () => {
-    const operation = {
-      type: "update_entity" as const,
-      input: {
-        entityId: 10,
-        patch: { name: "Laphroaig" },
-      },
-      rationale: "Use the canonical name.",
-      evidenceRefs: [{ kind: "entity" as const, entityId: 10 }],
-    };
-
-    expect(
-      createProposedOperationsSchema(2).safeParse([operation, operation])
-        .success,
-    ).toBe(true);
-    expect(
-      createProposedOperationsSchema(2).safeParse([
-        operation,
-        operation,
-        operation,
-      ]).success,
-    ).toBe(false);
-    expect(() => createProposedOperationsSchema(0)).toThrow(RangeError);
   });
 });

@@ -1,13 +1,8 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, test, vi } from "vitest";
-import {
-  AUDIT_BOTTLE_EVAL_CASES,
-  buildAuditEvalBottleContext,
-  getAuditEvalBottleContexts,
-} from "./auditBottle.eval.fixtures";
-import { loadClassifierEvalBottleContext } from "./classifier.eval.fixtures";
+import { describe, expect, test } from "vitest";
+import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
   auditBottleEvalFixtureSchema,
   classifierEvalFixtureSchema,
@@ -116,7 +111,7 @@ describe("eval fixture validation", () => {
       fixture?.input.context.inspectedBottles.map(({ bottleId }) => bottleId),
     ).toEqual([45146, 44288, 802]);
     expect(
-      getAuditEvalBottleContexts(fixture!).map(({ bottleId, groupId }) => ({
+      fixture!.input.context.bottleContexts.map(({ bottleId, groupId }) => ({
         bottleId,
         groupId,
       })),
@@ -185,291 +180,6 @@ describe("eval fixture validation", () => {
         }),
       );
     }
-  });
-
-  test("covers the supported Bottle and Entity operations without adding audit-only variants", () => {
-    const operations = AUDIT_BOTTLE_EVAL_CASES.flatMap(
-      (fixture) => fixture.expected.proposedOperations,
-    );
-    expect(new Set(operations.map((operation) => operation.type))).toEqual(
-      new Set([
-        "update_bottle",
-        "merge_bottles",
-        "update_entity",
-        "merge_entities",
-      ]),
-    );
-
-    const bottleUpdate = operations.find(
-      (operation) => operation.type === "update_bottle",
-    );
-    expect(bottleUpdate?.input.patch.shared?.brand).toMatchObject({
-      kind: "existing",
-      entityId: 5202,
-    });
-    expect(bottleUpdate?.input.patch.shared?.bottler).toMatchObject({
-      kind: "create",
-      entity: {
-        name: "Harbor House Bottling",
-        roles: ["bottler"],
-      },
-    });
-    expect(bottleUpdate?.input.patch.shared?.seriesId).toBe(5290);
-    const bottleUpdateFixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (fixture) => fixture.scenario === "bottle_update",
-    );
-    expect(bottleUpdateFixture?.input.context.inspectedSeries).toContainEqual({
-      seriesId: 5290,
-      name: "Harbor House Special Releases",
-    });
-    expect(
-      bottleUpdateFixture?.input.context.inspectedBottles.some(
-        (bottle) =>
-          bottle.series === "Harbor House Special Releases" &&
-          bottle.bottleId === 50202,
-      ),
-    ).toBe(true);
-    const seriesBottle =
-      bottleUpdateFixture?.input.context.inspectedBottles.find(
-        ({ bottleId }) => bottleId === 50202,
-      );
-    expect(seriesBottle).toBeDefined();
-    expect(
-      buildAuditEvalBottleContext(
-        seriesBottle!,
-        bottleUpdateFixture!.input.context.inspectedEntities,
-        bottleUpdateFixture!.input.context.inspectedSeries,
-      ).shared.series,
-    ).toEqual({
-      seriesId: 5290,
-      name: "Harbor House Special Releases",
-    });
-
-    const unresolved = AUDIT_BOTTLE_EVAL_CASES.find(
-      (fixture) => fixture.scenario === "unresolved",
-    );
-    expect(unresolved?.expected.proposedOperations).toEqual([]);
-    expect(unresolved?.expected.findings).toHaveLength(1);
-  });
-
-  test("rejects audit expectations that mutate an uninspected target", () => {
-    const cleanFixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (fixture) => fixture.scenario === "clean",
-    );
-    expect(cleanFixture).toBeDefined();
-
-    const result = auditBottleEvalFixtureSchema.safeParse({
-      ...cleanFixture,
-      expected: {
-        ...cleanFixture?.expected,
-        proposedOperations: [
-          {
-            type: "update_entity",
-            input: {
-              entityId: 9999,
-              patch: { name: "Uninspected Entity" },
-            },
-            rationale: "This target was never inspected.",
-            evidenceRefs: [{ kind: "entity", entityId: 9999 }],
-          },
-        ],
-      },
-    });
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues[0]).toMatchObject({
-        message: "Expected operation references uninspected Entity id 9999.",
-      });
-    }
-  });
-
-  test("validates nested existing Entity and Series targets but exempts Entity drafts", () => {
-    const cleanFixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (fixture) => fixture.scenario === "clean",
-    );
-    expect(cleanFixture).toBeDefined();
-
-    const result = auditBottleEvalFixtureSchema.safeParse({
-      ...cleanFixture,
-      expected: {
-        ...cleanFixture?.expected,
-        proposedOperations: [
-          {
-            type: "update_bottle",
-            input: {
-              bottleId: cleanFixture!.input.audit.bottleId,
-              patch: {
-                shared: {
-                  seriesId: 9901,
-                  brand: { kind: "existing", entityId: 9902 },
-                  distillers: [
-                    { kind: "existing", entityId: 9903 },
-                    {
-                      kind: "create",
-                      entity: {
-                        name: "New Distiller",
-                        roles: ["distiller"],
-                      },
-                    },
-                  ],
-                  bottler: { kind: "existing", entityId: 9904 },
-                },
-              },
-            },
-            rationale: "These existing targets were never inspected.",
-            evidenceRefs: [
-              {
-                kind: "bottle",
-                bottleId: cleanFixture!.input.audit.bottleId,
-              },
-            ],
-          },
-        ],
-      },
-    });
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(
-        result.error.issues.map(({ message, path }) => ({
-          message,
-          path: path.join("."),
-        })),
-      ).toEqual([
-        {
-          message:
-            "Expected operation references uninspected BottleSeries id 9901.",
-          path: "expected.proposedOperations.0.input.patch.shared.seriesId",
-        },
-        {
-          message: "Expected operation references uninspected Entity id 9902.",
-          path: "expected.proposedOperations.0.input.patch.shared.brand.entityId",
-        },
-        {
-          message: "Expected operation references uninspected Entity id 9903.",
-          path: "expected.proposedOperations.0.input.patch.shared.distillers.0.entityId",
-        },
-        {
-          message: "Expected operation references uninspected Entity id 9904.",
-          path: "expected.proposedOperations.0.input.patch.shared.bottler.entityId",
-        },
-      ]);
-    }
-  });
-
-  test("rejects duplicate normalized inspected Series names", () => {
-    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (candidate) => candidate.scenario === "bottle_update",
-    );
-    expect(fixture).toBeDefined();
-
-    const result = auditBottleEvalFixtureSchema.safeParse({
-      ...fixture,
-      input: {
-        ...fixture!.input,
-        context: {
-          ...fixture!.input.context,
-          inspectedSeries: [
-            ...fixture!.input.context.inspectedSeries,
-            {
-              seriesId: 5291,
-              name: "  harbor   HOUSE special releases  ",
-            },
-          ],
-        },
-      },
-    });
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({
-          message:
-            "Duplicate inspected BottleSeries name harbor   HOUSE special releases.",
-          path: ["input", "context", "inspectedSeries", 1, "name"],
-        }),
-      );
-    }
-  });
-
-  test("rejects inspected Series that no fixture Bottle can expose", () => {
-    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (candidate) => candidate.scenario === "bottle_update",
-    );
-    expect(fixture).toBeDefined();
-
-    const result = auditBottleEvalFixtureSchema.safeParse({
-      ...fixture,
-      input: {
-        ...fixture!.input,
-        context: {
-          ...fixture!.input.context,
-          inspectedSeries: [
-            ...fixture!.input.context.inspectedSeries,
-            {
-              seriesId: 5291,
-              name: "Unreachable Series",
-            },
-          ],
-        },
-      },
-    });
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues).toContainEqual(
-        expect.objectContaining({
-          message:
-            "Inspected BottleSeries Unreachable Series is not referenced by any fixture Bottle.",
-          path: ["input", "context", "inspectedSeries", 1, "name"],
-        }),
-      );
-    }
-  });
-
-  test("uses the same normalized Series name for reachability and BottleContext synthesis", () => {
-    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
-      (candidate) => candidate.scenario === "bottle_update",
-    );
-    expect(fixture).toBeDefined();
-
-    const result = auditBottleEvalFixtureSchema.safeParse({
-      ...fixture,
-      input: {
-        ...fixture!.input,
-        context: {
-          ...fixture!.input.context,
-          inspectedBottles: fixture!.input.context.inspectedBottles.map(
-            (bottle) =>
-              bottle.bottleId === 50202
-                ? {
-                    ...bottle,
-                    series: "  HARBOR   house special releases  ",
-                  }
-                : bottle,
-          ),
-        },
-      },
-    });
-
-    if (!result.success) {
-      throw result.error;
-    }
-    const seriesBottle = result.data.input.context.inspectedBottles.find(
-      ({ bottleId }) => bottleId === 50202,
-    );
-    expect(seriesBottle).toBeDefined();
-    expect(
-      buildAuditEvalBottleContext(
-        seriesBottle!,
-        result.data.input.context.inspectedEntities,
-        result.data.input.context.inspectedSeries,
-      ).shared.series,
-    ).toEqual({
-      seriesId: 5290,
-      name: "Harbor House Special Releases",
-    });
   });
 
   test("rejects production-miss decision fixtures without observed input context", () => {
@@ -604,21 +314,10 @@ describe("eval fixture validation", () => {
     expect(fixture.input.extractedIdentity).toBeNull();
   });
 
-  test("uses exact bounded contexts for the production Laphroaig decision case", async () => {
+  test("uses exact bounded contexts for the production Laphroaig decision case", () => {
     const fixture = loadLaphroaigDecisionFixture();
-    const fallback = vi.fn(async () => null);
-    const contexts = await Promise.all(
-      [39096, 45146, 44288].map(
-        async (bottleId) =>
-          await loadClassifierEvalBottleContext({
-            context: fixture.context,
-            bottleId,
-            fallback,
-          }),
-      ),
-    );
+    const contexts = fixture.context.bottleContexts ?? [];
 
-    expect(fallback).not.toHaveBeenCalled();
     expect(
       contexts.map((context) => ({
         bottleId: context?.bottleId,
@@ -668,7 +367,6 @@ describe("eval fixture validation", () => {
         },
       ],
     });
-    expect(fixture.requireExpectedOperationEvidence).toBe(false);
     expect(fixture.provenance?.dbOutcome).toMatchObject({
       bottleId: 45146,
       createsBottle: false,
@@ -751,27 +449,23 @@ describe("eval fixture validation", () => {
   });
 
   test("requires expected operation targets to be inspectable", () => {
-    const fixture = classifierEvalFixtureSchema.parse(
-      JSON.parse(
-        readFileSync(
-          `${decisionFixtureDir}/corrections/generalized-current-bottle-merges-into-selected-match.json`,
-          "utf8",
-        ),
-      ),
-    );
+    const fixture = loadLaphroaigDecisionFixture();
 
     const uninspected = classifierEvalFixtureSchema.safeParse({
       ...fixture,
       context: {
         ...fixture.context,
-        inspectedBottleIds: [50702],
+        inspectedBottleIds: [45146, 44288],
+        bottleContexts: fixture.context.bottleContexts?.filter(
+          ({ bottleId }) => bottleId !== 39096,
+        ),
       },
     });
     expect(uninspected.success).toBe(false);
     if (!uninspected.success) {
       expect(uninspected.error.issues).toContainEqual(
         expect.objectContaining({
-          message: "Expected operation references uninspected Bottle id 50701.",
+          message: "Expected operation references uninspected Bottle id 39096.",
         }),
       );
     }

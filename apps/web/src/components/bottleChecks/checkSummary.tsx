@@ -39,7 +39,31 @@ export function getBottleCheckSummary(check: BottleCheck): string {
   return check.error || "Bottle check needs review.";
 }
 
+const UNRESOLVED_OPERATION_STATUSES = new Set([
+  "blocked",
+  "pending_review",
+  "applying",
+  "stale",
+  "failed",
+]);
+
+export function getBottleCheckOperationCount(
+  check: BottleCheck,
+  { unresolvedOnly = false }: { unresolvedOnly?: boolean } = {},
+): number {
+  if (!check.schemaSupported) return check.operationCount;
+  if (!unresolvedOnly) return check.operations.length;
+  return check.operations.filter(({ status }) =>
+    UNRESOLVED_OPERATION_STATUSES.has(status),
+  ).length;
+}
+
 export function getBottleCheckState(check: BottleCheck): string {
+  if (check.closedAt) {
+    if (check.closeReason === "resolved_manually") return "Resolved manually";
+    if (check.closeReason === "dismissed") return "Dismissed";
+    return "Closed";
+  }
   if (!check.schemaSupported) return "Unsupported schema";
   const findings = getBottleCheckFindings(check);
   const statuses = new Set(

@@ -74,7 +74,10 @@
 - A suspected BottleGroup issue remains a non-executable finding. Add a
   regrouping operation only in a separate change supported by real reviewed
   cases and a canonical mutation service.
-- Price matching owns persistence.
+- Each invoking workflow owns its persistence and automation policy. Price
+  matching owns store-price proposal and attempt persistence plus its opt-in
+  linked reference checks; audit entrypoints own audit-check persistence.
+  Generic classifier calls do not persist on their own.
 - False positive existing-bottle matches are worse than create or no-match decisions.
 - New bottle creation may be more permissive when sampling or review gates
   exist; automatic verification still needs corroborating evidence or a

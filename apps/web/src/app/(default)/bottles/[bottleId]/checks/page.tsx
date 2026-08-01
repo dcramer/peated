@@ -3,6 +3,7 @@
 import {
   BottleCheckSubject,
   getBottleCheckFindings,
+  getBottleCheckOperationCount,
   getBottleCheckState,
   getBottleCheckSummary,
 } from "@peated/web/components/bottleChecks/checkSummary";
@@ -82,6 +83,7 @@ export default function Page() {
         <div className="space-y-4">
           {data.results.map((check) => {
             const findings = getBottleCheckFindings(check);
+            const operationCount = getBottleCheckOperationCount(check);
             return (
               <article
                 className="rounded-xl border border-slate-800 bg-slate-950 p-5"
@@ -104,9 +106,8 @@ export default function Page() {
                   </Link>
                 </div>
                 <div className="mt-4 text-xs text-slate-400">
-                  <BottleCheckSubject check={check} /> ·{" "}
-                  {check.operations.length} operation
-                  {check.operations.length === 1 ? "" : "s"} · {findings.length}{" "}
+                  <BottleCheckSubject check={check} /> · {operationCount}{" "}
+                  operation{operationCount === 1 ? "" : "s"} · {findings.length}{" "}
                   finding{findings.length === 1 ? "" : "s"}
                 </div>
                 {check.closedAt ? (

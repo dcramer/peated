@@ -1,7 +1,6 @@
 import {
   AuditBottleOriginSchema,
   BottleCheckIntentSchema,
-  EvidenceRefSchema,
   ProposedOperationSchema,
 } from "@peated/bottle-classifier";
 import {
@@ -28,7 +27,6 @@ export const BottleOperationResponseSchema = z
     id: z.number(),
     checkId: z.number(),
     proposal: ProposedOperationSchema,
-    resolvedEvidenceRefs: z.array(EvidenceRefSchema).nullable(),
     stateToken: JsonObjectSchema.nullable(),
     preparationError: JsonObjectSchema.nullable(),
     status: BottleOperationStatusSchema,
@@ -38,7 +36,6 @@ export const BottleOperationResponseSchema = z
     reviewerNote: z.string().nullable(),
     result: JsonObjectSchema.nullable(),
     error: z.string().nullable(),
-    preparedAt: DateTimeSchema.nullable(),
     executionStartedAt: DateTimeSchema.nullable(),
     executionCompletedAt: DateTimeSchema.nullable(),
     createdAt: DateTimeSchema,
@@ -172,7 +169,6 @@ export function serializeBottleCheck(check: BottleCheckWithOperations) {
     operations: check.operations.map((operation) => ({
       ...operation,
       reviewedAt: serializeDate(operation.reviewedAt),
-      preparedAt: serializeDate(operation.preparedAt),
       executionStartedAt: serializeDate(operation.executionStartedAt),
       executionCompletedAt: serializeDate(operation.executionCompletedAt),
       createdAt: operation.createdAt.toISOString(),

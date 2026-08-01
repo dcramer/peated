@@ -184,8 +184,6 @@ export const ProposedOperationTypeSchema = z.enum([
   "merge_entities",
 ]);
 
-export const PROPOSED_OPERATION_TYPES = ProposedOperationTypeSchema.options;
-
 export const UpdateBottleOperationSchema = z
   .object({
     type: z.literal(ProposedOperationTypeSchema.enum.update_bottle),
@@ -261,17 +259,9 @@ export const ProposedOperationSchema = z.union([
 
 export const DEFAULT_MAX_PROPOSED_OPERATIONS = 25;
 
-export function createProposedOperationsSchema(
-  maxOperations = DEFAULT_MAX_PROPOSED_OPERATIONS,
-) {
-  if (!Number.isSafeInteger(maxOperations) || maxOperations < 1) {
-    throw new RangeError("maxOperations must be a positive safe integer");
-  }
-
-  return z.array(ProposedOperationSchema).max(maxOperations);
-}
-
-export const ProposedOperationsSchema = createProposedOperationsSchema();
+export const ProposedOperationsSchema = z
+  .array(ProposedOperationSchema)
+  .max(DEFAULT_MAX_PROPOSED_OPERATIONS);
 
 export type BottleCheckIntent = z.infer<typeof BottleCheckIntentSchema>;
 export type AuditBottleOrigin = z.infer<typeof AuditBottleOriginSchema>;

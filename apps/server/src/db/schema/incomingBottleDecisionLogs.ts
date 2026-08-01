@@ -52,6 +52,8 @@ export const incomingBottleDecisionLogs = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     createdBottle: boolean("created_bottle").default(false).notNull(),
     createdRelease: boolean("created_release").default(false).notNull(),
     confidence: integer("confidence"),
@@ -73,6 +75,7 @@ export const incomingBottleDecisionLogs = pgTable(
       table.externalSiteId,
     ),
     index("incoming_bottle_decision_bottle_idx").on(table.bottleId),
+    index("incoming_bottle_decision_release_idx").on(table.legacyReleaseId),
     index("incoming_bottle_decision_actor_ref_idx").on(table.actorId),
   ],
 );

@@ -1,7 +1,10 @@
 import { z } from "zod";
 
-import { EntityTypeEnum, ProposedBottleSchema } from "./classifierTypes";
-import { ImageBottleEvidenceSchema } from "./imageEvidence";
+import {
+  BottleExtractedDetailsSchema,
+  EntityTypeEnum,
+  ProposedBottleSchema,
+} from "./classifierTypes";
 
 export const MAX_BOTTLE_CONTEXT_ALIASES = 12;
 export const MAX_BOTTLE_CONTEXT_SIBLINGS = 12;
@@ -115,9 +118,17 @@ export const BottleContextImageSourceSchema = z
   })
   .strict();
 
+export const BottleContextLabelEvidenceSchema = z
+  .object({
+    sourceImageId: NonEmptyTextSchema,
+    model: NonEmptyTextSchema,
+    extractedIdentity: BottleExtractedDetailsSchema.nullable(),
+  })
+  .strict();
+
 export const BottleContextPublicImageSchema =
   BottleContextImageSourceSchema.extend({
-    labelEvidence: ImageBottleEvidenceSchema,
+    labelEvidence: BottleContextLabelEvidenceSchema,
   }).strict();
 
 const BottleContextBaseSchema = z
@@ -189,6 +200,9 @@ export type BottleContextObservation = z.infer<
 export type BottleContextAlias = z.infer<typeof BottleContextAliasSchema>;
 export type BottleContextImageSource = z.infer<
   typeof BottleContextImageSourceSchema
+>;
+export type BottleContextLabelEvidence = z.infer<
+  typeof BottleContextLabelEvidenceSchema
 >;
 export type BottleContextPublicImage = z.infer<
   typeof BottleContextPublicImageSchema

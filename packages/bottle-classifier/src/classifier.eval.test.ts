@@ -11,11 +11,7 @@ import {
   type TranscriptEvent,
 } from "vitest-evals/harness";
 import { executeWithReplay } from "vitest-evals/replay";
-import {
-  AUDIT_BOTTLE_EVAL_CASES,
-  buildAuditEvalBottleContext,
-  getAuditEvalBottleContexts,
-} from "./auditBottle.eval.fixtures";
+import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
   scoreBottleCheckGrounding,
   scoreBottleCheckSemanticOutput,
@@ -25,10 +21,9 @@ import {
   EntityContextSchema,
   type EntityContext,
 } from "./bottleContextContract";
-import {
-  loadClassifierEvalBottleContext,
-  type ClassifierEvalCase,
-  type SearchResponseFixture,
+import type {
+  ClassifierEvalCase,
+  SearchResponseFixture,
 } from "./classifier.eval.fixtures";
 import {
   getClassifierLiveEvalCases,
@@ -713,8 +708,7 @@ function buildClassifierAdapters(
     return baseDataSource;
   }
 
-  const { inspectedBottleIds, inspectedEntities, inspectedSeries } =
-    testCase.testCase.context;
+  const { inspectedBottleIds, inspectedEntities } = testCase.testCase.context;
   const inspectedBottleIdSet = new Set(inspectedBottleIds);
   const entityContexts = new Map(
     inspectedEntities.map((entity) => [
@@ -722,31 +716,16 @@ function buildClassifierAdapters(
       auditEntityContext(entity),
     ]),
   );
-  const getBottleCandidateById =
-    baseDataSource.getBottleCandidateById ??
-    (async (bottleId: number) =>
-      knownCandidates.find((candidate) => candidate.bottleId === bottleId) ??
-      null);
-
   return {
     ...baseDataSource,
     ...(inspectedBottleIdSet.size > 0
       ? {
           getBottleContext: async (bottleId: number) => {
-            return await loadClassifierEvalBottleContext({
-              context: testCase.testCase.context,
-              bottleId,
-              fallback: async () => {
-                const candidate = await getBottleCandidateById(bottleId);
-                return candidate
-                  ? buildAuditEvalBottleContext(
-                      candidate,
-                      inspectedEntities,
-                      inspectedSeries,
-                    )
-                  : null;
-              },
-            });
+            return (
+              testCase.testCase.context.bottleContexts?.find(
+                (context) => context.bottleId === bottleId,
+              ) ?? null
+            );
           },
         }
       : {}),
@@ -887,9 +866,11 @@ function auditEntityContext(entity: EntityResolution): EntityContext {
 function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
   const { currentBottle, inspectedBottles, inspectedEntities } =
     testCase.input.context;
-  const contextSources = getAuditEvalBottleContexts(testCase);
   const bottleContexts = new Map(
-    contextSources.map((context) => [context.bottleId, context]),
+    testCase.input.context.bottleContexts.map((context) => [
+      context.bottleId,
+      context,
+    ]),
   );
   const entityContexts = new Map(
     inspectedEntities.map((entity) => [
@@ -1044,6 +1025,9 @@ const ClassifierGroundingJudge = createJudge<ClassifierJudgeContext>(
         input: input.testCase.input,
         artifacts: result.artifacts,
       }),
+      input.kind === "decision"
+        ? input.testCase.expected.proposedOperations
+        : undefined,
     );
     return { score: score.score, metadata: score };
   },

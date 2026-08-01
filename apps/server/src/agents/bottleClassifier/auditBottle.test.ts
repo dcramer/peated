@@ -172,7 +172,6 @@ describe("server-owned Bottle audit workflows", () => {
       ),
     ).toMatchObject({
       stateToken: expect.any(Object),
-      resolvedEvidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
     });
     expect(
       await db.query.bottles.findFirst({

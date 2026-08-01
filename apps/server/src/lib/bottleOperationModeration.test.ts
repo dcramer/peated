@@ -20,7 +20,6 @@ import {
   rejectBottleOperations,
   retryBottleOperation,
 } from "@peated/server/lib/bottleOperationModeration";
-import { prepareProposals } from "@peated/server/lib/bottleOperationReview";
 import * as workerClient from "@peated/server/worker/client";
 import mergeEntity from "@peated/server/worker/jobs/mergeEntity";
 import { eq } from "drizzle-orm";
@@ -162,17 +161,7 @@ async function createPreparedCheck({
       relatedBottles: [],
     })),
   };
-  const operations = await prepareProposals({
-    proposals,
-    artifacts,
-  });
-  if (operations.some(({ status }) => status === "blocked")) {
-    throw new Error(
-      `Expected test operations to prepare: ${JSON.stringify(operations)}`,
-    );
-  }
-
-  return await createBottleCheck({
+  const created = await createBottleCheck({
     intent: "audit_bottle",
     input: { bottleId, origin: "moderator" },
     result: {
@@ -181,9 +170,14 @@ async function createPreparedCheck({
       findings: [],
       artifacts,
     },
-    operations,
     model: "test-model",
   });
+  if (created.check.operations.some(({ status }) => status === "blocked")) {
+    throw new Error(
+      `Expected test operations to prepare: ${JSON.stringify(created.check.operations)}`,
+    );
+  }
+  return created;
 }
 
 describe("Bottle operation moderation", () => {
@@ -223,7 +217,6 @@ describe("Bottle operation moderation", () => {
             legacyOperation: "rename_entity",
             arguments: [entity.id, "Versioned After"],
           } as never,
-          resolvedEvidenceRefs: { legacyEntityId: entity.id } as never,
         },
       ],
     };
@@ -439,6 +432,62 @@ describe("Bottle operation moderation", () => {
         where: eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ abv: 47 });
+    expect(
+      await db.query.bottleOperations.findFirst({
+        where: eq(bottleOperations.id, operation.id),
+      }),
+    ).toMatchObject({ status: "stale" });
+  });
+
+  test("marks an Entity update stale when a concurrent edit commits before live preparation", async ({
+    fixtures,
+  }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity({ name: "Concurrent Entity Before" });
+    const bottle = await fixtures.Bottle({ brandId: entity.id });
+    const created = await createPreparedCheck({
+      bottleId: bottle.id,
+      proposals: [updateEntityProposal(entity.id, "Proposed Entity Name")],
+      inspectedEntities: [entity],
+    });
+    const operation = created.check.operations[0]!;
+    const client = new Client(getPostgresConnectionConfig());
+    let committed = false;
+    let approval: ReturnType<typeof approveBottleOperations> | undefined;
+
+    await client.connect();
+    try {
+      await client.query("BEGIN");
+      const blockerPid = (
+        await client.query<{ pid: number }>("SELECT pg_backend_pid() AS pid")
+      ).rows[0]!.pid;
+      await client.query(`UPDATE "entity" SET "name" = $1 WHERE "id" = $2`, [
+        "Concurrent Entity Change",
+        entity.id,
+      ]);
+
+      approval = approveBottleOperations(
+        { checkId: created.check.id, operationIds: [operation.id] },
+        moderator,
+      );
+      await waitForSessionBlockedBy(client, blockerPid);
+      await client.query("COMMIT");
+      committed = true;
+      await approval;
+    } finally {
+      if (!committed) await client.query("ROLLBACK");
+      await client.end();
+      await approval?.catch(() => undefined);
+    }
+
+    await expect(approval).resolves.toEqual([
+      { operationId: operation.id, status: "stale", error: null },
+    ]);
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, entity.id),
+      }),
+    ).toMatchObject({ name: "Concurrent Entity Change" });
     expect(
       await db.query.bottleOperations.findFirst({
         where: eq(bottleOperations.id, operation.id),

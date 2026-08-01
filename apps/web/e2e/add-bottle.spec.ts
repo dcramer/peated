@@ -530,12 +530,15 @@ test.describe("add bottle flow", () => {
       `/addBottle?bottle=${exactSearchBottle.id}&intent=addBottle`,
     );
     const expectedMetadata = [
+      testBrand.name,
       exactSearchBottle.edition,
       "Single Malt",
+      "21 years",
       "55.1% ABV",
       "2004 vintage",
       "2025 release",
       "Single cask",
+      "Cask strength",
       "1st Fill Oloroso Hogshead cask",
     ];
     const metadataItems = result.locator(".inline-flex.whitespace-nowrap");

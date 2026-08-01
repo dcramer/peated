@@ -147,10 +147,6 @@ export async function runBottleAudit(input: AuditBottleInput) {
   });
 }
 
-export async function auditBottle(input: AuditBottleInput) {
-  return (await runBottleAudit(input)).result;
-}
-
 async function identifyExactAliasReference({
   input,
 }: {

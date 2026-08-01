@@ -410,6 +410,8 @@ export const bottleObservations = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id, { onDelete: "cascade" })
       .notNull(),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     sourceType: varchar("source_type", {
       length: 32,
       enum: OBSERVATION_SOURCE_TYPES,
@@ -435,6 +437,7 @@ export const bottleObservations = pgTable(
       table.sourceKey,
     ),
     index("bottle_observation_bottle_idx").on(table.bottleId),
+    index("bottle_observation_release_idx").on(table.legacyReleaseId),
     index("bottle_observation_external_site_idx").on(table.externalSiteId),
   ],
 );
@@ -566,6 +569,8 @@ export const bottleAliases = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     name: varchar("name", { length: 255 }).notNull(),
     embedding: vector("embedding", { length: 3072 }),
     // Ignored aliases are retained for audit/history but excluded from exact matching.
@@ -586,6 +591,7 @@ export const bottleAliases = pgTable(
       sql`LOWER(${table.name})`,
     ),
     index("bottle_alias_bottle_idx").on(table.bottleId),
+    index("bottle_alias_release_idx").on(table.legacyReleaseId),
     index("bottle_alias_assigned_by_actor_idx").on(table.assignedByActorId),
   ],
 );

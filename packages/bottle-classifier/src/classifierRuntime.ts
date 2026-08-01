@@ -32,7 +32,6 @@ import {
   type EntityResolution,
   type SearchEntitiesArgs,
 } from "./classifierTypes";
-import { buildContextImageEvidence } from "./contextImageEvidence";
 import {
   AuditBottleInputSchema,
   BottleClassificationResultSchema,
@@ -578,11 +577,11 @@ export function createBottleContextLoader({
 
         return {
           ...imageSource,
-          labelEvidence: buildContextImageEvidence({
+          labelEvidence: {
             sourceImageId,
             model: options.model,
             extractedIdentity,
-          }),
+          },
         };
       }),
     );
@@ -621,45 +620,6 @@ function mergeCandidateLists(
   }
 
   return sortedBottleCandidates(candidatesByKey);
-}
-
-export function mergeBottleClassificationArtifacts(
-  existing: BottleClassificationArtifacts,
-  next: BottleClassificationArtifacts,
-): BottleClassificationArtifacts {
-  const resolvedEntities = new Map<number, EntityResolution>();
-  const bottleContexts = new Map<number, BottleContext>();
-  const entityContexts = new Map<number, EntityContext>();
-
-  for (const entity of [
-    ...existing.resolvedEntities,
-    ...next.resolvedEntities,
-  ]) {
-    mergeResolvedEntity(resolvedEntities, entity);
-  }
-  for (const context of [...existing.bottleContexts, ...next.bottleContexts]) {
-    bottleContexts.set(context.bottleId, context);
-  }
-  for (const context of [...existing.entityContexts, ...next.entityContexts]) {
-    entityContexts.set(context.entityId, context);
-  }
-
-  return buildBottleClassificationArtifacts({
-    extractedIdentity: existing.extractedIdentity ?? null,
-    imageEvidence: existing.imageEvidence ?? null,
-    candidates: mergeCandidateLists(existing.candidates, next.candidates),
-    searchEvidence: mergeSearchEvidenceList(
-      existing.searchEvidence,
-      next.searchEvidence,
-    ),
-    resolvedEntities: sortedResolvedEntities(resolvedEntities),
-    bottleContexts: Array.from(bottleContexts.values()).sort(
-      (left, right) => left.bottleId - right.bottleId,
-    ),
-    entityContexts: Array.from(entityContexts.values()).sort(
-      (left, right) => left.entityId - right.entityId,
-    ),
-  });
 }
 
 function buildAgentArtifacts({

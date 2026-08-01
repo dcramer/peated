@@ -1,8 +1,8 @@
 {
   "id": "watchpost-8-year-old",
   "referenceName": "Watchpost",
-  "expectedBottleName": "Watchpost Whiskey",
-  "summary": "Create Watchpost as the brand with the source-supported Whiskey style as its distinct core expression, preserving the American blended whiskey category, 42.5% ABV, and Westland production evidence instead of duplicating Watchpost as both brand and expression.",
+  "expectedBottleName": "Watchpost 8-year-old",
+  "summary": "Create Watchpost as the brand with the source-supported 8-year-old identity, preserving the marketed age in the Bottle name and structured age field alongside the American blended whiskey category, 42.5% ABV, and Westland production evidence.",
   "peatedBottleIds": [44299],
   "provenance": {
     "source": "production_miss",
@@ -17,13 +17,14 @@
       "releaseId": null,
       "createsBottle": true,
       "createsRelease": false,
-      "summary": "Production add-bottle flow created bottle 44299 as Watchpost Watchpost with category blend, stated age 8, 42.5% ABV, and a new Westland Distillery Co. entity 365683 instead of preserving a distinct expression and reusing an existing Westland distillery candidate."
+      "summary": "At capture, the production add-bottle flow created bottle 44299 as Watchpost Watchpost with category blend, stated age 8, 42.5% ABV, and a new Westland Distillery Co. entity 365683 instead of preserving a distinct expression and reusing an existing Westland distillery candidate."
     },
-    "notes": "Added from the exact failed image add-bottle flow and its persisted production image. The label reads Watchpost, An American Blended Whiskey, 42.5% Alc/Vol, Westland Distillery Co., and Aged 8 Years. Official Watchpost and Westland pages describe the product as an American blended whiskey made by the Westland team from eight-year-old whiskey components."
+    "notes": "Added from the exact failed image add-bottle flow and its persisted production image. The crop shows Watchpost, An American Blended Whiskey, 42.5% Alc/Vol, and Westland Distillery Co.; the numeric age is not reliably readable in the crop. Official Watchpost and Westland pages establish that the product is an eight-year-old American blended whiskey made by the Westland team. This fixture preserves the pre-creation local state. The current API record was later corrected to Watchpost 8-year-old with stated age 8, while the duplicate Westland Distillery Co. entity 365683 remains attached."
   },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
+    "action": "create_bottle",
     "exactBottleIdentity": null
   }
 }

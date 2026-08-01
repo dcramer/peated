@@ -1,4 +1,4 @@
-import type { EvidenceRef, ProposedOperation } from "@peated/bottle-classifier";
+import type { ProposedOperation } from "@peated/bottle-classifier";
 import { relations } from "drizzle-orm";
 import {
   bigint,
@@ -120,9 +120,6 @@ export const bottleOperations = pgTable(
       .references(() => bottleChecks.id, { onDelete: "cascade" })
       .notNull(),
     proposal: jsonb("proposal").$type<ProposedOperation>().notNull(),
-    resolvedEvidenceRefs: jsonb("resolved_evidence_refs").$type<
-      EvidenceRef[]
-    >(),
     stateToken: jsonb("state_token").$type<Record<string, unknown>>(),
     preparationError:
       jsonb("preparation_error").$type<Record<string, unknown>>(),
@@ -138,7 +135,6 @@ export const bottleOperations = pgTable(
     reviewerNote: text("reviewer_note"),
     result: jsonb("result").$type<Record<string, unknown>>(),
     error: text("error"),
-    preparedAt: timestamp("prepared_at"),
     executionStartedAt: timestamp("execution_started_at"),
     executionCompletedAt: timestamp("execution_completed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

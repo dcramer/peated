@@ -27,6 +27,8 @@ proposed operation, including operations blocked during preparation.
 
 - **WHEN** a store-price attempt runs `resolve_reference`
 - **THEN** the attempt and current proposal SHALL link to the check
+- **AND** the server SHALL reject a missing attempt or an attempt for another
+  price rather than accepting a proposal-only compatibility link
 - **AND** their existing decision fields SHALL remain authoritative in v1
 
 ### Requirement: Review surfaces show intent-specific results and operations

@@ -23,7 +23,6 @@ import {
   loadEntityMergeOperation,
   markEntityMergeOperationApplied,
   markEntityMergeOperationFailed,
-  markEntityMergeOperationStarted,
   revalidateApplyingEntityMergeOperation,
   type LoadedEntityMergeOperation,
 } from "@peated/server/lib/entityMergeOperation";
@@ -624,11 +623,6 @@ export default async function mergeEntity(rawInput: unknown) {
     if (operation.status === "applied") {
       return operation.result;
     }
-
-    await markEntityMergeOperationStarted({
-      operationId: operation.operationId,
-      approvingModeratorId: operation.approvingModerator.id,
-    });
 
     return await performEntityMerge({
       toEntityId: operation.destinationEntityId,

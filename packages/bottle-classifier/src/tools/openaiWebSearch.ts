@@ -18,6 +18,7 @@ import {
   getResultDomain,
   hydrateBottleSearchEvidence,
   isThinBottleSearchEvidence,
+  MAX_BOTTLE_SEARCH_SUMMARY_CHARS,
   mergeBottleSearchEvidence,
   type BottleWebSearchBudget,
   type BottleWebSearchExecutor,
@@ -96,8 +97,8 @@ export function extractOpenAISearchEvidence(
     (text): text is string => Boolean(text),
   );
   const summary =
-    outputText?.slice(0, 600) ||
-    messageTexts.join(" ").trim().slice(0, 600) ||
+    outputText?.slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS) ||
+    messageTexts.join(" ").trim().slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS) ||
     null;
   const resultsByUrl = new Map<
     string,

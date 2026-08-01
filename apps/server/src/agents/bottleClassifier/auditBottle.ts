@@ -1,7 +1,4 @@
-import {
-  getBottleCheckSourceEvidencePaths,
-  type AuditBottleInput,
-} from "@peated/bottle-classifier";
+import { type AuditBottleInput } from "@peated/bottle-classifier";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { bottleChecks } from "@peated/server/db/schema";
@@ -9,7 +6,6 @@ import {
   createBottleCheck,
   type CreateBottleCheckResult,
 } from "@peated/server/lib/bottleChecks";
-import { prepareProposals } from "@peated/server/lib/bottleOperationReview";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { runBottleAudit as auditBottleWithServerAdapters } from "./service";
@@ -51,22 +47,11 @@ async function runAndPersistBottleAudit({
   backgroundEventKey?: string;
 }): Promise<CreateBottleCheckResult> {
   const { result, modelMetadata } = await auditBottleWithServerAdapters(input);
-  const operations = await prepareProposals({
-    proposals: result.proposedOperations,
-    artifacts: result.artifacts,
-    sourceFields: getBottleCheckSourceEvidencePaths({
-      intent: "audit_bottle",
-      input,
-      artifacts: result.artifacts,
-    }),
-    protectedBottleIds: [],
-  });
 
   return await createBottleCheck({
     intent: "audit_bottle",
     input,
     result,
-    operations,
     model: config.OPENAI_MODEL,
     modelMetadata,
     ...(backgroundEventKey ? { backgroundEventKey } : {}),

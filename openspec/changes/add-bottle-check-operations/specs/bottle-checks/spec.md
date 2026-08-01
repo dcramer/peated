@@ -588,8 +588,8 @@ before operations are checked for direct conflicts.
 
 #### Scenario: The exact primary attempt cannot be verified
 
-- **WHEN** a reference check has only a proposal link, its attempt link was
-  cleared, or the linked attempt does not match the check's proposal and price
+- **WHEN** a persisted reference check's attempt link was cleared or the linked
+  attempt no longer matches the check's proposal and price
 - **THEN** supplemental operations MAY be previewed
 - **AND** execution SHALL fail closed
 
@@ -625,3 +625,16 @@ finding sets without assigning the same completion contract to both intents.
   verified evidence, expected result, and exact operations
 - **AND** reference operation-set mismatches SHALL remain diagnostic while
   audit operation-set mismatches SHALL follow the audit's exact-repair gate
+
+#### Scenario: Keep the initial audit corpus evidence-honest
+
+- **WHEN** the initial semantic audit corpus is assembled
+- **THEN** it SHALL contain a synthetic clean/no-op case and the verified
+  Laphroaig Càirdeas production case represented as both its observed reference
+  miss and a clearly labeled derived audit variant
+- **AND** the derived audit SHALL NOT claim to be a second observed production
+  failure
+- **AND** operation-shape breadth, invalid combinations, grounding failures,
+  and cross-operation conflicts SHALL be covered by deterministic contract,
+  policy, and server integration tests rather than invented semantic repair
+  fixtures

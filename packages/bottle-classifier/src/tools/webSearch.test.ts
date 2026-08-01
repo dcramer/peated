@@ -155,7 +155,7 @@ describe("bottleClassifier web search tools", () => {
       ],
     });
 
-    expect(evidence.summary).toHaveLength(320);
+    expect(evidence.summary).toHaveLength(600);
     expect(evidence.results).toEqual([
       expect.objectContaining({
         title: "Rare Breed Rye",
@@ -628,10 +628,11 @@ describe("bottleClassifier web search tools", () => {
   });
 
   test("caps bottle search evidence payload size", () => {
+    const decisiveFact = "The bottle has an 8-year age statement.";
     const evidence = buildBottleSearchEvidence({
       provider: "firecrawl",
       query: "ardbeg traigh bhan 19",
-      summary: "x".repeat(500),
+      summary: ["x".repeat(450), decisiveFact, "y".repeat(500)].join(" "),
       results: Array.from({ length: 12 }, (_, index) => ({
         title: `Result ${index + 1} ${"y".repeat(300)}`,
         url: `https://example.com/${index + 1}`,
@@ -641,7 +642,8 @@ describe("bottleClassifier web search tools", () => {
       })),
     });
 
-    expect(evidence.summary).toHaveLength(320);
+    expect(evidence.summary).toHaveLength(600);
+    expect(evidence.summary).toContain(decisiveFact);
     expect(evidence.results).toHaveLength(6);
     for (const result of evidence.results) {
       expect(result.title.length).toBeLessThanOrEqual(160);

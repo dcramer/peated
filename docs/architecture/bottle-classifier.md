@@ -113,8 +113,9 @@ V1 has no BottleGroup operation. A suspected grouping problem is a
 The reviewed Laphroaig Càirdeas 2022 production miss demonstrates that
 boundary: merge malformed Bottle `39096` into Warehouse 1 Bottle `45146`, while
 leaving generic Bottle `44288` unchanged. It does not justify regrouping. The
-`audit-unresolved-island-reserve` eval demonstrates the finding shape, but is
-synthetic and therefore is not evidence for a group mutation.
+initial audit corpus deliberately contains only the synthetic clean/no-op case
+and the Laphroaig audit derived from that verified reference miss. It has no
+BottleGroup-finding case and is not evidence for a group mutation.
 
 Track real moderator-reviewed `bottle_group` findings before designing a
 follow-up. If they demonstrate a recurring need, propose only the smallest

@@ -2591,6 +2591,13 @@ export async function prepareOperationForExecution({
       rawContext.database,
       proposal.input,
     );
+  } else if (proposal.type === "update_entity") {
+    await rawContext.database
+      .select({ id: entities.id })
+      .from(entities)
+      .where(eq(entities.id, proposal.input.entityId))
+      .limit(1)
+      .for("update");
   }
   const context = parseContext(rawContext);
   return await prepareParsedOperation({ proposal, context });
@@ -2674,7 +2681,6 @@ export async function prepareProposals({
       ? PreparedProposalSchema.parse({
           status: "pending_review",
           proposal: outcome.data.review.proposal,
-          resolvedEvidenceRefs: outcome.data.review.proposal.evidenceRefs,
           stateToken: outcome.data.review.stateToken,
         })
       : BlockedProposalSchema.parse({

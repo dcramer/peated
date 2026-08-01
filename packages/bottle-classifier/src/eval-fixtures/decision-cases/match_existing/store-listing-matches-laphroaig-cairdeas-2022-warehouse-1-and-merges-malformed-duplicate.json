@@ -342,7 +342,6 @@
       }
     ]
   },
-  "requireExpectedOperationEvidence": false,
   "context": {
     "inspectedBottleIds": [39096, 45146, 44288],
     "bottleContexts": [

@@ -13,7 +13,7 @@ should change, or that a related Entity should be created, updated, or merged.
 ## What Changes
 
 - Preserve `classifyBottleReference` and add `auditBottle`; each entrypoint
-  selects the server-owned persisted intent.
+  selects the server-owned intent.
 - Preserve the current match/create/repair/no-match decision for
   reference resolution. Audits return a summary, operations, and findings
   without a redundant outcome enum.
@@ -26,7 +26,10 @@ should change, or that a related Entity should be created, updated, or merged.
   Entity as part of the same transaction.
 - Define the four operations as one strict literal-tagged Zod union and handle
   them with plain exhaustive TypeScript functions.
-- Persist each check and its proposed operations for review.
+- Persist store-price reference checks and existing-Bottle audits with their
+  proposed operations for review. Other reference consumers continue to receive
+  classifier results without durable proposal review until their source kind is
+  explicitly integrated.
 - Show the check result and operation cards together in the relevant
   moderator workflow.
 - Put actionable post-create and moderator audits in one Bottle Checks inbox and
@@ -62,8 +65,9 @@ None.
 
 - The Bottle-classifier contract preserves its reference entrypoint, gains an
   audit entrypoint, and adds typed operations and findings.
-- New check and operation persistence supports both incoming
-  references and existing-Bottle audits.
+- New check and operation persistence supports store-price references and
+  existing-Bottle audits. Other reference source kinds remain a rollout
+  follow-up.
 - Store-price attempts can link to their check without replacing the
   current proposal workflow.
 - Canonical Entity update behavior is extracted from its route handler for safe

@@ -6,7 +6,6 @@ import {
   ClassifyBottleReferenceInputSchema,
   FindingSchema,
   getBottleCheckSourceEvidencePaths,
-  type ProposedOperationSchema,
 } from "@peated/bottle-classifier";
 import { db, type AnyConnection, type AnyDatabase } from "@peated/server/db";
 import {
@@ -21,8 +20,10 @@ import {
   BOTTLE_CHECK_SCHEMA_VERSION,
   isSupportedBottleCheckSchemaVersion,
 } from "@peated/server/lib/bottleCheckSchemaVersion";
-import { assertCollectedEvidenceRefs } from "@peated/server/lib/bottleOperationReview";
-import { PreparedProposalResultSchema as PersistedOperationInputSchema } from "@peated/server/lib/bottleOperationReviewSchemas";
+import {
+  assertCollectedEvidenceRefs,
+  prepareProposals,
+} from "@peated/server/lib/bottleOperationReview";
 import {
   and,
   desc,
@@ -93,26 +94,16 @@ const PersistedBottleCheckOutputSchema = z
   })
   .passthrough();
 
-const StorePriceLinkSchema = z.discriminatedUnion("kind", [
-  z
-    .object({
-      kind: z.literal("attempt"),
-      attemptId: PositiveIdSchema,
-    })
-    .strict(),
-  z
-    .object({
-      kind: z.literal("proposal"),
-      proposalId: PositiveIdSchema,
-    })
-    .strict(),
-]);
+const StorePriceAttemptLinkSchema = z
+  .object({
+    attemptId: PositiveIdSchema,
+  })
+  .strict();
 
 const CommonCreateFields = {
   backgroundEventKey: NonEmptyTextSchema.max(255).optional(),
   model: NonEmptyTextSchema.nullable().optional(),
   modelMetadata: JsonObjectSchema.nullable().optional(),
-  operations: z.array(PersistedOperationInputSchema),
 } as const;
 
 const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
@@ -123,7 +114,7 @@ const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
       sourceId: z.union([NonEmptyTextSchema, z.number().int()]),
       input: ClassifyBottleReferenceInputSchema,
       result: BottleClassificationResultSchema,
-      storePrice: StorePriceLinkSchema.optional(),
+      storePrice: StorePriceAttemptLinkSchema.optional(),
       ...CommonCreateFields,
     })
     .strict(),
@@ -294,79 +285,22 @@ export function sanitizeBottleCheckInput(
   return sanitizeBottleCheckValue(value) as Record<string, JsonValue>;
 }
 
-function serializedProposalCounts(
-  proposals: Array<z.infer<typeof ProposedOperationSchema>>,
-) {
-  const counts = new Map<string, number>();
-  for (const proposal of proposals) {
-    const serialized = JSON.stringify(proposal);
-    counts.set(serialized, (counts.get(serialized) ?? 0) + 1);
-  }
-  return counts;
-}
-
-function assertOperationsMatchResult({
-  operations,
-  proposedOperations,
-}: {
-  operations: Array<z.infer<typeof PersistedOperationInputSchema>>;
-  proposedOperations: Array<z.infer<typeof ProposedOperationSchema>>;
-}) {
-  const expected = serializedProposalCounts(proposedOperations);
-  const actual = serializedProposalCounts(
-    operations.map(({ proposal }) => proposal),
-  );
-
-  if (
-    expected.size !== actual.size ||
-    [...expected].some(
-      ([serialized, count]) => actual.get(serialized) !== count,
-    )
-  ) {
-    throw new Error(
-      "Persisted Bottle operations must exactly match the check result.",
-    );
-  }
-
-  for (const operation of operations) {
-    if (
-      operation.status === "pending_review" &&
-      JSON.stringify(operation.resolvedEvidenceRefs) !==
-        JSON.stringify(operation.proposal.evidenceRefs)
-    ) {
-      throw new Error(
-        "Persisted resolved evidence references must exactly match the proposal.",
-      );
-    }
-  }
-}
-
 async function resolveStorePriceLink({
   database,
   storePrice,
+  sourceId,
 }: {
   database: AnyDatabase;
-  storePrice?: z.infer<typeof StorePriceLinkSchema>;
+  storePrice: z.infer<typeof StorePriceAttemptLinkSchema>;
+  sourceId: string | number;
 }) {
-  if (!storePrice) {
-    return {
-      storePriceMatchAttemptId: null,
-      storePriceMatchProposalId: null,
-    };
-  }
-
-  if (storePrice.kind === "proposal") {
-    return {
-      storePriceMatchAttemptId: null,
-      storePriceMatchProposalId: storePrice.proposalId,
-    };
-  }
-
   const attempt = await database.query.storePriceMatchAttempts.findFirst({
     where: eq(storePriceMatchAttempts.id, storePrice.attemptId),
     columns: {
       id: true,
+      priceId: true,
       proposalId: true,
+      suggestedBottleId: true,
     },
   });
   if (!attempt) {
@@ -374,11 +308,35 @@ async function resolveStorePriceLink({
       `Store-price match attempt ${storePrice.attemptId} not found.`,
     );
   }
+  if (String(attempt.priceId) !== String(sourceId)) {
+    throw new Error(
+      `Store-price match attempt ${storePrice.attemptId} does not belong to price ${sourceId}.`,
+    );
+  }
 
   return {
     storePriceMatchAttemptId: attempt.id,
     storePriceMatchProposalId: attempt.proposalId,
+    suggestedBottleId: attempt.suggestedBottleId,
   };
+}
+
+function getProtectedBottleIds(
+  input: z.infer<typeof CreateBottleCheckInputSchema>,
+  storePriceSuggestedBottleId: number | null,
+): number[] {
+  if (input.intent === "audit_bottle") return [];
+  if (input.sourceKind === "store_price") {
+    return storePriceSuggestedBottleId === null
+      ? []
+      : [storePriceSuggestedBottleId];
+  }
+  if (input.result.status === "ignored") return [];
+
+  const { decision } = input.result;
+  return decision.action === "match" || decision.action === "repair_bottle"
+    ? [decision.matchedBottleId]
+    : [];
 }
 
 async function findCheckByBackgroundEventKey({
@@ -419,25 +377,23 @@ export async function createBottleCheck(
       "Post-user-creation Bottle checks require a background event key.",
     );
   }
-
-  assertOperationsMatchResult({
-    operations: input.operations,
-    proposedOperations: input.result.proposedOperations,
-  });
-  let sourceFields: string[];
-  if (input.intent === "audit_bottle") {
-    sourceFields = getBottleCheckSourceEvidencePaths({
-      intent: input.intent,
-      input: input.input,
-      artifacts: input.result.artifacts,
-    });
-  } else {
-    sourceFields = getBottleCheckSourceEvidencePaths({
-      intent: input.intent,
-      input: input.input,
-      artifacts: input.result.artifacts,
-    });
+  if (input.intent === "resolve_reference") {
+    if (input.sourceKind === "store_price" && !input.storePrice) {
+      throw new Error(
+        "Store-price Bottle checks require the exact match attempt.",
+      );
+    }
+    if (input.sourceKind !== "store_price" && input.storePrice) {
+      throw new Error(
+        "Only store-price Bottle checks may link a match attempt.",
+      );
+    }
   }
+  const evidenceSource = {
+    ...input,
+    artifacts: input.result.artifacts,
+  };
+  const sourceFields = getBottleCheckSourceEvidencePaths(evidenceSource);
   assertCollectedEvidenceRefs({
     artifacts: input.result.artifacts,
     evidenceRefs: input.result.findings.flatMap(
@@ -445,7 +401,6 @@ export async function createBottleCheck(
     ),
     sourceFields,
   });
-
   const artifacts = input.result.artifacts;
   const output =
     input.intent === "audit_bottle"
@@ -468,16 +423,26 @@ export async function createBottleCheck(
   const subjectKey = buildSubjectKey(subject);
 
   return await database.transaction(async (tx) => {
-    const storePriceLink =
-      input.intent === "resolve_reference"
+    const resolvedStorePriceLink =
+      input.intent === "resolve_reference" && input.storePrice
         ? await resolveStorePriceLink({
             database: tx,
             storePrice: input.storePrice,
+            sourceId: input.sourceId,
           })
         : {
             storePriceMatchAttemptId: null,
             storePriceMatchProposalId: null,
+            suggestedBottleId: null,
           };
+    const { suggestedBottleId, ...storePriceLink } = resolvedStorePriceLink;
+    const operations = await prepareProposals({
+      proposals: input.result.proposedOperations,
+      artifacts: input.result.artifacts,
+      sourceFields,
+      protectedBottleIds: getProtectedBottleIds(input, suggestedBottleId),
+      database: tx,
+    });
 
     const [check] = await tx
       .insert(bottleChecks)
@@ -530,26 +495,23 @@ export async function createBottleCheck(
       };
     }
 
-    const operations = input.operations.length
+    const insertedOperations = operations.length
       ? await tx
           .insert(bottleOperations)
           .values(
-            input.operations.map((operation) =>
+            operations.map((operation) =>
               operation.status === "blocked"
                 ? {
                     checkId: check.id,
                     proposal: operation.proposal,
                     preparationError: operation.preparationError,
                     status: operation.status,
-                    preparedAt: new Date(),
                   }
                 : {
                     checkId: check.id,
                     proposal: operation.proposal,
-                    resolvedEvidenceRefs: operation.resolvedEvidenceRefs,
                     stateToken: operation.stateToken,
                     status: operation.status,
-                    preparedAt: new Date(),
                   },
             ),
           )
@@ -559,7 +521,7 @@ export async function createBottleCheck(
     return {
       check: {
         ...check,
-        operations,
+        operations: insertedOperations,
       },
       created: true,
     };

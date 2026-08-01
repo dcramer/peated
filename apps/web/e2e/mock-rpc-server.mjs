@@ -72,6 +72,7 @@ const pendingUploadStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
 const approvedBottleCheckTokens = new Set();
 const rejectedBottleCheckTokens = new Set();
+const completedBottleAuditTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
 
@@ -136,6 +137,37 @@ async function handleRpcRequest({ request, response, url }) {
         },
       });
       return true;
+    case "bottleChecks/history": {
+      const token = getAccessToken(request);
+      if (!token.includes("bottle-audit")) {
+        sendRpcResponse(response, { results: [] });
+        return true;
+      }
+      if (Number(input?.bottle) !== existingBottleId) {
+        sendRpcError(response, "Unexpected Bottle history payload");
+        return true;
+      }
+      sendRpcResponse(response, {
+        results: completedBottleAuditTokens.has(token)
+          ? [buildModeratorAuditCheck()]
+          : [],
+      });
+      return true;
+    }
+    case "bottleChecks/audit": {
+      const token = getAccessToken(request);
+      if (
+        !token.includes("bottle-audit") ||
+        input?.bottle !== existingBottleId ||
+        input?.note !== "Verify the label and catalog identity."
+      ) {
+        sendRpcError(response, "Unexpected Bottle audit payload");
+        return true;
+      }
+      completedBottleAuditTokens.add(token);
+      sendRpcResponse(response, buildModeratorAuditCheck());
+      return true;
+    }
     case "bottleChecks/details": {
       const token = getAccessToken(request);
       if (
@@ -1118,7 +1150,6 @@ function buildLinkedStorePriceCheckDetails({ approved }) {
     id: linkedStorePriceOperationId,
     checkId: linkedStorePriceCheckId,
     proposal,
-    resolvedEvidenceRefs: proposal.evidenceRefs,
     stateToken,
     preparationError: null,
     status: approved ? "applied" : "pending_review",
@@ -1136,7 +1167,6 @@ function buildLinkedStorePriceCheckDetails({ approved }) {
         }
       : null,
     error: null,
-    preparedAt: timestamp,
     executionStartedAt: approved ? timestamp : null,
     executionCompletedAt: approved ? timestamp : null,
     createdAt: timestamp,
@@ -1270,7 +1300,6 @@ function buildBottleCheckDetails({ approved, rejected }) {
         rationale: "Rename the inspected Brand from current evidence.",
         evidenceRefs: [{ kind: "entity", entityId: 42 }],
       },
-      resolvedEvidenceRefs: [{ kind: "entity", entityId: 42 }],
       stateToken: readyStateToken,
       preparationError: null,
       status: approved ? "applied" : "pending_review",
@@ -1287,7 +1316,6 @@ function buildBottleCheckDetails({ approved, rejected }) {
           }
         : null,
       error: null,
-      preparedAt: timestamp,
       executionStartedAt: approved ? timestamp : null,
       executionCompletedAt: approved ? timestamp : null,
       createdAt: timestamp,
@@ -1305,7 +1333,6 @@ function buildBottleCheckDetails({ approved, rejected }) {
         rationale: "Review the second inspected Brand independently.",
         evidenceRefs: [{ kind: "entity", entityId: 43 }],
       },
-      resolvedEvidenceRefs: [{ kind: "entity", entityId: 43 }],
       stateToken: preparedDriftedStateToken,
       preparationError: null,
       status: rejected ? "rejected" : "pending_review",
@@ -1315,7 +1342,6 @@ function buildBottleCheckDetails({ approved, rejected }) {
       reviewerNote: null,
       result: null,
       error: null,
-      preparedAt: timestamp,
       executionStartedAt: null,
       executionCompletedAt: null,
       createdAt: timestamp,
@@ -1428,6 +1454,44 @@ function buildBottleCheckDetails({ approved, rejected }) {
             }),
       },
     ],
+  };
+}
+
+function buildModeratorAuditCheck() {
+  const timestamp = "2026-07-30T00:00:00.000Z";
+  return {
+    id: 93,
+    intent: "audit_bottle",
+    origin: "moderator",
+    sourceKind: null,
+    sourceId: null,
+    bottleId: existingBottleId,
+    subjectKey: `audit_bottle:bottle:${existingBottleId}`,
+    backgroundEventKey: null,
+    schemaVersion: 1,
+    schemaSupported: true,
+    inputSnapshot: {
+      bottleId: existingBottleId,
+      origin: "moderator",
+      note: "Verify the label and catalog identity.",
+    },
+    output: {
+      summary: "The Bottle identity is supported by the inspected evidence.",
+      findings: [],
+    },
+    artifacts: {},
+    model: "playwright-model",
+    modelMetadata: null,
+    error: null,
+    storePriceMatchProposalId: null,
+    storePriceMatchAttemptId: null,
+    closedById: null,
+    closeReason: null,
+    closeNote: null,
+    createdAt: timestamp,
+    completedAt: timestamp,
+    closedAt: null,
+    operations: [],
   };
 }
 

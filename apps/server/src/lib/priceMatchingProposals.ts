@@ -1,6 +1,5 @@
 import type { BottleReferenceRun } from "@peated/bottle-classifier";
 import {
-  getBottleCheckSourceEvidencePaths,
   type BottleClassificationResult,
   type CandidateExpansionMode,
   type ClassifyBottleReferenceInput,
@@ -38,7 +37,6 @@ import {
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
-import { prepareProposals } from "@peated/server/lib/bottleOperationReview";
 import {
   buildBottleInputFromProposedBottle,
   buildClassifierConcreteBottleInput,
@@ -721,26 +719,15 @@ async function recordStorePriceMatchAttempt({
   return attempt;
 }
 
-function getProtectedPrimaryBottleIds(
-  classification: BottleClassificationResult,
-): number[] {
-  if (isIgnoredBottleClassification(classification)) return [];
-
-  const { decision } = classification;
-  return decision.action === "match" || decision.action === "repair_bottle"
-    ? [decision.matchedBottleId]
-    : [];
-}
-
 async function tryPersistStorePriceBottleCheck({
-  attemptId,
+  attempt,
   classificationInput,
   classification,
   modelMetadata,
   price,
   proposal,
 }: {
-  attemptId: number;
+  attempt: { id: number; suggestedBottleId: number | null };
   classificationInput: ClassifyBottleReferenceInput;
   classification: BottleClassificationResult;
   modelMetadata: BottleReferenceRun["modelMetadata"];
@@ -748,17 +735,6 @@ async function tryPersistStorePriceBottleCheck({
   proposal: StorePriceMatchProposal;
 }) {
   try {
-    const preparedProposals = await prepareProposals({
-      proposals: classification.proposedOperations,
-      artifacts: classification.artifacts,
-      sourceFields: getBottleCheckSourceEvidencePaths({
-        intent: "resolve_reference",
-        input: classificationInput,
-        artifacts: classification.artifacts,
-      }),
-      protectedBottleIds: getProtectedPrimaryBottleIds(classification),
-    });
-
     await createBottleCheck({
       intent: "resolve_reference",
       sourceKind: "store_price",
@@ -766,12 +742,10 @@ async function tryPersistStorePriceBottleCheck({
       input: classificationInput,
       result: classification,
       storePrice: {
-        kind: "attempt",
-        attemptId,
+        attemptId: attempt.id,
       },
       model: proposal.model,
       modelMetadata,
-      operations: preparedProposals,
     });
   } catch (error) {
     logError(error, {
@@ -783,7 +757,7 @@ async function tryPersistStorePriceBottleCheck({
         id: proposal.id,
       },
       extra: {
-        attemptId,
+        attemptId: attempt.id,
         phase: "persist_store_price_bottle_check",
       },
     });
@@ -1429,7 +1403,7 @@ export async function resolveStorePriceMatchProposal(
       });
       if (shouldGenerateBottleCheck) {
         await tryPersistStorePriceBottleCheck({
-          attemptId: ignoredResult.attempt.id,
+          attempt: ignoredResult.attempt,
           classificationInput,
           classification,
           modelMetadata: classificationModelMetadata,
@@ -1483,7 +1457,7 @@ export async function resolveStorePriceMatchProposal(
     });
     if (shouldGenerateBottleCheck) {
       await tryPersistStorePriceBottleCheck({
-        attemptId: attempt.id,
+        attempt,
         classificationInput,
         classification,
         modelMetadata: classificationModelMetadata,

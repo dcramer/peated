@@ -285,12 +285,14 @@ describe("local catalog data source", () => {
           id: 5001,
           name: "Northstar",
           shortName: null,
+          aliases: [],
           type: ["distiller"],
         },
         {
           id: 5002,
           name: "Northstar Distillery",
           shortName: null,
+          aliases: [],
           type: ["distiller"],
         },
       ],
@@ -304,5 +306,47 @@ describe("local catalog data source", () => {
 
     expect(results?.map((result) => result.entityId)).toEqual([5002, 5001]);
     expect(results?.[0]?.score).toBeGreaterThan(results?.[1]?.score ?? 0);
+  });
+
+  test("resolves exact entity aliases ahead of contained names", async () => {
+    const dataSource = createLocalCatalogDataSource({
+      ...shieldaigCatalog,
+      entities: [
+        ...shieldaigCatalog.entities,
+        {
+          id: 1953,
+          name: "Komagatake",
+          shortName: null,
+          aliases: ["Mars Shinshu Distillery"],
+          type: ["brand", "distiller"],
+        },
+        {
+          id: 238555,
+          name: "Shinshu",
+          shortName: null,
+          aliases: [],
+          type: ["distiller"],
+        },
+      ],
+    });
+
+    await expect(
+      dataSource.searchEntities?.({
+        query: "Mars Shinshu Distillery",
+        type: "distiller",
+        limit: 5,
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        entityId: 1953,
+        alias: "Mars Shinshu Distillery",
+        score: 1,
+        source: ["local_catalog", "exact"],
+      }),
+      expect.objectContaining({
+        entityId: 238555,
+        score: expect.any(Number),
+      }),
+    ]);
   });
 });

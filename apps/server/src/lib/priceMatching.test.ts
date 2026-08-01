@@ -2375,6 +2375,7 @@ describe("priceMatching", () => {
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
+    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -2389,6 +2390,10 @@ describe("priceMatching", () => {
       name: "Bodega Cask",
       category: "blend",
       distillerIds: [],
+    });
+    const otherBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Unrelated Destination",
     });
     const price = await fixtures.StorePrice({
       bottleId: currentBottle.id,
@@ -2418,11 +2423,9 @@ describe("priceMatching", () => {
     vi.mocked(classifyBottleReference).mockResolvedValue(
       buildMockBottleReferenceClassification({
         decision: {
-          action: "create_new",
-          confidence: 92,
+          action: "create_bottle",
           rationale:
             "The local bottle shares the base name, but the stored category conflicts with official evidence.",
-          suggestedBottleId: null,
           candidateBottleIds: [currentBottle.id],
           proposedBottle: {
             name: "Bodega Cask",
@@ -2517,11 +2520,32 @@ describe("priceMatching", () => {
             source: ["exact"],
           },
         ],
+        bottleContexts: [
+          await inspectedBottleContext(currentBottle.id),
+          await inspectedBottleContext(otherBottle.id),
+        ],
+        proposedOperations: [
+          {
+            type: "merge_bottles",
+            input: {
+              sourceBottleId: currentBottle.id,
+              destinationBottleId: otherBottle.id,
+            },
+            rationale:
+              "This deliberately conflicts with the translated primary repair target.",
+            evidenceRefs: [
+              { kind: "bottle", bottleId: currentBottle.id },
+              { kind: "bottle", bottleId: otherBottle.id },
+            ],
+          },
+        ],
         resolvedEntities: [],
       }),
     );
 
-    const proposal = await resolveStorePriceMatchProposal(price.id);
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      generateBottleCheck: true,
+    });
 
     expect(proposal.status).toBe("pending_review");
     expect(proposal.proposalType).toBe("correction");
@@ -2540,6 +2564,16 @@ describe("priceMatching", () => {
       ],
     });
     expect(proposal.rationale).toContain("existing-bottle repair");
+    const check = await db.query.bottleChecks.findFirst({
+      where: eq(bottleChecks.storePriceMatchProposalId, proposal.id),
+      with: { operations: true },
+    });
+    expect(check?.operations).toEqual([
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({ code: "direct_conflict" }),
+      }),
+    ]);
   });
 
   test("stores first-class repair decisions as existing-bottle repairs", async ({
@@ -8072,10 +8106,6 @@ describe("priceMatching", () => {
       });
       expect(prepared).toMatchObject({
         status: "pending_review",
-        resolvedEvidenceRefs: [
-          { kind: "bottle", bottleId: sourceBottle.id },
-          { kind: "bottle", bottleId: destinationBottle.id },
-        ],
       });
       expect(prepared?.stateToken).toMatchObject({
         source: { bottleId: sourceBottle.id },

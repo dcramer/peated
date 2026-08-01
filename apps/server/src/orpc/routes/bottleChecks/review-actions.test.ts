@@ -8,7 +8,6 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
-import { prepareProposals } from "@peated/server/lib/bottleOperationReview";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -65,10 +64,6 @@ describe("Bottle Check review action routes", () => {
         },
       ],
     };
-    const [prepared] = await prepareProposals({
-      proposals: [proposal],
-      artifacts,
-    });
     const created = await createBottleCheck({
       intent: "audit_bottle",
       input: { bottleId: bottle.id, origin: "moderator" },
@@ -78,7 +73,6 @@ describe("Bottle Check review action routes", () => {
         findings: [],
         artifacts,
       },
-      operations: [prepared!],
     });
     return {
       check: created.check,
@@ -109,7 +103,6 @@ describe("Bottle Check review action routes", () => {
           legacyOperation: "rename_entity",
           arguments: [created.entity.id, "Legacy Entity Corrected"],
         } as never,
-        resolvedEvidenceRefs: { legacyEntityId: created.entity.id } as never,
       })
       .where(eq(bottleOperations.id, created.operation.id));
 
@@ -283,7 +276,6 @@ describe("Bottle Check review action routes", () => {
           ],
         }),
       },
-      operations: [],
     });
 
     const result = await routerClient.bottleChecks.close(

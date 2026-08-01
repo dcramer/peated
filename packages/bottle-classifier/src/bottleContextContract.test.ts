@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  BottleContextLabelEvidenceSchema,
   BottleContextSchema,
   BottleContextSourceSchema,
   EntityContextSchema,
@@ -14,7 +15,6 @@ import {
   MAX_ENTITY_CONTEXT_BOTTLES,
   type BottleContextSource,
 } from "./bottleContextContract";
-import { ImageBottleEvidenceSchema } from "./imageEvidence";
 
 const exact = {
   edition: null,
@@ -153,26 +153,24 @@ describe("Bottle context contracts", () => {
 
   test("requires normalized evidence for every public image", () => {
     const { imageSources: _, ...source } = bottleSource();
-    const evidence = ImageBottleEvidenceSchema.parse({
+    const evidence = BottleContextLabelEvidenceSchema.parse({
       sourceImageId: "bottle:10",
-      extractors: [
-        {
-          kind: "vision",
-          model: "test-model",
-          confidence: 0,
-          textSpans: [],
-          observations: ["No reliable identity evidence."],
-        },
-      ],
-      fieldCandidates: {},
-      photoSuitability: {
-        isSingleBottlePhoto: true,
-        labelReadable: true,
-        suitableAsTastingImage: true,
-        suitableAsBottleImage: true,
-      },
-      conflicts: [],
+      model: "test-model",
+      extractedIdentity: null,
     });
+    expect(evidence).toEqual({
+      sourceImageId: "bottle:10",
+      model: "test-model",
+      extractedIdentity: null,
+    });
+    expect(
+      BottleContextLabelEvidenceSchema.safeParse({
+        ...evidence,
+        confidence: 0.75,
+        textSpans: [{ text: "synthetic label text", confidence: 0.75 }],
+        photoSuitability: { suitableAsTastingImage: true },
+      }).success,
+    ).toBe(false);
 
     expect(
       BottleContextSchema.safeParse({

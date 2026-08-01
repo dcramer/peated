@@ -68,4 +68,4 @@ export {
 } from "./auditBottle";
 export { classifyBottleReference } from "./classifyBottleReference";
 export { identifyExistingBottleReference } from "./identifyExistingBottleReference";
-export { runBottleReference } from "./runBottleReference";
+export { runBottleReference } from "./service";

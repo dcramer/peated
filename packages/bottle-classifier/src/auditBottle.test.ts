@@ -137,9 +137,10 @@ describe("auditBottle", () => {
           url: "https://example.com/bottles/45146.webp",
           labelEvidence: {
             sourceImageId: "bottle:45146",
-            fieldCandidates: {
-              expression: { value: "Càirdeas" },
-              releaseYear: { value: 2022 },
+            model: "test-model",
+            extractedIdentity: {
+              expression: "Càirdeas",
+              release_year: 2022,
             },
           },
         });
@@ -213,6 +214,11 @@ describe("auditBottle", () => {
                 url: "https://example.com/bottles/45146.webp",
                 labelEvidence: {
                   sourceImageId: "bottle:45146",
+                  model: "test-model",
+                  extractedIdentity: {
+                    expression: "Càirdeas",
+                    release_year: 2022,
+                  },
                 },
               },
               {
@@ -220,6 +226,11 @@ describe("auditBottle", () => {
                 url: "https://example.com/tastings/901.webp",
                 labelEvidence: {
                   sourceImageId: "tasting:901",
+                  model: "test-model",
+                  extractedIdentity: {
+                    expression: "Càirdeas",
+                    release_year: 2022,
+                  },
                 },
               },
             ],

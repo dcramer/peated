@@ -49,6 +49,52 @@ function containedEntityScore(query: string, candidate: string) {
   return 0.25 + 0.2 * (candidate.length / query.length);
 }
 
+function getEntitySearchMatch({
+  query,
+  name,
+  shortName,
+  aliases,
+}: {
+  query: string;
+  name: string | null | undefined;
+  shortName: string | null | undefined;
+  aliases: string[];
+}) {
+  const candidates = [
+    { value: name, alias: null },
+    { value: shortName, alias: null },
+    ...aliases.map((alias) => ({ value: alias, alias })),
+  ];
+  let bestMatch:
+    | {
+        alias: string | null;
+        score: number;
+        source: "exact" | "text" | "contained";
+      }
+    | undefined;
+
+  for (const { value, alias } of candidates) {
+    const normalizedValue = normalizeSearchText(value);
+    const match =
+      normalizedValue === query
+        ? { alias, score: 1, source: "exact" as const }
+        : normalizedValue.includes(query)
+          ? { alias, score: 0.8, source: "text" as const }
+          : normalizedValue.length >= 4 && query.includes(normalizedValue)
+            ? {
+                alias,
+                score: containedEntityScore(query, normalizedValue),
+                source: "contained" as const,
+              }
+            : undefined;
+    if (match && (!bestMatch || match.score > bestMatch.score)) {
+      bestMatch = match;
+    }
+  }
+
+  return bestMatch;
+}
+
 function getEntity(catalog: LocalCatalog, id: number | null | undefined) {
   return id == null
     ? null
@@ -330,54 +376,32 @@ function searchCatalogEntities(
   const normalizedQuery = normalizeSearchText(args.query);
 
   return catalog.entities
-    .filter((entity) => {
+    .flatMap((entity) => {
       if (args.type !== null && !entity.type.includes(args.type)) {
-        return false;
+        return [];
       }
 
-      const normalizedName = normalizeSearchText(entity.name);
-      const normalizedShortName = normalizeSearchText(entity.shortName);
-      return (
-        normalizedName.includes(normalizedQuery) ||
-        normalizedShortName.includes(normalizedQuery) ||
-        (normalizedName.length >= 4 &&
-          normalizedQuery.includes(normalizedName)) ||
-        (normalizedShortName.length >= 4 &&
-          normalizedQuery.includes(normalizedShortName))
-      );
-    })
-    .map((entity) => {
-      const normalizedName = normalizeSearchText(entity.name);
-      const normalizedShortName = normalizeSearchText(entity.shortName);
-      const score =
-        normalizedName === normalizedQuery ||
-        normalizedShortName === normalizedQuery
-          ? 1
-          : normalizedName.includes(normalizedQuery) ||
-              normalizedShortName.includes(normalizedQuery)
-            ? 0.8
-            : Math.max(
-                containedEntityScore(normalizedQuery, normalizedName),
-                containedEntityScore(normalizedQuery, normalizedShortName),
-              );
-      const matchSource =
-        normalizedName === normalizedQuery ||
-        normalizedShortName === normalizedQuery
-          ? "exact"
-          : normalizedName.includes(normalizedQuery) ||
-              normalizedShortName.includes(normalizedQuery)
-            ? "text"
-            : "contained";
-
-      return EntityResolutionSchema.parse({
-        entityId: entity.id,
+      const match = getEntitySearchMatch({
+        query: normalizedQuery,
         name: entity.name,
         shortName: entity.shortName,
-        type: entity.type,
-        alias: null,
-        score,
-        source: ["local_catalog", matchSource],
+        aliases: entity.aliases,
       });
+      if (!match) {
+        return [];
+      }
+
+      return [
+        EntityResolutionSchema.parse({
+          entityId: entity.id,
+          name: entity.name,
+          shortName: entity.shortName,
+          type: entity.type,
+          alias: match.alias,
+          score: match.score,
+          source: ["local_catalog", match.source],
+        }),
+      ];
     })
     .sort((left, right) => {
       const scoreDelta = (right.score ?? 0) - (left.score ?? 0);

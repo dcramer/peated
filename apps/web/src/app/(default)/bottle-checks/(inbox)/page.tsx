@@ -4,6 +4,7 @@ import type { Outputs } from "@peated/server/orpc/router";
 import {
   BottleCheckSubject,
   getBottleCheckFindings,
+  getBottleCheckOperationCount,
   getBottleCheckState,
   getBottleCheckSummary,
 } from "@peated/web/components/bottleChecks/checkSummary";
@@ -37,13 +38,9 @@ function formatDate(value: string): string {
 
 export function BottleCheckRow({ check }: { check: BottleCheck }) {
   const findings = getBottleCheckFindings(check);
-  const unresolvedOperationCount = check.schemaSupported
-    ? check.operations.filter((operation) =>
-        ["blocked", "pending_review", "applying", "stale", "failed"].includes(
-          operation.status,
-        ),
-      ).length
-    : check.operationCount;
+  const unresolvedOperationCount = getBottleCheckOperationCount(check, {
+    unresolvedOnly: true,
+  });
 
   return (
     <tr>

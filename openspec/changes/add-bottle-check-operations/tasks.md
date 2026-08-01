@@ -52,13 +52,14 @@
       Peated API state, the official Laphroaig 2022 Warehouse 1 evidence, public
       tasting `223` and its Warehouse 1 label image, and the exact expected Peated
       outcome in the fixture provenance.
-- [x] 2.6 Add existing-Bottle audit fixtures for clean, update, duplicate merge,
-      Brand changes through `update_bottle`, embedded Entity creation, Entity
-      update/merge, findings, and unresolved cases.
-- [x] 2.7 Add generalized and negative fixtures with different products, ids,
-      Entity roles, unrelated Entity cleanup, prompt-injection evidence,
-      uninspected targets, primary/operation contradictions, and
-      current-to-selected-match operation correlation.
+- [x] 2.6 Add one synthetic clean/no-op audit fixture and one evidence-backed
+      Laphroaig Càirdeas audit fixture derived from the verified production
+      reference miss, with provenance that distinguishes the derived audit from
+      the observed reference failure.
+- [x] 2.7 Cover Bottle/Entity operation shapes, invalid combinations,
+      grounding failures, unrelated cleanup, and decision/operation conflicts
+      in deterministic contract, policy, and server integration tests rather
+      than invented semantic repair fixtures.
 - [x] 2.8 Report reference-decision accuracy separately from exact operation and
       finding precision/recall. Hard-gate the authoritative reference decision
       and canonical/collected grounding, keep exact reference operation/finding
@@ -84,9 +85,8 @@
       metadata, result/error, and timestamps. Use the operation id for
       dispatch/retry identity; do not add array position or per-operation versions.
 - [x] 3.2 Link store-price attempts/proposals to checks without replacing their
-      current decision fields. Use the exact linked attempt's final status as
-      the execution gate while retaining proposal-only links for preview
-      compatibility.
+      current decision fields. Require the exact linked attempt, derive its
+      proposal link, and use that attempt's final status as the execution gate.
 - [x] 3.3 Generate the database migration with `pnpm db:generate`.
 - [x] 3.4 Sanitize persisted input snapshots so inline image bytes are omitted,
       and store intent output and artifacts exactly once.
