@@ -2,6 +2,7 @@ import {
   createBottleClassifier as createInternalBottleClassifier,
   type BottleClassifierAdapters,
   type BottleClassifierDataSource,
+  type BottleReferenceRun,
   type BottleClassifier as InternalBottleClassifier,
   type CreateBottleClassifierOptions as InternalCreateBottleClassifierOptions,
 } from "./classifierRuntime";
@@ -14,6 +15,7 @@ import {
  */
 export type BottleClassifier = Pick<
   InternalBottleClassifier,
+  | "runBottleReference"
   | "classifyBottleReference"
   | "auditBottle"
   | "identifyExistingBottleReference"
@@ -27,7 +29,12 @@ export type CreateBottleClassifierOptions =
       : never
     : never;
 
-export type { BottleClassifierAdapters, BottleClassifierDataSource };
+export type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
+export type {
+  BottleClassifierAdapters,
+  BottleClassifierDataSource,
+  BottleReferenceRun,
+};
 
 /**
  * Creates the reviewed bottle classifier.

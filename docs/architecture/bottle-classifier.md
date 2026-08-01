@@ -57,7 +57,7 @@ A Bottle check is one immutable classifier result created for a server-owned
 intent:
 
 - `resolve_reference` identifies a Bottle from a listing or other external
-  reference. Its existing structured decision remains the primary result.
+  reference. Its existing structured decision remains the authoritative result.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
   sampled post-user-creation job. Its result is a narrative summary, proposed
   operations, and findings; it has no redundant structured conclusion.
@@ -73,7 +73,11 @@ evidence references. V1 supports exactly four:
 The agent has bounded read-only Bottle, BottleGroup, Entity, local-search, and
 focused web-evidence tools. It cannot mutate the catalog. Proposals may refer
 only to inspected resources and collected evidence. Unsupported or unresolved
-work remains a finding instead of becoming an invented operation.
+work remains a finding instead of becoming an invented operation, but only when
+positive evidence establishes a real catalog defect that remains after proposed
+operations apply. Uncertainty about whether an underspecified, generic, or
+family row is intentional is not a finding; no operations and no findings is a
+valid reviewed result.
 
 The server prepares each proposal independently as a review operation. A review
 operation adds the live diff, bounded impact, warnings, state token, and either
@@ -81,9 +85,13 @@ operation adds the live diff, bounded impact, warnings, state token, and either
 hide valid siblings, and operations are independent rather than an ordered
 plan.
 
-Supplemental proposed operations always require explicit moderator approval.
+An `update_bottle` cannot target a Bottle that is also a `merge_bottles` source
+in the same batch. The merge retires the source and subsumes correction of that
+row; proposing both would be redundant and dependent.
+
+Proposed catalog operations always require explicit moderator approval.
 This remains true for a high-confidence result and for checks created after an
-end-user save. Only the existing primary add-Bottle classification may
+end-user save. Only the existing add-Bottle classification may
 auto-apply under its established policy. Approval locks and revalidates the
 operation; relevant drift makes it stale. Only failed operations may be
 retried, using the same operation id and reconciliation before redispatch.
@@ -93,7 +101,8 @@ immutable.
 Generation, moderator visibility, and execution are controlled separately by
 `BOTTLE_CHECK_SHADOW_GENERATION`, `BOTTLE_CHECK_MODERATOR_VISIBILITY`, and
 `BOTTLE_CHECK_EXECUTION`. All three default off. Post-user-creation audits run
-after the Bottle save commits and never delay or roll back that save.
+after the Bottle save commits and never delay or roll back that save. These
+flags do not alter the four proposal tools exposed when a full check runs.
 
 ### BottleGroup Findings
 
@@ -116,12 +125,14 @@ move, merge, and split operations merely for symmetry.
 
 ### Measurement And Rollout
 
-Keep reference-decision accuracy separate from audit operation and finding
-precision. Before enabling execution broadly, measure:
+Keep reference-decision accuracy and diagnostic cleanup recall separate from
+audit operation and finding precision. Before enabling execution broadly,
+measure:
 
 - intent accuracy and schema-valid output;
-- exact proposed operations and missing operations, with harmful extras
-  weighted most heavily;
+- authoritative reference-decision and canonical/collected grounding gates;
+- exact proposed operation and finding sets, with missing and extra reference
+  entries reported diagnostically and exact audit repair gating;
 - reviewer rejection/correction and time to disposition;
 - stale, failed, retry, and reconciliation outcomes;
 - model cost, latency, and tool calls.
@@ -212,11 +223,30 @@ The pipeline is:
    code references.
 5. Resolve local brand, bottler, and distillery entities.
 6. Preload targeted web evidence when local candidates are missing or unsafe.
-7. Run one classifier agent with local search, entity search, and web search
-   tools.
-8. Validate model output against known candidates and resolved entities.
-9. Normalize create and repair drafts.
-10. Downgrade impossible decisions and decisions with concrete conflicts.
+7. Run one bounded classifier agent loop with local search, Entity search,
+   focused web search, context tools, and four non-mutating proposal tools.
+   Deterministic resolution, such as an SMWS code, is supplied as an identity
+   anchor rather than bypassing the agent.
+8. The reference agent returns the strict authoritative decision and findings.
+   Successful proposal-tool calls are collected by runtime and attached as
+   `proposedOperations`; the model does not echo operations in final output.
+9. Validate and finalize the decision, then hand each collected proposal to
+   server preparation independently. A proposal tool accepts work only when its
+   payload is canonical, its existing targets were inspected, its evidence was
+   collected, it is not an exact duplicate, and the per-run ceiling is not
+   exceeded. The tools never mutate, approve, order, replace, or withdraw work.
+
+With `candidateExpansion: initial_only`, full classification omits Bottle,
+Entity, and web search but retains Bottle and Entity context tools for ids the
+agent already knows. Local match-only identification receives neither context
+nor proposal tools.
+
+Existing-Bottle audits use the same four proposal tools in one bounded agent
+loop. Their strict final output is only a summary and findings. The audited
+Bottle is preloaded as inspected context.
+
+Ignored references do not run the agent. Local match-only identification stays
+separate and does not receive catalog proposal tools.
 
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
@@ -379,6 +409,11 @@ other web results; it must not infer truth from a hardcoded domain class.
 The originating retailer can support extraction, but it is not decisive creation
 evidence by itself.
 
+For image inputs, extraction scans the complete readable label, including
+smaller secondary bands, subtitles, and neck tags, for identity-bearing edition,
+batch, release, finish, and variant text. Missing extraction remains preferable
+to inventing text that is not visible.
+
 The full classifier agent has read-only tools for local candidates, local
 entities, and live web evidence:
 
@@ -390,9 +425,9 @@ entities, and live web evidence:
   scraped page excerpts
 - `openai_web_search`: no-Firecrawl fallback web evidence search
 
-Tool descriptions should state what the tool searches, what arguments mean, what
-it returns, and any hard limits. Put classifier policy in the stable prompt or
-review policy, not in tool prose.
+Tool descriptions should state the tool's purpose, arguments, result, hard
+limits, and tool-specific preconditions. Keep cross-tool classifier policy in
+the stable prompt or review policy rather than only in tool prose.
 
 Add source-specific tools only when they return materially better structured
 evidence than general web search and preserve the same trust boundary.
@@ -423,6 +458,19 @@ calibrate; instead evals assert the code-derived automation tier
 `deriveAutomationTier`, and that derivation is covered by unit tests rather than
 model-scored confidence. Encoded expected fields are required. Missing unencoded
 optional enrichment can be tolerated; wrong required identity fields should fail.
+Reference and audit fixtures exercise the same single agent loop and four
+proposal tools used by production Bottle checks. On a replay cache hit the eval
+harness does not invoke the underlying web tool, so replay does not consume the
+in-process web-query budget; live runs remain the budget authority.
+
+For `resolve_reference`, the authoritative identity decision and
+canonical/collected grounding are gating. Exact operation and finding sets,
+including missing and extra entries, are reported by named informational judges;
+a fixture cannot prove that an otherwise supported proposal is harmful merely by
+omitting it. This does not turn opportunistic cleanup into a requirement for
+every reference, and every proposal still requires moderator approval before
+mutation. For `audit_bottle`, exact operations, findings, and required evidence
+are gating because active repair investigation is the intent.
 
 Local-identification evals should be scored separately from full
 classification evals. They should cover exact alias matches, safe non-exact

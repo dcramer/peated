@@ -1,6 +1,16 @@
-import { openaiAgentsHarness } from "@vitest-evals/harness-openai-agents";
-import { createJudge, describeEval, type JudgeContext } from "vitest-evals";
-import { toJsonValue, type JsonValue } from "vitest-evals/harness";
+import { expect } from "vitest";
+import {
+  createHarness,
+  createJudge,
+  describeEval,
+  type JudgeContext,
+} from "vitest-evals";
+import {
+  toJsonValue,
+  type JsonValue,
+  type TranscriptEvent,
+} from "vitest-evals/harness";
+import { executeWithReplay } from "vitest-evals/replay";
 import {
   AUDIT_BOTTLE_EVAL_CASES,
   buildAuditEvalBottleContext,
@@ -15,9 +25,10 @@ import {
   EntityContextSchema,
   type EntityContext,
 } from "./bottleContextContract";
-import type {
-  ClassifierEvalCase,
-  SearchResponseFixture,
+import {
+  loadClassifierEvalBottleContext,
+  type ClassifierEvalCase,
+  type SearchResponseFixture,
 } from "./classifier.eval.fixtures";
 import {
   getClassifierLiveEvalCases,
@@ -25,15 +36,10 @@ import {
   type LiveClassifierEvalScenario,
 } from "./classifier.eval.scenarios";
 import {
-  collectInitialResolvedEntities,
   createBottleClassifier,
-  createBottleContextLoader,
-  finalizeBottleClassifierReasoningResult,
-  prepareBottleAuditAgentRun,
-  prepareBottleClassifierAgentRun,
   type BottleClassifierDataSource,
-  type PreparedBottleAuditAgentRun,
-  type PreparedBottleClassifierAgentRun,
+  type BottleClassifierToolEvent,
+  type CreateBottleClassifierOptions,
 } from "./classifierRuntime";
 import type {
   BottleCandidate,
@@ -45,16 +51,13 @@ import type {
 import {
   AuditBottleResultSchema,
   BottleClassificationResultSchema,
-  ClassifyBottleReferenceInputSchema,
-  buildBottleClassificationArtifacts,
-  createAuditBottleResult,
-  createDecidedBottleClassification,
-  type AuditBottleResult,
+  getBottleCheckSourceEvidencePaths,
   type BottleClassificationResult,
 } from "./contract";
 import type { AuditBottleEvalFixture } from "./evalFixtureSchemas";
 import {
   createEvalClassifierOptions,
+  evalClassifierModel,
   hasEvalOpenAICredentials,
 } from "./evalSupport";
 import { createLocalCatalogDataSource } from "./localCatalog";
@@ -64,13 +67,7 @@ import {
   type AutomationTier,
 } from "./priceMatchingEvidence";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
-import { getAutoIgnoreBottleReferenceReason } from "./reviewPolicy";
-import { buildDefaultBottleSearchInput } from "./runtime/agentInput";
-import {
-  applyDeterministicIdentitySeed,
-  getDeterministicIdentitySeed,
-  resolveDeterministicBottleReference,
-} from "./runtime/deterministic";
+import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
 
 type ClassifiedBottleClassificationResult = Extract<
   BottleClassificationResult,
@@ -736,17 +733,20 @@ function buildClassifierAdapters(
     ...(inspectedBottleIdSet.size > 0
       ? {
           getBottleContext: async (bottleId: number) => {
-            if (!inspectedBottleIdSet.has(bottleId)) {
-              return null;
-            }
-            const candidate = await getBottleCandidateById(bottleId);
-            return candidate
-              ? buildAuditEvalBottleContext(
-                  candidate,
-                  inspectedEntities,
-                  inspectedSeries,
-                )
-              : null;
+            return await loadClassifierEvalBottleContext({
+              context: testCase.testCase.context,
+              bottleId,
+              fallback: async () => {
+                const candidate = await getBottleCandidateById(bottleId);
+                return candidate
+                  ? buildAuditEvalBottleContext(
+                      candidate,
+                      inspectedEntities,
+                      inspectedSeries,
+                    )
+                  : null;
+              },
+            });
           },
         }
       : {}),
@@ -763,199 +763,109 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
   return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
-type PreparedScenarioClassifierRun = {
-  agentRun: PreparedBottleClassifierAgentRun;
-  deterministicResult?: BottleClassificationResult;
-  classifyAgentResult: (result: unknown) => Promise<BottleClassificationResult>;
-};
+function createEvalRuntime() {
+  const toolEvents: TranscriptEvent[] = [];
+  const options: Pick<
+    CreateBottleClassifierOptions,
+    "executeWebSearch" | "observeToolEvent"
+  > = {
+    executeWebSearch: async ({ toolName, args, execute }) => {
+      const { result } = await executeWithReplay({
+        toolName,
+        args,
+        context: null,
+        execute,
+        replay: true,
+      });
+      return result;
+    },
+    observeToolEvent: (event: BottleClassifierToolEvent) => {
+      if (event.type === "tool_call") {
+        const args = toJsonValue(event.arguments);
+        toolEvents.push({
+          type: "tool_call",
+          id: event.id,
+          name: event.name,
+          metadata: { phase: event.phase },
+          ...(args && typeof args === "object" && !Array.isArray(args)
+            ? { arguments: args }
+            : {}),
+        });
+        return;
+      }
 
-async function prepareScenarioClassifierRun(
-  testCase: ClassifierScenarioEvalCase,
-): Promise<PreparedScenarioClassifierRun> {
-  const options = createClassifierOptions(testCase);
-  const dataSource = options.dataSource ?? options.adapters;
-  if (!dataSource) {
-    throw new Error("Classifier eval requires a data source.");
-  }
-  const classifier = createBottleClassifier(options);
-  const parsedInput = ClassifyBottleReferenceInputSchema.parse(
-    testCase.testCase.input,
-  );
-  const deterministicIdentitySeed = getDeterministicIdentitySeed(
-    parsedInput.reference,
-  );
-  const rawExtractedIdentity =
-    parsedInput.extractedIdentity !== undefined
-      ? (parsedInput.extractedIdentity ?? deterministicIdentitySeed)
-      : (deterministicIdentitySeed ??
-        (await classifier.extractBottleReferenceIdentity(
-          parsedInput.reference,
-        )));
-  const extractedIdentity = applyDeterministicIdentitySeed({
-    reference: parsedInput.reference,
-    extractedIdentity: rawExtractedIdentity,
-  });
-  const imageEvidence = parsedInput.imageEvidence ?? null;
-  const initialArtifacts = buildBottleClassificationArtifacts({
-    extractedIdentity,
-    imageEvidence,
-  });
-  const autoIgnoreReason = getAutoIgnoreBottleReferenceReason(
-    parsedInput.reference.name,
-    initialArtifacts.extractedIdentity,
-  );
-
-  if (autoIgnoreReason) {
-    throw new Error(
-      `Native replay evals require the classifier agent path, but ${parsedInput.reference.name} was auto-ignored: ${autoIgnoreReason}`,
-    );
-  }
-
-  const candidates =
-    parsedInput.initialCandidates ??
-    (dataSource.findInitialCandidates
-      ? await dataSource.findInitialCandidates({
-          reference: parsedInput.reference,
-          extractedIdentity,
-        })
-      : await dataSource.searchBottles(
-          buildDefaultBottleSearchInput({
-            reference: parsedInput.reference,
-            extractedIdentity,
-          }),
-        ));
-  const artifacts = buildBottleClassificationArtifacts({
-    extractedIdentity,
-    imageEvidence,
-    candidates,
-  });
-  const deterministicDecision = resolveDeterministicBottleReference({
-    reference: parsedInput.reference,
-    artifacts,
-  });
-  const availableOperations =
-    testCase.kind === "decision" ? testCase.testCase.availableOperations : [];
-  const deterministicResult =
-    deterministicDecision && availableOperations.length === 0
-      ? BottleClassificationResultSchema.parse(
-          createDecidedBottleClassification({
-            decision: deterministicDecision,
-            artifacts,
-          }),
-        )
-      : undefined;
-
-  const resolvedEntities = await collectInitialResolvedEntities({
-    candidateExpansion: parsedInput.candidateExpansion,
-    extractedIdentity,
-    initialCandidates: artifacts.candidates,
-    options,
-  });
-
-  const agentRun = await prepareBottleClassifierAgentRun(options, {
-    reference: parsedInput.reference,
-    availableOperations,
-    extractedIdentity: artifacts.extractedIdentity,
-    imageEvidence: artifacts.imageEvidence,
-    initialCandidates: artifacts.candidates,
-    candidateExpansion: parsedInput.candidateExpansion,
-    resolvedEntities,
-  });
+      toolEvents.push({
+        type: "tool_result",
+        toolCallId: event.toolCallId,
+        name: event.name,
+        content: toJsonValue(event.result) ?? null,
+        metadata: { phase: event.phase },
+      });
+    },
+  };
 
   return {
-    agentRun,
-    deterministicResult,
-    classifyAgentResult: async (result) => {
-      const reasoning = agentRun.getReasoningResult(result);
-      const {
-        decision,
-        proposedOperations,
-        findings,
-        artifacts: reasoningArtifacts,
-      } = await finalizeBottleClassifierReasoningResult({
-        reference: parsedInput.reference,
-        reasoning,
-      });
+    toolEvents,
+    options,
+  };
+}
 
-      return BottleClassificationResultSchema.parse(
-        createDecidedBottleClassification({
-          decision,
-          proposedOperations,
-          findings,
-          artifacts: reasoningArtifacts,
-        }),
-      );
+function buildHarnessMeasurements(
+  modelMetadata: BottleClassifierRunMetadata | null,
+  totalMs: number,
+) {
+  return {
+    usage: modelMetadata
+      ? {
+          provider: "openai",
+          model: evalClassifierModel,
+          inputTokens: modelMetadata.usage.inputTokens,
+          outputTokens: modelMetadata.usage.outputTokens,
+          totalTokens: modelMetadata.usage.totalTokens,
+          toolCalls: modelMetadata.toolCalls.count,
+          metadata: {
+            scope: "agent_loop_only",
+            requests: modelMetadata.usage.requests,
+            toolNames: modelMetadata.toolCalls.names,
+          },
+        }
+      : undefined,
+    timings: {
+      totalMs,
+      ...(modelMetadata
+        ? { metadata: { agentDurationMs: modelMetadata.agentDurationMs } }
+        : {}),
     },
   };
 }
 
-const preparedClassifierRuns = new WeakMap<
-  ClassifierScenarioEvalCase,
-  Promise<PreparedScenarioClassifierRun>
->();
-
-function getPreparedClassifierRun(input: ClassifierScenarioEvalCase) {
-  let preparedRun = preparedClassifierRuns.get(input);
-  if (!preparedRun) {
-    preparedRun = prepareScenarioClassifierRun(input);
-    preparedClassifierRuns.set(input, preparedRun);
-  }
-
-  return preparedRun;
-}
-
-const classifierHarness = openaiAgentsHarness<
-  PreparedBottleClassifierAgentRun["agent"],
-  ClassifierScenarioEvalCase,
-  PreparedBottleClassifierAgentRun["runner"],
-  unknown,
-  unknown,
-  JsonValue
->({
+const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   name: "bottle-classifier",
-  agent: async ({ input }) =>
-    (await getPreparedClassifierRun(input)).agentRun.agent,
-  runner: async ({ input }) =>
-    (await getPreparedClassifierRun(input)).agentRun.runner,
-  runOptions: async ({ input }) => {
-    const { maxTurns } = (await getPreparedClassifierRun(input)).agentRun
-      .runOptions;
-    return {
-      maxTurns,
-      stream: false,
-    };
-  },
-  run: async ({ agent, input, runner, runOptions }) => {
-    if (!runner) {
-      throw new Error("Classifier eval runner was not prepared.");
-    }
-
-    const preparedRun = await getPreparedClassifierRun(input);
-    if (preparedRun.deterministicResult) {
-      return preparedRun.deterministicResult;
-    }
-
-    const result = await runner.run(agent, preparedRun.agentRun.input, {
-      ...runOptions,
-      stream: false,
+  run: async ({ input }) => {
+    const startedAt = performance.now();
+    const evalRuntime = createEvalRuntime();
+    const classifier = createBottleClassifier({
+      ...createClassifierOptions(input),
+      ...evalRuntime.options,
     });
+    const { result, modelMetadata } = await classifier.runBottleReference(
+      input.testCase.input,
+    );
+    const output = toJsonValue(result) ?? null;
 
-    return result;
-  },
-  output: async ({ input, result }) => {
-    const preparedRun = await getPreparedClassifierRun(input);
-    const classification = preparedRun.deterministicResult
-      ? BottleClassificationResultSchema.parse(result)
-      : await preparedRun.classifyAgentResult(result);
-
-    return toJsonValue(classification) ?? null;
-  },
-  // The harness rejects replay policies for tools absent from the prepared
-  // agent, so keep this aligned with Firecrawl-vs-OpenAI tool selection.
-  toolReplay: {
-    ...(process.env.FIRECRAWL_API_KEY
-      ? { firecrawl_web_search: true }
-      : { openai_web_search: true }),
+    return {
+      output,
+      events: [
+        {
+          type: "message",
+          role: "user",
+          content: toJsonValue(input.testCase.input) ?? null,
+        },
+        ...evalRuntime.toolEvents,
+        { type: "message", role: "assistant", content: output },
+      ],
+      ...buildHarnessMeasurements(modelMetadata, performance.now() - startedAt),
+    };
   },
 });
 
@@ -1000,107 +910,33 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
   });
 }
 
-type PreparedAuditEvalRun = {
-  agentRun: PreparedBottleAuditAgentRun;
-  getResult: (result: unknown) => AuditBottleResult;
-};
-
-const preparedAuditRuns = new WeakMap<
-  AuditBottleEvalFixture,
-  Promise<PreparedAuditEvalRun>
->();
-
-async function prepareAuditEvalRun(
-  testCase: AuditBottleEvalFixture,
-): Promise<PreparedAuditEvalRun> {
-  const options = createAuditEvalClassifierOptions(testCase);
-  const dataSource = options.dataSource ?? options.adapters;
-  if (!dataSource) {
-    throw new Error("Bottle audit eval requires a data source.");
-  }
-  const loadBottleContext = createBottleContextLoader({
-    dataSource,
-    options,
-  });
-  if (!loadBottleContext) {
-    throw new Error("Bottle audit eval requires Bottle context loading.");
-  }
-  const currentBottleContext = await loadBottleContext(
-    testCase.input.audit.bottleId,
-  );
-  if (!currentBottleContext) {
-    throw new Error(
-      "Audit eval fixture is missing its current Bottle context.",
-    );
-  }
-  const agentRun = prepareBottleAuditAgentRun(options, {
-    audit: testCase.input.audit,
-    availableOperations: [
-      "update_bottle",
-      "merge_bottles",
-      "update_entity",
-      "merge_entities",
-    ],
-    currentBottleContext,
-    conversationId: `bottle_audit_eval:${testCase.id}`,
-    searchEvidence: testCase.input.context.searchEvidence,
-  });
-  const prepared = {
-    agentRun,
-    getResult: (result: unknown) =>
-      createAuditBottleResult({
-        ...agentRun.getOutput(result),
-        artifacts: agentRun.getArtifacts(),
-      }),
-  };
-  return prepared;
-}
-
-function getPreparedAuditRun(
-  testCase: AuditBottleEvalFixture,
-): Promise<PreparedAuditEvalRun> {
-  const existing = preparedAuditRuns.get(testCase);
-  if (existing) {
-    return existing;
-  }
-
-  const prepared = prepareAuditEvalRun(testCase);
-  preparedAuditRuns.set(testCase, prepared);
-  return prepared;
-}
-
-const auditHarness = openaiAgentsHarness<
-  PreparedBottleAuditAgentRun["agent"],
-  AuditBottleEvalFixture,
-  PreparedBottleAuditAgentRun["runner"],
-  unknown,
-  unknown,
-  JsonValue
->({
+const auditHarness = createHarness<AuditBottleEvalFixture, JsonValue>({
   name: "bottle-auditor",
-  agent: async ({ input }) => (await getPreparedAuditRun(input)).agentRun.agent,
-  runner: async ({ input }) =>
-    (await getPreparedAuditRun(input)).agentRun.runner,
-  runOptions: async ({ input }) => ({
-    ...(await getPreparedAuditRun(input)).agentRun.runOptions,
-    stream: false,
-  }),
-  run: async ({ agent, input, runner, runOptions }) => {
-    if (!runner) {
-      throw new Error("Bottle audit eval runner was not prepared.");
-    }
-    const prepared = await getPreparedAuditRun(input);
-    return await runner.run(agent, prepared.agentRun.input, {
-      ...runOptions,
-      stream: false,
+  run: async ({ input }) => {
+    const startedAt = performance.now();
+    const evalRuntime = createEvalRuntime();
+    const classifier = createBottleClassifier({
+      ...createAuditEvalClassifierOptions(input),
+      ...evalRuntime.options,
     });
-  },
-  output: async ({ input, result }) =>
-    toJsonValue((await getPreparedAuditRun(input)).getResult(result)) ?? null,
-  toolReplay: {
-    ...(process.env.FIRECRAWL_API_KEY
-      ? { firecrawl_web_search: true }
-      : { openai_web_search: true }),
+    const { result, modelMetadata } = await classifier.runBottleAudit(
+      input.input.audit,
+    );
+    const output = toJsonValue(result) ?? null;
+
+    return {
+      output,
+      events: [
+        {
+          type: "message",
+          role: "user",
+          content: toJsonValue(input.input.audit) ?? null,
+        },
+        ...evalRuntime.toolEvents,
+        { type: "message", role: "assistant", content: output },
+      ],
+      ...buildHarnessMeasurements(modelMetadata, performance.now() - startedAt),
+    };
   },
 });
 
@@ -1123,9 +959,17 @@ function scoreAuditSemanticOutput(
 const AuditGroundingJudge = createJudge<AuditJudgeContext>(
   "AuditGroundingJudge",
   ({ input, run }) => {
+    const result = AuditBottleResultSchema.parse(run.output);
     const score = scoreBottleCheckGrounding(
-      AuditBottleResultSchema.parse(run.output),
-      input.input.audit.note === undefined ? [] : ["audit.note"],
+      result,
+      getBottleCheckSourceEvidencePaths({
+        intent: "audit_bottle",
+        input: input.input.audit,
+        artifacts: result.artifacts,
+      }),
+      input.requireExpectedOperationEvidence
+        ? input.expected.proposedOperations
+        : undefined,
     );
     return { score: score.score, metadata: score };
   },
@@ -1189,38 +1033,17 @@ function scoreScenarioSemanticOutput(
   return scoreBottleCheckSemanticOutput(expected, actual);
 }
 
-function getScenarioSourceFields(
-  input: ClassifierScenarioEvalCase,
-  result: BottleClassificationResult,
-) {
-  const sourceFields = new Set<string>();
-  for (const [field, value] of Object.entries(input.testCase.input.reference)) {
-    if (value !== null && value !== undefined) {
-      sourceFields.add(`reference.${field}`);
-    }
-  }
-  for (const [field, value] of Object.entries(
-    result.artifacts.extractedIdentity ?? {},
-  )) {
-    if (value !== null && value !== undefined) {
-      sourceFields.add(`extractedIdentity.${field}`);
-    }
-  }
-  for (const field of Object.keys(
-    result.artifacts.imageEvidence?.fieldCandidates ?? {},
-  )) {
-    sourceFields.add(`imageEvidence.fieldCandidates.${field}`);
-  }
-  return [...sourceFields];
-}
-
 const ClassifierGroundingJudge = createJudge<ClassifierJudgeContext>(
   "ClassifierGroundingJudge",
   ({ input, run }) => {
     const result = parseClassificationRunOutput(run.output);
     const score = scoreBottleCheckGrounding(
       result,
-      getScenarioSourceFields(input, result),
+      getBottleCheckSourceEvidencePaths({
+        intent: "resolve_reference",
+        input: input.testCase.input,
+        artifacts: result.artifacts,
+      }),
     );
     return { score: score.score, metadata: score };
   },
@@ -1285,17 +1108,19 @@ for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
     {
       skipIf: () => !hasEvalOpenAICredentials,
       harness: classifierHarness,
-      judges: [
-        ClassifierExpectationJudge,
-        ClassifierGroundingJudge,
-        OperationExpectationJudge,
-        FindingExpectationJudge,
-      ],
+      judges: [ClassifierExpectationJudge, ClassifierGroundingJudge],
       judgeThreshold: threshold,
     },
     (it) => {
       it.for(cases)("$name", async ({ testCase }, { run }) => {
-        await run(testCase);
+        const result = await run(testCase);
+
+        await expect(result).toSatisfyJudge(OperationExpectationJudge, {
+          threshold: null,
+        });
+        await expect(result).toSatisfyJudge(FindingExpectationJudge, {
+          threshold: null,
+        });
       });
     },
   );

@@ -44,9 +44,20 @@
   intent. Reference resolution retains its structured identity decision; an
   audit returns a summary, proposed operations, and findings without a second
   structured conclusion.
+- Reference resolution may opportunistically propose directly related repairs,
+  but a correct identity decision does not require it to complete an audit.
+  Existing-Bottle audits actively investigate repairs and are evaluated against
+  exact supported operations and evidence.
 - Bottle-check operations are limited to `update_bottle`, `merge_bottles`,
   `update_entity`, and `merge_entities`. They are independent suggestions, not
   an ordered plan or a generic workflow language.
+- Do not pair `update_bottle` with `merge_bottles` when the update target is the
+  merge source. The merge retires that Bottle and subsumes correction of its
+  row.
+- Findings require positive evidence of a real catalog defect that remains
+  after proposed operations apply. Uncertainty about whether an underspecified,
+  generic, or family row is intentional is not a finding; no action is valid
+  after review.
 - Supplemental operations always require explicit moderator approval. Only the
   existing end-user add-Bottle primary decision may auto-apply under its
   established policy.

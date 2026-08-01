@@ -15,6 +15,24 @@ export default function CheckResult({
   check: Check;
   title?: string;
 }) {
+  if (!check.schemaSupported) {
+    return (
+      <section className="rounded-xl border border-amber-800 bg-amber-950/40 p-5">
+        <div className="text-xs font-semibold uppercase tracking-wide text-amber-200">
+          Unsupported schema
+        </div>
+        <h2 className="mt-2 text-lg font-semibold text-white">{title}</h2>
+        <p className="mt-2 text-sm text-amber-100">
+          This check uses schema version {check.schemaVersion}. Its historical
+          proposals cannot be reviewed safely
+          {check.canClose
+            ? ", but the check can be closed."
+            : ". It cannot be closed while an operation is applying."}
+        </p>
+      </section>
+    );
+  }
+
   const findings = getBottleCheckFindings(check);
   const clean = check.operations.length === 0 && findings.length === 0;
 

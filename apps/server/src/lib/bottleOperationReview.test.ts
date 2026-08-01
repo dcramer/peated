@@ -5,20 +5,13 @@ import {
   collectionBottles,
   entities,
 } from "@peated/server/db/schema";
-import type { BottleCheckOperationCapabilities } from "@peated/server/lib/bottleCheckAvailableOperations";
 import {
   prepareOperation,
+  prepareOperationForExecution,
   prepareOperations,
   prepareProposals,
 } from "@peated/server/lib/bottleOperationReview";
 import { eq } from "drizzle-orm";
-
-const ALL_OPERATIONS: BottleCheckOperationCapabilities = {
-  update_bottle: true,
-  merge_bottles: true,
-  update_entity: true,
-  merge_entities: true,
-};
 
 function artifacts({
   bottleIds = [],
@@ -210,7 +203,6 @@ describe("Bottle operation review preparation", () => {
         bottleIds: [bottleToUpdate.id, mergeSource.id, mergeDestination.id],
         entities: [entityToUpdate, entityMergeSource, entityMergeDestination],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result).toHaveLength(4);
@@ -351,7 +343,6 @@ describe("Bottle operation review preparation", () => {
         bottleIds: [source.id, destination.id],
         entities: [sourceEntity, destinationEntity],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result[0]).toMatchObject({
@@ -468,7 +459,6 @@ describe("Bottle operation review preparation", () => {
       artifacts: artifacts({
         entities: [validEntity, badEvidenceEntity, conflictingEntity],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result.map(({ status }) => status)).toEqual([
@@ -559,7 +549,6 @@ describe("Bottle operation review preparation", () => {
         entities: [inspectedEntity],
         resolvedEntities: [discoveredEntity],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result.map(({ status }) => status)).toEqual([
@@ -576,55 +565,31 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
-  test("blocks no-op and disabled operations with no invented preview", async ({
+  test("blocks no-op operations with no invented preview", async ({
     fixtures,
   }) => {
     const noOpEntity = await fixtures.Entity({
       name: "No-op Entity",
       shortName: "Already Set",
     });
-    const disabledEntity = await fixtures.Entity({
-      name: "Disabled Entity",
-      shortName: null,
-    });
     const reviewArtifacts = artifacts({
-      entities: [noOpEntity, disabledEntity],
+      entities: [noOpEntity],
     });
-
-    const [noOp, disabled] = await Promise.all([
-      prepareOperation({
-        operation: {
-          id: 30,
-          proposal: {
-            type: "update_entity",
-            input: {
-              entityId: noOpEntity.id,
-              patch: { shortName: "Already Set" },
-            },
-            rationale: "This is already current.",
-            evidenceRefs: [{ kind: "entity", entityId: noOpEntity.id }],
+    const noOp = await prepareOperation({
+      operation: {
+        id: 30,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: noOpEntity.id,
+            patch: { shortName: "Already Set" },
           },
+          rationale: "This is already current.",
+          evidenceRefs: [{ kind: "entity", entityId: noOpEntity.id }],
         },
-        artifacts: reviewArtifacts,
-        capabilities: ALL_OPERATIONS,
-      }),
-      prepareOperation({
-        operation: {
-          id: 31,
-          proposal: {
-            type: "update_entity",
-            input: {
-              entityId: disabledEntity.id,
-              patch: { shortName: "Disabled" },
-            },
-            rationale: "This capability is disabled.",
-            evidenceRefs: [{ kind: "entity", entityId: disabledEntity.id }],
-          },
-        },
-        artifacts: reviewArtifacts,
-        capabilities: { ...ALL_OPERATIONS, update_entity: false },
-      }),
-    ]);
+      },
+      artifacts: reviewArtifacts,
+    });
 
     expect(noOp).toEqual(
       expect.objectContaining({
@@ -634,10 +599,6 @@ describe("Bottle operation review preparation", () => {
     );
     expect(noOp).not.toHaveProperty("preview");
     expect(noOp).not.toHaveProperty("stateToken");
-    expect(disabled).toMatchObject({
-      status: "blocked",
-      preparationError: { code: "operation_disabled" },
-    });
   });
 
   test("state tokens ignore unrelated counters and timestamps", async ({
@@ -662,7 +623,6 @@ describe("Bottle operation review preparation", () => {
     } as const;
     const context = {
       artifacts: artifacts({ entities: [entity] }),
-      capabilities: ALL_OPERATIONS,
     };
 
     const before = await prepareOperation({ operation, ...context });
@@ -735,7 +695,6 @@ describe("Bottle operation review preparation", () => {
         bottleIds: [bottleToSet.id],
         bottleContexts: [await bottleContext(bottleToClear.id)],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result).toHaveLength(2);
@@ -796,7 +755,6 @@ describe("Bottle operation review preparation", () => {
         bottleIds: [bottle.id],
         entities: [proposedBrand],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result).toMatchObject({
@@ -805,7 +763,7 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
-  test("detects sibling shared writes and merge-owned destination role writes", async ({
+  test("detects sibling shared writes and Entity merge-owned field conflicts", async ({
     fixtures,
   }) => {
     const firstBottle = await fixtures.Bottle({ name: "Sibling Conflict" });
@@ -826,7 +784,6 @@ describe("Bottle operation review preparation", () => {
         bottleIds: [firstBottle.id, sibling.id],
         entities: [sourceEntity, destinationEntity],
       }),
-      capabilities: ALL_OPERATIONS,
     };
 
     const siblingResult = await prepareOperations({
@@ -869,11 +826,35 @@ describe("Bottle operation review preparation", () => {
       }),
     ]);
 
-    const roleConflict = await prepareOperations({
+    const destinationIdentityConflict = await prepareOperations({
       ...context,
       operations: [
         {
           id: 62,
+          proposal: {
+            type: "update_entity",
+            input: {
+              entityId: destinationEntity.id,
+              patch: { name: "Renamed Merge Destination" },
+            },
+            rationale: "Updates the name used by merge materialization.",
+            evidenceRefs: [{ kind: "entity", entityId: destinationEntity.id }],
+          },
+        },
+        {
+          id: 63,
+          proposal: {
+            type: "update_entity",
+            input: {
+              entityId: destinationEntity.id,
+              patch: { shortName: "Renamed" },
+            },
+            rationale: "Updates the short name used by merge materialization.",
+            evidenceRefs: [{ kind: "entity", entityId: destinationEntity.id }],
+          },
+        },
+        {
+          id: 64,
           proposal: {
             type: "update_entity",
             input: {
@@ -885,7 +866,7 @@ describe("Bottle operation review preparation", () => {
           },
         },
         {
-          id: 63,
+          id: 65,
           proposal: {
             type: "merge_entities",
             input: {
@@ -901,35 +882,37 @@ describe("Bottle operation review preparation", () => {
         },
       ],
     });
-    expect(roleConflict.map(({ status }) => status)).toEqual([
+    expect(destinationIdentityConflict.map(({ status }) => status)).toEqual([
+      "blocked",
+      "blocked",
       "blocked",
       "blocked",
     ]);
 
-    const independentDestinationUpdate = await prepareOperations({
+    const sourceUpdateConflict = await prepareOperations({
       ...context,
       operations: [
         {
-          id: 64,
+          id: 66,
           proposal: {
             type: "update_entity",
             input: {
-              entityId: destinationEntity.id,
-              patch: { website: "https://example.com/role-destination" },
+              entityId: sourceEntity.id,
+              patch: { website: "https://example.com/role-source" },
             },
-            rationale: "Updates a field the merge does not own.",
-            evidenceRefs: [{ kind: "entity", entityId: destinationEntity.id }],
+            rationale: "Updates the Entity that the merge retires.",
+            evidenceRefs: [{ kind: "entity", entityId: sourceEntity.id }],
           },
         },
         {
-          id: 65,
+          id: 67,
           proposal: {
             type: "merge_entities",
             input: {
               sourceEntityId: sourceEntity.id,
               destinationEntityId: destinationEntity.id,
             },
-            rationale: "Merges the duplicate Entity independently.",
+            rationale: "Merges the duplicate Entity into that destination.",
             evidenceRefs: [
               { kind: "entity", entityId: sourceEntity.id },
               { kind: "entity", entityId: destinationEntity.id },
@@ -938,10 +921,279 @@ describe("Bottle operation review preparation", () => {
         },
       ],
     });
-    expect(independentDestinationUpdate.map(({ status }) => status)).toEqual([
-      "pending_review",
-      "pending_review",
+    expect(sourceUpdateConflict.map(({ status }) => status)).toEqual([
+      "blocked",
+      "blocked",
     ]);
+  });
+
+  test("allows a disjoint update to an Entity merge destination", async ({
+    fixtures,
+  }) => {
+    const sourceEntity = await fixtures.Entity({
+      name: "Metadata Merge Source",
+      type: ["distiller"],
+    });
+    const destinationEntity = await fixtures.Entity({
+      name: "Metadata Merge Destination",
+      type: ["brand"],
+    });
+    const country = await fixtures.Country({ name: "Metadata Country" });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      name: "Metadata Region",
+    });
+
+    const result = await prepareOperations({
+      operations: [
+        {
+          id: 68,
+          proposal: {
+            type: "update_entity",
+            input: {
+              entityId: destinationEntity.id,
+              patch: {
+                website: "https://example.com/metadata-destination",
+                country: country.name,
+                region: region.name,
+                yearEstablished: 1815,
+              },
+            },
+            rationale: "Corrects metadata that the merge does not overwrite.",
+            evidenceRefs: [{ kind: "entity", entityId: destinationEntity.id }],
+          },
+        },
+        {
+          id: 69,
+          proposal: {
+            type: "merge_entities",
+            input: {
+              sourceEntityId: sourceEntity.id,
+              destinationEntityId: destinationEntity.id,
+            },
+            rationale: "Merges the duplicate Entity into that destination.",
+            evidenceRefs: [
+              { kind: "entity", entityId: sourceEntity.id },
+              { kind: "entity", entityId: destinationEntity.id },
+            ],
+          },
+        },
+      ],
+      artifacts: artifacts({ entities: [sourceEntity, destinationEntity] }),
+    });
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        status: "pending_review",
+        type: "update_entity",
+        preview: expect.objectContaining({
+          changedFields: ["website", "country", "region", "yearEstablished"],
+        }),
+      }),
+      expect.objectContaining({
+        status: "pending_review",
+        type: "merge_entities",
+      }),
+    ]);
+  });
+
+  test("blocks an update to a Bottle retired by a merge in the same batch", async ({
+    fixtures,
+  }) => {
+    const source = await fixtures.Bottle({ name: "Retired Update Source" });
+    const destination = await fixtures.Bottle({
+      name: "Retired Update Destination",
+    });
+
+    const prepared = await prepareOperations({
+      operations: [
+        {
+          id: 66,
+          proposal: {
+            type: "update_bottle",
+            input: {
+              bottleId: source.id,
+              patch: { exact: { abv: 51.2 } },
+            },
+            rationale: "Corrects the malformed duplicate row.",
+            evidenceRefs: [{ kind: "bottle", bottleId: source.id }],
+          },
+        },
+        {
+          id: 67,
+          proposal: {
+            type: "merge_bottles",
+            input: {
+              sourceBottleId: source.id,
+              destinationBottleId: destination.id,
+            },
+            rationale: "Retires the duplicate in favor of the survivor.",
+            evidenceRefs: [
+              { kind: "bottle", bottleId: source.id },
+              { kind: "bottle", bottleId: destination.id },
+            ],
+          },
+        },
+      ],
+      artifacts: artifacts({ bottleIds: [source.id, destination.id] }),
+    });
+
+    expect(prepared).toEqual([
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({ code: "direct_conflict" }),
+      }),
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({ code: "direct_conflict" }),
+      }),
+    ]);
+  });
+
+  test("blocks merge batches that are not independently executable", async ({
+    fixtures,
+  }) => {
+    const bottleSourceOne = await fixtures.Bottle({
+      name: "Bottle Fan-in Source One",
+    });
+    const bottleSourceTwo = await fixtures.Bottle({
+      name: "Bottle Fan-in Source Two",
+    });
+    const bottleDestination = await fixtures.Bottle({
+      name: "Bottle Fan-in Destination",
+    });
+    const entitySourceOne = await fixtures.Entity({
+      name: "Entity Fan-in Source One",
+    });
+    const entitySourceTwo = await fixtures.Entity({
+      name: "Entity Fan-in Source Two",
+    });
+    const entityDestination = await fixtures.Entity({
+      name: "Entity Fan-in Destination",
+    });
+    const context = {
+      artifacts: artifacts({
+        bottleIds: [
+          bottleSourceOne.id,
+          bottleSourceTwo.id,
+          bottleDestination.id,
+        ],
+        entities: [entitySourceOne, entitySourceTwo, entityDestination],
+      }),
+    };
+    const bottleMerge = (
+      id: number,
+      sourceBottleId: number,
+      destinationBottleId: number,
+    ) => ({
+      id,
+      proposal: {
+        type: "merge_bottles" as const,
+        input: { sourceBottleId, destinationBottleId },
+        rationale: "The inspected Bottles are exact duplicates.",
+        evidenceRefs: [
+          { kind: "bottle" as const, bottleId: sourceBottleId },
+          { kind: "bottle" as const, bottleId: destinationBottleId },
+        ],
+      },
+    });
+    const entityMerge = (
+      id: number,
+      sourceEntityId: number,
+      destinationEntityId: number,
+    ) => ({
+      id,
+      proposal: {
+        type: "merge_entities" as const,
+        input: { sourceEntityId, destinationEntityId },
+        rationale: "The inspected Entities identify one producer.",
+        evidenceRefs: [
+          { kind: "entity" as const, entityId: sourceEntityId },
+          { kind: "entity" as const, entityId: destinationEntityId },
+        ],
+      },
+    });
+
+    let operationId = 66;
+    const expectBlockedPair = async ({
+      bottlePairs,
+      entityPairs,
+      name,
+    }: {
+      bottlePairs: [[number, number], [number, number]];
+      entityPairs: [[number, number], [number, number]];
+      name: string;
+    }) => {
+      const operations = [
+        ...bottlePairs.map(([sourceId, destinationId]) =>
+          bottleMerge(operationId++, sourceId, destinationId),
+        ),
+        ...entityPairs.map(([sourceId, destinationId]) =>
+          entityMerge(operationId++, sourceId, destinationId),
+        ),
+      ];
+      const prepared = await prepareOperations({ ...context, operations });
+      expect(
+        prepared.map(({ status }) => status),
+        name,
+      ).toEqual(["blocked", "blocked", "blocked", "blocked"]);
+    };
+
+    await expectBlockedPair({
+      name: "shared destination",
+      bottlePairs: [
+        [bottleSourceOne.id, bottleDestination.id],
+        [bottleSourceTwo.id, bottleDestination.id],
+      ],
+      entityPairs: [
+        [entitySourceOne.id, entityDestination.id],
+        [entitySourceTwo.id, entityDestination.id],
+      ],
+    });
+    await expectBlockedPair({
+      name: "reused source",
+      bottlePairs: [
+        [bottleSourceOne.id, bottleDestination.id],
+        [bottleSourceOne.id, bottleSourceTwo.id],
+      ],
+      entityPairs: [
+        [entitySourceOne.id, entityDestination.id],
+        [entitySourceOne.id, entitySourceTwo.id],
+      ],
+    });
+    await expectBlockedPair({
+      name: "merge chain",
+      bottlePairs: [
+        [bottleSourceOne.id, bottleSourceTwo.id],
+        [bottleSourceTwo.id, bottleDestination.id],
+      ],
+      entityPairs: [
+        [entitySourceOne.id, entitySourceTwo.id],
+        [entitySourceTwo.id, entityDestination.id],
+      ],
+    });
+    await expectBlockedPair({
+      name: "merge crossover",
+      bottlePairs: [
+        [bottleSourceTwo.id, bottleDestination.id],
+        [bottleSourceOne.id, bottleSourceTwo.id],
+      ],
+      entityPairs: [
+        [entitySourceTwo.id, entityDestination.id],
+        [entitySourceOne.id, entitySourceTwo.id],
+      ],
+    });
+    await expectBlockedPair({
+      name: "opposite direction",
+      bottlePairs: [
+        [bottleSourceOne.id, bottleSourceTwo.id],
+        [bottleSourceTwo.id, bottleSourceOne.id],
+      ],
+      entityPairs: [
+        [entitySourceOne.id, entitySourceTwo.id],
+        [entitySourceTwo.id, entitySourceOne.id],
+      ],
+    });
   });
 
   test("includes shared stated age in the token for a name update", async ({
@@ -965,7 +1217,6 @@ describe("Bottle operation review preparation", () => {
     } as const;
     const context = {
       artifacts: artifacts({ bottleIds: [bottle.id] }),
-      capabilities: ALL_OPERATIONS,
     };
 
     const before = await prepareOperation({ operation, ...context });
@@ -1009,7 +1260,6 @@ describe("Bottle operation review preparation", () => {
     } as const;
     const bottleContextInput = {
       artifacts: artifacts({ bottleIds: [bottle.id] }),
-      capabilities: ALL_OPERATIONS,
     };
     const beforeGroupDrift = await prepareOperation({
       operation: sharedOperation,
@@ -1057,7 +1307,6 @@ describe("Bottle operation review preparation", () => {
       artifacts: artifacts({
         bottleIds: [mergeSource.id, mergeDestination.id],
       }),
-      capabilities: ALL_OPERATIONS,
     };
     const beforeConsumerDrift = await prepareOperation({
       operation: mergeOperation,
@@ -1097,7 +1346,6 @@ describe("Bottle operation review preparation", () => {
     } as const;
     const entityContextInput = {
       artifacts: artifacts({ entities: [entity] }),
-      capabilities: ALL_OPERATIONS,
     };
     const beforeEntityDrift = await prepareOperation({
       operation: entityOperation,
@@ -1164,7 +1412,6 @@ describe("Bottle operation review preparation", () => {
         bottleIds: [bottle.id],
         entities: [firstDistiller, secondDistiller],
       }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result).toMatchObject({
@@ -1216,7 +1463,6 @@ describe("Bottle operation review preparation", () => {
         },
       },
       artifacts: artifacts({ entities: [source, destination] }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result).toMatchObject({
@@ -1262,7 +1508,6 @@ describe("Bottle operation review preparation", () => {
         },
       ],
       artifacts: artifacts({ entities: [valid] }),
-      capabilities: ALL_OPERATIONS,
     });
 
     expect(result).toEqual([
@@ -1280,5 +1525,61 @@ describe("Bottle operation review preparation", () => {
     ]);
     expect(result[0]).not.toHaveProperty("id");
     expect(result[0]).not.toHaveProperty("preview");
+  });
+
+  test("protects the primary Bottle only from being retired as a merge source", async ({
+    fixtures,
+  }) => {
+    const primary = await fixtures.Bottle({ name: "Primary Resolution" });
+    const duplicate = await fixtures.Bottle({ name: "Duplicate Resolution" });
+    const reviewArtifacts = artifacts({
+      bottleIds: [primary.id, duplicate.id],
+    });
+    const context = {
+      artifacts: reviewArtifacts,
+      protectedBottleIds: [primary.id],
+    };
+    const mergeProposal = (
+      sourceBottleId: number,
+      destinationBottleId: number,
+    ) => ({
+      type: "merge_bottles" as const,
+      input: { sourceBottleId, destinationBottleId },
+      rationale: "The inspected Bottles are exact duplicates.",
+      evidenceRefs: [
+        { kind: "bottle" as const, bottleId: sourceBottleId },
+        { kind: "bottle" as const, bottleId: destinationBottleId },
+      ],
+    });
+
+    const [protectedSource] = await prepareProposals({
+      ...context,
+      proposals: [mergeProposal(primary.id, duplicate.id)],
+    });
+    const [protectedDestination] = await prepareProposals({
+      ...context,
+      proposals: [mergeProposal(duplicate.id, primary.id)],
+    });
+    const [protectedUpdate] = await prepareProposals({
+      ...context,
+      proposals: [
+        {
+          type: "update_bottle",
+          input: {
+            bottleId: primary.id,
+            patch: { exact: { edition: "Corrected Edition" } },
+          },
+          rationale: "The primary Bottle needs a supported field correction.",
+          evidenceRefs: [{ kind: "bottle", bottleId: primary.id }],
+        },
+      ],
+    });
+
+    expect(protectedSource).toMatchObject({
+      status: "blocked",
+      preparationError: { code: "direct_conflict" },
+    });
+    expect(protectedDestination).toMatchObject({ status: "pending_review" });
+    expect(protectedUpdate).toMatchObject({ status: "pending_review" });
   });
 });

@@ -1,0 +1,288 @@
+import { tool } from "@openai/agents";
+import { z } from "zod";
+
+import {
+  DEFAULT_MAX_PROPOSED_OPERATIONS,
+  MergeBottlesOperationSchema,
+  MergeEntitiesOperationSchema,
+  ProposedOperationSchema,
+  UpdateBottleOperationSchema,
+  UpdateEntityOperationSchema,
+  type EvidenceRef,
+  type ProposedOperation,
+} from "../bottleCheckContract";
+
+const UpdateBottleProposalArgsSchema = UpdateBottleOperationSchema.omit({
+  type: true,
+});
+const MergeBottlesProposalArgsSchema = MergeBottlesOperationSchema.omit({
+  type: true,
+});
+const UpdateEntityProposalArgsSchema = UpdateEntityOperationSchema.omit({
+  type: true,
+});
+const MergeEntitiesProposalArgsSchema = MergeEntitiesOperationSchema.omit({
+  type: true,
+});
+
+type ProposalCollectionContext = {
+  hasBottleEvidence: (bottleId: number) => boolean;
+  hasEntityEvidence: (entityId: number) => boolean;
+  hasSourceEvidence: (field: string) => boolean;
+  hasWebEvidence: (url: string) => boolean;
+  isBottleInspected: (bottleId: number) => boolean;
+  isEntityInspected: (entityId: number) => boolean;
+  isSeriesInspected: (seriesId: number) => boolean;
+};
+
+type ProposalRecordResult =
+  | { status: "updated"; proposalIndex: number }
+  | { status: "recorded"; proposalIndex: number }
+  | { status: "rejected"; reason: string };
+
+export type BottleProposalCollector = {
+  getProposals: () => ProposedOperation[];
+  getMissingEvidence: (
+    evidenceRefs: readonly EvidenceRef[],
+  ) => EvidenceRef | null;
+  record: (proposal: unknown) => ProposalRecordResult;
+};
+
+function evidenceWasCollected(
+  evidence: EvidenceRef,
+  context: ProposalCollectionContext,
+) {
+  switch (evidence.kind) {
+    case "source":
+      return context.hasSourceEvidence(evidence.field);
+    case "bottle":
+      return context.hasBottleEvidence(evidence.bottleId);
+    case "entity":
+      return context.hasEntityEvidence(evidence.entityId);
+    case "web_result":
+      return context.hasWebEvidence(evidence.url);
+  }
+}
+
+function uninspectedTarget(
+  proposal: ProposedOperation,
+  context: ProposalCollectionContext,
+): string | null {
+  switch (proposal.type) {
+    case "update_bottle": {
+      if (!context.isBottleInspected(proposal.input.bottleId)) {
+        return `Bottle ${proposal.input.bottleId} was not inspected.`;
+      }
+      const seriesId = proposal.input.patch.shared?.seriesId;
+      if (
+        seriesId !== undefined &&
+        seriesId !== null &&
+        !context.isSeriesInspected(seriesId)
+      ) {
+        return `BottleSeries ${seriesId} was not inspected.`;
+      }
+      const choices = [
+        proposal.input.patch.shared?.brand,
+        ...(proposal.input.patch.shared?.distillers ?? []),
+        proposal.input.patch.shared?.bottler,
+      ];
+      const uninspectedEntity = choices.find(
+        (choice) =>
+          choice?.kind === "existing" &&
+          !context.isEntityInspected(choice.entityId),
+      );
+      return uninspectedEntity?.kind === "existing"
+        ? `Entity ${uninspectedEntity.entityId} was not inspected.`
+        : null;
+    }
+    case "merge_bottles":
+      if (!context.isBottleInspected(proposal.input.sourceBottleId)) {
+        return `Bottle ${proposal.input.sourceBottleId} was not inspected.`;
+      }
+      return context.isBottleInspected(proposal.input.destinationBottleId)
+        ? null
+        : `Bottle ${proposal.input.destinationBottleId} was not inspected.`;
+    case "update_entity":
+      return context.isEntityInspected(proposal.input.entityId)
+        ? null
+        : `Entity ${proposal.input.entityId} was not inspected.`;
+    case "merge_entities":
+      if (!context.isEntityInspected(proposal.input.sourceEntityId)) {
+        return `Entity ${proposal.input.sourceEntityId} was not inspected.`;
+      }
+      return context.isEntityInspected(proposal.input.destinationEntityId)
+        ? null
+        : `Entity ${proposal.input.destinationEntityId} was not inspected.`;
+  }
+}
+
+function requiredTargetEvidence(proposal: ProposedOperation): EvidenceRef[] {
+  switch (proposal.type) {
+    case "update_bottle": {
+      const choices = [
+        proposal.input.patch.shared?.brand,
+        ...(proposal.input.patch.shared?.distillers ?? []),
+        proposal.input.patch.shared?.bottler,
+      ];
+      return [
+        { kind: "bottle", bottleId: proposal.input.bottleId },
+        ...choices.flatMap((choice) =>
+          choice?.kind === "existing"
+            ? [{ kind: "entity" as const, entityId: choice.entityId }]
+            : [],
+        ),
+      ];
+    }
+    case "merge_bottles":
+      return [
+        { kind: "bottle", bottleId: proposal.input.sourceBottleId },
+        { kind: "bottle", bottleId: proposal.input.destinationBottleId },
+      ];
+    case "update_entity":
+      return [{ kind: "entity", entityId: proposal.input.entityId }];
+    case "merge_entities":
+      return [
+        { kind: "entity", entityId: proposal.input.sourceEntityId },
+        { kind: "entity", entityId: proposal.input.destinationEntityId },
+      ];
+  }
+}
+
+function evidenceMatches(left: EvidenceRef, right: EvidenceRef) {
+  switch (left.kind) {
+    case "source":
+      return right.kind === "source" && left.field === right.field;
+    case "bottle":
+      return right.kind === "bottle" && left.bottleId === right.bottleId;
+    case "entity":
+      return right.kind === "entity" && left.entityId === right.entityId;
+    case "web_result":
+      return right.kind === "web_result" && left.url === right.url;
+  }
+}
+
+export function createBottleProposalCollector({
+  context,
+  maxProposals = DEFAULT_MAX_PROPOSED_OPERATIONS,
+}: {
+  context: ProposalCollectionContext;
+  maxProposals?: number;
+}): BottleProposalCollector {
+  const proposals: ProposedOperation[] = [];
+  const proposalIndexes = new Map<string, number>();
+
+  const getMissingEvidence = (evidenceRefs: readonly EvidenceRef[]) =>
+    evidenceRefs.find((evidence) => !evidenceWasCollected(evidence, context)) ??
+    null;
+
+  return {
+    getProposals: () => [...proposals],
+    getMissingEvidence,
+    record: (rawProposal) => {
+      const parsed = ProposedOperationSchema.safeParse(rawProposal);
+      if (!parsed.success) {
+        return {
+          status: "rejected",
+          reason: z.prettifyError(parsed.error),
+        };
+      }
+
+      const proposal = parsed.data;
+      const targetError = uninspectedTarget(proposal, context);
+      if (targetError) {
+        return { status: "rejected", reason: targetError };
+      }
+
+      const missingEvidence = getMissingEvidence(proposal.evidenceRefs);
+      if (missingEvidence) {
+        return {
+          status: "rejected",
+          reason: `Evidence was not collected: ${JSON.stringify(missingEvidence)}.`,
+        };
+      }
+
+      const uncitedTarget = requiredTargetEvidence(proposal).find(
+        (target) =>
+          !proposal.evidenceRefs.some((evidence) =>
+            evidenceMatches(target, evidence),
+          ),
+      );
+      if (uncitedTarget) {
+        return {
+          status: "rejected",
+          reason: `Operation target was not cited as evidence: ${JSON.stringify(uncitedTarget)}.`,
+        };
+      }
+
+      const key = JSON.stringify({
+        type: proposal.type,
+        input: proposal.input,
+      });
+      const existingIndex = proposalIndexes.get(key);
+      if (existingIndex !== undefined) {
+        proposals[existingIndex] = proposal;
+        return { status: "updated", proposalIndex: existingIndex };
+      }
+      if (proposals.length >= maxProposals) {
+        return {
+          status: "rejected",
+          reason: `The proposal limit of ${maxProposals} was reached.`,
+        };
+      }
+
+      const proposalIndex = proposals.length;
+      proposals.push(proposal);
+      proposalIndexes.set(key, proposalIndex);
+      return { status: "recorded", proposalIndex };
+    },
+  };
+}
+
+function nonStrictJsonSchema(schema: z.ZodType) {
+  return z.toJSONSchema(schema, { target: "draft-7" }) as never;
+}
+
+function withOperationType(type: ProposedOperation["type"], args: unknown) {
+  return args !== null && typeof args === "object"
+    ? { ...args, type }
+    : { type };
+}
+
+export function createBottleProposalTools(collector: BottleProposalCollector) {
+  return [
+    tool({
+      name: "propose_update_bottle",
+      description:
+        "Record a read-only proposal to update one inspected Bottle. Use only after investigating the Bottle and collecting every cited piece of evidence. This does not mutate or approve catalog data.",
+      parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
+      strict: false,
+      execute: (args) =>
+        collector.record(withOperationType("update_bottle", args)),
+    }),
+    tool({
+      name: "propose_merge_bottles",
+      description:
+        "Record a read-only proposal to retire one inspected duplicate Bottle into an inspected canonical survivor. Before calling, inspect both records and collect direct authoritative external product evidence of exact equivalence when available; cite that web result. Catalog agreement, an audit note, search rank, or an attached label alone is insufficient. This does not mutate or approve catalog data.",
+      parameters: MergeBottlesProposalArgsSchema,
+      execute: (args) =>
+        collector.record(withOperationType("merge_bottles", args)),
+    }),
+    tool({
+      name: "propose_update_entity",
+      description:
+        "Record a read-only proposal to update one inspected Entity directly involved in representing the checked Bottle. Use only after collecting every cited piece of evidence. This does not mutate or approve catalog data.",
+      parameters: nonStrictJsonSchema(UpdateEntityProposalArgsSchema),
+      strict: false,
+      execute: (args) =>
+        collector.record(withOperationType("update_entity", args)),
+    }),
+    tool({
+      name: "propose_merge_entities",
+      description:
+        "Record a read-only proposal to retire one inspected duplicate Entity into an inspected canonical survivor directly related to the checked Bottle. This does not mutate or approve catalog data.",
+      parameters: MergeEntitiesProposalArgsSchema,
+      execute: (args) =>
+        collector.record(withOperationType("merge_entities", args)),
+    }),
+  ];
+}

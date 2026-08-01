@@ -31,7 +31,6 @@
       }
     ]
   },
-  "availableOperations": ["merge_bottles"],
   "context": {
     "inspectedBottleIds": [6504, 6505]
   },

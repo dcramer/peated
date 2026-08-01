@@ -1,0 +1,233 @@
+import { RunContext } from "@openai/agents";
+import { describe, expect, test } from "vitest";
+
+import {
+  createBottleProposalCollector,
+  createBottleProposalTools,
+} from "./proposeOperations";
+
+function createHarness() {
+  const inspectedBottleIds = new Set([10, 11]);
+  const inspectedEntityIds = new Set([20, 21]);
+  const collector = createBottleProposalCollector({
+    context: {
+      hasBottleEvidence: (bottleId) => inspectedBottleIds.has(bottleId),
+      hasEntityEvidence: (entityId) => inspectedEntityIds.has(entityId),
+      hasSourceEvidence: (field) => field === "reference.name",
+      hasWebEvidence: (url) => url === "https://example.com/evidence",
+      isBottleInspected: (bottleId) => inspectedBottleIds.has(bottleId),
+      isEntityInspected: (entityId) => inspectedEntityIds.has(entityId),
+      isSeriesInspected: (seriesId) => seriesId === 71,
+    },
+  });
+  return {
+    collector,
+    tools: createBottleProposalTools(collector),
+  };
+}
+
+async function invoke(
+  tools: ReturnType<typeof createBottleProposalTools>,
+  name: string,
+  input: unknown,
+) {
+  const selected = tools.find((candidate) => candidate.name === name);
+  if (!selected || selected.type !== "function") {
+    throw new Error(`Tool ${name} was not found.`);
+  }
+  return await selected.invoke(new RunContext(), JSON.stringify(input));
+}
+
+describe("Bottle proposal tools", () => {
+  test("exposes four non-mutating typed proposal tools", () => {
+    const { tools } = createHarness();
+
+    expect(tools.map(({ name }) => name)).toEqual([
+      "propose_update_bottle",
+      "propose_merge_bottles",
+      "propose_update_entity",
+      "propose_merge_entities",
+    ]);
+    expect(tools.map(({ strict }) => strict)).toEqual([
+      false,
+      true,
+      false,
+      true,
+    ]);
+
+    const mergeTool = tools.find(
+      ({ name }) => name === "propose_merge_bottles",
+    );
+    expect(mergeTool?.description).toContain("inspect both records");
+    expect(mergeTool?.description).toContain(
+      "authoritative external product evidence",
+    );
+    expect(mergeTool?.description).toContain("when available");
+    expect(mergeTool?.description).toContain("alone is insufficient");
+  });
+
+  test.each([
+    {
+      toolName: "propose_update_bottle",
+      spoofedType: "merge_bottles",
+      input: { sourceBottleId: 10, destinationBottleId: 11 },
+      evidenceRefs: [
+        { kind: "bottle", bottleId: 10 },
+        { kind: "bottle", bottleId: 11 },
+      ],
+    },
+    {
+      toolName: "propose_update_entity",
+      spoofedType: "merge_entities",
+      input: { sourceEntityId: 20, destinationEntityId: 21 },
+      evidenceRefs: [
+        { kind: "entity", entityId: 20 },
+        { kind: "entity", entityId: 21 },
+      ],
+    },
+  ])(
+    "does not allow $toolName to override its operation type",
+    async (testCase) => {
+      const { collector, tools } = createHarness();
+
+      expect(
+        await invoke(tools, testCase.toolName, {
+          type: testCase.spoofedType,
+          input: testCase.input,
+          rationale: "Attempt to cross the typed proposal-tool boundary.",
+          evidenceRefs: testCase.evidenceRefs,
+        }),
+      ).toMatchObject({ status: "rejected" });
+      expect(collector.getProposals()).toEqual([]);
+    },
+  );
+
+  test("records inspected proposals and updates repeated type plus input", async () => {
+    const { collector, tools } = createHarness();
+    const proposal = {
+      input: { sourceBottleId: 10, destinationBottleId: 11 },
+      rationale: "Both inspected records are the exact same marketed Bottle.",
+      evidenceRefs: [
+        { kind: "bottle", bottleId: 10 },
+        { kind: "bottle", bottleId: 11 },
+      ],
+    };
+
+    expect(
+      await invoke(tools, "propose_merge_bottles", proposal),
+    ).toMatchObject({ status: "recorded", proposalIndex: 0 });
+    expect(
+      await invoke(tools, "propose_merge_bottles", {
+        ...proposal,
+        rationale: "Updated rationale for the same operation.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: 10 },
+          { kind: "bottle", bottleId: 11 },
+          { kind: "web_result", url: "https://example.com/evidence" },
+        ],
+      }),
+    ).toMatchObject({ status: "updated", proposalIndex: 0 });
+    expect(collector.getProposals()).toEqual([
+      expect.objectContaining({
+        rationale: "Updated rationale for the same operation.",
+        evidenceRefs: expect.arrayContaining([
+          { kind: "web_result", url: "https://example.com/evidence" },
+        ]),
+      }),
+    ]);
+  });
+
+  test("rejects uninspected targets and uncollected evidence", async () => {
+    const { collector, tools } = createHarness();
+
+    expect(
+      await invoke(tools, "propose_update_entity", {
+        input: { entityId: 99, patch: { website: "https://example.com" } },
+        rationale: "The Entity needs its official website.",
+        evidenceRefs: [{ kind: "source", field: "reference.name" }],
+      }),
+    ).toMatchObject({ status: "rejected" });
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        input: { bottleId: 10, patch: { exact: { abv: 46 } } },
+        rationale: "The inspected Bottle has the wrong ABV.",
+        evidenceRefs: [
+          { kind: "web_result", url: "https://example.com/not-collected" },
+        ],
+      }),
+    ).toMatchObject({ status: "rejected" });
+    expect(collector.getProposals()).toEqual([]);
+  });
+
+  test("requires evidence refs for every existing operation target", async () => {
+    const { collector, tools } = createHarness();
+
+    expect(
+      await invoke(tools, "propose_merge_bottles", {
+        input: { sourceBottleId: 10, destinationBottleId: 11 },
+        rationale: "Both rows are the same marketed Bottle.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
+      }),
+    ).toMatchObject({
+      status: "rejected",
+      reason: expect.stringContaining('"bottleId":11'),
+    });
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        input: {
+          bottleId: 10,
+          patch: {
+            shared: { brand: { kind: "existing", entityId: 20 } },
+          },
+        },
+        rationale: "Use the inspected canonical Brand.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
+      }),
+    ).toMatchObject({
+      status: "rejected",
+      reason: expect.stringContaining('"entityId":20'),
+    });
+    expect(collector.getProposals()).toEqual([]);
+  });
+
+  test("requires Bottle context that exposes an assigned Series", async () => {
+    const { collector, tools } = createHarness();
+    const updateTool = tools.find(
+      (tool) => tool.name === "propose_update_bottle",
+    );
+
+    expect(JSON.stringify(updateTool?.parameters)).toContain("seriesId");
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        input: {
+          bottleId: 10,
+          patch: { shared: { seriesId: 72 } },
+        },
+        rationale: "Assign a Series that no inspected Bottle exposes.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
+      }),
+    ).toMatchObject({
+      status: "rejected",
+      reason: "BottleSeries 72 was not inspected.",
+    });
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        input: {
+          bottleId: 10,
+          patch: { shared: { seriesId: 71 } },
+        },
+        rationale: "An inspected Bottle exposes the canonical Series.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
+      }),
+    ).toMatchObject({ status: "recorded", proposalIndex: 0 });
+    expect(collector.getProposals()).toEqual([
+      expect.objectContaining({
+        input: expect.objectContaining({
+          patch: { shared: { seriesId: 71 } },
+        }),
+      }),
+    ]);
+  });
+});

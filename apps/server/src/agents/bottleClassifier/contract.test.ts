@@ -62,4 +62,30 @@ describe("bottleClassifier contract", () => {
       },
     });
   });
+
+  test("rejects findings on ignored results", () => {
+    expect(
+      BottleClassificationResultSchema.safeParse({
+        status: "ignored",
+        reason: "non-whisky",
+        proposedOperations: [],
+        findings: [
+          {
+            scope: "other",
+            summary: "Ignored results cannot carry review work.",
+            evidenceRefs: [],
+          },
+        ],
+        artifacts: {
+          extractedIdentity: null,
+          imageEvidence: null,
+          candidates: [],
+          searchEvidence: [],
+          resolvedEntities: [],
+          bottleContexts: [],
+          entityContexts: [],
+        },
+      }).success,
+    ).toBe(false);
+  });
 });

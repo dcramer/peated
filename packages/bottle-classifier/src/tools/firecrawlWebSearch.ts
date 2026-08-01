@@ -5,8 +5,11 @@ import { startToolSpan } from "../observability";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
+  executeBottleWebSearchInvocation,
   getResultDomain,
+  hydrateBottleSearchEvidence,
   type BottleWebSearchBudget,
+  type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
 
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
@@ -88,11 +91,13 @@ export function createFirecrawlWebSearchTool({
   apiUrl = FIRECRAWL_API_URL,
   budget,
   onEvidence,
+  executeWebSearch,
 }: {
   apiKey: string;
   apiUrl?: string;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
+  executeWebSearch?: BottleWebSearchExecutor;
 }) {
   return tool({
     name: "firecrawl_web_search",
@@ -104,21 +109,37 @@ export function createFirecrawlWebSearchTool({
         description: FIRECRAWL_WEB_SEARCH_TOOL_DESCRIPTION,
         args,
         callback: async () => {
-          if (!budget.tryConsume()) {
-            return budget.getExhaustedError();
-          }
+          let evidenceHydrated = false;
+          const hydrateEvidence = (evidence: BottleSearchEvidence) => {
+            evidenceHydrated = true;
+            onEvidence?.(evidence);
+          };
+          const execute = async () => {
+            const evidence = await runFirecrawlWebSearch({
+              apiKey,
+              apiUrl,
+              query: args.query,
+            });
 
-          const evidence = await runFirecrawlWebSearch({
-            apiKey,
-            apiUrl,
-            query: args.query,
+            if (!("error" in evidence) && evidence.results.length > 0) {
+              hydrateEvidence(evidence);
+            }
+
+            return evidence;
+          };
+          const result = await executeBottleWebSearchInvocation({
+            budget,
+            toolName: "firecrawl_web_search",
+            args,
+            execute,
+            executeWebSearch,
           });
 
-          if (!("error" in evidence) && evidence.results.length > 0) {
-            onEvidence?.(evidence);
+          if (executeWebSearch && !evidenceHydrated) {
+            hydrateBottleSearchEvidence(result, hydrateEvidence);
           }
 
-          return evidence;
+          return result;
         },
       });
     },

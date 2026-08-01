@@ -30,11 +30,12 @@ classifier when an Entity itself is the check subject.
 
 ## Terms
 
-- **Check:** one classifier run against an external Bottle reference or an
-  existing Bottle.
+- **Check:** one immutable classifier result for an external Bottle reference
+  or an existing Bottle.
 - **Intent:** the caller-selected reason for the check.
 - **Finding:** a useful issue that is not executable.
-- **Proposed operation:** the small typed object returned by the agent.
+- **Proposed operation:** the small typed object recorded by the agent through a
+  proposal tool.
 - **Review operation:** the server-prepared operation shown to a moderator.
 - **Apply:** execute one approved operation through a canonical service.
 
@@ -159,10 +160,13 @@ type Finding = {
 ```
 
 Findings preserve concrete, reviewer-relevant catalog problems outside the
-enabled operation set without inventing a mutation or suppressing valid
-operations. Missing optional enrichment, harmless absence, and speculative
-cleanup are not findings. This relevance boundary is prompt and eval policy,
-not a name, score, or relationship heuristic in code.
+supported operation set without inventing a mutation or suppressing valid
+operations. They require positive evidence of a real catalog defect that
+remains after proposed operations apply. Missing optional enrichment, harmless
+absence, speculative cleanup, and uncertainty about whether an underspecified,
+generic, or family row is intentional are not findings. Returning no operations
+and no findings is valid after review. This relevance boundary is prompt and
+eval policy, not a name, score, or relationship heuristic in code.
 
 ### Decision: Automation policy belongs to the invoking workflow
 
@@ -190,17 +194,18 @@ check. Existing deterministic Brand-repair candidate discovery may seed
 read-only candidate context; it is not a parallel conclusion or operation
 generator.
 
-This post-create audit is correlated follow-up by the same classifier family,
-not independent verification. Its result can surface work and measure quality,
-but a clean result is not a second proof that the original classification was
-correct.
+This post-create audit is a correlated follow-up Bottle check using the same
+classifier capability, not independent verification. Its result can surface
+work and measure quality, but a clean result is not a second proof that the
+original classification was correct.
 
 This lets agent use be fluid and automatic where it improves intake while
 keeping the small volume of broader catalog remediation human-supervised.
 
 ### Decision: Agent proposals and review operations are separate
 
-The agent returns small plain objects. Evidence references are typed:
+The agent records small plain objects through proposal tools. Evidence
+references are typed:
 
 ```ts
 type EvidenceRef =
@@ -209,7 +214,7 @@ type EvidenceRef =
   | { kind: "entity"; entityId: number }
   | { kind: "web_result"; url: string };
 
-const ProposedOperationSchema = z.discriminatedUnion("type", [
+const ProposedOperationSchema = z.union([
   UpdateBottleOperationSchema,
   MergeBottlesOperationSchema,
   UpdateEntityOperationSchema,
@@ -227,9 +232,10 @@ target ids must appear in the runtime's collected artifacts. The design does
 not add a second evidence-id system or trust model claims about which records
 were inspected.
 
-The model output contains the intent-specific decision or summary, proposed
-operations, and findings. Runtime code attaches collected artifacts and model
-metadata after the run; the model never echoes them.
+The final model output contains the intent-specific decision or summary and
+findings, but not proposed operations. Runtime code attaches proposals recorded
+by successful tool calls, collected artifacts, and model metadata after the
+run; the model never echoes those server-owned fields.
 
 Proposed operations do not contain
 database row ids for the operation itself, review status, permissions, impact
@@ -295,11 +301,9 @@ operation a compile error until both switches handle it. There are no handler
 classes, registries, mapped generic framework, inheritance, reflection,
 dependency injection container, or generic command objects.
 
-The model receives `availableOperations`, derived from the operation enum and
-enabled feature flags for the invoking workflow. It should not be encouraged to
-propose disabled operations.
-Preparation still fails closed if deployment capability changes between the
-agent run and review.
+Every full reference and audit run receives the same four non-mutating proposal
+tools. V1 does not add per-operation capability flags or expose operation names
+as a separate runtime input.
 
 UI code receives `ReviewOperation` and never interprets raw model payloads.
 This separation prevents model output from becoming an accidental apply
@@ -308,11 +312,11 @@ checks, and canonical execution.
 
 ### Decision: Existing-versus-new Entity choices are explicit
 
-Bottle creation and Bottle shared-field updates may need either an existing
-Entity or a new one. They use a discriminated choice:
+An `update_bottle` operation's shared-field patch may need either an existing
+Entity or a new one. It uses a discriminated choice:
 
 ```ts
-type ProposedEntityChoice =
+type BottleOperationEntityChoice =
   | { kind: "existing"; entityId: number }
   | { kind: "create"; entity: ProposedEntityDraft };
 ```
@@ -324,9 +328,11 @@ ids, reports possible collisions, and shows any Entity creation as an explicit
 effect in the preview. Similar names and search scores are warnings, not
 deterministic proof that the Entity must be reused.
 
-This replaces ambiguous `{id: null, name}` behavior. An embedded `kind:
-"create"` is part of the containing Bottle transaction; it is not a reference
-to another proposed operation.
+This removes ambiguous `{ id: null, name }` behavior from `update_bottle`
+operation patches. An embedded `kind: "create"` is part of that Bottle update
+transaction; it is not a reference to another proposed operation. The primary
+`create_bottle` decision keeps its existing `{ id, name }` Entity contract,
+including `id: null` for a new Entity.
 
 ### Decision: Use one explicit operation union
 
@@ -335,7 +341,7 @@ The initial operation union contains:
 1. `update_bottle`
    - one existing Bottle id;
    - one non-empty patch with explicit `shared` and `exact` sections;
-   - shared Entity fields use `ProposedEntityChoice`.
+   - shared Entity fields use `BottleOperationEntityChoice`.
    - changing the Bottle's Brand is an ordinary shared-field update, not a
      separate reassignment operation.
 2. `merge_bottles`
@@ -378,16 +384,16 @@ second real producer needs the same proposal contract.
 ### Decision: V1 operations are independently executable
 
 Every operation references catalog records that already exist, except for an
-explicit Entity creation embedded inside a Bottle create or update. An
+explicit Entity creation embedded inside an `update_bottle` operation. An
 operation cannot reference the result of another operation, and array order has
 no meaning.
 
 This produces deliberate constraints:
 
-- when primary Bottle creation or repair needs a new Entity, the existing
-  canonical Bottle action uses an explicit `kind: "create"` Entity choice and
-  creates it atomically;
-- an `update_bottle` may use the same explicit Entity choice;
+- when primary Bottle creation or repair needs a new Entity, its existing
+  `{ id, name }` Entity choice remains inside the canonical primary action;
+- an `update_bottle` operation may use an explicit `kind: "create"` Entity
+  choice;
 - a required reference repair stays inside the primary `create_bottle` or
   `repair_bottle` decision;
 - supplemental operations are optional cleanup and never prerequisites for a
@@ -401,6 +407,16 @@ Brand/distiller/bottler for the product, or whether cited evidence is
 persuasive. Existing target ids must be loaded through classifier tools before
 proposal, but code does not require a heuristic notion of “relatedness.”
 
+An `update_bottle` must not target a Bottle that is also a `merge_bottles`
+source in the same batch. The merge retires the source and subsumes correction
+of that row, so the two proposals are redundant and not independently
+executable. Existing batch preparation blocks both if the model returns them.
+
+Because operations execute independently against reviewed state, two merges of
+the same resource type cannot share a source or destination in one batch. A
+valid fan-in merge requires a separate check prepared after the first merge
+completes.
+
 The agent may propose an Entity operation only when it materially repairs the
 checked Bottle, an exact duplicate of that Bottle, or an Entity directly
 involved in representing it. This is semantic prompt and eval policy. Code does
@@ -410,28 +426,31 @@ This leaves some valid compound changes as two checks. That trade-off
 is preferable to adding a workflow graph before a real case proves it
 necessary.
 
-### Decision: One classifier agent handles both Bottle intents
+### Decision: One classifier capability handles both Bottle intents
 
 The existing Bottle classifier remains the semantic decision-maker. The prompt
-has a stable shared identity section followed by a small intent-specific
-section. One bounded agent session:
+has stable shared identity and operation-review sections followed by one small
+intent-specific section.
 
-1. inspects the source reference or existing Bottle;
-2. determines exact Bottle identity and catalog condition;
-3. uses bounded local Bottle and Entity search plus focused web evidence;
-4. returns the intent-specific result and proposed operations.
+Each non-ignored reference and each audit uses exactly one bounded semantic
+agent loop. A reference returns its strict authoritative decision plus findings;
+an audit returns a strict summary plus findings. Operations are recorded only by
+successful proposal-tool calls and attached by runtime with the artifacts and
+the single run's model metadata. There is no additional semantic agent call or
+intermediate result contract.
 
-The session retains the classifier's existing turn limit and shared web-query
-budget and may make a bounded evidence-driven retry when new evidence is
-actually collected. It ends on valid final output, those existing limits, or a
-terminal provider failure. Schema-invalid final output receives at most one
-normal structured-output retry; exhaustion fails the check without persistence
-or mutation. Cost is measured in evals and observability; this change does not
-invent a separate cost-governor subsystem. There is no second semantic agent
-reviewing or rewriting the first agent.
+Reference resolution settles identity first and may opportunistically record
+directly related repairs surfaced by the same evidence. Those proposals are not
+a completion requirement for the reference decision. Audit is the active repair
+intent: its eval contract requires supported repairs and their evidence.
 
-Bottle checks have two bounded read-only context tools whenever the enabled
-operations need their resource:
+Closed-form deterministic identity remains useful but is passed to the agent as
+an `identityAnchor`. The agent may preserve it or revise it when stronger
+inspected evidence proves it points at the wrong catalog row. Determinism does
+not suppress the one semantic loop.
+
+Full Bottle checks have two bounded read-only context tools for inspecting
+known operation targets:
 
 - `get_bottle_context`, returning one Bottle's complete exact/shared state,
   BottleGroup siblings, aliases, related Entity ids, Bottle observations, and
@@ -440,19 +459,42 @@ operations need their resource:
 - `get_entity_context`, returning one Entity's metadata, aliases, roles, and
   bounded related Bottle samples.
 
-Audit mode differs by preloading the audited Bottle's context. Both intents
-retain `search_bottles`, `search_entities`, and focused web search, whose
+Audit mode differs by preloading the audited Bottle's context. Open-expansion
+runs also retain `search_bottles`, `search_entities`, and focused web search, whose
 descriptions permit identity repair and audit use rather than only match/create
 blocking cases. Full mutation-impact previews are not agent tools; operation
-preparation owns them. The model receives the enabled operation names with the
-run. The agent does not gain mutation, approval, generic database, or queue
-tools.
+preparation owns them. The classifier gains no mutation, approval, generic
+database, or queue tools.
+
+`candidateExpansion: initial_only` disables candidate, Entity, and web search,
+but keeps both context tools so the agent can inspect ids already present in its
+input before recording a proposal. Local match-only identification remains a
+separate mode and receives neither context nor proposal tools.
+
+The four proposal tools are always present on full reference and audit runs:
+`propose_update_bottle`, `propose_merge_bottles`, `propose_update_entity`, and
+`propose_merge_entities`. Tool arguments omit the operation `type`; the tool
+adds it. Sparse update tools use provider non-strict schemas and immediately
+parse through the canonical strict schema. Merge tools use provider-strict
+schemas.
+
+The collector accepts a proposal only when the canonical payload parses, every
+existing target was inspected, every Bottle and Entity target is cited, every
+evidence reference was collected, and the bounded per-run proposal count
+remains available. Repeating an existing type/input pair revalidates and
+replaces its rationale and evidence in place so the agent can correct stale
+support without creating a duplicate. Rejection is visible to the agent and
+records no work. The collector does not resolve conflicts, order work, or
+support withdrawal. Server preparation owns live-state and execution checks.
 
 Bottle evidence excludes user identity, private activity, tasting prose,
 consumer counts, and unrelated social data. The context adapter passes the
 bounded public images through the classifier's existing image-evidence
 extractor and returns the normalized label evidence with its source and URL;
 the semantic agent is not expected to infer image contents from a URL alone.
+Image extraction scans the complete readable label, including smaller
+secondary bands, subtitles, and neck tags, for identity-bearing edition, batch,
+release, finish, and variant text.
 This reuses an existing extraction boundary rather than adding another
 remediation agent. It is evidence for identity repair, not permission to
 rewrite user activity.
@@ -466,25 +508,33 @@ Retrieved pages, source text, and tool results are untrusted evidence. They
 never enter the stable instruction channel and cannot grant permissions, change
 intent, or authorize application.
 
-The server parses final model output through the strict intent-specific Zod
-schema, including the discriminated operation union. A schema-invalid final
-output fails as a run; the system does not persist malformed fragments as
-operations.
+The server generates each provider JSON Schema from its canonical Zod schema.
+The reference final schema contains the decision fields and findings; the audit
+final schema contains summary and findings. Both use provider strict mode.
+Sparse update proposal tools use provider non-strict argument schemas and parse
+immediately through canonical Zod; merge proposal tools use strict argument
+schemas. A schema-invalid final output fails the whole run, while an invalid
+tool call records no proposal and returns a rejection to the agent.
 
 After parsing, each valid proposed operation is prepared independently. An
-unknown id, disabled deployment capability, direct conflict, or currently
-unexecutable operation is retained as `blocked` with a concrete preparation
-error. It does not erase valid siblings or rewrite the final primary decision.
+unknown id, direct conflict, or currently unexecutable operation is retained as
+`blocked` with a concrete preparation error. It does not erase valid siblings
+or rewrite the authoritative final decision.
 
-For reference resolution, the existing review policy finalizes the primary
-decision before supplemental operations are prepared. Mechanical conflict
-checks use that final reviewed decision, never the raw agent decision.
+For reference resolution, the existing review policy finalizes the agent's
+authoritative decision. Grounding failures have already been rejected by the
+collector and are not durable operations. Server preparation checks each
+collected operation independently against live mechanical and current-state
+constraints, retaining later failures as blocked without discarding the
+authoritative decision or valid sibling operations.
 
 When the invoking workflow automatically applies a primary create or repair,
 supplemental operations are prepared only after that mutation commits. In
 reviewed workflows they may be previewed immediately, but cannot be applied
-until the primary workflow is terminal. Preview and approval then prepare again
-against resulting current state.
+until the exact store-price attempt linked to the check has an `approved` or
+`ignored` final status. A missing attempt, mismatched proposal or price link, or
+proposal-only compatibility link fails closed for execution. Preview and
+approval then prepare again against resulting current state.
 
 ### Decision: Persist one check and its operations
 
@@ -545,10 +595,13 @@ force a rerun, in which case both intentional review batches may remain visible.
 V1 does not group or disposition operations across checks. Live preparation
 prevents an already-applied change from being applied twice.
 
-For v1, the current store-price proposal and attempt remain the authoritative
-workflow state for the primary resolution decision. The immutable check is
-supporting evidence and operation history; replacing price-workflow ownership
-requires a later explicit change.
+For v1, the exact store-price attempt linked to a check is the sole terminal
+authority for that check's primary resolution decision; the mutable proposal
+remains queue correlation. A forced rerun creates a new attempt and check, so it
+does not reopen an older check whose linked attempt is already terminal.
+Deleting the linked attempt clears the check link and makes execution fail
+closed. The immutable check remains supporting evidence and operation history;
+replacing price-workflow ownership requires a later explicit change.
 
 Store-price checks remain in Incoming Listings. Post-user-creation and
 moderator-triggered audits appear in one small Bottle Checks workstream, one row
@@ -637,15 +690,22 @@ state, not successful job dispatch alone.
 
 ### Decision: Test intent and operations separately
 
-Reference-resolution evals keep all current decision assertions. Audit evals
-score exact operations and findings, including whether clean Bottles produce
-neither.
+Reference-resolution evals keep all current decision assertions and hard-gate
+canonical schema, inspected-target, and collected-evidence grounding. Exact
+expected operation and finding sets, including missing and extra entries,
+remain named diagnostic scores. A fixture cannot prove that an otherwise
+supported proposal is harmful merely by omitting it, and moderator approval
+remains the mutation boundary. Production cases still keep their observed
+repair targets without turning every reference into an audit. Audit evals
+hard-gate exact operations, findings, and required evidence, including whether
+clean Bottles produce neither.
 
-Both score:
+Across both intents, reports include:
 
 - exact operation type and target ids/drafts/patches;
-- missing supported operations;
-- harmful extra operations;
+- missing supported operations, diagnostic for references and gating for
+  audits;
+- extra operations and findings;
 - entity-role correctness;
 - target grounding in collected artifacts;
 - schema and policy survival;
@@ -653,10 +713,11 @@ Both score:
 - noisy or unrelated findings and operations;
 - cost, latency, and tool use.
 
-False-positive update and merge operations are more
-costly than omitted cleanup. Production fixtures retain the real input,
-catalog state, verified online evidence, expected intent-specific result, and
-exact Peated operations.
+Operation-set mismatches remain diagnostic for references because a fixture
+cannot enumerate every supported proposal and every proposal requires human
+approval. For audits, exact repair is the completion contract. Production
+fixtures retain the real input, catalog state, verified online evidence,
+expected intent-specific result, and exact Peated operations.
 
 ### Decision: BottleGroup repair is a planned follow-up
 
@@ -679,9 +740,11 @@ add move, merge, and split operations merely for symmetry.
   real reviewed use case.
 - **The classifier overreaches from one Bottle into broad Entity cleanup.**
   Require existing ids to be loaded, use a configurable runaway-output safety
-  ceiling, retain evidence for review, and score harmful extras heavily.
-- **One invalid proposal hides valid work.** Prepare each operation
-  independently and retain blocked proposals with explicit reasons.
+  ceiling, retain evidence for review, report extra proposals diagnostically,
+  and measure moderator rejection and correction.
+- **One invalid proposal hides valid work.** Reject invalid tool calls without
+  disturbing recorded siblings, then prepare accepted operations independently
+  and retain later preparation failures with explicit reasons.
 - **Independent execution produces partial results.** Make independence
   explicit and display per-operation outcomes.
 - **Entity merge is asynchronous.** Keep an `applying` status and have the
@@ -694,9 +757,13 @@ add move, merge, and split operations merely for symmetry.
 
 ## Rollout
 
+Rollout flags gate check generation and persistence, moderator visibility, and
+execution. They do not alter the four proposal tools exposed when a full check
+runs.
+
 1. Introduce the intent and operation schemas while preserving the current
    resolve-reference adapter.
-2. Add intent-specific evals and run operation generation in shadow mode.
+2. Add intent-specific evals and generate checks in shadow mode.
 3. Persist checks and expose read-only operation previews.
 4. Enable moderator approval for Bottle operations.
 5. Extract and test the canonical Entity update service, then enable Entity

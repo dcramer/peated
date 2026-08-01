@@ -7,7 +7,7 @@ proposed operation, including operations blocked during preparation.
 
 #### Scenario: Check completes
 
-- **WHEN** a classifier run returns a valid intent-specific result
+- **WHEN** a Bottle check completes with a valid intent-specific result
 - **THEN** the server SHALL store its input snapshot, result, artifacts, model
   metadata, source or Bottle subject, and proposed operations
 

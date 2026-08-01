@@ -199,11 +199,15 @@ either if you want a different cost or quality tradeoff. `FIRECRAWL_API_KEY`
 enables live web evidence search;
 `FIRECRAWL_API_URL` can override the default Firecrawl API host.
 
-The live evals use `vitest-evals` harness-style `run(...)` tests with
-`@vitest-evals/harness-openai-agents` normalization, native harness
-`toolReplay`, and named judges. The classifier replays `firecrawl_web_search`
-when `FIRECRAWL_API_KEY` enables that tool; otherwise it replays
-`openai_web_search` for fallback runs.
+The live evals use a `vitest-evals` harness around the same
+`runBottleReference(...)` and `runBottleAudit(...)` entrypoints used in
+production. The harness records model usage and real tool events, and replays
+`firecrawl_web_search` when `FIRECRAWL_API_KEY` enables that tool; otherwise it
+replays `openai_web_search`.
+
+Reported token usage covers the measured agent loop only; extraction and
+pre-agent web-search model usage are not currently aggregated. Total timing is
+wall-clock time for the complete production entrypoint.
 
 Replay recordings default to the package-local upstream-style
 `packages/bottle-classifier/.vitest-evals/recordings/` directory via

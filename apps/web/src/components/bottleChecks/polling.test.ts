@@ -19,7 +19,7 @@ function details({
       closedAt: closed ? "2026-07-30T12:00:00.000Z" : null,
       operations: [{ status }],
     },
-  } as BottleCheckDetails;
+  } as unknown as BottleCheckDetails;
 }
 
 describe("Bottle Check applying polling", () => {

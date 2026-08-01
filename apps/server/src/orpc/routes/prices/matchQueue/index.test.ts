@@ -316,14 +316,16 @@ describe("price match queue", () => {
         inputSnapshot: {},
         output: {
           status: "classified",
-          summary: "The listing matched, with catalog cleanup remaining.",
-          findings: [
-            {
-              scope: "bottle",
-              summary: "Review the duplicate Bottle.",
-              evidenceRefs: [{ kind: "bottle", bottleId: sourceBottle.id }],
-            },
-          ],
+          decision: {
+            action: "match",
+            rationale: "The listing matched, with catalog cleanup remaining.",
+            candidateBottleIds: [destinationBottle.id],
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: destinationBottle.id,
+            proposedBottle: null,
+          },
+          findings: [],
         },
         storePriceMatchProposalId: proposal.id,
         completedAt: new Date(),
@@ -345,30 +347,6 @@ describe("price match queue", () => {
       },
       status: "pending_review",
     });
-    const [newerCheck] = await db
-      .insert(bottleChecks)
-      .values({
-        intent: "resolve_reference",
-        sourceKind: "store_price",
-        sourceId: String(price.id),
-        subjectKey: `resolve_reference:store_price:${price.id}`,
-        schemaVersion: 1,
-        inputSnapshot: {},
-        output: {
-          status: "classified",
-          summary: "A newer review batch also needs disposition.",
-          findings: [
-            {
-              scope: "entity",
-              summary: "Review the related Entity.",
-              evidenceRefs: [{ kind: "entity", entityId: 1 }],
-            },
-          ],
-        },
-        storePriceMatchProposalId: proposal.id,
-        completedAt: new Date(),
-      })
-      .returning();
 
     const result = await routerClient.prices.matchQueue.list(
       {},
@@ -379,7 +357,7 @@ describe("price match queue", () => {
     expect(result.results[0]).toMatchObject({
       id: proposal.id,
       status: "approved",
-      bottleCheckIds: [newerCheck.id, check.id],
+      bottleCheckIds: [check.id],
     });
     expect(result.stats.actionableCount).toBe(1);
   });

@@ -2,6 +2,7 @@ import type { MergeEntitiesOperation } from "@peated/bottle-classifier";
 import { db } from "@peated/server/db";
 import {
   actors,
+  bottleChecks,
   bottleGroupDistillers,
   bottleGroups,
   bottleOperations,
@@ -10,9 +11,10 @@ import {
   changes,
   entities,
   entityTombstones,
+  storePriceMatchAttempts,
+  storePriceMatchProposals,
 } from "@peated/server/db/schema";
 import type { getUserActor } from "@peated/server/lib/actors";
-import type { BottleCheckOperationCapabilities } from "@peated/server/lib/bottleCheckAvailableOperations";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import {
   prepareOperation,
@@ -23,13 +25,6 @@ import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperatio
 import { and, eq, inArray } from "drizzle-orm";
 import { beforeEach, expect } from "vitest";
 import mergeEntity from "./mergeEntity";
-
-const ALL_OPERATIONS: BottleCheckOperationCapabilities = {
-  update_bottle: true,
-  merge_bottles: true,
-  update_entity: true,
-  merge_entities: true,
-};
 
 function contextFor(user: Parameters<typeof getUserActor>[0]) {
   return { user } as Parameters<typeof createConcreteBottle>[0]["context"];
@@ -44,11 +39,17 @@ async function createApplyingEntityMergeOperation({
   bottleId,
   destinationEntityId,
   sourceEntityId,
+  storePrice,
 }: {
   approvingModeratorId: number;
   bottleId: number;
   destinationEntityId: number;
   sourceEntityId: number;
+  storePrice?: {
+    attemptId: number;
+    priceId: number;
+    priceName: string;
+  };
 }) {
   const proposal: MergeEntitiesOperation = {
     type: "merge_entities",
@@ -83,27 +84,49 @@ async function createApplyingEntityMergeOperation({
   const [prepared] = await prepareProposals({
     proposals: [proposal],
     artifacts,
-    capabilities: ALL_OPERATIONS,
   });
   if (!prepared || prepared.status === "blocked") {
     throw new Error(
       `Expected Entity merge operation preparation to succeed: ${JSON.stringify({ inspectedEntities, prepared })}`,
     );
   }
-  const created = await createBottleCheck({
-    intent: "audit_bottle",
-    input: {
-      bottleId,
-      origin: "moderator",
-    },
-    result: {
-      summary: "Merge the duplicate Entity.",
-      proposedOperations: [proposal],
-      findings: [],
-      artifacts,
-    },
-    operations: [prepared],
-  });
+  const created = storePrice
+    ? await createBottleCheck({
+        intent: "resolve_reference",
+        sourceKind: "store_price",
+        sourceId: storePrice.priceId,
+        input: {
+          reference: { id: storePrice.priceId, name: storePrice.priceName },
+        },
+        result: {
+          status: "classified",
+          decision: {
+            action: "no_match",
+            candidateBottleIds: [],
+            matchedBottleId: null,
+            proposedBottle: null,
+          },
+          proposedOperations: [proposal],
+          findings: [],
+          artifacts,
+        },
+        storePrice: { kind: "attempt", attemptId: storePrice.attemptId },
+        operations: [prepared],
+      })
+    : await createBottleCheck({
+        intent: "audit_bottle",
+        input: {
+          bottleId,
+          origin: "moderator",
+        },
+        result: {
+          summary: "Merge the duplicate Entity.",
+          proposedOperations: [proposal],
+          findings: [],
+          artifacts,
+        },
+        operations: [prepared],
+      });
   const operation = created.check.operations[0]!;
 
   const [applying] = await db
@@ -200,6 +223,47 @@ test("validates persisted Entity merge results by lifecycle state", async ({
     .set({ status: "applied", result: dispatchResult })
     .where(eq(bottleOperations.id, operation.id));
   await expect(loadOperation()).rejects.toThrow("has no valid applied result");
+});
+
+test("fails an operation when its check schema version is unsupported", async ({
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Version Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Version Destination",
+  });
+  const bottle = await fixtures.Bottle({ brandId: destinationEntity.id });
+  const moderator = await fixtures.User({ mod: true });
+  const operation = await createApplyingEntityMergeOperation({
+    approvingModeratorId: moderator.id,
+    bottleId: bottle.id,
+    sourceEntityId: sourceEntity.id,
+    destinationEntityId: destinationEntity.id,
+  });
+  await db
+    .update(bottleChecks)
+    .set({ schemaVersion: 2 })
+    .where(eq(bottleChecks.id, operation.checkId));
+
+  await mergeEntity({
+    operationId: operation.id,
+    approvingModeratorId: moderator.id,
+  });
+
+  expect(
+    await db.query.bottleOperations.findFirst({
+      where: eq(bottleOperations.id, operation.id),
+      columns: { status: true, error: true },
+    }),
+  ).toEqual({
+    status: "failed",
+    error: expect.stringContaining("uses unsupported schema version 2"),
+  });
+  expect(
+    await db.query.entities.findMany({
+      where: inArray(entities.id, [sourceEntity.id, destinationEntity.id]),
+    }),
+  ).toHaveLength(2);
 });
 
 test("merge A into B", async ({ fixtures }) => {
@@ -317,7 +381,6 @@ test("preserves the disjoint Entity role union shown in the merge preview", asyn
         relatedBottles: [],
       })),
     },
-    capabilities: ALL_OPERATIONS,
   });
   expect(prepared.status).toBe("pending_review");
   if (
@@ -664,6 +727,78 @@ test("operation-backed merge becomes stale when relevant state drifts before the
   ).toMatchObject({
     status: "stale",
     error: "Relevant catalog state changed before the Entity merge worker ran.",
+  });
+  expect(
+    await db.query.entities.findFirst({
+      where: eq(entities.id, sourceEntity.id),
+    }),
+  ).toMatchObject({ id: sourceEntity.id });
+  expect(
+    await db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, sourceEntity.id),
+    }),
+  ).toBeUndefined();
+});
+
+test("operation-backed merge does not mutate after its primary attempt is deleted", async ({
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Deleted Gate Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Deleted Gate Destination",
+  });
+  const bottle = await fixtures.Bottle({ brandId: sourceEntity.id });
+  const price = await fixtures.StorePrice({
+    bottleId: null,
+    name: "Deleted Gate Listing",
+  });
+  const moderator = await fixtures.User({ mod: true });
+  const [primaryProposal] = await db
+    .insert(storePriceMatchProposals)
+    .values({
+      priceId: price.id,
+      proposalType: "no_match",
+      status: "ignored",
+    })
+    .returning();
+  const [primaryAttempt] = await db
+    .insert(storePriceMatchAttempts)
+    .values({
+      priceId: price.id,
+      proposalId: primaryProposal!.id,
+      proposalType: "no_match",
+      initialStatus: "pending_review",
+      finalStatus: "ignored",
+    })
+    .returning();
+  const operation = await createApplyingEntityMergeOperation({
+    approvingModeratorId: moderator.id,
+    bottleId: bottle.id,
+    sourceEntityId: sourceEntity.id,
+    destinationEntityId: destinationEntity.id,
+    storePrice: {
+      attemptId: primaryAttempt!.id,
+      priceId: price.id,
+      priceName: price.name,
+    },
+  });
+
+  await db
+    .delete(storePriceMatchProposals)
+    .where(eq(storePriceMatchProposals.id, primaryProposal!.id));
+
+  await mergeEntity({
+    operationId: operation.id,
+    approvingModeratorId: moderator.id,
+  });
+
+  expect(
+    await db.query.bottleOperations.findFirst({
+      where: eq(bottleOperations.id, operation.id),
+    }),
+  ).toMatchObject({
+    status: "stale",
+    error: "The linked primary store-price decision is no longer complete.",
   });
   expect(
     await db.query.entities.findFirst({

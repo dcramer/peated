@@ -147,20 +147,10 @@ describe("verifyBottleCreation", () => {
     await verifyBottleCreation(input);
 
     expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(1);
-    expect(auditBottleWithServerAdapters).toHaveBeenCalledWith(
-      {
-        bottleId: bottle.id,
-        origin: "post_user_creation",
-      },
-      {
-        availableOperations: [
-          "update_bottle",
-          "merge_bottles",
-          "update_entity",
-          "merge_entities",
-        ],
-      },
-    );
+    expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
+      bottleId: bottle.id,
+      origin: "post_user_creation",
+    });
 
     const checks = await db
       .select()

@@ -4,9 +4,9 @@ import {
   AuditBottleResultSchema,
   BottleClassificationResultSchema,
   ClassifyBottleReferenceInputSchema,
-  EvidenceRefSchema,
   FindingSchema,
-  ProposedOperationSchema,
+  getBottleCheckSourceEvidencePaths,
+  type ProposedOperationSchema,
 } from "@peated/bottle-classifier";
 import { db, type AnyConnection, type AnyDatabase } from "@peated/server/db";
 import {
@@ -17,11 +17,26 @@ import {
   type BottleOperation,
   type User,
 } from "@peated/server/db/schema";
+import {
+  BOTTLE_CHECK_SCHEMA_VERSION,
+  isSupportedBottleCheckSchemaVersion,
+} from "@peated/server/lib/bottleCheckSchemaVersion";
 import { assertCollectedEvidenceRefs } from "@peated/server/lib/bottleOperationReview";
-import { and, desc, eq, exists, inArray, isNull, or, sql } from "drizzle-orm";
+import { PreparedProposalResultSchema as PersistedOperationInputSchema } from "@peated/server/lib/bottleOperationReviewSchemas";
+import {
+  and,
+  desc,
+  eq,
+  exists,
+  inArray,
+  isNull,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import { z } from "zod";
 
-export const BOTTLE_CHECK_SCHEMA_VERSION = 1;
+export { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleCheckSchemaVersion";
 
 const NonEmptyTextSchema = z.string().trim().min(1);
 const PositiveIdSchema = z.number().int().positive();
@@ -46,73 +61,6 @@ const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
 );
 
 const JsonObjectSchema = z.record(z.string(), JsonValueSchema);
-
-const MAX_STATE_TOKEN_DEPTH = 5;
-const MAX_STATE_TOKEN_KEYS = 64;
-const MAX_STATE_TOKEN_ARRAY_LENGTH = 100;
-const MAX_STATE_TOKEN_STRING_LENGTH = 4096;
-
-const StateTokenPrimitiveSchema = z.union([
-  z.string().max(MAX_STATE_TOKEN_STRING_LENGTH),
-  z.number().finite(),
-  z.boolean(),
-  z.null(),
-]);
-
-function boundedStateTokenValueSchema(depth: number): z.ZodType<JsonValue> {
-  if (depth === 0) {
-    return StateTokenPrimitiveSchema;
-  }
-
-  const nestedValueSchema = boundedStateTokenValueSchema(depth - 1);
-  return z.union([
-    StateTokenPrimitiveSchema,
-    z.array(nestedValueSchema).max(MAX_STATE_TOKEN_ARRAY_LENGTH),
-    z
-      .record(z.string().max(255), nestedValueSchema)
-      .refine((value) => Object.keys(value).length <= MAX_STATE_TOKEN_KEYS, {
-        message: `State token objects may contain at most ${MAX_STATE_TOKEN_KEYS} keys.`,
-      }),
-  ]);
-}
-
-const StateTokenSchema = z
-  .record(
-    z.string().max(255),
-    boundedStateTokenValueSchema(MAX_STATE_TOKEN_DEPTH),
-  )
-  .refine((value) => Object.keys(value).length <= MAX_STATE_TOKEN_KEYS, {
-    message: `State tokens may contain at most ${MAX_STATE_TOKEN_KEYS} keys.`,
-  });
-
-const PreparationErrorSchema = z
-  .object({
-    code: NonEmptyTextSchema,
-    message: NonEmptyTextSchema,
-  })
-  .strict();
-
-const PendingOperationSchema = z
-  .object({
-    status: z.literal("pending_review"),
-    proposal: ProposedOperationSchema,
-    resolvedEvidenceRefs: z.array(EvidenceRefSchema).nonempty(),
-    stateToken: StateTokenSchema,
-  })
-  .strict();
-
-const BlockedOperationSchema = z
-  .object({
-    status: z.literal("blocked"),
-    proposal: ProposedOperationSchema,
-    preparationError: PreparationErrorSchema,
-  })
-  .strict();
-
-const OperationInputSchema = z.discriminatedUnion("status", [
-  PendingOperationSchema,
-  BlockedOperationSchema,
-]);
 
 export const BottleCheckCloseReasonSchema = z.enum([
   "dismissed",
@@ -164,7 +112,7 @@ const CommonCreateFields = {
   backgroundEventKey: NonEmptyTextSchema.max(255).optional(),
   model: NonEmptyTextSchema.nullable().optional(),
   modelMetadata: JsonObjectSchema.nullable().optional(),
-  operations: z.array(OperationInputSchema),
+  operations: z.array(PersistedOperationInputSchema),
 } as const;
 
 const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
@@ -361,7 +309,7 @@ function assertOperationsMatchResult({
   operations,
   proposedOperations,
 }: {
-  operations: Array<z.infer<typeof OperationInputSchema>>;
+  operations: Array<z.infer<typeof PersistedOperationInputSchema>>;
   proposedOperations: Array<z.infer<typeof ProposedOperationSchema>>;
 }) {
   const expected = serializedProposalCounts(proposedOperations);
@@ -391,34 +339,6 @@ function assertOperationsMatchResult({
       );
     }
   }
-}
-
-function getCollectedSourceFields(
-  input: z.infer<typeof CreateBottleCheckInputSchema>,
-) {
-  if (input.intent === "audit_bottle") {
-    return input.input.note === undefined ? [] : ["audit.note"];
-  }
-
-  const sourceFields = new Set<string>();
-  for (const [field, value] of Object.entries(input.input.reference)) {
-    if (value !== null && value !== undefined) {
-      sourceFields.add(`reference.${field}`);
-    }
-  }
-  for (const [field, value] of Object.entries(
-    input.result.artifacts.extractedIdentity ?? {},
-  )) {
-    if (value !== null && value !== undefined) {
-      sourceFields.add(`extractedIdentity.${field}`);
-    }
-  }
-  for (const field of Object.keys(
-    input.result.artifacts.imageEvidence?.fieldCandidates ?? {},
-  )) {
-    sourceFields.add(`imageEvidence.fieldCandidates.${field}`);
-  }
-  return [...sourceFields];
 }
 
 async function resolveStorePriceLink({
@@ -504,12 +424,26 @@ export async function createBottleCheck(
     operations: input.operations,
     proposedOperations: input.result.proposedOperations,
   });
+  let sourceFields: string[];
+  if (input.intent === "audit_bottle") {
+    sourceFields = getBottleCheckSourceEvidencePaths({
+      intent: input.intent,
+      input: input.input,
+      artifacts: input.result.artifacts,
+    });
+  } else {
+    sourceFields = getBottleCheckSourceEvidencePaths({
+      intent: input.intent,
+      input: input.input,
+      artifacts: input.result.artifacts,
+    });
+  }
   assertCollectedEvidenceRefs({
     artifacts: input.result.artifacts,
     evidenceRefs: input.result.findings.flatMap(
       ({ evidenceRefs }) => evidenceRefs,
     ),
-    sourceFields: getCollectedSourceFields(input),
+    sourceFields,
   });
 
   const artifacts = input.result.artifacts;
@@ -646,29 +580,17 @@ export async function getBottleCheckHistory(
   });
 }
 
-export async function getLatestBottleCheck(
-  rawSubject: unknown,
-  database: AnyDatabase = db,
-): Promise<BottleCheckWithOperations | null> {
-  const subject = BottleCheckSubjectSchema.parse(rawSubject);
-  return (
-    (await database.query.bottleChecks.findFirst({
-      where: eq(bottleChecks.subjectKey, buildSubjectKey(subject)),
-      orderBy: [desc(bottleChecks.createdAt), desc(bottleChecks.id)],
-      with: {
-        operations: true,
-      },
-    })) ?? null
-  );
-}
-
 export async function listActionableBottleChecks(
   rawInput: unknown = {},
   database: AnyDatabase = db,
 ): Promise<ActionableBottleCheckList> {
   const input = ListActionableBottleChecksInputSchema.parse(rawInput);
   const offset = (input.cursor - 1) * input.limit;
-  const hasFindings = sql<boolean>`jsonb_array_length(COALESCE(${bottleChecks.output}->'findings', '[]'::jsonb)) > 0`;
+  const hasFindings = sql<boolean>`CASE
+    WHEN jsonb_typeof(${bottleChecks.output}->'findings') = 'array'
+    THEN jsonb_array_length(${bottleChecks.output}->'findings') > 0
+    ELSE false
+  END`;
   const hasActionableOperation = exists(
     database
       .select({ id: bottleOperations.id })
@@ -694,7 +616,11 @@ export async function listActionableBottleChecks(
         eq(bottleChecks.intent, "audit_bottle"),
         isNull(bottleChecks.closedAt),
         input.origin ? eq(bottleChecks.origin, input.origin) : undefined,
-        or(hasFindings, hasActionableOperation),
+        or(
+          ne(bottleChecks.schemaVersion, BOTTLE_CHECK_SCHEMA_VERSION),
+          hasFindings,
+          hasActionableOperation,
+        ),
       ),
     )
     .orderBy(desc(bottleChecks.createdAt), desc(bottleChecks.id))
@@ -777,9 +703,12 @@ export async function closeBottleCheck(
       .from(bottleOperations)
       .where(eq(bottleOperations.checkId, check.id))
       .orderBy(bottleOperations.id);
+    const schemaSupported = isSupportedBottleCheckSchemaVersion(check);
     if (
       operations.some(
-        ({ status }) => status === "pending_review" || status === "applying",
+        ({ status }) =>
+          status === "applying" ||
+          (schemaSupported && status === "pending_review"),
       )
     ) {
       throw new BottleCheckNotClosableError(
@@ -788,18 +717,20 @@ export async function closeBottleCheck(
       );
     }
 
-    const findings =
-      check.output === null
-        ? []
-        : PersistedBottleCheckOutputSchema.parse(check.output).findings;
-    const hasClosableOperation = operations.some(({ status }) =>
-      ["blocked", "stale", "failed"].includes(status),
-    );
-    if (findings.length === 0 && !hasClosableOperation) {
-      throw new BottleCheckNotClosableError(
-        check.id,
-        `Bottle check ${check.id} has no remaining work to close.`,
+    if (schemaSupported) {
+      const findings =
+        check.output === null
+          ? []
+          : PersistedBottleCheckOutputSchema.parse(check.output).findings;
+      const hasClosableOperation = operations.some(({ status }) =>
+        ["blocked", "stale", "failed"].includes(status),
       );
+      if (findings.length === 0 && !hasClosableOperation) {
+        throw new BottleCheckNotClosableError(
+          check.id,
+          `Bottle check ${check.id} has no remaining work to close.`,
+        );
+      }
     }
 
     const [closed] = await tx

@@ -37,11 +37,13 @@ function formatDate(value: string): string {
 
 export function BottleCheckRow({ check }: { check: BottleCheck }) {
   const findings = getBottleCheckFindings(check);
-  const unresolvedOperations = check.operations.filter((operation) =>
-    ["blocked", "pending_review", "applying", "stale", "failed"].includes(
-      operation.status,
-    ),
-  );
+  const unresolvedOperationCount = check.schemaSupported
+    ? check.operations.filter((operation) =>
+        ["blocked", "pending_review", "applying", "stale", "failed"].includes(
+          operation.status,
+        ),
+      ).length
+    : check.operationCount;
 
   return (
     <tr>
@@ -58,8 +60,8 @@ export function BottleCheckRow({ check }: { check: BottleCheck }) {
           {getBottleCheckSummary(check)}
         </div>
         <div className="mt-2 text-xs text-slate-400">
-          {unresolvedOperations.length} operation
-          {unresolvedOperations.length === 1 ? "" : "s"} · {findings.length}{" "}
+          {unresolvedOperationCount} operation
+          {unresolvedOperationCount === 1 ? "" : "s"} · {findings.length}{" "}
           finding{findings.length === 1 ? "" : "s"}
         </div>
       </td>

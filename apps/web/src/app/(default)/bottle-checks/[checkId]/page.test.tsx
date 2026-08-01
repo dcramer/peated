@@ -5,6 +5,9 @@ import Page from "./page";
 
 type Details = Outputs["bottleChecks"]["details"];
 type Operation = Details["check"]["operations"][number];
+type ReviewOperation = NonNullable<
+  Details["reviewOperations"][number]["review"]
+>;
 
 const testState = vi.hoisted(() => ({
   details: null as unknown,
@@ -53,6 +56,15 @@ vi.mock("@peated/web/lib/orpc/context", () => ({
   }),
 }));
 
+function entityStateToken() {
+  return {
+    entityId: 42,
+    fields: { name: "Wrong Brand" },
+    referencedCountry: null,
+    referencedRegion: null,
+  };
+}
+
 function operation(
   status: Operation["status"],
   overrides: Partial<Operation> = {},
@@ -70,7 +82,7 @@ function operation(
       evidenceRefs: [{ kind: "entity", entityId: 42 }],
     },
     resolvedEvidenceRefs: [{ kind: "entity", entityId: 42 }],
-    stateToken: {},
+    stateToken: entityStateToken(),
     preparationError: null,
     status,
     reviewedById: null,
@@ -88,6 +100,63 @@ function operation(
   };
 }
 
+function reviewForOperation(operation: Operation): ReviewOperation {
+  if (operation.proposal.type !== "update_entity") {
+    throw new Error("Expected an update_entity operation.");
+  }
+  if (operation.status === "blocked") {
+    return {
+      id: operation.id,
+      status: "blocked",
+      proposal: operation.proposal,
+      preparationError: {
+        code: "operation_disabled",
+        message: "The operation is blocked.",
+      },
+    };
+  }
+  if (operation.status === "applied" || operation.status === "rejected") {
+    throw new Error("Terminal operations do not have a live review.");
+  }
+  return {
+    id: operation.id,
+    type: "update_entity",
+    status: operation.status,
+    proposal: operation.proposal,
+    preview: {
+      before: {
+        entityId: 42,
+        name: "Wrong Brand",
+        shortName: null,
+        roles: ["brand"],
+        website: null,
+        location: { country: null, region: null },
+        yearEstablished: null,
+      },
+      after: {
+        entityId: 42,
+        name: "Correct Brand",
+        shortName: null,
+        roles: ["brand"],
+        website: null,
+        location: { country: null, region: null },
+        yearEstablished: null,
+      },
+      changedFields: ["name"],
+      impact: {
+        bottles: 1,
+        brandGroups: 1,
+        bottlerGroups: 0,
+        distillerGroups: 0,
+        series: 0,
+        aliases: 0,
+      },
+      warnings: [],
+    },
+    stateToken: entityStateToken(),
+  };
+}
+
 function details(operations: Operation[]): Details {
   return {
     check: {
@@ -99,7 +168,8 @@ function details(operations: Operation[]): Details {
       bottleId: 44,
       subjectKey: "audit_bottle:bottle:44",
       backgroundEventKey: null,
-      schemaVersion: 4,
+      schemaSupported: true,
+      schemaVersion: 1,
       inputSnapshot: {},
       output: {
         summary: "Review the proposed catalog work.",
@@ -125,7 +195,14 @@ function details(operations: Operation[]): Details {
       closedAt: null,
       operations,
     },
-    reviewOperations: [],
+    reviewOperations: operations.map((operation) => ({
+      operationId: operation.id,
+      review:
+        operation.status === "applied" || operation.status === "rejected"
+          ? null
+          : reviewForOperation(operation),
+      approvalReady: operation.status === "pending_review",
+    })),
   };
 }
 
@@ -150,13 +227,15 @@ describe("Bottle Check detail execution rollout", () => {
     expect(html).toContain("Reject selected");
   });
 
-  test("keeps close available for unresolved failed work", () => {
+  test("keeps rejection and close available for unresolved failed work", () => {
     testState.details = details([operation("failed")]);
 
     const html = renderToStaticMarkup(<Page />);
 
     expect(html).not.toContain("Approve selected");
     expect(html).not.toContain("Retry failed operation");
+    expect(html).toContain("Reject selected");
+    expect(html).toContain("Select");
     expect(html).toContain("Close check");
   });
 });

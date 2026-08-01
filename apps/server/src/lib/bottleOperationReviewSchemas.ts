@@ -360,18 +360,21 @@ const EntityMergeIdentityStateSchema = z
     name: NonEmptyTextSchema,
     shortName: NonEmptyTextSchema.nullable(),
     roles: EntityContextSchema.shape.roles,
-    website: EntityContextSchema.shape.website,
-    countryId: PositiveIdSchema.nullable(),
-    regionId: PositiveIdSchema.nullable(),
-    yearEstablished: EntityContextSchema.shape.yearEstablished,
     aliasDigest: RelationshipDigestSchema,
     tombstoneDestinationEntityId: PositiveIdSchema.nullable(),
   })
   .strict();
 
+const EntityMergeSourceStateSchema = EntityMergeIdentityStateSchema.extend({
+  website: EntityContextSchema.shape.website,
+  countryId: PositiveIdSchema.nullable(),
+  regionId: PositiveIdSchema.nullable(),
+  yearEstablished: EntityContextSchema.shape.yearEstablished,
+}).strict();
+
 export const EntityMergeStateTokenSchema = z
   .object({
-    source: EntityMergeIdentityStateSchema,
+    source: EntityMergeSourceStateSchema,
     destination: EntityMergeIdentityStateSchema,
     relationshipDigest: RelationshipDigestSchema,
   })
@@ -534,13 +537,3 @@ export const ReviewOperationSchema = z.union([
 export type PreparationError = z.infer<typeof PreparationErrorSchema>;
 export type PreparationErrorCode = z.infer<typeof PreparationErrorCodeSchema>;
 export type ReviewOperation = z.infer<typeof ReviewOperationSchema>;
-export type PreparedReviewOperation = z.infer<
-  typeof PreparedReviewOperationSchema
->;
-export type PreparedOperationData = z.infer<typeof PreparedOperationDataSchema>;
-export type PreparedProposalResult = z.infer<
-  typeof PreparedProposalResultSchema
->;
-export type BlockedReviewOperation = z.infer<
-  typeof BlockedReviewOperationSchema
->;

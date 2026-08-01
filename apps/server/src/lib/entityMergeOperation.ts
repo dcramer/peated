@@ -10,7 +10,15 @@ import {
   entities,
   users,
 } from "@peated/server/db/schema";
-import type { BottleCheckOperationCapabilities } from "@peated/server/lib/bottleCheckAvailableOperations";
+import { getPersistedBottleCheckSourceEvidencePaths } from "@peated/server/lib/bottleCheckEvidence";
+import {
+  isBottleCheckPrimaryDecisionTerminal,
+  lockBottleCheckPrimaryDecisionAttempt,
+} from "@peated/server/lib/bottleCheckPrimaryDecision";
+import {
+  assertSupportedBottleCheckSchemaVersion,
+  UnsupportedBottleCheckSchemaVersionError,
+} from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
   isOperationPreparationFailure,
   prepareOperationForExecution,
@@ -73,13 +81,6 @@ export type LoadedEntityMergeOperation = {
   result: EntityMergeOperationExecutionResult | null;
 };
 
-const ENTITY_MERGE_CAPABILITIES = {
-  update_bottle: true,
-  merge_bottles: true,
-  update_entity: true,
-  merge_entities: true,
-} as const satisfies BottleCheckOperationCapabilities;
-
 export async function loadEntityMergeOperation({
   operationId,
   approvingModeratorId,
@@ -103,12 +104,37 @@ export async function loadEntityMergeOperation({
     );
   }
 
-  const checkQuery = database
-    .select({ closedAt: bottleChecks.closedAt })
-    .from(bottleChecks)
-    .where(eq(bottleChecks.id, operationReference.checkId))
-    .limit(1);
-  const [check] = lock ? await checkQuery.for("update") : await checkQuery;
+  const checkQuery = () =>
+    database
+      .select({
+        closedAt: bottleChecks.closedAt,
+        intent: bottleChecks.intent,
+        sourceKind: bottleChecks.sourceKind,
+        sourceId: bottleChecks.sourceId,
+        storePriceMatchAttemptId: bottleChecks.storePriceMatchAttemptId,
+        storePriceMatchProposalId: bottleChecks.storePriceMatchProposalId,
+      })
+      .from(bottleChecks)
+      .where(eq(bottleChecks.id, operationReference.checkId))
+      .limit(1);
+  const [checkReference] = await checkQuery();
+  if (lock && checkReference) {
+    await lockBottleCheckPrimaryDecisionAttempt(checkReference, database);
+  }
+  const [check] = lock ? await checkQuery().for("update") : [checkReference];
+  if (
+    check &&
+    checkReference &&
+    (check.storePriceMatchAttemptId !==
+      checkReference.storePriceMatchAttemptId ||
+      check.storePriceMatchProposalId !==
+        checkReference.storePriceMatchProposalId)
+  ) {
+    throw new EntityMergeOperationExecutionError(
+      `Bottle operation ${operationId} primary decision linkage changed.`,
+      operationId,
+    );
+  }
   const operationQuery = database
     .select()
     .from(bottleOperations)
@@ -117,6 +143,12 @@ export async function loadEntityMergeOperation({
   const [operation] = lock
     ? await operationQuery.for("update")
     : await operationQuery;
+  if (operation && operation.checkId !== operationReference.checkId) {
+    throw new EntityMergeOperationExecutionError(
+      `Bottle operation ${operationId} changed checks before execution.`,
+      operationId,
+    );
+  }
   if (!operation) {
     throw new EntityMergeOperationExecutionError(
       `Bottle operation ${operationId} was not found.`,
@@ -249,6 +281,45 @@ export async function revalidateApplyingEntityMergeOperation({
       operationId,
     );
   }
+  try {
+    assertSupportedBottleCheckSchemaVersion(check);
+  } catch (error) {
+    if (!(error instanceof UnsupportedBottleCheckSchemaVersionError)) {
+      throw error;
+    }
+    await database
+      .update(bottleOperations)
+      .set({
+        status: "failed",
+        error: error.message,
+        executionCompletedAt: sql`NOW()`,
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          eq(bottleOperations.id, operationId),
+          eq(bottleOperations.status, "applying"),
+        ),
+      );
+    return false;
+  }
+  if (!(await isBottleCheckPrimaryDecisionTerminal(check, database))) {
+    await database
+      .update(bottleOperations)
+      .set({
+        status: "stale",
+        error: "The linked primary store-price decision is no longer complete.",
+        executionCompletedAt: sql`NOW()`,
+        updatedAt: sql`NOW()`,
+      })
+      .where(
+        and(
+          eq(bottleOperations.id, operationId),
+          eq(bottleOperations.status, "applying"),
+        ),
+      );
+    return false;
+  }
   const proposal = MergeEntitiesOperationSchema.safeParse(operation.proposal);
   if (!proposal.success) {
     throw new EntityMergeOperationExecutionError(
@@ -274,7 +345,7 @@ export async function revalidateApplyingEntityMergeOperation({
     prepared = await prepareOperationForExecution({
       operation,
       artifacts: check.artifacts ?? {},
-      capabilities: ENTITY_MERGE_CAPABILITIES,
+      sourceFields: getPersistedBottleCheckSourceEvidencePaths(check),
       database,
     });
   } catch (error) {

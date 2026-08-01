@@ -1,12 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import {
   AUDIT_BOTTLE_EVAL_CASES,
   buildAuditEvalBottleContext,
   getAuditEvalBottleContexts,
 } from "./auditBottle.eval.fixtures";
+import { loadClassifierEvalBottleContext } from "./classifier.eval.fixtures";
 import {
   auditBottleEvalFixtureSchema,
   classifierEvalFixtureSchema,
@@ -19,6 +20,13 @@ const fixtureRootDir = fileURLToPath(
 );
 const decisionFixtureDir = `${fixtureRootDir}/decision-cases`;
 const newBottleFixtureDir = `${fixtureRootDir}/new-bottles`;
+const laphroaigDecisionFixtureFile = `${decisionFixtureDir}/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate.json`;
+
+function loadLaphroaigDecisionFixture() {
+  return classifierEvalFixtureSchema.parse(
+    JSON.parse(readFileSync(laphroaigDecisionFixtureFile, "utf8")),
+  );
+}
 
 function inferDecisionScenario(
   fixture: ReturnType<typeof classifierEvalFixtureSchema.parse>,
@@ -87,32 +95,13 @@ describe("eval fixture validation", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  test("keeps a small audit corpus covering each supported scenario", () => {
-    expect(AUDIT_BOTTLE_EVAL_CASES).toHaveLength(7);
-    expect(
-      AUDIT_BOTTLE_EVAL_CASES.map((fixture) => fixture.scenario).sort(),
-    ).toEqual([
-      "adversarial",
-      "bottle_merge",
-      "bottle_merge",
-      "bottle_update",
-      "clean",
-      "entity_operations",
-      "unresolved",
-    ]);
-    expect(
-      new Set(AUDIT_BOTTLE_EVAL_CASES.map((fixture) => fixture.id)).size,
-    ).toBe(AUDIT_BOTTLE_EVAL_CASES.length);
-    expect(
-      AUDIT_BOTTLE_EVAL_CASES.filter(
-        (fixture) => fixture.provenance.source === "synthetic",
-      ),
-    ).toHaveLength(6);
-    expect(
-      AUDIT_BOTTLE_EVAL_CASES.filter(
-        (fixture) => fixture.provenance.source === "curated_regression",
-      ),
-    ).toHaveLength(1);
+  test("keeps audit fixture ids unique", () => {
+    const fixtures = AUDIT_BOTTLE_EVAL_CASES.map((fixture) =>
+      auditBottleEvalFixtureSchema.parse(fixture),
+    );
+
+    expect(fixtures.length).toBeGreaterThan(0);
+    expect(new Set(fixtures.map(({ id }) => id)).size).toBe(fixtures.length);
   });
 
   test("keeps the production-derived Càirdeas audit bounded and explicit about its DB outcome", () => {
@@ -125,8 +114,7 @@ describe("eval fixture validation", () => {
     expect(fixture?.input.audit.bottleId).toBe(39096);
     expect(
       fixture?.input.context.inspectedBottles.map(({ bottleId }) => bottleId),
-    ).toEqual([45146, 44288]);
-    expect(fixture?.input.context.searchEvidence).toHaveLength(1);
+    ).toEqual([45146, 44288, 802]);
     expect(
       getAuditEvalBottleContexts(fixture!).map(({ bottleId, groupId }) => ({
         bottleId,
@@ -136,32 +124,13 @@ describe("eval fixture validation", () => {
       { bottleId: 39096, groupId: 9433 },
       { bottleId: 45146, groupId: 18105 },
       { bottleId: 44288, groupId: 18105 },
+      { bottleId: 802, groupId: 9433 },
     ]);
-    expect(fixture?.input.context.bottleContexts?.[0]).toMatchObject({
-      shared: {
-        name: "Cairdeas - 15-year-old",
-        statedAge: 15,
-      },
-      exact: {
-        vintageYear: 2022,
-        releaseYear: null,
-      },
-      siblings: [{ bottleId: 802 }],
-      aliases: [],
-      observations: [],
-      imageSources: [
-        {
-          source: { kind: "tasting", tastingId: 223 },
-          url: "https://api.peated.com/uploads/tastings-dryhjq9r8lutxhl4r96lf9fp.webp",
-        },
-      ],
-    });
-    expect(
-      fixture?.input.context.searchEvidence[0]?.results.map(({ url }) => url),
-    ).toEqual([
-      "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
-      "https://www.laphroaig.com/en-gb/whisky-stories/cairdeas-expressions",
-    ]);
+    expect(fixture?.provenance.verifiedSourceUrls).toEqual(
+      expect.arrayContaining([
+        "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+      ]),
+    );
     expect(fixture?.expected.proposedOperations).toMatchObject([
       {
         type: "merge_bottles",
@@ -169,18 +138,23 @@ describe("eval fixture validation", () => {
           sourceBottleId: 39096,
           destinationBottleId: 45146,
         },
+        evidenceRefs: [
+          { kind: "bottle", bottleId: 39096 },
+          { kind: "bottle", bottleId: 45146 },
+          {
+            kind: "web_result",
+            url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+          },
+        ],
       },
     ]);
+    expect(fixture?.requireExpectedOperationEvidence).toBe(true);
     expect(fixture?.expected.findings).toEqual([]);
     expect(fixture?.provenance.dbOutcome).toMatchObject({
       bottleId: 45146,
       createsBottle: false,
       createsRelease: false,
     });
-    expect(fixture?.provenance.dbOutcome?.summary).toContain(
-      "Leave generic Càirdeas Bottle 44288 unchanged.",
-    );
-    expect(fixture?.provenance.dbOutcome?.summary).toContain("tasting 223");
   });
 
   test("requires explicit audit contexts to cover exactly the fixture Bottles", () => {
@@ -630,6 +604,116 @@ describe("eval fixture validation", () => {
     expect(fixture.input.extractedIdentity).toBeNull();
   });
 
+  test("uses exact bounded contexts for the production Laphroaig decision case", async () => {
+    const fixture = loadLaphroaigDecisionFixture();
+    const fallback = vi.fn(async () => null);
+    const contexts = await Promise.all(
+      [39096, 45146, 44288].map(
+        async (bottleId) =>
+          await loadClassifierEvalBottleContext({
+            context: fixture.context,
+            bottleId,
+            fallback,
+          }),
+      ),
+    );
+
+    expect(fallback).not.toHaveBeenCalled();
+    expect(
+      contexts.map((context) => ({
+        bottleId: context?.bottleId,
+        groupId: context?.groupId,
+      })),
+    ).toEqual([
+      { bottleId: 39096, groupId: 9433 },
+      { bottleId: 45146, groupId: 18105 },
+      { bottleId: 44288, groupId: 18105 },
+    ]);
+    expect(fixture.provenance?.catalogFieldObservations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: 39096,
+          field: "edition",
+          evidenceValue: "Warehouse 1",
+          source: "image_evidence",
+        }),
+        expect.objectContaining({
+          bottleId: 39096,
+          field: "abv",
+          evidenceValue: 52.2,
+          source: "image_evidence",
+        }),
+      ]),
+    );
+    expect(fixture.expected).toMatchObject({
+      status: "classified",
+      action: "match",
+      matchedBottleId: 45146,
+      proposedOperations: [
+        {
+          type: "merge_bottles",
+          input: {
+            sourceBottleId: 39096,
+            destinationBottleId: 45146,
+          },
+          evidenceRefs: [
+            { kind: "source", field: "reference.name" },
+            { kind: "bottle", bottleId: 39096 },
+            { kind: "bottle", bottleId: 45146 },
+            {
+              kind: "web_result",
+              url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            },
+          ],
+        },
+      ],
+    });
+    expect(fixture.requireExpectedOperationEvidence).toBe(false);
+    expect(fixture.provenance?.dbOutcome).toMatchObject({
+      bottleId: 45146,
+      createsBottle: false,
+      createsRelease: false,
+    });
+  });
+
+  test("keeps explicit decision contexts complete and free of private API fields", () => {
+    const fixture = loadLaphroaigDecisionFixture();
+    const serializedContexts = JSON.stringify(fixture.context.bottleContexts);
+
+    for (const field of [
+      "createdAt",
+      "createdBy",
+      "createdByActorId",
+      "username",
+      "private",
+      "friendStatus",
+      "rating",
+      "isFavorite",
+      "isLibrary",
+      "hasTasted",
+    ]) {
+      expect(serializedContexts).not.toContain(`"${field}"`);
+    }
+
+    const result = classifierEvalFixtureSchema.safeParse({
+      ...fixture,
+      context: {
+        ...fixture.context,
+        bottleContexts: fixture.context.bottleContexts?.slice(0, 2),
+      },
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message:
+            "Explicit Bottle contexts must exactly cover inspected Bottle ids.",
+          path: ["context", "bottleContexts"],
+        }),
+      );
+    }
+  });
+
   test("rejects duplicate initial candidate Bottle ids", () => {
     const result = classifierEvalFixtureSchema.safeParse({
       id: "duplicate-initial-candidate-ids",
@@ -666,7 +750,7 @@ describe("eval fixture validation", () => {
     }
   });
 
-  test("requires expected operations to be enabled and their targets inspectable", () => {
+  test("requires expected operation targets to be inspectable", () => {
     const fixture = classifierEvalFixtureSchema.parse(
       JSON.parse(
         readFileSync(
@@ -675,20 +759,6 @@ describe("eval fixture validation", () => {
         ),
       ),
     );
-
-    const disabled = classifierEvalFixtureSchema.safeParse({
-      ...fixture,
-      availableOperations: [],
-    });
-    expect(disabled.success).toBe(false);
-    if (!disabled.success) {
-      expect(disabled.error.issues).toContainEqual(
-        expect.objectContaining({
-          message:
-            "Expected operation type merge_bottles is not available to the classifier.",
-        }),
-      );
-    }
 
     const uninspected = classifierEvalFixtureSchema.safeParse({
       ...fixture,

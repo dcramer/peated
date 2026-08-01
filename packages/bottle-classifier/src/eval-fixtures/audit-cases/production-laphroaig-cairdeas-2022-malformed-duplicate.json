@@ -2,6 +2,7 @@
   "id": "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
   "name": "audit: retire the malformed Laphroaig Càirdeas 2022 duplicate",
   "scenario": "bottle_merge",
+  "requireExpectedOperationEvidence": true,
   "input": {
     "audit": {
       "bottleId": 39096,
@@ -35,6 +36,15 @@
           "brand": "Laphroaig",
           "distillery": ["Laphroaig"],
           "category": "single_malt"
+        },
+        {
+          "bottleId": 802,
+          "fullName": "Laphroaig Cairdeas - 15-year-old",
+          "brand": "Laphroaig",
+          "bottler": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "statedAge": 15
         }
       ],
       "bottleContexts": [
@@ -220,6 +230,64 @@
           "aliases": [],
           "observations": [],
           "imageSources": []
+        },
+        {
+          "bottleId": 802,
+          "fullName": "Laphroaig Cairdeas - 15-year-old",
+          "groupId": 9433,
+          "shared": {
+            "name": "Cairdeas - 15-year-old",
+            "statedAge": 15,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            },
+            "distillers": [
+              {
+                "entityId": 1129,
+                "name": "Laphroaig"
+              }
+            ],
+            "bottler": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            }
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": null,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [
+            {
+              "bottleId": 39096,
+              "fullName": "Laphroaig Cairdeas",
+              "exact": {
+                "edition": null,
+                "statedAge": null,
+                "abv": null,
+                "singleCask": null,
+                "caskStrength": null,
+                "vintageYear": 2022,
+                "releaseYear": null,
+                "caskSize": null,
+                "caskType": null,
+                "caskFill": null
+              }
+            }
+          ],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
         }
       ],
       "searchEvidence": [
@@ -257,6 +325,9 @@
       "https://api.peated.com/v1/bottles/45146",
       "https://api.peated.com/v1/bottles/39096",
       "https://api.peated.com/v1/bottles/44288",
+      "https://api.peated.com/v1/bottles/802",
+      "https://api.peated.com/v1/bottle-groups/9433",
+      "https://api.peated.com/v1/bottle-groups/9433/bottles",
       "https://api.peated.com/v1/tastings/223",
       "https://api.peated.com/uploads/tastings-dryhjq9r8lutxhl4r96lf9fp.webp",
       "https://api.peated.com/uploads/bottle-releases/bottle_release-414-pending-upload-e2dv003m0knz9un4uoswa5ml.webp"
@@ -302,7 +373,7 @@
         "notes": "The tasting image and official product page both state 52.2% ABV, which Bottle 45146 already stores."
       }
     ],
-    "notes": "Curated existing-Bottle audit variant derived from the July 29, 2026 production reference miss, not a second observed production miss. Re-verified July 30, 2026: Peated Bottle 39096 still stores vintageYear 2022 in BottleGroup 9433, whose shared identity is the 15-year-old Càirdeas represented by sibling Bottle 802, and owns tasting 223 with the public Warehouse 1 label image. Bottle 45146 stores Warehouse 1, releaseYear 2022, and 52.2% ABV in BottleGroup 18105 beside generic representative Bottle 44288. The public alias endpoint currently returns no persisted aliases for Bottle 39096, and no Bottle-observation endpoint or retained fixture evidence establishes a production BottleObservation row, so its explicit context truthfully leaves aliases and observations empty. The audit corpus keeps only those three inspected Bottles and the two official producer pages rather than copying the reference flow's 15 retrieval candidates."
+    "notes": "Curated existing-Bottle audit variant derived from the July 29, 2026 production reference miss, not a second observed production miss. Re-verified July 31, 2026: Peated Bottle 39096 still stores vintageYear 2022 in BottleGroup 9433, whose shared identity is the 15-year-old Càirdeas represented by sibling Bottle 802, and owns tasting 223 with the public Warehouse 1 label image. The Peated Bottle, BottleGroup, and group-members endpoints show Bottle 802 with group/shared age 15, group Brand/distiller/bottler Entity 1129, and null Bottle-exact edition, ABV, cask, and year fields; the retained official Laphroaig sources do not independently document that 15-year identity. Bottle 45146 stores Warehouse 1, releaseYear 2022, and 52.2% ABV in BottleGroup 18105 beside generic representative Bottle 44288. The public alias endpoint currently returns no persisted aliases for Bottle 39096, and no Bottle-observation endpoint or retained fixture evidence establishes a production BottleObservation row, so its explicit context truthfully leaves aliases and observations empty. The audit corpus keeps only the four inspected Bottles and the two official producer pages rather than copying the reference flow's 15 retrieval candidates."
   },
   "expected": {
     "summary": "The audited Bottle is a malformed duplicate of the complete 2022 Warehouse 1 Bottle; the generic Càirdeas Bottle remains a distinct unchanged catalog record.",

@@ -10,7 +10,9 @@ import {
   BottleCheckOrigin,
   BottleCheckSubject,
 } from "@peated/web/components/bottleChecks/checkSummary";
-import OperationCard from "@peated/web/components/bottleChecks/operationCard";
+import OperationCard, {
+  isBottleOperationRejectable,
+} from "@peated/web/components/bottleChecks/operationCard";
 import { getBottleCheckRefetchInterval } from "@peated/web/components/bottleChecks/polling";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
@@ -60,17 +62,16 @@ export default function Page() {
     refetchInterval: (query) => getBottleCheckRefetchInterval(query.state.data),
   });
   const check = data.check;
-  const reviewByOperation = useMemo(
+  const liveReviewByOperation = useMemo(
     () =>
       new Map(
-        data.reviewOperations.map(({ operationId, review }) => [
+        data.reviewOperations.map(({ operationId, ...liveReview }) => [
           operationId,
-          review,
+          liveReview,
         ]),
       ),
     [data.reviewOperations],
   );
-
   const approveMutation = useMutation(
     orpc.bottleChecks.approveSelected.mutationOptions(),
   );
@@ -94,6 +95,11 @@ export default function Page() {
     rejectMutation.isPending ||
     retryMutation.isPending ||
     closeMutation.isPending;
+  const canApprove =
+    selected.size > 0 &&
+    [...selected].every((operationId) =>
+      Boolean(liveReviewByOperation.get(operationId)?.approvalReady),
+    );
 
   async function refresh() {
     setSelected(new Set());
@@ -187,14 +193,16 @@ export default function Page() {
 
   const canClose =
     !check.closedAt &&
-    !check.operations.some(({ status }) =>
-      ["pending_review", "applying"].includes(status),
-    ) &&
-    (check.operations.some(({ status }) =>
-      ["blocked", "stale", "failed"].includes(status),
-    ) ||
-      (Array.isArray(check.output?.findings) &&
-        check.output.findings.length > 0));
+    (!check.schemaSupported
+      ? check.canClose
+      : !check.operations.some(({ status }) =>
+          ["pending_review", "applying"].includes(status),
+        ) &&
+        (check.operations.some(({ status }) =>
+          ["blocked", "stale", "failed"].includes(status),
+        ) ||
+          (Array.isArray(check.output?.findings) &&
+            check.output.findings.length > 0)));
   const canReject =
     selected.size > 0 &&
     (rejectionReason !== "other" || rejectionNote.trim().length > 0);
@@ -229,31 +237,36 @@ export default function Page() {
       <div className="space-y-5">
         <CheckResult check={check} />
 
-        {check.operations.length > 0 ? (
+        {check.schemaSupported && check.operations.length > 0 ? (
           <section>
             <h2 className="mb-3 text-lg font-semibold text-white">
               Proposed operations
             </h2>
             <div className="space-y-4">
-              {check.operations.map((operation) => (
-                <OperationCard
-                  checked={selected.has(operation.id)}
-                  disabled={busy || !!check.closedAt}
-                  executionEnabled={bottleCheckExecution}
-                  key={operation.id}
-                  onRetry={(operationId) =>
-                    void runAction(() => retry(operationId))
-                  }
-                  onSelect={updateSelection}
-                  operation={operation}
-                  review={reviewByOperation.get(operation.id) ?? null}
-                />
-              ))}
+              {check.operations.map((operation) => {
+                const liveReview = liveReviewByOperation.get(operation.id);
+                return (
+                  <OperationCard
+                    approvalReady={liveReview?.approvalReady ?? false}
+                    checked={selected.has(operation.id)}
+                    disabled={busy || !!check.closedAt}
+                    executionEnabled={bottleCheckExecution}
+                    key={operation.id}
+                    onRetry={(operationId) =>
+                      void runAction(() => retry(operationId))
+                    }
+                    onSelect={updateSelection}
+                    operation={operation}
+                    review={liveReview?.review ?? null}
+                  />
+                );
+              })}
             </div>
           </section>
         ) : null}
 
-        {!check.closedAt &&
+        {check.schemaSupported &&
+        !check.closedAt &&
         !bottleCheckExecution &&
         check.operations.some(({ status }) =>
           ["pending_review", "failed"].includes(status),
@@ -267,8 +280,9 @@ export default function Page() {
           </p>
         ) : null}
 
-        {!check.closedAt &&
-        check.operations.some(({ status }) => status === "pending_review") ? (
+        {check.schemaSupported &&
+        !check.closedAt &&
+        check.operations.some(isBottleOperationRejectable) ? (
           <section className="rounded-xl border border-slate-800 bg-slate-950 p-5">
             <h2 className="font-semibold text-white">Selected operations</h2>
             <p className="mt-1 text-xs text-slate-400">
@@ -279,7 +293,7 @@ export default function Page() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button
                   color="primary"
-                  disabled={busy || selected.size === 0}
+                  disabled={busy || !canApprove}
                   onClick={() => void runAction(approveSelected)}
                 >
                   Approve selected

@@ -1,8 +1,8 @@
 import {
   BottleClassificationArtifactsSchema,
   ProposedOperationSchema,
+  type BottleOperationEntityChoice,
   type EvidenceRef,
-  type ProposedEntityChoice,
   type ProposedOperation,
 } from "@peated/bottle-classifier";
 import {
@@ -44,7 +44,6 @@ import {
   storePrices,
   tastings,
 } from "@peated/server/db/schema";
-import type { BottleCheckOperationCapabilities } from "@peated/server/lib/bottleCheckAvailableOperations";
 import {
   getConcreteBottleExactIdentity,
   materializeConcreteBottleIdentity,
@@ -60,6 +59,8 @@ import { lockConcreteBottleMergeDependencies } from "@peated/server/lib/mergeCon
 import {
   concreteBottleUpdateExpectedSelectedBottleState,
   concreteBottleUpdateExpectedSharedState,
+  ConcreteBottleUpdateGraphError,
+  lockConcreteBottleUpdateDependencies,
   type ConcreteBottleUpdateExpectedSelectedBottleState,
   type ConcreteBottleUpdateExpectedSharedState,
 } from "@peated/server/lib/updateConcreteBottle";
@@ -96,8 +97,7 @@ import {
   type EntityChoicePreviewSchema,
   type PreparationError,
   type PreparationErrorCode,
-  type PreparedProposalResult,
-  type PreparedReviewOperation,
+  type PreparedProposalResultSchema,
   type ReviewOperation,
 } from "./bottleOperationReviewSchemas";
 
@@ -109,7 +109,6 @@ export type BottleOperationRow = {
 
 export type BottleOperationPreparationContext = {
   artifacts: unknown;
-  capabilities: BottleCheckOperationCapabilities;
   sourceFields?: readonly string[];
   protectedBottleIds?: readonly number[];
   database?: AnyDatabase;
@@ -161,7 +160,6 @@ export type PreparedOperationExecution =
 
 type ParsedPreparationContext = {
   artifacts: ParsedArtifacts;
-  capabilities: BottleCheckOperationCapabilities;
   sourceFields: ReadonlySet<string>;
   protectedBottleIds: ReadonlySet<number>;
   database: AnyDatabase;
@@ -254,7 +252,6 @@ function parseContext(
 
   return {
     artifacts,
-    capabilities: context.capabilities,
     sourceFields: new Set(context.sourceFields ?? []),
     protectedBottleIds: new Set(context.protectedBottleIds ?? []),
     database: context.database ?? db,
@@ -304,12 +301,6 @@ export function assertCollectedEvidenceRefs({
 }) {
   const context = parseContext({
     artifacts,
-    capabilities: {
-      update_bottle: false,
-      merge_bottles: false,
-      update_entity: false,
-      merge_entities: false,
-    },
     sourceFields,
   });
   const missingEvidence = evidenceRefs.find(
@@ -519,7 +510,7 @@ async function resolveEntityChoice({
   requiredRole,
   context,
 }: {
-  choice: ProposedEntityChoice;
+  choice: BottleOperationEntityChoice;
   requiredRole: Entity["type"][number];
   context: ParsedPreparationContext;
 }): Promise<ResolvedEntityChoice> {
@@ -2089,15 +2080,17 @@ async function prepareEntityUpdate(
         fields: tokenFields,
         referencedCountry: locationTouched ? resolved.referencedCountry : null,
         referencedRegion: locationTouched ? resolved.referencedRegion : null,
-        relationshipDigest: relationshipsTouched
-          ? relationshipDigest(
-              await entityRelationshipState(
-                context.database,
-                [current.entity.id],
-                true,
+        ...(relationshipsTouched
+          ? {
+              relationshipDigest: relationshipDigest(
+                await entityRelationshipState(
+                  context.database,
+                  [current.entity.id],
+                  true,
+                ),
               ),
-            )
-          : undefined,
+            }
+          : {}),
       },
     }),
     canonicalInput: {
@@ -2121,7 +2114,7 @@ async function entityAliasesFor(database: AnyDatabase, entityId: number) {
     .then((rows) => rows.map(({ name }) => name));
 }
 
-function entityMergeState(
+function entityMergeIdentityState(
   current: EntityWithLocation,
   aliases: string[],
   tombstoneDestinationEntityId: number | null,
@@ -2131,12 +2124,22 @@ function entityMergeState(
     name: current.entity.name,
     shortName: current.entity.shortName,
     roles: sortedRoles(current.entity.type),
+    aliasDigest: relationshipDigest(aliases),
+    tombstoneDestinationEntityId,
+  };
+}
+
+function entityMergeSourceState(
+  current: EntityWithLocation,
+  aliases: string[],
+  tombstoneDestinationEntityId: number | null,
+) {
+  return {
+    ...entityMergeIdentityState(current, aliases, tombstoneDestinationEntityId),
     website: current.entity.website,
     countryId: current.entity.countryId,
     regionId: current.entity.regionId,
     yearEstablished: current.entity.yearEstablished,
-    aliasDigest: relationshipDigest(aliases),
-    tombstoneDestinationEntityId,
   };
 }
 
@@ -2303,8 +2306,12 @@ async function prepareEntityMerge(
         warnings,
       },
       stateToken: {
-        source: entityMergeState(source, sourceAliases, null),
-        destination: entityMergeState(destination, destinationAliases, null),
+        source: entityMergeSourceState(source, sourceAliases, null),
+        destination: entityMergeIdentityState(
+          destination,
+          destinationAliases,
+          null,
+        ),
         relationshipDigest: relationshipDigest(
           await entityRelationshipState(context.database, [
             sourceEntityId,
@@ -2422,7 +2429,9 @@ function operationsConflict(
     return (
       left.input.entityId === right.input.sourceEntityId ||
       (left.input.entityId === right.input.destinationEntityId &&
-        left.input.patch.roles !== undefined)
+        (left.input.patch.name !== undefined ||
+          left.input.patch.shortName !== undefined ||
+          left.input.patch.roles !== undefined))
     );
   }
   if (left.type === "merge_entities" && right.type === "update_entity") {
@@ -2482,12 +2491,6 @@ async function prepareParsedOperation({
   proposal: ProposedOperation;
   context: ParsedPreparationContext;
 }): Promise<PreparedOperationExecution> {
-  if (context.capabilities[proposal.type] !== true) {
-    fail(
-      "operation_disabled",
-      `Operation ${proposal.type} is disabled for this workflow.`,
-    );
-  }
   validateEvidence(proposal, context);
 
   switch (proposal.type) {
@@ -2545,6 +2548,20 @@ async function prepareParsedProposals(
   );
 }
 
+function proposedBottleUpdateEntityIds(
+  proposal: Extract<ProposedOperation, { type: "update_bottle" }>,
+): number[] {
+  const shared = proposal.input.patch.shared;
+  const choices = [
+    shared?.brand,
+    shared?.bottler,
+    ...(shared?.distillers ?? []),
+  ];
+  return choices.flatMap((choice) =>
+    choice?.kind === "existing" ? [choice.entityId] : [],
+  );
+}
+
 /**
  * Rebuilds canonical service input from a persisted proposal and live state.
  * The returned input is server-only and must never be serialized for review.
@@ -2556,7 +2573,20 @@ export async function prepareOperationForExecution({
   operation: BottleOperationRow;
 }): Promise<PreparedOperationExecution> {
   const proposal = ProposedOperationSchema.parse(operation.proposal);
-  if (proposal.type === "merge_bottles") {
+  if (proposal.type === "update_bottle") {
+    try {
+      await lockConcreteBottleUpdateDependencies(
+        rawContext.database,
+        proposal.input.bottleId,
+        proposedBottleUpdateEntityIds(proposal),
+      );
+    } catch (error) {
+      if (error instanceof ConcreteBottleUpdateGraphError) {
+        fail("invalid_current_state", error.message);
+      }
+      throw error;
+    }
+  } else if (proposal.type === "merge_bottles") {
     await lockConcreteBottleMergeDependencies(
       rawContext.database,
       proposal.input,
@@ -2633,7 +2663,7 @@ export async function prepareProposals({
   ...rawContext
 }: BottleOperationPreparationContext & {
   proposals: unknown[];
-}): Promise<PreparedProposalResult[]> {
+}): Promise<Array<z.infer<typeof PreparedProposalResultSchema>>> {
   const context = parseContext(rawContext);
   const proposals = rawProposals.map((proposal) =>
     ProposedOperationSchema.parse(proposal),
@@ -2654,8 +2684,3 @@ export async function prepareProposals({
         }),
   );
 }
-
-export type {
-  PreparedProposalResult,
-  ReviewOperation,
-} from "./bottleOperationReviewSchemas";

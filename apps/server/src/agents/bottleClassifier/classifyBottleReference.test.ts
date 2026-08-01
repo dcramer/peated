@@ -38,9 +38,6 @@ describe("server bottleClassifier wrapper", () => {
     await expect(classifyBottleReference(input)).resolves.toMatchObject({
       status: "ignored",
     });
-    expect(classifyBottleReferenceInService).toHaveBeenCalledWith(
-      input,
-      undefined,
-    );
+    expect(classifyBottleReferenceInService).toHaveBeenCalledWith(input);
   });
 });

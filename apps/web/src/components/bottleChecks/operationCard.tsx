@@ -8,6 +8,8 @@ export type BottleOperation = Details["check"]["operations"][number];
 export type BottleOperationReview = NonNullable<
   Details["reviewOperations"][number]["review"]
 >;
+export type BottleOperationEvidence =
+  BottleOperation["proposal"]["evidenceRefs"][number];
 
 const STATUS_LABELS: Record<BottleOperation["status"], string> = {
   blocked: "Blocked",
@@ -337,58 +339,69 @@ function ExecutionSummary({ operation }: { operation: BottleOperation }) {
   );
 }
 
-export function EvidenceList({ evidence }: { evidence: unknown[] }) {
+export function EvidenceList({
+  evidence,
+}: {
+  evidence: readonly BottleOperationEvidence[];
+}) {
   if (evidence.length === 0) return null;
   return (
     <ul className="mt-2 space-y-1 text-sm text-slate-300">
-      {evidence.map((item, index) => {
-        if (typeof item !== "object" || item === null) return null;
-        const ref = item as Record<string, unknown>;
-        if (ref.kind === "bottle" && typeof ref.bottleId === "number") {
-          return (
-            <li key={`bottle:${ref.bottleId}`}>
-              Bottle evidence:{" "}
-              <Link className="underline" href={`/bottles/${ref.bottleId}`}>
-                #{ref.bottleId}
-              </Link>
-            </li>
-          );
+      {evidence.map((ref) => {
+        switch (ref.kind) {
+          case "bottle":
+            return (
+              <li key={`bottle:${ref.bottleId}`}>
+                Bottle evidence:{" "}
+                <Link className="underline" href={`/bottles/${ref.bottleId}`}>
+                  #{ref.bottleId}
+                </Link>
+              </li>
+            );
+          case "entity":
+            return (
+              <li key={`entity:${ref.entityId}`}>
+                Entity evidence:{" "}
+                <Link className="underline" href={`/entities/${ref.entityId}`}>
+                  #{ref.entityId}
+                </Link>
+              </li>
+            );
+          case "web_result":
+            return (
+              <li key={ref.url}>
+                Web evidence:{" "}
+                <a
+                  className="break-all underline"
+                  href={ref.url}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {ref.url}
+                </a>
+              </li>
+            );
+          case "source":
+            return <li key={`source:${ref.field}`}>Source: {ref.field}</li>;
         }
-        if (ref.kind === "entity" && typeof ref.entityId === "number") {
-          return (
-            <li key={`entity:${ref.entityId}`}>
-              Entity evidence:{" "}
-              <Link className="underline" href={`/entities/${ref.entityId}`}>
-                #{ref.entityId}
-              </Link>
-            </li>
-          );
-        }
-        if (ref.kind === "web_result" && typeof ref.url === "string") {
-          return (
-            <li key={ref.url}>
-              Web evidence:{" "}
-              <a
-                className="break-all underline"
-                href={ref.url}
-                rel="noreferrer"
-                target="_blank"
-              >
-                {ref.url}
-              </a>
-            </li>
-          );
-        }
-        if (ref.kind === "source" && typeof ref.field === "string") {
-          return <li key={`source:${ref.field}`}>Source: {ref.field}</li>;
-        }
-        return <li key={index}>Recorded evidence</li>;
       })}
     </ul>
   );
 }
 
+const REJECTABLE_OPERATION_STATUSES = new Set<BottleOperation["status"]>([
+  "blocked",
+  "pending_review",
+  "stale",
+  "failed",
+]);
+
+export function isBottleOperationRejectable(operation: BottleOperation) {
+  return REJECTABLE_OPERATION_STATUSES.has(operation.status);
+}
+
 export default function OperationCard({
+  approvalReady = false,
   checked = false,
   disabled = false,
   executionEnabled = true,
@@ -398,6 +411,7 @@ export default function OperationCard({
   review,
   showDisposition = true,
 }: {
+  approvalReady?: boolean;
   checked?: boolean;
   disabled?: boolean;
   executionEnabled?: boolean;
@@ -408,7 +422,9 @@ export default function OperationCard({
   showDisposition?: boolean;
 }) {
   const selectable =
-    showDisposition && !!onSelect && operation.status === "pending_review";
+    showDisposition && !!onSelect && isBottleOperationRejectable(operation);
+  const notApprovalReady =
+    showDisposition && operation.status === "pending_review" && !approvalReady;
 
   return (
     <article className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
@@ -418,7 +434,9 @@ export default function OperationCard({
             {OPERATION_LABELS[operation.proposal.type]}
           </h3>
           <span className="mt-2 inline-block rounded-full border border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-200">
-            {STATUS_LABELS[operation.status]}
+            {notApprovalReady
+              ? "Not ready to approve"
+              : STATUS_LABELS[operation.status]}
           </span>
         </div>
         {selectable ? (
@@ -447,6 +465,15 @@ export default function OperationCard({
         </div>
         <EvidenceList evidence={operation.proposal.evidenceRefs} />
       </div>
+
+      {notApprovalReady ? (
+        <div
+          className="mt-4 rounded border border-amber-800 bg-amber-950/40 p-3 text-sm text-amber-100"
+          role="status"
+        >
+          This operation cannot currently be approved, but you can reject it.
+        </div>
+      ) : null}
 
       {review ? <Preview review={review} /> : null}
 

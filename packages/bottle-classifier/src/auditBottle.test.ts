@@ -1,3 +1,4 @@
+import { Runner } from "@openai/agents";
 import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 
@@ -7,13 +8,11 @@ import type {
 } from "./bottleContextContract";
 import {
   createBottleClassifier,
-  type BottleClassifierReasoningResult,
+  type BottleClassifierAgentResult,
 } from "./classifierRuntime";
 import type { BottleCandidate } from "./classifierTypes";
-import {
-  buildBottleClassificationArtifacts,
-  type ProposedOperationType,
-} from "./contract";
+import { buildBottleClassificationArtifacts } from "./contract";
+import { BottleClassificationError } from "./error";
 
 function buildAuditedBottleContext(): BottleContextSource {
   return {
@@ -112,7 +111,6 @@ describe("auditBottle", () => {
     const runBottleAuditAgent = vi.fn(
       async ({
         audit,
-        availableOperations,
         currentBottleContext,
       }: {
         audit: {
@@ -120,7 +118,6 @@ describe("auditBottle", () => {
           origin: "moderator" | "post_user_creation";
           note?: string;
         };
-        availableOperations?: ProposedOperationType[];
         currentBottleContext: BottleContext;
       }) => {
         expect(audit).toEqual({
@@ -134,7 +131,6 @@ describe("auditBottle", () => {
           aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
           observations: [{ sourceKey: "warehouse-1" }],
         });
-        expect(availableOperations).toEqual(["update_bottle", "merge_bottles"]);
         expect(currentBottleContext.publicImages).toHaveLength(2);
         expect(currentBottleContext.publicImages[0]).toMatchObject({
           source: { kind: "bottle" },
@@ -186,16 +182,11 @@ describe("auditBottle", () => {
       },
     });
 
-    const result = await classifier.auditBottle(
-      {
-        bottleId: 45146,
-        origin: "moderator",
-        note: "Check whether the nearby generic row is a duplicate.",
-      },
-      {
-        availableOperations: ["update_bottle", "merge_bottles"],
-      },
-    );
+    const result = await classifier.auditBottle({
+      bottleId: 45146,
+      origin: "moderator",
+      note: "Check whether the nearby generic row is a duplicate.",
+    });
 
     expect(getBottleContext).toHaveBeenCalledWith(45146);
     expect(runBottleAuditAgent).toHaveBeenCalledOnce();
@@ -273,7 +264,126 @@ describe("auditBottle", () => {
     );
   });
 
-  test("attaches supplemental operations and findings to reference results", async () => {
+  test("preserves gathered artifacts when final finding validation fails", async () => {
+    const currentBottle = {
+      ...buildAuditedBottleContext(),
+      imageSources: [],
+    };
+    const relatedBottleSource = {
+      ...currentBottle,
+      bottleId: 39096,
+      fullName: "Malformed Laphroaig Càirdeas",
+    };
+    const relatedBottle: BottleContext = {
+      bottleId: relatedBottleSource.bottleId,
+      fullName: relatedBottleSource.fullName,
+      groupId: relatedBottleSource.groupId,
+      shared: relatedBottleSource.shared,
+      exact: relatedBottleSource.exact,
+      siblings: relatedBottleSource.siblings,
+      aliases: relatedBottleSource.aliases,
+      observations: relatedBottleSource.observations,
+      publicImages: [],
+    };
+    const runAgent = vi.spyOn(Runner.prototype, "run").mockResolvedValueOnce({
+      finalOutput: {
+        summary: "The audit returned an unsupported finding citation.",
+        findings: [
+          {
+            scope: "bottle",
+            summary: "An uncollected page allegedly establishes a defect.",
+            evidenceRefs: [
+              {
+                kind: "web_result",
+                url: "https://example.com/not-collected",
+              },
+            ],
+          },
+        ],
+      },
+      newItems: [
+        {
+          type: "tool_call_output_item",
+          rawItem: {
+            name: "get_bottle_context",
+            output: JSON.stringify({ context: relatedBottle }),
+          },
+        },
+      ],
+    } as never);
+    const classifier = createBottleClassifier({
+      client: {} as OpenAI,
+      model: "test-model",
+      maxSearchQueries: 0,
+      adapters: {
+        searchBottles: vi.fn(async () => []),
+        getBottleContext: vi.fn(async () => currentBottle),
+      },
+    });
+
+    try {
+      await classifier.runBottleAudit({
+        bottleId: currentBottle.bottleId,
+        origin: "moderator",
+      });
+      throw new Error("Expected Bottle audit validation to fail.");
+    } catch (error) {
+      expect(error).toBeInstanceOf(BottleClassificationError);
+      expect(error).toMatchObject({
+        message: expect.stringContaining(
+          "Finding 0 cites evidence that was not collected",
+        ),
+        artifacts: {
+          bottleContexts: expect.arrayContaining([
+            expect.objectContaining({ bottleId: currentBottle.bottleId }),
+            expect.objectContaining({ bottleId: relatedBottle.bottleId }),
+          ]),
+        },
+      });
+    } finally {
+      runAgent.mockRestore();
+    }
+  });
+
+  test("accepts any supported audit proposal type", async () => {
+    const classifier = createBottleClassifier({
+      client: {} as OpenAI,
+      model: "test-model",
+      maxSearchQueries: 0,
+      adapters: {
+        searchBottles: vi.fn(async () => []),
+        getBottleContext: vi.fn(async () => ({
+          ...buildAuditedBottleContext(),
+          imageSources: [],
+        })),
+      },
+      overrides: {
+        runBottleAuditAgent: vi.fn(async () => ({
+          summary: "The Brand needs review.",
+          proposedOperations: [
+            {
+              type: "update_entity" as const,
+              input: {
+                entityId: 9,
+                patch: { name: "Laphroaig Distillery" },
+              },
+              rationale: "The Entity name is stale.",
+              evidenceRefs: [{ kind: "entity" as const, entityId: 9 }],
+            },
+          ],
+          findings: [],
+        })),
+      },
+    });
+
+    await expect(
+      classifier.auditBottle({ bottleId: 45146, origin: "moderator" }),
+    ).resolves.toMatchObject({
+      proposedOperations: [{ type: "update_entity" }],
+    });
+  });
+
+  test("attaches proposals and findings from the reference agent", async () => {
     const classifier = createBottleClassifier({
       client: {} as OpenAI,
       model: "test-model",
@@ -283,7 +393,7 @@ describe("auditBottle", () => {
       },
       overrides: {
         runBottleClassifierAgent: vi.fn(
-          async (): Promise<BottleClassifierReasoningResult> => ({
+          async (): Promise<BottleClassifierAgentResult> => ({
             decision: {
               action: "no_match",
               rationale: "The source Bottle remains unresolved.",
@@ -295,23 +405,40 @@ describe("auditBottle", () => {
             },
             proposedOperations: [
               {
-                type: "update_entity",
+                type: "update_entity" as const,
                 input: {
                   entityId: 10,
                   patch: { name: "Canonical Brand" },
                 },
                 rationale: "The inspected Entity has a stale name.",
-                evidenceRefs: [{ kind: "entity", entityId: 10 }],
+                evidenceRefs: [{ kind: "entity" as const, entityId: 10 }],
               },
             ],
             findings: [
               {
-                scope: "series",
+                scope: "series" as const,
                 summary: "The related Series needs a workflow outside v1.",
-                evidenceRefs: [{ kind: "source", field: "reference.name" }],
+                evidenceRefs: [
+                  { kind: "source" as const, field: "reference.name" },
+                ],
               },
             ],
-            artifacts: buildBottleClassificationArtifacts({}),
+            artifacts: buildBottleClassificationArtifacts({
+              entityContexts: [
+                {
+                  entityId: 10,
+                  name: "Stale Brand",
+                  shortName: null,
+                  roles: ["brand"],
+                  website: null,
+                  country: null,
+                  region: null,
+                  yearEstablished: null,
+                  aliases: [],
+                  relatedBottles: [],
+                },
+              ],
+            }),
           }),
         ),
       },

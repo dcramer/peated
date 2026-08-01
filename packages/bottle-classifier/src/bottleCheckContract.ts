@@ -42,11 +42,18 @@ export const AuditBottleInputSchema = z
   })
   .strict();
 
-export const EvidenceRefSchema = z.discriminatedUnion("kind", [
+export const SourceEvidencePathSchema = z.union([
+  z.literal("audit.note"),
+  z.string().regex(/^reference\.[A-Za-z_][A-Za-z0-9_]*$/),
+  z.string().regex(/^extractedIdentity\.[A-Za-z_][A-Za-z0-9_]*$/),
+  z.string().regex(/^imageEvidence\.fieldCandidates\.[A-Za-z_][A-Za-z0-9_]*$/),
+]);
+
+export const EvidenceRefSchema = z.union([
   z
     .object({
       kind: z.literal("source"),
-      field: NonEmptyTextSchema,
+      field: SourceEvidencePathSchema,
     })
     .strict(),
   z
@@ -75,7 +82,10 @@ export const FindingSchema = z
     summary: NonEmptyTextSchema,
     evidenceRefs: z.array(EvidenceRefSchema).nonempty(),
   })
-  .strict();
+  .strict()
+  .describe(
+    "An unresolved catalog problem that still needs separate moderator attention after all proposed operations apply. Not an observation, confirmation, or correct unchanged state.",
+  );
 
 export const ProposedEntityDraftSchema = z
   .object({
@@ -89,7 +99,7 @@ export const ProposedEntityDraftSchema = z
   })
   .strict();
 
-export const ProposedEntityChoiceSchema = z.discriminatedUnion("kind", [
+export const BottleOperationEntityChoiceSchema = z.union([
   z
     .object({
       kind: z.literal("existing"),
@@ -110,9 +120,9 @@ export const BottleSharedPatchSchema = z
     statedAge: ProposedBottleSchema.shape.statedAge.removeDefault().optional(),
     category: ProposedBottleSchema.shape.category.removeDefault().optional(),
     seriesId: PositiveIdSchema.nullable().optional(),
-    brand: ProposedEntityChoiceSchema.optional(),
-    distillers: z.array(ProposedEntityChoiceSchema).optional(),
-    bottler: ProposedEntityChoiceSchema.nullable().optional(),
+    brand: BottleOperationEntityChoiceSchema.optional(),
+    distillers: z.array(BottleOperationEntityChoiceSchema).optional(),
+    bottler: BottleOperationEntityChoiceSchema.nullable().optional(),
   })
   .strict()
   .superRefine(requireAtLeastOneField);
@@ -242,7 +252,7 @@ export const MergeEntitiesOperationSchema = z
   })
   .strict();
 
-export const ProposedOperationSchema = z.discriminatedUnion("type", [
+export const ProposedOperationSchema = z.union([
   UpdateBottleOperationSchema,
   MergeBottlesOperationSchema,
   UpdateEntityOperationSchema,
@@ -269,7 +279,9 @@ export type AuditBottleInput = z.infer<typeof AuditBottleInputSchema>;
 export type EvidenceRef = z.infer<typeof EvidenceRefSchema>;
 export type Finding = z.infer<typeof FindingSchema>;
 export type ProposedEntityDraft = z.infer<typeof ProposedEntityDraftSchema>;
-export type ProposedEntityChoice = z.infer<typeof ProposedEntityChoiceSchema>;
+export type BottleOperationEntityChoice = z.infer<
+  typeof BottleOperationEntityChoiceSchema
+>;
 export type BottleSharedPatch = z.infer<typeof BottleSharedPatchSchema>;
 export type BottleExactPatch = z.infer<typeof BottleExactPatchSchema>;
 export type BottleUpdatePatch = z.infer<typeof BottleUpdatePatchSchema>;

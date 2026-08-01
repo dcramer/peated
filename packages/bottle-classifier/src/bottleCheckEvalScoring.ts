@@ -1,7 +1,7 @@
 import type {
+  BottleOperationEntityChoice,
   EvidenceRef,
   Finding,
-  ProposedEntityChoice,
   ProposedOperation,
 } from "./bottleCheckContract";
 import type { BottleClassificationArtifacts } from "./contract";
@@ -14,7 +14,7 @@ export type BottleCheckSetScore = {
   expectedCount: number;
   actualCount: number;
   missingCount: number;
-  harmfulExtraCount: number;
+  extraCount: number;
 };
 
 export type BottleCheckSemanticScore = {
@@ -33,6 +33,10 @@ export type BottleCheckGroundingScore = {
     owner: "operation" | "finding";
     itemIndex: number;
     evidenceRef: EvidenceRef;
+  }>;
+  missingRequiredEvidence: Array<{
+    operationType: ProposedOperation["type"];
+    missingEvidenceRefs: EvidenceRef[];
   }>;
 };
 
@@ -59,7 +63,7 @@ function stableKey(value: unknown): string {
 function scoreExactSet(
   expectedKeys: string[],
   actualKeys: string[],
-  harmfulExtraWeight: number,
+  extraWeight: number,
 ): BottleCheckSetScore {
   const remainingExpected = new Map<string, number>();
   for (const key of expectedKeys) {
@@ -67,14 +71,14 @@ function scoreExactSet(
   }
 
   let matchedCount = 0;
-  let harmfulExtraCount = 0;
+  let extraCount = 0;
   for (const key of actualKeys) {
     const remaining = remainingExpected.get(key) ?? 0;
     if (remaining > 0) {
       matchedCount += 1;
       remainingExpected.set(key, remaining - 1);
     } else {
-      harmfulExtraCount += 1;
+      extraCount += 1;
     }
   }
 
@@ -92,7 +96,7 @@ function scoreExactSet(
       ? 1
       : Math.max(
           0,
-          (matchedCount - harmfulExtraWeight * harmfulExtraCount) /
+          (matchedCount - extraWeight * extraCount) /
             Math.max(expectedKeys.length, 1),
         );
 
@@ -104,7 +108,7 @@ function scoreExactSet(
     expectedCount: expectedKeys.length,
     actualCount: actualKeys.length,
     missingCount,
-    harmfulExtraCount,
+    extraCount,
   };
 }
 
@@ -115,6 +119,8 @@ function operationKey(operation: ProposedOperation): string {
   });
 }
 
+// Finding prose may vary. Scope plus sorted typed refs is the deterministic
+// expectation signature; grounding separately verifies that those refs exist.
 function findingKey(finding: Finding): string {
   return stableKey({
     scope: finding.scope,
@@ -125,31 +131,9 @@ function findingKey(finding: Finding): string {
   });
 }
 
-export function scoreBottleCheckSemanticOutput(
-  expected: {
-    proposedOperations: ProposedOperation[];
-    findings: Finding[];
-  },
-  actual: {
-    proposedOperations: ProposedOperation[];
-    findings: Finding[];
-  },
-): BottleCheckSemanticScore {
-  return {
-    operations: scoreExactSet(
-      expected.proposedOperations.map(operationKey),
-      actual.proposedOperations.map(operationKey),
-      3,
-    ),
-    findings: scoreExactSet(
-      expected.findings.map(findingKey),
-      actual.findings.map(findingKey),
-      2,
-    ),
-  };
-}
-
-function existingEntityId(choice: ProposedEntityChoice | null | undefined) {
+function existingEntityId(
+  choice: BottleOperationEntityChoice | null | undefined,
+) {
   return choice?.kind === "existing" ? choice.entityId : null;
 }
 
@@ -166,7 +150,7 @@ export function listBottleCheckOperationTargets(
     case "update_bottle": {
       const shared = operation.input.patch.shared;
       const entityTarget = (
-        choice: ProposedEntityChoice | null | undefined,
+        choice: BottleOperationEntityChoice | null | undefined,
         path: Array<number | string>,
       ): BottleCheckOperationTarget[] => {
         const id = existingEntityId(choice);
@@ -193,15 +177,15 @@ export function listBottleCheckOperationTargets(
           "brand",
           "entityId",
         ]),
-        ...(shared?.distillers ?? []).flatMap((choice, index) => {
-          return entityTarget(choice, [
+        ...(shared?.distillers ?? []).flatMap((choice, index) =>
+          entityTarget(choice, [
             "patch",
             "shared",
             "distillers",
             index,
             "entityId",
-          ]);
-        }),
+          ]),
+        ),
         ...entityTarget(shared?.bottler, [
           "patch",
           "shared",
@@ -247,14 +231,14 @@ export function listBottleCheckOperationTargets(
   }
 }
 
-export function scoreBottleCheckGrounding(
+function getBottleCheckGroundingIssues(
   actual: {
     proposedOperations: ProposedOperation[];
     findings: Finding[];
     artifacts: BottleClassificationArtifacts;
   },
   sourceFields: readonly string[] = [],
-): BottleCheckGroundingScore {
+) {
   const inspectedBottleIds = new Set(
     actual.artifacts.bottleContexts.map(({ bottleId }) => bottleId),
   );
@@ -317,43 +301,146 @@ export function scoreBottleCheckGrounding(
     }
   };
 
-  const uninspectedTargets = actual.proposedOperations.flatMap(
-    (operation, operationIndex) =>
-      listBottleCheckOperationTargets(operation).flatMap((target) => {
-        const inspected =
-          target.kind === "bottle"
-            ? inspectedBottleIds.has(target.id)
-            : target.kind === "entity"
-              ? inspectedEntityIds.has(target.id)
-              : inspectedSeriesIds.has(target.id);
-        return inspected
-          ? []
-          : [{ operationIndex, kind: target.kind, id: target.id }];
-      }),
+  return {
+    uninspectedTargets: actual.proposedOperations.flatMap(
+      (operation, operationIndex) =>
+        listBottleCheckOperationTargets(operation).flatMap((target) => {
+          const inspected =
+            target.kind === "bottle"
+              ? inspectedBottleIds.has(target.id)
+              : target.kind === "entity"
+                ? inspectedEntityIds.has(target.id)
+                : inspectedSeriesIds.has(target.id);
+          return inspected
+            ? []
+            : [{ operationIndex, kind: target.kind, id: target.id }];
+        }),
+    ),
+    uncollectedEvidence: [
+      ...actual.proposedOperations.flatMap((operation, itemIndex) =>
+        operation.evidenceRefs.flatMap((evidenceRef) =>
+          evidenceWasCollected(evidenceRef)
+            ? []
+            : [{ owner: "operation" as const, itemIndex, evidenceRef }],
+        ),
+      ),
+      ...actual.findings.flatMap((finding, itemIndex) =>
+        finding.evidenceRefs.flatMap((evidenceRef) =>
+          evidenceWasCollected(evidenceRef)
+            ? []
+            : [{ owner: "finding" as const, itemIndex, evidenceRef }],
+        ),
+      ),
+    ],
+  };
+}
+
+export function scoreBottleCheckSemanticOutput(
+  expected: {
+    proposedOperations: ProposedOperation[];
+    findings: Finding[];
+  },
+  actual: {
+    proposedOperations: ProposedOperation[];
+    findings: Finding[];
+  },
+): BottleCheckSemanticScore {
+  return {
+    operations: scoreExactSet(
+      expected.proposedOperations.map(operationKey),
+      actual.proposedOperations.map(operationKey),
+      3,
+    ),
+    findings: scoreExactSet(
+      expected.findings.map(findingKey),
+      actual.findings.map(findingKey),
+      2,
+    ),
+  };
+}
+
+const TRACKING_QUERY_PARAMETER_NAMES = new Set([
+  "fbclid",
+  "gclid",
+  "mc_cid",
+  "mc_eid",
+]);
+
+function requiredWebEvidenceKey(url: string): string {
+  const parsed = new URL(url);
+  const host = parsed.host.toLowerCase().replace(/^www\./, "");
+  const pathname = parsed.pathname.replace(/\/+$/, "") || "/";
+  for (const name of Array.from(parsed.searchParams.keys())) {
+    const normalizedName = name.toLowerCase();
+    if (
+      normalizedName.startsWith("utm_") ||
+      TRACKING_QUERY_PARAMETER_NAMES.has(normalizedName)
+    ) {
+      parsed.searchParams.delete(name);
+    }
+  }
+  parsed.searchParams.sort();
+  return `${host}${pathname}${parsed.search}`;
+}
+
+function requiredEvidenceMatches(
+  expected: EvidenceRef,
+  actual: EvidenceRef,
+): boolean {
+  if (expected.kind === "web_result" && actual.kind === "web_result") {
+    return (
+      requiredWebEvidenceKey(expected.url) ===
+      requiredWebEvidenceKey(actual.url)
+    );
+  }
+
+  return stableKey(expected) === stableKey(actual);
+}
+
+export function scoreBottleCheckGrounding(
+  actual: {
+    proposedOperations: ProposedOperation[];
+    findings: Finding[];
+    artifacts: BottleClassificationArtifacts;
+  },
+  sourceFields: readonly string[] = [],
+  expectedOperations?: ProposedOperation[],
+): BottleCheckGroundingScore {
+  const { uninspectedTargets, uncollectedEvidence } =
+    getBottleCheckGroundingIssues(actual, sourceFields);
+  const missingRequiredEvidence = (expectedOperations ?? []).flatMap(
+    (expectedOperation) => {
+      const expectedKey = operationKey(expectedOperation);
+      const actualOperation = actual.proposedOperations.find(
+        (operation) => operationKey(operation) === expectedKey,
+      );
+      const missingEvidenceRefs = expectedOperation.evidenceRefs.filter(
+        (expectedEvidenceRef) =>
+          !actualOperation?.evidenceRefs.some((actualEvidenceRef) =>
+            requiredEvidenceMatches(expectedEvidenceRef, actualEvidenceRef),
+          ),
+      );
+
+      return missingEvidenceRefs.length === 0
+        ? []
+        : [
+            {
+              operationType: expectedOperation.type,
+              missingEvidenceRefs,
+            },
+          ];
+    },
   );
-  const uncollectedEvidence = [
-    ...actual.proposedOperations.flatMap((operation, itemIndex) =>
-      operation.evidenceRefs.flatMap((evidenceRef) =>
-        evidenceWasCollected(evidenceRef)
-          ? []
-          : [{ owner: "operation" as const, itemIndex, evidenceRef }],
-      ),
-    ),
-    ...actual.findings.flatMap((finding, itemIndex) =>
-      finding.evidenceRefs.flatMap((evidenceRef) =>
-        evidenceWasCollected(evidenceRef)
-          ? []
-          : [{ owner: "finding" as const, itemIndex, evidenceRef }],
-      ),
-    ),
-  ];
 
   return {
     score:
-      uninspectedTargets.length === 0 && uncollectedEvidence.length === 0
+      uninspectedTargets.length === 0 &&
+      uncollectedEvidence.length === 0 &&
+      missingRequiredEvidence.length === 0
         ? 1
         : 0,
     uninspectedTargets,
     uncollectedEvidence,
+    missingRequiredEvidence,
   };
 }

@@ -2,8 +2,10 @@ import { describe, expect, test } from "vitest";
 import {
   BottleClassificationResultSchema,
   ClassifyBottleReferenceInputSchema,
+  buildBottleClassificationArtifacts,
   createDecidedBottleClassification,
   createIgnoredBottleClassification,
+  getBottleCheckSourceEvidencePaths,
   isIgnoredBottleClassification,
 } from "./contract";
 
@@ -93,6 +95,102 @@ describe("bottle-classifier contract", () => {
     expect(parsed.reference.imageUrl).toBeNull();
   });
 
+  test("derives source evidence paths from present input and artifact fields", () => {
+    expect(
+      getBottleCheckSourceEvidencePaths({
+        intent: "resolve_reference",
+        input: {
+          reference: {
+            id: "listing-1",
+            name: "Example Bottle",
+            url: null,
+            imageUrl: "https://example.com/example-bottle.jpg",
+            currentBottleId: null,
+          },
+        },
+        artifacts: buildBottleClassificationArtifacts({
+          extractedIdentity: {
+            brand: "Example",
+            bottler: null,
+            expression: null,
+            series: null,
+            distillery: null,
+            category: null,
+            stated_age: null,
+            abv: null,
+            release_year: null,
+            vintage_year: null,
+            cask_strength: null,
+            single_cask: null,
+            cask_type: null,
+            cask_size: null,
+            cask_fill: null,
+            edition: null,
+          },
+          imageEvidence: {
+            sourceImageId: "image-1",
+            extractors: [
+              {
+                kind: "ocr",
+                confidence: 0.9,
+                textSpans: [],
+                observations: [],
+              },
+            ],
+            fieldCandidates: {
+              edition: { value: "Special", confidence: 0.8 },
+            },
+            photoSuitability: {
+              isSingleBottlePhoto: true,
+              labelReadable: true,
+              suitableAsTastingImage: true,
+              suitableAsBottleImage: true,
+            },
+            conflicts: [],
+          },
+        }),
+      }),
+    ).toEqual([
+      "reference.id",
+      "reference.name",
+      "reference.imageUrl",
+      "extractedIdentity.brand",
+      "imageEvidence.fieldCandidates.edition",
+    ]);
+  });
+
+  test("derives audit-note evidence from canonical artifacts", () => {
+    const artifacts = buildBottleClassificationArtifacts({});
+
+    expect(
+      getBottleCheckSourceEvidencePaths({
+        intent: "audit_bottle",
+        input: {
+          bottleId: 1,
+          origin: "moderator",
+          note: "Check the label.",
+        },
+        artifacts,
+      }),
+    ).toEqual(["audit.note"]);
+  });
+
+  test("derives only known reference evidence paths", () => {
+    const reference = {
+      name: "Example Bottle",
+      currentBottleId: 42,
+      unexpectedMetadata: "not source evidence",
+    };
+
+    expect(
+      getBottleCheckSourceEvidencePaths({
+        intent: "resolve_reference",
+        input: { reference },
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+    ).toEqual(["reference.name", "reference.currentBottleId"]);
+  });
+
   test("builds discriminated results with normalized artifacts", () => {
     const ignored = createIgnoredBottleClassification({
       reason: "non-whisky",
@@ -147,5 +245,31 @@ describe("bottle-classifier contract", () => {
         searchEvidence: [],
       },
     });
+  });
+
+  test("rejects findings on ignored results", () => {
+    const result = BottleClassificationResultSchema.safeParse({
+      status: "ignored",
+      reason: "non-whisky",
+      proposedOperations: [],
+      findings: [
+        {
+          scope: "other",
+          summary: "This must not survive an ignored result.",
+          evidenceRefs: [],
+        },
+      ],
+      artifacts: {
+        extractedIdentity: null,
+        imageEvidence: null,
+        candidates: [],
+        searchEvidence: [],
+        resolvedEntities: [],
+        bottleContexts: [],
+        entityContexts: [],
+      },
+    });
+
+    expect(result.success).toBe(false);
   });
 });

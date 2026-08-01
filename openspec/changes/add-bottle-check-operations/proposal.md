@@ -17,11 +17,14 @@ should change, or that a related Entity should be created, updated, or merged.
 - Preserve the current match/create/repair/no-match decision for
   reference resolution. Audits return a summary, operations, and findings
   without a redundant outcome enum.
-- Add one bounded `proposedOperations` array shared by both intents.
+- Add one bounded `proposedOperations` array shared by both intents. Each
+  non-ignored reference or audit uses one semantic agent loop. Four
+  non-mutating tools collect operation proposals during that loop; runtime
+  attaches the collected proposals to the strict final result.
 - Initially support explicit Bottle update/merge and related Entity
   update/merge operations. A Bottle update may explicitly create a related
   Entity as part of the same transaction.
-- Define the four operations as one strict Zod discriminated union and handle
+- Define the four operations as one strict literal-tagged Zod union and handle
   them with plain exhaustive TypeScript functions.
 - Persist each check and its proposed operations for review.
 - Show the check result and operation cards together in the relevant

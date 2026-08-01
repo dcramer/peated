@@ -83,6 +83,7 @@ vi.mock("@peated/server/agents/bottleClassifier", async (importOriginal) => {
   return {
     ...actual,
     classifyBottleReference: vi.fn(),
+    runBottleReference: vi.fn(),
     isIgnoredBottleClassification: (classification: { status: string }) =>
       classification.status === "ignored",
     BottleClassificationError: class BottleClassificationError extends Error {
@@ -278,8 +279,14 @@ describe("priceMatching", () => {
   const originalBottleCheckShadowGeneration =
     config.BOTTLE_CHECK_SHADOW_GENERATION;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetAllMocks();
+    const { classifyBottleReference, runBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    vi.mocked(runBottleReference).mockImplementation(async (...args) => ({
+      result: await vi.mocked(classifyBottleReference)(...args),
+      modelMetadata: null,
+    }));
     config.OPENAI_API_KEY = originalOpenAIApiKey;
     config.BOTTLE_CHECK_SHADOW_GENERATION = originalBottleCheckShadowGeneration;
   });
@@ -1159,7 +1166,6 @@ describe("priceMatching", () => {
         resolvedEntities: [],
       }),
     );
-
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(proposal.status).toBe("pending_review");
@@ -5592,19 +5598,16 @@ describe("priceMatching", () => {
 
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
-    expect(classifyBottleReference).toHaveBeenCalledWith(
-      {
-        reference: expect.objectContaining({
-          id: price.id,
-          externalSiteId: price.externalSiteId,
-          name: price.name,
-          url: price.url ?? null,
-          imageUrl: price.imageUrl ?? null,
-          currentBottleId: null,
-        }),
-      },
-      { availableOperations: [] },
-    );
+    expect(classifyBottleReference).toHaveBeenCalledWith({
+      reference: expect.objectContaining({
+        id: price.id,
+        externalSiteId: price.externalSiteId,
+        name: price.name,
+        url: price.url ?? null,
+        imageUrl: price.imageUrl ?? null,
+        currentBottleId: null,
+      }),
+    });
     expect(proposal.status).toBe("errored");
   });
 
@@ -7852,11 +7855,84 @@ describe("priceMatching", () => {
     expect(await db.select().from(bottleOperations)).toHaveLength(0);
   });
 
-  test("links every classified full retry to an immutable check and preserves blocked siblings", async ({
+  test("blocks a proposal that would retire the classifier's matched Bottle", async ({
     fixtures,
   }) => {
     config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const { classifyBottleReference } =
+      await import("@peated/server/agents/bottleClassifier");
+    const matchedBottle = await fixtures.Bottle({
+      name: "Protected Matched Bottle",
+    });
+    const otherBottle = await fixtures.Bottle({
+      name: "Other Inspected Bottle",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Protected Match Reference",
+      imageUrl: null,
+    });
+    const matchedCandidate = await getBottleCandidateById(matchedBottle.id);
+    const otherCandidate = await getBottleCandidateById(otherBottle.id);
+    expect(matchedCandidate).not.toBeNull();
+    expect(otherCandidate).not.toBeNull();
+
+    vi.mocked(classifyBottleReference).mockResolvedValue(
+      buildMockBottleReferenceClassification({
+        decision: {
+          action: "match",
+          rationale: "The source matches the protected Bottle.",
+          candidateBottleIds: [matchedBottle.id, otherBottle.id],
+          aliasScope: "none",
+          matchedBottleId: matchedBottle.id,
+          proposedBottle: null,
+        },
+        candidateBottles: [matchedCandidate, otherCandidate],
+        bottleContexts: [
+          await inspectedBottleContext(matchedBottle.id),
+          await inspectedBottleContext(otherBottle.id),
+        ],
+        proposedOperations: [
+          {
+            type: "merge_bottles",
+            input: {
+              sourceBottleId: matchedBottle.id,
+              destinationBottleId: otherBottle.id,
+            },
+            rationale: "This conflicts with the primary match decision.",
+            evidenceRefs: [
+              { kind: "bottle", bottleId: matchedBottle.id },
+              { kind: "bottle", bottleId: otherBottle.id },
+            ],
+          },
+        ],
+        findings: [],
+      }),
+    );
+
+    const proposal = await resolveStorePriceMatchProposal(price.id, {
+      generateBottleCheck: true,
+    });
+    const check = await db.query.bottleChecks.findFirst({
+      where: eq(bottleChecks.storePriceMatchProposalId, proposal.id),
+      with: { operations: true },
+    });
+
+    expect(check?.operations).toEqual([
+      expect.objectContaining({
+        status: "blocked",
+        preparationError: expect.objectContaining({
+          code: "direct_conflict",
+        }),
+      }),
+    ]);
+  });
+
+  test("links every classified full retry to an immutable check and preserves blocked siblings", async ({
+    fixtures,
+  }) => {
+    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
+    const { classifyBottleReference, runBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const sourceBottle = await fixtures.Bottle({ name: "Duplicate Source" });
     const destinationBottle = await fixtures.Bottle({
@@ -7915,6 +7991,23 @@ describe("priceMatching", () => {
         findings: [],
       }),
     );
+    const modelMetadata = {
+      agentDurationMs: 321,
+      usage: {
+        requests: 2,
+        inputTokens: 1_000,
+        outputTokens: 200,
+        totalTokens: 1_200,
+      },
+      toolCalls: {
+        count: 2,
+        names: ["search_bottles", "get_bottle_context"],
+      },
+    };
+    vi.mocked(runBottleReference).mockImplementation(async (...args) => ({
+      result: await vi.mocked(classifyBottleReference)(...args),
+      modelMetadata,
+    }));
 
     const firstProposal = await resolveStorePriceMatchProposal(price.id);
     const secondProposal = await resolveStorePriceMatchProposal(price.id, {
@@ -7947,19 +8040,10 @@ describe("priceMatching", () => {
     expect(classifyBottleReference).toHaveBeenNthCalledWith(
       1,
       expect.any(Object),
-      { availableOperations: [] },
     );
     expect(classifyBottleReference).toHaveBeenNthCalledWith(
       2,
       expect.any(Object),
-      {
-        availableOperations: [
-          "update_bottle",
-          "merge_bottles",
-          "update_entity",
-          "merge_entities",
-        ],
-      },
     );
     for (const check of checks) {
       expect(check).toMatchObject({
@@ -7973,6 +8057,7 @@ describe("priceMatching", () => {
             matchedBottleId: destinationBottle.id,
           },
         },
+        modelMetadata,
       });
       const blocked = check.operations.find(
         ({ proposal }) => proposal.type === "update_entity",

@@ -16,17 +16,21 @@ import {
   createBottleCheck,
   getBottleCheckForReview,
   getBottleCheckHistory,
-  getLatestBottleCheck,
   listActionableBottleChecks,
 } from "@peated/server/lib/bottleChecks";
+import {
+  BottleUpdateStateTokenSchema,
+  type PreparedProposalResultSchema,
+} from "@peated/server/lib/bottleOperationReviewSchemas";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
+import type { z } from "zod";
 
 function updateBottleProposal(
   bottleId: number,
   edition: string,
-): ProposedOperation {
+): Extract<ProposedOperation, { type: "update_bottle" }> {
   return {
     type: "update_bottle",
     input: {
@@ -42,6 +46,22 @@ function updateBottleProposal(
   };
 }
 
+function updateBottleStateToken(
+  bottle: { groupId: number | null; id: number },
+  exact?: { edition?: string | null },
+) {
+  if (bottle.groupId === null) {
+    throw new Error("Expected a concrete Bottle fixture.");
+  }
+  return BottleUpdateStateTokenSchema.parse({
+    bottleId: bottle.id,
+    groupId: bottle.groupId,
+    exact,
+    referencedEntities: [],
+    referencedSeries: [],
+  });
+}
+
 function auditCheckInput({
   artifacts,
   backgroundEventKey,
@@ -55,22 +75,7 @@ function auditCheckInput({
   backgroundEventKey?: string;
   bottleId: number;
   findings?: Finding[];
-  operations?: Array<
-    | {
-        preparationError: {
-          code: string;
-          message: string;
-        };
-        proposal: ProposedOperation;
-        status: "blocked";
-      }
-    | {
-        proposal: ProposedOperation;
-        resolvedEvidenceRefs: ProposedOperation["evidenceRefs"];
-        stateToken: Record<string, unknown>;
-        status: "pending_review";
-      }
-  >;
+  operations?: Array<z.infer<typeof PreparedProposalResultSchema>>;
   origin?: "moderator" | "post_user_creation";
   summary: string;
 }) {
@@ -186,18 +191,13 @@ describe("Bottle check persistence", () => {
             status: "pending_review",
             proposal: pendingProposal,
             resolvedEvidenceRefs: pendingProposal.evidenceRefs,
-            stateToken: {
-              bottleId: bottle.id,
-              exact: {
-                edition: null,
-              },
-            },
+            stateToken: updateBottleStateToken(bottle, { edition: null }),
           },
           {
             status: "blocked",
             proposal: blockedProposal,
             preparationError: {
-              code: "unsupported_change",
+              code: "invalid_current_state",
               message: "The exact change cannot be prepared.",
             },
           },
@@ -233,7 +233,7 @@ describe("Bottle check persistence", () => {
       stateToken: null,
       resolvedEvidenceRefs: null,
       preparationError: {
-        code: "unsupported_change",
+        code: "invalid_current_state",
         message: "The exact change cannot be prepared.",
       },
     });
@@ -258,12 +258,7 @@ describe("Bottle check persistence", () => {
               resolvedEvidenceRefs: [
                 { kind: "bottle", bottleId: otherBottle.id },
               ],
-              stateToken: {
-                bottleId: bottle.id,
-                exact: {
-                  edition: null,
-                },
-              },
+              stateToken: updateBottleStateToken(bottle, { edition: null }),
             },
           ],
         }),
@@ -395,7 +390,7 @@ describe("Bottle check persistence", () => {
     expect(persisted).toHaveLength(1);
   });
 
-  test("keeps moderator reruns as immutable history and selects the latest", async ({
+  test("keeps moderator reruns as immutable history ordered newest first", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -409,12 +404,7 @@ describe("Bottle check persistence", () => {
             status: "pending_review",
             proposal: firstProposal,
             resolvedEvidenceRefs: firstProposal.evidenceRefs,
-            stateToken: {
-              bottleId: bottle.id,
-              exact: {
-                edition: null,
-              },
-            },
+            stateToken: updateBottleStateToken(bottle, { edition: null }),
           },
         ],
       }),
@@ -430,16 +420,11 @@ describe("Bottle check persistence", () => {
     expect(second.created).toBe(true);
     expect(second.check.id).not.toBe(first.check.id);
 
-    const latest = await getLatestBottleCheck({
-      intent: "audit_bottle",
-      bottleId: bottle.id,
-    });
     const history = await getBottleCheckHistory({
       intent: "audit_bottle",
       bottleId: bottle.id,
     });
 
-    expect(latest?.id).toBe(second.check.id);
     expect(history.map(({ id }) => id)).toEqual([
       second.check.id,
       first.check.id,
@@ -657,7 +642,7 @@ describe("Bottle check persistence", () => {
             status: "pending_review",
             proposal: pendingProposal,
             resolvedEvidenceRefs: pendingProposal.evidenceRefs,
-            stateToken: { bottleId: pendingBottle.id },
+            stateToken: updateBottleStateToken(pendingBottle),
           },
         ],
       }),
@@ -692,7 +677,7 @@ describe("Bottle check persistence", () => {
             status: "pending_review",
             proposal: doneProposal,
             resolvedEvidenceRefs: doneProposal.evidenceRefs,
-            stateToken: { bottleId: doneBottle.id },
+            stateToken: updateBottleStateToken(doneBottle),
           },
         ],
       }),
@@ -777,7 +762,7 @@ describe("Bottle check persistence", () => {
             status: "pending_review",
             proposal,
             resolvedEvidenceRefs: proposal.evidenceRefs,
-            stateToken: { bottleId: bottle.id },
+            stateToken: updateBottleStateToken(bottle),
           },
         ],
       }),
@@ -943,7 +928,7 @@ describe("Bottle check persistence", () => {
                   status: "pending_review",
                   proposal,
                   resolvedEvidenceRefs: proposal.evidenceRefs,
-                  stateToken: { bottleId: bottle.id },
+                  stateToken: updateBottleStateToken(bottle),
                 },
           ],
         }),
@@ -986,7 +971,7 @@ describe("Bottle check persistence", () => {
               status: "pending_review",
               proposal,
               resolvedEvidenceRefs: proposal.evidenceRefs,
-              stateToken: { bottleId: bottle.id },
+              stateToken: updateBottleStateToken(bottle),
             },
           ],
         }),
@@ -1036,7 +1021,7 @@ describe("Bottle check persistence", () => {
             status: "pending_review",
             proposal,
             resolvedEvidenceRefs: proposal.evidenceRefs,
-            stateToken: { bottleId: doneBottle.id },
+            stateToken: updateBottleStateToken(doneBottle),
           },
         ],
       }),

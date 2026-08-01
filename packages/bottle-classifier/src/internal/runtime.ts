@@ -1,10 +1,10 @@
 export {
   createBottleClassifier,
   type BottleAuditRun,
-  type BottleCheckRunOptions,
   type BottleClassifier,
   type BottleClassifierAdapters,
   type BottleClassifierDataSource,
+  type BottleReferenceRun,
   type CreateBottleClassifierOptions,
   type RunBottleAuditAgentInput,
   type RunBottleClassifierAgentInput,

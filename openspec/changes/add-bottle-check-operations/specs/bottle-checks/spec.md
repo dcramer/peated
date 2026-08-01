@@ -3,9 +3,9 @@
 ### Requirement: Public entrypoints select the Bottle-check intent
 
 The Bottle classifier SHALL preserve `classifyBottleReference` for
-`resolve_reference` and add `auditBottle` for `audit_bottle`. Both SHALL share
-the same internal agent where useful without requiring existing callers to send
-a universal intent command.
+`resolve_reference` and add `auditBottle` for `audit_bottle`. Both SHALL use the
+same classifier capability where useful without requiring existing callers to
+send a universal intent command.
 
 #### Scenario: Resolve an external reference
 
@@ -37,10 +37,38 @@ findings without a separate outcome enum.
 
 #### Scenario: Reference is classified
 
-- **WHEN** a reference check completes
-- **THEN** its primary result SHALL remain one of
+- **WHEN** a reference check completes with `status: "classified"`
+- **THEN** its authoritative decision SHALL remain one of
   `match | create_bottle | repair_bottle | no_match`
 - **AND** it MAY include independent supplemental operations
+- **AND** omission of an otherwise useful supplemental operation SHALL NOT
+  invalidate a correct reference decision
+
+#### Scenario: Reference is ignored
+
+- **WHEN** a reference is rejected as non-whisky or not a single Bottle
+- **THEN** the classifier SHALL return the existing ignored result with empty
+  proposed operations and findings
+- **AND** it SHALL NOT run the semantic agent
+
+#### Scenario: Reference uses one semantic loop
+
+- **WHEN** a reference is not ignored
+- **THEN** the classifier SHALL run exactly one bounded semantic agent loop
+- **AND** that loop SHALL receive bounded read tools and all four non-mutating
+  proposal tools
+- **AND** its strict final output SHALL contain the authoritative decision and
+  findings, but SHALL NOT contain proposed operations
+- **AND** runtime SHALL attach successful tool-recorded proposals and collected
+  artifacts to the result
+
+#### Scenario: Reference agent fails
+
+- **WHEN** the provider call fails or its raw final output violates the strict
+  reference schema
+- **THEN** the Bottle check SHALL fail without persistence or mutation
+- **AND** it SHALL NOT make another semantic agent call or substitute a
+  fallback result
 
 #### Scenario: Existing Bottle is clean
 
@@ -73,25 +101,38 @@ Every check result SHALL include a `findings` array. Each finding SHALL contain
 a bounded scope, summary, and at least one typed evidence reference, but SHALL
 NOT be executable. Findings SHALL be concrete reviewer-relevant catalog
 problems, not missing optional enrichment, harmless absence, or speculative
-cleanup.
+cleanup. A finding SHALL require positive evidence of a real catalog defect
+that remains after all proposed operations apply. Mere uncertainty about
+whether an underspecified, generic, or family row is intentional SHALL NOT be a
+finding, and a reviewed check MAY validly return no operations and no findings.
+A finding SHALL describe a separate unresolved issue and SHALL NOT
+repeat a change or rationale already fully represented by a proposed operation.
+A cross-group `merge_bottles` retires its source Bottle, so the source and
+destination's prior group difference SHALL NOT also be a `bottle_group`
+finding. A `bottle_group` finding SHALL describe a distinct problem that
+remains among surviving Bottles.
 
 #### Scenario: Supported and unsupported issues are found together
 
 - **WHEN** a check finds one supported operation and another issue outside the
-  enabled operation set
+  supported operation set
 - **THEN** it SHALL return the supported proposed operation
 - **AND** it SHALL preserve the other issue as a finding
 
-### Requirement: Proposed operations use one strict bounded union
+### Requirement: Proposed operations use one canonical bounded union
 
-The model-output schema SHALL contain one strict Zod discriminated union for
-`proposedOperations`. The array SHALL use a configurable runaway-output safety
-ceiling rather than a small semantic operation limit.
+The Bottle-classifier contract SHALL contain one strict literal-tagged Zod
+union for `proposedOperations`. Each proposal tool's provider schema SHALL be
+generated from its corresponding variant with the operation `type` omitted.
+Every raw tool payload SHALL be parsed immediately through the canonical Zod
+contract after its tool overwrites any caller-supplied `type` with the tool's
+fixed operation type. The runtime-attached array SHALL use a configurable
+runaway-output safety ceiling rather than a small semantic operation limit.
 
 Every proposal SHALL contain only `type`, typed `input`, `rationale`, and
 at least one entry in `evidenceRefs`. Server-owned ids, status, permissions, previews,
-state tokens, function names, and results SHALL NOT be accepted from model
-output.
+state tokens, function names, and results SHALL NOT be accepted from proposal
+tool payloads.
 
 #### Scenario: Supplemental operations are valid
 
@@ -116,22 +157,22 @@ output.
 #### Scenario: Model output violates the schema
 
 - **WHEN** final model output fails the strict intent-specific schema
-- **THEN** the runtime MAY perform one bounded structured-output retry
-- **AND** exhaustion SHALL fail the check without persisting malformed
+- **THEN** the runtime SHALL fail the check without persisting malformed
   operation fragments
 
 ### Requirement: Proposed and review operation contracts are separate
 
-The Bottle-classifier contract SHALL own one strict Zod discriminated union for
-the four proposal variants. Server preparation and execution SHALL use plain
-exhaustive `switch` functions over that inferred union. Review responses SHALL
-use an explicit blocked-versus-prepared union. Its prepared branch SHALL use a
+The Bottle-classifier contract SHALL own one strict literal-tagged Zod union
+for the four proposal variants. Server preparation and execution SHALL use
+plain exhaustive `switch` functions over that inferred TypeScript
+discriminated union. Review responses SHALL use an explicit
+blocked-versus-prepared union. Its prepared branch SHALL use a
 resource-discriminated union correlating proposal and preview, and SHALL NOT
 expose internal prepared inputs.
 
 #### Scenario: Prepare a model proposal
 
-- **WHEN** a parsed proposed operation is supported and enabled
+- **WHEN** a parsed proposed operation is supported
 - **THEN** its prepare function SHALL normalize input, resolve evidence,
   calculate a live preview, and attach a server-owned state token
 - **AND** downstream review SHALL consume only the review operation
@@ -155,8 +196,7 @@ expose internal prepared inputs.
 #### Scenario: Proposal is mechanically blocked
 
 - **WHEN** an operation has an unknown id, impossible source/destination pair,
-  unsupported role value, direct conflicting write, or disabled deployment
-  capability
+  unsupported role value, or direct conflicting write
 - **THEN** preparation SHALL retain it as blocked with the exact mechanical
   reason
 - **AND** it SHALL NOT infer that the proposed identity or evidence is wrong
@@ -169,9 +209,11 @@ expose internal prepared inputs.
 
 ### Requirement: Entity choices are explicit
 
-Entity fields in Bottle creation and shared Bottle updates SHALL use
+Entity fields in an `update_bottle` operation's shared patch SHALL use
 `{ kind: "existing", entityId }` or
 `{ kind: "create", entity: ProposedEntityDraft }`.
+The primary `create_bottle` decision SHALL retain its existing `{ id, name }`
+Entity contract, including `id: null` for a new Entity.
 
 #### Scenario: Use an existing Entity
 
@@ -179,9 +221,9 @@ Entity fields in Bottle creation and shared Bottle updates SHALL use
 - **THEN** it SHALL provide the known Entity id
 - **AND** that id SHALL exist in collected Entity evidence
 
-#### Scenario: Create an Entity inside a Bottle operation
+#### Scenario: Create an Entity inside a Bottle update operation
 
-- **WHEN** the classifier proposes a new related Entity
+- **WHEN** an `update_bottle` operation proposes a new related Entity
 - **THEN** it SHALL provide an explicit creation draft without invented country
   or region ids
 - **AND** preparation SHALL resolve exact location names, report possible
@@ -207,12 +249,32 @@ The operation union SHALL initially support `update_bottle` and
 - **AND** preparation SHALL show all BottleGroup fan-out and related Entity
   creation as explicit preview effects
 
+#### Scenario: Assign an existing BottleSeries
+
+- **WHEN** an `update_bottle` shared patch assigns a non-null `seriesId`
+- **THEN** an inspected Bottle context SHALL expose that exact BottleSeries id
+- **AND** the proposal tool SHALL reject an uninspected BottleSeries target
+- **AND** preparation SHALL revalidate that the BottleSeries exists and belongs
+  to the selected Brand
+
 #### Scenario: Propose an exact Bottle merge
 
 - **WHEN** an operation is `merge_bottles`
 - **THEN** it SHALL name one existing source Bottle to retire and one distinct
   existing destination Bottle to survive
 - **AND** its rationale SHALL assert exact marketed-identity equivalence
+- **AND** internally inconsistent shared or BottleGroup fields SHALL be treated
+  as evidence rather than authority when direct product evidence coherently
+  identifies the selected exact Bottle
+- **AND** when direct authoritative external product evidence is available, the
+  proposal SHALL cite it
+- **AND** catalog agreement, an audit note, search rank, or an attached label
+  image alone SHALL NOT establish equivalence
+- **AND** when no authoritative source is available, equivalence SHALL NOT be
+  inferred from catalog data alone
+- **AND** once exact equivalence is established, conflicting shared or group
+  fields SHALL NOT be treated as proof of a distinct release or a separate
+  `bottle_group` finding
 - **AND** no relative merge-direction field SHALL be accepted
 
 ### Requirement: Initial Entity operations are bounded
@@ -244,8 +306,7 @@ creation belongs to an Entity-focused workflow.
 
 - **WHEN** an operation targets an existing Entity that was not loaded through
   classifier search or `get_entity_context`
-- **THEN** preparation SHALL block the operation because the target was not
-  inspected
+- **THEN** the proposal tool SHALL reject the call and record no operation
 - **AND** code SHALL NOT use relationship heuristics to decide whether the
   Entity is semantically relevant
 
@@ -283,11 +344,47 @@ proposed operation, and array order SHALL have no meaning.
 - **THEN** preparation SHALL block only the conflicting operations
 - **AND** it SHALL preserve independent proposals
 
+#### Scenario: A merge source also has an update
+
+- **WHEN** a proposed `update_bottle` targets a Bottle that is the source of a
+  `merge_bottles` operation in the same batch
+- **THEN** the agent SHALL omit the update because the merge retires the source
+  and subsumes correction of its row
+- **AND** preparation SHALL treat both operations as directly conflicting if
+  the model nevertheless returns them
+
+#### Scenario: Merges share a source or destination
+
+- **WHEN** two Bottle merges or two Entity merges in one batch share any source
+  or destination id
+- **THEN** preparation SHALL block both operations
+- **AND** a valid shared-destination merge SHALL require a separate check
+  prepared after the first merge completes
+
+#### Scenario: An Entity update overlaps an Entity merge
+
+- **WHEN** an `update_entity` targets an Entity that is the source of a
+  `merge_entities` operation in the same batch
+- **THEN** preparation SHALL block both operations because the source is
+  retired
+- **WHEN** an `update_entity` changes the merge destination's name, short name,
+  or roles
+- **THEN** preparation SHALL block both operations because Entity-merge
+  execution consumes those identity fields
+- **WHEN** an `update_entity` changes only the merge destination's website,
+  country, region, or year established
+- **THEN** both operations SHALL remain independently executable in either
+  approval order
+- **AND** the Entity-merge state token SHALL omit those destination metadata
+  fields while retaining the destination identity and relationship state that
+  execution consumes
+
 ### Requirement: Deterministic gates do not replace semantic judgment
 
-Preparation SHALL enforce only schema, permissions, inspected ids, supported
-enum values, direct payload contradictions, enabled deployment capability, and
-operation-specific live state.
+The proposal collector SHALL enforce schema, inspected ids, collected evidence,
+and supported enum values. Preparation SHALL enforce permissions, direct
+payload contradictions, and operation-specific live state. Neither boundary
+SHALL add semantic identity heuristics.
 
 #### Scenario: Model proposes an identity-sensitive operation
 
@@ -302,13 +399,14 @@ operation-specific live state.
 #### Scenario: Evidence reference is prepared
 
 - **WHEN** an operation cites evidence collected during the run
-- **THEN** code SHALL verify that the reference exists
+- **THEN** the proposal collector SHALL verify that the reference exists before
+  recording the operation
 - **AND** it SHALL NOT infer evidence quality or relevance from the URL or
   source domain
 
 ### Requirement: Evidence references are typed
 
-Evidence references SHALL use a discriminated union for a source field, Bottle
+Evidence references SHALL use a literal-tagged union for a source field, Bottle
 id, Entity id, or web-result URL. Freeform evidence-reference
 strings SHALL NOT be accepted. Source fields SHALL use exact serialized input
 paths: `reference.<field>`, `extractedIdentity.<field>`,
@@ -328,18 +426,59 @@ paths: `reference.<field>`, `extractedIdentity.<field>`,
   including structured results from `get_bottle_context` and
   `get_entity_context`
 - **AND** the model SHALL NOT echo or author those server-owned fields
+- **AND** the runtime SHALL attach proposals recorded by successful proposal
+  tool calls during that same run
 
-### Requirement: Enabled operations are explicit
+#### Scenario: Runtime records reference model metadata
 
-The server SHALL derive `availableOperations` from the operation enum and
-enabled feature flags and provide those names to the model for each check.
+- **WHEN** the semantic model loop runs for a reference check
+- **THEN** the runtime SHALL record its duration, request and token usage, and
+  tool-call measurements in the existing model metadata field
+- **AND** the existing `classifyBottleReference` result contract SHALL remain
+  unchanged
+- **AND** extraction and standalone preload web-search cost SHALL NOT be folded
+  into semantic-agent metadata
+- **AND** an override-only run with no native semantic call SHALL report null
+  model metadata
 
-#### Scenario: Operation is disabled for a workflow
+### Requirement: Full checks expose one fixed proposal-tool set
 
-- **WHEN** an operation definition is unavailable or disabled for the invoking
-  workflow
-- **THEN** the model SHALL not be instructed to propose it
-- **AND** preparation SHALL still fail closed if it appears
+Every full reference and audit check SHALL expose the same four non-mutating
+proposal tools. Local match-only identification SHALL remain separate and SHALL
+not expose them.
+
+#### Scenario: Full Bottle check runs
+
+- **WHEN** the semantic agent runs a full reference or audit check
+- **THEN** it SHALL receive `propose_update_bottle`,
+  `propose_merge_bottles`, `propose_update_entity`, and
+  `propose_merge_entities`
+- **AND** the server SHALL NOT expose a partial per-operation capability map
+- **AND** rollout flags SHALL NOT change this proposal-tool set
+
+#### Scenario: Closed candidate expansion still permits target inspection
+
+- **WHEN** a full reference check uses `candidateExpansion: initial_only`
+- **THEN** it SHALL withhold Bottle, Entity, and web search tools
+- **AND** it SHALL retain Bottle and Entity context tools for inspecting known
+  ids before recording proposals
+- **AND** local match-only identification SHALL receive neither context nor
+  proposal tools
+
+#### Scenario: Proposal tool records valid work
+
+- **WHEN** a proposal-tool payload passes its canonical schema and grounding
+  checks
+- **THEN** runtime SHALL record the typed proposal for moderator review
+- **AND** the tool SHALL NOT mutate, approve, dispatch, or apply catalog data
+
+#### Scenario: Proposed operation is not grounded
+
+- **WHEN** a structurally valid proposed operation targets an uninspected record
+  or cites evidence that was not collected
+- **THEN** the classifier result and other valid operations SHALL remain intact
+- **AND** the proposal tool SHALL reject the call, record no operation, and
+  return the concrete grounding error to the agent
 
 ### Requirement: Bottle checks are read-only and bounded
 
@@ -368,16 +507,43 @@ prose, consumer counts, and unrelated social data.
 - **AND** selected images SHALL pass through the existing classifier
   image-evidence extractor so the context contains normalized label evidence,
   not an opaque URL alone
+- **AND** image extraction SHALL scan the complete readable label, including
+  smaller secondary bands, subtitles, and neck tags, for identity-bearing
+  edition, batch, release, finish, and variant text
 - **AND** the runtime SHALL preserve that sample in the check artifacts
 - **AND** no private user or unrelated activity data SHALL be exposed
 
 #### Scenario: Agent gathers more evidence
 
 - **WHEN** a tool result exposes useful new evidence
-- **THEN** the same bounded agent session MAY continue or perform the existing
-  evidence-driven retry
+- **THEN** the current semantic loop MAY continue gathering evidence
 - **AND** it SHALL stop on valid output, the existing turn limit, the shared
   web-query budget, or terminal provider failure
+
+#### Scenario: Reference final output owns identity
+
+- **WHEN** the reference semantic loop completes
+- **THEN** its provider schema SHALL contain the canonical decision fields and
+  findings
+- **AND** it SHALL use provider strict mode and canonical Zod parsing
+- **AND** its decision SHALL be the authoritative result after canonical
+  finalization
+- **AND** it SHALL NOT contain proposed operations or intermediate conclusions
+
+#### Scenario: Proposal collector attaches independent work
+
+- **WHEN** a proposal tool is called during the same semantic loop
+- **THEN** the collector SHALL parse the canonical typed payload
+- **AND** it SHALL require inspected existing targets and collected evidence
+- **AND** every existing Bottle and Entity target SHALL appear in the
+  proposal's typed evidence references
+- **AND** repeating an exact type/input pair SHALL revalidate and replace that
+  proposal's rationale and evidence in place
+- **AND** the collector SHALL enforce the bounded unique-proposal ceiling
+- **AND** a rejected call SHALL record no proposal and SHALL explain the
+  rejection to the agent
+- **AND** runtime SHALL attach accepted proposals without changing the
+  authoritative decision
 
 #### Scenario: Retrieved content contains instructions
 
@@ -387,10 +553,10 @@ prose, consumer counts, and unrelated social data.
 - **AND** it SHALL NOT change intent, permissions, operation availability, or
   approval policy
 
-### Requirement: Primary decisions settle before supplemental preparation
+### Requirement: Authoritative decisions settle before operation preparation
 
-The existing review policy SHALL finalize a reference decision before
-supplemental operations are checked for direct conflicts.
+The existing review policy SHALL finalize the authoritative reference decision
+before operations are checked for direct conflicts.
 
 #### Scenario: End-user primary action applies automatically
 
@@ -408,25 +574,48 @@ supplemental operations are checked for direct conflicts.
 
 #### Scenario: Reviewed primary action is still open
 
-- **WHEN** a reference decision still awaits its terminal disposition
+- **WHEN** the exact store-price attempt linked to a reference check does not
+  have an `approved` or `ignored` final status
 - **THEN** supplemental operations MAY be previewed
 - **AND** they SHALL NOT be applied until the primary workflow is terminal
 
+#### Scenario: A newer store-price attempt exists
+
+- **WHEN** a forced rerun creates a newer attempt and check for the same mutable
+  proposal
+- **THEN** the older check SHALL continue to use its own linked attempt as its
+  terminal authority
+
+#### Scenario: The exact primary attempt cannot be verified
+
+- **WHEN** a reference check has only a proposal link, its attempt link was
+  cleared, or the linked attempt does not match the check's proposal and price
+- **THEN** supplemental operations MAY be previewed
+- **AND** execution SHALL fail closed
+
 ### Requirement: Evals score intent and operations explicitly
 
-Classifier evals SHALL score the existing reference decision and the exact
-proposed operation and finding sets.
+Classifier evals SHALL hard-gate the existing reference decision and
+canonical/collected grounding. They SHALL score exact proposed operation and
+finding sets without assigning the same completion contract to both intents.
 
 #### Scenario: Evaluate reference resolution
 
 - **WHEN** a `resolve_reference` fixture runs
 - **THEN** existing decision assertions SHALL remain in force
-- **AND** supplemental operations SHALL be scored separately
+- **AND** canonical schema, inspected-target, and collected-evidence grounding
+  assertions SHALL remain in force
+- **AND** exact expected operation and finding sets, including missing and
+  extra entries, SHALL remain visible as named diagnostic scores without
+  failing an otherwise correct and grounded resolution
+- **AND** the eval SHALL NOT classify a supported proposal as harmful solely
+  because the fixture did not enumerate it
 
 #### Scenario: Evaluate an existing-Bottle audit
 
 - **WHEN** an `audit_bottle` fixture runs
 - **THEN** the eval SHALL score exact operations and findings
+- **AND** missing supported operations or required evidence SHALL fail the eval
 - **AND** a clean fixture SHALL require both arrays to be empty
 
 #### Scenario: Preserve a production miss
@@ -434,4 +623,5 @@ proposed operation and finding sets.
 - **WHEN** a production case becomes an eval
 - **THEN** it SHALL retain the real intent, subject, catalog artifacts,
   verified evidence, expected result, and exact operations
-- **AND** harmful extra mutations SHALL cost more than omitted cleanup
+- **AND** reference operation-set mismatches SHALL remain diagnostic while
+  audit operation-set mismatches SHALL follow the audit's exact-repair gate

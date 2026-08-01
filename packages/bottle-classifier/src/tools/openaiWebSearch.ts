@@ -13,11 +13,14 @@ import { getStableOpenAISettings } from "../openaiModelSettings";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
+  executeBottleWebSearchInvocation,
   getDistinctResultDomains,
   getResultDomain,
+  hydrateBottleSearchEvidence,
   isThinBottleSearchEvidence,
   mergeBottleSearchEvidence,
   type BottleWebSearchBudget,
+  type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
 
 const OPENAI_WEB_SEARCH_RESPONSE_INCLUDES: ResponseIncludable[] = [
@@ -217,11 +220,13 @@ export function createOpenAIWebSearchTool({
   model,
   budget,
   onEvidence,
+  executeWebSearch,
 }: {
   client: OpenAI;
   model: string;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
+  executeWebSearch?: BottleWebSearchExecutor;
 }) {
   return tool({
     name: "openai_web_search",
@@ -239,6 +244,7 @@ export function createOpenAIWebSearchTool({
             budget,
             query: args.query,
             onEvidence,
+            executeWebSearch,
           }),
       });
     },
@@ -251,6 +257,48 @@ export async function runBottleWebEvidenceSearch({
   query,
   budget,
   onEvidence,
+  executeWebSearch,
+}: {
+  client: OpenAI;
+  model: string;
+  query: string;
+  budget: BottleWebSearchBudget;
+  onEvidence?: (evidence: BottleSearchEvidence) => void;
+  executeWebSearch?: BottleWebSearchExecutor;
+}): Promise<BottleSearchEvidence | { error: string }> {
+  let evidenceHydrated = false;
+  const hydrateEvidence = (evidence: BottleSearchEvidence) => {
+    evidenceHydrated = true;
+    onEvidence?.(evidence);
+  };
+  const result = await executeBottleWebSearchInvocation({
+    budget,
+    toolName: "openai_web_search",
+    args: { query },
+    execute: async () =>
+      await runBottleWebEvidenceSearchAfterBudget({
+        client,
+        model,
+        query,
+        budget,
+        onEvidence: hydrateEvidence,
+      }),
+    executeWebSearch,
+  });
+
+  if (executeWebSearch && !evidenceHydrated) {
+    hydrateBottleSearchEvidence(result, hydrateEvidence);
+  }
+
+  return result;
+}
+
+async function runBottleWebEvidenceSearchAfterBudget({
+  client,
+  model,
+  query,
+  budget,
+  onEvidence,
 }: {
   client: OpenAI;
   model: string;
@@ -258,10 +306,6 @@ export async function runBottleWebEvidenceSearch({
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }): Promise<BottleSearchEvidence | { error: string }> {
-  if (!budget.tryConsume()) {
-    return budget.getExhaustedError();
-  }
-
   try {
     const primaryEvidence = await runOpenAIWebSearch({
       client,

@@ -9,10 +9,7 @@ import {
   BottleCandidateSchema,
   createDecidedBottleClassification,
 } from "@peated/bottle-classifier/contract";
-import type {
-  BottleCheckRunOptions,
-  RunBottleClassifierAgentInput,
-} from "@peated/bottle-classifier/internal/runtime";
+import type { RunBottleClassifierAgentInput } from "@peated/bottle-classifier/internal/runtime";
 import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
 import {
   EntityResolutionSchema,
@@ -118,10 +115,7 @@ export function getBottleClassifier() {
   return bottleClassifier;
 }
 
-export async function classifyBottleReference(
-  input: ClassifyBottleReferenceInput,
-  options?: BottleCheckRunOptions,
-) {
+export async function runBottleReference(input: ClassifyBottleReferenceInput) {
   const reference = normalizeReferenceForClassifier(input.reference);
   const conversationId = buildReferenceConversationId(
     "bottle_reference",
@@ -130,34 +124,31 @@ export async function classifyBottleReference(
   );
 
   return await withReferenceConversation(conversationId, async () => {
-    return await getBottleClassifier().classifyBottleReference(
-      {
-        ...input,
-        reference,
-        conversationId,
-      },
-      options,
-    );
+    return await getBottleClassifier().runBottleReference({
+      ...input,
+      reference,
+      conversationId,
+    });
   });
 }
 
-export async function runBottleAudit(
-  input: AuditBottleInput,
-  options?: BottleCheckRunOptions,
+export async function classifyBottleReference(
+  input: ClassifyBottleReferenceInput,
 ) {
+  return (await runBottleReference(input)).result;
+}
+
+export async function runBottleAudit(input: AuditBottleInput) {
   const parsedInput = AuditBottleInputSchema.parse(input);
   const conversationId = `bottle_audit:${parsedInput.bottleId}`;
 
   return await withReferenceConversation(conversationId, async () => {
-    return await getBottleClassifier().runBottleAudit(parsedInput, options);
+    return await getBottleClassifier().runBottleAudit(parsedInput);
   });
 }
 
-export async function auditBottle(
-  input: AuditBottleInput,
-  options?: BottleCheckRunOptions,
-) {
-  return (await runBottleAudit(input, options)).result;
+export async function auditBottle(input: AuditBottleInput) {
+  return (await runBottleAudit(input)).result;
 }
 
 async function identifyExactAliasReference({

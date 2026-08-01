@@ -15,11 +15,14 @@
       envelope, typed evidence-reference union, explicit existing/create Entity
       choices inside Bottle operations, and separate prepared-versus-blocked review
       contracts.
-- [x] 1.6 Implement one strict Zod proposal union, one strict review union, and
-      plain exhaustive prepare/execute switches; derive `availableOperations` from
-      the operation enum and feature flags.
-- [x] 1.7 Prepare proposals independently, preserving the agent result and
-      valid siblings while retaining mechanically invalid proposals as blocked.
+- [x] 1.6 Implement one canonical strict literal-tagged Zod proposal union,
+      generate the provider JSON Schema from it, parse raw output back through
+      it, keep one strict review union, and use plain exhaustive prepare/execute
+      switches. Expose the four proposal tools on every full reference and audit
+      run without per-operation capability flags.
+- [x] 1.7 Prepare collector-accepted proposals independently, preserving the
+      agent result and valid siblings while retaining later mechanical or
+      current-state preparation failures as blocked.
 - [x] 1.8 Add contract and policy tests for every intent, operation variant,
       invalid combination, required evidence, type/input correlation, and absence
       of mutating tools.
@@ -28,12 +31,12 @@
 
 - [x] 2.1 Refactor classifier instructions into a stable shared Bottle identity
       section plus small intent-specific sections while retaining the existing
-      bounded tool loop and evidence-driven retry.
+      bounded evidence gathering within the same tool loop.
 - [x] 2.2 Add bounded Bottle-check context and read-only Bottle, BottleGroup, related
       Entity, sibling, and focused web-evidence tools through
       `get_bottle_context`, `get_entity_context`, existing search, and web search.
-      Make resource context available to either intent when its operations are
-      enabled, with audit mode preloading the audited Bottle. Include Bottle
+      Make resource context available to both full intents, with audit mode
+      preloading the audited Bottle. Include Bottle
       observations and bounded identity-bearing public images, but exclude user
       identity, private activity, tasting prose, counts, and unrelated social data.
 - [x] 2.3 Reuse the existing image-evidence extractor for selected Bottle
@@ -42,11 +45,13 @@
 - [x] 2.4 Persist structured Bottle and Entity context-tool results in runtime
       artifacts; keep consumer impact and blast radius in server previews.
 - [x] 2.5 Add the real Laphroaig Càirdeas production miss: listing `11828042`
-      SHALL match Warehouse 1 Bottle `45146`, propose `merge_bottles` from malformed
-      Bottle `39096` to `45146`, and leave generic Bottle `44288` unchanged. Record
-      the July 29, 2026 Peated API state, the official Laphroaig 2022 Warehouse 1
-      evidence, public tasting `223` and its Warehouse 1 label image, and the exact
-      expected Peated outcome in the fixture provenance.
+      SHALL hard-gate the authoritative decision matching Warehouse 1 Bottle
+      `45146` rather than generic Bottle `44288`, plus canonical/collected
+      grounding. Preserve `merge_bottles` from malformed Bottle `39096` to
+      `45146` as a diagnostic operation-recall target. Record the July 29, 2026
+      Peated API state, the official Laphroaig 2022 Warehouse 1 evidence, public
+      tasting `223` and its Warehouse 1 label image, and the exact expected Peated
+      outcome in the fixture provenance.
 - [x] 2.6 Add existing-Bottle audit fixtures for clean, update, duplicate merge,
       Brand changes through `update_bottle`, embedded Entity creation, Entity
       update/merge, findings, and unresolved cases.
@@ -55,7 +60,20 @@
       uninspected targets, primary/operation contradictions, and
       current-to-selected-match operation correlation.
 - [x] 2.8 Report reference-decision accuracy separately from exact operation and
-      finding precision/recall, weighting harmful or unrelated extras most heavily.
+      finding precision/recall. Hard-gate the authoritative reference decision
+      and canonical/collected grounding, keep exact reference operation/finding
+      sets—including missing and extra entries—diagnostic, and hard-gate exact
+      audit operations, findings, and required evidence.
+- [x] 2.9 Run exactly one bounded semantic agent loop for each non-ignored
+      reference and each audit. Give it the read tools and four non-mutating
+      proposal tools. Reference final output is the strict authoritative
+      decision plus findings; audit final output is summary plus findings;
+      runtime attaches proposals and artifacts collected during the loop.
+- [x] 2.10 Validate proposal-tool payloads through the canonical schemas,
+      require inspected existing targets and collected evidence, deduplicate
+      exact type/input pairs, and enforce a bounded proposal count. Supply
+      deterministic identity as an agent input anchor rather than suppressing
+      the agent. Scan smaller readable label regions for identity-bearing text.
 
 ## 3. Check Persistence
 
@@ -65,8 +83,10 @@
       token or blocking error, structured rejection/close reasons, reviewer
       metadata, result/error, and timestamps. Use the operation id for
       dispatch/retry identity; do not add array position or per-operation versions.
-- [x] 3.2 Link store-price attempts/proposals to checks without
-      replacing their current decision fields.
+- [x] 3.2 Link store-price attempts/proposals to checks without replacing their
+      current decision fields. Use the exact linked attempt's final status as
+      the execution gate while retaining proposal-only links for preview
+      compatibility.
 - [x] 3.3 Generate the database migration with `pnpm db:generate`.
 - [x] 3.4 Sanitize persisted input snapshots so inline image bytes are omitted,
       and store intent output and artifacts exactly once.
@@ -132,8 +152,8 @@
 
 - [x] 6.1 Add shadow-generation, moderator-visibility, and execution flags,
       disabled by default.
-- [x] 6.2 Enable shadow operations for individual full reference retries and
-      moderator-triggered Bottle audits.
+- [x] 6.2 Enable shadow check generation for individual full reference retries
+      and moderator-triggered Bottle audits.
 - [x] 6.3 Extend the existing `VerifyBottleCreation` job with an idempotent
       sampled post-create Bottle check that runs only after the end-user save
       commits, replaces the previous Bottle-specific heuristic conclusion, creates
@@ -141,16 +161,12 @@
       operations.
 - [x] 6.4 Preserve automatic primary classification only in the existing
       end-user add-Bottle workflow and its established review policy.
-- [ ] 6.5 Measure intent accuracy, schema validity, exact operations, harmful
-      extras, reviewer correction, review time, stale/failure rates, cost, and
-      latency and tool calls before enabling execution broadly.
+- [ ] 6.5 Measure intent accuracy, schema validity, diagnostic exact reference
+      operation/finding sets, exact audit repair, reviewer rejection/correction,
+      review time, stale/failure rates, cost, latency, and tool calls before
+      enabling execution broadly.
 - [x] 6.6 Update Bottle classifier, Entity classifier, whisky identity,
       store-price matching, agent-design, runtime-boundary, and background-work
       docs where their contracts change.
-- [x] 6.7 Run targeted classifier, server, worker, and web formatting, lint,
+- [ ] 6.7 Run targeted classifier, server, worker, and web formatting, lint,
       typecheck, tests, evals, migration checks, and manual QA.
-- [ ] 6.8 Track reviewed `bottle_group` findings and use the real cases to
-      produce a separate follow-up proposal for the smallest necessary regroup or
-      group-merge operations. Require that proposal to preserve Bottle ids,
-      consumers, aliases, shared-field rematerialization, representatives,
-      aggregates, and auditable history; do not add group operations to this v1.

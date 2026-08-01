@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   AuditBottleInputSchema,
   FindingSchema,
-  ProposedOperationTypeSchema,
   ProposedOperationsSchema,
 } from "./bottleCheckContract";
 import { listBottleCheckOperationTargets } from "./bottleCheckEvalScoring";
@@ -157,10 +156,48 @@ export const classifierEvalExpectationSchema = z.object({
 const classifierEvalContextSchema = z
   .object({
     inspectedBottleIds: z.array(z.number().int().positive()).default([]),
+    bottleContexts: z.array(BottleContextSourceSchema).optional(),
     inspectedEntities: z.array(EntityResolutionSchema).default([]),
     inspectedSeries: z.array(BottleContextSeriesRefSchema).default([]),
   })
   .strict();
+
+function validateExplicitBottleContextCoverage({
+  expectedBottleIds,
+  bottleContexts,
+  ctx,
+  message,
+  path,
+}: {
+  expectedBottleIds: number[];
+  bottleContexts: z.infer<typeof BottleContextSourceSchema>[] | undefined;
+  ctx: z.RefinementCtx;
+  message: string;
+  path: PropertyKey[];
+}) {
+  if (bottleContexts === undefined) {
+    return;
+  }
+
+  const sortedExpectedBottleIds = [...expectedBottleIds].sort(
+    (left, right) => left - right,
+  );
+  const contextBottleIds = bottleContexts
+    .map(({ bottleId }) => bottleId)
+    .sort((left, right) => left - right);
+  if (
+    sortedExpectedBottleIds.length !== contextBottleIds.length ||
+    sortedExpectedBottleIds.some(
+      (bottleId, index) => bottleId !== contextBottleIds[index],
+    )
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message,
+      path,
+    });
+  }
+}
 
 export const classifierEvalFixtureSchema = z
   .object({
@@ -177,7 +214,7 @@ export const classifierEvalFixtureSchema = z
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
     localCatalog: LocalCatalogSchema.optional(),
-    availableOperations: z.array(ProposedOperationTypeSchema).default([]),
+    requireExpectedOperationEvidence: z.boolean().default(false),
     context: classifierEvalContextSchema.default({
       inspectedBottleIds: [],
       inspectedEntities: [],
@@ -203,21 +240,15 @@ export const classifierEvalFixtureSchema = z
       initialCandidateIds.add(candidate.bottleId);
     }
 
-    const availableOperationTypes = new Set(value.availableOperations);
-    for (const [
-      operationIndex,
-      operation,
-    ] of value.expected.proposedOperations.entries()) {
-      if (!availableOperationTypes.has(operation.type)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Expected operation type ${operation.type} is not available to the classifier.`,
-          path: ["expected", "proposedOperations", operationIndex, "type"],
-        });
-      }
-    }
-
     const inspectedBottleIds = new Set(value.context.inspectedBottleIds);
+    validateExplicitBottleContextCoverage({
+      expectedBottleIds: [...inspectedBottleIds],
+      bottleContexts: value.context.bottleContexts,
+      ctx,
+      message:
+        "Explicit Bottle contexts must exactly cover inspected Bottle ids.",
+      path: ["context", "bottleContexts"],
+    });
     const inspectedEntityIds = new Set(
       value.context.inspectedEntities.map(({ entityId }) => entityId),
     );
@@ -365,6 +396,7 @@ export const auditBottleEvalFixtureSchema = z
       })
       .strict(),
     provenance: evalFixtureProvenanceSchema,
+    requireExpectedOperationEvidence: z.boolean().default(false),
     expected: AuditBottleResultSchema.omit({ artifacts: true }),
   })
   .strict()
@@ -394,27 +426,14 @@ export const auditBottleEvalFixtureSchema = z
       bottleIds.add(bottle.bottleId);
     }
 
-    if (value.input.context.bottleContexts !== undefined) {
-      const expectedBottleIds = [...bottleIds].sort(
-        (left, right) => left - right,
-      );
-      const contextBottleIds = value.input.context.bottleContexts
-        .map(({ bottleId }) => bottleId)
-        .sort((left, right) => left - right);
-      if (
-        expectedBottleIds.length !== contextBottleIds.length ||
-        expectedBottleIds.some(
-          (bottleId, index) => bottleId !== contextBottleIds[index],
-        )
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Explicit Bottle contexts must exactly cover the current and inspected Bottle ids.",
-          path: ["input", "context", "bottleContexts"],
-        });
-      }
-    }
+    validateExplicitBottleContextCoverage({
+      expectedBottleIds: [...bottleIds],
+      bottleContexts: value.input.context.bottleContexts,
+      ctx,
+      message:
+        "Explicit Bottle contexts must exactly cover the current and inspected Bottle ids.",
+      path: ["input", "context", "bottleContexts"],
+    });
 
     const entityIds = new Set<number>();
     for (const [

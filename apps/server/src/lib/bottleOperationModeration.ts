@@ -1,7 +1,4 @@
-import {
-  BottleClassificationArtifactsSchema,
-  ProposedOperationSchema,
-} from "@peated/bottle-classifier";
+import { ProposedOperationSchema } from "@peated/bottle-classifier";
 import config from "@peated/server/config";
 import {
   db,
@@ -12,17 +9,26 @@ import {
 import {
   bottleChecks,
   bottleOperations,
-  bottleTombstones,
   bottles,
+  bottleTombstones,
   entities,
   entityTombstones,
-  storePriceMatchProposals,
+  storePriceMatchAttempts,
   users,
   type BottleCheck,
   type BottleOperation,
   type User,
 } from "@peated/server/db/schema";
-import type { BottleCheckOperationCapabilities } from "@peated/server/lib/bottleCheckAvailableOperations";
+import { getPersistedBottleCheckSourceEvidencePaths } from "@peated/server/lib/bottleCheckEvidence";
+import {
+  isBottleCheckPrimaryDecisionTerminal,
+  lockBottleCheckPrimaryDecisionAttempt,
+} from "@peated/server/lib/bottleCheckPrimaryDecision";
+import {
+  assertSupportedBottleCheckSchemaVersion,
+  isSupportedBottleCheckSchemaVersion,
+  UnsupportedBottleCheckSchemaVersionError,
+} from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
   BottleOperationExecutionResultSchema,
   executePreparedOperationInTransaction,
@@ -83,9 +89,8 @@ export const ApproveBottleOperationsInputSchema = z
   })
   .strict();
 
-export const RejectBottleOperationsInputSchema = z
+export const BottleOperationRejectionInputSchema = z
   .object({
-    checkId: PositiveIdSchema,
     operationIds: SelectedBottleOperationIdsSchema,
     reason: BottleOperationRejectionReasonSchema,
     note: NonEmptyNoteSchema.optional(),
@@ -99,6 +104,11 @@ export const RejectBottleOperationsInputSchema = z
         path: ["note"],
       });
     }
+  });
+
+export const RejectBottleOperationsInputSchema =
+  BottleOperationRejectionInputSchema.safeExtend({
+    checkId: PositiveIdSchema,
   });
 
 export const RetryBottleOperationInputSchema = z
@@ -130,13 +140,6 @@ type PreparedExecution = {
   status: "applied" | "applying";
   afterCommit: () => Promise<void>;
 };
-
-const OPERATION_CAPABILITIES = {
-  update_bottle: true,
-  merge_bottles: true,
-  update_entity: true,
-  merge_entities: true,
-} as const satisfies BottleCheckOperationCapabilities;
 
 const REJECTABLE_STATUSES = new Set<BottleOperation["status"]>([
   "blocked",
@@ -200,6 +203,21 @@ function actionResult(
   });
 }
 
+async function assertPrimaryStorePriceDecisionTerminal(
+  check: BottleCheck,
+  operation: BottleOperation,
+  transaction: AnyTransaction,
+): Promise<void> {
+  if (await isBottleCheckPrimaryDecisionTerminal(check, transaction)) {
+    return;
+  }
+
+  throw new BottleOperationActionError(
+    `Bottle operation ${operation.id} cannot be applied until its primary store-price decision is complete.`,
+    operation.status,
+  );
+}
+
 async function loadLockedOperationContext({
   checkId,
   operationId,
@@ -210,8 +228,16 @@ async function loadLockedOperationContext({
   transaction: AnyTransaction;
 }): Promise<LockedOperationContext> {
   const [operationReference] = await transaction
-    .select({ checkId: bottleOperations.checkId })
+    .select({
+      checkId: bottleOperations.checkId,
+      intent: bottleChecks.intent,
+      sourceKind: bottleChecks.sourceKind,
+      sourceId: bottleChecks.sourceId,
+      storePriceMatchAttemptId: bottleChecks.storePriceMatchAttemptId,
+      storePriceMatchProposalId: bottleChecks.storePriceMatchProposalId,
+    })
     .from(bottleOperations)
+    .innerJoin(bottleChecks, eq(bottleChecks.id, bottleOperations.checkId))
     .where(eq(bottleOperations.id, operationId))
     .limit(1);
   if (!operationReference || operationReference.checkId !== checkId) {
@@ -219,6 +245,8 @@ async function loadLockedOperationContext({
       `Bottle operation ${operationId} was not found in check ${checkId}.`,
     );
   }
+
+  await lockBottleCheckPrimaryDecisionAttempt(operationReference, transaction);
 
   const [check] = await transaction
     .select()
@@ -231,7 +259,6 @@ async function loadLockedOperationContext({
       `Bottle check ${checkId} was not found.`,
     );
   }
-
   const [operation] = await transaction
     .select()
     .from(bottleOperations)
@@ -248,6 +275,17 @@ async function loadLockedOperationContext({
       `Bottle operation ${operationId} was not found in check ${checkId}.`,
     );
   }
+  if (
+    check.storePriceMatchAttemptId !==
+      operationReference.storePriceMatchAttemptId ||
+    check.storePriceMatchProposalId !==
+      operationReference.storePriceMatchProposalId
+  ) {
+    throw new BottleOperationActionError(
+      `Bottle check ${checkId} primary decision linkage changed.`,
+      operation.status,
+    );
+  }
   if (check.closedAt !== null) {
     throw new BottleOperationActionError(
       `Bottle check ${check.id} is closed.`,
@@ -259,43 +297,7 @@ async function loadLockedOperationContext({
 }
 
 function sourceFieldsForCheck(check: BottleCheck): string[] {
-  if (check.intent === "audit_bottle") {
-    return check.inputSnapshot.note === undefined ? [] : ["audit.note"];
-  }
-
-  const sourceFields = new Set<string>();
-  const reference = check.inputSnapshot.reference;
-  if (
-    reference !== null &&
-    typeof reference === "object" &&
-    !Array.isArray(reference)
-  ) {
-    for (const [field, value] of Object.entries(reference)) {
-      if (value !== null && value !== undefined) {
-        sourceFields.add(`reference.${field}`);
-      }
-    }
-  }
-
-  const artifacts = BottleClassificationArtifactsSchema.safeParse(
-    check.artifacts,
-  );
-  if (artifacts.success) {
-    for (const [field, value] of Object.entries(
-      artifacts.data.extractedIdentity ?? {},
-    )) {
-      if (value !== null && value !== undefined) {
-        sourceFields.add(`extractedIdentity.${field}`);
-      }
-    }
-    for (const field of Object.keys(
-      artifacts.data.imageEvidence?.fieldCandidates ?? {},
-    )) {
-      sourceFields.add(`imageEvidence.fieldCandidates.${field}`);
-    }
-  }
-
-  return [...sourceFields];
+  return getPersistedBottleCheckSourceEvidencePaths(check);
 }
 
 async function reviewPreparationContextForCheck(
@@ -303,22 +305,21 @@ async function reviewPreparationContextForCheck(
   database: AnyDatabase,
 ): Promise<BottleOperationPreparationContext> {
   let protectedBottleIds: number[] = [];
-  if (check.storePriceMatchProposalId !== null) {
-    const [proposal] = await database
+  if (check.storePriceMatchAttemptId !== null) {
+    const [attempt] = await database
       .select({
-        suggestedBottleId: storePriceMatchProposals.suggestedBottleId,
+        suggestedBottleId: storePriceMatchAttempts.suggestedBottleId,
       })
-      .from(storePriceMatchProposals)
-      .where(eq(storePriceMatchProposals.id, check.storePriceMatchProposalId))
+      .from(storePriceMatchAttempts)
+      .where(eq(storePriceMatchAttempts.id, check.storePriceMatchAttemptId))
       .limit(1);
-    if (proposal?.suggestedBottleId !== null && proposal?.suggestedBottleId) {
-      protectedBottleIds = [proposal.suggestedBottleId];
+    if (attempt?.suggestedBottleId !== null && attempt?.suggestedBottleId) {
+      protectedBottleIds = [attempt.suggestedBottleId];
     }
   }
 
   return {
     artifacts: check.artifacts ?? {},
-    capabilities: OPERATION_CAPABILITIES,
     sourceFields: sourceFieldsForCheck(check),
     protectedBottleIds,
     database,
@@ -329,6 +330,7 @@ async function executionPreparationContextForCheck(
   check: BottleCheck,
   transaction: AnyTransaction,
 ): Promise<BottleOperationExecutionPreparationContext> {
+  assertSupportedBottleCheckSchemaVersion(check);
   return {
     ...(await reviewPreparationContextForCheck(check, transaction)),
     database: transaction,
@@ -338,15 +340,32 @@ async function executionPreparationContextForCheck(
 export async function prepareBottleCheckReviewOperations(
   check: BottleCheck & { operations: BottleOperation[] },
   database: AnyDatabase = db,
-): Promise<Array<{ operationId: number; review: ReviewOperation | null }>> {
+): Promise<
+  Array<{
+    operationId: number;
+    review: ReviewOperation | null;
+    approvalReady: boolean;
+  }>
+> {
+  if (!isSupportedBottleCheckSchemaVersion(check)) {
+    return [];
+  }
   const preparationContext = await reviewPreparationContextForCheck(
+    check,
+    database,
+  );
+  const primaryDecisionTerminal = await isBottleCheckPrimaryDecisionTerminal(
     check,
     database,
   );
   return await Promise.all(
     check.operations.map(async (operation) => {
       if (operation.status === "applied" || operation.status === "rejected") {
-        return { operationId: operation.id, review: null };
+        return {
+          operationId: operation.id,
+          review: null,
+          approvalReady: false,
+        };
       }
       if (operation.status === "blocked") {
         const review = BlockedReviewOperationSchema.parse({
@@ -355,7 +374,11 @@ export async function prepareBottleCheckReviewOperations(
           proposal: operation.proposal,
           preparationError: operation.preparationError,
         });
-        return { operationId: operation.id, review };
+        return {
+          operationId: operation.id,
+          review,
+          approvalReady: false,
+        };
       }
 
       const liveReview = await prepareOperation({
@@ -369,7 +392,15 @@ export async function prepareBottleCheckReviewOperations(
               ...liveReview,
               status: operation.status,
             });
-      return { operationId: operation.id, review };
+      return {
+        operationId: operation.id,
+        review,
+        approvalReady:
+          primaryDecisionTerminal &&
+          operation.status === "pending_review" &&
+          liveReview.status !== "blocked" &&
+          isDeepStrictEqual(liveReview.stateToken, operation.stateToken),
+      };
     }),
   );
 }
@@ -399,6 +430,8 @@ async function prepareAndExecute({
   moderator: User;
   transaction: AnyTransaction;
 }): Promise<PreparedExecution | BottleOperationActionResult> {
+  await assertPrimaryStorePriceDecisionTerminal(check, operation, transaction);
+
   let prepared: PreparedOperationExecution;
   try {
     prepared = await prepareOperationForExecution({
@@ -406,6 +439,12 @@ async function prepareAndExecute({
       ...(await executionPreparationContextForCheck(check, transaction)),
     });
   } catch (error) {
+    if (error instanceof UnsupportedBottleCheckSchemaVersionError) {
+      return actionError(
+        operation.id,
+        new BottleOperationActionError(error.message, operation.status),
+      );
+    }
     if (isOperationPreparationFailure(error)) {
       return await markStale(transaction, operation.id);
     }
@@ -826,6 +865,11 @@ async function retryOne({
           context.operation.status,
         );
       }
+      await assertPrimaryStorePriceDecisionTerminal(
+        context.check,
+        context.operation,
+        transaction,
+      );
       if (
         !ProposedOperationSchema.safeParse(context.operation.proposal)
           .success ||

@@ -3,12 +3,13 @@ import { describe, expect, test } from "vitest";
 import {
   AuditBottleInputSchema,
   AuditBottleResultSchema,
+  BottleOperationEntityChoiceSchema,
   BottleSharedPatchSchema,
   createProposedOperationsSchema,
   EvidenceRefSchema,
   FindingSchema,
-  ProposedEntityChoiceSchema,
   ProposedOperationSchema,
+  SourceEvidencePathSchema,
 } from "./index";
 
 const evidenceRefs = [{ kind: "bottle" as const, bottleId: 42 }];
@@ -242,15 +243,44 @@ describe("bottle check public contract", () => {
     ).toBe(false);
   });
 
+  test("limits source evidence to documented serialized path shapes", () => {
+    const validPaths = [
+      "audit.note",
+      "reference.name",
+      "extractedIdentity.release_year",
+      "imageEvidence.fieldCandidates.edition",
+    ];
+    for (const field of validPaths) {
+      expect(SourceEvidencePathSchema.parse(field)).toBe(field);
+      expect(
+        EvidenceRefSchema.safeParse({ kind: "source", field }).success,
+      ).toBe(true);
+    }
+
+    const invalidPaths = [
+      "audit.origin",
+      "reference",
+      "reference.brand.name",
+      "imageEvidence.fieldCandidates",
+      "currentBottleContext.publicImages.labelEvidence.edition",
+    ];
+    for (const field of invalidPaths) {
+      expect(SourceEvidencePathSchema.safeParse(field).success).toBe(false);
+      expect(
+        EvidenceRefSchema.safeParse({ kind: "source", field }).success,
+      ).toBe(false);
+    }
+  });
+
   test("makes existing and create Entity choices unambiguous", () => {
     expect(
-      ProposedEntityChoiceSchema.parse({
+      BottleOperationEntityChoiceSchema.parse({
         kind: "existing",
         entityId: 10,
       }),
     ).toEqual({ kind: "existing", entityId: 10 });
     expect(
-      ProposedEntityChoiceSchema.parse({
+      BottleOperationEntityChoiceSchema.parse({
         kind: "create",
         entity: {
           name: "New Brand",
@@ -261,13 +291,13 @@ describe("bottle check public contract", () => {
       }),
     ).toMatchObject({ kind: "create", entity: { name: "New Brand" } });
     expect(
-      ProposedEntityChoiceSchema.safeParse({
+      BottleOperationEntityChoiceSchema.safeParse({
         id: null,
         name: "Ambiguous old shape",
       }).success,
     ).toBe(false);
     expect(
-      ProposedEntityChoiceSchema.safeParse({
+      BottleOperationEntityChoiceSchema.safeParse({
         kind: "create",
         entity: {
           name: "Invented location id",

@@ -146,6 +146,40 @@ describe("Bottle Check review components", () => {
     expect(html).not.toContain("Select");
   });
 
+  it("keeps a non-ready pending operation selectable for rejection", () => {
+    const html = renderToStaticMarkup(
+      <OperationCard
+        approvalReady={false}
+        onSelect={() => undefined}
+        operation={operation("pending_review")}
+        review={entityReview}
+      />,
+    );
+
+    expect(html).toContain("Not ready to approve");
+    expect(html).toContain(
+      "This operation cannot currently be approved, but you can reject it.",
+    );
+    expect(html).toContain("Select");
+    expect(html).toContain('type="checkbox"');
+  });
+
+  it.each(["blocked", "stale", "failed"] as const)(
+    "keeps a %s operation selectable for rejection",
+    (status) => {
+      const html = renderToStaticMarkup(
+        <OperationCard
+          onSelect={() => undefined}
+          operation={operation(status)}
+          review={status === "blocked" ? null : entityReview}
+        />,
+      );
+
+      expect(html).toContain("Select");
+      expect(html).toContain('type="checkbox"');
+    },
+  );
+
   it("renders blocked, applying, applied, stale, failed, and rejected dispositions", () => {
     const blocked = renderToStaticMarkup(
       <OperationCard
@@ -242,7 +276,8 @@ describe("Bottle Check review components", () => {
       bottleId: 44,
       subjectKey: "audit_bottle:bottle:44",
       backgroundEventKey: null,
-      schemaVersion: 4,
+      schemaSupported: true,
+      schemaVersion: 1,
       inputSnapshot: {},
       output: {
         summary: "The Bottle is supported.",
@@ -261,8 +296,27 @@ describe("Bottle Check review components", () => {
       completedAt: "2026-07-30T00:00:00.000Z",
       closedAt: null,
       operations: [],
-    } as ComponentProps<typeof CheckResult>["check"];
+    } satisfies ComponentProps<typeof CheckResult>["check"];
     const clean = renderToStaticMarkup(<CheckResult check={baseCheck} />);
+    const {
+      artifacts: _artifacts,
+      inputSnapshot: _inputSnapshot,
+      modelMetadata: _modelMetadata,
+      output: _output,
+      ...safeBaseCheck
+    } = baseCheck;
+    const unsupported = renderToStaticMarkup(
+      <CheckResult
+        check={{
+          ...safeBaseCheck,
+          schemaSupported: false,
+          schemaVersion: 2,
+          canClose: true,
+          operationCount: 1,
+          operations: [],
+        }}
+      />,
+    );
     const findings = renderToStaticMarkup(
       <CheckResult
         check={{
@@ -283,6 +337,8 @@ describe("Bottle Check review components", () => {
 
     expect(clean).toContain("No catalog changes");
     expect(clean).not.toContain("Approve");
+    expect(unsupported).toContain("Unsupported schema");
+    expect(unsupported).toContain("cannot be reviewed safely");
     expect(findings).toContain("The Bottle may belong in another group.");
     expect(findings).toContain('href="/bottles/44"');
     expect(findings).toContain(

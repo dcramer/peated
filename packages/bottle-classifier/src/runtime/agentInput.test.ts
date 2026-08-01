@@ -63,7 +63,7 @@ function buildBottleContext(): BottleContext {
 }
 
 describe("buildAgentInput", () => {
-  test("serializes candidate family context for reasoning", () => {
+  test("serializes candidate family context without operation capabilities", () => {
     const input = JSON.parse(
       buildAgentInput({
         reference: {
@@ -105,12 +105,10 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
-        availableOperations: ["merge_bottles"],
       }),
     );
 
     expect(input.localSearch).not.toHaveProperty("familyContextSummary");
-    expect(input.availableOperations).toEqual(["merge_bottles"]);
     expect(input.localSearch.candidates[0].familyContext).toEqual({
       siblingBottles: [
         {
@@ -190,6 +188,37 @@ describe("buildAgentInput", () => {
       "Uigeadail",
     );
   });
+
+  test("serializes a deterministic identity anchor without a phase handoff", () => {
+    const input = JSON.parse(
+      buildAgentInput({
+        reference: { name: "SMWS 95.71" },
+        extractedIdentity: null,
+        initialCandidates: [],
+        currentBottle: null,
+        hasExactAliasMatch: false,
+        candidateExpansion: "open",
+        identityAnchor: {
+          action: "match",
+          rationale: "The SMWS code is a closed identity anchor.",
+          candidateBottleIds: [95],
+          identityScope: "exact_cask",
+          aliasScope: "none",
+          observation: null,
+          identityBasis: null,
+          confidenceBasis: null,
+          matchedBottleId: 95,
+          proposedBottle: null,
+        },
+      }),
+    );
+
+    expect(input.identityAnchor).toMatchObject({
+      action: "match",
+      matchedBottleId: 95,
+    });
+    expect(input).not.toHaveProperty("phase");
+  });
 });
 
 describe("buildAuditBottleAgentInput", () => {
@@ -202,13 +231,11 @@ describe("buildAuditBottleAgentInput", () => {
           note: "Review the Brand assignment; this text is context only.",
         },
         currentBottleContext: buildBottleContext(),
-        availableOperations: ["update_bottle", "merge_entities"],
       }),
     );
 
     expect(input).toMatchObject({
       intent: "audit_bottle",
-      availableOperations: ["update_bottle", "merge_entities"],
       audit: {
         bottleId: 45146,
         origin: "moderator",

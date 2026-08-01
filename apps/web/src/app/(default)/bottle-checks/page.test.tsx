@@ -13,7 +13,8 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
     bottleId: 45146,
     subjectKey: "audit_bottle:bottle:45146",
     backgroundEventKey: "bottle_created:45146",
-    schemaVersion: 4,
+    schemaSupported: true,
+    schemaVersion: 1,
     inputSnapshot: {},
     output: {
       summary: "One catalog correction needs review.",

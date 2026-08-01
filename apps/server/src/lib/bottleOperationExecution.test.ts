@@ -9,7 +9,6 @@ import {
   changes,
   entities,
 } from "@peated/server/db/schema";
-import type { BottleCheckOperationCapabilities } from "@peated/server/lib/bottleCheckAvailableOperations";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import {
   BottleOperationExecutionResultSchema,
@@ -28,13 +27,6 @@ vi.mock("@peated/server/worker/client", () => ({
   pushJob: vi.fn(),
   pushUniqueJob: vi.fn(),
 }));
-
-const ALL_OPERATIONS: BottleCheckOperationCapabilities = {
-  update_bottle: true,
-  merge_bottles: true,
-  update_entity: true,
-  merge_entities: true,
-};
 
 function artifacts({
   bottleIds = [],
@@ -108,7 +100,6 @@ async function persistApplyingOperation({
   bottleId: number;
   context: {
     artifacts: ReturnType<typeof artifacts>;
-    capabilities: BottleCheckOperationCapabilities;
   };
   proposal: ProposedOperation;
 }) {
@@ -163,7 +154,6 @@ async function executePersistedOperation({
   approvingModerator: User;
   context: {
     artifacts: ReturnType<typeof artifacts>;
-    capabilities: BottleCheckOperationCapabilities;
   };
   operation: { id: number; proposal: unknown };
 }) {
@@ -233,7 +223,6 @@ describe("Bottle operation execution", () => {
     };
     const context = {
       artifacts: artifacts({ bottleIds: [bottle.id] }),
-      capabilities: ALL_OPERATIONS,
     };
     const operation = await persistApplyingOperation({
       approvingModeratorId: moderator.id,
@@ -303,7 +292,6 @@ describe("Bottle operation execution", () => {
     };
     const context = {
       artifacts: artifacts({ bottleIds: [source.id, destination.id] }),
-      capabilities: ALL_OPERATIONS,
     };
     const operation = await persistApplyingOperation({
       approvingModeratorId: moderator.id,
@@ -372,7 +360,6 @@ describe("Bottle operation execution", () => {
     };
     const context = {
       artifacts: artifacts({ inspectedEntities: [entity] }),
-      capabilities: ALL_OPERATIONS,
     };
     const operation = await persistApplyingOperation({
       approvingModeratorId: moderator.id,
@@ -452,7 +439,6 @@ describe("Bottle operation execution", () => {
     };
     const context = {
       artifacts: artifacts({ inspectedEntities: [source, destination] }),
-      capabilities: ALL_OPERATIONS,
     };
     const operation = await persistApplyingOperation({
       approvingModeratorId: moderator.id,

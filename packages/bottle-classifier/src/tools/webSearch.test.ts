@@ -1,11 +1,13 @@
 import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import {
+  createFirecrawlWebSearchTool,
   extractFirecrawlSearchEvidence,
   runFirecrawlWebSearch,
 } from "./firecrawlWebSearch";
 import {
   buildOpenAIWebSearchRequest,
+  createOpenAIWebSearchTool,
   extractOpenAISearchEvidence,
   runBottleWebEvidenceSearch,
 } from "./openaiWebSearch";
@@ -13,6 +15,7 @@ import {
   buildBottleSearchEvidence,
   createBottleWebSearchBudget,
   isThinBottleSearchEvidence,
+  type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
 
 describe("bottleClassifier web search tools", () => {
@@ -407,6 +410,218 @@ describe("bottleClassifier web search tools", () => {
       if ("error" in evidence) return;
       expect(evidence.results).toHaveLength(1);
       expect(evidence.summary).toContain("Whisky Advocate reviews");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test("can replay either web search tool through one execution boundary", async () => {
+    const evidence = buildBottleSearchEvidence({
+      provider: "openai",
+      query: "laphroaig cairdeas 2022 warehouse 1",
+      summary: "Laphroaig confirms the 2022 Warehouse 1 release.",
+      results: [
+        {
+          title: "Càirdeas 2022 Warehouse 1 Whisky",
+          url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+          domain: "laphroaig.com",
+          description: null,
+          extraSnippets: [],
+        },
+      ],
+    });
+    const events: string[] = [];
+    const executeWebSearch: BottleWebSearchExecutor = vi.fn(
+      async ({ toolName }) => {
+        events.push(`execute:${toolName}`);
+        return evidence;
+      },
+    );
+    const onOpenAIEvidence = vi.fn(() => events.push("hydrate:openai"));
+    const onFirecrawlEvidence = vi.fn(() => events.push("hydrate:firecrawl"));
+    const budget = createBottleWebSearchBudget(2);
+    const openAITool = createOpenAIWebSearchTool({
+      client: {} as OpenAI,
+      model: "gpt-5.4",
+      budget,
+      executeWebSearch,
+      onEvidence: onOpenAIEvidence,
+    });
+    const firecrawlTool = createFirecrawlWebSearchTool({
+      apiKey: "firecrawl-test-key",
+      budget,
+      executeWebSearch,
+      onEvidence: onFirecrawlEvidence,
+    });
+    const args = JSON.stringify({
+      query: "laphroaig cairdeas 2022 warehouse 1",
+    });
+
+    await openAITool.invoke({} as never, args);
+    await firecrawlTool.invoke({} as never, args);
+
+    expect(executeWebSearch).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        toolName: "openai_web_search",
+        args: { query: "laphroaig cairdeas 2022 warehouse 1" },
+        execute: expect.any(Function),
+      }),
+    );
+    expect(executeWebSearch).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        toolName: "firecrawl_web_search",
+        args: { query: "laphroaig cairdeas 2022 warehouse 1" },
+        execute: expect.any(Function),
+      }),
+    );
+    expect(onOpenAIEvidence).toHaveBeenCalledOnce();
+    expect(onOpenAIEvidence).toHaveBeenCalledWith(evidence);
+    expect(onFirecrawlEvidence).toHaveBeenCalledOnce();
+    expect(onFirecrawlEvidence).toHaveBeenCalledWith(evidence);
+    expect(events).toEqual([
+      "execute:openai_web_search",
+      "hydrate:openai",
+      "execute:firecrawl_web_search",
+      "hydrate:firecrawl",
+    ]);
+  });
+
+  test.each(["openai", "firecrawl"] as const)(
+    "charges replayed %s agent-tool calls against the shared budget",
+    async (firstProvider) => {
+      const evidence = buildBottleSearchEvidence({
+        provider: firstProvider,
+        query: "laphroaig cairdeas 2022 warehouse 1",
+        summary: "Laphroaig confirms the Warehouse 1 release.",
+        results: [
+          {
+            title: "Càirdeas 2022 Warehouse 1 Whisky",
+            url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            domain: "laphroaig.com",
+            description: null,
+            extraSnippets: [],
+          },
+        ],
+      });
+      const executeWebSearch: BottleWebSearchExecutor = vi.fn(
+        async () => evidence,
+      );
+      const budget = createBottleWebSearchBudget(1);
+      const tools = {
+        openai: createOpenAIWebSearchTool({
+          client: {} as OpenAI,
+          model: "gpt-5.4",
+          budget,
+          executeWebSearch,
+        }),
+        firecrawl: createFirecrawlWebSearchTool({
+          apiKey: "firecrawl-test-key",
+          budget,
+          executeWebSearch,
+        }),
+      };
+      const args = JSON.stringify({
+        query: "laphroaig cairdeas 2022 warehouse 1",
+      });
+
+      await tools[firstProvider].invoke({} as never, args);
+      const secondProvider =
+        firstProvider === "openai" ? "firecrawl" : "openai";
+      const exhausted = await tools[secondProvider].invoke({} as never, args);
+
+      expect(executeWebSearch).toHaveBeenCalledOnce();
+      expect(executeWebSearch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          toolName: `${firstProvider}_web_search`,
+        }),
+      );
+      expect(exhausted).toEqual({
+        error: "Search budget exhausted after 1 queries",
+      });
+    },
+  );
+
+  test("does not hydrate twice when a custom executor uses live execution", async () => {
+    const client = {
+      responses: {
+        create: vi.fn().mockResolvedValue({
+          output_text: [
+            "[Official product](https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky)",
+            "[Independent listing](https://www.whiskybase.com/whiskies/whisky/209611/laphroaig-cairdeas)",
+          ].join(" "),
+          output: [],
+        }),
+      },
+    } as unknown as OpenAI;
+    const onEvidence = vi.fn();
+    const budget = createBottleWebSearchBudget(1);
+    const tool = createOpenAIWebSearchTool({
+      client,
+      model: "gpt-5.4",
+      budget,
+      executeWebSearch: async ({ execute }) => await execute(),
+      onEvidence,
+    });
+
+    await tool.invoke(
+      {} as never,
+      JSON.stringify({ query: "laphroaig cairdeas warehouse 1" }),
+    );
+
+    expect(onEvidence).toHaveBeenCalledOnce();
+    expect(client.responses.create).toHaveBeenCalledOnce();
+    await expect(
+      tool.invoke(
+        {} as never,
+        JSON.stringify({ query: "laphroaig cairdeas warehouse 1 again" }),
+      ),
+    ).resolves.toEqual({
+      error: "Search budget exhausted after 1 queries",
+    });
+  });
+
+  test("does not double-charge Firecrawl when a custom executor delegates live", async () => {
+    const fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: {
+          web: [
+            {
+              title: "Càirdeas 2022 Warehouse 1 Whisky",
+              url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+              description: "Laphroaig confirms the Warehouse 1 release.",
+            },
+          ],
+        },
+      }),
+    });
+    vi.stubGlobal("fetch", fetch);
+
+    try {
+      const budget = createBottleWebSearchBudget(1);
+      const tool = createFirecrawlWebSearchTool({
+        apiKey: "firecrawl-test-key",
+        budget,
+        executeWebSearch: async ({ execute }) => await execute(),
+      });
+
+      await tool.invoke(
+        {} as never,
+        JSON.stringify({ query: "laphroaig cairdeas warehouse 1" }),
+      );
+
+      expect(fetch).toHaveBeenCalledOnce();
+      await expect(
+        tool.invoke(
+          {} as never,
+          JSON.stringify({ query: "laphroaig cairdeas warehouse 1 again" }),
+        ),
+      ).resolves.toEqual({
+        error: "Search budget exhausted after 1 queries",
+      });
     } finally {
       vi.unstubAllGlobals();
     }

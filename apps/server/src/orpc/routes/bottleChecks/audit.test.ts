@@ -109,21 +109,11 @@ test("Bottle audit persists and returns a clean moderator check", async ({
     },
     operations: [],
   });
-  expect(auditBottleWithServerAdapters).toHaveBeenCalledWith(
-    {
-      bottleId: bottle.id,
-      origin: "moderator",
-      note: "Confirm the label.",
-    },
-    {
-      availableOperations: [
-        "update_bottle",
-        "merge_bottles",
-        "update_entity",
-        "merge_entities",
-      ],
-    },
-  );
+  expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
+    bottleId: bottle.id,
+    origin: "moderator",
+    note: "Confirm the label.",
+  });
   expect(
     await db.query.bottleChecks.findFirst({
       where: eq(bottleChecks.id, result.id),

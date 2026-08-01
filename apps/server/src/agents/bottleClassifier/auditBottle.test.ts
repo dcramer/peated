@@ -115,21 +115,11 @@ describe("server-owned Bottle audit workflows", () => {
     });
 
     expect(created.created).toBe(true);
-    expect(auditBottleWithServerAdapters).toHaveBeenCalledWith(
-      {
-        bottleId: bottle.id,
-        origin: "moderator",
-        note: "Check the label identity.",
-      },
-      {
-        availableOperations: [
-          "update_bottle",
-          "merge_bottles",
-          "update_entity",
-          "merge_entities",
-        ],
-      },
-    );
+    expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
+      bottleId: bottle.id,
+      origin: "moderator",
+      note: "Check the label identity.",
+    });
     expect(created.check).toMatchObject({
       intent: "audit_bottle",
       origin: "moderator",

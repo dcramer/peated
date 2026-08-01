@@ -1,15 +1,10 @@
 import {
-  PROPOSED_OPERATION_TYPES,
+  getBottleCheckSourceEvidencePaths,
   type AuditBottleInput,
-  type ProposedOperationType,
 } from "@peated/bottle-classifier";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { bottleChecks } from "@peated/server/db/schema";
-import {
-  getAvailableBottleCheckOperations,
-  type BottleCheckOperationCapabilities,
-} from "@peated/server/lib/bottleCheckAvailableOperations";
 import {
   createBottleCheck,
   type CreateBottleCheckResult,
@@ -34,13 +29,6 @@ const PostUserCreationBottleAuditInputSchema =
     backgroundEventKey: NonEmptyTextSchema.max(255),
   }).strict();
 
-const AUDIT_OPERATION_CAPABILITIES = {
-  update_bottle: true,
-  merge_bottles: true,
-  update_entity: true,
-  merge_entities: true,
-} as const satisfies BottleCheckOperationCapabilities;
-
 export type ModeratorBottleAuditInput = z.input<
   typeof ModeratorBottleAuditInputSchema
 >;
@@ -55,22 +43,6 @@ export class BottleAuditUnavailableError extends Error {
   }
 }
 
-function getAuditOperationCapabilities(
-  operationTypes: ProposedOperationType[],
-): BottleCheckOperationCapabilities {
-  const availableOperations = new Set(operationTypes);
-  return Object.fromEntries(
-    PROPOSED_OPERATION_TYPES.map((operationType) => [
-      operationType,
-      availableOperations.has(operationType),
-    ]),
-  ) as BottleCheckOperationCapabilities;
-}
-
-function auditSourceFields(input: AuditBottleInput) {
-  return input.note === undefined ? [] : ["audit.note"];
-}
-
 async function runAndPersistBottleAudit({
   input,
   backgroundEventKey,
@@ -78,18 +50,16 @@ async function runAndPersistBottleAudit({
   input: AuditBottleInput;
   backgroundEventKey?: string;
 }): Promise<CreateBottleCheckResult> {
-  const availableOperations = getAvailableBottleCheckOperations(
-    AUDIT_OPERATION_CAPABILITIES,
-  );
-  const capabilities = getAuditOperationCapabilities(availableOperations);
-  const { result, modelMetadata } = await auditBottleWithServerAdapters(input, {
-    availableOperations,
-  });
+  const { result, modelMetadata } = await auditBottleWithServerAdapters(input);
   const operations = await prepareProposals({
     proposals: result.proposedOperations,
     artifacts: result.artifacts,
-    capabilities,
-    sourceFields: auditSourceFields(input),
+    sourceFields: getBottleCheckSourceEvidencePaths({
+      intent: "audit_bottle",
+      input,
+      artifacts: result.artifacts,
+    }),
+    protectedBottleIds: [],
   });
 
   return await createBottleCheck({

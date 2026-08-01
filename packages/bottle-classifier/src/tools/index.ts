@@ -9,9 +9,18 @@ export {
   createOpenAIWebSearchTool,
   runBottleWebEvidenceSearch,
 } from "./openaiWebSearch";
+export {
+  createBottleProposalCollector,
+  createBottleProposalTools,
+  type BottleProposalCollector,
+} from "./proposeOperations";
 export { createSearchBottlesTool } from "./searchBottles";
 export {
   createSearchEntitiesTool,
   type EntitySearchResult,
 } from "./searchEntities";
-export { createBottleWebSearchBudget } from "./sharedWebSearch";
+export {
+  createBottleWebSearchBudget,
+  executeBottleWebSearchInvocation,
+  type BottleWebSearchExecutor,
+} from "./sharedWebSearch";

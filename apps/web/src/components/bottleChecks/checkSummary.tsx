@@ -1,15 +1,17 @@
+import type { EvidenceRef } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 
 export type BottleCheck = Outputs["bottleChecks"]["list"]["results"][number];
 
 type Finding = {
-  evidenceRefs?: unknown;
+  evidenceRefs?: EvidenceRef[];
   scope?: unknown;
   summary?: unknown;
 };
 
 export function getBottleCheckFindings(check: BottleCheck): Finding[] {
+  if (!check.schemaSupported) return [];
   const findings = check.output?.findings;
   return Array.isArray(findings)
     ? findings.filter(
@@ -20,6 +22,9 @@ export function getBottleCheckFindings(check: BottleCheck): Finding[] {
 }
 
 export function getBottleCheckSummary(check: BottleCheck): string {
+  if (!check.schemaSupported) {
+    return `This check uses unsupported schema version ${check.schemaVersion}.`;
+  }
   if (typeof check.output?.summary === "string") return check.output.summary;
   if (typeof check.output?.reason === "string") return check.output.reason;
   const decision = check.output?.decision;
@@ -35,6 +40,7 @@ export function getBottleCheckSummary(check: BottleCheck): string {
 }
 
 export function getBottleCheckState(check: BottleCheck): string {
+  if (!check.schemaSupported) return "Unsupported schema";
   const findings = getBottleCheckFindings(check);
   const statuses = new Set(
     check.operations.map((operation) => operation.status),

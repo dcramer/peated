@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { z } from "zod";
+import type { BottleContextSource } from "./bottleContextContract";
 import type { BottleCandidate } from "./classifierTypes";
 import type { ClassifyBottleReferenceInput } from "./contract";
 import type { classifierEvalExpectationSchema } from "./evalFixtureSchemas";
@@ -29,12 +30,29 @@ export type ClassifierEvalCase = {
   input: ClassifyBottleReferenceInput;
   localCatalog?: LocalCatalog;
   searchResponses?: SearchResponseFixture[];
-  availableOperations: z.infer<
-    typeof classifierEvalFixtureSchema
-  >["availableOperations"];
+  requireExpectedOperationEvidence: boolean;
   context: ClassifierEvalContext;
   expected: ClassifierEvalExpectation;
 };
+
+export async function loadClassifierEvalBottleContext({
+  context,
+  bottleId,
+  fallback,
+}: {
+  context: ClassifierEvalContext;
+  bottleId: number;
+  fallback: () => Promise<BottleContextSource | null>;
+}): Promise<BottleContextSource | null> {
+  if (!context.inspectedBottleIds.includes(bottleId)) {
+    return null;
+  }
+
+  const explicitContext = context.bottleContexts?.find(
+    (candidate) => candidate.bottleId === bottleId,
+  );
+  return explicitContext ?? (await fallback());
+}
 
 const fixtureDir = fileURLToPath(
   new URL("./eval-fixtures/decision-cases/", import.meta.url),
@@ -51,7 +69,8 @@ function loadFixtureFiles(): ClassifierEvalCase[] {
       input: fixture.input,
       localCatalog: fixture.localCatalog,
       searchResponses: fixture.searchResponses,
-      availableOperations: fixture.availableOperations,
+      requireExpectedOperationEvidence:
+        fixture.requireExpectedOperationEvidence,
       context: fixture.context,
       expected: fixture.expected,
     };

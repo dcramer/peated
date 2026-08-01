@@ -1,10 +1,20 @@
 import {
+  AuditBottleOriginSchema,
+  BottleCheckIntentSchema,
   EvidenceRefSchema,
   ProposedOperationSchema,
 } from "@peated/bottle-classifier";
-import type { BottleCheckWithOperations } from "@peated/server/lib/bottleChecks";
+import {
+  BottleCheckCloseReasonSchema,
+  type BottleCheckWithOperations,
+} from "@peated/server/lib/bottleChecks";
+import {
+  BOTTLE_CHECK_SCHEMA_VERSION,
+  isSupportedBottleCheckSchemaVersion,
+} from "@peated/server/lib/bottleCheckSchemaVersion";
 import {
   BottleOperationActionResultSchema,
+  BottleOperationRejectionReasonSchema,
   BottleOperationStatusSchema,
 } from "@peated/server/lib/bottleOperationModeration";
 import { ReviewOperationSchema } from "@peated/server/lib/bottleOperationReviewSchemas";
@@ -24,15 +34,7 @@ export const BottleOperationResponseSchema = z
     status: BottleOperationStatusSchema,
     reviewedById: z.number().nullable(),
     reviewedAt: DateTimeSchema.nullable(),
-    rejectionReason: z
-      .enum([
-        "wrong_target",
-        "wrong_change",
-        "insufficient_evidence",
-        "resolved_manually",
-        "other",
-      ])
-      .nullable(),
+    rejectionReason: BottleOperationRejectionReasonSchema.nullable(),
     reviewerNote: z.string().nullable(),
     result: JsonObjectSchema.nullable(),
     error: z.string().nullable(),
@@ -44,34 +46,60 @@ export const BottleOperationResponseSchema = z
   })
   .strict();
 
-export const BottleCheckResponseSchema = z
+const BottleCheckResponseFields = {
+  id: z.number(),
+  intent: BottleCheckIntentSchema,
+  origin: AuditBottleOriginSchema.nullable(),
+  sourceKind: z.string().nullable(),
+  sourceId: z.string().nullable(),
+  bottleId: z.number().nullable(),
+  subjectKey: z.string(),
+  backgroundEventKey: z.string().nullable(),
+  model: z.string().nullable(),
+  error: z.string().nullable(),
+  storePriceMatchProposalId: z.number().nullable(),
+  storePriceMatchAttemptId: z.number().nullable(),
+  closedById: z.number().nullable(),
+  closeReason: BottleCheckCloseReasonSchema.nullable(),
+  closeNote: z.string().nullable(),
+  createdAt: DateTimeSchema,
+  completedAt: DateTimeSchema.nullable(),
+  closedAt: DateTimeSchema.nullable(),
+} as const;
+
+const SupportedBottleCheckResponseSchema = z
   .object({
-    id: z.number(),
-    intent: z.enum(["resolve_reference", "audit_bottle"]),
-    origin: z.enum(["moderator", "post_user_creation"]).nullable(),
-    sourceKind: z.string().nullable(),
-    sourceId: z.string().nullable(),
-    bottleId: z.number().nullable(),
-    subjectKey: z.string(),
-    backgroundEventKey: z.string().nullable(),
-    schemaVersion: z.number(),
+    ...BottleCheckResponseFields,
+    schemaSupported: z.literal(true),
+    schemaVersion: z.literal(BOTTLE_CHECK_SCHEMA_VERSION),
     inputSnapshot: JsonObjectSchema,
     output: JsonObjectSchema.nullable(),
     artifacts: JsonObjectSchema.nullable(),
-    model: z.string().nullable(),
     modelMetadata: JsonObjectSchema.nullable(),
-    error: z.string().nullable(),
-    storePriceMatchProposalId: z.number().nullable(),
-    storePriceMatchAttemptId: z.number().nullable(),
-    closedById: z.number().nullable(),
-    closeReason: z.enum(["dismissed", "resolved_manually"]).nullable(),
-    closeNote: z.string().nullable(),
-    createdAt: DateTimeSchema,
-    completedAt: DateTimeSchema.nullable(),
-    closedAt: DateTimeSchema.nullable(),
     operations: z.array(BottleOperationResponseSchema),
   })
   .strict();
+
+const UnsupportedBottleCheckResponseSchema = z
+  .object({
+    ...BottleCheckResponseFields,
+    schemaSupported: z.literal(false),
+    schemaVersion: z
+      .number()
+      .int()
+      .refine((value) => {
+        return value !== BOTTLE_CHECK_SCHEMA_VERSION;
+      }),
+    canClose: z.boolean(),
+    operationCount: z.number().int().nonnegative(),
+    operations: z.tuple([]),
+  })
+  .strict();
+
+export const BottleCheckResponseSchema = z.discriminatedUnion(
+  "schemaSupported",
+  [SupportedBottleCheckResponseSchema, UnsupportedBottleCheckResponseSchema],
+);
 
 export const BottleOperationActionResponseSchema = z
   .object({
@@ -87,6 +115,7 @@ export const BottleCheckDetailsResponseSchema = z
         .object({
           operationId: z.number().int().positive(),
           review: ReviewOperationSchema.nullable(),
+          approvalReady: z.boolean(),
         })
         .strict(),
     ),
@@ -98,11 +127,48 @@ function serializeDate(value: Date | null): string | null {
 }
 
 export function serializeBottleCheck(check: BottleCheckWithOperations) {
-  return BottleCheckResponseSchema.parse({
-    ...check,
+  const common = {
+    id: check.id,
+    intent: check.intent,
+    origin: check.origin,
+    sourceKind: check.sourceKind,
+    sourceId: check.sourceId,
+    bottleId: check.bottleId,
+    subjectKey: check.subjectKey,
+    backgroundEventKey: check.backgroundEventKey,
+    model: check.model,
+    error: check.error,
+    storePriceMatchProposalId: check.storePriceMatchProposalId,
+    storePriceMatchAttemptId: check.storePriceMatchAttemptId,
+    closedById: check.closedById,
+    closeReason: check.closeReason,
+    closeNote: check.closeNote,
     createdAt: check.createdAt.toISOString(),
     completedAt: serializeDate(check.completedAt),
     closedAt: serializeDate(check.closedAt),
+  };
+
+  if (!isSupportedBottleCheckSchemaVersion(check)) {
+    return UnsupportedBottleCheckResponseSchema.parse({
+      ...common,
+      schemaSupported: false,
+      schemaVersion: check.schemaVersion,
+      canClose:
+        check.closedAt === null &&
+        !check.operations.some(({ status }) => status === "applying"),
+      operationCount: check.operations.length,
+      operations: [],
+    });
+  }
+
+  return SupportedBottleCheckResponseSchema.parse({
+    ...common,
+    schemaSupported: true,
+    schemaVersion: check.schemaVersion,
+    inputSnapshot: check.inputSnapshot,
+    output: check.output,
+    artifacts: check.artifacts,
+    modelMetadata: check.modelMetadata,
     operations: check.operations.map((operation) => ({
       ...operation,
       reviewedAt: serializeDate(operation.reviewedAt),

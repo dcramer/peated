@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   FindingSchema,
   ProposedOperationsSchema,
+  type AuditBottleInput,
   type Finding,
   type ProposedOperation,
 } from "./bottleCheckContract";
@@ -23,6 +24,7 @@ export {
   AuditBottleOriginSchema,
   BottleCheckIntentSchema,
   BottleExactPatchSchema,
+  BottleOperationEntityChoiceSchema,
   BottleSharedPatchSchema,
   BottleUpdatePatchSchema,
   createProposedOperationsSchema,
@@ -33,11 +35,11 @@ export {
   MergeBottlesOperationSchema,
   MergeEntitiesOperationSchema,
   PROPOSED_OPERATION_TYPES,
-  ProposedEntityChoiceSchema,
   ProposedEntityDraftSchema,
   ProposedOperationSchema,
   ProposedOperationsSchema,
   ProposedOperationTypeSchema,
+  SourceEvidencePathSchema,
   UpdateBottleOperationSchema,
   UpdateEntityOperationSchema,
 } from "./bottleCheckContract";
@@ -46,6 +48,7 @@ export type {
   AuditBottleOrigin,
   BottleCheckIntent,
   BottleExactPatch,
+  BottleOperationEntityChoice,
   BottleSharedPatch,
   BottleUpdatePatch,
   EntityIdentityPatch,
@@ -53,7 +56,6 @@ export type {
   Finding,
   MergeBottlesOperation,
   MergeEntitiesOperation,
-  ProposedEntityChoice,
   ProposedEntityDraft,
   ProposedOperation,
   ProposedOperationType,
@@ -212,12 +214,64 @@ export const ClassifyBottleReferenceInputSchema = z
   })
   .strict();
 
+const BOTTLE_REFERENCE_EVIDENCE_FIELDS = [
+  "id",
+  "externalSiteId",
+  "name",
+  "url",
+  "imageUrl",
+  "currentBottleId",
+] as const satisfies readonly (keyof BottleReference)[];
+
+type BottleCheckEvidenceSource =
+  | {
+      intent: "audit_bottle";
+      input: AuditBottleInput;
+      artifacts: BottleClassificationArtifacts;
+    }
+  | {
+      intent: "resolve_reference";
+      input: {
+        reference: Partial<Record<keyof BottleReference, unknown>>;
+      };
+      artifacts: BottleClassificationArtifacts;
+    };
+
+export function getBottleCheckSourceEvidencePaths(
+  source: BottleCheckEvidenceSource,
+): string[] {
+  if (source.intent === "audit_bottle") {
+    return source.input.note === undefined ? [] : ["audit.note"];
+  }
+
+  const paths = new Set<string>();
+  for (const field of BOTTLE_REFERENCE_EVIDENCE_FIELDS) {
+    const value = source.input.reference[field];
+    if (value !== null && value !== undefined) {
+      paths.add(`reference.${field}`);
+    }
+  }
+  for (const [field, value] of Object.entries(
+    source.artifacts.extractedIdentity ?? {},
+  )) {
+    if (value !== null && value !== undefined) {
+      paths.add(`extractedIdentity.${field}`);
+    }
+  }
+  for (const field of Object.keys(
+    source.artifacts.imageEvidence?.fieldCandidates ?? {},
+  )) {
+    paths.add(`imageEvidence.fieldCandidates.${field}`);
+  }
+  return [...paths];
+}
+
 export const IgnoredBottleClassificationResultSchema = z
   .object({
     status: z.literal("ignored"),
     reason: z.string().min(1),
     proposedOperations: z.tuple([]).default([]),
-    findings: z.array(FindingSchema).default([]),
+    findings: z.tuple([]).default([]),
     artifacts: BottleClassificationArtifactsSchema,
   })
   .strict();
@@ -289,17 +343,14 @@ export function buildBottleClassificationArtifacts(
 
 export function createIgnoredBottleClassification({
   reason,
-  findings = [],
   artifacts,
 }: {
   reason: string;
-  findings?: Finding[];
   artifacts: Partial<BottleClassificationArtifacts>;
 }): IgnoredBottleClassificationResult {
   return IgnoredBottleClassificationResultSchema.parse({
     status: "ignored",
     reason,
-    findings,
     artifacts: buildBottleClassificationArtifacts(artifacts),
   });
 }

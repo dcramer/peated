@@ -1,8 +1,13 @@
+import { Runner } from "@openai/agents";
 import type OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
+import { buildAuditEvalBottleContext } from "./auditBottle.eval.fixtures";
 import {
   createBottleClassifier,
   prepareBottleClassifierAgentRun,
+  type BottleClassifierDataSource,
+  type BottleClassifierToolEvent,
+  type CreateBottleClassifierOptions,
   type RunBottleClassifierAgentInput,
 } from "./classifierRuntime";
 import type {
@@ -15,13 +20,57 @@ import type {
 import {
   buildBottleClassificationArtifacts,
   type BottleClassificationArtifacts,
+  type Finding,
+  type ProposedOperation,
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
 
 type ReasoningResult = {
   decision: BottleClassifierAgentDecisionInput;
+  proposedOperations?: ProposedOperation[];
+  findings?: Finding[];
   artifacts: Parameters<typeof buildBottleClassificationArtifacts>[0];
 };
+
+function nativeAgentResult({
+  finalOutput,
+  inputTokens,
+  outputTokens,
+  toolNames = [],
+}: {
+  finalOutput: unknown;
+  inputTokens: number;
+  outputTokens: number;
+  toolNames?: string[];
+}) {
+  return {
+    finalOutput,
+    state: {
+      usage: {
+        requests: 1,
+        inputTokens,
+        outputTokens,
+        totalTokens: inputTokens + outputTokens,
+      },
+    },
+    newItems: toolNames.map((name) => ({
+      type: "tool_call_output_item",
+      rawItem: { name },
+    })),
+  };
+}
+
+function noMatchAgentDecision() {
+  return {
+    action: "no_match" as const,
+    rationale: "No safe Bottle resolution.",
+    candidateBottleIds: [],
+    identityScope: "product" as const,
+    observation: null,
+    matchedBottleId: null,
+    proposedBottle: null,
+  };
+}
 
 function createReliableSearchEvidence({
   query,
@@ -68,10 +117,14 @@ function createTestClassifier({
   extractFromText,
   extractFromImageError,
   maxSearchQueries = 2,
+  firecrawlApiKey,
   searchBottles = vi.fn(async () => [] as BottleCandidate[]),
   searchEntities,
   getBottleCandidateById,
+  getBottleContext,
   runBottleClassifierAgent,
+  executeWebSearch,
+  observeToolEvent,
 }: {
   client?: OpenAI;
   extractedIdentity?: BottleExtractedDetails | null;
@@ -80,6 +133,7 @@ function createTestClassifier({
   extractFromText?: (label: string) => Promise<BottleExtractedDetails | null>;
   extractFromImageError?: Error | null;
   maxSearchQueries?: number;
+  firecrawlApiKey?: string;
   searchBottles?: ReturnType<
     typeof vi.fn<(args: unknown) => Promise<BottleCandidate[]>>
   >;
@@ -87,19 +141,26 @@ function createTestClassifier({
   getBottleCandidateById?: (
     bottleId: number,
   ) => Promise<BottleCandidate | null>;
+  getBottleContext?: BottleClassifierDataSource["getBottleContext"];
   runBottleClassifierAgent?: (
     args: RunBottleClassifierAgentInput,
   ) => Promise<ReasoningResult>;
+  executeWebSearch?: CreateBottleClassifierOptions["executeWebSearch"];
+  observeToolEvent?: CreateBottleClassifierOptions["observeToolEvent"];
 }) {
   return {
     classifier: createBottleClassifier({
       client,
       model: "test-model",
       maxSearchQueries,
+      firecrawlApiKey,
+      executeWebSearch,
+      observeToolEvent,
       adapters: {
         searchBottles,
         searchEntities,
         getBottleCandidateById,
+        getBottleContext,
       },
       overrides: {
         extractFromImage: async () => {
@@ -124,6 +185,16 @@ function createTestClassifier({
     }),
     searchBottles,
   };
+}
+
+function buildTestBottleContext(candidate: BottleCandidate) {
+  const { imageSources: _imageSources, ...context } =
+    buildAuditEvalBottleContext(candidate, [], []);
+  return { ...context, publicImages: [] };
+}
+
+function buildTestBottleContextSource(candidate: BottleCandidate) {
+  return buildAuditEvalBottleContext(candidate, [], []);
 }
 
 const wildTurkeyRareBreedRyeIdentity: BottleExtractedDetails = {
@@ -978,7 +1049,7 @@ describe("createBottleClassifier", () => {
       ],
     };
 
-    const reasoning = preparedRun.getReasoningResult({
+    const reasoning = preparedRun.getAgentResult({
       finalOutput: {
         action: "no_match",
         rationale: "No local candidate was provided.",
@@ -1026,7 +1097,6 @@ describe("createBottleClassifier", () => {
       },
     });
     expect(searchBottles).not.toHaveBeenCalled();
-    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
   test("auto ignores packaging-only gift set references when extraction fails", async () => {
@@ -1983,159 +2053,219 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("preloads web evidence for whisky-like references without exact local candidates", async () => {
-    const extractedIdentity: BottleExtractedDetails = {
-      brand: "Creag Isle",
-      bottler: null,
-      expression: null,
-      series: null,
-      distillery: [],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      edition: null,
-    };
-    const create = vi.fn().mockResolvedValue({
-      output_text:
-        "Distiller lists Creag Isle 12-year-old Island Single Malt Scotch Whisky as a real 12 year single malt.",
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            sources: [
-              {
-                type: "url",
-                url: "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
-              },
-            ],
+  test.each([
+    {
+      provider: "OpenAI",
+      toolName: "openai_web_search" as const,
+      firecrawlApiKey: undefined,
+    },
+    {
+      provider: "Firecrawl",
+      toolName: "firecrawl_web_search" as const,
+      firecrawlApiKey: "firecrawl-test-key",
+    },
+  ])(
+    "replays and observes $provider preloaded web evidence within the shared budget",
+    async ({ toolName, firecrawlApiKey }) => {
+      const extractedIdentity: BottleExtractedDetails = {
+        brand: "Creag Isle",
+        bottler: null,
+        expression: null,
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: 12,
+        abv: null,
+        release_year: null,
+        vintage_year: null,
+        cask_strength: null,
+        single_cask: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        edition: null,
+      };
+      const create = vi.fn().mockResolvedValue({
+        output_text:
+          "Distiller lists Creag Isle 12-year-old Island Single Malt Scotch Whisky as a real 12 year single malt.",
+        output: [
+          {
+            type: "web_search_call",
+            action: {
+              type: "search",
+              sources: [
+                {
+                  type: "url",
+                  url: "https://distiller.com/spirits/creag-isle-12-year-island-single-malt",
+                },
+              ],
+            },
           },
-        },
-      ],
-    });
-    const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
-    const runBottleClassifierAgent = vi.fn(
-      async ({ searchEvidence }): Promise<ReasoningResult> => {
-        if (searchEvidence?.length) {
+        ],
+      });
+      const replayedEvidence = {
+        ...createReliableSearchEvidence({
+          query: "Creag Isle 12 year old single malt",
+          summary:
+            "Distiller lists Creag Isle 12-year-old Island Single Malt Scotch Whisky as a real 12 year single malt.",
+        }),
+        provider: firecrawlApiKey
+          ? ("firecrawl" as const)
+          : ("openai" as const),
+      };
+      const executeWebSearch: NonNullable<
+        CreateBottleClassifierOptions["executeWebSearch"]
+      > = vi.fn(async ({ args }) => ({
+        ...replayedEvidence,
+        query: args.query,
+      }));
+      const toolEvents: BottleClassifierToolEvent[] = [];
+      const searchBottles = vi.fn(async () => [] as BottleCandidate[]);
+      const runBottleClassifierAgent = vi.fn(
+        async ({
+          searchEvidence,
+          webSearchBudget,
+        }): Promise<ReasoningResult> => {
+          expect(webSearchBudget?.tryConsume()).toBe(false);
+          if (searchEvidence?.length) {
+            return {
+              decision: {
+                action: "create_bottle",
+                rationale:
+                  "Web evidence confirms Creag Isle 12-year-old Island Single Malt as a standalone bottle.",
+                candidateBottleIds: [],
+                identityScope: "product",
+                observation: null,
+                confidenceBasis: {
+                  ...supportiveWebEvidenceConfidenceBasis,
+                  toolsUsed: [toolName],
+                },
+                matchedBottleId: null,
+                proposedBottle: {
+                  name: "12-year-old Island Single Malt",
+                  series: null,
+                  category: "single_malt",
+                  edition: null,
+                  statedAge: 12,
+                  caskStrength: null,
+                  singleCask: null,
+                  caskType: null,
+                  caskSize: null,
+                  caskFill: null,
+                  abv: null,
+                  vintageYear: null,
+                  releaseYear: null,
+                  brand: {
+                    id: null,
+                    name: "Creag Isle",
+                  },
+                  distillers: [],
+                  bottler: null,
+                },
+              },
+              artifacts: {
+                extractedIdentity,
+                searchEvidence,
+                candidates: [],
+                resolvedEntities: [],
+              },
+            };
+          }
+
           return {
             decision: {
-              action: "create_bottle",
+              action: "no_match",
               rationale:
-                "Web evidence confirms Creag Isle 12-year-old Island Single Malt as a standalone bottle.",
+                "No safe local match, and creation was not allowed without web confirmation.",
               candidateBottleIds: [],
               identityScope: "product",
               observation: null,
-              confidenceBasis: supportiveWebEvidenceConfidenceBasis,
               matchedBottleId: null,
-              proposedBottle: {
-                name: "12-year-old Island Single Malt",
-                series: null,
-                category: "single_malt",
-                edition: null,
-                statedAge: 12,
-                caskStrength: null,
-                singleCask: null,
-                caskType: null,
-                caskSize: null,
-                caskFill: null,
-                abv: null,
-                vintageYear: null,
-                releaseYear: null,
-                brand: {
-                  id: null,
-                  name: "Creag Isle",
-                },
-                distillers: [],
-                bottler: null,
-              },
+              proposedBottle: null,
             },
             artifacts: {
               extractedIdentity,
-              searchEvidence,
+              searchEvidence: [],
               candidates: [],
               resolvedEntities: [],
             },
           };
-        }
-
-        return {
-          decision: {
-            action: "no_match",
-            rationale:
-              "No safe local match, and creation was not allowed without web confirmation.",
-            candidateBottleIds: [],
-            identityScope: "product",
-            observation: null,
-            matchedBottleId: null,
-            proposedBottle: null,
-          },
-          artifacts: {
-            extractedIdentity,
-            searchEvidence: [],
-            candidates: [],
-            resolvedEntities: [],
-          },
-        };
-      },
-    );
-    const { classifier } = createTestClassifier({
-      client: {
-        responses: {
-          create,
         },
-      } as unknown as OpenAI,
-      extractedIdentity,
-      maxSearchQueries: 1,
-      searchBottles,
-      runBottleClassifierAgent,
-    });
+      );
+      const { classifier } = createTestClassifier({
+        client: {
+          responses: {
+            create,
+          },
+        } as unknown as OpenAI,
+        extractedIdentity,
+        maxSearchQueries: 1,
+        firecrawlApiKey,
+        searchBottles,
+        runBottleClassifierAgent,
+        executeWebSearch,
+        observeToolEvent: (event) => toolEvents.push(event),
+      });
 
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "Creag Isle 12-year-old Island Single Malt Scotch Whisky",
-        url: "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
-      },
-    });
-
-    expect(create).toHaveBeenCalledTimes(1);
-    expect(searchBottles).toHaveBeenCalledTimes(2);
-    expect(searchBottles).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        query: "Creag Isle 12 year old single malt",
-      }),
-    );
-    expect(runBottleClassifierAgent).toHaveBeenCalledTimes(1);
-    expect(runBottleClassifierAgent).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        investigationHint: expect.stringContaining(
-          "before the first reasoning pass",
-        ),
-        searchEvidence: expect.arrayContaining([
-          expect.objectContaining({
-            query: "Creag Isle 12 year old single malt",
-          }),
-        ]),
-      }),
-    );
-    expect(result.status).toBe("classified");
-    if (result.status !== "classified") return;
-    expect(result.decision).toMatchObject({
-      action: "create_bottle",
-      proposedBottle: {
-        brand: {
-          name: "Creag Isle",
+      const result = await classifier.classifyBottleReference({
+        reference: {
+          name: "Creag Isle 12-year-old Island Single Malt Scotch Whisky",
+          url: "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
         },
-        name: "12-year-old Island Single Malt",
-      },
-    });
-  });
+      });
+
+      expect(create).not.toHaveBeenCalled();
+      expect(executeWebSearch).toHaveBeenCalledOnce();
+      expect(executeWebSearch).toHaveBeenCalledWith({
+        toolName,
+        args: { query: "Creag Isle 12 year old single malt" },
+        execute: expect.any(Function),
+      });
+      expect(toolEvents).toHaveLength(2);
+      expect(toolEvents[0]).toMatchObject({
+        type: "tool_call",
+        phase: "preload",
+        name: toolName,
+        arguments: { query: "Creag Isle 12 year old single malt" },
+      });
+      expect(toolEvents[1]).toMatchObject({
+        type: "tool_result",
+        phase: "preload",
+        name: toolName,
+        toolCallId:
+          toolEvents[0]?.type === "tool_call" ? toolEvents[0].id : undefined,
+        result: replayedEvidence,
+      });
+      expect(searchBottles).toHaveBeenCalledTimes(2);
+      expect(searchBottles).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          query: "Creag Isle 12 year old single malt",
+        }),
+      );
+      expect(runBottleClassifierAgent).toHaveBeenCalledTimes(1);
+      expect(runBottleClassifierAgent).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          investigationHint: expect.stringContaining("before reasoning"),
+          searchEvidence: expect.arrayContaining([
+            expect.objectContaining({
+              query: "Creag Isle 12 year old single malt",
+            }),
+          ]),
+        }),
+      );
+      expect(result.status).toBe("classified");
+      if (result.status !== "classified") return;
+      expect(result.decision).toMatchObject({
+        action: "create_bottle",
+        proposedBottle: {
+          brand: {
+            name: "Creag Isle",
+          },
+          name: "12-year-old Island Single Malt",
+        },
+      });
+    },
+  );
 
   test("uses canonical cask traits to investigate and query an otherwise sparse reference", async () => {
     const extractedIdentity: BottleExtractedDetails = {
@@ -2309,9 +2439,7 @@ describe("createBottleClassifier", () => {
     expect(runBottleClassifierAgent).toHaveBeenCalledTimes(1);
     expect(runBottleClassifierAgent).toHaveBeenCalledWith(
       expect.objectContaining({
-        investigationHint: expect.stringContaining(
-          "before the first reasoning pass",
-        ),
+        investigationHint: expect.stringContaining("before reasoning"),
         searchEvidence: expect.arrayContaining([
           expect.objectContaining({
             query: "Creag Isle 12 year old single malt",
@@ -2326,183 +2454,62 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("preserves image evidence when retrying no_match with web investigation", async () => {
-    const extractedIdentity: BottleExtractedDetails = {
-      brand: "Ardbeg",
-      bottler: null,
-      expression: "Eureka!",
-      series: null,
-      distillery: ["Ardbeg"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      cask_type: null,
-      cask_size: null,
-      cask_fill: null,
-      edition: null,
-    };
-    const imageEvidence = {
-      sourceImageId: "pending-upload-eureka",
-      extractors: [
-        {
-          kind: "vision" as const,
-          confidence: 0.82,
-          textSpans: [{ text: "Ardbeg Eureka!", confidence: 0.88 }],
-          observations: ["front label identifies Ardbeg Eureka"],
-        },
-      ],
-      fieldCandidates: {
-        brand: { value: "Ardbeg", confidence: 0.9 },
-        expression: { value: "Eureka!", confidence: 0.86 },
-      },
-      photoSuitability: {
-        isSingleBottlePhoto: true,
-        labelReadable: true,
-        suitableAsTastingImage: true,
-        suitableAsBottleImage: true,
-      },
-      conflicts: [],
-    };
-    const create = vi.fn().mockResolvedValue({
-      output_text:
-        "Ardbeg Eureka! is an official Ardbeg single malt whisky release.",
-      output: [
-        {
-          type: "web_search_call",
-          action: {
-            type: "search",
-            sources: [
-              {
-                type: "url",
-                url: "https://www.ardbegjp.com/products/ardbeg-eureka",
-              },
-            ],
-          },
-        },
-      ],
-    });
-    const exactButWrongCandidate = buildBottleCandidate({
-      bottleId: 999,
-      fullName: "Ardbeg Ten",
-      brand: "Ardbeg",
-      category: "single_malt",
-      source: ["exact"],
-    });
-    const runBottleClassifierAgent = vi.fn(
-      async ({ imageEvidence, searchEvidence }): Promise<ReasoningResult> => {
-        if (searchEvidence?.length) {
-          return {
-            decision: {
-              action: "create_bottle",
-              rationale: "Web evidence confirms Ardbeg Eureka.",
-              candidateBottleIds: [],
-              identityScope: "product",
-              observation: null,
-              confidenceBasis: supportiveWebEvidenceConfidenceBasis,
-              matchedBottleId: null,
-              proposedBottle: {
-                name: "Eureka!",
-                series: null,
-                category: "single_malt",
-                edition: null,
-                statedAge: null,
-                caskStrength: null,
-                singleCask: null,
-                caskType: null,
-                caskSize: null,
-                caskFill: null,
-                abv: null,
-                vintageYear: null,
-                releaseYear: null,
-                brand: {
-                  id: null,
-                  name: "Ardbeg",
-                },
-                distillers: [],
-                bottler: null,
-              },
-            },
-            artifacts: {
-              extractedIdentity,
-              imageEvidence,
-              searchEvidence,
-              candidates: [],
-              resolvedEntities: [],
-            },
-          };
-        }
-
-        return {
-          decision: {
-            action: "no_match",
-            rationale: "No safe local match.",
-            candidateBottleIds: [],
-            identityScope: "product",
-            observation: null,
-            matchedBottleId: null,
-            proposedBottle: null,
-          },
-          artifacts: {
-            extractedIdentity,
-            imageEvidence,
-            searchEvidence: [],
-            candidates: [exactButWrongCandidate],
-            resolvedEntities: [],
-          },
-        };
-      },
+  test("reports metadata for one native reference reasoning call", async () => {
+    const runAgent = vi.spyOn(Runner.prototype, "run").mockResolvedValueOnce(
+      nativeAgentResult({
+        finalOutput: noMatchAgentDecision(),
+        inputTokens: 20,
+        outputTokens: 5,
+        toolNames: ["search_bottles"],
+      }) as never,
     );
+    const { classifier } = createTestClassifier({ maxSearchQueries: 0 });
+
+    try {
+      const run = await classifier.runBottleReference({
+        reference: { name: "Example Single Malt Whisky" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      });
+
+      expect(run.result).toMatchObject({
+        status: "classified",
+        decision: { action: "no_match" },
+      });
+      expect(run.modelMetadata).toMatchObject({
+        agentDurationMs: expect.any(Number),
+        usage: {
+          requests: 1,
+          inputTokens: 20,
+          outputTokens: 5,
+          totalTokens: 25,
+        },
+        toolCalls: { count: 1, names: ["search_bottles"] },
+      });
+    } finally {
+      runAgent.mockRestore();
+    }
+  });
+
+  test("returns null metadata for an override-only reference run", async () => {
     const { classifier } = createTestClassifier({
-      client: {
-        responses: {
-          create,
-        },
-      } as unknown as OpenAI,
-      extractedIdentity,
-      maxSearchQueries: 1,
-      searchBottles: vi.fn(async () => [] as BottleCandidate[]),
-      runBottleClassifierAgent,
+      runBottleClassifierAgent: async () => ({
+        decision: noMatchAgentDecision(),
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
     });
 
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "Ardbeg Eureka!",
-        url: "https://www.ardbegjp.com/products/ardbeg-eureka",
-      },
-      imageEvidence,
-      initialCandidates: [exactButWrongCandidate],
+    const run = await classifier.runBottleReference({
+      reference: { name: "Example Single Malt Whisky" },
+      extractedIdentity: null,
+      initialCandidates: [],
     });
 
-    expect(runBottleClassifierAgent).toHaveBeenCalledTimes(2);
-    expect(runBottleClassifierAgent).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        imageEvidence,
-      }),
-    );
-    expect(runBottleClassifierAgent).toHaveBeenNthCalledWith(
-      2,
-      expect.objectContaining({
-        imageEvidence,
-        investigationHint: expect.stringContaining(
-          "first pass found no safe local match",
-        ),
-        searchEvidence: expect.arrayContaining([
-          expect.objectContaining({
-            query: expect.stringContaining("Ardbeg Eureka"),
-          }),
-        ]),
-      }),
-    );
-    expect(result.status).toBe("classified");
-    if (result.status !== "classified") return;
-    expect(result.decision).toMatchObject({
-      action: "create_bottle",
+    expect(run.result).toMatchObject({
+      status: "classified",
+      decision: { action: "no_match" },
     });
+    expect(run.modelMetadata).toBeNull();
   });
 
   test("falls back to text extraction when image extraction returns null", async () => {
@@ -5069,24 +5076,21 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("resolves SMWS code references without running the classifier agent", async () => {
+  test("passes deterministic SMWS creation through the agent as an identity anchor", async () => {
     const extractFromText = vi.fn(async (): Promise<BottleExtractedDetails> => {
       throw new Error(
         "SMWS deterministic references should not need extraction",
       );
     });
     const runBottleClassifierAgent = vi.fn(
-      async (): Promise<ReasoningResult> => ({
-        decision: {
-          action: "no_match",
-          rationale: "Agent should not run for SMWS code references.",
-          candidateBottleIds: [],
-          identityScope: "product",
-          observation: null,
-          matchedBottleId: null,
-          proposedBottle: null,
-        },
-        artifacts: buildBottleClassificationArtifacts({}),
+      async ({
+        identityAnchor,
+        initialCandidates,
+      }): Promise<ReasoningResult> => ({
+        decision: identityAnchor ?? noMatchAgentDecision(),
+        artifacts: buildBottleClassificationArtifacts({
+          candidates: initialCandidates,
+        }),
       }),
     );
     const { classifier } = createTestClassifier({
@@ -5129,8 +5133,16 @@ describe("createBottleClassifier", () => {
         webEvidence: "not_needed",
       },
     });
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identityAnchor: expect.objectContaining({
+          action: "create_bottle",
+          identityScope: "exact_cask",
+        }),
+      }),
+    );
     expect(extractFromText).not.toHaveBeenCalled();
-    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
   });
 
   test("passes image evidence through to classifier agent overrides", async () => {
@@ -5206,7 +5218,7 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("matches existing SMWS bottles by code without running the classifier agent", async () => {
+  test("passes a deterministic SMWS match through the agent as an identity anchor", async () => {
     const existingSmwsBottle: BottleCandidate = {
       bottleId: 6505,
       alias: "SMWS RW6.5 Appley ever after",
@@ -5230,20 +5242,19 @@ describe("createBottleClassifier", () => {
       source: ["exact"],
     };
     const runBottleClassifierAgent = vi.fn(
-      async (): Promise<ReasoningResult> => ({
-        decision: {
-          action: "no_match",
-          rationale: "Agent should not run for SMWS code references.",
-          candidateBottleIds: [],
-          identityScope: "product",
-          observation: null,
-          matchedBottleId: null,
-          proposedBottle: null,
-        },
-        artifacts: buildBottleClassificationArtifacts({}),
+      async ({
+        identityAnchor,
+        initialCandidates,
+      }): Promise<ReasoningResult> => ({
+        decision: identityAnchor ?? noMatchAgentDecision(),
+        artifacts: buildBottleClassificationArtifacts({
+          candidates: initialCandidates,
+        }),
       }),
     );
+    const getBottleContext = vi.fn(async () => null);
     const { classifier } = createTestClassifier({
+      getBottleContext,
       runBottleClassifierAgent,
     });
 
@@ -5268,117 +5279,21 @@ describe("createBottleClassifier", () => {
         caskNumber: "RW6.5",
       },
     });
-    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
-  });
-
-  test("runs the classifier agent for supplemental operations after a deterministic match", async () => {
-    const currentBottle = buildBottleCandidate({
-      bottleId: 6504,
-      fullName: "SMWS Sauna Smoke",
-      brand: "SMWS",
-      bottler: "The Scotch Malt Whisky Society",
-      distillery: ["Kyrö"],
-      category: "rye",
-      singleCask: true,
-    });
-    const matchedBottle = buildBottleCandidate({
-      bottleId: 6505,
-      alias: "SMWS RW6.5 Appley ever after",
-      fullName: "SMWS RW6.5 Appley ever after",
-      brand: "SMWS",
-      bottler: "The Scotch Malt Whisky Society",
-      distillery: ["Kyrö"],
-      category: "rye",
-      singleCask: true,
-      score: 0.99,
-      source: ["exact"],
-    });
-    const runBottleClassifierAgent = vi.fn(
-      async ({ initialCandidates }: RunBottleClassifierAgentInput) => ({
-        decision: {
-          action: "match" as const,
-          rationale:
-            "The closed SMWS code identifies the complete existing Bottle.",
-          candidateBottleIds: [6504, 6505],
-          identityScope: "exact_cask" as const,
-          observation: {
-            selector: "Sauna Smoke",
-            caskNumber: "RW6.5",
-          },
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identityAnchor: expect.objectContaining({
+          action: "match",
           matchedBottleId: 6505,
-          proposedBottle: null,
-        },
-        proposedOperations: [
-          {
-            type: "merge_bottles" as const,
-            input: {
-              sourceBottleId: 6504,
-              destinationBottleId: 6505,
-            },
-            rationale:
-              "The incomplete current Bottle duplicates the code-identified Bottle.",
-            evidenceRefs: [
-              { kind: "bottle" as const, bottleId: 6504 },
-              { kind: "bottle" as const, bottleId: 6505 },
-            ],
-          },
-        ],
-        findings: [],
-        artifacts: buildBottleClassificationArtifacts({
-          candidates: initialCandidates,
         }),
       }),
     );
-    const { classifier } = createTestClassifier({
-      runBottleClassifierAgent,
-    });
-
-    const result = await classifier.classifyBottleReference(
-      {
-        reference: {
-          name: "SMWS RW6.5 Sauna Smoke",
-          currentBottleId: 6504,
-        },
-        initialCandidates: [currentBottle, matchedBottle],
-      },
-      { availableOperations: ["merge_bottles"] },
-    );
-
-    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        availableOperations: ["merge_bottles"],
-      }),
-    );
-    expect(result).toMatchObject({
-      status: "classified",
-      decision: {
-        action: "match",
-        matchedBottleId: 6505,
-      },
-      proposedOperations: [
-        {
-          type: "merge_bottles",
-          input: {
-            sourceBottleId: 6504,
-            destinationBottleId: 6505,
-          },
-        },
-      ],
-    });
+    expect(getBottleContext).not.toHaveBeenCalled();
   });
 
   test("keeps bare SMWS code references anchored to the code", async () => {
     const runBottleClassifierAgent = vi.fn(
-      async (): Promise<ReasoningResult> => ({
-        decision: {
-          action: "no_match",
-          rationale: "Agent should not run for SMWS code references.",
-          candidateBottleIds: [],
-          identityScope: "product",
-          observation: null,
-          matchedBottleId: null,
-          proposedBottle: null,
-        },
+      async ({ identityAnchor }): Promise<ReasoningResult> => ({
+        decision: identityAnchor ?? noMatchAgentDecision(),
         artifacts: buildBottleClassificationArtifacts({}),
       }),
     );
@@ -5419,7 +5334,14 @@ describe("createBottleClassifier", () => {
         caskNumber: "6.53",
       },
     });
-    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identityAnchor: expect.objectContaining({
+          action: "create_bottle",
+          identityScope: "exact_cask",
+        }),
+      }),
+    );
   });
 
   test("does not treat SMWS ABV values as deterministic cask codes", async () => {

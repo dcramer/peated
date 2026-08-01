@@ -1,31 +1,16 @@
 import config from "@peated/server/config";
 import {
-  BottleOperationRejectionReasonSchema,
-  SelectedBottleOperationIdsSchema,
+  BottleOperationRejectionInputSchema,
+  RejectBottleOperationsInputSchema,
   rejectBottleOperations,
 } from "@peated/server/lib/bottleOperationModeration";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { z } from "zod";
 import { BottleOperationActionResponseSchema } from "./schemas";
 
-const InputSchema = z
-  .object({
-    check: z.number().int().positive(),
-    operationIds: SelectedBottleOperationIdsSchema,
-    reason: BottleOperationRejectionReasonSchema,
-    note: z.string().trim().min(1).max(2000).optional(),
-  })
-  .strict()
-  .superRefine((input, context) => {
-    if (input.reason === "other" && input.note === undefined) {
-      context.addIssue({
-        code: "custom",
-        message: "A note is required when the rejection reason is other.",
-        path: ["note"],
-      });
-    }
-  });
+const InputSchema = BottleOperationRejectionInputSchema.safeExtend({
+  check: RejectBottleOperationsInputSchema.shape.checkId,
+});
 
 export default procedure
   .use(requireMod)
