@@ -170,6 +170,13 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "bottleChecks/details": {
       const token = getAccessToken(request);
+      if (token.includes("bottle-audit") && Number(input?.check) === 93) {
+        sendRpcResponse(response, {
+          check: buildModeratorAuditCheck(),
+          reviewOperations: [],
+        });
+        return true;
+      }
       if (
         token.includes("queue-linked-check") &&
         Number(input?.check) === linkedStorePriceCheckId

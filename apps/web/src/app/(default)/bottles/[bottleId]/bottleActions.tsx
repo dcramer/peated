@@ -15,7 +15,7 @@ export default function BottleActions({
   bottle: Pick<Bottle, "id">;
 }) {
   const { user } = useAuth();
-  const { bottleAudits } = useBottleCheckCapabilities();
+  const { bottleAudits, bottleChecks } = useBottleCheckCapabilities();
 
   return (
     <Menu as="div" className="menu">
@@ -41,8 +41,13 @@ export default function BottleActions({
               Merge Bottle
             </MenuItem>
             {bottleAudits ? (
-              <MenuItem as={Link} href={`/bottles/${bottle.id}/checks`}>
+              <MenuItem as={Link} href={`/bottles/${bottle.id}/audit`}>
                 Audit Bottle
+              </MenuItem>
+            ) : null}
+            {bottleChecks ? (
+              <MenuItem as={Link} href={`/bottles/${bottle.id}/checks`}>
+                Audit history
               </MenuItem>
             ) : null}
           </>

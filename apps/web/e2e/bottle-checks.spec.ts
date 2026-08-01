@@ -2,6 +2,7 @@ import { expect, test, type TestInfo } from "@playwright/test";
 
 import { expectNoHorizontalOverflow } from "./assertions";
 import {
+  existingBottle,
   existingBottleId,
   moderatorUser,
   testAccessToken,
@@ -96,7 +97,7 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expectNoHorizontalOverflow(page);
 });
 
-test("runs a moderator Bottle audit and adds it to history", async ({
+test("runs a moderator Bottle audit and shows it in Bottle history", async ({
   context,
   page,
 }, testInfo) => {
@@ -105,16 +106,26 @@ test("runs a moderator Bottle audit and adds it to history", async ({
     user: moderatorUser,
   });
 
-  await page.goto(`/bottles/${existingBottleId}/checks`);
+  await page.goto(`/bottles/${existingBottleId}/audit`);
 
   await expect(
-    page.getByRole("heading", { name: "Bottle Checks", exact: true }),
+    page.getByRole("heading", { name: "Audit Bottle", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByText("No audits have been run for this Bottle."),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
 
-  await page
+  const auditFieldset = page.locator("form > fieldset");
+  await expect(auditFieldset).toBeVisible();
+  await expect(
+    auditFieldset.getByRole("link", { name: existingBottle.fullName }),
+  ).toHaveAttribute("href", `/bottles/${existingBottleId}`);
+  const historyLink = auditFieldset.getByRole("link", {
+    name: "Audit history",
+  });
+  await expect(historyLink).toHaveAttribute(
+    "href",
+    `/bottles/${existingBottleId}/checks`,
+  );
+  await auditFieldset
     .getByRole("textbox", { name: "Optional context" })
     .fill("Verify the label and catalog identity.");
   const auditRequest = page.waitForRequest((request) =>
@@ -122,7 +133,19 @@ test("runs a moderator Bottle audit and adds it to history", async ({
   );
   await page.getByRole("button", { name: "Run Bottle Audit" }).click();
   await auditRequest;
+  await expect(page).toHaveURL(/\/bottle-checks\/93$/);
+  await expectNoHorizontalOverflow(page);
 
+  await page.goBack();
+  await expect(
+    page.getByRole("heading", { name: "Audit Bottle", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Audit history" }).click();
+  await expect(page).toHaveURL(`/bottles/${existingBottleId}/checks`);
+
+  await expect(
+    page.getByRole("heading", { name: "Audit history", exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByText(
       "The Bottle identity is supported by the inspected evidence.",
