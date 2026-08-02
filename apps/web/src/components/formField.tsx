@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import type { KeyboardEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 import classNames from "../lib/classNames";
 import FormLabel from "./formLabel";
 import HelpText from "./helpText";
@@ -28,31 +28,27 @@ export default function FormField({
   htmlFor,
   error,
   labelAction,
-  onClick,
   ...props
 }: Props) {
-  const interactionProps = onClick
-    ? {
-        role: "button",
-        tabIndex: 0,
-        onClick,
-        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            event.currentTarget.click();
-          }
-        },
-      }
-    : {};
+  const labelClassName = classNames(
+    "flex w-full flex-auto items-center text-left",
+    labelAction ? "cursor-pointer" : "cursor-default",
+  );
+  const labelContent = (
+    <>
+      {label}
+      {labelAction && (
+        <ChevronRightIcon className="ml-1 inline-block h-5 font-bold" />
+      )}
+    </>
+  );
 
   return (
     <div
       {...props}
-      {...interactionProps}
       className={classNames(
         `relative block px-4 py-4 text-white focus-within:z-10`,
         className,
-        onClick ? "cursor-pointer" : "",
         error ? "border border-red-500" : "",
       )}
     >
@@ -62,19 +58,27 @@ export default function FormField({
         </div>
       )}
 
-      {label && (
+      {label && labelAction ? (
+        <FormLabel
+          as="button"
+          type="button"
+          onClick={labelAction}
+          required={required}
+          labelNote={labelNote}
+          className={labelClassName}
+        >
+          {labelContent}
+        </FormLabel>
+      ) : label ? (
         <FormLabel
           htmlFor={htmlFor}
           required={required}
           labelNote={labelNote}
-          className="flex flex-auto cursor-pointer items-center"
+          className={labelClassName}
         >
-          {label}
-          {labelAction && (
-            <ChevronRightIcon className="ml-1 inline-block h-5 font-bold" />
-          )}
+          {labelContent}
         </FormLabel>
-      )}
+      ) : null}
       {children}
       {helpText && <HelpText>{helpText}</HelpText>}
     </div>

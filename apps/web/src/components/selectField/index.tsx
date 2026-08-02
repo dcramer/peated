@@ -136,6 +136,8 @@ export default function SelectField<T extends Option>({
   else if (!suggestedOptions)
     suggestedOptions = options.slice(0, targetOptions);
 
+  const canOpenDialog = !noDialog && !readOnly && !disabled;
+
   const toggleOption = (option: T) => {
     setPreviousValues(filterDupes([option], previousValues));
     if (value.find((i) => i.id == option.id && i.name == option.name)) {
@@ -182,15 +184,10 @@ export default function SelectField<T extends Option>({
       className={className}
       error={error}
       labelAction={
-        !noDialog && !readOnly && !disabled
+        canOpenDialog
           ? () => {
               setDialogOpen(true);
             }
-          : undefined
-      }
-      onClick={
-        !noDialog && !readOnly && !disabled
-          ? () => setDialogOpen(true)
           : undefined
       }
     >
@@ -213,9 +210,19 @@ export default function SelectField<T extends Option>({
             {onRenderChip ? onRenderChip(option) : option.name}
           </Chip>
         ))}
-        {visibleValues.length === 0 && placeholder && (
-          <div className="text-muted sm:leading-6">{placeholder}</div>
-        )}
+        {visibleValues.length === 0 &&
+          placeholder &&
+          (canOpenDialog ? (
+            <button
+              type="button"
+              className="text-muted text-left sm:leading-6"
+              onClick={() => setDialogOpen(true)}
+            >
+              {placeholder}
+            </button>
+          ) : (
+            <div className="text-muted sm:leading-6">{placeholder}</div>
+          ))}
         {visibleValues.length > 0 &&
           value.length < targetOptions &&
           (!options.length || visibleValues.length != options.length) &&

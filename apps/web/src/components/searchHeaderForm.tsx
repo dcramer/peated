@@ -26,6 +26,7 @@ export default function SearchHeaderForm({
   children?: ReactNode;
 }) {
   const [value, setValue] = useState(props.value ?? "");
+  const hasMounted = useRef(false);
   const previousPropValue = useRef(props.value);
   const latestValue = useRef(value);
 
@@ -34,6 +35,11 @@ export default function SearchHeaderForm({
   });
 
   useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      if (props.value === undefined) onChange?.("");
+      return;
+    }
     if (props.value === previousPropValue.current) return;
 
     previousPropValue.current = props.value;

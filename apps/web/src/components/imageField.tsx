@@ -147,9 +147,6 @@ export default forwardRef<HTMLInputElement, Props>(
         // in order for the 'drop' event to register.
         // See: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Drag_operations#droptargets
         // https://stackoverflow.com/questions/8006715/drag-drop-files-into-standard-html-file-input
-        onClick={(e) => {
-          fileRef.current?.click();
-        }}
         onDragOver={(e) => {
           e.preventDefault();
         }}
@@ -190,10 +187,14 @@ export default forwardRef<HTMLInputElement, Props>(
                 }}
               />
             ) : (
-              <div className="flex w-full flex-col items-center justify-center p-4 text-sm group-hover:bg-slate-700">
+              <button
+                type="button"
+                className="flex w-full flex-col items-center justify-center p-4 text-sm text-white group-hover:bg-slate-700"
+                onClick={() => fileRef.current?.click()}
+              >
                 <PhotoIcon className="h-12 w-12" />
                 Tap to upload an Image
-              </div>
+              </button>
             )}
             {(imageSrc || finalImage) && (
               <div
@@ -202,7 +203,12 @@ export default forwardRef<HTMLInputElement, Props>(
                   maxHeight: imageHeight,
                 }}
               >
-                <Button color="highlight">Change Image</Button>
+                <Button
+                  color="highlight"
+                  onClick={() => fileRef.current?.click()}
+                >
+                  Change Image
+                </Button>
                 <Button
                   color="danger"
                   onClick={(e) => {
@@ -220,6 +226,7 @@ export default forwardRef<HTMLInputElement, Props>(
             )}
           </div>
           <input
+            id={`f-${name}`}
             type="file"
             name={name}
             accept="image/*"
