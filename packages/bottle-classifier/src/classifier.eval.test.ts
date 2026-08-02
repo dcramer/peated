@@ -58,6 +58,7 @@ import {
   evalClassifierReasoningEffort,
   hasEvalOpenAICredentials,
 } from "./evalSupport";
+import { withEvalModelCallCapture } from "./evalTelemetry";
 import { createLocalCatalogDataSource } from "./localCatalog";
 import { exactBottleIdentityMatches } from "./normalizationEvalScoring";
 import {
@@ -739,13 +740,16 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   run: async ({ input }) => {
     const startedAt = performance.now();
     const evalRuntime = createEvalRuntime();
-    const classifier = createBottleClassifier({
-      ...createClassifierOptions(input),
-      ...evalRuntime.options,
+    const {
+      result: { result, modelMetadata },
+      modelCalls,
+    } = await withEvalModelCallCapture(async () => {
+      const classifier = createBottleClassifier({
+        ...createClassifierOptions(input),
+        ...evalRuntime.options,
+      });
+      return await classifier.runBottleReference(input.testCase.input);
     });
-    const { result, modelMetadata } = await classifier.runBottleReference(
-      input.testCase.input,
-    );
     const output = toJsonValue(result) ?? null;
 
     return {
@@ -764,6 +768,11 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
         modelMetadata,
         reasoningEffort: evalClassifierReasoningEffort,
         totalMs: performance.now() - startedAt,
+        modelCalls,
+        trace: {
+          name: "Bottle Classifier",
+          operationName: "invoke_agent",
+        },
       }),
     };
   },
@@ -828,13 +837,16 @@ const auditHarness = createHarness<AuditBottleEvalFixture, JsonValue>({
   run: async ({ input }) => {
     const startedAt = performance.now();
     const evalRuntime = createEvalRuntime();
-    const classifier = createBottleClassifier({
-      ...createAuditEvalClassifierOptions(input),
-      ...evalRuntime.options,
+    const {
+      result: { result, modelMetadata },
+      modelCalls,
+    } = await withEvalModelCallCapture(async () => {
+      const classifier = createBottleClassifier({
+        ...createAuditEvalClassifierOptions(input),
+        ...evalRuntime.options,
+      });
+      return await classifier.runBottleAudit(input.input.audit);
     });
-    const { result, modelMetadata } = await classifier.runBottleAudit(
-      input.input.audit,
-    );
     const output = toJsonValue(result) ?? null;
 
     return {
@@ -853,6 +865,11 @@ const auditHarness = createHarness<AuditBottleEvalFixture, JsonValue>({
         modelMetadata,
         reasoningEffort: evalClassifierReasoningEffort,
         totalMs: performance.now() - startedAt,
+        modelCalls,
+        trace: {
+          name: "Bottle Auditor",
+          operationName: "invoke_agent",
+        },
       }),
     };
   },

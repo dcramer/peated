@@ -8,7 +8,6 @@ import { logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { EntityTypeEnum } from "@peated/server/schemas";
-import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -98,25 +97,17 @@ export async function getGeneratedEntityDetails(
   return await withSentryConversation(
     conversationId,
     async () =>
-      await startSpan(
+      await getStructuredResponse(
+        "getGeneratedEntityDetails",
+        generatePrompt(entity),
+        OpenAIEntityDetailsSchema,
+        OpenAIEntityDetailsValidationSchema,
+        undefined,
         {
-          op: "ai.pipeline",
-          name: "getGeneratedEntityDetails",
-        },
-        async (span) => {
-          return await getStructuredResponse(
-            "getGeneratedEntityDetails",
-            generatePrompt(entity),
-            OpenAIEntityDetailsSchema,
-            OpenAIEntityDetailsValidationSchema,
-            undefined,
-            {
-              entity: {
-                id: entity.id,
-                name: entity.name,
-              },
-            },
-          );
+          entity: {
+            id: entity.id,
+            name: entity.name,
+          },
         },
       ),
   );

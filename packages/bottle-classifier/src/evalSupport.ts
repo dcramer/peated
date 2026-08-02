@@ -3,6 +3,10 @@ import type {
   BottleClassifierDataSource,
   CreateBottleClassifierOptions,
 } from "./classifierRuntime";
+import {
+  getActiveEvalModelCallStore,
+  recordEvalOpenAIResponse,
+} from "./evalTelemetry";
 import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
 import {
   getStableOpenAISettings,
@@ -25,12 +29,43 @@ export const evalJudgeModel = evalOpenAIConfig.evalModel;
 export const hasEvalOpenAICredentials = Boolean(evalOpenAIConfig.apiKey);
 
 export function createEvalOpenAIClient() {
-  return new OpenAI({
+  const client = new OpenAI({
     apiKey: evalOpenAIConfig.apiKey,
     baseURL: evalOpenAIConfig.baseURL,
     organization: evalOpenAIConfig.organization,
     project: evalOpenAIConfig.project,
   });
+  const originalCreate = client.responses.create.bind(client.responses);
+
+  const instrumentedCreate = (...args: Parameters<typeof originalCreate>) => {
+    const request = args[0];
+    const store = getActiveEvalModelCallStore();
+    const startedAt = new Date();
+    const requestPromise = originalCreate(...args);
+
+    if (store && request?.stream !== true) {
+      void requestPromise.then(
+        (response) => {
+          recordEvalOpenAIResponse({
+            request,
+            response,
+            startedAt,
+            store,
+          });
+        },
+        () => undefined,
+      );
+    }
+
+    return requestPromise;
+  };
+
+  Object.defineProperty(client.responses, "create", {
+    configurable: true,
+    value: instrumentedCreate as typeof client.responses.create,
+  });
+
+  return client;
 }
 
 export function createEvalClassifierOptions(

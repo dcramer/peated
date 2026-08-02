@@ -101,7 +101,7 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
-    "vitest-evals": "0.14.0"
+    "vitest-evals": "0.15.0"
   },
   "volta": {
     "extends": "../../package.json"

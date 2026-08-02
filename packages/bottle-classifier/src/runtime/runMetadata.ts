@@ -12,6 +12,7 @@ export const BottleClassifierRunMetadataSchema = z
         cachedInputTokens: NonnegativeIntegerSchema.optional(),
         cacheWriteTokens: NonnegativeIntegerSchema.optional(),
         outputTokens: NonnegativeIntegerSchema,
+        reasoningTokens: NonnegativeIntegerSchema.optional(),
         totalTokens: NonnegativeIntegerSchema,
       })
       .strict(),
@@ -41,8 +42,12 @@ function numberProperty(value: unknown, property: string): number {
     : 0;
 }
 
-function inputTokenDetail(usage: unknown, keys: string[]): number | undefined {
-  const details = objectProperty(usage, "inputTokensDetails");
+function tokenDetail(
+  usage: unknown,
+  detailsProperty: string,
+  keys: string[],
+): number | undefined {
+  const details = objectProperty(usage, detailsProperty);
   const entries = Array.isArray(details) ? details : details ? [details] : [];
   let measured = false;
   let total = 0;
@@ -81,13 +86,17 @@ export function getBottleClassifierRunMetadata({
     objectProperty(objectProperty(result, "state"), "usage") ??
     objectProperty(objectProperty(result, "runContext"), "usage") ??
     objectProperty(result, "usage");
-  const measuredCachedInputTokens = inputTokenDetail(usage, [
+  const measuredCachedInputTokens = tokenDetail(usage, "inputTokensDetails", [
     "cached_tokens",
     "cachedTokens",
   ]);
-  const measuredCacheWriteTokens = inputTokenDetail(usage, [
+  const measuredCacheWriteTokens = tokenDetail(usage, "inputTokensDetails", [
     "cache_write_tokens",
     "cacheWriteTokens",
+  ]);
+  const measuredReasoningTokens = tokenDetail(usage, "outputTokensDetails", [
+    "reasoning_tokens",
+    "reasoningTokens",
   ]);
   const toolNames: string[] = [];
   let toolCallCount = 0;
@@ -121,6 +130,9 @@ export function getBottleClassifierRunMetadata({
         ? {}
         : { cacheWriteTokens: measuredCacheWriteTokens }),
       outputTokens: numberProperty(usage, "outputTokens"),
+      ...(measuredReasoningTokens === undefined
+        ? {}
+        : { reasoningTokens: measuredReasoningTokens }),
       totalTokens: numberProperty(usage, "totalTokens"),
     },
     toolCalls: {

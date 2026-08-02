@@ -605,7 +605,7 @@ async function persistPhotoIdentificationReview({
  * gives the full classifier the chance to identify the Bottle and propose any
  * supported catalog repairs.
  *
- * This is the shared Photo Identification agent span boundary for all callers.
+ * This is the shared Photo Identification workflow span boundary for all callers.
  */
 export async function identifyPendingImage({
   pendingImage,
@@ -616,11 +616,12 @@ export async function identifyPendingImage({
 
   return await Sentry.startSpan(
     {
-      op: "gen_ai.invoke_agent",
-      name: "invoke_agent Photo Identification",
+      op: "gen_ai.invoke_workflow",
+      name: "invoke_workflow Photo Identification",
       attributes: {
-        "gen_ai.operation.name": "invoke_agent",
-        "gen_ai.agent.name": "Photo Identification",
+        "gen_ai.operation.name": "invoke_workflow",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.workflow.name": "Photo Identification",
         "gen_ai.conversation.id": conversationId,
         "photo_identification.pending_image_id": pendingImage.id,
         "photo_identification.source_image_url": absoluteUrl(

@@ -413,9 +413,12 @@ describe("POST /tastings/photo-identification", () => {
     );
     expect(Sentry.startSpan).toHaveBeenCalledWith(
       expect.objectContaining({
-        op: "gen_ai.invoke_agent",
-        name: "invoke_agent Photo Identification",
+        op: "gen_ai.invoke_workflow",
+        name: "invoke_workflow Photo Identification",
         attributes: expect.objectContaining({
+          "gen_ai.operation.name": "invoke_workflow",
+          "gen_ai.provider.name": "openai",
+          "gen_ai.workflow.name": "Photo Identification",
           "gen_ai.conversation.id": `photo_identification:${response.pendingImage.id}`,
           "photo_identification.pending_image_id": response.pendingImage.id,
         }),

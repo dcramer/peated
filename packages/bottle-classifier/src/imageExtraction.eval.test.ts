@@ -1,9 +1,14 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { describe, expect, test } from "vitest";
-import type { BottleExtractedDetails } from "./classifierTypes";
+import { expect } from "vitest";
+import { createHarness, describeEval } from "vitest-evals";
+import { toJsonValue, type JsonValue } from "vitest-evals/harness";
 import {
-  buildImageExtractionEvalMeasurements,
+  BottleExtractedDetailsSchema,
+  type BottleExtractedDetails,
+} from "./classifierTypes";
+import {
+  buildEvalHarnessMeasurements,
   formatEvalUsageAnnotation,
 } from "./evalMeasurements";
 import {
@@ -12,6 +17,7 @@ import {
   evalImageExtractionReasoningEffort,
   hasEvalOpenAICredentials,
 } from "./evalSupport";
+import { withEvalModelCallCapture } from "./evalTelemetry";
 import { createWhiskyLabelExtractor } from "./extractor";
 import {
   IMAGE_EXTRACTION_EVAL_CASES,
@@ -120,33 +126,70 @@ function assertExtractionExpectation(
   }
 }
 
-describe.skipIf(!hasEvalOpenAICredentials)("image extraction evals", () => {
-  const extractor = createWhiskyLabelExtractor({
-    client: createEvalOpenAIClient(),
-    model: evalImageExtractionModel,
-    reasoningEffort: evalImageExtractionReasoningEffort,
-  });
+const imageExtractionHarness = createHarness<
+  ImageExtractionEvalCase,
+  JsonValue
+>({
+  name: "image-extraction",
+  run: async ({ input }) => {
+    const startedAt = performance.now();
+    const { result: extractedIdentity, modelCalls } =
+      await withEvalModelCallCapture(async () => {
+        const extractor = createWhiskyLabelExtractor({
+          client: createEvalOpenAIClient(),
+          model: evalImageExtractionModel,
+          reasoningEffort: evalImageExtractionReasoningEffort,
+        });
+        return await extractor.extractFromImage(
+          imageFileToDataUrl(input.imagePath),
+        );
+      });
+    const output = toJsonValue(extractedIdentity) ?? null;
 
-  test.for(IMAGE_EXTRACTION_EVAL_CASES)("$name", async (testCase, context) => {
-    const extraction = await extractor.extractFromImageWithMetadata(
-      imageFileToDataUrl(testCase.imagePath),
-    );
-    const measurements = buildImageExtractionEvalMeasurements({
-      model: evalImageExtractionModel,
-      reasoningEffort: evalImageExtractionReasoningEffort,
-      metadata: extraction,
-    });
-    await context.annotate(
-      formatEvalUsageAnnotation(measurements.usage),
-      "usage",
-    );
-    await context.annotate(
-      `image extraction ${Math.round(extraction.durationMs).toLocaleString("en-US")} ms`,
-      "timing",
-    );
-
-    const extractedIdentity = extraction.result;
-    expect(extractedIdentity).not.toBeNull();
-    assertExtractionExpectation(testCase, extractedIdentity!);
-  });
+    return {
+      output,
+      events: [
+        {
+          type: "message",
+          role: "user",
+          content: `Extract the whisky label in fixture ${input.name}.`,
+        },
+        { type: "message", role: "assistant", content: output },
+      ],
+      ...buildEvalHarnessMeasurements({
+        model: evalImageExtractionModel,
+        modelMetadata: null,
+        reasoningEffort: evalImageExtractionReasoningEffort,
+        totalMs: performance.now() - startedAt,
+        modelCalls,
+        trace: {
+          name: "Image Extraction",
+          operationName: "invoke_workflow",
+        },
+      }),
+    };
+  },
 });
+
+describeEval(
+  "image extraction evals",
+  {
+    skipIf: () => !hasEvalOpenAICredentials,
+    harness: imageExtractionHarness,
+  },
+  (it) => {
+    it.for(IMAGE_EXTRACTION_EVAL_CASES)(
+      "$name",
+      async (testCase, { run, annotate }) => {
+        const result = await run(testCase);
+        await annotate(formatEvalUsageAnnotation(result.usage), "usage");
+        const extractedIdentity = BottleExtractedDetailsSchema.nullable().parse(
+          result.output,
+        );
+
+        expect(extractedIdentity).not.toBeNull();
+        assertExtractionExpectation(testCase, extractedIdentity!);
+      },
+    );
+  },
+);

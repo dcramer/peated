@@ -28,6 +28,7 @@ describe("observability span contexts", () => {
       name: "invoke_agent Bottle Classifier",
       attributes: {
         "gen_ai.operation.name": "invoke_agent",
+        "gen_ai.provider.name": "openai",
         "gen_ai.agent.name": "Bottle Classifier",
         "gen_ai.conversation.id": "photo_identification:pending-1",
         "bottle_classifier.reference_id": "pending-1",
@@ -80,6 +81,43 @@ describe("observability span contexts", () => {
         }),
       }),
       expect.any(Function),
+    );
+  });
+
+  test("records aggregate agent token usage on the invocation span", async () => {
+    const setAttribute = vi.fn();
+    vi.mocked(Sentry.startSpan).mockImplementationOnce(
+      async (_context, callback) =>
+        await callback({ setAttribute } as unknown as Parameters<
+          typeof callback
+        >[0]),
+    );
+
+    await startAgentSpan({
+      name: "Bottle Classifier",
+      conversationId: "bottle_reference:usage",
+      callback: async () => ({
+        modelMetadata: {
+          usage: {
+            inputTokens: 100,
+            cachedInputTokens: 40,
+            cacheWriteTokens: 5,
+            outputTokens: 20,
+            reasoningTokens: 7,
+          },
+        },
+      }),
+    });
+
+    expect(setAttribute).toHaveBeenCalledWith("gen_ai.usage.input_tokens", 100);
+    expect(setAttribute).toHaveBeenCalledWith(
+      "gen_ai.usage.cache_read.input_tokens",
+      40,
+    );
+    expect(setAttribute).toHaveBeenCalledWith("gen_ai.usage.output_tokens", 20);
+    expect(setAttribute).toHaveBeenCalledWith(
+      "gen_ai.usage.reasoning.output_tokens",
+      7,
     );
   });
 
