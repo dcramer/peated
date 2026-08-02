@@ -22,6 +22,8 @@ describe("GET /users/:user/library/stats", () => {
 
     expect(data).toMatchObject({
       total: 0,
+      status: { open: 0, sealed: 0, unspecified: 0 },
+      brands: [],
       distillers: [],
       age: {
         knownCount: 0,
@@ -47,19 +49,29 @@ describe("GET /users/:user/library/stats", () => {
     });
     const distillerA = await fixtures.Entity({ name: "Alpha Distillery" });
     const distillerB = await fixtures.Entity({ name: "Beta Distillery" });
+    const brandA = await fixtures.Entity({ name: "Alpha Brand" });
+    const brandB = await fixtures.Entity({ name: "Beta Brand" });
     const youngBottle = await fixtures.Bottle({
+      brandId: brandA.id,
+      name: "Young Release",
       category: "single_malt",
       statedAge: 8,
     });
     const twelveYearBottle = await fixtures.Bottle({
+      brandId: brandA.id,
+      name: "Twelve Year Release",
       category: "bourbon",
       statedAge: 12,
     });
     const oldBottle = await fixtures.Bottle({
+      brandId: brandA.id,
+      name: "Old Release",
       category: "single_malt",
       statedAge: 25,
     });
     const unstatedBottle = await fixtures.Bottle({
+      brandId: brandB.id,
+      name: "Unstated Release",
       category: "rye",
       statedAge: null,
     });
@@ -118,6 +130,11 @@ describe("GET /users/:user/library/stats", () => {
     );
 
     expect(data.total).toBe(4);
+    expect(data.status).toEqual({ open: 2, sealed: 1, unspecified: 1 });
+    expect(data.brands).toEqual([
+      { id: brandA.id, name: brandA.name, count: 3 },
+      { id: brandB.id, name: brandB.name, count: 1 },
+    ]);
     expect(data.distillers).toEqual([
       { id: distillerA.id, name: distillerA.name, count: 2 },
       { id: distillerB.id, name: distillerB.name, count: 1 },
@@ -333,8 +350,9 @@ describe("GET /users/:user/library/stats", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data).toEqual({
+    expect(data).toMatchObject({
       total: 201,
+      status: { open: 198, sealed: 3, unspecified: 0 },
       distillers: [
         { id: distillerA.id, name: distillerA.name, count: 2 },
         { id: distillerB.id, name: distillerB.name, count: 1 },

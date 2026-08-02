@@ -1,12 +1,15 @@
 "use client";
 
 import { formatFlavorProfile } from "@peated/server/lib/format";
+import type { Outputs } from "@peated/server/orpc/router";
 import AgeInsightCard from "@peated/web/components/ageInsightCard";
 import {
   InsightCard,
   InsightCardSkeleton,
   RankedInsightBars,
 } from "@peated/web/components/insightCard";
+import Link from "@peated/web/components/link";
+import SimpleRatingStats from "@peated/web/components/simpleRatingStats";
 import classNames from "@peated/web/lib/classNames";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -33,9 +36,11 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
   const regions = regionsQuery.data.results;
   const flavors = flavorsQuery.data.results;
   const stats = statsQuery.data;
+  const showSnapshot = stats.total > 0;
   const showAge = stats.age.knownCount >= 3;
-  const cardCount =
+  const insightCardCount =
     Number(regions.length > 0) + Number(flavors.length > 0) + Number(showAge);
+  const cardCount = Number(showSnapshot) + insightCardCount;
 
   if (!cardCount) return null;
 
@@ -53,10 +58,19 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
       <div
         className={classNames(
           "grid grid-cols-1 gap-3",
-          cardCount === 2 && "lg:grid-cols-2",
-          cardCount >= 3 && "lg:grid-cols-3",
+          insightCardCount === 2 && "lg:grid-cols-2",
+          insightCardCount >= 3 && "lg:grid-cols-3",
         )}
       >
+        {showSnapshot ? (
+          <TastingSnapshotCard
+            stats={stats}
+            className={classNames(
+              insightCardCount === 2 && "lg:col-span-2",
+              insightCardCount >= 3 && "lg:col-span-3",
+            )}
+          />
+        ) : null}
         {regions.length ? (
           <InsightCard title="Top regions">
             <RankedInsightBars
@@ -99,6 +113,62 @@ function UserTastingInsightsContent({ userId }: { userId: number }) {
         ) : null}
       </div>
     </section>
+  );
+}
+
+type TastingStats = Outputs["users"]["tastingStats"];
+
+export function TastingSnapshotCard({
+  stats,
+  className,
+}: {
+  stats: TastingStats;
+  className?: string;
+}) {
+  const ratingPercentage = (count: number) =>
+    stats.ratings.total ? (count / stats.ratings.total) * 100 : 0;
+  const repeatPours = stats.total - stats.uniqueBottles;
+
+  return (
+    <InsightCard title="Tasting snapshot" className={className}>
+      <div className="grid flex-1 gap-6 sm:grid-cols-[minmax(0,1.35fr)_minmax(12rem,0.65fr)] sm:divide-x sm:divide-slate-800">
+        <SimpleRatingStats
+          stats={{
+            ...stats.ratings,
+            avg: null,
+            percentage: {
+              pass: ratingPercentage(stats.ratings.pass),
+              sip: ratingPercentage(stats.ratings.sip),
+              savor: ratingPercentage(stats.ratings.savor),
+            },
+          }}
+        />
+        <div className="flex flex-col justify-center sm:pl-6">
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-white">
+              {repeatPours.toLocaleString()}
+            </span>
+            <span className="text-sm font-medium text-slate-200">
+              {repeatPours === 1 ? "repeat pour" : "repeat pours"}
+            </span>
+          </div>
+          {stats.mostTastedBottle ? (
+            <p className="text-muted mt-3 text-xs">
+              Most revisited{" "}
+              <Link
+                href={`/bottles/${stats.mostTastedBottle.id}`}
+                className="font-medium text-slate-200 hover:text-white"
+              >
+                {stats.mostTastedBottle.name}
+              </Link>{" "}
+              <span className="whitespace-nowrap">
+                · {stats.mostTastedBottle.count.toLocaleString()} times
+              </span>
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </InsightCard>
   );
 }
 

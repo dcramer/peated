@@ -181,7 +181,7 @@ export default async function Layout(props: {
         <ProfileProvider userId={user.id}>
           <Tabs border aria-label={`${user.username}'s profile`}>
             <TabItem as={Link} href={`/users/${user.username}`} controlled>
-              Profile
+              Overview
             </TabItem>
             <TabItem
               as={Link}
