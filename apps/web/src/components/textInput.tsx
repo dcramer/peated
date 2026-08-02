@@ -10,6 +10,14 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
   ref,
 ) {
   const { disabled, readOnly } = props;
+  const searchProps =
+    props.type === "search"
+      ? {
+          autoCapitalize: "none",
+          autoCorrect: "off",
+          spellCheck: false,
+        }
+      : {};
   const baseStyles = classNames(
     "rounded px-4 py-2 sm:leading-6 border-0 focus:ring-0",
     disabled || readOnly ? "bg-slate-900 text-slate-300" : "",
@@ -27,6 +35,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
             className,
           )}
           ref={ref}
+          {...searchProps}
           {...props}
         />
         <span className="flex select-none items-center text-slate-300 sm:text-sm">
@@ -45,6 +54,7 @@ export default forwardRef<HTMLInputElement, Props>(function TextInput(
         className || "",
       )}
       ref={ref}
+      {...searchProps}
       {...props}
     />
   );
