@@ -86,8 +86,10 @@ export function getBottleContextLabel(bottle: BottleLabelSource) {
 export function getBottlePlainTextIdentity(bottle: BottleLabelSource) {
   const contextLabel = getBottleContextLabel(bottle);
 
-  if (bottle.edition && !includesIdentityText(contextLabel, bottle.edition)) {
-    return `${contextLabel} - ${bottle.edition}`;
+  if (bottle.edition) {
+    return includesIdentityText(contextLabel, bottle.edition)
+      ? contextLabel
+      : `${contextLabel} - ${bottle.edition}`;
   }
   if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
     return `${contextLabel} - ${bottle.vintageYear} Vintage`;

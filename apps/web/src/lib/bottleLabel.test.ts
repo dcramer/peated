@@ -27,6 +27,18 @@ describe("bottle text labels", () => {
     );
   });
 
+  it("does not fall back to chronology when the release marker is already present", () => {
+    expect(
+      getBottlePlainTextIdentity({
+        ...bottle,
+        name: "Glenburgie 38-year-old Chapter Thirty Two",
+        group: { name: "Glenburgie 38-year-old Chapter Thirty Two" },
+      }),
+    ).toBe(
+      "Decadent Drinks Whiskyland Glenburgie 38-year-old Chapter Thirty Two",
+    );
+  });
+
   it("does not repeat series wording already present in the expression", () => {
     expect(
       getBottleContextLabel({
