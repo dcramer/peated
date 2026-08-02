@@ -672,7 +672,176 @@ describe("concrete Bottle updates", () => {
     expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
   });
 
-  test("rejects a retained or explicit series owned by another brand", async ({
+  test("migrates an exclusively used retained series when the brand changes", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const oldBrand = await fixtures.Entity({ name: "Old Series Brand" });
+    const newBrand = await fixtures.Entity({ name: "New Series Brand" });
+    const oldSeries = await fixtures.BottleSeries({
+      brandId: oldBrand.id,
+      name: "Shared Range",
+      fullName: `${oldBrand.name} Shared Range`,
+      description: "A range that survives a brand correction.",
+    });
+    const { first, members } = await createGroup({
+      user: mod,
+      stable: {
+        name: "Series Label",
+        brand: oldBrand.id,
+        series: oldSeries.id,
+      },
+      exacts: [{ edition: "One" }, { edition: "Two" }],
+    });
+
+    const result = await updateConcreteBottle({
+      bottleId: first.bottle.id,
+      input: { shared: { brand: newBrand.id } },
+      context: contextFor(mod),
+    });
+
+    const migratedSeries = await db.query.bottleSeries.findFirst({
+      where: eq(bottleSeries.id, oldSeries.id),
+    });
+    expect(migratedSeries).toMatchObject({
+      id: oldSeries.id,
+      name: oldSeries.name,
+      fullName: `${newBrand.name} ${oldSeries.name}`,
+      description: oldSeries.description,
+      brandId: newBrand.id,
+      numReleases: members.length,
+    });
+    expect(result.group).toMatchObject({
+      brandId: newBrand.id,
+      seriesId: oldSeries.id,
+    });
+    expect(await loadGroupMembers(first.group.id)).toEqual(
+      expect.arrayContaining(
+        members.map(({ bottle }) =>
+          expect.objectContaining({
+            id: bottle.id,
+            brandId: newBrand.id,
+            seriesId: oldSeries.id,
+          }),
+        ),
+      ),
+    );
+    expect(
+      await db
+        .select()
+        .from(bottleSeries)
+        .where(eq(bottleSeries.name, oldSeries.name)),
+    ).toHaveLength(1);
+  });
+
+  test("duplicates a retained series still used by another BottleGroup", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const oldBrand = await fixtures.Entity({ name: "Shared Series Brand" });
+    const newBrand = await fixtures.Entity({ name: "Split Series Brand" });
+    const oldSeries = await fixtures.BottleSeries({
+      brandId: oldBrand.id,
+      name: "Shared Range",
+      fullName: `${oldBrand.name} Shared Range`,
+      description: "A range shared by multiple bottle groups.",
+    });
+    const moving = await createGroup({
+      user: mod,
+      stable: {
+        name: "Moving Label",
+        brand: oldBrand.id,
+        series: oldSeries.id,
+      },
+      exacts: [{ edition: "One" }],
+    });
+    const staying = await createGroup({
+      user: mod,
+      stable: {
+        name: "Staying Label",
+        brand: oldBrand.id,
+        series: oldSeries.id,
+      },
+      exacts: [{ edition: "One" }],
+    });
+
+    const result = await updateConcreteBottle({
+      bottleId: moving.first.bottle.id,
+      input: { shared: { brand: newBrand.id } },
+      context: contextFor(mod),
+    });
+
+    const destinationSeries = await db.query.bottleSeries.findFirst({
+      where: and(
+        eq(bottleSeries.brandId, newBrand.id),
+        eq(bottleSeries.name, oldSeries.name),
+      ),
+    });
+    expect(destinationSeries).toMatchObject({
+      description: oldSeries.description,
+      numReleases: 1,
+    });
+    expect(destinationSeries?.id).not.toBe(oldSeries.id);
+    expect(result.group.seriesId).toBe(destinationSeries?.id);
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, staying.first.group.id),
+      }),
+    ).toMatchObject({ brandId: oldBrand.id, seriesId: oldSeries.id });
+    expect(
+      await db.query.bottleSeries.findFirst({
+        where: eq(bottleSeries.id, oldSeries.id),
+      }),
+    ).toMatchObject({ brandId: oldBrand.id, numReleases: 1 });
+  });
+
+  test("reuses a matching destination series when the brand changes", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const oldBrand = await fixtures.Entity({ name: "Source Series Brand" });
+    const newBrand = await fixtures.Entity({
+      name: "Destination Series Brand",
+    });
+    const oldSeries = await fixtures.BottleSeries({
+      brandId: oldBrand.id,
+      name: "Shared Range",
+      fullName: `${oldBrand.name} Shared Range`,
+    });
+    const destinationSeries = await fixtures.BottleSeries({
+      brandId: newBrand.id,
+      name: oldSeries.name,
+      fullName: `${newBrand.name} ${oldSeries.name}`,
+    });
+    const { first } = await createGroup({
+      user: mod,
+      stable: {
+        name: "Series Label",
+        brand: oldBrand.id,
+        series: oldSeries.id,
+      },
+      exacts: [{ edition: "One" }],
+    });
+
+    const result = await updateConcreteBottle({
+      bottleId: first.bottle.id,
+      input: { shared: { brand: newBrand.id } },
+      context: contextFor(mod),
+    });
+
+    expect(result.group).toMatchObject({
+      brandId: newBrand.id,
+      seriesId: destinationSeries.id,
+    });
+    expect(
+      await db
+        .select()
+        .from(bottleSeries)
+        .where(eq(bottleSeries.brandId, newBrand.id)),
+    ).toHaveLength(1);
+  });
+
+  test("rejects an explicit series owned by another brand", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -699,17 +868,17 @@ describe("concrete Bottle updates", () => {
     const aliasesBefore = await loadAliases(memberIds);
     resetQueueMock();
 
-    for (const shared of [{ brand: newBrand.id }, { series: otherSeries.id }]) {
-      const error = await waitError(
-        updateConcreteBottle({
-          bottleId: first.bottle.id,
-          input: { shared },
-          context: contextFor(mod),
-        }),
-        ConcreteBottleUpdateInputError,
-      );
-      expect(error.message).toMatch(/series/i);
-    }
+    const error = await waitError(
+      updateConcreteBottle({
+        bottleId: first.bottle.id,
+        input: {
+          shared: { brand: newBrand.id, series: otherSeries.id },
+        },
+        context: contextFor(mod),
+      }),
+      ConcreteBottleUpdateInputError,
+    );
+    expect(error.message).toMatch(/series/i);
 
     expect(
       (
