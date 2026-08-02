@@ -149,13 +149,11 @@ export default function BottleExactMetadata({
   bottle,
   className,
   exclude = [],
-  leadingContent,
   variant = "full",
 }: {
   bottle: BottleExactMetadataSource;
   className?: string;
   exclude?: readonly BottleExactMetadataKey[];
-  leadingContent?: ReactNode;
   variant?: "full" | "summary";
 }) {
   const excluded = new Set(exclude);
@@ -164,11 +162,7 @@ export default function BottleExactMetadata({
       ? getBottleReleaseSummary(bottle)
       : getBottleExactMetadata(bottle)
   ).filter(({ key }) => !excluded.has(key));
-  const items: Array<MetadataItem | { key: "leading"; content: ReactNode }> =
-    leadingContent !== undefined
-      ? [{ key: "leading", content: leadingContent }, ...metadata]
-      : metadata;
-  if (!items.length) return null;
+  if (!metadata.length) return null;
 
   return (
     <div
@@ -178,7 +172,7 @@ export default function BottleExactMetadata({
         className,
       )}
     >
-      {items.map(({ key, content }, index) => (
+      {metadata.map(({ key, content }, index) => (
         <span key={key} className="inline-flex whitespace-nowrap">
           {index ? <span className="mx-1.5">&middot;</span> : null}
           {content}

@@ -96,11 +96,12 @@ export default function BottleResultRow({
           </Link>
           <BottleStatusIcons bottle={bottle} />
         </div>
-        <BottleExactMetadata
-          bottle={bottle}
-          leadingContent={distillerMetadata}
-          exclude={[...metadataExclude]}
-        />
+        {distillerMetadata ? (
+          <div className="text-muted mt-1 text-sm leading-5">
+            {distillerMetadata}
+          </div>
+        ) : null}
+        <BottleExactMetadata bottle={bottle} exclude={[...metadataExclude]} />
         {bottle.group && bottle.group.totalBottles > 1 ? (
           <div className="mt-1 text-xs">
             <Link
