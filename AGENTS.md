@@ -47,6 +47,9 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
   required.
 - Let unexpected failures reach the owning boundary. Retry only expected
   transient failures; follow `docs/policies/error-handling.md`.
+- When a policy is enforced by a specific module or exported boundary, keep a
+  brief ownership/invariant comment beside that code; follow
+  `docs/policies/code-comments.md`.
 - Move durable explanations beside the code or feature that owns them. Delete
   completed plans instead of preserving stale implementation history.
 - Run targeted tests, typechecks, lint, and manual QA for the touched surface.

@@ -25,6 +25,9 @@ contract and should not change runtime behavior when a sink is unavailable.
   state that should not create an issue.
 - A retry may record attempts, but only the owning boundary should report the
   terminal failure.
+- Logging and tracing entry-point modules must state their ownership and error
+  semantics in a module comment. Shared logging APIs must make it clear whether
+  a call emits diagnostic telemetry or creates an actionable Sentry issue.
 - Follow [data-redaction.md](data-redaction.md). Telemetry records safe metadata,
   not private content, credentials, or unrestricted payloads.
 - Product tests should assert user-visible or durable outcomes instead of logs,
