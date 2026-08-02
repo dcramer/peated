@@ -133,6 +133,7 @@ export const classifierEvalExpectationSchema = z.object({
   aliasScope: AliasScopeEnum.optional(),
   matchedBottleId: z.number().int().nullable().optional(),
   proposedBottle: z.record(z.string(), z.unknown()).nullable().optional(),
+  proposedBottleNameOneOf: z.array(z.string().min(1)).min(1).optional(),
   proposedBottleNameIncludes: z.array(z.string().min(1)).optional(),
   proposedBottleNameExcludes: z.array(z.string().min(1)).optional(),
   proposedBottleDistillerIdOneOf: z

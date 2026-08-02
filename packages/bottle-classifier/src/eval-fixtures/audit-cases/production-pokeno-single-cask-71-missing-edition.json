@@ -107,7 +107,6 @@
       "https://api.peated.com/uploads/bottles/bottle-45174-pending-upload-nh8e88y2d7atvkesunuwvo5z.webp",
       "https://jvsimports.com/pokeno-whisky/",
       "https://www.drinqy.com/shop/p/pokeno-origin-acmb2",
-      "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
       "https://shop.klwines.com/products/details/1701896"
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/pokeno-single-cask-71.webp",
@@ -166,10 +165,6 @@
           {
             "kind": "web_result",
             "url": "https://www.drinqy.com/shop/p/pokeno-origin-acmb2"
-          },
-          {
-            "kind": "web_result",
-            "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019"
           }
         ]
       }

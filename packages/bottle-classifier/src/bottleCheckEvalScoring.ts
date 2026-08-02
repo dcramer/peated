@@ -285,7 +285,7 @@ function getBottleCheckGroundingIssues(
   const collectedSourceFields = new Set(sourceFields);
   const collectedWebUrls = new Set(
     actual.artifacts.searchEvidence.flatMap(({ results }) =>
-      results.map(({ url }) => url),
+      results.map(({ url }) => webEvidenceKey(url)),
     ),
   );
   const evidenceWasCollected = (evidenceRef: EvidenceRef) => {
@@ -297,7 +297,7 @@ function getBottleCheckGroundingIssues(
       case "entity":
         return collectedEntityIds.has(evidenceRef.entityId);
       case "web_result":
-        return collectedWebUrls.has(evidenceRef.url);
+        return collectedWebUrls.has(webEvidenceKey(evidenceRef.url));
     }
   };
 
@@ -366,7 +366,7 @@ const TRACKING_QUERY_PARAMETER_NAMES = new Set([
   "mc_eid",
 ]);
 
-function requiredWebEvidenceKey(url: string): string {
+function webEvidenceKey(url: string): string {
   const parsed = new URL(url);
   const host = parsed.host.toLowerCase().replace(/^www\./, "");
   const pathname = parsed.pathname.replace(/\/+$/, "") || "/";
@@ -388,10 +388,7 @@ function requiredEvidenceMatches(
   actual: EvidenceRef,
 ): boolean {
   if (expected.kind === "web_result" && actual.kind === "web_result") {
-    return (
-      requiredWebEvidenceKey(expected.url) ===
-      requiredWebEvidenceKey(actual.url)
-    );
+    return webEvidenceKey(expected.url) === webEvidenceKey(actual.url);
   }
 
   return stableKey(expected) === stableKey(actual);

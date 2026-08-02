@@ -4,9 +4,11 @@
   "expectedBottleName": "Heaven's Door Bootleg Series 13-year-old",
   "expectedBottleNames": [
     "Heaven's Door Bootleg Series 13-year-old",
-    "Heaven's Door Bootleg Series"
+    "Heaven's Door Bootleg Series",
+    "Heaven's Door Bootleg Series Vino de Naranja Finish 13-year-old",
+    "Heaven's Door Bootleg Series Vino de Naranja Finish"
   ],
-  "summary": "Treat Heaven's Door Bootleg Vol 3 as one complete Bottle with Volume III as its exact edition; reviewed web evidence may enrich it with the marketed 13-year-old age, but the source does not require that optional field.",
+  "summary": "Treat Heaven's Door Bootleg Vol 3 as one complete Bottle with Volume III as its exact edition; reviewed web evidence may enrich it with the marketed 13-year-old age and Vino de Naranja finish, but the source does not require those optional fields.",
   "peatedBottleIds": [44067],
   "expected": {
     "handlingStrategy": "classifier_required",

@@ -1,6 +1,6 @@
 {
   "id": "image-backed-photo-creates-watchpost-whiskey",
-  "name": "image-backed photo: creates Watchpost 8-year-old with existing Westland distiller",
+  "name": "image-backed photo: creates Watchpost Whiskey 8-year-old with existing Westland distiller",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -45,7 +45,6 @@
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
-      "name": "8-year-old",
       "brand": {
         "id": null,
         "name": "Watchpost"
@@ -60,9 +59,10 @@
       "statedAge": 8,
       "abv": 42.5
     },
+    "proposedBottleNameOneOf": ["8-year-old", "Whiskey"],
     "proposedBottleNameExcludes": ["Watchpost"],
     "suggestedNextStep": "confirm_create",
-    "summary": "Create Watchpost 8-year-old as a blend at 42.5% ABV and reuse the existing Westland Distillery entity candidate, recovering the marketed age from authoritative product evidence."
+    "summary": "Create Watchpost Whiskey 8-year-old as a blend at 42.5% ABV and reuse the existing Westland Distillery entity candidate, accepting the current Peated name layout or the official product title while recovering the marketed age from authoritative product evidence."
   },
   "localCatalog": {
     "entities": [
