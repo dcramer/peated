@@ -3,11 +3,12 @@ import { tmpdir } from "node:os";
 
 type Environment = Readonly<Record<string, string | undefined>>;
 
-function parseDisabledByDefaultFlag(
+function parseFeatureFlag(
   name: string,
   value: string | undefined,
+  defaultValue: boolean,
 ): boolean {
-  if (value === undefined || value === "") return false;
+  if (value === undefined || value === "") return defaultValue;
 
   switch (value.trim().toLowerCase()) {
     case "1":
@@ -23,17 +24,20 @@ function parseDisabledByDefaultFlag(
 
 export function resolveBottleCheckFeatureFlags(environment: Environment) {
   return {
-    BOTTLE_CHECK_SHADOW_GENERATION: parseDisabledByDefaultFlag(
+    BOTTLE_CHECK_SHADOW_GENERATION: parseFeatureFlag(
       "BOTTLE_CHECK_SHADOW_GENERATION",
       environment.BOTTLE_CHECK_SHADOW_GENERATION,
+      true,
     ),
-    BOTTLE_CHECK_MODERATOR_VISIBILITY: parseDisabledByDefaultFlag(
+    BOTTLE_CHECK_MODERATOR_VISIBILITY: parseFeatureFlag(
       "BOTTLE_CHECK_MODERATOR_VISIBILITY",
       environment.BOTTLE_CHECK_MODERATOR_VISIBILITY,
+      true,
     ),
-    BOTTLE_CHECK_EXECUTION: parseDisabledByDefaultFlag(
+    BOTTLE_CHECK_EXECUTION: parseFeatureFlag(
       "BOTTLE_CHECK_EXECUTION",
       environment.BOTTLE_CHECK_EXECUTION,
+      false,
     ),
   };
 }

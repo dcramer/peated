@@ -195,11 +195,12 @@ clean audit records no work; proposed changes enter moderator review; findings
 remain visible without changing the Bottle.
 
 For Bottles, this agent check replaces the job's existing heuristic
-passed/flagged finding calculation. The job keeps its sampling, uniqueness, and
-queue boundary, but it does not write a second verification result beside the
-check. Existing deterministic Brand-repair candidate discovery may seed
-read-only candidate context; it is not a parallel conclusion or operation
-generator.
+passed/flagged finding calculation. The job selects 100% of eligible
+`manual_entry` Bottles and a deterministic `price_match_automation` sample that
+defaults to 10%. It keeps its uniqueness and queue boundary, but it does not
+write a second verification result beside the check. Existing deterministic
+Brand-repair candidate discovery may seed read-only candidate context; it is
+not a parallel conclusion or operation generator.
 
 This post-create audit is a correlated follow-up Bottle check using the same
 classifier capability, not independent verification. Its result can surface
@@ -786,10 +787,11 @@ runs.
 5. Extract and test the canonical Entity update service, then enable Entity
    operations.
 6. Enable `audit_bottle` for individual moderator-triggered runs.
-7. Extend `VerifyBottleCreation` with idempotent post-create checks for a
-   bounded end-user Bottle sample.
-8. Expand source kinds and audit sampling only after review precision is
-   acceptable.
+7. Extend `VerifyBottleCreation` with idempotent post-create checks for 100% of
+   eligible `manual_entry` Bottles and a deterministic `price_match_automation`
+   sample that defaults to 10%.
+8. Expand source kinds or change the automation sample only after review
+   precision is acceptable.
 9. Use reviewed `bottle_group` findings to scope a separate BottleGroup-repair
    proposal around the smallest operations demonstrated by real cases.
 

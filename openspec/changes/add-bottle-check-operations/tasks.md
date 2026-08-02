@@ -150,15 +150,16 @@
 
 ## 6. Rollout and Documentation
 
-- [x] 6.1 Add shadow-generation, moderator-visibility, and execution flags,
-      disabled by default.
+- [x] 6.1 Add shadow-generation, moderator-visibility, and execution flags;
+      default generation and visibility on while keeping execution off.
 - [x] 6.2 Enable shadow check generation for individual full reference retries
       and moderator-triggered Bottle audits.
 - [x] 6.3 Extend the existing `VerifyBottleCreation` job with an idempotent
-      sampled post-create Bottle check that runs only after the end-user save
-      commits, replaces the previous Bottle-specific heuristic conclusion, creates
-      no duplicate actionable result, and never auto-applies supplemental
-      operations.
+      post-create Bottle check for 100% of eligible `manual_entry` Bottles and a
+      deterministic `price_match_automation` sample that defaults to 10%. Run
+      it only after the save commits, replace the previous Bottle-specific
+      heuristic conclusion, create no duplicate actionable result, and never
+      auto-apply supplemental operations.
 - [x] 6.4 Preserve automatic primary classification only in the existing
       end-user add-Bottle workflow and its established review policy.
 - [ ] 6.5 Measure intent accuracy, schema validity, diagnostic exact reference

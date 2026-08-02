@@ -3,9 +3,14 @@ import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
 describe("GET /", () => {
-  test("returns version info", async () => {
+  test("returns version info and review-only Bottle Check capabilities", async () => {
     const result = await routerClient.root();
     expect(result.version).toBeDefined();
+    expect(result.capabilities).toEqual({
+      bottleAudits: true,
+      bottleCheckExecution: false,
+      bottleChecks: true,
+    });
   });
 
   test("reports Bottle Check capabilities from the server flags", async () => {

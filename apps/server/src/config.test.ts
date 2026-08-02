@@ -1,25 +1,35 @@
 import config, { resolveBottleCheckFeatureFlags } from "./config";
 
-const disabledFlags = {
-  BOTTLE_CHECK_SHADOW_GENERATION: false,
-  BOTTLE_CHECK_MODERATOR_VISIBILITY: false,
+const reviewOnlyFlags = {
+  BOTTLE_CHECK_SHADOW_GENERATION: true,
+  BOTTLE_CHECK_MODERATOR_VISIBILITY: true,
   BOTTLE_CHECK_EXECUTION: false,
 };
 
 describe("Bottle check feature flags", () => {
-  test("are disabled by default in public server config", () => {
-    expect(config).toMatchObject(disabledFlags);
-    expect(resolveBottleCheckFeatureFlags({})).toEqual(disabledFlags);
+  test("default to review-only in public server config", () => {
+    expect(config).toMatchObject(reviewOnlyFlags);
+    expect(resolveBottleCheckFeatureFlags({})).toEqual(reviewOnlyFlags);
+  });
+
+  test("treats empty values as unset", () => {
+    expect(
+      resolveBottleCheckFeatureFlags({
+        BOTTLE_CHECK_SHADOW_GENERATION: "",
+        BOTTLE_CHECK_MODERATOR_VISIBILITY: "",
+        BOTTLE_CHECK_EXECUTION: "",
+      }),
+    ).toEqual(reviewOnlyFlags);
   });
 
   test.each([
-    "BOTTLE_CHECK_SHADOW_GENERATION",
-    "BOTTLE_CHECK_MODERATOR_VISIBILITY",
-    "BOTTLE_CHECK_EXECUTION",
-  ] as const)("%s can be enabled independently", (name) => {
-    expect(resolveBottleCheckFeatureFlags({ [name]: "1" })).toEqual({
-      ...disabledFlags,
-      [name]: true,
+    ["BOTTLE_CHECK_SHADOW_GENERATION", "0", false],
+    ["BOTTLE_CHECK_MODERATOR_VISIBILITY", "false", false],
+    ["BOTTLE_CHECK_EXECUTION", "1", true],
+  ] as const)("%s can override its default", (name, value, expected) => {
+    expect(resolveBottleCheckFeatureFlags({ [name]: value })).toEqual({
+      ...reviewOnlyFlags,
+      [name]: expected,
     });
   });
 
