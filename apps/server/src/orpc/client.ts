@@ -16,7 +16,7 @@ export function createClient(
         "user-agent": "@peated (orpc/proxy)",
       };
     },
-    interceptors: [sentryInterceptor({ captureInputs: true })],
+    interceptors: [sentryInterceptor()],
   });
 
   return createORPCClient(link);

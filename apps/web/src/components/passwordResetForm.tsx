@@ -7,7 +7,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import Alert from "./alert";
 
-function FormComponent() {
+function FormComponent({ initialEmail }: { initialEmail: string }) {
   const { pending } = useFormStatus();
 
   return (
@@ -21,6 +21,7 @@ function FormComponent() {
           required
           placeholder="you@example.com"
           autoFocus
+          defaultValue={initialEmail}
         />
       </div>
       <div className="flex justify-center gap-x-2">
@@ -32,7 +33,11 @@ function FormComponent() {
   );
 }
 
-export default function PasswordResetForm() {
+export default function PasswordResetForm({
+  initialEmail = "",
+}: {
+  initialEmail?: string;
+}) {
   const [result, formAction] = useActionState(passwordResetForm, undefined);
 
   return (
@@ -44,7 +49,7 @@ export default function PasswordResetForm() {
         </p>
       ) : (
         <form action={formAction}>
-          <FormComponent />
+          <FormComponent initialEmail={initialEmail} />
         </form>
       )}
     </div>

@@ -1,13 +1,19 @@
-import { os } from "@orpc/server";
+import { ORPCError, os } from "@orpc/server";
 import * as Sentry from "@sentry/core";
 
 type Options = {
   captureInputs?: boolean;
 };
 
+export function shouldCaptureORPCServerError(error: unknown): boolean {
+  if (!(error instanceof ORPCError)) return true;
+  return typeof error.status !== "number" || error.status >= 500;
+}
+
 /**
  * Creates Sentry middleware for oRPC procedures that automatically instruments
- * RPC calls with distributed tracing and error reporting on the server side.
+ * RPC calls with distributed tracing and unexpected error reporting on the
+ * server side.
  *
  * @param options - Configuration options for the middleware
  * @param options.captureInputs - Whether to capture RPC input arguments in span attributes (default: false)
@@ -50,16 +56,18 @@ const sentryMiddleware = (options: Options = {}) =>
             code: 2,
           });
 
-          // Log error to console for development/debugging
-          console.error(
-            `[ORPC Error] ${path.join("/")}:`,
-            error,
-            options.captureInputs
-              ? `\nInput: ${JSON.stringify(input, null, 2)}`
-              : "",
-          );
+          if (shouldCaptureORPCServerError(error)) {
+            // Log error to console for development/debugging
+            console.error(
+              `[ORPC Error] ${path.join("/")}:`,
+              error,
+              options.captureInputs
+                ? `\nInput: ${JSON.stringify(input, null, 2)}`
+                : "",
+            );
 
-          Sentry.captureException(error);
+            Sentry.captureException(error);
+          }
 
           // Re-throw the error so it can be handled by the error handler
           throw error;

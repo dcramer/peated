@@ -71,6 +71,4 @@ export const base = os
     },
   });
 
-// Base procedure with Sentry error tracking for all routes
-// Base procedure with Sentry only; ToS is enforced in UI flows
-export const procedure = base.use(sentryMiddleware({ captureInputs: true }));
+export const procedure = base.use(sentryMiddleware());

@@ -1,8 +1,11 @@
+import { db } from "@peated/server/db";
+import { users } from "@peated/server/db/schema";
 import { generatePasskeyChallenge } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
 import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
 import { createHash } from "crypto";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -20,7 +23,10 @@ export default procedure
   })
   .input(
     z.object({
-      username: z.string().describe("Username for the new account"),
+      username: z
+        .string()
+        .toLowerCase()
+        .describe("Username for the new account"),
       email: z
         .string()
         .email()
@@ -34,7 +40,34 @@ export default procedure
       signedChallenge: z.string(),
     }),
   )
-  .handler(async function ({ input }) {
+  .handler(async function ({ input, errors }) {
+    // Avoid creating a device credential that cannot be attached to a new
+    // account. The registration transaction still owns the race-safe check.
+    const [emailOwner, usernameOwner] = await Promise.all([
+      db.query.users.findFirst({
+        columns: { id: true },
+        where: eq(sql`LOWER(${users.email})`, input.email),
+      }),
+      db.query.users.findFirst({
+        columns: { id: true },
+        where: eq(sql`LOWER(${users.username})`, input.username),
+      }),
+    ]);
+
+    if (emailOwner) {
+      throw errors.CONFLICT({
+        message: "An account with this email already exists.",
+        data: { field: "email" },
+      });
+    }
+
+    if (usernameOwner) {
+      throw errors.CONFLICT({
+        message: "An account with this username already exists.",
+        data: { field: "username" },
+      });
+    }
+
     // Generate a random userID for WebAuthn
     // We use a hash of username+email to ensure consistency if they retry
     const userIdString = `${input.username}:${input.email}`;

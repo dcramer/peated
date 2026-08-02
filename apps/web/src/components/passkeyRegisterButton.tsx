@@ -3,6 +3,10 @@
 import Button from "@peated/web/components/button";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  getRegistrationConflictField,
+  type RegistrationConflictField,
+} from "@peated/web/lib/registration";
 import { startRegistration } from "@simplewebauthn/browser";
 import { useMutation } from "@tanstack/react-query";
 import { KeyRound } from "lucide-react";
@@ -15,12 +19,14 @@ export default function PasskeyRegisterButton({
   email,
   tosAccepted,
   onError,
+  onConflict,
 }: {
   action: (formData: FormData) => Promise<any>;
   username: string;
   email: string;
   tosAccepted: boolean;
   onError?: (error: string) => void;
+  onConflict?: (field: RegistrationConflictField, error: string) => void;
 }) {
   const orpc = useORPC();
   const router = useRouter();
@@ -71,19 +77,30 @@ export default function PasskeyRegisterButton({
 
       // Check if the action returned an error
       if (result?.error) {
-        onError?.(result.error);
+        if (result.conflictField) {
+          onConflict?.(result.conflictField, result.error);
+        } else {
+          onError?.(result.error);
+        }
         setLoading(false);
       }
       // If no error, the action will redirect, so we don't need to do anything
     } catch (err: any) {
-      logError(err, { context: "passkey_registration" });
-
       // Check if user cancelled the passkey prompt
       if (err.name === "NotAllowedError" || err.message?.includes("cancel")) {
         // User cancelled, just re-enable the form without showing an error
         setLoading(false);
         return;
       }
+
+      const conflictField = getRegistrationConflictField(err);
+      if (conflictField) {
+        onConflict?.(conflictField, err.message);
+        setLoading(false);
+        return;
+      }
+
+      logError(err, { context: "passkey_registration" });
 
       // Handle ORPC validation errors
       let errorMessage = "Failed to register with passkey";

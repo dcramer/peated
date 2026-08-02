@@ -49,6 +49,10 @@ describe("POST /auth/register", () => {
     expect(err).toMatchInlineSnapshot(
       `[Error: An account with this username already exists.]`,
     );
+    expect(err).toMatchObject({
+      status: 409,
+      data: { field: "username" },
+    });
   });
 
   test("duplicate email", async ({ fixtures }) => {
@@ -68,5 +72,9 @@ describe("POST /auth/register", () => {
     expect(err).toMatchInlineSnapshot(
       `[Error: An account with this email already exists.]`,
     );
+    expect(err).toMatchObject({
+      status: 409,
+      data: { field: "email" },
+    });
   });
 });

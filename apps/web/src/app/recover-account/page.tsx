@@ -12,6 +12,8 @@ export default async function PasswordReset(props: {
 }) {
   const searchParams = await props.searchParams;
   const token = searchParams.token;
+  const email =
+    typeof searchParams.email === "string" ? searchParams.email : "";
 
   return (
     <LayoutSplash>
@@ -26,7 +28,7 @@ export default async function PasswordReset(props: {
       {token ? (
         <PasswordResetChangeForm token={token} />
       ) : (
-        <PasswordResetForm />
+        <PasswordResetForm initialEmail={email} />
       )}
     </LayoutSplash>
   );

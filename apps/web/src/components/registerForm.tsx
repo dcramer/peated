@@ -1,9 +1,12 @@
 "use client";
 
+import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
+import PasskeyLoginButton from "@peated/web/components/passkeyLoginButton";
 import PasskeyRegisterButton from "@peated/web/components/passkeyRegisterButton";
 import TextField from "@peated/web/components/textField";
 import { authenticate, register } from "@peated/web/lib/auth.actions";
+import type { RegistrationConflictField } from "@peated/web/lib/registration";
 import { useState } from "react";
 import config from "../config";
 import Alert from "./alert";
@@ -14,6 +17,49 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [tosAccepted, setTosAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [conflictField, setConflictField] =
+    useState<RegistrationConflictField | null>(null);
+
+  const clearFeedback = () => {
+    setError(null);
+    setConflictField(null);
+  };
+
+  if (conflictField === "email") {
+    return (
+      <div className="min-w-sm flex flex-auto flex-col gap-y-4">
+        <Alert>{error}</Alert>
+        <p className="text-muted text-center text-sm">
+          Sign in with an existing passkey, choose another sign-in method, or
+          recover access to your account.
+        </p>
+        <PasskeyLoginButton action={authenticate} />
+        <Button
+          href={{ pathname: "/login", query: { email } }}
+          color="primary"
+          fullWidth
+        >
+          Other Sign-in Options
+        </Button>
+        <div className="mt-4 flex items-center justify-center gap-x-3 text-center text-sm">
+          <Link
+            href={{ pathname: "/recover-account", query: { email } }}
+            className="text-highlight underline"
+          >
+            Account Recovery
+          </Link>
+          <span>&middot;</span>
+          <button
+            type="button"
+            className="text-highlight underline"
+            onClick={clearFeedback}
+          >
+            Use a Different Email
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">
@@ -50,9 +96,10 @@ export default function RegisterForm() {
           placeholder="you@example.com"
           autoFocus
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setEmail(e.target.value)
-          }
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setEmail(e.target.value);
+            clearFeedback();
+          }}
         />
         <TextField
           className="py-3"
@@ -62,9 +109,10 @@ export default function RegisterForm() {
           required
           placeholder="you99"
           value={username}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUsername(e.target.value)
-          }
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setUsername(e.target.value);
+            clearFeedback();
+          }}
         />
         <label className="relative mb-3 block flex items-start gap-2 px-4 py-3 text-sm">
           <input
@@ -89,7 +137,14 @@ export default function RegisterForm() {
         username={username}
         email={email}
         tosAccepted={tosAccepted}
-        onError={setError}
+        onError={(message) => {
+          setConflictField(null);
+          setError(message);
+        }}
+        onConflict={(field, message) => {
+          setConflictField(field);
+          setError(message);
+        }}
       />
 
       <p className="mt-4 text-center text-sm">
