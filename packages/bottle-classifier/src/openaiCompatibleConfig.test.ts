@@ -32,7 +32,8 @@ describe("resolveOpenAICompatibleConfig", () => {
       apiKey: "openai-key",
       baseURL: "https://api.openai.com/v1",
       embeddingModel: "text-embedding-3-large",
-      evalModel: "gpt-5-mini",
+      evalModel: "gpt-5.6-luna",
+      evalReasoningEffort: "medium",
       imageExtractionModel: "gpt-5.6-luna",
       imageExtractionReasoningEffort: "high",
       model: "gpt-5.4",
@@ -53,7 +54,8 @@ describe("resolveOpenAICompatibleConfig", () => {
       apiKey: "gateway-key",
       baseURL: "https://ai-gateway.vercel.sh/v1",
       embeddingModel: "openai/text-embedding-3-large",
-      evalModel: "openai/gpt-5-mini",
+      evalModel: "openai/gpt-5.6-luna",
+      evalReasoningEffort: "medium",
       imageExtractionModel: "openai/gpt-5.6-luna",
       imageExtractionReasoningEffort: "high",
       model: "openai/gpt-5.4",
@@ -63,7 +65,9 @@ describe("resolveOpenAICompatibleConfig", () => {
       reasoningEffort: undefined,
     });
     expect(getStableOpenAISettings(config.model)).toEqual({});
-    expect(getStableOpenAISettings(config.evalModel)).toEqual({});
+    expect(
+      getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
+    ).toEqual({ reasoning: { effort: "medium" } });
   });
 
   it("normalizes gateway overrides and ignores direct-provider settings", () => {
@@ -72,6 +76,7 @@ describe("resolveOpenAICompatibleConfig", () => {
         AI_GATEWAY_API_KEY: "gateway-key",
         OPENAI_EMBEDDING_MODEL: "openai/text-embedding-3-small",
         OPENAI_EVAL_MODEL: "gpt-5-mini",
+        OPENAI_EVAL_REASONING_EFFORT: "xhigh",
         OPENAI_HOST: "https://example.com/v1",
         OPENAI_IMAGE_EXTRACTION_MODEL: "gpt-5.6-luna",
         OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT: "xhigh",
@@ -83,6 +88,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       baseURL: "https://ai-gateway.vercel.sh/v1",
       embeddingModel: "openai/text-embedding-3-small",
       evalModel: "openai/gpt-5-mini",
+      evalReasoningEffort: "xhigh",
       imageExtractionModel: "openai/gpt-5.6-luna",
       imageExtractionReasoningEffort: "xhigh",
       model: "openai/gpt-5.4",
@@ -122,6 +128,20 @@ describe("resolveOpenAICompatibleConfig", () => {
     ).toBe("high");
   });
 
+  it("applies an explicit effort to the eval judge independently", () => {
+    const config = resolveOpenAICompatibleConfig({
+      OPENAI_EVAL_MODEL: "gpt-5.6-luna",
+      OPENAI_EVAL_REASONING_EFFORT: "high",
+      OPENAI_REASONING_EFFORT: "low",
+    });
+
+    expect(config.evalReasoningEffort).toBe("high");
+    expect(
+      getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
+    ).toEqual({ reasoning: { effort: "high" } });
+    expect(config.reasoningEffort).toBe("low");
+  });
+
   it("does not send reasoning settings to custom non-GPT-5 models", () => {
     const config = resolveOpenAICompatibleConfig({
       OPENAI_MODEL: "custom-model",
@@ -148,4 +168,14 @@ describe("resolveOpenAICompatibleConfig", () => {
       );
     },
   );
+
+  it("identifies an invalid eval judge effort", () => {
+    expect(() =>
+      resolveOpenAICompatibleConfig({
+        OPENAI_EVAL_REASONING_EFFORT: "maximum",
+      }),
+    ).toThrow(
+      "OPENAI_EVAL_REASONING_EFFORT must be one of: none, low, medium, high, xhigh",
+    );
+  });
 });

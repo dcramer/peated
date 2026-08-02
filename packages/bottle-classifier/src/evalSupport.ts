@@ -26,6 +26,10 @@ export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(
   evalOpenAIConfig.imageExtractionReasoningEffort,
 );
 export const evalJudgeModel = evalOpenAIConfig.evalModel;
+export const evalJudgeReasoningEffort = resolveOpenAIReasoningEffort(
+  evalJudgeModel,
+  evalOpenAIConfig.evalReasoningEffort,
+);
 export const hasEvalOpenAICredentials = Boolean(evalOpenAIConfig.apiKey);
 
 export function createEvalOpenAIClient() {
@@ -87,7 +91,7 @@ export function createEvalClassifierOptions(
 }
 
 export function getEvalJudgeModelSettings() {
-  return getStableOpenAISettings(evalJudgeModel);
+  return getStableOpenAISettings(evalJudgeModel, evalJudgeReasoningEffort);
 }
 
 export async function promptEvalJudgeModel(

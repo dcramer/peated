@@ -52,6 +52,7 @@ export default defineConfig({
         "OPENAI_ORGANIZATION",
         "OPENAI_PROJECT",
         "OPENAI_EVAL_MODEL",
+        "OPENAI_EVAL_REASONING_EFFORT",
         "OPENAI_MODEL",
         "OPENAI_REASONING_EFFORT",
         "FIRECRAWL_API_KEY",
