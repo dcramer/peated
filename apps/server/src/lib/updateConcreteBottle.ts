@@ -51,7 +51,7 @@ import { formatBottleName } from "@peated/server/lib/format";
 import { logError } from "@peated/server/lib/log";
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 
 export { ConcreteBottleUpdateInputSchema } from "@peated/server/lib/concreteBottleSchemas";
 export type { ConcreteBottleUpdateInput } from "@peated/server/lib/concreteBottleSchemas";
@@ -711,6 +711,101 @@ async function resolveStableState(
       }
       throw error;
     }
+  } else if (
+    patch?.brand !== undefined &&
+    brand.id !== group.brandId &&
+    seriesId !== null
+  ) {
+    // Move the series row only when no other catalog group depends on it.
+    const [currentSeries] = await tx
+      .select()
+      .from(bottleSeries)
+      .where(eq(bottleSeries.id, seriesId))
+      .limit(1)
+      .for("update");
+    if (!currentSeries) {
+      throw new ConcreteBottleUpdateInputError(
+        `Series ${seriesId} could not be resolved.`,
+      );
+    }
+
+    const destinationFullName = `${brand.name} ${currentSeries.name}`;
+    const [destinationSeries] = await tx
+      .select({ id: bottleSeries.id })
+      .from(bottleSeries)
+      .where(
+        eq(
+          sql`LOWER(${bottleSeries.fullName})`,
+          destinationFullName.toLowerCase(),
+        ),
+      )
+      .limit(1);
+    if (destinationSeries && destinationSeries.id !== currentSeries.id) {
+      seriesId = destinationSeries.id;
+    } else {
+      const [otherGroup] = await tx
+        .select({ id: bottleGroups.id })
+        .from(bottleGroups)
+        .where(
+          and(
+            eq(bottleGroups.seriesId, currentSeries.id),
+            ne(bottleGroups.id, group.id),
+          ),
+        )
+        .limit(1);
+      const [ungroupedBottle] = await tx
+        .select({ id: bottles.id })
+        .from(bottles)
+        .where(
+          and(eq(bottles.seriesId, currentSeries.id), isNull(bottles.groupId)),
+        )
+        .limit(1);
+
+      if (!otherGroup && !ungroupedBottle) {
+        await tx
+          .update(bottleSeries)
+          .set({
+            brandId: brand.id,
+            fullName: destinationFullName,
+            updatedAt: new Date(),
+          })
+          .where(eq(bottleSeries.id, currentSeries.id));
+        await tx.insert(changes).values({
+          objectId: currentSeries.id,
+          objectType: "bottle_series",
+          type: "update",
+          displayName: destinationFullName,
+          data: {
+            brandId: brand.id,
+            fullName: destinationFullName,
+          },
+          actorId,
+        });
+      } else {
+        try {
+          [seriesId] = await processSeries({
+            tx,
+            series: {
+              name: currentSeries.name,
+              description: currentSeries.description,
+            },
+            brand,
+            userId: requireUpdateUser(user).id,
+            createdByActorId: actorId,
+          });
+        } catch (error) {
+          if (
+            error instanceof ORPCError &&
+            ["NOT_FOUND", "BAD_REQUEST", "INPUT_VALIDATION_FAILED"].includes(
+              error.code,
+            )
+          ) {
+            throw new ConcreteBottleUpdateInputError(error.message);
+          }
+          throw error;
+        }
+      }
+    }
   }
   if (patch !== undefined && seriesId !== null) {
     const [series] = await tx
@@ -1267,18 +1362,24 @@ export async function updateConcreteBottleInTransaction(
       (member) =>
         member.seriesId !== desiredByBottleId.get(member.id)!.seriesId,
     );
-  const affectedSeriesIds = memberSeriesChanged
-    ? Array.from(
-        new Set(
-          affectedMembers
-            .flatMap((member) => [
-              member.seriesId,
-              desiredByBottleId.get(member.id)!.seriesId,
-            ])
-            .filter((seriesId): seriesId is number => seriesId !== null),
-        ),
-      ).sort((left, right) => left - right)
-    : [];
+  const seriesOwnershipChanged =
+    sharedChanged &&
+    group.brandId !== stable.brandId &&
+    group.seriesId !== null &&
+    group.seriesId === stable.seriesId;
+  const affectedSeriesIds =
+    memberSeriesChanged || seriesOwnershipChanged
+      ? Array.from(
+          new Set(
+            affectedMembers
+              .flatMap((member) => [
+                member.seriesId,
+                desiredByBottleId.get(member.id)!.seriesId,
+              ])
+              .filter((seriesId): seriesId is number => seriesId !== null),
+          ),
+        ).sort((left, right) => left - right)
+      : [];
   for (const seriesId of affectedSeriesIds) {
     await tx
       .update(bottleSeries)
