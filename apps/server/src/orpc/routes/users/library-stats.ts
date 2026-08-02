@@ -23,6 +23,18 @@ const LIBRARY_STATS_BATCH_SIZE = 200;
 
 const LibraryStatsSchema = z.object({
   total: z.number(),
+  status: z.object({
+    open: z.number(),
+    sealed: z.number(),
+    unspecified: z.number(),
+  }),
+  brands: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      count: z.number(),
+    }),
+  ),
   distillers: z.array(
     z.object({
       id: z.number(),
@@ -45,13 +57,24 @@ type LibraryStatsAccumulator = {
   total: number;
   ages: number[];
   categoryCounts: Map<Category, number>;
+  brandCounts: Map<number, number>;
   distillerCounts: Map<number, number>;
+  status: {
+    open: number;
+    sealed: number;
+    unspecified: number;
+  };
   unstatedAgeCount: number;
 };
-type LibraryBottleRead = UserBottleRead & { distillerIds: number[] };
+type LibraryBottleRead = UserBottleRead & {
+  distillerIds: number[];
+  status: "open" | "sealed" | "empty" | null;
+};
 
 const emptyStats: LibraryStats = {
   total: 0,
+  status: { open: 0, sealed: 0, unspecified: 0 },
+  brands: [],
   distillers: [],
   age: {
     knownCount: 0,
@@ -78,7 +101,9 @@ function createLibraryStatsAccumulator(): LibraryStatsAccumulator {
     total: 0,
     ages: [],
     categoryCounts: new Map(),
+    brandCounts: new Map(),
     distillerCounts: new Map(),
+    status: { open: 0, sealed: 0, unspecified: 0 },
     unstatedAgeCount: 0,
   };
 }
@@ -103,31 +128,26 @@ function accumulateLibraryStats(
     if (bottle.category !== null) {
       incrementCount(accumulator.categoryCounts, bottle.category);
     }
+    incrementCount(accumulator.brandCounts, bottle.brandId);
     for (const distillerId of bottle.distillerIds) {
       incrementCount(accumulator.distillerCounts, distillerId);
     }
+    if (bottle.status === "open") accumulator.status.open += 1;
+    else if (bottle.status === "sealed") accumulator.status.sealed += 1;
+    else accumulator.status.unspecified += 1;
   }
 }
 
-async function finalizeLibraryStats(
-  accumulator: LibraryStatsAccumulator,
-): Promise<LibraryStats> {
-  const distillerIds = Array.from(accumulator.distillerCounts.keys());
-  const distillerList = distillerIds.length
-    ? await db.query.entities.findMany({
-        where: inArray(entities.id, distillerIds),
-        columns: { id: true, name: true },
-      })
-    : [];
-  const distillersById = new Map(
-    distillerList.map((distiller) => [distiller.id, distiller]),
-  );
-  const distillers = Array.from(accumulator.distillerCounts, ([id, count]) => {
-    const distiller = distillersById.get(id);
-    if (!distiller) {
-      throw new Error(`Bottle references missing distiller: ${id}`);
+function rankedEntities(
+  counts: Map<number, number>,
+  entitiesById: Map<number, { id: number; name: string }>,
+) {
+  return Array.from(counts, ([id, count]) => {
+    const entity = entitiesById.get(id);
+    if (!entity) {
+      throw new Error(`Bottle references missing entity: ${id}`);
     }
-    return { id, name: distiller.name, count };
+    return { id, name: entity.name, count };
   })
     .sort((left, right) =>
       right.count === left.count
@@ -135,6 +155,26 @@ async function finalizeLibraryStats(
         : right.count - left.count,
     )
     .slice(0, 5);
+}
+
+async function finalizeLibraryStats(
+  accumulator: LibraryStatsAccumulator,
+): Promise<LibraryStats> {
+  const entityIds = Array.from(
+    new Set([
+      ...accumulator.brandCounts.keys(),
+      ...accumulator.distillerCounts.keys(),
+    ]),
+  );
+  const entityList = entityIds.length
+    ? await db.query.entities.findMany({
+        where: inArray(entities.id, entityIds),
+        columns: { id: true, name: true },
+      })
+    : [];
+  const entitiesById = new Map(entityList.map((entity) => [entity.id, entity]));
+  const brands = rankedEntities(accumulator.brandCounts, entitiesById);
+  const distillers = rankedEntities(accumulator.distillerCounts, entitiesById);
   const categories = Array.from(
     accumulator.categoryCounts,
     ([category, count]) => ({
@@ -151,6 +191,8 @@ async function finalizeLibraryStats(
 
   return {
     total: accumulator.total,
+    status: accumulator.status,
+    brands,
     distillers,
     age: buildAgeStats(accumulator.ages, accumulator.unstatedAgeCount),
     categories,
@@ -163,7 +205,7 @@ export default procedure
     path: "/users/{user}/library/stats",
     summary: "Get user Library statistics",
     description:
-      "Retrieve distillery, age, and category insights for non-empty bottles in a visible user's Library",
+      "Retrieve producer, status, age, and category insights for non-empty bottles in a visible user's Library",
     operationId: "getUserLibraryStats",
   })
   .input(
@@ -209,6 +251,7 @@ export default procedure
               statedAge: bottles.statedAge,
             },
             retiredBottleId: bottleTombstones.bottleId,
+            status: collectionBottles.status,
           })
           .from(collectionBottles)
           .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
@@ -247,12 +290,13 @@ export default procedure
         }
         accumulateLibraryStats(
           accumulator,
-          directBottles.map((bottle) =>
+          directBottles.map((bottle, index) =>
             bottle === null
               ? null
               : {
                   ...bottle,
                   distillerIds: distillerIdsByBottleId.get(bottle.id) ?? [],
+                  status: rows[index]!.status,
                 },
           ),
         );

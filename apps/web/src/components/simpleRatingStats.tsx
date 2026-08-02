@@ -28,47 +28,10 @@ export default function SimpleRatingStats({ stats, className }: Props) {
     );
   }
 
-  const { percentage, total } = stats;
-
-  // Find the dominant rating
-  const dominant = Object.entries(percentage).reduce((a, b) =>
-    b[1] > a[1] ? b : a,
-  )[0] as keyof typeof percentage;
-
-  const dominantConfig = {
-    pass: {
-      label: "would pass",
-      color: "text-slate-600",
-      bgColor: "bg-slate-100",
-    },
-    sip: {
-      label: "would sip",
-      color: "text-slate-600",
-      bgColor: "bg-slate-100",
-    },
-    savor: {
-      label: "would savor",
-      color: "text-slate-600",
-      bgColor: "bg-slate-100",
-    },
-  };
-
-  const config = dominantConfig[dominant];
+  const { percentage } = stats;
 
   return (
     <div className={className}>
-      {/* Summary */}
-      <div className="mb-3">
-        <span className="text-lg font-semibold">
-          {Math.round(percentage[dominant])}%
-        </span>
-        <span className="ml-1">{config.label}</span>
-        <span className="text-muted ml-2 text-sm">
-          ({total} {total === 1 ? "rating" : "ratings"})
-        </span>
-      </div>
-
-      {/* Distribution bars */}
       <div className="space-y-2">
         <RatingBar
           label="Savor"

@@ -14,6 +14,7 @@ describe("GET /users/:user/tasting-stats", () => {
       await fixtures.Tasting({
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        rating: null,
       });
     }
 
@@ -27,6 +28,9 @@ describe("GET /users/:user/tasting-stats", () => {
 
     expect(data).toEqual({
       total: 5,
+      uniqueBottles: 5,
+      ratings: { total: 0, pass: 0, sip: 0, savor: 0 },
+      mostTastedBottle: null,
       age: {
         knownCount: 4,
         median: 15,
@@ -52,12 +56,55 @@ describe("GET /users/:user/tasting-stats", () => {
     );
 
     expect(data.total).toBe(0);
+    expect(data.uniqueBottles).toBe(0);
+    expect(data.ratings).toEqual({ total: 0, pass: 0, sip: 0, savor: 0 });
+    expect(data.mostTastedBottle).toBeNull();
     expect(data.age).toMatchObject({
       knownCount: 0,
       median: null,
       oldest: null,
     });
     expect(data.age.buckets.every((bucket) => bucket.count === 0)).toBe(true);
+  });
+
+  test("summarizes ratings and repeated bottles", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const favorite = await fixtures.Bottle({ fullName: "Favorite Bottle" });
+    const occasional = await fixtures.Bottle({ fullName: "Occasional Bottle" });
+    const tastingInputs = [
+      { bottleId: favorite.id, rating: 2, day: 1 },
+      { bottleId: favorite.id, rating: 2, day: 2 },
+      { bottleId: favorite.id, rating: 1, day: 3 },
+      { bottleId: occasional.id, rating: -1, day: 4 },
+      { bottleId: occasional.id, rating: null, day: 5 },
+    ];
+
+    for (const { bottleId, rating, day } of tastingInputs) {
+      await fixtures.Tasting({
+        bottleId,
+        rating,
+        createdById: defaults.user.id,
+        createdAt: new Date(`2026-01-0${day}T00:00:00.000Z`),
+      });
+    }
+
+    const data = await routerClient.users.tastingStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      total: 5,
+      uniqueBottles: 2,
+      ratings: { total: 4, pass: 1, sip: 1, savor: 2 },
+      mostTastedBottle: {
+        id: favorite.id,
+        name: favorite.fullName,
+        count: 3,
+      },
+    });
   });
 
   test("does not expose a private profile", async ({ fixtures }) => {

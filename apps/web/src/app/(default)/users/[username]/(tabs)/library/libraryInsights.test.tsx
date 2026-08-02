@@ -8,6 +8,8 @@ type LibraryStats = Outputs["users"]["libraryStats"];
 function makeStats(overrides: Partial<LibraryStats> = {}): LibraryStats {
   return {
     total: 4,
+    status: { open: 2, sealed: 1, unspecified: 1 },
+    brands: [{ id: 2, name: "Example Brand", count: 4 }],
     distillers: [{ id: 1, name: "Example Distillery", count: 3 }],
     age: {
       knownCount: 3,
@@ -28,12 +30,16 @@ function makeStats(overrides: Partial<LibraryStats> = {}): LibraryStats {
 }
 
 describe("LibraryInsightsContent", () => {
-  test("shows distilleries and age distribution with enough age data", () => {
+  test("shows producers, status, and age distribution with enough age data", () => {
     const html = renderToStaticMarkup(
       <LibraryInsightsContent stats={makeStats()} username="collector" />,
     );
 
-    expect(html).toContain("Top distilleries");
+    expect(html).toContain("Most collected");
+    expect(html).toContain("Brands");
+    expect(html).toContain("Example Brand");
+    expect(html).toContain("Example Brand: 4 bottles");
+    expect(html).toContain("Distilleries");
     expect(html).toContain("Example Distillery");
     expect(html).toContain("Example Distillery: 3 bottles");
     expect(html).toContain("Bottle ages");
@@ -42,7 +48,30 @@ describe("LibraryInsightsContent", () => {
     expect(html).toContain("Age stated for 3 of 4 bottles");
     expect(html).toContain("data-age-profile-chart");
     expect(html).toContain("min-h-28 flex-1");
+    expect(html).toContain("Bottle status");
+    expect(html).toContain("Open");
+    expect(html).toContain("Sealed");
+    expect(html).toContain("Not set");
     expect(html).not.toContain("Library types");
+  });
+
+  test("keeps each producer group to its top three entries", () => {
+    const stats = makeStats({
+      brands: [
+        { id: 1, name: "First Brand", count: 4 },
+        { id: 2, name: "Second Brand", count: 3 },
+        { id: 3, name: "Third Brand", count: 2 },
+        { id: 4, name: "Fourth Brand", count: 1 },
+      ],
+      distillers: [],
+    });
+    const html = renderToStaticMarkup(
+      <LibraryInsightsContent stats={stats} username="collector" />,
+    );
+
+    expect(html).toContain("First Brand");
+    expect(html).toContain("Third Brand");
+    expect(html).not.toContain("Fourth Brand");
   });
 
   test("falls back to category mix when age data is limited", () => {
