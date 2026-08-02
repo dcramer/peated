@@ -5,7 +5,6 @@ import { logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { type Country } from "@peated/server/types";
-import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -45,25 +44,17 @@ export async function getGeneratedCountryDetails(
   return await withSentryConversation(
     `country_details:${country.slug ?? country.name ?? "draft"}`,
     async () =>
-      await startSpan(
+      await getStructuredResponse(
+        "getGeneratedCountryDetails",
+        generatePrompt(country),
+        OpenAICountryDetailsSchema,
+        undefined,
+        undefined,
         {
-          op: "ai.pipeline",
-          name: "getGeneratedCountryDetails",
-        },
-        async (span) => {
-          return await getStructuredResponse(
-            "getGeneratedCountryDetails",
-            generatePrompt(country),
-            OpenAICountryDetailsSchema,
-            undefined,
-            undefined,
-            {
-              country: {
-                id: country.slug,
-                name: country.name,
-              },
-            },
-          );
+          country: {
+            id: country.slug,
+            name: country.name,
+          },
         },
       ),
   );

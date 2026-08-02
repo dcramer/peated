@@ -51,7 +51,7 @@ const STANDARD_SHORT_CONTEXT_PRICING: TokenPricing[] = [
 ];
 
 export type EvalRunCostMetadata = {
-  scope: "agent_loop_only";
+  scope: "agent_loop_only" | "full_llm_run";
   costCoverage:
     | "priced_model_tokens"
     | "cached_input_unreported_assumed_uncached"
@@ -60,6 +60,7 @@ export type EvalRunCostMetadata = {
     | "usage_unavailable"
     | "unsupported_model";
   estimatedAgentLoopCostUsd?: number;
+  estimatedLlmRunCostUsd?: number;
   pricingModel?: string;
   pricingEffectiveDate: string;
   pricingSource: string;
@@ -105,24 +106,28 @@ function resolveTokenPricing(model: string): TokenPricing | undefined {
 }
 
 /**
- * Estimates only measured agent-loop model tokens. Extraction, separate web
- * search responses and fees, and pricing adjustments stay outside this scope.
+ * Estimates the measured model tokens in the supplied usage scope. Provider
+ * tool fees and pricing adjustments remain outside the token estimate.
  */
 export function getEvalRunCostMetadata({
   model,
   usage,
+  scope = "agent_loop_only",
 }: {
   model: string;
   usage: BottleClassifierRunMetadata["usage"];
+  scope?: EvalRunCostMetadata["scope"];
 }): EvalRunCostMetadata {
   const metadata = getEvalModelCostMetadata({ model, usage });
   const { estimatedCostUsd, ...sharedMetadata } = metadata;
   return {
     ...sharedMetadata,
-    scope: "agent_loop_only",
+    scope,
     ...(estimatedCostUsd === undefined
       ? {}
-      : { estimatedAgentLoopCostUsd: estimatedCostUsd }),
+      : scope === "full_llm_run"
+        ? { estimatedLlmRunCostUsd: estimatedCostUsd }
+        : { estimatedAgentLoopCostUsd: estimatedCostUsd }),
   };
 }
 

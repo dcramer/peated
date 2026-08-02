@@ -26,7 +26,6 @@ import {
   updateConcreteBottleInTransaction,
 } from "@peated/server/lib/updateConcreteBottle";
 import { CategoryEnum, FlavorProfileEnum } from "@peated/server/schemas";
-import { startSpan } from "@sentry/node";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 
@@ -123,25 +122,17 @@ export async function getGeneratedBottleDetails(
   return await withSentryConversation(
     conversationId,
     async () =>
-      await startSpan(
+      await getStructuredResponse(
+        "generateBottleDetails",
+        generatePrompt(bottle, tagList),
+        OpenAIBottleDetailsSchema,
+        OpenAIBottleDetailsValidationSchema,
+        undefined,
         {
-          op: "ai.pipeline",
-          name: "generateBottleDetails",
-        },
-        async (span) => {
-          return await getStructuredResponse(
-            "generateBottleDetails",
-            generatePrompt(bottle, tagList),
-            OpenAIBottleDetailsSchema,
-            OpenAIBottleDetailsValidationSchema,
-            undefined,
-            {
-              bottle: {
-                id: bottle.id,
-                fullName: bottle.fullName,
-              },
-            },
-          );
+          bottle: {
+            id: bottle.id,
+            fullName: bottle.fullName,
+          },
         },
       ),
   );

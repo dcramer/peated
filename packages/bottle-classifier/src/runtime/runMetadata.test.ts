@@ -19,6 +19,10 @@ describe("getBottleClassifierRunMetadata", () => {
                 { cached_tokens: 20 },
               ],
               outputTokens: 20,
+              outputTokensDetails: [
+                { reasoning_tokens: 7 },
+                { reasoningTokens: 3 },
+              ],
               totalTokens: 120,
             },
           },
@@ -46,6 +50,7 @@ describe("getBottleClassifierRunMetadata", () => {
         cachedInputTokens: 60,
         cacheWriteTokens: 10,
         outputTokens: 20,
+        reasoningTokens: 10,
         totalTokens: 120,
       },
       toolCalls: {

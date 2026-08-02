@@ -5,7 +5,6 @@ import { logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { type Region } from "@peated/server/types";
-import { startSpan } from "@sentry/node";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -42,31 +41,23 @@ export async function getGeneratedRegionDetails(
   return await withSentryConversation(
     conversationId,
     async () =>
-      await startSpan(
+      await getStructuredResponse(
+        "getGeneratedRegionDetails",
+        generatePrompt(region),
+        OpenAIRegionDetailsSchema,
+        undefined,
+        undefined,
         {
-          op: "ai.pipeline",
-          name: "getGeneratedRegionDetails",
-        },
-        async (span) => {
-          return await getStructuredResponse(
-            "getGeneratedRegionDetails",
-            generatePrompt(region),
-            OpenAIRegionDetailsSchema,
-            undefined,
-            undefined,
-            {
-              region: {
-                id: region.id,
-                slug: region.slug,
-                name: region.name,
-              },
-              country: {
-                id: region.country.id,
-                slug: region.country.slug,
-                name: region.country.slug,
-              },
-            },
-          );
+          region: {
+            id: region.id,
+            slug: region.slug,
+            name: region.name,
+          },
+          country: {
+            id: region.country.id,
+            slug: region.country.slug,
+            name: region.country.slug,
+          },
         },
       ),
   );

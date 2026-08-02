@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/hono/node";
 import config from "./config";
+import { normalizeStreamedGenAiSpan } from "./lib/genAiTelemetry";
 import { configureLogging } from "./lib/log";
 
 type HonoNodeOptionsWithLocalVariables = Parameters<typeof Sentry.init>[0] & {
@@ -13,6 +14,7 @@ if (config.ENV !== "test") {
     tracesSampleRate: 1.0,
     enableLogs: true,
     streamGenAiSpans: true,
+    beforeSendSpan: Sentry.withStreamedSpan(normalizeStreamedGenAiSpan),
     tracePropagationTargets: ["localhost", "api.peated.com", "peated.com"],
     includeLocalVariables: true,
     sendDefaultPii: true,

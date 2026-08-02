@@ -28,6 +28,23 @@ export const GENERATION_PERSONA_PROMPT = [
   "</rules>",
 ].join("\n");
 
+export function buildStructuredResponseSpanContext(
+  pipelineName: string,
+  model: string,
+) {
+  return {
+    op: "gen_ai.invoke_workflow",
+    name: `invoke_workflow ${pipelineName}`,
+    attributes: {
+      "gen_ai.operation.name": "invoke_workflow",
+      "gen_ai.provider.name": "openai",
+      "gen_ai.workflow.name": pipelineName,
+      "gen_ai.request.model": model,
+      "gen_ai.output.type": "json",
+    },
+  };
+}
+
 export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   pipelineName: string,
   prompt: string | Message[],
@@ -66,17 +83,8 @@ export async function getStructuredResponse<
     typeof prompt === "string" ? [{ role: "user", content: prompt }] : prompt;
 
   const response = await startSpan(
-    {
-      op: "ai.run",
-      name: "getStructuredResponse",
-    },
+    buildStructuredResponseSpanContext(pipelineName, model),
     async (span) => {
-      span.setAttribute("ai.pipeline.name", pipelineName);
-      span.setAttribute("ai.instructions", GENERATION_PERSONA_PROMPT);
-      span.setAttribute("ai.input_messages", JSON.stringify(inputMessages));
-      span.setAttribute("ai.model_id", model);
-      span.setAttribute("ai.streaming", false);
-
       const result = await openai.responses.create({
         model,
         instructions: GENERATION_PERSONA_PROMPT,
@@ -89,20 +97,26 @@ export async function getStructuredResponse<
         temperature: 0,
       });
 
+      span.setAttribute("gen_ai.response.id", result.id);
+      span.setAttribute("gen_ai.response.model", result.model);
       if (result.usage) {
-        span.setAttribute("ai.total_tokens.used", result.usage.total_tokens);
-        span.setAttribute("ai.prompt_tokens.used", result.usage.input_tokens);
         span.setAttribute(
-          "ai.completion_tokens.used",
+          "gen_ai.usage.input_tokens",
+          result.usage.input_tokens,
+        );
+        span.setAttribute(
+          "gen_ai.usage.cache_read.input_tokens",
+          result.usage.input_tokens_details.cached_tokens,
+        );
+        span.setAttribute(
+          "gen_ai.usage.output_tokens",
           result.usage.output_tokens,
         );
         span.setAttribute(
-          "ai.reasoning_tokens.used",
+          "gen_ai.usage.reasoning.output_tokens",
           result.usage.output_tokens_details.reasoning_tokens,
         );
       }
-
-      span.setAttribute("ai.responses", JSON.stringify(result.output));
 
       return result;
     },

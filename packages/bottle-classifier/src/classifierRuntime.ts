@@ -1673,7 +1673,7 @@ export function createBottleClassifier(
           currentBottleContext,
           conversationId,
         });
-        output = await startAgentSpan({
+        const agentRun = await startAgentSpan({
           name: "Bottle Auditor",
           conversationId: preparedRun.conversationId,
           attributes: {
@@ -1688,17 +1688,22 @@ export function createBottleClassifier(
               preparedRun.input,
               preparedRun.runOptions,
             );
-            modelMetadata = getBottleClassifierRunMetadata({
+            const runMetadata = getBottleClassifierRunMetadata({
               result,
               durationMs: performance.now() - startedAt,
             });
             try {
-              return preparedRun.getOutput(result);
+              return {
+                output: preparedRun.getOutput(result),
+                modelMetadata: runMetadata,
+              };
             } finally {
               artifacts = preparedRun.getArtifacts();
             }
           },
         });
+        output = agentRun.output;
+        modelMetadata = agentRun.modelMetadata;
       }
 
       return {

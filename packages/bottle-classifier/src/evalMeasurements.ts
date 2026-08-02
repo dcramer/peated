@@ -1,5 +1,10 @@
 import type { JsonValue, UsageSummary } from "vitest-evals/harness";
 import { getEvalModelCostMetadata, getEvalRunCostMetadata } from "./evalCost";
+import {
+  buildEvalModelCallTrace,
+  summarizeEvalModelCalls,
+  type EvalModelCall,
+} from "./evalTelemetry";
 import type { WhiskyLabelExtractionMetadata } from "./extractor";
 import type { OpenAIReasoningEffort } from "./openaiModelSettings";
 import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
@@ -9,45 +14,96 @@ export function buildEvalHarnessMeasurements({
   modelMetadata,
   reasoningEffort,
   totalMs,
+  modelCalls,
+  trace,
 }: {
   model: string;
   modelMetadata: BottleClassifierRunMetadata | null;
   reasoningEffort?: OpenAIReasoningEffort;
   totalMs: number;
+  modelCalls?: EvalModelCall[];
+  trace?: {
+    name: string;
+    operationName: "invoke_agent" | "invoke_workflow";
+  };
 }) {
-  const costMetadata = modelMetadata
-    ? getEvalRunCostMetadata({ model, usage: modelMetadata.usage })
+  const capturedUsage = modelCalls
+    ? summarizeEvalModelCalls(modelCalls)
+    : undefined;
+  const measuredUsage =
+    capturedUsage?.inputTokens === undefined
+      ? modelMetadata?.usage
+      : {
+          requests: modelCalls?.length ?? 0,
+          inputTokens: capturedUsage.inputTokens,
+          ...(typeof capturedUsage.metadata?.cachedInputTokens === "number"
+            ? {
+                cachedInputTokens: capturedUsage.metadata.cachedInputTokens,
+              }
+            : {}),
+          ...(typeof capturedUsage.metadata?.cacheWriteTokens === "number"
+            ? { cacheWriteTokens: capturedUsage.metadata.cacheWriteTokens }
+            : {}),
+          outputTokens: capturedUsage.outputTokens ?? 0,
+          totalTokens: capturedUsage.totalTokens ?? 0,
+        };
+  const usageScope =
+    capturedUsage?.inputTokens === undefined
+      ? "agent_loop_only"
+      : "full_llm_run";
+  const costMetadata = measuredUsage
+    ? getEvalRunCostMetadata({ model, usage: measuredUsage, scope: usageScope })
     : null;
+  const usage = measuredUsage
+    ? {
+        provider: "openai",
+        model: capturedUsage?.model ?? model,
+        inputTokens: measuredUsage.inputTokens,
+        outputTokens: measuredUsage.outputTokens,
+        ...((capturedUsage?.reasoningTokens ??
+          modelMetadata?.usage.reasoningTokens) === undefined
+          ? {}
+          : {
+              reasoningTokens:
+                capturedUsage?.reasoningTokens ??
+                modelMetadata?.usage.reasoningTokens,
+            }),
+        totalTokens: measuredUsage.totalTokens,
+        toolCalls: modelMetadata?.toolCalls.count ?? 0,
+        metadata: {
+          ...costMetadata,
+          reasoningEffort: reasoningEffort ?? "provider_default",
+          requests: measuredUsage.requests,
+          ...(measuredUsage.cachedInputTokens === undefined
+            ? {}
+            : { cachedInputTokens: measuredUsage.cachedInputTokens }),
+          ...(measuredUsage.cacheWriteTokens === undefined
+            ? {}
+            : { cacheWriteTokens: measuredUsage.cacheWriteTokens }),
+          toolNames: modelMetadata?.toolCalls.names ?? [],
+          ...(capturedUsage?.metadata?.models
+            ? { models: capturedUsage.metadata.models }
+            : {}),
+        } satisfies Record<string, JsonValue>,
+      }
+    : undefined;
 
   return {
-    usage: modelMetadata
-      ? {
-          provider: "openai",
-          model,
-          inputTokens: modelMetadata.usage.inputTokens,
-          outputTokens: modelMetadata.usage.outputTokens,
-          totalTokens: modelMetadata.usage.totalTokens,
-          toolCalls: modelMetadata.toolCalls.count,
-          metadata: {
-            ...costMetadata,
-            reasoningEffort: reasoningEffort ?? "provider_default",
-            requests: modelMetadata.usage.requests,
-            ...(modelMetadata.usage.cachedInputTokens === undefined
-              ? {}
-              : { cachedInputTokens: modelMetadata.usage.cachedInputTokens }),
-            ...(modelMetadata.usage.cacheWriteTokens === undefined
-              ? {}
-              : { cacheWriteTokens: modelMetadata.usage.cacheWriteTokens }),
-            toolNames: modelMetadata.toolCalls.names,
-          } satisfies Record<string, JsonValue>,
-        }
-      : undefined,
+    usage,
     timings: {
       totalMs,
       ...(modelMetadata
         ? { metadata: { agentDurationMs: modelMetadata.agentDurationMs } }
         : {}),
     },
+    ...(trace && modelCalls
+      ? {
+          traces: buildEvalModelCallTrace({
+            ...trace,
+            modelCalls,
+          }),
+        }
+      : {}),
   };
 }
 
@@ -104,16 +160,24 @@ export function formatEvalUsageAnnotation(
 ): string {
   const metadata = usage?.metadata;
   const estimate =
-    metadata?.estimatedCostUsd ?? metadata?.estimatedAgentLoopCostUsd;
-  const coverage = metadata?.costCoverage ?? "usage_unavailable";
-  const reasoningEffort = metadata?.reasoningEffort ?? "provider_default";
-  const reasoningSummary = `effort ${String(reasoningEffort).replace("_", " ")}`;
-  const scopeSummary =
-    metadata?.scope === "image_extraction_only"
+    metadata?.estimatedCostUsd ??
+    metadata?.estimatedLlmRunCostUsd ??
+    metadata?.estimatedAgentLoopCostUsd;
+  const scope = metadata?.scope ?? "agent_loop_only";
+  const scopeLabel =
+    scope === "image_extraction_only"
       ? "image extraction only"
-      : "agent loop only";
+      : scope === "full_llm_run"
+        ? "full LLM run"
+        : "agent loop only";
+  const coverage = metadata?.costCoverage ?? "usage_unavailable";
+  const reasoningEffort =
+    typeof metadata?.reasoningEffort === "string"
+      ? metadata.reasoningEffort
+      : "provider_default";
+  const reasoningSummary = `effort ${reasoningEffort.replace("_", " ")}`;
   if (coverage === "usage_unavailable") {
-    return `usage unavailable | ${reasoningSummary} · ${scopeSummary}`;
+    return `usage unavailable | ${reasoningSummary} · ${scopeLabel}`;
   }
 
   const inputTokens = usage?.inputTokens ?? 0;
@@ -135,8 +199,8 @@ export function formatEvalUsageAnnotation(
   ].join(" | ");
 
   if (typeof estimate === "number") {
-    return `${tokenSummary} | ${reasoningSummary} | est. $${estimate.toFixed(6)} · ${scopeSummary}`;
+    return `${tokenSummary} | ${reasoningSummary} | est. $${estimate.toFixed(6)} · ${scopeLabel}`;
   }
 
-  return `${tokenSummary} | ${reasoningSummary} | cost unavailable (unsupported model) · ${scopeSummary}`;
+  return `${tokenSummary} | ${reasoningSummary} | cost unavailable (unsupported model) · ${scopeLabel}`;
 }
