@@ -52,7 +52,7 @@ describe("TastingBottleIdentity", () => {
     expect(text.match(/2025 Release/g)).toHaveLength(1);
     expect(text).not.toContain("2004 Vintage");
     expect(text).toContain("·Lagavulin Distillery");
-    expect(text).toContain("Single Malt");
+    expect(text).not.toContain("Single Malt");
     expect(text).not.toContain("Aged 21 years");
     expect(html).toContain("bg-highlight");
     expect(html).toContain("p-4");

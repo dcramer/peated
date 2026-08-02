@@ -1,4 +1,3 @@
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import {
   type BottleIdentitySource,
@@ -34,6 +33,10 @@ export default function TastingBottleIdentity({
     bottle,
     `${displayName} ${exactBottleLabel ?? ""}`,
   );
+  const standaloneAge =
+    bottle.statedAge && !metadataExclude.has("age")
+      ? `Aged ${bottle.statedAge} years`
+      : null;
 
   if (variant === "inline") {
     return (
@@ -90,23 +93,11 @@ export default function TastingBottleIdentity({
           ) : null}
         </div>
       </div>
-      <div className="hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex">
-        <div className="max-w-full truncate">
-          {bottle.category ? (
-            <Link
-              href={`/bottles?category=${bottle.category}`}
-              className="hover:underline"
-            >
-              {formatCategoryName(bottle.category)}
-            </Link>
-          ) : null}
+      {standaloneAge ? (
+        <div className="hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex">
+          <div>{standaloneAge}</div>
         </div>
-        <div>
-          {bottle.statedAge && !metadataExclude.has("age")
-            ? `Aged ${bottle.statedAge} years`
-            : null}
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }

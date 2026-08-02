@@ -232,6 +232,7 @@ export function getBottleMetadataExclusions(
   exclusions.add("single-cask");
   exclusions.add("cask-strength");
   exclusions.add("cask-details");
+  exclusions.add("category");
 
   if (bottle.edition) {
     exclusions.add("vintage");
@@ -360,7 +361,6 @@ export default function BottleIdentity({
   ) {
     metadataExclude.add("age");
   }
-  metadataExclude.add("category");
   const seriesName = isAbsolute
     ? getBottleIdentitySeriesName(bottle, title)
     : null;

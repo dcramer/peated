@@ -106,6 +106,13 @@ ABV is the useful technical strength fact for a bottle header or metadata row.
 When ABV is visible, do not add a derived cask-strength label. Ordinary headers
 should not add that label even when ABV is unavailable.
 
+### Treat category as taxonomy
+
+Category supports filtering, analytics, editing, and verification. It is not
+normally part of a bottle's marketed identity, so ordinary headers, results,
+tables, tasting panels, and flight rows should omit it. Purpose-built category
+views may still display it when comparison or classification is the point.
+
 ### Avoid duplicate or conflicting tokens
 
 A structured field should not be repeated when equivalent wording is already
@@ -270,7 +277,7 @@ particular result component omits some of them visually.
 | Cask-strength flag        | No                       | No                | No                 | No               | No                | Yes          |
 | Marketed cask/barrel code | As release marker        | As release marker | If needed          | Primary          | If needed         | Yes          |
 | Cask type/size/fill       | No                       | Normally no       | No                 | No               | No                | Yes          |
-| Category                  | Separate context         | Optional metadata | No                 | No               | No                | Yes          |
+| Category                  | No                       | No                | No                 | No               | No                | Yes          |
 
 “No” for a derived flag does not remove identical wording that belongs to the
 marketed expression or edition.

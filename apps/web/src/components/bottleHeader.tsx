@@ -29,7 +29,6 @@ export default function BottleHeader({
   const distinctDistillers = getDistinctBottleDistillers(bottle);
   const seriesName = getBottleIdentitySeriesName(bottle, expressionName);
 
-  metadataExclude.add("category");
   if (
     bottle.edition &&
     expressionName
