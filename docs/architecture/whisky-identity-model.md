@@ -72,9 +72,11 @@ exact identity and additionally owns:
 This duplication is intentional. BottleGroup is the authority for shared
 edits, while Bottle remains the authority for exact reads.
 
-`bottler` is an evidenced relationship, not a naming heuristic. It may point to
-the same Entity as `brand` when that company is also identified as the bottler;
-normalization must not erase it solely because the names match.
+`bottler` is the named, market-facing bottler or release imprint for the
+product. It may point to the same Entity as `brand` or a producing distillery.
+Ownership, importer/distributor, and physical packing relationships alone do
+not establish the role. Leave it null when product-specific evidence does not
+establish it.
 
 Observation-only facts by default include exact cask or barrel number, bottle
 number, outturn, retailer-exclusive wording, label notes, and unmodeled
@@ -146,8 +148,8 @@ authority.
 ## Naming And Entity Boundaries
 
 - `brand` is the consumer-facing label brand.
-- `bottler` is a separately stated bottling house when it differs from the
-  brand.
+- `bottler` is the named, market-facing bottler or release imprint for the
+  product. It may equal the Brand or a producing distillery.
 - `distillery` identifies the actual producer or producers.
 - `series` is a stable range or family, not a batch code or release year.
 - `edition` is a human-facing release descriptor such as `Batch 24`,

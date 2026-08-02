@@ -422,8 +422,8 @@ export default function BottleForm({
               <EntityField
                 {...field}
                 error={errors.bottler}
-                label="Bottled By"
-                helpText="Use this when the bottler is different from the brand."
+                label="Bottler"
+                helpText="Market-facing bottler or release imprint for this bottle. It may match the brand or distillery."
                 placeholder="e.g. The Scotch Malt Whisky Society"
                 suggestedOptions={brandValue ? [brandValue] : []}
                 searchContext={{
