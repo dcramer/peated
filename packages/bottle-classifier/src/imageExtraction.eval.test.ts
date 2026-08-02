@@ -3,9 +3,13 @@ import path from "node:path";
 import { describe, expect, test } from "vitest";
 import type { BottleExtractedDetails } from "./classifierTypes";
 import {
+  buildImageExtractionEvalMeasurements,
+  formatEvalUsageAnnotation,
+} from "./evalMeasurements";
+import {
   createEvalOpenAIClient,
-  evalClassifierModel,
-  evalClassifierReasoningEffort,
+  evalImageExtractionModel,
+  evalImageExtractionReasoningEffort,
   hasEvalOpenAICredentials,
 } from "./evalSupport";
 import { createWhiskyLabelExtractor } from "./extractor";
@@ -30,7 +34,8 @@ function imageFileToDataUrl(filename: string) {
 function normalizeEvalText(value: unknown): string {
   return String(value ?? "")
     .toLowerCase()
-    .replace(/['']/g, "")
+    .replace(/²/g, "2")
+    .replace(/['’]/g, "")
     .replace(/&/g, "and")
     .replace(/[^a-z0-9.]+/g, " ")
     .trim();
@@ -118,15 +123,29 @@ function assertExtractionExpectation(
 describe.skipIf(!hasEvalOpenAICredentials)("image extraction evals", () => {
   const extractor = createWhiskyLabelExtractor({
     client: createEvalOpenAIClient(),
-    model: evalClassifierModel,
-    reasoningEffort: evalClassifierReasoningEffort,
+    model: evalImageExtractionModel,
+    reasoningEffort: evalImageExtractionReasoningEffort,
   });
 
-  test.for(IMAGE_EXTRACTION_EVAL_CASES)("$name", async (testCase) => {
-    const extractedIdentity = await extractor.extractFromImage(
+  test.for(IMAGE_EXTRACTION_EVAL_CASES)("$name", async (testCase, context) => {
+    const extraction = await extractor.extractFromImageWithMetadata(
       imageFileToDataUrl(testCase.imagePath),
     );
+    const measurements = buildImageExtractionEvalMeasurements({
+      model: evalImageExtractionModel,
+      reasoningEffort: evalImageExtractionReasoningEffort,
+      metadata: extraction,
+    });
+    await context.annotate(
+      formatEvalUsageAnnotation(measurements.usage),
+      "usage",
+    );
+    await context.annotate(
+      `image extraction ${Math.round(extraction.durationMs).toLocaleString("en-US")} ms`,
+      "timing",
+    );
 
+    const extractedIdentity = extraction.result;
     expect(extractedIdentity).not.toBeNull();
     assertExtractionExpectation(testCase, extractedIdentity!);
   });

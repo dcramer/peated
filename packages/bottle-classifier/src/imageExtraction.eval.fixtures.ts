@@ -29,6 +29,7 @@ export type ImageExtractionEvalCase = {
   id: string;
   name: string;
   imagePath: string;
+  sourceUrl?: string;
   expected: {
     fields?: Partial<Record<ExtractedIdentityField, unknown>>;
     text?: TextExpectation[];
@@ -73,6 +74,31 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
         edition: null,
       },
       distilleryIncludes: ["Shinshu"],
+    },
+  },
+  {
+    id: "image-extraction-compass-box-hedonism-squared",
+    name: "Compass Box Hedonism²",
+    imagePath: assetPath("compass-box-hedonism-squared.jpg"),
+    sourceUrl:
+      "https://static.whiskybase.com/storage/whiskies/2/2/6721/406144-big.jpg",
+    expected: {
+      fields: {
+        brand: "Compass Box",
+        bottler: null,
+        category: "blend",
+        stated_age: null,
+        abv: 49,
+      },
+      // The source label uses a superscript 2. Accept either a faithful
+      // `Hedonism²` expression or a split `Hedonism` / `2` representation,
+      // but do not allow extraction to collapse it to plain Hedonism.
+      anyText: [
+        {
+          fields: ["expression", "edition"],
+          includes: ["Hedonism", "2"],
+        },
+      ],
     },
   },
   {

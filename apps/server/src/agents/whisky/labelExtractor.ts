@@ -29,8 +29,8 @@ export const extractFromImage = async (imageUrlOrBase64: string) =>
   withLegacyCaskFields(
     await extractFromImageWithClient({
       client: createOpenAIClient(),
-      model: config.OPENAI_MODEL,
-      reasoningEffort: config.OPENAI_REASONING_EFFORT,
+      model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
+      reasoningEffort: config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
       imageUrlOrBase64,
     }),
   );

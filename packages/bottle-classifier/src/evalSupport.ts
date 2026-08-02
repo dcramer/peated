@@ -16,6 +16,11 @@ export const evalClassifierReasoningEffort = resolveOpenAIReasoningEffort(
   evalClassifierModel,
   evalOpenAIConfig.reasoningEffort,
 );
+export const evalImageExtractionModel = evalOpenAIConfig.imageExtractionModel;
+export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(
+  evalImageExtractionModel,
+  evalOpenAIConfig.imageExtractionReasoningEffort,
+);
 export const evalJudgeModel = evalOpenAIConfig.evalModel;
 export const hasEvalOpenAICredentials = Boolean(evalOpenAIConfig.apiKey);
 
@@ -35,6 +40,8 @@ export function createEvalClassifierOptions(
     client: createEvalOpenAIClient(),
     model: evalClassifierModel,
     reasoningEffort: evalClassifierReasoningEffort,
+    imageExtractionModel: evalImageExtractionModel,
+    imageExtractionReasoningEffort: evalImageExtractionReasoningEffort,
     maxSearchQueries: Number(
       process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 3,
     ),

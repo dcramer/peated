@@ -1,5 +1,7 @@
 import {
   DEFAULT_OPENAI_EVAL_MODEL,
+  DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL,
+  DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
   DEFAULT_OPENAI_MODEL,
   parseOpenAIReasoningEffort,
   type OpenAIReasoningEffort,
@@ -15,6 +17,8 @@ type OpenAICompatibleEnvKey =
   | "OPENAI_EVAL_MODEL"
   | "OPENAI_EMBEDDING_MODEL"
   | "OPENAI_HOST"
+  | "OPENAI_IMAGE_EXTRACTION_MODEL"
+  | "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT"
   | "OPENAI_MODEL"
   | "OPENAI_ORGANIZATION"
   | "OPENAI_PROJECT"
@@ -25,6 +29,8 @@ export type OpenAICompatibleConfig = {
   baseURL: string;
   embeddingModel: string;
   evalModel: string;
+  imageExtractionModel: string;
+  imageExtractionReasoningEffort: OpenAIReasoningEffort | undefined;
   model: string;
   organization: string | undefined;
   project: string | undefined;
@@ -60,6 +66,9 @@ export function resolveOpenAICompatibleConfig(
   const embeddingModel =
     nonEmpty(envValue(env, "OPENAI_EMBEDDING_MODEL")) ??
     DEFAULT_OPENAI_EMBEDDING_MODEL;
+  const imageExtractionModel =
+    nonEmpty(envValue(env, "OPENAI_IMAGE_EXTRACTION_MODEL")) ??
+    DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL;
 
   return {
     apiKey: gatewayApiKey ?? nonEmpty(envValue(env, "OPENAI_API_KEY")),
@@ -68,6 +77,13 @@ export function resolveOpenAICompatibleConfig(
       : (nonEmpty(envValue(env, "OPENAI_HOST")) ?? OPENAI_BASE_URL),
     embeddingModel: usesGateway ? gatewayModel(embeddingModel) : embeddingModel,
     evalModel: usesGateway ? gatewayModel(evalModel) : evalModel,
+    imageExtractionModel: usesGateway
+      ? gatewayModel(imageExtractionModel)
+      : imageExtractionModel,
+    imageExtractionReasoningEffort: parseOpenAIReasoningEffort(
+      envValue(env, "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT") ??
+        DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
+    ),
     model: usesGateway ? gatewayModel(model) : model,
     organization: usesGateway
       ? undefined

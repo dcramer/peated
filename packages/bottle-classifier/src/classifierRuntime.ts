@@ -228,6 +228,8 @@ type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
+  imageExtractionModel?: string;
+  imageExtractionReasoningEffort?: OpenAIReasoningEffort;
   maxSearchQueries: number;
   firecrawlApiKey?: string | null;
   firecrawlApiUrl?: string | null;
@@ -1199,6 +1201,8 @@ export function createBottleClassifier(
     client: options.client,
     model: options.model,
     reasoningEffort: options.reasoningEffort,
+    imageModel: options.imageExtractionModel,
+    imageReasoningEffort: options.imageExtractionReasoningEffort,
   });
 
   const extractFromImage = async (imageUrlOrBase64: string) =>

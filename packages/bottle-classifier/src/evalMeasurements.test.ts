@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   buildEvalHarnessMeasurements,
+  buildImageExtractionEvalMeasurements,
   formatEvalUsageAnnotation,
 } from "./evalMeasurements";
 import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
@@ -11,6 +12,52 @@ import {
 import { getBottleClassifierRunMetadata } from "./runtime/runMetadata";
 
 describe("eval harness measurements", () => {
+  test("reports image extraction usage and its scoped cost", () => {
+    const measurements = buildImageExtractionEvalMeasurements({
+      model: "gpt-5.6-luna",
+      reasoningEffort: "high",
+      metadata: {
+        durationMs: 125,
+        response: {
+          id: "resp_123",
+          model: "gpt-5.6-luna-2026-07-15",
+          serviceTier: "default",
+        },
+        usage: {
+          inputTokens: 1_000,
+          cachedInputTokens: 100,
+          outputTokens: 200,
+          reasoningTokens: 150,
+          totalTokens: 1_200,
+        },
+      },
+    });
+
+    expect(measurements).toMatchObject({
+      usage: {
+        model: "gpt-5.6-luna",
+        inputTokens: 1_000,
+        outputTokens: 200,
+        totalTokens: 1_200,
+        metadata: {
+          scope: "image_extraction_only",
+          costCoverage: "cache_write_unreported_assumed_standard_input",
+          estimatedCostUsd: 0.000422,
+          cachedInputTokens: 100,
+          reasoningTokens: 150,
+          reasoningEffort: "high",
+        },
+      },
+      timings: {
+        totalMs: 125,
+        metadata: { imageExtractionDurationMs: 125 },
+      },
+    });
+    expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
+      "input 1,000 tok | output 200 tok | effort high | est. $0.000422 · image extraction only",
+    );
+  });
+
   test("prices cached agent usage through the harness boundary", () => {
     const modelMetadata = getBottleClassifierRunMetadata({
       durationMs: 125,

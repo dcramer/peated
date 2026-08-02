@@ -59,6 +59,8 @@ export default defineConfig({
         "AI_GATEWAY_API_KEY",
         "OPENAI_API_KEY",
         "OPENAI_HOST",
+        "OPENAI_IMAGE_EXTRACTION_MODEL",
+        "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT",
         "OPENAI_ORGANIZATION",
         "OPENAI_PROJECT",
         "OPENAI_EVAL_MODEL",
