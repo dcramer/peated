@@ -356,10 +356,7 @@ export default function BottleIdentity({
   }
   if (
     showReleaseYear &&
-    !getMetadataExpressedByTitle(
-      bottle,
-      [title, displayedLeadingContent].filter(Boolean).join(" "),
-    ).includes("release")
+    !getMetadataExpressedByTitle(bottle, title).includes("release")
   ) {
     metadataExclude.delete("release");
   }
