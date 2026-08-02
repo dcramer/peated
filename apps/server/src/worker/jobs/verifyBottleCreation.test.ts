@@ -32,6 +32,7 @@ describe("verifyBottleCreation", () => {
   test("records flagged findings for suspicious manually created bottles", async ({
     fixtures,
   }) => {
+    config.BOTTLE_CHECK_SHADOW_GENERATION = false;
     const currentBrand = await fixtures.Entity({
       name: "Canadian",
       type: ["brand", "distiller"],
