@@ -3,7 +3,6 @@ import BottleExactMetadata, {
 } from "./bottleExactMetadata";
 import { getBottleMetadataExclusions } from "./bottleIdentity";
 import type { Option } from "./selectField";
-import SingleCaskChip from "./singleCaskChip";
 
 type EntityOption = Option & {
   shortName?: string;
@@ -12,6 +11,7 @@ type EntityOption = Option & {
 type BottleFormData = {
   name: string;
   brand?: EntityOption | null | undefined;
+  series?: Option | null | undefined;
   distillers?: EntityOption[] | null | undefined;
   edition?: string | null | undefined;
 } & Partial<BottleExactMetadataSource>;
@@ -21,7 +21,7 @@ export const PreviewBottleCard = ({
 }: {
   data: Partial<BottleFormData>;
 }) => {
-  const { brand } = data;
+  const { brand, series } = data;
   const exactBottle = {
     category: null,
     edition: data.edition ?? null,
@@ -44,10 +44,11 @@ export const PreviewBottleCard = ({
     exactBottle,
     [data.name, leadingEdition].filter(Boolean).join(" "),
   );
-  const showSingleCaskChip =
-    data.singleCask && !metadataExclude.has("single-cask");
-
-  if (showSingleCaskChip) metadataExclude.add("single-cask");
+  const showSeries = Boolean(
+    series &&
+    data.name &&
+    !data.name.toLocaleLowerCase().includes(series.name.toLocaleLowerCase()),
+  );
 
   return (
     <section
@@ -55,17 +56,18 @@ export const PreviewBottleCard = ({
       className="bg-highlight min-w-0 p-4 text-black sm:rounded lg:p-5"
     >
       {brand && (
-        <div className="truncate text-xs font-medium uppercase tracking-wide text-black/60">
-          {brand.shortName || brand.name}
+        <div className="flex min-w-0 items-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide text-black/60">
+          <span className="truncate">{brand.shortName || brand.name}</span>
+          {showSeries ? (
+            <>
+              <span aria-hidden="true">&middot;</span>
+              <span className="truncate">{series!.name}</span>
+            </>
+          ) : null}
         </div>
       )}
       {data.name && (
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2">
-          <div className="break-words font-semibold">{data.name}</div>
-          {showSingleCaskChip ? (
-            <SingleCaskChip className="!border-black/20 !bg-black/10 !text-black hover:!bg-black/10" />
-          ) : null}
-        </div>
+        <div className="break-words font-semibold">{data.name}</div>
       )}
       <BottleExactMetadata
         className="!text-black/70"

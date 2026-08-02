@@ -1,7 +1,8 @@
 import { db } from "@peated/server/db";
-import { bottleSeries, entities } from "@peated/server/db/schema";
+import { bottleSeries, bottles, entities } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSeriesSearchVector } from "@peated/server/lib/search";
+import { pushUniqueJob } from "@peated/server/worker/client";
 import { eq } from "drizzle-orm";
 
 export default async ({ seriesId }: { seriesId: number }) => {
@@ -31,4 +32,14 @@ export default async ({ seriesId }: { seriesId: number }) => {
       searchVector,
     })
     .where(eq(bottleSeries.id, series.id));
+
+  const relatedBottles = await db
+    .select({ id: bottles.id })
+    .from(bottles)
+    .where(eq(bottles.seriesId, series.id));
+  await Promise.all(
+    relatedBottles.map(({ id }) =>
+      pushUniqueJob("IndexBottleSearchVectors", { bottleId: id }),
+    ),
+  );
 };

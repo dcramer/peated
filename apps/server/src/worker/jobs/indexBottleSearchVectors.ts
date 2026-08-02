@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleSeries,
   bottles,
   bottlesToDistillers,
   entities,
@@ -58,6 +59,13 @@ export default async function indexBottleSearchVectors(input: unknown) {
     ? await db.select().from(entities).where(eq(entities.id, bottle.bottlerId))
     : [];
 
+  const [series] = bottle.seriesId
+    ? await db
+        .select()
+        .from(bottleSeries)
+        .where(eq(bottleSeries.id, bottle.seriesId))
+    : [];
+
   const searchVector =
     buildBottleSearchVector(
       bottle,
@@ -65,6 +73,7 @@ export default async function indexBottleSearchVectors(input: unknown) {
       aliasList,
       bottler,
       distillerList,
+      series,
     ) || null;
 
   logInfo("Updating search vector for bottle {bottleId}", {

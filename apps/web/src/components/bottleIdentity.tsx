@@ -1,6 +1,10 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import type { Bottle } from "@peated/server/types";
 import Link from "@peated/web/components/link";
+import {
+  getBottleContextLabel,
+  getBottleExpressionName,
+} from "@peated/web/lib/bottleLabel";
 import classNames from "@peated/web/lib/classNames";
 import type { MouseEventHandler, ReactNode } from "react";
 import BottleExactMetadata, {
@@ -24,7 +28,8 @@ export type BottleIdentitySource = Pick<
   | "caskType"
   | "caskSize"
 > & {
-  brand: Pick<Bottle["brand"], "name" | "shortName">;
+  brand: Pick<Bottle["brand"], "id" | "name" | "shortName">;
+  series: Pick<NonNullable<Bottle["series"]>, "id" | "name"> | null;
   group?: Pick<NonNullable<Bottle["group"]>, "name" | "statedAge">;
 };
 
@@ -52,54 +57,37 @@ function formatAbv(abv: number) {
   return `${abv.toFixed(1)}% ABV`;
 }
 
-function getCanonicalMetadataSegments(bottle: BottleIdentitySource) {
-  return new Set(
-    [
-      bottle.statedAge !== null ? `${bottle.statedAge}-year-old` : undefined,
-      bottle.releaseYear !== null ? `${bottle.releaseYear} Release` : undefined,
-      bottle.vintageYear !== null ? `${bottle.vintageYear} Vintage` : undefined,
-      bottle.abv !== null ? formatAbv(bottle.abv) : undefined,
-      bottle.singleCask ? "Single Cask" : undefined,
-      bottle.caskStrength ? "Cask Strength" : undefined,
-      bottle.caskType ? `${toTitleCase(bottle.caskType)} Cask` : undefined,
-      bottle.caskSize ? toTitleCase(bottle.caskSize) : undefined,
-      bottle.caskFill
-        ? bottle.caskFill === "other"
-          ? "Other Fill"
-          : toTitleCase(bottle.caskFill)
-        : undefined,
-    ]
-      .filter((value): value is string => value !== undefined)
-      .map((value) => value.toLocaleLowerCase()),
-  );
-}
-
 /**
  * Removes only canonical trailing metadata from an ungrouped Bottle name.
  * A metadata-only name remains intact so identities such as "21-year-old"
  * still have a useful headline.
  */
 export function getAbsoluteBottleTitle(bottle: BottleIdentitySource) {
-  if (bottle.group) return bottle.group.name;
-
-  const metadataSegments = getCanonicalMetadataSegments(bottle);
-  const titleSegments = bottle.name.split(" - ");
-
-  while (
-    titleSegments.length > 1 &&
-    metadataSegments.has(
-      titleSegments[titleSegments.length - 1]!.toLocaleLowerCase(),
-    )
-  ) {
-    titleSegments.pop();
-  }
-
-  return titleSegments.length ? titleSegments.join(" - ") : bottle.name;
+  return getBottleExpressionName(bottle);
 }
 
 export function getAbsoluteBottleLabel(bottle: BottleIdentitySource) {
-  const brandName = bottle.brand.shortName || bottle.brand.name;
-  return `${brandName} ${getAbsoluteBottleTitle(bottle)}`;
+  return getBottleContextLabel({
+    ...bottle,
+    name: getAbsoluteBottleTitle(bottle),
+    group: undefined,
+  });
+}
+
+export function getBottleIdentitySeriesName(
+  bottle: Pick<BottleIdentitySource, "series">,
+  displayedIdentity: string,
+) {
+  if (
+    !bottle.series ||
+    displayedIdentity
+      .toLocaleLowerCase()
+      .includes(bottle.series.name.toLocaleLowerCase())
+  ) {
+    return null;
+  }
+
+  return bottle.series.name;
 }
 
 export function getDistinctBottleDistillers({
@@ -241,7 +229,16 @@ export function getBottleMetadataExclusions(
     getMetadataExpressedByTitle(bottle, displayedIdentity),
   );
 
-  if (bottle.abv !== null) exclusions.add("cask-strength");
+  exclusions.add("single-cask");
+  exclusions.add("cask-strength");
+  exclusions.add("cask-details");
+
+  if (bottle.edition) {
+    exclusions.add("vintage");
+    exclusions.add("release");
+  } else if (bottle.vintageYear !== null && bottle.releaseYear !== null) {
+    exclusions.add("release");
+  }
 
   return exclusions;
 }
@@ -280,14 +277,8 @@ export function getRelativeBottleIdentity(
       excludeMetadata: ["age"],
     };
   }
-  if (bottle.singleCask) {
-    return { label: "Single cask", excludeMetadata: ["single-cask"] };
-  }
   if (bottle.abv !== null) {
     return { label: formatAbv(bottle.abv), excludeMetadata: ["abv"] };
-  }
-  if (bottle.caskStrength) {
-    return { label: "Cask strength", excludeMetadata: ["cask-strength"] };
   }
   return { label: bottle.name, excludeMetadata: [], fallback: true };
 }
@@ -362,13 +353,39 @@ export default function BottleIdentity({
   if (!isAbsolute || displayedLeadingContent) {
     relativeIdentity.excludeMetadata.forEach((key) => metadataExclude.add(key));
   }
+  if (
+    !isAbsolute &&
+    bottle.group &&
+    bottle.statedAge === bottle.group.statedAge
+  ) {
+    metadataExclude.add("age");
+  }
   metadataExclude.add("category");
+  const seriesName = isAbsolute
+    ? getBottleIdentitySeriesName(bottle, title)
+    : null;
 
   return (
     <div className={classNames("min-w-0", className)}>
       {isAbsolute && showBrand ? (
-        <div className="text-muted truncate text-xs font-medium uppercase tracking-wide">
-          {bottle.brand.shortName || bottle.brand.name}
+        <div className="text-muted flex min-w-0 items-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide">
+          <Link
+            href={`/entities/${bottle.brand.id}`}
+            className="truncate hover:underline"
+          >
+            {bottle.brand.shortName || bottle.brand.name}
+          </Link>
+          {seriesName ? (
+            <>
+              <span aria-hidden="true">&middot;</span>
+              <Link
+                href={`/bottles?series=${bottle.series!.id}`}
+                className="truncate hover:underline"
+              >
+                {seriesName}
+              </Link>
+            </>
+          ) : null}
         </div>
       ) : null}
       <div className="flex min-w-0 flex-wrap items-center gap-x-2">

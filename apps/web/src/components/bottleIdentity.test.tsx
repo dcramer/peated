@@ -19,6 +19,7 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
       statedAge: 12,
     },
     brand: { id: 1, name: "Springbank" },
+    series: null,
     edition: "Batch 24",
     category: "single_malt",
     statedAge: 12,
@@ -42,7 +43,8 @@ describe("BottleIdentity", () => {
 
     expect(html).toContain("Batch 24");
     expect(html).toContain("57.2% ABV");
-    expect(html).toContain("2023 release");
+    expect(html).not.toContain(">12 years<");
+    expect(html).not.toContain("2023 release");
     expect(html).not.toContain(">Cask strength</span>");
     expect(html).toContain('aria-current="page"');
     expect(html).toContain('title="Currently viewing"');
@@ -77,6 +79,31 @@ describe("BottleIdentity", () => {
     expect(html).not.toContain(">12 years<");
     expect(html).not.toContain(">Cask strength</span>");
     expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
+  });
+
+  it("shows a nonduplicative series with producer context", () => {
+    const html = renderToStaticMarkup(
+      <BottleIdentity
+        bottle={makeBottle({
+          brand: { id: 2, name: "Decadent Drinks" } as Bottle["brand"],
+          series: {
+            id: 3,
+            name: "Whiskyland",
+          } as Bottle["series"],
+          group: {
+            ...makeBottle().group!,
+            name: "Glenburgie 38-year-old",
+          },
+          edition: "Chapter Thirty Two",
+        })}
+      />,
+    );
+
+    expect(html).toContain("Decadent Drinks");
+    expect(html).toContain("Whiskyland");
+    expect(html).toContain('href="/bottles?series=3"');
+    expect(html).toContain("Glenburgie 38-year-old");
+    expect(html).toContain("Chapter Thirty Two");
   });
 
   it("does not use exact age as a subtitle when the family title includes it", () => {
@@ -124,8 +151,8 @@ describe("BottleIdentity", () => {
     );
     expect(html).toContain(">Whiskyland - Chapter Thirty Three</a>");
     expect(html).toContain(">52 years</span>");
-    expect(html).toContain(">2026 release</span>");
-    expect(html).toContain(">1973 vintage</span>");
+    expect(html).not.toContain(">2026 release</span>");
+    expect(html).not.toContain(">1973 vintage</span>");
     expect(html).toContain(">53.2% ABV</span>");
   });
 
@@ -181,7 +208,7 @@ describe("BottleIdentity", () => {
     expect(html).not.toContain(">21 years</span>");
   });
 
-  it("uses every modeled exact branch before falling back to the name", () => {
+  it("uses meaningful release branches before falling back to the name", () => {
     expect(
       getRelativeBottleIdentity(
         makeBottle({ edition: null, vintageYear: 1998 }),
@@ -214,9 +241,10 @@ describe("BottleIdentity", () => {
           releaseYear: null,
           statedAge: 12,
           singleCask: true,
+          abv: null,
         }),
       ).label,
-    ).toBe("Single cask");
+    ).toBe("12-year-old Cask Strength Batch 24");
     expect(
       getRelativeBottleIdentity(
         makeBottle({

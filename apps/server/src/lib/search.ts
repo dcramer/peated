@@ -47,6 +47,7 @@ export function buildBottleSearchVector(
   aliasList?: Pick<NewBottleAlias, "name">[],
   bottler?: NewEntity,
   distillerList?: NewEntity[],
+  series?: NewBottleSeries,
 ): TSVector[] {
   const values: TSVector[] = [
     new TSVector(bottle.fullName, "A"),
@@ -72,6 +73,7 @@ export function buildBottleSearchVector(
     values.push(new TSVector(`${bottle.releaseYear} release`, "B"));
   if (bottle.abv) values.push(new TSVector(formatSearchAbv(bottle.abv)!, "B"));
   if (bottler) values.push(new TSVector(bottler.name, "C"));
+  if (series) values.push(new TSVector(series.name, "A"));
   aliasList
     ?.filter((a) => a.name !== bottle.fullName)
     .forEach((a) => values.push(new TSVector(a.name, "A")));

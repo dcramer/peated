@@ -122,28 +122,24 @@ function getBottleReleaseSummary(
   ) {
     metadata.push({ key: "age", content: `${bottle.statedAge} years` });
   }
-  if (bottle.vintageYear !== null) {
+  if (bottle.abv !== null) {
+    metadata.push({ key: "abv", content: `${bottle.abv.toFixed(1)}% ABV` });
+  }
+  if (!bottle.edition && bottle.vintageYear !== null) {
     metadata.push({
       key: "vintage",
       content: `${bottle.vintageYear} vintage`,
     });
   }
-  if (bottle.releaseYear !== null) {
+  if (
+    !bottle.edition &&
+    bottle.vintageYear === null &&
+    bottle.releaseYear !== null
+  ) {
     metadata.push({
       key: "release",
       content: `${bottle.releaseYear} release`,
     });
-  }
-
-  const caskDetails = [bottle.caskType, bottle.caskSize]
-    .filter((value): value is NonNullable<typeof value> => value !== null)
-    .map(toTitleCase)
-    .join(" ");
-  if (caskDetails) {
-    metadata.push({ key: "cask-details", content: `${caskDetails} cask` });
-  }
-  if (bottle.abv !== null) {
-    metadata.push({ key: "abv", content: `${bottle.abv.toFixed(1)}% ABV` });
   }
 
   return metadata.slice(0, 3);

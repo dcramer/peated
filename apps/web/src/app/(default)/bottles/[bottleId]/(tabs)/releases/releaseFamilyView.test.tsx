@@ -145,11 +145,11 @@ describe("ReleaseFamilyView", () => {
     expect(html).not.toContain(">Viewing<");
     expect(html).toContain("21 years");
     expect(html).toContain("55.1% ABV");
-    expect(html).toContain("2004 vintage");
-    expect(html).toContain("2025 release");
-    expect(html).toContain("Single cask");
+    expect(html).not.toContain("2004 vintage");
+    expect(html).not.toContain("2025 release");
+    expect(html).not.toContain("Single cask");
     expect(html).not.toContain("Cask strength");
-    expect(html).toContain("1st Fill Oloroso Hogshead cask");
+    expect(html).not.toContain("1st Fill Oloroso Hogshead cask");
     expect(html).toContain("1 rating");
     expect(html).not.toContain("1 tasting");
     expect(html).toContain("Average rating 2.00");

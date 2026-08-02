@@ -99,14 +99,14 @@ describe("BottleExactMetadata", () => {
 
     expect(html).toContain("block truncate");
     expect(html).not.toContain("flex-wrap");
-    expect(text).toBe("Batch 24·2004 vintage·2025 release");
+    expect(text).toBe("Batch 24·55.1% ABV");
     expect(text).not.toContain("21 years");
     expect(text).not.toContain("Single cask");
     expect(text).not.toContain("Cask strength");
     expect(text).not.toContain("Single Malt");
   });
 
-  it("uses cask and ABV when they are the useful differentiators", () => {
+  it("uses ABV without promoting generic cask details", () => {
     const html = renderToStaticMarkup(
       <BottleExactMetadata
         bottle={{
@@ -124,7 +124,7 @@ describe("BottleExactMetadata", () => {
     );
     const text = html.replace(/<[^>]*>/g, "");
 
-    expect(text).toBe("Pedro Ximenez cask·55.1% ABV");
+    expect(text).toBe("55.1% ABV");
   });
 
   it("omits a release summary when the full Bottle name is already shown", () => {

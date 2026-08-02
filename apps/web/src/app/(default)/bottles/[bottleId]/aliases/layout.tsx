@@ -1,4 +1,5 @@
 import SimpleHeader from "@peated/web/components/simpleHeader";
+import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { type ReactNode } from "react";
 import BottleFullHeader from "../bottleFullHeader";
@@ -13,7 +14,7 @@ export async function generateMetadata(props: {
   const bottle = await getBottlePage(Number(bottleId));
 
   return {
-    title: `Other Names for ${bottle.fullName}`,
+    title: `Other Names for ${getBottlePlainTextIdentity(bottle)}`,
   };
 }
 

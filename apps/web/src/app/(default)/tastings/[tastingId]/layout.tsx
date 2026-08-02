@@ -1,3 +1,4 @@
+import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getServerClient } from "@peated/web/lib/orpc/client.server";
 import { resolveOrNotFound } from "@peated/web/lib/orpc/notFound.server";
 import type { ReactNode } from "react";
@@ -14,7 +15,7 @@ export async function generateMetadata(props: {
   const tasting = await resolveOrNotFound(
     client.tastings.details({ tasting: Number(tastingId) }),
   );
-  const title = `${tasting.bottle.fullName} - Tasting Notes by ${tasting.createdBy.username}`;
+  const title = `${getBottlePlainTextIdentity(tasting.bottle)} - Tasting Notes by ${tasting.createdBy.username}`;
   return {
     title,
     description: tasting.notes,

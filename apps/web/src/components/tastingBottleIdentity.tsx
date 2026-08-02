@@ -9,8 +9,8 @@ import {
 } from "@peated/web/components/bottleIdentity";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
+import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import Join from "./join";
-import SingleCaskChip from "./singleCaskChip";
 
 export type TastingBottleIdentitySource = BottleIdentitySource &
   Pick<Bottle, "isLibrary" | "hasTasted"> & {
@@ -29,11 +29,7 @@ export default function TastingBottleIdentity({
   const exactBottleLabel =
     bottle.group && !relativeIdentity.fallback ? relativeIdentity.label : null;
   const distinctDistillers = getDistinctBottleDistillers(bottle);
-  const inlineSingleCaskChip =
-    bottle.singleCask && !/\bsingle[\s-]+cask\b/i.test(displayName);
-  const panelSingleCaskChip =
-    inlineSingleCaskChip &&
-    !/\bsingle[\s-]+cask\b/i.test(exactBottleLabel ?? "");
+  const inlineDisplayName = getBottlePlainTextIdentity(bottle);
   const metadataExclude = getBottleMetadataExclusions(
     bottle,
     `${displayName} ${exactBottleLabel ?? ""}`,
@@ -50,11 +46,10 @@ export default function TastingBottleIdentity({
                   href={`/bottles/${bottle.id}`}
                   className="hover:underline"
                 >
-                  {displayName}
+                  {inlineDisplayName}
                 </Link>
               </h4>
               <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-              {inlineSingleCaskChip && <SingleCaskChip />}
             </div>
           </div>
         </div>
@@ -73,16 +68,10 @@ export default function TastingBottleIdentity({
               </Link>
             </h4>
             <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-            {!exactBottleLabel && panelSingleCaskChip && <SingleCaskChip />}
           </div>
         </div>
         <div className="flex flex-row gap-x-1 text-sm">
-          {exactBottleLabel ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span>{exactBottleLabel}</span>
-              {panelSingleCaskChip && <SingleCaskChip />}
-            </div>
-          ) : null}
+          {exactBottleLabel ? <span>{exactBottleLabel}</span> : null}
           {!!(exactBottleLabel && distinctDistillers.length) && (
             <div>&middot;</div>
           )}

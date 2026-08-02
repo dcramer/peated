@@ -9,6 +9,7 @@ describe("PreviewBottleCard", () => {
         data={{
           name: "12-year-old",
           brand: { id: 1, name: "Springbank" },
+          series: { id: 3, name: "Local Barley" },
           distillers: [{ id: 2, name: "J & A Mitchell" }],
           category: "single_malt",
           statedAge: 12,
@@ -27,15 +28,16 @@ describe("PreviewBottleCard", () => {
 
     expect(html).toContain('aria-label="Bottle preview"');
     expect(html).toContain("Springbank");
+    expect(html).toContain("Local Barley");
     expect(html).toContain("12-year-old");
     expect(html).toContain("Batch 24");
     expect(html).not.toContain("12 years");
-    expect(html).toContain("2025");
-    expect(html).toContain("2013");
+    expect(html).not.toContain("2025");
+    expect(html).not.toContain("2013");
     expect(html).toContain("57.2% ABV");
-    expect(html).toContain("Single Cask");
+    expect(html).not.toContain("Single Cask");
     expect(html).not.toContain("Cask strength");
-    expect(html).toContain("1st Fill Oloroso Hogshead cask");
+    expect(html).not.toContain("1st Fill Oloroso Hogshead cask");
     expect(html).toContain("uppercase");
     expect(html).toContain("bg-highlight");
     expect(html).toContain("text-black/70");

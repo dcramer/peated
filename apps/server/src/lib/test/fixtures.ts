@@ -578,12 +578,19 @@ async function createBottleFixture(
         })
       : undefined;
 
+    const series = bottleData.seriesId
+      ? await tx.query.bottleSeries.findFirst({
+          where: eq(bottleSeries.id, bottleData.seriesId),
+        })
+      : undefined;
+
     const searchVector = buildBottleSearchVector(
       bottleData,
       brand,
       [],
       bottler,
       distillerList,
+      series,
     );
 
     // Object.assign(
