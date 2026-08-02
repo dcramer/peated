@@ -3,13 +3,21 @@ import OpenAI from "openai";
 
 import config from "../config";
 
-export function createOpenAIClient(): OpenAI {
+export function createOpenAIClient({
+  instrumentWithSentry = true,
+}: {
+  instrumentWithSentry?: boolean;
+} = {}): OpenAI {
   const client = new OpenAI({
     apiKey: config.OPENAI_API_KEY,
     baseURL: config.OPENAI_HOST,
     organization: config.OPENAI_ORGANIZATION,
     project: config.OPENAI_PROJECT,
   });
+
+  if (!instrumentWithSentry) {
+    return client;
+  }
 
   return Sentry.instrumentOpenAiClient(client, {
     recordInputs: true,

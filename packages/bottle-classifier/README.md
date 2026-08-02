@@ -206,7 +206,11 @@ GPT-5 models. When it is unset, the classifier omits the setting and uses the
 provider default; GPT-5.6 currently defaults to `medium`. Reasoning tokens are
 included in output-token usage and billed as output tokens. The eval metadata
 and visible usage annotation record the resolved effort for repeatable
-comparisons. `FIRECRAWL_API_KEY`
+comparisons. Image extraction separately defaults to `gpt-5.6-luna` with
+`high` reasoning; use `OPENAI_IMAGE_EXTRACTION_MODEL` and
+`OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT` to override it. Image extraction
+evals report their own token usage, estimated cost, and latency rather than
+mixing those measurements into the classifier agent loop. `FIRECRAWL_API_KEY`
 enables live web evidence search;
 `FIRECRAWL_API_URL` can override the default Firecrawl API host.
 

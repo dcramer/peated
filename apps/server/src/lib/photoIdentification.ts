@@ -10,6 +10,7 @@ import {
   createOpenAIClient,
   withSentryConversation,
 } from "@peated/server/lib/openaiClient";
+import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
 import { readFile } from "@peated/server/lib/uploads";
 
 type PhotoIdentificationPendingImage = {
@@ -89,7 +90,7 @@ export function buildPhotoEvidenceFromExtractedIdentity({
     extractors: [
       {
         kind: "vision",
-        model: config.OPENAI_MODEL,
+        model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
         confidence: extractedIdentity ? 0.75 : 0,
         textSpans: labelParts.length
           ? [
@@ -153,19 +154,32 @@ export async function extractPhotoBottleEvidence({
     };
   }
 
+  const conversationId = `photo_identification:${pendingUpload.id}`;
   const extractedIdentity = await withSentryConversation(
-    `photo_identification:${pendingUpload.id}`,
+    conversationId,
     async () => {
-      const extractor = createWhiskyLabelExtractor({
-        client: createOpenAIClient(),
-        model: config.OPENAI_MODEL,
-        reasoningEffort: config.OPENAI_REASONING_EFFORT,
+      return await instrumentOpenAIResponsesCall({
+        baseURL: config.OPENAI_HOST,
+        conversationId,
+        model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
+        callback: async (reportResponse) => {
+          const extractor = createWhiskyLabelExtractor({
+            client: createOpenAIClient({ instrumentWithSentry: false }),
+            model: config.OPENAI_MODEL,
+            reasoningEffort: config.OPENAI_REASONING_EFFORT,
+            imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,
+            imageReasoningEffort:
+              config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
+            onImageExtractionMetadata: reportResponse,
+          });
+          const extraction = await extractor.extractFromImageWithMetadata(
+            await getPhotoExtractionImageInput({ pendingUpload }),
+          );
+          return BottleExtractedDetailsSchema.nullable().parse(
+            extraction.result,
+          );
+        },
       });
-      return BottleExtractedDetailsSchema.nullable().parse(
-        await extractor.extractFromImage(
-          await getPhotoExtractionImageInput({ pendingUpload }),
-        ),
-      );
     },
   );
 

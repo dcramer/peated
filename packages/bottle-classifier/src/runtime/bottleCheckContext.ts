@@ -21,6 +21,8 @@ type BottleContextLoaderOptions = {
   client: OpenAI;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
+  imageExtractionModel?: string;
+  imageExtractionReasoningEffort?: OpenAIReasoningEffort;
   overrides?: {
     extractFromImage?: (
       imageUrlOrBase64: string,
@@ -71,6 +73,8 @@ export function createBottleContextLoader({
     client: options.client,
     model: options.model,
     reasoningEffort: options.reasoningEffort,
+    imageModel: options.imageExtractionModel,
+    imageReasoningEffort: options.imageExtractionReasoningEffort,
   });
   const extractFromImage = async (imageUrl: string) =>
     options.overrides?.extractFromImage
@@ -101,7 +105,7 @@ export function createBottleContextLoader({
           ...imageSource,
           labelEvidence: {
             sourceImageId,
-            model: options.model,
+            model: options.imageExtractionModel ?? options.model,
             extractedIdentity,
           },
         };

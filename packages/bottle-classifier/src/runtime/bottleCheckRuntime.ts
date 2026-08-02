@@ -84,6 +84,8 @@ type BottleCheckRuntimeOptions = {
   client: OpenAI;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
+  imageExtractionModel?: string;
+  imageExtractionReasoningEffort?: OpenAIReasoningEffort;
   firecrawlApiKey?: string | null;
   firecrawlApiUrl?: string | null;
   executeWebSearch?: BottleWebSearchExecutor;

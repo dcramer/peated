@@ -12,6 +12,14 @@ type TokenPricing = {
   outputUsdPerMillion: number;
 };
 
+type EvalTokenUsage = {
+  requests: number;
+  inputTokens: number;
+  cachedInputTokens?: number;
+  cacheWriteTokens?: number;
+  outputTokens: number;
+};
+
 const STANDARD_SHORT_CONTEXT_PRICING: TokenPricing[] = [
   {
     model: "gpt-5.6-terra",
@@ -58,6 +66,14 @@ export type EvalRunCostMetadata = {
   pricingBasis: "standard_short_context";
 };
 
+export type EvalModelCostMetadata = Omit<
+  EvalRunCostMetadata,
+  "scope" | "estimatedAgentLoopCostUsd"
+> & {
+  scope: "image_extraction_only";
+  estimatedCostUsd?: number;
+};
+
 function unqualifiedModel(model: string): string {
   return model.toLowerCase().split("/").at(-1) ?? model;
 }
@@ -99,9 +115,27 @@ export function getEvalRunCostMetadata({
   model: string;
   usage: BottleClassifierRunMetadata["usage"];
 }): EvalRunCostMetadata {
+  const metadata = getEvalModelCostMetadata({ model, usage });
+  const { estimatedCostUsd, ...sharedMetadata } = metadata;
+  return {
+    ...sharedMetadata,
+    scope: "agent_loop_only",
+    ...(estimatedCostUsd === undefined
+      ? {}
+      : { estimatedAgentLoopCostUsd: estimatedCostUsd }),
+  };
+}
+
+export function getEvalModelCostMetadata({
+  model,
+  usage,
+}: {
+  model: string;
+  usage: EvalTokenUsage;
+}): EvalModelCostMetadata {
   const pricing = resolveTokenPricing(model);
   const baseMetadata = {
-    scope: "agent_loop_only" as const,
+    scope: "image_extraction_only" as const,
     pricingEffectiveDate: PRICING_EFFECTIVE_DATE,
     pricingSource: PRICING_SOURCE_URL,
     pricingBasis: "standard_short_context" as const,
@@ -125,7 +159,7 @@ export function getEvalRunCostMetadata({
   );
   const standardInputTokens =
     usage.inputTokens - cachedInputTokens - cacheWriteTokens;
-  const estimatedAgentLoopCostUsd =
+  const estimatedCostUsd =
     (standardInputTokens * pricing.inputUsdPerMillion +
       cachedInputTokens * pricing.cachedInputUsdPerMillion +
       cacheWriteTokens *
@@ -152,7 +186,7 @@ export function getEvalRunCostMetadata({
   return {
     ...baseMetadata,
     costCoverage,
-    estimatedAgentLoopCostUsd,
+    estimatedCostUsd,
     pricingModel: pricing.model,
   };
 }

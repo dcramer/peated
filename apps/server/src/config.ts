@@ -57,6 +57,9 @@ export default {
   OPENAI_API_KEY: openAIConfig.apiKey,
   OPENAI_EMBEDDING_MODEL: openAIConfig.embeddingModel,
   OPENAI_HOST: openAIConfig.baseURL,
+  OPENAI_IMAGE_EXTRACTION_MODEL: openAIConfig.imageExtractionModel,
+  OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT:
+    openAIConfig.imageExtractionReasoningEffort,
   OPENAI_MODEL: openAIConfig.model,
   OPENAI_REASONING_EFFORT: openAIConfig.reasoningEffort,
   OPENAI_ORGANIZATION:
