@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   canApproveSuggestedBottle,
   getBottleRepairChanges,
+  isPrimaryDecisionComplete,
   isRepairProposal,
 } from "./queueItemCard";
 
@@ -34,6 +35,14 @@ describe("queue item Bottle actions", () => {
     expect(
       canApproveSuggestedBottle(decisionItem({ suggestedBottle: null })),
     ).toBe(false);
+  });
+
+  it("treats only terminal primary listing decisions as complete", () => {
+    expect(isPrimaryDecisionComplete({ status: "approved" })).toBe(true);
+    expect(isPrimaryDecisionComplete({ status: "ignored" })).toBe(true);
+    expect(isPrimaryDecisionComplete({ status: "verified" })).toBe(true);
+    expect(isPrimaryDecisionComplete({ status: "pending_review" })).toBe(false);
+    expect(isPrimaryDecisionComplete({ status: "errored" })).toBe(false);
   });
 
   it("recognizes repairs only when both assignments are the same Bottle", () => {

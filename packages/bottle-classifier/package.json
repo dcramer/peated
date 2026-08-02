@@ -97,7 +97,6 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitest-evals/harness-openai-agents": "0.14.0",
     "tinyrainbow": "^2.0.0",
     "typescript": "catalog:",
     "vite": "catalog:",

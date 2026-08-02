@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
+import type { BottleContext } from "../bottleContextContract";
 import type { BottleCandidate } from "../classifierTypes";
-import { buildAgentInput } from "./agentInput";
+import {
+  buildAgentInput,
+  buildAuditBottleAgentInput,
+  buildDefaultBottleSearchInput,
+} from "./agentInput";
 
 function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
   return {
@@ -28,8 +33,73 @@ function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
   };
 }
 
+function buildBottleContext(): BottleContext {
+  return {
+    bottleId: 45146,
+    fullName: "Laphroaig Càirdeas 2022 Warehouse 1",
+    groupId: 320,
+    shared: {
+      name: "Càirdeas",
+      statedAge: null,
+      series: { seriesId: 71, name: "Càirdeas" },
+      category: "single_malt",
+      brand: { entityId: 9, name: "Laphroaig" },
+      distillers: [{ entityId: 9, name: "Laphroaig" }],
+      bottler: null,
+    },
+    exact: {
+      edition: "Warehouse 1",
+      statedAge: null,
+      abv: 52.2,
+      singleCask: false,
+      caskStrength: true,
+      vintageYear: null,
+      releaseYear: 2022,
+      caskSize: null,
+      caskType: null,
+      caskFill: null,
+    },
+    siblings: [],
+    aliases: [{ name: "Laphroaig Cairdeas 2022", ignored: false }],
+    observations: [],
+    publicImages: [],
+  };
+}
+
 describe("buildAgentInput", () => {
-  test("serializes candidate family context for reasoning", () => {
+  test("omits optional cask metadata from the default search without dropping cask flags", () => {
+    expect(
+      buildDefaultBottleSearchInput({
+        reference: { name: "Example Distillery Reserve" },
+        extractedIdentity: {
+          brand: "Example Distillery",
+          bottler: null,
+          expression: "Reserve",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: true,
+          single_cask: true,
+          cask_type: "oloroso",
+          cask_size: "hogshead",
+          cask_fill: "1st_fill",
+          edition: null,
+        },
+      }),
+    ).toMatchObject({
+      cask_strength: true,
+      single_cask: true,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+    });
+  });
+
+  test("serializes candidate family context without operation capabilities", () => {
     const input = JSON.parse(
       buildAgentInput({
         reference: {
@@ -71,6 +141,7 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
+        availableSourceEvidenceFields: ["reference.name"],
       }),
     );
 
@@ -146,6 +217,13 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
+        availableSourceEvidenceFields: [
+          "reference.name",
+          "reference.imageUrl",
+          "extractedIdentity.brand",
+          "extractedIdentity.abv",
+          "imageEvidence.fieldCandidates.expression",
+        ],
       }),
     );
 
@@ -153,5 +231,80 @@ describe("buildAgentInput", () => {
     expect(input.imageEvidence.fieldCandidates.expression.value).toBe(
       "Uigeadail",
     );
+    expect(input.availableSourceEvidenceFields).toContain(
+      "imageEvidence.fieldCandidates.expression",
+    );
+  });
+
+  test("serializes a deterministic identity anchor without a phase handoff", () => {
+    const input = JSON.parse(
+      buildAgentInput({
+        reference: { name: "SMWS 95.71" },
+        extractedIdentity: null,
+        initialCandidates: [],
+        currentBottle: null,
+        hasExactAliasMatch: false,
+        candidateExpansion: "open",
+        availableSourceEvidenceFields: ["reference.name"],
+        identityAnchor: {
+          action: "match",
+          rationale: "The SMWS code is a closed identity anchor.",
+          candidateBottleIds: [95],
+          identityScope: "exact_cask",
+          aliasScope: "none",
+          observation: null,
+          identityBasis: null,
+          confidenceBasis: null,
+          matchedBottleId: 95,
+          proposedBottle: null,
+        },
+      }),
+    );
+
+    expect(input.identityAnchor).toMatchObject({
+      action: "match",
+      matchedBottleId: 95,
+    });
+    expect(input).not.toHaveProperty("phase");
+  });
+});
+
+describe("buildAuditBottleAgentInput", () => {
+  test("serializes server-owned audit context without a reference envelope", () => {
+    const input = JSON.parse(
+      buildAuditBottleAgentInput({
+        audit: {
+          bottleId: 45146,
+          origin: "moderator",
+          note: "Review the Brand assignment; this text is context only.",
+        },
+        currentBottleContext: buildBottleContext(),
+        availableSourceEvidenceFields: ["audit.note"],
+      }),
+    );
+
+    expect(input).toMatchObject({
+      intent: "audit_bottle",
+      audit: {
+        bottleId: 45146,
+        origin: "moderator",
+        note: "Review the Brand assignment; this text is context only.",
+      },
+      currentBottleContext: {
+        bottleId: 45146,
+        groupId: 320,
+        exact: {
+          releaseYear: 2022,
+        },
+        aliases: [
+          {
+            name: "Laphroaig Cairdeas 2022",
+            ignored: false,
+          },
+        ],
+      },
+      availableSourceEvidenceFields: ["audit.note"],
+    });
+    expect(input).not.toHaveProperty("reference");
   });
 });

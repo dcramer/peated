@@ -64,7 +64,7 @@ exact identity and additionally owns:
 - release and vintage years;
 - effective stated age;
 - ABV, single-cask, and cask-strength flags;
-- canonical cask size, type, and fill;
+- optional cask size, type, and fill when explicitly supplied;
 - exact aliases, content, images, activity, and statistics.
 
 This duplication is intentional. BottleGroup is the authority for shared
@@ -75,6 +75,13 @@ number, outturn, retailer-exclusive wording, label notes, and unmodeled
 maturation details. Promote one of these facts into Bottle identity only when
 it is part of the marketed release or is needed for recurring canonical
 disambiguation.
+
+`caskType`, `caskSize`, and `caskFill` remain nullable storage fields for
+compatibility but are soft-deprecated for automated identity decisions. Preserve
+explicit values without requiring or researching them, and do not select,
+reject, create, repair, or gate automation solely on differences in those
+fields. This does not deprecate marketed finish wording in `name` or `edition`,
+exact cask or barrel codes, `singleCask`, or `caskStrength`.
 
 ## Shared And Exact Edits
 
@@ -97,6 +104,15 @@ automatic regrouping system must be a separately reviewed change that preserves
 Bottle ids and consumer references, rematerializes shared fields
 transactionally, recomputes affected group aggregates, and records an auditable
 before/after result.
+
+Bottle checks may report a non-executable `bottle_group` finding, but they
+cannot move or merge groups. An exact duplicate remains a Bottle merge: for the
+reviewed Laphroaig Càirdeas 2022 case, malformed Bottle `39096` merges into
+Warehouse 1 Bottle `45146` while generic Bottle `44288` remains unchanged.
+That case does not authorize a grouping operation. A separate follow-up may
+define the smallest regroup or group-merge operation only after real reviewed
+findings demonstrate the need. It must also preserve aliases, representatives,
+and auditable history in addition to the invariants above.
 
 ## Exact Bottle Merge
 
@@ -151,8 +167,9 @@ evidence.
 Resolve the exact marketed Bottle first. Use exact label facts, authoritative
 sources, aliases, and nearby catalog entries as evidence. Missing optional
 attributes do not make a clear exact identity unresolved, while conflicting
-age, edition, year, cask, or single-cask facts are strong evidence of distinct
-Bottles.
+age, edition, year, marketed finish or exact cask code, single-cask, or
+cask-strength facts are strong evidence of distinct Bottles. Cask type, size,
+and fill metadata alone is not such a conflict.
 
 Grouping is a separate decision. Same-expression evidence may relate exact
 Bottles through a BottleGroup, but uncertain grouping leaves each Bottle in its

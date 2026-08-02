@@ -64,13 +64,13 @@ export function createSearchBottlesTool({
         "True only when the reference explicitly says single cask, single barrel, or a specific cask selection.",
       ),
       cask_type: BottleCandidateSearchInputSchema.shape.cask_type.describe(
-        "Canonical cask type when explicitly supported, such as bourbon, oloroso, or pedro_ximenez.",
+        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
       ),
       cask_size: BottleCandidateSearchInputSchema.shape.cask_size.describe(
-        "Canonical cask size when explicitly supported, such as barrel, hogshead, or butt.",
+        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
       ),
       cask_fill: BottleCandidateSearchInputSchema.shape.cask_fill.describe(
-        "Canonical fill when explicitly supported: 1st_fill, 2nd_fill, refill, or other.",
+        "Soft-deprecated optional metadata. Leave null; do not use it to narrow identity search.",
       ),
       edition: BottleCandidateSearchInputSchema.shape.edition.describe(
         "Batch label, store-pick code, release code, or numbered edition.",

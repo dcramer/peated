@@ -1,8 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
-import { getStableOpenAISettings } from "./openaiModelSettings";
+import {
+  getStableOpenAISettings,
+  resolveOpenAIReasoningEffort,
+  type OpenAIReasoningEffort,
+} from "./openaiModelSettings";
 
 describe("resolveOpenAICompatibleConfig", () => {
+  it("exposes only the app-supported reasoning efforts to callers", () => {
+    expectTypeOf<"high">().toMatchTypeOf<OpenAIReasoningEffort>();
+    expectTypeOf<"minimal">().not.toMatchTypeOf<OpenAIReasoningEffort>();
+  });
+
   it("accepts typed environment objects without declared OpenAI keys", () => {
     const env: Readonly<{ NODE_ENV: "test" }> = {
       NODE_ENV: "test",
@@ -28,6 +37,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       organization: undefined,
       project: undefined,
       provider: "openai",
+      reasoningEffort: undefined,
     });
   });
 
@@ -46,6 +56,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       organization: undefined,
       project: undefined,
       provider: "vercel-ai-gateway",
+      reasoningEffort: undefined,
     });
     expect(getStableOpenAISettings(config.model)).toEqual({});
     expect(getStableOpenAISettings(config.evalModel)).toEqual({});
@@ -87,4 +98,46 @@ describe("resolveOpenAICompatibleConfig", () => {
       provider: "openai",
     });
   });
+
+  it("applies an explicit effort to GPT-5 models", () => {
+    const config = resolveOpenAICompatibleConfig({
+      OPENAI_MODEL: "gpt-5.6-luna",
+      OPENAI_REASONING_EFFORT: " HIGH ",
+    });
+
+    expect(config.reasoningEffort).toBe("high");
+    expect(
+      getStableOpenAISettings(config.model, config.reasoningEffort),
+    ).toEqual({ reasoning: { effort: "high" } });
+    expect(
+      resolveOpenAIReasoningEffort(config.model, config.reasoningEffort),
+    ).toBe("high");
+  });
+
+  it("does not send reasoning settings to custom non-GPT-5 models", () => {
+    const config = resolveOpenAICompatibleConfig({
+      OPENAI_MODEL: "custom-model",
+      OPENAI_REASONING_EFFORT: "high",
+    });
+
+    expect(
+      getStableOpenAISettings(config.model, config.reasoningEffort),
+    ).toEqual({ temperature: 0 });
+    expect(
+      resolveOpenAIReasoningEffort(config.model, config.reasoningEffort),
+    ).toBeUndefined();
+  });
+
+  it.each(["minimal", "max"])(
+    "rejects unsupported reasoning effort %s",
+    (reasoningEffort) => {
+      expect(() =>
+        resolveOpenAICompatibleConfig({
+          OPENAI_REASONING_EFFORT: reasoningEffort,
+        }),
+      ).toThrow(
+        "OPENAI_REASONING_EFFORT must be one of: none, low, medium, high, xhigh",
+      );
+    },
+  );
 });

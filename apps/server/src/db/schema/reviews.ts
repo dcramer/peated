@@ -24,6 +24,8 @@ export const reviews = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     hidden: boolean("hidden").default(false),
     // ratings are 0-100
     rating: integer("rating").notNull(),
@@ -40,6 +42,7 @@ export const reviews = pgTable(
       table.issue,
     ),
     index("review_bottle_idx").on(table.bottleId),
+    index("review_release_idx").on(table.legacyReleaseId),
   ],
 );
 

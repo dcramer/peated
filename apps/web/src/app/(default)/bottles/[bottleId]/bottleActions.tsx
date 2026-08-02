@@ -6,6 +6,7 @@ import { type Bottle } from "@peated/server/types";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import useAuth from "@peated/web/hooks/useAuth";
+import useBottleCheckCapabilities from "@peated/web/hooks/useBottleCheckCapabilities";
 import { getAddSimilarBottlePath } from "@peated/web/lib/addBottle";
 
 export default function BottleActions({
@@ -14,6 +15,7 @@ export default function BottleActions({
   bottle: Pick<Bottle, "id">;
 }) {
   const { user } = useAuth();
+  const { bottleAudits, bottleChecks } = useBottleCheckCapabilities();
 
   return (
     <Menu as="div" className="menu">
@@ -38,6 +40,16 @@ export default function BottleActions({
             <MenuItem as={Link} href={`/bottles/${bottle.id}/merge`}>
               Merge Bottle
             </MenuItem>
+            {bottleAudits ? (
+              <MenuItem as={Link} href={`/bottles/${bottle.id}/audit`}>
+                Audit Bottle
+              </MenuItem>
+            ) : null}
+            {bottleChecks ? (
+              <MenuItem as={Link} href={`/bottles/${bottle.id}/checks`}>
+                Audit history
+              </MenuItem>
+            ) : null}
           </>
         ) : null}
       </MenuItems>

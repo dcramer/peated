@@ -1,8 +1,11 @@
 import type OpenAI from "openai";
 import { z } from "zod";
 import { BottleExtractedDetailsSchema } from "./classifierTypes";
-import { buildWhiskyLabelExtractorInstructions } from "./instructions";
-import { getStableOpenAISettings } from "./openaiModelSettings";
+import { buildWhiskyLabelExtractorInstructions } from "./extractorInstructions";
+import {
+  getStableOpenAISettings,
+  type OpenAIReasoningEffort,
+} from "./openaiModelSettings";
 
 const ResponseSchema = z.object({
   result: BottleExtractedDetailsSchema.nullable(),
@@ -11,21 +14,25 @@ const ResponseSchema = z.object({
 export function createWhiskyLabelExtractor({
   client,
   model,
+  reasoningEffort,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
 }) {
   return {
     extractFromImage: async (imageUrlOrBase64: string) =>
       extractFromImage({
         client,
         model,
+        reasoningEffort,
         imageUrlOrBase64,
       }),
     extractFromText: async (label: string) =>
       extractFromText({
         client,
         model,
+        reasoningEffort,
         label,
       }),
   };
@@ -34,10 +41,12 @@ export function createWhiskyLabelExtractor({
 export async function extractFromImage({
   client,
   model,
+  reasoningEffort,
   imageUrlOrBase64,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   imageUrlOrBase64: string;
 }) {
   const response = await client.responses.create({
@@ -62,7 +71,7 @@ export async function extractFromImage({
         schema: z.toJSONSchema(ResponseSchema),
       },
     },
-    ...getStableOpenAISettings(model),
+    ...getStableOpenAISettings(model, reasoningEffort),
   });
 
   const { result } = ResponseSchema.parse(JSON.parse(response.output_text));
@@ -72,10 +81,12 @@ export async function extractFromImage({
 export async function extractFromText({
   client,
   model,
+  reasoningEffort,
   label,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   label: string;
 }) {
   const response = await client.responses.create({
@@ -99,7 +110,7 @@ export async function extractFromText({
         schema: z.toJSONSchema(ResponseSchema),
       },
     },
-    ...getStableOpenAISettings(model),
+    ...getStableOpenAISettings(model, reasoningEffort),
   });
 
   const { result } = ResponseSchema.parse(JSON.parse(response.output_text));

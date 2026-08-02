@@ -18,9 +18,9 @@
       "abv": 47.8,
       "release_year": 2026,
       "vintage_year": null,
-      "cask_strength": true,
+      "cask_strength": null,
       "single_cask": null,
-      "edition": "Open Day - May 2026"
+      "edition": null
     },
     "imageEvidence": {
       "sourceImageId": "springbank-open-day-may-2026-30-year-old",
@@ -30,12 +30,12 @@
           "confidence": 0.97,
           "textSpans": [
             {
-              "text": "Springbank Open Day - May 2026. Aged 30 years. Single Malt Scotch Whisky. Maturation: Oloroso & Rum casks. Strength: 47.8% vol. One of 1,572 bottles. Distilled at Springbank Distillery by J & A Mitchell & Co. Ltd.",
+              "text": "Springbank Open Day - May 2026. Aged 30 years. Single Malt Scotch Whisky. Maturation: Bourbon, Oloroso & Rum casks. Contents: 35cl. Strength: 47.8% vol. One of 1,572 bottles. Distilled at Springbank Distillery by J & A Mitchell & Co. Ltd.",
               "confidence": 0.97
             }
           ],
           "observations": [
-            "The label identifies Springbank Open Day - May 2026, aged 30 years, 47.8% ABV, matured in Oloroso and rum casks, with an outturn of 1,572 bottles."
+            "The label identifies Springbank Open Day - May 2026, aged 30 years, 47.8% ABV, matured in Bourbon, Oloroso, and rum casks, with an outturn of 1,572 35cl bottles."
           ]
         }
       ],
@@ -60,11 +60,6 @@
           "confidence": 0.98,
           "sourceExtractorIndexes": [0]
         },
-        "edition": {
-          "value": "Open Day - May 2026",
-          "confidence": 0.97,
-          "sourceExtractorIndexes": [0]
-        },
         "releaseYear": {
           "value": 2026,
           "confidence": 0.96,
@@ -83,7 +78,11 @@
   "provenance": {
     "source": "curated_regression",
     "verifiedSourceUrls": [
-      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/springbank-open-day-may-2026-30-year-old.jpg"
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/springbank-open-day-may-2026-30-year-old.jpg",
+      "https://www.whiskybase.com/whiskies/whisky/300303/springbank-30-year-old",
+      "https://whiskyauctioneer.com/learn/explore-whisky/bottles/springbank-30-year-old-open-day-2026",
+      "https://api.peated.com/v1/bottles/44256",
+      "https://api.peated.com/v1/bottle-aliases?bottle=44256"
     ],
     "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/springbank-open-day-may-2026-30-year-old.jpg",
     "dbOutcome": {
@@ -93,7 +92,72 @@
       "createsRelease": false,
       "summary": "Production DB outcome: match existing bottle 44256, Springbank Open Day, releaseId null. Do not create a second Springbank Open Day May 2026 bottle from this photo."
     },
-    "notes": "Added from a failed image photo-identification flow using the checked-in photo as the observed source and replay artifact. The label reads Springbank Open Day - May 2026, aged 30 years, 47.8% ABV, Oloroso & Rum casks, one of 1,572 bottles; production already has bottle 44256 carrying those identity fields. Kept as curated_regression because independent online verification of this exact bottle was unavailable during fixture review."
+    "catalogFieldObservations": [
+      {
+        "target": "matched_bottle",
+        "bottleId": 44256,
+        "field": "singleCask",
+        "productionValue": true,
+        "evidenceValue": false,
+        "source": "image_evidence",
+        "issue": "conflicts_with_evidence",
+        "safeToAutoFill": true,
+        "notes": "The label and independently verified bottle records identify a vatting from Bourbon, Oloroso, and rum casks rather than a single-cask release."
+      }
+    ],
+    "notes": "Added from a failed image photo-identification flow using the checked-in photo as the observed source and replay artifact. Re-verified July 31, 2026: the label, Whiskybase WB300303, and Whisky Auctioneer agree this is the Springbank 30-year-old Open Day May 2026 bottling at 47.8% ABV, matured in Bourbon, Oloroso, and rum casks, with 1,572 35cl bottles. Production Bottle 44256 remains the exact Peated Bottle, but it incorrectly stores singleCask=true. Production currently assigns only the aliases Springbank Open Day and Springbank Open Day 2026; the longer May 2026 alias previously in this fixture was not production data."
+  },
+  "context": {
+    "inspectedBottleIds": [44256],
+    "bottleContexts": [
+      {
+        "bottleId": 44256,
+        "fullName": "Springbank Open Day",
+        "groupId": 18076,
+        "shared": {
+          "name": "Open Day",
+          "statedAge": 30,
+          "series": null,
+          "category": "single_malt",
+          "brand": {
+            "entityId": 1362,
+            "name": "Springbank"
+          },
+          "distillers": [
+            {
+              "entityId": 1362,
+              "name": "Springbank"
+            }
+          ],
+          "bottler": null
+        },
+        "exact": {
+          "edition": null,
+          "statedAge": null,
+          "abv": 47.8,
+          "singleCask": true,
+          "caskStrength": true,
+          "vintageYear": null,
+          "releaseYear": 2026,
+          "caskSize": null,
+          "caskType": null,
+          "caskFill": null
+        },
+        "siblings": [],
+        "aliases": [
+          {
+            "name": "Springbank Open Day",
+            "ignored": false
+          },
+          {
+            "name": "Springbank Open Day 2026",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ]
   },
   "expected": {
     "status": "classified",
@@ -103,6 +167,30 @@
     "expectedTier": "auto",
     "verifyEligible": true,
     "suggestedNextStep": "confirm_match",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 44256,
+          "patch": {
+            "exact": {
+              "singleCask": false
+            }
+          }
+        },
+        "rationale": "Bottle 44256 is the exact Springbank Open Day release, but its single-cask flag conflicts with the label's Bourbon, Oloroso, and rum cask vatting.",
+        "evidenceRefs": [
+          {
+            "kind": "source",
+            "field": "reference.imageUrl"
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 44256
+          }
+        ]
+      }
+    ],
     "summary": "Match existing bottle 44256, Springbank Open Day, from the label's May 2026 30-year-old Open Day identity."
   },
   "localCatalog": {
@@ -143,7 +231,7 @@
         "bottleId": 44256
       },
       {
-        "name": "Springbank Open Day May 2026 30 Year Old",
+        "name": "Springbank Open Day 2026",
         "bottleId": 44256
       },
       {

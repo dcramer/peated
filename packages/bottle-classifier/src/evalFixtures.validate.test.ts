@@ -2,7 +2,9 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
+import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
+  auditBottleEvalFixtureSchema,
   classifierEvalFixtureSchema,
   listFixtureFiles,
   realWorldNewBottleFixtureSchema,
@@ -13,6 +15,13 @@ const fixtureRootDir = fileURLToPath(
 );
 const decisionFixtureDir = `${fixtureRootDir}/decision-cases`;
 const newBottleFixtureDir = `${fixtureRootDir}/new-bottles`;
+const laphroaigDecisionFixtureFile = `${decisionFixtureDir}/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate.json`;
+
+function loadLaphroaigDecisionFixture() {
+  return classifierEvalFixtureSchema.parse(
+    JSON.parse(readFileSync(laphroaigDecisionFixtureFile, "utf8")),
+  );
+}
 
 function inferDecisionScenario(
   fixture: ReturnType<typeof classifierEvalFixtureSchema.parse>,
@@ -79,6 +88,104 @@ describe("eval fixture validation", () => {
 
     expect(ids.length).toBeGreaterThan(0);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  test("keeps audit fixture ids unique", () => {
+    const fixtures = AUDIT_BOTTLE_EVAL_CASES.map((fixture) =>
+      auditBottleEvalFixtureSchema.parse(fixture),
+    );
+
+    expect(fixtures.length).toBeGreaterThan(0);
+    expect(new Set(fixtures.map(({ id }) => id)).size).toBe(fixtures.length);
+  });
+
+  test("keeps the production-derived Càirdeas audit bounded and explicit about its DB outcome", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
+    expect(fixture?.provenance.source).toBe("curated_regression");
+    expect(fixture?.input.audit.bottleId).toBe(39096);
+    expect(
+      fixture?.input.context.inspectedBottles.map(({ bottleId }) => bottleId),
+    ).toEqual([45146, 44288, 802]);
+    expect(fixture?.searchResponses).toMatchObject([
+      {
+        when: ["laphroaig"],
+        results: [{ bottleId: 45146 }, { bottleId: 44288 }, { bottleId: 802 }],
+      },
+    ]);
+    expect(
+      fixture!.input.context.bottleContexts.map(({ bottleId, groupId }) => ({
+        bottleId,
+        groupId,
+      })),
+    ).toEqual([
+      { bottleId: 39096, groupId: 9433 },
+      { bottleId: 45146, groupId: 18105 },
+      { bottleId: 44288, groupId: 18105 },
+      { bottleId: 802, groupId: 9433 },
+    ]);
+    expect(fixture?.provenance.verifiedSourceUrls).toEqual(
+      expect.arrayContaining([
+        "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+      ]),
+    );
+    expect(fixture?.expected.proposedOperations).toMatchObject([
+      {
+        type: "merge_bottles",
+        input: {
+          sourceBottleId: 39096,
+          destinationBottleId: 45146,
+        },
+        evidenceRefs: [
+          { kind: "bottle", bottleId: 39096 },
+          { kind: "bottle", bottleId: 45146 },
+          {
+            kind: "web_result",
+            url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+          },
+        ],
+      },
+    ]);
+    expect(fixture?.requireExpectedOperationEvidence).toBe(true);
+    expect(fixture?.expected.findings).toEqual([]);
+    expect(fixture?.provenance.dbOutcome).toMatchObject({
+      bottleId: 45146,
+      createsBottle: false,
+      createsRelease: false,
+    });
+  });
+
+  test("requires explicit audit contexts to cover exactly the fixture Bottles", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+    );
+    expect(fixture).toBeDefined();
+
+    const result = auditBottleEvalFixtureSchema.safeParse({
+      ...fixture,
+      input: {
+        ...fixture!.input,
+        context: {
+          ...fixture!.input.context,
+          bottleContexts: fixture!.input.context.bottleContexts?.slice(0, 2),
+        },
+      },
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message:
+            "Explicit Bottle contexts must exactly cover the current and inspected Bottle ids.",
+          path: ["input", "context", "bottleContexts"],
+        }),
+      );
+    }
   });
 
   test("rejects production-miss decision fixtures without observed input context", () => {
@@ -174,6 +281,142 @@ describe("eval fixture validation", () => {
     );
   });
 
+  test("preserves an observed null extraction in a production-miss fixture", () => {
+    const fixture = classifierEvalFixtureSchema.parse({
+      id: "null-observed-extraction",
+      name: "Null observed extraction",
+      input: {
+        reference: {
+          name: "Laphroaig Càirdeas 2022",
+          url: "https://example.com/laphroaig-cairdeas-2022",
+        },
+        extractedIdentity: null,
+        initialCandidates: [
+          {
+            bottleId: 45146,
+            fullName: "Laphroaig Càirdeas Warehouse 1 2022 Release",
+          },
+        ],
+      },
+      provenance: {
+        source: "production_miss",
+        verifiedSourceUrls: [
+          "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+        ],
+        dbOutcome: {
+          bottleId: 45146,
+          createsBottle: false,
+          summary: "Match the observed listing to Bottle 45146.",
+        },
+      },
+      expected: {
+        status: "classified",
+        action: "match",
+        matchedBottleId: 45146,
+        summary: "Match the existing Warehouse 1 Bottle.",
+      },
+    });
+
+    expect(fixture.input.extractedIdentity).toBeNull();
+  });
+
+  test("uses exact bounded contexts for the production Laphroaig decision case", () => {
+    const fixture = loadLaphroaigDecisionFixture();
+    const contexts = fixture.context.bottleContexts ?? [];
+
+    expect(
+      contexts.map((context) => ({
+        bottleId: context?.bottleId,
+        groupId: context?.groupId,
+      })),
+    ).toEqual([
+      { bottleId: 39096, groupId: 9433 },
+      { bottleId: 45146, groupId: 18105 },
+      { bottleId: 44288, groupId: 18105 },
+    ]);
+    expect(fixture.provenance?.catalogFieldObservations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          bottleId: 39096,
+          field: "edition",
+          evidenceValue: "Warehouse 1",
+          source: "image_evidence",
+        }),
+        expect.objectContaining({
+          bottleId: 39096,
+          field: "abv",
+          evidenceValue: 52.2,
+          source: "image_evidence",
+        }),
+      ]),
+    );
+    expect(fixture.expected).toMatchObject({
+      status: "classified",
+      action: "match",
+      matchedBottleId: 45146,
+      proposedOperations: [
+        {
+          type: "merge_bottles",
+          input: {
+            sourceBottleId: 39096,
+            destinationBottleId: 45146,
+          },
+          evidenceRefs: [
+            { kind: "bottle", bottleId: 39096 },
+            { kind: "bottle", bottleId: 45146 },
+            {
+              kind: "web_result",
+              url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            },
+          ],
+        },
+      ],
+    });
+    expect(fixture.provenance?.dbOutcome).toMatchObject({
+      bottleId: 45146,
+      createsBottle: false,
+      createsRelease: false,
+    });
+  });
+
+  test("keeps explicit decision contexts complete and free of private API fields", () => {
+    const fixture = loadLaphroaigDecisionFixture();
+    const serializedContexts = JSON.stringify(fixture.context.bottleContexts);
+
+    for (const field of [
+      "createdAt",
+      "createdBy",
+      "createdByActorId",
+      "username",
+      "private",
+      "friendStatus",
+      "rating",
+      "isFavorite",
+      "isLibrary",
+      "hasTasted",
+    ]) {
+      expect(serializedContexts).not.toContain(`"${field}"`);
+    }
+
+    const result = classifierEvalFixtureSchema.safeParse({
+      ...fixture,
+      context: {
+        ...fixture.context,
+        bottleContexts: fixture.context.bottleContexts?.slice(0, 2),
+      },
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message:
+            "Explicit Bottle contexts must exactly cover inspected Bottle ids.",
+          path: ["context", "bottleContexts"],
+        }),
+      );
+    }
+  });
+
   test("rejects duplicate initial candidate Bottle ids", () => {
     const result = classifierEvalFixtureSchema.safeParse({
       id: "duplicate-initial-candidate-ids",
@@ -210,12 +453,35 @@ describe("eval fixture validation", () => {
     }
   });
 
-  test("accepts canonical cask traits in exact Bottle identity", () => {
-    const fixture = realWorldNewBottleFixtureSchema.parse({
+  test("requires expected operation targets to be inspectable", () => {
+    const fixture = loadLaphroaigDecisionFixture();
+
+    const uninspected = classifierEvalFixtureSchema.safeParse({
+      ...fixture,
+      context: {
+        ...fixture.context,
+        inspectedBottleIds: [45146, 44288],
+        bottleContexts: fixture.context.bottleContexts?.filter(
+          ({ bottleId }) => bottleId !== 39096,
+        ),
+      },
+    });
+    expect(uninspected.success).toBe(false);
+    if (!uninspected.success) {
+      expect(uninspected.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: "Expected operation references uninspected Bottle id 39096.",
+        }),
+      );
+    }
+  });
+
+  test("keeps compatibility cask metadata out of exact identity expectations", () => {
+    const fixture = {
       id: "canonical-cask-traits",
       referenceName: "Example First Fill Oloroso Hogshead",
       expectedBottleName: "Example First Fill Oloroso Hogshead",
-      summary: "Validates canonical structured cask traits.",
+      summary: "Validates the exact identity expectation boundary.",
       peatedBottleIds: [1],
       expected: {
         handlingStrategy: "classifier_required",
@@ -226,12 +492,27 @@ describe("eval fixture validation", () => {
           caskFill: "1st_fill",
         },
       },
-    });
+    };
 
-    expect(fixture.expected.exactBottleIdentity).toEqual({
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+    expect(realWorldNewBottleFixtureSchema.safeParse(fixture).success).toBe(
+      false,
+    );
+    expect(
+      realWorldNewBottleFixtureSchema.parse({
+        ...fixture,
+        expected: {
+          ...fixture.expected,
+          exactBottleIdentity: {
+            edition: "Annual Release",
+            releaseYear: 2024,
+            vintageYear: 2012,
+          },
+        },
+      }).expected.exactBottleIdentity,
+    ).toEqual({
+      edition: "Annual Release",
+      releaseYear: 2024,
+      vintageYear: 2012,
     });
   });
 

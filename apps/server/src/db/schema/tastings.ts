@@ -36,6 +36,8 @@ export const tastings = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     tags: varchar("tags", { length: 64 })
       .array()
       .default(sql`array[]::varchar[]`)
@@ -69,6 +71,7 @@ export const tastings = pgTable(
       table.createdAt,
     ),
     index("tasting_bottle_idx").on(table.bottleId),
+    index("tasting_release_idx").on(table.legacyReleaseId),
     index("tasting_flight_idx").on(table.flightId),
     index("tasting_created_by_idx").on(table.createdById),
   ],

@@ -65,6 +65,8 @@ export const collectionBottles = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" })
       .references(() => bottles.id)
       .notNull(),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     imageUrl: text("image_url"),
     status: collectionBottleStatusEnum("status"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -72,6 +74,7 @@ export const collectionBottles = pgTable(
   (table) => [
     unique().on(table.collectionId, table.bottleId),
     index("collection_bottle_bottle_idx").on(table.bottleId),
+    index("collection_bottle_release_idx").on(table.legacyReleaseId),
   ],
 );
 

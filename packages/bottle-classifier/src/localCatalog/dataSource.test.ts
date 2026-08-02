@@ -23,6 +23,10 @@ const shieldaigCatalog = LocalCatalogSchema.parse({
       groupId: 1001,
       category: "single_malt",
       statedAge: 30,
+      releaseYear: 2024,
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
     },
   ],
   aliases: [{ name: "Shieldaig Speyside", bottleId: 44175 }],
@@ -94,7 +98,7 @@ describe("local catalog data source", () => {
     });
   });
 
-  test("searches Bottle candidates by canonical cask traits", async () => {
+  test("keeps optional cask metadata out of local candidate scores", async () => {
     const dataSource = createLocalCatalogDataSource(
       LocalCatalogSchema.parse({
         entities: [{ id: 1, name: "Example", type: ["brand"] }],
@@ -120,17 +124,24 @@ describe("local catalog data source", () => {
       }),
     );
 
-    await expect(
-      dataSource.searchBottles(
-        BottleCandidateSearchInputSchema.parse({
-          cask_type: "oloroso",
-          cask_size: "hogshead",
-          cask_fill: "1st_fill",
-        }),
-      ),
-    ).resolves.toEqual([
+    const baseline = await dataSource.searchBottles(
+      BottleCandidateSearchInputSchema.parse({ brand: "Example" }),
+    );
+    const withCaskMetadata = await dataSource.searchBottles(
+      BottleCandidateSearchInputSchema.parse({
+        brand: "Example",
+        cask_type: "oloroso",
+        cask_size: "hogshead",
+        cask_fill: "1st_fill",
+      }),
+    );
+
+    expect(withCaskMetadata).toEqual(baseline);
+    expect(withCaskMetadata).toEqual([
+      expect.objectContaining({ bottleId: 2, score: 0.4 }),
       expect.objectContaining({
         bottleId: 1,
+        score: 0.4,
         caskType: "oloroso",
         caskSize: "hogshead",
         caskFill: "1st_fill",
@@ -177,6 +188,8 @@ describe("local catalog data source", () => {
             bottleId: 44266,
             fullName: "Shieldaig Speyside 30-year-old",
             statedAge: 30,
+            releaseYear: 2024,
+            traitFields: ["statedAge", "releaseYear"],
           },
         ],
       },
@@ -285,12 +298,14 @@ describe("local catalog data source", () => {
           id: 5001,
           name: "Northstar",
           shortName: null,
+          aliases: [],
           type: ["distiller"],
         },
         {
           id: 5002,
           name: "Northstar Distillery",
           shortName: null,
+          aliases: [],
           type: ["distiller"],
         },
       ],
@@ -304,5 +319,47 @@ describe("local catalog data source", () => {
 
     expect(results?.map((result) => result.entityId)).toEqual([5002, 5001]);
     expect(results?.[0]?.score).toBeGreaterThan(results?.[1]?.score ?? 0);
+  });
+
+  test("resolves exact entity aliases ahead of contained names", async () => {
+    const dataSource = createLocalCatalogDataSource({
+      ...shieldaigCatalog,
+      entities: [
+        ...shieldaigCatalog.entities,
+        {
+          id: 1953,
+          name: "Komagatake",
+          shortName: null,
+          aliases: ["Mars Shinshu Distillery"],
+          type: ["brand", "distiller"],
+        },
+        {
+          id: 238555,
+          name: "Shinshu",
+          shortName: null,
+          aliases: [],
+          type: ["distiller"],
+        },
+      ],
+    });
+
+    await expect(
+      dataSource.searchEntities?.({
+        query: "Mars Shinshu Distillery",
+        type: "distiller",
+        limit: 5,
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        entityId: 1953,
+        alias: "Mars Shinshu Distillery",
+        score: 1,
+        source: ["local_catalog", "exact"],
+      }),
+      expect.objectContaining({
+        entityId: 238555,
+        score: expect.any(Number),
+      }),
+    ]);
   });
 });

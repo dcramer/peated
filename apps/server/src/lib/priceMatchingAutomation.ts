@@ -82,9 +82,6 @@ const WEB_VALIDATED_DIFFERENTIATORS = new Set<MatchAttribute>([
   "distillery",
   "statedAge",
   "edition",
-  "caskType",
-  "caskSize",
-  "caskFill",
   "caskStrength",
   "singleCask",
   "abv",
@@ -269,12 +266,6 @@ function compareCandidateValue(
       return candidate.statedAge === Number(expectedValue);
     case "edition":
       return textsOverlap(candidate.edition, String(expectedValue));
-    case "caskType":
-      return textsOverlap(candidate.caskType, String(expectedValue));
-    case "caskSize":
-      return textsOverlap(candidate.caskSize, String(expectedValue));
-    case "caskFill":
-      return textsOverlap(candidate.caskFill, String(expectedValue));
     case "caskStrength":
       return (
         candidate.caskStrength ===
@@ -323,9 +314,6 @@ function getCreateNewChecks(
     addCheckIfPresent(allChecks, "category", proposedBottle.category, false);
     addCheckIfPresent(allChecks, "statedAge", proposedBottle.statedAge, false);
     addCheckIfPresent(allChecks, "edition", proposedBottle.edition, false);
-    addCheckIfPresent(allChecks, "caskType", proposedBottle.caskType, false);
-    addCheckIfPresent(allChecks, "caskSize", proposedBottle.caskSize, false);
-    addCheckIfPresent(allChecks, "caskFill", proposedBottle.caskFill, false);
     if (proposedBottle.caskStrength) {
       addCheckIfPresent(allChecks, "caskStrength", true, false);
     }
@@ -525,18 +513,6 @@ function getExistingMatchDecisiveAttributes({
     decisiveMatchAttributes.add("edition");
   }
 
-  if (label?.cask_type && textsOverlap(target.caskType, label.cask_type)) {
-    decisiveMatchAttributes.add("caskType");
-  }
-
-  if (label?.cask_size && textsOverlap(target.caskSize, label.cask_size)) {
-    decisiveMatchAttributes.add("caskSize");
-  }
-
-  if (label?.cask_fill && textsOverlap(target.caskFill, label.cask_fill)) {
-    decisiveMatchAttributes.add("caskFill");
-  }
-
   if (
     label &&
     label.cask_strength !== null &&
@@ -697,15 +673,6 @@ function getCreateNewScore({
   }
   if (proposedBottle?.edition) {
     score += 8;
-  }
-  if (proposedBottle?.caskType) {
-    score += 8;
-  }
-  if (proposedBottle?.caskSize) {
-    score += 4;
-  }
-  if (proposedBottle?.caskFill) {
-    score += 4;
   }
   if (proposedBottle?.caskStrength) {
     score += 5;

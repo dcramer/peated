@@ -9,15 +9,22 @@ import {
   type BottleSearchEvidence,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
-import { getStableOpenAISettings } from "../openaiModelSettings";
+import {
+  getStableOpenAISettings,
+  type OpenAIReasoningEffort,
+} from "../openaiModelSettings";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
+  executeBottleWebSearchInvocation,
   getDistinctResultDomains,
   getResultDomain,
+  hydrateBottleSearchEvidence,
   isThinBottleSearchEvidence,
+  MAX_BOTTLE_SEARCH_SUMMARY_CHARS,
   mergeBottleSearchEvidence,
   type BottleWebSearchBudget,
+  type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
 
 const OPENAI_WEB_SEARCH_RESPONSE_INCLUDES: ResponseIncludable[] = [
@@ -93,8 +100,8 @@ export function extractOpenAISearchEvidence(
     (text): text is string => Boolean(text),
   );
   const summary =
-    outputText?.slice(0, 600) ||
-    messageTexts.join(" ").trim().slice(0, 600) ||
+    outputText?.slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS) ||
+    messageTexts.join(" ").trim().slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS) ||
     null;
   const resultsByUrl = new Map<
     string,
@@ -215,13 +222,17 @@ export function extractOpenAISearchEvidence(
 export function createOpenAIWebSearchTool({
   client,
   model,
+  reasoningEffort,
   budget,
   onEvidence,
+  executeWebSearch,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
+  executeWebSearch?: BottleWebSearchExecutor;
 }) {
   return tool({
     name: "openai_web_search",
@@ -236,9 +247,11 @@ export function createOpenAIWebSearchTool({
           await runBottleWebEvidenceSearch({
             client,
             model,
+            reasoningEffort,
             budget,
             query: args.query,
             onEvidence,
+            executeWebSearch,
           }),
       });
     },
@@ -248,24 +261,68 @@ export function createOpenAIWebSearchTool({
 export async function runBottleWebEvidenceSearch({
   client,
   model,
+  reasoningEffort,
+  query,
+  budget,
+  onEvidence,
+  executeWebSearch,
+}: {
+  client: OpenAI;
+  model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
+  query: string;
+  budget: BottleWebSearchBudget;
+  onEvidence?: (evidence: BottleSearchEvidence) => void;
+  executeWebSearch?: BottleWebSearchExecutor;
+}): Promise<BottleSearchEvidence | { error: string }> {
+  let evidenceHydrated = false;
+  const hydrateEvidence = (evidence: BottleSearchEvidence) => {
+    evidenceHydrated = true;
+    onEvidence?.(evidence);
+  };
+  const result = await executeBottleWebSearchInvocation({
+    budget,
+    toolName: "openai_web_search",
+    args: { query },
+    execute: async () =>
+      await runBottleWebEvidenceSearchAfterBudget({
+        client,
+        model,
+        reasoningEffort,
+        query,
+        budget,
+        onEvidence: hydrateEvidence,
+      }),
+    executeWebSearch,
+  });
+
+  if (executeWebSearch && !evidenceHydrated) {
+    hydrateBottleSearchEvidence(result, hydrateEvidence);
+  }
+
+  return result;
+}
+
+async function runBottleWebEvidenceSearchAfterBudget({
+  client,
+  model,
+  reasoningEffort,
   query,
   budget,
   onEvidence,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   budget: BottleWebSearchBudget;
   onEvidence?: (evidence: BottleSearchEvidence) => void;
 }): Promise<BottleSearchEvidence | { error: string }> {
-  if (!budget.tryConsume()) {
-    return budget.getExhaustedError();
-  }
-
   try {
     const primaryEvidence = await runOpenAIWebSearch({
       client,
       model,
+      reasoningEffort,
       query,
       instructions:
         "Find bottle-specific evidence. Prefer specific, corroborated sources over copied snippets or retailer SEO. Summarize confirmed traits such as producer, bottler, age, ABV, edition, cask, vintage, or release year.",
@@ -280,6 +337,7 @@ export async function runBottleWebEvidenceSearch({
         supplementalEvidence = await runOpenAIWebSearch({
           client,
           model,
+          reasoningEffort,
           query,
           instructions:
             "Find additional corroborating sources on different domains when possible. Summarize any confirmed proof, ABV, strength, or release traits.",
@@ -323,11 +381,13 @@ export async function runBottleWebEvidenceSearch({
 
 export function buildOpenAIWebSearchRequest({
   model,
+  reasoningEffort,
   query,
   instructions,
   extraContext = null,
 }: {
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   instructions: string;
   extraContext?: string | null;
@@ -348,19 +408,21 @@ export function buildOpenAIWebSearchRequest({
       },
     ],
     tools: [{ type: "web_search" }],
-    ...getStableOpenAISettings(model),
+    ...getStableOpenAISettings(model, reasoningEffort),
   };
 }
 
 export async function runOpenAIWebSearch({
   client,
   model,
+  reasoningEffort,
   query,
   instructions,
   extraContext = null,
 }: {
   client: OpenAI;
   model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
   query: string;
   instructions: string;
   extraContext?: string | null;
@@ -368,6 +430,7 @@ export async function runOpenAIWebSearch({
   const response = await client.responses.create(
     buildOpenAIWebSearchRequest({
       model,
+      reasoningEffort,
       query,
       instructions,
       extraContext,

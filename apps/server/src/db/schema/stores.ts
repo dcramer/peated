@@ -26,6 +26,10 @@ export const storePriceMatchProposalTypeEnum = pgEnum(
   "store_price_match_proposal_type",
   ["match_existing", "create_new", "correction", "no_match"],
 );
+export const legacyStorePriceMatchCreationTargetEnum = pgEnum(
+  "store_price_match_creation_target",
+  ["bottle", "release", "bottle_and_release"],
+);
 export const storePriceMatchRetryRunKindEnum = pgEnum(
   "store_price_match_retry_run_kind",
   ["create_new", "match_existing", "correction", "errored"],
@@ -55,6 +59,8 @@ export const storePrices = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    // Retained compatibility field for safe migrations; do not use in new logic.
+    legacyReleaseId: bigint("release_id", { mode: "number" }),
     hidden: boolean("hidden").default(false),
     price: integer("price").notNull(),
     currency: currencyEnum("currency").notNull(),
@@ -71,6 +77,7 @@ export const storePrices = pgTable(
       table.volume,
     ),
     index("store_price_bottle_idx").on(table.bottleId),
+    index("store_price_release_idx").on(table.legacyReleaseId),
   ],
 );
 
@@ -137,9 +144,19 @@ export const storePriceMatchProposals = pgTable(
     currentBottleId: bigint("current_bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    // Retained compatibility columns for safe migrations; new logic uses Bottle IDs.
+    legacyCurrentReleaseId: bigint("current_release_id", { mode: "number" }),
     suggestedBottleId: bigint("suggested_bottle_id", {
       mode: "number",
     }).references(() => bottles.id),
+    legacySuggestedReleaseId: bigint("suggested_release_id", {
+      mode: "number",
+    }),
+    legacyParentBottleId: bigint("parent_bottle_id", {
+      mode: "number",
+    }).references(() => bottles.id),
+    legacyCreationTarget:
+      legacyStorePriceMatchCreationTargetEnum("creation_target"),
     // Classifier-asserted alias safety. A generic listing title is only safe to
     // reuse as a global bottle alias when the decision asserts `global_alias`;
     // null/"none" mean the exact listing may match but its title must not become
@@ -151,6 +168,8 @@ export const storePriceMatchProposals = pgTable(
       .notNull(),
     extractedLabel: jsonb("extracted_label").$type<Record<string, unknown>>(),
     proposedBottle: jsonb("proposed_bottle").$type<Record<string, unknown>>(),
+    legacyProposedRelease:
+      jsonb("proposed_release").$type<Record<string, unknown>>(),
     searchEvidence: jsonb("search_evidence")
       .$type<Record<string, unknown>[]>()
       .default(sql`'[]'::jsonb`)
@@ -180,6 +199,9 @@ export const storePriceMatchProposals = pgTable(
     index("store_price_match_proposal_current_bottle_idx").on(
       table.currentBottleId,
     ),
+    index("store_price_match_proposal_current_release_idx").on(
+      table.legacyCurrentReleaseId,
+    ),
     index("store_price_match_proposal_processing_expires_idx").on(
       table.processingExpiresAt,
     ),
@@ -188,6 +210,12 @@ export const storePriceMatchProposals = pgTable(
     ),
     index("store_price_match_proposal_suggested_bottle_idx").on(
       table.suggestedBottleId,
+    ),
+    index("store_price_match_proposal_suggested_release_idx").on(
+      table.legacySuggestedReleaseId,
+    ),
+    index("store_price_match_proposal_parent_bottle_idx").on(
+      table.legacyParentBottleId,
     ),
     index("store_price_match_proposal_reviewed_by_idx").on(table.reviewedById),
   ],
@@ -217,9 +245,19 @@ export const storePriceMatchAttempts = pgTable(
       () => bottles.id,
       { onDelete: "set null" },
     ),
+    // Retained compatibility columns for safe migrations; new logic uses Bottle IDs.
+    legacyCurrentReleaseId: bigint("current_release_id", { mode: "number" }),
     suggestedBottleId: bigint("suggested_bottle_id", {
       mode: "number",
     }).references(() => bottles.id, { onDelete: "set null" }),
+    legacySuggestedReleaseId: bigint("suggested_release_id", {
+      mode: "number",
+    }),
+    legacyParentBottleId: bigint("parent_bottle_id", {
+      mode: "number",
+    }).references(() => bottles.id, { onDelete: "set null" }),
+    legacyCreationTarget:
+      legacyStorePriceMatchCreationTargetEnum("creation_target"),
     automationEligible: boolean("automation_eligible").default(false).notNull(),
     automationScore: integer("automation_score"),
     model: text("model"),

@@ -24,6 +24,15 @@ describe("getAddBottleHref", () => {
     ).toBe("/addBottle?bottle=42&intent=tasting");
   });
 
+  it("marks a created Bottle result", () => {
+    expect(
+      getAddBottleHref({
+        bottleId: 42,
+        resultSource: "created",
+      }),
+    ).toBe("/addBottle?bottle=42&resultSource=created&intent=addBottle");
+  });
+
   it("serializes the supported Bottle and return context", () => {
     const options = {
       bottleId: 42,

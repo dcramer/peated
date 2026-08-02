@@ -186,10 +186,15 @@ type ExpectedSeries = Pick<
   BottleSeries,
   "id" | "brandId" | "name" | "fullName" | "description"
 >;
+export type ConcreteBottleUpdateExpectedEntityState = Pick<
+  Entity,
+  "id" | "name" | "shortName" | "type"
+>;
 
 export type ConcreteBottleUpdateExpectedSharedState = {
   group: Pick<BottleGroup, (typeof expectedGroupKeys)[number]>;
   distillerIds: number[];
+  referencedEntities: ConcreteBottleUpdateExpectedEntityState[];
   series: ExpectedSeries | null;
   referencedSeries: ExpectedSeries[];
 };
@@ -224,11 +229,13 @@ export function concreteBottleUpdateExpectedSelectedBottleState(
 export function concreteBottleUpdateExpectedSharedState({
   group,
   distillerIds,
+  referencedEntities = [],
   referencedSeries = [],
   series,
 }: {
   group: BottleGroup;
   distillerIds: number[];
+  referencedEntities?: ConcreteBottleUpdateExpectedEntityState[];
   referencedSeries?: BottleSeries[];
   series: BottleSeries | null;
 }): ConcreteBottleUpdateExpectedSharedState {
@@ -237,6 +244,14 @@ export function concreteBottleUpdateExpectedSharedState({
       expectedGroupKeys.map((key) => [key, group[key]]),
     ) as ConcreteBottleUpdateExpectedSharedState["group"],
     distillerIds: [...distillerIds].sort((left, right) => left - right),
+    referencedEntities: referencedEntities
+      .map(({ id, name, shortName, type }) => ({
+        id,
+        name,
+        shortName,
+        type: [...type].sort() as Entity["type"],
+      }))
+      .sort((left, right) => left.id - right.id),
     series: series
       ? {
           id: series.id,
@@ -258,6 +273,33 @@ export function concreteBottleUpdateExpectedSharedState({
 
 function hasFields(value: object | undefined): boolean {
   return value !== undefined && Object.keys(value).length > 0;
+}
+
+function existingEntityChoiceId(choice: unknown): number | null {
+  if (typeof choice === "number") return choice;
+  if (
+    choice !== null &&
+    typeof choice === "object" &&
+    "id" in choice &&
+    typeof choice.id === "number"
+  ) {
+    return choice.id;
+  }
+  return null;
+}
+
+function existingEntityIdsForUpdate(
+  input: SystemConcreteBottleUpdateInput,
+): number[] {
+  const choices = [
+    input.shared?.brand,
+    input.shared?.bottler,
+    ...(input.shared?.distillers ?? []),
+  ];
+  return choices.flatMap((choice) => {
+    const id = existingEntityChoiceId(choice);
+    return id === null ? [] : [id];
+  });
 }
 
 const exactIdentityKeys: ReadonlyArray<keyof ExactPatch> = [
@@ -684,10 +726,84 @@ function emptyResult(
 }
 
 /**
+ * Locks existing Entity choices before the selected BottleGroup and Bottle.
+ * The order matches Entity writers and is safe to repeat before execution.
+ */
+export async function lockConcreteBottleUpdateDependencies(
+  tx: AnyTransaction,
+  bottleId: number,
+  referencedEntityIds: readonly number[] = [],
+): Promise<{
+  bottle: Bottle;
+  group: BottleGroup;
+  referencedEntities: Entity[];
+}> {
+  const entityIds = Array.from(new Set(referencedEntityIds)).sort(
+    (left, right) => left - right,
+  );
+  if (entityIds.some((id) => !Number.isInteger(id) || id <= 0)) {
+    throw new ConcreteBottleUpdateInputError(
+      "Referenced Entity IDs must be positive integers.",
+    );
+  }
+  const referencedEntities = entityIds.length
+    ? await tx
+        .select()
+        .from(entities)
+        .where(inArray(entities.id, entityIds))
+        .orderBy(asc(entities.id))
+        .for("share")
+    : [];
+
+  const [discoveredBottle] = await tx
+    .select({ id: bottles.id, groupId: bottles.groupId })
+    .from(bottles)
+    .where(eq(bottles.id, bottleId))
+    .limit(1);
+  if (!discoveredBottle) {
+    throw new ConcreteBottleUpdateGraphError("not_found", bottleId);
+  }
+  if (discoveredBottle.groupId === null) {
+    throw new ConcreteBottleUpdateGraphError("missing_group", bottleId);
+  }
+  const groupId = discoveredBottle.groupId;
+
+  const [group] = await tx
+    .select()
+    .from(bottleGroups)
+    .where(eq(bottleGroups.id, groupId))
+    .limit(1)
+    .for("update");
+  if (!group) {
+    throw new ConcreteBottleUpdateGraphError(
+      "invalid_catalog_graph",
+      bottleId,
+      groupId,
+    );
+  }
+
+  const [bottle] = await tx
+    .select()
+    .from(bottles)
+    .where(eq(bottles.id, bottleId))
+    .limit(1)
+    .for("update");
+  if (!bottle || bottle.groupId !== groupId) {
+    throw new ConcreteBottleUpdateGraphError(
+      "invalid_catalog_graph",
+      bottleId,
+      groupId,
+    );
+  }
+
+  return { bottle, group, referencedEntities };
+}
+
+/**
  * Performs the complete locked concrete Bottle update transaction. The caller
  * must finalize the returned manifest only after its outermost transaction
- * commits. Optional expected shared state is compared while the BottleGroup
- * and every referenced series preimage remain locked.
+ * commits. Optional expected shared state is compared while its dependencies
+ * remain locked.
  */
 export async function updateConcreteBottleInTransaction(
   tx: AnyTransaction,
@@ -709,48 +825,17 @@ export async function updateConcreteBottleInTransaction(
     creationSource: CatalogVerificationCreationSource;
   },
 ): Promise<ConcreteBottleUpdateFinalizationManifest> {
-  const [discoveredBottle] = await tx
-    .select({ id: bottles.id, groupId: bottles.groupId })
-    .from(bottles)
-    .where(eq(bottles.id, bottleId))
-    .limit(1);
-  if (!discoveredBottle) {
-    throw new ConcreteBottleUpdateGraphError("not_found", bottleId);
-  }
-  if (discoveredBottle.groupId === null) {
-    throw new ConcreteBottleUpdateGraphError("missing_group", bottleId);
-  }
-  const groupId = discoveredBottle.groupId;
-
-  // Group-first locking gives graph writers one order; the Bottle is re-read
-  // under that lock because discovery above was intentionally unlocked.
-  const [group] = await tx
-    .select()
-    .from(bottleGroups)
-    .where(eq(bottleGroups.id, groupId))
-    .limit(1)
-    .for("update");
-  if (!group) {
-    throw new ConcreteBottleUpdateGraphError(
-      "invalid_catalog_graph",
-      bottleId,
-      groupId,
-    );
-  }
-
-  const [lockedBottle] = await tx
-    .select()
-    .from(bottles)
-    .where(eq(bottles.id, bottleId))
-    .limit(1)
-    .for("update");
-  if (!lockedBottle || lockedBottle.groupId !== groupId) {
-    throw new ConcreteBottleUpdateGraphError(
-      "invalid_catalog_graph",
-      bottleId,
-      groupId,
-    );
-  }
+  const expectedReferencedEntityIds =
+    expectedSharedState?.referencedEntities.map(({ id }) => id) ?? [];
+  const {
+    bottle: lockedBottle,
+    group,
+    referencedEntities,
+  } = await lockConcreteBottleUpdateDependencies(tx, bottleId, [
+    ...expectedReferencedEntityIds,
+    ...existingEntityIdsForUpdate(input),
+  ]);
+  const groupId = group.id;
   if (
     expectedSelectedBottleState &&
     expectedSelectedBottleKeys.some(
@@ -848,10 +933,24 @@ export async function updateConcreteBottleInTransaction(
         const expected = expectedSeriesById.get(series.id);
         return !expected || !sameExpectedSeries(series, expected);
       });
+    const expectedReferencedEntityIdSet = new Set(
+      expectedSharedState.referencedEntities.map(({ id }) => id),
+    );
+    const currentReferencedEntities = referencedEntities
+      .filter(({ id }) => expectedReferencedEntityIdSet.has(id))
+      .map(({ id, name, shortName, type }) => ({ id, name, shortName, type }));
+    const referencedEntitiesChanged =
+      JSON.stringify(
+        currentReferencedEntities.map((entity) => ({
+          ...entity,
+          type: [...entity.type].sort(),
+        })),
+      ) !== JSON.stringify(expectedSharedState.referencedEntities);
     if (
       groupChanged ||
       !sameValues(currentGroupDistillerIds, expectedSharedState.distillerIds) ||
-      seriesChanged
+      seriesChanged ||
+      referencedEntitiesChanged
     ) {
       throw new ConcreteBottleUpdateExpectedStateError(groupId);
     }

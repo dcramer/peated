@@ -1,9 +1,12 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleChecks,
   bottleGroupDistillers,
   bottleGroups,
   bottleObservations,
+  bottleOperations,
   bottleSeries,
   bottleTombstones,
   bottles,
@@ -25,7 +28,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { ProposedBottleSchema } from "@peated/server/schemas/priceMatches";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import type { z } from "zod";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -51,8 +54,16 @@ vi.mock("@peated/server/lib/catalogVerification", async () => {
 });
 
 describe("price match queue", () => {
+  const originalBottleCheckVisibility =
+    config.BOTTLE_CHECK_MODERATOR_VISIBILITY;
+
   beforeEach(() => {
     vi.resetAllMocks();
+    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = true;
+  });
+
+  afterEach(() => {
+    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = originalBottleCheckVisibility;
   });
 
   test("requires moderator access", async ({ fixtures }) => {
@@ -228,6 +239,218 @@ describe("price match queue", () => {
     expect(queueItem).not.toHaveProperty("parentBottleId");
     expect(queueItem).not.toHaveProperty("creationTarget");
     expect(queueItem).not.toHaveProperty("proposedRelease");
+  });
+
+  test("shows the latest clean linked check without duplicating the primary queue row", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const price = await fixtures.StorePrice({ name: "Clean Linked Check" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "match_existing",
+      })
+      .returning();
+    const [check] = await db
+      .insert(bottleChecks)
+      .values({
+        intent: "resolve_reference",
+        sourceKind: "store_price",
+        sourceId: String(price.id),
+        subjectKey: `resolve_reference:store_price:${price.id}`,
+        schemaVersion: 1,
+        inputSnapshot: {},
+        output: {
+          status: "classified",
+          summary: "No supplemental catalog cleanup was found.",
+          findings: [],
+        },
+        storePriceMatchProposalId: proposal.id,
+        completedAt: new Date(),
+      })
+      .returning();
+
+    const result = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({
+      id: proposal.id,
+      bottleCheckIds: [check.id],
+    });
+    expect(result.stats.actionableCount).toBe(1);
+  });
+
+  test("retains one completed primary row while linked supplemental work needs disposition", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const sourceBottle = await fixtures.Bottle();
+    const destinationBottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({
+      bottleId: destinationBottle.id,
+      name: "Supplemental Work",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "approved",
+        proposalType: "match_existing",
+        suggestedBottleId: destinationBottle.id,
+      })
+      .returning();
+    const [check] = await db
+      .insert(bottleChecks)
+      .values({
+        intent: "resolve_reference",
+        sourceKind: "store_price",
+        sourceId: String(price.id),
+        subjectKey: `resolve_reference:store_price:${price.id}`,
+        schemaVersion: 1,
+        inputSnapshot: {},
+        output: {
+          status: "classified",
+          decision: {
+            action: "match",
+            rationale: "The listing matched, with catalog cleanup remaining.",
+            candidateBottleIds: [destinationBottle.id],
+            identityScope: "product",
+            observation: null,
+            matchedBottleId: destinationBottle.id,
+            proposedBottle: null,
+          },
+          findings: [],
+        },
+        storePriceMatchProposalId: proposal.id,
+        completedAt: new Date(),
+      })
+      .returning();
+    await db.insert(bottleOperations).values({
+      checkId: check.id,
+      proposal: {
+        type: "merge_bottles",
+        input: {
+          sourceBottleId: sourceBottle.id,
+          destinationBottleId: destinationBottle.id,
+        },
+        rationale: "The Bottles are exact duplicates.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: sourceBottle.id },
+          { kind: "bottle", bottleId: destinationBottle.id },
+        ],
+      },
+      status: "pending_review",
+    });
+
+    const result = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({
+      id: proposal.id,
+      status: "approved",
+      bottleCheckIds: [check.id],
+    });
+    expect(result.stats.actionableCount).toBe(1);
+  });
+
+  test("removes a completed primary row after all linked supplemental work is done", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const sourceBottle = await fixtures.Bottle();
+    const destinationBottle = await fixtures.Bottle();
+    const price = await fixtures.StorePrice({ name: "Completed Work" });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "approved",
+        proposalType: "match_existing",
+        suggestedBottleId: destinationBottle.id,
+      })
+      .returning();
+    const [check] = await db
+      .insert(bottleChecks)
+      .values({
+        intent: "resolve_reference",
+        sourceKind: "store_price",
+        sourceId: String(price.id),
+        subjectKey: `resolve_reference:store_price:${price.id}`,
+        schemaVersion: 1,
+        inputSnapshot: {},
+        output: {
+          status: "classified",
+          summary: "All supplemental cleanup is complete.",
+          findings: [],
+        },
+        storePriceMatchProposalId: proposal.id,
+        completedAt: new Date(),
+      })
+      .returning();
+    await db.insert(bottleOperations).values({
+      checkId: check.id,
+      proposal: {
+        type: "merge_bottles",
+        input: {
+          sourceBottleId: sourceBottle.id,
+          destinationBottleId: destinationBottle.id,
+        },
+        rationale: "The Bottles were exact duplicates.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: sourceBottle.id },
+          { kind: "bottle", bottleId: destinationBottle.id },
+        ],
+      },
+      status: "applied",
+      result: {
+        type: "merge_bottles",
+        status: "applied",
+        sourceBottleId: sourceBottle.id,
+        destinationBottleId: destinationBottle.id,
+        changed: true,
+      },
+    });
+    await db.insert(bottleChecks).values({
+      intent: "resolve_reference",
+      sourceKind: "store_price",
+      sourceId: String(price.id),
+      subjectKey: `resolve_reference:store_price:${price.id}`,
+      schemaVersion: 1,
+      inputSnapshot: {},
+      output: {
+        status: "classified",
+        summary: "This finding was closed.",
+        findings: [
+          {
+            scope: "other",
+            summary: "No further action is required.",
+            evidenceRefs: [{ kind: "source", field: "reference.name" }],
+          },
+        ],
+      },
+      storePriceMatchProposalId: proposal.id,
+      closedById: user.id,
+      closeReason: "dismissed",
+      closedAt: new Date(),
+      completedAt: new Date(),
+    });
+
+    const result = await routerClient.prices.matchQueue.list(
+      {},
+      { context: { user } },
+    );
+
+    expect(result.results).toEqual([]);
+    expect(result.stats.actionableCount).toBe(0);
   });
 
   test("hydrates a direct Bottle suggestion", async ({ fixtures }) => {
@@ -3135,6 +3358,7 @@ describe("price match queue", () => {
       {
         priceId: price.id,
         force: true,
+        generateBottleCheck: true,
         processingToken: expect.any(String),
       },
     );

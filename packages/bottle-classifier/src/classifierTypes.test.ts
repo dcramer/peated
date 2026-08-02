@@ -6,6 +6,7 @@ import {
   BottleClassificationDecisionSchema,
   BottleClassifierAgentDecisionSchema,
   BottleExtractedDetailsSchema,
+  MAX_BOTTLE_CANDIDATES,
   ProposedBottleSchema,
 } from "./classifierTypes";
 
@@ -95,6 +96,26 @@ describe("BottleClassifierAgentDecisionSchema", () => {
         matchedBottleId: 123,
       }).success,
     ).toBe(true);
+  });
+
+  test("bounds model-declared candidate ids to the existing search ceiling", () => {
+    const candidateBottleIds = Array.from(
+      { length: MAX_BOTTLE_CANDIDATES + 1 },
+      (_, index) => index + 1,
+    );
+
+    expect(
+      BottleClassifierAgentDecisionSchema.safeParse({
+        action: "no_match",
+        candidateBottleIds,
+      }).success,
+    ).toBe(false);
+    expect(
+      BottleClassificationDecisionSchema.safeParse({
+        action: "no_match",
+        candidateBottleIds,
+      }).success,
+    ).toBe(false);
   });
 
   test("parses identity basis and candidate family context", () => {

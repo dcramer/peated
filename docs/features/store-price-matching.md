@@ -41,6 +41,11 @@ For each `store_price`, the matcher should decide one of four outcomes:
 
 The system persists one `store_price_match_proposal` row per `store_price`.
 
+The primary match proposal remains authoritative for the listing decision.
+When enabled, the classifier may also persist a linked Bottle check with
+supplemental proposed operations. That check does not replace, delay, or
+reinterpret the primary proposal.
+
 ## Matching Modes
 
 There are two matching modes:
@@ -94,6 +99,11 @@ Evaluation order:
 7. compute automation eligibility from deterministic checks
 8. upsert the proposal row
 9. auto-create only when the deterministic gate says it is safe
+
+When `BOTTLE_CHECK_SHADOW_GENERATION` is enabled, a full reference run may also
+create a `resolve_reference` Bottle check from the same reviewed artifacts. Its
+proposed operations are supplemental catalog work, not additional price-match
+outcomes.
 
 ## Observation Persistence
 
@@ -194,7 +204,7 @@ When `status = classified`, the decision must be one of:
 Additional rules:
 
 - `matchedBottleId` must be a known candidate bottle id when `action = match`
-- `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; the proposed bottle draft is a sparse repair draft and unknown fields must not clear existing bottle facts
+- `matchedBottleId` must be the current known candidate bottle id when `action = repair_bottle`; `proposedBottle` is the full canonical repair draft, and the price-matching adapter must not treat null or unknown values as sparse clears. Sparse field changes belong to supplemental `update_bottle` operations
 - classifier decisions carry Bottle ids only; they do not expose a legacy
   release-id picker
 - `create_bottle` carries one complete marketed Bottle draft, including exact
@@ -310,6 +320,20 @@ Moderators can:
 - apply a same-bottle correction repair
 - ignore a proposal
 - approve complete Bottle create-new input
+
+When `BOTTLE_CHECK_MODERATOR_VISIBILITY` is enabled, the same Incoming Listings
+row also shows its linked check summary, findings, and review operations. The
+existing match controls keep owning the primary listing decision. Supplemental
+work remains on that row until it is disposed; it does not create a duplicate
+Bottle Checks inbox item.
+
+Each review operation is read-only until separately approved. Approval never
+means “apply the whole agent result”: selected `update_bottle`,
+`merge_bottles`, `update_entity`, and `merge_entities` operations execute
+independently through canonical services. `BOTTLE_CHECK_EXECUTION` gates that
+execution and defaults off. Failed operations may be retried through
+reconciliation; blocked or stale work requires manual correction or a new
+check.
 
 The route accepts one complete Bottle input, creates or safely reuses one
 independently complete Bottle, and returns that Bottle directly. It has no

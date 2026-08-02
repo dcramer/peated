@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-01T02:28:19.676Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Laphroaig Càirdeas Warehouse 1 52.2 2022"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Laphroaig Càirdeas Warehouse 1 52.2 2022",
+    "summary": "**Laphroaig Càirdeas Warehouse 1 (2022)**\n\nConfirmed bottle details:\n\n- **Producer / bottler:** **Laphroaig Distillery**, distillery bottling. ([laphroaig.com](https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky))\n- **Series / edition:** **Càirdeas 2022**, released for **Fèis Ìle 2022 / Friends of Laphr",
+    "results": [
+      {
+        "title": "laphroaig.com",
+        "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+        "domain": "laphroaig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/209611/laphroaig-cairdeas",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "0a6721d6b9404b47fa710a0128e981e3a8ddfacfcef79b8e4e22e0ea2fe17085",
+    "mode": "record"
+  }
+}

@@ -34,6 +34,18 @@ TypeScript assumptions.
   records from retryable contexts.
 - Validate model or agent output before persistence. Model output may propose;
   code owns permissions, identity, and irreversible state changes.
+- Persist agent proposals separately from server-owned review state. Review
+  state may add a live preview, bounded impact, warnings, a narrow state token,
+  status, reviewer, and execution result; those fields must never be accepted
+  from the model.
+- Prepare proposals independently so a mechanical failure is retained as a
+  blocked review operation without discarding valid siblings.
+- Approval must revalidate the fields and relationships covered by the state
+  token. Relevant drift becomes stale without mutation; unrelated timestamps
+  must not invalidate an operation.
+- Retry only failed operations under the same durable operation id, and
+  reconcile a prior attempt before redispatch. Blocked or stale work requires a
+  new check or manual correction, and a closed parent check is immutable.
 
 ## Exceptions
 

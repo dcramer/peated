@@ -1,9 +1,11 @@
 import type {
+  AuditBottleInput,
   BottleClassificationResult,
   BottleReference,
   ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
 import {
+  AuditBottleInputSchema,
   BottleCandidateSchema,
   createDecidedBottleClassification,
 } from "@peated/bottle-classifier/contract";
@@ -28,6 +30,10 @@ import {
 } from "@peated/server/lib/openaiClient";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { randomUUID } from "node:crypto";
+import {
+  getBottleClassifierContext,
+  getEntityClassifierContext,
+} from "./contextAdapters";
 
 let bottleClassifier: ReturnType<typeof createBottleClassifier> | null = null;
 
@@ -86,6 +92,7 @@ export function getBottleClassifier() {
   bottleClassifier = createBottleClassifier({
     client,
     model: config.OPENAI_MODEL,
+    reasoningEffort: config.OPENAI_REASONING_EFFORT,
     maxSearchQueries: config.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES,
     firecrawlApiKey: config.FIRECRAWL_API_KEY,
     firecrawlApiUrl: config.FIRECRAWL_API_URL,
@@ -100,6 +107,8 @@ export function getBottleClassifier() {
         ),
       searchBottles: searchBottleCandidates,
       getBottleCandidateById,
+      getBottleContext: getBottleClassifierContext,
+      getEntityContext: getEntityClassifierContext,
       searchEntities: searchBottleClassifierEntities,
     },
   });
@@ -107,9 +116,7 @@ export function getBottleClassifier() {
   return bottleClassifier;
 }
 
-export async function classifyBottleReference(
-  input: ClassifyBottleReferenceInput,
-) {
+export async function runBottleReference(input: ClassifyBottleReferenceInput) {
   const reference = normalizeReferenceForClassifier(input.reference);
   const conversationId = buildReferenceConversationId(
     "bottle_reference",
@@ -118,11 +125,26 @@ export async function classifyBottleReference(
   );
 
   return await withReferenceConversation(conversationId, async () => {
-    return await getBottleClassifier().classifyBottleReference({
+    return await getBottleClassifier().runBottleReference({
       ...input,
       reference,
       conversationId,
     });
+  });
+}
+
+export async function classifyBottleReference(
+  input: ClassifyBottleReferenceInput,
+) {
+  return (await runBottleReference(input)).result;
+}
+
+export async function runBottleAudit(input: AuditBottleInput) {
+  const parsedInput = AuditBottleInputSchema.parse(input);
+  const conversationId = `bottle_audit:${parsedInput.bottleId}`;
+
+  return await withReferenceConversation(conversationId, async () => {
+    return await getBottleClassifier().runBottleAudit(parsedInput);
   });
 }
 

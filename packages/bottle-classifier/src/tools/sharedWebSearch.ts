@@ -24,7 +24,7 @@ export const BottleWebSearchErrorSchema = z.object({
 });
 
 const MAX_BOTTLE_SEARCH_RESULTS = 6;
-const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 320;
+export const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 1200;
 const MAX_BOTTLE_SEARCH_TITLE_CHARS = 160;
 const MAX_BOTTLE_SEARCH_DESCRIPTION_CHARS = 220;
 const MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS = 1;
@@ -36,6 +36,47 @@ export type BottleWebSearchBudget = {
     error: string;
   };
 };
+
+export type BottleWebSearchExecutor = (input: {
+  toolName: "openai_web_search" | "firecrawl_web_search";
+  args: { query: string };
+  execute: () => Promise<BottleSearchEvidence | { error: string }>;
+}) => Promise<BottleSearchEvidence | { error: string }>;
+
+export async function executeBottleWebSearchInvocation({
+  budget,
+  toolName,
+  args,
+  execute,
+  executeWebSearch,
+}: {
+  budget: BottleWebSearchBudget;
+  toolName: "openai_web_search" | "firecrawl_web_search";
+  args: { query: string };
+  execute: () => Promise<BottleSearchEvidence | { error: string }>;
+  executeWebSearch?: BottleWebSearchExecutor;
+}): Promise<BottleSearchEvidence | { error: string }> {
+  if (!budget.tryConsume()) {
+    return budget.getExhaustedError();
+  }
+
+  return executeWebSearch
+    ? await executeWebSearch({ toolName, args, execute })
+    : await execute();
+}
+
+export function hydrateBottleSearchEvidence(
+  result: BottleSearchEvidence | { error: string },
+  onEvidence?: (evidence: BottleSearchEvidence) => void,
+): boolean {
+  const parsed = BottleSearchEvidenceSchema.safeParse(result);
+  if (!parsed.success || parsed.data.results.length === 0) {
+    return false;
+  }
+
+  onEvidence?.(parsed.data);
+  return true;
+}
 
 export function createBottleWebSearchBudget(
   maxQueries: number,
@@ -159,7 +200,7 @@ export function mergeBottleSearchEvidence({
     ),
   )
     .join(" ")
-    .slice(0, 600);
+    .slice(0, MAX_BOTTLE_SEARCH_SUMMARY_CHARS);
 
   return buildBottleSearchEvidence({
     provider,

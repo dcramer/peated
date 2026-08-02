@@ -325,7 +325,7 @@ function MatchedOutcomeActions({
       href={getAddSimilarBottlePath(bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add a similar bottle
+      Add Similar
     </OutcomeButton>
   );
   const actionButtons =
@@ -462,13 +462,13 @@ function OutcomeSelection({
       View Bottle
     </OutcomeButton>
   );
-  const addSimilarBottleButton = (
+  const addSimilarBottleButton = wasCreated ? null : (
     <OutcomeButton
       key="similar-bottle"
       href={getAddSimilarBottlePath(selection.bottle.id)}
       icon={<Plus className="h-4 w-4" />}
     >
-      Add a similar bottle
+      Add Similar
     </OutcomeButton>
   );
   const actionButtons =
@@ -512,7 +512,11 @@ function OutcomeSelection({
               <h2 className="font-semibold text-white">{title}</h2>
               <p className="text-muted mt-1 text-sm">{description}</p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-4">{actionButtons}</div>
+            <div
+              className={`grid gap-3 ${wasCreated ? "sm:grid-cols-3" : "sm:grid-cols-4"}`}
+            >
+              {actionButtons}
+            </div>
           </div>
         </section>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -630,6 +634,8 @@ function AddBottleFlowContent() {
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
   const requestedBottleId = parseId(searchParams.get("bottle"));
+  const requestedResultSource =
+    searchParams.get("resultSource") === "created" ? "created" : undefined;
   const requestedFlightId = searchParams.get("flight") || null;
   const requestedPendingImage = useMemo(
     () => getPendingImageFromParams(new URLSearchParams(searchParams)),
@@ -638,10 +644,10 @@ function AddBottleFlowContent() {
   const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
     if (requestedBottleId) {
-      return `bottle:${requestedBottleId}:${pendingImageKey}`;
+      return `bottle:${requestedBottleId}:${pendingImageKey}:${requestedResultSource ?? "found"}`;
     }
     return null;
-  }, [requestedBottleId, requestedPendingImage?.id]);
+  }, [requestedBottleId, requestedPendingImage?.id, requestedResultSource]);
 
   const [loadedBottleKey, setLoadedBottleKey] = useState<string | null>(null);
   const [loadingBottle, setLoadingBottle] = useState(false);
@@ -715,6 +721,7 @@ function AddBottleFlowContent() {
           libraryEntryImageUrl: libraryEntry?.imageUrl ?? null,
           pendingImage: requestedPendingImage,
           previewUrl: requestedPendingImage?.imageUrl || null,
+          resultSource: requestedResultSource,
         });
         setLoadedBottleKey(requestedBottleKey);
       } catch (err) {
@@ -743,6 +750,7 @@ function AddBottleFlowContent() {
     requestedBottleId,
     requestedPendingImage,
     requestedBottleKey,
+    requestedResultSource,
   ]);
 
   function startOver() {

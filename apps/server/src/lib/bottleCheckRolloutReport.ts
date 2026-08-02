@@ -1,0 +1,308 @@
+import {
+  BottleClassifierRunMetadataSchema,
+  type ProposedOperationType,
+} from "@peated/bottle-classifier";
+import { db, type AnyDatabase } from "@peated/server/db";
+import { bottleChecks } from "@peated/server/db/schema";
+import { gte } from "drizzle-orm";
+
+type RolloutOperation = {
+  type: ProposedOperationType;
+  status:
+    | "blocked"
+    | "pending_review"
+    | "rejected"
+    | "applying"
+    | "applied"
+    | "stale"
+    | "failed";
+  reviewedAt: Date | null;
+  rejectionReason:
+    | "wrong_target"
+    | "wrong_change"
+    | "insufficient_evidence"
+    | "resolved_manually"
+    | "other"
+    | null;
+};
+
+export type BottleCheckRolloutRow = {
+  intent: "resolve_reference" | "audit_bottle";
+  origin: "source" | "moderator" | "post_user_creation";
+  schemaVersion: number;
+  model: string | null;
+  modelMetadata: unknown;
+  completedAt: Date | null;
+  operations: RolloutOperation[];
+};
+
+type CountByKey = Record<string, number>;
+type UsageByModel = Record<
+  string,
+  {
+    runs: number;
+    inputTokens: number;
+    outputTokens: number;
+    totalTokens: number;
+    toolCalls: number;
+  }
+>;
+
+export type BottleCheckRolloutReport = {
+  checks: {
+    total: number;
+    byIntent: CountByKey;
+    byOrigin: CountByKey;
+    bySchemaVersion: CountByKey;
+  };
+  review: {
+    reviewedOperations: number;
+    acceptedOperations: number;
+    rejectedOperations: number;
+    qualityRejections: number;
+    acceptanceRate: number | null;
+    rejectionRate: number | null;
+    qualityRejectionRate: number | null;
+    averageReviewTimeMs: number | null;
+    rejectionReasons: CountByKey;
+  };
+  execution: {
+    operations: number;
+    byOperationType: CountByKey;
+    attemptedOperations: number;
+    staleOperations: number;
+    staleRate: number | null;
+    failedOperations: number;
+    failureRate: number | null;
+  };
+  agentLoop: {
+    measuredRuns: number;
+    latencyCoverage: number;
+    cacheDetailRuns: number;
+    cacheDetailCoverage: number;
+    averageAgentLatencyMs: number | null;
+    totalInputTokens: number;
+    totalCachedInputTokens: number;
+    cachedInputTokenRate: number | null;
+    totalOutputTokens: number;
+    totalTokens: number;
+    totalToolCalls: number;
+    usageByModel: UsageByModel;
+  };
+};
+
+function increment(counts: CountByKey, key: string): void {
+  counts[key] = (counts[key] ?? 0) + 1;
+}
+
+function ratio(numerator: number, denominator: number): number | null {
+  return denominator === 0 ? null : numerator / denominator;
+}
+
+export function buildBottleCheckRolloutReport(
+  rows: BottleCheckRolloutRow[],
+): BottleCheckRolloutReport {
+  const byIntent: CountByKey = {};
+  const byOrigin: CountByKey = {};
+  const bySchemaVersion: CountByKey = {};
+  const byOperationType: CountByKey = {};
+  const rejectionReasons: CountByKey = {};
+  const reviewTimesMs: number[] = [];
+  const latenciesMs: number[] = [];
+  let operationCount = 0;
+  let attemptedOperations = 0;
+  let reviewedOperations = 0;
+  let acceptedOperations = 0;
+  let rejectedOperations = 0;
+  let qualityRejections = 0;
+  let staleOperations = 0;
+  let failedOperations = 0;
+  let measuredRuns = 0;
+  let totalInputTokens = 0;
+  let cacheDetailRuns = 0;
+  let cacheMeasuredInputTokens = 0;
+  let totalCachedInputTokens = 0;
+  let totalOutputTokens = 0;
+  let totalTokens = 0;
+  let totalToolCalls = 0;
+  const usageByModel: UsageByModel = {};
+  const qualityRejectionReasons = new Set([
+    "wrong_target",
+    "wrong_change",
+    "insufficient_evidence",
+  ]);
+
+  for (const row of rows) {
+    increment(byIntent, row.intent);
+    increment(byOrigin, row.origin);
+    increment(bySchemaVersion, String(row.schemaVersion));
+
+    const modelMetadata =
+      row.modelMetadata === null
+        ? null
+        : BottleClassifierRunMetadataSchema.parse(row.modelMetadata);
+    if (modelMetadata) {
+      measuredRuns += 1;
+      const model = row.model ?? "unknown";
+      const modelUsage = (usageByModel[model] ??= {
+        runs: 0,
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        toolCalls: 0,
+      });
+      modelUsage.runs += 1;
+      modelUsage.inputTokens += modelMetadata.usage.inputTokens;
+      modelUsage.outputTokens += modelMetadata.usage.outputTokens;
+      modelUsage.totalTokens += modelMetadata.usage.totalTokens;
+      modelUsage.toolCalls += modelMetadata.toolCalls.count;
+      latenciesMs.push(modelMetadata.agentDurationMs);
+      totalInputTokens += modelMetadata.usage.inputTokens;
+      if (modelMetadata.usage.cachedInputTokens !== undefined) {
+        cacheDetailRuns += 1;
+        cacheMeasuredInputTokens += modelMetadata.usage.inputTokens;
+        totalCachedInputTokens += modelMetadata.usage.cachedInputTokens;
+      }
+      totalOutputTokens += modelMetadata.usage.outputTokens;
+      totalTokens += modelMetadata.usage.totalTokens;
+      totalToolCalls += modelMetadata.toolCalls.count;
+    }
+
+    for (const operation of row.operations) {
+      operationCount += 1;
+      increment(byOperationType, operation.type);
+      if (
+        operation.status === "applying" ||
+        operation.status === "applied" ||
+        operation.status === "stale" ||
+        operation.status === "failed"
+      ) {
+        attemptedOperations += 1;
+      }
+      if (operation.status === "stale") {
+        staleOperations += 1;
+      }
+      if (operation.status === "failed") {
+        failedOperations += 1;
+      }
+      if (!operation.reviewedAt) continue;
+
+      reviewedOperations += 1;
+      if (operation.status === "rejected") {
+        rejectedOperations += 1;
+        if (
+          operation.rejectionReason &&
+          qualityRejectionReasons.has(operation.rejectionReason)
+        ) {
+          qualityRejections += 1;
+        }
+        increment(rejectionReasons, operation.rejectionReason ?? "unspecified");
+      } else {
+        acceptedOperations += 1;
+      }
+      if (row.completedAt) {
+        reviewTimesMs.push(
+          Math.max(
+            0,
+            operation.reviewedAt.getTime() - row.completedAt.getTime(),
+          ),
+        );
+      }
+    }
+  }
+
+  return {
+    checks: {
+      total: rows.length,
+      byIntent,
+      byOrigin,
+      bySchemaVersion,
+    },
+    review: {
+      reviewedOperations,
+      acceptedOperations,
+      rejectedOperations,
+      qualityRejections,
+      acceptanceRate: ratio(acceptedOperations, reviewedOperations),
+      rejectionRate: ratio(rejectedOperations, reviewedOperations),
+      qualityRejectionRate: ratio(qualityRejections, reviewedOperations),
+      averageReviewTimeMs:
+        reviewTimesMs.length === 0
+          ? null
+          : reviewTimesMs.reduce((sum, value) => sum + value, 0) /
+            reviewTimesMs.length,
+      rejectionReasons,
+    },
+    execution: {
+      operations: operationCount,
+      byOperationType,
+      attemptedOperations,
+      staleOperations,
+      staleRate: ratio(staleOperations, attemptedOperations),
+      failedOperations,
+      failureRate: ratio(failedOperations, attemptedOperations),
+    },
+    agentLoop: {
+      measuredRuns,
+      latencyCoverage: ratio(latenciesMs.length, rows.length) ?? 0,
+      cacheDetailRuns,
+      cacheDetailCoverage: ratio(cacheDetailRuns, measuredRuns) ?? 0,
+      averageAgentLatencyMs:
+        latenciesMs.length === 0
+          ? null
+          : latenciesMs.reduce((sum, value) => sum + value, 0) /
+            latenciesMs.length,
+      totalInputTokens,
+      totalCachedInputTokens,
+      cachedInputTokenRate: ratio(
+        totalCachedInputTokens,
+        cacheMeasuredInputTokens,
+      ),
+      totalOutputTokens,
+      totalTokens,
+      totalToolCalls,
+      usageByModel,
+    },
+  };
+}
+
+export async function getBottleCheckRolloutReport({
+  since,
+  database = db,
+}: {
+  since: Date;
+  database?: AnyDatabase;
+}): Promise<BottleCheckRolloutReport> {
+  const rows = await database.query.bottleChecks.findMany({
+    where: gte(bottleChecks.createdAt, since),
+    columns: {
+      intent: true,
+      origin: true,
+      schemaVersion: true,
+      model: true,
+      modelMetadata: true,
+      completedAt: true,
+    },
+    with: {
+      operations: {
+        columns: {
+          proposal: true,
+          status: true,
+          reviewedAt: true,
+          rejectionReason: true,
+        },
+      },
+    },
+  });
+
+  return buildBottleCheckRolloutReport(
+    rows.map((row) => ({
+      ...row,
+      origin: row.origin ?? "source",
+      operations: row.operations.map(({ proposal, ...operation }) => ({
+        ...operation,
+        type: proposal.type,
+      })),
+    })),
+  );
+}

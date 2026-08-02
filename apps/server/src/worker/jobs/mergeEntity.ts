@@ -1,19 +1,31 @@
-import { db } from "@peated/server/db";
+import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleGroupDistillers,
   bottleGroups,
   bottles,
   bottleSeries,
   bottlesToDistillers,
+  changes,
   entities,
   entityAliases,
   entityTombstones,
 } from "@peated/server/db/schema";
-import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
+import {
+  getPeatedSystemActorForDatabase,
+  getUserActorForDatabase,
+} from "@peated/server/lib/actors";
 import {
   getConcreteBottleExactIdentity,
   materializeConcreteBottleForGroup,
 } from "@peated/server/lib/concreteBottleIdentity";
+import {
+  EntityMergeOperationExecutionError,
+  loadEntityMergeOperation,
+  markEntityMergeOperationApplied,
+  markEntityMergeOperationFailed,
+  revalidateApplyingEntityMergeOperation,
+  type LoadedEntityMergeOperation,
+} from "@peated/server/lib/entityMergeOperation";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
@@ -29,6 +41,10 @@ import {
   type ConcreteBottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateConcreteBottle";
 import { pushUniqueJob } from "@peated/server/worker/client";
+import {
+  EntityMergeJobInputSchema,
+  isOperationEntityMergeJobInput,
+} from "@peated/server/worker/entityMerge";
 import { and, asc, eq, inArray, notInArray, or, sql } from "drizzle-orm";
 
 function replaceMergedEntityIds(
@@ -42,32 +58,188 @@ function replaceMergedEntityIds(
   ).sort((left, right) => left - right);
 }
 
-export default async function mergeEntity({
+type EntityRole = (typeof entities.$inferSelect)["type"][number];
+
+function sortedUniqueEntityRoles(roleSets: readonly EntityRole[][]) {
+  return Array.from(new Set(roleSets.flat())).sort() as EntityRole[];
+}
+
+function buildOperationResult(
+  operation: LoadedEntityMergeOperation,
+  reconciled: boolean,
+  destinationRoles: EntityRole[],
+) {
+  return {
+    type: "merge_entities" as const,
+    sourceEntityId: operation.sourceEntityId,
+    destinationEntityId: operation.destinationEntityId,
+    destinationRoles,
+    approvingModeratorId: operation.approvingModerator.id,
+    reconciled,
+    execution: {
+      kind: "worker" as const,
+      name: "MergeEntity" as const,
+    },
+  };
+}
+
+async function assertOperationResultState(
+  operation: LoadedEntityMergeOperation,
+  database: AnyDatabase = db,
+) {
+  const source = await database.query.entities.findFirst({
+    where: eq(entities.id, operation.sourceEntityId),
+  });
+  const destination = await database.query.entities.findFirst({
+    where: eq(entities.id, operation.destinationEntityId),
+  });
+  const tombstone = await database.query.entityTombstones.findFirst({
+    where: and(
+      eq(entityTombstones.entityId, operation.sourceEntityId),
+      eq(entityTombstones.newEntityId, operation.destinationEntityId),
+    ),
+  });
+
+  if (source || !destination || !tombstone) {
+    throw new EntityMergeOperationExecutionError(
+      `Bottle operation ${operation.operationId} does not match the current Entity merge state.`,
+      operation.operationId,
+    );
+  }
+
+  return destination;
+}
+
+async function performEntityMerge({
   toEntityId,
   fromEntityIds,
+  operation,
 }: {
   toEntityId: number;
   fromEntityIds: number[];
+  operation: LoadedEntityMergeOperation | null;
 }) {
   logInfo("Merging entities into {toEntityId}", {
-    extra: { fromEntityIds, toEntityId },
+    extra: {
+      fromEntityIds,
+      toEntityId,
+      operationId: operation?.operationId,
+    },
   });
 
-  const [toEntity] = await db
-    .select()
-    .from(entities)
-    .where(eq(entities.id, toEntityId));
-  if (!toEntity) {
-    logWarn("Merge target entity not found", { extra: { toEntityId } });
-    return;
-  }
-
-  const automationUser = await getAutomationModeratorUser();
   const bottleMergeManifests: ConcreteBottleMergeFinalizationManifest[] = [];
   const bottleUpdateManifests: ConcreteBottleUpdateFinalizationManifest[] = [];
+  let completedOperationResult: ReturnType<typeof buildOperationResult> | null =
+    null;
+  let performedMutation = false;
 
   await db.transaction(async (tx) => {
-    const actor = await getPeatedSystemActorForDatabase(tx);
+    if (operation) {
+      const currentOperation = await loadEntityMergeOperation({
+        operationId: operation.operationId,
+        approvingModeratorId: operation.approvingModerator.id,
+        database: tx,
+        lock: true,
+      });
+      if (currentOperation.status === "failed") {
+        return;
+      }
+      if (currentOperation.status === "applied") {
+        completedOperationResult = currentOperation.result;
+        return;
+      }
+      if (
+        currentOperation.sourceEntityId !== fromEntityIds[0] ||
+        currentOperation.destinationEntityId !== toEntityId ||
+        fromEntityIds.length !== 1
+      ) {
+        throw new EntityMergeOperationExecutionError(
+          `Bottle operation ${currentOperation.operationId} changed before execution.`,
+          currentOperation.operationId,
+        );
+      }
+      const [sourceEntity] = await tx
+        .select({ id: entities.id })
+        .from(entities)
+        .where(eq(entities.id, currentOperation.sourceEntityId))
+        .limit(1);
+      if (!sourceEntity) {
+        let reconciledDestination: typeof entities.$inferSelect;
+        try {
+          reconciledDestination = await assertOperationResultState(
+            currentOperation,
+            tx,
+          );
+        } catch (error) {
+          throw new EntityMergeOperationExecutionError(
+            `Source Entity ${currentOperation.sourceEntityId} was not found.`,
+            currentOperation.operationId,
+            { cause: error },
+          );
+        }
+
+        completedOperationResult = buildOperationResult(
+          currentOperation,
+          true,
+          sortedUniqueEntityRoles([reconciledDestination.type]),
+        );
+        await markEntityMergeOperationApplied({
+          database: tx,
+          operationId: currentOperation.operationId,
+          result: completedOperationResult,
+        });
+        return;
+      }
+      if (
+        !(await revalidateApplyingEntityMergeOperation({
+          operationId: currentOperation.operationId,
+          database: tx,
+        }))
+      ) {
+        return;
+      }
+    }
+
+    const mergeEntityRows = await tx
+      .select()
+      .from(entities)
+      .where(inArray(entities.id, [toEntityId, ...fromEntityIds]))
+      .orderBy(asc(entities.id))
+      .for("update");
+    const toEntity = mergeEntityRows.find(({ id }) => id === toEntityId);
+    if (!toEntity) {
+      if (operation) {
+        throw new EntityMergeOperationExecutionError(
+          `Destination Entity ${toEntityId} was not found.`,
+          operation.operationId,
+        );
+      }
+      logWarn("Merge target entity not found", { extra: { toEntityId } });
+      return;
+    }
+    performedMutation = true;
+
+    const mutationUser =
+      operation?.approvingModerator ?? (await getAutomationModeratorUser(tx));
+    const actor = operation
+      ? await getUserActorForDatabase(tx, operation.approvingModerator)
+      : await getPeatedSystemActorForDatabase(tx);
+    const destinationRolesBefore = sortedUniqueEntityRoles([toEntity.type]);
+    const destinationRolesAfter = sortedUniqueEntityRoles(
+      mergeEntityRows.map(({ type }) => type),
+    );
+    const destinationRolesChanged =
+      destinationRolesBefore.length !== destinationRolesAfter.length ||
+      destinationRolesBefore.some(
+        (role, index) => role !== destinationRolesAfter[index],
+      );
+    if (destinationRolesChanged) {
+      await tx
+        .update(entities)
+        .set({ type: destinationRolesAfter })
+        .where(eq(entities.id, toEntityId));
+    }
+
     const sourceSeriesRows = await tx
       .select()
       .from(bottleSeries)
@@ -246,7 +418,7 @@ export default async function mergeEntity({
               ...(seriesInput !== undefined ? { series: seriesInput } : {}),
             },
           },
-          user: automationUser,
+          user: mutationUser,
           actorId: actor.id,
           creationSource: "repair_workflow",
         }),
@@ -301,8 +473,103 @@ export default async function mergeEntity({
         newEntityId: toEntity.id,
       });
     }
+
+    if (operation) {
+      const sourceEntities = await tx
+        .select({ id: entities.id, name: entities.name })
+        .from(entities)
+        .where(inArray(entities.id, fromEntityIds));
+      await tx.insert(changes).values([
+        ...sourceEntities.map((sourceEntity) => ({
+          objectType: "entity" as const,
+          objectId: sourceEntity.id,
+          actorId: actor.id,
+          displayName: sourceEntity.name,
+          type: "delete" as const,
+          data: {
+            operationId: operation.operationId,
+            updateScope: "entity_merge",
+            destinationEntityId: toEntity.id,
+            execution: {
+              kind: "worker",
+              name: "MergeEntity",
+            },
+          },
+        })),
+        {
+          objectType: "entity" as const,
+          objectId: toEntity.id,
+          actorId: actor.id,
+          displayName: toEntity.name,
+          type: "update" as const,
+          data: {
+            operationId: operation.operationId,
+            updateScope: "entity_merge",
+            sourceEntityIds: fromEntityIds,
+            destinationRoles: destinationRolesAfter,
+            ...(destinationRolesChanged
+              ? {
+                  roleChange: {
+                    before: destinationRolesBefore,
+                    after: destinationRolesAfter,
+                  },
+                }
+              : {}),
+            execution: {
+              kind: "worker",
+              name: "MergeEntity",
+            },
+          },
+        },
+      ]);
+    }
+
     await tx.delete(entities).where(inArray(entities.id, fromEntityIds));
+
+    if (operation) {
+      const remainingSource = await tx
+        .select({ id: entities.id })
+        .from(entities)
+        .where(eq(entities.id, operation.sourceEntityId))
+        .limit(1);
+      const destination = await tx
+        .select({ id: entities.id })
+        .from(entities)
+        .where(eq(entities.id, operation.destinationEntityId))
+        .limit(1);
+      const tombstone = await tx
+        .select({ entityId: entityTombstones.entityId })
+        .from(entityTombstones)
+        .where(
+          and(
+            eq(entityTombstones.entityId, operation.sourceEntityId),
+            eq(entityTombstones.newEntityId, operation.destinationEntityId),
+          ),
+        )
+        .limit(1);
+      if (remainingSource.length || !destination.length || !tombstone.length) {
+        throw new EntityMergeOperationExecutionError(
+          `Bottle operation ${operation.operationId} could not verify the Entity merge result.`,
+          operation.operationId,
+        );
+      }
+
+      completedOperationResult = buildOperationResult(
+        operation,
+        false,
+        destinationRolesAfter,
+      );
+      await markEntityMergeOperationApplied({
+        database: tx,
+        operationId: operation.operationId,
+        result: completedOperationResult,
+      });
+    }
   });
+
+  if (!performedMutation) {
+    return completedOperationResult;
+  }
 
   for (const manifest of bottleMergeManifests) {
     await finalizeConcreteBottleMerge(manifest);
@@ -318,5 +585,57 @@ export default async function mergeEntity({
     );
   } catch (err) {
     logError(err, { entity: { id: toEntityId } });
+  }
+
+  return completedOperationResult;
+}
+
+export default async function mergeEntity(rawInput: unknown) {
+  const input = EntityMergeJobInputSchema.parse(rawInput);
+  if (!isOperationEntityMergeJobInput(input)) {
+    return await performEntityMerge({
+      toEntityId: input.toEntityId,
+      fromEntityIds: input.fromEntityIds,
+      operation: null,
+    });
+  }
+
+  let operation: LoadedEntityMergeOperation;
+  try {
+    operation = await loadEntityMergeOperation({
+      operationId: input.operationId,
+      approvingModeratorId: input.approvingModeratorId,
+    });
+    if (operation.status === "failed") {
+      logWarn("Entity merge operation is already failed", {
+        extra: { operationId: operation.operationId },
+      });
+      return;
+    }
+    if (operation.status === "applied") {
+      return operation.result;
+    }
+
+    return await performEntityMerge({
+      toEntityId: operation.destinationEntityId,
+      fromEntityIds: [operation.sourceEntityId],
+      operation,
+    });
+  } catch (error) {
+    try {
+      await markEntityMergeOperationFailed({
+        operationId: input.operationId,
+        approvingModeratorId: input.approvingModeratorId,
+        error,
+      });
+    } catch (statusError) {
+      logError(statusError, {
+        extra: {
+          operationId: input.operationId,
+          phase: "record_entity_merge_failure",
+        },
+      });
+    }
+    throw error;
   }
 }

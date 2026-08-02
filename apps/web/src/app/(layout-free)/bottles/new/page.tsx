@@ -240,6 +240,7 @@ function CreateBottleForm() {
               bottleId: createdBottle.id,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
+              resultSource: "created",
               intent: "library",
             }),
           );
@@ -251,6 +252,7 @@ function CreateBottleForm() {
               bottleId: createdBottle.id,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
+              resultSource: "created",
             }),
           );
         } else if (returnAction === "tasting") {
@@ -259,6 +261,7 @@ function CreateBottleForm() {
               bottleId: createdBottle.id,
               pendingImageId: nextPendingImageId,
               pendingImageUrl: nextPendingImageUrl,
+              resultSource: "created",
               intent: "tasting",
             }),
           );
@@ -268,6 +271,7 @@ function CreateBottleForm() {
           router.replace(
             getAddBottleHref({
               bottleId: createdBottle.id,
+              resultSource: "created",
               intent: "tasting",
             }),
           );

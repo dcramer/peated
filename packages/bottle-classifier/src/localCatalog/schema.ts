@@ -12,6 +12,7 @@ const LocalCatalogEntitySchema = z
     id: z.number().int(),
     name: z.string().trim().min(1),
     shortName: z.string().trim().min(1).nullable().default(null),
+    aliases: z.array(z.string().trim().min(1)).default([]),
     type: z.array(EntityTypeEnum).min(1),
   })
   .strict();

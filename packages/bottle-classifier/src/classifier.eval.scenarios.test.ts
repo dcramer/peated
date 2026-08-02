@@ -63,9 +63,7 @@ describe("classifier eval scenarios", () => {
     }
   });
 
-  test("keeps live classifier evals focused on bottle-backed scenarios", () => {
-    expect(LIVE_CLASSIFIER_EVAL_SCENARIOS).not.toContain("ignore_or_reject");
-
+  test("keeps every configured live classifier eval scenario populated", () => {
     for (const scenario of LIVE_CLASSIFIER_EVAL_SCENARIOS) {
       expect(getClassifierLiveEvalCases(scenario).length).toBeGreaterThan(0);
     }

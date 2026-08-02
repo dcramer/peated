@@ -30,6 +30,7 @@ export const extractFromImage = async (imageUrlOrBase64: string) =>
     await extractFromImageWithClient({
       client: createOpenAIClient(),
       model: config.OPENAI_MODEL,
+      reasoningEffort: config.OPENAI_REASONING_EFFORT,
       imageUrlOrBase64,
     }),
   );
@@ -39,6 +40,7 @@ export const extractFromText = async (label: string) =>
     await extractFromTextWithClient({
       client: createOpenAIClient(),
       model: config.OPENAI_MODEL,
+      reasoningEffort: config.OPENAI_REASONING_EFFORT,
       label,
     }),
   );

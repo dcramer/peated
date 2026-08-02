@@ -88,6 +88,16 @@ export const BOTTLE_EXACT_TRAIT_FIELDS = [
   "caskFill",
 ] as const;
 
+export const BOTTLE_DECISION_TRAIT_FIELDS = [
+  "edition",
+  "statedAge",
+  "releaseYear",
+  "vintageYear",
+  "abv",
+  "singleCask",
+  "caskStrength",
+] as const satisfies ReadonlyArray<(typeof BOTTLE_EXACT_TRAIT_FIELDS)[number]>;
+
 const BottleExactTraitFieldEnum = z.enum(BOTTLE_EXACT_TRAIT_FIELDS);
 
 const BottleCandidateSiblingSchema = z
@@ -292,6 +302,8 @@ export const ProposedBottleSchema = z
   })
   .strict();
 
+export const MAX_BOTTLE_CANDIDATES = 25;
+
 export const BottleCandidateSearchInputSchema = z
   .object({
     query: z.string().trim().nullable().default(null),
@@ -312,7 +324,7 @@ export const BottleCandidateSearchInputSchema = z
     vintage_year: z.number().int().nullable().default(null),
     release_year: z.number().int().nullable().default(null),
     currentBottleId: z.number().nullable().default(null),
-    limit: z.number().int().min(1).max(25).default(15),
+    limit: z.number().int().min(1).max(MAX_BOTTLE_CANDIDATES).default(15),
   })
   .strict();
 
@@ -464,7 +476,10 @@ export const BottleConfidenceBasisSchema = z
 const BottleClassifierDecisionBaseSchema = z
   .object({
     rationale: z.string().nullable().default(null),
-    candidateBottleIds: z.array(z.number().int()).default([]),
+    candidateBottleIds: z
+      .array(z.number().int())
+      .max(MAX_BOTTLE_CANDIDATES)
+      .default([]),
     identityScope: BottleIdentityScopeEnum.default("product").describe(
       "`product` for stable bottle-family identity; `exact_cask` only when the exact cask itself is the marketed bottle identity. SMWS codes qualify; generic cask/barrel details do not qualify without reliable evidence that the listed product is an exact single-cask identity.",
     ),
@@ -524,12 +539,15 @@ export const BottleClassifierAgentDecisionSchema = z
           "Decision action.",
           "match: an existing Bottle safely covers the marketed identity; set matchedBottleId.",
           "repair_bottle: existing bottle is the right identity but needs bottle-level field repair; set matchedBottleId and proposedBottle.",
-          "create_bottle: create one independently complete concrete bottle; set proposedBottle only, including every marketed release trait needed to identify it.",
+          "create_bottle: create one independently complete Bottle; set proposedBottle only, including every marketed release trait needed to identify it.",
           "no_match: no safe existing target and no supported create action, or creation would invent an ambiguous hybrid.",
         ].join(" "),
       ),
     rationale: z.string().nullable().default(null),
-    candidateBottleIds: z.array(z.number().int()).default([]),
+    candidateBottleIds: z
+      .array(z.number().int())
+      .max(MAX_BOTTLE_CANDIDATES)
+      .default([]),
     identityScope: BottleIdentityScopeEnum.nullable().default(null),
     aliasScope: AliasScopeEnum.nullable().default(null),
     observation: BottleObservationSchema.nullable().default(null),
@@ -539,7 +557,7 @@ export const BottleClassifierAgentDecisionSchema = z
     proposedBottle: AgentProposedBottleSchema.nullable()
       .default(null)
       .describe(
-        "Required for create_bottle and repair_bottle. A create draft describes one independently complete concrete bottle, including every supported marketed release trait; unknown optional fields may remain null.",
+        "Required for create_bottle and repair_bottle. A create draft describes one independently complete Bottle, including every supported marketed release trait; unknown optional fields may remain null.",
       ),
   })
   .strict();

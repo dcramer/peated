@@ -1,5 +1,23 @@
+export {
+  BottleContextSchema,
+  BottleContextSourceSchema,
+  EntityContextSchema,
+  MAX_BOTTLE_CONTEXT_ALIASES,
+  MAX_BOTTLE_CONTEXT_IMAGES,
+  MAX_BOTTLE_CONTEXT_OBSERVATIONS,
+  MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH,
+  MAX_BOTTLE_CONTEXT_OBSERVATION_TEXT_LENGTH,
+  MAX_BOTTLE_CONTEXT_SIBLINGS,
+  MAX_ENTITY_CONTEXT_ALIASES,
+  MAX_ENTITY_CONTEXT_BOTTLES,
+  type BottleContext,
+  type BottleContextExact,
+  type BottleContextSource,
+  type EntityContext,
+} from "../bottleContextContract";
 export { mergeBottleCandidateFamilyContext } from "../candidateFamilyContext";
 export {
+  BOTTLE_DECISION_TRAIT_FIELDS,
   BOTTLE_EXACT_TRAIT_FIELDS,
   BottleCandidateSchema,
   BottleCandidateSearchInputSchema,

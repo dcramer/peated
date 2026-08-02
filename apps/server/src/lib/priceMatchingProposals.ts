@@ -1,6 +1,8 @@
-import type {
-  CandidateExpansionMode,
-  ClassifyBottleReferenceInput,
+import type { BottleReferenceRun } from "@peated/bottle-classifier";
+import {
+  type BottleClassificationResult,
+  type CandidateExpansionMode,
+  type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
 import {
   BottleCandidateSchema,
@@ -12,8 +14,8 @@ import type { WebEvidenceJudgment } from "@peated/bottle-classifier/priceMatchin
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import {
   BottleClassificationError,
-  classifyBottleReference,
   isIgnoredBottleClassification,
+  runBottleReference,
   type BottleClassificationDecision,
 } from "@peated/server/agents/bottleClassifier";
 import config from "@peated/server/config";
@@ -34,6 +36,7 @@ import {
   assignBottleAliasInTransaction,
   finalizeBottleAliasAssignment,
 } from "@peated/server/lib/bottleAliases";
+import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import {
   buildBottleInputFromProposedBottle,
   buildClassifierConcreteBottleInput,
@@ -291,7 +294,15 @@ function buildClassifierBottleRepairDraft(
   proposedBottle: BottleClassificationDecision["proposedBottle"],
 ): StorePriceBottleRepairDraft | null {
   const normalized = parseClassifierProposedBottle(proposedBottle);
-  return normalized ? { ...normalized, statedAgeScope: "exact" } : null;
+  return normalized
+    ? {
+        ...normalized,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+        statedAgeScope: "exact",
+      }
+    : null;
 }
 
 function appendRationale(
@@ -397,27 +408,6 @@ function candidateNeedsExistingBottleRepair(
   if (
     proposedBottle.edition &&
     !textsOverlap(candidate.edition, proposedBottle.edition)
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskType !== null &&
-    candidate.caskType !== proposedBottle.caskType
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskSize !== null &&
-    candidate.caskSize !== proposedBottle.caskSize
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskFill !== null &&
-    candidate.caskFill !== proposedBottle.caskFill
   ) {
     return true;
   }
@@ -537,6 +527,30 @@ export function toStorePriceMatchDecision({
   }
 
   if (decision.action === "repair_bottle") {
+    const proposedBottle = buildClassifierBottleRepairDraft(
+      decision.proposedBottle,
+    );
+    const candidate = candidates.find(
+      ({ bottleId }) => bottleId === decision.matchedBottleId,
+    );
+    const needsRepair =
+      candidate !== undefined &&
+      proposedBottle !== null &&
+      candidateNeedsExistingBottleRepair(candidate, proposedBottle);
+
+    if (!needsRepair && price.bottleId === decision.matchedBottleId) {
+      return {
+        action: "match_existing",
+        confidence: null,
+        rationale: decision.rationale,
+        candidateBottleIds: decision.candidateBottleIds,
+        identityScope: decision.identityScope,
+        aliasScope: decision.aliasScope ?? "none",
+        suggestedBottleId: decision.matchedBottleId,
+        proposedBottle: null,
+      };
+    }
+
     return {
       action: "correction",
       confidence: null,
@@ -545,7 +559,7 @@ export function toStorePriceMatchDecision({
       identityScope: decision.identityScope,
       aliasScope: decision.aliasScope ?? "none",
       suggestedBottleId: decision.matchedBottleId,
-      proposedBottle: buildClassifierBottleRepairDraft(decision.proposedBottle),
+      proposedBottle: needsRepair ? proposedBottle : null,
     };
   }
 
@@ -714,6 +728,51 @@ async function recordStorePriceMatchAttempt({
   }
 
   return attempt;
+}
+
+async function tryPersistStorePriceBottleCheck({
+  attempt,
+  classificationInput,
+  classification,
+  modelMetadata,
+  price,
+  proposal,
+}: {
+  attempt: { id: number; suggestedBottleId: number | null };
+  classificationInput: ClassifyBottleReferenceInput;
+  classification: BottleClassificationResult;
+  modelMetadata: BottleReferenceRun["modelMetadata"];
+  price: StorePrice;
+  proposal: StorePriceMatchProposal;
+}) {
+  try {
+    await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "store_price",
+      sourceId: price.id,
+      input: classificationInput,
+      result: classification,
+      storePrice: {
+        attemptId: attempt.id,
+      },
+      model: proposal.model,
+      modelMetadata,
+    });
+  } catch (error) {
+    logError(error, {
+      price: {
+        id: price.id,
+        name: price.name,
+      },
+      proposal: {
+        id: proposal.id,
+      },
+      extra: {
+        attemptId: attempt.id,
+        phase: "persist_store_price_bottle_check",
+      },
+    });
+  }
 }
 
 async function markLatestStorePriceMatchAttemptFinalInTransaction(
@@ -1230,11 +1289,13 @@ export async function resolveStorePriceMatchProposal(
   {
     candidateExpansion = "open",
     force = false,
+    generateBottleCheck = false,
     processingToken,
     reuseExistingExtraction = false,
   }: {
     candidateExpansion?: CandidateExpansionMode;
     force?: boolean;
+    generateBottleCheck?: boolean;
     processingToken?: string;
     reuseExistingExtraction?: boolean;
   } = {},
@@ -1287,6 +1348,9 @@ export async function resolveStorePriceMatchProposal(
   let extractedLabel: ExtractedBottleDetails | null = null;
   let candidates: PriceMatchCandidate[] = [];
   let searchEvidence: SearchEvidence[] = [];
+  let classificationModelMetadata: BottleReferenceRun["modelMetadata"] = null;
+  const shouldGenerateBottleCheck =
+    generateBottleCheck && config.BOTTLE_CHECK_SHADOW_GENERATION;
   try {
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.
@@ -1308,7 +1372,9 @@ export async function resolveStorePriceMatchProposal(
         parseStoredExtractedLabel(existingProposal);
     }
 
-    const classification = await classifyBottleReference(classificationInput);
+    const classificationRun = await runBottleReference(classificationInput);
+    const classification = classificationRun.result;
+    classificationModelMetadata = classificationRun.modelMetadata;
 
     extractedLabel = parseClassifierExtractedLabel(
       classification.artifacts.extractedIdentity,
@@ -1328,13 +1394,13 @@ export async function resolveStorePriceMatchProposal(
           expectedProcessingToken: processingToken,
           tx,
         });
-      return await db.transaction(async (tx) => {
+      const ignoredResult = await db.transaction(async (tx) => {
         const proposal = await upsertIgnoredProposal(tx);
-        await recordStorePriceMatchAttempt({ proposal, tx });
+        const attempt = await recordStorePriceMatchAttempt({ proposal, tx });
         if (
           !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
         ) {
-          return proposal;
+          return { proposal, attempt };
         }
 
         if (price.bottleId !== null) {
@@ -1344,8 +1410,19 @@ export async function resolveStorePriceMatchProposal(
           });
         }
 
-        return proposal;
+        return { proposal, attempt };
       });
+      if (shouldGenerateBottleCheck) {
+        await tryPersistStorePriceBottleCheck({
+          attempt: ignoredResult.attempt,
+          classificationInput,
+          classification,
+          modelMetadata: classificationModelMetadata,
+          price,
+          proposal: ignoredResult.proposal,
+        });
+      }
+      return ignoredResult.proposal;
     }
 
     const classifierDecision = normalizeClassifierDecisionForPriceMatching(
@@ -1389,6 +1466,16 @@ export async function resolveStorePriceMatchProposal(
       proposal,
       automationAssessment,
     });
+    if (shouldGenerateBottleCheck) {
+      await tryPersistStorePriceBottleCheck({
+        attempt,
+        classificationInput,
+        classification,
+        modelMetadata: classificationModelMetadata,
+        price,
+        proposal,
+      });
+    }
 
     const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
       decision,

@@ -78,7 +78,7 @@ function buildSearchEvidence(
 }
 
 describe("priceMatchingEvidence", () => {
-  test("keeps cask-specific references and targets out of plain-age verification", () => {
+  test("ignores optional cask metadata but keeps cask flags decisive for plain-age verification", () => {
     const target = buildBottleCandidate({
       bottleId: 1,
       fullName: "Example Distillery 10-year-old",
@@ -100,9 +100,9 @@ describe("priceMatchingEvidence", () => {
     expect(isPlainAgeBottleMatchEligibleForVerification(input)).toBe(true);
 
     for (const caskSpecificLabel of [
-      { cask_type: "oloroso" as const },
-      { cask_size: "hogshead" as const },
-      { cask_fill: "1st_fill" as const },
+      { cask_type: "pedro_ximenez" as const },
+      { cask_size: "butt" as const },
+      { cask_fill: "2nd_fill" as const },
     ]) {
       expect(
         isPlainAgeBottleMatchEligibleForVerification({
@@ -112,13 +112,13 @@ describe("priceMatchingEvidence", () => {
             ...caskSpecificLabel,
           },
         }),
-      ).toBe(false);
+      ).toBe(true);
     }
 
     for (const caskSpecificTarget of [
-      { caskType: "oloroso" as const },
-      { caskSize: "hogshead" as const },
-      { caskFill: "1st_fill" as const },
+      { caskType: "pedro_ximenez" as const },
+      { caskSize: "butt" as const },
+      { caskFill: "2nd_fill" as const },
     ]) {
       const candidate = {
         ...target,
@@ -130,8 +130,67 @@ describe("priceMatchingEvidence", () => {
           target: candidate,
           candidates: [candidate],
         }),
+      ).toBe(true);
+    }
+
+    for (const decisiveLabel of [
+      { cask_strength: true as const },
+      { single_cask: true as const },
+    ]) {
+      expect(
+        isPlainAgeBottleMatchEligibleForVerification({
+          ...input,
+          extractedLabel: {
+            ...extractedLabel,
+            ...decisiveLabel,
+          },
+        }),
       ).toBe(false);
     }
+
+    for (const decisiveTarget of [
+      { caskStrength: true as const },
+      { singleCask: true as const },
+    ]) {
+      const candidate = { ...target, ...decisiveTarget };
+      expect(
+        isPlainAgeBottleMatchEligibleForVerification({
+          ...input,
+          target: candidate,
+          candidates: [candidate],
+        }),
+      ).toBe(false);
+    }
+  });
+
+  test("does not report optional cask metadata conflicts while retaining cask flag conflicts", () => {
+    expect(
+      getExistingMatchIdentityConflicts({
+        target: buildBottleCandidate({
+          bottleId: 4,
+          fullName: "Example Distillery Reserve",
+          brand: "Example Distillery",
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "refill",
+          caskStrength: true,
+          singleCask: false,
+        }),
+        extractedLabel: buildExtractedLabel({
+          expression: "Reserve",
+          stated_age: null,
+          abv: null,
+          cask_type: "oloroso",
+          cask_size: "hogshead",
+          cask_fill: "1st_fill",
+          cask_strength: false,
+          single_cask: true,
+        }),
+      }),
+    ).toEqual([
+      "candidate cask-strength flag conflicts with extracted label",
+      "candidate single-cask flag conflicts with extracted label",
+    ]);
   });
 
   test("treats agent-supported external evidence as support when it validates an omitted canonical trait", () => {

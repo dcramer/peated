@@ -1,6 +1,10 @@
 import http from "node:http";
 
 import {
+  bottleCheckCapabilities,
+  createBottleCheckMock,
+} from "./mock-rpc/bottle-checks.mjs";
+import {
   addAnotherReleaseSourceBottle,
   adminUser,
   anotherReleaseSourceBottle,
@@ -73,6 +77,14 @@ const appliedQueueProposalTokens = new Set();
 let collectionBottleId = 1;
 let pendingUploadId = 1;
 
+const bottleCheckMock = createBottleCheckMock({
+  exactMatchedBottleId,
+  exactMergeOtherBottle,
+  existingBottle,
+  testBrand,
+  testUser,
+});
+
 const server = http.createServer(async (request, response) => {
   if (request.method === "OPTIONS") {
     response.writeHead(204, corsHeaders).end();
@@ -118,8 +130,27 @@ process.on("SIGTERM", () => {
 async function handleRpcRequest({ request, response, url }) {
   const path = url.pathname.replace(/^\/rpc\/?/, "");
   const input = await readRpcInput(request, url);
+  const bottleCheckResult = bottleCheckMock.handleRpcRequest({
+    path,
+    input,
+    token: getAccessToken(request),
+  });
+  if (bottleCheckResult?.type === "error") {
+    sendRpcError(response, bottleCheckResult.message);
+    return true;
+  }
+  if (bottleCheckResult?.type === "response") {
+    sendRpcResponse(response, bottleCheckResult.value);
+    return true;
+  }
 
   switch (path) {
+    case "root":
+      sendRpcResponse(response, {
+        version: "playwright",
+        capabilities: bottleCheckCapabilities,
+      });
+      return true;
     case "activity/list":
       sendRpcResponse(
         response,
@@ -283,6 +314,21 @@ async function handleRpcRequest({ request, response, url }) {
     }
     case "prices/matchQueue/list": {
       const token = getAccessToken(request);
+      if (bottleCheckMock.isLinkedStorePriceRequest(token)) {
+        sendRpcResponse(response, {
+          results: [
+            bottleCheckMock.buildLinkedStorePriceQueueProposal(
+              buildDirectBottleProposal(),
+            ),
+          ],
+          rel: { nextCursor: null, prevCursor: null },
+          stats: {
+            actionableCount: 1,
+            processingCount: 0,
+          },
+        });
+        return true;
+      }
       if (!token.includes("queue-direct-bottle")) {
         return false;
       }
@@ -299,7 +345,10 @@ async function handleRpcRequest({ request, response, url }) {
       return true;
     }
     case "prices/matchQueue/activeRetryRun":
-      if (!getAccessToken(request).includes("queue-direct-bottle")) {
+      if (
+        !getAccessToken(request).includes("queue-direct-bottle") &&
+        !bottleCheckMock.isLinkedStorePriceRequest(getAccessToken(request))
+      ) {
         return false;
       }
       sendRpcResponse(response, { run: null });
@@ -1481,6 +1530,7 @@ function buildDirectBottleProposal() {
     processingExpiresAt: null,
     createdAt: "2026-06-07T12:00:00.000Z",
     updatedAt: "2026-06-07T12:00:00.000Z",
+    bottleCheckIds: [],
     price: {
       id: 9902,
       name: `${testBrand.name} ${createdBottleName}`,

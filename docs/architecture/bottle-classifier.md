@@ -7,7 +7,7 @@ instead of redoing identity reasoning.
 
 ## Contract
 
-The package has three distinct contracts:
+The package has four distinct contracts:
 
 - `extractBottleReferenceIdentity(...)`: reads bottle identity facts from image
   or text. It does not decide whether the facts are canonical Peated identity.
@@ -18,6 +18,9 @@ The package has three distinct contracts:
 - `classifyBottleReference(...)`: full reviewed classification. It can match,
   create, repair, or decline after considering local candidates, entity
   resolution, and web evidence when required.
+- `auditBottle(...)`: checks one existing Bottle and returns a summary,
+  proposed operations, and non-executable findings. It does not return another
+  identity decision.
 
 `classifyBottleReference(...)` accepts a generic reference:
 
@@ -37,16 +40,149 @@ It returns either `ignored` with a reason, or `classified` with:
 
 Decision actions are `match`, `repair_bottle`, `create_bottle`, and `no_match`.
 `create_bottle` proposes one complete observed marketed Bottle: a stable
-expression in `proposedBottle.name` plus every supported exact field, including
-edition, vintage year, release year, exact age, ABV, cask flags, and canonical
-cask type, size, and fill. Canonical
+expression in `proposedBottle.name` plus required exact fields, including edition,
+vintage year, release year, exact age, ABV, and cask flags. Canonical
 downstream materialization combines those values without duplicating exact
 markers in the stable name, creates the independently correct Bottle, and
 manages grouping automatically. The classifier never selects a BottleGroup.
 
+`caskType`, `caskSize`, and `caskFill` are soft-deprecated classifier metadata.
+Schemas, stored context, replay data, and explicit supplied values remain
+compatible. Once candidates are retrieved, the classifier does not use them as
+explicit identity constraints or deterministic score adjustments and does not
+investigate, reject, create, repair, or gate automation solely on those three
+fields.
+Marketed finish wording in the Bottle name or edition, exact cask or barrel
+codes, `singleCask`, and `caskStrength` remain identity evidence.
+
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
 policy.
+
+## Bottle Checks
+
+A Bottle check is one immutable classifier result created for a server-owned
+intent:
+
+- `resolve_reference` identifies a Bottle from a listing or other external
+  reference. Its existing structured decision remains the authoritative result.
+- `audit_bottle` reviews an existing Bottle from a moderator request or a
+  sampled post-user-creation job. Its result is a narrative summary, proposed
+  operations, and findings; it has no redundant structured conclusion.
+
+A proposed operation is an agent suggestion with a typed input, rationale, and
+evidence references. V1 supports exactly four:
+
+- `update_bottle`
+- `merge_bottles`
+- `update_entity`
+- `merge_entities`
+
+The agent has bounded read-only Bottle, BottleGroup, Entity, local-search, and
+focused web-evidence tools. It cannot mutate the catalog. Proposals may refer
+only to inspected resources and collected evidence. Unsupported or unresolved
+work remains a finding instead of becoming an invented operation, but only when
+positive evidence establishes a real catalog defect that remains after proposed
+operations apply. Uncertainty about whether an underspecified, generic, or
+family row is intentional is not a finding; no operations and no findings is a
+valid reviewed result.
+
+The server prepares each proposal independently as a review operation. A review
+operation adds the live diff, bounded impact, warnings, state token, and either
+`pending_review` or a mechanical blocking reason. One blocked proposal does not
+hide valid siblings, and operations are independent rather than an ordered
+plan.
+
+An `update_bottle` cannot target a Bottle that is also a `merge_bottles` source
+in the same batch. The merge retires the source and subsumes correction of that
+row; proposing both would be redundant and dependent.
+
+Proposed catalog operations always require explicit moderator approval.
+This remains true for a high-confidence result and for checks created after an
+end-user save. Only the existing add-Bottle classification may
+auto-apply under its established policy. Approval locks and revalidates the
+operation; relevant drift makes it stale. Only failed operations may be
+retried, using the same operation id and reconciliation before redispatch.
+Blocked or stale work needs manual correction or a new check. A closed check is
+immutable.
+
+Generation, moderator visibility, and execution are controlled separately by
+`BOTTLE_CHECK_SHADOW_GENERATION`, `BOTTLE_CHECK_MODERATOR_VISIBILITY`, and
+`BOTTLE_CHECK_EXECUTION`. All three default off. Post-user-creation audits run
+after the Bottle save commits and never delay or roll back that save. These
+flags do not alter the four proposal tools exposed when a full check runs.
+
+### BottleGroup Findings
+
+V1 has no BottleGroup operation. A suspected grouping problem is a
+`bottle_group` finding unless an exact duplicate can be resolved by
+`merge_bottles`.
+
+The reviewed Laphroaig Càirdeas 2022 production miss demonstrates that
+boundary: merge malformed Bottle `39096` into Warehouse 1 Bottle `45146`, while
+leaving generic Bottle `44288` unchanged. It does not justify regrouping. The
+initial audit corpus deliberately contains only the synthetic clean/no-op case
+and the Laphroaig audit derived from that verified reference miss. It has no
+BottleGroup-finding case and is not evidence for a group mutation.
+
+Track real moderator-reviewed `bottle_group` findings before designing a
+follow-up. If they demonstrate a recurring need, propose only the smallest
+required regroup or group-merge operation. That separate change must preserve
+Bottle ids, all Bottle consumers and aliases, shared-field rematerialization,
+representatives, aggregates, and auditable before/after history. It must not add
+move, merge, and split operations merely for symmetry.
+
+### Measurement And Rollout
+
+Keep reference-decision accuracy and diagnostic cleanup recall separate from
+audit operation and finding precision. Before enabling execution broadly,
+measure:
+
+- intent accuracy and schema-valid output;
+- authoritative reference-decision and canonical/collected grounding gates;
+- exact proposed operation and finding sets, with missing and extra reference
+  entries reported diagnostically and exact audit repair gating;
+- reviewer rejection/correction and time to disposition;
+- stale, failed, retry, and reconciliation outcomes;
+- model cost, latency, and tool calls.
+
+Intent is selected by the server entrypoint, not inferred by the model.
+“Intent accuracy” therefore means that eval fixtures exercise the intended
+entrypoint and durable checks retain that intent; it is not a second classifier
+score.
+
+Classifier evals provide the offline decision, operation, finding, cost,
+latency, and tool-use measures. Durable check and operation timestamps,
+statuses, and structured reasons provide the review and execution inputs.
+Broad execution remains off until those runtime inputs are aggregated and a
+reviewed rollout explicitly defines an acceptable precision and operational
+failure bar. A schema existing in the database is not itself a measurement
+gate.
+
+Run `pnpm cli classifier rollout-report --days 30` for the durable rollout
+inputs. The report counts accepted and rejected proposals separately and labels
+`wrong_target`, `wrong_change`, and `insufficient_evidence` as quality
+rejections; it does not claim that a rejected proposal was corrected. Counts are
+broken down by check intent, origin, and operation type. Review time runs from
+check completion to operation review. Stale and failure rates use all operations
+that reached approval or execution as their denominator; blocked, pending, and
+rejected proposals are not execution attempts. The report includes measurement
+coverage, and malformed persisted telemetry fails reporting instead of being
+treated as zero.
+
+Audit agent runs persist agent-loop request/token usage, cache-token detail when
+the provider supplies it, agent latency, and tool-call counts in `modelMetadata`.
+Cache coverage is reported separately so missing provider detail is not treated
+as a cache miss. Agent-loop token usage plus the stored model is the durable cost
+input; extraction and pre-agent search usage are outside that measurement. Live
+evals estimate agent-loop cost from a dated standard, short-context pricing
+table and label unsupported models, unavailable usage, and missing cache detail
+explicitly. Separate web-search response tokens and tool fees, alternate
+service tiers, long-context pricing, and regional adjustments remain outside
+the estimate. The durable report still does not invent a dollar estimate when
+no versioned pricing source was recorded. Reference-resolution runtime coverage
+and durable dollar cost are explicit rollout gaps. Broad execution therefore
+remains gated until those gaps and acceptable rollout bars are resolved.
 
 ## Correctness Bar
 
@@ -106,11 +242,30 @@ The pipeline is:
    code references.
 5. Resolve local brand, bottler, and distillery entities.
 6. Preload targeted web evidence when local candidates are missing or unsafe.
-7. Run one classifier agent with local search, entity search, and web search
-   tools.
-8. Validate model output against known candidates and resolved entities.
-9. Normalize create and repair drafts.
-10. Downgrade impossible decisions and decisions with concrete conflicts.
+7. Run one bounded classifier agent loop with local search, Entity search,
+   focused web search, context tools, and four non-mutating proposal tools.
+   Deterministic resolution, such as an SMWS code, is supplied as an identity
+   anchor rather than bypassing the agent.
+8. The reference agent returns the strict authoritative decision and findings.
+   Successful proposal-tool calls are collected by runtime and attached as
+   `proposedOperations`; the model does not echo operations in final output.
+9. Validate and finalize the decision, then hand each collected proposal to
+   server preparation independently. A proposal tool accepts work only when its
+   payload is canonical, its existing targets were inspected, its evidence was
+   collected, it is not an exact duplicate, and the per-run ceiling is not
+   exceeded. The tools never mutate, approve, order, replace, or withdraw work.
+
+With `candidateExpansion: initial_only`, full classification omits Bottle,
+Entity, and web search but retains Bottle and Entity context tools for ids the
+agent already knows. Local match-only identification receives neither context
+nor proposal tools.
+
+Existing-Bottle audits use the same four proposal tools in one bounded agent
+loop. Their strict final output is only a summary and findings. The audited
+Bottle is preloaded as inspected context.
+
+Ignored references do not run the agent. Local match-only identification stays
+separate and does not receive catalog proposal tools.
 
 Downstream code may gate persistence and automation. It should not promote a
 semantic identity decision the classifier did not make.
@@ -146,7 +301,8 @@ Deterministic code is allowed for closed-form behavior:
 - exact identity anchors such as SMWS bottle codes
 - unambiguous literal stored alias lookup for match-only local identification
 - direct field contradictions, such as an extracted brand, category, distillery,
-  stated age, ABV, vintage year, release year, cask flag, expression, or edition
+  stated age, ABV, vintage year, release year, cask-strength or single-cask
+  flag, expression, or edition
   that conflicts with the matched local candidate
 
 Deterministic code is not allowed for whisky-family semantics. Brand prefixes,
@@ -273,18 +429,27 @@ other web results; it must not infer truth from a hardcoded domain class.
 The originating retailer can support extraction, but it is not decisive creation
 evidence by itself.
 
+For image inputs, extraction scans the complete readable label, including
+smaller secondary bands, subtitles, and neck tags, for identity-bearing edition,
+batch, release, marketed finish, and variant text. Missing extraction remains
+preferable to inventing text that is not visible. Explicit cask type, size, and
+fill may be retained when readily available, but extraction does not need to
+infer or investigate them.
+
 The full classifier agent has read-only tools for local candidates, local
 entities, and live web evidence:
 
 - `search_bottles`: local Peated Bottle candidates
 - `search_entities`: local Peated brand, distillery, and bottler entities
+- `get_bottle_context`: bounded identity context for one inspected Bottle
+- `get_entity_context`: bounded identity context for one inspected Entity
 - `firecrawl_web_search`: configured default live web evidence search with
   scraped page excerpts
 - `openai_web_search`: no-Firecrawl fallback web evidence search
 
-Tool descriptions should state what the tool searches, what arguments mean, what
-it returns, and any hard limits. Put classifier policy in the stable prompt or
-review policy, not in tool prose.
+Tool descriptions should state the tool's purpose, arguments, result, hard
+limits, and tool-specific preconditions. Keep cross-tool classifier policy in
+the stable prompt or review policy rather than only in tool prose.
 
 Add source-specific tools only when they return materially better structured
 evidence than general web search and preserve the same trust boundary.
@@ -313,8 +478,23 @@ required exact-Bottle fields, and incorrect fields. There is no numeric confiden
 calibrate; instead evals assert the code-derived automation tier
 (`expectedTier: auto | review`) computed deterministically from the decision by
 `deriveAutomationTier`, and that derivation is covered by unit tests rather than
-model-scored confidence. Encoded expected fields are required. Missing unencoded
-optional enrichment can be tolerated; wrong required identity fields should fail.
+model-scored confidence. Encoded expected fields are required. Creation fixtures
+do not encode `caskType`, `caskSize`, or `caskFill` as classifier requirements.
+Missing unencoded optional enrichment can be tolerated; wrong required identity
+fields should fail.
+Reference and audit fixtures exercise the same single agent loop and four
+proposal tools used by production Bottle checks. On a replay cache hit the eval
+harness does not invoke the underlying web tool, so replay does not consume the
+in-process web-query budget; live runs remain the budget authority.
+
+For `resolve_reference`, the authoritative identity decision and
+canonical/collected grounding are gating. Exact operation and finding sets,
+including missing and extra entries, are reported by named informational judges;
+a fixture cannot prove that an otherwise supported proposal is harmful merely by
+omitting it. This does not turn opportunistic cleanup into a requirement for
+every reference, and every proposal still requires moderator approval before
+mutation. For `audit_bottle`, exact operations, findings, and required evidence
+are gating because active repair investigation is the intent.
 
 Local-identification evals should be scored separately from full
 classification evals. They should cover exact alias matches, safe non-exact

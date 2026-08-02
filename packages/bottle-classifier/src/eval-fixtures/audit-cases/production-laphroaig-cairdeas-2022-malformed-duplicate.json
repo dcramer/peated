@@ -1,0 +1,414 @@
+{
+  "id": "audit-production-laphroaig-cairdeas-2022-malformed-duplicate",
+  "name": "audit: retire the malformed Laphroaig Càirdeas 2022 duplicate",
+  "scenario": "bottle_merge",
+  "requireExpectedOperationEvidence": true,
+  "input": {
+    "audit": {
+      "bottleId": 39096,
+      "origin": "moderator",
+      "note": "Audit this existing Bottle and inspect nearby Càirdeas records before proposing catalog changes."
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 39096,
+        "fullName": "Laphroaig Cairdeas",
+        "brand": "Laphroaig",
+        "bottler": "Laphroaig",
+        "distillery": ["Laphroaig"],
+        "category": "single_malt",
+        "vintageYear": 2022
+      },
+      "inspectedBottles": [
+        {
+          "bottleId": 45146,
+          "fullName": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
+          "brand": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "edition": "Warehouse 1",
+          "abv": 52.2,
+          "releaseYear": 2022
+        },
+        {
+          "bottleId": 44288,
+          "fullName": "Laphroaig Càirdeas",
+          "brand": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt"
+        },
+        {
+          "bottleId": 802,
+          "fullName": "Laphroaig Cairdeas - 15-year-old",
+          "brand": "Laphroaig",
+          "bottler": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "statedAge": 15
+        }
+      ],
+      "bottleContexts": [
+        {
+          "bottleId": 39096,
+          "fullName": "Laphroaig Cairdeas",
+          "groupId": 9433,
+          "shared": {
+            "name": "Cairdeas - 15-year-old",
+            "statedAge": 15,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            },
+            "distillers": [
+              {
+                "entityId": 1129,
+                "name": "Laphroaig"
+              }
+            ],
+            "bottler": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            }
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": null,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": 2022,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [
+            {
+              "bottleId": 802,
+              "fullName": "Laphroaig Cairdeas - 15-year-old",
+              "exact": {
+                "edition": null,
+                "statedAge": null,
+                "abv": null,
+                "singleCask": null,
+                "caskStrength": null,
+                "vintageYear": null,
+                "releaseYear": null,
+                "caskSize": null,
+                "caskType": null,
+                "caskFill": null
+              }
+            }
+          ],
+          "aliases": [],
+          "observations": [],
+          "imageSources": [
+            {
+              "source": {
+                "kind": "tasting",
+                "tastingId": 223
+              },
+              "url": "https://api.peated.com/uploads/tastings-dryhjq9r8lutxhl4r96lf9fp.webp"
+            }
+          ]
+        },
+        {
+          "bottleId": 45146,
+          "fullName": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
+          "groupId": 18105,
+          "shared": {
+            "name": "Càirdeas",
+            "statedAge": null,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            },
+            "distillers": [
+              {
+                "entityId": 1129,
+                "name": "Laphroaig"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": "Warehouse 1",
+            "statedAge": null,
+            "abv": 52.2,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": 2022,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [
+            {
+              "bottleId": 44288,
+              "fullName": "Laphroaig Càirdeas",
+              "exact": {
+                "edition": null,
+                "statedAge": null,
+                "abv": null,
+                "singleCask": null,
+                "caskStrength": null,
+                "vintageYear": null,
+                "releaseYear": null,
+                "caskSize": null,
+                "caskType": null,
+                "caskFill": null
+              }
+            }
+          ],
+          "aliases": [],
+          "observations": [],
+          "imageSources": [
+            {
+              "source": {
+                "kind": "bottle"
+              },
+              "url": "https://api.peated.com/uploads/bottle-releases/bottle_release-414-pending-upload-e2dv003m0knz9un4uoswa5ml.webp"
+            }
+          ]
+        },
+        {
+          "bottleId": 44288,
+          "fullName": "Laphroaig Càirdeas",
+          "groupId": 18105,
+          "shared": {
+            "name": "Càirdeas",
+            "statedAge": null,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            },
+            "distillers": [
+              {
+                "entityId": 1129,
+                "name": "Laphroaig"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": null,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [
+            {
+              "bottleId": 45146,
+              "fullName": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
+              "exact": {
+                "edition": "Warehouse 1",
+                "statedAge": null,
+                "abv": 52.2,
+                "singleCask": null,
+                "caskStrength": null,
+                "vintageYear": null,
+                "releaseYear": 2022,
+                "caskSize": null,
+                "caskType": null,
+                "caskFill": null
+              }
+            }
+          ],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
+        },
+        {
+          "bottleId": 802,
+          "fullName": "Laphroaig Cairdeas - 15-year-old",
+          "groupId": 9433,
+          "shared": {
+            "name": "Cairdeas - 15-year-old",
+            "statedAge": 15,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            },
+            "distillers": [
+              {
+                "entityId": 1129,
+                "name": "Laphroaig"
+              }
+            ],
+            "bottler": {
+              "entityId": 1129,
+              "name": "Laphroaig"
+            }
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": null,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [
+            {
+              "bottleId": 39096,
+              "fullName": "Laphroaig Cairdeas",
+              "exact": {
+                "edition": null,
+                "statedAge": null,
+                "abv": null,
+                "singleCask": null,
+                "caskStrength": null,
+                "vintageYear": 2022,
+                "releaseYear": null,
+                "caskSize": null,
+                "caskType": null,
+                "caskFill": null
+              }
+            }
+          ],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
+        }
+      ]
+    }
+  },
+  "searchResponses": [
+    {
+      "when": ["laphroaig"],
+      "results": [
+        {
+          "bottleId": 45146,
+          "fullName": "Laphroaig Càirdeas - Warehouse 1 - 2022 Release - 52.2% ABV",
+          "brand": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "edition": "Warehouse 1",
+          "abv": 52.2,
+          "releaseYear": 2022
+        },
+        {
+          "bottleId": 44288,
+          "fullName": "Laphroaig Càirdeas",
+          "brand": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt"
+        },
+        {
+          "bottleId": 802,
+          "fullName": "Laphroaig Cairdeas - 15-year-old",
+          "brand": "Laphroaig",
+          "bottler": "Laphroaig",
+          "distillery": ["Laphroaig"],
+          "category": "single_malt",
+          "statedAge": 15
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+      "https://www.laphroaig.com/en-gb/whisky-stories/cairdeas-expressions",
+      "https://api.peated.com/v1/bottles/45146",
+      "https://api.peated.com/v1/bottles/39096",
+      "https://api.peated.com/v1/bottles/44288",
+      "https://api.peated.com/v1/bottles/802",
+      "https://api.peated.com/v1/bottle-groups/9433",
+      "https://api.peated.com/v1/bottle-groups/9433/bottles",
+      "https://api.peated.com/v1/tastings/223",
+      "https://api.peated.com/uploads/tastings-dryhjq9r8lutxhl4r96lf9fp.webp",
+      "https://api.peated.com/uploads/bottle-releases/bottle_release-414-pending-upload-e2dv003m0knz9un4uoswa5ml.webp"
+    ],
+    "dbOutcome": {
+      "bottleId": 45146,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Merge malformed Bottle 39096 into complete Warehouse 1 Bottle 45146, create a Bottle tombstone from 39096 to 45146, and repoint Bottle consumers and aliases including tasting 223 to 45146. Leave generic Càirdeas Bottle 44288 unchanged. Do not create a Bottle or propose a BottleGroup mutation."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 39096,
+        "field": "vintageYear",
+        "productionValue": 2022,
+        "evidenceValue": null,
+        "source": "production_search",
+        "issue": "conflicts_with_evidence",
+        "safeToAutoFill": false,
+        "notes": "The producer identifies 2022 as the annual release year, not a distillation vintage. Because Bottle 45146 already represents the exact release, this is a duplicate merge rather than a field-only update."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 39096,
+        "field": "edition",
+        "productionValue": null,
+        "evidenceValue": "Warehouse 1",
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "The public image attached through tasting 223 names Warehouse 1, matching Bottle 45146 and the official product page."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 39096,
+        "field": "abv",
+        "productionValue": null,
+        "evidenceValue": 52.2,
+        "source": "image_evidence",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "The tasting image and official product page both state 52.2% ABV, which Bottle 45146 already stores."
+      }
+    ],
+    "notes": "Curated existing-Bottle audit variant derived from the July 29, 2026 production reference miss, not a second observed production miss. Re-verified July 31, 2026: Peated Bottle 39096 still stores vintageYear 2022 in BottleGroup 9433, whose shared identity is the 15-year-old Càirdeas represented by sibling Bottle 802, and owns tasting 223 with the public Warehouse 1 label image. The Peated Bottle, BottleGroup, and group-members endpoints show Bottle 802 with group/shared age 15, group Brand/distiller/bottler Entity 1129, and null Bottle-exact edition, ABV, cask, and year fields; the retained official Laphroaig sources do not independently document that 15-year identity. Bottle 45146 stores Warehouse 1, releaseYear 2022, and 52.2% ABV in BottleGroup 18105 beside generic representative Bottle 44288. The public alias endpoint currently returns no persisted aliases for Bottle 39096, and no Bottle-observation endpoint or retained fixture evidence establishes a production BottleObservation row, so its explicit context truthfully leaves aliases and observations empty. The audit corpus keeps only the four inspected Bottles and the two official producer pages rather than copying the reference flow's 15 retrieval candidates."
+  },
+  "expected": {
+    "summary": "The audited Bottle is a malformed duplicate of the complete 2022 Warehouse 1 Bottle; the generic Càirdeas Bottle remains a distinct unchanged catalog record.",
+    "proposedOperations": [
+      {
+        "type": "merge_bottles",
+        "input": {
+          "sourceBottleId": 39096,
+          "destinationBottleId": 45146
+        },
+        "rationale": "Bottle 39096 misclassifies 2022 as a vintage and omits Warehouse 1 and 52.2% ABV, while inspected Bottle 45146 and the producer evidence identify the same exact 2022 Warehouse 1 release.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 39096
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 45146
+          },
+          {
+            "kind": "web_result",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky"
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

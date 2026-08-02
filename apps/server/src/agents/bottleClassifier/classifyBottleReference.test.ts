@@ -17,11 +17,15 @@ describe("server bottleClassifier wrapper", () => {
     vi.mocked(classifyBottleReferenceInService).mockResolvedValue({
       status: "ignored",
       reason: "ignored",
+      proposedOperations: [],
+      findings: [],
       artifacts: {
         extractedIdentity: null,
         candidates: [],
         searchEvidence: [],
         resolvedEntities: [],
+        bottleContexts: [],
+        entityContexts: [],
       },
     });
 

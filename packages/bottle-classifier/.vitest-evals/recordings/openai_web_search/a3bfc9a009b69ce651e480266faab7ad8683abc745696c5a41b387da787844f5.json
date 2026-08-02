@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-01T02:28:19.926Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Laphroaig Càirdeas Warehouse 1 52.2 2022 official"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Laphroaig Càirdeas Warehouse 1 52.2 2022 official",
+    "summary": "**Laphroaig Càirdeas Warehouse 1 (2022) — official bottling**\n\nConfirmed bottle details:\n\n- **Producer / distiller:** Laphroaig Distillery, Islay, Scotland. ([laphroaig.com](https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky))\n- **Bottler:** **Official distillery bottling**. Whiskybase lists it as “Dis",
+    "results": [
+      {
+        "title": "laphroaig.com",
+        "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+        "domain": "laphroaig.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/209611/laphroaig-cairdeas",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "laphroaig.com",
+        "url": "https://www.laphroaig.com/whisky-stories/cairdeas-expressions",
+        "domain": "laphroaig.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "a3bfc9a009b69ce651e480266faab7ad8683abc745696c5a41b387da787844f5",
+    "mode": "record"
+  }
+}

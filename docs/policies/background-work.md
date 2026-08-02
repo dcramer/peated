@@ -16,6 +16,14 @@ has completed.
   constraints when retries can schedule the same logical work more than once.
 - Log post-save side-effect failures with enough object context to retry or
   investigate without failing an already persisted save.
+- A post-user-creation Bottle check runs only after the Bottle transaction
+  commits. Key it to the Bottle-creation event so queue retries cannot create a
+  duplicate actionable check, and never auto-apply its supplemental proposed
+  operations.
+- Persist moderator approval before dispatching a review operation. Reuse its
+  durable operation id for at-most-once dispatch and reconciliation.
+- Asynchronous canonical work, including Entity merge, remains `applying` until
+  the worker records an authoritative mutation result or a safe failure.
 - Use database constraints, aliases, or other deterministic checks for immediate
   duplicate safety. Do not depend on a remote classifier or hosted service for
   request-path correctness.

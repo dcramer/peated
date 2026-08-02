@@ -1281,27 +1281,6 @@ function proposedBottleNeedsMaterialTargetRepair({
     return true;
   }
 
-  if (
-    proposedBottle.caskType !== null &&
-    target.caskType !== proposedBottle.caskType
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskSize !== null &&
-    target.caskSize !== proposedBottle.caskSize
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskFill !== null &&
-    target.caskFill !== proposedBottle.caskFill
-  ) {
-    return true;
-  }
-
   if (proposedBottle.abv !== null && target.abv !== proposedBottle.abv) {
     return true;
   }
@@ -1340,9 +1319,6 @@ function proposedBottleHasKnownTargetConflict({
       caskStrength:
         target.caskStrength === null ? null : proposedBottle.caskStrength,
       singleCask: target.singleCask === null ? null : proposedBottle.singleCask,
-      caskType: target.caskType === null ? null : proposedBottle.caskType,
-      caskSize: target.caskSize === null ? null : proposedBottle.caskSize,
-      caskFill: target.caskFill === null ? null : proposedBottle.caskFill,
     },
     extractedIdentity,
   });
@@ -1497,107 +1473,6 @@ function rejectInvalidExistingMatch({
     identityScope: decision.identityScope,
     rationale: downgradedRationale,
   });
-}
-
-function textLooksLikeUnsupportedHouseCategoryStyle(
-  value: string | null | undefined,
-): boolean {
-  const normalizedValue = normalizeComparableText(value);
-  if (!normalizedValue || /\bsingle\s+malt\b/.test(normalizedValue)) {
-    return false;
-  }
-
-  return /\b(?:straight\s+)?malt\s+whisk(?:e)?y\b/.test(normalizedValue);
-}
-
-function maybeRemoveUnsupportedStyleBottleCategory({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleClassificationDecision | null {
-  if (
-    decision.action !== "create_bottle" ||
-    !decision.proposedBottle ||
-    decision.proposedBottle.category === null ||
-    artifacts.extractedIdentity?.category !== null
-  ) {
-    return null;
-  }
-
-  if (
-    ![
-      reference.name,
-      artifacts.extractedIdentity?.expression,
-      decision.proposedBottle.name,
-    ].some(textLooksLikeUnsupportedHouseCategoryStyle)
-  ) {
-    return null;
-  }
-
-  return {
-    ...decision,
-    rationale: appendRationale(
-      decision.rationale,
-      "Server removed the proposed bottle category because the source style is not represented by a house category.",
-    ),
-    proposedBottle: {
-      ...decision.proposedBottle,
-      category: null,
-    },
-  };
-}
-
-function maybeRestoreUnsupportedStyleBottleName({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReference;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleClassificationDecision | null {
-  if (
-    decision.action !== "create_bottle" ||
-    !decision.proposedBottle ||
-    decision.proposedBottle.category !== null ||
-    !artifacts.extractedIdentity?.expression
-  ) {
-    return null;
-  }
-
-  const referenceBottleName = getReferenceBottleName({
-    reference,
-    brandName: decision.proposedBottle.brand.name,
-    extractedBrand: artifacts.extractedIdentity.brand,
-  });
-  if (
-    !referenceBottleName ||
-    referenceBottleName.length > 120 ||
-    !textsOverlap(
-      referenceBottleName,
-      artifacts.extractedIdentity.expression,
-    ) ||
-    normalizeComparableText(referenceBottleName) ===
-      normalizeComparableText(decision.proposedBottle.name)
-  ) {
-    return null;
-  }
-
-  return {
-    ...decision,
-    rationale: appendRationale(
-      decision.rationale,
-      "Server restored the proposed bottle name from the extracted expression because the unsupported style has no house category bucket.",
-    ),
-    proposedBottle: {
-      ...decision.proposedBottle,
-      name: referenceBottleName,
-    },
-  };
 }
 
 function sanitizeResolvedEntityChoice(
@@ -2173,24 +2048,12 @@ export function finalizeBottleReferenceClassification({
     decision: parsedDecision,
     artifacts,
   });
-  const unsupportedStyleCategoryAdjustedDecision =
-    maybeRemoveUnsupportedStyleBottleCategory({
+  const smwsCodeAdjustedDecision =
+    maybeResolveSmwsExactCaskCodeDecision({
       reference,
       decision: sanitizedDecision,
       artifacts,
     }) ?? sanitizedDecision;
-  const unsupportedStyleNameAdjustedDecision =
-    maybeRestoreUnsupportedStyleBottleName({
-      reference,
-      decision: unsupportedStyleCategoryAdjustedDecision,
-      artifacts,
-    }) ?? unsupportedStyleCategoryAdjustedDecision;
-  const smwsCodeAdjustedDecision =
-    maybeResolveSmwsExactCaskCodeDecision({
-      reference,
-      decision: unsupportedStyleNameAdjustedDecision,
-      artifacts,
-    }) ?? unsupportedStyleNameAdjustedDecision;
   const exactCaskAdjustedDecision =
     maybeRejectExactCaskCreateDuplicate({
       decision: smwsCodeAdjustedDecision,

@@ -67,6 +67,11 @@ jobs:
             echo "- will_run: $should_run"
           } >> "$GITHUB_STEP_SUMMARY"
 
+          if [[ "$evals_requested" == "true" && "$openai_ready" != "true" ]]; then
+            echo "::error::The trigger-evals label requires OPENAI_API_KEY."
+            exit 1
+          fi
+
   evals:
     name: "evals / classifier"
     needs: gate
@@ -88,4 +93,16 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @peated/bottle-classifier evals
+      - name: Run classifier evals
+        run: >-
+          pnpm --filter @peated/bottle-classifier evals --
+          --reporter=vitest-evals/reporter
+          --reporter=json
+          --outputFile.json=vitest-results.json
+
+      - name: Upload classifier eval report
+        if: ${{ always() && hashFiles('packages/bottle-classifier/vitest-results.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottle-classifier-eval-report
+          path: packages/bottle-classifier/vitest-results.json

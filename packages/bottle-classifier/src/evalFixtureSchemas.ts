@@ -1,15 +1,24 @@
 import { readdirSync } from "node:fs";
 import { z } from "zod";
 import {
+  AuditBottleInputSchema,
+  FindingSchema,
+  ProposedOperationsSchema,
+} from "./bottleCheckContract";
+import { listBottleCheckOperationTargets } from "./bottleCheckEvalScoring";
+import {
+  BottleContextSeriesRefSchema,
+  BottleContextSourceSchema,
+} from "./bottleContextContract";
+import {
   AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
   CategoryEnum,
+  EntityResolutionSchema,
 } from "./classifierTypes";
 import {
+  AuditBottleResultSchema,
   BottleReferenceSchema,
   CandidateExpansionModeSchema,
 } from "./contract";
@@ -135,8 +144,56 @@ export const classifierEvalExpectationSchema = z.object({
   suggestedNextStep: z
     .enum(["confirm_match", "confirm_create", "manual_search", "needs_review"])
     .optional(),
+  proposedOperations: ProposedOperationsSchema.default([]),
+  findings: z.array(FindingSchema).default([]),
   summary: z.string().min(1),
 });
+
+const classifierEvalContextSchema = z
+  .object({
+    inspectedBottleIds: z.array(z.number().int().positive()).default([]),
+    bottleContexts: z.array(BottleContextSourceSchema).optional(),
+    inspectedEntities: z.array(EntityResolutionSchema).default([]),
+    inspectedSeries: z.array(BottleContextSeriesRefSchema).default([]),
+  })
+  .strict();
+
+function validateExplicitBottleContextCoverage({
+  expectedBottleIds,
+  bottleContexts,
+  ctx,
+  message,
+  path,
+}: {
+  expectedBottleIds: number[];
+  bottleContexts: z.infer<typeof BottleContextSourceSchema>[] | undefined;
+  ctx: z.RefinementCtx;
+  message: string;
+  path: PropertyKey[];
+}) {
+  if (bottleContexts === undefined) {
+    return;
+  }
+
+  const sortedExpectedBottleIds = [...expectedBottleIds].sort(
+    (left, right) => left - right,
+  );
+  const contextBottleIds = bottleContexts
+    .map(({ bottleId }) => bottleId)
+    .sort((left, right) => left - right);
+  if (
+    sortedExpectedBottleIds.length !== contextBottleIds.length ||
+    sortedExpectedBottleIds.some(
+      (bottleId, index) => bottleId !== contextBottleIds[index],
+    )
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message,
+      path,
+    });
+  }
+}
 
 export const classifierEvalFixtureSchema = z
   .object({
@@ -153,6 +210,11 @@ export const classifierEvalFixtureSchema = z
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
     localCatalog: LocalCatalogSchema.optional(),
+    context: classifierEvalContextSchema.default({
+      inspectedBottleIds: [],
+      inspectedEntities: [],
+      inspectedSeries: [],
+    }),
     provenance: evalFixtureProvenanceSchema.optional(),
     expected: classifierEvalExpectationSchema,
   })
@@ -171,6 +233,57 @@ export const classifierEvalFixtureSchema = z
         });
       }
       initialCandidateIds.add(candidate.bottleId);
+    }
+
+    const inspectedBottleIds = new Set(value.context.inspectedBottleIds);
+    validateExplicitBottleContextCoverage({
+      expectedBottleIds: [...inspectedBottleIds],
+      bottleContexts: value.context.bottleContexts,
+      ctx,
+      message:
+        "Explicit Bottle contexts must exactly cover inspected Bottle ids.",
+      path: ["context", "bottleContexts"],
+    });
+    const inspectedEntityIds = new Set(
+      value.context.inspectedEntities.map(({ entityId }) => entityId),
+    );
+    const inspectedSeriesIds = new Set(
+      value.context.inspectedSeries.map(({ seriesId }) => seriesId),
+    );
+
+    for (const [
+      operationIndex,
+      operation,
+    ] of value.expected.proposedOperations.entries()) {
+      for (const target of listBottleCheckOperationTargets(operation)) {
+        const inspected =
+          target.kind === "bottle"
+            ? inspectedBottleIds.has(target.id)
+            : target.kind === "entity"
+              ? inspectedEntityIds.has(target.id)
+              : inspectedSeriesIds.has(target.id);
+        if (inspected) {
+          continue;
+        }
+
+        const label =
+          target.kind === "bottle"
+            ? "Bottle"
+            : target.kind === "entity"
+              ? "Entity"
+              : "BottleSeries";
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Expected operation references uninspected ${label} id ${target.id}.`,
+          path: [
+            "expected",
+            "proposedOperations",
+            operationIndex,
+            "input",
+            ...target.path,
+          ],
+        });
+      }
     }
 
     if (value.localCatalog !== undefined) {
@@ -206,11 +319,11 @@ export const classifierEvalFixtureSchema = z
       });
     }
 
-    if (value.input.extractedIdentity == null) {
+    if (value.input.extractedIdentity === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "`production_miss` fixtures must preserve the observed extracted identity.",
+          "`production_miss` fixtures must preserve the observed extracted identity, including an explicit null result.",
         path: ["input", "extractedIdentity"],
       });
     }
@@ -242,14 +355,155 @@ export const classifierEvalFixtureSchema = z
     }
   });
 
+export const auditBottleEvalScenarioSchema = z.enum(["clean", "bottle_merge"]);
+
+const auditBottleEvalContextSchema = z
+  .object({
+    currentBottle: BottleCandidateSchema,
+    inspectedBottles: z.array(BottleCandidateSchema).default([]),
+    bottleContexts: z.array(BottleContextSourceSchema),
+    inspectedEntities: z.array(EntityResolutionSchema).default([]),
+  })
+  .strict();
+
+export const auditBottleEvalFixtureSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    scenario: auditBottleEvalScenarioSchema,
+    input: z
+      .object({
+        audit: AuditBottleInputSchema,
+        context: auditBottleEvalContextSchema,
+      })
+      .strict(),
+    searchResponses: z.array(searchResponseFixtureSchema).optional(),
+    provenance: evalFixtureProvenanceSchema,
+    requireExpectedOperationEvidence: z.boolean().default(false),
+    expected: AuditBottleResultSchema.omit({ artifacts: true }),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (
+      value.input.audit.bottleId !== value.input.context.currentBottle.bottleId
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Audit subject and current Bottle ids must match.",
+        path: ["input", "context", "currentBottle", "bottleId"],
+      });
+    }
+
+    const bottleIds = new Set([value.input.context.currentBottle.bottleId]);
+    for (const [
+      index,
+      bottle,
+    ] of value.input.context.inspectedBottles.entries()) {
+      if (bottleIds.has(bottle.bottleId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate inspected Bottle id ${bottle.bottleId}.`,
+          path: ["input", "context", "inspectedBottles", index, "bottleId"],
+        });
+      }
+      bottleIds.add(bottle.bottleId);
+    }
+
+    for (const [responseIndex, response] of (
+      value.searchResponses ?? []
+    ).entries()) {
+      for (const [resultIndex, bottle] of response.results.entries()) {
+        if (!bottleIds.has(bottle.bottleId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Audit search response references uninspected Bottle id ${bottle.bottleId}.`,
+            path: [
+              "searchResponses",
+              responseIndex,
+              "results",
+              resultIndex,
+              "bottleId",
+            ],
+          });
+        }
+      }
+    }
+
+    validateExplicitBottleContextCoverage({
+      expectedBottleIds: [...bottleIds],
+      bottleContexts: value.input.context.bottleContexts,
+      ctx,
+      message:
+        "Explicit Bottle contexts must exactly cover the current and inspected Bottle ids.",
+      path: ["input", "context", "bottleContexts"],
+    });
+
+    const entityIds = new Set<number>();
+    for (const [
+      index,
+      entity,
+    ] of value.input.context.inspectedEntities.entries()) {
+      if (entityIds.has(entity.entityId)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate inspected Entity id ${entity.entityId}.`,
+          path: ["input", "context", "inspectedEntities", index, "entityId"],
+        });
+      }
+      entityIds.add(entity.entityId);
+    }
+
+    const seriesIds = new Set(
+      value.input.context.bottleContexts.flatMap(({ shared }) =>
+        shared.series ? [shared.series.seriesId] : [],
+      ),
+    );
+
+    for (const [
+      operationIndex,
+      operation,
+    ] of value.expected.proposedOperations.entries()) {
+      for (const target of listBottleCheckOperationTargets(operation)) {
+        const inspected =
+          target.kind === "bottle"
+            ? bottleIds.has(target.id)
+            : target.kind === "entity"
+              ? entityIds.has(target.id)
+              : seriesIds.has(target.id);
+        if (inspected) {
+          continue;
+        }
+
+        const label =
+          target.kind === "bottle"
+            ? "Bottle"
+            : target.kind === "entity"
+              ? "Entity"
+              : "BottleSeries";
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Expected operation references uninspected ${label} id ${target.id}.`,
+          path: [
+            "expected",
+            "proposedOperations",
+            operationIndex,
+            "input",
+            ...target.path,
+          ],
+        });
+      }
+    }
+  });
+
+export type AuditBottleEvalFixture = z.infer<
+  typeof auditBottleEvalFixtureSchema
+>;
+
 export const bottleNormalizationExactBottleIdentitySchema = z
   .object({
     edition: z.string().nullable().optional(),
     releaseYear: z.number().int().nullable().optional(),
     vintageYear: z.number().int().nullable().optional(),
-    caskType: CaskTypeEnum.nullable().optional(),
-    caskSize: CaskSizeEnum.nullable().optional(),
-    caskFill: CaskFillEnum.nullable().optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {

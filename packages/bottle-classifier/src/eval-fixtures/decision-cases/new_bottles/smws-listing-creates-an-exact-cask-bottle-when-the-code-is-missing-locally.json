@@ -3,30 +3,77 @@
   "name": "SMWS listing: creates an exact-cask bottle when the code is missing locally",
   "input": {
     "reference": {
-      "name": "SMWS RW6.5 Sauna Smoke",
-      "url": "https://vault.example/products/smws-rw6-5-sauna-smoke"
+      "name": "SMWS RW6.5 Appley ever after",
+      "url": "https://smws.com/appley-ever-after/"
     },
     "extractedIdentity": {
       "brand": "The Scotch Malt Whisky Society",
-      "bottler": "The Scotch Malt Whisky Society",
-      "expression": "RW6.5 Sauna Smoke",
+      "bottler": null,
+      "expression": "RW6.5 Appley ever after",
       "series": null,
-      "distillery": ["Kyro"],
+      "distillery": ["Kyrö"],
       "category": "rye",
-      "stated_age": null,
-      "abv": null,
-      "release_year": null,
+      "stated_age": 6,
+      "abv": 56,
+      "release_year": 2024,
       "vintage_year": null,
       "cask_strength": null,
       "single_cask": true,
+      "cask_type": null,
+      "cask_size": "barrel",
+      "cask_fill": "1st_fill",
       "edition": null
-    },
-    "initialCandidates": []
+    }
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 127,
+        "name": "Kyrö",
+        "type": ["distiller"]
+      }
+    ],
+    "bottles": [],
+    "aliases": []
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://smws.com/appley-ever-after/",
+      "https://api.peated.com/v1/bottles/43260"
+    ],
+    "notes": "Re-verified July 31, 2026. The official SMWS product page identifies cask RW6.5 as Appley ever after. This is a controlled missing-local-Bottle variant: the real SMWS and Kyrö entities remain available while the Bottle catalog is empty. It intentionally tests exact-cask creation and does not describe current production, where Peated Bottle 43260 exists."
   },
   "expected": {
     "status": "classified",
     "action": "create_bottle",
     "identityScope": "exact_cask",
+    "proposedBottle": {
+      "name": "RW6.5 Appley ever after",
+      "brand": {
+        "id": 4263,
+        "name": "The Scotch Malt Whisky Society"
+      },
+      "bottler": null,
+      "distillers": [
+        {
+          "id": 127,
+          "name": "Kyrö"
+        }
+      ],
+      "category": "rye",
+      "statedAge": 6,
+      "abv": 56,
+      "releaseYear": 2024,
+      "singleCask": true,
+      "caskStrength": null
+    },
     "summary": "Treat the SMWS code as exact-cask identity and create a new exact-cask bottle when no safe local candidate exists."
   }
 }

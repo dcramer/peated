@@ -272,6 +272,50 @@ function classifyStructuredExactName({
   });
 }
 
+function classifyCaskMetadataRepair(
+  changedFlag: { caskStrength?: boolean; singleCask?: boolean } = {},
+) {
+  const target: BottleCandidate = {
+    ...existingPrivateCask,
+    caskStrength: true,
+    caskType: "bourbon",
+    caskSize: "barrel",
+    caskFill: "refill",
+  };
+
+  return finalizeBottleReferenceClassification({
+    reference: { name: "Example Private Cask" },
+    decision: {
+      action: "repair_bottle",
+      rationale: "The cask metadata differs.",
+      candidateBottleIds: [target.bottleId],
+      identityScope: "product",
+      observation: null,
+      matchedBottleId: target.bottleId,
+      proposedBottle: {
+        name: "Private Cask",
+        brand: { name: "Example" },
+        bottler: null,
+        series: null,
+        category: "single_malt",
+        statedAge: null,
+        abv: null,
+        caskStrength: true,
+        singleCask: true,
+        caskType: "oloroso",
+        caskSize: "hogshead",
+        caskFill: "1st_fill",
+        vintageYear: null,
+        releaseYear: null,
+        edition: null,
+        distillers: [],
+        ...changedFlag,
+      },
+    },
+    artifacts: buildBottleClassificationArtifacts({ candidates: [target] }),
+  });
+}
+
 describe("finalizeBottleReferenceClassification", () => {
   test("removes a parenthesized structured edition without leaving empty punctuation", () => {
     const result = classifyStructuredExactName({
@@ -799,6 +843,25 @@ describe("finalizeBottleReferenceClassification", () => {
       action: "no_match",
       proposedBottle: null,
     });
+  });
+
+  test("normalizes a repair based only on optional cask metadata to an unchanged match", () => {
+    const result = classifyCaskMetadataRepair();
+
+    expect(result).toMatchObject({
+      action: "match",
+      matchedBottleId: existingPrivateCask.bottleId,
+      proposedBottle: null,
+    });
+  });
+
+  test.each([
+    ["cask strength", { caskStrength: false }],
+    ["single cask", { singleCask: false }],
+  ] as const)("keeps a repair for a changed %s flag", (_label, changedFlag) => {
+    expect(classifyCaskMetadataRepair(changedFlag).action).toBe(
+      "repair_bottle",
+    );
   });
 
   test("keeps bottle creation when bottle-level age is displayed as a word-age name", () => {

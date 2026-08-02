@@ -93,6 +93,137 @@ test.describe("unified Bottle workflows", () => {
     await expectNoHorizontalOverflow(page);
   });
 
+  test("keeps one Incoming Listing while its linked Bottle check needs disposition", async ({
+    context,
+    page,
+    request,
+  }, testInfo) => {
+    const accessToken = uniqueAccessToken(testInfo, "queue-linked-check");
+    await signIn(context, {
+      accessToken,
+      user: { ...testUser, admin: true, mod: true },
+    });
+
+    await page.goto("/admin/queue");
+
+    await expect(
+      page.getByRole("heading", { name: "Incoming Listings" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Actionable (1)" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "Playwright Store matched listing with supplemental work",
+        { exact: true },
+      ),
+    ).toHaveCount(1);
+    await expect(
+      page.getByText("Primary decision complete", { exact: true }),
+    ).toBeVisible();
+
+    const detailsResponse = await request.post(
+      `${mockApiServer}/rpc/bottleChecks/details`,
+      {
+        data: { json: { check: 92 } },
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    expect(detailsResponse.ok()).toBe(true);
+    const details = (await detailsResponse.json()).json;
+
+    await page
+      .getByText("Supplemental Bottle check (1)", { exact: true })
+      .click();
+
+    expect(details.check).not.toHaveProperty("inputSnapshot");
+    expect(details.check).not.toHaveProperty("artifacts");
+    expect(details.check).not.toHaveProperty("modelMetadata");
+    expect(details.check).not.toHaveProperty("subjectKey");
+    expect(details.check).not.toHaveProperty("backgroundEventKey");
+    expect(details.check.output.decision).toMatchObject({
+      aliasScope: null,
+      identityBasis: null,
+      confidenceBasis: null,
+    });
+    for (const operation of details.check.operations) {
+      expect(operation).not.toHaveProperty("stateToken");
+    }
+    for (const operation of details.reviewOperations) {
+      expect(operation.review).not.toHaveProperty("stateToken");
+    }
+    await expect(
+      page.getByText(
+        "The store listing is matched; one duplicate Bottle still needs moderator disposition.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "The surviving 2023 and 2024 Distillers Edition Bottles share the same stable expression but appear split across separate Bottle groups.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    const linkedOperation = page.getByRole("article").filter({
+      hasText: "The inspected listing matched the canonical Bottle",
+    });
+    await expect(
+      linkedOperation.getByRole("heading", { name: "Merge Bottles" }),
+    ).toBeVisible();
+    await expect(
+      linkedOperation.getByText("Pending review", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      linkedOperation.getByText("Select", { exact: true }),
+    ).toHaveCount(0);
+    await expectNoHorizontalOverflow(page);
+
+    await page.getByRole("link", { name: "Review Bottle check #92" }).click();
+    await expect(page).toHaveURL("/bottle-checks/92");
+    const reviewOperation = page.getByRole("article").filter({
+      hasText: "The inspected listing matched the canonical Bottle",
+    });
+    await reviewOperation.getByRole("checkbox", { name: "Select" }).check();
+    const approvalRequest = page.waitForRequest((request) =>
+      request.url().includes("/rpc/bottleChecks/approveSelected"),
+    );
+    await page.getByRole("button", { name: "Approve selected" }).click();
+    await approvalRequest;
+    await expect(
+      reviewOperation.getByText("Applied", { exact: true }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+
+    await page.goto("/admin/queue");
+    await expect(
+      page.getByRole("link", { name: "Actionable (1)" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "Playwright Store matched listing with supplemental work",
+        { exact: true },
+      ),
+    ).toHaveCount(1);
+    await page
+      .getByText("Supplemental Bottle check (1)", { exact: true })
+      .click();
+    await expect(
+      page.getByText(
+        "The surviving 2023 and 2024 Distillers Edition Bottles share the same stable expression but appear split across separate Bottle groups.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole("article")
+        .filter({
+          hasText: "The inspected listing matched the canonical Bottle",
+        })
+        .getByText("Applied", { exact: true }),
+    ).toBeVisible();
+    await expectNoHorizontalOverflow(page);
+  });
+
   test("creates an independent Bottle from a source-backed proposal", async ({
     context,
     page,
@@ -280,6 +411,10 @@ function uniqueAccessToken(testInfo: TestInfo, suffix: string) {
     `r${testInfo.retry}`,
   ].join("-");
 }
+
+const mockApiServer =
+  process.env.PLAYWRIGHT_API_SERVER ??
+  `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT ?? 4999}`;
 
 function requireBaseURL(baseURL: string | undefined): string {
   if (!baseURL) {

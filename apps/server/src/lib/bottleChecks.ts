@@ -1,0 +1,769 @@
+import {
+  AuditBottleInputSchema,
+  AuditBottleOriginSchema,
+  AuditBottleResultSchema,
+  BottleClassificationResultSchema,
+  BottleClassifierRunMetadataSchema,
+  ClassifyBottleReferenceInputSchema,
+  DecidedBottleClassificationResultSchema,
+  getBottleCheckSourceEvidencePaths,
+  IgnoredBottleClassificationResultSchema,
+  type BottleClassificationArtifacts,
+  type EvidenceRef,
+} from "@peated/bottle-classifier";
+import { db, type AnyConnection, type AnyDatabase } from "@peated/server/db";
+import {
+  bottleCheckCloseReasonEnum,
+  bottleChecks,
+  bottleOperations,
+  storePriceMatchAttempts,
+  type BottleCheck,
+  type BottleOperation,
+  type User,
+} from "@peated/server/db/schema";
+import {
+  BOTTLE_CHECK_SCHEMA_VERSION,
+  isSupportedBottleCheckSchemaVersion,
+} from "@peated/server/lib/bottleCheckSchemaVersion";
+import {
+  assertCollectedEvidenceRefs,
+  prepareProposals,
+} from "@peated/server/lib/bottleOperationReview";
+import {
+  and,
+  desc,
+  eq,
+  exists,
+  inArray,
+  isNull,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
+import { z } from "zod";
+
+export { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleCheckSchemaVersion";
+
+const NonEmptyTextSchema = z.string().trim().min(1);
+
+function assertFindingContextEvidenceRefs(
+  artifacts: BottleClassificationArtifacts,
+  evidenceRefs: readonly EvidenceRef[],
+) {
+  const inspectedBottleIds = new Set(
+    artifacts.bottleContexts.map(({ bottleId }) => bottleId),
+  );
+  const inspectedEntityIds = new Set(
+    artifacts.entityContexts.map(({ entityId }) => entityId),
+  );
+
+  for (const evidenceRef of evidenceRefs) {
+    if (
+      evidenceRef.kind === "bottle" &&
+      !inspectedBottleIds.has(evidenceRef.bottleId)
+    ) {
+      throw new Error(
+        `Finding Bottle evidence must reference an inspected Bottle context: ${evidenceRef.bottleId}.`,
+      );
+    }
+    if (
+      evidenceRef.kind === "entity" &&
+      !inspectedEntityIds.has(evidenceRef.entityId)
+    ) {
+      throw new Error(
+        `Finding Entity evidence must reference an inspected Entity context: ${evidenceRef.entityId}.`,
+      );
+    }
+  }
+}
+
+const PositiveIdSchema = z.number().int().positive();
+
+type JsonValue =
+  | boolean
+  | JsonValue[]
+  | null
+  | number
+  | string
+  | { [key: string]: JsonValue };
+
+const JsonValueSchema: z.ZodType<JsonValue> = z.lazy(() =>
+  z.union([
+    z.string(),
+    z.number().finite(),
+    z.boolean(),
+    z.null(),
+    z.array(JsonValueSchema),
+    z.record(z.string(), JsonValueSchema),
+  ]),
+);
+
+export const BottleCheckCloseReasonSchema = z.enum(
+  bottleCheckCloseReasonEnum.enumValues,
+);
+
+export const CloseBottleCheckInputSchema = z
+  .object({
+    checkId: PositiveIdSchema,
+    reason: BottleCheckCloseReasonSchema,
+    note: NonEmptyTextSchema.max(2000).optional(),
+  })
+  .strict();
+
+export const ListActionableBottleChecksInputSchema = z
+  .object({
+    cursor: z.coerce.number().int().positive().default(1),
+    limit: z.coerce.number().int().positive().max(100).default(50),
+    origin: AuditBottleOriginSchema.optional(),
+  })
+  .strict()
+  .default({
+    cursor: 1,
+    limit: 50,
+  });
+
+export const PersistedAuditBottleCheckOutputSchema =
+  AuditBottleResultSchema.omit({
+    proposedOperations: true,
+    artifacts: true,
+  });
+
+export const PersistedReferenceBottleCheckOutputSchema = z.discriminatedUnion(
+  "status",
+  [
+    IgnoredBottleClassificationResultSchema.omit({
+      proposedOperations: true,
+      artifacts: true,
+    }),
+    DecidedBottleClassificationResultSchema.omit({
+      proposedOperations: true,
+      artifacts: true,
+    }),
+  ],
+);
+
+export const PersistedBottleCheckOutputSchema = z.union([
+  PersistedAuditBottleCheckOutputSchema,
+  PersistedReferenceBottleCheckOutputSchema,
+]);
+
+const StorePriceAttemptLinkSchema = z
+  .object({
+    attemptId: PositiveIdSchema,
+  })
+  .strict();
+
+const CommonCreateFields = {
+  backgroundEventKey: NonEmptyTextSchema.max(255).optional(),
+  model: NonEmptyTextSchema.nullable().optional(),
+  modelMetadata: BottleClassifierRunMetadataSchema.nullable().optional(),
+} as const;
+
+const CreateBottleCheckInputSchema = z.discriminatedUnion("intent", [
+  z
+    .object({
+      intent: z.literal("resolve_reference"),
+      sourceKind: NonEmptyTextSchema,
+      sourceId: z.union([NonEmptyTextSchema, z.number().int()]),
+      input: ClassifyBottleReferenceInputSchema,
+      result: BottleClassificationResultSchema,
+      storePrice: StorePriceAttemptLinkSchema.optional(),
+      ...CommonCreateFields,
+    })
+    .strict(),
+  z
+    .object({
+      intent: z.literal("audit_bottle"),
+      input: AuditBottleInputSchema,
+      result: AuditBottleResultSchema,
+      ...CommonCreateFields,
+    })
+    .strict(),
+]);
+
+function buildPersistedBottleCheckOutput(
+  input: z.infer<typeof CreateBottleCheckInputSchema>,
+) {
+  const {
+    artifacts: _artifacts,
+    proposedOperations: _proposedOperations,
+    ...output
+  } = input.result;
+  return input.intent === "audit_bottle"
+    ? PersistedAuditBottleCheckOutputSchema.parse(output)
+    : PersistedReferenceBottleCheckOutputSchema.parse(output);
+}
+
+const BottleCheckSubjectSchema = z.discriminatedUnion("intent", [
+  z
+    .object({
+      intent: z.literal("resolve_reference"),
+      sourceKind: NonEmptyTextSchema,
+      sourceId: z.union([NonEmptyTextSchema, z.number().int()]),
+    })
+    .strict(),
+  z
+    .object({
+      intent: z.literal("audit_bottle"),
+      bottleId: PositiveIdSchema,
+    })
+    .strict(),
+]);
+
+export type CreateBottleCheckInput = z.input<
+  typeof CreateBottleCheckInputSchema
+>;
+export type BottleCheckSubject = z.input<typeof BottleCheckSubjectSchema>;
+export type BottleCheckCloseReason = z.infer<
+  typeof BottleCheckCloseReasonSchema
+>;
+export type ListActionableBottleChecksInput = z.input<
+  typeof ListActionableBottleChecksInputSchema
+>;
+export type BottleCheckWithOperations = BottleCheck & {
+  operations: BottleOperation[];
+};
+
+export type CreateBottleCheckResult = {
+  check: BottleCheckWithOperations;
+  created: boolean;
+};
+
+export type ActionableBottleCheckList = {
+  results: BottleCheckWithOperations[];
+  rel: {
+    nextCursor: number | null;
+    prevCursor: number | null;
+  };
+};
+
+export class BottleCheckCloseAuthorizationError extends Error {
+  constructor() {
+    super("Moderator authorization is required to close a Bottle check.");
+    this.name = "BottleCheckCloseAuthorizationError";
+  }
+}
+
+export class BottleCheckNotFoundError extends Error {
+  constructor(readonly checkId: number) {
+    super(`Bottle check ${checkId} was not found.`);
+    this.name = "BottleCheckNotFoundError";
+  }
+}
+
+export class BottleCheckAlreadyClosedError extends Error {
+  constructor(readonly checkId: number) {
+    super(`Bottle check ${checkId} is already closed.`);
+    this.name = "BottleCheckAlreadyClosedError";
+  }
+}
+
+export class BottleCheckNotClosableError extends Error {
+  constructor(
+    readonly checkId: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "BottleCheckNotClosableError";
+  }
+}
+
+function buildSubjectKey(subject: BottleCheckSubject): string {
+  if (subject.intent === "audit_bottle") {
+    return JSON.stringify([subject.intent, subject.bottleId]);
+  }
+
+  return JSON.stringify([
+    subject.intent,
+    subject.sourceKind,
+    String(subject.sourceId),
+  ]);
+}
+
+function getSubject(
+  input: z.infer<typeof CreateBottleCheckInputSchema>,
+): BottleCheckSubject {
+  if (input.intent === "audit_bottle") {
+    return {
+      intent: input.intent,
+      bottleId: input.input.bottleId,
+    };
+  }
+
+  return {
+    intent: input.intent,
+    sourceKind: input.sourceKind,
+    sourceId: input.sourceId,
+  };
+}
+
+const InlineImageDataUrlPattern =
+  /^data:(image\/[a-z0-9.+-]+);base64,([a-z0-9+/]*={0,2})$/i;
+
+function sanitizeBottleCheckValue(value: unknown): JsonValue {
+  if (
+    value === null ||
+    typeof value === "boolean" ||
+    typeof value === "number"
+  ) {
+    return JsonValueSchema.parse(value);
+  }
+
+  if (typeof value === "string") {
+    const inlineImage = InlineImageDataUrlPattern.exec(value);
+    if (!inlineImage) {
+      return value;
+    }
+
+    const [, mediaType, encodedBytes] = inlineImage;
+    return {
+      kind: "omitted_inline_image",
+      mediaType: mediaType.toLowerCase(),
+      byteLength: Buffer.from(encodedBytes, "base64").byteLength,
+    };
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(sanitizeBottleCheckValue);
+  }
+
+  if (typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).flatMap(([key, nestedValue]) =>
+        nestedValue === undefined
+          ? []
+          : [[key, sanitizeBottleCheckValue(nestedValue)]],
+      ),
+    );
+  }
+
+  throw new TypeError(
+    `Bottle check input contains unsupported ${typeof value}`,
+  );
+}
+
+export function sanitizeBottleCheckInput(
+  value: unknown,
+): Record<string, JsonValue> {
+  if (value === null || Array.isArray(value) || typeof value !== "object") {
+    throw new TypeError("Bottle check input must be an object.");
+  }
+  return sanitizeBottleCheckValue(value) as Record<string, JsonValue>;
+}
+
+async function resolveStorePriceLink({
+  database,
+  storePrice,
+  sourceId,
+}: {
+  database: AnyDatabase;
+  storePrice: z.infer<typeof StorePriceAttemptLinkSchema>;
+  sourceId: string | number;
+}) {
+  const attempt = await database.query.storePriceMatchAttempts.findFirst({
+    where: eq(storePriceMatchAttempts.id, storePrice.attemptId),
+    columns: {
+      id: true,
+      priceId: true,
+      proposalId: true,
+      suggestedBottleId: true,
+    },
+  });
+  if (!attempt) {
+    throw new Error(
+      `Store-price match attempt ${storePrice.attemptId} not found.`,
+    );
+  }
+  if (String(attempt.priceId) !== String(sourceId)) {
+    throw new Error(
+      `Store-price match attempt ${storePrice.attemptId} does not belong to price ${sourceId}.`,
+    );
+  }
+
+  return {
+    storePriceMatchAttemptId: attempt.id,
+    storePriceMatchProposalId: attempt.proposalId,
+    suggestedBottleId: attempt.suggestedBottleId,
+  };
+}
+
+function getProtectedBottleIds(
+  input: z.infer<typeof CreateBottleCheckInputSchema>,
+  storePriceSuggestedBottleId: number | null,
+): number[] {
+  if (input.intent === "audit_bottle") return [];
+  if (input.sourceKind === "store_price") {
+    return storePriceSuggestedBottleId === null
+      ? []
+      : [storePriceSuggestedBottleId];
+  }
+  if (input.result.status === "ignored") return [];
+
+  const { decision } = input.result;
+  return decision.action === "match" || decision.action === "repair_bottle"
+    ? [decision.matchedBottleId]
+    : [];
+}
+
+async function findCheckByBackgroundEventKey({
+  backgroundEventKey,
+  database,
+}: {
+  backgroundEventKey: string;
+  database: AnyDatabase;
+}) {
+  return await database.query.bottleChecks.findFirst({
+    where: eq(bottleChecks.backgroundEventKey, backgroundEventKey),
+    with: {
+      operations: true,
+    },
+  });
+}
+
+export async function createBottleCheck(
+  rawInput: unknown,
+  database: AnyDatabase = db,
+): Promise<CreateBottleCheckResult> {
+  const input = CreateBottleCheckInputSchema.parse(rawInput);
+  if (
+    input.intent === "audit_bottle" &&
+    input.input.origin === "moderator" &&
+    input.backgroundEventKey
+  ) {
+    throw new Error(
+      "Moderator Bottle checks must not use a background event key.",
+    );
+  }
+  if (
+    input.intent === "audit_bottle" &&
+    input.input.origin === "post_user_creation" &&
+    !input.backgroundEventKey
+  ) {
+    throw new Error(
+      "Post-user-creation Bottle checks require a background event key.",
+    );
+  }
+  if (input.intent === "resolve_reference") {
+    if (input.sourceKind === "store_price" && !input.storePrice) {
+      throw new Error(
+        "Store-price Bottle checks require the exact match attempt.",
+      );
+    }
+    if (input.sourceKind !== "store_price" && input.storePrice) {
+      throw new Error(
+        "Only store-price Bottle checks may link a match attempt.",
+      );
+    }
+  }
+  const findingEvidenceRefs = input.result.findings.flatMap(
+    ({ evidenceRefs }) => evidenceRefs,
+  );
+  const evidenceSource = {
+    ...input,
+    artifacts: input.result.artifacts,
+  };
+  const sourceFields = getBottleCheckSourceEvidencePaths(evidenceSource);
+  assertCollectedEvidenceRefs({
+    artifacts: input.result.artifacts,
+    evidenceRefs: findingEvidenceRefs,
+    sourceFields,
+  });
+  assertFindingContextEvidenceRefs(input.result.artifacts, findingEvidenceRefs);
+  const artifacts = input.result.artifacts;
+  const output = buildPersistedBottleCheckOutput(input);
+  const subject = getSubject(input);
+  const subjectKey = buildSubjectKey(subject);
+
+  return await database.transaction(async (tx) => {
+    const resolvedStorePriceLink =
+      input.intent === "resolve_reference" && input.storePrice
+        ? await resolveStorePriceLink({
+            database: tx,
+            storePrice: input.storePrice,
+            sourceId: input.sourceId,
+          })
+        : {
+            storePriceMatchAttemptId: null,
+            storePriceMatchProposalId: null,
+            suggestedBottleId: null,
+          };
+    const { suggestedBottleId, ...storePriceLink } = resolvedStorePriceLink;
+    const operations = await prepareProposals({
+      proposals: input.result.proposedOperations,
+      artifacts: input.result.artifacts,
+      sourceFields,
+      protectedBottleIds: getProtectedBottleIds(input, suggestedBottleId),
+      database: tx,
+    });
+
+    const [check] = await tx
+      .insert(bottleChecks)
+      .values({
+        intent: input.intent,
+        origin:
+          input.intent === "audit_bottle" ? input.input.origin : undefined,
+        sourceKind:
+          input.intent === "resolve_reference" ? input.sourceKind : undefined,
+        sourceId:
+          input.intent === "resolve_reference"
+            ? String(input.sourceId)
+            : undefined,
+        bottleId:
+          input.intent === "audit_bottle" ? input.input.bottleId : undefined,
+        subjectKey,
+        backgroundEventKey: input.backgroundEventKey,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
+        inputSnapshot: sanitizeBottleCheckInput(input.input),
+        output,
+        artifacts,
+        model: input.model,
+        modelMetadata: input.modelMetadata,
+        ...storePriceLink,
+        completedAt: new Date(),
+      })
+      .onConflictDoNothing({
+        target: bottleChecks.backgroundEventKey,
+      })
+      .returning();
+
+    if (!check) {
+      const existing = await findCheckByBackgroundEventKey({
+        database: tx,
+        backgroundEventKey: input.backgroundEventKey as string,
+      });
+      if (!existing) {
+        throw new Error(
+          "Bottle check background event conflict could not be resolved.",
+        );
+      }
+      if (existing.subjectKey !== subjectKey) {
+        throw new Error(
+          "Bottle check background event key belongs to a different subject.",
+        );
+      }
+      return {
+        check: existing,
+        created: false,
+      };
+    }
+
+    const insertedOperations = operations.length
+      ? await tx
+          .insert(bottleOperations)
+          .values(
+            operations.map((operation) =>
+              operation.status === "blocked"
+                ? {
+                    checkId: check.id,
+                    proposal: operation.proposal,
+                    preparationError: operation.preparationError,
+                    status: operation.status,
+                  }
+                : {
+                    checkId: check.id,
+                    proposal: operation.proposal,
+                    stateToken: operation.stateToken,
+                    status: operation.status,
+                  },
+            ),
+          )
+          .returning()
+      : [];
+
+    return {
+      check: {
+        ...check,
+        operations: insertedOperations,
+      },
+      created: true,
+    };
+  });
+}
+
+export async function getBottleCheckHistory(
+  rawSubject: unknown,
+  database: AnyDatabase = db,
+): Promise<BottleCheckWithOperations[]> {
+  const subject = BottleCheckSubjectSchema.parse(rawSubject);
+  return await database.query.bottleChecks.findMany({
+    where: eq(bottleChecks.subjectKey, buildSubjectKey(subject)),
+    orderBy: [desc(bottleChecks.createdAt), desc(bottleChecks.id)],
+    with: {
+      operations: true,
+    },
+  });
+}
+
+export async function listActionableBottleChecks(
+  rawInput: unknown = {},
+  database: AnyDatabase = db,
+): Promise<ActionableBottleCheckList> {
+  const input = ListActionableBottleChecksInputSchema.parse(rawInput);
+  const offset = (input.cursor - 1) * input.limit;
+  const hasFindings = sql<boolean>`CASE
+    WHEN jsonb_typeof(${bottleChecks.output}->'findings') = 'array'
+    THEN jsonb_array_length(${bottleChecks.output}->'findings') > 0
+    ELSE false
+  END`;
+  const hasActionableOperation = exists(
+    database
+      .select({ id: bottleOperations.id })
+      .from(bottleOperations)
+      .where(
+        and(
+          eq(bottleOperations.checkId, bottleChecks.id),
+          inArray(bottleOperations.status, [
+            "blocked",
+            "pending_review",
+            "applying",
+            "stale",
+            "failed",
+          ]),
+        ),
+      ),
+  );
+  const rows = await database
+    .select()
+    .from(bottleChecks)
+    .where(
+      and(
+        eq(bottleChecks.intent, "audit_bottle"),
+        isNull(bottleChecks.closedAt),
+        input.origin ? eq(bottleChecks.origin, input.origin) : undefined,
+        or(
+          ne(bottleChecks.schemaVersion, BOTTLE_CHECK_SCHEMA_VERSION),
+          hasFindings,
+          hasActionableOperation,
+        ),
+      ),
+    )
+    .orderBy(desc(bottleChecks.createdAt), desc(bottleChecks.id))
+    .limit(input.limit + 1)
+    .offset(offset);
+  const hasNextPage = rows.length > input.limit;
+  const page = rows.slice(0, input.limit);
+  const operations = page.length
+    ? await database
+        .select()
+        .from(bottleOperations)
+        .where(
+          inArray(
+            bottleOperations.checkId,
+            page.map(({ id }) => id),
+          ),
+        )
+        .orderBy(bottleOperations.id)
+    : [];
+  const operationsByCheckId = Map.groupBy(
+    operations,
+    (operation) => operation.checkId,
+  );
+
+  return {
+    results: page.map((check) => ({
+      ...check,
+      operations: operationsByCheckId.get(check.id) ?? [],
+    })),
+    rel: {
+      nextCursor: hasNextPage ? input.cursor + 1 : null,
+      prevCursor: input.cursor > 1 ? input.cursor - 1 : null,
+    },
+  };
+}
+
+export async function getBottleCheckForReview(
+  rawCheckId: unknown,
+  database: AnyDatabase = db,
+): Promise<BottleCheckWithOperations | null> {
+  const checkId = PositiveIdSchema.parse(rawCheckId);
+  return (
+    (await database.query.bottleChecks.findFirst({
+      where: eq(bottleChecks.id, checkId),
+      with: {
+        operations: {
+          orderBy: [bottleOperations.id],
+        },
+      },
+    })) ?? null
+  );
+}
+
+export async function closeBottleCheck(
+  rawInput: unknown,
+  user: User | null,
+  database: AnyConnection = db,
+): Promise<BottleCheckWithOperations> {
+  if (!user?.admin && !user?.mod) {
+    throw new BottleCheckCloseAuthorizationError();
+  }
+  const input = CloseBottleCheckInputSchema.parse(rawInput);
+
+  return await database.transaction(async (tx) => {
+    const [check] = await tx
+      .select()
+      .from(bottleChecks)
+      .where(eq(bottleChecks.id, input.checkId))
+      .limit(1)
+      .for("update");
+    if (!check) {
+      throw new BottleCheckNotFoundError(input.checkId);
+    }
+    if (check.closedAt !== null) {
+      throw new BottleCheckAlreadyClosedError(check.id);
+    }
+
+    const operations = await tx
+      .select()
+      .from(bottleOperations)
+      .where(eq(bottleOperations.checkId, check.id))
+      .orderBy(bottleOperations.id);
+    const schemaSupported = isSupportedBottleCheckSchemaVersion(check);
+    if (
+      operations.some(
+        ({ status }) =>
+          status === "applying" ||
+          (schemaSupported && status === "pending_review"),
+      )
+    ) {
+      throw new BottleCheckNotClosableError(
+        check.id,
+        `Bottle check ${check.id} still has pending or applying operations.`,
+      );
+    }
+
+    if (schemaSupported) {
+      const findings =
+        check.output === null
+          ? []
+          : PersistedBottleCheckOutputSchema.parse(check.output).findings;
+      const hasClosableOperation = operations.some(({ status }) =>
+        ["blocked", "stale", "failed"].includes(status),
+      );
+      if (findings.length === 0 && !hasClosableOperation) {
+        throw new BottleCheckNotClosableError(
+          check.id,
+          `Bottle check ${check.id} has no remaining work to close.`,
+        );
+      }
+    }
+
+    const [closed] = await tx
+      .update(bottleChecks)
+      .set({
+        closedAt: sql`NOW()`,
+        closedById: user.id,
+        closeReason: input.reason,
+        closeNote: input.note ?? null,
+      })
+      .where(and(eq(bottleChecks.id, check.id), isNull(bottleChecks.closedAt)))
+      .returning();
+    if (!closed) {
+      throw new BottleCheckAlreadyClosedError(check.id);
+    }
+
+    return {
+      ...closed,
+      operations,
+    };
+  });
+}

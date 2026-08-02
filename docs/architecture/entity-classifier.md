@@ -33,6 +33,13 @@ It owns:
 
 It does not own queue discovery, ranking, or bulk repair application.
 
+The Bottle classifier may discover related Entity work while checking one
+Bottle. In that workflow it can propose the same narrow `update_entity` or
+`merge_entities` catalog mutations, but the proposal is prepared as an
+independent review operation and always needs moderator approval. This does not
+turn the Entity classifier into a sub-agent or merge the two classifier
+contracts.
+
 ## Queue Versus Classifier
 
 There are two separate concepts:
@@ -101,3 +108,24 @@ The current admin workflow is:
 3. optionally apply verified grouped bottle repairs
 
 That split is intentional. Discovery and decisioning should remain decoupled.
+
+## Relationship To Bottle Checks
+
+An Entity classification starts with an Entity as its subject and returns an
+Entity decision. A Bottle check starts with a Bottle or Bottle reference and
+may return related Entity proposed operations when the inspected evidence
+supports them. Share canonical Entity update/merge services and operation
+schemas between those paths; do not share prompts, conclusions, or queue
+lifecycle by implication.
+
+For Bottle checks:
+
+- existing Entity targets must have been inspected;
+- Entity roles use the canonical supported role enum;
+- create-versus-existing Entity choices are explicit inside the Bottle
+  operation;
+- the server builds a live diff and impact preview;
+- approval revalidates current state, and asynchronous Entity merge stays
+  `applying` until its canonical job reports a terminal result;
+- only failed operations can be retried; stale work requires a new check or
+  manual correction.

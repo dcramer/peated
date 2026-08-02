@@ -63,6 +63,7 @@ export default defineConfig({
         "OPENAI_PROJECT",
         "OPENAI_EVAL_MODEL",
         "OPENAI_MODEL",
+        "OPENAI_REASONING_EFFORT",
         "FIRECRAWL_API_KEY",
         "FIRECRAWL_API_URL",
         "BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES",

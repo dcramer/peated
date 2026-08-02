@@ -1387,6 +1387,13 @@
       "when": 1785393387063,
       "tag": "0197_green_valeria_richards",
       "breakpoints": false
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1785565343075,
+      "tag": "0198_nappy_loki",
+      "breakpoints": false
     }
   ]
 }
