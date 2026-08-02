@@ -58,7 +58,10 @@ export default function SearchHeaderForm({
     >
       <input
         autoFocus={autoFocus || !onFocus}
+        autoCapitalize="none"
+        autoCorrect="off"
         name={name}
+        spellCheck={false}
         value={value}
         placeholder={placeholder}
         onFocus={onFocus}

@@ -252,7 +252,7 @@ export default function Page() {
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             <div className="min-w-0 flex-1">
               <TextInput
-                type="text"
+                type="search"
                 name="query"
                 defaultValue={currentQuery}
                 placeholder="Search entity, alias, or target brand names"

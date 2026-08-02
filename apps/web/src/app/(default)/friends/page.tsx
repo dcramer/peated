@@ -68,8 +68,11 @@ function FriendsPage() {
                 @
               </span>
               <input
+                autoCapitalize="none"
+                autoCorrect="off"
                 id="friend-search"
                 name="q"
+                spellCheck={false}
                 type="search"
                 placeholder="username"
                 className="min-w-0 flex-1 border-0 bg-transparent px-1.5 text-sm text-white outline-none placeholder:text-slate-500 focus:ring-0"

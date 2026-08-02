@@ -12,7 +12,7 @@ export default function SearchBar({ name = "query" }: { name?: string }) {
         <MagnifyingGlassIcon className="text-muted h-5 w-5 " />
         <div className="flex-grow">
           <TextInput
-            type="text"
+            type="search"
             name={name}
             defaultValue={searchParams.get(name) ?? ""}
           />
