@@ -60,7 +60,7 @@ subcommand
         .where(eq(sql`LOWER(${users.email})`, email.toLowerCase()))
         .returning();
       if (!existingUser) {
-        throw new Error(`Unknown user: ${email}.`);
+        throw new Error(`Unknown user: ${email}.`, { cause: err });
       }
       user = existingUser;
     }

@@ -55,7 +55,7 @@ export function getBottleResultHref({
 
 export default function BottleResultRow({
   result: { ref: bottle },
-  directToTasting = false,
+  directToTasting,
   addBottleIntent,
   pendingImage,
 }: {

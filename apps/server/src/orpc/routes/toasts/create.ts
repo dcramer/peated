@@ -60,7 +60,7 @@ export default procedure
           .set({ toasts: sql`${tastings.toasts} + 1` })
           .where(eq(tastings.id, targetTasting.id));
 
-        createNotification(tx, {
+        await createNotification(tx, {
           fromUserId: toast.createdById,
           type: "toast",
           objectId: toast.id,

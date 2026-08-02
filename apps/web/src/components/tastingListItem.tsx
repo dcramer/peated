@@ -35,9 +35,13 @@ const tastingActionClassName =
   "inline-flex h-9 items-center justify-center gap-x-1.5 rounded px-2 text-sm font-medium text-muted transition-colors hover:bg-slate-800 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peated disabled:cursor-default disabled:opacity-60";
 
 function ImageWithSkeleton({
+  alt,
   src,
   ...props
-}: Omit<ComponentPropsWithoutRef<"img">, "src"> & { src: string }) {
+}: Omit<ComponentPropsWithoutRef<"img">, "alt" | "src"> & {
+  alt: string;
+  src: string;
+}) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -51,7 +55,7 @@ function ImageWithSkeleton({
 
   if (!loaded) return <ImageSkeleton />;
 
-  return <img src={src} {...props} />;
+  return <img src={src} alt={alt} {...props} />;
 }
 
 function ImageSkeleton() {

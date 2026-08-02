@@ -4,7 +4,7 @@ import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import LayoutModal from "../layoutModal";
 import ListItem from "../listItem";
@@ -25,7 +25,7 @@ export default function SelectDialog<T extends Option>({
   open,
   setOpen,
   onSelect,
-  selectedValues = [],
+  selectedValues,
   searchPlaceholder,
   emptyListItem,
   canCreate = false,
@@ -33,7 +33,7 @@ export default function SelectDialog<T extends Option>({
   multiple = false,
   onQuery,
   onResults,
-  options = [],
+  options,
   onRenderOption,
 }: {
   open: boolean;
@@ -50,11 +50,18 @@ export default function SelectDialog<T extends Option>({
   options?: T[];
   onRenderOption?: OnRenderOption<T>;
 }) {
+  const resolvedOptions = useMemo(() => options ?? [], [options]);
+  const resolvedSelectedValues = useMemo(
+    () => selectedValues ?? [],
+    [selectedValues],
+  );
   const [query, setQuery] = useState("");
-  const [optionList, setOptionList] = useState<T[]>([...selectedValues]);
+  const [optionList, setOptionList] = useState<T[]>([
+    ...resolvedSelectedValues,
+  ]);
   const [results, setResults] = useState<T[]>([]);
   const [previousValues, setPreviousValues] = useState<T[]>([
-    ...selectedValues,
+    ...resolvedSelectedValues,
   ]);
   const [isLoading, setLoading] = useState(false);
   const [initialState, setInitialState] = useState<"loading" | "ready">(
@@ -66,8 +73,8 @@ export default function SelectDialog<T extends Option>({
     async (query = "") => {
       setLoading(true);
       const results = onQuery
-        ? await onQuery(query, options)
-        : options.filter(
+        ? await onQuery(query, resolvedOptions)
+        : resolvedOptions.filter(
             (o) => o.name.toLowerCase().indexOf(query.toLowerCase()) !== -1,
           );
       if (results === undefined) throw new Error("Invalid results returned");
@@ -76,7 +83,7 @@ export default function SelectDialog<T extends Option>({
       setLoading(false);
       setInitialState("ready");
     },
-    [onQuery, onResults],
+    [onQuery, onResults, resolvedOptions],
   );
 
   const onSearch = useDebounceCallback(unsafe_onSearch);
@@ -87,12 +94,8 @@ export default function SelectDialog<T extends Option>({
   };
 
   useEffect(() => {
-    setOptionList(filterDupes(selectedValues, results, previousValues));
-  }, [
-    JSON.stringify(selectedValues),
-    JSON.stringify(results),
-    JSON.stringify(previousValues),
-  ]);
+    setOptionList(filterDupes(resolvedSelectedValues, results, previousValues));
+  }, [resolvedSelectedValues, results, previousValues]);
 
   const listItemClasses = `px-3 group relative border-b border-slate-800 bg-slate-950 hover:bg-slate-900`;
 
@@ -106,7 +109,7 @@ export default function SelectDialog<T extends Option>({
               onClose={() => setOpen(false)}
               onChange={(value) => {
                 setLoading(true);
-                onSearch(value);
+                void onSearch(value);
               }}
               onDone={multiple ? () => setOpen(false) : undefined}
               closeIcon={<XMarkIcon className="h-8 w-8" />}
@@ -133,7 +136,7 @@ export default function SelectDialog<T extends Option>({
                       <CheckIcon
                         className={classNames(
                           "-ml-2 h-10 w-10 flex-none rounded p-2",
-                          selectedValues.find(
+                          resolvedSelectedValues.find(
                             (i) => i.id == option.id && i.name == option.name,
                           )
                             ? "bg-highlight text-black"
@@ -145,7 +148,7 @@ export default function SelectDialog<T extends Option>({
                         <div className="font-semibold text-white">
                           <button
                             onClick={() => {
-                              selectOption(option);
+                              void selectOption(option);
                             }}
                           >
                             <span className="absolute inset-x-0 -top-px bottom-0" />
@@ -225,7 +228,9 @@ export default function SelectDialog<T extends Option>({
           setOpen={setCreateOpen}
           render={createForm}
           onSubmit={(newOption) => {
-            selectOption(onResults ? onResults([newOption])[0] : newOption);
+            void selectOption(
+              onResults ? onResults([newOption])[0] : newOption,
+            );
           }}
         />
       )}

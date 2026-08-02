@@ -6,9 +6,11 @@ describe("POST /email/resend-verification", () => {
   test("initiates email", async ({ fixtures }) => {
     const user = await fixtures.User({ verified: false });
 
-    await routerClient.email.resendVerification(undefined, {
-      context: { user },
-    });
+    await expect(
+      routerClient.email.resendVerification(undefined, {
+        context: { user },
+      }),
+    ).resolves.toEqual({});
   });
 
   test("already verified", async ({ fixtures }) => {

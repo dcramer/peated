@@ -26,7 +26,9 @@
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
     "start": "dotenv -e .env.local -- turbo start",
     "typecheck": "turbo typecheck",
-    "lint": "github-actionlint && oxlint .",
+    "lint": "github-actionlint && oxlint . && pnpm ast-grep:lint",
+    "ast-grep:lint": "ast-grep scan",
+    "ast-grep:test": "ast-grep test --skip-snapshot-tests",
     "test": "turbo test",
     "test:all": "turbo test && pnpm --dir apps/web test:e2e",
     "test:web": "pnpm --dir apps/web test",
@@ -57,9 +59,12 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
+    "@ast-grep/cli": "0.45.0",
+    "@tanstack/eslint-plugin-query": "5.101.4",
     "github-actionlint": "1.7.12",
     "lint-staged": "^14.0.1",
     "oxlint": "^1.72.0",
+    "oxlint-tsgolint": "7.0.2001",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "catalog:"
@@ -69,6 +74,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@ast-grep/cli",
       "bcrypt"
     ]
   },

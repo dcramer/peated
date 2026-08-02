@@ -40,7 +40,7 @@ const ErrorView = ({ error, resetErrorBoundary }: any) => {
       <div>
         {error ? error.message || error.toString() : "Internal server error"}
       </div>
-      <button title="Retry" onClick={resetErrorBoundary} />
+      <button aria-label="Retry" title="Retry" onClick={resetErrorBoundary} />
     </EmptyActivity>
   );
 };

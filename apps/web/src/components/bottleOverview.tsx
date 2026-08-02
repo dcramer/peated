@@ -187,6 +187,7 @@ export default function BottleOverview({
               <div className="flex w-full justify-center rounded border border-slate-900 bg-white p-3 opacity-80">
                 <img
                   src={bottle.imageUrl}
+                  alt=""
                   className="block max-w-full rounded"
                   aria-hidden="true"
                 />

@@ -32,6 +32,7 @@ export default function TableSkeleton({
               <th
                 key={index}
                 scope="col"
+                aria-label="Loading"
                 className={classNames(
                   "px-3 py-2.5",
                   index !== 0 ? "hidden sm:table-cell" : "",

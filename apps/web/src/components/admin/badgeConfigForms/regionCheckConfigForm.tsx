@@ -31,7 +31,7 @@ export default function RegionCheckConfigForm({
   useEffect(() => {
     const subscription = watch((value, { name, type }) => onChange(value));
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [onChange, watch]);
 
   // TODO:
   const [countryValue, setCountryValue] = useState<Option | undefined>(

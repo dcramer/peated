@@ -32,7 +32,7 @@ export async function getStructuredResponse<Schema extends ZodSchema<any>>(
   pipelineName: string,
   prompt: string | Message[],
   schema: Schema,
-  fullSchema?: undefined | null,
+  fullSchema?: null,
   model?: string,
   logContext?: Record<string, Record<string, any>>,
 ): Promise<z.infer<Schema> | null>;

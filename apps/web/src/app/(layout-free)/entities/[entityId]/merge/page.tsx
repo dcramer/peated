@@ -53,7 +53,7 @@ function EntityMergeForm({ entityId }: { entityId: string }) {
   const entityMergeMutation = useMutation({
     ...orpc.entities.merge.mutationOptions(),
     onSuccess: (newEntity) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: orpc.entities.details.key({
           input: { entity: newEntity.id },
         }),

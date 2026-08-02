@@ -91,7 +91,7 @@ export default function PasswordResetChangeForm({ token }: { token: string }) {
       formData.append("passkeyResponse", JSON.stringify(response));
       formData.append("signedChallenge", signedChallenge);
 
-      await passkeyFormAction(formData);
+      passkeyFormAction(formData);
     } catch (err: any) {
       logError(err, { context: "passkey_recovery" });
 

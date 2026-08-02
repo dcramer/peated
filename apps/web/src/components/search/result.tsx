@@ -10,7 +10,7 @@ export type Result = BottleResult | UserResult | EntityResult;
 
 export default function ResultRow({
   result,
-  directToTasting = false,
+  directToTasting,
   addBottleIntent,
   pendingImage,
 }: {

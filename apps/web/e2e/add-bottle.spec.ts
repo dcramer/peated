@@ -873,7 +873,7 @@ test.describe("add bottle flow", () => {
     await expect(
       page.getByRole("button", { name: "Log Tasting" }),
     ).toBeVisible();
-    await expect(createRequests).toHaveLength(0);
+    expect(createRequests).toHaveLength(0);
 
     const requestPromise = waitForPhotoIdentificationCreate(page);
     await page.getByRole("button", { name: "Create Bottle" }).click();

@@ -123,7 +123,7 @@ export default procedure
       if (!myFollow) return;
 
       if (myFollow.status === "pending")
-        createNotification(tx, {
+        await createNotification(tx, {
           fromUserId: myFollow.fromUserId,
           type: "friend_request",
           objectId: myFollow.id,

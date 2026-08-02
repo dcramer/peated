@@ -60,7 +60,7 @@ export function SidePanelHeader({
 
 export default function SidePanel({
   onClose,
-  open = false,
+  open,
   children,
   ...props
 }: {

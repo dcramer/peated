@@ -43,6 +43,7 @@ export function verifyPayload(
       }
       if (!decoded || typeof decoded === "string") {
         rej("invalid token");
+        return;
       }
       res(decoded);
     });
@@ -198,7 +199,9 @@ export async function verifyChallenge(
   try {
     payload = (await verifyPayload(signedChallenge)) as any;
   } catch (err) {
-    throw new Error("Challenge signature is invalid or has expired");
+    throw new Error("Challenge signature is invalid or has expired", {
+      cause: err,
+    });
   }
 
   if (!payload?.challenge || !payload?.createdAt) {

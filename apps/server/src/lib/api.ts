@@ -21,7 +21,7 @@ import { follows, users } from "../db/schema";
 export async function getUserFromId(
   db: AnyDatabase,
   userId: string | number | "me",
-  currentUser?: User | null | undefined,
+  currentUser?: User | null,
 ): Promise<User | null> {
   if (userId === "me") {
     return currentUser || null;

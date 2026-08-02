@@ -30,7 +30,7 @@ export default function BottleCheckConfigForm({
   useEffect(() => {
     const subscription = watch((value, { name, type }) => onChange(value));
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [onChange, watch]);
 
   // TODO:
   const [bottleValue, setBottleValue] = useState<BottleOption[] | undefined>(

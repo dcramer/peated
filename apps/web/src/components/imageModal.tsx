@@ -39,15 +39,15 @@ export function ImageModal({
           {title && <DialogTitle className="sr-only">{title}</DialogTitle>}
           <img src={image} alt={alt} className="max-h-full max-w-full" />
           {action && (
-            <div
-              className="absolute bottom-4 left-1/2 flex -translate-x-1/2 justify-center sm:bottom-6"
-              onClick={(event) => event.stopPropagation()}
-            >
+            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 justify-center sm:bottom-6">
               <Button
                 size="small"
                 icon={action.icon}
                 disabled={action.disabled}
-                onClick={action.onClick}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  action.onClick();
+                }}
               >
                 {action.label}
               </Button>

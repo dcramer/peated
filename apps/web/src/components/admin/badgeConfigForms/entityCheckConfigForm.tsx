@@ -37,7 +37,7 @@ export default function EntityCheckConfigForm({
   useEffect(() => {
     const subscription = watch((value, { name, type }) => onChange(value));
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [onChange, watch]);
 
   // TODO:
   const [entityValue, setEntityValue] = useState<Option | undefined>(

@@ -88,7 +88,7 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
   const bottleMergeMutation = useMutation({
     ...orpc.bottles.merge.mutationOptions(),
     onSuccess: (newBottle) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: orpc.bottles.details.key({
           input: { bottle: newBottle.id },
         }),

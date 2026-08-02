@@ -1,0 +1,14 @@
+id: orpc-route-requires-operation-id
+valid:
+  - |
+    procedure.route({
+      method: "GET",
+      path: "/items",
+      spec: (spec) => ({ ...spec, operationId: "listItems" }),
+    })
+invalid:
+  - |
+    procedure.route({
+      method: "GET",
+      path: "/items",
+    })

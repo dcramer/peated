@@ -161,20 +161,6 @@ describe("GET /prices", () => {
     expect(result.results[0].id).toBe(price1.id);
   });
 
-  // TODO: We cant reliably test this as the params are type-safe and its throwing a
-  // validation error rather than a 404.
-  // test("throws NOT_FOUND for non-existent site", async ({ fixtures }) => {
-  //   const admin = await fixtures.User({ admin: true });
-
-  //   const err = await waitError(
-  //     routerClient.prices.list(
-  //       { site: "nonexistent" as any },
-  //       { context: { user: admin } },
-  //     ),
-  //   );
-  //   expect(err).toMatchInlineSnapshot(`[Error: Site not found.]`);
-  // });
-
   test("requires admin permission", async ({ fixtures }) => {
     const user = await fixtures.User({ admin: false });
 

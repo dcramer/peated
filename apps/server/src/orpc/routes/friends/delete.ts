@@ -74,7 +74,7 @@ export default procedure
         );
 
       if (follow)
-        deleteNotification(tx, {
+        await deleteNotification(tx, {
           type: "friend_request",
           objectId: follow.id,
           userId: follow.toUserId,

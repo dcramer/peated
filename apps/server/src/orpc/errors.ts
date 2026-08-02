@@ -8,11 +8,7 @@ export class ConflictError extends ORPCError<
 > {
   public existingRow: ConflictMatch;
 
-  constructor(
-    row: ConflictMatch,
-    err: Error | undefined = undefined,
-    message: string | undefined = undefined,
-  ) {
+  constructor(row: ConflictMatch, err?: Error, message?: string) {
     super("CONFLICT", {
       message: message ?? `Conflicting object already exists (ID=${row.id}).`,
       cause: err,

@@ -483,10 +483,7 @@ function getCategoryKeywords(value: string): string[] {
 // The legacy `spirit` bucket is a fallback for missing whisky category data,
 // so it should not count as either supportive identity evidence or a conflict.
 function normalizeComparableCategory(
-  value:
-    | BottleCandidate["category"]
-    | BottleExtractedDetails["category"]
-    | null,
+  value: BottleCandidate["category"] | null,
 ) {
   return value === "spirit" ? null : value;
 }

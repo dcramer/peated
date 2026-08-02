@@ -15,12 +15,15 @@ import { useEventListener } from "usehooks-ts";
 
 export default function ActivityFeed({
   activityList,
-  filter = "global",
+  filter,
 }: {
   activityList: Outputs["activity"]["list"];
   filter: "global" | "friends" | "local";
 }) {
   const orpc = useORPC();
+  // TanStack's helper currently widens queryFn to skipToken, which is not
+  // accepted by the suspense hook's narrower type.
+  /* oxlint-disable @tanstack/query/prefer-query-options */
   const {
     data: { pages },
     error,
@@ -62,6 +65,7 @@ export default function ActivityFeed({
     getNextPageParam: (lastPage) => lastPage.rel?.nextCursor,
     getPreviousPageParam: (firstPage) => firstPage.rel?.prevCursor,
   });
+  /* oxlint-enable @tanstack/query/prefer-query-options */
 
   const onScroll = () => {
     if (!hasNextPage) return;
@@ -69,7 +73,7 @@ export default function ActivityFeed({
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = document.documentElement.clientHeight;
     if (scrollTop + clientHeight >= scrollHeight - 100) {
-      fetchNextPage();
+      void fetchNextPage();
     }
   };
 

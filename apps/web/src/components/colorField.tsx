@@ -72,6 +72,7 @@ export default forwardRef<HTMLInputElement, Props>(
             return (
               <button
                 key={num}
+                aria-label={`Color ${num}`}
                 className={classNames(
                   "pointer h-8 flex-1",
                   num === value ? "h-12 px-2" : "",

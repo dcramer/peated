@@ -80,10 +80,7 @@ export function extractedIdentityLooksLikePlainAgeStatementReference(
 // The legacy `spirit` bucket means the category is unknown, not that the
 // bottle is positively identified as a generic spirit family.
 function normalizeComparableCategory(
-  value:
-    | BottleCandidate["category"]
-    | BottleExtractedDetails["category"]
-    | null,
+  value: BottleCandidate["category"] | null,
 ) {
   return value === "spirit" ? null : value;
 }

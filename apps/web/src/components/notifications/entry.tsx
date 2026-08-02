@@ -6,6 +6,7 @@ import { BottleLabel } from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
 import classNames from "@peated/web/lib/classNames";
 import { useRouter } from "next/navigation";
+import type { KeyboardEvent } from "react";
 import UserAvatar from "../userAvatar";
 import FriendRequestEntry from "./friendRequestEntry";
 
@@ -20,21 +21,33 @@ export default function NotificationEntry({
 }) {
   const router = useRouter();
   const link = getLink({ notification });
+  const openNotification = () => {
+    if (!link) return;
+    onMarkRead();
+    router.push(link);
+  };
+  const interactionProps = link
+    ? {
+        role: "link",
+        tabIndex: 0,
+        onClick: openNotification,
+        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openNotification();
+          }
+        },
+      }
+    : {};
+
   return (
     <div
+      {...interactionProps}
       className={classNames(
         "bg-slate-950 p-3",
         notification.read ? "text-muted" : "text-white",
         link ? "group cursor-pointer rounded hover:bg-slate-700" : "",
       )}
-      onClick={
-        link
-          ? () => {
-              onMarkRead();
-              router.push(link);
-            }
-          : undefined
-      }
     >
       <div className="flex flex-auto items-start">
         <div className="flex-shrink-0 self-center">

@@ -20,7 +20,7 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import BottleSelector from "./bottleSelector";
 import QueueItemCard, { type QueueItem } from "./queueItemCard";
 
@@ -138,11 +138,11 @@ export default function Page() {
     activeRetryRun?.status === "pending" ||
     activeRetryRun?.status === "running";
 
-  async function refreshQueueList(): Promise<void> {
+  const refreshQueueList = useCallback(async (): Promise<void> => {
     await queryClient.invalidateQueries({
       queryKey: listQueryOptions.queryKey,
     });
-  }
+  }, [listQueryOptions.queryKey, queryClient]);
 
   useEffect(() => {
     if (!activeRetryRun || retryRunIsActive) {
@@ -150,7 +150,7 @@ export default function Page() {
     }
 
     void refreshQueueList();
-  }, [activeRetryRun?.status, retryRunIsActive]);
+  }, [activeRetryRun, refreshQueueList, retryRunIsActive]);
 
   async function handleRetryAll(): Promise<void> {
     if (
