@@ -106,6 +106,7 @@ export default procedure
               err.constraint === "user_username_unq" ? "username" : "email";
             throw errors.CONFLICT({
               message: `An account with this ${fieldName} already exists.`,
+              data: { field: fieldName },
             });
           }
           throw err;
@@ -182,6 +183,7 @@ export default procedure
             err.constraint === "user_username_unq" ? "username" : "email";
           throw errors.CONFLICT({
             message: `An account with this ${fieldName} already exists.`,
+            data: { field: fieldName },
           });
         }
         throw err;

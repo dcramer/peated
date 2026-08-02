@@ -34,6 +34,7 @@ function FormComponent({ showPassword }: { showPassword: boolean }) {
           required
           placeholder="you@example.com"
           autoFocus
+          defaultValue={searchParams.get("email") ?? ""}
         />
         {showPasswordField && (
           <TextField
@@ -67,6 +68,11 @@ function FormComponent({ showPassword }: { showPassword: boolean }) {
 export default function LoginForm() {
   const [result, formAction] = useActionState(authenticateForm, undefined);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
+  const recoveryHref = email
+    ? { pathname: "/recover-account", query: { email } }
+    : "/recover-account";
 
   return (
     <div className="min-w-sm flex flex-auto flex-col gap-y-4">
@@ -101,10 +107,7 @@ export default function LoginForm() {
             </div>
             <div>&middot;</div>
             <div>
-              <Link
-                href="/recover-account"
-                className="text-highlight underline"
-              >
+              <Link href={recoveryHref} className="text-highlight underline">
                 Account Recovery
               </Link>
             </div>
@@ -136,10 +139,7 @@ export default function LoginForm() {
             </div>
             <div>&middot;</div>
             <div>
-              <Link
-                href="/recover-account"
-                className="text-highlight underline"
-              >
+              <Link href={recoveryHref} className="text-highlight underline">
                 Account Recovery
               </Link>
             </div>

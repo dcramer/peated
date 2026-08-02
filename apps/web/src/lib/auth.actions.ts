@@ -5,6 +5,7 @@ import { createServerClient } from "@peated/web/lib/orpc/client.server";
 import { redirect } from "next/navigation";
 import { getSafeRedirect } from "./auth";
 import { logInfo, logTelemetryError } from "./log";
+import { getRegistrationConflictField } from "./registration";
 import type { SessionData } from "./session.server";
 import { getSession } from "./session.server";
 
@@ -154,7 +155,12 @@ export async function register(formData: FormData) {
   );
 
   if (!result.ok) {
-    return { ok: false, error: result.errorMessage };
+    const conflictField = getRegistrationConflictField(result.error);
+    return {
+      ok: false,
+      error: result.errorMessage,
+      ...(conflictField ? { conflictField } : {}),
+    };
   }
 
   await saveAuthSession(session, result.data);
@@ -371,6 +377,7 @@ type Session = Awaited<ReturnType<typeof getSession>>;
 
 type SafeClientCallFailure = {
   error: {
+    data?: unknown;
     message: string;
     name?: string;
   };

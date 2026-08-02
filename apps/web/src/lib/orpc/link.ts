@@ -113,7 +113,7 @@ export function getLink({
           throw err;
         }
       },
-      sentryInterceptor({ captureInputs: true }),
+      sentryInterceptor(),
     ],
     plugins: [
       new BatchLinkPlugin({
