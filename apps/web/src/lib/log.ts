@@ -1,5 +1,12 @@
-// Web logging owns LogTape setup for Next server, edge, and browser runtimes.
-// `logError` is the only facade method that creates Sentry issues.
+/**
+ * Web logging boundary for Next server, edge, and browser runtimes.
+ *
+ * This module owns LogTape setup and the Sentry adapter. `logError` is the only
+ * facade method that creates Sentry issues; the other level helpers emit
+ * diagnostic telemetry without issue capture. Callers own selecting safe
+ * structured context under `docs/policies/observability.md` and
+ * `docs/policies/data-redaction.md`.
+ */
 import {
   configureSync,
   getConfig,

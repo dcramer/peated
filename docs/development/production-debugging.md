@@ -1,63 +1,53 @@
 # Production Debugging
 
-Use this playbook when production behavior differs from local behavior or when
-browser errors are too generic to identify the failing runtime.
+Use this playbook when production differs from local behavior or the browser
+error does not identify the failing runtime.
 
-## Hosts and Projects
+## Production Surfaces
 
-- Frontend host: `https://peated.com`
-- Production API host: `https://api.peated.com`
-- Sentry org: `peated`
-- Sentry project: `peated`
-- Vercel org: `peated`
-- Vercel web project: `peated-web-next`
+- frontend: `https://peated.com`, Vercel project `peated-web-next`
+- API: `https://api.peated.com`, Render service `api`
+- worker: Render service `worker`
+- Sentry org/project: `peated` / `peated`
+- Sentry web environment: `vercel-production`
+- Sentry API environment: `production`
 
-Sentry environment names differ by runtime:
+Begin with the exact route, absolute UTC timestamp, release, environment, and
+browser-visible failure. A local timestamp or vague time window creates noisy
+and misleading searches.
 
-- Web/Vercel events use `environment:vercel-production`.
-- API events use `environment:production`.
+## Diagnostic Sequence
 
-Start with the exact route, absolute timestamp, release, and browser message.
-For browser reports, convert local time to UTC before searching logs.
+1. Find the Sentry issue and event for the affected runtime and route.
+2. Capture its UTC timestamp, release, trace id, request URL, and first relevant
+   Peated stack frame.
+3. Inspect the trace for calls crossing from Vercel to `api.peated.com`.
+4. Query Vercel logs in a narrow matching window.
+5. When the web trace shows an upstream API failure, query Render request and
+   application logs for the same window.
+6. Look for the earliest shared failure before debugging the route that merely
+   surfaced it.
+7. After a fix, verify Sentry, platform logs, and the production route.
 
-## Sentry First
+## Sentry
 
-Search grouped issues for the affected runtime and route:
+Useful issue searches:
 
-```bash
-# Web App Router / Vercel runtime
+```text
 environment:vercel-production url:"https://peated.com/<path>"
-
-# API runtime
 environment:production url:"https://api.peated.com/<path>"
 ```
 
-If the browser shows a generic React Server Components message, search Sentry
-for the route and release instead of the browser text. In production, Next.js
-redacts Server Component exception messages before sending them to the browser.
-The browser may only show a digest like:
+Production Next.js may redact a Server Component exception and show only a
+generic message or digest in the browser. Search by route, time, and release;
+do not search only for the browser text.
 
-```text
-An error occurred in the Server Components render.
-```
-
-Open the Sentry issue and capture:
-
-- Issue ID and URL.
-- Event timestamp in UTC.
-- Release.
-- Environment.
-- Request URL and route transaction.
-- Trace ID.
-- Most relevant first-party stack frame.
-
-Then open the trace. For web server-render failures that call oRPC, inspect
-`http.client` spans to identify which `api.peated.com/rpc/*` calls failed and
-which HTTP status they returned.
+For a web server-render failure, inspect `http.client` spans in the trace. They
+show which API call failed and the status returned to the web runtime.
 
 ## Vercel Logs
 
-Use the Vercel CLI through `pnpm dlx` unless a local `vercel` binary is
+Use the Vercel CLI through `pnpm dlx` unless a local binary is already
 available:
 
 ```bash
@@ -65,21 +55,21 @@ pnpm dlx vercel whoami
 pnpm dlx vercel project ls --scope peated
 ```
 
-Query historical production logs with a tight UTC window:
+Query a tight UTC window and route:
 
 ```bash
 pnpm dlx vercel logs \
   --scope peated \
   --project peated-web-next \
   --environment production \
-  --since 2026-07-08T14:23:00Z \
-  --until 2026-07-08T14:26:00Z \
-  --query '/bottles/44290/bottlings/415' \
+  --since <start-utc> \
+  --until <end-utc> \
+  --query '<route>' \
   --json \
   --limit 100
 ```
 
-Useful filters:
+Broad error checks are useful only after narrowing the time:
 
 ```bash
 pnpm dlx vercel logs --scope peated --project peated-web-next \
@@ -89,104 +79,60 @@ pnpm dlx vercel logs --scope peated --project peated-web-next \
   --environment production --status-code 500 --since 30m --json
 ```
 
-Vercel `responseStatusCode` is the HTTP status returned by the web route. App
-Router can return `200` while logging a Server Component render error that is
-later surfaced to the browser through the RSC payload. Do not treat a `200`
-Vercel request line as proof that server render succeeded.
+A Vercel request may return HTTP 200 while the streamed React Server Component
+payload contains a render error. A successful outer request is not proof that
+server rendering completed.
 
-## oRPC Bad Gateway
+## Upstream 502s
 
-An oRPC `Error: Bad Gateway` from the web app means the oRPC client received an
-HTTP error response and could not decode a valid oRPC error envelope.
+An oRPC `BAD_GATEWAY` error usually means the client received an upstream HTTP
+error that was not a valid oRPC envelope. Inspect the logged response status,
+body, and headers.
 
-The important fields are inside the logged error:
+Headers such as `server: cloudflare`, `rndr-id`, or `x-render-routing` indicate
+that Vercel received the failure from the API hosting path. Use the trace to
+identify the RPC endpoint, then move to Render logs. Do not keep debugging the
+web component as if it created the 502.
 
-```text
-code: 'BAD_GATEWAY'
-status: 502
-data: {
-  body: undefined,
-  headers: { ... }
-}
-```
+When many unrelated API and upload paths begin returning 502 at the same time,
+search application logs for an earlier process-level error. A streaming,
+storage, or unhandled-rejection failure can restart an API instance and make
+otherwise unrelated routes fail during the restart window.
 
-If the headers include values like these, the failure is upstream of the web
-server:
+If a process-level error appears in Render but not Sentry, inspect shutdown and
+fatal-error handling. The process must flush Sentry before exit if the event is
+expected to reach Sentry reliably.
 
-```text
-server: cloudflare
-rndr-id: ...
-x-render-routing: dynamic-paid-error
-content-type: text/html; charset=utf-8
-```
+## Render Logs
 
-That means the web app received a literal HTTP 502 from `api.peated.com`, but
-the original API/runtime exception was hidden behind an HTML error response.
-Use the Sentry trace to identify the affected RPC endpoint, then inspect API
-logs or API Sentry events around the same UTC timestamp.
-
-## Render API Logs
-
-The API service runs on Render. Use this when Vercel logs show upstream headers
-such as `rndr-id` or `x-render-routing`.
-
-Render also provides an official CLI from `render-oss/cli`; it is not an npm
-package. Install it with Homebrew or the official install script:
+Install the official `render-oss/cli`, authenticate, and select the Peated
+workspace:
 
 ```bash
-brew update
 brew install render
-```
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/render-oss/cli/refs/heads/main/bin/install.sh | sh
-```
-
-Authenticate interactively:
-
-```bash
 render login
-```
-
-Select the Peated workspace before listing services or logs:
-
-```bash
 render workspaces --output json --confirm
 render workspace set <workspace-id> --confirm
-```
-
-Find service IDs:
-
-```bash
 render services --output json --confirm
 ```
 
-Current production service names:
-
-- API web service: `api`
-- Worker service: `worker`
-
-Query API request logs for a tight UTC window:
+Query requests and application errors separately for the same tight window:
 
 ```bash
 render logs \
   --resources <api-service-id> \
-  --start 2026-07-08T14:23:00Z \
-  --end 2026-07-08T14:26:00Z \
+  --start <start-utc> \
+  --end <end-utc> \
   --direction forward \
-  --path /rpc/bottles/details \
+  --path <api-path> \
   --output json \
   --confirm \
   --limit 200
-```
 
-Query app errors in the same window:
-
-```bash
 render logs \
   --resources <api-service-id> \
-  --start 2026-07-08T14:24:10Z \
-  --end 2026-07-08T14:24:40Z \
+  --start <start-utc> \
+  --end <end-utc> \
   --direction forward \
   --type app \
   --level error \
@@ -195,13 +141,13 @@ render logs \
   --limit 200
 ```
 
-Query 502s across all paths:
+To test whether an incident is broader than one route:
 
 ```bash
 render logs \
   --resources <api-service-id> \
-  --start 2026-07-08T14:24:10Z \
-  --end 2026-07-08T14:24:40Z \
+  --start <start-utc> \
+  --end <end-utc> \
   --direction forward \
   --type request \
   --status-code 502 \
@@ -210,95 +156,28 @@ render logs \
   --limit 200
 ```
 
-Check deploys and current instances:
+Check deploy and instance changes when failures align with restarts or rollout:
 
 ```bash
 render deploys list <api-service-id> --output json --confirm
 render services instances <api-service-id> --output json --confirm
 ```
 
-Useful filters supported by Render logs include:
+For non-interactive use, supply `RENDER_API_KEY` through the approved secret
+environment. Never paste keys into documentation, commands committed to the
+repository, issue bodies, or logs.
 
-- `resource`: service, cron job, job, Postgres, Redis, or workflow ID.
-- `instance`: specific running instance ID.
-- `host`: request host.
-- `statusCode`: request status code, including wildcard or regex patterns.
-- `method`: request method.
-- `level`: application log severity.
-- `type`: `app`, `request`, or `build`.
-- `text`: text search against log messages.
-- `path`: request path.
+## Code Follow-Up
 
-For incidents like `PEATED-48Z`, query both request logs and app logs around the
-same timestamp. Request logs confirm the HTTP status and path; app logs are more
-likely to contain the original stack trace or process-level failure that caused
-Render to return an HTML 502 response.
+- Wrap a shared server loader in React `cache()` when both `generateMetadata()`
+  and the page invoke the same request during one render.
+- Keep noncritical server-side data fetches non-fatal only when the page has a
+  useful degraded state.
+- Do not swallow required route identity failures unless the UI explicitly owns
+  the missing state.
+- Preserve upstream status and safe trace context at runtime boundaries.
+- Verify the repaired route and check that the original Sentry/log signature no
+  longer occurs.
 
-For non-interactive REST API use, set `RENDER_API_KEY`. The CLI uses that API
-key before locally saved CLI tokens:
-
-```bash
-export RENDER_API_KEY=rnd_...
-render services --output json --confirm
-```
-
-The REST API can fetch the same log data when CLI output needs custom paging:
-
-```bash
-curl -sS "https://api.render.com/v1/logs?ownerId=$RENDER_OWNER_ID&resource=$RENDER_API_SERVICE_ID&startTime=2026-07-08T14:23:00Z&endTime=2026-07-08T14:26:00Z&direction=forward&path=/rpc/bottles/details&statusCode=502&type=request&limit=100" \
-  -H "Authorization: Bearer $RENDER_API_KEY" \
-  -H "Accept: application/json" \
-  | jq
-```
-
-## Incident Notes
-
-On July 8, 2026, a bottling page failure appeared in the browser as a generic
-RSC error. Sentry issue `PEATED-48Z` showed the real web exception:
-
-- Route: `GET /bottles/[bottleId]/bottlings/[bottlingId]`
-- URL: `https://peated.com/bottles/44290/bottlings/415`
-- Release: `c1c2742b7dcac73eb13cb5436ef3ac8cd97c9c3a`
-- Trace ID: `3d4c25c0164df2bab2036b321729b166`
-- Time: `2026-07-08T14:24:21Z`
-
-The trace showed server-side RPC calls, including
-`POST https://api.peated.com/rpc/bottles/details`, returning HTTP 502. Vercel
-logs for `peated-web-next` confirmed the web
-route logged `Error: Bad Gateway` while the web request itself returned `200`.
-The upstream response headers included Cloudflare and Render headers, including
-`x-render-routing: dynamic-paid-error`, so the next root-cause step was API
-host/log inspection, not further web route debugging.
-
-Render request logs showed a burst of HTTP 502s across many API paths starting
-at `2026-07-08T14:24:17Z`, including `/uploads/*` and
-`/rpc/bottles/details`. API app logs at the same time showed both live instances
-logging an unhandled rejection:
-
-```text
-Error [ERR_STREAM_UNABLE_TO_PIPE]: Cannot pipe to a closed or destroyed stream
-```
-
-The stack pointed at `@google-cloud/storage` while serving `/uploads/*`. The API
-process exits on unhandled rejections, so this kind of upload stream failure can
-restart instances and make unrelated RPC endpoints return Render 502s during the
-restart window. When request logs show 502s across unrelated endpoints, look for
-the earliest app-level process error rather than assuming the route named in the
-browser error is the root cause.
-
-If Render shows a process-level error that does not appear in Sentry, inspect
-the shutdown path. The API must flush Sentry before `process.exit(1)`, otherwise
-captured unhandled rejections can be visible in Render logs but missing from
-Sentry issues.
-
-## Code Follow-Up Checklist
-
-- If a page calls the same server loader from both `generateMetadata()` and the
-  page component, wrap the shared loader in React `cache()` to dedupe identical
-  work during a render request.
-- Keep noncritical server-side data fetches non-fatal when the page can still
-  render useful content without them.
-- Do not swallow required route identity fetches, such as primary bottle or
-  entity details, unless the UI has an explicit degraded state.
-- After a fix, verify with Sentry issue search, trace search, Vercel logs, and
-  a browser or curl request to the production route.
+Follow [Observability](../policies/observability.md) and
+[Data Redaction](../policies/data-redaction.md) when adding diagnostic context.

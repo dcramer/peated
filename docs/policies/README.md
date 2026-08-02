@@ -1,40 +1,46 @@
 # Policies
 
-Policies are short repo-wide defaults.
+Policies are durable repo-wide engineering rules and defaults. They are the
+highest-authority repository documentation below executable configuration and
+must remain consistent with code-enforced constraints.
 
-Use a policy doc when we want to say "this is how we normally do this here"
-without turning it into a full architecture document or feature spec.
+Use a policy when the repository needs to say "this is how we do this here"
+across multiple packages or features.
 
-Good policy topics:
+Do not use policies for:
 
-- code comments and docstrings
-- frontend component ownership
-- background work and retry boundaries
-- runtime boundary schemas and ownership context
-- agent design and automation boundaries
-- testing expectations
-- naming conventions
-- migration hygiene
-- automation safety boundaries
+- one feature's architecture or lifecycle;
+- implementation plans, status, TODOs, or rollout tracking;
+- copied schemas, commands, or test inventories;
+- public product documentation.
+
+Feature architecture and non-obvious invariants belong in the owning package,
+module, or feature documentation. Code, runtime schemas, exported types, and
+tests define the implemented contract. Temporary implementation plans live
+under `../../openspec/changes/` and cannot override policy.
 
 Current policies:
 
 - [agent-design.md](agent-design.md)
 - [background-work.md](background-work.md)
 - [code-comments.md](code-comments.md)
+- [correctness-complexity.md](correctness-complexity.md)
+- [data-redaction.md](data-redaction.md)
+- [error-handling.md](error-handling.md)
+- [evals.md](evals.md)
 - [frontend-components.md](frontend-components.md)
+- [interface-design.md](interface-design.md)
+- [observability.md](observability.md)
 - [runtime-boundaries.md](runtime-boundaries.md)
 - [web-route-layouts.md](web-route-layouts.md)
 
-Backend testing expectations live in
-[../development/backend-testing.md](../development/backend-testing.md). Keep
-that integration-first test style as the source of truth instead of duplicating
-it here.
+Backend and frontend testing expectations live in
+[../development/backend-testing.md](../development/backend-testing.md) and
+[../development/frontend-testing.md](../development/frontend-testing.md). Keep
+those documents as the source of truth instead of duplicating them here.
 
-Keep policy docs small:
-
-- explain the intent briefly
-- state the default rule clearly
-- call out only the meaningful exceptions
+Keep policies short: explain the intent, state the default, and name only
+meaningful exceptions. Update the policy directly when the repo intends to
+change the default; silence elsewhere does not create an exception.
 
 Use [policy-template.md](policy-template.md) for new policies.

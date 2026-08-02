@@ -1,129 +1,52 @@
-# Account Policies: Terms of Service (ToS) and Email Verification
+# Account Access Policy
 
-This doc explains how ToS acceptance and email verification work across the API and web app, what they gate, and where to change behavior.
+This document records the product decisions for Terms of Service acceptance and
+email verification. Middleware, route schemas, and tests define the exact
+implemented coverage.
 
-## Data model
+## Terms Of Service
 
-- `users.termsAcceptedAt: timestamp | null` — set when a user agrees to the Terms of Service. `NULL` means not accepted.
-- `users.verified: boolean` — email address verified state.
+`users.termsAcceptedAt` records acceptance. A null value means the user has not
+accepted the current required terms.
 
-Schema: `apps/server/src/db/schema/users.ts`
+- Email/password and new-passkey registration require explicit acceptance.
+- Google, magic-link, and passkey authentication may establish a session for an
+  existing account that has not accepted the terms.
+- Such an account remains read-only until acceptance. Browsing and account
+  recovery stay available, while user-authored writes are rejected.
+- The authenticated ToS acceptance route records acceptance once; clients do
+  not set `termsAcceptedAt` directly.
+- The web app must show a clear acceptance path when an authenticated user is
+  read-only for this reason.
 
-## API surface
+User-authored write routes use `requireTosAccepted` after authentication. Do not
+maintain a route inventory here: new writes must make the requirement explicit
+at their route boundary, and integration tests should prove the important
+allowed and rejected cases.
 
-- Register: `POST /rpc/auth/register`
+Administrative or recovery operations may use a different boundary when their
+authority and purpose are explicit. Authentication alone never implies ToS
+acceptance.
 
-  - Input includes `tosAccepted: boolean` — required. If false/missing, returns 422.
-  - On success sets `users.termsAcceptedAt = NOW()`.
+## Email Verification
 
-- Login (Google): `POST /rpc/auth/login` (code or idToken)
+`users.verified` records verified-email state.
 
-  - Input accepts optional `tosAccepted: boolean`.
-  - Google OAuth does NOT require ToS acceptance at login time.
-  - If `tosAccepted=true` is provided, sets `termsAcceptedAt`.
-  - Users can sign in/up via Google without accepting ToS (read-only access until accepted).
+Verification is encouraged but is not a universal read or write gate. Operations
+that need stronger account assurance use `requireVerified` explicitly in
+addition to their other authorization middleware. The UI may prompt unverified
+users without presenting verification as a requirement for operations that do
+not enforce it.
 
-- Accept ToS: `POST /rpc/auth/tos/accept`
+## Ownership
 
-  - Auth required. Sets `users.termsAcceptedAt = NOW()` and returns updated user.
+- user fields: `apps/server/src/db/schema/users.ts`
+- authentication middleware: `apps/server/src/orpc/middleware/auth.ts`
+- acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
+- registration and authentication: `apps/server/src/orpc/routes/auth/`
+- web acceptance prompts: `apps/web/src/components/pendingTosAlert.tsx` and the
+  ToS-required authentication page
 
-- Email verification:
-  - `POST /rpc/email/verify` — verifies token from email.
-  - `POST /rpc/email/resend-verification` — resends verification email.
-
-## Server enforcement
-
-### Write operation gating (requireTosAccepted middleware)
-
-All user write operations require ToS acceptance. The `requireTosAccepted` middleware in `apps/server/src/orpc/middleware/auth.ts` returns FORBIDDEN (403) with message "You must accept the Terms of Service to perform this action." if `user.termsAcceptedAt` is null.
-
-**Routes using requireTosAccepted:**
-
-User content operations:
-
-- `tastings/create.ts`, `tastings/update.ts`, `tastings/delete.ts`
-- `tastings/image-update.ts`, `tastings/image-delete.ts`
-- `comments/create.ts`, `comments/delete.ts`
-- `collections/bottles/create.ts`, `collections/bottles/delete.ts`
-- `friends/create.ts`, `friends/delete.ts`
-- `flights/create.ts`, `flights/update.ts`
-- `users/update.ts`
-
-**Exempt from ToS check:**
-
-- All GET/list/details routes (read-only)
-- All `/auth/*` routes
-- Admin-only operations (use requireAdmin instead)
-
-### Adding ToS enforcement to new routes
-
-When creating a new write operation route, add the middleware after `requireAuth`:
-
-```typescript
-import {
-  requireAuth,
-  requireTosAccepted,
-} from "@peated/server/orpc/middleware";
-
-export default procedure.use(requireAuth).use(requireTosAccepted).route({
-  method: "POST",
-  // ...
-});
-```
-
-### Authentication edge enforcement
-
-- Register requires `tosAccepted=true` and sets `termsAcceptedAt`.
-- Google OAuth does NOT require ToS at login (allows nag-based acceptance flow).
-
-## Web behavior and flows
-
-### 1) Email/password registration
-
-1. Register form includes a required checkbox. The client passes `tosAccepted=true`.
-2. Server validates and sets `termsAcceptedAt`.
-3. New users are created with `verified=false` (unless configured to skip) and are redirected to `/verify` (existing flow).
-
-UI code: `apps/web/src/components/registerForm.tsx`, action in `apps/web/src/lib/auth.actions.ts`.
-
-### 2) Google sign in/up
-
-1. User clicks "Sign in with Google" — no ToS checkbox required.
-2. Google OAuth proceeds immediately.
-3. User is logged in but may not have accepted ToS yet.
-4. User has read-only access until they accept ToS via the nag banner.
-
-UI code: `apps/web/src/components/googleLoginButton.tsx`.
-
-### 3) Existing users without ToS (backfill case)
-
-1. User logs in normally.
-2. The `PendingTosAlert` banner prompts acceptance.
-3. User can browse (read-only) but cannot create content until they accept.
-4. Write API calls return 403 until ToS is accepted.
-
-### 4) Banners ("nag")
-
-- `PendingTosAlert`: `apps/web/src/components/pendingTosAlert.tsx`.
-- Added to: `apps/web/src/app/(default)/(activity)/layout.tsx` and settings page.
-- Shows "Accept Now" and "Review Terms" buttons.
-- The existing `PendingVerificationAlert` remains for the email flow.
-
-## User experience summary
-
-- **Email signup**: Requires ToS checkbox (server enforced at registration).
-- **Google OAuth**: No ToS required to sign in. Users get read-only access until they accept via the nag banner.
-- **Read-only until accepted**: Users can browse content but cannot create tastings, comments, collections, etc.
-- **Email verification**: Encouraged but not hard-blocked; banner prompts to verify.
-
-## Limitations and configuration
-
-- ToS link target: UI links use the relative path `/terms` to work in all environments (dev/staging/prod). The in-app static Terms page lives at `apps/web/src/app/(layout-free)/terms/page.tsx` and includes an Effective Date.
-- Tests: default fixtures set `termsAcceptedAt` to avoid breaking unrelated tests. Create targeted tests with `termsAcceptedAt: null` when needed.
-
-## How to test locally
-
-1. Create a user with `termsAcceptedAt = null` (override the fixture default) and log in via Google.
-2. Verify user can browse content but cannot create a tasting (should get 403).
-3. Use the PendingTosAlert banner to accept ToS.
-4. Verify write operations now work.
+When changing this policy, update the owning middleware and representative
+integration tests in the same change. Test fixtures may default to an accepted,
+verified user; policy tests should override those fields explicitly.

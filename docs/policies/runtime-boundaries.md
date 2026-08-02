@@ -12,40 +12,33 @@ TypeScript assumptions.
   that also owns the exported TypeScript type.
 - Parsers at external or durable boundaries should accept `unknown` and return
   parsed output types. Downstream runtime code should receive parsed data.
-- Keep actor, owner, moderator/admin authority, destination, and retry identity
-  explicit at mutation boundaries.
+- Schemas are strict by default. Unknown fields are rejected unless the field is
+  explicitly an opaque extension payload.
+- Keep actor, owner, moderator/admin authority, destination, correlation, and
+  retry identity explicit at mutation boundaries.
 - A caller should only read or mutate records it owns unless cross-owner access
   is the feature being implemented and is checked at the boundary.
+- Missing required context is an error. Do not infer authority or ownership from
+  nearby records, display names, previous requests, or synthetic sentinel
+  values.
+- Validate untrusted provider payloads at ingress. Once Peated signs, persists,
+  or dispatches canonical context, downstream readers should assert that exact
+  context rather than silently normalize or repair it.
+- Retryable and resumable workflows must preserve identity and idempotency
+  context across retries and continuation slices.
 - Keep platform clients and SDK details inside the layer that owns them. Expose
   narrow capability functions such as `queue`, `store`, `dispatch`, or `verify`
   rather than raw clients.
-- AI agent runs should always own an observability conversation id. Prefer a
-  durable entity id with a stable domain prefix; when no durable id exists,
-  generate a run-scoped UUID instead of using names or other fuzzy identifiers.
-- Tests for SDK-owned scope or context behavior should spy on the real SDK
-  surface, such as exported functions, logger methods, scope instances, or
-  prototypes. Do not whole-module mock observability clients such as Sentry;
-  whole-module mocks erase the runtime state the integration is meant to
-  protect.
-- Observability tests should stay minimal: assert the existence of the span,
-  operation, conversation id, and a few critical safe attributes. Do not snapshot
-  broad telemetry payloads or duplicate provider SDK behavior in unit tests.
+- Model and tool inputs must not supply privileged actor, owner, credential, or
+  durable runtime context when the runtime can derive it from authenticated
+  state.
 - Require deterministic idempotency or uniqueness for APIs that create durable
   records from retryable contexts.
 - Validate model or agent output before persistence. Model output may propose;
   code owns permissions, identity, and irreversible state changes.
-- Persist agent proposals separately from server-owned review state. Review
-  state may add a live preview, bounded impact, warnings, a narrow state token,
-  status, reviewer, and execution result; those fields must never be accepted
-  from the model.
-- Prepare proposals independently so a mechanical failure is retained as a
-  blocked review operation without discarding valid siblings.
-- Approval must revalidate the fields and relationships covered by the state
-  token. Relevant drift becomes stale without mutation; unrelated timestamps
-  must not invalidate an operation.
-- Retry only failed operations under the same durable operation id, and
-  reconcile a prior attempt before redispatch. Blocked or stale work requires a
-  new check or manual correction, and a closed parent check is immutable.
+- Any value needed after an async, tool, resume, or delivery boundary must be
+  represented by durable state or a persisted handle before success is
+  reported. In-memory values are caches only.
 
 ## Exceptions
 

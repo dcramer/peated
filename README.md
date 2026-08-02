@@ -10,12 +10,15 @@ A Discord is available if you want to contribute: <https://discord.gg/d7GFPfy88Z
 
 ### Rating Systems
 
-Peated is transitioning to a new simplified rating system:
+Peated uses a three-choice tasting rating:
 
-- **Simple Rating**: Whisky-themed Pass/Sip/Savor system for quick, meaningful ratings
-- **Traditional 5-Star Rating (Deprecated)**: Legacy ratings from 0-5 will remain viewable but are being phased out
+- **Pass**: Would not drink again
+- **Sip**: Enjoyable; would have sometimes
+- **Savor**: Excellent; would seek out
 
-See [Simple Rating System Documentation](./docs/features/simple-rating-system.md) for more details.
+Historical five-star values are retained as migration data, not as a second
+rating choice. See the
+[Rating Systems Architecture](./docs/architecture/rating-systems.md).
 
 ## Dev
 
@@ -26,7 +29,7 @@ Setup the required frameworks:
 
 Bootstrap the environment:
 
-```
+```bash
 docker compose up -d
 pnpm install
 ```
@@ -40,26 +43,26 @@ Note: If you need to tweak default settings, `cp .env.example .env` and go to to
 
 Setup the database:
 
-```
+```bash
 make create-db
-pnpm db migrate
+pnpm db:migrate
 ```
 
 Create a local user to avoid setting up Google credentials:
 
-```
+```bash
 pnpm cli users create you@example.com password -a -v
 ```
 
 Load some mock data:
 
-```
+```bash
 pnpm cli mocks load-all you@example.com
 ```
 
 Run the dev server, which spins up the `web`, API, and worker services:
 
-```
+```bash
 pnpm dev
 ```
 
@@ -67,28 +70,8 @@ The worker requires Redis. The default local Redis URL is
 `redis://@localhost:16379`, matching `docker-compose.yml`. For API-only local
 checks, use `pnpm dev:server:api`.
 
-## Runbooks
+## Operations
 
-### Configure GCP CLI
-
-<https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-access-for-kubectl>
-
-```shell
-# bind default project
-gcloud config set project cask-382601
-
-# configure kubectl
-gcloud container clusters get-credentials default --region=us-central1
-```
-
-### Shell on Pod
-
-```shell
-kubectl exec -it deploy/peated-api -- bash
-```
-
-### Run Arbitrary Command
-
-```shell
-gcloud alpha run jobs execute cli --args bottles,generate-descriptions,3298 --wait
-```
+The web app runs on Vercel and the API and worker run on Render. Use the
+[Production Debugging](./docs/development/production-debugging.md) playbook for
+current hosts, logs, traces, and diagnostic commands.

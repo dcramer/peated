@@ -1,1015 +1,168 @@
-# Photo Tasting Entry
+# Photo-Assisted Bottle Resolution
 
 ## Status
 
-Draft for product and implementation iteration.
-
-Initial rollout should be a new standalone record-tasting experience, not a
-replacement for the existing bottle-scoped tasting flow. Build and vet the new
-photo-first flow at `/addTasting` while keeping the current
-`/bottles/[bottleId]/addTasting` path unchanged.
-
-## Goal
-
-Let a user record a tasting by taking or uploading a bottle photo instead of
-starting with text search. The photo-assisted path should identify the Bottle,
-let the user confirm or correct the match, and then create the same tasting
-record the existing search path creates. Photo identification and its
-pending-photo manual fallback match or create one independently complete
-Bottle. Ideally, a clear label photo should drive the new-Bottle path
-automatically enough that the user reviews fields instead of starting from
-scratch.
-
-The uploaded photo may also become the tasting image. When photo identification
-creates a new Bottle, that creation operation may also promote a suitable photo
-as the Bottle image. Normal tasting creation does not promote catalog images.
-
-## Experience Goals
-
-- Photo lookup should feel fast enough to use while standing at a bar or shelf.
-- The user should see immediate progress after selecting a photo.
-- A slow or uncertain AI result should not block the user from searching
-  manually and finishing the tasting.
-- Tasting save should prioritize persisting the tasting over its best-effort
-  image attachment or post-save verification.
-
-Target latency budgets:
-
-- photo preview appears: under 200 ms after client selection
-- upload starts: immediately after selection
-- processed pending image stored: under 2 seconds for normal mobile photos
-- first useful bottle suggestion: under 5 seconds p50, under 10 seconds p90
-- manual-search fallback available: immediately while identification runs
-- final tasting save after bottle selection: same order as current tasting save
-
-These are product targets, not hard correctness gates. Instrumentation should
-measure each phase separately before optimizing prompts or models.
-
-## Non-Goals
-
-- Do not create tastings directly from model output without user confirmation.
-- Do not replace the existing text search flow.
-- Do not overwrite existing Bottle images silently.
-- Do not treat vision model guesses as canonical identity without classifier
-  review and local candidate search.
-- Do not store abandoned upload blobs permanently.
-- Do not require users to wait for creation-grade evidence when they are only
-  trying to select an existing bottle.
-
-## Product Flow
-
-The new record-tasting flow has two entry paths:
-
-1. Take or upload a bottle photo.
-2. Find a bottle manually, using the existing `/search?tasting` path.
-
-The first screen should make photo capture the primary action while keeping
-manual bottle search immediately available. This is a new experience for
-choosing a bottle before the tasting form, not a modal or minor enhancement
-inside the existing bottle detail page flow.
-
-The photo path should identify which Bottle the tasting belongs to before the
-user reaches the tasting form. The live photo workflow either selects an
-existing Bottle or reviews one independently complete new Bottle proposal:
-
-1. User uploads or takes a photo.
-2. Server stores a pending processed image.
-3. Server extracts label evidence from the image.
-4. Server classifies the bottle reference using the existing bottle classifier.
-5. When an existing-Bottle result also proposes catalog repairs or findings,
-   the server records one idempotent moderator review without exposing that
-   supplemental work in the tasting flow.
-6. UI shows the photo, extracted evidence, and suggested Bottle outcome.
-7. User confirms an existing match, opens full bottle search, chooses another
-   candidate, or reviews the proposed complete Bottle fields.
-8. Server creates any approved new Bottle before tasting save when the
-   confirmed photo-identification result is a creation proposal.
-9. User records tasting notes, rating, tags, serving style, flight, and friends.
-10. Server creates the tasting and attempts to attach the pending image if
-    selected.
-
-Low-confidence photo identification should fall back to seeded full search
-rather than forcing a create or match decision.
-
-Manual search from this page should reuse the existing `/search?tasting`
-experience instead of embedding a narrower local search. That route already
-handles selecting existing bottles and starting the add-bottle path when no
-match exists. The user should be able to finish a tasting without taking a
-photo. A failed photo lookup should keep a local preview visible on `/addTasting`
-with actions to start over or open full bottle search.
-
-## User Experience
-
-The photo path should feel like a faster way to pick the bottle for a tasting,
-not like a separate moderation workflow.
-
-### Entry Point
-
-Expose the new experience at `/addTasting` and route general record-tasting
-entry points there. Keep existing bottle-scoped deep links that already know the
-target Bottle on `/bottles/[bottleId]/addTasting`.
-
-On the new page, show a photo-first choice with manual search as the explicit
-fallback:
-
-- A large camera/upload target for photo lookup as the primary action.
-- A secondary search callout that opens `/search?tasting` for users who want to
-  find or add a bottle manually.
-- Recent or suggested bottles can remain below the search path if they already
-  exist in the current UI.
-
-The camera action should work well on mobile and desktop:
-
-- mobile: prefer camera capture with upload fallback
-- desktop: prefer file picker with drag-and-drop support if practical
-
-### Identification Progress
-
-After a photo is selected, show the image immediately and keep the user on the
-same task. On mobile, the progress state should feel like a centered loading
-screen with the selected image as a thumbnail, a spinner, and short
-whisky-themed loading messages. On desktop, keep the progress state in the
-normal page flow with a larger selected-image preview and a subtle animated
-loading phrase instead of a standalone spinner. Avoid numbered step indicators
-or implementation-specific phase names.
-
-If identification takes longer than expected, keep the uploaded photo visible
-and let the user switch to manual search without losing the pending image.
-
-The UI should not wait for all enrichment before showing a usable candidate. If
-fast extraction and local search produce a strong match, show it while slower web
-evidence or secondary extraction continues only when needed for creation or
-review.
-
-### Review Result
-
-When identification succeeds, show a compact confirmation view:
-
-- uploaded photo preview
-- proposed Bottle
-- confidence or review state in plain language
-- extracted key facts, such as brand, expression, age, vintage, ABV, and edition
-- a clear primary action to continue with the proposed Bottle
-- secondary actions to search bottles or start over
-
-The UI should distinguish these photo-identification outcomes:
-
-- matched existing concrete Bottle
-- proposed independently complete new Bottle
-- uncertain result requiring manual search
-
-The photo classifier and pending-photo manual fallback always identify a Bottle,
-never a BottleGroup. Leaving the photo flow for manual Bottle search does not
-preserve the pending image.
-
-When the result proposes creation, the UI should show the proposed canonical
-name and important fields before the user continues. A strong photo result
-should prefill as much of the new Bottle proposal as possible, including
-brand, series, expression, category, age, ABV, vintage, release year, edition,
-and cask details when visible. The user should not need to understand classifier
-internals, but they should be able to spot obvious errors such as the wrong age
-statement or brand.
-
-### Low Confidence And Multiple Candidates
-
-If the classifier is uncertain, show seeded search results instead of a hard
-failure:
-
-- seed `/search?tasting` with extracted search text when available
-- make full bottle search the primary next step
-- keep the uploaded photo visible on the result screen until the user starts
-  over or leaves for full search
-
-If the photo appears to contain multiple bottles, do not auto-select a result.
-Ask the user to choose from candidates or retake the photo.
-
-### Expired Or Failed Photo State
-
-If the pending image expires while the user is still editing, keep the selected
-bottle and tasting fields intact. The UI should explain that the photo expired
-and offer to re-upload before save.
-
-If the identification request fails, keep the local preview while the page is
-open and offer full bottle search plus start over. The user should not have to
-restart the tasting entry flow just to try another photo.
-
-### Tasting Form
-
-After the user confirms, manually selects, or approves creation of a Bottle,
-continue to the normal tasting form with that Bottle fixed at the top. The
-uploaded photo should appear in the normal tasting picture field as the default
-selected image, as if the user had already chosen it in that field.
-
-Be careful implementing this default image behavior. The photo picker should not
-be a second, independent attachment system that can drift from the form state.
-Prefer representing the pending upload as the initial value for the existing
-picture control, while preserving the user's ability to replace it, remove it,
-or save without a picture. Saving the tasting should attach the image only if the
-picture field still references the pending upload at submit time.
-
-The tasting form does not expose catalog-image promotion. Promotion is owned by
-photo-identification creation when that operation creates a new Bottle and the
-photo is suitable; adding such a choice to normal tasting save is deferred
-rather than part of the current contract.
-
-For the first standalone version, the form may reuse the existing tasting form
-component if it can support a bottle chosen inside the page. Avoid changing the
-legacy bottle-scoped form contract unless the change is backwards-compatible for
-the existing route.
-
-### Save Result
-
-Saving should prioritize the tasting record. Pending-image attachment is a
-best-effort side effect after the tasting commits. An attachment failure is
-logged and leaves the successfully created tasting without that image; surfaced
-retry or partial-success UI is deferred.
-
-- tasting saved
-- image attachment failed
-
-The user should not lose notes, rating, or selected bottle because image handling
-failed.
-
-### Accessibility
-
-The photo path should remain usable without camera access:
-
-- file upload must be available anywhere camera capture is available
-- manual search must remain available before, during, and after photo lookup
-- progress and error states should be text-readable, not only spinner-based
-- extracted fields and proposed matches should be readable by screen readers
-- image attachment, removal, and replacement should use standard form controls
-
-## Storage Model
-
-Use the existing Peated upload bucket and serving path, with a reusable pending
-upload prefix.
-
-Recommended object layout:
-
-- `pending-uploads/<id>.webp`
-- `tastings/<id>.webp`
-- `bottles/<id>.webp`
-
-The retained `bottle-releases/<id>.webp` namespace is staged migration
-compatibility only. The live photo workflow does not write it.
-
-In local development, the same namespaces map into `UPLOAD_PATH`.
-
-Using one bucket keeps credentials, serving, CORS, and local behavior aligned
-with existing uploads. A separate temporary bucket is only worth adding if GCS
-lifecycle policy, access policy, or cost controls cannot be expressed cleanly by
-prefix.
-
-### Pending Upload Records
-
-Add a durable reusable pending upload record instead of passing opaque URLs
-through the client:
-
-```ts
-pendingUploads {
-  id: string;
-  createdById: number;
-  imageUrl: string;
-  namespace: "pending-uploads";
-  kind: "image";
-  purpose:
-    | "photo_tasting_entry"
-    | "tasting_image"
-    | "bottle_image"
-    | "bottle_release_image" // staged migration compatibility only
-    | "badge_image"
-    | "avatar";
-  status: "pending" | "attached" | "expired";
-  idempotencyKey?: string | null;
-  createdAt: Date;
-  expiresAt: Date;
-  attachedToType?: string | null;
-  attachedToId?: number | null;
-  objectDeletedAt?: Date | null;
-}
-```
-
-The pending upload record is the authorization boundary. Only the owner, or an
-admin path that explicitly supports it, can use a pending upload.
-
-### TTL And Promotion
-
-Use a short lifecycle TTL for the `pending-uploads/` prefix, for example 24 to
-72 hours.
-Promotion should copy the object from the pending upload namespace into the
-permanent destination namespace and update the destination row to point at the
-permanent URL.
-
-Do not rely on "removing TTL" from a pending object. Prefix lifecycle rules are
-bucket policy, not durable application state. Copying to a permanent namespace
-keeps the state simple:
-
-- pending object can expire at any time after the TTL
-- permanent object is not under the pending lifecycle rule
-- database rows never point at TTL-managed objects after final save
-
-After successful copy, mark the pending upload `attached` but keep the pending
-source object usable until `expiresAt`. The same owned, unexpired pending image
-can be copied to more than one permanent destination, such as a Library entry
-and a tasting. Cleanup deletes attached pending source objects only after they
-expire; correctness must not depend on that job succeeding.
-
-### GCS Lifecycle Configuration
-
-Production requires a GCS lifecycle rule on the existing Peated upload bucket
-that deletes only objects under the pending prefix.
-
-Required behavior:
-
-- bucket: existing configured `GCS_BUCKET_NAME`
-- prefix: `${GCS_BUCKET_PATH}/pending-uploads/` when `GCS_BUCKET_PATH` is set,
-  otherwise `pending-uploads/`
-- action: delete
-- age: chosen pending upload TTL, for example 2 or 3 days
-
-The lifecycle rule must not match permanent prefixes such as `tastings/`,
-`bottles/`, `badges/`, or `avatars/`. Until destructive legacy-storage cleanup,
-it must also exclude the retained `bottle-releases/` prefix.
-
-This is an operational setup step outside the application migration. The app
-should still store `expiresAt` and run cleanup jobs so the database reflects
-pending upload state, but GCS lifecycle is the safety net that removes abandoned
-objects even if workers are delayed.
-
-### Privacy And Metadata
-
-Server-side processing should strip EXIF and other embedded metadata before
-storing pending or permanent images. The image used for OCR or vision should be
-the same processed image, or an equivalently metadata-stripped derivative.
-
-Do not store original camera uploads unless a future debugging feature
-explicitly requires it and has a separate retention policy. User photos can
-contain location metadata, faces, bar backgrounds, receipts, or other incidental
-personal information.
-
-## API Shape
-
-### Identify Bottle From Photo
-
-`POST /tastings/photo-identification`
-
-Input:
-
-```ts
-{
-  file: Blob;
-  idempotencyKey: string;
-}
-```
-
-Output:
-
-```ts
-type PhotoIdentificationCandidate = {
-  // Display-only classifier evidence; the confirmed decision owns identity.
-  fullName: string;
-};
-
-type PhotoIdentificationDecision =
-  | {
-      action: "match";
-      matchedBottle: Bottle;
-    }
-  | {
-      action: "create_bottle";
-      proposedBottle: {
-        name: string;
-        category: string | null;
-        // Exact marketed traits belong directly to this Bottle.
-        edition: string | null;
-        statedAge: number | null;
-        abv: number | null;
-        caskStrength: boolean | null;
-        singleCask: boolean | null;
-        caskType: string | null;
-        caskSize: string | null;
-        caskFill: string | null;
-        vintageYear: number | null;
-        releaseYear: number | null;
-        brand: { id: number | null; name: string };
-        distillers: Array<{ id: number | null; name: string }>;
-      };
-    }
-  | {
-      action: "repair_bottle" | "no_match";
-    };
-
-{
-  pendingImage: {
-    id: string;
-    imageUrl: string;
-    expiresAt: string;
-  };
-  imageEvidence: ImageBottleEvidence;
-  classification:
-    | {
-        status: "ignored";
-        reason: string;
-        artifacts: {
-          candidates: PhotoIdentificationCandidate[];
-        };
-      }
-    | {
-        status: "classified";
-        decision: PhotoIdentificationDecision;
-        artifacts: {
-          candidates: PhotoIdentificationCandidate[];
-        };
-      };
-  suggestedNextStep:
-    | "confirm_match"
-    | "confirm_create"
-    | "manual_search"
-    | "needs_review";
-  diagnostics: PhotoIdentificationDiagnostics;
-  createToken: string | null;
-}
-```
-
-This route intentionally has no permanent side effects beyond creating the
-pending upload record. The public response should return bounded
-photo-identification data. Auto-approved create proposals also return a signed
-create token that carries the reviewed classifier decision needed to create the
-target without rerunning photo extraction or classification.
-
-The route should support idempotency for client retries. If the same user retries
-with the same `idempotencyKey`, return the existing pending upload and current
-identification state instead of creating duplicate pending objects.
-
-If extraction or classification fails or times out, the route should fail the
-photo-identification request. The client keeps the local preview visible and
-lets the user continue by manually searching for the bottle.
-
-### Create Bottle From Photo Identification
-
-`POST /tastings/photo-identification-create`
-
-Input:
-
-```ts
-{
-  createToken: string;
-}
-```
-
-The identify response returns `createToken` only for auto-approved create
-proposals. The token signs the pending upload id, create decision, reviewed
-candidate bottle ids, and photo suitability so creation can persist the reviewed
-result without rerunning photo extraction or classification.
-
-Every accepted `create_bottle` decision describes one independently complete
-marketed Bottle and creates or safely reuses that Bottle in a singleton group.
-Photo classification never chooses a BottleGroup. The response returns that
-Bottle directly; no live workflow creates a BottleRelease or reconstructs a
-Bottle/Release pair in the browser.
-
-When the pending scan is suitable as a catalog image and a new Bottle was
-created, creation promotes it to that Bottle. Unsuitable photos and safe reuse
-still return the Bottle without writing a public catalog image.
-
-If the reviewed Bottle proposal collides with an existing bottle or canonical
-alias, the create route returns `409 CONFLICT` with the conflicting bottle id in
-`data.bottle`.
-
-### Create Tasting With Selected Picture
-
-Tasting creation receives the confirmed Bottle's single `bottleId`; the browser
-does not independently submit BottleGroup or BottleRelease identity. The form
-keeps that Bottle fixed.
-
-When the user confirms a photo result, the client seeds the normal tasting
-`Picture` field with the pending upload. If the user leaves that field selected,
-the tasting create request attaches the pending image. If the user removes or
-replaces the picture field value, submit that current field state instead.
-
-The Bottle-native request may carry the owned pending upload id:
-
-```ts
-{
-  bottle: number;
-  pendingImageId?: string;
-}
-```
-
-- create the tasting through the existing deterministic path
-- validate the pending image's ownership, purpose, and expiry before creating
-  the tasting
-- after the tasting commits, copy the selected pending picture into the tasting
-  namespace and persist its image URL
-- log a copy failure without rolling back the tasting; the response remains the
-  normal tasting-create response and carries no partial-success metadata
-- upload a replacement through the existing image update path after creation
-- avoid re-running image identification during final tasting save
-
-Future `photoIdentificationId` support may link the user-confirmed choice back
-to the extraction and classifier trace for audit, eval sampling, and debugging.
-It should not be required for manual search flows that only reuse a local
-picture field value.
-
-## Image Evidence Contract
-
-The image extraction layer should produce evidence, not a final bottle decision.
-
-```ts
-type ImageBottleEvidence = {
-  sourceImageId: string;
-  sourceImageHash?: string;
-  extractors: Array<{
-    kind: "ocr" | "vision";
-    model?: string;
-    confidence: number;
-    textSpans: Array<{
-      text: string;
-      confidence: number;
-      region?: { x: number; y: number; width: number; height: number };
-    }>;
-    observations: string[];
-  }>;
-  fieldCandidates: {
-    brand?: EvidenceField<string>;
-    expression?: EvidenceField<string>;
-    series?: EvidenceField<string>;
-    distillery?: EvidenceField<string>;
-    bottler?: EvidenceField<string>;
-    category?: EvidenceField<Category>;
-    statedAge?: EvidenceField<number>;
-    abv?: EvidenceField<number>;
-    vintageYear?: EvidenceField<number>;
-    releaseYear?: EvidenceField<number>;
-    edition?: EvidenceField<string>;
-    caskType?: EvidenceField<string>;
-    caskNumber?: EvidenceField<string>;
-    caskStrength?: EvidenceField<boolean>;
-    singleCask?: EvidenceField<boolean>;
-  };
-  photoSuitability: {
-    isSingleBottlePhoto: boolean;
-    labelReadable: boolean;
-    suitableAsTastingImage: boolean;
-    suitableAsBottleImage: boolean;
-    reason?: string;
-  };
-  conflicts: Array<{
-    field: string;
-    values: unknown[];
-    reason: string;
-  }>;
-};
-```
-
-The bottle classifier should receive the extracted identity and image evidence
-as reference context, then run local candidate search and existing decision
-policy. Vision or OCR output must not bypass candidate retrieval.
-
-Extraction output should be persisted in a compact trace record with references
-to the pending image and classifier run. Avoid storing full prompt payloads or
-large duplicate image data in normal database rows.
-
-## OCR And Vision Strategy
-
-Initial implementation should support a single extractor interface and allow
-both OCR and vision model backends.
-
-For early eval collection, run both when feasible and record their outputs. Once
-we understand real accuracy and cost, production can route:
-
-- OCR-only when the label is clear and identity-critical fields are extracted.
-- Vision fallback when OCR misses brand, expression, age, year, or cask details.
-- Vision-only when OCR cannot produce useful text but the image appears
-  label-like.
-
-The route should expose progress or loading states because the user intentionally
-waits for an external AI result in this flow.
-
-### Speed Strategy
-
-Optimize for a useful confirmed bottle quickly, not maximum enrichment before
-the user sees anything.
-
-Recommended runtime shape:
-
-1. Client creates a local preview immediately.
-2. Client uploads a resized image capped to a practical edge length before
-   server processing.
-3. Server stores the processed pending image with existing non-resumable small
-   upload behavior.
-4. Server runs the fastest viable extraction path first.
-5. Server searches local bottles as soon as it has brand/name-like text.
-6. Server returns a strong local match without waiting for web evidence when
-   creation or repair is not needed.
-7. Server only uses slower vision, web search, or creation evidence when the
-   fast path cannot produce a safe match.
-
-The user should always be able to fall back to manual search while the
-identification request is still running.
-
-Do not add extra storage handshakes or queue round trips to the blocking path
-unless they are needed for correctness. Background jobs can enrich traces,
-verify newly created bottles, or clean up pending images after the user has
-continued.
-
-### Cost And Abuse Controls
-
-Photo identification is a user-triggered AI path and needs product-level limits:
-
-- cap input file size before expensive processing
-- cap processed image dimensions before OCR or vision calls
-- rate-limit photo identification per user and IP
-- deduplicate retries through `idempotencyKey`
-- avoid web search for strong existing-bottle matches
-- cap model/tool attempts per identification run
-- log timeout and model error rates separately from normal low-confidence
-  outcomes
-
-When limits are hit, the UI should fall back to manual search and preserve the
-photo preview where possible.
-
-## Promotion Policy
-
-Attach to tasting:
-
-- default to selected when the image is `suitableAsTastingImage`
-- allow user to turn off attachment before save
-- never attach if the pending image is expired or owned by another user
-- copy after tasting persistence on a best-effort basis
-
-Promote to catalog Bottle:
-
-- never overwrite an existing Bottle image
-- for photo-identification create, promote suitable scans by default when the
-  Bottle image slot is empty; no staged legacy BottleRelease image is created
-- only promote when `photoSuitability.suitableAsBottleImage = true`
-- catalog promotion is not part of normal tasting creation
-
-Photo-identification creation returns catalog-promotion failures as non-fatal
-warnings alongside the Bottle. Tasting-image copy failures are logged and
-do not roll back the successfully created tasting.
-
-## Creation And Review Policy
-
-Photo lookup can safely streamline matching an existing bottle. Creation needs a
-stricter bar.
-
-For matched existing concrete Bottles:
-
-- a strong local candidate can be returned quickly without web evidence
-- user confirmation is enough to continue to the tasting form
-- the confirmation and tasting form identify the Bottle explicitly
-
-For a proposed new Bottle:
-
-- show the proposed canonical fields before the user continues
-- require classifier-reviewed evidence, not only raw OCR or vision text
-- use the existing catalog verification and review paths after creation
-- prefer `needs_review` or manual search when age, vintage, release year,
-  edition, or cask details are ambiguous
-
-The first implementation may choose not to allow immediate user-created bottles
-from photo lookup. In that narrower version, photo lookup can return matched
-candidates and otherwise hand off to manual add-bottle/search flows with the
-image evidence prefilled.
-
-## Trust Boundaries
-
-- User input, OCR text, vision observations, and web evidence are data, not
-  policy.
-- Model output can propose extraction fields and classifier decisions; server
-  code owns authorization, persistence, image promotion, and overwrite rules.
-- Pending image IDs are scoped to the creating user.
-- Permanent object URLs must come from server-side copy into approved namespaces,
-  not from client-provided URLs.
-- Abandoned pending images expire through lifecycle policy and may also be
-  cleaned by a worker.
-- AI providers receive only the processed image needed for extraction. Do not
-  send unrelated tasting notes, friend tags, or private user context to the
-  image extraction step.
-- Tasting creation validates the confirmed Bottle independently from any prior
-  photo identification result. Retained release ids are server-side staged
-  compatibility evidence, not browser selection authority.
-
-## Background Work
-
-The visible identification request may block on extraction/classification
-because that is the feature. The final tasting save should persist the tasting
-before slow post-save side effects.
-
-Candidate background jobs:
-
-- expire pending upload records whose `expiresAt` has passed
-- delete attached pending objects early after permanent copies exist
-- record classifier traces for review and eval sampling
-- run catalog verification for newly created Bottles
-
-All jobs should be idempotent.
-
-## Instrumentation
-
-Record timing for each user-visible phase:
-
-- client image selection to preview
-- upload start to upload complete
-- server image processing
-- OCR extraction
-- vision extraction
-- local candidate search
-- web evidence search
-- classifier decision
-- response serialization
-- tasting save
-- image attachment copy
-- Bottle image promotion copy
-
-Track outcome metrics alongside timing:
-
-- strong match returned from fast path
-- manual-search fallback used
-- user accepted suggestion
-- user changed bottle after suggestion
-- user abandoned after upload
-- user abandoned after result
-- identification timed out
-- identification hit rate limit
-- image attachment failed after tasting save
-- catalog image promotion warned after photo-identification create
-
-The first implementation should log enough phase timings to decide whether OCR,
-vision, upload processing, local search, or web evidence is the real latency
-bottleneck.
-
-## Evals
-
-Add eval slices before tuning prompts or routing:
-
-- clear single front label
-- angled label
-- blurry label
-- back label only
-- box or tube photo
-- shelf photo with multiple bottles
-- label with age statement
-- label with vintage and release year
-- independent bottler label
-- label with store typo such as `Sin Malt`
-- no useful bottle label
-
-Measure:
-
-- field extraction accuracy
-- candidate retrieval quality
-- final classifier action accuracy
-- false match rate
-- false create rate
-- abstain/manual-search rate
-- image suitability accuracy
-- image promotion correctness
-- latency and model cost
-- expired pending image behavior
-- retry/idempotency behavior
-- rate-limit and timeout fallback behavior
-
-Latency evals should include realistic mobile photo sizes and poor network
-simulation. A flow that is accurate but routinely takes long enough for users to
-abandon is not successful.
-
-## Implementation Plan
-
-This should ship in small vertical slices. Each slice should leave the existing
-search-based tasting flow working and should have integration tests at the API
-boundary. Classifier and extraction tests should stay isolated in the classifier
-package so they can run without the server database.
-
-### Phase 1: Pending Upload Storage
-
-Add the durable storage foundation without AI or classifier behavior.
-
-Scope:
-
-- add `pendingUploads` schema and migration
-- add serializer and route schema
-- add upload helper support for the `pending-uploads/` namespace
-- add server-side image processing that strips metadata
-- add helper to copy pending uploads into permanent namespaces
-- add cleanup job for expired pending upload records and objects
-
-API tests:
-
-- uploading a pending image creates an owned pending upload record
-- unauthenticated users cannot upload
-- users cannot read or attach another user's pending image
-- expired pending images cannot be attached
-- copied permanent image URLs do not point at the `pending-uploads/` namespace
-- cleanup job is idempotent
-
-This phase should not call OCR, vision, or the bottle classifier.
-
-### Phase 2: Image Evidence Contract
-
-Add the classifier-facing image evidence type in isolation.
-
-Scope:
-
-- define `ImageBottleEvidence` and related schemas in
-  `packages/bottle-classifier`
-- add extractor adapter interfaces for OCR and vision outputs
-- add deterministic validation for field candidates, conflicts, and
-  photo-suitability
-- add fixture helpers for image evidence without server dependencies
-
-Classifier/package tests:
-
-- image evidence schema accepts representative OCR and vision outputs
-- invalid confidence, malformed regions, or impossible field values are rejected
-- evidence can seed existing classifier input without database or API access
-- local catalog classifier evals can consume image-seeded extracted identity
-
-This phase should be testable entirely inside `packages/bottle-classifier`.
-
-### Phase 3: Photo Identification API
-
-Add the user-visible identification route, still without final tasting changes.
-
-Scope:
-
-- add `POST /tastings/photo-identification`
-- store a pending processed image
-- run extraction through the server whisky label extractor
-- call the bottle classifier with extracted identity and image evidence
-- return pending image, evidence summary, classification, and suggested next step
-- support idempotency keys
-- enforce file size, processed image size, and rate limits
-
-API integration tests:
-
-- valid photo-identification request returns pending image and classifier result
-- idempotent retry returns the same pending image/result state
-- oversized upload fails before model calls
-- extraction or classifier failure rejects the photo-identification request
-- rate-limited request fails cleanly
-- route does not create Bottles or tastings
-
-Classifier calls in route tests should use a test adapter/fake at the server
-boundary. The classifier's own behavior remains covered by package evals and
-classifier tests.
-
-### Phase 4: Tasting Create With Pending Image
-
-The normal tasting creation path consumes pending images without owning catalog
-image promotion.
-
-Scope:
-
-- accept optional `pendingImageId` in the normal tasting create schema
-- validate that it is an unexpired, user-owned `photo_tasting_entry` upload
-  before creating the tasting
-- after tasting persistence, copy the pending image into the tasting namespace
-  and update the tasting image URL
-- treat copy failure as best-effort: log it, preserve the tasting, and return the
-  normal tasting-create response
-- defer photo-identification trace linkage and surfaced attachment retry state
-- keep catalog-image promotion solely in photo-identification create
-
-API integration tests:
-
-- creates tasting with attached pending image
-- creates tasting without attaching pending image
-- rejects pending images owned by another user
-- rejects expired pending images while preserving normal tasting validation
-- preserves the tasting without an image when the post-commit copy fails
-- does not mutate the selected Bottle image
-- does not re-run extraction or classifier during tasting save
-
-This phase should continue using real route/database integration tests rather
-than mocks for persistence behavior.
-
-### Phase 5: UI Photo Entry Path
-
-Build the frontend flow after the API contract is stable.
-
-Scope:
-
-- add camera/upload action next to bottle search in add tasting
-- show immediate local preview
-- show identification progress states
-- show confirmation state for match, create proposal, or manual-search fallback
-- seed the uploaded photo into the normal tasting picture field
-- allow the user to remove or replace that picture field value
-- leave surfaced attachment retry or partial-success messaging deferred until
-  the tasting-create response owns such a contract
-
-UI verification:
-
-- mobile camera/upload path
-- desktop upload path
-- slow identification with manual fallback
-- low-confidence result
-- successful existing-bottle match
-- uploaded photo appears in the tasting picture field by default
-- text does not overflow compact mobile controls
-
-Browser verification should use the local UI verification playbook when auth or
-moderator state is needed.
-
-### Phase 6: Creation Path
-
-Only add photo-driven creation after existing-bottle matching works well.
-
-Scope:
-
-- decide whether v1 permits immediate create from photo lookup
-- if enabled, route the single `create_bottle` classifier action through
-  canonical independent Bottle creation and return that Bottle directly in its
-  new singleton group
-- show canonical fields before confirmation
-- queue catalog verification after creation
-- promote only to the concrete Bottle image, and only after the Bottle is
-  durable
-
-Tests:
-
-- proposed new bottle requires reviewed classifier evidence
-- `create_bottle` carries all fields needed for one independently complete
-  concrete Bottle and never requires trusted parent or group context
-- ambiguous age/year/cask fields downgrade to manual review or manual search
-- the created concrete Bottle can receive the promoted image only when policy
-  allows
-
-This phase should be gated by eval results from real photo fixtures.
-
-## Testing Strategy
-
-Use two separate test layers.
-
-### Server Integration Tests
-
-Server tests should exercise real routes, schemas, database writes, ownership,
-and storage helper behavior. They should follow the existing backend testing
-policy and avoid replacing durable behavior with broad mocks.
-
-Use focused route tests for:
-
-- pending image upload
-- photo identification API boundary
-- tasting create with pending image
-- cleanup job
-- photo-identification-create catalog promotion and warning behavior
-- best-effort tasting-image copy failure
-
-Where external systems would make tests slow or flaky, isolate them at a narrow
-adapter boundary:
-
-- fake OCR/vision extractor result
-- fake classifier result
-- fake storage copy failure
-
-Do not mock the tasting create transaction, ownership checks, or expiration
-checks. Exercise catalog-image promotion separately through
-photo-identification create.
-
-### Classifier And Extraction Tests
-
-Classifier tests should stay in `packages/bottle-classifier` and should not
-depend on the server database, GCS, or production APIs.
-
-Use:
-
-- schema tests for `ImageBottleEvidence`
-- extractor-output normalization tests
-- local catalog data-source fixtures for existing Peated state
-- eval fixtures for image-derived bottle identity decisions
-- recorded model/search outputs only when intentionally updating eval evidence
-
-These tests should prove that image evidence improves or safely abstains from
-bottle identification without changing server inputs merely to make evals pass.
-
-### Rollout Gates
-
-Do not broaden the feature until each gate is satisfied:
-
-1. Pending image storage works with auth, TTL, metadata stripping, and cleanup.
-2. Photo identification can return useful existing-bottle matches without
-   creating durable bottle/tasting state.
-3. Tasting create can attach pending images with deterministic ownership and
-   expiry checks.
-4. UI can complete a tasting through manual fallback when identification is slow
-   or uncertain.
-5. Existing-bottle photo evals are stable enough to measure false matches and
-   user correction rate.
-6. Photo-driven creation is enabled only after evals show acceptable quality and
-   review policy is clear.
-
-## Open Questions
-
-- Should users be able to save an unidentified tasting draft, or should manual
-  search remain required before saving?
-- What TTL is appropriate for pending images in production?
-- Should the first shipped version allow photo-driven bottle creation, or only
-  existing-bottle matching plus manual add-bottle fallback?
-- What per-user and anonymous/IP rate limits should apply to photo
-  identification?
-- How much extraction/classifier trace data should be visible to moderators?
+This document describes the current photo-assisted Bottle resolution contract.
+Code, runtime schemas, and tests remain authoritative for exact request and
+response shapes.
+
+`/addTasting` redirects to `/addBottle?intent=tasting`. The Add Bottle flow owns
+photo resolution, manual search, Bottle creation, Library continuation, and the
+tasting continuation so the same pending image can follow the user's selected
+action.
+
+## User Flow
+
+1. The user takes or uploads one Bottle photo, or chooses manual search.
+2. The browser shows a local preview immediately and sends the photo to
+   `POST /tastings/photo-identification` with an idempotency key.
+3. The server processes the image, creates an owned pending upload, extracts
+   label evidence, searches the local catalog, and runs the Bottle classifier.
+4. The resolver presents one of three outcomes:
+   - a concrete existing Bottle match;
+   - an approved proposal for one new, independently complete Bottle; or
+   - manual search when the evidence is insufficient or conflicting.
+5. After resolving a Bottle, the user may log a tasting, add it to their
+   Library, view it, search again, or start over.
+6. The tasting continuation loads the normal tasting form with the selected
+   Bottle fixed and the pending photo preselected as its picture.
+
+The flow never creates a tasting directly from model output. The user chooses
+the Bottle and action before any tasting is saved.
+
+## Experience Contract
+
+- Photo upload is an accelerator, not a requirement. Manual Bottle search is
+  available from the initial, failure, and result states.
+- Keep the local preview visible while identification runs and when it fails.
+- Progress and error states must be readable without relying on animation,
+  color, or camera access.
+- A failed or uncertain identification must preserve a path to search or retry.
+- Multiple-Bottle or ambiguous evidence must not silently select a Bottle.
+- The user may remove or replace the pending image before tasting save.
+- General record-tasting entry uses the shared Add Bottle resolver. Existing
+  Bottle-scoped tasting links may continue directly with their known Bottle.
+
+## Identity And Classification
+
+The [Whisky Identity Model](../architecture/whisky-identity-model.md) governs
+every result. Photo resolution identifies one concrete Bottle, never a
+BottleGroup or a legacy Bottle/BottleRelease pair.
+
+Image extraction produces evidence rather than catalog authority. OCR, vision,
+source text, local candidates, and web results are untrusted observations. The
+Bottle classifier may propose a match or creation, while server code owns:
+
+- authentication and authorization;
+- pending-upload ownership and expiry;
+- schema validation and idempotency;
+- durable Bottle and tasting creation;
+- conflict handling and image promotion; and
+- automation and review thresholds.
+
+Existing-Bottle matches may use strong local evidence without web research.
+Creation requires the classifier's complete `create_bottle` proposal and the
+approved automation tier. Otherwise the flow falls back to search or manual
+creation.
+
+## Pending Images
+
+Pending images are durable, owned records rather than client-supplied URLs.
+Their current lifecycle is:
+
+- the server resizes and processes the upload before storage;
+- the default expiry is 48 hours;
+- ownership, purpose, status, deletion state, and expiry are checked before
+  every permanent copy;
+- an idempotency key is unique per user and purpose;
+- a usable source may be copied to more than one supported destination;
+- copying marks the source attached but does not consume it; and
+- cleanup expires and eventually deletes the temporary source while permanent
+  copies remain in their destination namespaces.
+
+The pending record is the authorization boundary. Clients pass its id, never an
+arbitrary permanent object URL. Permanent images are server-side copies in the
+owning namespace, including `tastings/`, `collection-bottles/`, or `bottles/`.
+
+Image processing must strip embedded metadata before storage or model use. Do
+not retain original camera uploads or send unrelated tasting, friend, or user
+context to the extraction provider.
+
+## API Boundaries
+
+### Identify From Photo
+
+`POST /tastings/photo-identification`:
+
+- requires an authenticated user who has accepted the Terms of Service;
+- rejects oversized files before model work;
+- creates a `photo_tasting_entry` pending upload;
+- returns bounded image evidence, classifier output, diagnostics, a suggested
+  next step, and the pending image reference; and
+- returns a signed creation token only for an auto-approved creation decision.
+
+The route's only durable product side effect is the pending upload and its
+diagnostic trace. It does not create a Bottle or tasting.
+
+### Create Approved Bottle
+
+`POST /tastings/photo-identification-create`:
+
+- requires a verified authenticated user who has accepted the Terms of Service;
+- verifies the signed token, user, pending upload, and automation decision;
+- creates or safely reuses one independently complete Bottle;
+- returns `409 CONFLICT` when canonical duplicate protection finds a competing
+  Bottle; and
+- promotes a suitable photo only when a new Bottle was created and its catalog
+  image slot is still empty.
+
+Catalog-image copy failure is a non-fatal warning after Bottle creation. The
+route does not rerun extraction or classification.
+
+### Create Tasting
+
+Normal tasting creation accepts an optional owned `pendingImageId` alongside
+the selected `bottle` id.
+
+The server validates the pending image before the tasting transaction. After
+the tasting commits, it copies the image and updates the tasting. Copy failure
+is logged and does not roll back the tasting. A replacement image uses the
+normal tasting image-update path after creation.
+
+This ordering is intentional: saved tasting content is more important than a
+best-effort attachment.
+
+## Failures And Recovery
+
+- Extraction or classification failure returns an identification error; the UI
+  keeps the local preview and offers search or retry.
+- Low-confidence, review-only, and `no_match` outcomes route to manual search or
+  manual creation rather than forcing a semantic decision.
+- An expired or foreign pending image is rejected before durable creation.
+- Catalog-image promotion never overwrites an existing Bottle image.
+- Post-commit tasting-image failure leaves a valid tasting and produces an
+  operator-visible error plus user-facing partial-success messaging where the
+  UI owns it.
+
+## Verification And Ownership
+
+Use the repository's [backend testing](../development/backend-testing.md),
+[frontend testing](../development/frontend-testing.md), and
+[local UI verification](../development/local-ui-verification.md) guidance.
+Model-sensitive behavior belongs in classifier evals; deterministic ownership,
+expiry, schema, conflict, and persistence behavior belongs in integration
+tests.
+
+Primary owners:
+
+- UI resolver: `apps/web/src/components/bottleResolver/`
+- shared continuation: `apps/web/src/app/(layout-free)/addBottle/`
+- identification routes: `apps/server/src/orpc/routes/tastings/photo-identification*.ts`
+- pending image lifecycle: `apps/server/src/lib/pendingUploads.ts`
+- pending image schema: `apps/server/src/db/schema/pendingUploads.ts`
+- image evidence: `packages/bottle-classifier/src/imageEvidence.ts`
+
+Follow [Observability](../policies/observability.md),
+[Data Redaction](../policies/data-redaction.md), and
+[Evals](../policies/evals.md) when changing the external-model or tracing parts
+of this flow.

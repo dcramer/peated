@@ -23,6 +23,17 @@ tasting target.
 The database stores the value as a `smallint`. API schemas accept only `-1`,
 `1`, `2`, or `null`.
 
+## User-Facing Behavior
+
+- The tasting form lets the user choose Pass, Sip, Savor, or no rating.
+- Rating controls expose text labels and selected state without relying on
+  emoji or color. Keyboard and screen-reader users must be able to choose or
+  clear a rating.
+- Bottle pages show statistics owned by that Bottle. Related-release pages may
+  separately show a group summary derived from current member activity.
+- Current product copy must not present the historical five-star value as a
+  second available rating system.
+
 ## Identity And Persistence
 
 - `tasting.bottleId` is the authoritative, non-null catalog identity.

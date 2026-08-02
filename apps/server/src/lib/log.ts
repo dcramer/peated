@@ -1,5 +1,12 @@
-// Server logging owns LogTape setup, JSON console output, and Sentry Logs.
-// `logError` is the only facade method that creates Sentry issues.
+/**
+ * Server logging boundary.
+ *
+ * This module owns LogTape setup, JSON console output, and Sentry Logs.
+ * `logError` is the only facade method that creates Sentry issues; the other
+ * level helpers emit diagnostic telemetry without issue capture. Callers own
+ * selecting safe structured context under `docs/policies/observability.md` and
+ * `docs/policies/data-redaction.md`.
+ */
 import { honoLogger } from "@logtape/hono";
 import {
   configureSync,
