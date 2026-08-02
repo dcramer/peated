@@ -1,3 +1,4 @@
+import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { summarize } from "@peated/web/lib/markdown";
 import { parseReleaseFamilyRouteId } from "@peated/web/lib/releaseFamily";
@@ -14,16 +15,17 @@ export async function generateMetadata(props: {
   const { bottleId } = params;
 
   const bottle = await getBottlePage(parseReleaseFamilyRouteId(bottleId));
+  const bottleIdentity = getBottlePlainTextIdentity(bottle);
 
   const description = summarize(bottle.description || "", 200);
   const images = bottle.imageUrl ? [bottle.imageUrl] : [];
 
   return {
-    title: bottle.fullName,
+    title: bottleIdentity,
     description,
     images,
     openGraph: {
-      title: bottle.fullName,
+      title: bottleIdentity,
       description: description,
       images,
     },
@@ -44,10 +46,11 @@ export default async function Layout(props: {
 
   const bottleId = parseReleaseFamilyRouteId(params.bottleId);
   const bottle = await getBottlePage(bottleId);
+  const bottleIdentity = getBottlePlainTextIdentity(bottle);
   const jsonLd: WithContext<Product> = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: bottle.fullName,
+    name: bottleIdentity,
     image: bottle.imageUrl ?? undefined,
     description: summarize(bottle.description || "", 200),
     brand: {

@@ -258,6 +258,7 @@ export default function BottleForm({
     caskSize: watch("caskSize"),
     distillers: distillersValue,
     brand: brandValue,
+    series: seriesValue,
   };
   const showPreview =
     Boolean(

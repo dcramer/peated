@@ -74,6 +74,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 - `docs/architecture/account-policies.md`
 - `docs/architecture/bottle-classifier.md`
 - `docs/architecture/bottle-creation-alias-system.md`
+- `docs/architecture/bottle-identity-presentation.md`
 - `docs/architecture/bottle-normalization-contract.md`
 - `docs/architecture/bottle-normalization-examples.md`
 - `docs/architecture/entity-classifier.md`

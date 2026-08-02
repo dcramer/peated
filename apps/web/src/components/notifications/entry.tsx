@@ -2,8 +2,8 @@
 
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import type { Notification } from "@peated/server/types";
-import { BottleLabel } from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
+import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import classNames from "@peated/web/lib/classNames";
 import { useRouter } from "next/navigation";
 import type { KeyboardEvent } from "react";
@@ -127,7 +127,7 @@ export const getStatusMessage = ({
               href={`/tastings/${notification.ref.id}`}
               className="font-semibold"
             >
-              <BottleLabel bottle={notification.ref.bottle} />
+              {getBottlePlainTextIdentity(notification.ref.bottle)}
             </Link>
           ) : (
             "unknown tasting"
@@ -143,7 +143,7 @@ export const getStatusMessage = ({
               href={`/tastings/${notification.ref.id}`}
               className="font-semibold"
             >
-              <BottleLabel bottle={notification.ref.bottle} />
+              {getBottlePlainTextIdentity(notification.ref.bottle)}
             </Link>
           ) : (
             "an unknown tasting"

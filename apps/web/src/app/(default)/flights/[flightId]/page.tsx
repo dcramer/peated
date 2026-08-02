@@ -2,7 +2,6 @@
 import { use } from "react";
 
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
-import { formatCategoryName } from "@peated/server/lib/format";
 import { BottleStatusIndicators } from "@peated/web/components/bottleStatusIcons";
 import Button from "@peated/web/components/button";
 import FlightBottleIdentity from "@peated/web/components/flightBottleIdentity";
@@ -71,9 +70,6 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
                       hasTasted={flightBottle.hasTasted}
                       isLibrary={flightBottle.isLibrary}
                     />
-                  </div>
-                  <div className="text-muted text-sm">
-                    {formatCategoryName(bottle.category)}
                   </div>
                   <div className="mt-3 sm:hidden">
                     <Button

@@ -49,10 +49,6 @@ test.describe("Bottle releases", () => {
       has: page.locator(`a[href="/bottles/${bottleGroupRepresentative.id}"]`),
     });
     await expect(representativeItem.getByText("Cask 42")).toBeVisible();
-    await expect(representativeItem.getByText("55.1% ABV")).toBeVisible();
-    await expect(representativeItem.getByText("2005 vintage")).toBeVisible();
-    await expect(representativeItem.getByText("2022 release")).toBeVisible();
-    await expect(representativeItem.getByText("Single cask")).toBeVisible();
     await expect(releases.getByText("0 ratings")).toHaveCount(3);
     await expectNoHorizontalOverflow(page);
 

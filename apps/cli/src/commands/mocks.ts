@@ -293,6 +293,190 @@ const loadDefaultBottles = async (
   }
 };
 
+const loadIdentityBottleVariants = async () => {
+  const ensureBrand = (name: string, type: EntityType[] = ["brand"]) =>
+    Fixtures.EntityOrExisting({ name, type });
+  const ensureSeries = async (brand: Entity, name: string) => {
+    const existing = await db.query.bottleSeries.findFirst({
+      where: (bottleSeries, { and, eq }) =>
+        and(eq(bottleSeries.brandId, brand.id), eq(bottleSeries.name, name)),
+    });
+    return existing ?? Fixtures.BottleSeries({ brandId: brand.id, name });
+  };
+  const ensureGroup = async ({
+    brand,
+    name,
+    ...data
+  }: {
+    brand: Entity;
+    name: string;
+  } & Partial<Pick<Bottle, "category" | "seriesId" | "statedAge">>) => {
+    const existing = await db.query.bottles.findFirst({
+      where: (bottles, { and, eq, isNull }) =>
+        and(
+          eq(bottles.brandId, brand.id),
+          eq(bottles.name, name),
+          isNull(bottles.edition),
+          isNull(bottles.vintageYear),
+          isNull(bottles.releaseYear),
+        ),
+    });
+    return (
+      existing ??
+      Fixtures.Bottle({
+        brandId: brand.id,
+        distillerIds: brand.type.includes("distiller") ? [brand.id] : [],
+        name,
+        ...data,
+      })
+    );
+  };
+  const ensureMember = async (
+    groupId: number,
+    data: Omit<Parameters<typeof Fixtures.BottleGroupMember>[0], "groupId">,
+  ) => {
+    const members = await db.query.bottles.findMany({
+      where: (bottles, { eq }) => eq(bottles.groupId, groupId),
+    });
+    const existing = members.find(
+      (bottle) =>
+        bottle.edition === (data.edition ?? null) &&
+        bottle.vintageYear === (data.vintageYear ?? null) &&
+        bottle.releaseYear === (data.releaseYear ?? null) &&
+        bottle.abv === (data.abv ?? null),
+    );
+    return existing ?? Fixtures.BottleGroupMember({ groupId, ...data });
+  };
+
+  const decadentDrinks = await ensureBrand("Decadent Drinks", [
+    "brand",
+    "bottler",
+  ]);
+  const whiskyland = await ensureSeries(decadentDrinks, "Whiskyland");
+  const whiskylandGroup = await ensureGroup({
+    brand: decadentDrinks,
+    name: "Glenburgie 38-year-old",
+    category: "single_malt",
+    statedAge: 38,
+    seriesId: whiskyland.id,
+  });
+  await ensureMember(whiskylandGroup.groupId!, {
+    edition: "Chapter Thirty Two",
+    statedAge: 38,
+    vintageYear: 1988,
+    releaseYear: 2026,
+    abv: 46.7,
+    singleCask: true,
+    caskStrength: true,
+    caskFill: "refill",
+    caskType: "bourbon",
+    caskSize: "hogshead",
+  });
+
+  const springbank = await ensureBrand("Springbank", ["brand", "distiller"]);
+  const springbankGroup = await ensureGroup({
+    brand: springbank,
+    name: "12-year-old Cask Strength",
+    category: "single_malt",
+    statedAge: 12,
+  });
+  await ensureMember(springbankGroup.groupId!, {
+    edition: "Batch 23",
+    releaseYear: 2022,
+    abv: 55.9,
+    caskStrength: true,
+  });
+  await ensureMember(springbankGroup.groupId!, {
+    edition: "Batch 24",
+    releaseYear: 2023,
+    abv: 57.2,
+    caskStrength: true,
+  });
+
+  const fourRoses = await ensureBrand("Four Roses", ["brand", "distiller"]);
+  const fourRosesGroup = await ensureGroup({
+    brand: fourRoses,
+    name: "Limited Edition Small Batch",
+    category: "bourbon",
+  });
+  await ensureMember(fourRosesGroup.groupId!, {
+    releaseYear: 2017,
+    abv: 54.2,
+  });
+
+  const macallan = await ensureBrand("Macallan", ["brand", "distiller"]);
+  const macallanGroup = await ensureGroup({
+    brand: macallan,
+    name: "Sherry Oak 18-year-old",
+    category: "single_malt",
+    statedAge: 18,
+  });
+  await ensureMember(macallanGroup.groupId!, {
+    vintageYear: 1994,
+    statedAge: 18,
+    abv: 43,
+  });
+
+  const pokeno = await ensureBrand("Pōkeno", ["brand", "distiller"]);
+  const explorationSeries = await ensureSeries(pokeno, "Exploration Series");
+  await ensureGroup({
+    brand: pokeno,
+    name: "Exploration Series No. 1 Totara Cask",
+    category: "single_malt",
+    seriesId: explorationSeries.id,
+  });
+
+  const smws = await ensureBrand("The Scotch Malt Whisky Society", [
+    "brand",
+    "bottler",
+  ]);
+  const smwsGroup = await ensureGroup({
+    brand: smws,
+    name: "95.71 Prepare for Winter",
+    category: "single_malt",
+    statedAge: 17,
+  });
+  await ensureMember(smwsGroup.groupId!, {
+    statedAge: 17,
+    abv: 59.1,
+    singleCask: true,
+    caskStrength: true,
+  });
+
+  const highlandPark = await ensureBrand("Highland Park", [
+    "brand",
+    "distiller",
+  ]);
+  const highlandParkGroup = await ensureGroup({
+    brand: highlandPark,
+    name: "Cask Strength No. 5",
+    category: "single_malt",
+  });
+  await ensureMember(highlandParkGroup.groupId!, {
+    abv: 64.7,
+    caskStrength: true,
+  });
+
+  const willett = await ensureBrand("Willett", ["brand", "distiller"]);
+  const willettSeries = await ensureSeries(willett, "Family Estate Bottled");
+  const willettGroup = await ensureGroup({
+    brand: willett,
+    name: "Family Estate 5-year-old",
+    category: "bourbon",
+    statedAge: 5,
+    seriesId: willettSeries.id,
+  });
+  await ensureMember(willettGroup.groupId!, {
+    edition: "Barrel No. 4769",
+    statedAge: 5,
+    abv: 64.2,
+    singleCask: true,
+    caskStrength: true,
+  });
+
+  console.log("Bottle identity presentation variants created.");
+};
+
 const subcommand = program.command("mocks");
 
 subcommand
@@ -309,6 +493,7 @@ subcommand
     const entityList = await loadDefaultEntities();
     const siteList = await loadDefaultSites();
     const bottleList = await loadDefaultBottles(entityList, siteList);
+    await loadIdentityBottleVariants();
 
     for (let i = 0; i < options.tastings; i++) {
       const imageUrl =

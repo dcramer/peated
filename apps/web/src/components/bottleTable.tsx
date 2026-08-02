@@ -1,13 +1,12 @@
 "use client";
 
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle, CollectionBottle, PagingRel } from "@peated/server/types";
 import BottleStatusIcons, {
   BottleStatusIndicators,
 } from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
 import type { ComponentProps, ReactNode } from "react";
-import BottleIdentity, { getAbsoluteBottleTitle } from "./bottleIdentity";
+import BottleIdentity from "./bottleIdentity";
 import BottleRatingSummary from "./bottleRatingSummary";
 import SimpleRatingIndicator from "./simpleRatingIndicator";
 import Table from "./table";
@@ -73,16 +72,6 @@ export default function BottleTable({
           cellClassName: compactIdentity ? "max-w-0" : undefined,
           value: (item) => {
             const { bottle } = item;
-            const categoryName = bottle.category
-              ? formatCategoryName(bottle.category)
-              : null;
-            const identityTitle = getAbsoluteBottleTitle(bottle);
-            const showCategory =
-              !compactIdentity &&
-              categoryName &&
-              String(bottle.category) !== "other" &&
-              categoryName.toLocaleLowerCase() !==
-                identityTitle.toLocaleLowerCase();
             const collectionImage =
               item.collectionBottle &&
               renderCollectionBottleImage?.(item.collectionBottle);
@@ -103,15 +92,6 @@ export default function BottleTable({
                 hideLibrary={hideLibraryStatus}
               />
             );
-            const categoryLink = showCategory ? (
-              <Link
-                href={`/bottles/?category=${bottle.category}`}
-                className="hover:underline"
-              >
-                {categoryName}
-              </Link>
-            ) : null;
-
             return (
               <div className="flex min-w-0 items-start gap-3">
                 {collectionImage}
@@ -125,10 +105,6 @@ export default function BottleTable({
                   <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
                     {statusIndicators}
                     {collectionMeta}
-                    {collectionMeta && categoryLink ? (
-                      <span aria-hidden="true">&middot;</span>
-                    ) : null}
-                    {categoryLink}
                   </div>
                 </div>
                 {showRatingSummary ? (

@@ -543,24 +543,6 @@ test.describe("add bottle flow", () => {
       "href",
       `/addBottle?bottle=${exactSearchBottle.id}&intent=addBottle`,
     );
-    const expectedMetadata = [
-      exactSearchBottle.edition,
-      "Single Malt",
-      "55.1% ABV",
-      "2004 vintage",
-      "2025 release",
-      "Single cask",
-      "1st Fill Oloroso Hogshead cask",
-    ];
-    const metadataItems = result.locator(".inline-flex.whitespace-nowrap");
-    await expect(metadataItems).toHaveCount(expectedMetadata.length);
-    for (const [index, metadata] of expectedMetadata.entries()) {
-      const item = metadataItems.nth(index);
-      await expect(item).toBeVisible();
-      await expect(item).toHaveText(index ? `·${metadata}` : metadata);
-    }
-    await expectNoHorizontalOverflow(page);
-
     await bottleLink.click();
 
     await expect(page).toHaveURL(/\/addBottle\?/);

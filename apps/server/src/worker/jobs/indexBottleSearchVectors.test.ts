@@ -29,11 +29,16 @@ describe("indexBottleSearchVectors", () => {
     });
     const bottler = await fixtures.Entity({ name: "Independent Bottler" });
     const distiller = await fixtures.Entity({ name: "Vector Distillery" });
+    const series = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Searchable Series Zenith",
+    });
     const bottle = await fixtures.Bottle({
       name: "Core Expression",
       brandId: brand.id,
       bottlerId: bottler.id,
       distillerIds: [distiller.id],
+      seriesId: series.id,
       edition: "Promoted Batch Solstice",
       statedAge: 19,
       abv: 57.4,
@@ -83,6 +88,9 @@ describe("indexBottleSearchVectors", () => {
     expect(await searchVectorMatches(bottle.id, "Vector Distillery")).toBe(
       true,
     );
+    expect(
+      await searchVectorMatches(bottle.id, "Searchable Series Zenith"),
+    ).toBe(true);
     expect(
       await searchVectorMatches(bottle.id, "Authoritative Alias Aurora"),
     ).toBe(true);

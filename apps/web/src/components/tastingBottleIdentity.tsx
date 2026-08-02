@@ -1,4 +1,3 @@
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import {
   type BottleIdentitySource,
@@ -9,8 +8,8 @@ import {
 } from "@peated/web/components/bottleIdentity";
 import BottleStatusIcons from "@peated/web/components/bottleStatusIcons";
 import Link from "@peated/web/components/link";
+import { getBottlePlainTextIdentity } from "@peated/web/lib/bottleLabel";
 import Join from "./join";
-import SingleCaskChip from "./singleCaskChip";
 
 export type TastingBottleIdentitySource = BottleIdentitySource &
   Pick<Bottle, "isLibrary" | "hasTasted"> & {
@@ -29,15 +28,15 @@ export default function TastingBottleIdentity({
   const exactBottleLabel =
     bottle.group && !relativeIdentity.fallback ? relativeIdentity.label : null;
   const distinctDistillers = getDistinctBottleDistillers(bottle);
-  const inlineSingleCaskChip =
-    bottle.singleCask && !/\bsingle[\s-]+cask\b/i.test(displayName);
-  const panelSingleCaskChip =
-    inlineSingleCaskChip &&
-    !/\bsingle[\s-]+cask\b/i.test(exactBottleLabel ?? "");
+  const inlineDisplayName = getBottlePlainTextIdentity(bottle);
   const metadataExclude = getBottleMetadataExclusions(
     bottle,
     `${displayName} ${exactBottleLabel ?? ""}`,
   );
+  const standaloneAge =
+    bottle.statedAge && !metadataExclude.has("age")
+      ? `Aged ${bottle.statedAge} years`
+      : null;
 
   if (variant === "inline") {
     return (
@@ -50,11 +49,10 @@ export default function TastingBottleIdentity({
                   href={`/bottles/${bottle.id}`}
                   className="hover:underline"
                 >
-                  {displayName}
+                  {inlineDisplayName}
                 </Link>
               </h4>
               <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-              {inlineSingleCaskChip && <SingleCaskChip />}
             </div>
           </div>
         </div>
@@ -73,16 +71,10 @@ export default function TastingBottleIdentity({
               </Link>
             </h4>
             <BottleStatusIcons bottle={bottle} className="inline h-4 w-4" />
-            {!exactBottleLabel && panelSingleCaskChip && <SingleCaskChip />}
           </div>
         </div>
         <div className="flex flex-row gap-x-1 text-sm">
-          {exactBottleLabel ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <span>{exactBottleLabel}</span>
-              {panelSingleCaskChip && <SingleCaskChip />}
-            </div>
-          ) : null}
+          {exactBottleLabel ? <span>{exactBottleLabel}</span> : null}
           {!!(exactBottleLabel && distinctDistillers.length) && (
             <div>&middot;</div>
           )}
@@ -101,23 +93,11 @@ export default function TastingBottleIdentity({
           ) : null}
         </div>
       </div>
-      <div className="hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex">
-        <div className="max-w-full truncate">
-          {bottle.category ? (
-            <Link
-              href={`/bottles?category=${bottle.category}`}
-              className="hover:underline"
-            >
-              {formatCategoryName(bottle.category)}
-            </Link>
-          ) : null}
+      {standaloneAge ? (
+        <div className="hidden w-[200px] flex-col items-end justify-center whitespace-nowrap text-sm sm:flex">
+          <div>{standaloneAge}</div>
         </div>
-        <div>
-          {bottle.statedAge && !metadataExclude.has("age")
-            ? `Aged ${bottle.statedAge} years`
-            : null}
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }

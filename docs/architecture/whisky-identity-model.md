@@ -4,6 +4,8 @@ This is the source of truth for how Peated models whisky identity.
 
 Deterministic name cleanup is governed by the
 [Bottle Normalization Contract](./bottle-normalization-contract.md).
+Surface-specific rendering is governed by
+[Bottle Identity Presentation](./bottle-identity-presentation.md).
 
 ## Identity Objects
 

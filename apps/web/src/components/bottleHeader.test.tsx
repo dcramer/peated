@@ -39,9 +39,8 @@ describe("BottleHeader", () => {
 
     expect(text).toContain("Lagavulin21");
     expect(text).not.toContain(bottle.fullName);
-    expect(text).toContain(
-      "Distillers Edition·Single Malt·21 years·55.1% ABV·2025 release",
-    );
+    expect(text).toContain("Distillers Edition·21 years·55.1% ABV");
+    expect(text).not.toContain("2025 release");
     expect(text).not.toContain("Cask strength");
     expect(html).toContain(`title="${bottle.fullName}"`);
   });
@@ -71,7 +70,7 @@ describe("BottleHeader", () => {
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text.match(/Distillers Edition/g)).toHaveLength(1);
-    expect(text).toContain("2025 release");
+    expect(text).not.toContain("2025 release");
   });
 
   it("keeps repeated identity fields out of a single-cask header", () => {
@@ -99,10 +98,10 @@ describe("BottleHeader", () => {
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(text.match(/Pōkeno/g)).toHaveLength(1);
-    expect(text.match(/Single Cask/g)).toHaveLength(1);
+    expect(text).not.toContain("Single Cask");
     expect(text).not.toContain("3 years");
     expect(text).not.toContain("Bourbon cask");
-    expect(text).toContain("Single Malt·56.0% ABV");
+    expect(text).toContain("56.0% ABV");
     expect(text).not.toContain("Cask strength");
     expect(text).not.toContain("Distilled at");
   });
@@ -226,5 +225,40 @@ describe("BottleHeader", () => {
 
     expect(text.match(/Single Cask/g)).toHaveLength(1);
     expect(html).not.toContain('title="Single cask"');
+  });
+
+  it("promotes a nonduplicative series into the header context", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Decadent Drinks Glenburgie 38-year-old - Chapter Thirty Two",
+      name: "Glenburgie 38-year-old - Chapter Thirty Two",
+      group: { name: "Glenburgie 38-year-old" },
+      brand: { id: 7, name: "Decadent Drinks", shortName: null },
+      series: { id: 9, name: "Whiskyland" },
+      distillers: [{ id: 8, name: "Glenburgie" }],
+      edition: "Chapter Thirty Two",
+      category: "single_malt",
+      statedAge: 38,
+      abv: 46.7,
+      vintageYear: 1988,
+      releaseYear: 2026,
+      singleCask: true,
+      caskStrength: true,
+      caskFill: "refill",
+      caskType: "bourbon",
+      caskSize: "hogshead",
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text).toContain("Decadent Drinks·WhiskylandGlenburgie 38-year-old");
+    expect(html).toContain('href="/bottles?series=9"');
+    expect(text).toContain("Chapter Thirty Two·46.7% ABV");
+    expect(text).not.toContain("1988 vintage");
+    expect(text).not.toContain("2026 release");
+    expect(text).not.toContain("Single cask");
+    expect(text).not.toContain("Cask strength");
+    expect(text).not.toContain("Bourbon Hogshead cask");
   });
 });

@@ -115,17 +115,16 @@ describe("BottleResultRow", () => {
     expect(text).toContain("3 related releases");
     expect(text).toContain(group.fullName);
     expect(text).not.toContain(exactBottle.fullName);
-    expect(text).toContain("Distillers Edition·Single Malt·43.0% ABV");
+    expect(text).toContain("Distillers Edition·43.0% ABV");
     expect(text).not.toContain("16 years");
-    expect(text).toContain("2008 vintage·2024 release");
-    expect(text).toContain("Single cask");
+    expect(text).not.toContain("2008 vintage");
+    expect(text).not.toContain("2024 release");
+    expect(text).not.toContain("Single cask");
     expect(text).not.toContain("Cask strength");
-    expect(text).toContain("1st Fill Oloroso Hogshead cask");
+    expect(text).not.toContain("1st Fill Oloroso Hogshead cask");
+    expect(text).not.toContain("Single Malt");
     expect(text.match(/Distillers Edition/g)).toHaveLength(1);
     expect(text.match(/Lagavulin/g)).toHaveLength(1);
-    expect(html).toContain(
-      '<span class="inline-flex whitespace-nowrap"><span class="mx-1.5">·</span>Single Malt</span>',
-    );
   });
 
   it("omits absent exact metadata without rendering empty separators", () => {

@@ -6,13 +6,13 @@ import BottleExactMetadata, {
 import {
   getAbsoluteBottleLabel,
   getAbsoluteBottleTitle,
+  getBottleIdentitySeriesName,
   getBottleMetadataExclusions,
   getDistinctBottleDistillers,
 } from "@peated/web/components/bottleIdentity";
 import Link from "@peated/web/components/link";
 import { Distillers } from "./bottleMetadata";
 import PageHeader from "./pageHeader";
-import SingleCaskChip from "./singleCaskChip";
 
 export default function BottleHeader({
   bottle,
@@ -27,10 +27,8 @@ export default function BottleHeader({
   const expressionName = getAbsoluteBottleTitle(bottle);
   const metadataExclude = getBottleMetadataExclusions(bottle, expressionName);
   const distinctDistillers = getDistinctBottleDistillers(bottle);
-  const showSingleCaskChip =
-    bottle.singleCask && !metadataExclude.has("single-cask");
+  const seriesName = getBottleIdentitySeriesName(bottle, expressionName);
 
-  if (showSingleCaskChip) metadataExclude.add("single-cask");
   if (
     bottle.edition &&
     expressionName
@@ -41,7 +39,6 @@ export default function BottleHeader({
   }
   const metadataKeys = [...metadataExclude];
   const hasIdentityDetails =
-    showSingleCaskChip ||
     hasBottleExactMetadata(bottle, metadataKeys) ||
     distinctDistillers.length > 0;
 
@@ -60,17 +57,27 @@ export default function BottleHeader({
               {label}
             </Link>
           ) : (
-            <div
-              title={bottle.fullName}
-              className="flex flex-wrap items-center gap-2"
-            >
-              <Link
-                href={`/entities/${bottle.brand.id}`}
-                className="hover:underline"
-              >
-                {bottle.brand.shortName || bottle.brand.name}
-              </Link>
-              {expressionName}
+            <div title={bottle.fullName} className="flex min-w-0 flex-col">
+              <span className="text-muted flex min-w-0 items-center justify-center gap-1.5 truncate text-xs font-medium uppercase tracking-wide lg:justify-start">
+                <Link
+                  href={`/entities/${bottle.brand.id}`}
+                  className="truncate hover:underline"
+                >
+                  {bottle.brand.shortName || bottle.brand.name}
+                </Link>
+                {seriesName ? (
+                  <>
+                    <span aria-hidden="true">&middot;</span>
+                    <Link
+                      href={`/bottles?series=${bottle.series!.id}`}
+                      className="truncate hover:underline"
+                    >
+                      {seriesName}
+                    </Link>
+                  </>
+                ) : null}
+              </span>
+              <span>{expressionName}</span>
             </div>
           )}
         </div>
@@ -81,9 +88,6 @@ export default function BottleHeader({
             <BottleExactMetadata
               bottle={bottle}
               exclude={metadataKeys}
-              leadingContent={
-                showSingleCaskChip ? <SingleCaskChip /> : undefined
-              }
               className="justify-center lg:justify-start"
             />
             {distinctDistillers.length ? (
