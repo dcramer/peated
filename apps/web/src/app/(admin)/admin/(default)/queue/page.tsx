@@ -134,23 +134,23 @@ export default function Page() {
   const actionableCount = proposalList.stats.actionableCount;
   const activeRetryRun =
     activeRetryRunQuery.data ?? activeRetryRunListQuery.data?.run ?? null;
+  const activeRetryRunStatus = activeRetryRun?.status ?? null;
   const retryRunIsActive =
-    activeRetryRun?.status === "pending" ||
-    activeRetryRun?.status === "running";
+    activeRetryRunStatus === "pending" || activeRetryRunStatus === "running";
 
   const refreshQueueList = useCallback(async (): Promise<void> => {
     await queryClient.invalidateQueries({
-      queryKey: listQueryOptions.queryKey,
+      queryKey: orpc.prices.matchQueue.list.key(),
     });
-  }, [listQueryOptions.queryKey, queryClient]);
+  }, [orpc, queryClient]);
 
   useEffect(() => {
-    if (!activeRetryRun || retryRunIsActive) {
+    if (!activeRetryRunStatus || retryRunIsActive) {
       return;
     }
 
     void refreshQueueList();
-  }, [activeRetryRun, refreshQueueList, retryRunIsActive]);
+  }, [activeRetryRunStatus, refreshQueueList, retryRunIsActive]);
 
   async function handleRetryAll(): Promise<void> {
     if (
