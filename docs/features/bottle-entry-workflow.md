@@ -1,93 +1,53 @@
 # Bottle Entry Workflow
 
-## Identity Contract
+This document describes the current manual Bottle create and edit workflow. The
+[Whisky Identity Model](../architecture/whisky-identity-model.md) owns identity,
+field ownership, grouping, and merge semantics.
 
-Bottle saves should complete after Peated persists the bottle. Slow duplicate
-review, catalog verification, indexing, and similar work should run after the
-save unless it is required for deterministic correctness.
+## Creation
 
-Every marketed release is one concrete Bottle. Each Bottle durably stores the
-shared expression values and exact fields needed to render, search, and
-understand it without loading its BottleGroup. The group owns the shared
-expression label, shared editing semantics, representative relationship, and
-member-derived aggregates; it does not own editorial presentation or supply
-missing exact Bottle data at read time.
+- Add Bottle accepts the shared expression and exact marketed-release fields in
+  one submission and returns one independently complete Bottle.
+- Creation atomically creates a singleton BottleGroup. Users do not select,
+  name, or submit authority for a group.
+- Deterministic alias duplicate checks remain in the request path. Slow catalog
+  verification, review, indexing, and similar work run after persistence.
+- “Add a similar bottle” only prefills the same independent creation form from
+  the selected Bottle. It does not reuse or join the source BottleGroup.
+- A created Bottle id continues directly into Library, tasting, image, proposal,
+  and return-intent workflows. The browser never reconstructs a legacy
+  Bottle/BottleRelease pair.
 
-Manual entry uses one concrete Bottle form for add and edit. The form combines
-shared expression fields with exact Bottle fields such as edition, ABV, release
-year, vintage year, and cask details. Independent creation atomically creates a
-complete Bottle and an automatic singleton BottleGroup. Ordinary users never
-create, select, or name a BottleGroup.
+When photo resolution suggests the wrong Bottle, the user can search or open
+manual creation with supported label fields and the pending photo. The
+[photo-assisted resolution contract](./photo-tasting-entry.md) owns that handoff.
 
-“Add a similar bottle” pre-fills the selected Bottle's durable fields and submits
-the same independent Bottle creation operation. It also creates a singleton;
-it does not join the source group. Automatic regrouping is a separate future
-capability, not a dormant service in this release.
+## Editing
 
-Bottle pages and search results render exact fields from the independently
-complete Bottle. A Bottle page may link quietly to all related releases using
-that active member as the route anchor. The release-family page uses group-owned
-identity and aggregate data and lists independently complete member Bottles.
-Canonical paths and user-facing terminology do not expose BottleGroup ids, and
-there is no public `/bottle-groups` route.
-
-Consumer workflows carry one Bottle id. Assigned aliases also point directly to
-one Bottle; a general expression alias points to the retained general Bottle,
-not BottleGroup or its representative. Library, tasting, Flight, review, and
-price flows use that same Bottle identity without a second resolver. Uncertain
-identity remains unresolved.
-
-## Creation And Editing
-
-- Add Bottle accepts shared and exact fields in one submission and always
-  creates a Bottle, never a child release record.
-- When photo identification matches an existing Bottle, the result presents an
-  explicit “Not the right bottle?” recovery path. Manual creation uses the
-  scanned label details and pending photo rather than cloning the matched
-  Bottle.
-- “Add a similar bottle” uses the selected Bottle and its group's shared label
-  only to prefill the same independent form. Submission does not carry source
-  Bottle or group authority and starts in a new singleton group.
-- Creation returns the complete Bottle. Library, tasting, image, proposal, and
-  return-intent continuations use its Bottle id directly rather than
-  reconstructing a Bottle/release pair.
-- Exact-only moderator edits change only the selected Bottle and its exact
-  aliases.
-- Shared moderator edits update the BottleGroup and atomically rematerialize
-  every member Bottle's complete shared identity while preserving each
-  member's exact fields. A shared name change therefore regenerates all member
-  Bottle names.
-- Independently created Bottles remain in singleton groups. Name similarity,
-  shared brand, or shared series never merges them silently.
-
-Image uploads may still be part of the visible save flow, but the server remains
-authoritative for final image dimensions, encoding, and quality. Client-side
-resizing should reduce upload latency without replacing server processing.
-
-## Current Workflow Details
-
-- Manual bottle creation relies on deterministic alias duplicate checks in the
-  request path and queues catalog verification after creation.
-- Add and edit share one concrete Bottle form with explicit shared-versus-exact
+- Add and edit use one concrete Bottle form with explicit shared-versus-exact
   field ownership.
-- Exact Bottle search and related-release rows share one Bottle-owned metadata
-  renderer; BottleGroup hydration is not required for exact details.
-- No manual or automatic regrouping operation ships in this release.
-- Bottle and tasting image uploads avoid GCS resumable-session startup for small
-  processed images.
-- Browser-side image blobs keep a high-quality intermediate image capped at a
-  1600px edge before the server creates canonical derivatives.
-- Moderators can update bottle images for bottles they did not create.
+- An exact edit changes only the selected Bottle and its exact aliases.
+- A shared edit updates the BottleGroup and atomically rematerializes every
+  member Bottle while preserving exact fields and aliases.
+- Independently created Bottles stay in singleton groups. Similar names, brand,
+  or series do not merge them automatically.
+- No manual or automatic regrouping operation ships in the current workflow.
 
-## Improvement Plan
+## Save Boundary
 
-- Improve partial-success UX so the page can say when the bottle was saved but
-  image upload failed, timed out, or can be retried.
-- Track save latency separately for bottle create, image processing, storage
-  writes, and post-save jobs.
-- Keep exact duplicate protection deterministic and fast; use queued verifier
-  output for review, repair, sampling, or moderation rather than blocking saves.
-- Continue using Peated's integration-first backend tests. Add focused route
-  tests for each workflow branch instead of replacing them with broad mocks.
-- Verify add/edit flows with local browser automation at desktop and mobile
-  widths before shipping user-facing form changes.
+Bottle persistence is the authoritative save. Image handling may remain visible
+to the user, but server processing owns final dimensions, encoding, and quality.
+Client resizing is only a latency optimization.
+
+Post-save side-effect failure must not make a durable Bottle appear unsaved.
+Surface partial success when the UI has a recovery action; otherwise log enough
+safe context for investigation and retry. Follow
+[Background Work](../policies/background-work.md) and
+[Error Handling](../policies/error-handling.md).
+
+## Verification
+
+Use integration tests for create, duplicate, exact-edit, shared-edit, and
+continuation branches. Verify user-facing add and edit changes at desktop and
+mobile widths with the
+[local UI verification playbook](../development/local-ui-verification.md).
