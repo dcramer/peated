@@ -91,3 +91,31 @@ test("bottle list", async ({ axiosMock }) => {
     ]
   `);
 });
+
+test("continues when optional SMWS catalog fields are absent", async ({
+  axiosMock,
+}) => {
+  const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
+  const payload = JSON.parse(await loadFixture("smws", "bottle-list.json")) as {
+    items: Record<string, unknown>[];
+  };
+
+  payload.items[0].cask_no = null;
+  payload.items[1].cask_type = null;
+  delete payload.items[2].distilleddate;
+  axiosMock.onGet(url).reply(200, payload);
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items).toHaveLength(127);
+  expect(items[0][0]).toMatchObject({
+    name: "3.350 Gladrags of yesteryear",
+    caskFill: null,
+    caskType: null,
+    caskSize: null,
+  });
+  expect(items[1][0].name).toBe("4.303 A nocturne sipper");
+});

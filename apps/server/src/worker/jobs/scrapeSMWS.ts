@@ -51,13 +51,12 @@ const SMWSPayloadSchema = z.object({
       name: z.string(),
       age: z.number().nullable(),
       abv: z.union([z.string(), z.number()]).nullable(),
-      cask_no: z.string(),
-      cask_type: z.string(),
+      cask_no: z.string().nullish(),
+      cask_type: z.string().nullish(),
       categories: z.array(z.string()),
       price: z.number(),
       url: z.string(),
       release_date: z.string().nullable(),
-      distilleddate: z.string(),
       image: z.string(),
     }),
   ),
@@ -82,17 +81,25 @@ export async function scrapeBottles(
           logScrapeWarning(SITE, "Cannot find cask name for product");
           return;
         }
-        const details = parseDetailsFromName(`${item.cask_no} ${caskName}`);
+        const caskNumber = item.cask_no;
+        if (!caskNumber) {
+          logScrapeWarning(SITE, "Cannot find cask number for product", {
+            caskName,
+          });
+          return;
+        }
+
+        const details = parseDetailsFromName(`${caskNumber} ${caskName}`);
         if (!details?.distiller) {
           logScrapeWarning(SITE, "Cannot find distiller", {
-            caskNumber: item.cask_no,
+            caskNumber,
             caskName,
           });
           return;
         }
         if (!details?.category) {
           logScrapeWarning(SITE, "Unsupported spirit", {
-            caskNumber: item.cask_no,
+            caskNumber,
             caskName,
           });
           return;
@@ -120,7 +127,9 @@ export async function scrapeBottles(
 
         const abv = parseAbv(item.abv);
 
-        const [caskFill, caskType, caskSize] = parseCaskType(item.cask_type);
+        const [caskFill, caskType, caskSize] = item.cask_type
+          ? parseCaskType(item.cask_type)
+          : [null, null, null];
         // "2nd fill ex-bourbon hogshead"
 
         await cb(
