@@ -376,6 +376,8 @@ export function FallbackActions({
   searchLabel,
   createBottleHref,
   createBottleLabel = "Create Bottle",
+  title,
+  description,
   onStartOver,
   showStartOver = false,
 }: {
@@ -383,6 +385,8 @@ export function FallbackActions({
   searchLabel: string;
   createBottleHref?: string | null;
   createBottleLabel?: string;
+  title?: string;
+  description?: string;
   onStartOver?: () => void;
   showStartOver?: boolean;
 }) {
@@ -390,8 +394,17 @@ export function FallbackActions({
     (createBottleHref ? 1 : 0) + (showStartOver && onStartOver ? 1 : 0) + 1;
 
   return (
-    <div className="space-y-3">
-      <OrDivider />
+    <div className="space-y-3 px-4 lg:px-6">
+      {title ? (
+        <div>
+          <h2 className="font-semibold text-white">{title}</h2>
+          {description ? (
+            <p className="text-muted mt-1 text-sm">{description}</p>
+          ) : null}
+        </div>
+      ) : (
+        <OrDivider />
+      )}
       <div
         className={`mx-auto grid w-full gap-3 ${
           columnCount >= 3 ? "sm:grid-cols-3" : "sm:w-1/2 sm:grid-cols-2"
