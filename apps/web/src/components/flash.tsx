@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useInterval } from "usehooks-ts";
 import classNames from "../lib/classNames";
 
@@ -53,30 +60,35 @@ export default function FlashMessages({ children }: { children: ReactNode }) {
   useInterval(() => {
     setMessages((messages) => {
       const cutoff = new Date().getTime() - ALIVE_TIME;
-      return messages.filter((m) => m.createdAt > cutoff);
+      const activeMessages = messages.filter((m) => m.createdAt > cutoff);
+      return activeMessages.length === messages.length
+        ? messages
+        : activeMessages;
     });
   }, 1000);
 
+  const flash = useCallback(
+    (message: string | ReactNode, type: FlashType = "success") => {
+      setMessages((messages) => {
+        const cutoff = new Date().getTime() - ALIVE_TIME;
+        return [
+          ...messages.filter((m) => m.createdAt > cutoff),
+          {
+            message,
+            type,
+            id: messageNum,
+            createdAt: new Date().getTime(),
+          },
+        ];
+      });
+      messageNum += 1;
+    },
+    [],
+  );
+  const contextValue = useMemo(() => ({ flash }), [flash]);
+
   return (
-    <FlashContext.Provider
-      value={{
-        flash: (message: string | ReactNode, type: FlashType = "success") => {
-          setMessages((messages) => {
-            const cutoff = new Date().getTime() - ALIVE_TIME;
-            return [
-              ...messages.filter((m) => m.createdAt > cutoff),
-              {
-                message,
-                type,
-                id: messageNum,
-                createdAt: new Date().getTime(),
-              },
-            ];
-          });
-          messageNum += 1;
-        },
-      }}
-    >
+    <FlashContext.Provider value={contextValue}>
       <div className="fixed right-0 top-0 z-50 flex max-w-xl flex-col gap-y-4 p-4">
         {messages.map((m) => (
           <Message {...m} key={m.id} />

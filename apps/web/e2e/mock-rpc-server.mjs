@@ -212,7 +212,9 @@ async function handleRpcRequest({ request, response, url }) {
       );
       const expectedIncludes = bottleGroupWorkflow
         ? ["bottles", "users", "entities"]
-        : ["bottles"];
+        : input?.query === "playwright search"
+          ? ["bottles", "entities"]
+          : ["bottles"];
       if (
         !Array.isArray(input?.include) ||
         input.include.length !== expectedIncludes.length ||

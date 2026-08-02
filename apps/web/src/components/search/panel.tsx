@@ -105,7 +105,7 @@ export default function SearchPanel({
       setState("ready");
       setInitialState("ready");
     },
-    [addBottleIntent, directToTasting, orpc.search, searchType, user],
+    [addBottleIntent, directToTasting, orpc, searchType, user],
   );
 
   // TODO: handle errors
@@ -114,9 +114,8 @@ export default function SearchPanel({
   useEffect(() => {
     const curValue = initialValue ?? value ?? "";
     setQuery(curValue);
-    if (onQueryChange) onQueryChange(curValue);
     void onQuery(curValue);
-  }, [initialValue, value, onQuery, onQueryChange]);
+  }, [initialValue, value, onQuery]);
 
   return (
     <Layout
