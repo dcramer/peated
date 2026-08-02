@@ -374,10 +374,6 @@ function searchCatalogEntities(
 
   return catalog.entities
     .flatMap((entity) => {
-      if (args.type !== null && !entity.type.includes(args.type)) {
-        return [];
-      }
-
       const match = getEntitySearchMatch({
         query: normalizedQuery,
         name: entity.name,
@@ -385,6 +381,14 @@ function searchCatalogEntities(
         aliases: entity.aliases,
       });
       if (!match) {
+        return [];
+      }
+      // Mirror production: only non-exact candidates are narrowed by role.
+      if (
+        match.source !== "exact" &&
+        args.type !== null &&
+        !entity.type.includes(args.type)
+      ) {
         return [];
       }
 

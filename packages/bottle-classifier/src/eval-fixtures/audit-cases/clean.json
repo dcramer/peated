@@ -5,7 +5,8 @@
   "input": {
     "audit": {
       "bottleId": 50101,
-      "origin": "moderator"
+      "origin": "moderator",
+      "note": "Verify whether this ordinary official North Channel distillery bottling has any supported catalog gaps, including a distinct bottler."
     },
     "context": {
       "currentBottle": {
@@ -61,10 +62,10 @@
   },
   "provenance": {
     "source": "synthetic",
-    "notes": "Generalized synthetic audit case; all names and ids are fictional."
+    "notes": "Generalized synthetic audit regression for the ordinary distillery-bottling rule; all names and ids are fictional and differ from the motivating Hibiki production miss."
   },
   "expected": {
-    "summary": "The audited Bottle is internally consistent and no catalog changes are supported.",
+    "summary": "The audited Bottle is internally consistent; its shared Brand and distillery identity does not establish a distinct bottler, and no catalog changes are supported.",
     "proposedOperations": [],
     "findings": []
   }

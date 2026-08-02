@@ -55,11 +55,14 @@ fields.
 Marketed finish wording in the Bottle name or edition, exact cask or barrel
 codes, `singleCask`, and `caskStrength` remain identity evidence.
 
-`bottler` is the named, market-facing bottler or release imprint for the
-product. It may equal the Brand or a producing distillery. Ownership,
+`bottler` is an independently meaningful, market-facing bottler or release
+imprint for the product. An ordinary official Brand or distillery bottling does
+not gain a bottler merely because the same company produces, owns, releases, or
+hosts a page for it. It may equal the Brand or a producing distillery only when
+product-specific marketing establishes that separate role. Ownership,
 importer/distributor, and physical packing relationships alone do not establish
-the role. The classifier must leave it null when product-specific evidence does
-not establish it.
+it. Otherwise the classifier leaves it null and does not treat the missing value
+as a generic enrichment gap.
 
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier

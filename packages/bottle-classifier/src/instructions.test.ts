@@ -78,25 +78,28 @@ describe("Bottle check instructions", () => {
     );
   });
 
-  test("preserves an evidenced bottler even when it is also the Brand", () => {
+  test("keeps bottler limited to an independently meaningful product role", () => {
     const reference = buildBottleClassifierInstructions();
     const extractor = buildWhiskyLabelExtractorInstructions({ mode: "image" });
     const audit = buildBottleAuditInstructions();
 
     expect(reference).toContain(
-      "`bottler` is the named, market-facing bottler or release imprint for this product",
+      "`bottler` is an independently meaningful, market-facing bottler or release imprint for this product",
     );
     expect(reference).toContain(
-      "It may equal the Brand or a producing distillery",
+      "An ordinary official Brand or distillery bottling does not gain a bottler",
     );
     expect(reference).toContain(
-      "Ownership, importer/distributor, and physical packing relationships alone do not establish the role",
+      "It may equal the Brand or a producing distillery only when product-specific marketing establishes that separate role",
     );
     expect(reference).toContain(
-      "Leave it null when product-specific evidence does not establish it",
+      "Ownership, importer/distributor, and physical packing relationships alone do not establish it",
     );
     expect(audit).toContain(
-      "supported gaps in ABV, release or vintage year, bottler, and distilleries",
+      "supported gaps in ABV, release or vintage year, and distilleries",
+    );
+    expect(audit).toContain(
+      "Do not treat a null bottler as a generic audit gap",
     );
     expect(extractor).toContain(
       "product-specific evidence names the market-facing bottler or release imprint for this product",
@@ -113,7 +116,7 @@ describe("Bottle check instructions", () => {
       "make one focused web investigation before finalizing",
     );
     expect(reference).toContain(
-      "ABV, a product-specific release or bottling year, an evidenced bottler, or distilleries",
+      "ABV, a product-specific release or bottling year, or distilleries",
     );
     expect(reference).toContain(
       "This is not a general audit or exhaustive search",
