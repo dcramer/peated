@@ -8,38 +8,26 @@ const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const workspaceRoot = path.resolve(packageRoot, "../..");
 const replayRoot = path.resolve(packageRoot, ".vitest-evals/recordings");
 
-function createEnvFileLoader(
+function applyEnvFile(
+  absolutePath: string,
   targetEnv: NodeJS.ProcessEnv = process.env,
-): (absolutePath: string) => void {
+): void {
+  if (!fs.existsSync(absolutePath)) {
+    return;
+  }
+
   const protectedKeys = new Set(Object.keys(targetEnv));
-  const loadedKeys = new Set<string>();
-
-  return (absolutePath: string) => {
-    if (!fs.existsSync(absolutePath)) {
-      return;
+  const values = parseEnv(fs.readFileSync(absolutePath, "utf8"));
+  for (const [name, value] of Object.entries(values)) {
+    if (protectedKeys.has(name)) {
+      continue;
     }
 
-    const values = parseEnv(fs.readFileSync(absolutePath, "utf8"));
-    for (const [name, value] of Object.entries(values)) {
-      if (protectedKeys.has(name) && !loadedKeys.has(name)) {
-        continue;
-      }
-
-      targetEnv[name] = value;
-      loadedKeys.add(name);
-    }
-  };
+    targetEnv[name] = value;
+  }
 }
 
-const applyEnvFile = createEnvFileLoader();
-for (const envFile of [
-  path.resolve(workspaceRoot, ".env"),
-  path.resolve(workspaceRoot, ".env.local"),
-  path.resolve(packageRoot, ".env"),
-  path.resolve(packageRoot, ".env.local"),
-]) {
-  applyEnvFile(envFile);
-}
+applyEnvFile(path.resolve(workspaceRoot, ".env.local"));
 
 function pickDefinedEnv(keys: string[]): Record<string, string> {
   return Object.fromEntries(

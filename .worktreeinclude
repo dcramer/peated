@@ -1,0 +1,2 @@
+# Codex-managed worktrees need the same local runtime configuration.
+.env.local

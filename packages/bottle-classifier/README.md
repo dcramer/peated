@@ -194,8 +194,8 @@ pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts
 `pnpm evals` is the intended repo-root entrypoint. It forwards extra Vitest args
 to the package runner and uses the `vitest-evals` reporter configured in
 [`vitest.evals.config.mts`](./vitest.evals.config.mts).
-The eval config loads the repo-root `.env` and then `.env.local`, with later
-files overriding earlier ones. Shell-provided env vars still take precedence.
+The eval config loads the repo-root `.env.local`. Shell-provided env vars still
+take precedence.
 `AI_GATEWAY_API_KEY` or `OPENAI_API_KEY` is required. The gateway key takes
 precedence when both are set. With the gateway, `OPENAI_MODEL` defaults to
 `openai/gpt-5.4` and `OPENAI_EVAL_MODEL` defaults to
