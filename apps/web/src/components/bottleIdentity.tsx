@@ -323,6 +323,7 @@ export default function BottleIdentity({
   className,
   linkClassName,
   showBrand = true,
+  showReleaseYear = false,
 }: {
   bottle: BottleIdentitySource;
   mode?: "absolute" | "relative";
@@ -334,6 +335,7 @@ export default function BottleIdentity({
   className?: string;
   linkClassName?: string;
   showBrand?: boolean;
+  showReleaseYear?: boolean;
 }) {
   const relativeIdentity = getRelativeBottleIdentity(bottle);
   const isAbsolute = mode === "absolute";
@@ -360,6 +362,15 @@ export default function BottleIdentity({
     bottle.statedAge === bottle.group.statedAge
   ) {
     metadataExclude.add("age");
+  }
+  if (
+    showReleaseYear &&
+    !getMetadataExpressedByTitle(
+      bottle,
+      [title, displayedLeadingContent].filter(Boolean).join(" "),
+    ).includes("release")
+  ) {
+    metadataExclude.delete("release");
   }
   const seriesName = isAbsolute
     ? getBottleIdentitySeriesName(bottle, title)

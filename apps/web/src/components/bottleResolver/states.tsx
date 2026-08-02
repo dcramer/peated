@@ -243,6 +243,7 @@ export function PhotoMatchCreateState({
               <BottleIdentity
                 bottle={matchedBottle}
                 linkClassName="font-semibold text-white hover:underline"
+                showReleaseYear
               />
               <EvidencePills result={result} compact />
             </div>
