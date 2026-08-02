@@ -268,6 +268,49 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
+  test("normalizes legacy blank distiller short names in Bottle update previews", async ({
+    fixtures,
+  }) => {
+    const distiller = await fixtures.Entity({
+      name: "Legacy Blank Short Name Distillery",
+      shortName: "",
+      type: ["distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      name: "Legacy Distiller Preview",
+      distillerIds: [distiller.id],
+    });
+
+    const result = await prepareOperation({
+      operation: {
+        id: 5,
+        proposal: {
+          type: "update_bottle",
+          input: {
+            bottleId: bottle.id,
+            patch: { exact: { edition: "Reviewed Edition" } },
+          },
+          rationale: "The inspected evidence confirms this edition.",
+          evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
+        },
+      },
+      artifacts: artifacts({ bottleIds: [bottle.id] }),
+    });
+
+    expect(result).toMatchObject({
+      status: "pending_review",
+      type: "update_bottle",
+      preview: {
+        before: {
+          shared: { distillers: [{ shortName: null }] },
+        },
+        after: {
+          shared: { distillers: [{ shortName: null }] },
+        },
+      },
+    });
+  });
+
   test("reports merge membership and identity collisions as canonical merge warnings", async ({
     fixtures,
   }) => {

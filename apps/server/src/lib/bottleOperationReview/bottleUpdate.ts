@@ -92,10 +92,7 @@ async function resolveEntityChoice({
       roles: [...current.entity.type].sort() as Entity["type"],
     };
     return {
-      preview: {
-        kind: "existing",
-        ...dependency,
-      },
+      preview: existingEntityChoice(current.entity),
       canonical: current.entity.id,
       dependency,
     };
