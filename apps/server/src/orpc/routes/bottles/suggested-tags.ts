@@ -1,10 +1,17 @@
 import { db } from "@peated/server/db";
 import { bottleTags, bottles, tags } from "@peated/server/db/schema";
-import { shuffle } from "@peated/server/lib/rand";
 import { procedure } from "@peated/server/orpc";
 import { TagSchema } from "@peated/server/schemas";
 import { desc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
+
+const COMMON_TASTING_NOTE_NAMES = [
+  "vanilla",
+  "caramel",
+  "oak",
+  "apple",
+  "smoke",
+] as const;
 
 export default procedure
   .route({
@@ -71,12 +78,21 @@ export default procedure
 
     const defaultTags = await db.select().from(tags);
 
-    const results = shuffle(defaultTags)
+    const commonTagOrder = new Map<string, number>(
+      COMMON_TASTING_NOTE_NAMES.map((name, index) => [name, index]),
+    );
+    const results = defaultTags
       .map((t) => ({
         tag: t,
         count: Number(usedTags[t.name] || 0),
       }))
-      .sort((a, b) => b.count - a.count);
+      .sort(
+        (a, b) =>
+          b.count - a.count ||
+          (commonTagOrder.get(a.tag.name) ?? Number.MAX_SAFE_INTEGER) -
+            (commonTagOrder.get(b.tag.name) ?? Number.MAX_SAFE_INTEGER) ||
+          a.tag.name.localeCompare(b.tag.name),
+      );
 
     return {
       results,

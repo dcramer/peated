@@ -18,6 +18,7 @@ import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
   buildTastingTagOptions,
+  filterTastingTagOptions,
   TastingFormFieldsSchema,
   type TastingCreateFormSubmitData,
   type TastingEditFormSubmitData,
@@ -178,13 +179,7 @@ export default function TastingForm(
                 placeholder="What flavors and aromas come to mind with this spirit?"
                 options={tagOptions}
                 onQuery={async (query, options) => {
-                  return options.filter(
-                    (o) =>
-                      o.name.toLowerCase().includes(query.toLowerCase()) ||
-                      o.tag?.tagCategory
-                        .toLowerCase()
-                        .includes(query.toLowerCase()) === true,
-                  );
+                  return filterTastingTagOptions(query, options);
                 }}
                 onRenderOption={(option) => {
                   return (
