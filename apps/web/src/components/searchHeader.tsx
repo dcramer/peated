@@ -23,6 +23,7 @@ export default function SearchHeader({
     <nav className="flex min-w-full items-stretch justify-between gap-x-4 text-white">
       <div className="flex items-center">
         <button
+          aria-label={onClose ? "Close" : "Back"}
           onClick={() => (onClose ? onClose() : router.back())}
           className={`${blockStyles} text-muted group flex justify-center`}
         >

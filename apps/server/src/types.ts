@@ -101,6 +101,7 @@ export type User = z.infer<typeof UserSchema>;
 
 export type Tag = {
   name: string;
+  synonyms: string[];
   tagCategory: TagCategory;
   flavorProfiles: FlavorProfile[];
 };

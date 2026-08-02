@@ -4,7 +4,7 @@ import config from "@peated/web/config";
 import classNames from "@peated/web/lib/classNames";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import LayoutModal from "../layoutModal";
 import ListItem from "../listItem";
@@ -68,6 +68,7 @@ export default function SelectDialog<T extends Option>({
     "loading",
   );
   const [createOpen, setCreateOpen] = useState(false);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const unsafe_onSearch = useCallback(
     async (query = "") => {
@@ -101,13 +102,16 @@ export default function SelectDialog<T extends Option>({
 
   return (
     <>
-      <Modal open={open} onClose={setOpen}>
+      <Modal open={open} onClose={setOpen} aria-label="Select an option">
         <LayoutModal
           noMargin
           header={
             <SearchHeader
               onClose={() => setOpen(false)}
               onChange={(value) => {
+                listRef.current
+                  ?.closest<HTMLElement>(".dialog-panel")
+                  ?.scrollTo({ top: 0 });
                 setLoading(true);
                 void onSearch(value);
               }}
@@ -119,6 +123,7 @@ export default function SelectDialog<T extends Option>({
           }
         >
           <ul
+            ref={listRef}
             role="list"
             className="divide-y divide-slate-800 border-slate-800 lg:border-x lg:border-b"
           >
@@ -173,7 +178,9 @@ export default function SelectDialog<T extends Option>({
                           <div className="font-semibold">
                             <button onClick={() => setCreateOpen(true)}>
                               <span className="absolute inset-x-0 -top-px bottom-0" />
-                              Can't find what you're looking for?
+                              {query
+                                ? "Still can't find what you're looking for?"
+                                : "Can't find what you're looking for?"}
                             </button>
                           </div>
                           <div className="mt-1 flex gap-x-1 text-sm">
@@ -205,11 +212,13 @@ export default function SelectDialog<T extends Option>({
                               rel="noreferrer"
                             >
                               <span className="absolute inset-x-0 -top-px bottom-0" />
-                              Can't find what you're looking for?
+                              {query
+                                ? "Still can't find what you're looking for?"
+                                : "Can't find what you're looking for?"}
                             </a>
                           </div>
                           <div className="mt-1 flex gap-x-1 text-sm">
-                            Well, that stinks. Maybe open an issue on GitHub?
+                            Tell us what we're missing on GitHub.
                           </div>
                         </div>
                       </>
