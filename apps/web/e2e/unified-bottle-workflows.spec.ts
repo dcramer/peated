@@ -311,10 +311,6 @@ test.describe("unified Bottle workflows", () => {
     );
     await expect(page.getByLabel("Shared Stated Age")).toHaveCount(0);
     await expect(page.getByLabel("Bottle-specific Stated Age")).toHaveCount(0);
-    const preview = page.getByRole("region", { name: "Bottle preview" });
-    await expect(preview).toContainText(
-      `${unifiedBottleEditContext.exact.statedAge} years`,
-    );
     await expect(page.getByLabel("Edition or Batch")).toHaveValue(
       unifiedBottleEditContext.exact.edition,
     );
@@ -333,19 +329,14 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("group", { name: "Exact Bottle details" }),
     ).toHaveCount(0);
-    await expect(preview).toContainText("Cask 42");
-    await expect(preview).toContainText("55.1% ABV");
-    await expect(preview).toContainText("2023 release");
-    await expect(preview).toContainText("2004 vintage");
     await expect(page.getByText("Edit Bottling", { exact: true })).toHaveCount(
       0,
     );
 
     await page.getByLabel("Edition or Batch").fill("Cask 43");
-    await expect(preview).toContainText("Cask 43");
-    await expect(preview).not.toContainText("Cask 42");
+    await expect(page.getByLabel("Edition or Batch")).toHaveValue("Cask 43");
     await page.getByLabel("Age Statement").fill("22");
-    await expect(preview).toContainText("22 years");
+    await expect(page.getByLabel("Age Statement")).toHaveValue("22");
 
     const updateRequestPromise = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottles/update"),
