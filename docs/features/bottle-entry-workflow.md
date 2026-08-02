@@ -41,6 +41,10 @@ identity remains unresolved.
 
 - Add Bottle accepts shared and exact fields in one submission and always
   creates a Bottle, never a child release record.
+- When photo identification matches an existing Bottle, the result presents an
+  explicit “Not the right bottle?” recovery path. Manual creation uses the
+  scanned label details and pending photo rather than cloning the matched
+  Bottle.
 - “Add a similar bottle” uses the selected Bottle and its group's shared label
   only to prefill the same independent form. Submission does not carry source
   Bottle or group authority and starts in a new singleton group.

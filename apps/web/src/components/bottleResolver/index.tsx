@@ -443,7 +443,7 @@ export default function BottleResolver({
         onChange={onFileChange}
       />
 
-      <div className="mx-auto mt-5 max-w-3xl space-y-5">
+      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
         {!previewUrl && !photoResult && !isIdentifying && (
           <PhotoUploadState
             searchHref={defaultSearchHref}
@@ -518,6 +518,15 @@ export default function BottleResolver({
                 searchHref={searchHref}
                 searchLabel={searchActionLabel}
                 createBottleHref={matchedBottle ? createBottleHref : null}
+                createBottleLabel={
+                  matchedBottle ? "Create New Bottle" : undefined
+                }
+                title={matchedBottle ? "Not the right bottle?" : undefined}
+                description={
+                  matchedBottle
+                    ? "Search for the correct bottle or create a new one using the details from this label."
+                    : undefined
+                }
                 showStartOver
                 onStartOver={startOver}
               />

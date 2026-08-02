@@ -30,10 +30,7 @@ import TastingForm, {
 } from "@peated/web/components/tastingForm";
 import useAuth from "@peated/web/hooks/useAuth";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
-import {
-  getAddSimilarBottlePath,
-  getPendingImageFromParams,
-} from "@peated/web/lib/addBottle";
+import { getPendingImageFromParams } from "@peated/web/lib/addBottle";
 import { toBlob } from "@peated/web/lib/blobs";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
@@ -180,7 +177,7 @@ function CollectionBottlePanel({ entry }: { entry: CollectionBottle }) {
 function LoadingBottlePanel() {
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl">
+      <div className="mx-auto mt-5 max-w-3xl px-4 lg:px-0">
         <Spinner />
       </div>
     </Layout>
@@ -202,7 +199,7 @@ function BottleLoadErrorPanel({
 }) {
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5">
+      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
         <FormError values={[message]} />
         <div className="grid gap-3 sm:grid-cols-2">
           <Button
@@ -319,31 +316,12 @@ function MatchedOutcomeActions({
       View Bottle
     </OutcomeButton>
   );
-  const addSimilarBottleButton = (
-    <OutcomeButton
-      key="similar-bottle"
-      href={getAddSimilarBottlePath(bottle.id)}
-      icon={<Plus className="h-4 w-4" />}
-    >
-      Add Similar
-    </OutcomeButton>
-  );
   const actionButtons =
     intent === "tasting"
-      ? [
-          tastingButton,
-          libraryButton,
-          viewButton,
-          addSimilarBottleButton,
-        ].filter(Boolean)
-      : [
-          libraryButton,
-          tastingButton,
-          viewButton,
-          addSimilarBottleButton,
-        ].filter(Boolean);
+      ? [tastingButton, libraryButton, viewButton]
+      : [libraryButton, tastingButton, viewButton];
 
-  return <div className="grid gap-3 sm:grid-cols-4">{actionButtons}</div>;
+  return <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>;
 }
 
 function CreateProposalOutcomeActions({
@@ -462,33 +440,14 @@ function OutcomeSelection({
       View Bottle
     </OutcomeButton>
   );
-  const addSimilarBottleButton = wasCreated ? null : (
-    <OutcomeButton
-      key="similar-bottle"
-      href={getAddSimilarBottlePath(selection.bottle.id)}
-      icon={<Plus className="h-4 w-4" />}
-    >
-      Add Similar
-    </OutcomeButton>
-  );
   const actionButtons =
     intent === "tasting"
-      ? [
-          tastingButton,
-          libraryButton,
-          viewButton,
-          addSimilarBottleButton,
-        ].filter(Boolean)
-      : [
-          libraryButton,
-          tastingButton,
-          viewButton,
-          addSimilarBottleButton,
-        ].filter(Boolean);
+      ? [tastingButton, libraryButton, viewButton]
+      : [libraryButton, tastingButton, viewButton];
 
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5">
+      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
         <BottlePanel
           bottle={selection.bottle}
           previewUrl={selection.previewUrl}
@@ -512,11 +471,7 @@ function OutcomeSelection({
               <h2 className="font-semibold text-white">{title}</h2>
               <p className="text-muted mt-1 text-sm">{description}</p>
             </div>
-            <div
-              className={`grid gap-3 ${wasCreated ? "sm:grid-cols-3" : "sm:grid-cols-4"}`}
-            >
-              {actionButtons}
-            </div>
+            <div className="grid gap-3 sm:grid-cols-3">{actionButtons}</div>
           </div>
         </section>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -565,7 +520,7 @@ function AddedToLibrary({
 }) {
   return (
     <Layout footer={null} header={<FlowHeader>{null}</FlowHeader>}>
-      <div className="mx-auto mt-5 max-w-3xl space-y-5">
+      <div className="mx-auto mt-5 max-w-3xl space-y-5 px-4 lg:px-0">
         <section className="rounded border border-slate-800 bg-slate-950/50 p-4 lg:p-6">
           <div className="space-y-5">
             <div className="flex items-start gap-3">
