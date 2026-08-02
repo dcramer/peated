@@ -39,7 +39,24 @@ Local Postgres is published on `localhost:15432` and Redis is published on
 tracked local test database config in `apps/server/.env.test` uses the same
 host ports.
 
-Note: If you need to tweak default settings, `cp .env.example .env` and go to town.
+Copy the example environment file into your local-only configuration:
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local` is ignored and is copied into Codex-managed worktrees through
+`.worktreeinclude`.
+
+For the Codex local environment setup script, use:
+
+```bash
+test -f .env.local || cp .env.example .env.local
+SKIP_INSTALL_SIMPLE_GIT_HOOKS=1 pnpm install --frozen-lockfile
+```
+
+Git hooks are shared with the primary checkout, so worktrees do not need to
+install them again.
 
 Setup the database:
 

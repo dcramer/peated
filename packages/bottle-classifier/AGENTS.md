@@ -76,5 +76,5 @@ Before changing classifier behavior, read:
 - Live evals are expensive. Run focused live evals only for intentional
   model-sensitive work. Commit replay recordings required by deliberate fixture
   or harness changes.
-- Live evals load repo-root `.env`/`.env.local`, then package-root equivalents;
-  shell-provided environment variables take precedence.
+- Live evals load repo-root `.env.local`; shell-provided environment variables
+  take precedence.
