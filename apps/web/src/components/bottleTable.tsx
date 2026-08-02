@@ -101,11 +101,13 @@ export default function BottleTable({
                     mode="absolute"
                     metadataVariant={compactIdentity ? "summary" : "full"}
                     showBrand={!props.groupBy}
+                    trailingContent={statusIndicators}
                   />
-                  <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
-                    {statusIndicators}
-                    {collectionMeta}
-                  </div>
+                  {collectionMeta ? (
+                    <div className="text-muted mt-1 flex min-w-0 flex-wrap items-center gap-x-1 text-sm">
+                      {collectionMeta}
+                    </div>
+                  ) : null}
                 </div>
                 {showRatingSummary ? (
                   <BottleRatingSummary

@@ -2,7 +2,7 @@
 
 import type { Bottle } from "@peated/server/types";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import BottleIdentity from "./bottleIdentity";
 import BottlePanel from "./bottlePanel";
 import { ClientOnly } from "./clientOnly";
@@ -10,9 +10,11 @@ import { ClientOnly } from "./clientOnly";
 export default function FlightBottleIdentity({
   bottle,
   flightId,
+  trailingContent,
 }: {
   bottle: Bottle;
   flightId: string;
+  trailingContent?: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -22,6 +24,7 @@ export default function FlightBottleIdentity({
         bottle={bottle}
         mode="absolute"
         metadataVariant="summary"
+        trailingContent={trailingContent}
         onClick={(event) => {
           event.preventDefault();
           setOpen(true);
