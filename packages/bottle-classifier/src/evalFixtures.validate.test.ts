@@ -362,7 +362,6 @@ describe("eval fixture validation", () => {
             destinationBottleId: 45146,
           },
           evidenceRefs: [
-            { kind: "source", field: "reference.name" },
             { kind: "bottle", bottleId: 39096 },
             { kind: "bottle", bottleId: 45146 },
             {

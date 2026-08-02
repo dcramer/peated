@@ -144,7 +144,7 @@ describe("bottleClassifier web search tools", () => {
               type: "output_text",
               text: [
                 "Wild Turkey confirms Rare Breed Rye is barrel proof.",
-                "x".repeat(650),
+                "x".repeat(1250),
                 "[Rare Breed Rye](https://www.wildturkeybourbon.com/products/rare-breed-rye/)",
                 `[Whisky Advocate review](${independentUrl})`,
               ].join(" "),
@@ -155,7 +155,7 @@ describe("bottleClassifier web search tools", () => {
       ],
     });
 
-    expect(evidence.summary).toHaveLength(600);
+    expect(evidence.summary).toHaveLength(1200);
     expect(evidence.results).toEqual([
       expect.objectContaining({
         title: "Rare Breed Rye",
@@ -168,6 +168,28 @@ describe("bottleClassifier web search tools", () => {
         url: independentUrl,
       }),
     ]);
+  });
+
+  test("preserves decisive bottle facts after the first 600 summary characters", () => {
+    const decisiveFacts =
+      "Confirmed traits: age 12 years; ABV 48.0%; bottled 2022; cask 2nd fill hogshead.";
+    const evidence = extractOpenAISearchEvidence("Example whisky release", {
+      output: [
+        {
+          type: "message",
+          content: [
+            {
+              type: "output_text",
+              text: ["x".repeat(650), decisiveFacts, "y".repeat(600)].join(" "),
+              annotations: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(evidence.summary).toContain(decisiveFacts);
+    expect(evidence.summary).toHaveLength(1200);
   });
 
   test.each(["Markdown", "structured"] as const)(
@@ -632,7 +654,7 @@ describe("bottleClassifier web search tools", () => {
     const evidence = buildBottleSearchEvidence({
       provider: "firecrawl",
       query: "ardbeg traigh bhan 19",
-      summary: ["x".repeat(450), decisiveFact, "y".repeat(500)].join(" "),
+      summary: ["x".repeat(450), decisiveFact, "y".repeat(800)].join(" "),
       results: Array.from({ length: 12 }, (_, index) => ({
         title: `Result ${index + 1} ${"y".repeat(300)}`,
         url: `https://example.com/${index + 1}`,
@@ -642,7 +664,7 @@ describe("bottleClassifier web search tools", () => {
       })),
     });
 
-    expect(evidence.summary).toHaveLength(600);
+    expect(evidence.summary).toHaveLength(1200);
     expect(evidence.summary).toContain(decisiveFact);
     expect(evidence.results).toHaveLength(6);
     for (const result of evidence.results) {

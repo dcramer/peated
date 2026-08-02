@@ -55,6 +55,10 @@ import {
   formatEvalUsageAnnotation,
 } from "./evalMeasurements";
 import {
+  assertSuccessfulWebSearchReplay,
+  sanitizeWebSearchRecording,
+} from "./evalReplay";
+import {
   createEvalClassifierOptions,
   evalClassifierModel,
   evalClassifierReasoningEffort,
@@ -760,8 +764,9 @@ function createEvalRuntime() {
         args,
         context: null,
         execute,
-        replay: true,
+        replay: { sanitize: sanitizeWebSearchRecording },
       });
+      assertSuccessfulWebSearchReplay(result);
       return result;
     },
     observeToolEvent: (event: BottleClassifierToolEvent) => {
@@ -1075,6 +1080,11 @@ const SCENARIO_CONFIG: Array<{
   {
     label: "corrections",
     scenario: "corrections",
+    threshold: 1,
+  },
+  {
+    label: "ignored / no match",
+    scenario: "ignore_or_reject",
     threshold: 1,
   },
 ];

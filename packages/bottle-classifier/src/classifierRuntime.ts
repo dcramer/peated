@@ -940,19 +940,20 @@ export async function prepareBottleClassifierAgentRun(
     instructionMode === "local_identification"
       ? buildBottleLocalIdentifierInstructions()
       : buildBottleClassifierInstructions();
+  const availableSourceEvidenceFields = getBottleCheckSourceEvidencePaths({
+    intent: "resolve_reference",
+    input: { reference },
+    artifacts: buildBottleClassificationArtifacts({
+      extractedIdentity: normalizedExtractedIdentity,
+      imageEvidence: normalizedImageEvidence,
+    }),
+  });
 
   const proposalCollector =
     instructionMode === "classification"
       ? createRunProposalCollector({
           maxProposals: CLASSIFIER_MAX_PROPOSED_OPERATIONS,
-          sourceFields: getBottleCheckSourceEvidencePaths({
-            intent: "resolve_reference",
-            input: { reference },
-            artifacts: buildBottleClassificationArtifacts({
-              extractedIdentity: normalizedExtractedIdentity,
-              imageEvidence: normalizedImageEvidence,
-            }),
-          }),
+          sourceFields: availableSourceEvidenceFields,
           state,
         })
       : null;
@@ -1022,6 +1023,7 @@ export async function prepareBottleClassifierAgentRun(
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
     investigationHint,
     identityAnchor,
+    availableSourceEvidenceFields,
   });
   const getArtifacts = () =>
     buildAgentArtifacts({
@@ -1113,16 +1115,17 @@ export function prepareBottleAuditAgentRun(
     entityContexts: new Map(),
   };
   const webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
+  const availableSourceEvidenceFields = getBottleCheckSourceEvidencePaths({
+    intent: "audit_bottle",
+    input: audit,
+    artifacts: buildBottleClassificationArtifacts({
+      candidates: [currentBottle],
+      bottleContexts: [currentBottleContext],
+    }),
+  });
   const proposalCollector = createRunProposalCollector({
     maxProposals: CLASSIFIER_MAX_PROPOSED_OPERATIONS,
-    sourceFields: getBottleCheckSourceEvidencePaths({
-      intent: "audit_bottle",
-      input: audit,
-      artifacts: buildBottleClassificationArtifacts({
-        candidates: [currentBottle],
-        bottleContexts: [currentBottleContext],
-      }),
-    }),
+    sourceFields: availableSourceEvidenceFields,
     state,
   });
   const agent: BottleAuditAgent = new Agent({
@@ -1171,6 +1174,7 @@ export function prepareBottleAuditAgentRun(
       audit,
       currentBottleContext,
       searchEvidence,
+      availableSourceEvidenceFields,
     }),
     conversationId,
     runOptions: {

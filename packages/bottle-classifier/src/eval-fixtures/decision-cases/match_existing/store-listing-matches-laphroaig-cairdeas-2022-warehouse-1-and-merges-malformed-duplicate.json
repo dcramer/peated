@@ -605,10 +605,6 @@
         "rationale": "Bottle 39096 is a malformed duplicate of the exact 2022 Càirdeas Warehouse 1 release represented by Bottle 45146; its tasting image shows Warehouse 1 and 52.2% ABV, and 2022 is the release year rather than a vintage year.",
         "evidenceRefs": [
           {
-            "kind": "source",
-            "field": "reference.name"
-          },
-          {
             "kind": "bottle",
             "bottleId": 39096
           },

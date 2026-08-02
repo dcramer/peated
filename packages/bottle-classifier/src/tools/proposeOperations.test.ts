@@ -58,6 +58,7 @@ describe("Bottle proposal tools", () => {
       expect(proposalTool.description).toContain("recorded | updated");
       expect(proposalTool.description).toContain("status: rejected");
       expect(proposalTool.description).toContain("reason");
+      expect(JSON.stringify(proposalTool.parameters)).not.toContain('"input"');
     }
 
     const mergeTool = tools.find(
@@ -69,6 +70,14 @@ describe("Bottle proposal tools", () => {
     );
     expect(mergeTool?.description).toContain("when available");
     expect(mergeTool?.description).toContain("alone is insufficient");
+    expect(mergeTool?.parameters).toMatchObject({
+      properties: {
+        sourceBottleId: expect.anything(),
+        destinationBottleId: expect.anything(),
+        rationale: expect.anything(),
+        evidenceRefs: expect.anything(),
+      },
+    });
   });
 
   test.each([
@@ -110,7 +119,8 @@ describe("Bottle proposal tools", () => {
   test("records inspected proposals and updates repeated type plus input", async () => {
     const { collector, tools } = createHarness();
     const proposal = {
-      input: { sourceBottleId: 10, destinationBottleId: 11 },
+      sourceBottleId: 10,
+      destinationBottleId: 11,
       rationale: "Both inspected records are the exact same marketed Bottle.",
       evidenceRefs: [
         { kind: "bottle", bottleId: 10 },
@@ -147,14 +157,16 @@ describe("Bottle proposal tools", () => {
 
     expect(
       await invoke(tools, "propose_update_entity", {
-        input: { entityId: 99, patch: { website: "https://example.com" } },
+        entityId: 99,
+        patch: { website: "https://example.com" },
         rationale: "The Entity needs its official website.",
         evidenceRefs: [{ kind: "source", field: "reference.name" }],
       }),
     ).toMatchObject({ status: "rejected" });
     expect(
       await invoke(tools, "propose_update_bottle", {
-        input: { bottleId: 10, patch: { exact: { abv: 46 } } },
+        bottleId: 10,
+        patch: { exact: { abv: 46 } },
         rationale: "The inspected Bottle has the wrong ABV.",
         evidenceRefs: [
           { kind: "web_result", url: "https://example.com/not-collected" },
@@ -169,7 +181,8 @@ describe("Bottle proposal tools", () => {
 
     expect(
       await invoke(tools, "propose_merge_bottles", {
-        input: { sourceBottleId: 10, destinationBottleId: 11 },
+        sourceBottleId: 10,
+        destinationBottleId: 11,
         rationale: "Both rows are the same marketed Bottle.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
       }),
@@ -179,11 +192,9 @@ describe("Bottle proposal tools", () => {
     });
     expect(
       await invoke(tools, "propose_update_bottle", {
-        input: {
-          bottleId: 10,
-          patch: {
-            shared: { brand: { kind: "existing", entityId: 20 } },
-          },
+        bottleId: 10,
+        patch: {
+          shared: { brand: { kind: "existing", entityId: 20 } },
         },
         rationale: "Use the inspected canonical Brand.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
@@ -205,10 +216,8 @@ describe("Bottle proposal tools", () => {
 
     expect(
       await invoke(tools, "propose_update_bottle", {
-        input: {
-          bottleId: 10,
-          patch: { shared: { seriesId: 72 } },
-        },
+        bottleId: 10,
+        patch: { shared: { seriesId: 72 } },
         rationale: "Assign a Series that no inspected Bottle exposes.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
       }),
@@ -219,10 +228,8 @@ describe("Bottle proposal tools", () => {
 
     expect(
       await invoke(tools, "propose_update_bottle", {
-        input: {
-          bottleId: 10,
-          patch: { shared: { seriesId: 71 } },
-        },
+        bottleId: 10,
+        patch: { shared: { seriesId: 71 } },
         rationale: "An inspected Bottle exposes the canonical Series.",
         evidenceRefs: [{ kind: "bottle", bottleId: 10 }],
       }),

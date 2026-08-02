@@ -110,10 +110,15 @@ async function runWithFakeModel(
 describe("classifier output boundary", () => {
   test("sends the generated reference JSON Schema in the model request", async () => {
     const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
-      reference: { name: "Laphroaig Cairdeas 2022" },
+      reference: {
+        id: "listing-1",
+        externalSiteId: 7,
+        name: "Laphroaig Cairdeas 2022",
+      },
       extractedIdentity: null,
       initialCandidates: [],
     });
+    const dynamicInput = JSON.parse(prepared.input);
 
     const { outputType, result } = await runWithFakeModel(
       prepared.agent,
@@ -156,6 +161,12 @@ describe("classifier output boundary", () => {
         "propose_merge_entities",
       ]),
     );
+    expect(dynamicInput.reference.externalSiteId).toBe(7);
+    expect(dynamicInput.availableSourceEvidenceFields).toEqual([
+      "reference.id",
+      "reference.externalSiteId",
+      "reference.name",
+    ]);
     expect(prepared.getAgentResult(result)).toMatchObject({
       decision: { action: "no_match" },
       findings: [],
@@ -200,6 +211,9 @@ describe("classifier output boundary", () => {
         "propose_update_entity",
         "propose_merge_entities",
       ]),
+    );
+    expect(JSON.parse(prepared.input).availableSourceEvidenceFields).toEqual(
+      [],
     );
   });
 

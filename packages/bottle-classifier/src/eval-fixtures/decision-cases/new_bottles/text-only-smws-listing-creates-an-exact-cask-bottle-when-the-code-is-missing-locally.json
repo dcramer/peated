@@ -42,10 +42,7 @@
         "id": 4263,
         "name": "The Scotch Malt Whisky Society"
       },
-      "bottler": {
-        "id": 4263,
-        "name": "The Scotch Malt Whisky Society"
-      },
+      "bottler": null,
       "distillers": [
         {
           "id": 127,

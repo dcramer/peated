@@ -234,10 +234,8 @@ describe("Bottle-check context tools", () => {
     });
     expect(
       await invokePreparedTool(prepared, "propose_merge_bottles", {
-        input: {
-          sourceBottleId: duplicate.bottleId,
-          destinationBottleId: canonical.bottleId,
-        },
+        sourceBottleId: duplicate.bottleId,
+        destinationBottleId: canonical.bottleId,
         rationale: "Both inspected rows are the same marketed Bottle.",
         evidenceRefs: [
           { kind: "bottle", bottleId: duplicate.bottleId },
@@ -327,10 +325,8 @@ describe("Bottle-check context tools", () => {
       prepared,
       "propose_merge_bottles",
       {
-        input: {
-          sourceBottleId: duplicate.bottleId,
-          destinationBottleId: canonical.bottleId,
-        },
+        sourceBottleId: duplicate.bottleId,
+        destinationBottleId: canonical.bottleId,
         rationale:
           "Both inspected rows and official evidence identify the same marketed Bottle.",
         evidenceRefs: [

@@ -12,18 +12,21 @@ import {
   type ProposedOperation,
 } from "../bottleCheckContract";
 
-const UpdateBottleProposalArgsSchema = UpdateBottleOperationSchema.omit({
-  type: true,
-});
-const MergeBottlesProposalArgsSchema = MergeBottlesOperationSchema.omit({
-  type: true,
-});
-const UpdateEntityProposalArgsSchema = UpdateEntityOperationSchema.omit({
-  type: true,
-});
-const MergeEntitiesProposalArgsSchema = MergeEntitiesOperationSchema.omit({
-  type: true,
-});
+const ProposalEnvelopeArgsShape = {
+  rationale: UpdateBottleOperationSchema.shape.rationale,
+  evidenceRefs: UpdateBottleOperationSchema.shape.evidenceRefs,
+};
+
+const UpdateBottleProposalArgsSchema =
+  UpdateBottleOperationSchema.shape.input.safeExtend(ProposalEnvelopeArgsShape);
+const MergeBottlesProposalArgsSchema =
+  MergeBottlesOperationSchema.shape.input.safeExtend(ProposalEnvelopeArgsShape);
+const UpdateEntityProposalArgsSchema =
+  UpdateEntityOperationSchema.shape.input.safeExtend(ProposalEnvelopeArgsShape);
+const MergeEntitiesProposalArgsSchema =
+  MergeEntitiesOperationSchema.shape.input.safeExtend(
+    ProposalEnvelopeArgsShape,
+  );
 
 type ProposalCollectionContext = {
   hasBottleEvidence: (bottleId: number) => boolean;
@@ -256,10 +259,13 @@ function nonStrictJsonSchema(schema: z.ZodType) {
   return z.toJSONSchema(schema, { target: "draft-7" }) as never;
 }
 
-function withOperationType(type: ProposedOperation["type"], args: unknown) {
-  return args !== null && typeof args === "object"
-    ? { ...args, type }
-    : { type };
+function toStoredOperation(type: ProposedOperation["type"], args: unknown) {
+  if (args === null || typeof args !== "object") {
+    return { type };
+  }
+
+  const { rationale, evidenceRefs, ...input } = args as Record<string, unknown>;
+  return { type, input, rationale, evidenceRefs };
 }
 
 const PROPOSAL_RESULT_DESCRIPTION =
@@ -279,7 +285,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
       parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,
       execute: (args) =>
-        collector.record(withOperationType("update_bottle", args)),
+        collector.record(toStoredOperation("update_bottle", args)),
     }),
     tool({
       name: "propose_merge_bottles",
@@ -288,7 +294,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
       ),
       parameters: MergeBottlesProposalArgsSchema,
       execute: (args) =>
-        collector.record(withOperationType("merge_bottles", args)),
+        collector.record(toStoredOperation("merge_bottles", args)),
     }),
     tool({
       name: "propose_update_entity",
@@ -298,7 +304,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
       parameters: nonStrictJsonSchema(UpdateEntityProposalArgsSchema),
       strict: false,
       execute: (args) =>
-        collector.record(withOperationType("update_entity", args)),
+        collector.record(toStoredOperation("update_entity", args)),
     }),
     tool({
       name: "propose_merge_entities",
@@ -307,7 +313,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
       ),
       parameters: MergeEntitiesProposalArgsSchema,
       execute: (args) =>
-        collector.record(withOperationType("merge_entities", args)),
+        collector.record(toStoredOperation("merge_entities", args)),
     }),
   ];
 }

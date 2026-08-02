@@ -105,6 +105,7 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
+        availableSourceEvidenceFields: ["reference.name"],
       }),
     );
 
@@ -180,12 +181,22 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "initial_only",
+        availableSourceEvidenceFields: [
+          "reference.name",
+          "reference.imageUrl",
+          "extractedIdentity.brand",
+          "extractedIdentity.abv",
+          "imageEvidence.fieldCandidates.expression",
+        ],
       }),
     );
 
     expect(input.imageEvidence.sourceImageId).toBe("pending-upload-1");
     expect(input.imageEvidence.fieldCandidates.expression.value).toBe(
       "Uigeadail",
+    );
+    expect(input.availableSourceEvidenceFields).toContain(
+      "imageEvidence.fieldCandidates.expression",
     );
   });
 
@@ -198,6 +209,7 @@ describe("buildAgentInput", () => {
         currentBottle: null,
         hasExactAliasMatch: false,
         candidateExpansion: "open",
+        availableSourceEvidenceFields: ["reference.name"],
         identityAnchor: {
           action: "match",
           rationale: "The SMWS code is a closed identity anchor.",
@@ -231,6 +243,7 @@ describe("buildAuditBottleAgentInput", () => {
           note: "Review the Brand assignment; this text is context only.",
         },
         currentBottleContext: buildBottleContext(),
+        availableSourceEvidenceFields: ["audit.note"],
       }),
     );
 
@@ -254,6 +267,7 @@ describe("buildAuditBottleAgentInput", () => {
           },
         ],
       },
+      availableSourceEvidenceFields: ["audit.note"],
     });
     expect(input).not.toHaveProperty("reference");
   });

@@ -38,6 +38,7 @@ describe("Bottle check instructions", () => {
     for (const instructions of [reference, audit]) {
       expect(instructions).toContain("proposal tools");
       expect(instructions).toMatch(/do not mutate|read-only/);
+      expect(instructions).toContain("`availableSourceEvidenceFields`");
     }
   });
 
@@ -50,6 +51,7 @@ describe("Bottle check instructions", () => {
       "Once reviewed evidence establishes equivalence",
       "Do not include proposed operations in the final structured output",
       "Use an evidenced canonical `proposedBottle.name`",
+      "establish cask size only",
       "actual `toolsUsed`",
     ]) {
       expect(reference).toContain(rule);

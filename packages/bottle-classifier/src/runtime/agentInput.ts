@@ -28,6 +28,7 @@ export function buildAgentInput({
   resolvedEntities = [],
   investigationHint = null,
   identityAnchor = null,
+  availableSourceEvidenceFields,
 }: {
   reference: BottleReference;
   extractedIdentity: BottleExtractedDetails | null;
@@ -40,6 +41,7 @@ export function buildAgentInput({
   resolvedEntities?: EntityResolution[];
   investigationHint?: string | null;
   identityAnchor?: BottleClassificationDecision | null;
+  availableSourceEvidenceFields: readonly string[];
 }): string {
   /**
    * The model should see the raw reference, extracted identity, photo evidence,
@@ -50,6 +52,7 @@ export function buildAgentInput({
     {
       reference: {
         id: reference.id ?? null,
+        externalSiteId: reference.externalSiteId ?? null,
         name: reference.name,
         url: reference.url ?? null,
         imageUrl: reference.imageUrl ?? null,
@@ -71,6 +74,7 @@ export function buildAgentInput({
       },
       investigationHint,
       identityAnchor,
+      availableSourceEvidenceFields,
     },
     null,
     2,
@@ -81,10 +85,12 @@ export function buildAuditBottleAgentInput({
   audit,
   currentBottleContext,
   searchEvidence = [],
+  availableSourceEvidenceFields,
 }: {
   audit: AuditBottleInput;
   currentBottleContext: BottleContext;
   searchEvidence?: BottleSearchEvidence[];
+  availableSourceEvidenceFields: readonly string[];
 }): string {
   return JSON.stringify(
     {
@@ -98,6 +104,7 @@ export function buildAuditBottleAgentInput({
       webEvidence: {
         results: searchEvidence,
       },
+      availableSourceEvidenceFields,
     },
     null,
     2,

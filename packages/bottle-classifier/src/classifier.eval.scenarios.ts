@@ -17,6 +17,7 @@ export const LIVE_CLASSIFIER_EVAL_SCENARIOS = [
   "new_bottles",
   "match_existing",
   "corrections",
+  "ignore_or_reject",
 ] as const;
 
 export type LiveClassifierEvalScenario =
