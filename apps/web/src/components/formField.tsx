@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@heroicons/react/20/solid";
-import type { MouseEvent, ReactNode } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 import classNames from "../lib/classNames";
 import FormLabel from "./formLabel";
 import HelpText from "./helpText";
@@ -16,7 +16,6 @@ type Props = React.ComponentPropsWithoutRef<"div"> & {
   };
   className?: string;
   labelAction?: () => void;
-  onClick?: (e: MouseEvent<HTMLDivElement>) => void;
 };
 
 export default function FormField({
@@ -30,16 +29,32 @@ export default function FormField({
   error,
   labelAction,
   onClick,
+  ...props
 }: Props) {
+  const interactionProps = onClick
+    ? {
+        role: "button",
+        tabIndex: 0,
+        onClick,
+        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.currentTarget.click();
+          }
+        },
+      }
+    : {};
+
   return (
     <div
+      {...props}
+      {...interactionProps}
       className={classNames(
         `relative block px-4 py-4 text-white focus-within:z-10`,
         className,
         onClick ? "cursor-pointer" : "",
         error ? "border border-red-500" : "",
       )}
-      onClick={onClick}
     >
       {error?.message && (
         <div className="-mx-3 -mt-2.5 mb-2.5 bg-red-600 px-3 py-2.5 sm:-mx-5 sm:-mt-4 sm:mb-4 sm:px-5">

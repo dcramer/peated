@@ -34,6 +34,14 @@ export default function Tooltip({
       onClick={() => {
         setVisible(!visible);
       }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setVisible(!visible);
+        }
+      }}
+      role="button"
+      tabIndex={0}
       style={style}
     >
       {children}

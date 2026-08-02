@@ -20,9 +20,9 @@ export default function PendingVerificationAlert() {
   useEffect(() => {
     if (state?.alreadyVerified) {
       flash("Oops, looks like you already verified your account.", "success");
-      updateSession();
+      void updateSession();
     }
-  }, [state?.alreadyVerified]);
+  }, [flash, state?.alreadyVerified]);
 
   return (
     <Alert type="default" noMargin>

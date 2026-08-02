@@ -98,7 +98,7 @@ function CreateForm({
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          handleSubmit(onSubmit)(e);
+          void handleSubmit(onSubmit)(e);
         }}
         isSubmitting={isSubmitting}
       >

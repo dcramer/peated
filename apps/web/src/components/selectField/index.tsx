@@ -115,6 +115,9 @@ export default function SelectField<T extends Option>({
     targetOptions = options.length;
   }
 
+  // The field accepts object arrays that callers commonly recreate; retain
+  // deep comparison so controlled values do not produce a callback loop.
+  /* oxlint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const newValue = Array.isArray(props.value)
       ? props.value
@@ -123,6 +126,7 @@ export default function SelectField<T extends Option>({
         : [];
     setValue(newValue);
   }, [JSON.stringify(props.value)]);
+  /* oxlint-enable react-hooks/exhaustive-deps */
 
   const [value, setValue] = useState<T[]>(initialValue);
   const [previousValues, setPreviousValues] = useState<T[]>(value);
@@ -147,6 +151,7 @@ export default function SelectField<T extends Option>({
     return true;
   };
 
+  /* oxlint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     if (!onChange) return;
     if (multiple) {
@@ -155,6 +160,7 @@ export default function SelectField<T extends Option>({
       (onChange as (value: T) => void)(value[0]);
     }
   }, [JSON.stringify(value)]);
+  /* oxlint-enable react-hooks/exhaustive-deps */
 
   const visibleValues = rememberValues
     ? filterDupes(value, previousValues)

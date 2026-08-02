@@ -27,8 +27,7 @@ export default class BatchQueue<T> {
 
   private async checkBatchSize(): Promise<void> {
     while (this.queue.length >= this.batchSize && !this.processingBatch) {
-      this.processBatch();
-      await this.checkBatchSize(); // Check again in case more items were added
+      await this.processBatch();
     }
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import useAutofocus from "../hooks/useAutofocus";
 import Spinner from "./spinner";
 
@@ -26,23 +26,22 @@ export default function SearchHeaderForm({
   children?: ReactNode;
 }) {
   const [value, setValue] = useState(props.value ?? "");
+  const previousPropValue = useRef(props.value);
+  const latestValue = useRef(value);
 
   const ref = useAutofocus<HTMLInputElement>(() => {
     return autoFocus || !onFocus;
   });
 
   useEffect(() => {
-    if (props.value !== value) {
-      const newValue = props.value ?? "";
-      setValue(newValue);
-      if (onChange) onChange(newValue);
-    }
-  }, [props.value]);
+    if (props.value === previousPropValue.current) return;
 
-  // we store the onChange event here as setState is async
-  // and if you type a value and quickly hit enter (to submit)
-  // it will not capture the last character
-  let _lastValue = value;
+    previousPropValue.current = props.value;
+    const newValue = props.value ?? "";
+    latestValue.current = newValue;
+    setValue(newValue);
+    onChange?.(newValue);
+  }, [onChange, props.value]);
 
   return (
     <form
@@ -52,8 +51,8 @@ export default function SearchHeaderForm({
       onSubmit={(e) => {
         e.stopPropagation();
 
-        if (onSubmit) onSubmit(_lastValue);
-        else if (onChange) onChange(_lastValue);
+        if (onSubmit) onSubmit(latestValue.current);
+        else if (onChange) onChange(latestValue.current);
       }}
     >
       <input
@@ -66,7 +65,7 @@ export default function SearchHeaderForm({
         placeholder={placeholder}
         onFocus={onFocus}
         onChange={(e) => {
-          _lastValue = e.target.value;
+          latestValue.current = e.target.value;
           setValue(e.target.value);
           if (onChange) onChange(e.target.value);
         }}

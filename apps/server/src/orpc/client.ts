@@ -6,7 +6,7 @@ import { type Router } from "@peated/server/orpc/router";
 
 export function createClient(
   apiServer: string,
-  accessToken?: string | null | undefined,
+  accessToken?: string | null,
 ): RouterClient<Router> {
   const link = new RPCLink({
     url: `${apiServer}/rpc`,

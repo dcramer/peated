@@ -20,6 +20,7 @@ export default function Legend({
       <div className="flex-grow text-lg">{title}</div>
       {isCollapsed !== undefined && onCollapse && (
         <button
+          aria-label={isCollapsed ? "Expand section" : "Collapse section"}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

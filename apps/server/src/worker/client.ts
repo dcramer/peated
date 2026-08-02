@@ -117,10 +117,7 @@ export async function getConnection() {
   return connection;
 }
 
-export async function gracefulShutdown(
-  signal?: string | undefined,
-  worker?: Worker | undefined,
-) {
+export async function gracefulShutdown(signal?: string, worker?: Worker) {
   scheduler.stop();
   if (connection) connection.disconnect();
   connection = null;
@@ -183,6 +180,6 @@ export async function runWorker() {
 
   process.on("SIGTERM", () => termProcess("SIGTERM"));
 
-  worker.run();
+  void worker.run();
   logInfo("Worker running", {});
 }

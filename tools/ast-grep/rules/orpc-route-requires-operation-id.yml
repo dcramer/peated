@@ -1,0 +1,15 @@
+id: orpc-route-requires-operation-id
+language: TypeScript
+severity: error
+message: Every oRPC route must declare a stable OpenAPI operationId.
+files:
+  - apps/server/src/orpc/routes/**/*.ts
+rule:
+  all:
+    - pattern: $PROCEDURE.route($CONFIG)
+    - not:
+        has:
+          pattern:
+            context: "{ operationId: $ID }"
+            selector: pair
+          stopBy: end

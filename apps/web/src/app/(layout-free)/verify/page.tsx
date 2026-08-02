@@ -21,7 +21,7 @@ export default function Verify() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const emailVerifyMutation = useMutation(
+  const { mutate: verifyEmail } = useMutation(
     orpc.email.verify.mutationOptions({
       onSuccess: async () => {
         setSuccess(true);
@@ -40,7 +40,7 @@ export default function Verify() {
       setLoading(false);
       return;
     }
-    emailVerifyMutation.mutate(
+    verifyEmail(
       { token },
       {
         onError: (err: any) => {
@@ -57,7 +57,7 @@ export default function Verify() {
         },
       },
     );
-  }, [token]);
+  }, [token, verifyEmail]);
 
   return (
     <LayoutSplash>

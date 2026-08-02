@@ -9,7 +9,7 @@ import {
   type BottleInputSchema,
   type StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { type z } from "zod";
+import { z } from "zod";
 import { logScrapeWarning } from "./scrapeLogging";
 
 const SITE = "smws";
@@ -45,21 +45,23 @@ export default async function scrapeSMWS() {
   // }
 }
 
-type SMWSPayload = {
-  items: {
-    name: string;
-    age: number | null;
-    abv: number | null;
-    cask_no: string;
-    cask_type: string;
-    categories: string[];
-    price: number;
-    url: string;
-    release_date: string; // seems to be iso
-    distilleddate: string; // needs parsed
-    image: string;
-  }[];
-};
+const SMWSPayloadSchema = z.object({
+  items: z.array(
+    z.object({
+      name: z.string(),
+      age: z.number().nullable(),
+      abv: z.union([z.string(), z.number()]).nullable(),
+      cask_no: z.string(),
+      cask_type: z.string(),
+      categories: z.array(z.string()),
+      price: z.number(),
+      url: z.string(),
+      release_date: z.string().nullable(),
+      distilleddate: z.string(),
+      image: z.string(),
+    }),
+  ),
+});
 
 export async function scrapeBottles(
   url: string,
@@ -70,7 +72,7 @@ export async function scrapeBottles(
   ) => Promise<void>,
 ) {
   const body = await getUrl(url);
-  const data = JSON.parse(body) as SMWSPayload;
+  const data = SMWSPayloadSchema.parse(JSON.parse(body));
 
   await chunked(data.items, 10, async (items) => {
     await Promise.all(

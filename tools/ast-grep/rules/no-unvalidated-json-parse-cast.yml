@@ -1,0 +1,16 @@
+id: no-unvalidated-json-parse-cast
+language: TypeScript
+severity: error
+message: Validate parsed JSON at the runtime boundary instead of asserting its type.
+note: Parse unknown JSON with a schema (for example, Zod) before using it as typed data.
+files:
+  - apps/**/src/**/*.ts
+  - packages/**/src/**/*.ts
+ignores:
+  - apps/**/src/**/*.test.ts
+  - packages/**/src/**/*.test.ts
+rule:
+  all:
+    - pattern: JSON.parse($VALUE) as $TYPE
+    - not:
+        pattern: JSON.parse($VALUE) as unknown

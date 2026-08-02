@@ -10,7 +10,7 @@ export default function PendingTosAlert() {
   const [state, acceptAction] = useActionState(acceptTosForm, undefined);
 
   useEffect(() => {
-    if (state?.ok) updateSession();
+    if (state?.ok) void updateSession();
   }, [state?.ok]);
 
   return (

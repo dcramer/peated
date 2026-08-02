@@ -1,0 +1,7 @@
+id: no-unvalidated-json-parse-cast
+valid:
+  - const data = PayloadSchema.parse(JSON.parse(body));
+  - "const data: unknown = JSON.parse(body);"
+invalid:
+  - const data = JSON.parse(body) as Payload;
+  - "const data = JSON.parse(body) as { items: Item[] };"

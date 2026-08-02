@@ -70,7 +70,7 @@ export default function PasskeyManager() {
       });
 
       // Refresh passkeys list
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
     } catch (err: any) {
@@ -93,7 +93,7 @@ export default function PasskeyManager() {
 
     try {
       await deletePasskeyMutation.mutateAsync({ passkeyId });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
     } catch (err: any) {
@@ -112,7 +112,7 @@ export default function PasskeyManager() {
         passkeyId,
         nickname: editingName.trim() || undefined,
       });
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: orpc.auth.passkey.list.key({ input: undefined }),
       });
       setEditingId(null);
@@ -160,7 +160,7 @@ export default function PasskeyManager() {
                       onChange={(e) => setEditingName(e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                          handleSavePasskey(passkey.id);
+                          void handleSavePasskey(passkey.id);
                         } else if (e.key === "Escape") {
                           handleCancelEdit();
                         }

@@ -1,0 +1,13 @@
+id: orpc-handler-requires-output
+language: TypeScript
+severity: error
+message: Every oRPC handler must declare an output schema.
+files:
+  - apps/server/src/orpc/routes/**/*.ts
+rule:
+  all:
+    - pattern: $PROCEDURE.handler($HANDLER)
+    - not:
+        has:
+          pattern: $CHAIN.output($SCHEMA)
+          stopBy: end

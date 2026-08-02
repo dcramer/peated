@@ -20,7 +20,7 @@ const AuthContext = createContext<Auth>({
 });
 
 export const AuthProvider = ({
-  user = null,
+  user,
   children,
 }: {
   user: User | null;

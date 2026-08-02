@@ -63,6 +63,12 @@ export default function PriceChanges() {
     <div>
       {data.results.length ? (
         <table className="my-2 min-w-full text-sm">
+          <thead className="sr-only">
+            <tr>
+              <th scope="col">Bottle</th>
+              <th scope="col">Price change</th>
+            </tr>
+          </thead>
           <colgroup>
             <col className="min-w-full sm:w-5/6" />
             <col className="sm:w-1/6" />
@@ -81,7 +87,10 @@ export default function PriceChanges() {
                       isLibrary={price.isLibrary}
                     />
                   </td>
-                  <td className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3">
+                  <td
+                    aria-label="Price change"
+                    className="py-2 pl-3 pr-4 text-right sm:table-cell sm:pr-3"
+                  >
                     <div className="text-muted flex flex-col items-end text-xs">
                       <span>
                         <Price value={price.price} currency={price.currency} />

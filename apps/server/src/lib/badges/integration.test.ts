@@ -9,8 +9,8 @@ import { asc } from "drizzle-orm";
 import { awardAllBadgeXp } from ".";
 import { createTastingForBadge, getPersistedBadgeTasting } from "./testHelpers";
 
-describe("badge integration test", () => {
-  test("test first tasting example", async ({ fixtures }) => {
+describe("badge integration", () => {
+  test("first tasting example", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region = await fixtures.Region({ countryId: country.id });
 
@@ -63,7 +63,7 @@ describe("badge integration test", () => {
     `);
   });
 
-  test("test 50 states example", async ({ fixtures }) => {
+  test("50 states example", async ({ fixtures }) => {
     const user = await fixtures.User();
 
     const countrySc = await fixtures.Country({ name: "Scotland" });

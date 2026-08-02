@@ -36,7 +36,7 @@ export default function CategoryCheckConfigForm({
   useEffect(() => {
     const subscription = watch((value, { name, type }) => onChange(value));
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [onChange, watch]);
 
   return (
     <>

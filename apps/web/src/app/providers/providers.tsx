@@ -32,7 +32,7 @@ export default function Providers({
   // Sync from server props on navigation
   useEffect(() => {
     setSession(initialSession);
-  }, [initialSession.accessToken, initialSession.ts]);
+  }, [initialSession]);
 
   // Periodic session refresh
   useInterval(async () => {

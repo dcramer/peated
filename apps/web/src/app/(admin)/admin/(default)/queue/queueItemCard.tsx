@@ -602,7 +602,7 @@ function BottleIdentitySection({
   placeholder,
 }: {
   label: string;
-  bottle: QueueItem["currentBottle"] | QueueItem["suggestedBottle"];
+  bottle: QueueItem["currentBottle"];
   placeholder: string;
 }) {
   return (

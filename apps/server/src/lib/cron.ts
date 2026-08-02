@@ -11,8 +11,8 @@ export function scheduledJob(
   cb: () => Promise<void>,
 ) {
   const task = new AsyncTask(jobName, async () => {
-    Sentry.withIsolationScope(async (scope) => {
-      Sentry.startNewTrace(async () => {
+    await Sentry.withIsolationScope(async (scope) => {
+      await Sentry.startNewTrace(async () => {
         const jobId = cuid2.createId();
 
         scope.setContext("monitor", {

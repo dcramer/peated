@@ -128,9 +128,10 @@ export async function verifyPasskeyRegistration(
     if (err instanceof z.ZodError) {
       throw new Error(
         `Invalid client data JSON: ${err.issues.map((issue) => issue.message).join(", ")}`,
+        { cause: err },
       );
     }
-    throw new Error("Invalid client data JSON format");
+    throw new Error("Invalid client data JSON format", { cause: err });
   }
 
   const challenge = clientDataJSON.challenge;
@@ -138,8 +139,10 @@ export async function verifyPasskeyRegistration(
   // Verify the signed challenge to prevent tampering and replay attacks
   try {
     await verifyChallenge(signedChallenge, challenge);
-  } catch (err: any) {
-    throw new Error(err.message || "Invalid challenge");
+  } catch (err: unknown) {
+    throw new Error(err instanceof Error ? err.message : "Invalid challenge", {
+      cause: err,
+    });
   }
 
   // Verify the WebAuthn registration response

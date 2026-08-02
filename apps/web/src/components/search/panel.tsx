@@ -105,7 +105,7 @@ export default function SearchPanel({
       setState("ready");
       setInitialState("ready");
     },
-    [addBottleIntent, directToTasting, searchType, user],
+    [addBottleIntent, directToTasting, orpc.search, searchType, user],
   );
 
   // TODO: handle errors
@@ -115,7 +115,7 @@ export default function SearchPanel({
     const curValue = initialValue ?? value ?? "";
     setQuery(curValue);
     if (onQueryChange) onQueryChange(curValue);
-    onQuery(curValue);
+    void onQuery(curValue);
   }, [initialValue, value, onQuery, onQueryChange]);
 
   return (
@@ -132,7 +132,7 @@ export default function SearchPanel({
             onChange={(value) => {
               setQuery(value);
               if (onQueryChange) onQueryChange(value);
-              onQuery(value);
+              void onQuery(value);
             }}
             onSubmit={(value) => {
               const params = new URLSearchParams({ q: value });

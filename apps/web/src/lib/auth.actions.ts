@@ -167,11 +167,9 @@ type GenericResult = {
 };
 
 export async function resendVerificationForm(
-  prevState?:
-    | (GenericResult & {
-        alreadyVerified?: boolean;
-      })
-    | undefined,
+  prevState?: GenericResult & {
+    alreadyVerified?: boolean;
+  },
   formData?: FormData,
 ) {
   "use server";

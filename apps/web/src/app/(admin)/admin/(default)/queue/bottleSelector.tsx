@@ -83,7 +83,7 @@ export default function BottleSelector({
     if (!open) return;
 
     setQuery(name ?? "");
-    onSearch(name ?? "");
+    void onSearch(name ?? "");
   }, [name, onSearch, open]);
 
   const invalidatePendingRequests = () => {
@@ -141,7 +141,7 @@ export default function BottleSelector({
               setResults([]);
               setError(null);
               setSuccessfulQuery(null);
-              onSearch(value);
+              void onSearch(value);
             }}
             closeIcon={<XMarkIcon className="h-8 w-8" />}
             placeholder="Search for a bottle"

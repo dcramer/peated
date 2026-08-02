@@ -1,0 +1,5 @@
+id: orpc-handler-requires-output
+valid:
+  - procedure.output(ItemSchema).handler(async () => item)
+invalid:
+  - procedure.handler(async () => item)

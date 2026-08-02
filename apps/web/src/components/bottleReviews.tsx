@@ -37,7 +37,11 @@ export default function BottleReviews({ bottleId }: { bottleId: number }) {
               key={r.id}
               className="relative col-span-3 grid grid-cols-subgrid items-center gap-x-2 gap-y-2 p-2 hover:bg-slate-800"
             >
-              <a href={r.url} className="absolute inset-0" />
+              <a
+                href={r.url}
+                aria-label={`Read ${r.site.name} review`}
+                className="absolute inset-0"
+              />
               <span className="flex items-center gap-x-2">{r.site.name}</span>
               <span className="flex items-center justify-end gap-x-2">
                 <RatingIcon rating={r.rating} />

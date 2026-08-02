@@ -13,12 +13,6 @@ describe("findBottleId", () => {
     expect(result).toMatchInlineSnapshot(`1`);
   });
 
-  // test("matches fullName as prefix", async ({ fixtures }) => {
-  //   const bottle = await fixtures.Bottle();
-  //   const result = await findBottleId(bottle.fullName + " Single Grain");
-  //   expect(result).toBe(bottle.id);
-  // });
-
   test("will not wrongly match a suffix", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ name: "The Macallan" });
     const bottle = await fixtures.Bottle({

@@ -32,9 +32,7 @@ const BottleConflictDataSchema = z.object({
   bottle: z.number().int().positive(),
 });
 
-if (!existsSync(CACHE)) {
-  mkdirSync(CACHE);
-}
+mkdirSync(CACHE, { recursive: true });
 
 export class PageNotFound extends Error {}
 

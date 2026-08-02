@@ -112,7 +112,7 @@ export default forwardRef<HTMLInputElement, Props>(
     useEffect(() => {
       if (!initialFile) return;
 
-      (async () => {
+      void (async () => {
         const imageSrc = await fileToDataUrl(initialFile);
         setImageSrc(imageSrc);
         onSave(await fileDataToCanvas(initialFile));
@@ -122,7 +122,7 @@ export default forwardRef<HTMLInputElement, Props>(
     const updateImageSrc = () => {
       const file = Array.from(fileRef.current?.files || []).find(() => true);
       if (file) {
-        (async () => {
+        void (async () => {
           const imageSrc = await fileToDataUrl(file);
           setImageSrc(imageSrc);
           if (noEditor) onSave(await fileDataToCanvas(file));
