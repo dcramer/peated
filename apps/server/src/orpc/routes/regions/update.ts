@@ -1,10 +1,12 @@
 import { db } from "@peated/server/db";
-import { countries, regions } from "@peated/server/db/schema";
+import { countries, regions, type NewRegion } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
+import { ConflictError } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { RegionInputSchema, RegionSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { RegionSerializer } from "@peated/server/serializers/region";
+import slugify from "@sindresorhus/slugify";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -20,7 +22,7 @@ export default procedure
     path: "/countries/{country}/regions/{region}",
     summary: "Update region",
     description:
-      "Update region information including description. Requires moderator privileges",
+      "Update a region name and description. Renaming regenerates its slug. Requires moderator privileges",
     operationId: "updateRegion",
   })
   .input(InputSchema)
@@ -59,7 +61,13 @@ export default procedure
       });
     }
 
-    const data: { [name: string]: any } = {};
+    const data: Partial<NewRegion> = {};
+
+    if (input.name !== undefined) {
+      const desiredSlug = slugify(input.name);
+      if (input.name !== region.name) data.name = input.name;
+      if (desiredSlug !== region.slug) data.slug = desiredSlug;
+    }
 
     if (
       input.description !== undefined &&
@@ -75,16 +83,35 @@ export default procedure
       return await serialize(RegionSerializer, region, context.user);
     }
 
-    const [newRegion] = await db
-      .update(regions)
-      .set(data)
-      .where(
-        and(
-          eq(regions.countryId, countryId),
-          eq(sql`LOWER(${regions.slug})`, region.slug.toLowerCase()),
-        ),
-      )
-      .returning();
+    let newRegion: typeof regions.$inferSelect | undefined;
+    try {
+      [newRegion] = await db
+        .update(regions)
+        .set(data)
+        .where(eq(regions.id, region.id))
+        .returning();
+    } catch (error: any) {
+      const conflictField =
+        error?.code === "23505" && error?.constraint === "region_slug_unq"
+          ? regions.slug
+          : error?.code === "23505" && error?.constraint === "region_name_unq"
+            ? regions.name
+            : null;
+      if (!conflictField) throw error;
+
+      const conflictValue =
+        conflictField === regions.slug ? data.slug : data.name;
+      const [existingRegion] = await db
+        .select()
+        .from(regions)
+        .where(
+          and(
+            eq(regions.countryId, countryId),
+            eq(sql`LOWER(${conflictField})`, conflictValue!.toLowerCase()),
+          ),
+        );
+      throw new ConflictError(existingRegion, error);
+    }
 
     if (!newRegion) {
       throw errors.INTERNAL_SERVER_ERROR({

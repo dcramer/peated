@@ -79,12 +79,6 @@ async function resolveEntityChoice({
   if (choice.kind === "existing") {
     requireInspectedEntity(choice.entityId, context);
     const current = await loadEntity(context.database, choice.entityId);
-    if (!current.entity.type.includes(requiredRole)) {
-      fail(
-        "invalid_current_state",
-        `Entity ${choice.entityId} does not have the ${requiredRole} role.`,
-      );
-    }
     const dependency = {
       entityId: current.entity.id,
       name: current.entity.name,
@@ -713,6 +707,19 @@ export async function prepareBottleUpdate(
       message: "This Bottle update will create a related Entity.",
     })),
   ];
+  const stateToken = relevantBottleUpdateToken({
+    resource,
+    proposal,
+    referencedEntities,
+    referencedSeries,
+    relationshipDigest: proposal.input.patch.shared
+      ? relationshipDigest(
+          await relationshipStateForGroups(context.database, [
+            resource.group.id,
+          ]),
+        )
+      : undefined,
+  });
 
   return {
     type: proposal.type,
@@ -727,19 +734,7 @@ export async function prepareBottleUpdate(
         entityCreations,
         warnings,
       },
-      stateToken: relevantBottleUpdateToken({
-        resource,
-        proposal,
-        referencedEntities,
-        referencedSeries,
-        relationshipDigest: proposal.input.patch.shared
-          ? relationshipDigest(
-              await relationshipStateForGroups(context.database, [
-                resource.group.id,
-              ]),
-            )
-          : undefined,
-      }),
+      stateToken,
     }),
     canonicalInput: {
       bottleId: proposal.input.bottleId,
@@ -751,7 +746,7 @@ export async function prepareBottleUpdate(
             expectedSharedState: concreteBottleUpdateExpectedSharedState({
               group: resource.group,
               distillerIds: resource.distillerIds,
-              referencedEntities: referencedEntities.map(
+              referencedEntities: stateToken.referencedEntities.map(
                 ({ entityId: id, name, shortName, roles: type }) => ({
                   id,
                   name,

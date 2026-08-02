@@ -57,6 +57,67 @@ describe("PATCH /countries/:country/regions/:region", () => {
     expect(dbRegion.descriptionSrc).toBe("user");
   });
 
+  test("renames a region and regenerates its slug", async ({ fixtures }) => {
+    const country = await fixtures.Country({
+      name: "Scotland",
+      slug: "scotland",
+    });
+    const region = await fixtures.Region({
+      countryId: country.id,
+      name: "Cambeltown",
+      slug: "cambeltown",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const updatedRegion = await routerClient.regions.update(
+      {
+        country: country.slug,
+        region: region.slug,
+        name: "Campbeltown",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(updatedRegion).toMatchObject({
+      id: region.id,
+      name: "Campbeltown",
+      slug: "campbeltown",
+    });
+    await expect(
+      db.query.regions.findFirst({ where: eq(regions.id, region.id) }),
+    ).resolves.toMatchObject({
+      name: "Campbeltown",
+      slug: "campbeltown",
+    });
+  });
+
+  test("repairs a stale slug when the supplied name is unchanged", async ({
+    fixtures,
+  }) => {
+    const country = await fixtures.Country();
+    const region = await fixtures.Region({
+      countryId: country.id,
+      name: "Campbeltown",
+      slug: "cambeltown",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const updatedRegion = await routerClient.regions.update(
+      {
+        country: country.slug,
+        region: region.slug,
+        name: region.name,
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(updatedRegion).toMatchObject({
+      id: region.id,
+      name: "Campbeltown",
+      slug: "campbeltown",
+    });
+  });
+
   test("updates region with country slug", async ({ fixtures }) => {
     const country = await fixtures.Country();
     const region = await fixtures.Region({ countryId: country.id });

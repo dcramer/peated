@@ -23,6 +23,11 @@ const nextConfig = {
         destination: "/addBottle?bottle=:bottleId&intent=tasting",
         permanent: false,
       },
+      {
+        source: "/locations/scotland/regions/cambeltown",
+        destination: "/locations/scotland/regions/campbeltown",
+        permanent: true,
+      },
     ];
   },
   turbopack: {

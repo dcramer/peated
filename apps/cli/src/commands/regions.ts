@@ -8,7 +8,7 @@ import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 const LOCATION_DATA = [
   {
     name: "Scotland",
-    regions: ["Islay", "Highland", "Lowland", "Cambeltown", "Speyside"],
+    regions: ["Islay", "Highland", "Lowland", "Campbeltown", "Speyside"],
   },
   { name: "Ireland", regions: [] },
   {
@@ -141,6 +141,12 @@ const LOCATION_DATA = [
   },
 ];
 
+function getLegacyRegionName(countryName: string, regionName: string) {
+  if (countryName === "Scotland" && regionName === "Campbeltown") {
+    return "Cambeltown";
+  }
+}
+
 const subcommand = program.command("regions");
 
 subcommand
@@ -216,7 +222,8 @@ subcommand
       }
 
       for (const regionName of countryData.regions) {
-        const [region] = await db
+        const desiredSlug = slugify(regionName);
+        let [region] = await db
           .select()
           .from(regions)
           .where(
@@ -225,12 +232,33 @@ subcommand
               eq(regions.name, regionName),
             ),
           );
+
+        if (!region) {
+          const legacyName = getLegacyRegionName(countryData.name, regionName);
+          if (legacyName) {
+            [region] = await db
+              .select()
+              .from(regions)
+              .where(
+                and(
+                  eq(regions.countryId, country.id),
+                  eq(regions.name, legacyName),
+                ),
+              );
+          }
+        }
+
         if (!region) {
           await db.insert(regions).values({
             name: regionName,
-            slug: slugify(regionName),
+            slug: desiredSlug,
             countryId: country.id,
           });
+        } else if (region.name !== regionName || region.slug !== desiredSlug) {
+          await db
+            .update(regions)
+            .set({ name: regionName, slug: desiredSlug })
+            .where(eq(regions.id, region.id));
         }
       }
     }

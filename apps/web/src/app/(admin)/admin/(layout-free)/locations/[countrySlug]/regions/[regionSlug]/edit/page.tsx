@@ -5,11 +5,7 @@ import RegionForm from "@peated/web/components/admin/regionForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page(props: {
@@ -49,30 +45,8 @@ function RegionEditForm({
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
 
-  const queryClient = useQueryClient();
-
   const regionUpdateMutation = useMutation(
-    orpc.regions.update.mutationOptions({
-      onSuccess: (data) => {
-        if (!data) return;
-        // TODO: this might be wrong
-        queryClient.setQueryData(
-          orpc.regions.details.key({
-            input: {
-              country: countrySlug,
-              region: data.slug,
-            },
-          }),
-          (oldData: any) =>
-            oldData
-              ? {
-                  ...oldData,
-                  ...data,
-                }
-              : oldData,
-        );
-      },
-    }),
+    orpc.regions.update.mutationOptions(),
   );
 
   return (
@@ -86,11 +60,13 @@ function RegionEditForm({
           },
           {
             onSuccess: (result) => {
-              if (returnTo) router.push(returnTo);
-              else
-                router.replace(
-                  `/locations/${result.country.slug}/regions/${result.slug}`,
-                );
+              const canonicalPath = `/locations/${result.country.slug}/regions/${result.slug}`;
+              const identityChanged =
+                result.slug !== region.slug ||
+                result.country.slug !== region.country.slug;
+              if (identityChanged) router.replace(canonicalPath);
+              else if (returnTo) router.push(returnTo);
+              else router.replace(canonicalPath);
             },
           },
         );
