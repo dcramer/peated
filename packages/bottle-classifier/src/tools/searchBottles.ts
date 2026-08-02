@@ -36,7 +36,7 @@ export function createSearchBottlesTool({
         "Most prominent consumer-facing brand on the label. For independent bottlings, this is usually the bottler label, not the distillery.",
       ),
       bottler: BottleCandidateSearchInputSchema.shape.bottler.describe(
-        "Evidenced bottling or whiskymaking company. It may equal the label brand; leave null when the source does not establish the role.",
+        "Named market-facing bottler or release imprint for this product. It may equal the brand or a distillery; leave null when product-specific evidence does not establish the role.",
       ),
       expression: BottleCandidateSearchInputSchema.shape.expression.describe(
         "Core release name after removing brand, age, ABV, and generic style words.",

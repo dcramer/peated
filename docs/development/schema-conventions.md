@@ -78,8 +78,11 @@ preserves only the differing overrides.
 ## Field Definitions
 
 - **brand**: The consumer-facing label brand.
-- **bottler**: An evidenced bottling or whiskymaking company. It may equal
-  `brand`; leave it null when the source does not establish the role.
+- **bottler**: The named, market-facing bottler or release imprint for the
+  product. It may equal `brand` or a producing `distillery`. Ownership,
+  importer/distributor, and physical packing relationships alone do not
+  establish the role. Leave it null when product-specific evidence does not
+  establish it.
 - **distillery**: An array of actual producing distilleries. Use `[]` when
   unknown.
 - **expression**: The shared product name after removing producer, age, ABV,
@@ -130,11 +133,12 @@ the marketed release or are required for recurring disambiguation.
 
 ### Brand, Bottler, And Distillery
 
-- For an official distillery bottling, the brand is normally the distillery
-  name and `distillery` contains that entity.
-- For an independent bottling, use the consumer-facing bottler label as the
-  brand, record the separately stated bottler when appropriate, and list the
-  actual producer or producers as distilleries.
+- Set `brand` from the consumer-facing label and `distillery` from the actual
+  producer or producers.
+- Set `bottler` only when product-specific evidence names the market-facing
+  bottler or release imprint for the product. It may equal `brand` or a
+  producing `distillery`. Ownership, importer/distributor, and physical packing
+  relationships alone do not establish the role.
 - For a blend, list all known contributors. Use `[]` rather than guessing when
   they are unknown.
 - Do not derive brand identity from a longest-prefix string match.

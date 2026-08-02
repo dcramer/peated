@@ -83,13 +83,26 @@ describe("Bottle check instructions", () => {
     const extractor = buildWhiskyLabelExtractorInstructions({ mode: "image" });
     const audit = buildBottleAuditInstructions();
 
-    expect(reference).toContain("it may equal `brand`");
+    expect(reference).toContain(
+      "`bottler` is the named, market-facing bottler or release imprint for this product",
+    );
+    expect(reference).toContain(
+      "It may equal the Brand or a producing distillery",
+    );
+    expect(reference).toContain(
+      "Ownership, importer/distributor, and physical packing relationships alone do not establish the role",
+    );
+    expect(reference).toContain(
+      "Leave it null when product-specific evidence does not establish it",
+    );
     expect(audit).toContain(
       "supported gaps in ABV, release or vintage year, bottler, and distilleries",
     );
-    expect(extractor).toContain("The bottler may equal `brand`");
     expect(extractor).toContain(
-      "do not infer a bottler from the brand logo alone",
+      "product-specific evidence names the market-facing bottler or release imprint for this product",
+    );
+    expect(extractor).toContain(
+      "It may equal `brand` or a producing distillery",
     );
   });
 

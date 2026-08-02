@@ -44,8 +44,9 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     label: "Bottler",
     outputField: "`bottler`",
     guidance: [
-      "Populate this when the source explicitly identifies the bottling or whiskymaking company.",
-      "The bottler may equal `brand`; preserve both roles when the evidence supports them, but do not infer a bottler from the brand logo alone.",
+      "Populate `bottler` only when product-specific evidence names the market-facing bottler or release imprint for this product.",
+      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing relationships alone do not establish the role.",
+      "Leave this null when product-specific evidence does not establish the role.",
     ],
   },
   {
@@ -562,8 +563,8 @@ export function buildWhiskyLabelExtractorInstructions({
     renderBulletLines([
       "For official distillery bottlings, `brand` often matches the single item inside `distillery`, but do not force them to be identical.",
       "Keep the consumer-facing brand when it differs from the producing distillery name. Official single-distillery bottlings such as `Jura` / `Isle of Jura` or `Ledaig` / `Tobermory` are real examples.",
-      "For independent bottlings, keep the bottler label in `brand` and the producing distillery in `distillery`.",
-      "Populate `bottler` when the source identifies the bottling or whiskymaking company. It may equal `brand`; preserve both roles when evidenced, but do not infer a bottler from the brand logo alone.",
+      "Populate `bottler` only when product-specific evidence names the market-facing bottler or release imprint for the product.",
+      "It may equal `brand` or a producing distillery. Ownership, importer/distributor, and physical packing relationships alone do not establish the role.",
       "When the visible label, capsule, or neck tag explicitly names a producer with `Distillery` in the name, include that producer in `distillery` even if the front brand is a shorter consumer label.",
       "Prefer `[]` over guessing when the producing distillery is unknown.",
       "When a component is ambiguous, leave it `null` or `[]` instead of guessing. Missing data is better than a fabricated identity signal.",

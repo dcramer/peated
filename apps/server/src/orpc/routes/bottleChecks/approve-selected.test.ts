@@ -186,6 +186,97 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     ).toMatchObject({ name: "Route Entity After" });
   });
 
+  test("applies a Bottle relationship to an inspected Entity that lacks the role", async ({
+    fixtures,
+  }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const producer = await fixtures.Entity({
+      name: "Shared Producer Relationship Test",
+      type: ["brand", "distiller"],
+    });
+    const bottle = await fixtures.Bottle({
+      name: "Open Day Relationship Test",
+      brandId: producer.id,
+    });
+    const proposal: ProposedOperation = {
+      type: "update_bottle",
+      input: {
+        bottleId: bottle.id,
+        patch: {
+          shared: {
+            bottler: { kind: "existing", entityId: producer.id },
+          },
+        },
+      },
+      rationale: "The inspected release is bottled by its producer.",
+      evidenceRefs: [
+        { kind: "bottle", bottleId: bottle.id },
+        { kind: "entity", entityId: producer.id },
+      ],
+    };
+    const created = await createBottleCheck({
+      intent: "audit_bottle",
+      input: { bottleId: bottle.id, origin: "moderator" },
+      result: {
+        summary: "Assign the evidenced bottler.",
+        proposedOperations: [proposal],
+        findings: [],
+        artifacts: {
+          bottleContexts: [await inspectedBottleContext(bottle.id)],
+          resolvedEntities: [{ entityId: producer.id, name: producer.name }],
+          entityContexts: [
+            {
+              entityId: producer.id,
+              name: producer.name,
+              shortName: producer.shortName,
+              roles: producer.type,
+              website: producer.website,
+              country: null,
+              region: null,
+              yearEstablished: producer.yearEstablished,
+              aliases: [],
+              relatedBottles: [],
+            },
+          ],
+        },
+      },
+    });
+    expect(created.check.operations).toEqual([
+      expect.objectContaining({ status: "pending_review" }),
+    ]);
+    const bottleOperation = created.check.operations[0]!;
+
+    expect(
+      await routerClient.bottleChecks.approveSelected(
+        {
+          check: created.check.id,
+          operationIds: [bottleOperation.id],
+        },
+        { context: { user: moderator } },
+      ),
+    ).toEqual({
+      results: [
+        {
+          operationId: bottleOperation.id,
+          status: "applied",
+          error: null,
+        },
+      ],
+    });
+    expect(
+      await db.query.bottleGroups.findFirst({
+        where: (groups, { eq }) => eq(groups.id, bottle.groupId as number),
+      }),
+    ).toMatchObject({ bottlerId: producer.id });
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, producer.id),
+      }),
+    ).toMatchObject({
+      type: expect.arrayContaining(["brand", "bottler", "distiller"]),
+    });
+  });
+
   test("blocks a destination identity update selected with an Entity merge", async ({
     fixtures,
   }) => {

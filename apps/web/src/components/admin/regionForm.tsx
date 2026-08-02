@@ -86,7 +86,6 @@ export default function RegionForm({
           <TextField
             {...register("name")}
             label="Name"
-            readOnly={edit}
             placeholder="e.g. Islay"
             error={errors.name}
             required

@@ -8,7 +8,7 @@ import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 const LOCATION_DATA = [
   {
     name: "Scotland",
-    regions: ["Islay", "Highland", "Lowland", "Cambeltown", "Speyside"],
+    regions: ["Islay", "Highland", "Lowland", "Campbeltown", "Speyside"],
   },
   { name: "Ireland", regions: [] },
   {
