@@ -441,7 +441,7 @@ describe("concrete Bottle updates", () => {
     ).toMatchObject({ seriesId: null });
   });
 
-  test("rejects numeric entities that lack the requested shared role", async ({
+  test("adds requested roles to existing numeric entities", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -449,53 +449,61 @@ describe("concrete Bottle updates", () => {
       name: "Role Validation Brand",
       type: ["brand"],
     });
-    const invalidEntity = await fixtures.Entity({
-      name: "Roleless Entity",
+    const rolelessBrand = await fixtures.Entity({
+      name: "Roleless Brand",
       type: [],
     });
-    const { first, members } = await createGroup({
+    const rolelessBottler = await fixtures.Entity({
+      name: "Roleless Bottler",
+      type: [],
+    });
+    const rolelessDistiller = await fixtures.Entity({
+      name: "Roleless Distiller",
+      type: [],
+    });
+    const { first } = await createGroup({
       user: mod,
       stable: { name: "Role Validation Label", brand: brand.id },
       exacts: [{ edition: "One" }],
     });
-    const [groupBefore] = await db
-      .select()
-      .from(bottleGroups)
-      .where(eq(bottleGroups.id, first.group.id));
-    const membersBefore = await loadGroupMembers(first.group.id);
-    const aliasesBefore = await loadAliases(
-      members.map(({ bottle }) => bottle.id),
-    );
     resetQueueMock();
 
-    for (const [role, shared] of [
-      ["brand", { brand: invalidEntity.id }],
-      ["bottler", { bottler: invalidEntity.id }],
-      ["distiller", { distillers: [invalidEntity.id] }],
-    ] as const) {
-      const error = await waitError(
-        updateConcreteBottle({
-          bottleId: first.bottle.id,
-          input: { shared },
-          context: contextFor(mod),
-        }),
-        ConcreteBottleUpdateInputError,
-      );
-      expect(error.message).toMatch(new RegExp(role, "i"));
-    }
+    const result = await updateConcreteBottle({
+      bottleId: first.bottle.id,
+      input: {
+        shared: {
+          brand: rolelessBrand.id,
+          bottler: rolelessBottler.id,
+          distillers: [rolelessDistiller.id],
+        },
+      },
+      context: contextFor(mod),
+    });
 
-    expect(
-      (
-        await db
-          .select()
-          .from(bottleGroups)
-          .where(eq(bottleGroups.id, first.group.id))
-      )[0],
-    ).toEqual(groupBefore);
-    expect(await loadGroupMembers(first.group.id)).toEqual(membersBefore);
-    expect(await loadAliases([first.bottle.id])).toEqual(aliasesBefore);
-    expect(await loadUpdateAudits([first.bottle.id])).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(result.changed).toBe(true);
+    expect(result.group).toMatchObject({
+      brandId: rolelessBrand.id,
+      bottlerId: rolelessBottler.id,
+    });
+    for (const [entityId, role] of [
+      [rolelessBrand.id, "brand"],
+      [rolelessBottler.id, "bottler"],
+      [rolelessDistiller.id, "distiller"],
+    ] as const) {
+      expect(
+        await db.query.entities.findFirst({
+          where: eq(entities.id, entityId),
+        }),
+      ).toMatchObject({ type: [role] });
+      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+        "OnEntityChange",
+        { entityId },
+      );
+    }
+    expect(await loadBottleDistillers([first.bottle.id])).toMatchObject([
+      { bottleId: first.bottle.id, distillerId: rolelessDistiller.id },
+    ]);
+    expect(await loadUpdateAudits([first.bottle.id])).toHaveLength(1);
   });
 
   test("accounts for a role added while resolving an existing entity", async ({

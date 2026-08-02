@@ -2,6 +2,8 @@
  * Transactional moderator editing for concrete Bottles. Shared patches fan out
  * durable member Bottle materialization; exact patches remain isolated.
  */
+// TODO(dcramer): Rename this module's ConcreteBottleUpdate symbols now that
+// the Bottle/BottleRelease distinction is retired.
 import { ORPCError } from "@orpc/server";
 import {
   bottleNameDuplicatesBrand,
@@ -472,18 +474,6 @@ async function loadEntity(tx: AnyTransaction, entityId: number) {
   return entity;
 }
 
-function requireEntityRole(
-  entity: Entity,
-  role: Entity["type"][number],
-  label: string,
-) {
-  if (!entity.type.includes(role)) {
-    throw new ConcreteBottleUpdateInputError(
-      `${label} entity ${entity.id} does not have the ${role} role.`,
-    );
-  }
-}
-
 function requireUpdateUser(user: User | undefined): User {
   if (!user) {
     throw new ConcreteBottleUpdateInputError(
@@ -491,6 +481,42 @@ function requireUpdateUser(user: User | undefined): User {
     );
   }
   return user;
+}
+
+async function addEntityRoleIfNeeded({
+  tx,
+  entity,
+  role,
+  user,
+  actorId,
+  creationSource,
+  changedEntityIds,
+}: {
+  tx: AnyTransaction;
+  entity: Entity;
+  role: Entity["type"][number];
+  user?: User;
+  actorId: number;
+  creationSource: CatalogVerificationCreationSource;
+  changedEntityIds: Set<number>;
+}): Promise<Entity> {
+  if (entity.type.includes(role)) return entity;
+
+  const result = await upsertEntity({
+    db: tx,
+    data: entity.id,
+    creationSource,
+    userId: requireUpdateUser(user).id,
+    createdByActorId: actorId,
+    type: role,
+  });
+  if (!result) {
+    throw new ConcreteBottleUpdateInputError(
+      `Entity ${entity.id} could not be resolved.`,
+    );
+  }
+  if (result.changed) changedEntityIds.add(result.id);
+  return result.result;
 }
 
 /**
@@ -519,21 +545,48 @@ async function resolveStableState(
     newEntityIds: Set<number>;
   },
 ): Promise<StableState> {
-  const numericBrand =
+  let numericBrand =
     typeof patch?.brand === "number" ? await loadEntity(tx, patch.brand) : null;
-  if (numericBrand) requireEntityRole(numericBrand, "brand", "Brand");
+  if (numericBrand) {
+    numericBrand = await addEntityRoleIfNeeded({
+      tx,
+      entity: numericBrand,
+      role: "brand",
+      user,
+      actorId,
+      creationSource,
+      changedEntityIds,
+    });
+  }
 
-  const numericBottler =
+  let numericBottler =
     typeof patch?.bottler === "number"
       ? await loadEntity(tx, patch.bottler)
       : null;
-  if (numericBottler) requireEntityRole(numericBottler, "bottler", "Bottler");
+  if (numericBottler) {
+    numericBottler = await addEntityRoleIfNeeded({
+      tx,
+      entity: numericBottler,
+      role: "bottler",
+      user,
+      actorId,
+      creationSource,
+      changedEntityIds,
+    });
+  }
 
   const numericDistillers = new Map<number, Entity>();
   for (const choice of patch?.distillers ?? []) {
     if (typeof choice !== "number" || numericDistillers.has(choice)) continue;
-    const distiller = await loadEntity(tx, choice);
-    requireEntityRole(distiller, "distiller", "Distiller");
+    const distiller = await addEntityRoleIfNeeded({
+      tx,
+      entity: await loadEntity(tx, choice),
+      role: "distiller",
+      user,
+      actorId,
+      creationSource,
+      changedEntityIds,
+    });
     numericDistillers.set(choice, distiller);
   }
 

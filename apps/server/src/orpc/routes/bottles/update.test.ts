@@ -7,6 +7,7 @@ import {
   bottles,
   bottlesToDistillers,
   changes,
+  entities,
 } from "@peated/server/db/schema";
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
@@ -184,7 +185,7 @@ describe("PATCH /bottles/{bottle}", () => {
     const newBrand = await fixtures.Entity({ name: "New Route Brand" });
     const newBottler = await fixtures.Entity({
       name: "New Route Bottler",
-      type: ["bottler"],
+      type: [],
     });
     const newDistillers = [
       await fixtures.Entity({ name: "New Route Distiller A" }),
@@ -278,6 +279,11 @@ describe("PATCH /bottles/{bottle}", () => {
         .from(bottleGroupDistillers)
         .where(eq(bottleGroupDistillers.groupId, first.group.id)),
     ).toHaveLength(newDistillers.length);
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, newBottler.id),
+      }),
+    ).toMatchObject({ type: ["bottler"] });
   });
 
   test("maps input, graph, and identity failures to stable statuses", async ({
@@ -315,14 +321,10 @@ describe("PATCH /bottles/{bottle}", () => {
     );
     expect(retiredError).toMatchObject({ status: 409 });
 
-    const roleless = await fixtures.Entity({
-      name: "Not A Route Brand",
-      type: [],
-    });
     const valid = await fixtures.Bottle({ name: "Invalid Route Input" });
     const badInput = await waitError(
       routerClient.bottles.update(
-        { bottle: valid.id, shared: { brand: roleless.id } },
+        { bottle: valid.id, shared: { brand: 999_999 } },
         { context: { user: mod } },
       ),
     );
