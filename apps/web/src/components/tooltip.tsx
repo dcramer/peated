@@ -9,6 +9,7 @@ type Props = {
   title: ReactNode;
   children?: ReactNode;
   className?: string;
+  contentClassName?: string;
   origin?: "left" | "right" | "center";
   style?: Record<string, any>;
 };
@@ -18,6 +19,7 @@ export default function Tooltip({
   children,
   origin = "right",
   className,
+  contentClassName,
   style,
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -39,10 +41,12 @@ export default function Tooltip({
       {children}
       <span
         className={classNames(
-          "absolute top-6 w-48 max-w-48 scale-0 items-center justify-center rounded bg-slate-700 p-2 text-center text-xs text-slate-400 transition-all group-hover:scale-100 group-focus:scale-100 group-active:scale-100",
+          "absolute top-6 z-10 scale-0 transition-all group-hover:scale-100 group-focus:scale-100 group-active:scale-100",
+          contentClassName ||
+            "w-48 max-w-48 rounded bg-slate-700 p-2 text-center text-xs text-slate-400",
           origin === "right" ? "right-0" : "",
           origin === "left" ? "left-0" : "",
-          // origin === "center" ? "-right-1/2" : "",
+          origin === "center" ? "left-1/2 -translate-x-1/2" : "",
           visible ? "scale-100" : "",
         )}
         ref={ref}

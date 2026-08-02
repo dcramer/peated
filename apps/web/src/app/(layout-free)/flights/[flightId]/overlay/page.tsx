@@ -54,7 +54,10 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
                           />
                         </div>
                         <div className="text-muted flex flex-row items-start space-x-1 truncate">
-                          <Distillers distillers={bottle.distillers} />
+                          <Distillers
+                            distillers={bottle.distillers}
+                            isBlend={bottle.category === "blend"}
+                          />
                         </div>
                         {bottle.description}
                       </td>

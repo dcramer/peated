@@ -107,7 +107,34 @@ describe("BottleHeader", () => {
     expect(text).not.toContain("Distilled at");
   });
 
-  it("retains distinct distiller attribution", () => {
+  it("uses production wording for a non-blend distiller", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Compass Box Orchard House",
+      name: "Orchard House",
+      group: { name: "Orchard House" },
+      brand: { id: 7, name: "Compass Box", shortName: null },
+      distillers: [{ id: 8, name: "Clynelish" }],
+      edition: null,
+      category: "single_malt",
+      statedAge: null,
+      abv: 46,
+      vintageYear: null,
+      releaseYear: null,
+      singleCask: false,
+      caskStrength: false,
+      caskFill: null,
+      caskType: null,
+      caskSize: null,
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text).toContain("Distilled atClynelish");
+  });
+
+  it("uses provenance wording for a blend with one known distillery", () => {
     const bottle = {
       id: 42,
       fullName: "Compass Box Orchard House",
@@ -131,7 +158,46 @@ describe("BottleHeader", () => {
     const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
     const text = html.replace(/<[^>]*>/g, "");
 
-    expect(text).toContain("Distilled atClynelish");
+    expect(text).toContain("DistilleryClynelish");
+    expect(text).not.toContain("Distilled at");
+  });
+
+  it("shows every distiller name in the multi-distiller tooltip", () => {
+    const bottle = {
+      id: 42,
+      fullName: "Compass Box Seven Distilleries",
+      name: "Seven Distilleries",
+      group: { name: "Seven Distilleries" },
+      brand: { id: 7, name: "Compass Box", shortName: null },
+      distillers: [
+        { id: 1, name: "Aberlour" },
+        { id: 2, name: "Clynelish" },
+        { id: 3, name: "Dailuaine" },
+        { id: 4, name: "Glen Elgin" },
+        { id: 5, name: "Linkwood" },
+        { id: 6, name: "Mortlach" },
+        { id: 7, name: "Teaninich" },
+      ],
+      edition: null,
+      category: "blend",
+      statedAge: null,
+      abv: 46,
+      vintageYear: null,
+      releaseYear: null,
+      singleCask: false,
+      caskStrength: false,
+      caskFill: null,
+      caskType: null,
+      caskSize: null,
+    } as unknown as Bottle;
+
+    const html = renderToStaticMarkup(<BottleHeader bottle={bottle} />);
+    const text = html.replace(/<[^>]*>/g, "");
+
+    expect(text).toContain("7 distilleries");
+    for (const distillery of bottle.distillers) {
+      expect(text).toContain(distillery.name);
+    }
   });
 
   it("does not add a chip when Single Cask is already in the title", () => {
