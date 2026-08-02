@@ -1,0 +1,231 @@
+{
+  "id": "image-backed-photo-creates-compass-box-hedonism-squared",
+  "name": "Compass Box Hedonism²: image-backed photo creates complete bottle",
+  "input": {
+    "reference": {
+      "name": "Bottle photo upload",
+      "url": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-hedonism-squared.jpg",
+      "imageUrl": "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-hedonism-squared.jpg"
+    },
+    "extractedIdentity": {
+      "brand": "Compass Box",
+      "bottler": null,
+      "expression": "Hedonism²",
+      "series": null,
+      "distillery": [],
+      "category": "blend",
+      "stated_age": null,
+      "abv": 49,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_type": null,
+      "cask_size": null,
+      "cask_fill": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": null
+    },
+    "imageEvidence": {
+      "sourceImageId": "compass-box-hedonism-squared",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "gpt-5.6-luna",
+          "confidence": 0.94,
+          "textSpans": [
+            {
+              "text": "COMPASS BOX SCOTCH WHISKYMAKER HEDONISM² SCOTCH WHISKY 49% VOL 70CL 648 BOTTLES BLENDED GRAIN SCOTCH WHISKY PRODUCT OF SCOTLAND",
+              "confidence": 0.94
+            }
+          ],
+          "observations": [
+            "The readable front label identifies Compass Box Hedonism², a 49% ABV blended grain Scotch whisky with an outturn of 648 bottles."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Compass Box",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Hedonism²",
+          "confidence": 0.96,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "blend",
+          "confidence": 0.97,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 49,
+          "confidence": 0.99,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://hedonism.co.uk/collections/exclusive-to-hedonism",
+      "https://www.whiskybase.com/whiskies/whisky/226721/hedonism-23-year-old-cb",
+      "https://api.peated.com/v1/bottles?query=Hedonism",
+      "https://raw.githubusercontent.com/dcramer/peated/main/packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-hedonism-squared.jpg"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-hedonism-squared.jpg",
+    "dbOutcome": {
+      "bottleId": null,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Production search on 2026-08-02 returned eight other Hedonism bottles but no Hedonism² row. Photo identification proposed creation but routed the user to the manual Bottle form, so the observed flow created no Bottle automatically."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 14189,
+        "field": "name",
+        "productionValue": "Hedonism The Muse",
+        "evidenceValue": "Hedonism²",
+        "source": "image_evidence",
+        "issue": "competing_candidate",
+        "safeToAutoFill": false,
+        "notes": "The Muse is a different named Hedonism release and cannot cover the photographed Hedonism² exclusive."
+      }
+    ],
+    "notes": "The checked-in photo is the observed add-bottle source. The current Hedonism Wines exclusive collection identifies this bottle as Compass Box Hedonism², a blended grain made from North British, Port Dundas, and Girvan whiskies whose youngest components are 23 years old, bottled at 49% ABV. Whiskybase independently records a 23-year stated age, Compass Box as bottler, and 2023 as the bottling year. The photographed label and Whiskybase record an outturn of 648 bottles; the retailer copy inconsistently says 600 while also displaying '1 of 648', so outturn remains an observation and is not a required Bottle field. Production already has Compass Box (entity 1422), North British (1204), Port Dundas (1270), and Girvan (944), so classification must reuse those entities. Production search returned eight other Hedonism results, including three malformed rows under a separate Hedonism Brand; none is Hedonism². This readable, externally corroborated image proposal should have no unresolved identity risk and should be eligible for confirm-create rather than manual form review."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "name": "Hedonism²",
+      "series": null,
+      "brand": {
+        "id": 1422,
+        "name": "Compass Box"
+      },
+      "bottler": {
+        "id": 1422,
+        "name": "Compass Box"
+      },
+      "category": "blend",
+      "edition": null,
+      "statedAge": 23,
+      "abv": 49,
+      "vintageYear": null,
+      "releaseYear": 2023
+    },
+    "proposedBottleDistillerIds": [944, 1204, 1270],
+    "expectedTier": "auto",
+    "suggestedNextStep": "confirm_create",
+    "summary": "Create one complete Compass Box Hedonism² Bottle with its 23-year age, Compass Box bottler, North British/Port Dundas/Girvan distillers, 2023 release year, and 49% ABV."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1422,
+        "name": "Compass Box",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 1016,
+        "name": "Hedonism",
+        "type": ["brand"]
+      },
+      {
+        "id": 1204,
+        "name": "North British",
+        "type": ["distiller"]
+      },
+      {
+        "id": 1270,
+        "name": "Port Dundas",
+        "type": ["distiller", "brand"]
+      },
+      {
+        "id": 944,
+        "name": "Girvan",
+        "type": ["bottler", "brand", "distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 7630,
+        "name": "Blended Grain Scotch Whisky CB The Signature Range",
+        "fullName": "Hedonism Blended Grain Scotch Whisky CB The Signature Range",
+        "brandId": 1016,
+        "bottlerId": 1422,
+        "category": "blend"
+      },
+      {
+        "id": 9808,
+        "name": "Blended Grain Scotch Whisky CB Limited Production",
+        "fullName": "Hedonism Blended Grain Scotch Whisky CB Limited Production",
+        "brandId": 1016,
+        "bottlerId": 1422,
+        "category": "blend"
+      },
+      {
+        "id": 10084,
+        "name": "Quindecimus CB 15th Anniversary Limited Edition",
+        "fullName": "Hedonism Quindecimus CB 15th Anniversary Limited Edition",
+        "brandId": 1016,
+        "bottlerId": 1422,
+        "category": "blend"
+      },
+      {
+        "id": 14189,
+        "name": "Hedonism The Muse",
+        "fullName": "Compass Box Hedonism The Muse",
+        "brandId": 1422,
+        "category": "blend"
+      },
+      {
+        "id": 16244,
+        "name": "Hedonism Quindecimus",
+        "fullName": "Compass Box Hedonism Quindecimus",
+        "brandId": 1422,
+        "category": "blend"
+      },
+      {
+        "id": 17759,
+        "name": "Hedonism Maximus",
+        "fullName": "Compass Box Hedonism Maximus",
+        "brandId": 1422,
+        "category": "blend"
+      },
+      {
+        "id": 13261,
+        "name": "Hedonism Felicitas - 2020 Release",
+        "fullName": "Compass Box Hedonism Felicitas - 2020 Release - 53.0% ABV",
+        "brandId": 1422,
+        "bottlerId": 1422,
+        "category": "blend",
+        "abv": 53,
+        "releaseYear": 2020
+      },
+      {
+        "id": 42499,
+        "name": "Hedonism Felicitas - 2024 Release",
+        "fullName": "Compass Box Hedonism Felicitas - 2024 Release",
+        "brandId": 1422,
+        "bottlerId": 1422,
+        "category": "blend",
+        "releaseYear": 2024
+      }
+    ],
+    "aliases": []
+  }
+}

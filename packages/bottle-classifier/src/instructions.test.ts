@@ -121,6 +121,10 @@ describe("Bottle check instructions", () => {
     expect(reference).toContain(
       "This is not a general audit or exhaustive search",
     );
+    expect(reference).toContain("each product-specific component distillery");
+    expect(reference).toContain(
+      "do not demote those producing distilleries to `observation`",
+    );
     expect(reference).toContain(
       "other unknown core facts do not block a sparse `update_bottle`",
     );

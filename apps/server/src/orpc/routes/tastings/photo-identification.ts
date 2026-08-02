@@ -199,6 +199,12 @@ async function serializePhotoIdentificationClassification(
         action: "create_bottle",
         proposedBottle: {
           name: decision.proposedBottle.name,
+          series: decision.proposedBottle.series
+            ? {
+                id: decision.proposedBottle.series.id,
+                name: decision.proposedBottle.series.name,
+              }
+            : null,
           category: decision.proposedBottle.category,
           edition: decision.proposedBottle.edition,
           statedAge: decision.proposedBottle.statedAge,
@@ -218,6 +224,12 @@ async function serializePhotoIdentificationClassification(
             id: distiller.id,
             name: distiller.name,
           })),
+          bottler: decision.proposedBottle.bottler
+            ? {
+                id: decision.proposedBottle.bottler.id,
+                name: decision.proposedBottle.bottler.name,
+              }
+            : null,
         },
       };
       break;

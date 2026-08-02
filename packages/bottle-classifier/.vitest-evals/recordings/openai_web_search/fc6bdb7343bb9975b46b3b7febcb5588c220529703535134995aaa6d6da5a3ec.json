@@ -1,0 +1,53 @@
+{
+  "writtenAt": "2026-08-02T19:01:35.151Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Compass Box Hedonism² blend 49% ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Compass Box Hedonism² blend 49% ABV",
+    "summary": "Hedonism²; Compass Box; Compass Box for Hedonism Wines; North British, Port Dundas, Girvan; 23 years; 49%; Exclusive to Hedonism Wines; unknown; unknown; 2023\n\n- **Exact name / brand / bottler / ABV / age / release year:** Spirit Radar’s exact bottle record is **“Hedonism2 23yo CB Hedonism Wines 49% 700ml”** under **Compass Box**, with **49.0% ABV**, **23 years**, and **Bottled Year 2023**. ([spiritradar.com](https://www.spiritradar.com/whisky-db/hedonism2-23yo-cb-hedonism-wines-49-percent-700ml/))\n- **Edition wording:** Hedonism’s current exact retailer page and exclusive-collections page identify the bottle as **“Compass Box Hedonism² (Exclusive to Hedonism Wines)”** / **“Exclusive to Hedonism”**. ([hedonism.co.uk](https://hedonism.co.uk/collections/exclusive-to-hedonism))\n- **Distillery components:** The exact Hedonism retailer-exclusive page says it is **“a marriage of venerable grain whiskies from North British, Port Dundas and Girvan.”** ([hedonism.co.uk](https://hedonism.co.uk/collections/exclusive-to-hedonism))\n- **Why bottler is listed as Compass Box rather than Hedonism Wines:** the retailer frames it as an **exclusive bottling** of Compass Box’s whisky for Hedonism Wines",
+    "results": [
+      {
+        "title": "spiritradar.com",
+        "url": "https://www.spiritradar.com/whisky-db/hedonism2-23yo-cb-hedonism-wines-49-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "thegrandwhiskyauction.com",
+        "url": "https://www.thegrandwhiskyauction.com/lot-742353/compass-box-hedonism2",
+        "domain": "thegrandwhiskyauction.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskynotes.be",
+        "url": "https://www.whiskynotes.be/2026/grain/compass-box-hedonism/",
+        "domain": "whiskynotes.be",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "https://www.compassboxwhisky.com/collections/hedonism-whiskies-page",
+        "url": "https://www.compassboxwhisky.com/collections/hedonism-whiskies-page",
+        "domain": "compassboxwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "hedonism.co.uk",
+        "url": "https://hedonism.co.uk/collections/exclusive-to-hedonism",
+        "domain": "hedonism.co.uk",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "fc6bdb7343bb9975b46b3b7febcb5588c220529703535134995aaa6d6da5a3ec",
+    "mode": "auto"
+  }
+}

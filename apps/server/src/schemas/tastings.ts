@@ -159,6 +159,12 @@ const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
 
 const PhotoIdentificationProposedBottleSchema = z.object({
   name: z.string().trim().min(1),
+  series: z
+    .object({
+      id: z.number().int().nullable(),
+      name: z.string().trim().min(1),
+    })
+    .nullable(),
   category: CategoryEnum.nullable(),
   edition: z.string().nullable(),
   statedAge: z.number().nullable(),
@@ -180,6 +186,12 @@ const PhotoIdentificationProposedBottleSchema = z.object({
       name: z.string().trim().min(1),
     }),
   ),
+  bottler: z
+    .object({
+      id: z.number().int().nullable(),
+      name: z.string().trim().min(1),
+    })
+    .nullable(),
 });
 
 export const PhotoIdentificationDecisionSchema = z.discriminatedUnion(

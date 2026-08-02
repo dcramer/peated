@@ -325,7 +325,7 @@ async function runBottleWebEvidenceSearchAfterBudget({
       reasoningEffort,
       query,
       instructions:
-        "Find bottle-specific evidence. Prefer specific, corroborated sources over copied snippets or retailer SEO. Summarize confirmed traits such as producer, bottler, age, ABV, edition, cask, vintage, or release year.",
+        "Find exact bottle-specific evidence. Lead with a compact field list for exact name, brand/producer, market-facing bottler, producing distilleries or blend components, age, ABV, edition, cask traits, vintage year, and release or bottling year; mark unverified fields unknown. Put confirmed facts and citations before commentary so they fit within 900 characters. Prefer exact product or exclusive-release pages and corroborated sources over generic family pages, copied snippets, or retailer SEO.",
     });
     const openAIEvidences = [primaryEvidence];
 

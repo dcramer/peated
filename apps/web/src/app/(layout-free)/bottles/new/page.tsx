@@ -20,9 +20,9 @@ import { mergeCreateBottleInitialData } from "./createBottleInitialData";
 
 type ReturnAction = "addBottle" | "library" | "tasting" | "view";
 
-function getNameChoice(value: string | null) {
+function getNameChoice(value: string | null, id?: number | null) {
   const name = value?.trim();
-  return name ? { name } : undefined;
+  return name ? { ...(id ? { id } : {}), name } : undefined;
 }
 
 function getReturnAction(value: string | null): ReturnAction | null {
@@ -58,12 +58,31 @@ function CreateBottleForm() {
   const pendingImageUrl = searchParams.get("pendingImageUrl") || null;
 
   const prefill = parseCreateBottlePrefill(searchParams);
-  const distiller = prefill.distillerId ? String(prefill.distillerId) : null;
-  const distillerName = getNameChoice(prefill.distillerName ?? null);
-  const brand = prefill.brandId ? String(prefill.brandId) : null;
-  const bottler = searchParams.get("bottler") || null;
-  const series = searchParams.get("series") || null;
-  const brandName = getNameChoice(prefill.brandName ?? null);
+  const distiller =
+    prefill.distillers?.length || !prefill.distillerId
+      ? null
+      : String(prefill.distillerId);
+  const distillerName = getNameChoice(
+    prefill.distillerName ?? null,
+    prefill.distillerId,
+  );
+  const brand =
+    prefill.brandId && !prefill.brandName ? String(prefill.brandId) : null;
+  const bottler =
+    prefill.bottlerId && !prefill.bottlerName
+      ? String(prefill.bottlerId)
+      : null;
+  const series =
+    prefill.seriesId && !prefill.seriesName ? String(prefill.seriesId) : null;
+  const brandName = getNameChoice(prefill.brandName ?? null, prefill.brandId);
+  const bottlerName = getNameChoice(
+    prefill.bottlerName ?? null,
+    prefill.bottlerId,
+  );
+  const seriesName = getNameChoice(
+    prefill.seriesName ?? null,
+    prefill.seriesId,
+  );
   const statedAge = prefill.statedAge ?? null;
   const abv = prefill.abv ?? null;
   const edition = prefill.edition ?? null;
@@ -85,13 +104,28 @@ function CreateBottleForm() {
     name,
     ...(pendingImageUrl ? { imageUrl: pendingImageUrl } : {}),
     ...(brandName ? { brand: brandName } : {}),
-    ...(distillerName ? { distillers: [distillerName] } : {}),
+    ...(prefill.distillers?.length
+      ? { distillers: prefill.distillers }
+      : distillerName
+        ? { distillers: [distillerName] }
+        : {}),
+    ...(bottlerName ? { bottler: bottlerName } : {}),
+    ...(seriesName ? { series: seriesName } : {}),
     ...(category ? { category } : {}),
     ...(statedAge !== null ? { statedAge } : {}),
     ...(abv !== null ? { abv } : {}),
     ...(edition ? { edition } : {}),
     ...(vintageYear !== null ? { vintageYear } : {}),
     ...(releaseYear !== null ? { releaseYear } : {}),
+    ...(prefill.caskStrength !== null && prefill.caskStrength !== undefined
+      ? { caskStrength: prefill.caskStrength }
+      : {}),
+    ...(prefill.singleCask !== null && prefill.singleCask !== undefined
+      ? { singleCask: prefill.singleCask }
+      : {}),
+    ...(prefill.caskType ? { caskType: prefill.caskType } : {}),
+    ...(prefill.caskSize ? { caskSize: prefill.caskSize } : {}),
+    ...(prefill.caskFill ? { caskFill: prefill.caskFill } : {}),
   });
 
   const distillerQuery = useQuery({
