@@ -237,16 +237,24 @@ approval, regardless of source or confidence.
 
 ### Requirement: Newly added Bottles may receive background audits
 
-The add-Bottle workflow SHALL support optionally enqueueing one idempotent
-`audit_bottle` check through the existing `VerifyBottleCreation` job after the
-authoritative Bottle save commits.
+With shadow generation enabled, the existing `VerifyBottleCreation` job SHALL
+run one idempotent `audit_bottle` check for 100% of eligible `manual_entry`
+Bottles. `price_match_automation` Bottles SHALL use a deterministic sample that
+defaults to 10%. The check SHALL run after the authoritative Bottle save
+commits.
 
 #### Scenario: User-created Bottle commits
 
-- **WHEN** post-create audit sampling selects the Bottle
+- **WHEN** an eligible `manual_entry` Bottle commits
 - **THEN** the save response SHALL complete without waiting for the audit
 - **AND** `VerifyBottleCreation` SHALL run the check against the committed
   Bottle using the existing Bottle-creation event and origin for retry safety
+
+#### Scenario: Automated price-match Bottle commits
+
+- **WHEN** deterministic sampling selects a `price_match_automation` Bottle
+- **THEN** `VerifyBottleCreation` SHALL run the same post-create check
+- **AND** the sample rate SHALL default to 10%
 
 #### Scenario: Post-create audit proposes changes
 
@@ -259,7 +267,8 @@ authoritative Bottle save commits.
 - **WHEN** Bottle post-create verification uses the new check
 - **THEN** it SHALL replace the previous Bottle-specific heuristic
   passed/flagged finding calculation
-- **AND** sampling and unique-job behavior SHALL remain
+- **AND** 100% coverage of eligible `manual_entry` Bottles, deterministic
+  `price_match_automation` sampling, and unique-job behavior SHALL remain
 - **AND** it SHALL NOT create a second actionable verification result or queue
 
 ### Requirement: Bottle operations use canonical services

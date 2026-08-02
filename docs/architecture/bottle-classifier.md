@@ -67,7 +67,7 @@ intent:
 - `resolve_reference` identifies a Bottle from a listing or other external
   reference. Its existing structured decision remains the authoritative result.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
-  sampled post-user-creation job. Its result is a narrative summary, proposed
+  post-user-creation job. Its result is a narrative summary, proposed
   operations, and findings; it has no redundant structured conclusion.
 
 A proposed operation is an agent suggestion with a typed input, rationale, and
@@ -108,9 +108,12 @@ immutable.
 
 Generation, moderator visibility, and execution are controlled separately by
 `BOTTLE_CHECK_SHADOW_GENERATION`, `BOTTLE_CHECK_MODERATOR_VISIBILITY`, and
-`BOTTLE_CHECK_EXECUTION`. All three default off. Post-user-creation audits run
-after the Bottle save commits and never delay or roll back that save. These
-flags do not alter the four proposal tools exposed when a full check runs.
+`BOTTLE_CHECK_EXECUTION`. Generation and moderator visibility default on;
+execution defaults off. Post-user-creation audits run after the Bottle save
+commits and never delay or roll back that save. The job audits 100% of eligible
+`manual_entry` Bottles. `price_match_automation` Bottles use a deterministic
+sample that defaults to 10%. These flags do not alter the four proposal tools
+exposed when a full check runs.
 
 ### BottleGroup Findings
 
