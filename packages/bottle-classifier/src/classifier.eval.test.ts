@@ -243,6 +243,7 @@ function getProposedBottleIdentityText(
 function normalizeEvalText(value: string | null | undefined): string {
   return (value ?? "")
     .toLowerCase()
+    .replace(/[²₂]/g, "2")
     .replace(/['’]/g, "")
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, " ")

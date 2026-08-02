@@ -914,6 +914,64 @@ describe("POST /tastings/photo-identification", () => {
     });
   });
 
+  test("serializes the complete reviewed bottle draft for manual fallback", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const baseDecision = buildCreateBottleDecision({
+      brandName: "Compass Box",
+      bottleName: "Hedonism²",
+      confidenceBasis: {
+        positiveEvidence: ["The label identifies Hedonism²."],
+        unresolvedRisks: [
+          {
+            category: "insufficient_evidence",
+            note: "Keep this proposal in manual review for the test.",
+          },
+        ],
+        toolsUsed: ["openai_web_search"],
+        webEvidence: "supportive",
+      },
+    });
+    const proposedBottle = {
+      ...baseDecision.proposedBottle,
+      series: { id: 77, name: "Hedonism" },
+      category: "blend",
+      statedAge: 23,
+      abv: 49,
+      releaseYear: 2023,
+      caskStrength: false,
+      singleCask: false,
+      caskType: "bourbon",
+      caskSize: "barrel",
+      caskFill: "1st_fill",
+      brand: { id: 1422, name: "Compass Box" },
+      bottler: { id: 1422, name: "Compass Box" },
+      distillers: [
+        { id: 1204, name: "North British" },
+        { id: 1270, name: "Port Dundas" },
+        { id: 944, name: "Girvan" },
+      ],
+    };
+    const decision = { ...baseDecision, proposedBottle };
+
+    const identification = await identifyCreateProposal({
+      fixtures,
+      user: defaults.user,
+      idempotencyKey: "photo-identification-complete-manual-draft",
+      decision,
+    });
+
+    expect(identification.suggestedNextStep).toBe("manual_search");
+    expect(identification.classification).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "create_bottle",
+        proposedBottle,
+      },
+    });
+  });
+
   test("routes review-band create proposals to manual review", async ({
     defaults,
     fixtures,

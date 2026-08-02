@@ -65,18 +65,24 @@ function getRawNumberFieldValue(
   return typeof value === "number" ? value : null;
 }
 
-function getFirstRawStringFieldValue(
+function getRawStringFieldValues(
   result: PhotoIdentification | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
-  if (typeof value === "string") return value;
+  if (typeof value === "string") return [value];
   if (Array.isArray(value)) {
-    return (
-      value.find((item): item is string => typeof item === "string") ?? null
-    );
+    return value.filter((item): item is string => typeof item === "string");
   }
-  return null;
+  return [];
+}
+
+function getRawBooleanFieldValue(
+  result: PhotoIdentification | null,
+  field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
+) {
+  const value = getRawFieldValue(result, field);
+  return typeof value === "boolean" ? value : null;
 }
 
 export function getSearchSeed(result: PhotoIdentification | null) {
@@ -111,10 +117,21 @@ export function getCreateBottlePrefill(
       getRawStringFieldValue(result, "brand") ??
       null,
     category: category.success ? category.data : null,
-    distillerId: proposedBottle?.distillers[0]?.id ?? null,
-    distillerName:
-      proposedBottle?.distillers[0]?.name ??
-      getFirstRawStringFieldValue(result, "distillery") ??
+    distillers: proposedBottle?.distillers.length
+      ? proposedBottle.distillers
+      : getRawStringFieldValues(result, "distillery").map((name) => ({
+          id: null,
+          name,
+        })),
+    bottlerId: proposedBottle?.bottler?.id ?? null,
+    bottlerName:
+      proposedBottle?.bottler?.name ??
+      getRawStringFieldValue(result, "bottler") ??
+      null,
+    seriesId: proposedBottle?.series?.id ?? null,
+    seriesName:
+      proposedBottle?.series?.name ??
+      getRawStringFieldValue(result, "series") ??
       null,
     statedAge:
       proposedBottle?.statedAge ?? getRawNumberFieldValue(result, "statedAge"),
@@ -129,6 +146,15 @@ export function getCreateBottlePrefill(
     releaseYear:
       proposedBottle?.releaseYear ??
       getRawNumberFieldValue(result, "releaseYear"),
+    caskStrength:
+      proposedBottle?.caskStrength ??
+      getRawBooleanFieldValue(result, "caskStrength"),
+    singleCask:
+      proposedBottle?.singleCask ??
+      getRawBooleanFieldValue(result, "singleCask"),
+    caskType: proposedBottle?.caskType ?? null,
+    caskSize: proposedBottle?.caskSize ?? null,
+    caskFill: proposedBottle?.caskFill ?? null,
   };
 }
 

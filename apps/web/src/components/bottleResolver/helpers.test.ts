@@ -46,6 +46,10 @@ function buildPhotoResult(): PhotoIdentification {
         action: "create_bottle",
         proposedBottle: {
           name: "Canonical Expression",
+          series: {
+            id: 303,
+            name: "Canonical Series",
+          },
           category: "single_malt",
           statedAge: null,
           edition: "2024 Edition",
@@ -61,10 +65,18 @@ function buildPhotoResult(): PhotoIdentification {
             id: 101,
             name: "Canonical Brand",
           },
+          bottler: {
+            id: 404,
+            name: "Canonical Bottler",
+          },
           distillers: [
             {
               id: 202,
               name: "Existing Distillery",
+            },
+            {
+              id: 203,
+              name: "Second Distillery",
             },
           ],
         },
@@ -102,8 +114,14 @@ describe("photo create prefill", () => {
       brandId: 101,
       brandName: "Canonical Brand",
       category: "single_malt",
-      distillerId: 202,
-      distillerName: "Existing Distillery",
+      distillers: [
+        { id: 202, name: "Existing Distillery" },
+        { id: 203, name: "Second Distillery" },
+      ],
+      bottlerId: 404,
+      bottlerName: "Canonical Bottler",
+      seriesId: 303,
+      seriesName: "Canonical Series",
       edition: "2024 Edition",
       abv: 48,
       releaseYear: 2024,
