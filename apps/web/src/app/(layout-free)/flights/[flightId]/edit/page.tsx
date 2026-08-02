@@ -3,6 +3,7 @@ import { use } from "react";
 
 import FlightForm from "@peated/web/components/flightForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import {
   useMutation,
   useQueryClient,
@@ -17,9 +18,11 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
 
   const orpc = useORPC();
   const { data: flight } = useSuspenseQuery(
-    orpc.flights.details.queryOptions({
-      input: { flight: flightId },
-    }),
+    formQueryOptions(
+      orpc.flights.details.queryOptions({
+        input: { flight: flightId },
+      }),
+    ),
   );
 
   const router = useRouter();

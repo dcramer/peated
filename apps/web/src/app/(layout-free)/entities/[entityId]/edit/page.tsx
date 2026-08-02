@@ -4,6 +4,7 @@ import { use } from "react";
 import EntityForm from "@peated/web/components/entityForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -22,7 +23,11 @@ export default function Page(props: { params: Promise<{ entityId: string }> }) {
 function EntityEditForm({ entityId }: { entityId: string }) {
   const orpc = useORPC();
   const { data: entity } = useSuspenseQuery(
-    orpc.entities.details.queryOptions({ input: { entity: Number(entityId) } }),
+    formQueryOptions(
+      orpc.entities.details.queryOptions({
+        input: { entity: Number(entityId) },
+      }),
+    ),
   );
   const router = useRouter();
 

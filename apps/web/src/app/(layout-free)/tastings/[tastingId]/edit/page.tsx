@@ -10,6 +10,7 @@ import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -31,9 +32,11 @@ function TastingEditForm({ tastingId }: { tastingId: string }) {
   const orpc = useORPC();
 
   const { data: tasting } = useSuspenseQuery(
-    orpc.tastings.details.queryOptions({
-      input: { tasting: Number(tastingId) },
-    }),
+    formQueryOptions(
+      orpc.tastings.details.queryOptions({
+        input: { tasting: Number(tastingId) },
+      }),
+    ),
   );
 
   const router = useRouter();
@@ -85,9 +88,11 @@ function TastingEditFields({
 }) {
   const orpc = useORPC();
   const { data: suggestedTags } = useSuspenseQuery(
-    orpc.bottles.suggestedTags.queryOptions({
-      input: { bottle: tasting.bottle.id },
-    }),
+    formQueryOptions(
+      orpc.bottles.suggestedTags.queryOptions({
+        input: { bottle: tasting.bottle.id },
+      }),
+    ),
   );
 
   return (
