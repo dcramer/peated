@@ -6,10 +6,7 @@ import {
 import { runPostUserCreationBottleAudit } from "@peated/server/agents/bottleClassifier/auditBottle";
 import config from "@peated/server/config";
 import { recordCatalogVerificationResult } from "@peated/server/lib/catalogVerification";
-import {
-  getBottleCatalogVerificationFindings,
-  getCatalogVerificationDisplayName,
-} from "@peated/server/lib/catalogVerificationFindings";
+import { getCatalogVerificationDisplayName } from "@peated/server/lib/catalogVerificationFindings";
 import { z } from "zod";
 
 export const VerifyBottleCreationJobArgsSchema = z
@@ -31,17 +28,16 @@ export default async function verifyBottleCreation(input: unknown) {
   const { bottleId, creationSource } =
     VerifyBottleCreationJobArgsSchema.parse(input);
 
-  const displayName = await getCatalogVerificationDisplayName({
-    objectId: bottleId,
-    objectType: "bottle",
-  });
-
   if (
     !shouldRunCatalogVerification(creationSource, {
       sampleKey: bottleId,
       sampleRate: config.CATALOG_VERIFICATION_AUTOMATION_SAMPLE_RATE,
     })
   ) {
+    const displayName = await getCatalogVerificationDisplayName({
+      objectId: bottleId,
+      objectType: "bottle",
+    });
     await recordCatalogVerificationResult({
       displayName,
       objectId: bottleId,
@@ -56,25 +52,8 @@ export default async function verifyBottleCreation(input: unknown) {
     return;
   }
 
-  if (config.BOTTLE_CHECK_SHADOW_GENERATION) {
-    await runPostUserCreationBottleAudit({
-      bottleId,
-      backgroundEventKey: getBottleCreationEventKey(bottleId),
-    });
-    return;
-  }
-
-  const findings = await getBottleCatalogVerificationFindings({ bottleId });
-
-  await recordCatalogVerificationResult({
-    displayName,
-    objectId: bottleId,
-    objectType: "bottle",
-    result: {
-      source: creationSource,
-      status: findings.length > 0 ? "flagged" : "passed",
-      reason: null,
-      findings,
-    },
+  await runPostUserCreationBottleAudit({
+    bottleId,
+    backgroundEventKey: getBottleCreationEventKey(bottleId),
   });
 }

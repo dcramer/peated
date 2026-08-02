@@ -500,6 +500,25 @@ function evaluateDecisionShape(
     }
   }
 
+  if (expected.proposedBottleDistillerIds !== undefined) {
+    const selectedIds =
+      result.decision.proposedBottle?.distillers
+        .map((distiller) => distiller.id)
+        .filter((id): id is number => id !== null)
+        .sort((left, right) => left - right) ?? [];
+    const expectedIds = [...expected.proposedBottleDistillerIds].sort(
+      (left, right) => left - right,
+    );
+    if (
+      selectedIds.length !== expectedIds.length ||
+      selectedIds.some((id, index) => id !== expectedIds[index])
+    ) {
+      failures.push(
+        `proposedBottle.distillers expected ids ${expectedIds.join(", ")} but got ${selectedIds.join(", ")}`,
+      );
+    }
+  }
+
   return getShapeVerdict(failures);
 }
 

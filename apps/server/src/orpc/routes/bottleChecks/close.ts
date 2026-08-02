@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import {
   BottleCheckAlreadyClosedError,
   BottleCheckNotClosableError,
@@ -26,9 +25,6 @@ export default procedure
   .input(InputSchema)
   .output(BottleCheckResponseSchema)
   .handler(async ({ input, context, errors }) => {
-    if (!config.BOTTLE_CHECK_MODERATOR_VISIBILITY) {
-      throw errors.NOT_FOUND();
-    }
     try {
       return serializeBottleCheck(
         await closeBottleCheck(

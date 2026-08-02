@@ -64,7 +64,21 @@ export function formatEvalUsageAnnotation(
 
   const inputTokens = usage?.inputTokens ?? 0;
   const outputTokens = usage?.outputTokens ?? 0;
-  const tokenSummary = `input ${inputTokens.toLocaleString("en-US")} tok | output ${outputTokens.toLocaleString("en-US")} tok`;
+  const reportedCachedInputTokens = metadata?.cachedInputTokens;
+  const cachedInputTokens =
+    typeof reportedCachedInputTokens === "number"
+      ? Math.min(inputTokens, Math.max(0, reportedCachedInputTokens))
+      : 0;
+  const uncachedInputTokens = Math.max(0, inputTokens - cachedInputTokens);
+  const comparisonTokens = uncachedInputTokens + outputTokens;
+  const tokenSummary = [
+    `uncached input ${uncachedInputTokens.toLocaleString("en-US")} tok`,
+    `output ${outputTokens.toLocaleString("en-US")} tok`,
+    `proxy total ${comparisonTokens.toLocaleString("en-US")} tok`,
+    ...(cachedInputTokens > 0
+      ? [`cached input ${cachedInputTokens.toLocaleString("en-US")} tok`]
+      : []),
+  ].join(" | ");
 
   if (typeof estimate === "number") {
     return `${tokenSummary} | ${reasoningSummary} | est. $${estimate.toFixed(6)} · agent loop only`;

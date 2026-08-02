@@ -56,52 +56,46 @@ test("disposes non-ready and live-ready operations independently", async ({
     .filter({ hasText: "Review the second inspected Brand" });
 
   await expect(
-    readyOperation.getByRole("checkbox", { name: "Select" }),
-  ).toBeVisible();
+    readyOperation.getByRole("button", { name: "Apply" }),
+  ).toBeEnabled();
   await expect(
     nonReadyOperation.getByText("Not ready to approve"),
   ).toBeVisible();
   await expect(
     nonReadyOperation.getByText(
-      "This operation cannot currently be approved, but you can reject it.",
+      "The current catalog state does not support applying this proposal.",
     ),
   ).toBeVisible();
-  await nonReadyOperation.getByRole("checkbox", { name: "Select" }).check();
   await expect(
-    page.getByRole("button", { name: "Approve selected" }),
+    nonReadyOperation.getByRole("button", { name: "Apply" }),
   ).toBeDisabled();
+  await nonReadyOperation.getByRole("button", { name: "Reject" }).click();
   await expect(
-    page.getByRole("button", { name: "Reject selected" }),
+    nonReadyOperation.getByRole("button", { name: "Confirm rejection" }),
   ).toBeEnabled();
   const rejectionRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/bottleChecks/rejectSelected"),
   );
-  await page.getByRole("button", { name: "Reject selected" }).click();
+  await nonReadyOperation
+    .getByRole("button", { name: "Confirm rejection" })
+    .click();
   await rejectionRequest;
 
   await expect(
     nonReadyOperation.getByText("Rejected", { exact: true }),
   ).toBeVisible();
-  const actionResults = page.getByRole("region", {
-    name: "Operation results",
-  });
-  const rejectionResult = actionResults
-    .getByRole("listitem")
-    .filter({ hasText: "Operation #702" });
   await expect(
-    rejectionResult.getByText("Operation #702", { exact: true }),
-  ).toBeVisible();
-  await expect(rejectionResult.getByText(/^rejected$/i)).toBeVisible();
+    page.getByRole("region", { name: "Operation results" }),
+  ).toHaveCount(0);
   await expect(
-    readyOperation.getByRole("checkbox", { name: "Select" }),
-  ).toBeVisible();
+    readyOperation.getByRole("button", { name: "Apply" }),
+  ).toBeEnabled();
   await expectNoHorizontalOverflow(page);
 
-  await readyOperation.getByRole("checkbox", { name: "Select" }).check();
   const approvalRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/bottleChecks/approveSelected"),
   );
-  await page.getByRole("button", { name: "Approve selected" }).click();
+  await readyOperation.getByRole("button", { name: "Apply" }).click();
   await approvalRequest;
 
   await expect(
@@ -110,18 +104,11 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expect(
     nonReadyOperation.getByText("Rejected", { exact: true }),
   ).toBeVisible();
-  const approvalResult = actionResults
-    .getByRole("listitem")
-    .filter({ hasText: "Operation #701" });
-  await expect(
-    approvalResult.getByText("Operation #701", { exact: true }),
-  ).toBeVisible();
-  await expect(approvalResult.getByText(/^applied$/i)).toBeVisible();
   await expect(page.getByRole("checkbox", { name: "Select" })).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 });
 
-test("runs a moderator Bottle audit and shows it in Bottle history", async ({
+test("runs a clean moderator Bottle audit inline and returns to the Bottle", async ({
   context,
   page,
 }, testInfo) => {
@@ -142,13 +129,7 @@ test("runs a moderator Bottle audit and shows it in Bottle history", async ({
   await expect(
     auditFieldset.getByRole("link", { name: existingBottle.fullName }),
   ).toHaveAttribute("href", `/bottles/${existingBottleId}`);
-  const historyLink = auditFieldset.getByRole("link", {
-    name: "Audit history",
-  });
-  await expect(historyLink).toHaveAttribute(
-    "href",
-    `/bottles/${existingBottleId}/checks`,
-  );
+  await expect(auditFieldset.getByText("Audit history")).toHaveCount(0);
   await auditFieldset
     .getByRole("textbox", { name: "Optional context" })
     .fill("Verify the label and catalog identity.");
@@ -157,18 +138,9 @@ test("runs a moderator Bottle audit and shows it in Bottle history", async ({
   );
   await page.getByRole("button", { name: "Run Bottle Audit" }).click();
   await auditRequest;
-  await expect(page).toHaveURL(/\/bottle-checks\/93$/);
-  await expectNoHorizontalOverflow(page);
-
-  await page.goBack();
+  await expect(page).toHaveURL(`/bottles/${existingBottleId}/audit`);
   await expect(
-    page.getByRole("heading", { name: "Audit Bottle", exact: true }),
-  ).toBeVisible();
-  await page.getByRole("link", { name: "Audit history" }).click();
-  await expect(page).toHaveURL(`/bottles/${existingBottleId}/checks`);
-
-  await expect(
-    page.getByRole("heading", { name: "Audit history", exact: true }),
+    page.getByRole("heading", { name: "No changes proposed" }),
   ).toBeVisible();
   await expect(
     page.getByText(
@@ -176,10 +148,34 @@ test("runs a moderator Bottle audit and shows it in Bottle history", async ({
       { exact: true },
     ),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "View review" })).toHaveAttribute(
-    "href",
-    "/bottle-checks/93",
-  );
+  await expectNoHorizontalOverflow(page);
+
+  await page.getByRole("button", { name: "Return to Bottle" }).click();
+  await expect(page).toHaveURL(`/bottles/${existingBottleId}`);
+});
+
+test("redirects an actionable moderator audit to its current check", async ({
+  context,
+  page,
+}, testInfo) => {
+  await signIn(context, {
+    accessToken: uniqueAccessToken(
+      testInfo,
+      "bottle-audit-bottle-check-review",
+    ),
+    user: moderatorUser,
+  });
+
+  await page.goto(`/bottles/${existingBottleId}/audit`);
+  await page
+    .getByRole("textbox", { name: "Optional context" })
+    .fill("Review proposed catalog work.");
+  await page.getByRole("button", { name: "Run Bottle Audit" }).click();
+
+  await expect(page).toHaveURL("/bottle-checks/91");
+  await expect(
+    page.getByRole("heading", { name: "Bottle Check #91" }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 

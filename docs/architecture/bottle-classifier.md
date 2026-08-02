@@ -61,11 +61,13 @@ policy.
 
 ## Bottle Checks
 
-A Bottle check is one immutable classifier result created for a server-owned
-intent:
+A Bottle check is persisted workflow state for a server-owned intent:
 
 - `resolve_reference` identifies a Bottle from a listing or other external
   reference. Its existing structured decision remains the authoritative result.
+  Photo identification persists this state only when an existing-Bottle match
+  or repair result also contains supplemental operations or findings; the
+  end-user flow still receives only its existing match/create response.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
   post-user-creation job. Its result is a narrative summary, proposed
   operations, and findings; it has no redundant structured conclusion.
@@ -106,14 +108,17 @@ retried, using the same operation id and reconciliation before redispatch.
 Blocked or stale work needs manual correction or a new check. A closed check is
 immutable.
 
-Generation, moderator visibility, and execution are controlled separately by
-`BOTTLE_CHECK_SHADOW_GENERATION`, `BOTTLE_CHECK_MODERATOR_VISIBILITY`, and
-`BOTTLE_CHECK_EXECUTION`. Generation and moderator visibility default on;
-execution defaults off. Post-user-creation audits run after the Bottle save
-commits and never delay or roll back that save. The job audits 100% of eligible
-`manual_entry` Bottles. `price_match_automation` Bottles use a deterministic
-sample that defaults to 10%. These flags do not alter the four proposal tools
-exposed when a full check runs.
+Bottle checks are normal moderator functionality. A manual clean audit returns
+its summary directly without persisting a check and removes older terminal
+manual reviews. An actionable manual audit persists one current review, and
+another request reuses that review until its work is terminal. A replacement
+also removes older terminal manual reviews; pending, applying, blocked, stale,
+and failed work remains durable.
+
+Post-user-creation audits run after the Bottle save commits and never delay or
+roll back that save. The job audits 100% of eligible `manual_entry` Bottles.
+`price_match_automation` Bottles use a deterministic sample that defaults to
+10%. Background checks retain their event-key receipt for retry safety.
 
 ### BottleGroup Findings
 
@@ -124,9 +129,9 @@ V1 has no BottleGroup operation. A suspected grouping problem is a
 The reviewed Laphroaig Càirdeas 2022 production miss demonstrates that
 boundary: merge malformed Bottle `39096` into Warehouse 1 Bottle `45146`, while
 leaving generic Bottle `44288` unchanged. It does not justify regrouping. The
-initial audit corpus deliberately contains only the synthetic clean/no-op case
-and the Laphroaig audit derived from that verified reference miss. It has no
-BottleGroup-finding case and is not evidence for a group mutation.
+audit corpus includes synthetic clean/no-op coverage and production-derived
+Bottle update and duplicate-merge cases. It has no BottleGroup-finding case and
+is not evidence for a group mutation.
 
 Track real moderator-reviewed `bottle_group` findings before designing a
 follow-up. If they demonstrate a recurring need, propose only the smallest
@@ -135,11 +140,10 @@ Bottle ids, all Bottle consumers and aliases, shared-field rematerialization,
 representatives, aggregates, and auditable before/after history. It must not add
 move, merge, and split operations merely for symmetry.
 
-### Measurement And Rollout
+### Measurement
 
 Keep reference-decision accuracy and diagnostic cleanup recall separate from
-audit operation and finding precision. Before enabling execution broadly,
-measure:
+audit operation and finding precision. Measure:
 
 - intent accuracy and schema-valid output;
 - authoritative reference-decision and canonical/collected grounding gates;
@@ -157,10 +161,8 @@ score.
 Classifier evals provide the offline decision, operation, finding, cost,
 latency, and tool-use measures. Durable check and operation timestamps,
 statuses, and structured reasons provide the review and execution inputs.
-Broad execution remains off until those runtime inputs are aggregated and a
-reviewed rollout explicitly defines an acceptable precision and operational
-failure bar. A schema existing in the database is not itself a measurement
-gate.
+These measurements guide classifier and review-workflow improvements; a schema
+existing in the database is not itself a quality measurement.
 
 Run `pnpm cli classifier rollout-report --days 30` for the durable rollout
 inputs. The report counts accepted and rejected proposals separately and labels
@@ -184,8 +186,7 @@ explicitly. Separate web-search response tokens and tool fees, alternate
 service tiers, long-context pricing, and regional adjustments remain outside
 the estimate. The durable report still does not invent a dollar estimate when
 no versioned pricing source was recorded. Reference-resolution runtime coverage
-and durable dollar cost are explicit rollout gaps. Broad execution therefore
-remains gated until those gaps and acceptable rollout bars are resolved.
+and durable dollar cost remain explicit measurement gaps.
 
 ## Correctness Bar
 
@@ -263,9 +264,13 @@ Entity, and web search but retains Bottle and Entity context tools for ids the
 agent already knows. Local match-only identification receives neither context
 nor proposal tools.
 
-Existing-Bottle audits use the same four proposal tools in one bounded agent
-loop. Their strict final output is only a summary and findings. The audited
-Bottle is preloaded as inspected context.
+Existing-Bottle audits reuse the full reference evidence preparation: public
+label extraction, initial Bottle candidates, Entity resolution, deterministic
+identity anchors, the focused-web budget, and the same read/proposal tools. The
+audited Bottle and its complete context are preloaded, then one bounded audit
+agent loop compares the authoritative marketed identity with the stored Bottle.
+Its strict final output remains only a summary and findings, without a redundant
+reference decision.
 
 Ignored references do not run the agent. Local match-only identification stays
 separate and does not receive catalog proposal tools.

@@ -39,6 +39,7 @@ describe("Bottle check instructions", () => {
       expect(instructions).toContain("proposal tools");
       expect(instructions).toMatch(/do not mutate|read-only/);
       expect(instructions).toContain("`availableSourceEvidenceFields`");
+      expect(instructions).toContain("a search result alone is not inspection");
     }
   });
 
@@ -52,6 +53,7 @@ describe("Bottle check instructions", () => {
       "Do not include proposed operations in the final structured output",
       "Use an evidenced canonical `proposedBottle.name`",
       "do not investigate, search, distinguish, reject, create, repair",
+      "not a different Bottle solely because its stored Brand, category, age",
       "actual `toolsUsed`",
     ]) {
       expect(reference).toContain(rule);
@@ -76,6 +78,39 @@ describe("Bottle check instructions", () => {
     );
   });
 
+  test("preserves an evidenced bottler even when it is also the Brand", () => {
+    const reference = buildBottleClassifierInstructions();
+    const extractor = buildWhiskyLabelExtractorInstructions({ mode: "image" });
+    const audit = buildBottleAuditInstructions();
+
+    expect(reference).toContain("it may equal `brand`");
+    expect(audit).toContain(
+      "supported gaps in ABV, release or vintage year, bottler, and distilleries",
+    );
+    expect(extractor).toContain("The bottler may equal `brand`");
+    expect(extractor).toContain(
+      "do not infer a bottler from the brand logo alone",
+    );
+  });
+
+  test("researches core missing facts without broadening the audit", () => {
+    const reference = buildBottleClassifierInstructions();
+
+    expect(reference).toContain(
+      "make one focused web investigation before finalizing",
+    );
+    expect(reference).toContain(
+      "ABV, a product-specific release or bottling year, an evidenced bottler, or distilleries",
+    );
+    expect(reference).toContain(
+      "This is not a general audit or exhaustive search",
+    );
+    expect(reference).toContain(
+      "other unknown core facts do not block a sparse `update_bottle`",
+    );
+    expect(reference).toContain("Do not guess or wait for complete enrichment");
+  });
+
   test("asks image extraction to inspect the complete readable label", () => {
     const instructions = buildWhiskyLabelExtractorInstructions({
       mode: "image",
@@ -83,5 +118,20 @@ describe("Bottle check instructions", () => {
 
     expect(instructions).toContain("Scan the complete readable label");
     expect(instructions).toContain("smaller secondary bands");
+    expect(instructions).toContain("`Cask No. 71`");
+    expect(instructions).toContain("never reduce it to bare digits");
+    expect(instructions).toContain("never use it as `edition`");
+    expect(instructions).toContain("leave `edition` null instead of guessing");
+  });
+
+  test("requires independent support for numeric image-derived repairs", () => {
+    const audit = buildBottleAuditInstructions();
+
+    expect(audit).toContain(
+      "corroborate the exact characters with raw label text or focused external product evidence",
+    );
+    expect(audit).toContain(
+      "Repeated or synthesized structured fields from one extraction are not independent support",
+    );
   });
 });

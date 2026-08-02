@@ -1,6 +1,5 @@
 import type { ProposedOperation } from "@peated/bottle-classifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import * as schema from "@peated/server/db/schema";
@@ -18,7 +17,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 async function createStorePriceUpdateEntityCheck({
   entity,
@@ -88,19 +87,6 @@ async function inspectedBottleContext(bottleId: number) {
 }
 
 describe("POST /bottle-checks/{check}/operations/approve", () => {
-  const originalExecutionFlag = config.BOTTLE_CHECK_EXECUTION;
-  const originalVisibilityFlag = config.BOTTLE_CHECK_MODERATOR_VISIBILITY;
-
-  beforeEach(() => {
-    config.BOTTLE_CHECK_EXECUTION = true;
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = true;
-  });
-
-  afterEach(() => {
-    config.BOTTLE_CHECK_EXECUTION = originalExecutionFlag;
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = originalVisibilityFlag;
-  });
-
   test("requires moderator access", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
 
@@ -112,18 +98,6 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     );
 
     expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-  });
-
-  test("honors the execution feature flag", async ({ fixtures }) => {
-    const moderator = await fixtures.User({ mod: true });
-    config.BOTTLE_CHECK_EXECUTION = false;
-
-    await expect(
-      routerClient.bottleChecks.approveSelected(
-        { check: 1, operationIds: [1] },
-        { context: { user: moderator } },
-      ),
-    ).rejects.toThrow("Bottle operation execution is not enabled");
   });
 
   test("returns a live preview and then applies through the moderation service", async ({

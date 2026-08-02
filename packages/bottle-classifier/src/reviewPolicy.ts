@@ -1,4 +1,8 @@
 import { normalizePotentialProofLikeDecision } from "./abv";
+import type {
+  BottleOperationEntityChoice,
+  ProposedOperation,
+} from "./bottleCheckContract";
 import {
   exactEditionMarkersMatch,
   extractedIdentityLooksLikePlainAgeStatementReference,
@@ -29,6 +33,7 @@ import {
   hasExactCaskSignals,
   inferBottleIdentityScope,
 } from "./exactCaskPolicy";
+import { listMatchesExpectedValue } from "./identityEvidenceCore";
 import {
   bottleNameDuplicatesBrand,
   normalizeBottle,
@@ -1420,10 +1425,12 @@ function rejectInvalidExistingMatch({
   reference,
   decision,
   artifacts,
+  proposedOperations,
 }: {
   reference: BottleReference;
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
+  proposedOperations: readonly ProposedOperation[];
 }): BottleClassificationDecision {
   if (decision.action !== "match") {
     return decision;
@@ -1448,13 +1455,160 @@ function rejectInvalidExistingMatch({
     targetCandidate: target,
     extractedLabel: artifacts.extractedIdentity,
   });
+
+  const resolveEntityChoiceName = (
+    choice: BottleOperationEntityChoice,
+  ): string | null => {
+    if (choice.kind === "create") {
+      return choice.entity.name;
+    }
+
+    return (
+      artifacts.resolvedEntities.find(
+        ({ entityId }) => entityId === choice.entityId,
+      )?.name ??
+      artifacts.entityContexts.find(
+        ({ entityId }) => entityId === choice.entityId,
+      )?.name ??
+      artifacts.bottleContexts
+        .flatMap(({ shared }) => [
+          shared.brand,
+          ...shared.distillers,
+          ...(shared.bottler ? [shared.bottler] : []),
+        ])
+        .find(({ entityId }) => entityId === choice.entityId)?.name ??
+      null
+    );
+  };
+  const extracted = artifacts.extractedIdentity;
+  const targetContext = artifacts.bottleContexts.find(
+    ({ bottleId }) => bottleId === decision.matchedBottleId,
+  );
+  const repairedFields = new Set<string>();
+  for (const operation of proposedOperations) {
+    if (
+      operation.type !== "update_bottle" ||
+      operation.input.bottleId !== decision.matchedBottleId
+    ) {
+      continue;
+    }
+
+    const { shared, exact } = operation.input.patch;
+    if (
+      shared?.name !== undefined &&
+      extracted?.expression &&
+      textsOverlap(shared.name, extracted.expression)
+    ) {
+      repairedFields.add("expression");
+    }
+    if (shared?.brand !== undefined && extracted?.brand) {
+      const brandName = resolveEntityChoiceName(shared.brand);
+      if (brandName && textsOverlap(brandName, extracted.brand)) {
+        repairedFields.add("brand");
+      }
+    }
+    if (shared?.bottler !== undefined && extracted?.bottler) {
+      const bottlerName = shared.bottler
+        ? resolveEntityChoiceName(shared.bottler)
+        : null;
+      if (bottlerName && textsOverlap(bottlerName, extracted.bottler)) {
+        repairedFields.add("bottler");
+      }
+    }
+    if (shared?.seriesId !== undefined && extracted?.series) {
+      const seriesName =
+        shared.seriesId === null
+          ? null
+          : artifacts.bottleContexts
+              .map(({ shared: contextShared }) => contextShared.series)
+              .find((series) => series?.seriesId === shared.seriesId)?.name;
+      if (seriesName && textsOverlap(seriesName, extracted.series)) {
+        repairedFields.add("series");
+      }
+    }
+    if (
+      shared?.category !== undefined &&
+      extracted?.category &&
+      shared.category === extracted.category
+    ) {
+      repairedFields.add("category");
+    }
+    if (shared?.distillers !== undefined && extracted?.distillery?.length) {
+      const distillers = shared.distillers.map(resolveEntityChoiceName);
+      if (
+        distillers.every((name): name is string => name !== null) &&
+        listMatchesExpectedValue(distillers, extracted.distillery) &&
+        listMatchesExpectedValue(extracted.distillery, distillers)
+      ) {
+        repairedFields.add("distillery");
+      }
+    }
+    const proposedStatedAge =
+      exact?.statedAge !== undefined
+        ? exact.statedAge
+        : targetContext?.exact.statedAge == null
+          ? shared?.statedAge
+          : undefined;
+    if (
+      proposedStatedAge !== undefined &&
+      extracted?.stated_age != null &&
+      proposedStatedAge === extracted.stated_age
+    ) {
+      repairedFields.add("stated_age");
+    }
+    if (
+      exact?.abv !== undefined &&
+      extracted?.abv != null &&
+      exact.abv === extracted.abv
+    ) {
+      repairedFields.add("abv");
+    }
+    if (
+      exact?.vintageYear !== undefined &&
+      extracted?.vintage_year != null &&
+      exact.vintageYear === extracted.vintage_year
+    ) {
+      repairedFields.add("vintage_year");
+    }
+    if (
+      exact?.releaseYear !== undefined &&
+      extracted?.release_year != null &&
+      exact.releaseYear === extracted.release_year
+    ) {
+      repairedFields.add("release_year");
+    }
+    if (
+      exact?.caskStrength !== undefined &&
+      extracted?.cask_strength != null &&
+      exact.caskStrength === extracted.cask_strength
+    ) {
+      repairedFields.add("cask_strength");
+    }
+    if (
+      exact?.singleCask !== undefined &&
+      extracted?.single_cask != null &&
+      exact.singleCask === extracted.single_cask
+    ) {
+      repairedFields.add("single_cask");
+    }
+    if (
+      exact?.edition !== undefined &&
+      extracted?.edition &&
+      exactEditionMarkersMatch(exact.edition, extracted.edition)
+    ) {
+      repairedFields.add("edition");
+    }
+  }
+  const unrepairedIdentityConflicts = identityConflicts.filter(
+    (field) => !repairedFields.has(field),
+  );
   const smwsCode = getSmwsCodeAnchor({ reference, decision, artifacts });
   const materialIdentityConflicts =
     smwsCode &&
     candidateLooksSmws(target) &&
     candidateHasExactCaskCodeAnchor(target, smwsCode)
-      ? identityConflicts.filter((field) => field !== "brand")
-      : identityConflicts;
+      ? unrepairedIdentityConflicts.filter((field) => field !== "brand")
+      : unrepairedIdentityConflicts;
 
   if (!materialIdentityConflicts.length) {
     return decision;
@@ -2034,10 +2188,12 @@ export function finalizeBottleReferenceClassification({
   reference,
   decision,
   artifacts,
+  proposedOperations = [],
 }: {
   reference: BottleReference;
   decision: BottleClassifierAgentDecisionInput;
   artifacts: BottleClassificationArtifacts;
+  proposedOperations?: readonly ProposedOperation[];
 }): BottleClassificationDecision {
   const parsedDecision: BottleClassifierAgentDecision =
     BottleClassifierAgentDecisionSchema.parse(
@@ -2076,6 +2232,7 @@ export function finalizeBottleReferenceClassification({
     reference,
     decision: agentBasisAdjustedDecision,
     artifacts,
+    proposedOperations,
   });
   const finalDecision = reviewedDecision.proposedBottle
     ? {

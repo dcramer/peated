@@ -1,7 +1,9 @@
-import type { Outputs } from "@peated/server/orpc/router";
+"use client";
+
+import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 type Details = Outputs["bottleChecks"]["details"];
 export type BottleOperation = Details["check"]["operations"][number];
@@ -10,6 +12,18 @@ export type BottleOperationReview = NonNullable<
 >;
 export type BottleOperationEvidence =
   BottleOperation["proposal"]["evidenceRefs"][number];
+type RejectionReason = Inputs["bottleChecks"]["rejectSelected"]["reason"];
+
+const REJECTION_REASONS: Array<{
+  id: RejectionReason;
+  label: string;
+}> = [
+  { id: "wrong_target", label: "Wrong target" },
+  { id: "wrong_change", label: "Wrong change" },
+  { id: "insufficient_evidence", label: "Insufficient evidence" },
+  { id: "resolved_manually", label: "Resolved manually" },
+  { id: "other", label: "Other" },
+];
 
 const STATUS_LABELS: Record<BottleOperation["status"], string> = {
   blocked: "Blocked",
@@ -70,26 +84,24 @@ function getPath(value: unknown, path: string): unknown {
 }
 
 function ImpactList({
+  hideSingles = false,
   values,
 }: {
+  hideSingles?: boolean;
   values: Record<string, number | undefined>;
 }) {
   const entries = Object.entries(values).filter(
-    (entry): entry is [string, number] => typeof entry[1] === "number",
+    (entry): entry is [string, number] =>
+      typeof entry[1] === "number" && entry[1] > (hideSingles ? 1 : 0),
   );
   if (entries.length === 0) return null;
 
   return (
-    <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+    <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
       {entries.map(([label, value]) => (
-        <div
-          className="rounded border border-slate-800 bg-slate-950 px-3 py-2"
-          key={label}
-        >
-          <dt className="text-xs capitalize text-slate-400">
-            {label.replaceAll(/([A-Z])/g, " $1")}
-          </dt>
-          <dd className="text-sm font-semibold text-white">{value}</dd>
+        <div className="flex gap-1" key={label}>
+          <dd className="font-semibold text-slate-200">{value}</dd>
+          <dt className="lowercase">{label.replaceAll(/([A-Z])/g, " $1")}</dt>
         </div>
       ))}
     </dl>
@@ -180,6 +192,7 @@ function Preview({ review }: { review: BottleOperationReview }) {
             labelField={formatBottleFieldLabel}
           />
           <ImpactList
+            hideSingles
             values={{
               affectedBottles: review.preview.affectedBottles.total,
               entitiesCreated: review.preview.entityCreations.length,
@@ -217,7 +230,7 @@ function Preview({ review }: { review: BottleOperationReview }) {
             before={review.preview.before}
             fields={review.preview.changedFields}
           />
-          <ImpactList values={review.preview.impact} />
+          <ImpactList hideSingles values={review.preview.impact} />
           <Warnings warnings={review.preview.warnings} />
         </div>
       );
@@ -423,29 +436,43 @@ export function isBottleOperationRejectable(operation: BottleOperation) {
 
 export default function OperationCard({
   approvalReady = false,
-  checked = false,
+  actionError = null,
   disabled = false,
-  executionEnabled = true,
+  onApply,
+  onReject,
   onRetry,
-  onSelect,
   operation,
   review,
   showDisposition = true,
 }: {
   approvalReady?: boolean;
-  checked?: boolean;
+  actionError?: string | null;
   disabled?: boolean;
-  executionEnabled?: boolean;
+  onApply?: (operationId: number) => void;
+  onReject?: (
+    operationId: number,
+    reason: RejectionReason,
+    note?: string,
+  ) => void;
   onRetry?: (operationId: number) => void;
-  onSelect?: (operationId: number, selected: boolean) => void;
   operation: BottleOperation;
   review: BottleOperationReview | null;
   showDisposition?: boolean;
 }) {
-  const selectable =
-    showDisposition && !!onSelect && isBottleOperationRejectable(operation);
+  const [rejecting, setRejecting] = useState(false);
+  const [rejectionReason, setRejectionReason] =
+    useState<RejectionReason>("wrong_change");
+  const [rejectionNote, setRejectionNote] = useState("");
   const notApprovalReady =
     showDisposition && operation.status === "pending_review" && !approvalReady;
+  const canApply =
+    showDisposition && !!onApply && operation.status === "pending_review";
+  const canReject =
+    showDisposition && !!onReject && isBottleOperationRejectable(operation);
+  const canRetry =
+    showDisposition && !!onRetry && operation.status === "failed";
+  const canConfirmRejection =
+    rejectionReason !== "other" || rejectionNote.trim().length > 0;
 
   return (
     <article className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
@@ -460,43 +487,26 @@ export default function OperationCard({
               : STATUS_LABELS[operation.status]}
           </span>
         </div>
-        {selectable ? (
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            <input
-              checked={checked}
-              disabled={disabled}
-              onChange={(event) =>
-                onSelect?.(operation.id, event.currentTarget.checked)
-              }
-              type="checkbox"
-            />
-            Select
-          </label>
-        ) : null}
-      </div>
-
-      <p className="mt-4 text-sm text-slate-200">
-        {operation.proposal.rationale}
-      </p>
-      <ResourceLinks operation={operation} />
-
-      <div className="mt-4">
-        <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Evidence
-        </div>
-        <EvidenceList evidence={operation.proposal.evidenceRefs} />
       </div>
 
       {notApprovalReady ? (
-        <div
-          className="mt-4 rounded border border-amber-800 bg-amber-950/40 p-3 text-sm text-amber-100"
-          role="status"
-        >
-          This operation cannot currently be approved, but you can reject it.
-        </div>
+        <p className="mt-3 text-sm text-amber-200" role="status">
+          The current catalog state does not support applying this proposal.
+        </p>
       ) : null}
 
       {review ? <Preview review={review} /> : null}
+
+      <details className="mt-4 border-t border-slate-800 pt-3">
+        <summary className="cursor-pointer text-sm font-medium text-slate-300 hover:text-white">
+          Evidence and reasoning
+        </summary>
+        <p className="mt-3 text-sm text-slate-300">
+          {operation.proposal.rationale}
+        </p>
+        <EvidenceList evidence={operation.proposal.evidenceRefs} />
+        <ResourceLinks operation={operation} />
+      </details>
 
       {operation.rejectionReason ? (
         <div className="mt-4 text-sm text-slate-300">
@@ -510,18 +520,102 @@ export default function OperationCard({
           {operation.error}
         </div>
       ) : null}
-      {showDisposition &&
-      executionEnabled &&
-      onRetry &&
-      operation.status === "failed" ? (
-        <div className="mt-4">
-          <Button
-            disabled={disabled}
-            onClick={() => onRetry(operation.id)}
-            size="small"
-          >
-            Retry failed operation
-          </Button>
+
+      {actionError ? (
+        <div className="mt-4 rounded border border-red-900 bg-red-950/40 p-3 text-sm text-red-200">
+          {actionError}
+        </div>
+      ) : null}
+
+      {canApply || canReject || canRetry ? (
+        <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-800 pt-4">
+          {canApply ? (
+            <Button
+              color="primary"
+              disabled={disabled || !approvalReady}
+              onClick={() => onApply?.(operation.id)}
+              size="small"
+            >
+              Apply
+            </Button>
+          ) : null}
+          {canReject ? (
+            <Button
+              disabled={disabled}
+              onClick={() => setRejecting((value) => !value)}
+              size="small"
+            >
+              Reject
+            </Button>
+          ) : null}
+          {canRetry ? (
+            <Button
+              disabled={disabled}
+              onClick={() => onRetry?.(operation.id)}
+              size="small"
+            >
+              Retry failed operation
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {rejecting && canReject ? (
+        <div className="mt-3 rounded border border-slate-800 bg-slate-950 p-3">
+          <div className="grid gap-3 sm:grid-cols-[180px_minmax(0,1fr)]">
+            <label className="text-xs text-slate-300">
+              Reason
+              <select
+                className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2 text-sm"
+                disabled={disabled}
+                onChange={(event) =>
+                  setRejectionReason(
+                    event.currentTarget.value as RejectionReason,
+                  )
+                }
+                value={rejectionReason}
+              >
+                {REJECTION_REASONS.map((reason) => (
+                  <option key={reason.id} value={reason.id}>
+                    {reason.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-xs text-slate-300">
+              Note {rejectionReason === "other" ? "(required)" : "(optional)"}
+              <input
+                className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2 text-sm"
+                disabled={disabled}
+                onChange={(event) =>
+                  setRejectionNote(event.currentTarget.value)
+                }
+                value={rejectionNote}
+              />
+            </label>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              disabled={disabled || !canConfirmRejection}
+              onClick={() =>
+                onReject?.(
+                  operation.id,
+                  rejectionReason,
+                  rejectionNote.trim() || undefined,
+                )
+              }
+              size="small"
+            >
+              Confirm rejection
+            </Button>
+            <Button
+              disabled={disabled}
+              onClick={() => setRejecting(false)}
+              size="small"
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
       ) : null}
     </article>

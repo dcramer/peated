@@ -1,25 +1,17 @@
 "use client";
 
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
-import ActionResults, {
-  type BottleOperationActionResult,
-  runActionWithCanonicalRefresh,
-} from "@peated/web/components/bottleChecks/actionResults";
 import CheckResult from "@peated/web/components/bottleChecks/checkResult";
 import {
   BottleCheckOrigin,
   BottleCheckSubject,
 } from "@peated/web/components/bottleChecks/checkSummary";
-import OperationCard, {
-  isBottleOperationRejectable,
-} from "@peated/web/components/bottleChecks/operationCard";
+import OperationCard from "@peated/web/components/bottleChecks/operationCard";
 import { getBottleCheckRefetchInterval } from "@peated/web/components/bottleChecks/polling";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
-import Link from "@peated/web/components/link";
 import SimpleHeader from "@peated/web/components/simpleHeader";
 import useAuth from "@peated/web/hooks/useAuth";
-import useBottleCheckCapabilities from "@peated/web/hooks/useBottleCheckCapabilities";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
@@ -31,30 +23,27 @@ import { useMemo, useState } from "react";
 
 type RejectionReason = Inputs["bottleChecks"]["rejectSelected"]["reason"];
 type CloseReason = Inputs["bottleChecks"]["close"]["reason"];
-type Details = Outputs["bottleChecks"]["details"];
-
-const REJECTION_REASONS: Array<{
-  id: RejectionReason;
-  label: string;
-}> = [
-  { id: "wrong_target", label: "Wrong target" },
-  { id: "wrong_change", label: "Wrong change" },
-  { id: "insufficient_evidence", label: "Insufficient evidence" },
-  { id: "resolved_manually", label: "Resolved manually" },
-  { id: "other", label: "Other" },
-];
+type OperationActionResult =
+  Outputs["bottleChecks"]["approveSelected"]["results"][number];
 
 const CLOSE_REASONS: Array<{ id: CloseReason; label: string }> = [
   { id: "dismissed", label: "Dismissed" },
   { id: "resolved_manually", label: "Resolved manually" },
 ];
 
+function requireActionResult(
+  results: OperationActionResult[],
+): OperationActionResult {
+  const result = results[0];
+  if (!result) throw new Error("The operation returned no result.");
+  return result;
+}
+
 export default function Page() {
   const { checkId } = useParams<{ checkId: string }>();
   const checkNumber = Number(checkId);
   const orpc = useORPC();
   const { user } = useAuth();
-  const { bottleCheckExecution } = useBottleCheckCapabilities();
   const queryClient = useQueryClient();
   const detailsOptions = orpc.bottleChecks.details.queryOptions({
     input: { check: checkNumber },
@@ -82,97 +71,90 @@ export default function Page() {
   );
   const retryMutation = useMutation(orpc.bottleChecks.retry.mutationOptions());
   const closeMutation = useMutation(orpc.bottleChecks.close.mutationOptions());
-  const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [rejectionReason, setRejectionReason] =
-    useState<RejectionReason>("wrong_change");
-  const [rejectionNote, setRejectionNote] = useState("");
   const [closeReason, setCloseReason] = useState<CloseReason>("dismissed");
   const [closeNote, setCloseNote] = useState("");
-  const [actionResults, setActionResults] = useState<
-    BottleOperationActionResult[]
-  >([]);
+  const [actionErrors, setActionErrors] = useState<Map<number, string>>(
+    new Map(),
+  );
   const [error, setError] = useState<string | null>(null);
   const busy =
     approveMutation.isPending ||
     rejectMutation.isPending ||
     retryMutation.isPending ||
     closeMutation.isPending;
-  const canApprove =
-    selected.size > 0 &&
-    [...selected].every((operationId) =>
-      Boolean(liveReviewByOperation.get(operationId)?.approvalReady),
-    );
 
   async function refresh() {
-    setSelected(new Set());
     await queryClient.invalidateQueries({
       queryKey: detailsOptions.queryKey,
     });
     await queryClient.invalidateQueries({
       queryKey: orpc.bottleChecks.list.queryOptions({ input: {} }).queryKey,
     });
-    if (check.bottleId) {
-      await queryClient.invalidateQueries({
-        queryKey: orpc.bottleChecks.history.queryOptions({
-          input: { bottle: check.bottleId },
-        }).queryKey,
-      });
-    }
   }
 
-  async function runAction(
-    action: () => Promise<BottleOperationActionResult[]>,
+  async function runOperationAction(
+    operationId: number,
+    action: () => Promise<OperationActionResult>,
   ) {
     setError(null);
+    setActionErrors((current) => {
+      const next = new Map(current);
+      next.delete(operationId);
+      return next;
+    });
     try {
-      setActionResults(
-        await runActionWithCanonicalRefresh({
-          action,
-          refresh,
-        }),
-      );
+      const result = await action();
+      await refresh();
+      if (result.error) {
+        setActionErrors((current) =>
+          new Map(current).set(operationId, result.error as string),
+        );
+      }
     } catch (actionError) {
-      setError(
-        actionError instanceof Error
-          ? actionError.message
-          : "The operation could not be completed.",
+      setActionErrors((current) =>
+        new Map(current).set(
+          operationId,
+          actionError instanceof Error
+            ? actionError.message
+            : "The operation could not be completed.",
+        ),
       );
     }
   }
 
-  function updateSelection(operationId: number, isSelected: boolean) {
-    setSelected((current) => {
-      const next = new Set(current);
-      if (isSelected) next.add(operationId);
-      else next.delete(operationId);
-      return next;
+  async function applyOperation(operationId: number) {
+    await runOperationAction(operationId, async () => {
+      const result = await approveMutation.mutateAsync({
+        check: check.id,
+        operationIds: [operationId],
+      });
+      return requireActionResult(result.results);
     });
   }
 
-  async function approveSelected() {
-    const result = await approveMutation.mutateAsync({
-      check: check.id,
-      operationIds: [...selected],
+  async function rejectOperation(
+    operationId: number,
+    reason: RejectionReason,
+    note?: string,
+  ) {
+    await runOperationAction(operationId, async () => {
+      const result = await rejectMutation.mutateAsync({
+        check: check.id,
+        operationIds: [operationId],
+        reason,
+        ...(note ? { note } : {}),
+      });
+      return requireActionResult(result.results);
     });
-    return result.results;
   }
 
-  async function rejectSelected() {
-    const result = await rejectMutation.mutateAsync({
-      check: check.id,
-      operationIds: [...selected],
-      reason: rejectionReason,
-      ...(rejectionNote.trim() ? { note: rejectionNote.trim() } : {}),
+  async function retryOperation(operationId: number) {
+    await runOperationAction(operationId, async () => {
+      return await retryMutation.mutateAsync({
+        check: check.id,
+        operation: operationId,
+      });
     });
-    return result.results;
-  }
-
-  async function retry(operationId: number) {
-    const result = await retryMutation.mutateAsync({
-      check: check.id,
-      operation: operationId,
-    });
-    return [result];
   }
 
   async function closeCheck() {
@@ -204,9 +186,6 @@ export default function Page() {
           ["blocked", "stale", "failed"].includes(status),
         ) ||
           check.output.findings.length > 0));
-  const canReject =
-    selected.size > 0 &&
-    (rejectionReason !== "other" || rejectionNote.trim().length > 0);
   const isStorePriceReference =
     check.intent === "resolve_reference" && check.sourceKind === "store_price";
   const parentPage =
@@ -230,14 +209,6 @@ export default function Page() {
 
       <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-slate-300">
         <BottleCheckSubject check={check} />
-        {check.bottleId ? (
-          <Link
-            className="underline"
-            href={`/bottles/${check.bottleId}/checks`}
-          >
-            Bottle audit history
-          </Link>
-        ) : null}
         <BottleCheckOrigin check={check} />
       </div>
 
@@ -261,15 +232,15 @@ export default function Page() {
                 const liveReview = liveReviewByOperation.get(operation.id);
                 return (
                   <OperationCard
+                    actionError={actionErrors.get(operation.id) ?? null}
                     approvalReady={liveReview?.approvalReady ?? false}
-                    checked={selected.has(operation.id)}
                     disabled={busy || !!check.closedAt}
-                    executionEnabled={bottleCheckExecution}
                     key={operation.id}
-                    onRetry={(operationId) =>
-                      void runAction(() => retry(operationId))
+                    onApply={(operationId) => void applyOperation(operationId)}
+                    onReject={(operationId, reason, note) =>
+                      void rejectOperation(operationId, reason, note)
                     }
-                    onSelect={updateSelection}
+                    onRetry={(operationId) => void retryOperation(operationId)}
                     operation={operation}
                     review={liveReview?.review ?? null}
                   />
@@ -279,96 +250,19 @@ export default function Page() {
           </section>
         ) : null}
 
-        {check.schemaSupported &&
-        !check.closedAt &&
-        !bottleCheckExecution &&
-        check.operations.some(({ status }) =>
-          ["pending_review", "failed"].includes(status),
-        ) ? (
-          <p
-            className="rounded border border-amber-800 bg-amber-950/40 p-3 text-sm text-amber-100"
-            role="status"
-          >
-            Applying catalog changes is disabled during rollout. You can still
-            reject operations or close resolved checks.
-          </p>
-        ) : null}
-
-        {check.schemaSupported &&
-        !check.closedAt &&
-        check.operations.some(isBottleOperationRejectable) ? (
-          <section className="rounded-xl border border-slate-800 bg-slate-950 p-5">
-            <h2 className="font-semibold text-white">Selected operations</h2>
-            <p className="mt-1 text-xs text-slate-400">
-              Approval is independent. One failure does not roll back another
-              operation.
-            </p>
-            {bottleCheckExecution ? (
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button
-                  color="primary"
-                  disabled={busy || !canApprove}
-                  onClick={() => void runAction(approveSelected)}
-                >
-                  Approve selected
-                </Button>
-              </div>
-            ) : null}
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-[220px_minmax(0,1fr)_auto]">
-              <label className="text-sm text-slate-300">
-                Rejection reason
-                <select
-                  className="mt-2 block w-full rounded border-0 bg-slate-800 px-3 py-2"
-                  onChange={(event) =>
-                    setRejectionReason(
-                      event.currentTarget.value as RejectionReason,
-                    )
-                  }
-                  value={rejectionReason}
-                >
-                  {REJECTION_REASONS.map((reason) => (
-                    <option key={reason.id} value={reason.id}>
-                      {reason.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="text-sm text-slate-300">
-                Note {rejectionReason === "other" ? "(required)" : "(optional)"}
-                <input
-                  className="mt-2 block w-full rounded border-0 bg-slate-800 px-3 py-2"
-                  onChange={(event) =>
-                    setRejectionNote(event.currentTarget.value)
-                  }
-                  value={rejectionNote}
-                />
-              </label>
-              <div className="self-end">
-                <Button
-                  disabled={busy || !canReject}
-                  onClick={() => void runAction(rejectSelected)}
-                >
-                  Reject selected
-                </Button>
-              </div>
-            </div>
-          </section>
-        ) : null}
-
-        <ActionResults results={actionResults} />
-
         {canClose ? (
-          <section className="rounded-xl border border-slate-800 bg-slate-950 p-5">
-            <h2 className="font-semibold text-white">Close check</h2>
-            <p className="mt-1 text-xs text-slate-400">
-              Close remaining findings or work resolved outside this proposal.
+          <details className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-slate-300 hover:text-white">
+              Close without further catalog changes
+            </summary>
+            <p className="mt-2 text-xs text-slate-400">
+              Use this for findings or work resolved outside this proposal.
             </p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-[220px_minmax(0,1fr)_auto]">
+            <div className="mt-3 grid gap-3 sm:grid-cols-[200px_minmax(0,1fr)_auto]">
               <label className="text-sm text-slate-300">
-                Close reason
+                Reason
                 <select
-                  className="mt-2 block w-full rounded border-0 bg-slate-800 px-3 py-2"
+                  className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2"
                   onChange={(event) =>
                     setCloseReason(event.currentTarget.value as CloseReason)
                   }
@@ -384,7 +278,7 @@ export default function Page() {
               <label className="text-sm text-slate-300">
                 Note (optional)
                 <input
-                  className="mt-2 block w-full rounded border-0 bg-slate-800 px-3 py-2"
+                  className="mt-1 block w-full rounded border-0 bg-slate-800 px-3 py-2"
                   onChange={(event) => setCloseNote(event.currentTarget.value)}
                   value={closeNote}
                 />
@@ -395,14 +289,14 @@ export default function Page() {
                 </Button>
               </div>
             </div>
-          </section>
+          </details>
         ) : null}
 
         {check.closedAt ? (
-          <section className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-300">
+          <p className="text-sm text-slate-400">
             Closed as {check.closeReason?.replaceAll("_", " ")}
             {check.closeNote ? ` — ${check.closeNote}` : ""}
-          </section>
+          </p>
         ) : null}
 
         {error ? (

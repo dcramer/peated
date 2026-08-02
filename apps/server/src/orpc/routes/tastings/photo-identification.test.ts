@@ -1,14 +1,18 @@
+import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
 import { BottleClassificationResultSchema } from "@peated/server/agents/bottleClassifier/contract";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
+  bottleChecks,
   bottleGroups,
+  bottleOperations,
   bottles,
   pendingUploads,
   tastings,
 } from "@peated/server/db/schema";
+import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
 import type * as pendingUploadsModule from "@peated/server/lib/pendingUploads";
 import type * as photoIdentificationModule from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
@@ -20,6 +24,7 @@ import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
 
 const classifyBottleReferenceMock = vi.hoisted(() => vi.fn());
+const runBottleReferenceMock = vi.hoisted(() => vi.fn());
 const extractPhotoBottleEvidenceMock = vi.hoisted(() => vi.fn());
 const copyPendingImageToBottleMock = vi.hoisted(() => vi.fn());
 const sentrySpanSetAttributeMock = vi.hoisted(() => vi.fn());
@@ -31,6 +36,7 @@ vi.mock(
   "@peated/server/agents/bottleClassifier/classifyBottleReference",
   () => ({
     classifyBottleReference: classifyBottleReferenceMock,
+    runBottleReference: runBottleReferenceMock,
   }),
 );
 vi.mock("@peated/server/lib/photoIdentification", async (importOriginal) => ({
@@ -271,6 +277,11 @@ describe("POST /tastings/photo-identification", () => {
   beforeEach(() => {
     config.OPENAI_API_KEY = undefined;
     classifyBottleReferenceMock.mockReset();
+    runBottleReferenceMock.mockReset();
+    runBottleReferenceMock.mockImplementation(async (input) => ({
+      result: await classifyBottleReferenceMock(input),
+      modelMetadata: null,
+    }));
     extractPhotoBottleEvidenceMock.mockReset();
     copyPendingImageToBottleMock.mockClear();
     sentrySpanSetAttributeMock.mockClear();
@@ -516,7 +527,7 @@ describe("POST /tastings/photo-identification", () => {
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
   });
 
-  test("uses exact Peated aliases before full photo classification", async ({
+  test("passes exact Peated alias candidates through full photo classification", async ({
     fixtures,
     defaults,
   }) => {
@@ -545,6 +556,24 @@ describe("POST /tastings/photo-identification", () => {
         imageEvidence: buildImageEvidence(pendingUpload.id),
       }),
     );
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+        },
+        {
+          candidates: [
+            {
+              bottleId: bottle.id,
+              fullName: "Ardbeg Uigeadail",
+              brand: "Ardbeg",
+              source: ["exact"],
+            },
+          ],
+        },
+      ),
+    );
 
     const response = await routerClient.tastings.photoIdentification(
       {
@@ -564,7 +593,160 @@ describe("POST /tastings/photo-identification", () => {
         matchedBottle: { id: bottle.id },
       },
     });
-    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialCandidates: [
+          expect.objectContaining({
+            bottleId: bottle.id,
+            fullName: bottle.fullName,
+            source: expect.arrayContaining(["exact"]),
+          }),
+        ],
+      }),
+    );
+  });
+
+  test("persists photo match repairs once for moderator review without exposing them to the user", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Uigeadail", abv: null });
+    const bottleContext = await getBottleClassifierContext(bottle.id);
+    if (!bottleContext) throw new Error("Expected Bottle context.");
+    const { imageSources: _imageSources, ...persistedBottleContext } =
+      bottleContext;
+
+    extractPhotoBottleEvidenceMock.mockImplementation(
+      async ({ pendingUpload }) => ({
+        extractedIdentity: {
+          brand: "Ardbeg",
+          expression: "Uigeadail",
+          series: null,
+          distillery: ["Ardbeg"],
+          bottler: null,
+          category: "single_malt",
+          stated_age: null,
+          abv: 54.2,
+          vintage_year: null,
+          release_year: null,
+          cask_strength: null,
+          single_cask: null,
+          edition: null,
+        },
+        imageEvidence: {
+          ...buildImageEvidence(pendingUpload.id),
+          fieldCandidates: {
+            ...buildImageEvidence(pendingUpload.id).fieldCandidates,
+            abv: {
+              value: 54.2,
+              confidence: 0.95,
+              sourceExtractorIndexes: [0],
+            },
+          },
+        },
+      }),
+    );
+    const classification = buildClassification(
+      {
+        action: "match",
+        matchedBottleId: bottle.id,
+      },
+      {
+        candidates: [
+          {
+            bottleId: bottle.id,
+            fullName: bottle.fullName,
+            brand: bottle.brandId.toString(),
+            source: ["exact"],
+          },
+        ],
+        imageEvidence: {
+          ...buildImageEvidence("pending-image"),
+          fieldCandidates: {
+            ...buildImageEvidence("pending-image").fieldCandidates,
+            abv: {
+              value: 54.2,
+              confidence: 0.95,
+              sourceExtractorIndexes: [0],
+            },
+          },
+        },
+        bottleContexts: [{ ...persistedBottleContext, publicImages: [] }],
+      },
+    );
+    classification.proposedOperations = [
+      {
+        type: "update_bottle",
+        input: {
+          bottleId: bottle.id,
+          patch: { exact: { abv: 54.2 } },
+        },
+        rationale: "The readable label states 54.2% ABV.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: bottle.id },
+          { kind: "source", field: "imageEvidence.fieldCandidates.abv" },
+        ],
+      },
+    ];
+    runBottleReferenceMock.mockResolvedValue({
+      result: classification,
+      modelMetadata: {
+        agentDurationMs: 25,
+        usage: {
+          requests: 1,
+          inputTokens: 100,
+          outputTokens: 20,
+          totalTokens: 120,
+        },
+        toolCalls: { count: 1, names: ["propose_update_bottle"] },
+      },
+    });
+
+    const input = {
+      file: await fixtures.SampleSquareImage(),
+      idempotencyKey: "photo-identification-repair-review",
+    };
+    const first = await routerClient.tastings.photoIdentification(input, {
+      context: { user: defaults.user },
+    });
+    const second = await routerClient.tastings.photoIdentification(input, {
+      context: { user: defaults.user },
+    });
+
+    expect(first.classification).not.toHaveProperty("proposedOperations");
+    expect(second.pendingImage.id).toBe(first.pendingImage.id);
+    const checks = await db
+      .select()
+      .from(bottleChecks)
+      .where(eq(bottleChecks.sourceKind, "photo_identification"));
+    expect(checks).toHaveLength(1);
+    expect(checks[0]).toMatchObject({
+      intent: "resolve_reference",
+      sourceId: first.pendingImage.id,
+      model: config.OPENAI_MODEL,
+      modelMetadata: expect.objectContaining({
+        usage: expect.objectContaining({ totalTokens: 120 }),
+      }),
+    });
+    await expect(
+      db
+        .select()
+        .from(bottleOperations)
+        .where(eq(bottleOperations.checkId, checks[0].id)),
+    ).resolves.toMatchObject([
+      {
+        status: "pending_review",
+        proposal: expect.objectContaining({ type: "update_bottle" }),
+      },
+    ]);
+    await expect(listActionableBottleChecks()).resolves.toMatchObject({
+      results: [
+        expect.objectContaining({
+          id: checks[0].id,
+          sourceKind: "photo_identification",
+        }),
+      ],
+    });
   });
 
   test("falls back to manual search when classifier does not match", async ({

@@ -183,11 +183,10 @@ test.describe("unified Bottle workflows", () => {
     const reviewOperation = page.getByRole("article").filter({
       hasText: "The inspected listing matched the canonical Bottle",
     });
-    await reviewOperation.getByRole("checkbox", { name: "Select" }).check();
     const approvalRequest = page.waitForRequest((request) =>
       request.url().includes("/rpc/bottleChecks/approveSelected"),
     );
-    await page.getByRole("button", { name: "Approve selected" }).click();
+    await reviewOperation.getByRole("button", { name: "Apply" }).click();
     await approvalRequest;
     await expect(
       reviewOperation.getByText("Applied", { exact: true }),

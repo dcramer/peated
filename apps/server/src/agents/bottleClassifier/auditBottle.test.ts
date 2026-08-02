@@ -4,12 +4,14 @@ import {
 } from "@peated/bottle-classifier/contract";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { bottleChecks, bottles } from "@peated/server/db/schema";
-import { getBottleCheckHistory } from "@peated/server/lib/bottleChecks";
+import {
+  bottleChecks,
+  bottleOperations,
+  bottles,
+} from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
-  BottleAuditUnavailableError,
   runModeratorBottleAudit,
   runPostUserCreationBottleAudit,
 } from "./auditBottle";
@@ -27,9 +29,11 @@ vi.mock("./service", () => {
 async function auditResult({
   bottleId,
   blockedEntityId,
+  includeFinding = true,
 }: {
   bottleId: number;
   blockedEntityId?: number;
+  includeFinding?: boolean;
 }) {
   const { getBottleClassifierContext } = await import("./contextAdapters");
   const bottleContext = await getBottleClassifierContext(bottleId);
@@ -64,13 +68,15 @@ async function auditResult({
             },
           ]),
     ],
-    findings: [
-      {
-        scope: "bottle_group",
-        summary: "The group relationship needs moderator judgment.",
-        evidenceRefs: [{ kind: "bottle", bottleId }],
-      },
-    ],
+    findings: includeFinding
+      ? [
+          {
+            scope: "bottle_group",
+            summary: "The group relationship needs moderator judgment.",
+            evidenceRefs: [{ kind: "bottle", bottleId }],
+          },
+        ]
+      : [],
     artifacts: buildBottleClassificationArtifacts({
       bottleContexts: [{ ...contextFields, publicImages: [] }],
     }),
@@ -79,14 +85,12 @@ async function auditResult({
 
 describe("server-owned Bottle audit workflows", () => {
   afterEach(() => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = false;
     vi.resetAllMocks();
   });
 
   test("persists a moderator audit with fixed intent and origin while retaining blocked siblings", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle({ edition: null });
     const uninspectedEntity = await fixtures.Entity();
     vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
@@ -114,7 +118,10 @@ describe("server-owned Bottle audit workflows", () => {
       note: "Check the label identity.",
     });
 
-    expect(created.created).toBe(true);
+    expect(created.status).toBe("needs_review");
+    if (created.status !== "needs_review") {
+      throw new Error("Expected an actionable Bottle audit.");
+    }
     expect(auditBottleWithServerAdapters).toHaveBeenCalledWith({
       bottleId: bottle.id,
       origin: "moderator",
@@ -181,13 +188,15 @@ describe("server-owned Bottle audit workflows", () => {
     ).toEqual({ edition: null });
   });
 
-  test("rejects caller-owned origin and preserves moderator reruns as separate checks", async ({
+  test("rejects caller-owned origin and reuses current moderator work", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle({ edition: null });
     vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
-      result: await auditResult({ bottleId: bottle.id }),
+      result: await auditResult({
+        bottleId: bottle.id,
+        includeFinding: false,
+      }),
       modelMetadata: null,
     });
 
@@ -201,14 +210,149 @@ describe("server-owned Bottle audit workflows", () => {
     const first = await runModeratorBottleAudit({ bottleId: bottle.id });
     const second = await runModeratorBottleAudit({ bottleId: bottle.id });
 
-    expect(first.created).toBe(true);
-    expect(second.created).toBe(true);
+    expect(first.status).toBe("needs_review");
+    expect(second.status).toBe("needs_review");
+    if (first.status !== "needs_review" || second.status !== "needs_review") {
+      throw new Error("Expected actionable Bottle audits.");
+    }
+    expect(second.check.id).toBe(first.check.id);
+    expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(1);
+    expect(
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
+      }),
+    ).toHaveLength(1);
+  });
+
+  test("returns a transient clean result without persistence", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+      result: createAuditBottleResult({
+        summary: "The Bottle is clean.",
+        proposedOperations: [],
+        findings: [],
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+      modelMetadata: null,
+    });
+
+    await expect(
+      runModeratorBottleAudit({ bottleId: bottle.id }),
+    ).resolves.toEqual({ status: "clean", summary: "The Bottle is clean." });
+    expect(
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
+      }),
+    ).toEqual([]);
+  });
+
+  test("a clean rerun removes prior terminal moderator work", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ edition: null });
+    vi.mocked(auditBottleWithServerAdapters).mockResolvedValueOnce({
+      result: await auditResult({
+        bottleId: bottle.id,
+        includeFinding: false,
+      }),
+      modelMetadata: null,
+    });
+
+    const first = await runModeratorBottleAudit({ bottleId: bottle.id });
+    if (first.status !== "needs_review") {
+      throw new Error("Expected an actionable Bottle audit.");
+    }
+    await db
+      .update(bottleOperations)
+      .set({ status: "applied" })
+      .where(eq(bottleOperations.checkId, first.check.id));
+    vi.mocked(auditBottleWithServerAdapters).mockResolvedValueOnce({
+      result: createAuditBottleResult({
+        summary: "The Bottle is now clean.",
+        proposedOperations: [],
+        findings: [],
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+      modelMetadata: null,
+    });
+
+    await expect(
+      runModeratorBottleAudit({ bottleId: bottle.id }),
+    ).resolves.toEqual({
+      status: "clean",
+      summary: "The Bottle is now clean.",
+    });
+    expect(
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
+      }),
+    ).toEqual([]);
+  });
+
+  test("replaces prior terminal moderator work with the new actionable check", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ edition: null });
+    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+      result: await auditResult({
+        bottleId: bottle.id,
+        includeFinding: false,
+      }),
+      modelMetadata: null,
+    });
+
+    const first = await runModeratorBottleAudit({ bottleId: bottle.id });
+    if (first.status !== "needs_review") {
+      throw new Error("Expected an actionable Bottle audit.");
+    }
+    await db
+      .update(bottleOperations)
+      .set({ status: "rejected" })
+      .where(eq(bottleOperations.checkId, first.check.id));
+    const second = await runModeratorBottleAudit({ bottleId: bottle.id });
+    if (second.status !== "needs_review") {
+      throw new Error("Expected an actionable Bottle audit.");
+    }
     expect(second.check.id).not.toBe(first.check.id);
     expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(2);
     expect(
-      await getBottleCheckHistory({
-        intent: "audit_bottle",
-        bottleId: bottle.id,
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
+      }),
+    ).toEqual([expect.objectContaining({ id: second.check.id })]);
+  });
+
+  test("does not delete closed failed moderator work when replacing a check", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ edition: null });
+    vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
+      result: await auditResult({ bottleId: bottle.id }),
+      modelMetadata: null,
+    });
+
+    const first = await runModeratorBottleAudit({ bottleId: bottle.id });
+    if (first.status !== "needs_review") {
+      throw new Error("Expected an actionable Bottle audit.");
+    }
+    await db
+      .update(bottleOperations)
+      .set({ status: "failed" })
+      .where(eq(bottleOperations.checkId, first.check.id));
+    await db
+      .update(bottleChecks)
+      .set({ closedAt: new Date() })
+      .where(eq(bottleChecks.id, first.check.id));
+
+    const second = await runModeratorBottleAudit({ bottleId: bottle.id });
+    if (second.status !== "needs_review") {
+      throw new Error("Expected an actionable Bottle audit.");
+    }
+    expect(
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
       }),
     ).toHaveLength(2);
   });
@@ -216,7 +360,6 @@ describe("server-owned Bottle audit workflows", () => {
   test("deduplicates a post-user-creation audit by its caller-owned event key", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle({ edition: null });
     const result = await auditResult({ bottleId: bottle.id });
     vi.mocked(auditBottleWithServerAdapters).mockResolvedValue({
@@ -255,7 +398,6 @@ describe("server-owned Bottle audit workflows", () => {
   test("keeps concurrent post-user-creation retries race-safe at persistence", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle({ edition: null });
     const result = await auditResult({ bottleId: bottle.id });
     let auditCalls = 0;
@@ -293,30 +435,6 @@ describe("server-owned Bottle audit workflows", () => {
         .from(bottleChecks)
         .where(eq(bottleChecks.backgroundEventKey, input.backgroundEventKey)),
     ).toHaveLength(1);
-  });
-
-  test("does not run or persist audits while shadow generation is disabled", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-
-    await expect(
-      runModeratorBottleAudit({ bottleId: bottle.id }),
-    ).rejects.toBeInstanceOf(BottleAuditUnavailableError);
-    await expect(
-      runPostUserCreationBottleAudit({
-        bottleId: bottle.id,
-        backgroundEventKey: `bottle_created:${bottle.id}`,
-      }),
-    ).resolves.toBeNull();
-
-    expect(auditBottleWithServerAdapters).not.toHaveBeenCalled();
-    expect(
-      await getBottleCheckHistory({
-        intent: "audit_bottle",
-        bottleId: bottle.id,
-      }),
-    ).toEqual([]);
   });
 
   test("keeps the existing reference-classification entrypoint exported", () => {

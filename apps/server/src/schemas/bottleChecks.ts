@@ -121,6 +121,24 @@ export const BottleCheckResponseSchema = z.union([
   UnsupportedBottleCheckResponseSchema,
 ]);
 
+export const ModeratorBottleAuditResponseSchema = z.discriminatedUnion(
+  "status",
+  [
+    z
+      .object({
+        status: z.literal("clean"),
+        summary: z.string().trim().min(1),
+      })
+      .strict(),
+    z
+      .object({
+        status: z.literal("needs_review"),
+        check: BottleCheckResponseSchema,
+      })
+      .strict(),
+  ],
+);
+
 const PreparedReviewOperationResponseSchema = z.discriminatedUnion("type", [
   ReviewBottleUpdateSchema.omit({ stateToken: true }),
   ReviewBottleMergeSchema.omit({ stateToken: true }),

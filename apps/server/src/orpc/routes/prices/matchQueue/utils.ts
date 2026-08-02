@@ -4,7 +4,6 @@ import {
   BottleExtractedDetailsSchema as ClassifierBottleExtractedDetailsSchema,
   type BottleCandidate,
 } from "@peated/bottle-classifier/internal/types";
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleChecks,
@@ -63,7 +62,7 @@ function checkHasFindings(check: LinkedBottleCheck): boolean {
 async function getLinkedBottleCheckIds(
   proposals: StorePriceMatchProposal[],
 ): Promise<Map<number, number[]>> {
-  if (!config.BOTTLE_CHECK_MODERATOR_VISIBILITY || proposals.length === 0) {
+  if (proposals.length === 0) {
     return new Map();
   }
 

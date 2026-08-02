@@ -78,7 +78,8 @@ preserves only the differing overrides.
 ## Field Definitions
 
 - **brand**: The consumer-facing label brand.
-- **bottler**: A separately stated bottling house when different from `brand`.
+- **bottler**: An evidenced bottling or whiskymaking company. It may equal
+  `brand`; leave it null when the source does not establish the role.
 - **distillery**: An array of actual producing distilleries. Use `[]` when
   unknown.
 - **expression**: The shared product name after removing producer, age, ABV,

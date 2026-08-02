@@ -1,7 +1,25 @@
 import type { ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
-import { BottleCheckEmptyState, BottleCheckRow } from "./page";
+import {
+  BottleCheckEmptyState,
+  BottleCheckRow,
+  getBottleCheckSourceLabel,
+} from "./page";
+
+test.each([
+  ["resolve_reference", null, "photo_identification", "Bottle photo scan"],
+  ["resolve_reference", null, "store_price", "Store price"],
+  ["audit_bottle", "moderator", null, "Moderator audit"],
+  ["audit_bottle", "post_user_creation", null, "New Bottle audit"],
+] as const)(
+  "labels %s work from %s as %s",
+  (intent, origin, sourceKind, expected) => {
+    expect(getBottleCheckSourceLabel({ intent, origin, sourceKind })).toBe(
+      expected,
+    );
+  },
+);
 
 test("Bottle Checks renders one inbox row per actionable check", () => {
   const check = {

@@ -454,7 +454,6 @@ not expose them.
   `propose_merge_bottles`, `propose_update_entity`, and
   `propose_merge_entities`
 - **AND** the server SHALL NOT expose a partial per-operation capability map
-- **AND** rollout flags SHALL NOT change this proposal-tool set
 
 #### Scenario: Closed candidate expansion still permits target inspection
 

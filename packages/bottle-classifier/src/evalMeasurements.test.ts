@@ -76,7 +76,7 @@ describe("eval harness measurements", () => {
       pricingModel: "gpt-5.6-luna",
     });
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "input 1,000,000 tok | output 100,000 tok | effort provider default | est. $0.320000 · agent loop only",
+      "uncached input 1,000,000 tok | output 100,000 tok | proxy total 1,100,000 tok | effort provider default | est. $0.320000 · agent loop only",
     );
   });
 
@@ -134,7 +134,7 @@ describe("eval harness measurements", () => {
       "estimatedAgentLoopCostUsd",
     );
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "input 100 tok | output 20 tok | effort provider default | cost unavailable (unsupported model) · agent loop only",
+      "uncached input 100 tok | output 20 tok | proxy total 120 tok | effort provider default | cost unavailable (unsupported model) · agent loop only",
     );
   });
 
@@ -177,7 +177,29 @@ describe("eval harness measurements", () => {
     });
 
     expect(formatEvalUsageAnnotation(measurements.usage)).toBe(
-      "input 1,000 tok | output 100 tok | effort provider default | est. $0.004000 · agent loop only",
+      "uncached input 1,000 tok | output 100 tok | proxy total 1,100 tok | effort provider default | est. $0.004000 · agent loop only",
+    );
+  });
+
+  test("excludes cached input from the comparison proxy", () => {
+    const measurements = buildEvalHarnessMeasurements({
+      model: "gpt-5.4",
+      modelMetadata: {
+        agentDurationMs: 10,
+        usage: {
+          requests: 1,
+          inputTokens: 1_000,
+          cachedInputTokens: 750,
+          outputTokens: 100,
+          totalTokens: 1_100,
+        },
+        toolCalls: { count: 0, names: [] },
+      },
+      totalMs: 12,
+    });
+
+    expect(formatEvalUsageAnnotation(measurements.usage)).toContain(
+      "uncached input 250 tok | output 100 tok | proxy total 350 tok | cached input 750 tok",
     );
   });
 

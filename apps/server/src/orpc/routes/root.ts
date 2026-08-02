@@ -16,22 +16,10 @@ export default procedure
   .output(
     z.object({
       version: z.string(),
-      capabilities: z.object({
-        bottleAudits: z.boolean(),
-        bottleCheckExecution: z.boolean(),
-        bottleChecks: z.boolean(),
-      }),
     }),
   )
   .handler(async function () {
     return {
       version: config.VERSION,
-      capabilities: {
-        bottleAudits:
-          config.BOTTLE_CHECK_MODERATOR_VISIBILITY &&
-          config.BOTTLE_CHECK_SHADOW_GENERATION,
-        bottleCheckExecution: config.BOTTLE_CHECK_EXECUTION,
-        bottleChecks: config.BOTTLE_CHECK_MODERATOR_VISIBILITY,
-      },
     };
   });

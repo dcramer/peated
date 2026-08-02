@@ -70,6 +70,10 @@ exact identity and additionally owns:
 This duplication is intentional. BottleGroup is the authority for shared
 edits, while Bottle remains the authority for exact reads.
 
+`bottler` is an evidenced relationship, not a naming heuristic. It may point to
+the same Entity as `brand` when that company is also identified as the bottler;
+normalization must not erase it solely because the names match.
+
 Observation-only facts by default include exact cask or barrel number, bottle
 number, outturn, retailer-exclusive wording, label notes, and unmodeled
 maturation details. Promote one of these facts into Bottle identity only when

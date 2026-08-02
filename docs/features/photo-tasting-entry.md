@@ -76,14 +76,17 @@ existing Bottle or reviews one independently complete new Bottle proposal:
 2. Server stores a pending processed image.
 3. Server extracts label evidence from the image.
 4. Server classifies the bottle reference using the existing bottle classifier.
-5. UI shows the photo, extracted evidence, and suggested Bottle outcome.
-6. User confirms an existing match, opens full bottle search, chooses another
+5. When an existing-Bottle result also proposes catalog repairs or findings,
+   the server records one idempotent moderator review without exposing that
+   supplemental work in the tasting flow.
+6. UI shows the photo, extracted evidence, and suggested Bottle outcome.
+7. User confirms an existing match, opens full bottle search, chooses another
    candidate, or reviews the proposed complete Bottle fields.
-7. Server creates any approved new Bottle before tasting save when the
+8. Server creates any approved new Bottle before tasting save when the
    confirmed photo-identification result is a creation proposal.
-8. User records tasting notes, rating, tags, serving style, flight, and friends.
-9. Server creates the tasting and attempts to attach the pending image if
-   selected.
+9. User records tasting notes, rating, tags, serving style, flight, and friends.
+10. Server creates the tasting and attempts to attach the pending image if
+    selected.
 
 Low-confidence photo identification should fall back to seeded full search
 rather than forcing a create or match decision.
@@ -1002,8 +1005,6 @@ Do not broaden the feature until each gate is satisfied:
 
 ## Open Questions
 
-- Should photo identification create an explicit review artifact even when the
-  user abandons the flow?
 - Should users be able to save an unidentified tasting draft, or should manual
   search remain required before saving?
 - What TTL is appropriate for pending images in production?

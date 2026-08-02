@@ -270,7 +270,7 @@ describe("buildAgentInput", () => {
 });
 
 describe("buildAuditBottleAgentInput", () => {
-  test("serializes server-owned audit context without a reference envelope", () => {
+  test("serializes audit context with the prepared reference evidence", () => {
     const input = JSON.parse(
       buildAuditBottleAgentInput({
         audit: {
@@ -278,6 +278,19 @@ describe("buildAuditBottleAgentInput", () => {
           origin: "moderator",
           note: "Review the Brand assignment; this text is context only.",
         },
+        reference: {
+          id: "audit:45146",
+          name: "Laphroaig Càirdeas 2022 Warehouse 1",
+          currentBottleId: 45146,
+        },
+        extractedIdentity: null,
+        initialCandidates: [
+          buildCandidate({
+            bottleId: 45146,
+            fullName: "Laphroaig Càirdeas 2022 Warehouse 1",
+            brand: "Laphroaig",
+          }),
+        ],
         currentBottleContext: buildBottleContext(),
         availableSourceEvidenceFields: ["audit.note"],
       }),
@@ -303,8 +316,15 @@ describe("buildAuditBottleAgentInput", () => {
           },
         ],
       },
+      reference: {
+        id: "audit:45146",
+        currentBottleId: 45146,
+      },
+      localSearch: {
+        candidates: [{ bottleId: 45146 }],
+      },
       availableSourceEvidenceFields: ["audit.note"],
     });
-    expect(input).not.toHaveProperty("reference");
+    expect(input.extractedIdentity).toBeNull();
   });
 });

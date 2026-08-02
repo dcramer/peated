@@ -139,6 +139,10 @@ export const classifierEvalExpectationSchema = z.object({
     .array(z.number().int().positive())
     .min(1)
     .optional(),
+  proposedBottleDistillerIds: z
+    .array(z.number().int().positive())
+    .min(1)
+    .optional(),
   expectedTier: z.enum(["auto", "review"]).optional(),
   verifyEligible: z.boolean().optional(),
   suggestedNextStep: z
@@ -355,7 +359,11 @@ export const classifierEvalFixtureSchema = z
     }
   });
 
-export const auditBottleEvalScenarioSchema = z.enum(["clean", "bottle_merge"]);
+export const auditBottleEvalScenarioSchema = z.enum([
+  "clean",
+  "bottle_update",
+  "bottle_merge",
+]);
 
 const auditBottleEvalContextSchema = z
   .object({

@@ -3,7 +3,6 @@ import {
   createAuditBottleResult,
 } from "@peated/bottle-classifier/contract";
 import { runBottleAudit as auditBottleWithServerAdapters } from "@peated/server/agents/bottleClassifier/service";
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleChecks,
@@ -25,62 +24,12 @@ vi.mock("@peated/server/agents/bottleClassifier/service", () => {
 
 describe("verifyBottleCreation", () => {
   afterEach(() => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = false;
     vi.resetAllMocks();
-  });
-
-  test("records flagged findings for suspicious manually created bottles", async ({
-    fixtures,
-  }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = false;
-    const currentBrand = await fixtures.Entity({
-      name: "Canadian",
-      type: ["brand", "distiller"],
-    });
-    await fixtures.Entity({
-      name: "Canadian Club",
-      type: ["brand"],
-      totalBottles: 12,
-    });
-    const bottle = await fixtures.Bottle({
-      brandId: currentBrand.id,
-      name: "Reserve 9-year-old Triple Aged",
-    });
-    await fixtures.BottleAlias({
-      bottleId: bottle.id,
-      name: "Canadian Club Reserve 9-year-old Triple Aged",
-    });
-
-    await verifyBottleCreation({
-      bottleId: bottle.id,
-      creationSource: "manual_entry",
-    });
-
-    const bottleChanges = await db
-      .select()
-      .from(changes)
-      .where(
-        and(eq(changes.objectType, "bottle"), eq(changes.objectId, bottle.id)),
-      );
-    const verificationChange = bottleChanges.find(
-      (change) => change.data?.catalogVerification?.phase === "result",
-    );
-
-    expect(verificationChange?.data.catalogVerification).toMatchObject({
-      source: "manual_entry",
-      status: "flagged",
-    });
-    expect(
-      verificationChange?.data.catalogVerification.findings.map(
-        (finding: { kind: string }) => finding.kind,
-      ),
-    ).toContain("brand_repair_candidate");
   });
 
   test("records skipped results for trusted creation flows", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle();
 
     await verifyBottleCreation({
@@ -108,7 +57,6 @@ describe("verifyBottleCreation", () => {
   test("replaces selected Bottle verification with one review-only audit check", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle({ edition: null });
     const { getBottleClassifierContext } =
       await import("@peated/server/agents/bottleClassifier/contextAdapters");
@@ -198,7 +146,6 @@ describe("verifyBottleCreation", () => {
   test("fails for retry without falling back to the old heuristic conclusion", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const bottle = await fixtures.Bottle();
     vi.mocked(auditBottleWithServerAdapters).mockRejectedValue(
       new Error("classifier unavailable"),

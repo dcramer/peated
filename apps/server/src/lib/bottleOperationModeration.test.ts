@@ -3,7 +3,6 @@ import {
   type ProposedOperation,
 } from "@peated/bottle-classifier";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import * as schema from "@peated/server/db/schema";
@@ -25,7 +24,7 @@ import mergeEntity from "@peated/server/worker/jobs/mergeEntity";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
@@ -181,18 +180,11 @@ async function createPreparedCheck({
 }
 
 describe("Bottle operation moderation", () => {
-  const originalExecutionFlag = config.BOTTLE_CHECK_EXECUTION;
-
   beforeEach(() => {
-    config.BOTTLE_CHECK_EXECUTION = true;
     vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
     vi.mocked(workerClient.pushUniqueJob)
       .mockReset()
       .mockResolvedValue(undefined);
-  });
-
-  afterEach(() => {
-    config.BOTTLE_CHECK_EXECUTION = originalExecutionFlag;
   });
 
   test("keeps unsupported check versions non-executable", async ({
