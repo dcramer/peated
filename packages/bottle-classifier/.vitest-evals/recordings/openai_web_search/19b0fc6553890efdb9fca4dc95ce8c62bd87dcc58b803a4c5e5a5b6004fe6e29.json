@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T19:31:16.945Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Heaven's Door Bootleg Series bourbon Vol. 3"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Heaven's Door Bootleg Series bourbon Vol. 3",
+    "summary": "**Heaven’s Door Bootleg Series Vol. III** is a **2021 limited release** from **Heaven’s Door Spirits**. It is a **13-year-old Kentucky bourbon** bottled at **cask strength**, and the official Heaven’s Door description says it was **finished in Spanish wine barrels**. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n\nMore specifically, corroborating bottle-specific sources identify the finishing casks as **Vino de Naranja casks** from Spain, with one retailer listing the bottle at **121.2 proof / 60.6% ABV**. The official producer page and PR release confirm the 13-year age statement, Kentucky bourbon base, cask-strength presentation, and 2021 Vol. III release. ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n\nConfirmed traits:\n- **Producer:** Heaven’s Door Spirits ([prnewswire.com](https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html))\n- **Series/Edition:** **Bootleg Series Vol. III / Volume 3** ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n- **Release year:** **2021** ([heavensdoor.com](https://www.heavensdoor.com/bootleg-series))\n- **Whiskey type:** **Kentucky b",
+    "results": [
+      {
+        "title": "heavensdoor.com",
+        "url": "https://www.heavensdoor.com/bootleg-series",
+        "domain": "heavensdoor.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "prnewswire.com",
+        "url": "https://www.prnewswire.com/news-releases/heavens-door-spirits-announces-release-of-the-bootleg-series-vol-iii-301439092.html",
+        "domain": "prnewswire.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "19b0fc6553890efdb9fca4dc95ce8c62bd87dcc58b803a4c5e5a5b6004fe6e29",
+    "mode": "auto"
+  }
+}

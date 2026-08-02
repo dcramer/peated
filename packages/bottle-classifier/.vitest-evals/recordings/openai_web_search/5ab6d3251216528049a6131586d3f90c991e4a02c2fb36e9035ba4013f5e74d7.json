@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-02T19:35:25.275Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Watchpost blend Westland Distillery Co. 42.5% ABV"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Watchpost blend Westland Distillery Co. 42.5% ABV",
+    "summary": "Confirmed bottle details for **Watchpost Whiskey / Watchpost Blend**:\n\n- **Producer / bottler:** **Westland Distillery Co.**, Seattle, Washington. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whiskey))\n- **Style:** **American blended whiskey**. ([westlanddistillery.com](https://westlanddistillery.com/products/watchpost-whiskey))\n- **Age statement:** **8 years old**. ([distiller.com](https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey))\n- **ABV:** **42.5%**. ([distiller.com](https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey))\n- **Blend composition:** Westland’s **five-malt American single malt** combined with **sourced grain/light whiskey from Indiana (MGP)**. ([distiller.com](https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey))\n- **Cask / maturation details:** Westland component aged in **new oak and Pedro Ximénez casks**; grain/light whiskey aged in **ex-bourbon barrels**. Distiller also describes the blend as using **ex-bourbon, Cooper’s Select, and PX casks** overall. ([distiller.com](https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey))\n- **Edition / release context",
+    "results": [
+      {
+        "title": "westlanddistillery.com",
+        "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+        "domain": "westlanddistillery.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "distiller.com",
+        "url": "https://distiller.com/spirits/watchpost-8-year-american-blended-whiskey",
+        "domain": "distiller.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "sipmagazine.com",
+        "url": "https://sipmagazine.com/announcing-watchpost-american-blended-whiskey-from-the-team-at-westland-distillery/",
+        "domain": "sipmagazine.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "5ab6d3251216528049a6131586d3f90c991e4a02c2fb36e9035ba4013f5e74d7",
+    "mode": "auto"
+  }
+}

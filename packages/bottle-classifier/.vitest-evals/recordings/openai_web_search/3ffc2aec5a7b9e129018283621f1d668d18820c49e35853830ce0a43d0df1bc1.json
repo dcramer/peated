@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T20:02:24.633Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS 72.123 Big moves and subtle details Miltonduff 15 58.7 2009"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS 72.123 Big moves and subtle details Miltonduff 15 58.7 2009",
+    "summary": "## SMWS 72.123 — “Big moves and subtle details”\n\n| Trait | Confirmed detail |\n|---|---|\n| **Distillery** | Miltonduff |\n| **Region** | Speyside |\n| **Bottler** | The Scotch Malt Whisky Society |\n| **Cask number** | 72.123 |\n| **Distilled** | 18 December 2009 |\n| **Age** | 15 years |\n| **ABV** | 58.7% |\n| **Bottling** | 70 cl |\n| **Maturation** | 12 years in a bourbon barrel, then transferred to a **first-fill, heavy-toast, medium-char new-oak barrel** |\n| **SMWS title** | “Big moves and subtle details” |\n| **Official flavour description** | Treacle, ink, bergamot and dried exotic fruit; with water, red-fruit jam, plum wine, aniseed, marzipan and fruity cough sweets; the palate is medicinal and spicy, with cherry cough syrup, baked apple, liquorice, cedar, clove, mint, camphor and tarragon. |\n\nThe core specifications and maturation are confirmed directly by SMWS, while Master of Malt independently corroborates the distillery, bottler, 15-year age, 18 December 2009 distillation date and 58.7% ABV. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n\n**Note:** “2009” is the **distillation year**, not necessarily the release year. A secondary listing associates it with an Octo",
+    "results": [
+      {
+        "title": "smws.com",
+        "url": "https://smws.com/big-moves-and-subtle-details/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "twowhiskybros.co.uk",
+        "url": "https://twowhiskybros.co.uk/blogs/blog/smws-october-2025-outturn-review",
+        "domain": "twowhiskybros.co.uk",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3ffc2aec5a7b9e129018283621f1d668d18820c49e35853830ce0a43d0df1bc1",
+    "mode": "auto"
+  }
+}

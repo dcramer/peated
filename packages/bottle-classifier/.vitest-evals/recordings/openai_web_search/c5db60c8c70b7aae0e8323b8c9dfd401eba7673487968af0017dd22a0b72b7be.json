@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T19:34:07.800Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "SMWS 72.123 Big moves and subtle details single malt Miltonduff The Scotch Malt Whisky Society 72.123 single cask"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "SMWS 72.123 Big moves and subtle details single malt Miltonduff The Scotch Malt Whisky Society 72.123 single cask",
+    "summary": "Confirmed bottle details for **SMWS 72.123 “Big moves and subtle details”**:\n\n- **Distillery / code:** **Miltonduff**, which matches **SMWS code 72**. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **Bottler:** **The Scotch Malt Whisky Society (SMWS)**. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **Type:** **Single cask Speyside single malt Scotch whisky**. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **Cask number / edition:** **72.123**, bottle name **“Big moves and subtle details.”** ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **Vintage / distilled:** **18 December 2009**. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **Stated age:** **15 years**. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **ABV:** **58.7%**. ([smws.com](https://smws.com/big-moves-and-subtle-details/))\n- **Cask / maturation:** SMWS lists **HTMC New Oak Barrel**; corroborating retailer/auction descriptions say it was **initially matured in an ex-bourbon barrel, then given a finish in a high-toast medium-char new oak barrel**. That phrasing is consistent with the HTMC designation. ([smws.com](https://smws.c",
+    "results": [
+      {
+        "title": "smws.com",
+        "url": "https://smws.com/big-moves-and-subtle-details/",
+        "domain": "smws.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "just-whisky.co.uk",
+        "url": "https://www.just-whisky.co.uk/product/miltonduff-15-years-old-2009-smws-72123-big-moves-and-subtle-details-1498579",
+        "domain": "just-whisky.co.uk",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "c5db60c8c70b7aae0e8323b8c9dfd401eba7673487968af0017dd22a0b72b7be",
+    "mode": "auto"
+  }
+}

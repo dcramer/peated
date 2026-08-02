@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T20:30:23.246Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Pokeno whisky \"55.8%\" \"Pedro Ximenez\" 4 year single cask 2019"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Pokeno whisky \"55.8%\" \"Pedro Ximenez\" 4 year single cask 2019",
+    "summary": "The details appear to combine **two different Pōkeno PX single-cask releases**:\n\n### Bottle matching **55.8% and 2019**\n- **Producer/bottler:** Pōkeno, New Zealand; distillery bottling  \n- **Type:** New Zealand single malt, single cask  \n- **Vintage/distilled:** **22 November 2019**  \n- **Bottled:** **19 May 2023**  \n- **Age:** **3 years**, not 4  \n- **Cask:** PX sherry, **cask #69**  \n- **ABV:** **55.8%**  \n- **Outturn:** **300 bottles**, 700 ml ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019))\n\n### Separate **4-year-old US-exclusive** release\n- **Cask:** PX sherry cask **#71**, from Miguel Martin  \n- **Age:** **4 years**, fully matured in PX sherry  \n- **Edition:** US-exclusive single cask  \n- **Outturn:** **336 bottles**, 700 ml  \n- **ABV:** The importer’s listing gives **56.5%**, while one retailer lists **55.8%**—the 55.8% figure may be a retailer/cataloguing error. ([impexbev.com](https://impexbev.com/pokeno-whisky/))\n\n**Best identification:** if your bottle says **55.8%, 2019, and 300 bottles**, it is almost certainly **Pōkeno 2019 PX Sherry Single Cask #69**, a **3-year-old** release. If it says **4 years, cask #71, and 336 bottles**, it is t",
+    "results": [
+      {
+        "title": "impexbev.com",
+        "url": "https://impexbev.com/pokeno-whisky/",
+        "domain": "impexbev.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "90d43b7f550be53160dc41965fe90dca8d78255fd14cacd343c5d92b6a66ed37",
+    "mode": "auto"
+  }
+}
