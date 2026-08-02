@@ -20,22 +20,22 @@ const exactBottle = {
 } satisfies BottleExactMetadataSource;
 
 describe("BottleExactMetadata", () => {
-  it("renders leading context and exact fields as non-breaking items", () => {
+  it("renders exact fields in canonical order as non-breaking items", () => {
     const html = renderToStaticMarkup(
-      <BottleExactMetadata bottle={exactBottle} leadingContent="Lagavulin" />,
+      <BottleExactMetadata bottle={exactBottle} />,
     );
     const text = html.replace(/<[^>]*>/g, "");
 
     expect(html).toContain("flex-wrap");
     expect(text).toBe(
-      "Lagavulin·2025 Release·Single Malt·21 years·55.1% ABV·2004 vintage·Single cask·Cask strength·1st Fill Oloroso Hogshead cask",
+      "2025 Release·Single Malt·21 years·55.1% ABV·2004 vintage·Single cask·Cask strength·1st Fill Oloroso Hogshead cask",
     );
     expect(html.match(/class="inline-flex whitespace-nowrap"/g)).toHaveLength(
-      9,
+      8,
     );
   });
 
-  it("renders leading content alongside an edition without duplicate keys", () => {
+  it("renders an edition summary without duplicate keys", () => {
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => undefined);
@@ -48,13 +48,11 @@ describe("BottleExactMetadata", () => {
             edition: "Distillers Edition",
             group: { statedAge: exactBottle.statedAge },
           }}
-          leadingContent="Lagavulin"
           variant="summary"
         />,
       );
       const text = html.replace(/<[^>]*>/g, "");
 
-      expect(text).toContain("Lagavulin");
       expect(text).toContain("Distillers Edition");
       expect(consoleError).not.toHaveBeenCalled();
     } finally {

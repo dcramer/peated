@@ -25,12 +25,14 @@ describe("PreviewBottleCard", () => {
         }}
       />,
     );
+    const text = html.replace(/<[^>]*>/g, "");
 
     expect(html).toContain('aria-label="Bottle preview"');
     expect(html).toContain("Springbank");
     expect(html).toContain("Local Barley");
     expect(html).toContain("12-year-old");
     expect(html).toContain("Batch 24");
+    expect(text).toContain("Batch 24·57.2% ABV");
     expect(html).not.toContain("12 years");
     expect(html).not.toContain("2025");
     expect(html).not.toContain("2013");

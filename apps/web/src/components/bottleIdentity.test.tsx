@@ -81,6 +81,26 @@ describe("BottleIdentity", () => {
     expect(html).toContain('title="Springbank 12 Cask Strength Batch 24"');
   });
 
+  it("keeps exact metadata in canonical order for grouped and ungrouped bottles", () => {
+    const bottle = makeBottle({
+      edition: null,
+      vintageYear: null,
+      releaseYear: 2023,
+    });
+    const groupedText = renderToStaticMarkup(
+      <BottleIdentity bottle={bottle} mode="absolute" />,
+    ).replace(/<[^>]*>/g, "");
+    const ungroupedText = renderToStaticMarkup(
+      <BottleIdentity
+        bottle={{ ...bottle, group: undefined }}
+        mode="absolute"
+      />,
+    ).replace(/<[^>]*>/g, "");
+
+    expect(groupedText).toContain("57.2% ABV·2023 release");
+    expect(ungroupedText).toContain("57.2% ABV·2023 release");
+  });
+
   it("shows a nonduplicative series with producer context", () => {
     const html = renderToStaticMarkup(
       <BottleIdentity

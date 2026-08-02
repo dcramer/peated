@@ -343,17 +343,8 @@ export default function BottleIdentity({
     ? getAbsoluteBottleTitle(bottle)
     : relativeIdentity.label;
   const titleMetadata = getBottleMetadataExclusions(bottle, title);
-  const leadingContent =
-    isAbsolute &&
-    bottle.group &&
-    !relativeIdentity.fallback &&
-    !relativeIdentity.excludeMetadata.some((key) => titleMetadata.has(key))
-      ? relativeIdentity.label
-      : undefined;
-  const displayedLeadingContent =
-    metadataVariant === "summary" ? undefined : leadingContent;
   const metadataExclude = titleMetadata;
-  if (!isAbsolute || displayedLeadingContent) {
+  if (!isAbsolute) {
     relativeIdentity.excludeMetadata.forEach((key) => metadataExclude.add(key));
   }
   if (
@@ -365,10 +356,7 @@ export default function BottleIdentity({
   }
   if (
     showReleaseYear &&
-    !getMetadataExpressedByTitle(
-      bottle,
-      [title, displayedLeadingContent].filter(Boolean).join(" "),
-    ).includes("release")
+    !getMetadataExpressedByTitle(bottle, title).includes("release")
   ) {
     metadataExclude.delete("release");
   }
@@ -425,7 +413,6 @@ export default function BottleIdentity({
         bottle={bottle}
         variant={metadataVariant}
         exclude={[...metadataExclude]}
-        leadingContent={displayedLeadingContent}
       />
     </div>
   );

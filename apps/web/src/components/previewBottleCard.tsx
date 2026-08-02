@@ -35,14 +35,9 @@ export const PreviewBottleCard = ({
     caskType: data.caskType ?? null,
     caskSize: data.caskSize ?? null,
   };
-  const editionInTitle = Boolean(
-    data.edition &&
-    data.name?.toLocaleLowerCase().includes(data.edition.toLocaleLowerCase()),
-  );
-  const leadingEdition = editionInTitle ? undefined : data.edition || undefined;
   const metadataExclude = getBottleMetadataExclusions(
     exactBottle,
-    [data.name, leadingEdition].filter(Boolean).join(" "),
+    data.name ?? "",
   );
   const showSeries = Boolean(
     series &&
@@ -73,7 +68,6 @@ export const PreviewBottleCard = ({
         className="!text-black/70"
         bottle={exactBottle}
         exclude={[...metadataExclude]}
-        leadingContent={leadingEdition}
       />
     </section>
   );
