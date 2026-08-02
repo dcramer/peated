@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T19:31:38.642Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Highland Park Cask Strength single malt No. 5"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Highland Park Cask Strength single malt No. 5",
+    "summary": "**Highland Park Cask Strength Release No. 5** is a **single malt Scotch whisky** from **Highland Park Distillery, Orkney**, and it is a **distillery bottling**. It is **NAS** (no age statement), **bottled in 2024**, and released as the **fifth edition** in Highland Park’s annual Cask Strength series. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5))\n\nConfirmed bottle traits:\n- **Producer/Bottler:** Highland Park / distillery bottling. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5))\n- **Edition:** **Cask Strength Release No. 5**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5))\n- **ABV:** **64.7%**. ([highlandparkwhisky.com](https://www.highlandparkwhisky.com/en/cask-strength-release-no-5))\n- **Release year:** **2024**; US launch reported in **June 2024**. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength))\n- **Cask makeup:** predominantly **first-fill sherry-seasoned European oak casks**, including **Pedro Ximénez casks**, plus **refill casks**, **ex-bourbon casks**, and a **small quantity of first-fill she",
+    "results": [
+      {
+        "title": "highlandparkwhisky.com",
+        "url": "https://www.highlandparkwhisky.com/en/cask-strength-release-no-5",
+        "domain": "highlandparkwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/255934/highland-park-cask-strength",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "3efa723f4d8ccfc818397765f8196802d2fb1530347debb77644d64b4d26ffdf",
+    "mode": "auto"
+  }
+}

@@ -2,7 +2,11 @@
   "id": "watchpost-8-year-old",
   "referenceName": "Watchpost",
   "expectedBottleName": "Watchpost 8-year-old",
-  "summary": "Create Watchpost as the brand with the source-supported 8-year-old identity, preserving the marketed age in the Bottle name and structured age field alongside the American blended whiskey category, 42.5% ABV, and Westland production evidence.",
+  "expectedBottleNames": [
+    "Watchpost 8-year-old",
+    "Watchpost Whiskey 8-year-old"
+  ],
+  "summary": "Create Watchpost as the brand with the source-supported 8-year-old identity, accepting either the current Peated display layout or the official Watchpost Whiskey title while preserving structured age, American blended whiskey category, 42.5% ABV, and Westland production evidence.",
   "peatedBottleIds": [44299],
   "provenance": {
     "source": "production_miss",

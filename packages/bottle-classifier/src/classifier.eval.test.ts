@@ -456,6 +456,19 @@ function evaluateDecisionShape(
     failures.push("proposedBottle missing expected fields");
   }
 
+  if (expected.proposedBottleNameOneOf !== undefined) {
+    const proposedBottleName = result.decision.proposedBottle?.name ?? "";
+    if (
+      !expected.proposedBottleNameOneOf.some((expectedName) =>
+        evalTextMatches(proposedBottleName, expectedName),
+      )
+    ) {
+      failures.push(
+        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")}`,
+      );
+    }
+  }
+
   if (expected.proposedBottleNameIncludes !== undefined) {
     const proposedBottleName = result.decision.proposedBottle?.name ?? "";
     for (const requiredText of expected.proposedBottleNameIncludes) {

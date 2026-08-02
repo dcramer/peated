@@ -575,6 +575,37 @@ describe("Bottle-check eval scoring", () => {
     },
   );
 
+  test("grounds collected web evidence across equivalent URL variants", () => {
+    const artifacts = BottleClassificationArtifactsSchema.parse({
+      searchEvidence: [
+        {
+          query: "official source",
+          results: [
+            {
+              title: "Collected source",
+              url: "https://www.example.com/products/example-bottle/",
+            },
+          ],
+        },
+      ],
+    });
+
+    expectGrounded(
+      scoreBottleCheckGrounding({
+        artifacts,
+        proposedOperations: [],
+        findings: [
+          findingExpectation("Equivalent citation URL.", [
+            {
+              kind: "web_result",
+              url: "https://example.com/products/example-bottle?utm_source=search",
+            },
+          ]),
+        ],
+      }),
+    );
+  });
+
   test("reports uninspected targets and fabricated evidence independently", () => {
     const artifacts = BottleClassificationArtifactsSchema.parse({
       candidates: [{ bottleId: 3, fullName: "Shallow candidate" }],

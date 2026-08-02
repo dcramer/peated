@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T20:30:37.177Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Pokeno 2019 cask 69 55.8 3 year PX 300 bottles"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Pokeno 2019 cask 69 55.8 3 year PX 300 bottles",
+    "summary": "This appears to be a **Pōkeno 2019 Single Cask PX Sherry** New Zealand single malt.\n\n**Confirmed bottle details:**\n\n- **Producer/distillery:** Pōkeno Whisky, New Zealand  \n- **Bottler:** Distillery bottling  \n- **Vintage/distilled:** 2019; specifically listed as **22 November 2019**  \n- **Bottled:** **19 May 2023**  \n- **Age:** 3 years  \n- **Cask:** PX Sherry, cask **#69**  \n- **ABV:** **55.8%**  \n- **Outturn:** **300 bottles**  \n- **Bottle size:** 700 ml  \n- **Edition:** Single Cask / limited release  \n- **Category:** New Zealand single malt whisky  \n\nThe cask number, PX designation, age, ABV, bottling date, and 300-bottle outturn are all listed together in Whiskybase’s bottle-specific record. Spirit Radar independently corroborates the key commercial details: 2019 vintage, 3 years, 2023 bottling, 55.8% ABV, 700 ml, and 300 bottles. ([whiskybase.com](https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019))\n\nPōkeno’s own site confirms that the distillery produces New Zealand single malts and releases single-cask expressions. ([pokenowhisky.com](https://pokenowhisky.com/our-whisky/))",
+    "results": [
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "pokenowhisky.com",
+        "url": "https://pokenowhisky.com/our-whisky/",
+        "domain": "pokenowhisky.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "f9e90505d72b83118a4aec6e83e06b37f4cc5c20ca3fba27560f0c481a569b53",
+    "mode": "auto"
+  }
+}

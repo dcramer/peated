@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T20:25:19.502Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Ardbeg Uigeadail official product 54.2% single malt Scotch whisky bottler distillery"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Ardbeg Uigeadail official product 54.2% single malt Scotch whisky bottler distillery",
+    "summary": "## Ardbeg Uigeadail — bottle identification\n\n| Field | Confirmed detail |\n|---|---|\n| **Product** | Ardbeg Uigeadail |\n| **Spirit** | Islay single malt Scotch whisky |\n| **ABV** | **54.2%** |\n| **Distillery** | **Ardbeg Distillery**, Islay, Scotland |\n| **Bottler** | **Distillery bottling / original bottling** |\n| **Age** | **No Age Statement (NAS)** |\n| **Cask profile** | Vatted from whisky matured in **ex-bourbon** and **ex-sherry Oloroso** casks |\n| **Filtration** | **Non-chill-filtered** |\n| **Standard bottle size** | 70 cl |\n\nArdbeg’s official product page confirms the 54.2% ABV, NAS status, ex-bourbon and Oloroso sherry cask components, and non-chill filtration. ([ardbeg.com](https://www.ardbeg.com/Ardbeg%20Uigeadail-1077251.html)) Independent bottle listings identify it as an **Ardbeg distillery/original bottling**, rather than an independent bottler’s release. ([thewhiskyexchange.com](https://www.thewhiskyexchange.com/p/114/ardbeg-uigeadail))\n\n**Classification:** Ardbeg Uigeadail, **distillery-bottled Islay single malt Scotch whisky, 54.2% ABV, NAS**.",
+    "results": [
+      {
+        "title": "ardbeg.com",
+        "url": "https://www.ardbeg.com/Ardbeg%20Uigeadail-1077251.html",
+        "domain": "ardbeg.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "thewhiskyexchange.com",
+        "url": "https://www.thewhiskyexchange.com/p/114/ardbeg-uigeadail",
+        "domain": "thewhiskyexchange.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "9ae1ac369a118424a88acae4465f887bc4b431ff8ec723fc488c39b989249f0c",
+    "mode": "auto"
+  }
+}

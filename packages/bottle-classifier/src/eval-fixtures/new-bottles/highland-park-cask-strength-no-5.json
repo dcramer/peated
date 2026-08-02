@@ -2,14 +2,14 @@
   "id": "highland-park-cask-strength-no-5",
   "referenceName": "Highland Park Cask Strength No. 5",
   "expectedBottleName": "Highland Park Cask Strength",
-  "summary": "Treat Highland Park Cask Strength No. 5 as one complete Bottle, preserving No. 5 as its exact edition and in the marketed Bottle identity.",
+  "summary": "Treat Highland Park Cask Strength No. 5 as one complete 2024 Bottle, preserving No. 5 as its exact edition and in the marketed Bottle identity.",
   "peatedBottleIds": [44080],
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
     "exactBottleIdentity": {
       "edition": "No. 5",
-      "releaseYear": null
+      "releaseYear": 2024
     }
   }
 }

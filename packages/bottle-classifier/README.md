@@ -199,8 +199,10 @@ take precedence.
 `AI_GATEWAY_API_KEY` or `OPENAI_API_KEY` is required. The gateway key takes
 precedence when both are set. With the gateway, `OPENAI_MODEL` defaults to
 `openai/gpt-5.4` and `OPENAI_EVAL_MODEL` defaults to
-`openai/gpt-5-mini`; direct OpenAI defaults omit the provider prefix. Override
-either if you want a different cost or quality tradeoff.
+`openai/gpt-5.6-luna`; direct OpenAI defaults omit the provider prefix. The judge
+uses `medium` reasoning by default; override it with
+`OPENAI_EVAL_REASONING_EFFORT`. Override either model if you want a different
+cost or quality tradeoff.
 `OPENAI_REASONING_EFFORT` accepts `none`, `low`, `medium`, `high`, or `xhigh` for
 GPT-5 models. When it is unset, the classifier omits the setting and uses the
 provider default; GPT-5.6 currently defaults to `medium`. Reasoning tokens are

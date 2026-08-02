@@ -1,7 +1,8 @@
 import type { ModelSettings } from "@openai/agents";
 
 export const DEFAULT_OPENAI_MODEL = "gpt-5.4";
-export const DEFAULT_OPENAI_EVAL_MODEL = "gpt-5-mini";
+export const DEFAULT_OPENAI_EVAL_MODEL = "gpt-5.6-luna";
+export const DEFAULT_OPENAI_EVAL_REASONING_EFFORT = "medium";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL = "gpt-5.6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT = "high";
 
@@ -21,6 +22,7 @@ export type OpenAIReasoningEffort = (typeof OPENAI_REASONING_EFFORTS)[number];
 
 export function parseOpenAIReasoningEffort(
   value: string | undefined,
+  settingName = "OPENAI_REASONING_EFFORT",
 ): OpenAIReasoningEffort | undefined {
   const normalized = value?.trim().toLowerCase();
   if (!normalized) {
@@ -36,7 +38,7 @@ export function parseOpenAIReasoningEffort(
   }
 
   throw new Error(
-    `OPENAI_REASONING_EFFORT must be one of: ${OPENAI_REASONING_EFFORTS.join(", ")}`,
+    `${settingName} must be one of: ${OPENAI_REASONING_EFFORTS.join(", ")}`,
   );
 }
 

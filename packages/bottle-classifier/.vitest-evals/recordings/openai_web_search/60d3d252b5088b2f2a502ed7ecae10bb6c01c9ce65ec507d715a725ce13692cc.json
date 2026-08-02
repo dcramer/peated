@@ -1,0 +1,32 @@
+{
+  "writtenAt": "2026-08-02T19:55:42.498Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Pokeno Single Cask 4 year 55.8 Pedro Ximenez"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Pokeno Single Cask 4 year 55.8 Pedro Ximenez",
+    "summary": "Here’s the most likely bottle-specific match for **“Pokeno Single Cask 4 year 55.8 Pedro Ximenez”**:\n\n- **Producer:** Pōkeno Whisky / Pōkeno Distillery, New Zealand. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **Bottling type:** **Distillery single cask** release. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **Age:** **4 years**. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **ABV:** **55.8%** is repeatedly listed for this PX single-cask expression. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **Cask/style:** **Pedro Ximénez (PX) sherry cask**, with multiple listings saying it was **fully matured in a PX sherry cask from Miguel Martin**. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **Edition / cask number:** The best-correlated result is **Single Cask #71**, described as a **US exclusive**. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **Bottle count:** **336 bottles** is listed by more than one seller. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origin-acmb2))\n- **Size:** **700 ml**. ([drinqy.com](https://www.drinqy.com/shop/p/pokeno-origi",
+    "results": [
+      {
+        "title": "drinqy.com",
+        "url": "https://www.drinqy.com/shop/p/pokeno-origin-acmb2",
+        "domain": "drinqy.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/239793/pokeno-2019",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "60d3d252b5088b2f2a502ed7ecae10bb6c01c9ce65ec507d715a725ce13692cc",
+    "mode": "auto"
+  }
+}

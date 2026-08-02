@@ -4,9 +4,11 @@
   "expectedBottleName": "SMWS 72.123",
   "expectedBottleNames": [
     "SMWS 72.123",
-    "SMWS 72.123 Big moves and subtle details"
+    "SMWS 72.123 Big moves and subtle details",
+    "SMWS 72.123 15-year-old",
+    "SMWS 72.123 Big moves and subtle details 15-year-old"
   ],
-  "summary": "Use the SMWS 72.123 code as the exact-cask identity anchor; a visible source-backed subtitle may be preserved in the bottle display/create proposal.",
+  "summary": "Use the SMWS 72.123 code as the exact-cask identity anchor; the source-backed subtitle and 15-year age may be preserved in the bottle display/create proposal.",
   "peatedBottleIds": [43670],
   "expected": {
     "handlingStrategy": "deterministic_safe",

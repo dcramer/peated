@@ -58,7 +58,7 @@
     "status": "classified",
     "action": "match",
     "identityScope": "product",
-    "aliasScope": "global_alias",
+    "aliasScope": "none",
     "matchedBottleId": 630,
     "summary": "Extract the canonical bottle identity from a noisy retailer title and match Ardbeg Uigeadail without needing seeded extraction output."
   }

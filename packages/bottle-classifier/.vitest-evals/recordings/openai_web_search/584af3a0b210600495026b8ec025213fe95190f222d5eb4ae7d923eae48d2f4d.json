@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-02T20:30:40.264Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "site:impexbev.com/pokeno-whisky Pokeno single cask 71 4 year 56.5 PX"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "site:impexbev.com/pokeno-whisky Pokeno single cask 71 4 year 56.5 PX",
+    "summary": "## Pōkeno PX Sherry Single Cask #71\n\n**Bottle-specific identification:** **Pōkeno US Exclusive PX Sherry Single Cask #71**, a New Zealand single malt.\n\n| Trait | Confirmed detail |\n|---|---|\n| **Producer** | Pōkeno Whisky Company, New Zealand |\n| **Expression** | PX Sherry Single Cask #71 |\n| **Age** | 4 years |\n| **Cask** | Full maturation in a Pedro Ximénez/PX sherry cask sourced from Miguel Martin |\n| **ABV** | **56.5%** |\n| **Edition** | US-exclusive single-cask release |\n| **Bottle count** | 336 bottles |\n| **Bottling** | Pōkeno states that its products are bottled onsite at the distillery; ImpEx appears to be the U.S. importer/brand representative rather than the distillery bottler. |\n| **Vintage/release year** | Not stated in the specific producer/importer description |\n\nImpEx’s product page is the strongest source: it explicitly identifies Cask #71, four years of full PX maturation, 56.5% ABV, and the 336-bottle U.S. allocation. ([impexbev.com](https://impexbev.com/pokeno-whisky/)) Pōkeno’s own site confirms that its products are bottled at the distillery. ([pokenowhisky.com](https://pokenowhisky.com/our-place/))\n\n**Official tasting description:** ripe cherries, Black Fores",
+    "results": [
+      {
+        "title": "impexbev.com",
+        "url": "https://impexbev.com/pokeno-whisky/",
+        "domain": "impexbev.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "pokenowhisky.com",
+        "url": "https://pokenowhisky.com/our-place/",
+        "domain": "pokenowhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "norfolkwineandspirits.com",
+        "url": "https://norfolkwineandspirits.com/shop/pokeno-us-exclusive-px-sherry-single-cask-71-55-8/",
+        "domain": "norfolkwineandspirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "584af3a0b210600495026b8ec025213fe95190f222d5eb4ae7d923eae48d2f4d",
+    "mode": "auto"
+  }
+}
