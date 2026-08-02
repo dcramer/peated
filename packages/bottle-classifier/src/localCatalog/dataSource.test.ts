@@ -289,6 +289,44 @@ describe("local catalog data source", () => {
     ]);
   });
 
+  test("returns an exact entity identity without the requested role", async () => {
+    const dataSource = createLocalCatalogDataSource({
+      ...shieldaigCatalog,
+      entities: [
+        ...shieldaigCatalog.entities,
+        {
+          id: 1383,
+          name: "Suntory",
+          shortName: null,
+          aliases: [],
+          type: ["brand", "distiller"],
+        },
+      ],
+    });
+
+    await expect(
+      dataSource.searchEntities?.({
+        query: "Suntory",
+        type: "bottler",
+        limit: 5,
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        entityId: 1383,
+        type: ["brand", "distiller"],
+        source: ["local_catalog", "exact"],
+      }),
+    ]);
+
+    await expect(
+      dataSource.searchEntities?.({
+        query: "Suntory Holdings",
+        type: "bottler",
+        limit: 5,
+      }),
+    ).resolves.toEqual([]);
+  });
+
   test("ranks more specific contained entity candidates first", async () => {
     const dataSource = createLocalCatalogDataSource({
       ...shieldaigCatalog,

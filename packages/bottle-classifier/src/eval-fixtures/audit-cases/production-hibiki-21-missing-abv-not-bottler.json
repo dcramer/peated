@@ -1,0 +1,152 @@
+{
+  "id": "audit-production-hibiki-21-missing-abv-not-bottler",
+  "name": "audit: add Hibiki 21 ABV without inventing a bottler",
+  "scenario": "bottle_update",
+  "requireExpectedOperationEvidence": true,
+  "input": {
+    "audit": {
+      "bottleId": 11863,
+      "origin": "moderator",
+      "note": "Audit this existing Bottle against focused product evidence without treating an ordinary official producer as an independent bottler."
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 11863,
+        "fullName": "Hibiki 21-year-old",
+        "brand": "Hibiki",
+        "bottler": null,
+        "distillery": ["Yamazaki", "Hakushu", "Chita"],
+        "category": "blend",
+        "statedAge": 21,
+        "abv": null,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 11863,
+          "fullName": "Hibiki 21-year-old",
+          "groupId": 12545,
+          "shared": {
+            "name": "21-year-old",
+            "statedAge": 21,
+            "series": null,
+            "category": "blend",
+            "brand": {
+              "entityId": 1022,
+              "name": "Hibiki"
+            },
+            "distillers": [
+              {
+                "entityId": 493,
+                "name": "Yamazaki"
+              },
+              {
+                "entityId": 1007,
+                "name": "Hakushu"
+              },
+              {
+                "entityId": 1616,
+                "name": "Chita"
+              }
+            ],
+            "bottler": null
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": null,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
+        }
+      ]
+    }
+  },
+  "searchResponses": [
+    {
+      "when": ["hibiki"],
+      "results": [
+        {
+          "bottleId": 11863,
+          "fullName": "Hibiki 21-year-old",
+          "brand": "Hibiki",
+          "bottler": null,
+          "distillery": ["Yamazaki", "Hakushu", "Chita"],
+          "category": "blend",
+          "statedAge": 21,
+          "abv": null,
+          "score": 1,
+          "source": ["search"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://api.peated.com/v1/bottles/11863",
+      "https://api.peated.com/v1/entities/1383",
+      "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+      "https://www.wine.com/product/suntory-hibiki-21-year-japanese-whisky/531876",
+      "https://whiskymag.com/tastings/hibiki-21-years-old/"
+    ],
+    "dbOutcome": {
+      "bottleId": 11863,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Keep Bottle 11863, add exact ABV 43%, and leave bottler null. Do not create or assign a Suntory bottler Entity and do not merge or create a Bottle."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 11863,
+        "field": "abv",
+        "productionValue": null,
+        "evidenceValue": 43,
+        "source": "production_search",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "Independent product references consistently identify the standard Hibiki 21-year-old blend at 43% ABV."
+      }
+    ],
+    "notes": "Observed August 2, 2026 from Bottle Check #9 for production Bottle 11863. The audit correctly found the missing 43% ABV but also proposed creating and assigning Suntory as bottler. Production Entity 1383 already owns the Suntory identity, which mechanically blocked the proposal. More importantly, the House of Suntory product page presents Hibiki 21 as an ordinary official Hibiki release and does not establish a separate market-facing bottler or release-imprint relationship. The exact Peated outcome is therefore an ABV-only update with bottler left null."
+  },
+  "expected": {
+    "summary": "Hibiki 21-year-old Bottle 11863 is missing its supported 43% ABV; the evidence does not establish a separate bottler relationship.",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 11863,
+          "patch": {
+            "exact": {
+              "abv": 43
+            }
+          }
+        },
+        "rationale": "Independent product evidence identifies the standard Hibiki 21-year-old blend at 43% ABV; the available evidence does not establish a separate bottler or release imprint.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 11863
+          },
+          {
+            "kind": "web_result",
+            "url": "https://www.wine.com/product/suntory-hibiki-21-year-japanese-whisky/531876"
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}

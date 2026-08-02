@@ -64,6 +64,7 @@ export async function searchClassifierEntities(
   const normalizedQuery = normalizeEntityLookupText(args.query);
   const results = new Map<number, ClassifierEntityResolution>();
 
+  // Exact identity is role-independent; canonical Bottle assignment can add a missing role.
   const exactMatches = await db
     .select({
       entityId: entities.id,
@@ -76,7 +77,6 @@ export async function searchClassifierEntities(
     .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
     .where(
       and(
-        args.type ? sql`${args.type} = ANY(${entities.type})` : undefined,
         or(
           eq(sql`LOWER(${entities.name})`, args.query.toLowerCase()),
           eq(

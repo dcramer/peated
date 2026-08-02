@@ -339,7 +339,7 @@ export const SearchEntitiesArgsSchema = z.object({
   type: EntityTypeEnum.nullable()
     .default(null)
     .describe(
-      "Entity type hint to narrow results. Use when you know whether you need a brand, distillery, or bottler match.",
+      "Entity type hint used to narrow non-exact results. Exact names, short names, and aliases may match an Entity without this role because assignment can add it.",
     ),
   limit: z
     .number()

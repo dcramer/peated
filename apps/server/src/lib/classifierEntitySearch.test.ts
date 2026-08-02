@@ -1,6 +1,38 @@
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 
 describe("searchClassifierEntities", () => {
+  test("returns a role-independent exact identity without widening fuzzy results", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Existing Release Imprint",
+      type: ["brand", "distiller"],
+    });
+
+    const results = await searchClassifierEntities({
+      query: "Existing Release Imprint",
+      type: "bottler",
+      limit: 5,
+    });
+
+    expect(results).toContainEqual(
+      expect.objectContaining({
+        entityId: entity.id,
+        source: expect.arrayContaining(["exact"]),
+      }),
+    );
+
+    const fuzzyResults = await searchClassifierEntities({
+      query: "Existing Release Imprint Company",
+      type: "bottler",
+      limit: 5,
+    });
+
+    expect(fuzzyResults.map((result) => result.entityId)).not.toContain(
+      entity.id,
+    );
+  });
+
   test("returns a shorter contained distillery name as a candidate", async ({
     fixtures,
   }) => {
