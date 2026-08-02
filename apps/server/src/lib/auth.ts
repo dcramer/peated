@@ -17,6 +17,8 @@ import { default as jsonwebtoken } from "jsonwebtoken";
 import { sendVerificationEmail } from "./email";
 const { sign, verify } = jsonwebtoken;
 
+export const ACCESS_TOKEN_EXPIRES_IN_SECONDS = 7 * 24 * 60 * 60;
+
 export function signPayload(payload: string | object): Promise<string> {
   return new Promise<string>((res, rej) => {
     sign(payload, config.JWT_SECRET, { expiresIn: "7d" }, (err, token) => {

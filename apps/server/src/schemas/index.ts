@@ -19,6 +19,7 @@ export * from "./follows";
 export * from "./friends";
 export * from "./magicLink";
 export * from "./notifications";
+export * from "./oauth";
 export * from "./pendingUploads";
 export * from "./priceMatches";
 export * from "./profileActivity";

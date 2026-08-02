@@ -79,6 +79,12 @@ export default function AdminSidebar() {
                     Locations
                   </SidebarLink>
                   <SidebarLink
+                    href="/admin/oauth-clients"
+                    active={pathname.startsWith("/admin/oauth-clients")}
+                  >
+                    OAuth Clients
+                  </SidebarLink>
+                  <SidebarLink
                     href="/admin/sites"
                     active={pathname.startsWith("/admin/sites")}
                   >

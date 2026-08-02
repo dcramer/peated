@@ -32,6 +32,7 @@ import type {
   FriendSchema,
   FriendStatusEnum,
   NotificationSchema,
+  OAuthClientSchema,
   ObjectTypeEnum,
   PointSchema,
   ProfileActivityEntrySchema,
@@ -94,6 +95,7 @@ export type Flight = z.infer<typeof FlightSchema>;
 export type Follow = z.infer<typeof FollowSchema>;
 export type Friend = z.infer<typeof FriendSchema>;
 export type Notification = z.infer<typeof NotificationSchema>;
+export type OAuthClient = z.infer<typeof OAuthClientSchema>;
 export type Review = z.infer<typeof ReviewSchema>;
 export type StorePrice = z.infer<typeof StorePriceSchema>;
 export type Tasting = z.infer<typeof TastingSchema>;
