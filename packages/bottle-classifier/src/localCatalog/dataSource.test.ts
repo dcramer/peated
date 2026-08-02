@@ -23,6 +23,10 @@ const shieldaigCatalog = LocalCatalogSchema.parse({
       groupId: 1001,
       category: "single_malt",
       statedAge: 30,
+      releaseYear: 2024,
+      caskType: "oloroso",
+      caskSize: "hogshead",
+      caskFill: "1st_fill",
     },
   ],
   aliases: [{ name: "Shieldaig Speyside", bottleId: 44175 }],
@@ -94,7 +98,7 @@ describe("local catalog data source", () => {
     });
   });
 
-  test("searches Bottle candidates by canonical cask traits", async () => {
+  test("keeps optional cask metadata out of local candidate scores", async () => {
     const dataSource = createLocalCatalogDataSource(
       LocalCatalogSchema.parse({
         entities: [{ id: 1, name: "Example", type: ["brand"] }],
@@ -120,17 +124,24 @@ describe("local catalog data source", () => {
       }),
     );
 
-    await expect(
-      dataSource.searchBottles(
-        BottleCandidateSearchInputSchema.parse({
-          cask_type: "oloroso",
-          cask_size: "hogshead",
-          cask_fill: "1st_fill",
-        }),
-      ),
-    ).resolves.toEqual([
+    const baseline = await dataSource.searchBottles(
+      BottleCandidateSearchInputSchema.parse({ brand: "Example" }),
+    );
+    const withCaskMetadata = await dataSource.searchBottles(
+      BottleCandidateSearchInputSchema.parse({
+        brand: "Example",
+        cask_type: "oloroso",
+        cask_size: "hogshead",
+        cask_fill: "1st_fill",
+      }),
+    );
+
+    expect(withCaskMetadata).toEqual(baseline);
+    expect(withCaskMetadata).toEqual([
+      expect.objectContaining({ bottleId: 2, score: 0.4 }),
       expect.objectContaining({
         bottleId: 1,
+        score: 0.4,
         caskType: "oloroso",
         caskSize: "hogshead",
         caskFill: "1st_fill",
@@ -177,6 +188,8 @@ describe("local catalog data source", () => {
             bottleId: 44266,
             fullName: "Shieldaig Speyside 30-year-old",
             statedAge: 30,
+            releaseYear: 2024,
+            traitFields: ["statedAge", "releaseYear"],
           },
         ],
       },

@@ -73,9 +73,6 @@ export function extractedIdentityLooksLikePlainAgeStatementReference(
     extractedLabel.vintage_year === null &&
     extractedLabel.cask_strength === null &&
     extractedLabel.single_cask === null &&
-    extractedLabel.cask_type === null &&
-    extractedLabel.cask_size === null &&
-    extractedLabel.cask_fill === null &&
     extractedLabel.abv === null
   );
 }
@@ -254,24 +251,6 @@ export function getExistingMatchIdentityConflicts({
     extractedLabel.single_cask !== targetCandidate.singleCask
   ) {
     conflicts.push("single_cask");
-  }
-
-  for (const [extractedField, candidateField] of [
-    ["cask_type", "caskType"],
-    ["cask_size", "caskSize"],
-    ["cask_fill", "caskFill"],
-  ] as const) {
-    const extractedValue = extractedLabel?.[extractedField];
-    const candidateValue = targetCandidate[candidateField];
-    if (
-      extractedValue !== null &&
-      extractedValue !== undefined &&
-      candidateValue !== null &&
-      candidateValue !== undefined &&
-      extractedValue !== candidateValue
-    ) {
-      conflicts.push(extractedField);
-    }
   }
 
   if (

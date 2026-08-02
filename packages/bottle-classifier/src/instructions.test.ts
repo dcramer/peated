@@ -51,7 +51,7 @@ describe("Bottle check instructions", () => {
       "Once reviewed evidence establishes equivalence",
       "Do not include proposed operations in the final structured output",
       "Use an evidenced canonical `proposedBottle.name`",
-      "establish cask size only",
+      "do not investigate, search, distinguish, reject, create, repair",
       "actual `toolsUsed`",
     ]) {
       expect(reference).toContain(rule);
@@ -61,6 +61,19 @@ describe("Bottle check instructions", () => {
         /Every marketed release is one independently complete Bottle; BottleGroup assignment is automatic downstream\./g,
       ),
     ).toHaveLength(1);
+  });
+
+  test("soft-deprecates optional cask metadata without weakening marketed cask identity", () => {
+    const reference = buildBottleClassifierInstructions();
+    const audit = buildBottleAuditInstructions();
+
+    expect(reference).toContain("marketed finish");
+    expect(reference).toContain("exact cask codes");
+    expect(reference).toContain("single-cask");
+    expect(reference).toContain("cask-strength");
+    expect(audit).toContain(
+      "Do not investigate, propose an operation or finding, or require web or local search solely to fill or correct `caskType`, `caskSize`, or `caskFill`.",
+    );
   });
 
   test("asks image extraction to inspect the complete readable label", () => {

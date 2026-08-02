@@ -131,7 +131,7 @@
         "notes": "The existing exact-cask production row is for cask no. 2504, not the observed barrel no. 4769."
       }
     ],
-    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads Willett Family Estate Bottled Single Barrel Bourbon, aged in hand-selected white oak barrels for 5 years, hand bottled from barrel no. 4769, 64.2% ABV / 128.4 proof. The label therefore supports canonical oak cask type and barrel size; it does not state a fill, so this fixture does not assert one. Willett Family Estate bourbons are individually barrel-numbered barrel-proof single-barrel releases; this photo should not collapse to the generic Single Barrel Family Estate row, the generic Small Batch row, or the different cask no. 2504 row."
+    "notes": "Added from a failed image addBottle flow using the checked-in photo as the observed source. The label reads Willett Family Estate Bottled Single Barrel Bourbon, aged in hand-selected white oak barrels for 5 years, hand bottled from barrel no. 4769, and 64.2% ABV / 128.4 proof. The oak and barrel wording is retained as factual source provenance, not as a required normalized cask identity expectation. Willett Family Estate bourbons are individually barrel-numbered barrel-proof single-barrel releases; this photo should not collapse to the generic Single Barrel Family Estate row, the generic Small Batch row, or the different cask no. 2504 row."
   },
   "expected": {
     "status": "classified",
@@ -146,9 +146,7 @@
       "statedAge": 5,
       "abv": 64.2,
       "caskStrength": true,
-      "singleCask": true,
-      "caskType": "oak",
-      "caskSize": "barrel"
+      "singleCask": true
     },
     "proposedBottleNameIncludes": ["Family Estate", "Single Barrel"],
     "proposedBottleNameExcludes": ["4769", "2504", "Small Batch"],

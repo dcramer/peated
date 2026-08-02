@@ -476,12 +476,12 @@ describe("eval fixture validation", () => {
     }
   });
 
-  test("accepts canonical cask traits in exact Bottle identity", () => {
-    const fixture = realWorldNewBottleFixtureSchema.parse({
+  test("keeps compatibility cask metadata out of exact identity expectations", () => {
+    const fixture = {
       id: "canonical-cask-traits",
       referenceName: "Example First Fill Oloroso Hogshead",
       expectedBottleName: "Example First Fill Oloroso Hogshead",
-      summary: "Validates canonical structured cask traits.",
+      summary: "Validates the exact identity expectation boundary.",
       peatedBottleIds: [1],
       expected: {
         handlingStrategy: "classifier_required",
@@ -492,12 +492,27 @@ describe("eval fixture validation", () => {
           caskFill: "1st_fill",
         },
       },
-    });
+    };
 
-    expect(fixture.expected.exactBottleIdentity).toEqual({
-      caskType: "oloroso",
-      caskSize: "hogshead",
-      caskFill: "1st_fill",
+    expect(realWorldNewBottleFixtureSchema.safeParse(fixture).success).toBe(
+      false,
+    );
+    expect(
+      realWorldNewBottleFixtureSchema.parse({
+        ...fixture,
+        expected: {
+          ...fixture.expected,
+          exactBottleIdentity: {
+            edition: "Annual Release",
+            releaseYear: 2024,
+            vintageYear: 2012,
+          },
+        },
+      }).expected.exactBottleIdentity,
+    ).toEqual({
+      edition: "Annual Release",
+      releaseYear: 2024,
+      vintageYear: 2012,
     });
   });
 

@@ -42,9 +42,6 @@ const SPECIFIC_IDENTITY_WEB_SUPPORT_ATTRIBUTES = new Set<MatchAttribute>([
   "edition",
   "caskStrength",
   "singleCask",
-  "caskType",
-  "caskSize",
-  "caskFill",
   "abv",
   "vintageYear",
   "releaseYear",
@@ -374,9 +371,6 @@ function extractedLabelLooksLikePlainAgeStatement(
     extractedLabel.vintage_year === null &&
     extractedLabel.cask_strength === null &&
     extractedLabel.single_cask === null &&
-    extractedLabel.cask_type === null &&
-    extractedLabel.cask_size === null &&
-    extractedLabel.cask_fill === null &&
     extractedLabel.abv === null
   );
 }
@@ -388,9 +382,6 @@ function bottleCandidateIsPlainAgeAutoVerificationTarget(
     target.abv === null &&
     target.caskStrength !== true &&
     target.singleCask !== true &&
-    target.caskType === null &&
-    target.caskSize === null &&
-    target.caskFill === null &&
     targetLooksLikePlainAgeStatementBottle(target)
   );
 }
@@ -410,9 +401,6 @@ function extractedLabelCarriesUnsupportedSpecificity({
     Boolean(extractedLabel.edition && !target.edition) ||
     (extractedLabel.cask_strength === true && target.caskStrength === null) ||
     (extractedLabel.single_cask === true && target.singleCask === null) ||
-    (extractedLabel.cask_type !== null && target.caskType === null) ||
-    (extractedLabel.cask_size !== null && target.caskSize === null) ||
-    (extractedLabel.cask_fill !== null && target.caskFill === null) ||
     (extractedLabel.abv !== null && target.abv === null) ||
     (extractedLabel.vintage_year !== null && target.vintageYear === null) ||
     (extractedLabel.release_year !== null && target.releaseYear === null)
@@ -746,20 +734,6 @@ function buildExistingMatchSupportChecks({
     addCheckIfPresent(checks, "singleCask", label.single_cask, false);
   }
 
-  for (const [attribute, extractedValue, candidateValue] of [
-    ["caskType", label?.cask_type, target.caskType],
-    ["caskSize", label?.cask_size, target.caskSize],
-    ["caskFill", label?.cask_fill, target.caskFill],
-  ] as const) {
-    if (
-      extractedValue !== null &&
-      extractedValue !== undefined &&
-      candidateValue === extractedValue
-    ) {
-      addCheckIfPresent(checks, attribute, extractedValue, false);
-    }
-  }
-
   if (
     label &&
     label.abv !== null &&
@@ -820,20 +794,6 @@ function buildExistingMatchSupportChecks({
   if (extractedLabel?.single_cask === null && target.singleCask) {
     addCheckIfPresent(checks, "singleCask", true, true);
     differentiatingAttributes.add("singleCask");
-  }
-
-  for (const [attribute, extractedValue, candidateValue] of [
-    ["caskType", extractedLabel?.cask_type, target.caskType],
-    ["caskSize", extractedLabel?.cask_size, target.caskSize],
-    ["caskFill", extractedLabel?.cask_fill, target.caskFill],
-  ] as const) {
-    if (
-      (extractedValue === null || extractedValue === undefined) &&
-      candidateValue !== null
-    ) {
-      addCheckIfPresent(checks, attribute, candidateValue, true);
-      differentiatingAttributes.add(attribute);
-    }
   }
 
   if (extractedLabel?.abv === null && target.abv !== null) {

@@ -1,7 +1,11 @@
 import { describe, expect, test } from "vitest";
 import type { BottleContext } from "../bottleContextContract";
 import type { BottleCandidate } from "../classifierTypes";
-import { buildAgentInput, buildAuditBottleAgentInput } from "./agentInput";
+import {
+  buildAgentInput,
+  buildAuditBottleAgentInput,
+  buildDefaultBottleSearchInput,
+} from "./agentInput";
 
 function buildCandidate(candidate: Partial<BottleCandidate>): BottleCandidate {
   return {
@@ -63,6 +67,38 @@ function buildBottleContext(): BottleContext {
 }
 
 describe("buildAgentInput", () => {
+  test("omits optional cask metadata from the default search without dropping cask flags", () => {
+    expect(
+      buildDefaultBottleSearchInput({
+        reference: { name: "Example Distillery Reserve" },
+        extractedIdentity: {
+          brand: "Example Distillery",
+          bottler: null,
+          expression: "Reserve",
+          series: null,
+          distillery: [],
+          category: "single_malt",
+          stated_age: null,
+          abv: null,
+          release_year: null,
+          vintage_year: null,
+          cask_strength: true,
+          single_cask: true,
+          cask_type: "oloroso",
+          cask_size: "hogshead",
+          cask_fill: "1st_fill",
+          edition: null,
+        },
+      }),
+    ).toMatchObject({
+      cask_strength: true,
+      single_cask: true,
+      cask_type: null,
+      cask_size: null,
+      cask_fill: null,
+    });
+  });
+
   test("serializes candidate family context without operation capabilities", () => {
     const input = JSON.parse(
       buildAgentInput({

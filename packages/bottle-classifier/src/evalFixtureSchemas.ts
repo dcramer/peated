@@ -14,9 +14,6 @@ import {
   AliasScopeEnum,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
-  CaskFillEnum,
-  CaskSizeEnum,
-  CaskTypeEnum,
   CategoryEnum,
   EntityResolutionSchema,
 } from "./classifierTypes";
@@ -507,9 +504,6 @@ export const bottleNormalizationExactBottleIdentitySchema = z
     edition: z.string().nullable().optional(),
     releaseYear: z.number().int().nullable().optional(),
     vintageYear: z.number().int().nullable().optional(),
-    caskType: CaskTypeEnum.nullable().optional(),
-    caskSize: CaskSizeEnum.nullable().optional(),
-    caskFill: CaskFillEnum.nullable().optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, {

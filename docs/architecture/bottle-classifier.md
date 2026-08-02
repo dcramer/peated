@@ -40,12 +40,20 @@ It returns either `ignored` with a reason, or `classified` with:
 
 Decision actions are `match`, `repair_bottle`, `create_bottle`, and `no_match`.
 `create_bottle` proposes one complete observed marketed Bottle: a stable
-expression in `proposedBottle.name` plus every supported exact field, including
-edition, vintage year, release year, exact age, ABV, cask flags, and canonical
-cask type, size, and fill. Canonical
+expression in `proposedBottle.name` plus required exact fields, including edition,
+vintage year, release year, exact age, ABV, and cask flags. Canonical
 downstream materialization combines those values without duplicating exact
 markers in the stable name, creates the independently correct Bottle, and
 manages grouping automatically. The classifier never selects a BottleGroup.
+
+`caskType`, `caskSize`, and `caskFill` are soft-deprecated classifier metadata.
+Schemas, stored context, replay data, and explicit supplied values remain
+compatible. Once candidates are retrieved, the classifier does not use them as
+explicit identity constraints or deterministic score adjustments and does not
+investigate, reject, create, repair, or gate automation solely on those three
+fields.
+Marketed finish wording in the Bottle name or edition, exact cask or barrel
+codes, `singleCask`, and `caskStrength` remain identity evidence.
 
 The classifier is bottle-centric. Price-match terms such as `match_existing`,
 `correction`, and `create_new` are downstream proposal policy, not classifier
@@ -293,7 +301,8 @@ Deterministic code is allowed for closed-form behavior:
 - exact identity anchors such as SMWS bottle codes
 - unambiguous literal stored alias lookup for match-only local identification
 - direct field contradictions, such as an extracted brand, category, distillery,
-  stated age, ABV, vintage year, release year, cask flag, expression, or edition
+  stated age, ABV, vintage year, release year, cask-strength or single-cask
+  flag, expression, or edition
   that conflicts with the matched local candidate
 
 Deterministic code is not allowed for whisky-family semantics. Brand prefixes,
@@ -422,8 +431,10 @@ evidence by itself.
 
 For image inputs, extraction scans the complete readable label, including
 smaller secondary bands, subtitles, and neck tags, for identity-bearing edition,
-batch, release, finish, and variant text. Missing extraction remains preferable
-to inventing text that is not visible.
+batch, release, marketed finish, and variant text. Missing extraction remains
+preferable to inventing text that is not visible. Explicit cask type, size, and
+fill may be retained when readily available, but extraction does not need to
+infer or investigate them.
 
 The full classifier agent has read-only tools for local candidates, local
 entities, and live web evidence:
@@ -467,8 +478,10 @@ required exact-Bottle fields, and incorrect fields. There is no numeric confiden
 calibrate; instead evals assert the code-derived automation tier
 (`expectedTier: auto | review`) computed deterministically from the decision by
 `deriveAutomationTier`, and that derivation is covered by unit tests rather than
-model-scored confidence. Encoded expected fields are required. Missing unencoded
-optional enrichment can be tolerated; wrong required identity fields should fail.
+model-scored confidence. Encoded expected fields are required. Creation fixtures
+do not encode `caskType`, `caskSize`, or `caskFill` as classifier requirements.
+Missing unencoded optional enrichment can be tolerated; wrong required identity
+fields should fail.
 Reference and audit fixtures exercise the same single agent loop and four
 proposal tools used by production Bottle checks. On a replay cache hit the eval
 harness does not invoke the underlying web tool, so replay does not consume the

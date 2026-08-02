@@ -4980,7 +4980,7 @@ describe("priceMatching", () => {
     );
   });
 
-  test("includes structured bottle fields in candidate search text", async () => {
+  test("includes decision-relevant structured bottle fields in candidate search text", async () => {
     config.OPENAI_API_KEY = "test-openai-key";
 
     const { getOpenAIEmbedding } =
@@ -5024,10 +5024,10 @@ describe("priceMatching", () => {
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(
       expect.stringContaining("Campbeltown Merchant"),
     );
-    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+    expect(getOpenAIEmbedding).not.toHaveBeenCalledWith(
       expect.stringContaining("port_pipe"),
     );
-    expect(getOpenAIEmbedding).toHaveBeenCalledWith(
+    expect(getOpenAIEmbedding).not.toHaveBeenCalledWith(
       expect.stringContaining("1st_fill"),
     );
     expect(getOpenAIEmbedding).toHaveBeenCalledWith(

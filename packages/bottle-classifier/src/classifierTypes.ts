@@ -88,6 +88,16 @@ export const BOTTLE_EXACT_TRAIT_FIELDS = [
   "caskFill",
 ] as const;
 
+export const BOTTLE_DECISION_TRAIT_FIELDS = [
+  "edition",
+  "statedAge",
+  "releaseYear",
+  "vintageYear",
+  "abv",
+  "singleCask",
+  "caskStrength",
+] as const satisfies ReadonlyArray<(typeof BOTTLE_EXACT_TRAIT_FIELDS)[number]>;
+
 const BottleExactTraitFieldEnum = z.enum(BOTTLE_EXACT_TRAIT_FIELDS);
 
 const BottleCandidateSiblingSchema = z

@@ -36,13 +36,7 @@ import {
   type BottleClassifierToolEvent,
   type CreateBottleClassifierOptions,
 } from "./classifierRuntime";
-import type {
-  BottleCandidate,
-  CaskFill,
-  CaskSize,
-  CaskType,
-  EntityResolution,
-} from "./classifierTypes";
+import type { BottleCandidate, EntityResolution } from "./classifierTypes";
 import {
   AuditBottleResultSchema,
   BottleClassificationResultSchema,
@@ -65,6 +59,7 @@ import {
   hasEvalOpenAICredentials,
 } from "./evalSupport";
 import { createLocalCatalogDataSource } from "./localCatalog";
+import { exactBottleIdentityMatches } from "./normalizationEvalScoring";
 import {
   agentActionRiskClass,
   deriveAutomationTier,
@@ -256,30 +251,6 @@ function normalizeEvalText(value: string | null | undefined): string {
     .join(" ");
 }
 
-function normalizeEvalEditionText(value: string | null | undefined): string {
-  const romanNumerals: Record<string, string> = {
-    i: "1",
-    ii: "2",
-    iii: "3",
-    iv: "4",
-    v: "5",
-    vi: "6",
-    vii: "7",
-    viii: "8",
-    ix: "9",
-    x: "10",
-  };
-
-  return normalizeEvalText(value)
-    .split(" ")
-    .flatMap((token) => {
-      if (token === "release") return [];
-      if (token === "vol") return ["volume"];
-      return [romanNumerals[token] ?? token];
-    })
-    .join(" ");
-}
-
 function evalTextMatches(
   actual: string | null | undefined,
   expected: string,
@@ -315,9 +286,6 @@ function getNormalizationExactBottleIdentity(
   edition: string | null;
   releaseYear: number | null;
   vintageYear: number | null;
-  caskType: CaskType | null;
-  caskSize: CaskSize | null;
-  caskFill: CaskFill | null;
 } | null {
   if (result.status !== "classified") {
     return null;
@@ -328,9 +296,6 @@ function getNormalizationExactBottleIdentity(
       edition: result.decision.proposedBottle.edition,
       releaseYear: result.decision.proposedBottle.releaseYear,
       vintageYear: result.decision.proposedBottle.vintageYear,
-      caskType: result.decision.proposedBottle.caskType,
-      caskSize: result.decision.proposedBottle.caskSize,
-      caskFill: result.decision.proposedBottle.caskFill,
     };
 
     return Object.values(exactIdentity).some((value) => value !== null)
@@ -349,9 +314,6 @@ function getNormalizationExactBottleIdentity(
     edition: matchedCandidate.edition,
     releaseYear: matchedCandidate.releaseYear,
     vintageYear: matchedCandidate.vintageYear,
-    caskType: matchedCandidate.caskType,
-    caskSize: matchedCandidate.caskSize,
-    caskFill: matchedCandidate.caskFill,
   };
 }
 
@@ -389,53 +351,6 @@ function formatNormalizationBottleActual(
         }
       : null,
   });
-}
-
-function exactBottleIdentityMatches(
-  actual: ReturnType<typeof getNormalizationExactBottleIdentity>,
-  expected: NonNullable<
-    RealWorldNewBottleEvalCase["expected"]["exactBottleIdentity"]
-  >,
-): boolean {
-  if (actual === null) {
-    return false;
-  }
-
-  if (
-    "edition" in expected &&
-    normalizeEvalEditionText(actual.edition) !==
-      normalizeEvalEditionText(expected.edition)
-  ) {
-    return false;
-  }
-
-  if (
-    "releaseYear" in expected &&
-    actual.releaseYear !== expected.releaseYear
-  ) {
-    return false;
-  }
-
-  if (
-    "vintageYear" in expected &&
-    actual.vintageYear !== expected.vintageYear
-  ) {
-    return false;
-  }
-
-  if ("caskType" in expected && actual.caskType !== expected.caskType) {
-    return false;
-  }
-
-  if ("caskSize" in expected && actual.caskSize !== expected.caskSize) {
-    return false;
-  }
-
-  if ("caskFill" in expected && actual.caskFill !== expected.caskFill) {
-    return false;
-  }
-
-  return true;
 }
 
 type ShapeVerdict = {

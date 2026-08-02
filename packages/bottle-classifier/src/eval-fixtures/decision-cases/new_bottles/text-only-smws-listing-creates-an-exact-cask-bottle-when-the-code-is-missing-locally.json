@@ -54,10 +54,7 @@
       "abv": 56,
       "releaseYear": 2024,
       "singleCask": true,
-      "caskStrength": null,
-      "caskType": null,
-      "caskSize": "barrel",
-      "caskFill": "1st_fill"
+      "caskStrength": null
     },
     "summary": "Extract the SMWS code from raw title text and create the exact-cask bottle when no safe local candidate exists."
   }

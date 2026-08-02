@@ -176,6 +176,47 @@ describe("Bottle proposal tools", () => {
     expect(collector.getProposals()).toEqual([]);
   });
 
+  test("rejects cask-metadata-only Bottle updates but keeps mixed updates compatible", async () => {
+    const { collector, tools } = createHarness();
+    const evidenceRefs = [{ kind: "bottle" as const, bottleId: 10 }];
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        bottleId: 10,
+        patch: {
+          exact: {
+            caskType: "oloroso",
+            caskSize: "hogshead",
+            caskFill: "1st_fill",
+          },
+        },
+        rationale: "Fill optional cask metadata.",
+        evidenceRefs,
+      }),
+    ).toEqual({
+      status: "rejected",
+      reason:
+        "Bottle updates cannot change only optional cask type, size, or fill metadata.",
+    });
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        bottleId: 10,
+        patch: { exact: { abv: 46, caskType: "oloroso" } },
+        rationale: "Correct the ABV while preserving supplied cask metadata.",
+        evidenceRefs,
+      }),
+    ).toMatchObject({ status: "recorded", proposalIndex: 0 });
+    expect(collector.getProposals()).toEqual([
+      expect.objectContaining({
+        input: {
+          bottleId: 10,
+          patch: { exact: { abv: 46, caskType: "oloroso" } },
+        },
+      }),
+    ]);
+  });
+
   test("requires evidence refs for every existing operation target", async () => {
     const { collector, tools } = createHarness();
 

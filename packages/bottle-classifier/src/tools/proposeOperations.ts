@@ -43,6 +43,12 @@ type ProposalRecordResult =
   | { status: "recorded"; proposalIndex: number }
   | { status: "rejected"; reason: string };
 
+const OPTIONAL_CASK_METADATA_FIELDS = new Set([
+  "caskType",
+  "caskSize",
+  "caskFill",
+]);
+
 export type BottleProposalCollector = {
   getProposals: () => ProposedOperation[];
   getMissingEvidence: (
@@ -167,6 +173,22 @@ function evidenceMatches(left: EvidenceRef, right: EvidenceRef) {
   }
 }
 
+function changesOnlyOptionalCaskMetadata(proposal: ProposedOperation) {
+  if (proposal.type !== "update_bottle") {
+    return false;
+  }
+
+  if (proposal.input.patch.shared !== undefined) {
+    return false;
+  }
+
+  const exactFields = Object.keys(proposal.input.patch.exact ?? {});
+  return (
+    exactFields.length > 0 &&
+    exactFields.every((field) => OPTIONAL_CASK_METADATA_FIELDS.has(field))
+  );
+}
+
 export function createBottleProposalCollector({
   context,
   maxProposals = DEFAULT_MAX_PROPOSED_OPERATIONS,
@@ -205,6 +227,14 @@ export function createBottleProposalCollector({
       }
 
       const proposal = parsed.data;
+      if (changesOnlyOptionalCaskMetadata(proposal)) {
+        return {
+          status: "rejected",
+          reason:
+            "Bottle updates cannot change only optional cask type, size, or fill metadata.",
+        };
+      }
+
       const targetError = uninspectedTarget(proposal, context);
       if (targetError) {
         return { status: "rejected", reason: targetError };
@@ -280,7 +310,7 @@ export function createBottleProposalTools(collector: BottleProposalCollector) {
     tool({
       name: "propose_update_bottle",
       description: proposalToolDescription(
-        "Record a read-only proposal to update one inspected Bottle. Use only after investigating the Bottle and collecting every cited piece of evidence. This does not mutate or approve catalog data.",
+        "Record a read-only proposal to update one inspected Bottle. Use only after investigating the Bottle and collecting every cited piece of evidence. Do not propose an update solely for cask type, size, or fill. This does not mutate or approve catalog data.",
       ),
       parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,

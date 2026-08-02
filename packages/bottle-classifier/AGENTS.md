@@ -36,10 +36,15 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
   `identityScope` signal validation lives in `src/exactCaskPolicy.ts`.
 - Post-agent deterministic gates may reject only unknown targets, schema
   violations, impossible states, and direct extracted-field conflicts on
-  explicit fields such as brand, category, age, ABV, cask flags, canonical cask
-  type/size/fill, or years. They
+  explicit fields such as brand, category, age, ABV, cask-strength or
+  single-cask flags, or years. They
   must not require text-search rank, comparable-name support, or structured
   name/family heuristics to corroborate an agent's semantic `match`.
+- `caskType`, `caskSize`, and `caskFill` remain nullable compatibility fields.
+  Preserve explicit supplied values, but do not require, investigate, search,
+  select, reject, create, repair, or gate automation solely on the trio.
+  Marketed finish wording, exact cask/barrel codes, `singleCask`, and
+  `caskStrength` remain identity-critical.
 - The model decides the exact marketed Bottle identity. Every marketed release
   is one independently complete Bottle; the classifier never chooses a parent,
   source group, or BottleGroup.

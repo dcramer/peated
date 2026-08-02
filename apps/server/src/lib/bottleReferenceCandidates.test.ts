@@ -66,6 +66,11 @@ test("returns a complete Bottle candidate with active BottleGroup siblings", asy
           fullName: sibling.fullName,
           edition: "Batch 2",
           releaseYear: 2025,
+          traitFields: expect.not.arrayContaining([
+            "caskType",
+            "caskSize",
+            "caskFill",
+          ]),
           caskType: "oloroso",
           caskSize: "butt",
           caskFill: "2nd_fill",
@@ -131,4 +136,24 @@ test("normalizes proof-like ABV before building candidate search evidence", asyn
   expect(embeddingSpy).toHaveBeenCalledWith(
     expect.stringContaining("59.2% ABV"),
   );
+});
+
+test("does not inject normalized cask metadata into candidate search evidence", async () => {
+  config.OPENAI_API_KEY = "test-openai-key";
+  const embeddingSpy = vi
+    .spyOn(openaiEmbeddings, "getOpenAIEmbedding")
+    .mockResolvedValue(new Array<number>(1536).fill(0));
+
+  await searchBottleCandidates({
+    query: "Example Distillery Warehouse Selection",
+    brand: "Example Distillery",
+    expression: "Warehouse Selection",
+    cask_type: "tawny_port",
+    cask_size: "butt",
+    cask_fill: "2nd_fill",
+  });
+
+  const queryText = embeddingSpy.mock.calls[0]?.[0];
+  expect(queryText).toContain("Warehouse Selection");
+  expect(queryText).not.toMatch(/tawny|port|butt|fill/i);
 });

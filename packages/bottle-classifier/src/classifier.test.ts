@@ -2093,9 +2093,9 @@ describe("createBottleClassifier", () => {
         vintage_year: null,
         cask_strength: null,
         single_cask: null,
-        cask_type: null,
-        cask_size: null,
-        cask_fill: null,
+        cask_type: "oloroso",
+        cask_size: "hogshead",
+        cask_fill: "1st_fill",
         edition: null,
       };
       const create = vi.fn().mockResolvedValue({
@@ -2280,7 +2280,7 @@ describe("createBottleClassifier", () => {
     },
   );
 
-  test("uses canonical cask traits to investigate and query an otherwise sparse reference", async () => {
+  test("does not investigate an otherwise sparse reference solely from optional cask metadata", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Example",
       bottler: null,
@@ -2355,14 +2355,10 @@ describe("createBottleClassifier", () => {
       initialCandidates: [],
     });
 
-    expect(create).toHaveBeenCalledTimes(1);
+    expect(create).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).toHaveBeenCalledWith(
       expect.objectContaining({
-        searchEvidence: expect.arrayContaining([
-          expect.objectContaining({
-            query: "Example pedro ximenez hogshead 1st fill",
-          }),
-        ]),
+        searchEvidence: [],
       }),
     );
   });

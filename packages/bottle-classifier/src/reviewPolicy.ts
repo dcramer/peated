@@ -1281,27 +1281,6 @@ function proposedBottleNeedsMaterialTargetRepair({
     return true;
   }
 
-  if (
-    proposedBottle.caskType !== null &&
-    target.caskType !== proposedBottle.caskType
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskSize !== null &&
-    target.caskSize !== proposedBottle.caskSize
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskFill !== null &&
-    target.caskFill !== proposedBottle.caskFill
-  ) {
-    return true;
-  }
-
   if (proposedBottle.abv !== null && target.abv !== proposedBottle.abv) {
     return true;
   }
@@ -1340,9 +1319,6 @@ function proposedBottleHasKnownTargetConflict({
       caskStrength:
         target.caskStrength === null ? null : proposedBottle.caskStrength,
       singleCask: target.singleCask === null ? null : proposedBottle.singleCask,
-      caskType: target.caskType === null ? null : proposedBottle.caskType,
-      caskSize: target.caskSize === null ? null : proposedBottle.caskSize,
-      caskFill: target.caskFill === null ? null : proposedBottle.caskFill,
     },
     extractedIdentity,
   });

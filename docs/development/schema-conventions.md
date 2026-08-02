@@ -35,6 +35,15 @@ Exact Bottle fields:
 - `cask_type`
 - `cask_size`
 
+`cask_fill`, `cask_type`, and `cask_size` are retained as soft-deprecated
+compatibility fields. Existing data and explicitly supplied values continue to
+round-trip, but these normalized fields are not explicit classifier identity
+constraints, deterministic candidate-score adjustments, confidence evidence,
+rejection reasons, or repair-only proposals. Candidate recall may still reflect
+indexed catalog text, source text, and stored compatibility metadata. Exact
+marketed finish wording and cask or barrel codes remain significant through the
+Bottle's name, edition, aliases, and observations.
+
 Bottle `name`, `fullName`, brand/entity relationships, category, series,
 flavor profile, distillers, and effective stated age are durable exact-record
 data even when their editing authority is shared. An exact Bottle must remain
@@ -84,7 +93,8 @@ preserves only the differing overrides.
 - **abv**: Alcohol by volume as a percentage, for example `46.3`.
 - **release_year**: The bottling or marketed release year, or `null`.
 - **vintage_year**: The distillation or vintage year, or `null`.
-- **cask_type**: The primary maturation or finishing cask, or `null`.
+- **cask_type**, **cask_size**, and **cask_fill**: Soft-deprecated normalized
+  metadata retained for compatibility; use `null` when not explicitly supplied.
 - **cask_strength**: `true` only when the source explicitly states cask,
   barrel, full, natural, or equivalent strength; otherwise `null`.
 - **single_cask**: `true` only when the source explicitly states single cask,
@@ -152,9 +162,12 @@ the marketed release or are required for recurring disambiguation.
 ### ABV And Cask Details
 
 - Extract ABV as a decimal percentage.
-- Extract canonical primary maturation or finish wording into `cask_type`.
+- Preserve explicitly supplied normalized cask type, size, and fill values, but
+  do not infer them for automated matching or repair.
 - Set cask-strength and single-cask flags only from explicit source language.
-- Preserve more granular or uncertain cask facts as BottleObservations.
+- Preserve exact marketed finish wording, cask or barrel codes, and more
+  granular or uncertain cask facts in the Bottle name, edition, aliases, or
+  BottleObservations as appropriate.
 
 ### Uncertainty
 
@@ -165,12 +178,13 @@ the marketed release or are required for recurring disambiguation.
 ## Matching Conventions
 
 Compare exact Bottle candidates in this order: brand, distillery, expression,
-series, age, edition, category, cask details, single-cask and cask-strength
-flags, ABV, then year fields.
+series, age, edition, category, single-cask and cask-strength flags, ABV, then
+year fields.
 
 - Missing generic style words are weak evidence.
-- Conflicting age, edition, store-pick code, barrel description, or single-cask
-  status is strong evidence of different Bottles.
+- Conflicting age, edition, exact marketed store-pick or cask/barrel code, or
+  single-cask status is strong evidence of different Bottles. Conflicting
+  normalized cask type, size, or fill is not.
 - Evaluate brand and distillery separately for independent bottlings.
 - Bias toward `no_match` or review when decisive components are weak or
   conflicting. A false exact match is worse than an unresolved listing.

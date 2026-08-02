@@ -211,9 +211,6 @@ function scoreCandidate({
     [args.abv, candidate.abv],
     [args.cask_strength, candidate.caskStrength],
     [args.single_cask, candidate.singleCask],
-    [args.cask_type, candidate.caskType],
-    [args.cask_size, candidate.caskSize],
-    [args.cask_fill, candidate.caskFill],
     [args.vintage_year, candidate.vintageYear],
     [args.release_year, candidate.releaseYear],
   ] as const;

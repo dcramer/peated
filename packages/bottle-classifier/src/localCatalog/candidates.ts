@@ -1,5 +1,5 @@
 import {
-  BOTTLE_EXACT_TRAIT_FIELDS,
+  BOTTLE_DECISION_TRAIT_FIELDS,
   BottleCandidateSchema,
   type BottleCandidate,
 } from "../classifierTypes";
@@ -37,7 +37,7 @@ function getBottleFullName(
 }
 
 function getTraitFields(value: Partial<LocalCatalogBottle>) {
-  return BOTTLE_EXACT_TRAIT_FIELDS.filter((field) => value[field] != null);
+  return BOTTLE_DECISION_TRAIT_FIELDS.filter((field) => value[field] != null);
 }
 
 function getSiblingBottleContext({

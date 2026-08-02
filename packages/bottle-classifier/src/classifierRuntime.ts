@@ -521,9 +521,6 @@ function extractedIdentityLooksWebInvestigable({
     extractedIdentity.edition !== null ||
     extractedIdentity.cask_strength === true ||
     extractedIdentity.single_cask === true ||
-    extractedIdentity.cask_type !== null ||
-    extractedIdentity.cask_size !== null ||
-    extractedIdentity.cask_fill !== null ||
     extractedIdentity.vintage_year !== null ||
     extractedIdentity.release_year !== null
   );
@@ -725,9 +722,6 @@ function buildNoMatchInvestigationQuery({
   if (extractedIdentity?.single_cask) {
     addSearchPart(parts, "single cask");
   }
-  addSearchPart(parts, extractedIdentity?.cask_type?.replace(/_/g, " "));
-  addSearchPart(parts, extractedIdentity?.cask_size?.replace(/_/g, " "));
-  addSearchPart(parts, extractedIdentity?.cask_fill?.replace(/_/g, " "));
   if (extractedIdentity?.abv != null) {
     addSearchPart(parts, `${extractedIdentity.abv}% ABV`);
   }

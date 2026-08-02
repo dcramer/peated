@@ -530,9 +530,6 @@ describe("bottleClassificationEvidence", () => {
       "release_year",
       "cask_strength",
       "single_cask",
-      "cask_type",
-      "cask_size",
-      "cask_fill",
     ]);
 
     expect(

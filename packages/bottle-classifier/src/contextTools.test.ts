@@ -7,10 +7,17 @@ import type {
   BottleContextSource,
   EntityContext,
 } from "./bottleContextContract";
-import { prepareBottleClassifierAgentRun } from "./classifierRuntime";
+import {
+  prepareBottleAuditAgentRun,
+  prepareBottleClassifierAgentRun,
+} from "./classifierRuntime";
+
+type PreparedRun =
+  | Awaited<ReturnType<typeof prepareBottleClassifierAgentRun>>
+  | ReturnType<typeof prepareBottleAuditAgentRun>;
 
 async function invokePreparedTool(
-  prepared: Awaited<ReturnType<typeof prepareBottleClassifierAgentRun>>,
+  prepared: PreparedRun,
   name: string,
   input: unknown,
 ) {
@@ -76,6 +83,46 @@ function entityContext(): EntityContext {
 }
 
 describe("Bottle-check context tools", () => {
+  test("does not return cask-metadata-only proposals from an audit run", async () => {
+    const currentBottleContext = bottleContext();
+    const prepared = prepareBottleAuditAgentRun(
+      {
+        client: {} as OpenAI,
+        model: "test-model",
+        maxSearchQueries: 0,
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+          getBottleContext: vi.fn(async () => null),
+        },
+      },
+      {
+        audit: {
+          bottleId: currentBottleContext.bottleId,
+          origin: "moderator",
+        },
+        currentBottleContext,
+        conversationId: "test-audit",
+      },
+    );
+
+    expect(
+      await invokePreparedTool(prepared, "propose_update_bottle", {
+        bottleId: currentBottleContext.bottleId,
+        patch: { exact: { caskType: "oloroso" } },
+        rationale: "Fill optional cask metadata.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: currentBottleContext.bottleId },
+        ],
+      }),
+    ).toMatchObject({ status: "rejected" });
+
+    expect(
+      prepared.getOutput({
+        finalOutput: { summary: "No material Bottle repair is needed." },
+      }).proposedOperations,
+    ).toEqual([]);
+  });
+
   test("offers bounded context and proposal tools and retains each loaded context once", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {

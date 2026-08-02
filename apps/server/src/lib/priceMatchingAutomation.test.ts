@@ -84,6 +84,73 @@ describe("priceMatchingAutomation", () => {
     expect(assessment.decisiveMatchAttributes).toContain("statedAge");
   });
 
+  test("does not use normalized cask metadata as automation evidence", () => {
+    const proposedBottle = {
+      name: "Port Cask",
+      series: null,
+      category: "single_malt" as const,
+      edition: null,
+      statedAge: 10,
+      caskStrength: null,
+      singleCask: null,
+      abv: 58.4,
+      vintageYear: null,
+      releaseYear: null,
+      caskType: "tawny_port" as const,
+      caskSize: "butt" as const,
+      caskFill: "2nd_fill" as const,
+      brand: { id: null, name: "Example Distillery" },
+      distillers: [{ id: null, name: "Example Distillery" }],
+      bottler: null,
+    };
+    const input = {
+      action: "create_new" as const,
+      modelConfidence: 95,
+      price: {
+        bottleId: null,
+        name: "Example Distillery Port Cask 10 Year",
+        url: "https://example.com/port-cask",
+      },
+      suggestedBottleId: null,
+      extractedLabel: buildExtractedLabel(),
+      searchEvidence: [],
+      candidateBottles: [
+        buildCandidate({
+          caskType: "bourbon",
+          caskSize: "barrel",
+          caskFill: "1st_fill",
+        }),
+      ],
+    };
+
+    const withCaskMetadata = getStorePriceMatchAutomationAssessment({
+      ...input,
+      proposedBottle,
+    });
+    const withoutCaskMetadata = getStorePriceMatchAutomationAssessment({
+      ...input,
+      proposedBottle: {
+        ...proposedBottle,
+        caskType: null,
+        caskSize: null,
+        caskFill: null,
+      },
+    });
+
+    expect(withCaskMetadata.automationScore).toBe(
+      withoutCaskMetadata.automationScore,
+    );
+    expect(withCaskMetadata.differentiatingAttributes).toEqual(
+      withoutCaskMetadata.differentiatingAttributes,
+    );
+    expect(withCaskMetadata.webEvidenceChecks).toEqual(
+      withoutCaskMetadata.webEvidenceChecks,
+    );
+    expect(withCaskMetadata.decisiveMatchAttributes).not.toEqual(
+      expect.arrayContaining(["caskType", "caskSize", "caskFill"]),
+    );
+  });
+
   test("accepts exact fields carried directly by the suggested Bottle", () => {
     const assessment = getStorePriceMatchAutomationAssessment({
       action: "match_existing",
@@ -768,14 +835,20 @@ describe("priceMatchingAutomation", () => {
       ]),
     );
     expect(
-      assessment.webEvidenceChecks.find(
-        (check) => check.attribute === "caskType",
-      ),
+      assessment.webEvidenceChecks.find((check) => check.attribute === "abv"),
     ).toMatchObject({
       validated: false,
       weaklySupported: true,
       matchedSourceTiers: expect.arrayContaining(["origin_retailer"]),
     });
+    expect(
+      assessment.webEvidenceChecks.some(
+        (check) =>
+          check.attribute === "caskType" ||
+          check.attribute === "caskSize" ||
+          check.attribute === "caskFill",
+      ),
+    ).toBe(false);
   });
 
   test("allows auto-create when agent-supported external evidence validates differentiating traits", () => {

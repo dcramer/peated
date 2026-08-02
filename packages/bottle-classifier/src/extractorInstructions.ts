@@ -584,7 +584,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "Use `release_year` only for explicit release or bottling years, not founding dates or warning text.",
       "If both distillation and bottling years are present, use `vintage_year` for the distillation year and `release_year` for the bottling year.",
       "If the source gives proof instead of ABV, convert proof to ABV by dividing by 2 and store only the ABV percentage.",
-      "Keep cask or finish wording in the bottle name, expression, or edition when it is part of the marketed identity. Also populate canonical `cask_type`, `cask_size`, and `cask_fill` when the label explicitly supports them; leave those fields null instead of guessing from broad finish language.",
+      "Keep marketed cask or finish wording in the bottle name, expression, or edition. Preserve explicit `cask_type`, `cask_size`, and `cask_fill` values when readily available, but do not infer or investigate those optional fields; leave them null when uncertain.",
       "Set `cask_strength` and `single_cask` only when the label states them explicitly. `Barrel Strength`, `Barrel Proof`, `Full Proof`, and `Natural Strength` all count as `cask_strength: true`.",
       "A specific `Cask No.` or `Barrel No.` on a single-bottle whisky label counts as `single_cask: true` when the label presents it as the source barrel/cask identity.",
       "Correct obvious whisky-name typos only when the intended bottle is clear from the input.",

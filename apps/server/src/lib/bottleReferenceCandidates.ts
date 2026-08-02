@@ -1,5 +1,5 @@
 import {
-  BOTTLE_EXACT_TRAIT_FIELDS,
+  BOTTLE_DECISION_TRAIT_FIELDS,
   BottleCandidateSchema,
   BottleCandidateSearchInputSchema,
   BottleExtractedDetailsSchema,
@@ -121,9 +121,6 @@ function buildSearchLabel(
     !input.category &&
     !input.stated_age &&
     input.abv === null &&
-    !input.cask_type &&
-    input.cask_size === null &&
-    input.cask_fill === null &&
     input.cask_strength === null &&
     input.single_cask === null &&
     !input.edition &&
@@ -162,9 +159,6 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.edition,
     input.stated_age ? `${input.stated_age}` : null,
     formatSearchAbv(input.abv),
-    input.cask_type,
-    input.cask_size,
-    input.cask_fill,
     input.cask_strength ? "cask strength" : null,
     input.single_cask ? "single cask" : null,
     input.vintage_year ? `${input.vintage_year} vintage` : null,
@@ -178,9 +172,6 @@ function buildRawSearchName(input: BottleCandidateSearchInput) {
     input.series ||
     input.edition ||
     input.stated_age ||
-    input.cask_type ||
-    input.cask_size ||
-    input.cask_fill ||
     input.vintage_year ||
     input.release_year ||
     input.distillery.length,
@@ -345,9 +336,6 @@ function buildQueryText(
     parts.push(`${extractedLabel.stated_age}-year-old`);
   if (extractedLabel?.abv !== null && extractedLabel?.abv !== undefined)
     parts.push(formatSearchAbv(extractedLabel.abv)!);
-  if (extractedLabel?.cask_type) parts.push(extractedLabel.cask_type);
-  if (extractedLabel?.cask_size) parts.push(extractedLabel.cask_size);
-  if (extractedLabel?.cask_fill) parts.push(extractedLabel.cask_fill);
   if (extractedLabel?.cask_strength) parts.push("cask strength");
   if (extractedLabel?.single_cask) parts.push("single cask");
   if (extractedLabel?.vintage_year)
@@ -508,24 +496,6 @@ function getStructuredCandidateAdjustment(
       : -0.2;
   }
 
-  if (extractedLabel.cask_type && candidate.caskType) {
-    adjustment += textsOverlap(candidate.caskType, extractedLabel.cask_type)
-      ? 0.08
-      : -0.14;
-  }
-
-  if (extractedLabel.cask_size && candidate.caskSize) {
-    adjustment += textsOverlap(candidate.caskSize, extractedLabel.cask_size)
-      ? 0.06
-      : -0.1;
-  }
-
-  if (extractedLabel.cask_fill && candidate.caskFill) {
-    adjustment += textsOverlap(candidate.caskFill, extractedLabel.cask_fill)
-      ? 0.05
-      : -0.08;
-  }
-
   if (
     extractedLabel.cask_strength !== null &&
     candidate.caskStrength !== null
@@ -640,7 +610,7 @@ function getPopulatedBottleTraitFields(
     includeStatedAge?: boolean;
   } = {},
 ): BottleCandidateTraitField[] {
-  return BOTTLE_EXACT_TRAIT_FIELDS.filter((field) => {
+  return BOTTLE_DECISION_TRAIT_FIELDS.filter((field) => {
     if (field === "statedAge" && !includeStatedAge) {
       return false;
     }
