@@ -61,16 +61,16 @@ export default function Page(props: { params: Promise<{ flightId: string }> }) {
             return (
               <tr key={bottle.id} className="border-b border-slate-800">
                 <td className="max-w-0 py-4 pl-4 pr-3 text-sm sm:pl-3">
-                  <div className="flex items-center gap-x-1">
-                    <FlightBottleIdentity
-                      bottle={bottle}
-                      flightId={flight.id}
-                    />
-                    <BottleStatusIndicators
-                      hasTasted={flightBottle.hasTasted}
-                      isLibrary={flightBottle.isLibrary}
-                    />
-                  </div>
+                  <FlightBottleIdentity
+                    bottle={bottle}
+                    flightId={flight.id}
+                    trailingContent={
+                      <BottleStatusIndicators
+                        hasTasted={flightBottle.hasTasted}
+                        isLibrary={flightBottle.isLibrary}
+                      />
+                    }
+                  />
                   <div className="mt-3 sm:hidden">
                     <Button
                       color={flightBottle.hasTasted ? "default" : "highlight"}
