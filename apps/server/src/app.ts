@@ -30,6 +30,7 @@ import { userToActorContext, withActorContext } from "./lib/actorContext";
 import { getUserFromHeader } from "./lib/auth";
 import { httpLogger, logError, logInfo, logWarn } from "./lib/log";
 import { readFile as readUploadFile } from "./lib/uploads";
+import { oauthTokenHandler } from "./oauth/token";
 import router from "./orpc/router";
 import {
   AuthSchema,
@@ -218,6 +219,7 @@ export const app = honoApp
   .get("/_health", (c) => {
     return c.json({ ok: true });
   })
+  .post("/oauth/token", oauthTokenHandler)
   .get("/robots.txt", (c) => {
     return c.text("User-agent: *\nDisallow: /");
   })

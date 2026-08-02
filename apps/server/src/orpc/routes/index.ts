@@ -20,6 +20,7 @@ import externalSites from "./external-sites";
 import flights from "./flights";
 import friends from "./friends";
 import notifications from "./notifications";
+import oauth from "./oauth";
 import pendingUploads from "./pendingUploads";
 import prices from "./prices";
 import regions from "./regions";
@@ -57,6 +58,7 @@ export interface Router {
   flights: typeof flights;
   friends: typeof friends;
   notifications: typeof notifications;
+  oauth: typeof oauth;
   pendingUploads: typeof pendingUploads;
   prices: typeof prices;
   regions: typeof regions;
@@ -96,6 +98,7 @@ export default {
   friends,
   smws,
   notifications,
+  oauth,
   pendingUploads,
   prices,
   regions,

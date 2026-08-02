@@ -1401,6 +1401,13 @@
       "when": 1785689993133,
       "tag": "0199_expand_tasting_note_vocabulary",
       "breakpoints": false
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1785694143634,
+      "tag": "0200_yummy_polaris",
+      "breakpoints": false
     }
   ]
 }

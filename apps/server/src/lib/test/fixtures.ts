@@ -22,6 +22,7 @@ import {
   flightBottles,
   flights,
   follows,
+  oauthClients,
   passkeys,
   reviews,
   storePriceHistories,
@@ -30,6 +31,7 @@ import {
   toasts,
   users,
 } from "@peated/server/db/schema";
+import { generateOAuthClientId } from "@peated/server/lib/oauth";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import { type ExternalSiteType } from "@peated/server/types";
 import slugify from "@sindresorhus/slugify";
@@ -204,6 +206,24 @@ export const Passkey = async (
     })
     .returning();
   if (!result) throw new Error("Unable to create Passkey fixture");
+  return result;
+};
+
+export const OAuthClient = async (
+  { ...data }: Partial<Omit<dbSchema.NewOAuthClient, "id">> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.OAuthClient> => {
+  const [result] = await db
+    .insert(oauthClients)
+    .values({
+      clientId: data.clientId ?? generateOAuthClientId(),
+      name: data.name ?? faker.company.name(),
+      redirectUris: data.redirectUris ?? ["http://127.0.0.1/callback"],
+      active: data.active ?? true,
+      ...data,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create OAuth client fixture");
   return result;
 };
 

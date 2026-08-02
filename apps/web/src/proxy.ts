@@ -18,6 +18,11 @@ export function proxy(request: NextRequest) {
     response.headers.set("Cache-Control", PRIVATE_CACHE_CONTROL);
   }
 
+  if (request.nextUrl.pathname === "/oauth/authorize") {
+    response.headers.set("Cache-Control", "no-store");
+    response.headers.set("Referrer-Policy", "no-referrer");
+  }
+
   return response;
 }
 
