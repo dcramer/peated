@@ -34,6 +34,26 @@ const createQueryClient = () => {
   return queryClient;
 };
 
+const FORM_QUERY_SCOPE = { scope: "form" } as const;
+
+/**
+ * Isolates form initialization from cached read views and discards the snapshot
+ * as soon as the form unmounts.
+ */
+export function formQueryOptions<
+  const TOptions extends { queryKey: readonly unknown[] },
+>(options: TOptions) {
+  return {
+    ...options,
+    queryKey: [...options.queryKey, FORM_QUERY_SCOPE],
+    gcTime: 0,
+    staleTime: "static" as const,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+  };
+}
+
 let browserQueryClient: QueryClient | undefined = undefined;
 
 // isServerComponent must be true for any server component

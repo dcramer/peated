@@ -3,6 +3,7 @@ import { use } from "react";
 
 import EventForm from "@peated/web/components/admin/eventForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -13,11 +14,13 @@ export default function Page(props: { params: Promise<{ eventId: string }> }) {
 
   const orpc = useORPC();
   const { data: event } = useSuspenseQuery(
-    orpc.events.details.queryOptions({
-      input: {
-        event: parseInt(eventId, 10),
-      },
-    }),
+    formQueryOptions(
+      orpc.events.details.queryOptions({
+        input: {
+          event: parseInt(eventId, 10),
+        },
+      }),
+    ),
   );
 
   const router = useRouter();

@@ -7,6 +7,7 @@ import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { toBlob } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { buildConcreteBottleUpdateInput } from "./buildConcreteBottleUpdateInput";
@@ -26,9 +27,11 @@ export default function Page(props: { params: Promise<{ bottleId: string }> }) {
 function BottleEditForm({ bottleId }: { bottleId: string }) {
   const orpc = useORPC();
   const { data: context } = useSuspenseQuery(
-    orpc.bottles.editContext.queryOptions({
-      input: { bottle: Number(bottleId) },
-    }),
+    formQueryOptions(
+      orpc.bottles.editContext.queryOptions({
+        input: { bottle: Number(bottleId) },
+      }),
+    ),
   );
   const router = useRouter();
   const bottleUpdateMutation = useMutation(

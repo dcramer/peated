@@ -3,6 +3,7 @@ import { use } from "react";
 
 import TagForm from "@peated/web/components/admin/tagForm";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -13,11 +14,13 @@ export default function Page(props: { params: Promise<{ tagId: string }> }) {
 
   const orpc = useORPC();
   const { data: tag } = useSuspenseQuery(
-    orpc.tags.details.queryOptions({
-      input: {
-        tag: tagId,
-      },
-    }),
+    formQueryOptions(
+      orpc.tags.details.queryOptions({
+        input: {
+          tag: tagId,
+        },
+      }),
+    ),
   );
 
   const router = useRouter();

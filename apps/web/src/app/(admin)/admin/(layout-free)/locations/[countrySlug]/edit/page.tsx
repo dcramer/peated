@@ -4,6 +4,7 @@ import { use } from "react";
 import CountryForm from "@peated/web/components/admin/countryForm";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import {
   useMutation,
   useQueryClient,
@@ -28,9 +29,11 @@ export default function Page(props: {
 function CountryEditForm({ countrySlug }: { countrySlug: string }) {
   const orpc = useORPC();
   const { data: country } = useSuspenseQuery(
-    orpc.countries.details.queryOptions({
-      input: { country: countrySlug },
-    }),
+    formQueryOptions(
+      orpc.countries.details.queryOptions({
+        input: { country: countrySlug },
+      }),
+    ),
   );
 
   const router = useRouter();
