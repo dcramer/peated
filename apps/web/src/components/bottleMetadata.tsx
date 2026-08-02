@@ -61,14 +61,42 @@ export const Brand = ({ data: { brand } }: Props) => {
   );
 };
 
-export const Distillers = ({ distillers }: { distillers?: Distiller[] }) => {
+export const Distillers = ({
+  distillers,
+  isBlend = false,
+}: {
+  distillers?: Distiller[];
+  isBlend?: boolean;
+}) => {
   if (!distillers?.length) return null;
 
   if (distillers.length > 1) {
     return (
-      <Tooltip title={distillers.map((d) => d.name).join(", ")} origin="center">
+      <Tooltip
+        title={
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              {isBlend ? "Distilleries" : "Distillers"}
+            </div>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+              {distillers.map((distiller) => (
+                <li key={distiller.id}>
+                  <Link
+                    href={`/entities/${distiller.id}`}
+                    className="block text-slate-200 hover:text-white hover:underline"
+                  >
+                    {distiller.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        }
+        contentClassName="w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-slate-700 bg-slate-900 p-3 text-left text-sm shadow-xl"
+        origin="center"
+      >
         <span className="underline decoration-dotted">
-          {distillers.length} distillers
+          {distillers.length} {isBlend ? "distilleries" : "distillers"}
         </span>
       </Tooltip>
     );
@@ -77,7 +105,7 @@ export const Distillers = ({ distillers }: { distillers?: Distiller[] }) => {
   const d = distillers[0];
   return (
     <div className="space-x-1">
-      <span>Distilled at</span>
+      <span>{isBlend ? "Distillery" : "Distilled at"}</span>
       <Link
         key={d.id}
         href={`/entities/${d.id}`}

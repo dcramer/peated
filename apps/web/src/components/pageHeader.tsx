@@ -29,7 +29,7 @@ export default function PageHeader({
         </div>
       )}
 
-      <div className="flex flex-auto flex-col items-center justify-center truncate lg:w-auto lg:items-start">
+      <div className="flex min-w-0 flex-auto flex-col items-center justify-center lg:w-auto lg:items-start">
         <h1
           className={classNames(
             "max-w-full truncate text-center font-semibold lg:mx-0 lg:text-left",

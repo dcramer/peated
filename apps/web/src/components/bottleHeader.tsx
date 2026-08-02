@@ -88,7 +88,10 @@ export default function BottleHeader({
             />
             {distinctDistillers.length ? (
               <div className="text-muted mt-1 text-sm">
-                <Distillers distillers={distinctDistillers} />
+                <Distillers
+                  distillers={distinctDistillers}
+                  isBlend={bottle.category === "blend"}
+                />
               </div>
             ) : null}
           </div>
