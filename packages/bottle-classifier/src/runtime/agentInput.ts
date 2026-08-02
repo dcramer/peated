@@ -83,13 +83,27 @@ export function buildAgentInput({
 
 export function buildAuditBottleAgentInput({
   audit,
+  reference,
+  extractedIdentity,
+  imageEvidence,
+  initialCandidates,
   currentBottleContext,
   searchEvidence = [],
+  resolvedEntities = [],
+  investigationHint = null,
+  identityAnchor = null,
   availableSourceEvidenceFields,
 }: {
   audit: AuditBottleInput;
+  reference: BottleReference;
+  extractedIdentity: BottleExtractedDetails | null;
+  imageEvidence?: ImageBottleEvidence | null;
+  initialCandidates: BottleCandidate[];
   currentBottleContext: BottleContext;
   searchEvidence?: BottleSearchEvidence[];
+  resolvedEntities?: EntityResolution[];
+  investigationHint?: string | null;
+  identityAnchor?: BottleClassificationDecision | null;
   availableSourceEvidenceFields: readonly string[];
 }): string {
   return JSON.stringify(
@@ -100,10 +114,28 @@ export function buildAuditBottleAgentInput({
         origin: audit.origin,
         note: audit.note ?? null,
       },
+      reference: {
+        id: reference.id ?? null,
+        externalSiteId: reference.externalSiteId ?? null,
+        name: reference.name,
+        url: reference.url ?? null,
+        imageUrl: reference.imageUrl ?? null,
+        currentBottleId: reference.currentBottleId ?? null,
+      },
+      extractedIdentity,
+      imageEvidence: imageEvidence ?? null,
+      localSearch: {
+        candidates: initialCandidates,
+      },
+      localEntitySearch: {
+        results: resolvedEntities,
+      },
       currentBottleContext,
       webEvidence: {
         results: searchEvidence,
       },
+      investigationHint,
+      identityAnchor,
       availableSourceEvidenceFields,
     },
     null,

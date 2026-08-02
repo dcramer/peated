@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import {
   ListActionableBottleChecksInputSchema,
   listActionableBottleChecks,
@@ -31,10 +30,7 @@ export default procedure
       })
       .strict(),
   )
-  .handler(async ({ input, errors }) => {
-    if (!config.BOTTLE_CHECK_MODERATOR_VISIBILITY) {
-      throw errors.NOT_FOUND();
-    }
+  .handler(async ({ input }) => {
     const result = await listActionableBottleChecks(input);
     return {
       ...result,

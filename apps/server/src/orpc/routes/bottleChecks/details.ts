@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import { getBottleCheckForReview } from "@peated/server/lib/bottleChecks";
 import { prepareBottleCheckReviewOperations } from "@peated/server/lib/bottleOperationModeration";
 import { procedure } from "@peated/server/orpc";
@@ -21,9 +20,6 @@ export default procedure
   .input(z.object({ check: z.coerce.number().int().positive() }).strict())
   .output(BottleCheckDetailsResponseSchema)
   .handler(async ({ input, errors }) => {
-    if (!config.BOTTLE_CHECK_MODERATOR_VISIBILITY) {
-      throw errors.NOT_FOUND();
-    }
     const check = await getBottleCheckForReview(input.check);
     if (!check) {
       throw errors.NOT_FOUND({ message: "Bottle check not found." });

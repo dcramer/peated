@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleAliases,
@@ -28,7 +27,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { ProposedBottleSchema } from "@peated/server/schemas/priceMatches";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { z } from "zod";
 
 const queueBottleCreationVerificationMock = vi.hoisted(() => vi.fn());
@@ -54,16 +53,8 @@ vi.mock("@peated/server/lib/catalogVerification", async () => {
 });
 
 describe("price match queue", () => {
-  const originalBottleCheckVisibility =
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY;
-
   beforeEach(() => {
     vi.resetAllMocks();
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = true;
-  });
-
-  afterEach(() => {
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = originalBottleCheckVisibility;
   });
 
   test("requires moderator access", async ({ fixtures }) => {

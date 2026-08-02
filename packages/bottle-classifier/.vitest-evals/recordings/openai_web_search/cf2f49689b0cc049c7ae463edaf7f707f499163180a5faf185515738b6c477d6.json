@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-08-02T05:27:15.059Z",
+  "toolName": "openai_web_search",
+  "input": {
+    "query": "Compass Box Spice Tree Extravaganza Limited Edition"
+  },
+  "output": {
+    "provider": "openai",
+    "query": "Compass Box Spice Tree Extravaganza Limited Edition",
+    "summary": "**Compass Box Spice Tree Extravaganza Limited Edition** is a **blended malt Scotch whisky** from **Compass Box**, bottled at **46% ABV**, with **natural colour** and **no chill-filtration**. Compass Box describes it as a **limited edition** created to mark **the tenth anniversary of the original Spice Tree being discontinued/banned**. ([compassboxwhisky.com](https://www.compassboxwhisky.com/products/spice-tree-extraveganza))\n\nConfirmed bottle-specific traits:\n- **Producer / bottler:** Compass Box. ([compassboxwhisky.com](https://www.compassboxwhisky.com/products/spice-tree-extraveganza))\n- **Name:** Spice Tree Extravaganza. ([compassboxwhisky.com](https://www.compassboxwhisky.com/products/spice-tree-extraveganza))\n- **Category:** **Blended Malt Scotch Whisky**. ([compassboxwhisky.com](https://www.compassboxwhisky.com/products/spice-tree-extraveganza))\n- **ABV:** **46.0%**. ([compassboxwhisky.com](https://www.compassboxwhisky.com/products/spice-tree-extraveganza))\n- **Filtration / colour:** **Not chill-filtered** and **natural colour**. ([compassboxwhisky.com](https://www.compassboxwhisky.com/products/spice-tree-extraveganza))\n- **Edition / purpose:** **Limited edition** issued to c",
+    "results": [
+      {
+        "title": "compassboxwhisky.com",
+        "url": "https://www.compassboxwhisky.com/products/spice-tree-extraveganza",
+        "domain": "compassboxwhisky.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "whiskybase.com",
+        "url": "https://www.whiskybase.com/whiskies/whisky/87242/the-spice-tree-extravaganza-cb",
+        "domain": "whiskybase.com",
+        "description": null,
+        "extraSnippets": []
+      },
+      {
+        "title": "spiritradar.com",
+        "url": "https://www.spiritradar.com/whisky-db/spice-tree-extravaganza-cb-limited-edition-46-percent-700ml/",
+        "domain": "spiritradar.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cf2f49689b0cc049c7ae463edaf7f707f499163180a5faf185515738b6c477d6",
+    "mode": "auto"
+  }
+}

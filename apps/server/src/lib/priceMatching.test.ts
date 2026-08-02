@@ -276,8 +276,6 @@ function normalizeMockBottleClassifierDecision(decision: Record<string, any>) {
 
 describe("priceMatching", () => {
   const originalOpenAIApiKey = config.OPENAI_API_KEY;
-  const originalBottleCheckShadowGeneration =
-    config.BOTTLE_CHECK_SHADOW_GENERATION;
 
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -288,12 +286,10 @@ describe("priceMatching", () => {
       modelMetadata: null,
     }));
     config.OPENAI_API_KEY = originalOpenAIApiKey;
-    config.BOTTLE_CHECK_SHADOW_GENERATION = originalBottleCheckShadowGeneration;
   });
 
   afterEach(() => {
     config.OPENAI_API_KEY = originalOpenAIApiKey;
-    config.BOTTLE_CHECK_SHADOW_GENERATION = originalBottleCheckShadowGeneration;
   });
 
   test("falls back to exact candidates when embeddings fail", async ({
@@ -2375,7 +2371,6 @@ describe("priceMatching", () => {
     fixtures,
   }) => {
     config.OPENAI_API_KEY = undefined;
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
 
     const { extractFromText } =
       await import("@peated/server/agents/whisky/labelExtractor");
@@ -7835,10 +7830,9 @@ describe("priceMatching", () => {
     });
   });
 
-  test("does not persist a Bottle check when shadow generation is disabled", async ({
+  test("does not persist a Bottle check when the caller opts out", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = false;
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const bottle = await fixtures.Bottle();
@@ -7876,7 +7870,7 @@ describe("priceMatching", () => {
     );
 
     const proposal = await resolveStorePriceMatchProposal(price.id, {
-      generateBottleCheck: true,
+      generateBottleCheck: false,
     });
 
     expect(proposal).toMatchObject({
@@ -7892,7 +7886,6 @@ describe("priceMatching", () => {
   test("blocks a proposal that would retire the classifier's matched Bottle", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const matchedBottle = await fixtures.Bottle({
@@ -7965,7 +7958,6 @@ describe("priceMatching", () => {
   test("links every classified full retry to an immutable check and preserves blocked siblings", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const { classifyBottleReference, runBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const sourceBottle = await fixtures.Bottle({ name: "Duplicate Source" });
@@ -8117,7 +8109,6 @@ describe("priceMatching", () => {
   test("links ignored results to their attempt without changing ignored behavior", async ({
     fixtures,
   }) => {
-    config.BOTTLE_CHECK_SHADOW_GENERATION = true;
     const { classifyBottleReference } =
       await import("@peated/server/agents/bottleClassifier");
     const assignedBottle = await fixtures.Bottle();

@@ -55,9 +55,6 @@ function extractExplicitAbvFromBottleName(name: string): {
 export function normalizeProposedBottleDraft(
   proposedBottle: ProposedBottle,
 ): ProposedBottle {
-  const normalizedBrandName = normalizeString(
-    proposedBottle.brand.name,
-  ).toLowerCase();
   const distillersByName = new Map<
     string,
     ProposedBottle["distillers"][number]
@@ -76,9 +73,6 @@ export function normalizeProposedBottleDraft(
     }
   }
 
-  const normalizedBottlerName = proposedBottle.bottler
-    ? normalizeString(proposedBottle.bottler.name).toLowerCase()
-    : null;
   const nameWithoutExplicitAbv = extractExplicitAbvFromBottleName(
     proposedBottle.name,
   );
@@ -105,9 +99,6 @@ export function normalizeProposedBottleDraft(
     singleCask: normalized.singleCask ?? null,
     distillers: Array.from(distillersByName.values()),
     abv: proposedBottle.abv ?? nameWithoutExplicitAbv.abv,
-    bottler:
-      normalizedBottlerName && normalizedBottlerName === normalizedBrandName
-        ? null
-        : proposedBottle.bottler,
+    bottler: proposedBottle.bottler,
   };
 }

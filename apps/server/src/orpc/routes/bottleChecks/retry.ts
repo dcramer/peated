@@ -1,4 +1,3 @@
-import config from "@peated/server/config";
 import {
   BottleOperationActionResultSchema,
   RetryBottleOperationInputSchema,
@@ -28,10 +27,7 @@ export default procedure
       .strict(),
   )
   .output(BottleOperationActionResultSchema)
-  .handler(async ({ input, context, errors }) => {
-    if (!config.BOTTLE_CHECK_MODERATOR_VISIBILITY) {
-      throw errors.NOT_FOUND();
-    }
+  .handler(async ({ input, context }) => {
     return await retryBottleOperation(
       {
         checkId: input.check,

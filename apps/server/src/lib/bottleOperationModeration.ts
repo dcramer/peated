@@ -2,7 +2,6 @@ import {
   DEFAULT_MAX_PROPOSED_OPERATIONS,
   ProposedOperationSchema,
 } from "@peated/bottle-classifier";
-import config from "@peated/server/config";
 import {
   db,
   type AnyConnection,
@@ -146,13 +145,6 @@ export class BottleOperationModerationAuthorizationError extends Error {
   constructor() {
     super("Moderator authorization is required to review Bottle operations.");
     this.name = "BottleOperationModerationAuthorizationError";
-  }
-}
-
-export class BottleOperationExecutionDisabledError extends Error {
-  constructor() {
-    super("Bottle operation execution is not enabled.");
-    this.name = "BottleOperationExecutionDisabledError";
   }
 }
 
@@ -652,9 +644,6 @@ export async function approveBottleOperations(
   database: AnyConnection = db,
 ): Promise<BottleOperationActionResult[]> {
   assertModerator(user);
-  if (!config.BOTTLE_CHECK_EXECUTION) {
-    throw new BottleOperationExecutionDisabledError();
-  }
   const input = ApproveBottleOperationsInputSchema.parse(rawInput);
   const results: BottleOperationActionResult[] = [];
   for (const operationId of input.operationIds) {
@@ -947,9 +936,6 @@ export async function retryBottleOperation(
   database: AnyConnection = db,
 ): Promise<BottleOperationActionResult> {
   assertModerator(user);
-  if (!config.BOTTLE_CHECK_EXECUTION) {
-    throw new BottleOperationExecutionDisabledError();
-  }
   const input = RetryBottleOperationInputSchema.parse(rawInput);
   return await retryOne({
     checkId: input.checkId,

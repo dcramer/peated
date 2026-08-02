@@ -90,9 +90,9 @@
 - [x] 3.3 Generate the database migration with `pnpm db:generate`.
 - [x] 3.4 Sanitize persisted input snapshots so inline image bytes are omitted,
       and store intent output and artifacts exactly once.
-- [x] 3.5 Implement latest-check history and background-event uniqueness
-      without invalidating older proposals solely because a moderator forced a
-      newer run.
+- [x] 3.5 Implement current actionable moderator-check reuse and
+      background-event uniqueness; keep clean moderator results transient and
+      replace only prior terminal moderator checks.
 - [x] 3.6 Add transaction tests for concurrent reruns, latest selection,
       blocked/operation status transitions, and deleted subjects.
 
@@ -150,10 +150,10 @@
 
 ## 6. Rollout and Documentation
 
-- [x] 6.1 Add shadow-generation, moderator-visibility, and execution flags;
-      default generation and visibility on while keeping execution off.
-- [x] 6.2 Enable shadow check generation for individual full reference retries
-      and moderator-triggered Bottle audits.
+- [x] 6.1 Make check generation, moderator visibility, and approved execution
+      normal behavior without rollout feature flags.
+- [x] 6.2 Enable check generation for individual full reference retries and
+      moderator-triggered Bottle audits.
 - [x] 6.3 Extend the existing `VerifyBottleCreation` job with an idempotent
       post-create Bottle check for 100% of eligible `manual_entry` Bottles and a
       deterministic `price_match_automation` sample that defaults to 10%. Run
@@ -164,10 +164,9 @@
       end-user add-Bottle workflow and its established review policy.
 - [ ] 6.5 Measure intent accuracy, schema validity, diagnostic exact reference
       operation/finding sets, exact audit repair, reviewer rejection/correction,
-      review time, stale/failure rates, cost, latency, and tool calls before
-      enabling execution broadly.
+      review time, stale/failure rates, cost, latency, and tool calls.
 - [x] 6.6 Update Bottle classifier, Entity classifier, whisky identity,
       store-price matching, agent-design, runtime-boundary, and background-work
       docs where their contracts change.
-- [ ] 6.7 Run targeted classifier, server, worker, and web formatting, lint,
+- [x] 6.7 Run targeted classifier, server, worker, and web formatting, lint,
       typecheck, tests, evals, migration checks, and manual QA.

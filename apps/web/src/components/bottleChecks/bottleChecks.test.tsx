@@ -1,7 +1,6 @@
 import type { ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import ActionResults, { runActionWithCanonicalRefresh } from "./actionResults";
 import CheckResult from "./checkResult";
 import {
   type BottleCheck,
@@ -88,25 +87,6 @@ const entityReview = {
 } as BottleOperationReview;
 
 describe("Bottle Check review components", () => {
-  it("waits for canonical detail refresh before publishing action results", async () => {
-    const events: string[] = [];
-
-    const result = await runActionWithCanonicalRefresh({
-      action: async () => {
-        events.push("action");
-        return [{ operationId: 17, status: "applied", error: null }] as const;
-      },
-      refresh: async () => {
-        events.push("refresh");
-      },
-    });
-
-    events.push("publish");
-
-    expect(events).toEqual(["action", "refresh", "publish"]);
-    expect(result[0]).toMatchObject({ status: "applied" });
-  });
-
   it("renders reference source identity without an audit-origin label", () => {
     const check = {
       bottleId: null,
@@ -176,6 +156,9 @@ describe("Bottle Check review components", () => {
     expect(html).toContain("Wrong Brand");
     expect(html).toContain("Correct Brand");
     expect(html).toContain("Roles will be preserved.");
+    expect(html).toContain("8</dd><dt");
+    expect(html).not.toContain("0</dd><dt");
+    expect(html).not.toContain("1</dd><dt");
     expect(html).not.toContain("Select");
   });
 
@@ -244,11 +227,12 @@ describe("Bottle Check review components", () => {
     expect(html).not.toContain("exact.edition");
   });
 
-  it("keeps a non-ready pending operation selectable for rejection", () => {
+  it("keeps a non-ready pending operation directly rejectable", () => {
     const html = renderToStaticMarkup(
       <OperationCard
         approvalReady={false}
-        onSelect={() => undefined}
+        onApply={() => undefined}
+        onReject={() => undefined}
         operation={operation("pending_review")}
         review={entityReview}
       />,
@@ -256,25 +240,26 @@ describe("Bottle Check review components", () => {
 
     expect(html).toContain("Not ready to approve");
     expect(html).toContain(
-      "This operation cannot currently be approved, but you can reject it.",
+      "The current catalog state does not support applying this proposal.",
     );
-    expect(html).toContain("Select");
-    expect(html).toContain('type="checkbox"');
+    expect(html).toContain("Apply");
+    expect(html).toContain("Reject");
+    expect(html).not.toContain('type="checkbox"');
   });
 
   it.each(["blocked", "stale", "failed"] as const)(
-    "keeps a %s operation selectable for rejection",
+    "keeps a %s operation directly rejectable",
     (status) => {
       const html = renderToStaticMarkup(
         <OperationCard
-          onSelect={() => undefined}
+          onReject={() => undefined}
           operation={operation(status)}
           review={status === "blocked" ? null : entityReview}
         />,
       );
 
-      expect(html).toContain("Select");
-      expect(html).toContain('type="checkbox"');
+      expect(html).toContain("Reject");
+      expect(html).not.toContain('type="checkbox"');
     },
   );
 
@@ -355,18 +340,17 @@ describe("Bottle Check review components", () => {
     expect(rejected).toContain("Fixed in the Entity editor.");
   });
 
-  it("hides retry while Bottle Check execution is disabled", () => {
+  it("shows an inline action error without a separate results panel", () => {
     const html = renderToStaticMarkup(
       <OperationCard
-        executionEnabled={false}
-        onRetry={() => undefined}
-        operation={operation("failed", { error: "Worker unavailable." })}
+        actionError="The operation was already reviewed."
+        operation={operation("pending_review")}
         review={entityReview}
       />,
     );
 
-    expect(html).toContain("Worker unavailable.");
-    expect(html).not.toContain("Retry failed operation");
+    expect(html).toContain("The operation was already reviewed.");
+    expect(html).not.toContain("Operation results");
   });
 
   it("shows clean and finding audit results without per-finding controls", () => {
@@ -433,37 +417,6 @@ describe("Bottle Check review components", () => {
     expect(unsupported).toContain("cannot be reviewed safely");
     expect(findings).toContain("The Bottle may belong in another group.");
     expect(findings).toContain('href="/bottles/44"');
-    expect(findings).toContain(
-      "Findings are closed with the check; they do not have individual disposition controls.",
-    );
-  });
-
-  it("reports mixed approve-selected outcomes independently", () => {
-    const html = renderToStaticMarkup(
-      <ActionResults
-        results={[
-          { operationId: 1, status: "applied", error: null },
-          {
-            operationId: 2,
-            status: "failed",
-            error: "Canonical update failed.",
-          },
-          {
-            operationId: 3,
-            status: null,
-            error: "Operation was already reviewed.",
-          },
-        ]}
-      />,
-    );
-
-    expect(html).toContain(
-      "Each selected operation was processed independently.",
-    );
-    expect(html).toContain("Operation #1");
-    expect(html).toContain("applied");
-    expect(html).toContain("Canonical update failed.");
-    expect(html).toContain("Not processed");
-    expect(html).toContain("Operation was already reviewed.");
+    expect(findings).toContain("<details");
   });
 });

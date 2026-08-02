@@ -38,7 +38,7 @@ describe("ProfileDropdown", () => {
   test("keeps Bottle Checks available in the mobile moderator menu", () => {
     const html = renderToStaticMarkup(
       <AuthProvider user={moderator}>
-        <ProfileDropdown bottleChecksAvailable />
+        <ProfileDropdown />
       </AuthProvider>,
     );
 
@@ -47,13 +47,14 @@ describe("ProfileDropdown", () => {
     expect(html).toContain("Bottle Checks");
   });
 
-  test("hides Bottle Checks when the capability is unavailable", () => {
+  test("keeps Bottle Checks available to administrators", () => {
     const html = renderToStaticMarkup(
       <AuthProvider user={admin}>
-        <ProfileDropdown bottleChecksAvailable={false} />
+        <ProfileDropdown />
       </AuthProvider>,
     );
 
-    expect(html).not.toContain('href="/bottle-checks"');
+    expect(html).toContain('href="/bottle-checks"');
+    expect(html).toContain('href="/admin"');
   });
 });

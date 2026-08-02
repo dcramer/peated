@@ -60,7 +60,6 @@ export type {
   EntityResolution,
 } from "@peated/bottle-classifier/internal/types";
 export {
-  BottleAuditUnavailableError,
   runModeratorBottleAudit,
   runPostUserCreationBottleAudit,
   type ModeratorBottleAuditInput,

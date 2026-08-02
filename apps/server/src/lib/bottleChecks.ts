@@ -237,6 +237,23 @@ export type ActionableBottleCheckList = {
   };
 };
 
+const ACTIONABLE_OPERATION_STATUS_VALUES: BottleOperation["status"][] = [
+  "blocked",
+  "pending_review",
+  "applying",
+  "stale",
+  "failed",
+];
+
+const ACTIONABLE_OPERATION_STATUSES = new Set(
+  ACTIONABLE_OPERATION_STATUS_VALUES,
+);
+
+const TERMINAL_OPERATION_STATUSES = new Set<BottleOperation["status"]>([
+  "applied",
+  "rejected",
+]);
+
 export class BottleCheckCloseAuthorizationError extends Error {
   constructor() {
     super("Moderator authorization is required to close a Bottle check.");
@@ -580,18 +597,94 @@ export async function createBottleCheck(
   });
 }
 
-export async function getBottleCheckHistory(
-  rawSubject: unknown,
+function getPersistedCheckFindings(check: BottleCheck): unknown[] | null {
+  if (!isSupportedBottleCheckSchemaVersion(check) || check.output === null) {
+    return null;
+  }
+
+  return PersistedBottleCheckOutputSchema.parse(check.output).findings;
+}
+
+export async function getCurrentModeratorBottleAudit(
+  rawBottleId: unknown,
   database: AnyDatabase = db,
-): Promise<BottleCheckWithOperations[]> {
-  const subject = BottleCheckSubjectSchema.parse(rawSubject);
-  return await database.query.bottleChecks.findMany({
-    where: eq(bottleChecks.subjectKey, buildSubjectKey(subject)),
+): Promise<BottleCheckWithOperations | null> {
+  const bottleId = PositiveIdSchema.parse(rawBottleId);
+  const checks = await database.query.bottleChecks.findMany({
+    where: and(
+      eq(bottleChecks.intent, "audit_bottle"),
+      eq(bottleChecks.origin, "moderator"),
+      eq(bottleChecks.bottleId, bottleId),
+      isNull(bottleChecks.closedAt),
+    ),
     orderBy: [desc(bottleChecks.createdAt), desc(bottleChecks.id)],
     with: {
       operations: true,
     },
   });
+
+  return (
+    checks.find((check) => {
+      const findings = getPersistedCheckFindings(check);
+      return (
+        findings === null ||
+        findings.length > 0 ||
+        check.operations.some(({ status }) =>
+          ACTIONABLE_OPERATION_STATUSES.has(status),
+        )
+      );
+    }) ?? null
+  );
+}
+
+export async function deleteTerminalModeratorBottleAudits(
+  {
+    bottleId: rawBottleId,
+    exceptCheckId: rawExceptCheckId,
+  }: {
+    bottleId: unknown;
+    exceptCheckId?: unknown;
+  },
+  database: AnyDatabase = db,
+): Promise<void> {
+  const bottleId = PositiveIdSchema.parse(rawBottleId);
+  const exceptCheckId =
+    rawExceptCheckId === undefined
+      ? undefined
+      : PositiveIdSchema.parse(rawExceptCheckId);
+  const checks = await database.query.bottleChecks.findMany({
+    where: and(
+      eq(bottleChecks.intent, "audit_bottle"),
+      eq(bottleChecks.origin, "moderator"),
+      eq(bottleChecks.bottleId, bottleId),
+      exceptCheckId === undefined
+        ? undefined
+        : ne(bottleChecks.id, exceptCheckId),
+    ),
+    with: {
+      operations: true,
+    },
+  });
+  const terminalCheckIds = checks
+    .filter((check) => {
+      if (
+        !check.operations.every(({ status }) =>
+          TERMINAL_OPERATION_STATUSES.has(status),
+        )
+      ) {
+        return false;
+      }
+
+      const findings = getPersistedCheckFindings(check);
+      return check.closedAt !== null || findings?.length === 0;
+    })
+    .map(({ id }) => id);
+
+  if (terminalCheckIds.length > 0) {
+    await database
+      .delete(bottleChecks)
+      .where(inArray(bottleChecks.id, terminalCheckIds));
+  }
 }
 
 export async function listActionableBottleChecks(
@@ -612,13 +705,7 @@ export async function listActionableBottleChecks(
       .where(
         and(
           eq(bottleOperations.checkId, bottleChecks.id),
-          inArray(bottleOperations.status, [
-            "blocked",
-            "pending_review",
-            "applying",
-            "stale",
-            "failed",
-          ]),
+          inArray(bottleOperations.status, ACTIONABLE_OPERATION_STATUS_VALUES),
         ),
       ),
   );
@@ -627,9 +714,19 @@ export async function listActionableBottleChecks(
     .from(bottleChecks)
     .where(
       and(
-        eq(bottleChecks.intent, "audit_bottle"),
+        input.origin
+          ? and(
+              eq(bottleChecks.intent, "audit_bottle"),
+              eq(bottleChecks.origin, input.origin),
+            )
+          : or(
+              eq(bottleChecks.intent, "audit_bottle"),
+              and(
+                eq(bottleChecks.intent, "resolve_reference"),
+                eq(bottleChecks.sourceKind, "photo_identification"),
+              ),
+            ),
         isNull(bottleChecks.closedAt),
-        input.origin ? eq(bottleChecks.origin, input.origin) : undefined,
         or(
           ne(bottleChecks.schemaVersion, BOTTLE_CHECK_SCHEMA_VERSION),
           hasFindings,

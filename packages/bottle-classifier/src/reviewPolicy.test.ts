@@ -1418,6 +1418,217 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
+  test("keeps a match when its grounded update repairs the extracted identity conflict", () => {
+    const targetCandidate: BottleCandidate = {
+      ...existingPrivateCask,
+      bottleId: 9900,
+      fullName: "Spice Tree Extravaganza CB Limited Edition",
+      brand: "Spice Tree",
+      bottler: "Compass Box",
+      category: "single_malt",
+      statedAge: 3,
+      singleCask: null,
+    };
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "match",
+      rationale: "The distinctive marketed product matches the malformed row.",
+      candidateBottleIds: [9900],
+      identityScope: "product",
+      aliasScope: "none",
+      observation: null,
+      matchedBottleId: 9900,
+      proposedBottle: null,
+    };
+    const artifacts = buildBottleClassificationArtifacts({
+      candidates: [targetCandidate],
+      resolvedEntities: [
+        {
+          entityId: 1422,
+          name: "Compass Box",
+          shortName: null,
+          type: ["brand", "bottler"],
+          alias: null,
+          score: 1,
+          source: ["search"],
+        },
+        {
+          entityId: 9999,
+          name: "Unrelated Brand",
+          shortName: null,
+          type: ["brand"],
+          alias: null,
+          score: 1,
+          source: ["search"],
+        },
+      ],
+      extractedIdentity: {
+        brand: "Compass Box",
+        bottler: "Compass Box",
+        expression: "Spice Tree Extravaganza",
+        series: null,
+        distillery: [],
+        category: null,
+        stated_age: null,
+        abv: null,
+        release_year: null,
+        vintage_year: null,
+        cask_strength: null,
+        single_cask: null,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        edition: "Limited Edition",
+      },
+    });
+
+    expect(
+      finalizeBottleReferenceClassification({
+        reference: { name: "Compass Box Spice Tree Extravaganza" },
+        decision,
+        artifacts,
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: {
+              bottleId: 9900,
+              patch: { exact: { abv: 46 } },
+            },
+            rationale: "Fill a missing field unrelated to the Brand conflict.",
+            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
+          },
+        ],
+      }),
+    ).toMatchObject({ action: "no_match" });
+
+    expect(
+      finalizeBottleReferenceClassification({
+        reference: { name: "Compass Box Spice Tree Extravaganza" },
+        decision,
+        artifacts,
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: {
+              bottleId: 9900,
+              patch: {
+                shared: {
+                  brand: { kind: "existing", entityId: 123456 },
+                },
+              },
+            },
+            rationale: "Replace the Brand with an unknown Entity.",
+            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
+          },
+        ],
+      }),
+    ).toMatchObject({ action: "no_match" });
+
+    expect(
+      finalizeBottleReferenceClassification({
+        reference: { name: "Compass Box Spice Tree Extravaganza" },
+        decision,
+        artifacts,
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: {
+              bottleId: 9900,
+              patch: {
+                shared: {
+                  brand: { kind: "existing", entityId: 9999 },
+                },
+              },
+            },
+            rationale: "Replace the Brand with an unrelated inspected Entity.",
+            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
+          },
+        ],
+      }),
+    ).toMatchObject({ action: "no_match" });
+
+    expect(
+      finalizeBottleReferenceClassification({
+        reference: { name: "Compass Box Spice Tree Extravaganza" },
+        decision,
+        artifacts,
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: {
+              bottleId: 9900,
+              patch: {
+                shared: {
+                  brand: { kind: "existing", entityId: 1422 },
+                },
+              },
+            },
+            rationale: "Repair the malformed Brand on the exact product.",
+            evidenceRefs: [{ kind: "bottle", bottleId: 9900 }],
+          },
+        ],
+      }),
+    ).toMatchObject({ action: "match", matchedBottleId: 9900 });
+  });
+
+  test("requires a Bottle update value to resolve the extracted scalar conflict", () => {
+    const targetCandidate: BottleCandidate = {
+      ...existingPrivateCask,
+      abv: 45,
+    };
+    const decision: BottleClassifierAgentDecisionInput = {
+      action: "match",
+      rationale: "The source otherwise identifies the existing Bottle.",
+      candidateBottleIds: [100],
+      identityScope: "product",
+      aliasScope: "none",
+      observation: null,
+      matchedBottleId: 100,
+      proposedBottle: null,
+    };
+    const artifacts = buildBottleClassificationArtifacts({
+      candidates: [targetCandidate],
+      extractedIdentity: {
+        brand: "Example",
+        bottler: null,
+        expression: "Private Cask",
+        series: null,
+        distillery: [],
+        category: "single_malt",
+        stated_age: null,
+        abv: 46,
+        release_year: null,
+        vintage_year: null,
+        cask_strength: null,
+        single_cask: true,
+        cask_type: null,
+        cask_size: null,
+        cask_fill: null,
+        edition: null,
+      },
+    });
+    const finalizeWithAbv = (abv: number | null) =>
+      finalizeBottleReferenceClassification({
+        reference: { name: "Example Private Cask" },
+        decision,
+        artifacts,
+        proposedOperations: [
+          {
+            type: "update_bottle",
+            input: { bottleId: 100, patch: { exact: { abv } } },
+            rationale: "Update the conflicting ABV.",
+            evidenceRefs: [{ kind: "bottle", bottleId: 100 }],
+          },
+        ],
+      });
+
+    expect(finalizeWithAbv(null)).toMatchObject({ action: "no_match" });
+    expect(finalizeWithAbv(44)).toMatchObject({ action: "no_match" });
+    expect(finalizeWithAbv(46)).toMatchObject({
+      action: "match",
+      matchedBottleId: 100,
+    });
+  });
+
   test("keeps the extracted SMWS title in exact-cask create proposals", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {

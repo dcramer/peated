@@ -95,7 +95,7 @@ export const BottleSchema = z.object({
     .describe("List of distilleries that produced this whisky"),
   bottler: EntitySchema.nullable()
     .default(null)
-    .describe("Independent bottler if different from the brand"),
+    .describe("Evidenced bottling company, which may also be the brand"),
 
   description: z
     .string()

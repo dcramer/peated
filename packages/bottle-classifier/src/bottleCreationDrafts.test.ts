@@ -61,7 +61,10 @@ describe("normalizeProposedBottleDraft", () => {
           name: "Maker's Mark",
         },
       ],
-      bottler: null,
+      bottler: {
+        id: 44,
+        name: "Maker’s Mark",
+      },
     });
   });
 

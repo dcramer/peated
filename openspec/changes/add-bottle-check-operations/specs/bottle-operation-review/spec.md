@@ -1,27 +1,38 @@
 ## ADDED Requirements
 
-### Requirement: Checks and operations are durable
+### Requirement: Actionable checks and operations are durable
 
-The system SHALL persist one immutable Bottle check and one child row per
-proposed operation, including operations blocked during preparation.
+The system SHALL persist current actionable workflow state and one child row
+per proposed operation, including operations blocked during preparation.
 
 #### Scenario: Check completes
 
-- **WHEN** a Bottle check completes with a valid intent-specific result
+- **WHEN** a store-price or post-user-creation check completes with a valid
+  intent-specific result
 - **THEN** the server SHALL store its input snapshot, result, artifacts, model
   metadata, source or Bottle subject, and proposed operations
 
-#### Scenario: Check is rerun
+#### Scenario: Manual audit is clean
 
-- **WHEN** the same subject and intent are checked again
-- **THEN** the server SHALL create a new immutable check and present it
-  as the latest review batch
-- **AND** previously reviewed or applied operations SHALL remain history
-- **AND** an older pending operation SHALL be judged by live state, not
-  invalidated solely by recency
-- **AND** a moderator-forced rerun MAY leave both intentional review batches
-  visible
-- **AND** v1 SHALL NOT group or disposition operations across checks
+- **WHEN** a moderator audit returns no findings or proposed operations
+- **THEN** the server SHALL return a typed clean result with its summary
+- **AND** it SHALL persist no check or operation rows
+- **AND** it SHALL remove older terminal moderator audits for that Bottle
+
+#### Scenario: Manual audit already has current work
+
+- **WHEN** an open moderator audit for the Bottle has findings or an operation
+  in `blocked | pending_review | applying | stale | failed`
+- **THEN** the server SHALL return that check without another model call
+
+#### Scenario: Manual audit creates replacement work
+
+- **WHEN** a moderator audit returns findings or proposed operations and no
+  current actionable check exists
+- **THEN** the server SHALL persist one current check
+- **AND** it SHALL remove older terminal moderator audits for that Bottle
+- **AND** it SHALL preserve prior `blocked | pending_review | applying | stale |
+failed` work
 
 #### Scenario: Store-price classification invokes a check
 
@@ -51,7 +62,7 @@ evidence, and one card per operation in the selected check.
 #### Scenario: Completed audit is clean
 
 - **WHEN** a valid audit has no operations or findings
-- **THEN** the UI SHALL show a clear clean-audit result
+- **THEN** the UI SHALL show the transient clean-audit result
 - **AND** it SHALL not show empty approval controls
 
 ### Requirement: Actionable Bottle checks have one inbox
@@ -199,8 +210,7 @@ findings, blocked/stale/failed work, dismissal, or manual resolution.
 - **WHEN** a check has findings and no `pending_review` or `applying`
   operations
 - **THEN** a moderator MAY close the check
-- **AND** it SHALL leave review history visible without remaining in the active
-  inbox
+- **AND** it SHALL leave the active inbox
 
 #### Scenario: Check still has undecided work
 
@@ -235,10 +245,10 @@ approval, regardless of source or confidence.
 - **THEN** the system MAY persist and surface them automatically
 - **AND** it SHALL NOT apply them without moderator approval
 
-### Requirement: Newly added Bottles may receive background audits
+### Requirement: Newly added Bottles receive background audits
 
-With shadow generation enabled, the existing `VerifyBottleCreation` job SHALL
-run one idempotent `audit_bottle` check for 100% of eligible `manual_entry`
+The existing `VerifyBottleCreation` job SHALL run one idempotent
+`audit_bottle` check for 100% of eligible `manual_entry`
 Bottles. `price_match_automation` Bottles SHALL use a deterministic sample that
 defaults to 10%. The check SHALL run after the authoritative Bottle save
 commits.

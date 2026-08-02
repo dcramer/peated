@@ -5,11 +5,12 @@ import {
   agentActionRiskClass,
   deriveAutomationTier,
 } from "@peated/bottle-classifier/priceMatchingEvidence";
-import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
+import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { identifyExistingBottleReference } from "@peated/server/agents/bottleClassifier/identifyExistingBottleReference";
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { logError } from "@peated/server/lib/log";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
@@ -43,8 +44,11 @@ type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
 };
 type PhotoIdentificationClassification = Awaited<
-  ReturnType<typeof classifyBottleReference>
->;
+  ReturnType<typeof runBottleReference>
+>["result"];
+type PhotoIdentificationModelMetadata = Awaited<
+  ReturnType<typeof runBottleReference>
+>["modelMetadata"];
 type PhotoIdentificationAttributeValue =
   | boolean
   | number
@@ -554,9 +558,52 @@ function logPhotoIdentificationFailure({
   });
 }
 
+async function persistPhotoIdentificationReview({
+  classification,
+  classificationInput,
+  modelMetadata,
+  pendingImageId,
+}: {
+  classification: PhotoIdentificationClassification;
+  classificationInput: Parameters<typeof runBottleReference>[0];
+  modelMetadata: PhotoIdentificationModelMetadata;
+  pendingImageId: string;
+}) {
+  if (
+    classification.status !== "classified" ||
+    !["match", "repair_bottle"].includes(classification.decision.action) ||
+    (classification.proposedOperations.length === 0 &&
+      classification.findings.length === 0)
+  ) {
+    return;
+  }
+
+  try {
+    await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "photo_identification",
+      sourceId: pendingImageId,
+      input: classificationInput,
+      result: classification,
+      backgroundEventKey: `photo_identification:${pendingImageId}`,
+      model: config.OPENAI_MODEL,
+      modelMetadata,
+    });
+  } catch (error) {
+    // Supplemental review must never break the user's photo-tasting flow.
+    logError(error, {
+      photoIdentification: {
+        pendingImageId,
+        phase: "persist_bottle_check",
+      },
+    });
+  }
+}
+
 /**
- * Runs label extraction and local matching for a pending scan, using the full
- * classifier only when the local pass does not produce a match.
+ * Runs label extraction and local candidate discovery for a pending scan, then
+ * gives the full classifier the chance to identify the Bottle and propose any
+ * supported catalog repairs.
  *
  * This is the shared Photo Identification agent span boundary for all callers.
  */
@@ -602,11 +649,22 @@ export async function identifyPendingImage({
       };
       const localIdentification =
         await identifyExistingBottleReference(classificationInput);
-      const classification =
-        localIdentification.status === "classified" &&
-        localIdentification.decision.action === "match"
-          ? localIdentification
-          : await classifyBottleReference(classificationInput);
+      const classificationInputWithCandidates = {
+        ...classificationInput,
+        ...(localIdentification.artifacts.candidates.length > 0
+          ? { initialCandidates: localIdentification.artifacts.candidates }
+          : {}),
+      };
+      const classificationRun = await runBottleReference(
+        classificationInputWithCandidates,
+      );
+      const classification = classificationRun.result;
+      await persistPhotoIdentificationReview({
+        classification,
+        classificationInput: classificationInputWithCandidates,
+        modelMetadata: classificationRun.modelMetadata,
+        pendingImageId: pendingImage.id,
+      });
       const referenceName = classificationInput.reference.name;
       const diagnostics = buildPhotoIdentificationDiagnostics({
         extractionStatus: extractedIdentity ? "found" : "empty",
@@ -640,6 +698,7 @@ export async function identifyPendingImage({
         imageEvidence,
         localIdentification,
         classification,
+        modelMetadata: classificationRun.modelMetadata,
         referenceName,
         diagnostics,
         suggestedNextStep,

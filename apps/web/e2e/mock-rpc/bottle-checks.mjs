@@ -1,9 +1,3 @@
-export const bottleCheckCapabilities = {
-  bottleAudits: true,
-  bottleCheckExecution: true,
-  bottleChecks: true,
-};
-
 export function createBottleCheckMock({
   exactMatchedBottleId,
   exactMergeOtherBottle,
@@ -13,7 +7,6 @@ export function createBottleCheckMock({
 }) {
   const approvedTokens = new Set();
   const rejectedTokens = new Set();
-  const completedAuditTokens = new Set();
   const linkedStorePriceCheckId = 92;
   const linkedStorePriceOperationId = 703;
   const linkedStorePriceDistillersEdition2023BottleId = 9313;
@@ -30,35 +23,31 @@ export function createBottleCheckMock({
 
   function handleRpcRequest({ path, input, token }) {
     switch (path) {
-      case "bottleChecks/history":
-        if (!token.includes("bottle-audit")) {
-          return response({ results: [] });
-        }
-        if (Number(input?.bottle) !== existingBottleId) {
-          return error("Unexpected Bottle history payload");
-        }
-        return response({
-          results: completedAuditTokens.has(token)
-            ? [buildModeratorAuditCheck()]
-            : [],
-        });
       case "bottleChecks/audit":
         if (
           !token.includes("bottle-audit") ||
-          input?.bottle !== existingBottleId ||
-          input?.note !== "Verify the label and catalog identity."
+          input?.bottle !== existingBottleId
         ) {
           return error("Unexpected Bottle audit payload");
         }
-        completedAuditTokens.add(token);
-        return response(buildModeratorAuditCheck());
-      case "bottleChecks/details":
-        if (token.includes("bottle-audit") && Number(input?.check) === 93) {
+        if (input?.note === "Review proposed catalog work.") {
           return response({
-            check: buildModeratorAuditCheck(),
-            reviewOperations: [],
+            status: "needs_review",
+            check: buildBottleCheckDetails({
+              approved: approvedTokens.has(token),
+              rejected: rejectedTokens.has(token),
+            }).check,
           });
         }
+        if (input?.note !== "Verify the label and catalog identity.") {
+          return error("Unexpected Bottle audit note");
+        }
+        return response({
+          status: "clean",
+          summary:
+            "The Bottle identity is supported by the inspected evidence.",
+        });
+      case "bottleChecks/details":
         if (
           isLinkedStorePriceRequest(token) &&
           Number(input?.check) === linkedStorePriceCheckId
@@ -472,35 +461,6 @@ export function createBottleCheckMock({
               }),
         },
       ],
-    };
-  }
-
-  function buildModeratorAuditCheck() {
-    const timestamp = "2026-07-30T00:00:00.000Z";
-    return {
-      id: 93,
-      intent: "audit_bottle",
-      origin: "moderator",
-      sourceKind: null,
-      sourceId: null,
-      bottleId: existingBottleId,
-      schemaVersion: 1,
-      schemaSupported: true,
-      output: {
-        summary: "The Bottle identity is supported by the inspected evidence.",
-        findings: [],
-      },
-      model: "playwright-model",
-      error: null,
-      storePriceMatchProposalId: null,
-      storePriceMatchAttemptId: null,
-      closedById: null,
-      closeReason: null,
-      closeNote: null,
-      createdAt: timestamp,
-      completedAt: timestamp,
-      closedAt: null,
-      operations: [],
     };
   }
 

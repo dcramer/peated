@@ -30,8 +30,8 @@ classifier when an Entity itself is the check subject.
 
 ## Terms
 
-- **Check:** one immutable classifier result for an external Bottle reference
-  or an existing Bottle.
+- **Check:** persisted current workflow state for an external Bottle reference
+  or an actionable existing-Bottle audit.
 - **Intent:** the caller-selected reason for the check.
 - **Finding:** a useful issue that is not executable.
 - **Proposed operation:** the small typed object recorded by the agent through a
@@ -58,7 +58,7 @@ objects, and plain async functions.
 - Make operation names, direction, creation behavior, and affected scope
   explicit; no behavior may depend on route conventions or nullable-id tricks.
 - Keep all mutation authority in canonical server services.
-- Preserve current store-price behavior during rollout.
+- Preserve current store-price behavior.
 - Separate automatic checks from automatic mutation.
 
 **Non-Goals:**
@@ -100,11 +100,13 @@ or photo. Audit `origin` records what started the audit. Intent describes the
 job; source or origin describes why this check exists.
 
 Selecting an intent does not itself persist the classifier result. V1 creates
-durable `resolve_reference` checks from store-price retries and durable audits
-from the moderator and post-user-creation audit entrypoints. Photo and other
-generic reference consumers still receive the classifier result but do not
-persist or surface its supplemental proposals; expanding reference source kinds
-is a later rollout step.
+durable `resolve_reference` checks from store-price retries, durable background
+audit receipts, and durable actionable moderator audits. Clean moderator audits
+return a transient result without persistence. Photo identification also
+persists an idempotent `resolve_reference` check when an existing-Bottle result
+contains supplemental operations or findings. That check is moderator-only;
+the end-user response keeps the existing photo-tasting contract. Other generic
+reference consumers do not persist or surface supplemental proposals.
 
 The server assembles the input, intent, and origin before the agent runs. The
 model cannot switch an audit into a reference-resolution task or use freeform
@@ -544,7 +546,7 @@ until the exact store-price attempt linked to the check has an `approved` or
 a mismatched proposal or price link, is rejected at persistence. Preview and
 approval then prepare again against resulting current state.
 
-### Decision: Persist one check and its operations
+### Decision: Persist current check workflow and its operations
 
 Because existing-Bottle audits do not have a store-price attempt, the durable
 batch boundary becomes a small shared check record:
@@ -560,7 +562,7 @@ batch boundary becomes a small shared check record:
 - intent-specific output without artifacts, plus one artifacts snapshot,
   model metadata, and timestamps;
 - optional link to the store-price match attempt/proposal that invoked it;
-- stable subject identity for history and latest-run lookup;
+- stable subject identity for current-work lookup;
 - optional closed-by moderator, close timestamp,
   `dismissed | resolved_manually` close reason, and close note.
 
@@ -583,7 +585,8 @@ The initial rejection reasons are `wrong_target`, `wrong_change`,
 `insufficient_evidence`, `resolved_manually`, and `other`. A note is required
 for `other`. This is review feedback, not an agent-visible decision rule.
 
-Clean audits do not enter the review queue. Findings and
+Clean moderator audits are returned directly without persistence. Background
+audits retain their event-key receipt for retry safety. Findings and
 `pending_review | blocked | stale | failed` operations need disposition;
 `applying` remains visible as in progress. A check with no findings leaves the
 queue automatically once every operation is `applied | rejected`. A moderator
@@ -592,30 +595,30 @@ may close remaining findings or blocked/stale/failed work as `dismissed` or
 state machine. A check cannot close while an operation is `pending_review` or
 `applying`.
 
-A rerun creates a new check; it never edits what a moderator already
-saw. The UI defaults to the latest run. An older pending operation is not made
-false merely by recency: it may still be reviewed if preparation against live
-state succeeds. No separate plan revision, dependency, or event table is
-introduced.
+In the normal moderator flow, before an audit calls the model, it returns any
+open audit for the Bottle that has findings or an operation in
+`blocked | pending_review | applying | stale | failed`. When no current work
+exists, a clean result stays transient and removes older terminal moderator
+audits. An actionable result persists one new check and also removes older
+terminal moderator audits for that Bottle. It does not delete blocked, pending,
+applying, stale, or failed work.
 
-Background callers use a durable uniqueness key for the triggering event and do
-not enqueue another run while the equivalent check is open. Moderators may
-force a rerun, in which case both intentional review batches may remain visible.
-V1 does not group or disposition operations across checks. Live preparation
-prevents an already-applied change from being applied twice.
+Background callers use a durable uniqueness key for the triggering event.
+Their receipts and store-price reference checks keep their existing lifecycle.
+No separate plan revision, dependency, event, or history table is introduced.
+Live preparation prevents an already-applied change from being applied twice.
 
 For v1, the exact store-price attempt linked to a check is the sole terminal
 authority for that check's primary resolution decision; the mutable proposal
 remains queue correlation. A forced rerun creates a new attempt and check, so it
 does not reopen an older check whose linked attempt is already terminal.
 Deleting the linked attempt clears the check link and makes execution fail
-closed. The immutable check remains supporting evidence and operation history;
-replacing price-workflow ownership requires a later explicit change.
+closed. The linked check remains supporting workflow evidence; replacing
+price-workflow ownership requires a later explicit change.
 
 Store-price checks remain in Incoming Listings. Post-user-creation and
 moderator-triggered audits appear in one small Bottle Checks workstream, one row
-per open check rather than one row per operation. The Bottle page also shows
-history, but it is not the only way to discover actionable background work.
+per open check rather than one row per operation.
 An Incoming Listings row remains while any linked check has findings or an
 operation that still needs disposition, even when the primary store-price
 decision is already complete. The listing is counted once and displays the
@@ -773,15 +776,11 @@ add move, merge, and split operations merely for symmetry.
 - **Current state changes before approval.** Rebuild previews and run canonical
   validation immediately before mutation.
 
-## Rollout
-
-Rollout flags gate check generation and persistence, moderator visibility, and
-execution. They do not alter the four proposal tools exposed when a full check
-runs.
+## Delivery
 
 1. Introduce the intent and operation schemas while preserving the current
    resolve-reference adapter.
-2. Add intent-specific evals and generate checks in shadow mode.
+2. Add intent-specific evals and persist checks in their owning workflows.
 3. Persist checks and expose read-only operation previews.
 4. Enable moderator approval for Bottle operations.
 5. Extract and test the canonical Entity update service, then enable Entity
@@ -795,6 +794,6 @@ runs.
 9. Use reviewed `bottle_group` findings to scope a separate BottleGroup-repair
    proposal around the smallest operations demonstrated by real cases.
 
-Rollback disables new check generation and operation approval. Current
+Rollback removes the new entrypoints and operation approval routes. Current
 store-price decisions and manual Bottle/Entity controls remain available.
-Already applied operations remain normal audited catalog changes.
+Already applied operations remain normal catalog changes.

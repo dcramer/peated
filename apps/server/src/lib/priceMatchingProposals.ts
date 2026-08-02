@@ -1349,8 +1349,7 @@ export async function resolveStorePriceMatchProposal(
   let candidates: PriceMatchCandidate[] = [];
   let searchEvidence: SearchEvidence[] = [];
   let classificationModelMetadata: BottleReferenceRun["modelMetadata"] = null;
-  const shouldGenerateBottleCheck =
-    generateBottleCheck && config.BOTTLE_CHECK_SHADOW_GENERATION;
+  const shouldGenerateBottleCheck = generateBottleCheck;
   try {
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.

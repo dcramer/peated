@@ -1,7 +1,6 @@
 import type { ProposedOperation } from "@peated/bottle-classifier";
 import { buildBottleClassificationArtifacts } from "@peated/bottle-classifier/contract";
 import { getBottleClassifierContext } from "@peated/server/agents/bottleClassifier/contextAdapters";
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   bottleChecks,
@@ -12,22 +11,9 @@ import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 describe("Bottle Check review action routes", () => {
-  const originalExecutionFlag = config.BOTTLE_CHECK_EXECUTION;
-  const originalVisibilityFlag = config.BOTTLE_CHECK_MODERATOR_VISIBILITY;
-
-  beforeEach(() => {
-    config.BOTTLE_CHECK_EXECUTION = true;
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = true;
-  });
-
-  afterEach(() => {
-    config.BOTTLE_CHECK_EXECUTION = originalExecutionFlag;
-    config.BOTTLE_CHECK_MODERATOR_VISIBILITY = originalVisibilityFlag;
-  });
-
   async function createEntityUpdateCheck(
     fixtures: {
       Entity: (input: {

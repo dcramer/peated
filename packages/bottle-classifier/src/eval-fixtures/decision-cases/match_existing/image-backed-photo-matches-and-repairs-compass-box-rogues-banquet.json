@@ -1,0 +1,301 @@
+{
+  "id": "image-backed-photo-matches-and-repairs-compass-box-rogues-banquet",
+  "name": "Rogues' Banquet: image-backed match and repair",
+  "input": {
+    "reference": {
+      "name": "Compass Box Rogues' Banquet",
+      "url": "https://www.compassboxwhisky.com/cdn/shop/files/RoguesBanquet.png?v=1722005483&width=1946",
+      "imageUrl": "https://www.compassboxwhisky.com/cdn/shop/files/RoguesBanquet.png?v=1722005483&width=1946"
+    },
+    "extractedIdentity": {
+      "brand": "Compass Box",
+      "bottler": "Compass Box",
+      "expression": "Rogues' Banquet",
+      "series": null,
+      "distillery": [],
+      "category": "blend",
+      "stated_age": null,
+      "abv": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "edition": "Limited Edition"
+    },
+    "imageEvidence": {
+      "sourceImageId": "compass-box-rogues-banquet-official",
+      "sourceImageHash": "f44bc60d1b7b210618a299c9d5f10f2856dfbf6b0f92f88adae4e61fb2597cec",
+      "extractors": [
+        {
+          "kind": "ocr",
+          "confidence": 0.98,
+          "textSpans": [
+            {
+              "text": "COMPASS BOX. CRAFTED BY WHISKYMAKERS. ROGUES' BANQUET. LIMITED EDITION. BLENDED SCOTCH WHISKY.",
+              "confidence": 0.98
+            }
+          ],
+          "observations": [
+            "The official bottle art identifies Compass Box, Rogues' Banquet, Limited Edition, and blended Scotch whisky; it does not visibly establish the ABV, release year, or component distilleries."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Compass Box",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Rogues' Banquet",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "bottler": {
+          "value": "Compass Box",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "blend",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "Limited Edition",
+          "confidence": 0.98,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": true,
+        "suitableAsBottleImage": true
+      },
+      "conflicts": []
+    }
+  },
+  "context": {
+    "inspectedBottleIds": [13364],
+    "bottleContexts": [
+      {
+        "bottleId": 13364,
+        "fullName": "Compass Box Rogues' Banquet",
+        "groupId": 13220,
+        "shared": {
+          "name": "Rogues' Banquet",
+          "statedAge": null,
+          "series": null,
+          "category": "blend",
+          "brand": {
+            "entityId": 1422,
+            "name": "Compass Box"
+          },
+          "distillers": [],
+          "bottler": null
+        },
+        "exact": {
+          "edition": null,
+          "statedAge": null,
+          "abv": null,
+          "singleCask": null,
+          "caskStrength": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "caskSize": null,
+          "caskType": null,
+          "caskFill": null
+        },
+        "siblings": [],
+        "aliases": [
+          {
+            "name": "Compass Box Rogues' Banquet",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "entityId": 1422,
+        "name": "Compass Box",
+        "type": ["brand", "bottler"],
+        "source": ["context"]
+      },
+      {
+        "entityId": 237,
+        "name": "Glen Elgin",
+        "type": ["brand", "distiller"],
+        "source": ["context"]
+      },
+      {
+        "entityId": 843,
+        "name": "Clynelish",
+        "type": ["brand", "distiller"],
+        "source": ["context"]
+      },
+      {
+        "entityId": 1185,
+        "name": "Miltonduff",
+        "type": ["brand", "distiller"],
+        "source": ["context"]
+      },
+      {
+        "entityId": 1204,
+        "name": "North British",
+        "type": ["distiller"],
+        "source": ["context"]
+      }
+    ]
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.compassboxwhisky.com/products/rogues-banquet",
+      "https://cdn.shopify.com/s/files/1/0605/1990/7463/files/Rogues_Banquet_Recipe_Fact_Sheet_2020.pdf?v=1727337875",
+      "https://www.whiskybase.com/whiskies/whisky/145016/rogues-banquet-blended-scotch-whisky-cb",
+      "https://api.peated.com/v1/bottles/13364"
+    ],
+    "fixtureImagePath": "packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/compass-box-rogues-banquet-official.png",
+    "dbOutcome": {
+      "bottleId": 13364,
+      "releaseId": null,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Keep existing Bottle 13364 and propose its missing Limited Edition marker, 46% ABV, 2020 release year, Compass Box bottler, and Glen Elgin, Clynelish, Miltonduff, and North British distillers."
+    },
+    "notes": "The original user-uploaded scan and its exact extraction were no longer available, so this is deliberately a curated regression rather than a production_miss fixture. Its image evidence contains only facts visible on the official bottle art; the classifier must gather ABV, release year, bottler, and component distilleries through focused web evidence. The incomplete catalog snapshot models the reported pre-repair state; the public API now shows Bottle 13364 after manual correction with 46% ABV, releaseYear 2020, Compass Box as bottler, and all four component distilleries. The official product page explicitly says the whisky was released in March 2020 and bottled at 46%; the recipe sheet names all four components; Whiskybase independently corroborates the bottler, distilleries, bottling date, and ABV. Cask type, size, and fill are intentionally outside this expectation."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 13364,
+    "expectedTier": "auto",
+    "verifyEligible": true,
+    "suggestedNextStep": "confirm_match",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 13364,
+          "patch": {
+            "shared": {
+              "distillers": [
+                {
+                  "kind": "existing",
+                  "entityId": 237
+                },
+                {
+                  "kind": "existing",
+                  "entityId": 843
+                },
+                {
+                  "kind": "existing",
+                  "entityId": 1185
+                },
+                {
+                  "kind": "existing",
+                  "entityId": 1204
+                }
+              ],
+              "bottler": {
+                "kind": "existing",
+                "entityId": 1422
+              }
+            },
+            "exact": {
+              "edition": "Limited Edition",
+              "abv": 46,
+              "releaseYear": 2020
+            }
+          }
+        },
+        "rationale": "Bottle 13364 is the exact Rogues' Banquet product, while the official facts support its missing 46% ABV, 2020 release year, Compass Box bottler, and four component distilleries.",
+        "evidenceRefs": [
+          {
+            "kind": "web_result",
+            "url": "https://www.compassboxwhisky.com/products/rogues-banquet"
+          },
+          {
+            "kind": "web_result",
+            "url": "https://cdn.shopify.com/s/files/1/0605/1990/7463/files/Rogues_Banquet_Recipe_Fact_Sheet_2020.pdf?v=1727337875"
+          },
+          {
+            "kind": "bottle",
+            "bottleId": 13364
+          },
+          {
+            "kind": "entity",
+            "entityId": 1422
+          },
+          {
+            "kind": "entity",
+            "entityId": 237
+          },
+          {
+            "kind": "entity",
+            "entityId": 843
+          },
+          {
+            "kind": "entity",
+            "entityId": 1185
+          },
+          {
+            "kind": "entity",
+            "entityId": 1204
+          }
+        ]
+      }
+    ],
+    "summary": "Match existing Bottle 13364 and retain one sparse moderator-reviewed proposal for its supported missing facts."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1422,
+        "name": "Compass Box",
+        "type": ["brand", "bottler"]
+      },
+      {
+        "id": 237,
+        "name": "Glen Elgin",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 843,
+        "name": "Clynelish",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 1185,
+        "name": "Miltonduff",
+        "type": ["brand", "distiller"]
+      },
+      {
+        "id": 1204,
+        "name": "North British",
+        "type": ["distiller"]
+      }
+    ],
+    "bottles": [
+      {
+        "id": 13364,
+        "name": "Rogues' Banquet",
+        "fullName": "Compass Box Rogues' Banquet",
+        "brandId": 1422,
+        "groupId": 13220,
+        "category": "blend"
+      }
+    ],
+    "aliases": [
+      {
+        "name": "Compass Box Rogues' Banquet",
+        "bottleId": 13364
+      }
+    ]
+  }
+}

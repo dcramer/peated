@@ -4,10 +4,8 @@ import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import * as schema from "@peated/server/db/schema";
 import {
-  bottleAliases,
   bottleChecks,
   bottleOperations,
-  bottles,
   storePriceMatchAttempts,
   storePriceMatchProposals,
 } from "@peated/server/db/schema";
@@ -18,7 +16,6 @@ import {
   closeBottleCheck,
   createBottleCheck,
   getBottleCheckForReview,
-  getBottleCheckHistory,
   listActionableBottleChecks,
 } from "@peated/server/lib/bottleChecks";
 import { eq } from "drizzle-orm";
@@ -424,90 +421,6 @@ describe("Bottle check persistence", () => {
     expect(persisted).toHaveLength(1);
   });
 
-  test("keeps moderator reruns as immutable history ordered newest first", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.Bottle();
-    const firstProposal = updateBottleProposal(bottle.id, "First Review");
-    const first = await createBottleCheck(
-      auditCheckInput({
-        artifacts: await bottleArtifacts(bottle.id),
-        bottleId: bottle.id,
-        summary: "First moderator review.",
-        operations: [
-          {
-            proposal: firstProposal,
-          },
-        ],
-      }),
-    );
-    const second = await createBottleCheck(
-      auditCheckInput({
-        bottleId: bottle.id,
-        summary: "Forced second moderator review.",
-      }),
-    );
-
-    expect(first.created).toBe(true);
-    expect(second.created).toBe(true);
-    expect(second.check.id).not.toBe(first.check.id);
-
-    const history = await getBottleCheckHistory({
-      intent: "audit_bottle",
-      bottleId: bottle.id,
-    });
-
-    expect(history.map(({ id }) => id)).toEqual([
-      second.check.id,
-      first.check.id,
-    ]);
-    expect(history[1]).toMatchObject({
-      output: {
-        summary: "First moderator review.",
-      },
-      operations: [
-        {
-          status: "pending_review",
-          stateToken: {
-            bottleId: bottle.id,
-            exact: {
-              edition: null,
-            },
-          },
-        },
-      ],
-    });
-  });
-
-  test("retains audit history after the Bottle is deleted", async ({
-    fixtures,
-  }) => {
-    const bottle = await fixtures.LegacyBottle();
-    const created = await createBottleCheck(
-      auditCheckInput({
-        bottleId: bottle.id,
-        summary: "Audit before deletion.",
-      }),
-    );
-
-    await db.delete(bottleAliases).where(eq(bottleAliases.bottleId, bottle.id));
-    await db.delete(bottles).where(eq(bottles.id, bottle.id));
-
-    const history = await getBottleCheckHistory({
-      intent: "audit_bottle",
-      bottleId: bottle.id,
-    });
-
-    expect(history).toHaveLength(1);
-    expect(history[0]).toMatchObject({
-      id: created.check.id,
-      bottleId: null,
-      output: {
-        summary: "Audit before deletion.",
-      },
-    });
-  });
-
   test("rejects a background event key on moderator-forced checks", async ({
     fixtures,
   }) => {
@@ -543,11 +456,11 @@ describe("Bottle check persistence", () => {
       "Post-user-creation Bottle checks require a background event key.",
     );
 
-    const history = await getBottleCheckHistory({
-      intent: "audit_bottle",
-      bottleId: bottle.id,
-    });
-    expect(history).toEqual([]);
+    expect(
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
+      }),
+    ).toEqual([]);
   });
 
   test("persists findings only when resource evidence was inspected", async ({
@@ -675,9 +588,8 @@ describe("Bottle check persistence", () => {
     ).rejects.toThrow("Evidence reference was not collected");
 
     expect(
-      await getBottleCheckHistory({
-        intent: "audit_bottle",
-        bottleId: bottle.id,
+      await db.query.bottleChecks.findMany({
+        where: eq(bottleChecks.bottleId, bottle.id),
       }),
     ).toHaveLength(1);
   });

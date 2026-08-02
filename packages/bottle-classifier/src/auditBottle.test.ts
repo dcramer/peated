@@ -9,6 +9,7 @@ import type {
 import {
   createBottleClassifier,
   type BottleClassifierAgentResult,
+  type RunBottleAuditAgentInput,
 } from "./classifierRuntime";
 import type { BottleCandidate } from "./classifierTypes";
 import { buildBottleClassificationArtifacts } from "./contract";
@@ -111,20 +112,28 @@ describe("auditBottle", () => {
     const runBottleAuditAgent = vi.fn(
       async ({
         audit,
+        reference,
+        extractedIdentity,
+        initialCandidates,
         currentBottleContext,
-      }: {
-        audit: {
-          bottleId: number;
-          origin: "moderator" | "post_user_creation";
-          note?: string;
-        };
-        currentBottleContext: BottleContext;
-      }) => {
+      }: RunBottleAuditAgentInput) => {
         expect(audit).toEqual({
           bottleId: 45146,
           origin: "moderator",
           note: "Check whether the nearby generic row is a duplicate.",
         });
+        expect(reference).toMatchObject({
+          name: "Laphroaig Càirdeas 2022 Warehouse 1",
+          imageUrl: "https://example.com/bottles/45146.webp",
+          currentBottleId: 45146,
+        });
+        expect(extractedIdentity).toMatchObject({
+          edition: "Warehouse 1",
+          release_year: 2022,
+        });
+        expect(initialCandidates).toEqual([
+          expect.objectContaining({ bottleId: 45146 }),
+        ]);
         expect(currentBottleContext).toMatchObject({
           bottleId: 45146,
           groupId: 320,
@@ -203,7 +212,11 @@ describe("auditBottle", () => {
         },
       ],
       artifacts: {
-        extractedIdentity: null,
+        extractedIdentity: {
+          expression: "Càirdeas",
+          edition: "Warehouse 1",
+          release_year: 2022,
+        },
         candidates: [{ bottleId: 45146 }],
         bottleContexts: [
           {
@@ -252,7 +265,14 @@ describe("auditBottle", () => {
     );
     expect(extractFromText).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
-    expect(searchBottles).not.toHaveBeenCalled();
+    expect(searchBottles).toHaveBeenCalledOnce();
+    expect(searchBottles).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: "Laphroaig Càirdeas 2022 Warehouse 1",
+        currentBottleId: 45146,
+        edition: "Warehouse 1",
+      }),
+    );
   });
 
   test("requires the read-only Bottle preload capability", async () => {

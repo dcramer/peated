@@ -16,10 +16,18 @@ const fixtureRootDir = fileURLToPath(
 const decisionFixtureDir = `${fixtureRootDir}/decision-cases`;
 const newBottleFixtureDir = `${fixtureRootDir}/new-bottles`;
 const laphroaigDecisionFixtureFile = `${decisionFixtureDir}/match_existing/store-listing-matches-laphroaig-cairdeas-2022-warehouse-1-and-merges-malformed-duplicate.json`;
+const roguesBanquetMatchFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-matches-and-repairs-compass-box-rogues-banquet.json`;
+const spiceTreeRepairFixtureFile = `${decisionFixtureDir}/match_existing/image-backed-photo-repairs-spice-tree-extravaganza.json`;
 
 function loadLaphroaigDecisionFixture() {
   return classifierEvalFixtureSchema.parse(
     JSON.parse(readFileSync(laphroaigDecisionFixtureFile, "utf8")),
+  );
+}
+
+function loadDecisionFixture(filename: string) {
+  return classifierEvalFixtureSchema.parse(
+    JSON.parse(readFileSync(filename, "utf8")),
   );
 }
 
@@ -156,6 +164,176 @@ describe("eval fixture validation", () => {
       createsBottle: false,
       createsRelease: false,
     });
+  });
+
+  test("keeps the Pōkeno Cask No. 71 audit tied to the observed production repair", () => {
+    const fixture = AUDIT_BOTTLE_EVAL_CASES.find(
+      ({ id }) =>
+        id === "audit-production-pokeno-single-cask-71-missing-edition",
+    );
+
+    expect(fixture).toBeDefined();
+    expect(fixture?.scenario).toBe("bottle_update");
+    expect(fixture?.provenance.source).toBe("production_miss");
+    expect(fixture?.input.audit.bottleId).toBe(45174);
+    expect(fixture?.provenance.verifiedSourceUrls).toEqual(
+      expect.arrayContaining([
+        "https://jvsimports.com/pokeno-whisky/",
+        "https://www.drinqy.com/shop/p/pokeno-origin-acmb2",
+      ]),
+    );
+    expect(fixture?.expected.proposedOperations).toMatchObject([
+      {
+        type: "update_bottle",
+        input: {
+          bottleId: 45174,
+          patch: {
+            exact: {
+              edition: "Cask No. 71",
+              vintageYear: 2019,
+            },
+          },
+        },
+      },
+    ]);
+    expect(JSON.stringify(fixture?.expected.proposedOperations)).not.toContain(
+      '"edition":"11"',
+    );
+    expect(JSON.stringify(fixture?.expected.proposedOperations)).not.toContain(
+      '"edition":"71"',
+    );
+  });
+
+  test("covers real Compass Box photo misses without forcing duplicate creation", () => {
+    const matchFixture = loadDecisionFixture(roguesBanquetMatchFixtureFile);
+    const repairFixture = loadDecisionFixture(spiceTreeRepairFixtureFile);
+    const roguesVerifiedUrls = [
+      "https://www.compassboxwhisky.com/products/rogues-banquet",
+      "https://www.whiskybase.com/whiskies/whisky/145016/rogues-banquet-blended-scotch-whisky-cb",
+      "https://api.peated.com/v1/bottles/13364",
+    ];
+
+    expect(matchFixture.provenance?.source).toBe("curated_regression");
+    expect(matchFixture.expected).toMatchObject({
+      action: "match",
+      matchedBottleId: 13364,
+      proposedOperations: [
+        {
+          type: "update_bottle",
+          input: {
+            bottleId: 13364,
+            patch: {
+              exact: { abv: 46, releaseYear: 2020 },
+              shared: {
+                bottler: { kind: "existing", entityId: 1422 },
+                distillers: [
+                  { kind: "existing", entityId: 237 },
+                  { kind: "existing", entityId: 843 },
+                  { kind: "existing", entityId: 1185 },
+                  { kind: "existing", entityId: 1204 },
+                ],
+              },
+            },
+          },
+        },
+      ],
+    });
+    expect(matchFixture.localCatalog?.bottles).toMatchObject([
+      {
+        id: 13364,
+        abv: null,
+        releaseYear: null,
+        bottlerId: null,
+        distillerIds: [],
+      },
+    ]);
+
+    expect(repairFixture.provenance?.source).toBe("curated_regression");
+    expect(repairFixture.localCatalog?.bottles).toMatchObject([
+      {
+        id: 9900,
+        brandId: 1361,
+        bottlerId: 1422,
+        category: "single_malt",
+        statedAge: 3,
+      },
+    ]);
+    expect(repairFixture.expected).toMatchObject({
+      action: "match",
+      matchedBottleId: 9900,
+      proposedOperations: [
+        {
+          type: "update_bottle",
+          input: {
+            bottleId: 9900,
+            patch: {
+              shared: {
+                name: "Spice Tree Extravaganza",
+                statedAge: null,
+                category: "blend",
+                brand: { kind: "existing", entityId: 1422 },
+                distillers: [
+                  { kind: "existing", entityId: 15 },
+                  { kind: "existing", entityId: 89 },
+                  { kind: "existing", entityId: 242 },
+                  { kind: "existing", entityId: 410 },
+                  { kind: "existing", entityId: 516 },
+                  { kind: "existing", entityId: 843 },
+                ],
+              },
+              exact: {
+                edition: "Limited Edition",
+                abv: 46,
+                releaseYear: 2016,
+              },
+            },
+          },
+        },
+      ],
+    });
+
+    expect(matchFixture.provenance?.verifiedSourceUrls).toEqual(
+      expect.arrayContaining(roguesVerifiedUrls),
+    );
+    expect(repairFixture.provenance?.verifiedSourceUrls).toEqual(
+      expect.arrayContaining([
+        "https://api.peated.com/v1/bottles/45175",
+        "https://api.peated.com/v1/bottles/9900",
+        "https://www.whiskybase.com/whiskies/whisky/87242/the-spice-tree-extravaganza-cb",
+      ]),
+    );
+
+    for (const fixture of [matchFixture, repairFixture]) {
+      const encodedExpectations = JSON.stringify(fixture.expected);
+      expect(encodedExpectations).not.toContain("caskType");
+      expect(encodedExpectations).not.toContain("caskSize");
+      expect(encodedExpectations).not.toContain("caskFill");
+
+      const availableSourcePaths = new Set([
+        ...Object.entries(fixture.input.reference).flatMap(([field, value]) =>
+          value == null ? [] : [`reference.${field}`],
+        ),
+        ...Object.entries(fixture.input.extractedIdentity ?? {}).flatMap(
+          ([field, value]) =>
+            value == null ? [] : [`extractedIdentity.${field}`],
+        ),
+        ...Object.keys(fixture.input.imageEvidence?.fieldCandidates ?? {}).map(
+          (field) => `imageEvidence.fieldCandidates.${field}`,
+        ),
+      ]);
+      const verifiedUrls = new Set(
+        fixture.provenance?.verifiedSourceUrls ?? [],
+      );
+      for (const operation of fixture.expected.proposedOperations) {
+        for (const evidenceRef of operation.evidenceRefs) {
+          if (evidenceRef.kind === "source") {
+            expect(availableSourcePaths).toContain(evidenceRef.field);
+          } else if (evidenceRef.kind === "web_result") {
+            expect(verifiedUrls).toContain(evidenceRef.url);
+          }
+        }
+      }
+    }
   });
 
   test("requires explicit audit contexts to cover exactly the fixture Bottles", () => {

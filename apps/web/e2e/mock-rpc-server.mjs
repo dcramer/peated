@@ -1,9 +1,6 @@
 import http from "node:http";
 
-import {
-  bottleCheckCapabilities,
-  createBottleCheckMock,
-} from "./mock-rpc/bottle-checks.mjs";
+import { createBottleCheckMock } from "./mock-rpc/bottle-checks.mjs";
 import {
   addAnotherReleaseSourceBottle,
   adminUser,
@@ -148,7 +145,6 @@ async function handleRpcRequest({ request, response, url }) {
     case "root":
       sendRpcResponse(response, {
         version: "playwright",
-        capabilities: bottleCheckCapabilities,
       });
       return true;
     case "activity/list":

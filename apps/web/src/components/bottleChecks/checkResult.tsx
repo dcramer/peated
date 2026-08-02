@@ -37,46 +37,46 @@ export default function CheckResult({
   const clean = check.operations.length === 0 && findings.length === 0;
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-950 p-5">
-      <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-        {getBottleCheckState(check)}
+    <section className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full border border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-200">
+          {getBottleCheckState(check)}
+        </span>
+        <h2 className="text-sm font-semibold text-white">{title}</h2>
       </div>
-      <h2 className="mt-2 text-lg font-semibold text-white">{title}</h2>
       <p className="mt-2 text-sm text-slate-200">
         {getBottleCheckSummary(check)}
       </p>
 
       {clean ? (
-        <div className="mt-4 rounded border border-emerald-900 bg-emerald-950/40 p-3 text-sm text-emerald-200">
+        <div className="mt-2 text-sm text-emerald-300">
           No catalog changes or unresolved findings were proposed.
         </div>
       ) : null}
 
       {findings.length > 0 ? (
-        <div className="mt-5">
+        <div className="mt-4 border-t border-slate-800 pt-3">
           <h3 className="text-sm font-semibold text-white">Findings</h3>
-          <div className="mt-3 space-y-3">
+          <div className="mt-2 space-y-3">
             {findings.map((finding, index) => {
               return (
                 <article
-                  className="rounded border border-slate-800 bg-slate-900/60 p-4"
+                  className="text-sm text-slate-200"
                   key={`${finding.scope}:${finding.summary}:${index}`}
                 >
-                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                    {finding.scope.replaceAll("_", " ")}
-                  </div>
-                  <p className="mt-2 text-sm text-slate-200">
-                    {finding.summary}
-                  </p>
-                  <EvidenceList evidence={finding.evidenceRefs} />
+                  <p>{finding.summary}</p>
+                  {finding.evidenceRefs.length > 0 ? (
+                    <details className="mt-1 text-xs text-slate-400">
+                      <summary className="cursor-pointer hover:text-white">
+                        Evidence
+                      </summary>
+                      <EvidenceList evidence={finding.evidenceRefs} />
+                    </details>
+                  ) : null}
                 </article>
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-slate-400">
-            Findings are closed with the check; they do not have individual
-            disposition controls.
-          </p>
         </div>
       ) : null}
     </section>

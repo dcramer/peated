@@ -29,14 +29,6 @@ vi.mock("@tanstack/react-query", () => ({
   useSuspenseQuery: () => ({ data: testState.details }),
 }));
 
-vi.mock("@peated/web/hooks/useBottleCheckCapabilities", () => ({
-  default: () => ({
-    bottleAudits: true,
-    bottleCheckExecution: false,
-    bottleChecks: true,
-  }),
-}));
-
 vi.mock("@peated/web/hooks/useAuth", () => ({
   default: () => ({ user: testState.user }),
 }));
@@ -48,9 +40,6 @@ vi.mock("@peated/web/lib/orpc/context", () => ({
       close: { mutationOptions: () => ({}) },
       details: {
         queryOptions: () => ({ queryKey: ["bottle-checks", "details", 9] }),
-      },
-      history: {
-        queryOptions: () => ({ queryKey: ["bottle-checks", "history", 44] }),
       },
       list: {
         queryOptions: () => ({ queryKey: ["bottle-checks", "list"] }),
@@ -199,13 +188,13 @@ function details(
   };
 }
 
-describe("Bottle Check detail execution rollout", () => {
+describe("Bottle Check detail", () => {
   beforeEach(() => {
     testState.details = details([]);
     testState.user = { admin: true, mod: false };
   });
 
-  test("omits execution controls while keeping pending rejection available", () => {
+  test("renders direct independent operation controls", () => {
     testState.details = details([
       operation("pending_review"),
       operation("failed"),
@@ -213,12 +202,14 @@ describe("Bottle Check detail execution rollout", () => {
 
     const html = renderToStaticMarkup(<Page />);
 
-    expect(html).toContain(
-      "Applying catalog changes is disabled during rollout",
-    );
+    expect(html).not.toContain("disabled during rollout");
     expect(html).not.toContain("Approve selected");
-    expect(html).not.toContain("Retry failed operation");
-    expect(html).toContain("Reject selected");
+    expect(html).not.toContain("Reject selected");
+    expect(html).not.toContain("Selected operations");
+    expect(html).not.toContain('type="checkbox"');
+    expect(html).toContain("Apply");
+    expect(html).toContain("Reject");
+    expect(html).toContain("Retry failed operation");
   });
 
   test("keeps rejection and close available for unresolved failed work", () => {
@@ -226,10 +217,10 @@ describe("Bottle Check detail execution rollout", () => {
 
     const html = renderToStaticMarkup(<Page />);
 
-    expect(html).not.toContain("Approve selected");
-    expect(html).not.toContain("Retry failed operation");
-    expect(html).toContain("Reject selected");
-    expect(html).toContain("Select");
+    expect(html).toContain("Retry failed operation");
+    expect(html).toContain("Reject");
+    expect(html).not.toContain("Select");
+    expect(html).toContain("Close without further catalog changes");
     expect(html).toContain("Close check");
   });
 

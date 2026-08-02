@@ -104,6 +104,50 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
     },
   },
   {
+    id: "image-extraction-compass-box-rogues-banquet",
+    name: "Compass Box Rogues' Banquet official bottle art",
+    imagePath: assetPath("compass-box-rogues-banquet-official.png"),
+    expected: {
+      fields: {
+        brand: "Compass Box",
+        bottler: "Compass Box",
+        expression: "Rogues' Banquet",
+        category: "blend",
+        edition: "Limited Edition",
+      },
+    },
+  },
+  {
+    id: "image-extraction-compass-box-spice-tree-extravaganza",
+    name: "Compass Box Spice Tree Extravaganza bottle photo",
+    imagePath: assetPath("compass-box-spice-tree-extravaganza.webp"),
+    expected: {
+      fields: {
+        brand: "Compass Box",
+        bottler: "Compass Box",
+        expression: "Spice Tree Extravaganza",
+        edition: "Limited Edition",
+      },
+    },
+  },
+  {
+    id: "image-extraction-pokeno-single-cask-71",
+    name: "Pōkeno Single Cask No. 71",
+    imagePath: assetPath("pokeno-single-cask-71.webp"),
+    expected: {
+      fields: {
+        brand: "Pōkeno",
+        stated_age: 4,
+        abv: 55.8,
+        vintage_year: 2019,
+        release_year: null,
+        cask_strength: true,
+        single_cask: true,
+        edition: "Cask No. 71",
+      },
+    },
+  },
+  {
     id: "image-extraction-high-west-midwinter-act-10-scene-4",
     name: "High West A Midwinter Night's Dram Act 10 Scene 4",
     imagePath: assetPath("high-west-midwinter-act-10-scene-4.jpg"),

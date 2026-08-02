@@ -14,11 +14,7 @@ import { Fragment, useRef } from "react";
 import LogoutButton from "./logoutButton";
 import UserAvatar from "./userAvatar";
 
-export function ProfileDropdown({
-  bottleChecksAvailable,
-}: {
-  bottleChecksAvailable: boolean;
-}) {
+export function ProfileDropdown() {
   const { user } = useAuth();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -71,11 +67,9 @@ export function ProfileDropdown({
               </div>
               {(user.mod || user.admin) && (
                 <div>
-                  {bottleChecksAvailable ? (
-                    <MenuItem>
-                      <Link href="/bottle-checks">Bottle Checks</Link>
-                    </MenuItem>
-                  ) : null}
+                  <MenuItem>
+                    <Link href="/bottle-checks">Bottle Checks</Link>
+                  </MenuItem>
                   {user.admin ? (
                     <MenuItem>
                       <Link href={`/admin`}>Admin</Link>

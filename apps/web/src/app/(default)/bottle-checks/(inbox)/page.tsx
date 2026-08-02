@@ -36,6 +36,23 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
+export function getBottleCheckSourceLabel(
+  check: Pick<BottleCheck, "intent" | "origin" | "sourceKind">,
+): string {
+  if (check.intent === "resolve_reference") {
+    if (check.sourceKind === "photo_identification") {
+      return "Bottle photo scan";
+    }
+    return check.sourceKind === "store_price"
+      ? "Store price"
+      : "Bottle reference";
+  }
+
+  return check.origin === "post_user_creation"
+    ? "New Bottle audit"
+    : "Moderator audit";
+}
+
 export function BottleCheckRow({ check }: { check: BottleCheck }) {
   const findings = getBottleCheckFindings(check);
   const unresolvedOperationCount = getBottleCheckOperationCount(check, {
@@ -47,9 +64,7 @@ export function BottleCheckRow({ check }: { check: BottleCheck }) {
       <td className="px-4 py-4 align-top">
         <BottleCheckSubject check={check} />
         <div className="mt-1 text-xs text-slate-400">
-          {check.origin === "post_user_creation"
-            ? "New Bottle audit"
-            : "Moderator audit"}
+          {getBottleCheckSourceLabel(check)}
         </div>
       </td>
       <td className="max-w-xl px-4 py-4 align-top">
