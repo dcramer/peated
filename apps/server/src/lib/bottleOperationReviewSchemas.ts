@@ -252,7 +252,9 @@ const EntityDependencyStateSchema = z
   .object({
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
+    // State tokens retain raw database values so legacy blanks still take part
+    // in exact staleness comparisons.
+    shortName: z.string().nullable(),
     roles: EntityContextSchema.shape.roles,
   })
   .strict();

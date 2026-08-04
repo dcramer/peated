@@ -268,7 +268,7 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
-  test("normalizes legacy blank distiller short names in Bottle update previews", async ({
+  test("supports legacy blank distiller short names in Bottle update review state", async ({
     fixtures,
   }) => {
     const distiller = await fixtures.Entity({
@@ -288,13 +288,22 @@ describe("Bottle operation review preparation", () => {
           type: "update_bottle",
           input: {
             bottleId: bottle.id,
-            patch: { exact: { edition: "Reviewed Edition" } },
+            patch: {
+              shared: {
+                category: "single_malt",
+                distillers: [{ kind: "existing", entityId: distiller.id }],
+              },
+            },
           },
-          rationale: "The inspected evidence confirms this edition.",
+          rationale:
+            "The inspected evidence confirms the category and distiller.",
           evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
         },
       },
-      artifacts: artifacts({ bottleIds: [bottle.id] }),
+      artifacts: artifacts({
+        bottleIds: [bottle.id],
+        entities: [distiller],
+      }),
     });
 
     expect(result).toMatchObject({
@@ -307,6 +316,14 @@ describe("Bottle operation review preparation", () => {
         after: {
           shared: { distillers: [{ shortName: null }] },
         },
+      },
+      stateToken: {
+        referencedEntities: expect.arrayContaining([
+          expect.objectContaining({
+            entityId: distiller.id,
+            shortName: "",
+          }),
+        ]),
       },
     });
   });
