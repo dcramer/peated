@@ -16,6 +16,13 @@ export const MAX_OPERATION_PREVIEW_IDS = 20;
 
 const PositiveIdSchema = z.number().int().positive();
 const NonEmptyTextSchema = z.string().trim().min(1);
+// Previews canonicalize legacy blanks for reviewers; state tokens retain raw
+// database values for exact staleness comparisons.
+const EntityPreviewShortNameSchema = z
+  .string()
+  .nullable()
+  .transform((value) => value?.trim() || null);
+const RawEntityShortNameSchema = z.string().nullable();
 
 export const PreparationErrorCodeSchema = z.enum([
   "target_not_inspected",
@@ -80,7 +87,7 @@ export const ExistingEntityPreviewSchema = z
     kind: z.literal("existing"),
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
+    shortName: EntityPreviewShortNameSchema,
     roles: EntityContextSchema.shape.roles,
   })
   .strict();
@@ -124,7 +131,7 @@ export const EntityPreviewStateSchema = z
   .object({
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
+    shortName: EntityPreviewShortNameSchema,
     roles: EntityContextSchema.shape.roles,
     website: EntityContextSchema.shape.website,
     location: EntityLocationSchema,
@@ -252,7 +259,7 @@ const EntityDependencyStateSchema = z
   .object({
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
+    shortName: RawEntityShortNameSchema,
     roles: EntityContextSchema.shape.roles,
   })
   .strict();
@@ -324,7 +331,7 @@ export const BottleMergeStateTokenSchema = z
 const EntityPatchStateTokenSchema = z
   .object({
     name: NonEmptyTextSchema.optional(),
-    shortName: NonEmptyTextSchema.nullable().optional(),
+    shortName: RawEntityShortNameSchema.optional(),
     roles: EntityContextSchema.shape.roles.optional(),
     website: EntityContextSchema.shape.website.optional(),
     countryId: PositiveIdSchema.nullable().optional(),
@@ -357,7 +364,7 @@ const EntityMergeIdentityStateSchema = z
   .object({
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
+    shortName: RawEntityShortNameSchema,
     roles: EntityContextSchema.shape.roles,
     aliasDigest: RelationshipDigestSchema,
     tombstoneDestinationEntityId: PositiveIdSchema.nullable(),

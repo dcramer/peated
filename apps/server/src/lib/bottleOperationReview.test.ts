@@ -268,7 +268,7 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
-  test("normalizes legacy blank distiller short names in Bottle update previews", async ({
+  test("supports legacy blank distiller short names in Bottle update review state", async ({
     fixtures,
   }) => {
     const distiller = await fixtures.Entity({
@@ -288,13 +288,22 @@ describe("Bottle operation review preparation", () => {
           type: "update_bottle",
           input: {
             bottleId: bottle.id,
-            patch: { exact: { edition: "Reviewed Edition" } },
+            patch: {
+              shared: {
+                category: "single_malt",
+                distillers: [{ kind: "existing", entityId: distiller.id }],
+              },
+            },
           },
-          rationale: "The inspected evidence confirms this edition.",
+          rationale:
+            "The inspected evidence confirms the category and distiller.",
           evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
         },
       },
-      artifacts: artifacts({ bottleIds: [bottle.id] }),
+      artifacts: artifacts({
+        bottleIds: [bottle.id],
+        entities: [distiller],
+      }),
     });
 
     expect(result).toMatchObject({
@@ -307,6 +316,120 @@ describe("Bottle operation review preparation", () => {
         after: {
           shared: { distillers: [{ shortName: null }] },
         },
+      },
+      stateToken: {
+        referencedEntities: expect.arrayContaining([
+          expect.objectContaining({
+            entityId: distiller.id,
+            shortName: "",
+          }),
+        ]),
+      },
+    });
+  });
+
+  test("supports legacy blank short names in Entity merge review state", async ({
+    fixtures,
+  }) => {
+    const source = await fixtures.Entity({
+      name: "Legacy Blank Merge Source",
+      shortName: "",
+      type: ["distiller"],
+    });
+    const destination = await fixtures.Entity({
+      name: "Legacy Blank Merge Destination",
+      type: ["brand"],
+    });
+
+    const result = await prepareOperation({
+      operation: {
+        id: 6,
+        proposal: {
+          type: "merge_entities",
+          input: {
+            sourceEntityId: source.id,
+            destinationEntityId: destination.id,
+          },
+          rationale: "The inspected records identify the same producer.",
+          evidenceRefs: [
+            { kind: "entity", entityId: source.id },
+            { kind: "entity", entityId: destination.id },
+          ],
+        },
+      },
+      artifacts: artifacts({ entities: [source, destination] }),
+    });
+
+    expect(result).toMatchObject({
+      status: "pending_review",
+      type: "merge_entities",
+      preview: {
+        source: { entityId: source.id, shortName: null },
+      },
+      stateToken: {
+        source: { entityId: source.id, shortName: "" },
+      },
+    });
+  });
+
+  test("supports legacy blank short names in Entity update review state", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Legacy Blank Update Entity",
+      shortName: "",
+      type: ["brand"],
+    });
+    const context = { artifacts: artifacts({ entities: [entity] }) };
+
+    const shortNameUpdate = await prepareOperation({
+      operation: {
+        id: 7,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: entity.id,
+            patch: { shortName: "Legacy Update" },
+          },
+          rationale: "The inspected Entity uses this short name.",
+          evidenceRefs: [{ kind: "entity", entityId: entity.id }],
+        },
+      },
+      ...context,
+    });
+    const websiteUpdate = await prepareOperation({
+      operation: {
+        id: 8,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: entity.id,
+            patch: { website: "https://legacy-update.example" },
+          },
+          rationale: "The inspected Entity uses this website.",
+          evidenceRefs: [{ kind: "entity", entityId: entity.id }],
+        },
+      },
+      ...context,
+    });
+
+    expect(shortNameUpdate).toMatchObject({
+      status: "pending_review",
+      type: "update_entity",
+      preview: {
+        before: { shortName: null },
+        after: { shortName: "Legacy Update" },
+      },
+      stateToken: {
+        fields: { shortName: "" },
+      },
+    });
+    expect(websiteUpdate).toMatchObject({
+      status: "pending_review",
+      type: "update_entity",
+      preview: {
+        before: { shortName: null },
+        after: { shortName: null },
       },
     });
   });
