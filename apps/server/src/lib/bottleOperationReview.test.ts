@@ -372,6 +372,68 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
+  test("supports legacy blank short names in Entity update review state", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Legacy Blank Update Entity",
+      shortName: "",
+      type: ["brand"],
+    });
+    const context = { artifacts: artifacts({ entities: [entity] }) };
+
+    const shortNameUpdate = await prepareOperation({
+      operation: {
+        id: 7,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: entity.id,
+            patch: { shortName: "Legacy Update" },
+          },
+          rationale: "The inspected Entity uses this short name.",
+          evidenceRefs: [{ kind: "entity", entityId: entity.id }],
+        },
+      },
+      ...context,
+    });
+    const websiteUpdate = await prepareOperation({
+      operation: {
+        id: 8,
+        proposal: {
+          type: "update_entity",
+          input: {
+            entityId: entity.id,
+            patch: { website: "https://legacy-update.example" },
+          },
+          rationale: "The inspected Entity uses this website.",
+          evidenceRefs: [{ kind: "entity", entityId: entity.id }],
+        },
+      },
+      ...context,
+    });
+
+    expect(shortNameUpdate).toMatchObject({
+      status: "pending_review",
+      type: "update_entity",
+      preview: {
+        before: { shortName: null },
+        after: { shortName: "Legacy Update" },
+      },
+      stateToken: {
+        fields: { shortName: "" },
+      },
+    });
+    expect(websiteUpdate).toMatchObject({
+      status: "pending_review",
+      type: "update_entity",
+      preview: {
+        before: { shortName: null },
+        after: { shortName: null },
+      },
+    });
+  });
+
   test("reports merge membership and identity collisions as canonical merge warnings", async ({
     fixtures,
   }) => {

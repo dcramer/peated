@@ -123,7 +123,7 @@ export function existingEntityChoice(entity: Entity) {
     kind: "existing" as const,
     entityId: entity.id,
     name: entity.name,
-    shortName: entity.shortName?.trim() || null,
+    shortName: entity.shortName,
     roles: [...entity.type].sort(),
   };
 }
