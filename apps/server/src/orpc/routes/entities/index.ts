@@ -1,6 +1,7 @@
 import { base } from "@peated/server/orpc";
 import aliases from "./aliases";
 import auditCandidates from "./audit-candidates";
+import catalog from "./catalog";
 import categories from "./categories";
 import classify from "./classify";
 import create from "./create";
@@ -12,6 +13,7 @@ import update from "./update";
 
 export default base.tag("entities").router({
   auditCandidates,
+  catalog,
   classify,
   details,
   list,
