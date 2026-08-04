@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import verifyEntityCreation from "./verifyEntityCreation";
 
 describe("verifyEntityCreation", () => {
-  test("records flagged findings for suspicious manually created entities", async ({
+  test("records flagged findings for suspicious automated entities", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({
@@ -14,7 +14,7 @@ describe("verifyEntityCreation", () => {
 
     await verifyEntityCreation({
       entityId: entity.id,
-      creationSource: "manual_entry",
+      creationSource: "price_match_automation",
     });
 
     const entityChanges = await db
@@ -28,7 +28,7 @@ describe("verifyEntityCreation", () => {
     );
 
     expect(verificationChange?.data.catalogVerification).toMatchObject({
-      source: "manual_entry",
+      source: "price_match_automation",
       status: "flagged",
     });
     expect(

@@ -54,7 +54,7 @@ describe("verifyBottleCreation", () => {
     expect(auditBottleWithServerAdapters).not.toHaveBeenCalled();
   });
 
-  test("replaces selected Bottle verification with one review-only audit check", async ({
+  test("audits automated price-match Bottles with one review-only check", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle({ edition: null });
@@ -90,7 +90,7 @@ describe("verifyBottleCreation", () => {
 
     const input = {
       bottleId: bottle.id,
-      creationSource: "manual_entry" as const,
+      creationSource: "price_match_automation" as const,
     };
     await verifyBottleCreation(input);
     await verifyBottleCreation(input);
