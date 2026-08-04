@@ -23,7 +23,7 @@ export function createBottleCheckMock({
 
   function handleRpcRequest({ path, input, token }) {
     switch (path) {
-      case "bottleChecks/audit":
+      case "audits/create":
         if (
           !token.includes("bottle-audit") ||
           input?.bottle !== existingBottleId
@@ -33,10 +33,10 @@ export function createBottleCheckMock({
         if (input?.note === "Review proposed catalog work.") {
           return response({
             status: "needs_review",
-            check: buildBottleCheckDetails({
+            audit: buildBottleCheckDetails({
               approved: approvedTokens.has(token),
               rejected: rejectedTokens.has(token),
-            }).check,
+            }).audit,
           });
         }
         if (input?.note !== "Verify the label and catalog identity.") {
@@ -47,10 +47,10 @@ export function createBottleCheckMock({
           summary:
             "The Bottle identity is supported by the inspected evidence.",
         });
-      case "bottleChecks/details":
+      case "audits/details":
         if (
           isLinkedStorePriceRequest(token) &&
-          Number(input?.check) === linkedStorePriceCheckId
+          Number(input?.audit) === linkedStorePriceCheckId
         ) {
           return response(
             buildLinkedStorePriceCheckDetails({
@@ -60,7 +60,7 @@ export function createBottleCheckMock({
         }
         if (
           !token.includes("bottle-check-review") ||
-          Number(input?.check) !== 91
+          Number(input?.audit) !== 91
         ) {
           return null;
         }
@@ -70,10 +70,10 @@ export function createBottleCheckMock({
             rejected: rejectedTokens.has(token),
           }),
         );
-      case "bottleChecks/approveSelected":
+      case "audits/approveSelected":
         if (
           isLinkedStorePriceRequest(token) &&
-          input?.check === linkedStorePriceCheckId &&
+          input?.audit === linkedStorePriceCheckId &&
           Array.isArray(input?.operationIds) &&
           input.operationIds.length === 1 &&
           input.operationIds[0] === linkedStorePriceOperationId
@@ -91,7 +91,7 @@ export function createBottleCheckMock({
         }
         if (
           !token.includes("bottle-check-review") ||
-          input?.check !== 91 ||
+          input?.audit !== 91 ||
           !Array.isArray(input?.operationIds) ||
           input.operationIds.length !== 1 ||
           input.operationIds[0] !== 701
@@ -102,12 +102,12 @@ export function createBottleCheckMock({
         return response({
           results: [{ operationId: 701, status: "applied", error: null }],
         });
-      case "bottleChecks/rejectSelected":
+      case "audits/rejectSelected":
         if (!token.includes("bottle-check-review")) {
           return null;
         }
         if (
-          input?.check !== 91 ||
+          input?.audit !== 91 ||
           !Array.isArray(input?.operationIds) ||
           input.operationIds.length !== 1 ||
           input.operationIds[0] !== 702 ||
@@ -220,7 +220,7 @@ export function createBottleCheckMock({
     };
 
     return {
-      check: {
+      audit: {
         id: linkedStorePriceCheckId,
         intent: "resolve_reference",
         origin: null,
@@ -410,7 +410,7 @@ export function createBottleCheckMock({
     });
 
     return {
-      check: {
+      audit: {
         id: 91,
         intent: "audit_bottle",
         origin: "moderator",

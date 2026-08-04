@@ -1,6 +1,7 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
+import AdminWorkstreamTabs from "@peated/web/components/admin/workstreamTabs";
 import {
   BottleCheckSubject,
   getBottleCheckFindings,
@@ -20,7 +21,7 @@ import { buildQueryString } from "@peated/web/lib/urls";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
 
-type BottleCheck = Outputs["bottleChecks"]["list"]["results"][number];
+type BottleCheck = Outputs["audits"]["list"]["results"][number];
 type AuditOrigin = NonNullable<BottleCheck["origin"]>;
 
 const ORIGIN_OPTIONS: Array<{ id: AuditOrigin | null; label: string }> = [
@@ -49,7 +50,7 @@ export function getBottleCheckSourceLabel(
   }
 
   return check.origin === "post_user_creation"
-    ? "New Bottle audit"
+    ? "Post-create audit"
     : "Moderator audit";
 }
 
@@ -88,7 +89,7 @@ export function BottleCheckRow({ check }: { check: BottleCheck }) {
       <td className="px-4 py-4 text-right align-top">
         <Link
           className="text-highlight text-sm font-semibold hover:underline"
-          href={`/bottle-checks/${check.id}`}
+          href={`/admin/audits/${check.id}`}
         >
           Review
         </Link>
@@ -105,13 +106,13 @@ export function BottleCheckEmptyState({
   filtered: boolean;
 }) {
   if (!filtered) {
-    return <EmptyActivity>No Bottle checks need attention.</EmptyActivity>;
+    return <EmptyActivity>No audits need attention.</EmptyActivity>;
   }
 
   return (
     <EmptyActivity>
       <div className="flex flex-col items-center gap-3">
-        <div>No Bottle checks match this filter.</div>
+        <div>No audits match this filter.</div>
         <Button href={clearHref}>Clear filter</Button>
       </div>
     </EmptyActivity>
@@ -125,7 +126,7 @@ export default function Page() {
   const queryParams = useApiQueryParams({ numericFields: ["cursor", "limit"] });
   const orpc = useORPC();
   const { data } = useSuspenseQuery(
-    orpc.bottleChecks.list.queryOptions({
+    orpc.audits.list.queryOptions({
       input: {
         cursor: queryParams.cursor,
         limit: queryParams.limit,
@@ -139,13 +140,16 @@ export default function Page() {
       <Breadcrumbs
         pages={[
           {
-            name: "Bottle Checks",
-            href: "/bottle-checks",
+            name: "Audits",
+            href: "/admin/audits",
             current: true,
           },
         ]}
       />
-      <SimpleHeader>Bottle Checks</SimpleHeader>
+      <SimpleHeader>Audits</SimpleHeader>
+      <div className="mb-6">
+        <AdminWorkstreamTabs />
+      </div>
       <div className="mb-6 flex flex-wrap gap-2">
         {ORIGIN_OPTIONS.map((option) => {
           const queryString = buildQueryString(searchParams, {

@@ -17,9 +17,9 @@ export default procedure
   .use(requireMod)
   .route({
     method: "POST",
-    path: "/bottle-checks/audit",
-    summary: "Audit an existing Bottle",
-    spec: (spec) => ({ ...spec, operationId: "auditBottle" }),
+    path: "/audits",
+    summary: "Create an audit for an existing Bottle",
+    spec: (spec) => ({ ...spec, operationId: "createAudit" }),
   })
   .input(InputSchema)
   .output(ModeratorBottleAuditResponseSchema)
@@ -32,6 +32,6 @@ export default procedure
       ? result
       : {
           status: result.status,
-          check: serializeBottleCheck(result.check),
+          audit: serializeBottleCheck(result.check),
         };
   });

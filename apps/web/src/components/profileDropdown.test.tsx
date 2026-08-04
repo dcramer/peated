@@ -35,26 +35,25 @@ const moderator = {
 const admin = { ...moderator, admin: true, mod: false } satisfies User;
 
 describe("ProfileDropdown", () => {
-  test("keeps Bottle Checks available in the mobile moderator menu", () => {
+  test("does not show the admin Audits page to moderators", () => {
     const html = renderToStaticMarkup(
       <AuthProvider user={moderator}>
         <ProfileDropdown />
       </AuthProvider>,
     );
 
-    expect(html).not.toContain("hidden sm:block");
-    expect(html).toContain('href="/bottle-checks"');
-    expect(html).toContain("Bottle Checks");
+    expect(html).not.toContain("Audits");
+    expect(html).not.toContain('href="/admin"');
   });
 
-  test("keeps Bottle Checks available to administrators", () => {
+  test("keeps Audits available to administrators", () => {
     const html = renderToStaticMarkup(
       <AuthProvider user={admin}>
         <ProfileDropdown />
       </AuthProvider>,
     );
 
-    expect(html).toContain('href="/bottle-checks"');
+    expect(html).toContain('href="/admin/audits"');
     expect(html).toContain('href="/admin"');
   });
 });

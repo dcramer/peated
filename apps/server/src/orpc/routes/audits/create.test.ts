@@ -59,10 +59,7 @@ test("Bottle audit requires moderator access", async ({ fixtures }) => {
   const user = await fixtures.User({ mod: false, admin: false });
 
   const error = await waitError(
-    routerClient.bottleChecks.audit(
-      { bottle: bottle.id },
-      { context: { user } },
-    ),
+    routerClient.audits.create({ bottle: bottle.id }, { context: { user } }),
   );
 
   expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
@@ -79,7 +76,7 @@ test("clean Bottle audit returns a transient result without persistence", async 
     modelMetadata: null,
   });
 
-  const result = await routerClient.bottleChecks.audit(
+  const result = await routerClient.audits.create(
     { bottle: bottle.id, note: "Confirm the label." },
     { context: { user: moderator } },
   );
@@ -110,18 +107,18 @@ test("actionable Bottle audit persists one current review", async ({
     modelMetadata: null,
   });
 
-  const first = await routerClient.bottleChecks.audit(
+  const first = await routerClient.audits.create(
     { bottle: bottle.id },
     { context: { user: moderator } },
   );
-  const second = await routerClient.bottleChecks.audit(
+  const second = await routerClient.audits.create(
     { bottle: bottle.id },
     { context: { user: moderator } },
   );
 
   expect(first).toMatchObject({
     status: "needs_review",
-    check: {
+    audit: {
       intent: "audit_bottle",
       origin: "moderator",
       bottleId: bottle.id,
@@ -132,7 +129,7 @@ test("actionable Bottle audit persists one current review", async ({
   });
   expect(second).toMatchObject({
     status: "needs_review",
-    check: { id: first.status === "needs_review" ? first.check.id : -1 },
+    audit: { id: first.status === "needs_review" ? first.audit.id : -1 },
   });
   expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(1);
   expect(

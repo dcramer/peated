@@ -160,6 +160,54 @@ describe("OpenAPI generation ($ref reuse)", () => {
     >().toEqualTypeOf<false>();
   });
 
+  it("publishes audits as the only moderator review route contract", async () => {
+    const spec = await generateSpec();
+    const operations = [
+      ["/audits", "get", "listAudits"],
+      ["/audits", "post", "createAudit"],
+      ["/audits/{audit}", "get", "getAudit"],
+      ["/audits/{audit}/close", "post", "closeAudit"],
+      ["/audits/{audit}/operations/approve", "post", "approveAuditOperations"],
+      ["/audits/{audit}/operations/reject", "post", "rejectAuditOperations"],
+      [
+        "/audits/{audit}/operations/{operation}/retry",
+        "post",
+        "retryAuditOperation",
+      ],
+    ] as const;
+
+    for (const [path, method, operationId] of operations) {
+      expect((spec.paths?.[path] as any)?.[method]?.operationId).toBe(
+        operationId,
+      );
+    }
+    expect(
+      Object.keys(spec.paths ?? {}).filter((path) =>
+        path.startsWith("/bottle-checks"),
+      ),
+    ).toEqual([]);
+
+    const detailsResponse = getJsonResponseSchema(
+      spec.paths?.["/audits/{audit}"]?.get,
+    );
+    expect(detailsResponse?.required).toContain("audit");
+    expect(detailsResponse?.properties).toHaveProperty("audit");
+    expect(detailsResponse?.properties).not.toHaveProperty("check");
+
+    expectTypeOf<
+      "audit" extends keyof Inputs["audits"]["details"] ? true : false
+    >().toEqualTypeOf<true>();
+    expectTypeOf<
+      "check" extends keyof Inputs["audits"]["details"] ? true : false
+    >().toEqualTypeOf<false>();
+    expectTypeOf<
+      "audit" extends keyof Outputs["audits"]["details"] ? true : false
+    >().toEqualTypeOf<true>();
+    expectTypeOf<
+      "check" extends keyof Outputs["audits"]["details"] ? true : false
+    >().toEqualTypeOf<false>();
+  });
+
   it("publishes Bottle aliases with one direct Bottle identity", async () => {
     const spec = await generateSpec();
     const listItem = getJsonResponseSchema(spec.paths?.["/bottle-aliases"]?.get)

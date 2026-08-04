@@ -2,7 +2,7 @@ import type { Finding } from "@peated/bottle-classifier";
 import type { Outputs } from "@peated/server/orpc/router";
 import Link from "@peated/web/components/link";
 
-export type BottleCheck = Outputs["bottleChecks"]["list"]["results"][number];
+export type BottleCheck = Outputs["audits"]["list"]["results"][number];
 
 export function getBottleCheckFindings(check: BottleCheck): Finding[] {
   return check.schemaSupported ? check.output.findings : [];
@@ -10,14 +10,12 @@ export function getBottleCheckFindings(check: BottleCheck): Finding[] {
 
 export function getBottleCheckSummary(check: BottleCheck): string {
   if (!check.schemaSupported) {
-    return `This check uses unsupported schema version ${check.schemaVersion}.`;
+    return `This audit uses unsupported schema version ${check.schemaVersion}.`;
   }
   if (check.intent === "audit_bottle") return check.output.summary;
   if (check.output.status === "ignored") return check.output.reason;
   return (
-    check.output.decision.rationale ??
-    check.error ??
-    "Bottle check needs review."
+    check.output.decision.rationale ?? check.error ?? "Audit needs review."
   );
 }
 

@@ -65,18 +65,16 @@ export function ProfileDropdown() {
                   <LogoutButton />
                 </MenuItem>
               </div>
-              {(user.mod || user.admin) && (
+              {user.admin ? (
                 <div>
                   <MenuItem>
-                    <Link href="/bottle-checks">Bottle Checks</Link>
+                    <Link href="/admin/audits">Audits</Link>
                   </MenuItem>
-                  {user.admin ? (
-                    <MenuItem>
-                      <Link href={`/admin`}>Admin</Link>
-                    </MenuItem>
-                  ) : null}
+                  <MenuItem>
+                    <Link href={`/admin`}>Admin</Link>
+                  </MenuItem>
                 </div>
-              )}
+              ) : null}
             </MenuItems>
           </Transition>
         </>

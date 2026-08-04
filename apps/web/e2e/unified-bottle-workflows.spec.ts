@@ -93,7 +93,7 @@ test.describe("unified Bottle workflows", () => {
     await expectNoHorizontalOverflow(page);
   });
 
-  test("keeps one Incoming Listing while its linked Bottle check needs disposition", async ({
+  test("keeps one Incoming Listing while its linked audit needs disposition", async ({
     context,
     page,
     request,
@@ -123,30 +123,28 @@ test.describe("unified Bottle workflows", () => {
     ).toBeVisible();
 
     const detailsResponse = await request.post(
-      `${mockApiServer}/rpc/bottleChecks/details`,
+      `${mockApiServer}/rpc/audits/details`,
       {
-        data: { json: { check: 92 } },
+        data: { json: { audit: 92 } },
         headers: { Authorization: `Bearer ${accessToken}` },
       },
     );
     expect(detailsResponse.ok()).toBe(true);
     const details = (await detailsResponse.json()).json;
 
-    await page
-      .getByText("Supplemental Bottle check (1)", { exact: true })
-      .click();
+    await page.getByText("Supplemental audit (1)", { exact: true }).click();
 
-    expect(details.check).not.toHaveProperty("inputSnapshot");
-    expect(details.check).not.toHaveProperty("artifacts");
-    expect(details.check).not.toHaveProperty("modelMetadata");
-    expect(details.check).not.toHaveProperty("subjectKey");
-    expect(details.check).not.toHaveProperty("backgroundEventKey");
-    expect(details.check.output.decision).toMatchObject({
+    expect(details.audit).not.toHaveProperty("inputSnapshot");
+    expect(details.audit).not.toHaveProperty("artifacts");
+    expect(details.audit).not.toHaveProperty("modelMetadata");
+    expect(details.audit).not.toHaveProperty("subjectKey");
+    expect(details.audit).not.toHaveProperty("backgroundEventKey");
+    expect(details.audit.output.decision).toMatchObject({
       aliasScope: null,
       identityBasis: null,
       confidenceBasis: null,
     });
-    for (const operation of details.check.operations) {
+    for (const operation of details.audit.operations) {
       expect(operation).not.toHaveProperty("stateToken");
     }
     for (const operation of details.reviewOperations) {
@@ -178,13 +176,13 @@ test.describe("unified Bottle workflows", () => {
     ).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
 
-    await page.getByRole("link", { name: "Review Bottle check #92" }).click();
-    await expect(page).toHaveURL("/bottle-checks/92");
+    await page.getByRole("link", { name: "Review audit #92" }).click();
+    await expect(page).toHaveURL("/admin/audits/92");
     const reviewOperation = page.getByRole("article").filter({
       hasText: "The inspected listing matched the canonical Bottle",
     });
     const approvalRequest = page.waitForRequest((request) =>
-      request.url().includes("/rpc/bottleChecks/approveSelected"),
+      request.url().includes("/rpc/audits/approveSelected"),
     );
     await reviewOperation.getByRole("button", { name: "Apply" }).click();
     await approvalRequest;
@@ -203,9 +201,7 @@ test.describe("unified Bottle workflows", () => {
         { exact: true },
       ),
     ).toHaveCount(1);
-    await page
-      .getByText("Supplemental Bottle check (1)", { exact: true })
-      .click();
+    await page.getByText("Supplemental audit (1)", { exact: true }).click();
     await expect(
       page.getByText(
         "The surviving 2023 and 2024 Distillers Edition Bottles share the same stable expression but appear split across separate Bottle groups.",

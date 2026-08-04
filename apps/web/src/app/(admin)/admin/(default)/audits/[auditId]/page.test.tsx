@@ -3,19 +3,18 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import Page from "./page";
 
-type Details = Outputs["bottleChecks"]["details"];
-type Operation = Details["check"]["operations"][number];
+type Details = Outputs["audits"]["details"];
+type Operation = Details["audit"]["operations"][number];
 type ReviewOperation = NonNullable<
   Details["reviewOperations"][number]["review"]
 >;
 
 const testState = vi.hoisted(() => ({
   details: null as unknown,
-  user: { admin: true, mod: false },
 }));
 
 vi.mock("next/navigation", () => ({
-  useParams: () => ({ checkId: "9" }),
+  useParams: () => ({ auditId: "9" }),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
@@ -29,20 +28,16 @@ vi.mock("@tanstack/react-query", () => ({
   useSuspenseQuery: () => ({ data: testState.details }),
 }));
 
-vi.mock("@peated/web/hooks/useAuth", () => ({
-  default: () => ({ user: testState.user }),
-}));
-
 vi.mock("@peated/web/lib/orpc/context", () => ({
   useORPC: () => ({
-    bottleChecks: {
+    audits: {
       approveSelected: { mutationOptions: () => ({}) },
       close: { mutationOptions: () => ({}) },
       details: {
-        queryOptions: () => ({ queryKey: ["bottle-checks", "details", 9] }),
+        queryOptions: () => ({ queryKey: ["audits", "details", 9] }),
       },
       list: {
-        queryOptions: () => ({ queryKey: ["bottle-checks", "list"] }),
+        queryOptions: () => ({ queryKey: ["audits", "list"] }),
       },
       rejectSelected: { mutationOptions: () => ({}) },
       retry: { mutationOptions: () => ({}) },
@@ -141,11 +136,11 @@ function reviewForOperation(operation: Operation): ReviewOperation {
 function details(
   operations: Operation[],
   checkOverrides: Partial<
-    Extract<Details["check"], { schemaSupported: true }>
+    Extract<Details["audit"], { schemaSupported: true }>
   > = {},
 ): Details {
   return {
-    check: {
+    audit: {
       id: 9,
       intent: "audit_bottle",
       origin: "moderator",
@@ -176,7 +171,7 @@ function details(
       closedAt: null,
       operations,
       ...checkOverrides,
-    } as Extract<Details["check"], { schemaSupported: true }>,
+    } as Extract<Details["audit"], { schemaSupported: true }>,
     reviewOperations: operations.map((operation) => ({
       operationId: operation.id,
       review:
@@ -188,10 +183,9 @@ function details(
   };
 }
 
-describe("Bottle Check detail", () => {
+describe("Audit detail", () => {
   beforeEach(() => {
     testState.details = details([]);
-    testState.user = { admin: true, mod: false };
   });
 
   test("renders direct independent operation controls", () => {
@@ -210,6 +204,7 @@ describe("Bottle Check detail", () => {
     expect(html).toContain("Apply");
     expect(html).toContain("Reject");
     expect(html).toContain("Retry failed operation");
+    expect(html).toContain("Copy operation payload");
   });
 
   test("keeps rejection and close available for unresolved failed work", () => {
@@ -221,7 +216,7 @@ describe("Bottle Check detail", () => {
     expect(html).toContain("Reject");
     expect(html).not.toContain("Select");
     expect(html).toContain("Close without further catalog changes");
-    expect(html).toContain("Close check");
+    expect(html).toContain("Close audit");
   });
 
   test("returns store-price references to Incoming Listings", () => {
@@ -251,28 +246,6 @@ describe("Bottle Check detail", () => {
     expect(html).toContain('href="/admin/queue"');
     expect(html).toContain("Incoming Listings");
     expect(html).toContain("Reference result");
-    expect(html).not.toContain('href="/bottle-checks"');
-  });
-
-  test("returns moderator-only store-price reviews to Bottle Checks", () => {
-    testState.user = { admin: false, mod: true };
-    testState.details = details([], {
-      intent: "resolve_reference",
-      origin: null,
-      sourceKind: "store_price",
-      sourceId: "510",
-      bottleId: null,
-      output: {
-        status: "ignored",
-        reason: "The listing needs moderator review.",
-        findings: [],
-      },
-    });
-
-    const html = renderToStaticMarkup(<Page />);
-
-    expect(html).toContain('href="/bottle-checks"');
-    expect(html).toContain("Bottle Checks");
-    expect(html).not.toContain('href="/admin/queue"');
+    expect(html).not.toContain('href="/admin/audits"');
   });
 });

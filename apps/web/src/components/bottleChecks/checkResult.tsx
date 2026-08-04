@@ -6,7 +6,7 @@ import {
 } from "./checkSummary";
 import { EvidenceList } from "./operationCard";
 
-type Check = Outputs["bottleChecks"]["details"]["check"];
+type Check = Outputs["audits"]["details"]["audit"];
 
 export default function CheckResult({
   check,
@@ -23,10 +23,10 @@ export default function CheckResult({
         </div>
         <h2 className="mt-2 text-lg font-semibold text-white">{title}</h2>
         <p className="mt-2 text-sm text-amber-100">
-          This check uses schema version {check.schemaVersion}. Its historical
+          This audit uses schema version {check.schemaVersion}. Its historical
           proposals cannot be reviewed safely
           {check.canClose
-            ? ", but the check can be closed."
+            ? ", but the audit can be closed."
             : ". It cannot be closed while an operation is applying."}
         </p>
       </section>

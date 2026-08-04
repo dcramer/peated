@@ -5,9 +5,9 @@ import { LinkedBottleCheckDetails } from "./linkedBottleChecks";
 
 type Details = Parameters<typeof LinkedBottleCheckDetails>[0]["details"];
 
-test("renders a linked Bottle check as a read-only review link", () => {
+test("renders a linked audit as a read-only review link", () => {
   const details = {
-    check: {
+    audit: {
       id: 41,
       intent: "resolve_reference",
       origin: null,
@@ -49,8 +49,8 @@ test("renders a linked Bottle check as a read-only review link", () => {
   );
 
   expect(html).toContain('data-bottle-check-id="41"');
-  expect(html).toContain("Supplemental Bottle check");
-  expect(html).toContain("/bottle-checks/41");
+  expect(html).toContain("Supplemental audit");
+  expect(html).toContain("/admin/audits/41");
   expect(html).toContain("The listing matched without supplemental cleanup.");
   expect(html).not.toContain(">Select<");
 });

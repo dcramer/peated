@@ -133,7 +133,7 @@ export const ModeratorBottleAuditResponseSchema = z.discriminatedUnion(
     z
       .object({
         status: z.literal("needs_review"),
-        check: BottleCheckResponseSchema,
+        audit: BottleCheckResponseSchema,
       })
       .strict(),
   ],
@@ -157,9 +157,9 @@ export const BottleOperationActionResponseSchema = z
   })
   .strict();
 
-export const BottleCheckDetailsResponseSchema = z
+export const AuditDetailsResponseSchema = z
   .object({
-    check: BottleCheckResponseSchema,
+    audit: BottleCheckResponseSchema,
     reviewOperations: z.array(
       z
         .object({

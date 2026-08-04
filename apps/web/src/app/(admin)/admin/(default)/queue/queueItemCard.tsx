@@ -1184,9 +1184,7 @@ export default function QueueItemCard({
               <div className="text-xs font-semibold uppercase tracking-wide text-emerald-200">
                 Primary decision complete
               </div>
-              <div className="mt-2">
-                Supplemental Bottle check work remains below.
-              </div>
+              <div className="mt-2">Supplemental audit work remains below.</div>
             </div>
           ) : (
             <>

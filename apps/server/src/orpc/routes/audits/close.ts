@@ -11,16 +11,16 @@ import { BottleCheckResponseSchema } from "@peated/server/schemas/bottleChecks";
 import { serializeBottleCheck } from "@peated/server/serializers/bottleCheck";
 
 const InputSchema = CloseBottleCheckInputSchema.omit({ checkId: true }).extend({
-  check: CloseBottleCheckInputSchema.shape.checkId,
+  audit: CloseBottleCheckInputSchema.shape.checkId,
 });
 
 export default procedure
   .use(requireMod)
   .route({
     method: "POST",
-    path: "/bottle-checks/{check}/close",
-    summary: "Close a Bottle check",
-    spec: (spec) => ({ ...spec, operationId: "closeBottleCheck" }),
+    path: "/audits/{audit}/close",
+    summary: "Close an audit",
+    spec: (spec) => ({ ...spec, operationId: "closeAudit" }),
   })
   .input(InputSchema)
   .output(BottleCheckResponseSchema)
@@ -29,7 +29,7 @@ export default procedure
       return serializeBottleCheck(
         await closeBottleCheck(
           {
-            checkId: input.check,
+            checkId: input.audit,
             reason: input.reason,
             note: input.note,
           },
