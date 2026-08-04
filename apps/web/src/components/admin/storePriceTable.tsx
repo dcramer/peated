@@ -1,6 +1,7 @@
 import type { PagingRel, StorePrice } from "@peated/server/types";
 import Link from "@peated/web/components/link";
 import Price from "@peated/web/components/price";
+import TimeSince from "@peated/web/components/timeSince";
 import PaginationButtons from "../paginationButtons";
 
 export default function StorePriceTable({
@@ -34,6 +35,12 @@ export default function StorePriceTable({
               className="hidden px-3 py-2.5 text-right sm:table-cell"
             >
               Price
+            </th>
+            <th
+              scope="col"
+              className="hidden px-3 py-2.5 text-right sm:table-cell"
+            >
+              Last seen
             </th>
           </tr>
         </thead>
@@ -69,9 +76,15 @@ export default function StorePriceTable({
                       <em>No Bottle</em>
                     )}
                   </div>
+                  <div className="text-muted mt-1 text-xs sm:hidden">
+                    Last seen <TimeSince date={price.updatedAt} />
+                  </div>
                 </td>
                 <td className="hidden px-3 py-3 text-right sm:table-cell">
                   <Price value={price.price} currency={price.currency} />
+                </td>
+                <td className="text-muted hidden px-3 py-3 text-right sm:table-cell">
+                  <TimeSince date={price.updatedAt} />
                 </td>
               </tr>
             );

@@ -84,6 +84,16 @@ function makePrice(overrides: Partial<StorePrice>): StorePrice {
 }
 
 describe("StorePriceTable", () => {
+  it("shows when each listing was last seen", () => {
+    const updatedAt = "2026-07-22T12:34:56.000Z";
+    const html = renderToStaticMarkup(
+      <StorePriceTable priceList={[makePrice({ updatedAt })]} />,
+    );
+
+    expect(html).toContain("Last seen");
+    expect(html).toContain(`dateTime="${updatedAt}"`);
+  });
+
   it("links a resolved listing to its direct Bottle", () => {
     const html = renderToStaticMarkup(
       <StorePriceTable priceList={[makePrice({ bottle })]} />,
