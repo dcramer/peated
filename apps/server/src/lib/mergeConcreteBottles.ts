@@ -744,7 +744,8 @@ export async function mergeConcreteBottlesInTransaction(
     canonicalAlias.bottleId !== null &&
     canonicalAlias.bottleId !== sourceBottleId &&
     canonicalAlias.bottleId !== destinationBottleId &&
-    canonicalAliasOwner?.groupId !== sourceGroupId
+    canonicalAliasOwner?.groupId !== sourceGroupId &&
+    canonicalAliasOwner?.groupId !== destinationGroupId
   ) {
     throw new ConcreteBottleMergeConflictError("identity_conflict");
   }

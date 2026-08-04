@@ -581,6 +581,47 @@ describe("exact Bottle merges", () => {
     ).toBeUndefined();
   });
 
+  test("keeps a canonical alias assigned to a surviving destination-group Bottle", async ({
+    fixtures,
+  }) => {
+    const actor = await getUserActor(await fixtures.User({ mod: true }));
+    const source = await fixtures.Bottle({
+      name: "Destination Group Alias Source",
+    });
+    const destinationGroupBottle = await fixtures.Bottle({
+      name: "Destination Group Alias Owner",
+    });
+    const destination = await fixtures.BottleGroupMember({
+      groupId: destinationGroupBottle.groupId!,
+      edition: "Canonical Release",
+    });
+    const [canonicalAlias] = await db
+      .update(bottleAliases)
+      .set({ bottleId: destinationGroupBottle.id })
+      .where(eq(bottleAliases.name, source.fullName))
+      .returning();
+    if (!canonicalAlias) throw new Error("Expected the canonical alias.");
+
+    await db.transaction((tx) =>
+      mergeConcreteBottlesInTransaction(tx, {
+        sourceBottleId: source.id,
+        destinationBottleId: destination.id,
+        actorId: actor.id,
+      }),
+    );
+
+    expect(
+      await db.query.bottleAliases.findFirst({
+        where: eq(bottleAliases.name, canonicalAlias.name),
+      }),
+    ).toMatchObject({ bottleId: destinationGroupBottle.id });
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, source.id),
+      }),
+    ).toBeUndefined();
+  });
+
   test("claims an unassigned canonical alias for the destination", async ({
     fixtures,
   }) => {
@@ -614,7 +655,7 @@ describe("exact Bottle merges", () => {
     });
   });
 
-  test("rejects a canonical alias assigned outside the source group", async ({
+  test("rejects a canonical alias assigned outside both merge groups", async ({
     fixtures,
   }) => {
     const actor = await getUserActor(await fixtures.User({ mod: true }));

@@ -292,6 +292,20 @@ async function bottleMergeRelationshipState(
     .from(bottleTombstones)
     .where(inArray(bottleTombstones.newBottleId, bottleIds))
     .orderBy(asc(bottleTombstones.bottleId));
+  const [canonicalAlias] = await database
+    .select({
+      name: bottleAliases.name,
+      bottleId: bottleAliases.bottleId,
+      ignored: bottleAliases.ignored,
+    })
+    .from(bottleAliases)
+    .where(
+      eq(
+        sql`LOWER(${bottleAliases.name})`,
+        source.bottle.fullName.toLowerCase(),
+      ),
+    )
+    .limit(1);
   return {
     bottleGroups: bottleGroupsState,
     bottles: bottleStates,
@@ -306,6 +320,7 @@ async function bottleMergeRelationshipState(
     matchAttempts: matchAttemptRows,
     tags: tagRows,
     flavorProfiles: flavorRows,
+    canonicalAlias: canonicalAlias ?? null,
     incomingTombstones: tombstoneRows.filter(
       (
         row,
@@ -342,6 +357,22 @@ export async function prepareBottleMerge(
     source,
     destination,
   );
+  const canonicalAliasOwnerId = relationships.canonicalAlias?.bottleId;
+  const mergeGroupBottleIds = new Set(
+    relationships.bottleGroups.flatMap(
+      ({ memberBottleIds }) => memberBottleIds,
+    ),
+  );
+  if (
+    canonicalAliasOwnerId !== null &&
+    canonicalAliasOwnerId !== undefined &&
+    !mergeGroupBottleIds.has(canonicalAliasOwnerId)
+  ) {
+    fail(
+      "identity_collision",
+      `Bottle identity "${source.bottle.fullName}" conflicts with an alias assigned to Bottle ${canonicalAliasOwnerId}.`,
+    );
+  }
   const collisionTotal =
     impact.membershipCollisions.collections +
     impact.membershipCollisions.flights;

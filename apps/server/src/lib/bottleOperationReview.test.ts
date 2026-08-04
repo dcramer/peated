@@ -535,6 +535,71 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
+  test("blocks only canonical alias owners outside both merge groups", async ({
+    fixtures,
+  }) => {
+    const sourceGroupBottle = await fixtures.Bottle({
+      name: "Alias Review Source Group",
+    });
+    const source = await fixtures.BottleGroupMember({
+      groupId: sourceGroupBottle.groupId!,
+      edition: "Duplicate Release",
+    });
+    const destinationGroupBottle = await fixtures.Bottle({
+      name: "Alias Review Destination Group",
+    });
+    const destination = await fixtures.BottleGroupMember({
+      groupId: destinationGroupBottle.groupId!,
+      edition: "Canonical Release",
+    });
+    const foreignOwner = await fixtures.Bottle({
+      name: "Alias Review Foreign Owner",
+    });
+    const operation = {
+      id: 12,
+      proposal: {
+        type: "merge_bottles",
+        input: {
+          sourceBottleId: source.id,
+          destinationBottleId: destination.id,
+        },
+        rationale: "The inspected records are exact duplicates.",
+        evidenceRefs: [
+          { kind: "bottle", bottleId: source.id },
+          { kind: "bottle", bottleId: destination.id },
+        ],
+      },
+    } as const;
+    const context = {
+      artifacts: artifacts({ bottleIds: [source.id, destination.id] }),
+    };
+
+    const allowedStateTokens: string[] = [];
+    for (const allowedOwner of [sourceGroupBottle, destinationGroupBottle]) {
+      await db
+        .update(bottleAliases)
+        .set({ bottleId: allowedOwner.id })
+        .where(eq(bottleAliases.name, source.fullName));
+      const prepared = await prepareOperation({ operation, ...context });
+      expect(prepared).toMatchObject({ status: "pending_review" });
+      if (prepared.status !== "blocked" && prepared.type === "merge_bottles") {
+        allowedStateTokens.push(prepared.stateToken.relationshipDigest);
+      }
+    }
+    expect(allowedStateTokens[0]).not.toBe(allowedStateTokens[1]);
+
+    await db
+      .update(bottleAliases)
+      .set({ bottleId: foreignOwner.id })
+      .where(eq(bottleAliases.name, source.fullName));
+    await expect(
+      prepareOperation({ operation, ...context }),
+    ).resolves.toMatchObject({
+      status: "blocked",
+      preparationError: { code: "identity_collision" },
+    });
+  });
+
   test("blocks only invalid or conflicting proposals and keeps valid siblings", async ({
     fixtures,
   }) => {
