@@ -732,10 +732,10 @@ export async function mergeConcreteBottlesInTransaction(
     .where(sql`LOWER(${bottleAliases.name}) = LOWER(${source.fullName})`)
     .limit(1)
     .for("update");
+  const canonicalAliasOwnerId = canonicalAlias?.bottleId;
   if (
-    canonicalAlias &&
-    canonicalAlias.bottleId !== sourceBottleId &&
-    canonicalAlias.bottleId !== destinationBottleId
+    typeof canonicalAliasOwnerId === "number" &&
+    !bottleById.has(canonicalAliasOwnerId)
   ) {
     throw new ConcreteBottleMergeConflictError("identity_conflict");
   }
@@ -771,6 +771,18 @@ export async function mergeConcreteBottlesInTransaction(
       assignmentSource: "human_approved",
       assignedByActorId: actorId,
     });
+  } else if (canonicalAlias.bottleId === null) {
+    await tx
+      .update(bottleAliases)
+      .set({
+        name: source.fullName,
+        bottleId: destinationBottleId,
+        ignored: false,
+        embedding: null,
+        assignmentSource: "human_approved",
+        assignedByActorId: actorId,
+      })
+      .where(eq(bottleAliases.name, canonicalAlias.name));
   }
 
   const sourceTags = await tx
