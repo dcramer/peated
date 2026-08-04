@@ -18,6 +18,13 @@ function createHarness() {
       isBottleInspected: (bottleId) => inspectedBottleIds.has(bottleId),
       isEntityInspected: (entityId) => inspectedEntityIds.has(entityId),
       isSeriesInspected: (seriesId) => seriesId === 71,
+      getBottleBranding: (bottleId) =>
+        bottleId === 10
+          ? {
+              brand: "The Scotch Malt Whisky Society",
+              bottler: "The Scotch Malt Whisky Society",
+            }
+          : { brand: "Example Distillery", bottler: null },
     },
   });
   return {
@@ -215,6 +222,67 @@ describe("Bottle proposal tools", () => {
         },
       }),
     ]);
+  });
+
+  test("rejects an SMWS cask code as edition while keeping the other exact repairs", async () => {
+    const { collector, tools } = createHarness();
+    const evidenceRefs = [{ kind: "bottle" as const, bottleId: 10 }];
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        bottleId: 10,
+        patch: {
+          exact: {
+            edition: "95.71",
+            abv: 57,
+            singleCask: true,
+            vintageYear: 2007,
+          },
+        },
+        rationale: "Add the verified exact Bottle traits.",
+        evidenceRefs,
+      }),
+    ).toEqual({
+      status: "rejected",
+      reason:
+        "SMWS exact-cask codes belong in the Bottle name, not exact.edition. Omit the edition field from this proposal.",
+    });
+    expect(collector.getProposals()).toEqual([]);
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        bottleId: 10,
+        patch: {
+          exact: { abv: 57, singleCask: true, vintageYear: 2007 },
+        },
+        rationale: "Add the verified exact Bottle traits.",
+        evidenceRefs,
+      }),
+    ).toMatchObject({ status: "recorded", proposalIndex: 0 });
+    expect(collector.getProposals()).toEqual([
+      expect.objectContaining({
+        input: {
+          bottleId: 10,
+          patch: {
+            exact: { abv: 57, singleCask: true, vintageYear: 2007 },
+          },
+        },
+      }),
+    ]);
+  });
+
+  test("does not apply SMWS field placement to other exact-cask programs", async () => {
+    const { collector, tools } = createHarness();
+
+    expect(
+      await invoke(tools, "propose_update_bottle", {
+        bottleId: 11,
+        patch: { exact: { edition: "10.258" } },
+        rationale: "Add the marketed release code.",
+        evidenceRefs: [{ kind: "bottle", bottleId: 11 }],
+      }),
+    ).toMatchObject({ status: "recorded", proposalIndex: 0 });
+    expect(collector.getProposals()).toHaveLength(1);
   });
 
   test("requires evidence refs for every existing operation target", async () => {

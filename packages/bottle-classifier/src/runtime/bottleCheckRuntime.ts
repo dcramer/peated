@@ -535,6 +535,15 @@ export function createRunProposalCollector({
         Array.from(state.bottleContexts.values()).some(
           (context) => context.shared.series?.seriesId === seriesId,
         ),
+      getBottleBranding: (bottleId) => {
+        const context = state.bottleContexts.get(bottleId);
+        return context
+          ? {
+              brand: context.shared.brand.name,
+              bottler: context.shared.bottler?.name ?? null,
+            }
+          : null;
+      },
     },
   });
 }

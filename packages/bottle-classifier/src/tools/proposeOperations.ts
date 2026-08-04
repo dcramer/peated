@@ -11,6 +11,8 @@ import {
   type EvidenceRef,
   type ProposedOperation,
 } from "../bottleCheckContract";
+import { getExactCaskCodeAnchor } from "../exactCask";
+import { isSmwsIdentityAnchor } from "../smwsPolicy";
 
 const ProposalEnvelopeArgsShape = {
   rationale: UpdateBottleOperationSchema.shape.rationale,
@@ -36,6 +38,9 @@ type ProposalCollectionContext = {
   isBottleInspected: (bottleId: number) => boolean;
   isEntityInspected: (entityId: number) => boolean;
   isSeriesInspected: (seriesId: number) => boolean;
+  getBottleBranding: (
+    bottleId: number,
+  ) => { brand: string; bottler: string | null } | null;
 };
 
 type ProposalRecordResult =
@@ -189,6 +194,32 @@ function changesOnlyOptionalCaskMetadata(proposal: ProposedOperation) {
   );
 }
 
+function getSmwsEditionError(
+  proposal: ProposedOperation,
+  context: ProposalCollectionContext,
+): string | null {
+  if (proposal.type !== "update_bottle") {
+    return null;
+  }
+
+  const edition = proposal.input.patch.exact?.edition;
+  if (!edition || !getExactCaskCodeAnchor(edition)) {
+    return null;
+  }
+
+  const branding = context.getBottleBranding(proposal.input.bottleId);
+  if (
+    !branding ||
+    ![branding.brand, branding.bottler].some(isSmwsIdentityAnchor)
+  ) {
+    return null;
+  }
+
+  // SMWS code identity is materialized in the Bottle name by the package's
+  // deterministic SMWS policy; accepting it as edition would render it twice.
+  return "SMWS exact-cask codes belong in the Bottle name, not exact.edition. Omit the edition field from this proposal.";
+}
+
 export function createBottleProposalCollector({
   context,
   maxProposals = DEFAULT_MAX_PROPOSED_OPERATIONS,
@@ -233,6 +264,11 @@ export function createBottleProposalCollector({
           reason:
             "Bottle updates cannot change only optional cask type, size, or fill metadata.",
         };
+      }
+
+      const smwsEditionError = getSmwsEditionError(proposal, context);
+      if (smwsEditionError) {
+        return { status: "rejected", reason: smwsEditionError };
       }
 
       const targetError = uninspectedTarget(proposal, context);

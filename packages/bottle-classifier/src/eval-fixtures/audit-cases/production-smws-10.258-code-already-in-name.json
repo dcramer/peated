@@ -1,0 +1,174 @@
+{
+  "id": "audit-production-smws-10.258-code-already-in-name",
+  "name": "audit: enrich SMWS 10.258 without duplicating its code as edition",
+  "scenario": "bottle_update",
+  "input": {
+    "audit": {
+      "bottleId": 25608,
+      "origin": "moderator"
+    },
+    "context": {
+      "currentBottle": {
+        "bottleId": 25608,
+        "fullName": "SMWS 10.258 Quo vadis?",
+        "brand": "The Scotch Malt Whisky Society",
+        "bottler": "The Scotch Malt Whisky Society",
+        "distillery": ["Bunnahabhain"],
+        "category": "single_malt",
+        "statedAge": 9,
+        "edition": null,
+        "abv": null,
+        "singleCask": null,
+        "caskStrength": null,
+        "vintageYear": null,
+        "releaseYear": null,
+        "score": 1,
+        "source": ["context"]
+      },
+      "bottleContexts": [
+        {
+          "bottleId": 25608,
+          "fullName": "SMWS 10.258 Quo vadis?",
+          "groupId": 16244,
+          "shared": {
+            "name": "10.258 Quo vadis?",
+            "statedAge": 9,
+            "series": null,
+            "category": "single_malt",
+            "brand": {
+              "entityId": 4263,
+              "name": "The Scotch Malt Whisky Society"
+            },
+            "distillers": [
+              {
+                "entityId": 144,
+                "name": "Bunnahabhain"
+              }
+            ],
+            "bottler": {
+              "entityId": 4263,
+              "name": "The Scotch Malt Whisky Society"
+            }
+          },
+          "exact": {
+            "edition": null,
+            "statedAge": null,
+            "abv": null,
+            "singleCask": null,
+            "caskStrength": null,
+            "vintageYear": null,
+            "releaseYear": null,
+            "caskSize": null,
+            "caskType": null,
+            "caskFill": null
+          },
+          "siblings": [],
+          "aliases": [],
+          "observations": [],
+          "imageSources": []
+        }
+      ]
+    }
+  },
+  "searchResponses": [
+    {
+      "when": ["smws"],
+      "results": [
+        {
+          "bottleId": 25608,
+          "fullName": "SMWS 10.258 Quo vadis?",
+          "brand": "The Scotch Malt Whisky Society",
+          "bottler": "The Scotch Malt Whisky Society",
+          "distillery": ["Bunnahabhain"],
+          "category": "single_malt",
+          "statedAge": 9,
+          "edition": null,
+          "abv": null,
+          "singleCask": null,
+          "caskStrength": null,
+          "vintageYear": null,
+          "releaseYear": null,
+          "score": 1,
+          "source": ["search"]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://peated.com/bottles/25608",
+      "https://smwsa.com/products/cask-no-10-258",
+      "https://www.smws.com.tw/product/list/43?max=8&offset=32",
+      "https://www.whiskygoodness.com/whiskies/bunnahabhain-quo-vadis"
+    ],
+    "dbOutcome": {
+      "bottleId": 25608,
+      "createsBottle": false,
+      "createsRelease": false,
+      "summary": "Keep Bottle 25608 and its canonical name 10.258 Quo vadis?. Add exact ABV 58.1%, singleCask true, and vintageYear 2013. Leave edition null because the SMWS code is already materialized in the Bottle name."
+    },
+    "catalogFieldObservations": [
+      {
+        "target": "candidate_bottle",
+        "bottleId": 25608,
+        "field": "abv",
+        "productionValue": null,
+        "evidenceValue": 58.1,
+        "source": "production_search",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "Official SMWS product catalogs identify cask 10.258 at 58.1% ABV."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 25608,
+        "field": "singleCask",
+        "productionValue": null,
+        "evidenceValue": true,
+        "source": "production_search",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "Official SMWS product catalogs market 10.258 as one Society cask."
+      },
+      {
+        "target": "candidate_bottle",
+        "bottleId": 25608,
+        "field": "vintageYear",
+        "productionValue": null,
+        "evidenceValue": 2013,
+        "source": "production_search",
+        "issue": "missing_in_production",
+        "safeToAutoFill": false,
+        "notes": "The official SMWS Taiwan catalog gives the distillation date as 2013-10-17."
+      }
+    ],
+    "notes": "Observed August 3, 2026 from Audit #29 and operation #26 for production Bottle 25608. The audit correctly identified SMWS 10.258 Quo vadis? and proposed ABV 58.1%, singleCask true, and vintageYear 2013, but it also proposed edition 10.258. Because the stored shared name already begins with 10.258, applying that patch would render the code twice. The failed operation cited the older Whisky Goodness URL https://www.whiskygoodness.com/smws/10/10.258; that content now resolves under the verified canonical URL recorded above."
+  },
+  "expected": {
+    "summary": "Bottle 25608 is SMWS 10.258 Quo vadis?; its code is already canonical in the Bottle name, while its supported ABV, single-cask flag, and 2013 vintage are missing.",
+    "proposedOperations": [
+      {
+        "type": "update_bottle",
+        "input": {
+          "bottleId": 25608,
+          "patch": {
+            "exact": {
+              "abv": 58.1,
+              "singleCask": true,
+              "vintageYear": 2013
+            }
+          }
+        },
+        "rationale": "Official SMWS product evidence identifies cask 10.258 at 58.1% ABV and as a 2013 single-cask distillation; the code is already present in the canonical Bottle name and does not belong in edition.",
+        "evidenceRefs": [
+          {
+            "kind": "bottle",
+            "bottleId": 25608
+          }
+        ]
+      }
+    ],
+    "findings": []
+  }
+}
