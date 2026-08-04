@@ -9,7 +9,7 @@ import {
 
 test.each([
   ["resolve_reference", null, "photo_identification", "Bottle photo scan"],
-  ["resolve_reference", null, "store_price", "Store price"],
+  ["resolve_reference", null, "store_price", "Incoming listing audit"],
   ["audit_bottle", "moderator", null, "Moderator audit"],
   ["audit_bottle", "post_user_creation", null, "Post-create audit"],
 ] as const)(
@@ -56,6 +56,7 @@ test("Audits renders one inbox row per actionable check", () => {
       {
         id: 71,
         checkId: 51,
+        excludedFields: [],
         proposal: {
           type: "update_bottle",
           input: {
@@ -81,19 +82,16 @@ test("Audits renders one inbox row per actionable check", () => {
     ],
   } as ComponentProps<typeof BottleCheckRow>["check"];
 
-  const html = renderToStaticMarkup(
-    <table>
-      <tbody>
-        <BottleCheckRow check={check} />
-      </tbody>
-    </table>,
-  );
+  const html = renderToStaticMarkup(<BottleCheckRow check={check} />);
 
-  expect(html.match(/<tr/g)).toHaveLength(1);
+  expect(html.match(/<article/g)).toHaveLength(1);
   expect(html).toContain("Bottle #45146");
   expect(html).toContain("1 operation");
   expect(html).toContain("1 finding");
   expect(html).toContain('href="/admin/audits/51"');
+  expect(
+    renderToStaticMarkup(<BottleCheckRow check={check} source="new_bottle" />),
+  ).toContain('href="/admin/audits/51?source=new_bottle"');
 });
 
 describe("Audits empty states", () => {

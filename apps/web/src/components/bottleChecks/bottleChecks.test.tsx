@@ -21,6 +21,7 @@ function operation(
   return {
     id: 17,
     checkId: 9,
+    excludedFields: [],
     proposal: {
       type: "update_entity",
       input: {
@@ -103,7 +104,7 @@ describe("Bottle Check review components", () => {
       />,
     );
 
-    expect(subject).toContain("Store price #510");
+    expect(subject).toContain("Incoming listing #510");
     expect(subject).not.toContain("Deleted Bottle");
     expect(origin).toBe("");
   });
@@ -220,10 +221,11 @@ describe("Bottle Check review components", () => {
       <OperationCard operation={bottleOperation} review={review} />,
     );
 
-    expect(html).toContain(">Edition</td>");
-    expect(html).toContain(">ABV</td>");
-    expect(html).toContain(">Release year</td>");
-    expect(html).toContain(">Cask type</td>");
+    expect(html).toContain(">Edition</span>");
+    expect(html).toContain(">ABV</span>");
+    expect(html).toContain(">Release year</span>");
+    expect(html).toContain(">Cask type</span>");
+    expect(html).toContain('aria-label="Exclude Edition"');
     expect(html).not.toContain("exact.edition");
   });
 
@@ -242,8 +244,8 @@ describe("Bottle Check review components", () => {
     expect(html).toContain(
       "The current catalog state does not support applying this proposal.",
     );
-    expect(html).toContain("Apply");
-    expect(html).toContain("Reject");
+    expect(html).toContain("Apply included changes");
+    expect(html).toContain("Remove operation");
     expect(html).not.toContain('type="checkbox"');
   });
 
@@ -258,7 +260,7 @@ describe("Bottle Check review components", () => {
         />,
       );
 
-      expect(html).toContain("Reject");
+      expect(html).toContain("Remove operation");
       expect(html).not.toContain('type="checkbox"');
     },
   );
@@ -411,6 +413,25 @@ describe("Bottle Check review components", () => {
         }}
       />,
     );
+    const compactFindings = renderToStaticMarkup(
+      <CheckResult
+        check={{
+          ...baseCheck,
+          output: {
+            summary: "One relationship needs review.",
+            findings: [
+              {
+                scope: "bottle_group",
+                summary: "The Bottle may belong in another group.",
+                evidenceRefs: [],
+              },
+            ],
+          },
+        }}
+        compact
+        title="Audit result"
+      />,
+    );
 
     expect(clean).toContain("No catalog changes");
     expect(clean).not.toContain("Approve");
@@ -419,5 +440,8 @@ describe("Bottle Check review components", () => {
     expect(findings).toContain("The Bottle may belong in another group.");
     expect(findings).toContain('href="/bottles/44"');
     expect(findings).toContain("<details");
+    expect(compactFindings).toContain("One relationship needs review.");
+    expect(compactFindings).not.toContain("Audit result");
+    expect(compactFindings).not.toContain(">Findings<");
   });
 });

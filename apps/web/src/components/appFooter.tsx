@@ -16,7 +16,7 @@ export default function AppFooter() {
 
   return (
     <nav className="sm:min-h-18 mx-auto flex min-h-14 w-full max-w-4xl items-center justify-center gap-x-6 px-3 sm:px-3 lg:px-0">
-      <NavLink href="/">
+      <NavLink aria-label="Home" href="/">
         <GlobeAmericasIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
       <NavLink href={libraryHref} aria-label="Library">
@@ -30,7 +30,7 @@ export default function AppFooter() {
       >
         <PlusIcon className="m-5 h-9 w-9" />
       </NavLink>
-      <NavLink href="/friends">
+      <NavLink aria-label="Friends" href="/friends">
         <UserGroupIcon className="h-8 w-8 sm:h-9 sm:w-9" />
       </NavLink>
       <NotificationsPanel />

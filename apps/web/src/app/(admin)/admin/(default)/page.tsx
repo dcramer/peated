@@ -113,11 +113,8 @@ export default function Admin() {
   const incomingListings = ADMIN_WORKSTREAMS.find(
     (workstream) => workstream.id === "queue",
   )!;
-  const brandRepairs = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "brand-repairs",
-  )!;
-  const entityAudits = ADMIN_WORKSTREAMS.find(
-    (workstream) => workstream.id === "entity-audits",
+  const audits = ADMIN_WORKSTREAMS.find(
+    (workstream) => workstream.id === "audits",
   )!;
 
   const queueQuery = useQuery(
@@ -171,14 +168,12 @@ export default function Admin() {
               Start Here
             </div>
             <h2 className="mt-2 text-lg font-semibold text-white">
-              Pick the queue by the change you need to make.
+              Two focused queues cover moderation.
             </h2>
             <p className="mt-2 max-w-3xl text-sm text-slate-300">
-              Incoming listings and catalog repairs use different tools. Start
-              with the listing queue when retailer data is wrong or unmatched.
-              Entity and brand repairs have dedicated queues. To merge exact
-              duplicate Bottles, use Merge Bottle from the Bottle page moderator
-              menu.
+              Start with Incoming Listings to decide the Bottle assigned to a
+              retailer listing. Use Audits for classifier-proposed catalog
+              changes, including Bottle and Entity updates or merges.
             </p>
 
             <div className="mt-4 grid gap-3 lg:grid-cols-2">
@@ -199,30 +194,15 @@ export default function Admin() {
               </div>
               <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Suspect producer row
+                  Catalog changes
                 </div>
                 <div className="mt-1 text-sm text-slate-300">
-                  Run an audit first in{" "}
+                  Review proposed operations and findings in{" "}
                   <Link
-                    href={entityAudits.href}
+                    href={audits.href}
                     className="font-medium text-white underline"
                   >
-                    {entityAudits.pageTitle}
-                  </Link>
-                  .
-                </div>
-              </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                  Wrong brand entity
-                </div>
-                <div className="mt-1 text-sm text-slate-300">
-                  Reassign the bottle to the right producer in{" "}
-                  <Link
-                    href={brandRepairs.href}
-                    className="font-medium text-white underline"
-                  >
-                    {brandRepairs.pageTitle}
+                    {audits.pageTitle}
                   </Link>
                   .
                 </div>
@@ -284,20 +264,12 @@ export default function Admin() {
             whenToUse={incomingListings.whenToUse}
           />
           <WorkbenchCard
-            detail="Open this queue to audit suspicious producer rows before you decide whether to repair bottles, merge duplicates, or fix metadata."
-            href={entityAudits.href}
-            hrefLabel="Open Entity Audits"
-            summary={entityAudits.summary}
-            title={entityAudits.pageTitle}
-            whenToUse={entityAudits.whenToUse}
-          />
-          <WorkbenchCard
-            detail="Open this queue to move bottles onto the right brand entity without renaming the bottle titles."
-            href={brandRepairs.href}
-            hrefLabel="Open Brand / Entity Repairs"
-            summary={brandRepairs.summary}
-            title={brandRepairs.pageTitle}
-            whenToUse={brandRepairs.whenToUse}
+            detail="Review classifier-proposed operations, strike out unsupported fields, remove incorrect operations, and move directly to the next audit."
+            href={audits.href}
+            hrefLabel="Open Audits"
+            summary={audits.summary}
+            title={audits.pageTitle}
+            whenToUse={audits.whenToUse}
           />
         </section>
       </div>

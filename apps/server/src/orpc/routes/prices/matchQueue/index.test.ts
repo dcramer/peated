@@ -232,7 +232,7 @@ describe("price match queue", () => {
     expect(queueItem).not.toHaveProperty("proposedRelease");
   });
 
-  test("shows the latest clean linked check without duplicating the primary queue row", async ({
+  test("keeps a pending primary decision in Incoming Listings only", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -245,24 +245,21 @@ describe("price match queue", () => {
         proposalType: "match_existing",
       })
       .returning();
-    const [check] = await db
-      .insert(bottleChecks)
-      .values({
-        intent: "resolve_reference",
-        sourceKind: "store_price",
-        sourceId: String(price.id),
-        subjectKey: `resolve_reference:store_price:${price.id}`,
-        schemaVersion: 1,
-        inputSnapshot: {},
-        output: {
-          status: "classified",
-          summary: "No supplemental catalog cleanup was found.",
-          findings: [],
-        },
-        storePriceMatchProposalId: proposal.id,
-        completedAt: new Date(),
-      })
-      .returning();
+    await db.insert(bottleChecks).values({
+      intent: "resolve_reference",
+      sourceKind: "store_price",
+      sourceId: String(price.id),
+      subjectKey: `resolve_reference:store_price:${price.id}`,
+      schemaVersion: 1,
+      inputSnapshot: {},
+      output: {
+        status: "classified",
+        summary: "No supplemental catalog cleanup was found.",
+        findings: [],
+      },
+      storePriceMatchProposalId: proposal.id,
+      completedAt: new Date(),
+    });
 
     const result = await routerClient.prices.matchQueue.list(
       {},
@@ -270,14 +267,17 @@ describe("price match queue", () => {
     );
 
     expect(result.results).toHaveLength(1);
-    expect(result.results[0]).toMatchObject({
-      id: proposal.id,
-      bottleCheckIds: [check.id],
-    });
+    expect(result.results[0]).toMatchObject({ id: proposal.id });
     expect(result.stats.actionableCount).toBe(1);
+    await expect(
+      routerClient.audits.list(
+        { source: "incoming_listing" },
+        { context: { user } },
+      ),
+    ).resolves.toMatchObject({ results: [] });
   });
 
-  test("retains one completed primary row while linked supplemental work needs disposition", async ({
+  test("moves supplemental work to Bottle Checks after the primary decision", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -344,13 +344,16 @@ describe("price match queue", () => {
       { context: { user } },
     );
 
-    expect(result.results).toHaveLength(1);
-    expect(result.results[0]).toMatchObject({
-      id: proposal.id,
-      status: "approved",
-      bottleCheckIds: [check.id],
+    expect(result.results).toEqual([]);
+    expect(result.stats.actionableCount).toBe(0);
+    await expect(
+      routerClient.audits.list(
+        { source: "incoming_listing" },
+        { context: { user } },
+      ),
+    ).resolves.toMatchObject({
+      results: [expect.objectContaining({ id: check.id })],
     });
-    expect(result.stats.actionableCount).toBe(1);
   });
 
   test("removes a completed primary row after all linked supplemental work is done", async ({
@@ -442,6 +445,12 @@ describe("price match queue", () => {
 
     expect(result.results).toEqual([]);
     expect(result.stats.actionableCount).toBe(0);
+    await expect(
+      routerClient.audits.list(
+        { source: "incoming_listing" },
+        { context: { user } },
+      ),
+    ).resolves.toMatchObject({ results: [] });
   });
 
   test("hydrates a direct Bottle suggestion", async ({ fixtures }) => {

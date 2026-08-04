@@ -10,9 +10,11 @@ type Check = Outputs["audits"]["details"]["audit"];
 
 export default function CheckResult({
   check,
+  compact = false,
   title = "Audit result",
 }: {
   check: Check;
+  compact?: boolean;
   title?: string;
 }) {
   if (!check.schemaSupported) {
@@ -35,6 +37,44 @@ export default function CheckResult({
 
   const findings = getBottleCheckFindings(check);
   const clean = check.operations.length === 0 && findings.length === 0;
+
+  if (compact) {
+    return (
+      <section
+        aria-label="Review summary"
+        className="rounded-xl border border-slate-800 bg-slate-950 p-4"
+      >
+        <p className="text-sm text-slate-200">{getBottleCheckSummary(check)}</p>
+
+        {clean ? (
+          <p className="mt-2 text-sm text-emerald-300">
+            No catalog changes or unresolved findings were proposed.
+          </p>
+        ) : null}
+
+        {findings.length > 0 ? (
+          <div className="mt-3 space-y-3 border-t border-slate-800 pt-3">
+            {findings.map((finding, index) => (
+              <article
+                className="text-sm text-slate-200"
+                key={`${finding.scope}:${finding.summary}:${index}`}
+              >
+                <p>{finding.summary}</p>
+                {finding.evidenceRefs.length > 0 ? (
+                  <details className="mt-1 text-xs text-slate-400">
+                    <summary className="cursor-pointer hover:text-white">
+                      Evidence
+                    </summary>
+                    <EvidenceList evidence={finding.evidenceRefs} />
+                  </details>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-xl border border-slate-800 bg-slate-950 p-4">

@@ -3,18 +3,22 @@ import classNames from "../lib/classNames";
 
 type Props = {
   mobileOnly?: boolean;
+  semantic?: boolean;
   color?: "default" | "primary";
   children?: ReactNode;
 };
 
 export default function Header({
   mobileOnly = false,
+  semantic = true,
   children,
   color = "default",
 }: Props) {
+  const Element = semantic ? "header" : "div";
+
   return (
     <div>
-      <header
+      <Element
         className={classNames(
           "h-14 flex-shrink-0 overflow-hidden lg:h-16",
           mobileOnly ? "block lg:hidden" : "",
@@ -34,7 +38,7 @@ export default function Header({
             </div>
           </div>
         </div>
-      </header>
+      </Element>
     </div>
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "bottle_operation" ADD COLUMN "excluded_fields" jsonb DEFAULT '[]'::jsonb NOT NULL;

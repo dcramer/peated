@@ -15,8 +15,6 @@ export const fetchCache = "default-no-store";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1.0,
-  userScalable: false,
   themeColor: config.THEME_COLOR,
 };
 

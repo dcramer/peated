@@ -70,13 +70,38 @@ export function createBottleCheckMock({
             rejected: rejectedTokens.has(token),
           }),
         );
+      case "audits/list":
+        if (isLinkedStorePriceRequest(token)) {
+          return response({
+            results: [
+              buildLinkedStorePriceCheckDetails({
+                approved: approvedTokens.has(token),
+              }).audit,
+            ],
+            rel: { nextCursor: null, prevCursor: null },
+          });
+        }
+        if (token.includes("bottle-check-review")) {
+          const details = buildBottleCheckDetails({
+            approved: approvedTokens.has(token),
+            rejected: rejectedTokens.has(token),
+          });
+          return response({
+            results:
+              approvedTokens.has(token) && rejectedTokens.has(token)
+                ? []
+                : [details.audit],
+            rel: { nextCursor: null, prevCursor: null },
+          });
+        }
+        return null;
       case "audits/approveSelected":
         if (
           isLinkedStorePriceRequest(token) &&
           input?.audit === linkedStorePriceCheckId &&
-          Array.isArray(input?.operationIds) &&
-          input.operationIds.length === 1 &&
-          input.operationIds[0] === linkedStorePriceOperationId
+          Array.isArray(input?.operations) &&
+          input.operations.length === 1 &&
+          input.operations[0]?.operationId === linkedStorePriceOperationId
         ) {
           approvedTokens.add(token);
           return response({
@@ -92,9 +117,9 @@ export function createBottleCheckMock({
         if (
           !token.includes("bottle-check-review") ||
           input?.audit !== 91 ||
-          !Array.isArray(input?.operationIds) ||
-          input.operationIds.length !== 1 ||
-          input.operationIds[0] !== 701
+          !Array.isArray(input?.operations) ||
+          input.operations.length !== 1 ||
+          input.operations[0]?.operationId !== 701
         ) {
           return error("Unexpected Bottle Check approval payload");
         }
@@ -197,6 +222,7 @@ export function createBottleCheckMock({
       id: linkedStorePriceOperationId,
       checkId: linkedStorePriceCheckId,
       proposal,
+      excludedFields: [],
       preparationError: null,
       status: approved ? "applied" : "pending_review",
       reviewedById: approved ? testUser.id : null,
@@ -336,6 +362,7 @@ export function createBottleCheckMock({
       {
         id: 701,
         checkId: 91,
+        excludedFields: [],
         proposal: {
           type: "update_entity",
           input: {
@@ -368,6 +395,7 @@ export function createBottleCheckMock({
       {
         id: 702,
         checkId: 91,
+        excludedFields: [],
         proposal: {
           type: "update_entity",
           input: {
@@ -502,27 +530,7 @@ export function createBottleCheckMock({
     };
   }
 
-  function buildLinkedStorePriceQueueProposal(proposal) {
-    return {
-      ...proposal,
-      id: 9911,
-      status: "approved",
-      proposalType: "match_existing",
-      proposedBottle: null,
-      bottleCheckIds: [linkedStorePriceCheckId],
-      price: {
-        ...proposal.price,
-        id: 9912,
-        name: "Playwright Store matched listing with supplemental work",
-        bottle: existingBottle,
-      },
-      currentBottle: existingBottle,
-      suggestedBottle: existingBottle,
-    };
-  }
-
   return {
-    buildLinkedStorePriceQueueProposal,
     handleRpcRequest,
     isLinkedStorePriceRequest,
   };

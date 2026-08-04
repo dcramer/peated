@@ -77,6 +77,8 @@ A Bottle check is persisted workflow state for a server-owned intent:
   Photo identification persists this state only when an existing-Bottle match
   or repair result also contains supplemental operations or findings; the
   end-user flow still receives only its existing match/create response.
+  Actionable store-price checks enter the Audits inbox only after the
+  linked primary listing decision is complete.
 - `audit_bottle` reviews an existing Bottle from a moderator request or a
   post-user-creation job. Its result is a narrative summary, proposed
   operations, and findings; it has no redundant structured conclusion.
@@ -116,6 +118,14 @@ operation; relevant drift makes it stale. Only failed operations may be
 retried, using the same operation id and reconciliation before redispatch.
 Blocked or stale work needs manual correction or a new check. A closed check is
 immutable.
+
+Moderators may remove an entire operation with a structured rejection reason.
+For `update_bottle` and `update_entity`, they may also strike out direct patch
+fields before approval. The original classifier proposal remains immutable for
+audit history, while the operation records the excluded field paths and
+executes only the remaining patch after the original state token is
+revalidated. At least one field must remain. Merge operations are all-or-nothing
+and cannot exclude fields.
 
 Bottle checks are normal moderator functionality. A manual clean audit returns
 its summary directly without persisting a check and removes older terminal

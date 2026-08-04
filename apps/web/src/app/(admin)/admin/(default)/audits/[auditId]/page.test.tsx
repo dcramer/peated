@@ -16,6 +16,8 @@ const testState = vi.hoisted(() => ({
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({ auditId: "9" }),
+  useRouter: () => ({ prefetch: vi.fn(), push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("@tanstack/react-query", () => ({
@@ -24,20 +26,29 @@ vi.mock("@tanstack/react-query", () => ({
     mutateAsync: vi.fn(),
   }),
   useQueryClient: () => ({
+    fetchQuery: vi.fn(),
     invalidateQueries: vi.fn(),
+    prefetchQuery: vi.fn(),
   }),
   useSuspenseQuery: (options: { queryKey: string[] }) => ({
     data:
-      options.queryKey[0] === "bottles" ? testState.bottle : testState.details,
+      options.queryKey[0] === "bottles"
+        ? testState.bottle
+        : options.queryKey[1] === "list"
+          ? {
+              results: [{ id: 9 }],
+              rel: { nextCursor: null, prevCursor: null },
+            }
+          : testState.details,
   }),
 }));
 
-vi.mock("@peated/web/components/search/bottleResult", () => ({
-  default: ({
-    result,
-  }: {
-    result: { ref: { id: number; fullName: string } };
-  }) => <a href={`/bottles/${result.ref.id}`}>{result.ref.fullName}</a>,
+vi.mock("@peated/web/components/tastingBottleIdentity", () => ({
+  default: ({ bottle }: { bottle: { id: number; fullName: string } }) => (
+    <a data-testid="tasting-bottle-identity" href={`/bottles/${bottle.id}`}>
+      {bottle.fullName}
+    </a>
+  ),
 }));
 
 vi.mock("@peated/web/lib/orpc/context", () => ({
@@ -69,6 +80,7 @@ function operation(
   return {
     id: status === "failed" ? 18 : 17,
     checkId: 9,
+    excludedFields: [],
     proposal: {
       type: "update_entity",
       input: {
@@ -237,19 +249,25 @@ describe("Audit detail", () => {
     expect(html).not.toContain("Reject selected");
     expect(html).not.toContain("Selected operations");
     expect(html).not.toContain('type="checkbox"');
-    expect(html).toContain("Apply");
-    expect(html).toContain("Reject");
+    expect(html).toContain("Apply included changes");
+    expect(html).toContain("Remove operation");
     expect(html).toContain("Retry failed operation");
     expect(html).toContain("Copy operation payload");
   });
 
-  test("puts the audited Bottle first and shows run metadata", () => {
+  test("puts moderation work before collapsed run metadata", () => {
+    testState.details = details([operation("pending_review")]);
     const html = renderToStaticMarkup(<Page />);
 
-    expect(html.indexOf("Lagavulin 16-year-old")).toBeLessThan(
-      html.indexOf("Bottle audit"),
+    expect(html.indexOf("Bottle audit")).toBeLessThan(
+      html.indexOf("Lagavulin 16-year-old"),
+    );
+    expect(html.indexOf("Apply included changes")).toBeLessThan(
+      html.indexOf("Total tokens"),
     );
     expect(html).toContain('aria-label="Audited Bottle"');
+    expect(html).toContain('data-testid="tasting-bottle-identity"');
+    expect(html).toContain("Classifier run details");
     expect(html).toContain("10,800");
     expect(html).toContain("$0.0440");
     expect(html).toContain("2.4 sec");
@@ -261,13 +279,36 @@ describe("Audit detail", () => {
     const html = renderToStaticMarkup(<Page />);
 
     expect(html).toContain("Retry failed operation");
-    expect(html).toContain("Reject");
+    expect(html).toContain("Remove operation");
     expect(html).not.toContain("Select");
-    expect(html).toContain("Close without further catalog changes");
-    expect(html).toContain("Close audit");
+    expect(html).toContain("Finish audit without more catalog changes");
+    expect(html).toContain("Close and review next");
   });
 
-  test("returns store-price references to Incoming Listings", () => {
+  test("keeps completed and removed work out of the active review stack", () => {
+    testState.details = details([
+      operation("applied", {
+        result: {
+          type: "update_entity",
+          status: "applied",
+          entityId: 42,
+          changed: true,
+        },
+      }),
+      operation("rejected", {
+        id: 19,
+        rejectionReason: "wrong_change",
+      }),
+    ]);
+
+    const html = renderToStaticMarkup(<Page />);
+
+    expect(html).toContain("Reviewed operations (2)");
+    expect(html).toContain("Removed");
+    expect(html).not.toContain("Operations to review");
+  });
+
+  test("keeps store-price references in the Audits workflow", () => {
     testState.details = details([], {
       intent: "resolve_reference",
       origin: null,
@@ -291,9 +332,9 @@ describe("Audit detail", () => {
 
     const html = renderToStaticMarkup(<Page />);
 
-    expect(html).toContain('href="/admin/queue"');
-    expect(html).toContain("Incoming Listings");
+    expect(html).toContain('href="/admin/audits"');
+    expect(html).toContain("Audits");
     expect(html).toContain("Reference result");
-    expect(html).not.toContain('href="/admin/audits"');
+    expect(html).not.toContain('href="/admin/queue"');
   });
 });

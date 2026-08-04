@@ -7,7 +7,7 @@ import NotificationCount from "../notificationCount";
 
 export default function NotificationsPanel() {
   return (
-    <NavLink href="/notifications">
+    <NavLink aria-label="Notifications" href="/notifications">
       <InboxIcon className="h-8 w-8" />
       <ErrorBoundary fallback={null}>
         <Suspense>
