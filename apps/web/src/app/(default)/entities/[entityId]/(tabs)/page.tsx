@@ -3,6 +3,7 @@ import { use } from "react";
 
 import { MapIcon } from "@heroicons/react/24/outline";
 import RobotImage from "@peated/web/assets/robot.png";
+import EntityCatalogOverview from "@peated/web/components/entityCatalogOverview";
 import EntityMap from "@peated/web/components/entityMap";
 import Link from "@peated/web/components/link";
 import Markdown from "@peated/web/components/markdown";
@@ -43,6 +44,8 @@ export default function EntityDetails(props: {
             />
           </div>
         )}
+
+        <EntityCatalogOverview entity={entity} />
 
         <div className="prose prose-invert max-w-none flex-auto">
           <dl>
