@@ -29,10 +29,6 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import {
-  ExactBottleAliasConflictError,
-  reserveLiteralCanonicalBottleAliasInTransaction,
-} from "@peated/server/lib/bottleAliases";
 import { logError } from "@peated/server/lib/log";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
@@ -736,16 +732,10 @@ export async function mergeConcreteBottlesInTransaction(
     .where(sql`LOWER(${bottleAliases.name}) = LOWER(${source.fullName})`)
     .limit(1)
     .for("update");
-  const canonicalAliasOwner = canonicalAlias?.bottleId
-    ? bottleById.get(canonicalAlias.bottleId)
-    : null;
+  const canonicalAliasOwnerId = canonicalAlias?.bottleId;
   if (
-    canonicalAlias &&
-    canonicalAlias.bottleId !== null &&
-    canonicalAlias.bottleId !== sourceBottleId &&
-    canonicalAlias.bottleId !== destinationBottleId &&
-    canonicalAliasOwner?.groupId !== sourceGroupId &&
-    canonicalAliasOwner?.groupId !== destinationGroupId
+    typeof canonicalAliasOwnerId === "number" &&
+    !bottleById.has(canonicalAliasOwnerId)
   ) {
     throw new ConcreteBottleMergeConflictError("identity_conflict");
   }
@@ -774,22 +764,25 @@ export async function mergeConcreteBottlesInTransaction(
     .update(bottleAliases)
     .set({ bottleId: destinationBottleId })
     .where(eq(bottleAliases.bottleId, sourceBottleId));
-  if (!canonicalAlias || canonicalAlias.bottleId === null) {
-    try {
-      await reserveLiteralCanonicalBottleAliasInTransaction(tx, {
+  if (!canonicalAlias) {
+    await tx.insert(bottleAliases).values({
+      name: source.fullName,
+      bottleId: destinationBottleId,
+      assignmentSource: "human_approved",
+      assignedByActorId: actorId,
+    });
+  } else if (canonicalAlias.bottleId === null) {
+    await tx
+      .update(bottleAliases)
+      .set({
         name: source.fullName,
         bottleId: destinationBottleId,
+        ignored: false,
+        embedding: null,
         assignmentSource: "human_approved",
         assignedByActorId: actorId,
-      });
-    } catch (error) {
-      if (error instanceof ExactBottleAliasConflictError) {
-        throw new ConcreteBottleMergeConflictError("identity_conflict", {
-          cause: error,
-        });
-      }
-      throw error;
-    }
+      })
+      .where(eq(bottleAliases.name, canonicalAlias.name));
   }
 
   const sourceTags = await tx
