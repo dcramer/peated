@@ -19,6 +19,10 @@ They measure judgment that deterministic tests cannot prove reliably.
 - When an eval fails, state the general product invariant it exposed before
   changing the prompt, retrieval, tools, schema, runtime, or automation policy.
   Fix the smallest implicated layer.
+- Trace a model-facing failure to its owner before editing: extraction or input
+  context, retrieval, tool execution, model judgment, deterministic review or
+  integration, or the eval expectation itself. A prompt change cannot repair a
+  missing input, provider failure, code-owned invariant, or incorrect fixture.
 - Use evals for model-facing choices. Use unit or integration tests for schemas,
   transport, persistence, permissions, deterministic post-processing, and
   other code-owned behavior.
@@ -33,9 +37,12 @@ They measure judgment that deterministic tests cannot prove reliably.
   concrete values. The production fixture preserves the miss; the separate case
   proves the generalized rule.
 - Treat replay recordings as reproducible eval evidence. Commit recordings
-  required to replay a deliberate fixture or harness change.
+  required to replay a deliberate fixture or harness change. Recordings must
+  satisfy the tool's success contract; top-level and nested provider errors
+  must fail validation rather than replay as empty evidence.
 - Live evals are expensive. Run focused evals when model-sensitive behavior is
-  intentionally changing; do not make full live evals part of routine testing.
+  intentionally changing. Run the full live suite once at a deliberate
+  checkpoint, not repeatedly during iteration or as part of routine testing.
 
 ## Exceptions
 

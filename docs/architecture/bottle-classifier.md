@@ -434,6 +434,22 @@ upgrade a decision the derived tier routes to review.
 `confidenceBasis.webEvidence = supportive` is required before automation can
 treat web-backed create evidence as validated.
 
+### Prompt And Context Structure
+
+The classifier prompt should be compact without becoming policy-free. Its
+stable prefix owns the mission, success criteria, Bottle identity policy,
+evidence and decision policy, cross-tool rules, operation policy, and output
+contract. Tool-specific arguments, limits, and preconditions belong in the
+tool descriptions. The current reference, extracted identity, raw readable
+label text, candidates, and retrieved evidence belong in runtime context.
+
+Do not move request facts or eval cases into the stable prompt, and do not
+remove transferable whisky-identity rules merely to reduce prompt length. Add
+a prompt rule only when it generalizes across products; preserve concrete
+production misses in fixtures. Keep the classifier model and reasoning effort
+independently configured from extraction and eval-judge models so an unrelated
+default change cannot silently move the classifier baseline.
+
 ## Evidence And Tools
 
 Source pages, snippets, search results, and retailer titles are evidence, not
@@ -446,6 +462,21 @@ other web results; it must not infer truth from a hardcoded domain class.
 
 The originating retailer can support extraction, but it is not decisive creation
 evidence by itself.
+
+Evidence normally narrows through four stages:
+
+1. Start with the source reference, complete readable label text, and local
+   catalog context.
+2. Search only when those inputs do not resolve an identity-critical fact.
+3. Treat ranked search results and snippets as discovery candidates, not proof.
+4. Read a promising public page through Firecrawl when its excerpt does not
+   contain the exact fact needed for the decision.
+
+Search followed by focused reading is the normal workflow, not a runtime
+authorization boundary: the read tool may fetch a public HTTP(S) page through
+Firecrawl even when code cannot prove that exact URL came from the preceding
+search. Source quality and relevance remain agent judgments; URL safety and
+tool budgets remain code-owned.
 
 For image inputs, extraction scans the complete readable label, including
 smaller secondary bands, subtitles, and neck tags, for identity-bearing edition,

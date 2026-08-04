@@ -125,6 +125,25 @@ Package-specific reminders:
 
 ## Iteration Workflow
 
+### Diagnose Before Editing
+
+Inspect the eval trace from the source outward and change the first layer that
+lost or mishandled the required information:
+
+| Symptom                                                                                                         | Owning layer                                           | Response                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| The fact is absent from `rawLabelText` and `extractedIdentity` before the classifier runs.                      | Extraction or input context                            | Fix extraction or accept that the fact is unavailable. Do not ask the classifier prompt to invent it.                |
+| A relevant local or web candidate is absent from tool results.                                                  | Retrieval or adapter                                   | Fix the query, result shape, or adapter. More decision policy cannot reason over missing evidence.                   |
+| Useful tools and evidence are available, but the agent does not call them or makes the wrong semantic decision. | Prompt, tool description, or classifier model baseline | Add the smallest transferable rule, clarify the tool contract, or deliberately compare the model baseline.           |
+| A tool returns an error, malformed response, or empty result caused by its provider.                            | Tool execution or replay harness                       | Fix or surface the tool failure. Never reinterpret it as negative evidence.                                          |
+| The raw agent result is valid, but later code rejects or changes it.                                            | Review policy or server integration                    | Fix the deterministic boundary and cover it with a unit or integration test.                                         |
+| The expected result requires an unsupported trait, exact source URL, or unsafe normalization.                   | Eval fixture                                           | Correct or narrow the expectation; imperfect but evidence-grounded behavior is preferable to a fixture-driven guess. |
+
+Hold the classifier model and reasoning effort fixed while isolating a failure.
+During iteration, run the narrow failing slice and inspect its tool trace. Run
+the full live suite once after the change is coherent; repeated full runs add
+cost and noise without locating the owning layer.
+
 When changing classifier behavior:
 
 1. Update or add a focused unit test only for deterministic behavior.

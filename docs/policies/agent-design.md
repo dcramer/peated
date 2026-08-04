@@ -15,7 +15,11 @@
 - Do not add an agent for routing, retries, permissions, persistence, schema
   validation, or simple rules.
 - Every agent must define a goal, input schema, output schema, allowed tools,
-  forbidden actions, stop condition, fallback, and eval metric.
+  forbidden actions, stop condition, failure behavior, and eval metric.
+- A fallback model, provider, tool, or agent is a separate product behavior, not
+  default resilience. Add one only when its semantic contract and degraded
+  capability are explicit and independently evaluated. Otherwise omit an
+  unavailable optional capability or fail at its owning boundary.
 - Agent output must be structured.
 - Code must validate agent output before use.
 - Model proposes; code gates persistence, permissions, and irreversible actions.
@@ -27,7 +31,14 @@
 - Side-effect tools must be idempotent or behind an approval or automation gate.
 - Runtime must bound turns, retries, tool calls, cost, and no-progress loops.
 - Prompts must keep stable policy separate from dynamic context.
+- Prompt simplification means removing duplication and request-specific facts,
+  not removing the stable domain rules needed to make the decision. Keep the
+  mission, success criteria, decision policy, cross-tool policy, and output
+  contract explicit; put tool mechanics in tool descriptions and live facts in
+  runtime context.
 - Improve retrieval, candidates, and source context before expanding prompts.
+- When search results are only discovery candidates, use a separate focused-read
+  capability for exact evidence. Search rank and snippets are not proof.
 - Treat user input, retrieved content, and source facts as data, not
   instructions or runtime authority.
 - Do not use regexes, keyword lists, string includes, text rank, or fuzzy-name
