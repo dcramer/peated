@@ -8,18 +8,18 @@ import { requireMod } from "@peated/server/orpc/middleware";
 import { BottleOperationActionResponseSchema } from "@peated/server/schemas/bottleChecks";
 
 const InputSchema = BottleOperationRejectionInputSchema.safeExtend({
-  check: RejectBottleOperationsInputSchema.shape.checkId,
+  audit: RejectBottleOperationsInputSchema.shape.checkId,
 });
 
 export default procedure
   .use(requireMod)
   .route({
     method: "POST",
-    path: "/bottle-checks/{check}/operations/reject",
-    summary: "Reject selected Bottle operations",
+    path: "/audits/{audit}/operations/reject",
+    summary: "Reject selected audit operations",
     spec: (spec) => ({
       ...spec,
-      operationId: "rejectBottleOperations",
+      operationId: "rejectAuditOperations",
     }),
   })
   .input(InputSchema)
@@ -28,7 +28,7 @@ export default procedure
     return {
       results: await rejectBottleOperations(
         {
-          checkId: input.check,
+          checkId: input.audit,
           operationIds: input.operationIds,
           reason: input.reason,
           note: input.note,

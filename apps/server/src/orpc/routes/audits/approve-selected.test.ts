@@ -86,13 +86,13 @@ async function inspectedBottleContext(bottleId: number) {
   return { ...fields, publicImages: [] };
 }
 
-describe("POST /bottle-checks/{check}/operations/approve", () => {
+describe("POST /audits/{audit}/operations/approve", () => {
   test("requires moderator access", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: false });
 
     const error = await waitError(() =>
-      routerClient.bottleChecks.approveSelected(
-        { check: 1, operationIds: [1] },
+      routerClient.audits.approveSelected(
+        { audit: 1, operationIds: [1] },
         { context: { user } },
       ),
     );
@@ -144,8 +144,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     });
     const operation = created.check.operations[0]!;
 
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
     expect(details.reviewOperations).toMatchObject([
@@ -166,12 +166,12 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     expect(details.reviewOperations[0]?.review).not.toHaveProperty(
       "stateToken",
     );
-    expect(details.check.operations[0]).not.toHaveProperty("stateToken");
+    expect(details.audit.operations[0]).not.toHaveProperty("stateToken");
 
     expect(
-      await routerClient.bottleChecks.approveSelected(
+      await routerClient.audits.approveSelected(
         {
-          check: created.check.id,
+          audit: created.check.id,
           operationIds: [operation.id],
         },
         { context: { user: moderator } },
@@ -247,9 +247,9 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     const bottleOperation = created.check.operations[0]!;
 
     expect(
-      await routerClient.bottleChecks.approveSelected(
+      await routerClient.audits.approveSelected(
         {
-          check: created.check.id,
+          audit: created.check.id,
           operationIds: [bottleOperation.id],
         },
         { context: { user: moderator } },
@@ -358,8 +358,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     const operationIds = created.check.operations.map(({ id }) => id);
 
     expect(
-      await routerClient.bottleChecks.approveSelected(
-        { check: created.check.id, operationIds },
+      await routerClient.audits.approveSelected(
+        { audit: created.check.id, operationIds },
         { context: { user: moderator } },
       ),
     ).toMatchObject({
@@ -414,8 +414,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     });
     const operation = created.check.operations[0]!;
 
-    const pendingDetails = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const pendingDetails = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
     expect(pendingDetails.reviewOperations).toMatchObject([
@@ -434,8 +434,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
     ]);
 
     expect(
-      await routerClient.bottleChecks.approveSelected(
-        { check: created.check.id, operationIds: [operation.id] },
+      await routerClient.audits.approveSelected(
+        { audit: created.check.id, operationIds: [operation.id] },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -480,16 +480,16 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       initialStatus: "pending_review",
     });
 
-    const terminalDetails = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const terminalDetails = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
     expect(terminalDetails.reviewOperations).toMatchObject([
       { operationId: operation.id, approvalReady: true },
     ]);
     expect(
-      await routerClient.bottleChecks.approveSelected(
-        { check: created.check.id, operationIds: [operation.id] },
+      await routerClient.audits.approveSelected(
+        { audit: created.check.id, operationIds: [operation.id] },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -586,8 +586,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       suggestedBottleId: duplicate.id,
     });
 
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
     expect(details.reviewOperations).toMatchObject([
@@ -646,16 +646,16 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       storePriceMatchProposalId: primaryProposal!.id,
     });
 
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
     expect(details.reviewOperations).toMatchObject([
       { operationId: operation.id, approvalReady: false },
     ]);
     expect(
-      await routerClient.bottleChecks.approveSelected(
-        { check: created.check.id, operationIds: [operation.id] },
+      await routerClient.audits.approveSelected(
+        { audit: created.check.id, operationIds: [operation.id] },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -732,8 +732,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       .where(eq(bottleChecks.id, created.check.id));
 
     expect(
-      await routerClient.bottleChecks.approveSelected(
-        { check: created.check.id, operationIds: [operation.id] },
+      await routerClient.audits.approveSelected(
+        { audit: created.check.id, operationIds: [operation.id] },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -807,8 +807,8 @@ describe("POST /bottle-checks/{check}/operations/approve", () => {
       .where(eq(storePriceMatchAttempts.id, primaryAttempt!.id));
 
     expect(
-      await routerClient.bottleChecks.retry(
-        { check: created.check.id, operation: operation.id },
+      await routerClient.audits.retry(
+        { audit: created.check.id, operation: operation.id },
         { context: { user: moderator } },
       ),
     ).toEqual({

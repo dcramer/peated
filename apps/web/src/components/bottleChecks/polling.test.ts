@@ -5,17 +5,17 @@ import {
   getBottleCheckRefetchInterval,
 } from "./polling";
 
-type BottleCheckDetails = Outputs["bottleChecks"]["details"];
+type BottleCheckDetails = Outputs["audits"]["details"];
 
 function details({
   closed = false,
   status,
 }: {
   closed?: boolean;
-  status: BottleCheckDetails["check"]["operations"][number]["status"];
+  status: BottleCheckDetails["audit"]["operations"][number]["status"];
 }): BottleCheckDetails {
   return {
-    check: {
+    audit: {
       closedAt: closed ? "2026-07-30T12:00:00.000Z" : null,
       operations: [{ status }],
     },

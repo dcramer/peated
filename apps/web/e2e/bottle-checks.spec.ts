@@ -18,36 +18,35 @@ test("disposes non-ready and live-ready operations independently", async ({
   const accessToken = uniqueAccessToken(testInfo);
   await signIn(context, {
     accessToken,
-    user: { ...testUser, mod: true },
+    user: { ...testUser, admin: true, mod: true },
   });
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
 
   const detailsResponse = await request.post(
-    `${mockApiServer}/rpc/bottleChecks/details`,
+    `${mockApiServer}/rpc/audits/details`,
     {
-      data: { json: { check: 91 } },
+      data: { json: { audit: 91 } },
       headers: { Authorization: `Bearer ${accessToken}` },
     },
   );
   expect(detailsResponse.ok()).toBe(true);
   const details = (await detailsResponse.json()).json;
 
-  expect(details.check).not.toHaveProperty("inputSnapshot");
-  expect(details.check).not.toHaveProperty("artifacts");
-  expect(details.check).not.toHaveProperty("modelMetadata");
-  expect(details.check).not.toHaveProperty("subjectKey");
-  expect(details.check).not.toHaveProperty("backgroundEventKey");
-  for (const operation of details.check.operations) {
+  expect(details.audit).not.toHaveProperty("inputSnapshot");
+  expect(details.audit).not.toHaveProperty("artifacts");
+  expect(details.audit).not.toHaveProperty("modelMetadata");
+  expect(details.audit).not.toHaveProperty("subjectKey");
+  expect(details.audit).not.toHaveProperty("backgroundEventKey");
+  for (const operation of details.audit.operations) {
     expect(operation).not.toHaveProperty("stateToken");
   }
   for (const operation of details.reviewOperations) {
     expect(operation.review).not.toHaveProperty("stateToken");
   }
 
-  await page.goto("/bottle-checks/91");
+  await page.goto("/admin/audits/91");
 
-  await expect(
-    page.getByRole("heading", { name: "Bottle Check #91" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Audit #91" })).toBeVisible();
   const readyOperation = page
     .getByRole("article")
     .filter({ hasText: "Rename the inspected Brand" });
@@ -58,6 +57,22 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expect(
     readyOperation.getByRole("button", { name: "Apply" }),
   ).toBeEnabled();
+  await readyOperation
+    .getByRole("button", { name: "Copy operation payload" })
+    .click();
+  const copiedOperation = JSON.parse(
+    await page.evaluate(() => navigator.clipboard.readText()),
+  );
+  expect(copiedOperation).toMatchObject({
+    schemaVersion: 1,
+    source: "peated.admin.audit_operation",
+    audit: { id: 91 },
+    operation: { checkId: 91 },
+    liveReview: { approvalReady: true },
+  });
+  await expect(
+    page.getByText("Copied audit operation", { exact: false }),
+  ).toBeVisible();
   await expect(
     nonReadyOperation.getByText("Not ready to approve"),
   ).toBeVisible();
@@ -74,7 +89,7 @@ test("disposes non-ready and live-ready operations independently", async ({
     nonReadyOperation.getByRole("button", { name: "Confirm rejection" }),
   ).toBeEnabled();
   const rejectionRequest = page.waitForRequest((request) =>
-    request.url().includes("/rpc/bottleChecks/rejectSelected"),
+    request.url().includes("/rpc/audits/rejectSelected"),
   );
   await nonReadyOperation
     .getByRole("button", { name: "Confirm rejection" })
@@ -93,7 +108,7 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expectNoHorizontalOverflow(page);
 
   const approvalRequest = page.waitForRequest((request) =>
-    request.url().includes("/rpc/bottleChecks/approveSelected"),
+    request.url().includes("/rpc/audits/approveSelected"),
   );
   await readyOperation.getByRole("button", { name: "Apply" }).click();
   await approvalRequest;
@@ -134,7 +149,7 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
     .getByRole("textbox", { name: "Optional context" })
     .fill("Verify the label and catalog identity.");
   const auditRequest = page.waitForRequest((request) =>
-    request.url().includes("/rpc/bottleChecks/audit"),
+    request.url().includes("/rpc/audits/create"),
   );
   await page.getByRole("button", { name: "Run Bottle Audit" }).click();
   await auditRequest;
@@ -154,7 +169,7 @@ test("runs a clean moderator Bottle audit inline and returns to the Bottle", asy
   await expect(page).toHaveURL(`/bottles/${existingBottleId}`);
 });
 
-test("redirects an actionable moderator audit to its current check", async ({
+test("redirects an actionable admin audit to its current check", async ({
   context,
   page,
 }, testInfo) => {
@@ -163,7 +178,7 @@ test("redirects an actionable moderator audit to its current check", async ({
       testInfo,
       "bottle-audit-bottle-check-review",
     ),
-    user: moderatorUser,
+    user: { ...moderatorUser, admin: true },
   });
 
   await page.goto(`/bottles/${existingBottleId}/audit`);
@@ -172,10 +187,8 @@ test("redirects an actionable moderator audit to its current check", async ({
     .fill("Review proposed catalog work.");
   await page.getByRole("button", { name: "Run Bottle Audit" }).click();
 
-  await expect(page).toHaveURL("/bottle-checks/91");
-  await expect(
-    page.getByRole("heading", { name: "Bottle Check #91" }),
-  ).toBeVisible();
+  await expect(page).toHaveURL("/admin/audits/91");
+  await expect(page.getByRole("heading", { name: "Audit #91" })).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 

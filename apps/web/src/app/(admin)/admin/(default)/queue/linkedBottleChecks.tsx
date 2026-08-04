@@ -9,7 +9,7 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
-type BottleCheckDetails = Outputs["bottleChecks"]["details"];
+type BottleCheckDetails = Outputs["audits"]["details"];
 
 export function LinkedBottleCheckDetails({
   details,
@@ -28,24 +28,24 @@ export function LinkedBottleCheckDetails({
   );
 
   return (
-    <section className="space-y-4" data-bottle-check-id={details.check.id}>
+    <section className="space-y-4" data-bottle-check-id={details.audit.id}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm font-semibold text-white">
           Supplemental catalog review
         </div>
         <Link
           className="text-sm underline"
-          href={`/bottle-checks/${details.check.id}`}
+          href={`/admin/audits/${details.audit.id}`}
         >
-          Review Bottle check #{details.check.id}
+          Review audit #{details.audit.id}
         </Link>
       </div>
 
-      <CheckResult check={details.check} title="Supplemental Bottle check" />
+      <CheckResult check={details.audit} title="Supplemental audit" />
 
-      {details.check.operations.length > 0 ? (
+      {details.audit.operations.length > 0 ? (
         <div className="space-y-3">
-          {details.check.operations.map((operation) => (
+          {details.audit.operations.map((operation) => (
             <OperationCard
               key={operation.id}
               operation={operation}
@@ -61,8 +61,8 @@ export function LinkedBottleCheckDetails({
 
 function LinkedBottleCheck({ checkId }: { checkId: number }) {
   const orpc = useORPC();
-  const detailsOptions = orpc.bottleChecks.details.queryOptions({
-    input: { check: checkId },
+  const detailsOptions = orpc.audits.details.queryOptions({
+    input: { audit: checkId },
   });
   const detailsQuery = useQuery({
     ...detailsOptions,
@@ -71,15 +71,13 @@ function LinkedBottleCheck({ checkId }: { checkId: number }) {
 
   if (detailsQuery.isPending) {
     return (
-      <div className="text-sm text-slate-400">
-        Loading Bottle check #{checkId}…
-      </div>
+      <div className="text-sm text-slate-400">Loading audit #{checkId}…</div>
     );
   }
   if (detailsQuery.isError) {
     return (
       <div className="text-sm text-red-200">
-        Bottle check #{checkId} could not be loaded.
+        Audit #{checkId} could not be loaded.
       </div>
     );
   }
@@ -104,7 +102,7 @@ export default function LinkedBottleChecks({
       onToggle={(event) => setOpen(event.currentTarget.open)}
     >
       <summary className="cursor-pointer text-sm font-semibold text-white">
-        Supplemental Bottle {checkIds.length === 1 ? "check" : "checks"} (
+        Supplemental {checkIds.length === 1 ? "audit" : "audits"} (
         {checkIds.length})
       </summary>
       {open ? (

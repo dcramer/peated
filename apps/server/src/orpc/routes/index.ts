@@ -1,11 +1,11 @@
 import activity from "./activity";
 import admin from "./admin";
 import ai from "./ai";
+import audits from "./audits";
 import auth from "./auth";
 import badges from "./badges";
 import bottleAliases from "./bottleAliases";
 import bottleBarcodes from "./bottleBarcodes";
-import bottleChecks from "./bottleChecks";
 import bottleGroups from "./bottleGroups";
 import bottles from "./bottles";
 import bottleSeries from "./bottleSeries";
@@ -39,12 +39,12 @@ export interface Router {
   activity: typeof activity;
   admin: typeof admin;
   ai: typeof ai;
+  audits: typeof audits;
   auth: typeof auth;
   badges: typeof badges;
   bottles: typeof bottles;
   bottleAliases: typeof bottleAliases;
   bottleBarcodes: typeof bottleBarcodes;
-  bottleChecks: typeof bottleChecks;
   bottleGroups: typeof bottleGroups;
   bottleSeries: typeof bottleSeries;
   changes: typeof changes;
@@ -78,12 +78,12 @@ export default {
   activity,
   admin,
   ai,
+  audits,
   auth,
   badges,
   bottles,
   bottleAliases,
   bottleBarcodes,
-  bottleChecks,
   bottleGroups,
   bottleSeries,
   changes,

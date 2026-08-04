@@ -1,18 +1,19 @@
 "use client";
 
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
 import { useState, type ReactNode } from "react";
 
-type Details = Outputs["bottleChecks"]["details"];
-export type BottleOperation = Details["check"]["operations"][number];
+type Details = Outputs["audits"]["details"];
+export type BottleOperation = Details["audit"]["operations"][number];
 export type BottleOperationReview = NonNullable<
   Details["reviewOperations"][number]["review"]
 >;
 export type BottleOperationEvidence =
   BottleOperation["proposal"]["evidenceRefs"][number];
-type RejectionReason = Inputs["bottleChecks"]["rejectSelected"]["reason"];
+type RejectionReason = Inputs["audits"]["rejectSelected"]["reason"];
 
 const REJECTION_REASONS: Array<{
   id: RejectionReason;
@@ -437,8 +438,10 @@ export function isBottleOperationRejectable(operation: BottleOperation) {
 export default function OperationCard({
   approvalReady = false,
   actionError = null,
+  copying = false,
   disabled = false,
   onApply,
+  onCopy,
   onReject,
   onRetry,
   operation,
@@ -447,8 +450,10 @@ export default function OperationCard({
 }: {
   approvalReady?: boolean;
   actionError?: string | null;
+  copying?: boolean;
   disabled?: boolean;
   onApply?: (operationId: number) => void;
+  onCopy?: (operationId: number) => void;
   onReject?: (
     operationId: number,
     reason: RejectionReason,
@@ -487,6 +492,20 @@ export default function OperationCard({
               : STATUS_LABELS[operation.status]}
           </span>
         </div>
+        {onCopy ? (
+          <Button
+            disabled={copying}
+            icon={
+              <DocumentDuplicateIcon aria-hidden="true" className="h-5 w-5" />
+            }
+            loading={copying}
+            onClick={() => onCopy(operation.id)}
+            size="small"
+            title="Copy structured audit operation data as JSON"
+          >
+            <span className="sr-only">Copy operation payload</span>
+          </Button>
+        ) : null}
       </div>
 
       {notApprovalReady ? (

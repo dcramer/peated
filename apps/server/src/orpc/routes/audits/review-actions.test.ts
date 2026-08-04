@@ -13,7 +13,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
-describe("Bottle Check review action routes", () => {
+describe("Audit review action routes", () => {
   async function createEntityUpdateCheck(
     fixtures: {
       Entity: (input: {
@@ -93,12 +93,12 @@ describe("Bottle Check review action routes", () => {
       })
       .where(eq(bottleOperations.id, created.operation.id));
 
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
 
-    expect(details.check).toMatchObject({
+    expect(details.audit).toMatchObject({
       id: created.check.id,
       schemaSupported: false,
       schemaVersion: 2,
@@ -106,10 +106,10 @@ describe("Bottle Check review action routes", () => {
       operationCount: 1,
       operations: [],
     });
-    expect("output" in details.check).toBe(false);
+    expect("output" in details.audit).toBe(false);
     expect(details.reviewOperations).toEqual([]);
 
-    const listed = await routerClient.bottleChecks.list(
+    const listed = await routerClient.audits.list(
       {},
       { context: { user: moderator } },
     );
@@ -120,9 +120,9 @@ describe("Bottle Check review action routes", () => {
       }),
     );
 
-    const closed = await routerClient.bottleChecks.close(
+    const closed = await routerClient.audits.close(
       {
-        check: created.check.id,
+        audit: created.check.id,
         reason: "dismissed",
         note: "The old check cannot be reviewed with the current schema.",
       },
@@ -143,17 +143,17 @@ describe("Bottle Check review action routes", () => {
     const moderator = await fixtures.User({ mod: true });
     const created = await createEntityUpdateCheck(fixtures);
 
-    const result = await routerClient.bottleChecks.rejectSelected(
+    const result = await routerClient.audits.rejectSelected(
       {
-        check: created.check.id,
+        audit: created.check.id,
         operationIds: [created.operation.id],
         reason: "resolved_manually",
         note: "Fixed in the Entity editor.",
       },
       { context: { user: moderator } },
     );
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
 
@@ -166,7 +166,7 @@ describe("Bottle Check review action routes", () => {
         },
       ],
     });
-    expect(details.check.operations[0]).toMatchObject({
+    expect(details.audit.operations[0]).toMatchObject({
       status: "rejected",
       rejectionReason: "resolved_manually",
       reviewerNote: "Fixed in the Entity editor.",
@@ -193,8 +193,8 @@ describe("Bottle Check review action routes", () => {
       .set({ name: "Blocked Preview Entity Corrected" })
       .where(eq(entities.id, created.entity.id));
 
-    const details = await routerClient.bottleChecks.details(
-      { check: created.check.id },
+    const details = await routerClient.audits.details(
+      { audit: created.check.id },
       { context: { user: moderator } },
     );
 
@@ -208,7 +208,7 @@ describe("Bottle Check review action routes", () => {
         },
       },
     ]);
-    expect(details.check.operations).toMatchObject([
+    expect(details.audit.operations).toMatchObject([
       { id: created.operation.id, status: "pending_review" },
     ]);
     expect(
@@ -246,9 +246,9 @@ describe("Bottle Check review action routes", () => {
       },
     });
 
-    const result = await routerClient.bottleChecks.close(
+    const result = await routerClient.audits.close(
       {
-        check: created.check.id,
+        audit: created.check.id,
         reason: "resolved_manually",
         note: "Moved through the existing Bottle editor.",
       },
@@ -271,8 +271,8 @@ describe("Bottle Check review action routes", () => {
     const created = await createEntityUpdateCheck(fixtures);
 
     const error = await waitError(
-      routerClient.bottleChecks.close(
-        { check: created.check.id, reason: "dismissed" },
+      routerClient.audits.close(
+        { audit: created.check.id, reason: "dismissed" },
         { context: { user: moderator } },
       ),
     );
@@ -300,8 +300,8 @@ describe("Bottle Check review action routes", () => {
       })
       .where(eq(bottleOperations.id, created.operation.id));
 
-    const result = await routerClient.bottleChecks.retry(
-      { check: created.check.id, operation: created.operation.id },
+    const result = await routerClient.audits.retry(
+      { audit: created.check.id, operation: created.operation.id },
       { context: { user: moderator } },
     );
 

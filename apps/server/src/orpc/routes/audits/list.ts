@@ -12,9 +12,9 @@ export default procedure
   .use(requireMod)
   .route({
     method: "GET",
-    path: "/bottle-checks",
-    summary: "List actionable Bottle checks",
-    spec: (spec) => ({ ...spec, operationId: "listBottleChecks" }),
+    path: "/audits",
+    summary: "List actionable audits",
+    spec: (spec) => ({ ...spec, operationId: "listAudits" }),
   })
   .input(ListActionableBottleChecksInputSchema)
   .output(

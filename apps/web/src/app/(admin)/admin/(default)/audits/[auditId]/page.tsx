@@ -6,12 +6,14 @@ import {
   BottleCheckOrigin,
   BottleCheckSubject,
 } from "@peated/web/components/bottleChecks/checkSummary";
+import { formatBottleCheckOperationLlmExport } from "@peated/web/components/bottleChecks/llmExport";
 import OperationCard from "@peated/web/components/bottleChecks/operationCard";
 import { getBottleCheckRefetchInterval } from "@peated/web/components/bottleChecks/polling";
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
+import { useFlashMessages } from "@peated/web/components/flash";
 import SimpleHeader from "@peated/web/components/simpleHeader";
-import useAuth from "@peated/web/hooks/useAuth";
+import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
@@ -21,10 +23,10 @@ import {
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
-type RejectionReason = Inputs["bottleChecks"]["rejectSelected"]["reason"];
-type CloseReason = Inputs["bottleChecks"]["close"]["reason"];
+type RejectionReason = Inputs["audits"]["rejectSelected"]["reason"];
+type CloseReason = Inputs["audits"]["close"]["reason"];
 type OperationActionResult =
-  Outputs["bottleChecks"]["approveSelected"]["results"][number];
+  Outputs["audits"]["approveSelected"]["results"][number];
 
 const CLOSE_REASONS: Array<{ id: CloseReason; label: string }> = [
   { id: "dismissed", label: "Dismissed" },
@@ -40,19 +42,19 @@ function requireActionResult(
 }
 
 export default function Page() {
-  const { checkId } = useParams<{ checkId: string }>();
-  const checkNumber = Number(checkId);
+  const { auditId } = useParams<{ auditId: string }>();
+  const auditNumber = Number(auditId);
   const orpc = useORPC();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
-  const detailsOptions = orpc.bottleChecks.details.queryOptions({
-    input: { check: checkNumber },
+  const { flash } = useFlashMessages();
+  const detailsOptions = orpc.audits.details.queryOptions({
+    input: { audit: auditNumber },
   });
   const { data } = useSuspenseQuery({
     ...detailsOptions,
     refetchInterval: (query) => getBottleCheckRefetchInterval(query.state.data),
   });
-  const check = data.check;
+  const check = data.audit;
   const liveReviewByOperation = useMemo(
     () =>
       new Map(
@@ -64,15 +66,18 @@ export default function Page() {
     [data.reviewOperations],
   );
   const approveMutation = useMutation(
-    orpc.bottleChecks.approveSelected.mutationOptions(),
+    orpc.audits.approveSelected.mutationOptions(),
   );
   const rejectMutation = useMutation(
-    orpc.bottleChecks.rejectSelected.mutationOptions(),
+    orpc.audits.rejectSelected.mutationOptions(),
   );
-  const retryMutation = useMutation(orpc.bottleChecks.retry.mutationOptions());
-  const closeMutation = useMutation(orpc.bottleChecks.close.mutationOptions());
+  const retryMutation = useMutation(orpc.audits.retry.mutationOptions());
+  const closeMutation = useMutation(orpc.audits.close.mutationOptions());
   const [closeReason, setCloseReason] = useState<CloseReason>("dismissed");
   const [closeNote, setCloseNote] = useState("");
+  const [copyingOperationId, setCopyingOperationId] = useState<number | null>(
+    null,
+  );
   const [actionErrors, setActionErrors] = useState<Map<number, string>>(
     new Map(),
   );
@@ -88,7 +93,7 @@ export default function Page() {
       queryKey: detailsOptions.queryKey,
     });
     await queryClient.invalidateQueries({
-      queryKey: orpc.bottleChecks.list.queryOptions({ input: {} }).queryKey,
+      queryKey: orpc.audits.list.queryOptions({ input: {} }).queryKey,
     });
   }
 
@@ -125,7 +130,7 @@ export default function Page() {
   async function applyOperation(operationId: number) {
     await runOperationAction(operationId, async () => {
       const result = await approveMutation.mutateAsync({
-        check: check.id,
+        audit: check.id,
         operationIds: [operationId],
       });
       return requireActionResult(result.results);
@@ -139,7 +144,7 @@ export default function Page() {
   ) {
     await runOperationAction(operationId, async () => {
       const result = await rejectMutation.mutateAsync({
-        check: check.id,
+        audit: check.id,
         operationIds: [operationId],
         reason,
         ...(note ? { note } : {}),
@@ -151,17 +156,41 @@ export default function Page() {
   async function retryOperation(operationId: number) {
     await runOperationAction(operationId, async () => {
       return await retryMutation.mutateAsync({
-        check: check.id,
+        audit: check.id,
         operation: operationId,
       });
     });
+  }
+
+  async function copyOperation(operationId: number) {
+    const operation = check.operations.find(({ id }) => id === operationId);
+    if (!operation) return;
+
+    setCopyingOperationId(operationId);
+    try {
+      await copyTextToClipboard(
+        formatBottleCheckOperationLlmExport({
+          check,
+          operation,
+          liveReview:
+            data.reviewOperations.find(
+              ({ operationId: id }) => id === operationId,
+            ) ?? null,
+        }),
+      );
+      flash(`Copied audit operation #${operationId} as structured JSON.`);
+    } catch {
+      flash(`Unable to copy audit operation #${operationId}.`, "error");
+    } finally {
+      setCopyingOperationId(null);
+    }
   }
 
   async function closeCheck() {
     setError(null);
     try {
       await closeMutation.mutateAsync({
-        check: check.id,
+        audit: check.id,
         reason: closeReason,
         ...(closeNote.trim() ? { note: closeNote.trim() } : {}),
       });
@@ -170,7 +199,7 @@ export default function Page() {
       setError(
         closeError instanceof Error
           ? closeError.message
-          : "The check could not be closed.",
+          : "The audit could not be closed.",
       );
     }
   }
@@ -188,10 +217,9 @@ export default function Page() {
           check.output.findings.length > 0));
   const isStorePriceReference =
     check.intent === "resolve_reference" && check.sourceKind === "store_price";
-  const parentPage =
-    isStorePriceReference && user?.admin
-      ? { name: "Incoming Listings", href: "/admin/queue" }
-      : { name: "Bottle Checks", href: "/bottle-checks" };
+  const parentPage = isStorePriceReference
+    ? { name: "Incoming Listings", href: "/admin/queue" }
+    : { name: "Audits", href: "/admin/audits" };
 
   return (
     <>
@@ -199,13 +227,13 @@ export default function Page() {
         pages={[
           parentPage,
           {
-            name: `Check #${check.id}`,
-            href: `/bottle-checks/${check.id}`,
+            name: `Audit #${check.id}`,
+            href: `/admin/audits/${check.id}`,
             current: true,
           },
         ]}
       />
-      <SimpleHeader>Bottle Check #{check.id}</SimpleHeader>
+      <SimpleHeader>Audit #{check.id}</SimpleHeader>
 
       <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-slate-300">
         <BottleCheckSubject check={check} />
@@ -234,9 +262,11 @@ export default function Page() {
                   <OperationCard
                     actionError={actionErrors.get(operation.id) ?? null}
                     approvalReady={liveReview?.approvalReady ?? false}
+                    copying={copyingOperationId === operation.id}
                     disabled={busy || !!check.closedAt}
                     key={operation.id}
                     onApply={(operationId) => void applyOperation(operationId)}
+                    onCopy={(operationId) => void copyOperation(operationId)}
                     onReject={(operationId, reason, note) =>
                       void rejectOperation(operationId, reason, note)
                     }
@@ -285,7 +315,7 @@ export default function Page() {
               </label>
               <div className="self-end">
                 <Button disabled={busy} onClick={() => void closeCheck()}>
-                  Close check
+                  Close audit
                 </Button>
               </div>
             </div>

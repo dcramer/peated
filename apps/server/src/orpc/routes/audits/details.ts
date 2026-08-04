@@ -2,7 +2,7 @@ import { getBottleCheckForReview } from "@peated/server/lib/bottleChecks";
 import { prepareBottleCheckReviewOperations } from "@peated/server/lib/bottleOperationModeration";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { BottleCheckDetailsResponseSchema } from "@peated/server/schemas/bottleChecks";
+import { AuditDetailsResponseSchema } from "@peated/server/schemas/bottleChecks";
 import {
   serializeBottleCheck,
   serializeReviewOperation,
@@ -13,20 +13,20 @@ export default procedure
   .use(requireMod)
   .route({
     method: "GET",
-    path: "/bottle-checks/{check}",
-    summary: "Get a Bottle check",
-    spec: (spec) => ({ ...spec, operationId: "getBottleCheck" }),
+    path: "/audits/{audit}",
+    summary: "Get an audit",
+    spec: (spec) => ({ ...spec, operationId: "getAudit" }),
   })
-  .input(z.object({ check: z.coerce.number().int().positive() }).strict())
-  .output(BottleCheckDetailsResponseSchema)
+  .input(z.object({ audit: z.coerce.number().int().positive() }).strict())
+  .output(AuditDetailsResponseSchema)
   .handler(async ({ input, errors }) => {
-    const check = await getBottleCheckForReview(input.check);
+    const check = await getBottleCheckForReview(input.audit);
     if (!check) {
-      throw errors.NOT_FOUND({ message: "Bottle check not found." });
+      throw errors.NOT_FOUND({ message: "Audit not found." });
     }
     const reviewOperations = await prepareBottleCheckReviewOperations(check);
     return {
-      check: serializeBottleCheck(check),
+      audit: serializeBottleCheck(check),
       reviewOperations: reviewOperations.map((operation) => ({
         ...operation,
         review: serializeReviewOperation(operation.review),

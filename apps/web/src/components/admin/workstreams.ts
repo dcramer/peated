@@ -1,6 +1,6 @@
 export type AdminWorkstream = {
   href: string;
-  id: "bottle-checks" | "brand-repairs" | "entity-audits" | "queue";
+  id: "audits" | "brand-repairs" | "entity-audits" | "queue";
   pageTitle: string;
   sidebarLabel: string;
   summary: string;
@@ -19,14 +19,14 @@ export const ADMIN_WORKSTREAMS: AdminWorkstream[] = [
       "Use this when a listing is wrong or unmatched, but the catalog bottle itself may still be correct.",
   },
   {
-    id: "bottle-checks",
-    href: "/bottle-checks",
-    pageTitle: "Bottle Checks",
-    sidebarLabel: "Bottle Checks",
+    id: "audits",
+    href: "/admin/audits",
+    pageTitle: "Audits",
+    sidebarLabel: "Audits",
     summary:
       "Review catalog changes and findings proposed by audits of existing Bottles.",
     whenToUse:
-      "Use this when a Bottle audit found catalog work that still needs approval, rejection, retry, or closure.",
+      "Use this when an audit found catalog work that still needs approval, rejection, retry, or closure.",
   },
   {
     id: "entity-audits",

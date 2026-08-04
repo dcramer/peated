@@ -32,7 +32,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
       input: { bottle: Number(bottleId) },
     }),
   );
-  const auditMutation = useMutation(orpc.bottleChecks.audit.mutationOptions());
+  const auditMutation = useMutation(orpc.audits.create.mutationOptions());
   const [note, setNote] = useState("");
   const [cleanSummary, setCleanSummary] = useState<string | null>(null);
 
@@ -45,7 +45,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
       ...(note.trim() ? { note: note.trim() } : {}),
     });
     if (result.status === "needs_review") {
-      router.replace(`/bottle-checks/${result.check.id}`);
+      router.replace(`/admin/audits/${result.audit.id}`);
       return;
     }
     setCleanSummary(result.summary);
@@ -137,7 +137,7 @@ function AuditBottleForm({ bottleId }: { bottleId: string }) {
             <TextAreaField
               name="note"
               label="Optional context"
-              helpText="The audit is read-only. Any proposed catalog changes will require separate moderator approval."
+              helpText="The audit is read-only. Any proposed catalog changes will require separate admin approval."
               onChange={(event) => setNote(event.target.value)}
               placeholder="What looks wrong?"
               rows={4}

@@ -11,17 +11,17 @@ export default procedure
   .use(requireMod)
   .route({
     method: "POST",
-    path: "/bottle-checks/{check}/operations/{operation}/retry",
-    summary: "Retry a failed Bottle operation",
+    path: "/audits/{audit}/operations/{operation}/retry",
+    summary: "Retry a failed audit operation",
     spec: (spec) => ({
       ...spec,
-      operationId: "retryBottleOperation",
+      operationId: "retryAuditOperation",
     }),
   })
   .input(
     z
       .object({
-        check: RetryBottleOperationInputSchema.shape.checkId,
+        audit: RetryBottleOperationInputSchema.shape.checkId,
         operation: RetryBottleOperationInputSchema.shape.operationId,
       })
       .strict(),
@@ -30,7 +30,7 @@ export default procedure
   .handler(async ({ input, context }) => {
     return await retryBottleOperation(
       {
-        checkId: input.check,
+        checkId: input.audit,
         operationId: input.operation,
       },
       context.user,

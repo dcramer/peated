@@ -10,16 +10,16 @@ export default procedure
   .use(requireMod)
   .route({
     method: "POST",
-    path: "/bottle-checks/{check}/operations/approve",
-    summary: "Approve selected Bottle operations",
+    path: "/audits/{audit}/operations/approve",
+    summary: "Approve selected audit operations",
     spec: (spec) => ({
       ...spec,
-      operationId: "approveBottleOperations",
+      operationId: "approveAuditOperations",
     }),
   })
   .input(
     ApproveBottleOperationsInputSchema.omit({ checkId: true }).extend({
-      check: ApproveBottleOperationsInputSchema.shape.checkId,
+      audit: ApproveBottleOperationsInputSchema.shape.checkId,
     }),
   )
   .output(BottleOperationActionResponseSchema)
@@ -27,7 +27,7 @@ export default procedure
     return {
       results: await approveBottleOperations(
         {
-          checkId: input.check,
+          checkId: input.audit,
           operationIds: input.operationIds,
         },
         context.user,

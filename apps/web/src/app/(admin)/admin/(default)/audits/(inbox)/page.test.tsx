@@ -11,7 +11,7 @@ test.each([
   ["resolve_reference", null, "photo_identification", "Bottle photo scan"],
   ["resolve_reference", null, "store_price", "Store price"],
   ["audit_bottle", "moderator", null, "Moderator audit"],
-  ["audit_bottle", "post_user_creation", null, "New Bottle audit"],
+  ["audit_bottle", "post_user_creation", null, "Post-create audit"],
 ] as const)(
   "labels %s work from %s as %s",
   (intent, origin, sourceKind, expected) => {
@@ -21,7 +21,7 @@ test.each([
   },
 );
 
-test("Bottle Checks renders one inbox row per actionable check", () => {
+test("Audits renders one inbox row per actionable check", () => {
   const check = {
     id: 51,
     intent: "audit_bottle",
@@ -92,26 +92,26 @@ test("Bottle Checks renders one inbox row per actionable check", () => {
   expect(html).toContain("Bottle #45146");
   expect(html).toContain("1 operation");
   expect(html).toContain("1 finding");
-  expect(html).toContain('href="/bottle-checks/51"');
+  expect(html).toContain('href="/admin/audits/51"');
 });
 
-describe("Bottle Checks empty states", () => {
+describe("Audits empty states", () => {
   test("offers to clear an empty filter", () => {
     const html = renderToStaticMarkup(
-      <BottleCheckEmptyState clearHref="/bottle-checks" filtered />,
+      <BottleCheckEmptyState clearHref="/admin/audits" filtered />,
     );
 
-    expect(html).toContain("No Bottle checks match this filter.");
-    expect(html).toContain('href="/bottle-checks"');
+    expect(html).toContain("No audits match this filter.");
+    expect(html).toContain('href="/admin/audits"');
     expect(html).toContain("Clear filter");
   });
 
   test("keeps the unfiltered inbox message concise", () => {
     const html = renderToStaticMarkup(
-      <BottleCheckEmptyState clearHref="/bottle-checks" filtered={false} />,
+      <BottleCheckEmptyState clearHref="/admin/audits" filtered={false} />,
     );
 
-    expect(html).toContain("No Bottle checks need attention.");
+    expect(html).toContain("No audits need attention.");
     expect(html).not.toContain("Clear filter");
   });
 });
