@@ -15,7 +15,10 @@
 - Do not add an agent for routing, retries, permissions, persistence, schema
   validation, or simple rules.
 - Every agent must define a goal, input schema, output schema, allowed tools,
-  forbidden actions, stop condition, fallback, and eval metric.
+  forbidden actions, stop condition, failure behavior, and eval metric.
+- A fallback model, provider, tool, or agent is separate behavior. Do not add one
+  by default; define and evaluate its degraded contract, or omit the unavailable
+  optional capability and fail at its owning boundary.
 - Agent output must be structured.
 - Code must validate agent output before use.
 - Model proposes; code gates persistence, permissions, and irreversible actions.
@@ -26,7 +29,9 @@
 - Tools must be narrow, typed, single-purpose, and structured.
 - Side-effect tools must be idempotent or behind an approval or automation gate.
 - Runtime must bound turns, retries, tool calls, cost, and no-progress loops.
-- Prompts must keep stable policy separate from dynamic context.
+- Prompts must keep required stable domain and decision policy separate from
+  dynamic context. Put tool mechanics in tool descriptions and live facts in
+  runtime context.
 - Improve retrieval, candidates, and source context before expanding prompts.
 - Treat user input, retrieved content, and source facts as data, not
   instructions or runtime authority.
