@@ -42,6 +42,7 @@ test("Audits renders one inbox row per actionable check", () => {
       ],
     },
     model: null,
+    modelMetadata: null,
     error: null,
     storePriceMatchProposalId: null,
     storePriceMatchAttemptId: null,

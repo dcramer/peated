@@ -81,6 +81,34 @@ describe("getBottleClassifierRunMetadata", () => {
     });
   });
 
+  test("captures the estimated agent token cost with its pricing basis", () => {
+    expect(
+      getBottleClassifierRunMetadata({
+        durationMs: 50,
+        model: "gpt-5.6-terra",
+        result: {
+          usage: {
+            requests: 1,
+            inputTokens: 1_000,
+            inputTokensDetails: [{ cached_tokens: 400 }],
+            outputTokens: 100,
+            totalTokens: 1_100,
+          },
+        },
+      }),
+    ).toMatchObject({
+      usage: { totalTokens: 1_100 },
+      cost: {
+        scope: "agent_loop_only",
+        costCoverage: "cache_write_unreported_assumed_standard_input",
+        estimatedAgentLoopCostUsd: 0.00248,
+        pricingModel: "gpt-5.6-terra",
+        pricingEffectiveDate: "2026-08-01",
+        pricingBasis: "standard_short_context",
+      },
+    });
+  });
+
   test("rejects incomplete persisted run metadata", () => {
     expect(() =>
       BottleClassifierRunMetadataSchema.parse({

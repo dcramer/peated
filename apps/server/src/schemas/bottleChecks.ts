@@ -1,6 +1,7 @@
 import {
   AuditBottleOriginSchema,
   BottleCheckIntentSchema,
+  BottleClassifierRunMetadataSchema,
   ProposedOperationSchema,
 } from "@peated/bottle-classifier";
 import {
@@ -50,6 +51,7 @@ export const BottleOperationResponseSchema = z
 const CommonBottleCheckResponseFields = {
   id: z.number(),
   model: z.string().nullable(),
+  modelMetadata: BottleClassifierRunMetadataSchema.nullable(),
   error: z.string().nullable(),
   storePriceMatchProposalId: z.number().nullable(),
   storePriceMatchAttemptId: z.number().nullable(),

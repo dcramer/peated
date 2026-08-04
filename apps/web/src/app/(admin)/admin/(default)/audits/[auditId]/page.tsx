@@ -12,7 +12,7 @@ import { getBottleCheckRefetchInterval } from "@peated/web/components/bottleChec
 import { Breadcrumbs } from "@peated/web/components/breadcrumbs";
 import Button from "@peated/web/components/button";
 import { useFlashMessages } from "@peated/web/components/flash";
-import SimpleHeader from "@peated/web/components/simpleHeader";
+import BottleResultRow from "@peated/web/components/search/bottleResult";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -32,6 +32,85 @@ const CLOSE_REASONS: Array<{ id: CloseReason; label: string }> = [
   { id: "dismissed", label: "Dismissed" },
   { id: "resolved_manually", label: "Resolved manually" },
 ];
+
+function formatCost(value: number | undefined): string {
+  if (value === undefined) return "Unavailable";
+  if (value > 0 && value < 0.0001) return "<$0.0001";
+  return `$${value.toLocaleString("en-US", {
+    minimumFractionDigits: 4,
+    maximumFractionDigits: 6,
+  })}`;
+}
+
+function formatDuration(durationMs: number): string {
+  if (durationMs < 1_000) return `${durationMs.toLocaleString("en-US")} ms`;
+  return `${(durationMs / 1_000).toLocaleString("en-US", {
+    maximumFractionDigits: 1,
+  })} sec`;
+}
+
+function AuditedBottleCard({ bottleId }: { bottleId: number }) {
+  const orpc = useORPC();
+  const { data: bottle } = useSuspenseQuery(
+    orpc.bottles.details.queryOptions({ input: { bottle: bottleId } }),
+  );
+
+  return (
+    <section
+      aria-label="Audited Bottle"
+      className="relative flex items-center rounded-xl border border-slate-800 bg-slate-950 p-3 sm:p-4"
+    >
+      <BottleResultRow
+        directToTasting={false}
+        result={{ type: "bottle", ref: bottle }}
+      />
+    </section>
+  );
+}
+
+function CheckMetadata({
+  check,
+}: {
+  check: Outputs["audits"]["details"]["audit"];
+}) {
+  const metadata = check.modelMetadata;
+  const items = [
+    ...(check.model ? [{ label: "Model", value: check.model }] : []),
+    ...(metadata
+      ? [
+          {
+            label: "Total tokens",
+            value: metadata.usage.totalTokens.toLocaleString("en-US"),
+          },
+          {
+            label: "Estimated cost",
+            value: formatCost(metadata.cost?.estimatedAgentLoopCostUsd),
+          },
+          {
+            label: "Agent time",
+            value: formatDuration(metadata.agentDurationMs),
+          },
+        ]
+      : []),
+  ];
+
+  if (items.length === 0) return null;
+
+  return (
+    <dl className="grid gap-px overflow-hidden rounded-xl border border-slate-800 bg-slate-800 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((item) => (
+        <div className="bg-slate-950 px-4 py-3" key={item.label}>
+          <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            {item.label}
+          </dt>
+          <dd className="mt-1 truncate text-sm font-medium text-slate-200">
+            {item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
 
 function requireActionResult(
   results: OperationActionResult[],
@@ -233,14 +312,37 @@ export default function Page() {
           },
         ]}
       />
-      <SimpleHeader>Audit #{check.id}</SimpleHeader>
-
-      <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-slate-300">
-        <BottleCheckSubject check={check} />
-        <BottleCheckOrigin check={check} />
-      </div>
 
       <div className="space-y-5">
+        {check.intent === "audit_bottle" && check.bottleId ? (
+          <AuditedBottleCard bottleId={check.bottleId} />
+        ) : null}
+
+        <header className="border-b border-slate-800 pb-4">
+          <h1 className="text-2xl font-semibold text-white">
+            {check.intent === "audit_bottle"
+              ? "Bottle audit"
+              : "Reference check"}
+          </h1>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-400">
+            <span>Check #{check.id}</span>
+            <span aria-hidden="true">&middot;</span>
+            {check.intent === "audit_bottle" ? (
+              <BottleCheckOrigin check={check} />
+            ) : (
+              <BottleCheckSubject check={check} />
+            )}
+            {check.intent === "audit_bottle" && !check.bottleId ? (
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <BottleCheckSubject check={check} />
+              </>
+            ) : null}
+          </div>
+        </header>
+
+        <CheckMetadata check={check} />
+
         <CheckResult
           check={check}
           title={

@@ -30,6 +30,7 @@ test("renders a linked audit as a read-only review link", () => {
         findings: [],
       },
       model: "test-model",
+      modelMetadata: null,
       error: null,
       storePriceMatchProposalId: 12,
       storePriceMatchAttemptId: 13,

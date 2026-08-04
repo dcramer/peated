@@ -1214,6 +1214,7 @@ export function createBottleClassifier(
             modelMetadata: getBottleClassifierRunMetadata({
               result,
               durationMs: performance.now() - startedAt,
+              model: options.model,
             }),
           };
         },
@@ -1439,6 +1440,7 @@ export function createBottleClassifier(
             const runMetadata = getBottleClassifierRunMetadata({
               result,
               durationMs: performance.now() - startedAt,
+              model: options.model,
             });
             try {
               return {

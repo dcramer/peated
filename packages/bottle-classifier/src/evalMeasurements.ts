@@ -1,5 +1,4 @@
 import type { JsonValue, UsageSummary } from "vitest-evals/harness";
-import { getEvalModelCostMetadata, getEvalRunCostMetadata } from "./evalCost";
 import {
   buildEvalModelCallTrace,
   summarizeEvalModelCalls,
@@ -7,6 +6,7 @@ import {
 } from "./evalTelemetry";
 import type { WhiskyLabelExtractionMetadata } from "./extractor";
 import type { OpenAIReasoningEffort } from "./openaiModelSettings";
+import { getModelCostMetadata, getRunCostMetadata } from "./runtime/cost";
 import type { BottleClassifierRunMetadata } from "./runtime/runMetadata";
 
 export function buildEvalHarnessMeasurements({
@@ -52,7 +52,7 @@ export function buildEvalHarnessMeasurements({
       ? "agent_loop_only"
       : "full_llm_run";
   const costMetadata = measuredUsage
-    ? getEvalRunCostMetadata({ model, usage: measuredUsage, scope: usageScope })
+    ? getRunCostMetadata({ model, usage: measuredUsage, scope: usageScope })
     : null;
   const usage = measuredUsage
     ? {
@@ -123,7 +123,7 @@ export function buildImageExtractionEvalMeasurements({
     ...(usage ? { cachedInputTokens: usage.cachedInputTokens } : {}),
     outputTokens: usage?.outputTokens ?? 0,
   };
-  const costMetadata = getEvalModelCostMetadata({
+  const costMetadata = getModelCostMetadata({
     model,
     usage: normalizedUsage,
   });

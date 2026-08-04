@@ -10,6 +10,7 @@ type ReviewOperation = NonNullable<
 >;
 
 const testState = vi.hoisted(() => ({
+  bottle: { id: 44, fullName: "Lagavulin 16-year-old" },
   details: null as unknown,
 }));
 
@@ -25,11 +26,27 @@ vi.mock("@tanstack/react-query", () => ({
   useQueryClient: () => ({
     invalidateQueries: vi.fn(),
   }),
-  useSuspenseQuery: () => ({ data: testState.details }),
+  useSuspenseQuery: (options: { queryKey: string[] }) => ({
+    data:
+      options.queryKey[0] === "bottles" ? testState.bottle : testState.details,
+  }),
+}));
+
+vi.mock("@peated/web/components/search/bottleResult", () => ({
+  default: ({
+    result,
+  }: {
+    result: { ref: { id: number; fullName: string } };
+  }) => <a href={`/bottles/${result.ref.id}`}>{result.ref.fullName}</a>,
 }));
 
 vi.mock("@peated/web/lib/orpc/context", () => ({
   useORPC: () => ({
+    bottles: {
+      details: {
+        queryOptions: () => ({ queryKey: ["bottles", "details", "44"] }),
+      },
+    },
     audits: {
       approveSelected: { mutationOptions: () => ({}) },
       close: { mutationOptions: () => ({}) },
@@ -160,6 +177,25 @@ function details(
         ],
       },
       model: "test-model",
+      modelMetadata: {
+        agentDurationMs: 2_400,
+        usage: {
+          requests: 2,
+          inputTokens: 10_000,
+          outputTokens: 800,
+          totalTokens: 10_800,
+        },
+        toolCalls: { count: 3, names: ["search_bottles"] },
+        cost: {
+          scope: "agent_loop_only",
+          costCoverage: "priced_model_tokens",
+          estimatedAgentLoopCostUsd: 0.044,
+          pricingModel: "gpt-5.6-terra",
+          pricingEffectiveDate: "2026-08-01",
+          pricingSource: "https://developers.openai.com/api/docs/pricing",
+          pricingBasis: "standard_short_context",
+        },
+      },
       error: null,
       storePriceMatchProposalId: null,
       storePriceMatchAttemptId: null,
@@ -205,6 +241,18 @@ describe("Audit detail", () => {
     expect(html).toContain("Reject");
     expect(html).toContain("Retry failed operation");
     expect(html).toContain("Copy operation payload");
+  });
+
+  test("puts the audited Bottle first and shows run metadata", () => {
+    const html = renderToStaticMarkup(<Page />);
+
+    expect(html.indexOf("Lagavulin 16-year-old")).toBeLessThan(
+      html.indexOf("Bottle audit"),
+    );
+    expect(html).toContain('aria-label="Audited Bottle"');
+    expect(html).toContain("10,800");
+    expect(html).toContain("$0.0440");
+    expect(html).toContain("2.4 sec");
   });
 
   test("keeps rejection and close available for unresolved failed work", () => {
