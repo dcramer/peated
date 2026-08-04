@@ -10,10 +10,7 @@ import {
 import { createConcreteBottle } from "@peated/server/lib/createConcreteBottle";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import * as testFixtures from "@peated/server/lib/test/fixtures";
-import {
-  ConcreteBottleUpdateExpectedBottleStateError,
-  updateConcreteBottle,
-} from "@peated/server/lib/updateConcreteBottle";
+import { updateConcreteBottle } from "@peated/server/lib/updateConcreteBottle";
 import * as workerClient from "@peated/server/worker/client";
 import { and, asc, eq } from "drizzle-orm";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -253,11 +250,8 @@ test("preserves a concurrent moderator exact-content edit", async ({
   });
   vi.mocked(workerClient.pushUniqueJob).mockClear();
 
-  const rejection = expect(work).rejects.toBeInstanceOf(
-    ConcreteBottleUpdateExpectedBottleStateError,
-  );
   deferred.resolve(generatedDetails());
-  await rejection;
+  await expect(work).resolves.toBeUndefined();
 
   expect(
     await db.query.bottles.findFirst({
@@ -282,7 +276,7 @@ test("preserves a concurrent moderator exact-content edit", async ({
   expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 });
 
-test("rejects generated work planned from stale exact identity", async ({
+test("discards generated work planned from stale exact identity", async ({
   defaults,
   fixtures,
 }) => {
@@ -311,11 +305,8 @@ test("rejects generated work planned from stale exact identity", async ({
   if (!moderatorBottle) throw new Error("Expected updated Bottle.");
   vi.mocked(workerClient.pushUniqueJob).mockClear();
 
-  const rejection = expect(work).rejects.toBeInstanceOf(
-    ConcreteBottleUpdateExpectedBottleStateError,
-  );
   deferred.resolve(generatedDetails());
-  await rejection;
+  await expect(work).resolves.toBeUndefined();
 
   expect(
     await db.query.bottles.findFirst({
@@ -364,11 +355,8 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
   });
   vi.mocked(workerClient.pushUniqueJob).mockClear();
 
-  const rejection = expect(work).rejects.toBeInstanceOf(
-    ConcreteBottleUpdateExpectedBottleStateError,
-  );
   deferred.resolve(generatedDetails());
-  await rejection;
+  await expect(work).resolves.toBeUndefined();
 
   expect(
     await db
@@ -386,6 +374,42 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
       columns: { flavorProfile: true },
     }),
   ).toEqual({ flavorProfile: "lightly_peated" });
+  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+});
+
+test("discards generated work planned from stale shared authority", async ({
+  defaults,
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({
+    name: "Generated Shared Authority Race Brand",
+  });
+  const { source } = await createTwoMemberGroup(defaults.user, brand.id);
+  const deferred = deferModelResult();
+  const work = generateBottleDetails({ bottleId: source.bottle.id });
+  await vi.waitFor(() => expect(getStructuredResponse).toHaveBeenCalledOnce());
+
+  await db
+    .update(bottleGroups)
+    .set({ name: "New shared authority" })
+    .where(eq(bottleGroups.id, source.group.id));
+  vi.mocked(workerClient.pushUniqueJob).mockClear();
+
+  deferred.resolve(generatedDetails());
+  await expect(work).resolves.toBeUndefined();
+
+  expect(
+    await db.query.bottleGroups.findFirst({
+      where: eq(bottleGroups.id, source.group.id),
+      columns: { name: true, flavorProfile: true },
+    }),
+  ).toEqual({ name: "New shared authority", flavorProfile: null });
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, source.bottle.id),
+      columns: { description: true, tastingNotes: true },
+    }),
+  ).toEqual({ description: null, tastingNotes: null });
   expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
 });
 
@@ -425,11 +449,8 @@ test("does not fan out after the selected Bottle moves groups", async ({
     .where(eq(bottles.id, source.bottle.id));
   vi.mocked(workerClient.pushUniqueJob).mockClear();
 
-  const rejection = expect(work).rejects.toBeInstanceOf(
-    ConcreteBottleUpdateExpectedBottleStateError,
-  );
   deferred.resolve(generatedDetails());
-  await rejection;
+  await expect(work).resolves.toBeUndefined();
 
   expect(
     await db

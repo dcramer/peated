@@ -20,8 +20,10 @@ import { logError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import {
+  ConcreteBottleUpdateExpectedBottleStateError,
   concreteBottleUpdateExpectedSelectedBottleState,
   concreteBottleUpdateExpectedSharedState,
+  ConcreteBottleUpdateExpectedStateError,
   finalizeConcreteBottleUpdate,
   updateConcreteBottleInTransaction,
 } from "@peated/server/lib/updateConcreteBottle";
@@ -253,16 +255,29 @@ export default async function generateBottleDetails(rawJobArgs: unknown) {
     shared,
     exact: Object.keys(exact).length ? exact : undefined,
   });
-  const update = await db.transaction(async (tx) => {
-    const actor = await getPeatedSystemActorForDatabase(tx);
-    return await updateConcreteBottleInTransaction(tx, {
-      bottleId: bottle.id,
-      input,
-      expectedSelectedBottleState,
-      expectedSharedState,
-      actorId: actor.id,
-      creationSource: "repair_workflow",
+  let update;
+  try {
+    update = await db.transaction(async (tx) => {
+      const actor = await getPeatedSystemActorForDatabase(tx);
+      return await updateConcreteBottleInTransaction(tx, {
+        bottleId: bottle.id,
+        input,
+        expectedSelectedBottleState,
+        expectedSharedState,
+        actorId: actor.id,
+        creationSource: "repair_workflow",
+      });
     });
-  });
+  } catch (error) {
+    // Generated details belong only to the snapshot sent to the model. A newer
+    // authoritative edit supersedes them, so the stale result is discarded.
+    if (
+      error instanceof ConcreteBottleUpdateExpectedBottleStateError ||
+      error instanceof ConcreteBottleUpdateExpectedStateError
+    ) {
+      return;
+    }
+    throw error;
+  }
   await finalizeConcreteBottleUpdate(update);
 }
