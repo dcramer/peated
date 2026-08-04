@@ -1,10 +1,8 @@
 import {
-  bottleChecks,
-  bottleOperations,
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { and, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
+import { and, eq, ilike, inArray, sql, type SQL } from "drizzle-orm";
 import { z } from "zod";
 
 export const QueueKindSchema = z
@@ -41,61 +39,22 @@ export const QueueListInputSchema = z
 type QueueKind = z.infer<typeof QueueKindSchema>;
 type QueueState = z.infer<typeof QueueStateSchema>;
 
-export const SUPPLEMENTAL_WORK_STATUSES = [
-  "blocked",
-  "pending_review",
-  "applying",
-  "stale",
-  "failed",
-] as const;
-
-export function getQueueHasSupplementalWorkSql(): SQL<boolean> {
-  return sql<boolean>`EXISTS (
-    SELECT 1
-    FROM ${bottleChecks}
-    WHERE ${bottleChecks.storePriceMatchProposalId} = ${storePriceMatchProposals.id}
-      AND ${bottleChecks.closedAt} IS NULL
-      AND (
-        jsonb_array_length(COALESCE(${bottleChecks.output}->'findings', '[]'::jsonb)) > 0
-        OR EXISTS (
-          SELECT 1
-          FROM ${bottleOperations}
-          WHERE ${bottleOperations.checkId} = ${bottleChecks.id}
-            AND ${bottleOperations.status} IN (${sql.join(
-              SUPPLEMENTAL_WORK_STATUSES.map((status) => sql`${status}`),
-              sql`, `,
-            )})
-        )
-      )
-  )`;
-}
-
-function getQueueKindFilter(
-  kind: QueueKind,
-  includeSupplementalWork: boolean,
-): SQL {
-  const hasSupplementalWork = includeSupplementalWork
-    ? getQueueHasSupplementalWorkSql()
-    : undefined;
-
+function getQueueKindFilter(kind: QueueKind): SQL {
   if (kind === "errored") {
     return eq(storePriceMatchProposals.status, "errored");
   }
 
   if (kind) {
     return and(
-      or(
-        eq(storePriceMatchProposals.status, "pending_review"),
-        hasSupplementalWork,
-      ),
+      eq(storePriceMatchProposals.status, "pending_review"),
       eq(storePriceMatchProposals.proposalType, kind),
     ) as SQL;
   }
 
-  return or(
-    inArray(storePriceMatchProposals.status, ["pending_review", "errored"]),
-    hasSupplementalWork,
-  ) as SQL;
+  return inArray(storePriceMatchProposals.status, [
+    "pending_review",
+    "errored",
+  ]);
 }
 
 export function getQueueProcessingFilter(): SQL {
@@ -118,34 +77,21 @@ export function getQueueStateFilter(state: QueueState): SQL {
   return getQueueActionableFilter();
 }
 
-export function getQueueBaseWhere(
-  input: {
-    query: string;
-    kind: QueueKind;
-  },
-  options: {
-    includeSupplementalWork?: boolean;
-  } = {},
-): SQL {
+export function getQueueBaseWhere(input: {
+  query: string;
+  kind: QueueKind;
+}): SQL {
   return and(
     eq(storePrices.hidden, false),
-    getQueueKindFilter(input.kind, options.includeSupplementalWork ?? false),
+    getQueueKindFilter(input.kind),
     input.query ? ilike(storePrices.name, `%${input.query}%`) : undefined,
   ) as SQL;
 }
 
-export function getQueueWhere(
-  input: {
-    query: string;
-    kind: QueueKind;
-    state: QueueState;
-  },
-  options: {
-    includeSupplementalWork?: boolean;
-  } = {},
-): SQL {
-  return and(
-    getQueueBaseWhere(input, options),
-    getQueueStateFilter(input.state),
-  ) as SQL;
+export function getQueueWhere(input: {
+  query: string;
+  kind: QueueKind;
+  state: QueueState;
+}): SQL {
+  return and(getQueueBaseWhere(input), getQueueStateFilter(input.state)) as SQL;
 }

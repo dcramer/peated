@@ -27,6 +27,7 @@ function serializeBottleOperation(
     id: operation.id,
     checkId: operation.checkId,
     proposal: operation.proposal,
+    excludedFields: operation.excludedFields,
     preparationError: operation.preparationError,
     status: operation.status,
     reviewedById: operation.reviewedById,

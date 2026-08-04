@@ -28,7 +28,7 @@ export default procedure
       results: await approveBottleOperations(
         {
           checkId: input.audit,
-          operationIds: input.operationIds,
+          operations: input.operations,
         },
         context.user,
       ),

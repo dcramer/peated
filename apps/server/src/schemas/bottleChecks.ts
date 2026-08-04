@@ -33,6 +33,7 @@ export const BottleOperationResponseSchema = z
     id: z.number(),
     checkId: z.number(),
     proposal: ProposedOperationSchema,
+    excludedFields: z.array(z.string()),
     preparationError: PreparationErrorSchema.nullable(),
     status: BottleOperationStatusSchema,
     reviewedById: z.number().nullable(),

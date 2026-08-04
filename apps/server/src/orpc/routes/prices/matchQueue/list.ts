@@ -31,9 +31,8 @@ export default procedure
   .output(StorePriceMatchQueueListResponse)
   .handler(async function ({ input, context, errors }) {
     const offset = (input.cursor - 1) * input.limit;
-    const queueOptions = { includeSupplementalWork: true };
-    const baseWhere = getQueueBaseWhere(input, queueOptions);
-    const queueWhere = getQueueWhere(input, queueOptions);
+    const baseWhere = getQueueBaseWhere(input);
+    const queueWhere = getQueueWhere(input);
     const [stats] = await db
       .select({
         actionableCount: sql<number>`count(*) filter (where ${getQueueStateFilter("actionable")})::int`,

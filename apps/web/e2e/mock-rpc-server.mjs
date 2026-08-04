@@ -314,14 +314,10 @@ async function handleRpcRequest({ request, response, url }) {
       const token = getAccessToken(request);
       if (bottleCheckMock.isLinkedStorePriceRequest(token)) {
         sendRpcResponse(response, {
-          results: [
-            bottleCheckMock.buildLinkedStorePriceQueueProposal(
-              buildDirectBottleProposal(),
-            ),
-          ],
+          results: [],
           rel: { nextCursor: null, prevCursor: null },
           stats: {
-            actionableCount: 1,
+            actionableCount: 0,
             processingCount: 0,
           },
         });
@@ -1528,7 +1524,6 @@ function buildDirectBottleProposal() {
     processingExpiresAt: null,
     createdAt: "2026-06-07T12:00:00.000Z",
     updatedAt: "2026-06-07T12:00:00.000Z",
-    bottleCheckIds: [],
     price: {
       id: 9902,
       name: `${testBrand.name} ${createdBottleName}`,

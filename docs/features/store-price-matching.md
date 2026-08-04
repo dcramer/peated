@@ -329,10 +329,12 @@ Moderators can:
 - ignore a proposal
 - approve complete Bottle create-new input
 
-The same Incoming Listings row shows its linked check summary, findings, and
-review operations. The existing match controls keep owning the primary listing
-decision. Supplemental work remains on that row until it is disposed; it does
-not create a duplicate Bottle Checks inbox item.
+Incoming Listings owns only the primary listing decision. Once that decision is
+complete, an actionable linked check appears in Audits under the
+Incoming Listings source and the completed proposal leaves the listing queue.
+This keeps supplemental catalog findings and review operations in the same
+inbox as other Bottle audit work without exposing them before their primary
+listing decision is settled.
 
 Each review operation is read-only until separately approved. Approval never
 means “apply the whole agent result”: selected `update_bottle`,

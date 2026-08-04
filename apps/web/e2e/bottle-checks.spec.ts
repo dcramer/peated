@@ -55,6 +55,7 @@ test("disposes non-ready and live-ready operations independently", async ({
   await expect(
     page.getByRole("heading", { name: "Bottle audit" }),
   ).toBeVisible();
+  await page.getByText("Classifier run details", { exact: true }).click();
   await expect(page.getByText("10,800", { exact: true })).toBeVisible();
   await expect(page.getByText("$0.0440", { exact: true })).toBeVisible();
   await expect(page.getByText("2.4 sec", { exact: true })).toBeVisible();
@@ -66,7 +67,7 @@ test("disposes non-ready and live-ready operations independently", async ({
     .filter({ hasText: "Review the second inspected Brand" });
 
   await expect(
-    readyOperation.getByRole("button", { name: "Apply" }),
+    readyOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeEnabled();
   await readyOperation
     .getByRole("button", { name: "Copy operation payload" })
@@ -93,44 +94,56 @@ test("disposes non-ready and live-ready operations independently", async ({
     ),
   ).toBeVisible();
   await expect(
-    nonReadyOperation.getByRole("button", { name: "Apply" }),
+    nonReadyOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeDisabled();
-  await nonReadyOperation.getByRole("button", { name: "Reject" }).click();
+  await nonReadyOperation
+    .getByRole("button", { name: "Remove operation" })
+    .click();
   await expect(
-    nonReadyOperation.getByRole("button", { name: "Confirm rejection" }),
+    nonReadyOperation.getByRole("button", { name: "Confirm removal" }),
   ).toBeEnabled();
+  await nonReadyOperation
+    .getByRole("button", { name: "Confirm removal" })
+    .click();
+  await expect(
+    page.getByText("Operation removed", { exact: false }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Undo remove" }).click();
+  await expect(
+    nonReadyOperation.getByRole("button", { name: "Apply included changes" }),
+  ).toBeDisabled();
+
+  await nonReadyOperation
+    .getByRole("button", { name: "Remove operation" })
+    .click();
   const rejectionRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/audits/rejectSelected"),
   );
   await nonReadyOperation
-    .getByRole("button", { name: "Confirm rejection" })
+    .getByRole("button", { name: "Confirm removal" })
     .click();
   await rejectionRequest;
 
-  await expect(
-    nonReadyOperation.getByText("Rejected", { exact: true }),
-  ).toBeVisible();
+  await page.getByText("Reviewed operations (1)", { exact: true }).click();
+  await expect(page.getByText("Removed", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("region", { name: "Operation results" }),
   ).toHaveCount(0);
   await expect(
-    readyOperation.getByRole("button", { name: "Apply" }),
+    readyOperation.getByRole("button", { name: "Apply included changes" }),
   ).toBeEnabled();
   await expectNoHorizontalOverflow(page);
 
   const approvalRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/audits/approveSelected"),
   );
-  await readyOperation.getByRole("button", { name: "Apply" }).click();
+  await readyOperation
+    .getByRole("button", { name: "Apply included changes" })
+    .click();
   await approvalRequest;
 
-  await expect(
-    readyOperation.getByText("Applied", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    nonReadyOperation.getByText("Rejected", { exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole("checkbox", { name: "Select" })).toHaveCount(0);
+  await expect(page).toHaveURL("/admin/audits");
+  await expect(page.getByText("No audits need attention.")).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 

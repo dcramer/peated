@@ -1,10 +1,13 @@
 "use client";
 
-import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowRightIcon,
+  DocumentDuplicateIcon,
+} from "@heroicons/react/24/outline";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import Button from "@peated/web/components/button";
 import Link from "@peated/web/components/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 type Details = Outputs["audits"]["details"];
 export type BottleOperation = Details["audit"]["operations"][number];
@@ -14,6 +17,9 @@ export type BottleOperationReview = NonNullable<
 export type BottleOperationEvidence =
   BottleOperation["proposal"]["evidenceRefs"][number];
 type RejectionReason = Inputs["audits"]["rejectSelected"]["reason"];
+export type ExcludedOperationField = NonNullable<
+  Inputs["audits"]["approveSelected"]["operations"][number]["excludedFields"]
+>[number];
 
 const REJECTION_REASONS: Array<{
   id: RejectionReason;
@@ -29,7 +35,7 @@ const REJECTION_REASONS: Array<{
 const STATUS_LABELS: Record<BottleOperation["status"], string> = {
   blocked: "Blocked",
   pending_review: "Pending review",
-  rejected: "Rejected",
+  rejected: "Removed",
   applying: "Applying",
   applied: "Applied",
   stale: "Stale",
@@ -132,45 +138,139 @@ function Warnings({
 function FieldDiff({
   after,
   before,
+  editableFields = [],
+  excludedFields = new Set(),
   fields,
   labelField = formatFieldLabel,
+  onToggleField,
 }: {
   after: unknown;
   before: unknown;
+  editableFields?: readonly string[];
+  excludedFields?: ReadonlySet<string>;
   fields: string[];
   labelField?: (field: string) => string;
+  onToggleField?: (field: ExcludedOperationField) => void;
 }) {
+  function renderToggle(field: string, excluded: boolean) {
+    const editable = editableFields.includes(field);
+    if (!onToggleField) return null;
+    if (!editable) {
+      return <span className="text-xs text-slate-500">Linked</span>;
+    }
+    return (
+      <button
+        aria-label={`${excluded ? "Include" : "Exclude"} ${labelField(field)}`}
+        aria-pressed={!excluded}
+        className={`focus-visible:outline-peated min-h-9 rounded border px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+          excluded
+            ? "border-slate-700 text-slate-400 hover:border-slate-600 hover:text-white"
+            : "border-emerald-700 bg-emerald-950/40 text-emerald-200 hover:bg-emerald-900/50"
+        }`}
+        onClick={() => onToggleField(field as ExcludedOperationField)}
+        type="button"
+      >
+        {excluded ? "Skipped" : "Use"}
+      </button>
+    );
+  }
+
   return (
-    <div className="mt-3 overflow-x-auto">
-      <table className="min-w-full divide-y divide-slate-800 text-sm">
+    <div className="mt-3">
+      <div className="space-y-2 sm:hidden">
+        {fields.map((field) => {
+          const excluded = excludedFields.has(field);
+          return (
+            <div
+              className={`rounded-lg border border-slate-800 bg-slate-950/60 p-3 ${
+                excluded ? "opacity-50" : ""
+              }`}
+              key={field}
+            >
+              <div className="flex min-h-9 items-center justify-between gap-3">
+                <div
+                  className={`text-sm font-semibold text-slate-200 ${
+                    excluded ? "line-through" : ""
+                  }`}
+                >
+                  {labelField(field)}
+                </div>
+                {renderToggle(field, excluded)}
+              </div>
+              <dl className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2">
+                <div className="min-w-0">
+                  <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                    Current
+                  </dt>
+                  <dd className="mt-1 break-words text-sm text-slate-400">
+                    {formatValue(getPath(before, field))}
+                  </dd>
+                </div>
+                <ArrowRightIcon
+                  aria-hidden="true"
+                  className="mt-5 h-4 w-4 text-slate-600"
+                />
+                <div className="min-w-0">
+                  <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                    Proposed
+                  </dt>
+                  <dd className="mt-1 break-words text-sm font-medium text-white">
+                    {formatValue(getPath(after, field))}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          );
+        })}
+      </div>
+      <table className="hidden min-w-full divide-y divide-slate-800 text-sm sm:table">
         <thead>
           <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
+            {onToggleField ? <th className="w-20 py-2 pr-4">Apply</th> : null}
             <th className="py-2 pr-4">Field</th>
             <th className="py-2 pr-4">Current</th>
             <th className="py-2">Proposed</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-800">
-          {fields.map((field) => (
-            <tr key={field}>
-              <td className="py-2 pr-4 font-medium text-slate-300">
-                {labelField(field)}
-              </td>
-              <td className="py-2 pr-4 text-slate-400">
-                {formatValue(getPath(before, field))}
-              </td>
-              <td className="py-2 text-white">
-                {formatValue(getPath(after, field))}
-              </td>
-            </tr>
-          ))}
+          {fields.map((field) => {
+            const excluded = excludedFields.has(field);
+            return (
+              <tr className={excluded ? "opacity-50" : undefined} key={field}>
+                {onToggleField ? (
+                  <td className="py-2 pr-4">{renderToggle(field, excluded)}</td>
+                ) : null}
+                <td className="py-2 pr-4 font-medium text-slate-300">
+                  <span className={excluded ? "line-through" : undefined}>
+                    {labelField(field)}
+                  </span>
+                </td>
+                <td className="py-2 pr-4 text-slate-400">
+                  {formatValue(getPath(before, field))}
+                </td>
+                <td className="py-2 text-white">
+                  {formatValue(getPath(after, field))}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
   );
 }
 
-function Preview({ review }: { review: BottleOperationReview }) {
+function Preview({
+  editableFields,
+  excludedFields,
+  onToggleField,
+  review,
+}: {
+  editableFields: readonly string[];
+  excludedFields: ReadonlySet<string>;
+  onToggleField?: (field: ExcludedOperationField) => void;
+  review: BottleOperationReview;
+}) {
   if (review.status === "blocked") {
     return (
       <div className="mt-4 rounded border border-red-900 bg-red-950/40 p-3 text-sm text-red-200">
@@ -189,8 +289,11 @@ function Preview({ review }: { review: BottleOperationReview }) {
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
+            editableFields={editableFields}
+            excludedFields={excludedFields}
             fields={review.preview.changedFields}
             labelField={formatBottleFieldLabel}
+            onToggleField={onToggleField}
           />
           <ImpactList
             hideSingles
@@ -229,7 +332,10 @@ function Preview({ review }: { review: BottleOperationReview }) {
           <FieldDiff
             after={review.preview.after}
             before={review.preview.before}
+            editableFields={editableFields}
+            excludedFields={excludedFields}
             fields={review.preview.changedFields}
+            onToggleField={onToggleField}
           />
           <ImpactList hideSingles values={review.preview.impact} />
           <Warnings warnings={review.preview.warnings} />
@@ -435,11 +541,33 @@ export function isBottleOperationRejectable(operation: BottleOperation) {
   return REJECTABLE_OPERATION_STATUSES.has(operation.status);
 }
 
+function getEditableFields(
+  operation: BottleOperation,
+): ExcludedOperationField[] {
+  const proposal = operation.proposal;
+  if (proposal.type === "update_entity") {
+    return Object.keys(proposal.input.patch) as ExcludedOperationField[];
+  }
+  if (proposal.type === "update_bottle") {
+    return [
+      ...Object.keys(proposal.input.patch.shared ?? {}).map(
+        (field) => `shared.${field}` as ExcludedOperationField,
+      ),
+      ...Object.keys(proposal.input.patch.exact ?? {}).map(
+        (field) => `exact.${field}` as ExcludedOperationField,
+      ),
+    ];
+  }
+  return [];
+}
+
 export default function OperationCard({
   approvalReady = false,
   actionError = null,
   copying = false,
+  compact = false,
   disabled = false,
+  actionPending = false,
   onApply,
   onCopy,
   onReject,
@@ -450,24 +578,42 @@ export default function OperationCard({
 }: {
   approvalReady?: boolean;
   actionError?: string | null;
+  actionPending?: boolean;
+  compact?: boolean;
   copying?: boolean;
   disabled?: boolean;
-  onApply?: (operationId: number) => void;
+  onApply?: (
+    operationId: number,
+    excludedFields: ExcludedOperationField[],
+  ) => void;
   onCopy?: (operationId: number) => void;
   onReject?: (
     operationId: number,
     reason: RejectionReason,
     note?: string,
-  ) => void;
+  ) => Promise<void> | void;
   onRetry?: (operationId: number) => void;
   operation: BottleOperation;
   review: BottleOperationReview | null;
   showDisposition?: boolean;
 }) {
   const [rejecting, setRejecting] = useState(false);
+  const [pendingRemoval, setPendingRemoval] = useState<{
+    note?: string;
+    reason: RejectionReason;
+  } | null>(null);
+  const [savingRemoval, setSavingRemoval] = useState(false);
+  const removalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rejectionPanel = useRef<HTMLDivElement | null>(null);
+  const undoButton = useRef<HTMLButtonElement | null>(null);
+  const mounted = useRef(true);
   const [rejectionReason, setRejectionReason] =
     useState<RejectionReason>("wrong_change");
   const [rejectionNote, setRejectionNote] = useState("");
+  const editableFields = getEditableFields(operation);
+  const [excludedFields, setExcludedFields] = useState<
+    Set<ExcludedOperationField>
+  >(() => new Set(operation.excludedFields as ExcludedOperationField[]));
   const notApprovalReady =
     showDisposition && operation.status === "pending_review" && !approvalReady;
   const canApply =
@@ -478,19 +624,114 @@ export default function OperationCard({
     showDisposition && !!onRetry && operation.status === "failed";
   const canConfirmRejection =
     rejectionReason !== "other" || rejectionNote.trim().length > 0;
+  const allFieldsExcluded =
+    editableFields.length > 0 &&
+    editableFields.every((field) => excludedFields.has(field));
+  const Heading = compact ? "h2" : "h3";
+
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (pendingRemoval && !savingRemoval) undoButton.current?.focus();
+  }, [pendingRemoval, savingRemoval]);
+
+  useEffect(() => {
+    if (!rejecting) return;
+    const frame = requestAnimationFrame(() => {
+      const panel = rejectionPanel.current;
+      if (!panel) return;
+      const reservedBottom = window.innerWidth < 1024 ? 112 : 16;
+      const overlap =
+        panel.getBoundingClientRect().bottom -
+        (window.innerHeight - reservedBottom);
+      if (overlap <= 0) return;
+      window.scrollBy({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        top: overlap + 16,
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [rejecting]);
+
+  function toggleField(field: ExcludedOperationField) {
+    setExcludedFields((current) => {
+      const next = new Set(current);
+      if (next.has(field)) next.delete(field);
+      else next.add(field);
+      return next;
+    });
+  }
+
+  function undoRemoval() {
+    if (removalTimer.current) clearTimeout(removalTimer.current);
+    removalTimer.current = null;
+    setPendingRemoval(null);
+  }
+
+  function stageRemoval() {
+    const removal = {
+      reason: rejectionReason,
+      ...(rejectionNote.trim() ? { note: rejectionNote.trim() } : {}),
+    };
+    setRejecting(false);
+    setPendingRemoval(removal);
+    removalTimer.current = setTimeout(async () => {
+      removalTimer.current = null;
+      if (mounted.current) setSavingRemoval(true);
+      await onReject?.(operation.id, removal.reason, removal.note);
+      if (mounted.current) {
+        setSavingRemoval(false);
+        setPendingRemoval(null);
+      }
+    }, 4_500);
+  }
+
+  if (pendingRemoval) {
+    return (
+      <article className="rounded-xl border border-amber-800/70 bg-amber-950/20 p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Heading className="font-semibold text-white">
+              {OPERATION_LABELS[operation.proposal.type]}
+            </Heading>
+            <p className="mt-1 text-sm text-amber-100" role="status">
+              {savingRemoval
+                ? "Removing operation…"
+                : "Operation removed. This will be saved shortly."}
+            </p>
+          </div>
+          {!savingRemoval ? (
+            <Button onClick={undoRemoval} ref={undoButton} size="small">
+              Undo remove
+            </Button>
+          ) : null}
+        </div>
+      </article>
+    );
+  }
 
   return (
-    <article className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+    <article className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-white">
+          <Heading className="font-semibold text-white">
             {OPERATION_LABELS[operation.proposal.type]}
-          </h3>
-          <span className="mt-2 inline-block rounded-full border border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-200">
-            {notApprovalReady
-              ? "Not ready to approve"
-              : STATUS_LABELS[operation.status]}
-          </span>
+          </Heading>
+          {!compact ||
+          operation.status !== "pending_review" ||
+          notApprovalReady ? (
+            <span className="mt-2 inline-block rounded-full border border-slate-700 px-2.5 py-1 text-xs font-semibold text-slate-200">
+              {notApprovalReady
+                ? "Not ready to approve"
+                : STATUS_LABELS[operation.status]}
+            </span>
+          ) : null}
         </div>
         {onCopy ? (
           <Button
@@ -514,22 +755,28 @@ export default function OperationCard({
         </p>
       ) : null}
 
-      {review ? <Preview review={review} /> : null}
+      {review ? (
+        <Preview
+          editableFields={editableFields}
+          excludedFields={excludedFields}
+          onToggleField={
+            operation.status === "pending_review" ? toggleField : undefined
+          }
+          review={review}
+        />
+      ) : null}
 
-      <details className="mt-4 border-t border-slate-800 pt-3">
-        <summary className="cursor-pointer text-sm font-medium text-slate-300 hover:text-white">
-          Evidence and reasoning
-        </summary>
-        <p className="mt-3 text-sm text-slate-300">
-          {operation.proposal.rationale}
+      {excludedFields.size > 0 ? (
+        <p className="mt-3 text-sm text-slate-400">
+          {excludedFields.size} proposed field
+          {excludedFields.size === 1 ? " is" : "s are"} struck out and will not
+          be applied.
         </p>
-        <EvidenceList evidence={operation.proposal.evidenceRefs} />
-        <ResourceLinks operation={operation} />
-      </details>
+      ) : null}
 
       {operation.rejectionReason ? (
         <div className="mt-4 text-sm text-slate-300">
-          Rejected: {operation.rejectionReason.replaceAll("_", " ")}
+          Removed: {operation.rejectionReason.replaceAll("_", " ")}
           {operation.reviewerNote ? ` — ${operation.reviewerNote}` : ""}
         </div>
       ) : null}
@@ -547,29 +794,42 @@ export default function OperationCard({
       ) : null}
 
       {canApply || canReject || canRetry ? (
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-800 pt-4">
+        <div className="-mx-4 mt-4 grid grid-cols-2 gap-2 border-y border-slate-800 bg-slate-900/95 px-4 py-3 sm:mx-0 sm:flex sm:flex-wrap sm:border-b-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-4">
           {canApply ? (
             <Button
-              color="primary"
-              disabled={disabled || !approvalReady}
-              onClick={() => onApply?.(operation.id)}
+              aria-label="Apply included changes"
+              className="min-h-10 sm:flex-none"
+              color={
+                approvalReady && !allFieldsExcluded ? "highlight" : undefined
+              }
+              disabled={disabled || !approvalReady || allFieldsExcluded}
+              loading={actionPending}
+              onClick={() => onApply?.(operation.id, [...excludedFields])}
               size="small"
             >
-              Apply
+              {actionPending
+                ? "Applying…"
+                : compact
+                  ? "Apply"
+                  : "Apply included changes"}
             </Button>
           ) : null}
           {canReject ? (
             <Button
+              aria-label="Remove operation"
+              className="min-h-10 sm:flex-none"
               disabled={disabled}
               onClick={() => setRejecting((value) => !value)}
               size="small"
             >
-              Reject
+              {compact ? "Remove" : "Remove operation"}
             </Button>
           ) : null}
           {canRetry ? (
             <Button
+              className="min-h-10 sm:flex-none"
               disabled={disabled}
+              loading={actionPending}
               onClick={() => onRetry?.(operation.id)}
               size="small"
             >
@@ -579,8 +839,22 @@ export default function OperationCard({
         </div>
       ) : null}
 
+      <details className="mt-4 border-t border-slate-800 pt-3">
+        <summary className="cursor-pointer text-sm font-medium text-slate-300 hover:text-white">
+          {compact ? "Evidence" : "Evidence and reasoning"}
+        </summary>
+        <p className="mt-3 text-sm text-slate-300">
+          {operation.proposal.rationale}
+        </p>
+        <EvidenceList evidence={operation.proposal.evidenceRefs} />
+        <ResourceLinks operation={operation} />
+      </details>
+
       {rejecting && canReject ? (
-        <div className="mt-3 rounded border border-slate-800 bg-slate-950 p-3">
+        <div
+          className="mt-3 scroll-mb-32 rounded border border-slate-800 bg-slate-950 p-3"
+          ref={rejectionPanel}
+        >
           <div className="grid gap-3 sm:grid-cols-[180px_minmax(0,1fr)]">
             <label className="text-xs text-slate-300">
               Reason
@@ -615,17 +889,12 @@ export default function OperationCard({
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
+              color="danger"
               disabled={disabled || !canConfirmRejection}
-              onClick={() =>
-                onReject?.(
-                  operation.id,
-                  rejectionReason,
-                  rejectionNote.trim() || undefined,
-                )
-              }
+              onClick={stageRemoval}
               size="small"
             >
-              Confirm rejection
+              Confirm removal
             </Button>
             <Button
               disabled={disabled}

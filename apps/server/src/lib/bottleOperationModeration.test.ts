@@ -222,7 +222,10 @@ describe("Bottle operation moderation", () => {
     ).resolves.toEqual([]);
     await expect(
       approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       ),
     ).resolves.toEqual([
@@ -293,7 +296,10 @@ describe("Bottle operation moderation", () => {
 
     await expect(
       approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         user,
       ),
     ).rejects.toThrow("Moderator authorization is required");
@@ -329,7 +335,10 @@ describe("Bottle operation moderation", () => {
     const results = await approveBottleOperations(
       {
         checkId: created.check.id,
-        operationIds: [firstOperation!.id, secondOperation!.id],
+        operations: [
+          { operationId: firstOperation!.id },
+          { operationId: secondOperation!.id },
+        ],
       },
       moderator,
     );
@@ -357,7 +366,7 @@ describe("Bottle operation moderation", () => {
       await approveBottleOperations(
         {
           checkId: created.check.id,
-          operationIds: [firstOperation!.id],
+          operations: [{ operationId: firstOperation!.id }],
         },
         moderator,
       ),
@@ -386,7 +395,10 @@ describe("Bottle operation moderation", () => {
 
     expect(
       await approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       ),
     ).toEqual([{ operationId: operation.id, status: "applied", error: null }]);
@@ -435,7 +447,10 @@ describe("Bottle operation moderation", () => {
       ]);
 
       approval = approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       );
       await waitForSessionBlockedBy(client, blockerPid);
@@ -491,7 +506,10 @@ describe("Bottle operation moderation", () => {
       ]);
 
       approval = approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       );
       await waitForSessionBlockedBy(client, blockerPid);
@@ -563,7 +581,10 @@ describe("Bottle operation moderation", () => {
 
     expect(
       await approveBottleOperations(
-        { checkId: mergeCheck.check.id, operationIds: [mergeOperation.id] },
+        {
+          checkId: mergeCheck.check.id,
+          operations: [{ operationId: mergeOperation.id }],
+        },
         moderator,
       ),
     ).toEqual([
@@ -603,7 +624,7 @@ describe("Bottle operation moderation", () => {
       updateApproval = approveBottleOperations(
         {
           checkId: updateCheck.check.id,
-          operationIds: [updateOperation.id],
+          operations: [{ operationId: updateOperation.id }],
         },
         moderator,
         updateDatabase,
@@ -700,7 +721,9 @@ describe("Bottle operation moderation", () => {
     const results = await approveBottleOperations(
       {
         checkId: created.check.id,
-        operationIds: created.check.operations.map(({ id }) => id),
+        operations: created.check.operations.map(({ id: operationId }) => ({
+          operationId,
+        })),
       },
       moderator,
     );
@@ -740,7 +763,10 @@ describe("Bottle operation moderation", () => {
 
     expect(
       await approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       ),
     ).toEqual([
@@ -791,7 +817,10 @@ describe("Bottle operation moderation", () => {
 
     expect(
       await approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       ),
     ).toEqual([
@@ -883,7 +912,10 @@ describe("Bottle operation moderation", () => {
 
     expect(
       await approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       ),
     ).toEqual([{ operationId: operation.id, status: "applying", error: null }]);
@@ -999,7 +1031,7 @@ describe("Bottle operation moderation", () => {
       for (const operationId of operationIds) {
         expect(
           await approveBottleOperations(
-            { checkId: created.check.id, operationIds: [operationId] },
+            { checkId: created.check.id, operations: [{ operationId }] },
             moderator,
           ),
         ).toEqual([
@@ -1140,7 +1172,10 @@ describe("Bottle operation moderation", () => {
       .where(eq(bottleChecks.id, created.check.id));
     expect(
       await approveBottleOperations(
-        { checkId: created.check.id, operationIds: [operation.id] },
+        {
+          checkId: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         moderator,
       ),
     ).toEqual([

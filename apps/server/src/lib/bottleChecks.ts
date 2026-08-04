@@ -17,6 +17,7 @@ import {
   bottleChecks,
   bottleOperations,
   storePriceMatchAttempts,
+  storePriceMatchProposals,
   type BottleCheck,
   type BottleOperation,
   type User,
@@ -114,7 +115,9 @@ export const ListActionableBottleChecksInputSchema = z
   .object({
     cursor: z.coerce.number().int().positive().default(1),
     limit: z.coerce.number().int().positive().max(100).default(50),
-    origin: AuditBottleOriginSchema.optional(),
+    source: z
+      .enum(["incoming_listing", "moderator", "new_bottle", "photo_scan"])
+      .optional(),
   })
   .strict()
   .default({
@@ -709,23 +712,69 @@ export async function listActionableBottleChecks(
         ),
       ),
   );
+  // Store-price checks become Bottle Checks work only after the listing queue
+  // has finished its authoritative assignment decision.
+  const completedStorePriceCheck = and(
+    eq(bottleChecks.intent, "resolve_reference"),
+    eq(bottleChecks.sourceKind, "store_price"),
+    exists(
+      database
+        .select({ id: storePriceMatchProposals.id })
+        .from(storePriceMatchProposals)
+        .where(
+          and(
+            eq(
+              storePriceMatchProposals.id,
+              bottleChecks.storePriceMatchProposalId,
+            ),
+            inArray(storePriceMatchProposals.status, [
+              "approved",
+              "ignored",
+              "verified",
+            ]),
+          ),
+        ),
+    ),
+  );
+  let sourceFilter = or(
+    eq(bottleChecks.intent, "audit_bottle"),
+    and(
+      eq(bottleChecks.intent, "resolve_reference"),
+      eq(bottleChecks.sourceKind, "photo_identification"),
+    ),
+    completedStorePriceCheck,
+  );
+  switch (input.source) {
+    case "incoming_listing":
+      sourceFilter = completedStorePriceCheck;
+      break;
+    case "moderator":
+      sourceFilter = and(
+        eq(bottleChecks.intent, "audit_bottle"),
+        eq(bottleChecks.origin, "moderator"),
+      );
+      break;
+    case "new_bottle":
+      sourceFilter = and(
+        eq(bottleChecks.intent, "audit_bottle"),
+        eq(bottleChecks.origin, "post_user_creation"),
+      );
+      break;
+    case "photo_scan":
+      sourceFilter = and(
+        eq(bottleChecks.intent, "resolve_reference"),
+        eq(bottleChecks.sourceKind, "photo_identification"),
+      );
+      break;
+    case undefined:
+      break;
+  }
   const rows = await database
     .select()
     .from(bottleChecks)
     .where(
       and(
-        input.origin
-          ? and(
-              eq(bottleChecks.intent, "audit_bottle"),
-              eq(bottleChecks.origin, input.origin),
-            )
-          : or(
-              eq(bottleChecks.intent, "audit_bottle"),
-              and(
-                eq(bottleChecks.intent, "resolve_reference"),
-                eq(bottleChecks.sourceKind, "photo_identification"),
-              ),
-            ),
+        sourceFilter,
         isNull(bottleChecks.closedAt),
         or(
           ne(bottleChecks.schemaVersion, BOTTLE_CHECK_SCHEMA_VERSION),

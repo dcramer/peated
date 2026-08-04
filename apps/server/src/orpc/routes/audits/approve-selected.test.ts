@@ -92,7 +92,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
 
     const error = await waitError(() =>
       routerClient.audits.approveSelected(
-        { audit: 1, operationIds: [1] },
+        { audit: 1, operations: [{ operationId: 1 }] },
         { context: { user } },
       ),
     );
@@ -172,7 +172,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       await routerClient.audits.approveSelected(
         {
           audit: created.check.id,
-          operationIds: [operation.id],
+          operations: [{ operationId: operation.id }],
         },
         { context: { user: moderator } },
       ),
@@ -184,6 +184,84 @@ describe("POST /audits/{audit}/operations/approve", () => {
         where: eq(entities.id, entity.id),
       }),
     ).toMatchObject({ name: "Route Entity After" });
+  });
+
+  test("applies an update while preserving fields excluded by the moderator", async ({
+    fixtures,
+  }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity({
+      name: "Scoped Entity Before",
+      website: "https://before.example.com",
+    });
+    const bottle = await fixtures.Bottle({ brandId: entity.id });
+    const created = await createBottleCheck({
+      intent: "audit_bottle",
+      input: { bottleId: bottle.id, origin: "moderator" },
+      result: {
+        summary: "Update only the supported Entity fields.",
+        proposedOperations: [
+          {
+            type: "update_entity",
+            input: {
+              entityId: entity.id,
+              patch: {
+                name: "Scoped Entity After",
+                website: "https://wrong.example.com",
+              },
+            },
+            rationale: "The name is supported but the website is not.",
+            evidenceRefs: [{ kind: "entity", entityId: entity.id }],
+          },
+        ],
+        findings: [],
+        artifacts: {
+          resolvedEntities: [{ entityId: entity.id, name: entity.name }],
+          entityContexts: [
+            {
+              entityId: entity.id,
+              name: entity.name,
+              shortName: entity.shortName,
+              roles: entity.type,
+              website: entity.website,
+              country: null,
+              region: null,
+              yearEstablished: entity.yearEstablished,
+              aliases: [],
+              relatedBottles: [],
+            },
+          ],
+        },
+      },
+    });
+    const operation = created.check.operations[0]!;
+
+    expect(
+      await routerClient.audits.approveSelected(
+        {
+          audit: created.check.id,
+          operations: [
+            { operationId: operation.id, excludedFields: ["website"] },
+          ],
+        },
+        { context: { user: moderator } },
+      ),
+    ).toEqual({
+      results: [{ operationId: operation.id, status: "applied", error: null }],
+    });
+    expect(
+      await db.query.entities.findFirst({
+        where: eq(entities.id, entity.id),
+      }),
+    ).toMatchObject({
+      name: "Scoped Entity After",
+      website: "https://before.example.com",
+    });
+    expect(
+      await db.query.bottleOperations.findFirst({
+        where: eq(bottleOperations.id, operation.id),
+      }),
+    ).toMatchObject({ excludedFields: ["website"], status: "applied" });
   });
 
   test("applies a Bottle relationship to an inspected Entity that lacks the role", async ({
@@ -250,7 +328,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       await routerClient.audits.approveSelected(
         {
           audit: created.check.id,
-          operationIds: [bottleOperation.id],
+          operations: [{ operationId: bottleOperation.id }],
         },
         { context: { user: moderator } },
       ),
@@ -359,7 +437,10 @@ describe("POST /audits/{audit}/operations/approve", () => {
 
     expect(
       await routerClient.audits.approveSelected(
-        { audit: created.check.id, operationIds },
+        {
+          audit: created.check.id,
+          operations: operationIds.map((operationId) => ({ operationId })),
+        },
         { context: { user: moderator } },
       ),
     ).toMatchObject({
@@ -435,7 +516,10 @@ describe("POST /audits/{audit}/operations/approve", () => {
 
     expect(
       await routerClient.audits.approveSelected(
-        { audit: created.check.id, operationIds: [operation.id] },
+        {
+          audit: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -489,7 +573,10 @@ describe("POST /audits/{audit}/operations/approve", () => {
     ]);
     expect(
       await routerClient.audits.approveSelected(
-        { audit: created.check.id, operationIds: [operation.id] },
+        {
+          audit: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -655,7 +742,10 @@ describe("POST /audits/{audit}/operations/approve", () => {
     ]);
     expect(
       await routerClient.audits.approveSelected(
-        { audit: created.check.id, operationIds: [operation.id] },
+        {
+          audit: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -733,7 +823,10 @@ describe("POST /audits/{audit}/operations/approve", () => {
 
     expect(
       await routerClient.audits.approveSelected(
-        { audit: created.check.id, operationIds: [operation.id] },
+        {
+          audit: created.check.id,
+          operations: [{ operationId: operation.id }],
+        },
         { context: { user: moderator } },
       ),
     ).toEqual({
@@ -876,7 +969,7 @@ describe("POST /audits/{audit}/operations/approve", () => {
       approveBottleOperations(
         {
           checkId: created.check.id,
-          operationIds: [operation.id],
+          operations: [{ operationId: operation.id }],
         },
         moderator,
         concurrentDatabase,

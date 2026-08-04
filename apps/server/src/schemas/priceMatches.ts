@@ -262,7 +262,6 @@ export const StorePriceMatchQueueItemSchema =
     }),
     currentBottle: BottleSchema.nullable(),
     suggestedBottle: BottleSchema.nullable(),
-    bottleCheckIds: z.array(z.number().int().positive()),
   });
 
 export const StorePriceMatchQueueListResponse = z.object({

@@ -78,7 +78,7 @@ export function BottleCheckSubject({
     return (
       <span className="text-slate-300">
         {check.sourceKind === "store_price"
-          ? "Store price"
+          ? "Incoming listing"
           : "Bottle reference"}
         {check.sourceId ? ` #${check.sourceId}` : ""}
       </span>

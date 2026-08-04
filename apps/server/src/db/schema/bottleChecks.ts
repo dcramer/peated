@@ -135,6 +135,10 @@ export const bottleOperations = pgTable(
       .references(() => bottleChecks.id, { onDelete: "cascade" })
       .notNull(),
     proposal: jsonb("proposal").$type<ProposedOperation>().notNull(),
+    excludedFields: jsonb("excluded_fields")
+      .$type<string[]>()
+      .default([])
+      .notNull(),
     stateToken: jsonb("state_token").$type<Record<string, unknown>>(),
     preparationError:
       jsonb("preparation_error").$type<Record<string, unknown>>(),

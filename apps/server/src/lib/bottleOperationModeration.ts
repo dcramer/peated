@@ -75,10 +75,55 @@ export const SelectedBottleOperationIdsSchema = z
     message: "Operation ids must be unique.",
   });
 
+const BottleOperationFieldPathSchema = z.enum([
+  "shared.name",
+  "shared.statedAge",
+  "shared.seriesId",
+  "shared.category",
+  "shared.brand",
+  "shared.distillers",
+  "shared.bottler",
+  "exact.edition",
+  "exact.statedAge",
+  "exact.abv",
+  "exact.singleCask",
+  "exact.caskStrength",
+  "exact.vintageYear",
+  "exact.releaseYear",
+  "exact.caskSize",
+  "exact.caskType",
+  "exact.caskFill",
+  "name",
+  "shortName",
+  "roles",
+  "website",
+  "country",
+  "region",
+  "yearEstablished",
+]);
+
+const SelectedBottleOperationSchema = z
+  .object({
+    operationId: PositiveIdSchema,
+    excludedFields: z.array(BottleOperationFieldPathSchema).default([]),
+  })
+  .strict();
+
+export const SelectedBottleOperationsSchema = z
+  .array(SelectedBottleOperationSchema)
+  .min(1)
+  .max(DEFAULT_MAX_PROPOSED_OPERATIONS)
+  .refine(
+    (operations) =>
+      new Set(operations.map(({ operationId }) => operationId)).size ===
+      operations.length,
+    { message: "Operation ids must be unique." },
+  );
+
 export const ApproveBottleOperationsInputSchema = z
   .object({
     checkId: PositiveIdSchema,
-    operationIds: SelectedBottleOperationIdsSchema,
+    operations: SelectedBottleOperationsSchema,
   })
   .strict();
 
@@ -133,6 +178,8 @@ type PreparedExecution = {
   status: "applied" | "applying";
   afterCommit: () => Promise<void>;
 };
+
+type BottleOperationFieldPath = z.infer<typeof BottleOperationFieldPathSchema>;
 
 const REJECTABLE_STATUSES = new Set<BottleOperation["status"]>([
   "blocked",
@@ -286,6 +333,77 @@ function sourceFieldsForCheck(check: BottleCheck): string[] {
   return getPersistedBottleCheckSourceEvidencePaths(check);
 }
 
+function proposalWithoutExcludedFields(
+  operation: BottleOperation,
+  excludedFields: readonly BottleOperationFieldPath[],
+) {
+  const proposal = ProposedOperationSchema.parse(operation.proposal);
+  if (excludedFields.length === 0) return proposal;
+  if (proposal.type === "merge_bottles" || proposal.type === "merge_entities") {
+    throw new BottleOperationActionError(
+      "Merge operations cannot exclude individual fields.",
+      operation.status,
+    );
+  }
+
+  const excluded = new Set(excludedFields);
+  if (proposal.type === "update_entity") {
+    const patch = { ...proposal.input.patch };
+    for (const field of excluded) {
+      if (field.includes(".") || !(field in patch)) {
+        throw new BottleOperationActionError(
+          `Field ${field} is not part of Bottle operation ${operation.id}.`,
+          operation.status,
+        );
+      }
+      delete patch[field as keyof typeof patch];
+    }
+    if (Object.keys(patch).length === 0) {
+      throw new BottleOperationActionError(
+        "At least one field must remain, or the whole operation should be removed.",
+        operation.status,
+      );
+    }
+    return ProposedOperationSchema.parse({
+      ...proposal,
+      input: { ...proposal.input, patch },
+    });
+  }
+
+  const shared = proposal.input.patch.shared
+    ? { ...proposal.input.patch.shared }
+    : undefined;
+  const exact = proposal.input.patch.exact
+    ? { ...proposal.input.patch.exact }
+    : undefined;
+  for (const field of excluded) {
+    const [scope, name, extra] = field.split(".");
+    const patch =
+      scope === "shared" ? shared : scope === "exact" ? exact : null;
+    if (!patch || !name || extra || !(name in patch)) {
+      throw new BottleOperationActionError(
+        `Field ${field} is not part of Bottle operation ${operation.id}.`,
+        operation.status,
+      );
+    }
+    delete patch[name as keyof typeof patch];
+  }
+  const filteredPatch = {
+    ...(shared && Object.keys(shared).length > 0 ? { shared } : {}),
+    ...(exact && Object.keys(exact).length > 0 ? { exact } : {}),
+  };
+  if (Object.keys(filteredPatch).length === 0) {
+    throw new BottleOperationActionError(
+      "At least one field must remain, or the whole operation should be removed.",
+      operation.status,
+    );
+  }
+  return ProposedOperationSchema.parse({
+    ...proposal,
+    input: { ...proposal.input, patch: filteredPatch },
+  });
+}
+
 async function reviewPreparationContextForCheck(
   check: BottleCheck,
   database: AnyDatabase,
@@ -413,21 +531,42 @@ async function markStale(
 
 async function prepareAndExecute({
   check,
+  excludedFields: requestedExcludedFields,
   moderator,
   operation,
   transaction,
 }: LockedOperationContext & {
+  excludedFields?: BottleOperationFieldPath[];
   moderator: User;
   transaction: AnyTransaction;
 }): Promise<PreparedExecution | BottleOperationActionResult> {
+  const excludedFields =
+    requestedExcludedFields ??
+    (operation.excludedFields as BottleOperationFieldPath[]);
   await assertPrimaryStorePriceDecisionTerminal(check, operation, transaction);
 
   let prepared: PreparedOperationExecution;
   try {
-    prepared = await prepareOperationForExecution({
+    const originalPrepared = await prepareOperationForExecution({
       operation,
       ...(await executionPreparationContextForCheck(check, transaction)),
     });
+    if (
+      !isDeepStrictEqual(
+        originalPrepared.review.stateToken,
+        operation.stateToken,
+      )
+    ) {
+      return await markStale(transaction, operation.id);
+    }
+    const proposal = proposalWithoutExcludedFields(operation, excludedFields);
+    prepared =
+      excludedFields.length === 0
+        ? originalPrepared
+        : await prepareOperationForExecution({
+            operation: { ...operation, proposal },
+            ...(await executionPreparationContextForCheck(check, transaction)),
+          });
   } catch (error) {
     if (error instanceof UnsupportedBottleCheckSchemaVersionError) {
       return actionError(
@@ -441,15 +580,12 @@ async function prepareAndExecute({
     throw error;
   }
 
-  if (!isDeepStrictEqual(prepared.review.stateToken, operation.stateToken)) {
-    return await markStale(transaction, operation.id);
-  }
-
   const reviewedAt = new Date();
   await transaction
     .update(bottleOperations)
     .set({
       status: "applying",
+      excludedFields,
       reviewedById: moderator.id,
       reviewedAt,
       rejectionReason: null,
@@ -589,11 +725,13 @@ async function runAfterCommit({
 async function approveOne({
   checkId,
   database,
+  excludedFields,
   moderator,
   operationId,
 }: {
   checkId: number;
   database: AnyConnection;
+  excludedFields: BottleOperationFieldPath[];
   moderator: User;
   operationId: number;
 }): Promise<BottleOperationActionResult> {
@@ -613,6 +751,7 @@ async function approveOne({
       }
       return await prepareAndExecute({
         ...context,
+        excludedFields,
         moderator,
         transaction,
       });
@@ -646,11 +785,12 @@ export async function approveBottleOperations(
   assertModerator(user);
   const input = ApproveBottleOperationsInputSchema.parse(rawInput);
   const results: BottleOperationActionResult[] = [];
-  for (const operationId of input.operationIds) {
+  for (const { operationId, excludedFields } of input.operations) {
     results.push(
       await approveOne({
         checkId: input.checkId,
         database,
+        excludedFields,
         moderator: user,
         operationId,
       }),
