@@ -328,6 +328,50 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
+  test("supports legacy blank short names in Entity merge review state", async ({
+    fixtures,
+  }) => {
+    const source = await fixtures.Entity({
+      name: "Legacy Blank Merge Source",
+      shortName: "",
+      type: ["distiller"],
+    });
+    const destination = await fixtures.Entity({
+      name: "Legacy Blank Merge Destination",
+      type: ["brand"],
+    });
+
+    const result = await prepareOperation({
+      operation: {
+        id: 6,
+        proposal: {
+          type: "merge_entities",
+          input: {
+            sourceEntityId: source.id,
+            destinationEntityId: destination.id,
+          },
+          rationale: "The inspected records identify the same producer.",
+          evidenceRefs: [
+            { kind: "entity", entityId: source.id },
+            { kind: "entity", entityId: destination.id },
+          ],
+        },
+      },
+      artifacts: artifacts({ entities: [source, destination] }),
+    });
+
+    expect(result).toMatchObject({
+      status: "pending_review",
+      type: "merge_entities",
+      preview: {
+        source: { entityId: source.id, shortName: null },
+      },
+      stateToken: {
+        source: { entityId: source.id, shortName: "" },
+      },
+    });
+  });
+
   test("reports merge membership and identity collisions as canonical merge warnings", async ({
     fixtures,
   }) => {

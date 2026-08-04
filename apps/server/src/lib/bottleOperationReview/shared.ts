@@ -337,7 +337,7 @@ export function entityPreviewState({
   return {
     entityId: entity.id,
     name: entity.name,
-    shortName: entity.shortName,
+    shortName: entity.shortName?.trim() || null,
     roles: [...entity.type].sort(),
     website: entity.website,
     location: {

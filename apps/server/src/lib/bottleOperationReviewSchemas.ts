@@ -16,6 +16,9 @@ export const MAX_OPERATION_PREVIEW_IDS = 20;
 
 const PositiveIdSchema = z.number().int().positive();
 const NonEmptyTextSchema = z.string().trim().min(1);
+// State tokens retain raw database values so legacy blanks still take part in
+// exact staleness comparisons.
+const RawEntityShortNameSchema = z.string().nullable();
 
 export const PreparationErrorCodeSchema = z.enum([
   "target_not_inspected",
@@ -252,9 +255,7 @@ const EntityDependencyStateSchema = z
   .object({
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    // State tokens retain raw database values so legacy blanks still take part
-    // in exact staleness comparisons.
-    shortName: z.string().nullable(),
+    shortName: RawEntityShortNameSchema,
     roles: EntityContextSchema.shape.roles,
   })
   .strict();
@@ -359,7 +360,7 @@ const EntityMergeIdentityStateSchema = z
   .object({
     entityId: PositiveIdSchema,
     name: NonEmptyTextSchema,
-    shortName: NonEmptyTextSchema.nullable(),
+    shortName: RawEntityShortNameSchema,
     roles: EntityContextSchema.shape.roles,
     aliasDigest: RelationshipDigestSchema,
     tombstoneDestinationEntityId: PositiveIdSchema.nullable(),
