@@ -3349,7 +3349,6 @@ describe("price match queue", () => {
       {
         priceId: price.id,
         force: true,
-        generateBottleCheck: true,
         processingToken: expect.any(String),
       },
     );

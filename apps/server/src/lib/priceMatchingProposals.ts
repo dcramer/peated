@@ -730,49 +730,38 @@ async function recordStorePriceMatchAttempt({
   return attempt;
 }
 
-async function tryPersistStorePriceBottleCheck({
-  attempt,
+async function persistStorePriceBottleCheck({
+  attemptId,
   classificationInput,
   classification,
+  database,
+  model,
   modelMetadata,
-  price,
-  proposal,
+  priceId,
 }: {
-  attempt: { id: number; suggestedBottleId: number | null };
+  attemptId: number;
   classificationInput: ClassifyBottleReferenceInput;
   classification: BottleClassificationResult;
+  database: AnyDatabase;
+  model: StorePriceMatchProposal["model"];
   modelMetadata: BottleReferenceRun["modelMetadata"];
-  price: StorePrice;
-  proposal: StorePriceMatchProposal;
+  priceId: number;
 }) {
-  try {
-    await createBottleCheck({
+  await createBottleCheck(
+    {
       intent: "resolve_reference",
       sourceKind: "store_price",
-      sourceId: price.id,
+      sourceId: priceId,
       input: classificationInput,
       result: classification,
       storePrice: {
-        attemptId: attempt.id,
+        attemptId,
       },
-      model: proposal.model,
+      model,
       modelMetadata,
-    });
-  } catch (error) {
-    logError(error, {
-      price: {
-        id: price.id,
-        name: price.name,
-      },
-      proposal: {
-        id: proposal.id,
-      },
-      extra: {
-        attemptId: attempt.id,
-        phase: "persist_store_price_bottle_check",
-      },
-    });
-  }
+    },
+    database,
+  );
 }
 
 async function markLatestStorePriceMatchAttemptFinalInTransaction(
@@ -1284,18 +1273,20 @@ export async function createBottleFromStorePriceMatchProposal({
   };
 }
 
+/**
+ * Owns full store-price classification persistence: the proposal, attempt, and
+ * linked Bottle check commit together before any automated catalog mutation.
+ */
 export async function resolveStorePriceMatchProposal(
   priceId: number,
   {
     candidateExpansion = "open",
     force = false,
-    generateBottleCheck = false,
     processingToken,
     reuseExistingExtraction = false,
   }: {
     candidateExpansion?: CandidateExpansionMode;
     force?: boolean;
-    generateBottleCheck?: boolean;
     processingToken?: string;
     reuseExistingExtraction?: boolean;
   } = {},
@@ -1349,7 +1340,6 @@ export async function resolveStorePriceMatchProposal(
   let candidates: PriceMatchCandidate[] = [];
   let searchEvidence: SearchEvidence[] = [];
   let classificationModelMetadata: BottleReferenceRun["modelMetadata"] = null;
-  const shouldGenerateBottleCheck = generateBottleCheck;
   try {
     // Price matching consumes the generic bottle classifier and only layers
     // price-specific persistence and automation policy on top of its result.
@@ -1393,13 +1383,22 @@ export async function resolveStorePriceMatchProposal(
           expectedProcessingToken: processingToken,
           tx,
         });
-      const ignoredResult = await db.transaction(async (tx) => {
+      const ignoredProposal = await db.transaction(async (tx) => {
         const proposal = await upsertIgnoredProposal(tx);
         const attempt = await recordStorePriceMatchAttempt({ proposal, tx });
+        await persistStorePriceBottleCheck({
+          attemptId: attempt.id,
+          classificationInput,
+          classification,
+          database: tx,
+          model: proposal.model,
+          modelMetadata: classificationModelMetadata,
+          priceId: price.id,
+        });
         if (
           !canClearIgnoredStorePriceAssignment({ proposal, processingToken })
         ) {
-          return { proposal, attempt };
+          return proposal;
         }
 
         if (price.bottleId !== null) {
@@ -1409,19 +1408,9 @@ export async function resolveStorePriceMatchProposal(
           });
         }
 
-        return { proposal, attempt };
+        return proposal;
       });
-      if (shouldGenerateBottleCheck) {
-        await tryPersistStorePriceBottleCheck({
-          attempt: ignoredResult.attempt,
-          classificationInput,
-          classification,
-          modelMetadata: classificationModelMetadata,
-          price,
-          proposal: ignoredResult.proposal,
-        });
-      }
-      return ignoredResult.proposal;
+      return ignoredProposal;
     }
 
     const classifierDecision = normalizeClassifierDecisionForPriceMatching(
@@ -1445,36 +1434,40 @@ export async function resolveStorePriceMatchProposal(
       webEvidenceJudgment:
         classification.decision.confidenceBasis?.webEvidence ?? null,
     });
-    const proposal = await upsertStorePriceMatchProposal({
-      price,
-      extractedLabel,
-      candidates,
-      decision,
-      decisionEvidence: {
-        hasUnresolvedRisks:
-          (classification.decision.confidenceBasis?.unresolvedRisks.length ??
-            0) > 0,
-        webEvidence:
-          classification.decision.confidenceBasis?.webEvidence ?? null,
-      },
-      automationAssessment,
-      searchEvidence,
-      expectedProcessingToken: processingToken,
-    });
-    const attempt = await recordStorePriceMatchAttempt({
-      proposal,
-      automationAssessment,
-    });
-    if (shouldGenerateBottleCheck) {
-      await tryPersistStorePriceBottleCheck({
-        attempt,
+    const { proposal, attempt } = await db.transaction(async (tx) => {
+      const proposal = await upsertStorePriceMatchProposal({
+        price,
+        extractedLabel,
+        candidates,
+        decision,
+        decisionEvidence: {
+          hasUnresolvedRisks:
+            (classification.decision.confidenceBasis?.unresolvedRisks.length ??
+              0) > 0,
+          webEvidence:
+            classification.decision.confidenceBasis?.webEvidence ?? null,
+        },
+        automationAssessment,
+        searchEvidence,
+        expectedProcessingToken: processingToken,
+        tx,
+      });
+      const attempt = await recordStorePriceMatchAttempt({
+        proposal,
+        automationAssessment,
+        tx,
+      });
+      await persistStorePriceBottleCheck({
+        attemptId: attempt.id,
         classificationInput,
         classification,
+        database: tx,
+        model: proposal.model,
         modelMetadata: classificationModelMetadata,
-        price,
-        proposal,
+        priceId: price.id,
       });
-    }
+      return { proposal, attempt };
+    });
 
     const shouldAutoCreate = shouldAutoCreateStorePriceMatchProposal({
       decision,
